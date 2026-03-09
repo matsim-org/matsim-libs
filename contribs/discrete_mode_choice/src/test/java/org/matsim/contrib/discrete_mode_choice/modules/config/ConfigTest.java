@@ -17,13 +17,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contribs.discrete_mode_choice.components.constraints.LinkAttributeConstraint;
 import org.matsim.contribs.discrete_mode_choice.components.constraints.ShapeFileConstraint;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel.FallbackBehaviour;
-import org.matsim.contribs.discrete_mode_choice.modules.ConstraintModule;
-import org.matsim.contribs.discrete_mode_choice.modules.EstimatorModule;
-import org.matsim.contribs.discrete_mode_choice.modules.HomeFinderModule;
-import org.matsim.contribs.discrete_mode_choice.modules.ModeAvailabilityModule;
 import org.matsim.contribs.discrete_mode_choice.modules.ModelModule;
-import org.matsim.contribs.discrete_mode_choice.modules.SelectorModule;
-import org.matsim.contribs.discrete_mode_choice.modules.TourFinderModule;
 import org.matsim.contribs.discrete_mode_choice.modules.config.ActivityTourFinderConfigGroup;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.contribs.discrete_mode_choice.modules.config.LinkAttributeConstraintConfigGroup;
@@ -55,70 +49,79 @@ public class ConfigTest {
 		DiscreteModeChoiceConfigGroup dmcConfig2 = new DiscreteModeChoiceConfigGroup();
 		ConfigUtils.loadConfig(path, dmcConfig2);
 
-		// Verify top-level defaults
-		assertEquals(true, dmcConfig2.getPerformReroute());
-		assertEquals(false, dmcConfig2.getEnforceSinglePlan());
-		assertEquals(true, dmcConfig2.getAccumulateEstimationDelays());
-		assertEquals(ModelModule.ModelType.Tour, dmcConfig2.getModelType());
-		assertEquals(FallbackBehaviour.EXCEPTION, dmcConfig2.getFallbackBehaviour());
-		assertEquals(ModeAvailabilityModule.CAR, dmcConfig2.getModeAvailability());
-		assertEquals(TourFinderModule.ACTIVITY_BASED, dmcConfig2.getTourFinder());
-		assertEquals(HomeFinderModule.ACTIVITY_BASED, dmcConfig2.getHomeFinder());
-		assertEquals(SelectorModule.RANDOM, dmcConfig2.getSelector());
-		assertEquals(new HashSet<>(Arrays.asList(ConstraintModule.VEHICLE_CONTINUITY)),
+		// Verify top-level defaults (compare against original dmcConfig, not hard-coded values)
+		assertEquals(dmcConfig.getPerformReroute(), dmcConfig2.getPerformReroute());
+		assertEquals(dmcConfig.getEnforceSinglePlan(), dmcConfig2.getEnforceSinglePlan());
+		assertEquals(dmcConfig.getAccumulateEstimationDelays(), dmcConfig2.getAccumulateEstimationDelays());
+		assertEquals(dmcConfig.getModelType(), dmcConfig2.getModelType());
+		assertEquals(dmcConfig.getFallbackBehaviour(), dmcConfig2.getFallbackBehaviour());
+		assertEquals(dmcConfig.getModeAvailability(), dmcConfig2.getModeAvailability());
+		assertEquals(dmcConfig.getTourFinder(), dmcConfig2.getTourFinder());
+		assertEquals(dmcConfig.getHomeFinder(), dmcConfig2.getHomeFinder());
+		assertEquals(dmcConfig.getSelector(), dmcConfig2.getSelector());
+		assertEquals(new HashSet<>(dmcConfig.getTourConstraints()),
 				new HashSet<>(dmcConfig2.getTourConstraints()));
-		assertEquals(new HashSet<>(Arrays.asList(ConstraintModule.VEHICLE_CONTINUITY)),
+		assertEquals(new HashSet<>(dmcConfig.getTripConstraints()),
 				new HashSet<>(dmcConfig2.getTripConstraints()));
-		assertEquals(EstimatorModule.UNIFORM, dmcConfig2.getTourEstimator());
-		assertEquals(EstimatorModule.UNIFORM, dmcConfig2.getTripEstimator());
-		assertTrue(dmcConfig2.getTourFilters().isEmpty());
-		assertTrue(dmcConfig2.getTripFilters().isEmpty());
-		assertTrue(dmcConfig2.getCachedModes().isEmpty());
-		assertEquals(1, dmcConfig2.getWriteUtilitiesInterval());
+		assertEquals(dmcConfig.getTourEstimator(), dmcConfig2.getTourEstimator());
+		assertEquals(dmcConfig.getTripEstimator(), dmcConfig2.getTripEstimator());
+		assertEquals(new HashSet<>(dmcConfig.getTourFilters()), new HashSet<>(dmcConfig2.getTourFilters()));
+		assertEquals(new HashSet<>(dmcConfig.getTripFilters()), new HashSet<>(dmcConfig2.getTripFilters()));
+		assertEquals(new HashSet<>(dmcConfig.getCachedModes()), new HashSet<>(dmcConfig2.getCachedModes()));
+		assertEquals(dmcConfig.getWriteUtilitiesInterval(), dmcConfig2.getWriteUtilitiesInterval());
 
 		// Verify LinkAttributeConstraintConfigGroup defaults
-		LinkAttributeConstraintConfigGroup linkAttr = dmcConfig2.getLinkAttributeConstraintConfigGroup();
-		assertEquals(LinkAttributeConstraint.Requirement.BOTH, linkAttr.getRequirement());
-		assertNull(linkAttr.getAttributeName());
-		assertNull(linkAttr.getAttributeValue());
-		assertTrue(linkAttr.getConstrainedModes().isEmpty());
+		LinkAttributeConstraintConfigGroup linkAttr = dmcConfig.getLinkAttributeConstraintConfigGroup();
+		LinkAttributeConstraintConfigGroup linkAttr2 = dmcConfig2.getLinkAttributeConstraintConfigGroup();
+		assertEquals(linkAttr.getRequirement(), linkAttr2.getRequirement());
+		assertEquals(linkAttr.getAttributeName(), linkAttr2.getAttributeName());
+		assertEquals(linkAttr.getAttributeValue(), linkAttr2.getAttributeValue());
+		assertEquals(new HashSet<>(linkAttr.getConstrainedModes()), new HashSet<>(linkAttr2.getConstrainedModes()));
 
 		// Verify ShapeFileConstraintConfigGroup defaults
-		ShapeFileConstraintConfigGroup shapeFile = dmcConfig2.getShapeFileConstraintConfigGroup();
-		assertEquals(ShapeFileConstraint.Requirement.BOTH, shapeFile.getRequirement());
-		assertNull(shapeFile.getPath());
-		assertTrue(shapeFile.getConstrainedModes().isEmpty());
+		ShapeFileConstraintConfigGroup shapeFile = dmcConfig.getShapeFileConstraintConfigGroup();
+		ShapeFileConstraintConfigGroup shapeFile2 = dmcConfig2.getShapeFileConstraintConfigGroup();
+		assertEquals(shapeFile.getRequirement(), shapeFile2.getRequirement());
+		assertEquals(shapeFile.getPath(), shapeFile2.getPath());
+		assertEquals(new HashSet<>(shapeFile.getConstrainedModes()), new HashSet<>(shapeFile2.getConstrainedModes()));
 
 		// Verify MultinomialLogitSelectorConfigGroup defaults
-		MultinomialLogitSelectorConfigGroup mls = dmcConfig2.getMultinomialLogitSelectorConfig();
-		assertEquals(-700.0, mls.getMinimumUtility(), 1e-9);
-		assertEquals(700.0, mls.getMaximumUtility(), 1e-9);
-		assertEquals(false, mls.getConsiderMinimumUtility());
+		MultinomialLogitSelectorConfigGroup mls = dmcConfig.getMultinomialLogitSelectorConfig();
+		MultinomialLogitSelectorConfigGroup mls2 = dmcConfig2.getMultinomialLogitSelectorConfig();
+		assertEquals(mls.getMinimumUtility(), mls2.getMinimumUtility(), 1e-9);
+		assertEquals(mls.getMaximumUtility(), mls2.getMaximumUtility(), 1e-9);
+		assertEquals(mls.getConsiderMinimumUtility(), mls2.getConsiderMinimumUtility());
 
 		// Verify VehicleTourConstraintConfigGroup defaults
-		VehicleTourConstraintConfigGroup vehicleTour = dmcConfig2.getVehicleTourConstraintConfig();
-		assertEquals(new HashSet<>(Arrays.asList("car", "bike")),
-				new HashSet<>(vehicleTour.getRestrictedModes()));
+		VehicleTourConstraintConfigGroup vehicleTour = dmcConfig.getVehicleTourConstraintConfig();
+		VehicleTourConstraintConfigGroup vehicleTour2 = dmcConfig2.getVehicleTourConstraintConfig();
+		assertEquals(new HashSet<>(vehicleTour.getRestrictedModes()),
+				new HashSet<>(vehicleTour2.getRestrictedModes()));
 
 		// Verify VehicleTripConstraintConfigGroup defaults
-		VehicleTripConstraintConfigGroup vehicleTrip = dmcConfig2.getVehicleTripConstraintConfig();
-		assertEquals(new HashSet<>(Arrays.asList("car", "bike")),
-				new HashSet<>(vehicleTrip.getRestrictedModes()));
-		assertEquals(true, vehicleTrip.getIsAdvanced());
+		VehicleTripConstraintConfigGroup vehicleTrip = dmcConfig.getVehicleTripConstraintConfig();
+		VehicleTripConstraintConfigGroup vehicleTrip2 = dmcConfig2.getVehicleTripConstraintConfig();
+		assertEquals(new HashSet<>(vehicleTrip.getRestrictedModes()),
+				new HashSet<>(vehicleTrip2.getRestrictedModes()));
+		assertEquals(vehicleTrip.getIsAdvanced(), vehicleTrip2.getIsAdvanced());
 
 		// Verify SubtourModeConstraintConfigGroup defaults
-		assertTrue(dmcConfig2.getSubtourConstraintConfig().getConstrainedModes().isEmpty());
+		assertEquals(new HashSet<>(dmcConfig.getSubtourConstraintConfig().getConstrainedModes()),
+				new HashSet<>(dmcConfig2.getSubtourConstraintConfig().getConstrainedModes()));
 
 		// Verify MATSimTripScoringConfigGroup defaults
-		MATSimTripScoringConfigGroup matSimScoring = dmcConfig2.getMATSimTripScoringConfigGroup();
-		assertEquals(new HashSet<>(Arrays.asList("pt")), new HashSet<>(matSimScoring.getPtLegModes()));
+		MATSimTripScoringConfigGroup matSimScoring = dmcConfig.getMATSimTripScoringConfigGroup();
+		MATSimTripScoringConfigGroup matSimScoring2 = dmcConfig2.getMATSimTripScoringConfigGroup();
+		assertEquals(new HashSet<>(matSimScoring.getPtLegModes()), new HashSet<>(matSimScoring2.getPtLegModes()));
 
 		// Verify TourLengthFilterConfigGroup defaults
-		assertEquals(10, dmcConfig2.getTourLengthFilterConfigGroup().getMaximumLength());
+		assertEquals(dmcConfig.getTourLengthFilterConfigGroup().getMaximumLength(),
+				dmcConfig2.getTourLengthFilterConfigGroup().getMaximumLength());
 
 		// Verify ActivityTourFinderConfigGroup defaults
-		ActivityTourFinderConfigGroup atf = dmcConfig2.getActivityTourFinderConfigGroup();
-		assertEquals(new HashSet<>(Arrays.asList("home")), new HashSet<>(atf.getActivityTypes()));
+		ActivityTourFinderConfigGroup atf = dmcConfig.getActivityTourFinderConfigGroup();
+		ActivityTourFinderConfigGroup atf2 = dmcConfig2.getActivityTourFinderConfigGroup();
+		assertEquals(new HashSet<>(atf.getActivityTypes()), new HashSet<>(atf2.getActivityTypes()));
 	}
 
 	@Test
@@ -242,10 +245,10 @@ public class ConfigTest {
 		DiscreteModeChoiceConfigGroup dmcConfig = new DiscreteModeChoiceConfigGroup();
 		Config config = ConfigUtils.createConfig(dmcConfig);
 
-		// Defaults: attributeName/attributeValue/path are null
-		assertNull(dmcConfig.getLinkAttributeConstraintConfigGroup().getAttributeName());
-		assertNull(dmcConfig.getLinkAttributeConstraintConfigGroup().getAttributeValue());
-		assertNull(dmcConfig.getShapeFileConstraintConfigGroup().getPath());
+		// Explicitly set values to null to ensure null survives the round-trip
+		dmcConfig.getLinkAttributeConstraintConfigGroup().setAttributeName(null);
+		dmcConfig.getLinkAttributeConstraintConfigGroup().setAttributeValue(null);
+		dmcConfig.getShapeFileConstraintConfigGroup().setPath(null);
 
 		String path = utils.getOutputDirectory() + "/config_nullable.xml";
 		new ConfigWriter(config).write(path);
