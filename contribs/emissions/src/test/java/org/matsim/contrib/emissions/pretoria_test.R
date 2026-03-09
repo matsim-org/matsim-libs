@@ -109,11 +109,6 @@
            NOx_diff = 100*NOx_MATSim/NOx_pems-100)
 }
 
-# ==== Accumulative Plots ====
-{
-  #TODO
-}
-
 # ==== PHEM C-Route Test Preparation ====
 {
   vehicle <- "FIGO"
