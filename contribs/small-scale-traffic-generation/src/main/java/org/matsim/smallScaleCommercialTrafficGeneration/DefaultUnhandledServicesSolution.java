@@ -79,8 +79,8 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					modeORvehType = "total";
 				} else if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("goodsTraffic")) {
 					smallScaleCommercialTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
-					String[] split = carrierId.split("_");
-					modeORvehType = split[split.length - 1];
+					String[] split = carrierId.split("vehTyp")[1].split("_"); //TODO make this via attributes
+					modeORvehType = split[0];
 				} else {
 					log.warn("Carrier {} has no valid subpopulation. Skipping.", carrier.getId());
 					continue;
