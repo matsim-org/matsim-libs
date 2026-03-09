@@ -419,6 +419,7 @@ public class PretoriaTest {
 
 		Map<Integer, Map<Id<Link>, Map<Pollutant, Double>>> tripId2linkId2pollutant2realEmission = new ArrayMap<>();
 		Map<Integer, Map<Id<Link>, Map<Pollutant, Double>>> tripId2linkId2pollutant2warmEmission = new ArrayMap<>();
+		Map<Integer, Map<Id<Link>, Double>> tripId2linkId2pollutant2averageVelocity = new ArrayMap<>();
 		Map<Integer, Map<Pollutant, Double>> tripId2pollutant2coldEmission = new ArrayMap<>();
 
 		tripId2pretoriaGpsEntries.forEach((tripId, gpsEntries) -> {
@@ -491,6 +492,9 @@ public class PretoriaTest {
 				tripId2linkId2pollutant2warmEmission.get(tripId).get(linkId).put(Pollutant.CO, warmEmissionsMatsim.get(Pollutant.CO));
 				tripId2linkId2pollutant2warmEmission.get(tripId).get(linkId).put(Pollutant.CO2_TOTAL, warmEmissionsMatsim.get(Pollutant.CO2_TOTAL));
 				tripId2linkId2pollutant2warmEmission.get(tripId).get(linkId).put(Pollutant.NOx, warmEmissionsMatsim.get(Pollutant.NOx));
+
+				tripId2linkId2pollutant2averageVelocity.putIfAbsent(tripId, new HashMap<>());
+				tripId2linkId2pollutant2averageVelocity.get(tripId).put(linkId, link.getLength()/time);
 			});
 
 		});
@@ -510,7 +514,8 @@ public class PretoriaTest {
 			"CO2_MATSim",
 			"CO2_pems",
 			"NOx_MATSim",
-			"NOx_pems"
+			"NOx_pems",
+			"averageVelocity"
 		);
 
 		AtomicReference<String> segment = new AtomicReference<>("none");
@@ -569,7 +574,8 @@ public class PretoriaTest {
 						pollutant2warmEmissions.get(Pollutant.CO2_TOTAL),
 						pollutant2realEmissions.get(Pollutant.CO2_TOTAL),
 						pollutant2warmEmissions.get(Pollutant.NOx),
-						pollutant2realEmissions.get(Pollutant.NOx)
+						pollutant2realEmissions.get(Pollutant.NOx),
+						tripId2linkId2pollutant2averageVelocity.get(tripId).get(linkId)
 					);
 				} catch (IOException e) {
 					throw new RuntimeException(e);
