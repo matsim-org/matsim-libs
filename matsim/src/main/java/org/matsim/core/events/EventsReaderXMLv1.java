@@ -270,7 +270,13 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 				double yy = Double.parseDouble(atts.getValue(Event.ATTRIBUTE_Y));
 				coord = new Coord(xx, yy);
 			}
-			this.events.processEvent(new PersonInitializedEvent(time, personId, coord));
+			this.events.processEvent(new PersonInitializedEvent(time, personId, 
+				atts.getValue(HasLinkId.ATTRIBUTE_LINK) == null ? null : Id.create(atts.getValue(HasLinkId.ATTRIBUTE_LINK),
+					Link.class),
+				atts.getValue(HasFacilityId.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(HasFacilityId.ATTRIBUTE_FACILITY),
+					ActivityFacility.class),
+				atts.getValue(PersonInitializedEvent.ATTRIBUTE_ACTIVITY_TYPE),
+				coord));
 		} else {
 			GenericEvent event = new GenericEvent(eventType, time);
 			for (int ii = 0; ii < atts.getLength(); ii++) {

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -266,15 +267,7 @@ import com.google.common.collect.ImmutableSortedSet;
 
 	@Override
 	public Coord getCoord() {
-		Coord fromXY = getFromNode().getCoord();
-		Coord toXY = getToNode().getCoord();
-		double x = (fromXY.getX() + toXY.getX()) / 2.0;
-		double y = (fromXY.getY() + toXY.getY()) / 2.0;
-		if (fromXY.hasZ() && toXY.hasZ()) {
-			double z = (fromXY.getZ() + toXY.getZ()) / 2.0;
-			return new Coord(x, y, z);
-		}
-		return new Coord(x, y);
+		return CoordUtils.interpolate(from.getCoord(), to.getCoord(), 0.5);
 	}
 
 	@Override

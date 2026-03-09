@@ -112,8 +112,6 @@ public class RunDistributedSim implements Callable<Integer> {
 
 		Controler controler = new Controler(s, DistributedContext.create(comm, config));
 
-		controler.addOverridingModule(new DistributedSimulationModule());
-
 		controler.getInjector();
 		// Removes check after injector has been created, just a workaround to avoid exceptions
 		controler.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
