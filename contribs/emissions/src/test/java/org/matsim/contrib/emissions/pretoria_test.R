@@ -60,8 +60,8 @@
   # 2: Matches the profile of a moderate driver     (avg.vel.=40.19; avg.pos.acc.=2.38)
   # 3: Matches the profile of a passive driver      (avg.vel.=37.02; avg.pos.acc.=2.17)
 
-  vehicle <- "FIGO"
-  method <- "StopAndGoFraction"
+  vehicle <- "FIGO_TECHAVG"
+  method <- "InterpolationFraction"
 
   pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}_{method}.csv")) %>%
     filter(linkId != 6555) %>%
@@ -88,7 +88,7 @@
   # B: Freeway (from 11614 to 28906)
   # C: Steep, suburban (from waterkloof4_waterkloof5 to 37156)
 
-  vehicle <- "FIGO"
+  vehicle <- "FIGO_TECHAVG"
   method <- "InterpolationFraction"
 
   pretoria_output <- read_csv(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/output_{vehicle}_{method}.csv")) %>%
@@ -211,22 +211,30 @@
   # Error Histograms
   {
     vehicle <- "FIGO_TECHAVG"
-    method <- "StopAndGoFraction"
 
-    pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}_{method}.csv")) %>%
+    pretoria_output.SG <- read_csv(glue("{pretoria_path}/output_{vehicle}_StopAndGoFraction.csv")) %>%
       filter(linkId != 6555 & linkId != "cold") %>%
       mutate(ERR_CO = CO_MATSim - CO_pems, ERR_CO2 = CO2_MATSim - CO2_pems, ERR_NOx = NOx_MATSim - NOx_pems) %>%
-      pivot_longer(c("ERR_CO", "ERR_CO2", "ERR_NOx"), names_to = "component", values_to = "error")
+      pivot_longer(c("ERR_CO", "ERR_CO2", "ERR_NOx"), names_to = "component", values_to = "error") %>%
+      mutate(method = "StopAndGoFraction")
+
+    pretoria_output.Int <- read_csv(glue("{pretoria_path}/output_{vehicle}_InterpolationFraction.csv")) %>%
+      filter(linkId != 6555 & linkId != "cold") %>%
+      mutate(ERR_CO = CO_MATSim - CO_pems, ERR_CO2 = CO2_MATSim - CO2_pems, ERR_NOx = NOx_MATSim - NOx_pems) %>%
+      pivot_longer(c("ERR_CO", "ERR_CO2", "ERR_NOx"), names_to = "component", values_to = "error") %>%
+      mutate(method = "InterpolationFraction")
 
     network_information <- read_csv("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/networkInformation.csv") %>%
       separate(roadType, c("Region", "RoadType", "VClass"), sep="/")
 
-    d <- pretoria_output %>%
+    d <- pretoria_output.SG %>%
+      rbind(pretoria_output.Int) %>%
       inner_join(network_information, by = "linkId")
 
     p1 <- ggplot(d) +
-      stat_summary_bin(aes(x=gradient, y=error), fun = mean, binwidth=0.05, geom="line") +
-      facet_wrap(~component, scales="free")
+      stat_summary_bin(aes(x=gradient, y=error, color=method), fun = mean, binwidth=0.05, geom="line") +
+      facet_wrap(~component, scales="free") +
+      ggtitle("Error and distribution of error per link by gradient")
 
     p2 <- ggplot(d) +
       geom_histogram(aes(x=gradient), binwidth = 0.05) +
@@ -235,14 +243,24 @@
     p1 / p2
 
     p3 <- ggplot(d) +
-      stat_summary_bin(aes(x=freespeed, y=error), fun = mean, binwidth=1, geom="line") +
-      facet_wrap(~component, scales="free")
+      stat_summary_bin(aes(x=freespeed, y=error, color=method), fun = mean, binwidth=1, geom="line") +
+      facet_wrap(~component, scales="free") +
+      theme_minimal() +
+      theme(text = element_text(size=18)) +
+      ggtitle("Absolute error and distribution of error per link by average speed")
 
     p4 <- ggplot(d) +
       geom_histogram(aes(x=freespeed), binwidth = 1) +
-      facet_wrap(~component, scales="free")
+      facet_wrap(~component, scales="free") +
+      theme_minimal() +
+      theme(text = element_text(size=18))
 
     p3 / p4
+
+    ggsave(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/freespeed_err.png"),
+           width = 30,
+           height = 20,
+           dpi = 300)
   }
 
   {
@@ -265,10 +283,25 @@
       filter(!startsWith(Gradient, "+/-")) %>%
       mutate(Gradient = Gradient %>% str_remove("\\+/-") %>% str_remove("%") %>% as.numeric)
 
+    d_ribbon <- d %>%
+      filter(TrafficSituation %in% c("St+Go", "Freeflow")) %>%
+      select(Gradient, EFA, TrafficSituation, RoadType, VClass) %>%
+      pivot_wider(names_from = TrafficSituation, values_from = EFA)
+
     colors <- c("#17d2a4", "#70aef4", "#88e72f", "#f1e843", "#eb4949", "#eb49ad")
 
     ggplot(d) +
       geom_line(aes(x=as.numeric(Gradient), y=EFA, color=TrafficSituation)) +
+      geom_ribbon(
+        data = d_ribbon,
+        aes(
+          x = Gradient,
+          ymin = Freeflow,
+          ymax = `St+Go`
+        ),
+        fill = "red",
+        alpha = 0.2
+      ) +
       # geom_point(aes(x=as.numeric(Freespeed), y=EFA, color=TrafficSituation)) +
       facet_wrap(RoadType~as.numeric(VClass), scales = "free") +
       theme_minimal() +
@@ -276,8 +309,14 @@
       scale_color_manual(values=colors) +
       # scale_x_continuous(breaks = seq(0, max(as.numeric(d$Freespeed)), by = 10)) +
       # labs(title=glue("Emissions for all HBEFA keys with: {tech}, {concept}, {component}")) +
-      xlab("Speed (km/h)") +
+      ggtitle("Emission development over gradient for CO") +
+      xlab("Gradient (%)") +
       ylab("Emissions (g/km)")
+
+    ggsave(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/gradient_development.png"),
+           width = 10,
+           height = 10,
+           dpi = 300)
   }
 
 }
