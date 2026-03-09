@@ -319,6 +319,7 @@ gradientCurves <- function(
 {
   speedCurves(curves = c("AverageSpeed", "StopAndGoFraction"))
   speedCurves()
+  speedCurves(trafficSit = "URB/Local/50")
   gradientCurves()
 }
 
