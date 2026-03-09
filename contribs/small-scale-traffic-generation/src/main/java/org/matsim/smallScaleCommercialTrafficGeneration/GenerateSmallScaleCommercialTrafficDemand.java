@@ -312,10 +312,27 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 				readVehicleTypes.keySet().removeIf(vehicleType -> !usedCarrierVehicleTypes.contains(vehicleType));
 
+				// if we do solving of unhandled jobs, these steps are necessary to prepare the solving.
+				if (maxNumberOfLoopsForVRPSolving > 0) {
+					if (!Files.exists(shapeFileZonePath)) {
+						throw new Exception("Required districts shape file {} not found" + shapeFileZonePath.toString());
+					}
+					indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
+					filterFacilitiesForZones(scenario);
+					linksPerZone = filterLinksForZones(scenario, this.indexZones, facilitiesPerZoneWithProbabilities, shapeFileZoneNameColumn);
+				}
 				if (Objects.requireNonNull(usedCreationOption) == CreationOption.useExistingCarrierFileWithoutSolution) {
 					CarriersUtils.getCarriers(scenario).getCarriers().values().forEach(carrier -> {
 						carrier.getPlans().clear();
 					});
+				}
+				else {
+					// if we use an existing carrier with a solution, we delete only the plans of carriers which have unhandled jobs.
+					List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(
+						CarriersUtils.getCarriers(scenario));
+					if (!nonCompleteSolvedCarriers.isEmpty()) {
+						nonCompleteSolvedCarriers.forEach((carrier -> carrier.getPlans().clear()));
+					}
 				}
 				// for the case @useExistingCarrierFileWithSolution the method solveSeparatedVRPs skips carriers with existing plans. But if a carrier without plans exists, it will be solved.
 				solveSeparatedVRPs(scenario);
