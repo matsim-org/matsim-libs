@@ -6,7 +6,7 @@ import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.TcpIpConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.cp.ICountDownLatch;
+import com.hazelcast.map.IMap;
 import com.hazelcast.topic.ITopic;
 import org.agrona.concurrent.BusySpinIdleStrategy;
 import org.agrona.concurrent.IdleStrategy;
@@ -86,13 +86,20 @@ public class HazelcastCommunicator implements Communicator {
 
 	@Override
 	public void connect() throws Exception {
-		ICountDownLatch startup = hz.getCPSubsystem().getCountDownLatch("startup");
-		startup.trySetCount(size);
+		IMap<Integer, Boolean> startupMap = hz.getMap("startup");
 
 		topics.get(rank).addMessageListener(this::onMessage);
 
-		startup.countDown();
-		startup.await(10, TimeUnit.MINUTES);
+		startupMap.put(rank, true);
+
+		// Wait for all nodes to register
+		long deadline = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(10);
+		while (startupMap.size() < size) {
+			if (System.currentTimeMillis() > deadline) {
+				throw new RuntimeException("Timeout waiting for all nodes to connect");
+			}
+			Thread.sleep(100);
+		}
 	}
 
 	@Override
