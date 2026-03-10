@@ -37,7 +37,7 @@ public class AccessibilityDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 
 		header.title = "Accessibility";

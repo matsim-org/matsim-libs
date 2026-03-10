@@ -33,8 +33,6 @@ public class BasicCommercialDemandGenerationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	@Disabled // this test fails when the whole package is run, but passes when it is run alone.  Since there are many static non-final variables
-		// in the code, I assume that those are the cause.
 	void testMainRun() {
 		try {
 			Path output = Path.of(utils.getOutputDirectory());
@@ -44,7 +42,6 @@ public class BasicCommercialDemandGenerationTest {
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 
-//			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 			URL url = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
 			URL result = IOUtils.extendUrl( url, "grid9x9.xml" );
 			String network = result.toString();
@@ -100,7 +97,29 @@ public class BasicCommercialDemandGenerationTest {
 		for (Carrier thisCarrier : carriersSolution.getCarriers().values()) {
 			Assertions.assertTrue(carriersToCompare.getCarriers().containsKey(thisCarrier.getId()));
 			Carrier inputCarrier = carriersToCompare.getCarriers().get(thisCarrier.getId());
-			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScore(), thisCarrier.getSelectedPlan().getScore());
+			inputCarrier.getShipments().values().forEach(shipment ->
+					Assertions.assertTrue(thisCarrier.getShipments().containsKey(shipment.getId()))
+			);
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getPickupLinkId(), (shipment.getPickupLinkId())));
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getDeliveryLinkId(), (shipment.getDeliveryLinkId())));
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getCapacityDemand(), (shipment.getCapacityDemand())));
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getPickupDuration(), (shipment.getPickupDuration())));
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getPickupStartingTimeWindow(), (shipment.getPickupStartingTimeWindow())));
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getDeliveryStartingTimeWindow(), (shipment.getDeliveryStartingTimeWindow())));
+			inputCarrier.getCarrierCapabilities().getCarrierVehicles().values().forEach(carrierVehicle ->
+				Assertions.assertTrue(thisCarrier.getCarrierCapabilities().getCarrierVehicles().containsKey(carrierVehicle.getId()))
+			);
+			inputCarrier.getCarrierCapabilities().getCarrierVehicles().values().forEach(carrierVehicle ->
+				Assertions.assertEquals(thisCarrier.getCarrierCapabilities().getCarrierVehicles().get(carrierVehicle.getId()).getLinkId(), (carrierVehicle.getLinkId())));
+			Assertions.assertEquals(CarriersUtils.getJspritScore(inputCarrier.getSelectedPlan()), CarriersUtils.getJspritScore(thisCarrier.getSelectedPlan()));
+
+			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScore(), thisCarrier.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScheduledTours().size(), thisCarrier.getSelectedPlan().getScheduledTours().size());
 		}
 
@@ -122,7 +141,6 @@ public class BasicCommercialDemandGenerationTest {
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 
-//			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 			URL url = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
 			URL result = IOUtils.extendUrl( url, "grid9x9.xml" );
 			String network = result.toString();

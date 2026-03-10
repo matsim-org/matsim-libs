@@ -4,6 +4,7 @@ import org.matsim.application.analysis.population.StuckAgentAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.viz.Bar;
 import org.matsim.simwrapper.viz.Plotly;
 import org.matsim.simwrapper.viz.Table;
@@ -18,7 +19,7 @@ import java.util.List;
 public class StuckAgentDashboard implements Dashboard {
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Stuck Agents";
 		header.description = "Analyze agents that are 'stuck' i.e. could not finish their daily plan.";

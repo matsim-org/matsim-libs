@@ -4,6 +4,7 @@ import org.matsim.application.analysis.population.PopulationAttributeAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.viz.Bar;
 import org.matsim.simwrapper.viz.PieChart;
 import org.matsim.simwrapper.viz.Tile;
@@ -13,7 +14,7 @@ import org.matsim.simwrapper.viz.Tile;
  */
 public class PopulationAttributeDashboard implements Dashboard {
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Population Attribute";
 		header.description = "Analyze the attributes of the population.";
