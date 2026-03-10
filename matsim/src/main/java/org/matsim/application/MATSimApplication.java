@@ -177,16 +177,20 @@ public abstract class MATSimApplication implements Callable<Integer> {
 		if (runId != null)
 			config.controller().setRunId(runId);
 
-		final Scenario scenario = createScenario(config);
-
-		prepareScenario(scenario);
-
-		Controler controler = new Controler(scenario);
-		prepareControler(controler);
-
-		// Check if simulation needs to be run
-		if (post != PostProcessOption.post_process_only)
-			controler.run();
+		{
+			// encapsule the scenario and controler here to reduce the memory-consumption
+			// for the post-process-step since we do not use the scenario there. 
+			final Scenario scenario = createScenario(config);
+			
+			prepareScenario(scenario);
+			
+			Controler controler = new Controler(scenario);
+			prepareControler(controler);
+			
+			// Check if simulation needs to be run
+			if (post != PostProcessOption.post_process_only)
+				controler.run();
+		}
 
 		if (post != PostProcessOption.disabled) {
 
