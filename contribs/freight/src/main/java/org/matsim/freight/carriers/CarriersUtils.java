@@ -260,12 +260,7 @@ public class CarriersUtils {
 		Carriers carriers = getCarriers(scenario);
 
 		//Check if the inputs of the carrier(s) are consistent before starting the planning
-		var result = CarrierConsistencyCheckers.checkBeforePlanning(carriers, Level.ERROR);
-		if (result == CarrierConsistencyCheckers.CheckResult.CHECK_FAILED) {
-			//I will start with ERROR level. This may be changed later to throwing a RuntimeException. KMT Jun'25
-			log.error("Carrier consistency check failed! There will be carriers with unhandled jobs or other inconsistencies. " +
-				"Please check the log for details. To avoid this, please check your input files before running jsprit.");
-		}
+		CarrierConsistencyCheckers.checkBeforePlanning(carriers, Level.ERROR);
 
 		HashMap<Id<Carrier>, Integer> carrierActivityCounterMap = new HashMap<>();
 
@@ -312,13 +307,8 @@ public class CarriersUtils {
 		}
 		writeCarriers(carriers, scenario.getConfig().controller().getOutputDirectory() + "/jsprit_output_carriers.xml.gz");
 		writeAggregatedResultsForAllRunVRPs(carriers, aggegatedJspritAnalysisCSVPath, bestJspritSolutionCollector.snapshot());
-		//Check if the inputs of the carrier(s) are consistent before starting the planning
-		var result2 = CarrierConsistencyCheckers.checkAfterResults(carriers, Level.ERROR);
-		if (result2 == CarrierConsistencyCheckers.CheckResult.CHECK_FAILED) {
-			//I will start with ERROR level. This may be changed later to throwing a RuntimeException. KMT Jun'25
-			log.error("Carrier consistency check failed! There are carriers with unhandled jobs or other inconsistencies. " +
-				"Please check the log for details.");
-		}
+		// checks the consistency of the carriers after planning. This is especially important, because we want to check if there are unplanned jobs after the VRP solution and if the selected plans are consistent with the carrier's jobs.
+		CarrierConsistencyCheckers.checkAfterResults(carriers, Level.INFO);
 	}
 
 	/**

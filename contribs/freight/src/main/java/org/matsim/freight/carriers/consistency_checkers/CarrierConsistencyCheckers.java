@@ -86,6 +86,8 @@ public class CarrierConsistencyCheckers {
 		if (nuOfChecksFailed == 0) {
 			return CheckResult.CHECK_SUCCESSFUL;
 		} else {
+			log.error("Carrier consistency check failed! There will be carriers with unhandled jobs or other inconsistencies. " +
+				"Please check the log for details. To avoid this, please check your input files before running jsprit.");
 			return CheckResult.CHECK_FAILED;
 		}
 	}
@@ -107,6 +109,7 @@ public class CarrierConsistencyCheckers {
 		if (nuOfChecksFailed == 0) {
 			return CheckResult.CHECK_SUCCESSFUL;
 		} else {
+			log.warn("Not all jobs are handled within the tours. Please check the log messages for more details.");
 			return CheckResult.CHECK_FAILED;
 		}
 	}
