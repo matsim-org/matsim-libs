@@ -277,6 +277,10 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			for (int i = 0; i < persons.rowCount(); i++) {
 				Row row = persons.row(i);
+				if (!new HashSet<>(row.columnNames()).containsAll(List.of("home_x", "home_y"))) {
+					idx.add(i); //assuming that these are commercial agents without home coordinates, we keep them in the analysis
+					continue;
+				}
 				Point p = f.createPoint(new Coordinate(row.getDouble("home_x"), row.getDouble("home_y")));
 				if (geometry.contains(p) || Double.isNaN(p.getX()) && Double.isNaN(p.getY())) {//TODO discuss what we should do with the commercial agents without home coordinates
 					idx.add(i);
