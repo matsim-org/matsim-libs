@@ -1,11 +1,12 @@
 package org.matsim.dsim.simulation.net;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.dsim.DSimConfigGroup;
-import org.matsim.dsim.simulation.SimStepMessaging;
+import org.matsim.dsim.PartitionTransfer;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -37,7 +38,7 @@ public interface SimLink {
 
 	void addLeaveHandler(OnLeaveQueue onLeaveQueue);
 
-	boolean doSimStep(SimStepMessaging messaging, double now);
+	boolean doSimStep(PartitionTransfer messaging, double now);
 
 	enum OnLeaveQueueInstruction {MoveToBuffer, RemoveVehicle, BlockQueue}
 
@@ -214,7 +215,7 @@ public interface SimLink {
 		}
 
 		@Override
-		public boolean doSimStep(SimStepMessaging messaging, double now) {
+		public boolean doSimStep(PartitionTransfer messaging, double now) {
 
 			while (!q.isEmpty()) {
 
@@ -352,10 +353,10 @@ public interface SimLink {
 		}
 
 		@Override
-		public boolean doSimStep(SimStepMessaging messaging, double now) {
+		public boolean doSimStep(PartitionTransfer messaging, double now) {
 			for (var vehicle : q) {
 				onLeaveHandler.apply(vehicle, this, now);
-				messaging.collectVehicle(vehicle);
+				messaging.collect(vehicle.toMessage(), vehicle.getCurrentLinkId());
 			}
 			q.clear();
 			// mark ourselves as inactive. If the upstream node pushes vehicles onto the link
@@ -468,7 +469,7 @@ public interface SimLink {
 		}
 
 		@Override
-		public boolean doSimStep(SimStepMessaging messaging, double now) {
+		public boolean doSimStep(PartitionTransfer messaging, double now) {
 
 			// report capacity changes to the upstream partition
 			// during doSimStep, vehicles may leave the network, and if we operate in kinematicWaves mode
@@ -482,7 +483,8 @@ public interface SimLink {
 			var released = releasedDuringSimStep + releasedStorageCap;
 
 			if (released > 0 || consumedStorageCap > 0) {
-				messaging.collectStorageCapacityUpdate(getId(), released, consumedStorageCap, fromPart);
+				var update = new CapacityUpdate(getId(), released, consumedStorageCap);
+				messaging.collect(update, fromPart);
 				consumedStorageCap = 0;
 			}
 			return localLinkActive || !storageReleased;
@@ -501,6 +503,10 @@ public interface SimLink {
 		@Override
 		public String toString() {
 			return "SplitIn: " + localLink.toString();
+		}
+
+		record CapacityUpdate(Id<Link> linkId, double released, double consumed) implements Message {
+
 		}
 	}
 }

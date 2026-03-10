@@ -16,8 +16,8 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
-import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.HashMap;
@@ -45,7 +45,8 @@ public class BackpackDataCollector implements BasicEventHandler {
 	private final Map<Id<Vehicle>, Set<Backpack>> backpackByVehicle = new HashMap<>();
 	private final Set<Id<Person>> ignoredAgents = new HashSet<>();
 
-	private final SimStepMessaging simStepMessaging;
+	//private final SimStepMessaging simStepMessaging;
+	private final PartitionTransfer partitionTransfer;
 	private final Network network;
 	private final Population population;
 
@@ -54,9 +55,10 @@ public class BackpackDataCollector implements BasicEventHandler {
 	private final Map<String, BackpackRouteProvider> providers;
 
 	@Inject
-	BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population,
+	BackpackDataCollector(PartitionTransfer partitionTransfer, Network network, Population population,
 						  AgentSourcesContainer asc, FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
-		this.simStepMessaging = simStepMessaging;
+		this.partitionTransfer = partitionTransfer;
+		//this.simStepMessaging = simStepMessaging;
 		this.network = network;
 		this.population = population;
 		this.asc = asc;
@@ -164,8 +166,8 @@ public class BackpackDataCollector implements BasicEventHandler {
 				backpackByVehicle.remove(backpack.currentVehicle());
 			}
 		}
-		var msg = backpack.toMessage();
-		simStepMessaging.collectBackPack(msg, toPart);
+		var message = backpack.toMessage();
+		partitionTransfer.collect(message, toPart);
 	}
 
 	@Override

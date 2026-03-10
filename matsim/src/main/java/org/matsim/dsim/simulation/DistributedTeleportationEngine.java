@@ -2,6 +2,7 @@ package org.matsim.dsim.simulation;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -13,6 +14,7 @@ import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
@@ -25,7 +27,8 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 	private final EventsManager em;
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
-	private final SimStepMessaging simStepMessaging;
+	//private final SimStepMessaging simStepMessaging;
+	private final PartitionTransfer partitionTransfer;
 	private final AgentSourcesContainer asc;
 	private final BackpackDataCollector bdc;
 
@@ -39,9 +42,9 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	}
 
 	@Inject
-	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, AgentSourcesContainer asc,
+	DistributedTeleportationEngine(EventsManager em, PartitionTransfer partitionTransfer, AgentSourcesContainer asc,
 								   BackpackDataCollector bdc) {
-		this.simStepMessaging = simStepMessaging;
+		this.partitionTransfer = partitionTransfer;
 		this.em = em;
 		this.asc = asc;
 		this.bdc = bdc;
@@ -68,12 +71,14 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 		var travelTime = person.getExpectedTravelTime().seconds();
 		var exitTime = now + travelTime;
+		var teleportation = new TeleportationEntry(person, exitTime);
 
-		if (simStepMessaging.isLocal(person.getDestinationLinkId())) {
-			personsTeleporting.add(new TeleportationEntry(person, exitTime));
+		if (partitionTransfer.isLocal(person.getDestinationLinkId())) {
+			personsTeleporting.add(teleportation);
 		} else {
+			// TODO: replace with general mechanism for notifying person is leaving
 			bdc.teleportedPersonLeavesPartition(person);
-			simStepMessaging.collectTeleportation(person, exitTime);
+			partitionTransfer.collect(teleportation, person.getDestinationLinkId());
 		}
 
 		return true;
@@ -136,6 +141,6 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		throw new RuntimeException("Snapshot Positions are not implemented for Distributed Teleportation Engine. This method is only here because the 'TeleportationInterface' requires it.");
 	}
 
-	private record TeleportationEntry(DistributedMobsimAgent person, double exitTime) {
+	private record TeleportationEntry(DistributedMobsimAgent person, double exitTime) implements Message {
 	}
 }
