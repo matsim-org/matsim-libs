@@ -76,7 +76,7 @@ class FreespeedFactorRouting implements Provider<RoutingModule> {
 		} ;
 		Gbl.assertNotNull(leastCostPathCalculatorFactory);
 		// Pass factory instead of creating algo instance - algo should be created per routing call for thread-safety
-		return DefaultRoutingModules.createPseudoTransitRouter(params.getMode(), populationFactory,
+		return DefaultRoutingModules.createFreespeedFactorRouter(params.getMode(), populationFactory,
 				network, leastCostPathCalculatorFactory, travelTime, travelDisutility, params);
 	}
 }
