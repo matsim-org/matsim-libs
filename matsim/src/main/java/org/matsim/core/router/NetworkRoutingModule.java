@@ -21,6 +21,8 @@ package org.matsim.core.router;
 import java.util.Arrays;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -35,6 +37,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
@@ -50,6 +54,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 	private final String mode;
 	private final PopulationFactory populationFactory;
 
+	private final Scenario scenario;
 	private final Network network;
 	private final LeastCostPathCalculator routeAlgo;
 
@@ -57,11 +62,13 @@ public final class NetworkRoutingModule implements RoutingModule {
 	 public NetworkRoutingModule(
 			final String mode,
 			final PopulationFactory populationFactory,
+			final Scenario scenario,
 			final Network network,
 			final LeastCostPathCalculator routeAlgo) {
 		 Gbl.assertNotNull(network);
 //		 Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
 		 // makes many tests fail.
+		 this.scenario = scenario;
 		 this.network = network;
 		 this.routeAlgo = routeAlgo;
 		 this.mode = mode;
@@ -95,30 +102,44 @@ public final class NetworkRoutingModule implements RoutingModule {
 		Gbl.assertNotNull(fromLink);
 		Gbl.assertNotNull(toLink);
 
-		if (toLink != fromLink) {
-			// (a "true" route)
+		// use vehicle from routing request attribute, if defined
+		Id<Vehicle> vehicleId = (Id<Vehicle>) request.getAttributes().getAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID);
+		if (vehicleId == null && VehicleUtils.hasVehicleId(person, mode)) {
+			vehicleId = VehicleUtils.getVehicleId(person, mode);
+		}
 
-			/* The NetworkInclAccessEgressModule actually looks up the vehicle in the scenario and passes it to the routeAlgo as well as to the resulting route.
-			 * Here, we do not hold the scenario as a field (yet) and can not perform the lookup.
-			 * So i don't add it here (yet), in order not to break anything. But probably should be done in future.
-			 * ts, june '21
-			 */
+		if (toLink != fromLink) { // (a "true" route)
+			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+
 			Path path = this.routeAlgo.calcLeastCostPath(fromLink, toLink, departureTime, person, null);
 			if (path == null)
 				throw new RuntimeException("No route found from link " + fromLink.getId() + " to link " + toLink.getId() + " by mode " + this.mode + ".");
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-			route.setTravelTime(path.travelTime);
+
+			double relPosOnDepartureLink = 1.0;
+			double relPosOnArrivalLink = 1.0;
+
+			double maxSpeedOnToLink = toLink.getFreespeed();
+			if (vehicle != null) {
+				maxSpeedOnToLink = Math.min(vehicle.getType().getMaximumVelocity(), maxSpeedOnToLink);
+			}
+			double travelTimeEstimateOnToLink = (toLink.getLength() / maxSpeedOnToLink) * relPosOnArrivalLink;
+			int travelTime = (int) (path.travelTime + travelTimeEstimateOnToLink);
+			route.setTravelTime(travelTime);
+
 			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.network));
+			route.setDistance(RouteUtils.calcDistance(route, relPosOnDepartureLink, relPosOnArrivalLink, this.network));
+			route.setVehicleId(vehicleId);
 			newLeg.setRoute(route);
-			newLeg.setTravelTime(path.travelTime);
+			newLeg.setTravelTime(travelTime);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
+			route.setVehicleId(vehicleId);
 			newLeg.setRoute(route);
 			newLeg.setTravelTime(0);
 		}

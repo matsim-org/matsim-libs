@@ -46,6 +46,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
@@ -1224,7 +1225,7 @@ public final class PopulationUtils {
 		Coord fromCoord = link.getFromNode().getCoord();
 		Coord toCoord = link.getToNode().getCoord();
 		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink();
-		return new Coord(fromCoord.getX() + rel * (toCoord.getX() - fromCoord.getX()), fromCoord.getY() + rel * (toCoord.getY() - fromCoord.getY()));
+		return CoordUtils.interpolate(fromCoord, toCoord, rel);
 	}
 
 	public static void sampleDown(Population pop, double sample) {

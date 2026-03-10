@@ -66,10 +66,11 @@ public final class DefaultRoutingModules {
 	 * Creates network router without access/egress.
 	 */
 	@Deprecated // use AccessEgressNetworkRouter instead
-	public static RoutingModule createPureNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
+	public static RoutingModule createPureNetworkRouter( String mode, PopulationFactory popFact, Scenario scenario, Network net, final LeastCostPathCalculator routeAlgo ) {
 		return new NetworkRoutingModule(
 			mode,
 			popFact,
+			scenario,
 			net,
 			routeAlgo);
 	}

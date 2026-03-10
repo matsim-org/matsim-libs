@@ -107,6 +107,7 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 		final NetworkRoutingModule routingModule = new NetworkRoutingModule(
 		            TransportMode.car,
 		            f.s.getPopulation().getFactory(),
+		            f.s, 
 		            f.s.getNetwork(),
 		            router);
 		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );
