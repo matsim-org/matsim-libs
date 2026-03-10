@@ -201,6 +201,12 @@ public final class RoutingConfigGroup extends ConfigGroup {
 				// this should not happen anyway as the setters forbid it
 				throw new RuntimeException( "cannot combine per-person speed attribute and freespeed factor for "+mode );
 			}
+
+			if (teleportedModeFreespeedFactor != null && beelineDistanceFactorForMode != null) {
+				// kept for backwards compatibility
+				log.warn("beelineDistanceFactor has no effect for freespeed-teleported mode " + mode
+						+ ", its use for freespeed teleportation is deprecated. This may be enforced in a future version of MATSim.");
+			}
 		}
 
 		@Override
@@ -455,7 +461,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		TeleportedModeParams pars = (TeleportedModeParams) set ;
 		// for the time being pushing the "global" factor into the local ones if they are not initialized by
 		// themselves.  Necessary for some tests; maybe we should eventually disable them.  kai, feb'15
-		if ( pars.getBeelineDistanceFactor()== null ) {
+		if ( pars.getTeleportedModeSpeed() != null && pars.getBeelineDistanceFactor() == null ) {
 			pars.setBeelineDistanceFactor( this.beelineDistanceFactor );
 		}
 		super.addParameterSet( set );

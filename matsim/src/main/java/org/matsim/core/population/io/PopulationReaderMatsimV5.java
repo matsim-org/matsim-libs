@@ -270,9 +270,9 @@ import org.xml.sax.Attributes;
 				if (fromCoord != null && toCoord != null) {
 					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 					if ( this.scenario.getConfig().routing().
-							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
+							getBeelineDistanceFactors().containsKey(  this.currleg.getMode()  ) ) {
 						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
-								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
+								getBeelineDistanceFactors().get( this.currleg.getMode() ) ;
 						this.currRoute.setDistance(estimatedNetworkDistance);
 					}
 				}
