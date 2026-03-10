@@ -23,7 +23,7 @@ public class SimWrapperTest {
 
 		SimWrapper simWrapper = SimWrapper.create();
 
-		simWrapper.addDashboard((header, layout) -> {
+		simWrapper.addDashboard((header, layout, configGroup) -> {
 
 			header.title = "Simwrapper Test Dashboard";
 			header.description = "Test All Simwrapper Plug-Ins Dashboard";
@@ -176,7 +176,7 @@ public class SimWrapperTest {
 
 		SimWrapper simWrapper = SimWrapper.create();
 
-		simWrapper.addDashboard((header, layout) -> {
+		simWrapper.addDashboard((header, layout, configGroup) -> {
 
 			header.title = "Simwrapper Test Dashboard";
 			header.fullScreen = true;
