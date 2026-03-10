@@ -42,7 +42,7 @@ public final class DefaultRoutingModules {
 
 	private DefaultRoutingModules(){} // do not instantiate
 
-	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net,
+	public static RoutingModule createFreespeedFactorRouter( String mode, PopulationFactory popFac, Network net,
 			LeastCostPathCalculatorFactory calculatorFactory, TravelTime travelTime, TravelDisutility travelDisutility,
 			RoutingConfigGroup.TeleportedModeParams params ) {
 		return new FreespeedFactorRoutingModule(
