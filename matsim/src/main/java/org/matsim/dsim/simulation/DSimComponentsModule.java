@@ -13,6 +13,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.simulation.net.DefaultWait2Link;
 import org.matsim.dsim.simulation.net.Wait2Link;
 import org.matsim.dsim.simulation.pt.DistributedPtEngine;
@@ -23,7 +24,7 @@ public class DSimComponentsModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 
-		bind(SimStepMessaging.class).in(Singleton.class);
+		bind(PartitionTransfer.class).in(Singleton.class);
 		bind(AgentSourcesContainer.class).in(Singleton.class);
 
 		bind(TeleportationEngine.class).to(DistributedTeleportationEngine.class).in(Singleton.class);
@@ -31,7 +32,7 @@ public class DSimComponentsModule extends AbstractQSimModule {
 
 		bind(PopulationAgentSource.class).asEagerSingleton();
 		addQSimComponentBinding(PopulationModule.COMPONENT_NAME).to(PopulationAgentSource.class);
-		
+
 		if (getConfig().transit().isUseTransit()) {
 			bind(Wait2Link.class).to(DistributedPtEngine.class).in(Singleton.class);
 		} else {

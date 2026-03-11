@@ -4,11 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.dsim.DSimConfigGroup;
+import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.TestUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 public class TestLocalLink {
 
@@ -32,8 +34,7 @@ public class TestLocalLink {
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		config.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {
-		});
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {}, mock(PartitionTransfer.class));
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
@@ -63,8 +64,7 @@ public class TestLocalLink {
 		var node = new SimNode(link.getToNode().getId());
 		var activated = new AtomicInteger(0);
 
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {
-		});
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {}, mock(PartitionTransfer.class));
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
@@ -92,8 +92,7 @@ public class TestLocalLink {
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var activated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {
-		});
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {}, mock(PartitionTransfer.class));
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10., 1);
 
 		// push one vehicle. This consumes the entire inflow, but only some storage
@@ -116,7 +115,8 @@ public class TestLocalLink {
 		var node = new SimNode(link.getToNode().getId());
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> linkActivated.incrementAndGet(), _ -> nodeActivated.incrementAndGet());
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> linkActivated.incrementAndGet(),
+			_ -> nodeActivated.incrementAndGet(), mock(PartitionTransfer.class));
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
@@ -153,7 +153,8 @@ public class TestLocalLink {
 		var nodeActivated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> linkActivated.incrementAndGet(), _ -> nodeActivated.incrementAndGet());
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> linkActivated.incrementAndGet(),
+			_ -> nodeActivated.incrementAndGet(), mock(PartitionTransfer.class));
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 		var vehicle3 = TestUtils.createVehicle("vehicle-3", 10, 10);
@@ -186,12 +187,12 @@ public class TestLocalLink {
 		simLink.pushVehicle(vehicle1, SimLink.LinkPosition.QStart, 0);
 
 		var now = vehicle1.getEarliestLinkExitTime() - 1;
-		simLink.doSimStep(null, now);
+		simLink.doSimStep(now);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
 		assertFalse(simLink.isOffering());
 
 		now = vehicle1.getEarliestLinkExitTime();
-		simLink.doSimStep(null, now);
+		simLink.doSimStep(now);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
 		assertTrue(simLink.isOffering());
 		assertFalse(simLink.isStuck(now));
@@ -220,18 +221,18 @@ public class TestLocalLink {
 
 		// move vehicles 1 and 2 to the buffer
 		var now = vehicle1.getEarliestLinkExitTime();
-		simLink.doSimStep(null, now);
+		simLink.doSimStep(now);
 		assertTrue(simLink.isOffering());
 		assertEquals(vehicle1.getId(), simLink.popVehicle().getId());
 		assertTrue(simLink.isOffering());
 		assertEquals(vehicle2.getId(), simLink.popVehicle().getId());
 
 		now = now + (vehicle1.getSizeInEquivalents() + vehicle2.getSizeInEquivalents()) / simLink.getMaxFlowCapacity() - 1;
-		simLink.doSimStep(null, now);
+		simLink.doSimStep(now);
 		assertFalse(simLink.isOffering());
 
 		now = now + 1;
-		simLink.doSimStep(null, now);
+		simLink.doSimStep(now);
 		assertTrue(simLink.isOffering());
 		assertEquals(vehicle3.getId(), simLink.popVehicle().getId());
 	}
@@ -244,9 +245,7 @@ public class TestLocalLink {
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> {
-		}, _ -> {
-		});
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> {}, _ -> {}, mock(PartitionTransfer.class));
 		var vehicle = TestUtils.createVehicle("vehicle-3", 42, 10);
 
 		simLink.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, 0);
@@ -254,7 +253,7 @@ public class TestLocalLink {
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 
 		// move the vehicle into the buffer, which starts a backwards travelling hole.
-		assertFalse(simLink.doSimStep(null, 0));
+		assertFalse(simLink.doSimStep(0));
 		assertTrue(simLink.isOffering());
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
@@ -302,7 +301,7 @@ public class TestLocalLink {
 
 		// remove the first vehicle
 		var now = vehicle1.getEarliestLinkExitTime();
-		simLink.doSimStep(null, now);
+		simLink.doSimStep(now);
 
 		// vehicle2 should be at the head of the queue
 		assertEquals(vehicle2.getId(), simLink.peekFirstVehicle().getId());
@@ -310,7 +309,7 @@ public class TestLocalLink {
 
 		// move second vehicle into the buffer
 		now = vehicle2.getEarliestLinkExitTime();
-		simLink.doSimStep(null, now);
+		simLink.doSimStep(now);
 		assertTrue(simLink.isOffering());
 		assertEquals(vehicle2.getId(), simLink.popVehicle().getId());
 	}
@@ -344,14 +343,14 @@ public class TestLocalLink {
 
 		// first vehicle blocks the queue
 		var now = vehicle1.getEarliestLinkExitTime();
-		simLink.doSimStep(null, now);
+		simLink.doSimStep(now);
 		assertEquals(vehicle1.getId(), simLink.peekFirstVehicle().getId());
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 		assertFalse(simLink.isOffering());
 
 		// move the blocking vehicle
 		now = now + blockTime;
-		simLink.doSimStep(null, now);
+		simLink.doSimStep(now);
 		assertTrue(simLink.isOffering());
 		var pop1 = simLink.popVehicle();
 		assertEquals(vehicle1.getId(), pop1.getId());
@@ -359,7 +358,7 @@ public class TestLocalLink {
 
 		// move the blocked vehicle, after flow capacity is restored
 		now = now + pop1.getSizeInEquivalents() / simLink.getMaxFlowCapacity();
-		simLink.doSimStep(null, now);
+		simLink.doSimStep(now);
 		assertTrue(simLink.isOffering());
 		var pop2 = simLink.popVehicle();
 		assertEquals(vehicle2.getId(), pop2.getId());

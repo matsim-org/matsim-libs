@@ -59,7 +59,7 @@ class VehicleDepartingOnLinkTest {
 
 		// free the link
 		assertEquals(blockingVehicle.getId(), simLink.popVehicle().getId());
-		simLink.doSimStep(null, 2);
+		simLink.doSimStep(2);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer, 2));
 		assertFalse(simLink.isOffering());
 
@@ -70,7 +70,7 @@ class VehicleDepartingOnLinkTest {
 		assertEquals(simVehicle1.getId(), simLink.popVehicle().getId());
 		verify(em, times(1)).processEvent(any());
 
-		simLink.doSimStep(null, 4);
+		simLink.doSimStep(4);
 		wait2link.moveWaiting(4);
 		assertEquals(simVehicle2.getId(), simLink.popVehicle().getId());
 		verify(em, times(2)).processEvent(any());
@@ -113,7 +113,7 @@ class VehicleDepartingOnLinkTest {
 		verify(em, times(0)).processEvent(any());
 
 		// free the link
-		simLink.doSimStep(null, 0);
+		simLink.doSimStep(0);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
 		assertTrue(simLink.isOffering());
 		// this should put both vehicles onto the link
@@ -126,7 +126,7 @@ class VehicleDepartingOnLinkTest {
 			assertEquals(expectedId, v.getId());
 			return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 		});
-		assertFalse(simLink.doSimStep(null, 0));
+		assertFalse(simLink.doSimStep(0));
 	}
 
 	@Test

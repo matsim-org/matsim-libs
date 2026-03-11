@@ -38,7 +38,7 @@ public interface SimLink {
 
 	void addLeaveHandler(OnLeaveQueue onLeaveQueue);
 
-	boolean doSimStep(PartitionTransfer messaging, double now);
+	boolean doSimStep(double now);
 
 	enum OnLeaveQueueInstruction {MoveToBuffer, RemoveVehicle, BlockQueue}
 
@@ -62,7 +62,7 @@ public interface SimLink {
 		}
 	}
 
-	static SimLink create(Link link, SimNode toNode, DSimConfigGroup config, double effectiveCellSize, int part, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode) {
+	static SimLink create(Link link, SimNode toNode, DSimConfigGroup config, double effectiveCellSize, int part, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode, PartitionTransfer partitionTransfer) {
 		var fromPart = getPartition(link.getFromNode());
 		var toPart = getPartition(link.getToNode());
 		var outflowCapacity = FlowCapacity.createOutflowCapacity(link);
@@ -72,11 +72,11 @@ public interface SimLink {
 		} else if (toPart == part) {
 			var q = SimQueue.create(link, config, effectiveCellSize);
 			var localLink = new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), activateLink, activateNode);
-			return new SplitInLink(localLink, fromPart);
+			return new SplitInLink(localLink, fromPart, partitionTransfer);
 		} else {
 			var inflowCapacity = FlowCapacity.createInflowCapacity(link, config, effectiveCellSize);
 			var storageCapacity = createStorageCapacityForSplitOutLink(link, effectiveCellSize, config);
-			return new SplitOutLink(link, storageCapacity, inflowCapacity, activateLink);
+			return new SplitOutLink(link, storageCapacity, inflowCapacity, activateLink, partitionTransfer);
 		}
 	}
 
@@ -215,7 +215,7 @@ public interface SimLink {
 		}
 
 		@Override
-		public boolean doSimStep(PartitionTransfer messaging, double now) {
+		public boolean doSimStep(double now) {
 
 			while (!q.isEmpty()) {
 
@@ -292,14 +292,16 @@ public interface SimLink {
 		private final SimpleStorageCapacity storageCapacity;
 		private final FlowCapacity inflowCapacity;
 		private final Consumer<SimLink> activateLink;
+		private final PartitionTransfer partitionTransfer;
 		private OnLeaveQueue onLeaveHandler = (_, _, _) -> OnLeaveQueueInstruction.RemoveVehicle;
 
-		SplitOutLink(Link link, SimpleStorageCapacity storageCapacity, FlowCapacity inflowCapacity, Consumer<SimLink> activateLink) {
+		SplitOutLink(Link link, SimpleStorageCapacity storageCapacity, FlowCapacity inflowCapacity, Consumer<SimLink> activateLink, PartitionTransfer partitionTransfer) {
 			id = link.getId();
 			this.toPart = (int) link.getToNode().getAttributes().getAttribute(PARTITION_ATTR_KEY);
 			this.storageCapacity = storageCapacity;
 			this.inflowCapacity = inflowCapacity;
 			this.activateLink = activateLink;
+			this.partitionTransfer = partitionTransfer;
 		}
 
 		@Override
@@ -353,10 +355,10 @@ public interface SimLink {
 		}
 
 		@Override
-		public boolean doSimStep(PartitionTransfer messaging, double now) {
+		public boolean doSimStep(double now) {
 			for (var vehicle : q) {
 				onLeaveHandler.apply(vehicle, this, now);
-				messaging.collect(vehicle.toMessage(), vehicle.getCurrentLinkId());
+				partitionTransfer.collect(vehicle.toMessage(), toPart);
 			}
 			q.clear();
 			// mark ourselves as inactive. If the upstream node pushes vehicles onto the link
@@ -398,10 +400,12 @@ public interface SimLink {
 
 		private double consumedStorageCap = 0;
 		private double releasedStorageCap = 0;
+		private final PartitionTransfer partitionTransfer;
 
-		SplitInLink(LocalLink localLink, int fromPart) {
+		SplitInLink(LocalLink localLink, int fromPart, PartitionTransfer partitionTransfer) {
 			this.localLink = localLink;
 			this.fromPart = fromPart;
+			this.partitionTransfer = partitionTransfer;
 		}
 
 		@Override
@@ -469,14 +473,14 @@ public interface SimLink {
 		}
 
 		@Override
-		public boolean doSimStep(PartitionTransfer messaging, double now) {
+		public boolean doSimStep(double now) {
 
 			// report capacity changes to the upstream partition
 			// during doSimStep, vehicles may leave the network, and if we operate in kinematicWaves mode
 			// backwardstravelling holes may reach the upstream end of a link, so that capacity becomes
 			// available.
 			var occupiedBeforeSimStep = localLink.q.getOccupied();
-			var localLinkActive = localLink.doSimStep(messaging, now);
+			var localLinkActive = localLink.doSimStep(now);
 			var storageReleased = localLink.q.isAccepting(LinkPosition.QStart, now);
 			var occupiedAfterSimStep = localLink.q.getOccupied();
 			var releasedDuringSimStep = occupiedBeforeSimStep - occupiedAfterSimStep;
@@ -484,7 +488,7 @@ public interface SimLink {
 
 			if (released > 0 || consumedStorageCap > 0) {
 				var update = new CapacityUpdate(getId(), released, consumedStorageCap);
-				messaging.collect(update, fromPart);
+				partitionTransfer.collect(update, fromPart);
 				consumedStorageCap = 0;
 			}
 			return localLinkActive || !storageReleased;

@@ -11,6 +11,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.dsim.NetworkDecomposition;
+import org.matsim.dsim.PartitionTransfer;
 import org.matsim.examples.ExamplesUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,7 +49,7 @@ class SimNetworkTest {
 
 		var config = ConfigUtils.createConfig();
 		var simNetwork = new SimNetwork(network, config, partitioning.getPartition(part),
-			mock(ActiveLinks.class), mock(ActiveNodes.class));
+			mock(ActiveLinks.class), mock(ActiveNodes.class), mock(PartitionTransfer.class));
 
 		assertInstanceOf(SimLink.SplitInLink.class, simNetwork.getLinks().get(l1.getId()));
 		assertInstanceOf(SimLink.LocalLink.class, simNetwork.getLinks().get(l2.getId()));
@@ -65,14 +66,14 @@ class SimNetworkTest {
 		var network = NetworkUtils.readNetwork(netPath.toString());
 		NetworkDecomposition.scattered(network, 2);
 
-		var localNetwork = new SimNetwork(network, config, NetworkPartition.SINGLE_INSTANCE, mock(ActiveLinks.class), mock(ActiveNodes.class));
+		var localNetwork = new SimNetwork(network, config, NetworkPartition.SINGLE_INSTANCE, mock(ActiveLinks.class), mock(ActiveNodes.class), mock(PartitionTransfer.class));
 		var simulationNode = ComputeNode.builder()
 			.rank(0)
 			.parts(new IntArrayList(new int[]{0, 1}))
 			.cores(2)
 			.build();
 		var netPart = new NetworkPartitioning(simulationNode, network);
-		var distNetwork = new SimNetwork(network, config, netPart.getPartition(0), mock(ActiveLinks.class), mock(ActiveNodes.class));
+		var distNetwork = new SimNetwork(network, config, netPart.getPartition(0), mock(ActiveLinks.class), mock(ActiveNodes.class), mock(PartitionTransfer.class));
 
 		assertNotEquals(localNetwork.getLinks().size(), distNetwork.getLinks().size());
 		assertNotEquals(localNetwork.getNodes().size(), distNetwork.getNodes().size());

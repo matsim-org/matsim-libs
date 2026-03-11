@@ -29,6 +29,7 @@ import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.dsim.DistributedEventsManager;
+import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.messages.SimStepMessageProcessor;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.scoring.BackpackScoringModule;
@@ -47,7 +48,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final List<DistributedDepartureHandler> departureHandlers = new ArrayList<>();
 	private final List<DistributedActivityHandler> activityHandlers = new ArrayList<>();
 	private final MobsimListenerManager listenerManager = new MobsimListenerManager(this);
-	private final SimStepMessaging messaging;
+	//	private final SimStepMessaging messaging;
+	private final PartitionTransfer partitionTransfer;
 	private final Scenario scenario;
 	private final NetworkPartition partition;
 	private final AgentSourcesContainer asc;
@@ -66,15 +68,15 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final IdMap<Person, MobsimAgent> agents = new IdMap<>(Person.class);
 
 	@Inject
-	SimProcess(Scenario scenario, NetworkPartition partition, SimStepMessaging messaging, AgentSourcesContainer asc, DistributedEventsManager em,
+	SimProcess(Scenario scenario, NetworkPartition partition, PartitionTransfer messaging, AgentSourcesContainer asc, DistributedEventsManager em,
 			   BackpackDataCollector bdc, BackpackScoringModule.BackpackDataCollectorRegistry registry) {
 		this.scenario = scenario;
 		this.partition = partition;
-		this.messaging = messaging;
 		this.asc = asc;
 		this.em = em;
 		this.currentTime = new MobsimTimer();
 		this.backpackDataCollector = bdc;
+		this.partitionTransfer = messaging;
 
 		// register the collector, so it can be removed from the events manager eventually.
 		registry.register(bdc);
@@ -135,7 +137,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			engine.doSimStep(time);
 		}
 
-		messaging.sendMessages(time);
+		partitionTransfer.send(time);
 
 		listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 	}

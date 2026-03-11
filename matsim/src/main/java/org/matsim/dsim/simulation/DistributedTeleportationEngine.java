@@ -141,6 +141,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		throw new RuntimeException("Snapshot Positions are not implemented for Distributed Teleportation Engine. This method is only here because the 'TeleportationInterface' requires it.");
 	}
 
-	private record TeleportationEntry(DistributedMobsimAgent person, double exitTime) implements Message {
+	// must be at least package private, so that it can be picked up by the serialization mechanism.
+	record TeleportationEntry(DistributedMobsimAgent person, double exitTime) implements Message {
 	}
 }

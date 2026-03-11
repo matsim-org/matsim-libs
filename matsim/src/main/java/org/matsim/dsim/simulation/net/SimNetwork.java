@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.dsim.DSimConfigGroup;
+import org.matsim.dsim.PartitionTransfer;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ public class SimNetwork {
 
 	@Inject
 	SimNetwork(Network network, Config config, NetworkPartition networkPartition,
-			   ActiveLinks activeLinks, ActiveNodes activeNodes) {
+			   ActiveLinks activeLinks, ActiveNodes activeNodes, PartitionTransfer partitionTransfer) {
 
 		// collect nodes which belong to this partition
 		var localNodes = network.getNodes().values().stream()
@@ -56,7 +57,7 @@ public class SimNetwork {
 			.distinct()
 			.map(link -> {
 				var toNode = nodes.get(link.getToNode().getId());
-				return SimLink.create(link, toNode, dsimConfig, network.getEffectiveCellSize(), networkPartition.getIndex(), activeLinks::activate, activeNodes::activate);
+				return SimLink.create(link, toNode, dsimConfig, network.getEffectiveCellSize(), networkPartition.getIndex(), activeLinks::activate, activeNodes::activate, partitionTransfer);
 			})
 			.collect(Collectors.toMap(SimLink::getId, l -> l));
 
