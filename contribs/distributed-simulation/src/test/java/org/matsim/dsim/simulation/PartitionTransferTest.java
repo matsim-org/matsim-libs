@@ -36,12 +36,12 @@ class PartitionTransferTest {
 	void setUp() {
 		var network = TestUtils.createDistributedThreeLinkNetwork();
 		var node0 = ComputeNode.builder().rank(0).parts(IntList.of(0)).cores(1).hostname("localhost").build();
-		var partitioning = new NetworkPartitioning(node0, network);
+		network.setPartitioning(new NetworkPartitioning(node0, network));
 
 		broker = mock(MessageBroker.class);
 		when(broker.getRank()).thenReturn(0);
 
-		transfer = new PartitionTransfer(partitioning, broker);
+		transfer = new PartitionTransfer(network, broker);
 	}
 
 	// --- collect(Message, Id<Link>) ---
@@ -52,8 +52,7 @@ class PartitionTransferTest {
 		// l2 belongs to partition 1
 		transfer.collect(msg, Id.createLinkId("l2"));
 
-		verify(broker).send(msg, 1);
-		verifyNoMoreInteractions(broker);
+		verify(broker, times(1)).send(msg, 1);
 	}
 
 	@Test

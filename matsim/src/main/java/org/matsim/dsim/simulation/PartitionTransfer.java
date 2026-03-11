@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.dsim.MessageBroker;
 import org.matsim.dsim.messages.SimStepMessage2;
@@ -21,8 +22,8 @@ public class PartitionTransfer {
 	private final Int2ObjectMap<Int2ObjectMap<List<Message>>> messages = new Int2ObjectOpenHashMap<>();
 
 	@Inject
-	public PartitionTransfer(NetworkPartitioning networkPartitioning, MessageBroker messageBroker) {
-		this.networkPartitioning = networkPartitioning;
+	public PartitionTransfer(Network network, MessageBroker messageBroker) {
+		this.networkPartitioning = network.getPartitioning();
 		this.messageBroker = messageBroker;
 	}
 
