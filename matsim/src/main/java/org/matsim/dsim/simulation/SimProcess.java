@@ -29,7 +29,6 @@ import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.dsim.DistributedEventsManager;
-import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.messages.SimStepMessageProcessor;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.scoring.BackpackScoringModule;

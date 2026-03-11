@@ -14,7 +14,6 @@ import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 

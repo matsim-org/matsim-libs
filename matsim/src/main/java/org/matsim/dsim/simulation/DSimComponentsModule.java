@@ -13,7 +13,6 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.simulation.net.DefaultWait2Link;
 import org.matsim.dsim.simulation.net.Wait2Link;
 import org.matsim.dsim.simulation.pt.DistributedPtEngine;

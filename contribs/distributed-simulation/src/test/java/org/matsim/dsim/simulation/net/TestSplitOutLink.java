@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.dsim.DSimConfigGroup;
-import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.TestUtils;
+import org.matsim.dsim.simulation.PartitionTransfer;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

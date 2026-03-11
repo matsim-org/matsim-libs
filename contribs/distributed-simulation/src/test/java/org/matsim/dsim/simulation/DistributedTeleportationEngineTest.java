@@ -17,7 +17,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;

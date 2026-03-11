@@ -23,10 +23,10 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.dsim.DSimConfigGroup;
-import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
+import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.dsim.simulation.SimpleVehicle;
 import org.matsim.vehicles.VehicleType;
 

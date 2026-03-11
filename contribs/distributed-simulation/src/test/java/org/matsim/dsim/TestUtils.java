@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.dsim.simulation.SimpleAgent;
 import org.matsim.dsim.simulation.SimpleVehicle;
 import org.matsim.dsim.simulation.net.SimLink;

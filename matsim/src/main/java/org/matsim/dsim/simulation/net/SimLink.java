@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.dsim.DSimConfigGroup;
-import org.matsim.dsim.PartitionTransfer;
+import org.matsim.dsim.simulation.PartitionTransfer;
 
 import java.util.*;
 import java.util.function.Consumer;

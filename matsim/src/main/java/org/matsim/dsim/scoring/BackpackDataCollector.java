@@ -16,8 +16,8 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.dsim.PartitionTransfer;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
+import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.HashMap;

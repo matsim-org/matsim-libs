@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.dsim.DSimConfigGroup;
-import org.matsim.dsim.PartitionTransfer;
+import org.matsim.dsim.simulation.PartitionTransfer;
 
 import java.util.Map;
 import java.util.stream.Collectors;

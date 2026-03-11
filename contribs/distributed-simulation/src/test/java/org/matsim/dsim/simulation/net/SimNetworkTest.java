@@ -11,7 +11,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.dsim.NetworkDecomposition;
-import org.matsim.dsim.PartitionTransfer;
+import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.examples.ExamplesUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
