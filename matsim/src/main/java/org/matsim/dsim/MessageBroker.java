@@ -11,8 +11,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.HdrHistogram.Histogram;
 import org.agrona.BitUtil;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
-import org.apache.fury.ThreadSafeFury;
-import org.apache.fury.memory.MemoryBuffer;
+import org.apache.fory.memory.MemoryBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
@@ -405,7 +404,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		log.trace("#{} queue send to {}/{}: {}", this.getRank(), rank, partition, msg);
 		AtomicInteger oldPos = dataSize[rank + 1];
 
-		ThreadSafeFury fury = serialization.getFury();
+		var fury = serialization.getFory();
 		MemoryBuffer buf = MemoryBuffer.newHeapBuffer(1024);
 
 		while (true) {

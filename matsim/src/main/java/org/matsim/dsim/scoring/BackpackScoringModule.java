@@ -2,6 +2,7 @@ package org.matsim.dsim.scoring;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.MapBinder;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -24,7 +25,9 @@ import org.matsim.core.scoring.NewScoreAssignerImpl;
 import org.matsim.dsim.simulation.IterationInformation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class BackpackScoringModule extends AbstractModule {
 	@Override
@@ -60,6 +63,30 @@ public class BackpackScoringModule extends AbstractModule {
 				bind(BackpackDataCollector.class).in(Singleton.class);
 			}
 		});
+
+		// the following binds providers to create experienced routes. We need one provider for each mode used
+		// during the simulation.
+		var binder = MapBinder.newMapBinder(binder(), String.class, BackpackRouteProvider.class);
+
+		// create generic routes for teleported modes. This includes all modes for which we have teleported speeds, freesped factors,
+		// as well as network modes in routing, which are not contained as network modes in the mobsim. Also, pt is handled separately.
+		Stream.of(
+				getConfig().routing().getTeleportedModeSpeeds().keySet(),
+				getConfig().routing().getTeleportedModeFreespeedFactors().keySet(),
+				getConfig().routing().getNetworkModes()
+			)
+			.flatMap(Collection::stream)
+			.filter(m -> !getConfig().dsim().getNetworkModes().contains(m))
+			.filter(m -> !getConfig().transit().getTransitModes().contains(m))
+			.forEach(m -> binder.addBinding(m).to(BackpackGenericRouteProvider.class));
+
+		// network routes for all modes that are registered as network modes.
+		getConfig().dsim().getNetworkModes().forEach(m -> binder.addBinding(m).to(BackpackNetworkRouteProvider.class));
+
+		// transit routes if pt is enabled
+		if (getConfig().transit().isUseTransit()) {
+			getConfig().transit().getTransitModes().forEach(m -> binder.addBinding(m).to(BackpackTransitRouteProvider.class));
+		}
 	}
 
 	/**

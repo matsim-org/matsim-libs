@@ -98,7 +98,7 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car,
 					routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser );
 		} else {
-			return DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, populationFactory,
+			return DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, populationFactory, scenario,
 					filteredNetwork, routeAlgo);
 		}
 		// yyyyyy not so great that this differentiation is here; need to push it down a bit (again). kai, feb'2016

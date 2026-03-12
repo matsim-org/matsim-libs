@@ -43,7 +43,8 @@ public class VehicleTripConstraintConfigGroup extends ComponentConfigGroup {
 	@StringSetter(RESTRICTED_MODES)
 	public void setRestrictedModesAsString(String restrictedModes) {
 		this.restrictedModes = new HashSet<>(
-				Arrays.asList(restrictedModes.split(",")).stream().map(String::trim).collect(Collectors.toSet()));
+				Arrays.asList(restrictedModes.split(",")).stream().map(String::trim).filter(s -> !s.isEmpty())
+						.collect(Collectors.toSet()));
 	}
 
 	public Collection<String> getRestrictedModes() {

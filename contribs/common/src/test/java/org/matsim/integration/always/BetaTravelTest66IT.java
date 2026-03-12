@@ -135,6 +135,7 @@ public class BetaTravelTest66IT {
 		Config config = utils.loadConfig("../../examples/scenarios/equil/config.xml");
 		ConfigUtils.loadConfig(config, utils.getInputDirectory() + "config.xml");
 		config.controller().setWritePlansInterval(0);
+		config.global().setRelativeToleranceForSampleSizeFactors( 5.1 );
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		/*

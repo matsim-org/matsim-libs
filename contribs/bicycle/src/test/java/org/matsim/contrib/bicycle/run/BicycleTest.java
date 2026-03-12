@@ -39,6 +39,7 @@ import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
@@ -93,6 +94,7 @@ public class BicycleTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		new RunBicycleExample().run(config );
 
@@ -130,6 +132,7 @@ public class BicycleTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		new RunBicycleExample().run(config );
 		{
@@ -162,6 +165,7 @@ public class BicycleTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		new RunBicycleExample().run(config );
 
@@ -192,6 +196,7 @@ public class BicycleTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		new RunBicycleExample().run(config );
 
@@ -223,6 +228,7 @@ public class BicycleTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		new RunBicycleExample().run(config );
 
@@ -254,6 +260,7 @@ public class BicycleTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		new RunBicycleExample().run(config );
 
@@ -282,6 +289,7 @@ public class BicycleTest {
 		config.plans().setInputFile("population_1200.xml");
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		// 10 iterations
 		config.controller().setLastIteration(10);
 		config.controller().setWriteEventsInterval(10);
@@ -649,6 +657,7 @@ public class BicycleTest {
 		config.controller().setWriteEventsInterval( 10 );
 		config.controller().setWritePlansInterval( 10 );
 		config.controller().setCreateGraphs( false );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		return config;
 	}
 

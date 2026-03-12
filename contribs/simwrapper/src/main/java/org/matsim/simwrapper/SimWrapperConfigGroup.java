@@ -1,5 +1,6 @@
 package org.matsim.simwrapper;
 
+import org.apache.commons.math3.util.Precision;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -19,7 +20,7 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Whether default dashboards are created.")
-	private Mode defaultDashboards = Mode.enabled;
+	private DefaultDashboardsMode defaultDashboards = DefaultDashboardsMode.enabled;
 
 	@Parameter
 	@Comment("Set of packages to scan for dashboard provider classes.")
@@ -95,13 +96,22 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 		if (!getInclude().isEmpty() && !getExclude().isEmpty()) {
 			throw new IllegalStateException("Include and exclude option can't be set both.");
 		}
+
+		// check the (available) scale factors:
+		final double flowCapFactor = config.qsim().getFlowCapFactor();
+		final double relativeTolerance = config.global().getRelativeToleranceForSampleSizeFactor();
+		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, this.sampleSize, relativeTolerance ) ) {
+			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
+			+ ". Relative tolerance can be set in the global config group.");
+		}
+
 	}
 
-	public Mode getDefaultDashboards() {
+	public DefaultDashboardsMode getDefaultDashboards() {
 		return defaultDashboards;
 	}
 
-	public void setDefaultDashboards(Mode defaultDashboards) {
+	public void setDefaultDashboards( DefaultDashboardsMode defaultDashboards ) {
 		this.defaultDashboards = defaultDashboards;
 	}
 
@@ -140,7 +150,7 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * Mode how default dashboards are loaded.
 	 */
-	public enum Mode {
+	public enum DefaultDashboardsMode{
 		enabled,
 		disabled
 	}
@@ -202,33 +212,38 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 			return context;
 		}
 
-		public void setContext(String context) {
+		public ContextParams setContext(String context) {
 			this.context = context;
+			return this;
 		}
 
 		public String getShp() {
 			return shp;
 		}
 
-		public void setShp(String shp) {
+		public ContextParams setShp(String shp) {
 			this.shp = shp;
+			return this;
 		}
 
 		public String getMapCenter() {
 			return mapCenter;
 		}
 
-		public void setMapCenter(String mapCenter) {
+		public ContextParams setMapCenter(String mapCenter) {
 			this.mapCenter = mapCenter;
+			return this;
 		}
 
 		public Double getMapZoomLevel() {
 			return mapZoomLevel;
 		}
 
-		public void setMapZoomLevel(Double mapZoomLevel) {
+		public ContextParams setMapZoomLevel(Double mapZoomLevel) {
 			this.mapZoomLevel = mapZoomLevel;
+			return this;
 		}
 	}
+
 
 }

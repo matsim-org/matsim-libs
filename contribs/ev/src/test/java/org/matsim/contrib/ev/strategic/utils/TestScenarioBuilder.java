@@ -75,6 +75,7 @@ import org.matsim.contrib.ev.withinday.events.UpdateChargingAttemptEvent;
 import org.matsim.contrib.ev.withinday.events.UpdateChargingAttemptEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
@@ -420,6 +421,7 @@ public class TestScenarioBuilder {
 		config.scoring().addActivityParams(genericActivity);
 
 		config.controller().setLastIteration(iterations);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		config.qsim().setStartTime(simulationStartTime);
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);

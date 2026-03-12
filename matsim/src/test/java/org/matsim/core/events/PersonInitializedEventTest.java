@@ -56,6 +56,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -74,19 +75,25 @@ public class PersonInitializedEventTest {
 
 	@Test
 	void testWriteReadXml() {
-		final PersonInitializedEvent event1 = new PersonInitializedEvent(0, Id.createPersonId("testPerson"));
+		final PersonInitializedEvent event1 = new PersonInitializedEvent(0, Id.createPersonId("testPerson"), Id.createLinkId("testLink"), Id.create("testFacility", ActivityFacility.class), "testType", null);
 		final PersonInitializedEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getPersonId(), event2.getPersonId());
+		assertEquals(event1.getLinkId(), event2.getLinkId());
+		assertEquals(event1.getFacilityId(), event2.getFacilityId());
+		assertEquals(event1.getActivityType(), event2.getActivityType());
 		assertNull(event2.getCoord());
 	}
 	
 	@Test
 	void testWriteReadXmlWithCoord() {
-		final PersonInitializedEvent event1 = new PersonInitializedEvent(0, Id.createPersonId("testPerson"), new Coord(12345, 67890));
+		final PersonInitializedEvent event1 = new PersonInitializedEvent(0, Id.createPersonId("testPerson"), Id.createLinkId("testLink"), Id.create("testFacility", ActivityFacility.class), "testType", new Coord(12345, 67890));
 		final PersonInitializedEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getPersonId(), event2.getPersonId());
+		assertEquals(event1.getLinkId(), event2.getLinkId());
+		assertEquals(event1.getFacilityId(), event2.getFacilityId());
+		assertEquals(event1.getActivityType(), event2.getActivityType());
 		assertEquals(event1.getCoord(), event2.getCoord());
 	}
 	

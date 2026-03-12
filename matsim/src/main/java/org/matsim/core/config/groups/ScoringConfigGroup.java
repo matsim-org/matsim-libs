@@ -457,7 +457,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 	}
-
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public Collection<ActivityParams> getActivityParams() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getActivityParams();
@@ -467,6 +467,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			throw new RuntimeException("Default subpopulation is not defined");
 	}
 
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public Map<String, ModeParams> getModes() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getModes();
@@ -494,6 +495,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	/* direct access */
 
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public double getMarginalUtlOfWaitingPt_utils_hr() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getMarginalUtlOfWaitingPt_utils_hr();
@@ -504,10 +506,12 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	}
 
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public void setMarginalUtlOfWaitingPt_utils_hr(double val) {
 		getScoringParameters(null).setMarginalUtlOfWaitingPt_utils_hr(val);
 	}
 
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public ActivityParams getActivityParams(final String actType) {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getActivityParams(actType);
@@ -706,21 +710,21 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		delegate.setPathSizeLogitBeta(beta);
 	}
 
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public double getLateArrival_utils_hr() {
-
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getLateArrival_utils_hr();
 		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
 			return getScoringParameters(DEFAULT_SUBPOPULATION).getLateArrival_utils_hr();
 		else
 			throw new RuntimeException("Default subpopulation is not defined");
-
 	}
 
 	public void setLateArrival_utils_hr(double lateArrival) {
 		getScoringParameters(null).setLateArrival_utils_hr(lateArrival);
 	}
 
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public double getEarlyDeparture_utils_hr() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getEarlyDeparture_utils_hr();
@@ -735,6 +739,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		getScoringParameters(null).setEarlyDeparture_utils_hr(earlyDeparture);
 	}
 
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public double getPerforming_utils_hr() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getPerforming_utils_hr();
@@ -749,6 +754,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		getScoringParameters(null).setPerforming_utils_hr(performing);
 	}
 
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public double getMarginalUtilityOfMoney() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getMarginalUtilityOfMoney();
@@ -763,6 +769,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		getScoringParameters(null).setMarginalUtilityOfMoney(marginalUtilityOfMoney);
 	}
 
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public double getUtilityOfLineSwitch() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getUtilityOfLineSwitch();
@@ -794,6 +801,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		delegate.setWriteExperiencedPlans(writeExperiencedPlans);
 	}
 
+	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public double getMarginalUtlOfWaiting_utils_hr() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getMarginalUtlOfWaiting_utils_hr();
