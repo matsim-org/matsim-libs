@@ -29,7 +29,7 @@ public class PartitionTransfer {
 
 	public void collect(Message message, Id<Link> targetLink) {
 		var targetPartition = getRank(targetLink);
-		messageBroker.send(message, targetPartition);
+		collect(message, targetPartition);
 	}
 
 	public void collect(Message message, int targetRank) {
