@@ -28,6 +28,7 @@ public class DashboardTests {
 		config.controller().setWriteEventsInterval(4);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
+//		group.setSampleSize(0.001);
 		group.setSampleSize(0.001);
 		group.defaultParams().setMapCenter("11.891000, 48.911000");
 
