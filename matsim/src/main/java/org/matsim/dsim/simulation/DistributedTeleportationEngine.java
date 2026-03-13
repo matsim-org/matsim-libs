@@ -10,17 +10,14 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
-import org.matsim.core.mobsim.dsim.SimStepMessage;
+import org.matsim.core.mobsim.dsim.Teleportation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class DistributedTeleportationEngine implements DistributedDepartureHandler, DistributedMobsimEngine, TeleportationEngine {
 
@@ -44,8 +41,8 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	DistributedTeleportationEngine(EventsManager em, PartitionTransfer partitionTransfer, AgentSourcesContainer asc,
 								   BackpackDataCollector bdc) {
 		this.partitionTransfer = partitionTransfer;
-		this.em = em;
 		this.asc = asc;
+		this.em = em;
 		this.bdc = bdc;
 	}
 
@@ -70,32 +67,37 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 		var travelTime = person.getExpectedTravelTime().seconds();
 		var exitTime = now + travelTime;
-		var teleportation = new TeleportationEntry(person, exitTime);
 
 		if (partitionTransfer.isLocal(person.getDestinationLinkId())) {
-			personsTeleporting.add(teleportation);
+			personsTeleporting.add(new TeleportationEntry(person, exitTime));
 		} else {
 			// TODO: replace with general mechanism for notifying person is leaving
 			bdc.teleportedPersonLeavesPartition(person);
-			partitionTransfer.collect(teleportation, person.getDestinationLinkId());
+			partitionTransfer.collect(new Teleportation(person.getClass(), person.toMessage(), exitTime), person.getDestinationLinkId());
 		}
 
 		return true;
 	}
 
 	@Override
-	public void process(SimStepMessage stepMessage, double now) {
-		for (var teleportation : stepMessage.teleportations()) {
-			var exitTime = teleportation.exitTime();
-			if (exitTime < now) {
-				throw new IllegalStateException("Teleportation message was received too late. Exit time is supposed to be" +
-					exitTime + " but simulation time is already at: " + now + ". This might happen, if partitions " +
-					"diverge in simulation time. We don't really have a solution to this problem yet. However, this" +
-					" error might be an indicator, that the speed of the teleported leg is too fast.");
-			}
+	public Map<Integer, MessageHandler> getMessageHandlers() {
+		return Map.of(
+			Teleportation.class.getName().hashCode(),
+			this::processTeleportationMessages
+		);
+	}
 
-			DistributedMobsimAgent agent = asc.agentFromMessage(teleportation.type(), teleportation.agent());
-			personsTeleporting.add(new TeleportationEntry(agent, exitTime));
+	private void processTeleportationMessages(List<Message> messages, double now) {
+		for (var m : messages) {
+			var msg = (Teleportation) m;
+			if (msg.exitTime() < now) {
+				throw new IllegalStateException("Teleportation message was received too late. Exit time is supposed to be " +
+					msg.exitTime() + " but simulation time is already at: " + now + ". This might happen, if partitions " +
+					"diverge in simulation time. We don't really have a solution to this problem yet. However, this " +
+					"error might be an indicator, that the speed of the teleported leg is too fast.");
+			}
+			var agent = asc.agentFromMessage(msg.type(), msg.agent());
+			personsTeleporting.add(new TeleportationEntry(agent, msg.exitTime()));
 		}
 	}
 
@@ -140,7 +142,6 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		throw new RuntimeException("Snapshot Positions are not implemented for Distributed Teleportation Engine. This method is only here because the 'TeleportationInterface' requires it.");
 	}
 
-	// must be at least package private, so that it can be picked up by the serialization mechanism.
-	record TeleportationEntry(DistributedMobsimAgent person, double exitTime) implements Message {
+	record TeleportationEntry(DistributedMobsimAgent person, double exitTime) {
 	}
 }

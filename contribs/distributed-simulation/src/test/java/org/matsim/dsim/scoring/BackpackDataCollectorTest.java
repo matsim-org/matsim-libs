@@ -13,7 +13,6 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.PersonEntersPtVehicleEvent;
@@ -162,9 +161,10 @@ class BackpackDataCollectorTest {
 		verify(messaging, times(1)).collect(backPackCaptor.capture(), anyInt());
 		var backpack = backPackCaptor.getValue();
 
-		// create a message from the backpack and pass it back to the collector.
-		var msg = SimStepMessage.builder().addBackPack(backpack).build();
-		collector.process(msg);
+		// pass the backpack back to the collector via its message handler.
+		collector.getMessageHandlers()
+			.get(Backpack.Msg.class.getName().hashCode())
+			.handle(List.of(backpack), 0);
 
 		// now, process the remaining events.
 		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
@@ -564,11 +564,12 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
 
-		var msg = SimStepMessage.builder()
-			.addBackPack(new Backpack.Msg(registered, List.of(), 0, new BackpackPlan.Msg(null, null, null)))
-			.addVehicleContainer(new VehicleContainer(null, null, new VehicleContainer.Occupant(ignoredAgent), List.of()))
-			.build();
-		collector.process(msg);
+		collector.getMessageHandlers()
+			.get(Backpack.Msg.class.getName().hashCode())
+			.handle(List.of(new Backpack.Msg(registered, List.of(), 0, new BackpackPlan.Msg(null, null, null))), 0);
+		collector.getMessageHandlers()
+			.get(VehicleContainer.class.getName().hashCode())
+			.handle(List.of(new VehicleContainer(null, null, new VehicleContainer.Occupant(ignoredAgent), List.of())), 0);
 
 		// make sure the collector doesn't crash when we send it events with the ignored agent.
 		collector.handleEvent(new ActivityEndEvent(100., ignored, link1, null, "home", new Coord(0, 0)));

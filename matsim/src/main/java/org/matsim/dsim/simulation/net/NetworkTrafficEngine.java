@@ -7,11 +7,15 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.dsim.*;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
+
+import java.util.Map;
 
 public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
@@ -79,14 +83,13 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Override
-	public void process(SimStepMessage stepMessage, double now) {
-		for (VehicleContainer vehicleMessage : stepMessage.vehicles()) {
-			processVehicleMessage(vehicleMessage, now);
-		}
-
-		for (CapacityUpdate updateMessage : stepMessage.capUpdates()) {
-			processUpdateMessage(updateMessage);
-		}
+	public Map<Integer, MessageHandler> getMessageHandlers() {
+		return Map.<Integer, MessageHandler>of(
+			VehicleContainer.class.getName().hashCode(),
+			(msgs, now) -> msgs.forEach(m -> processVehicleMessage((VehicleContainer) m, now)),
+			SimLink.SplitInLink.CapacityUpdate.class.getName().hashCode(),
+			(msgs, now) -> msgs.forEach(m -> processUpdateMessage((SimLink.SplitInLink.CapacityUpdate) m))
+		);
 	}
 
 	private void processVehicleMessage(VehicleContainer vehicleContainer, double now) {
@@ -97,7 +100,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		link.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
 	}
 
-	private void processUpdateMessage(CapacityUpdate updateMessage) {
+	private void processUpdateMessage(SimLink.SplitInLink.CapacityUpdate updateMessage) {
 
 		Id<Link> linkId = updateMessage.linkId();
 		double released = updateMessage.released();
