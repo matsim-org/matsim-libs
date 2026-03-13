@@ -17,6 +17,7 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimEngine.MessageHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.dsim.NetworkDecomposition;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.vehicles.Vehicle;
@@ -107,9 +108,11 @@ public class BackpackDataCollector implements BasicEventHandler {
 		// janek, marcel Dec' 2025
 		for (var m : messages) {
 			var veh = asc.vehicleFromContainer((VehicleContainer) m);
-			// if the driver does not bring a backpack, we can ignore it.
+			// Transit drivers are not part of the population and do not carry backpacks.
+			// Using population membership (not backpack presence) avoids a race condition where
+			// the backpack message for a population agent may arrive in a different order than the vehicle message.
 			var driverId = veh.getDriver().getId();
-			if (!backpackByPerson.containsKey(driverId)) {
+			if (!population.getPersons().containsKey(driverId)) {
 				ignoredAgents.add(driverId);
 			}
 		}
@@ -117,7 +120,8 @@ public class BackpackDataCollector implements BasicEventHandler {
 
 	public void vehicleLeavesPartition(DistributedMobsimVehicle vehicle) {
 		var driverId = vehicle.getDriver().getId();
-		var targetPart = network.getPartitioning().getPartition(vehicle.getCurrentLinkId());
+		var link = network.getLinks().get(vehicle.getCurrentLinkId());
+		var targetPart = (int) link.getToNode().getAttributes().getAttribute(NetworkDecomposition.PARTITION_ATTR_KEY);
 
 		if (!ignoredAgents.contains(driverId)) {
 			personLeavingPartition(driverId, targetPart);
