@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.dsim.DSimConfigGroup;
+import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.PartitionTransfer;
 
 import java.util.*;
@@ -358,7 +359,7 @@ public interface SimLink {
 		public boolean doSimStep(double now) {
 			for (var vehicle : q) {
 				onLeaveHandler.apply(vehicle, this, now);
-				partitionTransfer.collect(vehicle.toMessage(), toPart);
+				partitionTransfer.collect(AgentSourcesContainer.vehicleToContainer(vehicle), toPart);
 			}
 			q.clear();
 			// mark ourselves as inactive. If the upstream node pushes vehicles onto the link
