@@ -88,7 +88,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	MutableScenario baseScenario;
 	private List<PreparedGeometry> geometries;
 
-	Injector injector;
+	Injector baseInjector;
 	Injector policyInjector;
 
 	private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
@@ -217,6 +217,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		Config baseConfig = ConfigUtils.loadConfig( globFile( baseCasePath, "*output_config_reduced.xml" ).toString() );
 		// (The reduced config has fewer problems with newly introduced config params.)
 
+		baseConfig.controller().setOutputDirectory( "output/dummyOutputFromAgentWiseComparisonKN" );
 		baseConfig.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
@@ -226,8 +227,6 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the reduced config specifies them in an incomplete
 		// way, but I am not sure if that is the problem. --> that probably is indeed the problem.  In general, they are created automatically,
 		// but if they already exist in some other way (i.e., in this case coming from the reduced config), then those are not over-written.
-
-//		baseConfig.routing().setNetworkModes( Collections.singletonList( TransportMode.car ) );  // the rail raptor tries to go to the links which are connected to facilities
 
 		baseConfig.facilities().setInputFile( globFile( baseCasePath, "*output_" + DefaultFiles.facilities.getFilename() + ".gz" ).toString() );
 
@@ -247,6 +246,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		baseConfig.routing().setNetworkModes( Collections.emptySet() );
 
+		// ===
+
 		baseScenario = (MutableScenario) ScenarioUtils.loadScenario( baseConfig );
 
 		final Population basePopulation = readAndCleanPopulation( baseCasePath, eventsFilePatterns );
@@ -256,26 +257,21 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		computeAndSetMarginalUtilitiesOfMoney( baseScenario );
 		computeAndSetIncomeDeciles( basePopulation );
 
-		///  see {@link org.matsim.application.prepare.pt.AdjustSameDepartureTimes}
-
-		ScoringFunctionFactory baseScoringFunctionFactory;
-		{
-			baseScenario.getConfig().controller().setOutputDirectory( "output/dummyOutputFromAgentWiseComparisonKN" );
-			this.injector = new org.matsim.core.controler.Injector.InjectorBuilder( baseScenario )
-													  .addStandardModules()
-													  .addOverridingModule( new AbstractModule(){
-														  @Override public void install(){
-															  bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
-														  }
-													  } ).build();
-			baseScoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
-		}
-
 		// ===
+
+		this.baseInjector = new org.matsim.core.controler.Injector.InjectorBuilder( baseScenario )
+								.addStandardModules()
+								.addOverridingModule( new AbstractModule(){
+									@Override public void install(){
+										bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
+									}
+								} ).build();
+
+		// ###
 
 //		Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
 		Table baseTableTrips = null;
-		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null, baseScoringFunctionFactory );
+		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null, baseInjector.getInstance( ScoringFunctionFactory.class ) );
 
 		baseTablePersons.addColumns( baseTablePersons.doubleColumn( MATSIM_SCORE ).subtract( baseTablePersons.doubleColumn( SCORE ) ).setName( "error" ) );
 
@@ -343,6 +339,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		// (tagging is better than removing since (1) one can have multiple tags in one go, and (2) the average income becomes different once we start removing people)
 
 		policyScenario.setActivityFacilities( baseScenario.getActivityFacilities() );
+
+		// ===
 
 		this.policyInjector = new org.matsim.core.controler.Injector.InjectorBuilder( policyScenario )
 							 .addStandardModules()
@@ -586,7 +584,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	void compare( Scenario policyScenario, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Scenario baseScenario, Config baseConfig, Path outputPath ){
 
 		if( doRoh ){
-			new AgentWiseRuleOfHalfComputation( this.injector, this.policyInjector ).somehowComputeRuleOfHalf();
+			new AgentWiseRuleOfHalfComputation( this.baseInjector, this.policyInjector ).somehowComputeRuleOfHalf();
 			addRohValuesToTable( policyScenario.getPopulation(), personsTablePolicy );
 		}
 		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
