@@ -179,6 +179,20 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log(lvl, "timeAllocationMutator is affecting duration; vsp default is to not do that.  Reason is that the upstream demand generation uses activityEndTimes " +
 				"for long activity types and duration for short activity types.  However, for a short activity of, say, 10min, a mutation of plus/minus the time mutation range leads to problems.");
 		}
+		// added feb'26
+		if ( config.timeAllocationMutator().isMutateAroundInitialEndTimeOnly() ) {
+			System.out.flush();
+			log.log(lvl, "timeAllocationMutator mutates around the initial end time only; vsp default is to not do that.  Reason is that mutating around the initial end time " +
+							 "destroys the economic interpretation of MATSim ... since travellers who stop adjusting because of this switch are no longer driven by the scoring function, " +
+							 "but by the computational process.");
+			problem = true;
+		}
+		// added feb'26
+		if ( config.timeAllocationMutator().getLatestActivityEndTime() < 27. * 3600 ) {
+			System.out.flush();
+			log.log( lvl, "The latest activity end time of the timeAllocationMutator is too early.  It should be infinity, but since that setting is not possible, it should " +
+							  "minimally be the last time step of the qsim.");
+		}
 		return problem;
 	}
 

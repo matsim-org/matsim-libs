@@ -1,5 +1,6 @@
 package org.matsim.application.analysis.population;
 
+import com.google.inject.Injector;
 import gnu.trove.TIntCollection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +18,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -105,8 +105,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	MutableScenario baseScenario;
 	private List<PreparedGeometry> geometries;
 
-	com.google.inject.Injector injector;
-	com.google.inject.Injector injector2;
+	Injector injector;
+	Injector injector2;
 //	TripRouter tripRouter1;
 //	TripRouter tripRouter2;
 
@@ -143,12 +143,18 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		// -- "old"
 //		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-none-it500-20260218";
 //		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-none-it500-20260218";
-		// // final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-none-it500-routesCleaned-20260218";
+
+		// -- "old" with cleaned routes:
+//		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-none-it500-routesCleaned-20260224";
+//		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-none-it500-routesCleaned-20260218";
 
 		// -- "new":
 		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it500-20260218";
 		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-20260218";
-// //		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-routesCleaned-20260218";
+
+		// -- "new" with cleaned routes:
+//		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it500-cleaned-20260224";
+// 		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-routesCleaned-20260218";
 
 		// iatbr glamobi:
 //		final String baseDir="/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
@@ -274,7 +280,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		ScoringFunctionFactory baseScoringFunctionFactory;
 		{
 			baseScenario.getConfig().controller().setOutputDirectory( "output/dummyOutputFromAgentWiseComparisonKN" );
-			this.injector = new Injector.InjectorBuilder( baseScenario )
+			this.injector = new org.matsim.core.controler.Injector.InjectorBuilder( baseScenario )
 													  .addStandardModules()
 													  .addOverridingModule( new AbstractModule(){
 														  @Override public void install(){
@@ -312,7 +318,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			scenario2.setActivityFacilities( baseScenario.getActivityFacilities() );
 			scenario2.setPopulation( baseScenario.getPopulation() );
 			new TransitScheduleReader( scenario2 ).readFile( policyTransitScheduleFilename );
-			this.injector2 = new Injector.InjectorBuilder( scenario2 )
+			this.injector2 = new org.matsim.core.controler.Injector.InjectorBuilder( scenario2 )
 													   .addStandardModules()
 													   .addOverridingModule( new AbstractModule(){
 														   @Override public void install(){ bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class ); }
@@ -599,143 +605,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 	private static int cnt = 0;
 
-	private void somehowComputeRuleOfHalf( Population basePopulation, Population policyPopulation, Table personsTablePolicy ){
-		var ttimeRemHom = DoubleColumn.create( W1_TTIME_DIFF_REM );
-		var ttimeRemHet = DoubleColumn.create( W2_TTIME_DIFF_REM );
-		var ixRem = DoubleColumn.create( IX_DIFF_REMAINING );
-		var ttimeSwiHom = DoubleColumn.create( W1_TTIME_DIFF_SWI );
-		var ttimeSwiHet = DoubleColumn.create( W2_TTIME_DIFF_SWI );
-		var ixSwi = DoubleColumn.create( IX_DIFF_SWITCHING );
-
-		TripRouter tripRouter1 = this.injector.getInstance( TripRouter.class );
-		TripRouter tripRouter2 = this.injector2.getInstance( TripRouter.class );
-
-		Counter counter = new Counter( "somehowComputeRuleOfHalf; person # " );
-		for( Person policyPerson : policyPopulation.getPersons().values() ){
-			counter.incCounter();
-
-			double sumTravTimeDiffsRemainersHom = 0.;
-			double sumTravTimeDiffsRemainersHet = 0.;
-			double sumTravTimeDiffsSwitchersHom = 0.;
-			double sumTravTimeDiffsSwitchersHet = 0.;
-
-			double sumIchangesDiffsRemainers = 0;
-			double sumIchangesDiffsSwitchers = 0.;
-
-			Person basePerson = basePopulation.getPersons().get( policyPerson.getId() );
-
-			if( basePerson != null ){
-				Double musl = (Double) getMUSE_h( basePerson.getSelectedPlan() );
-				if( musl == null ){
-					log.warn( "muse is null; I do not know why; personId={}", basePerson.getId() );
-					musl = MUTTS_AV;
-				}
-				List<TripStructureUtils.Trip> baseTrips = TripStructureUtils.getTrips( basePerson.getSelectedPlan() );
-				List<TripStructureUtils.Trip> policyTrips = TripStructureUtils.getTrips( policyPerson.getSelectedPlan() );
-				Gbl.assertIf( baseTrips.size() == policyTrips.size() );
-				for( int ii = 0 ; ii < baseTrips.size() ; ii++ ){
-					TripStructureUtils.Trip baseTrip = baseTrips.get( ii );
-					final String baseTripMainMode = TripStructureUtils.identifyMainMode( baseTrip.getTripElements() );
-					final TripStructureUtils.Trip policyTrip = policyTrips.get( ii );
-					final String policyMainMode = TripStructureUtils.identifyMainMode( policyTrip.getTripElements() );
-					if( pt.equals( policyMainMode ) ){
-						if( pt.equals( baseTripMainMode ) ){
-							// Altnutzer; compute base ttime etc. from actual trip:
-							double sumBaseTtime = 0.;
-							double sumBaseLineSwitches = -1;
-							for( Leg leg : baseTrip.getLegsOnly() ){
-								sumBaseTtime += leg.getTravelTime().seconds();
-								if( pt.equals( leg.getMode() ) ){
-									sumBaseLineSwitches++;
-								}
-							}
-							// compute policy ttime from actual trip:
-							double sumPolicyTtime = 0.;
-							double sumPolicyLineSwitches = -1.;
-							for( Leg leg : policyTrip.getLegsOnly() ){
-								sumPolicyTtime += leg.getTravelTime().seconds();
-								if( pt.equals( leg.getMode() ) ){
-									sumPolicyLineSwitches++;
-								}
-							}
-							sumTravTimeDiffsRemainersHom += (sumPolicyTtime - sumBaseTtime) * MUTTS_AV * (-1);
-							sumTravTimeDiffsRemainersHet += (sumPolicyTtime - sumBaseTtime) * musl * (-1);
-							sumIchangesDiffsRemainers += (sumPolicyLineSwitches - sumBaseLineSwitches);
-						} else{
-							// Neunutzer; rule-of-half
-							// first need hypothetical base travel time
-							final Result baseResult = routeTrip( policyTrip, policyMainMode, policyPerson, tripRouter1 );
-							// (this is deliberately using the policyTrip (and also the policyPerson) since otherwise the departure time is off in many cases)
-
-							// then compute hypothetical policy travel time
-							final Result policyResult = routeTrip( policyTrip, policyMainMode, policyPerson, tripRouter2 );
-							// sum up (rule-of-half is done later):
-							sumTravTimeDiffsSwitchersHom += (policyResult.sumTtime() - baseResult.sumTtime()) * MUTTS_AV * (-1);
-							sumTravTimeDiffsSwitchersHet += (policyResult.sumTtime() - baseResult.sumTtime()) * musl * (-1);
-							sumIchangesDiffsSwitchers += (policyResult.sumLineSwitches() - baseResult.sumLineSwitches());
-						}
-					} else if ( pt.equals( baseTripMainMode ) && !pt.equals( policyMainMode ) ) {
-						// Wegwechsler; kommt in der Theorie nicht vor
-
-						// first need hypothetical base travel time
-						final Result baseResult = routeTrip( baseTrip, baseTripMainMode, basePerson, tripRouter1 );
-						if ( isTestPerson( basePerson.getId() ) ) {
-							log.warn( "personId={}; baseResult={}", basePerson.getId(), baseResult );
-						}
-						// then compute hypothetical policy travel time
-						final Result policyResult = routeTrip( baseTrip, baseTripMainMode, basePerson, tripRouter2 );
-						// (this is deliberately using the baseTrip (and also the basePerson) since otherwise the departure time is off in many cases)
-						if ( isTestPerson( policyPerson.getId() ) ) {
-							log.warn( "personId={}; policyResult={}", policyPerson.getId(), baseResult );
-						}
-						// sum up (rule-of-half is done later):
-						sumTravTimeDiffsSwitchersHom -= (policyResult.sumTtime() - baseResult.sumTtime()) * MUTTS_AV * (-1);
-						sumTravTimeDiffsSwitchersHet -= (policyResult.sumTtime() - baseResult.sumTtime()) * musl * (-1);
-						sumIchangesDiffsSwitchers -= (policyResult.sumLineSwitches() - baseResult.sumLineSwitches());
-						// (Im relations-basierten Modell würde man die Wegwechsler vorher abziehen, und die RoH nur auf die Netto-Wechsler
-						// anwenden.  Hier geht das nicht.  Also machen wir die gleiche Rechnung wie bei den Neunutzern, aber mit negativem VZ.)
-					}
-				}
-			}
-			ttimeRemHom.append( sumTravTimeDiffsRemainersHom / 3600. );
-			ttimeRemHet.append( sumTravTimeDiffsRemainersHet / 3600. );
-			ttimeSwiHom.append( sumTravTimeDiffsSwitchersHom / 3600. );
-			ttimeSwiHet.append( sumTravTimeDiffsSwitchersHet / 3600. );
-			ixRem.append( sumIchangesDiffsRemainers );
-			ixSwi.append( sumIchangesDiffsSwitchers );
-		}
-		personsTablePolicy.addColumns( ttimeRemHom, ttimeRemHet, ixRem, ttimeSwiHom, ttimeSwiHet, ixSwi );
-		log.info( "persons table policy after adding RoH entries:" );
-		System.out.println( personsTablePolicy );
-	}
-
-	private @NotNull Result routeTrip( TripStructureUtils.Trip baseTrip, String policyMainMode, Person basePerson, TripRouter tripRouter ){
-		Facility fromFacility = FacilitiesUtils.toFacility( baseTrip.getOriginActivity(), baseScenario.getActivityFacilities() );
-		Facility toFacility = FacilitiesUtils.toFacility( baseTrip.getDestinationActivity(), baseScenario.getActivityFacilities() );
-		final List<? extends PlanElement> planElements = tripRouter.calcRoute( policyMainMode, fromFacility, toFacility,
-			baseTrip.getOriginActivity().getEndTime().seconds(), basePerson, null );
-
-		// count the number of line switches:
-		double sumBaseTtime = 0.;
-		double sumBaseLineSwitches = -1;
-		for( Leg leg : TripStructureUtils.getLegs( planElements ) ){
-			sumBaseTtime += leg.getTravelTime().seconds();
-			if( pt.equals( leg.getMode() ) ){
-				sumBaseLineSwitches++;
-			}
-		}
-
-		// return the result:
-		return new Result( sumBaseTtime, sumBaseLineSwitches );
-	}
-
-	private record Result(double sumTtime, double sumLineSwitches){
-	}
 
 	void compare( Scenario policyScenario, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Scenario baseScenario, Config baseConfig, Path outputPath ){
 
 		if( doRoh ){
-			somehowComputeRuleOfHalf( baseScenario.getPopulation(), policyScenario.getPopulation(), personsTablePolicy );
+			new AgentWiseRuleOfHalfComputation( this.injector, this.injector2 ).somehowComputeRuleOfHalf( personsTablePolicy );
 		}
 		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
 
@@ -747,58 +621,92 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		joinedTable.addColumns( deltaColumn( joinedTable, TTIME ), deltaColumn( joinedTable, MONEY ) );
 
+		Table copyOfJoinedTable = Table.create( joinedTable.columns() );
+
+		// yy it might be possible to first create the deltaTalbe and then do the filtering
+		{
+			log.info("");
+			log.info("## REMAINERS: ===");
+			log.info("");
+
 //		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
-		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isNotEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
-//		joinedTable = joinedTable.where( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) );
-		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
-		// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
+			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
+			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
+			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
 
-//		final Pattern pattern = Pattern.compile( "pt" );
-//		IntColumn nPtBase = IntColumn.create( "nPtBase", joinedTable.rowCount() );
-//		{
-//			StringColumn col = joinedTable.stringColumn( MODE_SEQ );
-//			col.mapInto( str -> {
-//				return (int) pattern.matcher( str ).results().count();
-//			}, nPtBase );
-//		}
-//		IntColumn nPtPol = IntColumn.create( "nPtPol", joinedTable.rowCount() );
-//		{
-//			StringColumn col = joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) );
-//			col.mapInto( str -> {
-//				return (int) pattern.matcher( str ).results().count();
-//			}, nPtPol );
-//		}
-//		joinedTable = joinedTable.where( nPtPol.isNotEqualTo( nPtBase ) );
+			Table deltaTable = createDeltaTable( joinedTable );
 
-		Table deltaTable = createDeltaTable( joinedTable );
+			formatTable( deltaTable, 1 );
 
-		formatTable( deltaTable, 1 );
+			log.info( "" );
+			log.info( "print sorted table:" );
+			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
 
-		log.info("");log.info("print sorted table:");
-		System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
+			// ===
 
-		// ===
+			Table rohDeltaTable = null;
+			if( doRoh ){
+				rohDeltaTable = createRohDeltaTable( joinedTable );
 
-		Table rohDeltaTable = null;
-		if ( doRoh ){
-			rohDeltaTable = createRohDeltaTable( joinedTable );
+				formatTable( rohDeltaTable, 1 );
 
-			formatTable( rohDeltaTable, 1 );
+				log.info( "" );
+				log.info( "print sorted roh table:" );
+				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
+			}
 
-			log.info("");log.info("print sorted roh table:");
-			System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
-		}
+			// ===
 
-		// ===
-
-		writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
+			writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
 //		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
 //		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
 
-		if ( doRoh ){
-			writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+			if( doRoh ){
+				writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+			}
 		}
+		{
+			System.out.println();
+			System.out.println("## SWITCHERS: ===");
+			System.out.println();
 
+//		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
+			joinedTable = copyOfJoinedTable.where( copyOfJoinedTable.stringColumn( MODE_SEQ ).isNotEqualTo( copyOfJoinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
+			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or(
+				joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
+			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
+
+			Table deltaTable = createDeltaTable( joinedTable );
+
+			formatTable( deltaTable, 1 );
+
+//			log.info( "" );
+//			log.info( "print sorted table:" );
+//			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
+
+			// ===
+
+			Table rohDeltaTable = null;
+			if( doRoh ){
+				rohDeltaTable = createRohDeltaTable( joinedTable );
+
+				formatTable( rohDeltaTable, 1 );
+
+				log.info( "" );
+				log.info( "print sorted roh table:" );
+				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
+			}
+
+			// ===
+
+			writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
+//		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
+//		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+
+			if( doRoh ){
+				writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+			}
+		}
 		writeAscTable( baseConfig );
 
 	}
