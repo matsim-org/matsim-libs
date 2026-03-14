@@ -61,15 +61,8 @@ import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.Ex
 
 @CommandLine.Command(name = "monetary-utility", description = "List and compare fare, dailyRefund and utility values for agents in base and policy case.")
 public class AgentWiseComparisonKN implements MATSimAppCommand{
-	// I need a simpler way to organize this workflow.  Use case ZEZ (where I need to start from the basic matsim files).
-
-	// The main problem for me is that I repeatedly need to put the file paths into the IntelliJ run configurations.  I would like to do this at most once.
-
-	// My current intuition would be to build an umbrella class that implements the MATSimAppCommand and call the respective methods by one-liners.
-
-	// Alternatively (or even at the same time) I could put args into main methods and call from there.
-
 	private static final Logger log = LogManager.getLogger( AgentWiseComparisonKN.class );
+
 	public static final String KN_MONEY = "knMoney";
 
 	private static int scoreWrnCnt = 0;
@@ -92,14 +85,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
 
-//	ScoringFunctionFactory scoringFunctionFactory;
 	MutableScenario baseScenario;
 	private List<PreparedGeometry> geometries;
 
 	Injector injector;
-	Injector injector2;
-//	TripRouter tripRouter1;
-//	TripRouter tripRouter2;
+	Injector policyInjector;
 
 	private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
 
@@ -277,44 +267,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 														  @Override public void install(){
 															  bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
 														  }
-													  } )
-													  .build();
+													  } ).build();
 			baseScoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
-		}
-		{
-			// The following comes too early?!
-
-			Config policyConfig = ConfigUtils.loadConfig( globFile( inputPath, "*output_config_reduced.xml" ).toString() );
-			// (The reduced config has fewer problems with newly introduced config params.)
-			policyConfig.controller().setOutputDirectory( "output/dummyOutput2FromAgentWiseComparisonKN" );
-			policyConfig.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
-			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike) ).setScoringThisActivityAtAll( false ) );
-			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
-			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
-
-			policyConfig.plans().setInputFile( null );
-			policyConfig.network().setChangeEventsInputFile( null );
-			policyConfig.transit().setVehiclesFile( null );
-			policyConfig.vehicles().setVehiclesFile( null );
-			policyConfig.counts().setInputFile( null );
-
-			policyConfig.routing().setNetworkModes( Collections.emptySet() );
-
-			// Here, we do not want to use ScenarioUtils.loadScenario, because we might be able to rescue files from the base scenario.  (Not totally clear.)
-			String policyTransitScheduleFilename = globFile( inputPath, "*output_" + DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
-			String policyNetworkFilename = globFile( inputPath, "*output_" + DefaultFiles.network.getFilename() + ".gz" ).toString();
-			MutableScenario scenario2 = ScenarioUtils.createMutableScenario( policyConfig );
-			new MatsimNetworkReader( scenario2.getNetwork() ).readFile( policyNetworkFilename );
-			scenario2.setActivityFacilities( baseScenario.getActivityFacilities() );
-			scenario2.setPopulation( baseScenario.getPopulation() );
-			new TransitScheduleReader( scenario2 ).readFile( policyTransitScheduleFilename );
-			this.injector2 = new org.matsim.core.controler.Injector.InjectorBuilder( scenario2 )
-													   .addStandardModules()
-													   .addOverridingModule( new AbstractModule(){
-														   @Override public void install(){ bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class ); }
-													   } )
-													   .build();
 		}
 
 		// ===
@@ -323,6 +277,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		Table baseTableTrips = null;
 		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null, baseScoringFunctionFactory );
 
+		baseTablePersons.addColumns( baseTablePersons.doubleColumn( MATSIM_SCORE ).subtract( baseTablePersons.doubleColumn( SCORE ) ).setName( "error" ) );
+
+		printTable( baseTablePersons.sortOn( "error" ), "sorted by score differences bw mw and self-computed" );
 		{
 			HistogramTrace histogramTrace = HistogramTrace.builder( baseTablePersons.doubleColumn( MUSE_h ) ).build();
 			final Layout.LayoutBuilder layoutBuilder = Layout.builder().width( 1000 );
@@ -346,27 +303,59 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		}
 
-//		log.fatal("ending here because of iatbr vtts computation");
-//		System.exit(-1);
+		// ############################
+		// ############################
 
 		// ### next cometh the policy data:
 
-		String policyConfigFilename = globFile( inputPath, "*output_config_reduced.xml" ).toString();
+		Config policyConfig = ConfigUtils.loadConfig( globFile( inputPath, "*output_config_reduced.xml" ).toString() );
 		// (The reduced config has fewer problems with newly introduced config params.)
 
-		Config policyConfig = ConfigUtils.loadConfig( policyConfigFilename );
+		policyConfig.controller().setOutputDirectory( "output/dummyOutput2FromAgentWiseComparisonKN" );
+		policyConfig.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
+		policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike) ).setScoringThisActivityAtAll( false ) );
+		policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
+		policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
+
+		policyConfig.plans().setInputFile( null );
+		policyConfig.network().setChangeEventsInputFile( null );
+		policyConfig.transit().setVehiclesFile( null );
+		policyConfig.vehicles().setVehiclesFile( null );
+		policyConfig.counts().setInputFile( null );
+
+		policyConfig.routing().setNetworkModes( Collections.emptySet() );
+
+		// ===
 
 		MutableScenario policyScenario = ScenarioUtils.createMutableScenario( policyConfig );
-		policyScenario.setNetwork( this.baseScenario.getNetwork() );
-		policyScenario.setTransitSchedule( this.baseScenario.getTransitSchedule() );
+		// Here, we do not want to use ScenarioUtils.loadScenario, because we might be able to rescue files from the base scenario.  (Not totally clear.)
+
+		String policyNetworkFilename = globFile( inputPath, "*output_" + DefaultFiles.network.getFilename() + ".gz" ).toString();
+		new MatsimNetworkReader( policyScenario.getNetwork() ).readFile( policyNetworkFilename );
+
+		String policyTransitScheduleFilename = globFile( inputPath, "*output_" + DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
+		new TransitScheduleReader( policyScenario ).readFile( policyTransitScheduleFilename );
 
 		Population policyPopulation = readAndCleanPopulation( inputPath, eventsFilePatterns );
 		policyScenario.setPopulation( policyPopulation );
 		tagPersonsToAnalyse( policyPopulation, geometries, baseScenario );
 		// (tagging is better than removing since (1) one can have multiple tags in one go, and (2) the average income becomes different once we start removing people)
 
-		ScoringFunctionFactory policyScoringFunctionFactory = this.injector2.getInstance( ScoringFunctionFactory.class );
+		policyScenario.setActivityFacilities( baseScenario.getActivityFacilities() );
+
+		this.policyInjector = new org.matsim.core.controler.Injector.InjectorBuilder( policyScenario )
+							 .addStandardModules()
+							 .addOverridingModule( new AbstractModule(){
+								 @Override public void install(){ bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class ); }
+							 } ).build();
+
+
+		ScoringFunctionFactory policyScoringFunctionFactory = this.policyInjector.getInstance( ScoringFunctionFactory.class );
 		Table personsTablePolicy = generatePersonTableFromPopulation( policyPopulation, policyConfig, basePopulation, policyScoringFunctionFactory );
+
+		// ############################
+		// ############################
 
 		compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath );
 
@@ -594,13 +583,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	}
 
 
-	private static int cnt = 0;
-
-
 	void compare( Scenario policyScenario, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Scenario baseScenario, Config baseConfig, Path outputPath ){
 
 		if( doRoh ){
-			new AgentWiseRuleOfHalfComputation( this.injector, this.injector2 ).somehowComputeRuleOfHalf();
+			new AgentWiseRuleOfHalfComputation( this.injector, this.policyInjector ).somehowComputeRuleOfHalf();
 			addRohValuesToTable( policyScenario.getPopulation(), personsTablePolicy );
 		}
 		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
@@ -617,9 +603,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		// yy it might be possible to first create the deltaTalbe and then do the filtering
 		{
-			log.info("");
-			log.info("## REMAINERS: ===");
-			log.info("");
+			System.out.println("");
+			System.out.println("## REMAINERS: ===");
+			System.out.println("");
 
 //		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
 			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
@@ -632,7 +618,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			log.info( "" );
 			log.info( "print sorted table:" );
-			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
+			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
 
 			// ===
 
@@ -644,7 +630,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 				log.info( "" );
 				log.info( "print sorted roh table:" );
-				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
+				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
 			}
 
 			// ===
@@ -657,6 +643,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
 			}
 		}
+//		log.error("stopping after remainers");
+//		System.exit(-1);
 		{
 			System.out.println();
 			System.out.println("## SWITCHERS: ===");

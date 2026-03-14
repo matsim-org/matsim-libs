@@ -464,8 +464,7 @@ class AgentWiseComparisonKNUtils{
 			}
 		}
 	}
-	static double computeMUSE_h( Activity act, ScoringFunction sfNormal, PopulationFactory pf, ScoringFunction sfEarly, double scoreNormalBefore,
-								 double scoreEarlyBefore ){
+	static double computeMUSE_h( Activity act, ScoringFunction sfNormal, PopulationFactory pf, ScoringFunction sfEarly, double scoreNormalBefore, double scoreEarlyBefore ){
 		sfNormal.handleActivity( act );
 		Activity earlyActivity = pf.createActivityFromLinkId( act.getType(), act.getLinkId() );
 		PopulationUtils.copyFromTo( act, earlyActivity );
