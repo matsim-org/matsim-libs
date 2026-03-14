@@ -597,4 +597,29 @@ class AgentWiseComparisonKNUtils{
 		System.out.println( table );
 		log.info("" );
 	}
+	static void addRohValuesToTable( Population policyPopulation, Table personsTablePolicy ) {
+		// yyyy note that this does not check that the person IDs are consistent.
+
+		var ttimeRemHom = DoubleColumn.create( W1_TTIME_DIFF_REM );
+		var ttimeRemHet = DoubleColumn.create( W2_TTIME_DIFF_REM );
+		var ixRem = DoubleColumn.create( IX_DIFF_REMAINING );
+
+		var ttimeSwiHom = DoubleColumn.create( W1_TTIME_DIFF_SWI );
+		var ttimeSwiHet = DoubleColumn.create( W2_TTIME_DIFF_SWI );
+		var ixSwi = DoubleColumn.create( IX_DIFF_SWITCHING );
+
+		for( Person person : policyPopulation.getPersons().values() ){
+			ttimeRemHom.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.REM, AgentWiseRuleOfHalfComputation.HOM, person ) );
+			ttimeRemHet.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.REM, AgentWiseRuleOfHalfComputation.HET, person ) );
+			ttimeSwiHom.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.SWI, AgentWiseRuleOfHalfComputation.HOM, person ) );
+			ttimeSwiHet.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.SWI, AgentWiseRuleOfHalfComputation.HET, person ) );
+			ixRem.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.IX, AgentWiseRuleOfHalfComputation.REM, AgentWiseRuleOfHalfComputation.HOM, person ) );
+			ixSwi.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.IX, AgentWiseRuleOfHalfComputation.SWI, AgentWiseRuleOfHalfComputation.HOM, person ) );
+		}
+
+		personsTablePolicy.addColumns( ttimeRemHom, ttimeRemHet, ixRem, ttimeSwiHom, ttimeSwiHet, ixSwi );
+		log.info( "persons table policy after adding RoH entries:" );
+		System.out.println( personsTablePolicy );
+
+	}
 }
