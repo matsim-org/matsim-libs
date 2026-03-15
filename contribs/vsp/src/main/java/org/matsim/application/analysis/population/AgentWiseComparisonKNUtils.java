@@ -16,7 +16,10 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -35,6 +38,7 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.*;
 
+import static org.matsim.api.core.v01.TransportMode.*;
 import static org.matsim.application.ApplicationUtils.globFile;
 import static org.matsim.application.analysis.population.HeadersKN.*;
 import static org.matsim.core.population.PersonUtils.getMarginalUtilityOfMoney;
@@ -620,5 +624,39 @@ class AgentWiseComparisonKNUtils{
 		log.info( "persons table policy after adding RoH entries:" );
 		System.out.println( personsTablePolicy );
 
+	}
+	static @NotNull Config prepareConfig( Path path ){
+		Config config = ConfigUtils.loadConfig( globFile( path, "*output_config_reduced.xml" ).toString() );
+		// (The reduced config has fewer problems with newly introduced config params.)
+
+		config.controller().setOutputDirectory( "output/dummyOutputFromAgentWiseComparisonKN" );
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+
+		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
+		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
+		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
+		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
+		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the reduced config specifies them in an incomplete
+		// way, but I am not sure if that is the problem. --> that probably is indeed the problem.  In general, they are created automatically,
+		// but if they already exist in some other way (i.e., in this case coming from the reduced config), then those are not over-written.
+
+		config.facilities().setInputFile( globFile( path, "*output_" + Controler.DefaultFiles.facilities.getFilename() + ".gz" ).toString() );
+
+		String baseTransitScheduleFilename = null;
+		if ( config.transit().isUseTransit() ){
+			baseTransitScheduleFilename = globFile( path, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
+		}
+		config.transit().setTransitScheduleFile( baseTransitScheduleFilename );
+
+		config.network().setInputFile( globFile( path, "*output_" + Controler.DefaultFiles.network.getFilename() + ".gz" ).toString() );
+
+		config.plans().setInputFile( null );
+		config.network().setChangeEventsInputFile( null );
+		config.transit().setVehiclesFile( null );
+		config.vehicles().setVehiclesFile( null );
+		config.counts().setInputFile( null );
+
+		config.routing().setNetworkModes( Collections.emptySet() );
+		return config;
 	}
 }

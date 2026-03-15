@@ -214,37 +214,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			eventsFilePatterns.add( "*output_events.xml.gz" );
 		}
 
-		Config baseConfig = ConfigUtils.loadConfig( globFile( baseCasePath, "*output_config_reduced.xml" ).toString() );
-		// (The reduced config has fewer problems with newly introduced config params.)
+		// ===
 
-		baseConfig.controller().setOutputDirectory( "output/dummyOutputFromAgentWiseComparisonKN" );
-		baseConfig.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-
-		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
-		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
-		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
-		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
-		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the reduced config specifies them in an incomplete
-		// way, but I am not sure if that is the problem. --> that probably is indeed the problem.  In general, they are created automatically,
-		// but if they already exist in some other way (i.e., in this case coming from the reduced config), then those are not over-written.
-
-		baseConfig.facilities().setInputFile( globFile( baseCasePath, "*output_" + DefaultFiles.facilities.getFilename() + ".gz" ).toString() );
-
-		String baseTransitScheduleFilename = null;
-		if ( baseConfig.transit().isUseTransit() ){
-			baseTransitScheduleFilename = globFile( baseCasePath, "*output_" + DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
-		}
-		baseConfig.transit().setTransitScheduleFile( baseTransitScheduleFilename );
-
-		baseConfig.network().setInputFile( globFile( baseCasePath, "*output_" + DefaultFiles.network.getFilename() + ".gz" ).toString() );
-
-		baseConfig.plans().setInputFile( null );
-		baseConfig.network().setChangeEventsInputFile( null );
-		baseConfig.transit().setVehiclesFile( null );
-		baseConfig.vehicles().setVehiclesFile( null );
-		baseConfig.counts().setInputFile( null );
-
-		baseConfig.routing().setNetworkModes( Collections.emptySet() );
+		final Config baseConfig = prepareConfig( baseCasePath );
 
 		// ===
 
