@@ -16,7 +16,10 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -25,6 +28,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.geometry.GeometryUtils;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
@@ -34,6 +38,7 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.*;
 
+import static org.matsim.api.core.v01.TransportMode.*;
 import static org.matsim.application.ApplicationUtils.globFile;
 import static org.matsim.application.analysis.population.HeadersKN.*;
 import static org.matsim.core.population.PersonUtils.getMarginalUtilityOfMoney;
@@ -53,6 +58,10 @@ class AgentWiseComparisonKNUtils{
 		}
 		@Override public void handleEvent( PersonMoneyEvent event ){
 			Person person = population.getPersons().get( event.getPersonId() );
+			if ( person==null ) {
+				// can happen e.g. if population file is reduced
+				return;
+			}
 			Double moneyAttrib = (Double) person.getAttributes().getAttribute( AgentWiseComparisonKN.KN_MONEY );
 			if ( moneyAttrib == null ) {
 				person.getAttributes().putAttribute( AgentWiseComparisonKN.KN_MONEY, event.getAmount() );
@@ -133,6 +142,21 @@ class AgentWiseComparisonKNUtils{
 					setIsInShp( person, "true" );
 					// vllt weglassen (default)?
 				}
+//				for( Person person : pop.getPersons().values() ){
+//					boolean isUsingCaBa = false;
+//					for( Leg leg : TripStructureUtils.getLegs( person.getSelectedPlan() ) ){
+//						if ( leg.getRoute() instanceof TransitRoute ) {
+//							if ( leg.getRoute().getRouteDescription().contains( "CaBa" ) ) {
+//								isUsingCaBa = true;
+//							}
+//						}
+//					}
+//					if ( isUsingCaBa ){
+//						setIsInShp( person, "true" );
+//					} else {
+//						setIsInShp( person, "false" );
+//					}
+//				}
 			} else{
 				for( Person person : pop.getPersons().values() ){
 					boolean toAnalyse = false;
@@ -153,37 +177,6 @@ class AgentWiseComparisonKNUtils{
 			}
 		}
 
-//	static void tagPersonsToAnalyse( Population basePopulation, List<PreparedGeometry> geometries, Scenario scenario ){
-//		if ( geometries==null || geometries.isEmpty() ) {
-//			return;
-//		}
-//		for( Person person : basePopulation.getPersons().values() ){
-//			boolean toAnalyse = false;
-//			for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), StagesAsNormalActivities ) ){
-//				Coord coord = PopulationUtils.decideOnCoordForActivity( act, scenario );
-//				Point point = GeometryUtils.createGeotoolsPoint( coord );
-//				for( PreparedGeometry geometry : geometries ){
-//					if( geometry.contains( point ) ){
-//						toAnalyse = true;
-//					}
-//				}
-//			}
-//			if ( toAnalyse ){
-//				setAnalysisPopulation( person, "true" );
-//			} else {
-//				setAnalysisPopulation( person, "false" );
-//			}
-//		}
-////		Population newPop = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-////		for( Person person : basePopulation.getPersons().values() ){
-////			if ( "true".equals( getAnalysisPopulation( person ) ) ) {
-////				newPop.addPerson( person );
-////			}
-////		}
-////		PopulationUtils.writePopulation( newPop, "gartenfeld.plans.xml.gz" );
-////		log.warn("exiting here");
-////		System.exit(-1);
-//	}
 	static void setIsInShp( Person person, String analysisPopulation ){
 		person.getAttributes().putAttribute( "isInShp", analysisPopulation );
 	}
@@ -230,7 +223,9 @@ class AgentWiseComparisonKNUtils{
 				// berlin:
 				 "berlin_c5d528ea",
 				 // example:
-				 "person1"
+				 "person1",
+				 // dresden CaBa debugging:
+				 "79496"
 					-> true;
 			default -> false;
 		};
@@ -263,10 +258,10 @@ class AgentWiseComparisonKNUtils{
 		final double factor = 1./ config.qsim().getFlowCapFactor();
 
 		double homTtimeBenefitRemainers = deltaTable.doubleColumn( W1_TTIME_DIFF_REM ).sum() * factor ;
-		double hetTtimeBenefitRemainers = deltaTable.doubleColumn( W2_TTIME_DIFF_REM ).sum() * factor ;
+//		double hetTtimeBenefitRemainers = deltaTable.doubleColumn( W2_TTIME_DIFF_REM ).sum() * factor ;
 
 		double homTtimeBenfitSwitchers = deltaTable.doubleColumn( W1_TTIME_DIFF_SWI ).sum() * factor / 2 ;
-		double hetTtimeBenfitSwitchers = deltaTable.doubleColumn( W2_TTIME_DIFF_SWI ).sum() * factor / 2 ;
+//		double hetTtimeBenfitSwitchers = deltaTable.doubleColumn( W2_TTIME_DIFF_SWI ).sum() * factor / 2 ;
 
 		double ixBenefitRemainers = deltaTable.doubleColumn( IX_DIFF_REMAINING ).sum() * factor * (-1);
 		double ixBenefitSwitchers = deltaTable.doubleColumn( IX_DIFF_SWITCHING ).sum() * factor / 2 * (-1);
@@ -281,11 +276,11 @@ class AgentWiseComparisonKNUtils{
 		final StringBuilder hom_ttime_uniform_rem_cmt = new StringBuilder( "... are the travel time benefits trips-w-same-mode (hom. mUTTS)." );
 		final StringBuilder het_ttime_rem_cmt = new StringBuilder( "... are the travel time benefits trips-w-same-mode (het. mUTTS)." );
 
-		final StringBuilder hom_ttime_swi_cmt = new StringBuilder( "... are the roh travel time benefits trips-w-other-mode (hom. mUTTS)." );
-		final StringBuilder het_ttime_swi_cmt = new StringBuilder( "... are the roh travel time benefits trips-w-other-mode (het. mUTTS)." );
+		final StringBuilder hom_ttime_swi_cmt = new StringBuilder( "... are the travel time benefits trips-w-other-mode (hom. mUTTS)." );
+		final StringBuilder het_ttime_swi_cmt = new StringBuilder( "... are the RoH travel time benefits trips-w-other-mode (het. mUTTS)." );
 
 		final StringBuilder u_lineswitches_rem_cmt = new StringBuilder("... are the iX benefits trips-w-same-mode.");
-		final StringBuilder u_lineswitches_swi_cmt = new StringBuilder("... are the roh iX benefits trips-w-other-mode.");
+		final StringBuilder u_lineswitches_swi_cmt = new StringBuilder("... are the RoH iX benefits trips-w-other-mode.");
 
 		final int maxLen = score_cmt.length();alignLeft( het_ttime_rem_cmt, maxLen );alignLeft( u_lineswitches_rem_cmt, maxLen );
 		alignLeft( hom_ttime_swi_cmt, maxLen ); alignLeft( het_ttime_swi_cmt, maxLen ); alignLeft( u_lineswitches_swi_cmt, maxLen );
@@ -345,16 +340,16 @@ class AgentWiseComparisonKNUtils{
 		final double non_monetary = ascs_sum + u_trav_score + line_switch_score + acts_score;
 
 		final StringBuilder score_cmt = new StringBuilder( "is the overall benefit (potentially negative) in score space. This has the following contributions:" );
-		final StringBuilder weighted_ttime_cmt = new StringBuilder( "... is the travel time benefit." );
+		final StringBuilder weighted_ttime_cmt = new StringBuilder( "... ... is the travel time benefit." );
 		final StringBuilder weighted_money_cmt = new StringBuilder( "... is the monetary benefit (re-weighted by indiv. mUoM)." );
-		final StringBuilder asc_cmt = new StringBuilder( "... are the ASC benefits." );
-		final StringBuilder u_trav_direct_cmt = new StringBuilder( "... are the direct travel score benefits (=less bike, less ride)." );
-		final StringBuilder u_lineswitches_cmt = new StringBuilder("... are the line switching benefits.");
+		final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC benefits." );
+		final StringBuilder u_trav_direct_cmt = new StringBuilder( "... ... are the direct travel score benefits (=less bike, less ride)." );
+		final StringBuilder u_lineswitches_cmt = new StringBuilder("... ... are the line switching benefits.");
 		final StringBuilder sum_cmt = new StringBuilder( "is the sum of these contributions." );
-		final StringBuilder acts_score_cmt = new StringBuilder( "... are the activities score (= pure travel time) benefits." );
+		final StringBuilder acts_score_cmt = new StringBuilder( "... ... are the activities score (= pure travel time) benefits." );
 		final StringBuilder alt_sum_cmt = new StringBuilder("is the sum of these contributions.") ;
 		final StringBuilder matsim_score_cmt = new StringBuilder("is the matsim score diff from the output population");
-		final StringBuilder non_monetary_cmt = new StringBuilder("... are the non-monetary benefits.");
+		final StringBuilder non_monetary_cmt = new StringBuilder("... are the non-monetary benefits.  This has the following contributions:");
 
 		final int maxLen = score_cmt.length();
 		alignLeft( weighted_ttime_cmt, maxLen );
@@ -375,14 +370,11 @@ class AgentWiseComparisonKNUtils{
 		summaryTable.doubleColumn( "value" ).append( score_sum );
 		summaryTable.stringColumn( "comment" ).append( score_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( non_monetary );
-		summaryTable.stringColumn( "comment" ).append( non_monetary_cmt.toString() );
-
 		summaryTable.doubleColumn( "value" ).append( money_score );
 		summaryTable.stringColumn( "comment" ).append( weighted_money_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( acts_score + u_trav_score + ascs_sum + line_switch_score + money_score );
-		summaryTable.stringColumn( "comment" ).append( alt_sum_cmt.toString() );
+		summaryTable.doubleColumn( "value" ).append( non_monetary );
+		summaryTable.stringColumn( "comment" ).append( non_monetary_cmt.toString() );
 
 		summaryTable.doubleColumn( "value" ).append( acts_score );
 		summaryTable.stringColumn( "comment" ).append( acts_score_cmt.toString() );
@@ -395,6 +387,9 @@ class AgentWiseComparisonKNUtils{
 
 		summaryTable.doubleColumn( "value" ).append( ascs_sum );
 		summaryTable.stringColumn( "comment" ).append( asc_cmt.toString() );
+
+		summaryTable.doubleColumn( "value" ).append( acts_score + u_trav_score + ascs_sum + line_switch_score + money_score );
+		summaryTable.stringColumn( "comment" ).append( alt_sum_cmt.toString() );
 
 		summaryTable.doubleColumn( "value" ).append( matsim_score_sum );
 		summaryTable.stringColumn( "comment" ).append( matsim_score_cmt.toString() );
@@ -423,12 +418,16 @@ class AgentWiseComparisonKNUtils{
 	static @NotNull Population readAndCleanPopulation( Path path, List<String> eventsFilePatterns ){
 		String basePopulationFilename;
 		try {
-			basePopulationFilename = globFile( path, "*vtts_experienced_plans.xml.gz" ).toString();
-		} catch ( IllegalStateException ee ) {
-			try{
-				basePopulationFilename = globFile( path, "*postproc_experienced_plans.xml.gz" ).toString();
-			} catch ( IllegalStateException e2 ) {
-				basePopulationFilename = globFile( path, "*experienced_plans.xml.gz" ).toString();
+			basePopulationFilename = globFile( path, "*reduced_plans.xml" ).toString();
+		} catch ( IllegalStateException e0 ) {
+			try {
+				basePopulationFilename = globFile( path, "*vtts_experienced_plans.xml.gz" ).toString();
+			} catch ( IllegalStateException ee ){
+				try{
+					basePopulationFilename = globFile( path, "*postproc_experienced_plans.xml.gz" ).toString();
+				} catch( IllegalStateException e2 ){
+					basePopulationFilename = globFile( path, "*experienced_plans.xml.gz" ).toString();
+				}
 			}
 		}
 
@@ -469,8 +468,7 @@ class AgentWiseComparisonKNUtils{
 			}
 		}
 	}
-	static double computeMUSE_h( Activity act, ScoringFunction sfNormal, PopulationFactory pf, ScoringFunction sfEarly, double scoreNormalBefore,
-								 double scoreEarlyBefore ){
+	static double computeMUSE_h( Activity act, ScoringFunction sfNormal, PopulationFactory pf, ScoringFunction sfEarly, double scoreNormalBefore, double scoreEarlyBefore ){
 		sfNormal.handleActivity( act );
 		Activity earlyActivity = pf.createActivityFromLinkId( act.getType(), act.getLinkId() );
 		PopulationUtils.copyFromTo( act, earlyActivity );
@@ -543,7 +541,6 @@ class AgentWiseComparisonKNUtils{
 			// information:
 			, joinedTable.column( MODE_SEQ )
 			, joinedTable.column( keyTwoOf( MODE_SEQ ) )
-			// tags:
 			, joinedTable.column( INCOME_DECILE )
 						   );
 	}
@@ -570,14 +567,15 @@ class AgentWiseComparisonKNUtils{
 			, deltaColumn( joinedTable, ASCS )
 			//
 			, joinedTable.column( W1_TTIME_DIFF_REM )
-			, joinedTable.column( W2_TTIME_DIFF_REM )
+//			, joinedTable.column( W2_TTIME_DIFF_REM )
 			, joinedTable.column( IX_DIFF_REMAINING )
 			, joinedTable.column( W1_TTIME_DIFF_SWI )
-			, joinedTable.column( W2_TTIME_DIFF_SWI )
+//			, joinedTable.column( W2_TTIME_DIFF_SWI )
 			, joinedTable.column( IX_DIFF_SWITCHING )
 			// information:
 			, joinedTable.column( MODE_SEQ )
 			, joinedTable.column( keyTwoOf( MODE_SEQ ) )
+			, joinedTable.column( INCOME_DECILE )
 						   );
 	}
 	static @NotNull Table createPopulationTable(){
@@ -601,5 +599,64 @@ class AgentWiseComparisonKNUtils{
 		log.info( msg );
 		System.out.println( table );
 		log.info("" );
+	}
+	static void addRohValuesToTable( Population policyPopulation, Table personsTablePolicy ) {
+		// yyyy note that this does not check that the person IDs are consistent.
+
+		var ttimeRemHom = DoubleColumn.create( W1_TTIME_DIFF_REM );
+		var ttimeRemHet = DoubleColumn.create( W2_TTIME_DIFF_REM );
+		var ixRem = DoubleColumn.create( IX_DIFF_REMAINING );
+
+		var ttimeSwiHom = DoubleColumn.create( W1_TTIME_DIFF_SWI );
+		var ttimeSwiHet = DoubleColumn.create( W2_TTIME_DIFF_SWI );
+		var ixSwi = DoubleColumn.create( IX_DIFF_SWITCHING );
+
+		for( Person person : policyPopulation.getPersons().values() ){
+			ttimeRemHom.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.REM, AgentWiseRuleOfHalfComputation.HOM, person ) );
+			ttimeRemHet.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.REM, AgentWiseRuleOfHalfComputation.HET, person ) );
+			ttimeSwiHom.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.SWI, AgentWiseRuleOfHalfComputation.HOM, person ) );
+			ttimeSwiHet.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.SWI, AgentWiseRuleOfHalfComputation.HET, person ) );
+			ixRem.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.IX, AgentWiseRuleOfHalfComputation.REM, AgentWiseRuleOfHalfComputation.HOM, person ) );
+			ixSwi.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.IX, AgentWiseRuleOfHalfComputation.SWI, AgentWiseRuleOfHalfComputation.HOM, person ) );
+		}
+
+		personsTablePolicy.addColumns( ttimeRemHom, ttimeRemHet, ixRem, ttimeSwiHom, ttimeSwiHet, ixSwi );
+		log.info( "persons table policy after adding RoH entries:" );
+		System.out.println( personsTablePolicy );
+
+	}
+	static @NotNull Config prepareConfig( Path path ){
+		Config config = ConfigUtils.loadConfig( globFile( path, "*output_config_reduced.xml" ).toString() );
+		// (The reduced config has fewer problems with newly introduced config params.)
+
+		config.controller().setOutputDirectory( "output/dummyOutputFromAgentWiseComparisonKN" );
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+
+		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
+		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
+		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
+		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
+		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the reduced config specifies them in an incomplete
+		// way, but I am not sure if that is the problem. --> that probably is indeed the problem.  In general, they are created automatically,
+		// but if they already exist in some other way (i.e., in this case coming from the reduced config), then those are not over-written.
+
+		config.facilities().setInputFile( globFile( path, "*output_" + Controler.DefaultFiles.facilities.getFilename() + ".gz" ).toString() );
+
+		String baseTransitScheduleFilename = null;
+		if ( config.transit().isUseTransit() ){
+			baseTransitScheduleFilename = globFile( path, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
+		}
+		config.transit().setTransitScheduleFile( baseTransitScheduleFilename );
+
+		config.network().setInputFile( globFile( path, "*output_" + Controler.DefaultFiles.network.getFilename() + ".gz" ).toString() );
+
+		config.plans().setInputFile( null );
+		config.network().setChangeEventsInputFile( null );
+		config.transit().setVehiclesFile( null );
+		config.vehicles().setVehiclesFile( null );
+		config.counts().setInputFile( null );
+
+		config.routing().setNetworkModes( Collections.emptySet() );
+		return config;
 	}
 }

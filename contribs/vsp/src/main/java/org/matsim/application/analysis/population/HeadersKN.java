@@ -8,11 +8,11 @@ class HeadersKN{
 	public static final String IX_DIFF_SWITCHING = "ixDiffSwi";
 	public static final String MONEY_SCORE = "money_score";
 	public static final String ANALYSIS_POPULATION = "analysis_population";
-	public static final String W1_TTIME_DIFF_REM = "wUniTtimeDiffRem";
+	public static final String W1_TTIME_DIFF_REM = "ttimeDiffRemUni";
 
-	public static final String W2_TTIME_DIFF_REM = "wHetTtimeDiffRem";
-	public static final String W2_TTIME_DIFF_SWI = "wHetTtimeDiffSwi";
-	public static final String W1_TTIME_DIFF_SWI = "wUniTtimeDiffSwi";
+	public static final String W2_TTIME_DIFF_REM = "ttimeDiffRemHet";
+	public static final String W2_TTIME_DIFF_SWI = "ttimeDiffSwiHet";
+	public static final String W1_TTIME_DIFF_SWI = "ttimeDiffSwiUni";
 
 	public static final String personId = "personId";
 	public static final String tripIdx = "tripIdx";
