@@ -49,7 +49,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		checkEventsFormatLanesSignals(config);
 		checkTravelTimeCalculationRoutingConfiguration(config);
 		checkLaneDefinitionRoutingConfiguration(config);
-		checkPlanCalcScore(config);
+		checkScoring(config);
 		checkTransit(config);
 		checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 	}
@@ -67,7 +67,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		return problem ;
 	}
 
-	/*package because of test */ static void checkPlanCalcScore(final Config c) {
+	/*package because of test */ static void checkScoring(final Config c) {
 		ModeParams ptModeParams = c.scoring().getModes().get(TransportMode.pt);
 		if (ptModeParams!=null && ptModeParams.getMarginalUtilityOfTraveling() > 0) {
 			log.warn(ScoringConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
