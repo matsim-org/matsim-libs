@@ -17,7 +17,7 @@ import com.google.inject.Singleton;
 
 /**
  * Internal module that manages all built-in selectors.
- * 
+ *
  * @author sebhoerl
  *
  */
@@ -60,7 +60,7 @@ public class SelectorModule extends AbstractDiscreteModeChoiceExtension {
 			DiscreteModeChoiceConfigGroup dmcConfig) {
 		MultinomialLogitSelectorConfigGroup config = dmcConfig.getMultinomialLogitSelectorConfig();
 		return new MultinomialLogitSelector.Factory(config.getMinimumUtility(), config.getMaximumUtility(),
-				config.getConsiderMinimumUtility());
+				config.getConsiderMinimumUtility(), config.getWriteDetailedUtilities());
 	}
 
 	@Provides
