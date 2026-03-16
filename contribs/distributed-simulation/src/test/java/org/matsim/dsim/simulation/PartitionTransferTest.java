@@ -48,12 +48,15 @@ class PartitionTransferTest {
 	// --- collect(Message, Id<Link>) ---
 
 	@Test
-	void collectByLink_resolvesPartitionAndSendsImmediately() {
+	void collectByLink_resolvesPartitionOnFlush() {
 		var msg = new MessageA();
 		// l2 belongs to partition 1
 		transfer.collect(msg, Id.createLinkId("l2"));
+		transfer.send(1.0, IntSet.of());
 
-		verify(broker, times(1)).send(msg, 1);
+		var captor = ArgumentCaptor.forClass(Message.class);
+		verify(broker, times(1)).send(captor.capture(), eq(1));
+		assertSame(msg, ((SimStepMessage2) captor.getValue()).messages().getFirst());
 	}
 
 	@Test
@@ -61,8 +64,11 @@ class PartitionTransferTest {
 		var msg = new MessageA();
 		// l3 belongs to partition 2
 		transfer.collect(msg, Id.createLinkId("l3"));
+		transfer.send(1.0, IntSet.of());
 
-		verify(broker).send(msg, 2);
+		var captor = ArgumentCaptor.forClass(Message.class);
+		verify(broker).send(captor.capture(), eq(2));
+		assertSame(msg, ((SimStepMessage2) captor.getValue()).messages().getFirst());
 	}
 
 	// --- collect(Message, int) + send() ---
