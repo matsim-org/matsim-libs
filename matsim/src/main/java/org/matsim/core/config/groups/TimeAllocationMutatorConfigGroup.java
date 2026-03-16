@@ -75,6 +75,11 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 		return this;
 	}
 
+	public TimeAllocationMutatorConfigGroup setLatestActivityEndTime(Double latestActivityEndTime) {
+		this.latestActivityEndTime = latestActivityEndTime;
+		return this;
+	}
+
 	@StringGetter(MUTATE_AROUND_INITIAL_END_TIME_ONLY)
 	public boolean isMutateAroundInitialEndTimeOnly() {
 		return mutateAroundInitialEndTimeOnly;
