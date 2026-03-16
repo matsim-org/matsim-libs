@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.dsim.MessageBroker;
 import org.matsim.dsim.TestUtils;
@@ -37,12 +38,14 @@ class PartitionTransferTest {
 	void setUp() {
 		var network = TestUtils.createDistributedThreeLinkNetwork();
 		var node0 = ComputeNode.builder().rank(0).parts(IntList.of(0)).cores(1).hostname("localhost").build();
-		network.setPartitioning(new NetworkPartitioning(node0, network));
+		var partitioning = new NetworkPartitioning(node0, network);
+		network.setPartitioning(partitioning);
+		NetworkPartition partition = partitioning.getPartition(0);
 
 		broker = mock(MessageBroker.class);
 		when(broker.getRank()).thenReturn(0);
 
-		transfer = new PartitionTransfer(network, broker);
+		transfer = new PartitionTransfer(network, partition, broker);
 	}
 
 	// --- collect(Message, Id<Link>) ---
@@ -199,9 +202,9 @@ class PartitionTransferTest {
 	// --- getRank() ---
 
 	@Test
-	void getRank_returnsCorrectPartitionForLink() {
-		assertEquals(1, transfer.getRank(Id.createLinkId("l2")));
-		assertEquals(2, transfer.getRank(Id.createLinkId("l3")));
-		assertEquals(0, transfer.getRank(Id.createLinkId("l1")));
+	void getPartitionIndex_returnsCorrectPartitionForLink() {
+		assertEquals(1, transfer.getPartitionIndex(Id.createLinkId("l2")));
+		assertEquals(2, transfer.getPartitionIndex(Id.createLinkId("l3")));
+		assertEquals(0, transfer.getPartitionIndex(Id.createLinkId("l1")));
 	}
 }

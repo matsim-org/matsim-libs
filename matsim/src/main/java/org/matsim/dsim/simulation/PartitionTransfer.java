@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.dsim.MessageBroker;
 import org.matsim.dsim.messages.SimStepMessage2;
@@ -18,18 +19,20 @@ import java.util.List;
 public class PartitionTransfer {
 
 	private final NetworkPartitioning networkPartitioning;
+	private final NetworkPartition partition;
 	private final MessageBroker messageBroker;
 
 	private final Int2ObjectMap<Int2ObjectMap<List<Message>>> messages = new Int2ObjectOpenHashMap<>();
 
 	@Inject
-	public PartitionTransfer(Network network, MessageBroker messageBroker) {
+	public PartitionTransfer(Network network, NetworkPartition partition, MessageBroker messageBroker) {
 		this.networkPartitioning = network.getPartitioning();
+		this.partition = partition;
 		this.messageBroker = messageBroker;
 	}
 
 	public void collect(Message message, Id<Link> targetLink) {
-		var targetPartition = getRank(targetLink);
+		var targetPartition = getPartitionIndex(targetLink);
 		collect(message, targetPartition);
 	}
 
@@ -60,7 +63,7 @@ public class PartitionTransfer {
 		}
 	}
 
-	public boolean isLocal(Id<Link> linkId) {return networkPartitioning.getPartition(messageBroker.getRank()).containsLink(linkId);}
+	public boolean isLocal(Id<Link> linkId) {return partition.containsLink(linkId);}
 
-	public int getRank(Id<Link> linkId) {return networkPartitioning.getPartition(linkId);}
+	public int getPartitionIndex(Id<Link> linkId) {return networkPartitioning.getPartition(linkId);}
 }
