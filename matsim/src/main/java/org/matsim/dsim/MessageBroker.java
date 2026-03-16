@@ -95,24 +95,19 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	private final Int2ObjectMap<List<SimTask>> byType = new Int2ObjectOpenHashMap<>(1024);
 
 	/**
-	 * Set of partitions to wait for.
+	 * Set of node ranks to wait for.
 	 */
-	private final IntSet waitFor = new IntOpenHashSet();
+	private final IntSet waitForRanks = new IntOpenHashSet();
 
 	/**
 	 * Set of partitions for which a null message has to be sent this sync step. These partitions will wait for a message.
 	 */
-	private final IntSet sendNullMsgs = new IntOpenHashSet();
+	private final IntSet sendToRanks = new IntOpenHashSet();
 
 	/**
 	 * Partitions on this node.
 	 */
 	private final IntSet ownParts;
-
-	/**
-	 * All other partitions on different nodes.
-	 */
-	private final IntSet otherParts;
 
 	/**
 	 * Serialization provider.
@@ -166,19 +161,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		}
 
 		this.ownParts = new IntOpenHashSet(topology.getNodeByIndex(comm.getRank()).getParts());
-		this.otherParts = new IntOpenHashSet();
-		for (int i = 0; i < topology.getTotalPartitions(); i++) {
-			if (!ownParts.contains(i)) {
-				otherParts.add(broadcastAddress(i));
-			}
-		}
-	}
-
-	/**
-	 * Internal id of a partition that used the broadcast to all.
-	 */
-	static int broadcastAddress(int partition) {
-		return -(partition + 1);
 	}
 
 	static long address(int part, int type) {
@@ -297,22 +279,44 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	}
 
 	/**
-	 * Add a rank that should be waited for in the next synchronization step.
+	 * Registers a rank which the message broker should synchronize with during the next sync.
+	 * <p>
+	 * This works in combination with {@link #syncToRank(int)}. This message broker will await messages from all registered ranks during
+	 * the next sync. The message broker blocks until it has received a message from all registered ranks.
 	 */
-	public void addWaitForRank(int rank) {
-		// Copy all partitions of the rank to wait list
-		waitFor.addAll(topology.getNodeByIndex(rank).getParts());
+	public void syncFromRank(int rank) {
+
+		if (getRank() != rank) {
+			waitForRanks.add(rank);
+		}
 	}
 
 	/**
-	 * Register a rank to be sent a null message if no other messages are sent to it.
+	 * Register a partition which the message broker should synchronize with during the next sync.
+	 * <p>
+	 * The message broker determines the rank of the supplied partition and behaves like {@link #syncToRank(int)}.
 	 */
-	public void addNullMessage(int partition) {
-		// This is inefficient, but should be a small loop
-		for (ComputeNode node : topology) {
-			if (node.getParts().contains(partition)) {
-				sendNullMsgs.add(node.getRank());
-			}
+	public void syncToPart(int partition) {
+
+		// add the mapped rank if the partition is on another compute node
+		var rank = addresses[partition];
+		syncToRank(rank);
+	}
+
+	/**
+	 * Register a rank which the message broker should synchronize with during the next sync.
+	 * <p>
+	 * The message broker will send a message to the supplied rank during the next sync in any case, signaling the other rank, that this rank has
+	 * progressed to the next timestep. To actually synchronize, the other rank must wait for a message from this rank. This can be achieved by adding
+	 * a rank via {@link #syncFromRank(int)}.
+	 * <p>
+	 * Internally, the message broker will either send a message which was queued by the simulation or an {@link EmptyMessage}.
+	 */
+	public void syncToRank(int rank) {
+
+		// no need to wait for ourselves
+		if (getRank() != rank) {
+			sendToRanks.add(rank);
 		}
 	}
 
@@ -353,7 +357,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		long t = System.nanoTime();
 
 		for (SimTask task : tasks) {
-			IntSet others = task.waitForOtherRanks(time);
+			IntSet otherParts = task.waitForOtherParts(time);
 
 			// On last iteration the lps are not executed
 			if (last && task instanceof LPTask)
@@ -361,23 +365,35 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 			// event manager also determines when to wait for ranks,
 			// this might be not necesarry for event handler here
-			if (others == LP.ALL_NODES_BROADCAST) {
-				waitFor.addAll(otherParts);
-			} else
-				waitFor.addAll(others);
-		}
-
-		// remove all that are on the same partition
-		waitFor.removeAll(ownParts);
-
-		for (int rank : sendNullMsgs) {
-			int length = dataSize[rank + 1].get();
-			if (length == 0) {
-				send(EmptyMessage.INSTANCE, rank);
+			if (otherParts == LP.ALL_PARTS_BROADCAST) {
+				for (int i = 0; i < topology.getNodesCount(); i++) {
+					syncFromRank(i);
+				}
+			} else {
+				for (int partition : otherParts) {
+					var rank = addresses[partition];
+					syncFromRank(rank);
+				}
 			}
 		}
 
-		sendNullMsgs.clear();
+		waitForRanks.remove(comm.getRank());
+
+//		for (int rank : nullMessages) {
+//			// No need to send a heartbeat to ourselves; waitFor already removes own partitions.
+//			if (rank == comm.getRank()) continue;
+//			int length = dataSize[rank + 1].get();
+//			if (length == 0) {
+//				// sendNullMsgs stores node ranks; send() expects a partition index.
+//				// Use the first partition of that node as the routing address.
+//				var parts = topology.getNodeByIndex(rank).getParts();
+//				if (!parts.isEmpty()) {
+//					send(EmptyMessage.INSTANCE, parts.getInt(0));
+//				}
+//			}
+//		}
+//
+//		nullMessages.clear();
 		sendRecvMessages();
 
 		try {
@@ -388,7 +404,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	}
 
 	void afterSim() {
-		waitFor.clear();
+		waitForRanks.clear();
 		nodesMessages.clear();
 		histogram.reset();
 		sizes.reset();
@@ -456,6 +472,9 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 	private void sendRecvMessages() {
 
+		// add null messages if that is necessary.
+		queueNullMessages();
+
 		for (int i = 0; i < outgoing.length; i++) {
 			int length = dataSize[i].get();
 			if (length > 0) {
@@ -481,18 +500,36 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		comm.recv(this, this);
 	}
 
+	private void queueNullMessages() {
+		for (int rank : sendToRanks) {
+			// No need to send a heartbeat to ourselves; waitFor already removes own partitions.
+			if (rank == comm.getRank()) continue;
+			int length = dataSize[rank + 1].get();
+			if (length == 0) {
+
+				// we want to send a null/sync message to the compute node. We don't care which partition receives it on the other side.
+				var parts = topology.getNodeByIndex(rank).getParts();
+				var anyPartition = parts.getInt(0);
+				if (!parts.isEmpty()) {
+					queueSend(EmptyMessage.INSTANCE, rank, anyPartition);
+				}
+			}
+		}
+		sendToRanks.clear();
+	}
+
 	private double currentTime = -1;
 
 	@Override
 	public boolean expectsMoreMessages() {
-		if (!waitFor.isEmpty()) {
+		if (!waitForRanks.isEmpty()) {
 			log.trace(this::traceWaiting);
 		}
-		return !waitFor.isEmpty();
+		return !waitForRanks.isEmpty();
 	}
 
 	private String traceWaiting() {
-		var waitForParts = waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(","));
+		var waitForParts = waitForRanks.intStream().mapToObj(String::valueOf).collect(Collectors.joining(","));
 		return "#" + getRank() + " at t:" + currentTime + " waiting for: [" + waitForParts + "]";
 	}
 
@@ -516,7 +553,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			log.error(error);
 			log.error("Sender node: {}, Receiver node: {}", sender, receiver);
 			log.error("Node {} contains partitions: {}", comm.getRank(), ownParts);
-			log.error("Node {} currently supposed to wait for partitions: {}", comm.getRank(), waitFor);
+			log.error("Node {} currently supposed to wait for partitions: {}", comm.getRank(), waitForRanks);
 			log.error("Message covered partitions: {}", topology.getNodeByIndex(sender).getParts());
 			log.error("Message contents:");
 
@@ -561,13 +598,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			}
 		}
 
-		// The communication between two nodes may be split up into two separate messages.
-		// Need to differentiate if a message iy received as broadcast to all or as directed message
-		if (receiver == Communicator.BROADCAST_TO_ALL) {
-			topology.getNodeByIndex(sender).getParts().forEach(p -> waitFor.remove(broadcastAddress(p)));
-		} else {
-			topology.getNodeByIndex(sender).getParts().forEach(waitFor::remove);
-		}
+		waitForRanks.remove(sender);
 	}
 
 	public Histogram getRuntime() {

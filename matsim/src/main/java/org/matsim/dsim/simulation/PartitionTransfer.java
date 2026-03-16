@@ -59,7 +59,7 @@ public class PartitionTransfer {
 		// even if no data was collected for it. The broker will send EmptyMessage if no real
 		// data was queued for that rank.
 		for (int neighbor : neighborPartitions) {
-			messageBroker.addNullMessage(neighbor);
+			messageBroker.syncToPart(neighbor);
 		}
 	}
 

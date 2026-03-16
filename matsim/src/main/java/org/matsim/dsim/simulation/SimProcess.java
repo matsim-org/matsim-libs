@@ -243,7 +243,7 @@ public class SimProcess implements Steppable, LP, SimStepMessage2Processor, Nets
 	}
 
 	@Override
-	public IntSet waitForOtherRanks(double time) {
+	public IntSet waitForOtherParts(double time) {
 		return partition.getNeighbors();
 	}
 

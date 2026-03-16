@@ -171,8 +171,8 @@ class PartitionTransferTest {
 	void send_registersNullMessageForEachNeighborPartition() {
 		transfer.send(1.0, IntSet.of(1, 2));
 
-		verify(broker).addNullMessage(1);
-		verify(broker).addNullMessage(2);
+		verify(broker).syncToPart(1);
+		verify(broker).syncToPart(2);
 	}
 
 	@Test
@@ -182,7 +182,7 @@ class PartitionTransferTest {
 
 		// real data was sent AND null message was registered — broker guards against double-send
 		verify(broker).send(any(SimStepMessage2.class), eq(1));
-		verify(broker).addNullMessage(1);
+		verify(broker).syncToPart(1);
 	}
 
 	// --- isLocal() ---

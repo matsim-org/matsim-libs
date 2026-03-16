@@ -5,7 +5,6 @@ import com.google.inject.Provider;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -408,11 +407,11 @@ public final class DistributedEventsManager implements EventsManager {
 					broker.send(e, receiver);
 				}
 
-				broker.addNullMessage(receiver);
+				broker.syncToRank(receiver);
 			}
 
 			if (!waitFor.isEmpty()) {
-				waitFor.forEach(broker::addWaitForRank);
+				waitFor.forEach(broker::syncFromRank);
 			}
 
 			lastSync = time;
