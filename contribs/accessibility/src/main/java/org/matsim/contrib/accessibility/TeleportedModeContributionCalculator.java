@@ -94,30 +94,30 @@ public class TeleportedModeContributionCalculator implements AccessibilityContri
 
 	}
 
-	public double computeContributionOfOpportunityPerson(Person person, Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
-
-		double expSum = 0.;
-
-		for (AggregationObject destination : aggregatedOpportunities.values()) {
-
-			Facility opportunity = (Facility) destination.getNearestBasicLocation();
-
-			Facility homeFacility = FacilitiesUtils.wrapActivity((Activity) person.getSelectedPlan().getPlanElements().get(0));
-			List<? extends PlanElement> planElements = tripRouter.calcRoute(mode, homeFacility, opportunity, departureTime, null, null);
-			Leg walkLeg = extractLeg(planElements, mode);
-			double teleportTime_h = walkLeg.getTravelTime().seconds() / 3600;
-			double teleportDist_m = walkLeg.getRoute().getDistance();
-			double utilityTeleport = teleportTime_h * betaTT_h + teleportDist_m * betaDist_m + asc;
-
-			if(PersonUtils.getAge(person) > 60) {
-				utilityTeleport -= 10.0;
-			}
-
-			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * utilityTeleport);
-		}
-
-		return expSum;
-	}
+//	public double computeContributionOfOpportunityPerson(Person person, Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
+//
+//		double expSum = 0.;
+//
+//		for (AggregationObject destination : aggregatedOpportunities.values()) {
+//
+//			Facility opportunity = (Facility) destination.getNearestBasicLocation();
+//
+//			Facility homeFacility = FacilitiesUtils.wrapActivity((Activity) person.getSelectedPlan().getPlanElements().get(0));
+//			List<? extends PlanElement> planElements = tripRouter.calcRoute(mode, homeFacility, opportunity, departureTime, null, null);
+//			Leg walkLeg = extractLeg(planElements, mode);
+//			double teleportTime_h = walkLeg.getTravelTime().seconds() / 3600;
+//			double teleportDist_m = walkLeg.getRoute().getDistance();
+//			double utilityTeleport = teleportTime_h * betaTT_h + teleportDist_m * betaDist_m + asc;
+//
+//			if(PersonUtils.getAge(person) > 60) {
+//				utilityTeleport -= 10.0;
+//			}
+//
+//			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * utilityTeleport);
+//		}
+//
+//		return expSum;
+//	}
 
 	@Override
 	public Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {

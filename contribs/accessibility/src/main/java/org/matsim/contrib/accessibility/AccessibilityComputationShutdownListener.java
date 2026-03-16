@@ -45,8 +45,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
-import javax.xml.crypto.Data;
-
 /**
  * @author dziemke
  */
@@ -196,11 +194,9 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 					for (final List<Id<? extends BasicLocation>> partition : partitions) {
 						tasks.add(() -> {
 							try {
-								if(acg.isPersonBased()){
-									computePersonBased(mode, departureTime, aggregatedOpportunities, scenario.getPopulation());
-								}else {
-									compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, partition, progressBar);
-								}
+
+								compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, partition, progressBar);
+
 							} catch (Exception e) {
 								throw new RuntimeException(e);
 							}
@@ -221,15 +217,9 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 				} else {
 					LOG.info("Performing the computation without parallelization.");
 					ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
-					if(acg.isPersonBased()){
-						computePersonBased(mode, departureTime, aggregatedOpportunities, scenario.getPopulation());
-					}else {
-						compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginIds, progressBar);				}
-				}
 
-				if (!mode.equals(Modes4Accessibility.pt.toString())) {
-					break;
-				}
+					compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginIds, progressBar);				}
+
 			}
 			for (DataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 				zoneDataExchangeInterface.finish();
@@ -274,56 +264,13 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
                 }
 
 				for (DataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-
-					if(zoneDataExchangeInterface instanceof PersonDataExchangeInterface){
-						throw new IllegalStateException("The accessibility computation is not set to be person-based, but a PersonDataExchangeInterface was added as listener. Aborting...");
+					if(acg.isPersonBased()){
+						((PersonDataExchangeInterface) zoneDataExchangeInterface).setPersonAccessibilities((Person) origin.getAttributes().getAttribute("person"), departureTime, mode, accessibility);
+					} else {
+						((FacilityDataExchangeInterface) zoneDataExchangeInterface).setFacilityAccessibilities(origin, departureTime, mode, accessibility);
 					}
-					((FacilityDataExchangeInterface) zoneDataExchangeInterface).setFacilityAccessibilities(origin, departureTime, mode, accessibility);
 				}
 			}
-		}
-	}
-
-	private void computePersonBased(String mode, Double departureTime, Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities,
-						  Population population) {
-
-		AccessibilityContributionCalculator calculator;
-		if (acg.isUseParallelization()) {
-			calculator = calculators.get(mode).duplicate();
-		} else {
-			calculator = calculators.get(mode);
-		}
-
-
-			// Go through all person assigned to current node
-		for (Person person : population.getPersons().values()) {
-
-//				assert(origin.getCoord() != null);
-
-			assert (calculator instanceof TeleportedModeContributionCalculator);
-
-			double expSum = ((TeleportedModeContributionCalculator) calculator).computeContributionOfOpportunityPerson(person, aggregatedOpportunities, departureTime);
-
-			double accessibility;
-			if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.logSum) {
-				accessibility = (1 / this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSum);
-			} else if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.rawSum) {
-				accessibility = expSum;
-			} else if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.gravity) {
-				throw new IllegalArgumentException("This accessibility measure is not yet implemented.");
-			} else {
-				throw new IllegalArgumentException("No valid accessibility measure type chosen.");
-			}
-
-
-			// todo: what does this do?
-				for (DataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-					if(zoneDataExchangeInterface instanceof FacilityDataExchangeInterface){
-						throw new IllegalStateException("The accessibility computation is not set to be facility-based, but a FacilityDataExchangeInterface was added as listener. Aborting...");
-					}
-					((PersonDataExchangeInterface) zoneDataExchangeInterface).setPersonAccessibilities(person, departureTime, mode, accessibility);
-
-				}
 		}
 	}
 

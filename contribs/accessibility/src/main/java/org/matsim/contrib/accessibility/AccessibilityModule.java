@@ -191,6 +191,8 @@ public final class AccessibilityModule extends AbstractModule {
 						null
 					);
 
+					facility.getAttributes().putAttribute("person", person);
+
 					measuringPoints.addActivityFacility(facility);
 				}
 			} else { // This covers also the "fromNetwork" case

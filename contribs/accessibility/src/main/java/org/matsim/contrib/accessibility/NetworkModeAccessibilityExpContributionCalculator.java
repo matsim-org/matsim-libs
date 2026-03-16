@@ -122,23 +122,26 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 			Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
 		double expSum = 0.;
 
+		// Find nearest link to measuring point
 		Link nearestLink = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
-		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
-		double walkTravelTimeMeasuringPoint2Road_h = distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
-		// Orthogonal walk to nearest link
-		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
-		// NEW AV MODE
-		//		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime_s") / 3600.;
-		//		double walkUtilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
-		//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
-		// END NEW AV MODE
 
-		// Travel on section of first link to first node
+		// Distances includes :
+		// (1) distanceCoord2Intersection: from measuring point to closest point on link (WALKED)
+		// (2) distanceIntersection2Node: distance along Link from intersection to end of link (DRIVEN)
+		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
+
+		// first we deal with (1): (a) tt --> (b) (dis)utility
+		double walkTravelTimeMeasuringPoint2Road_h = distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
+		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
+
+		// now we deal with (2): Travel on section of first link to first node
 		double distanceFraction = distance.getDistanceIntersection2Node() / nearestLink.getLength();
 		double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
 
-		// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
+		// now we take the ASC
 		double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, scoringConfigGroup);
+
+
 
 		for (final AggregationObject destination : aggregatedOpportunities.values()) {
 
@@ -150,6 +153,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 			//double congestedCarUtility = - multiNodePathCalculator.constructPath(fromNode, destination.getNearestNode(), departureTime).travelCost;
 
 			// Pre-computed effect of all opportunities reachable from destination network node
+			// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
 			double sumExpVjkWalk = destination.getSum();
 
 				expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * (walkUtilityMeasuringPoint2Road + modeSpecificConstant
