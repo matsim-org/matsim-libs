@@ -3,6 +3,7 @@ package org.matsim.dsim.simulation;
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
@@ -38,7 +39,7 @@ public class PartitionTransfer {
 		messagesForType.add(message);
 	}
 
-	public void send(double now) {
+	public void send(double now, IntSet neighborPartitions) {
 		for (var partitions : messages.int2ObjectEntrySet()) {
 			var toPartition = partitions.getIntKey();
 			for (var types : partitions.getValue().int2ObjectEntrySet()) {
@@ -49,6 +50,13 @@ public class PartitionTransfer {
 			}
 			// remove reference to the list of message for given type.
 			partitions.getValue().clear();
+		}
+
+		// Ensure every neighbor partition receives at least a sync heartbeat this time step,
+		// even if no data was collected for it. The broker will send EmptyMessage if no real
+		// data was queued for that rank.
+		for (int neighbor : neighborPartitions) {
+			messageBroker.addNullMessage(neighbor);
 		}
 	}
 

@@ -146,7 +146,7 @@ public class SimProcess implements Steppable, LP, SimStepMessage2Processor, Nets
 			engine.doSimStep(time);
 		}
 
-		partitionTransfer.send(time);
+		partitionTransfer.send(time, partition.getNeighbors());
 
 		listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 	}

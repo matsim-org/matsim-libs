@@ -1,6 +1,7 @@
 package org.matsim.dsim.simulation;
 
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -70,7 +71,7 @@ class PartitionTransferTest {
 	void collectByRank_singleMessage_sentOnFlush() {
 		var msg = new MessageA();
 		transfer.collect(msg, 1);
-		transfer.send(42.0);
+		transfer.send(42.0, IntSet.of());
 
 		var captor = ArgumentCaptor.forClass(Message.class);
 		verify(broker).send(captor.capture(), eq(1));
@@ -90,7 +91,7 @@ class PartitionTransferTest {
 		transfer.collect(m1, 1);
 		transfer.collect(m2, 1);
 		transfer.collect(m3, 1);
-		transfer.send(10.0);
+		transfer.send(10.0, IntSet.of());
 
 		var captor = ArgumentCaptor.forClass(Message.class);
 		verify(broker, times(1)).send(captor.capture(), eq(1));
@@ -106,7 +107,7 @@ class PartitionTransferTest {
 		var msgB = new MessageB();
 		transfer.collect(msgA, 1);
 		transfer.collect(msgB, 1);
-		transfer.send(5.0);
+		transfer.send(5.0, IntSet.of());
 
 		var captor = ArgumentCaptor.forClass(Message.class);
 		verify(broker, times(2)).send(captor.capture(), eq(1));
@@ -128,7 +129,7 @@ class PartitionTransferTest {
 		var msgToRank2 = new MessageA();
 		transfer.collect(msgToRank1, 1);
 		transfer.collect(msgToRank2, 2);
-		transfer.send(0.0);
+		transfer.send(0.0, IntSet.of());
 
 		var rankCaptor = ArgumentCaptor.forClass(Integer.class);
 		var msgCaptor = ArgumentCaptor.forClass(Message.class);
@@ -142,19 +143,37 @@ class PartitionTransferTest {
 	// --- send() edge cases ---
 
 	@Test
-	void send_withNoMessages_doesNotCallBroker() {
-		transfer.send(99.0);
+	void send_withNoMessages_doesNotCallBrokerSend() {
+		transfer.send(99.0, IntSet.of());
 		verify(broker, never()).send(any(), anyInt());
 	}
 
 	@Test
 	void send_clearsBufferAfterFlushing() {
 		transfer.collect(new MessageA(), 1);
-		transfer.send(1.0);
-		transfer.send(2.0);  // second send — buffer should be empty
+		transfer.send(1.0, IntSet.of());
+		transfer.send(2.0, IntSet.of());  // second send — buffer should be empty
 
 		// send() called for SimStepMessage2 only once (from first send)
 		verify(broker, times(1)).send(any(SimStepMessage2.class), anyInt());
+	}
+
+	@Test
+	void send_registersNullMessageForEachNeighborPartition() {
+		transfer.send(1.0, IntSet.of(1, 2));
+
+		verify(broker).addNullMessage(1);
+		verify(broker).addNullMessage(2);
+	}
+
+	@Test
+	void send_registersNullMessageForNeighborEvenWhenDataWasSentToIt() {
+		transfer.collect(new MessageA(), 1);
+		transfer.send(1.0, IntSet.of(1));
+
+		// real data was sent AND null message was registered — broker guards against double-send
+		verify(broker).send(any(SimStepMessage2.class), eq(1));
+		verify(broker).addNullMessage(1);
 	}
 
 	// --- isLocal() ---

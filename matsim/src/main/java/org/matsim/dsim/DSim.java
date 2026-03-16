@@ -20,6 +20,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.MobsimListenerManager;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.simulation.SimProvider;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
@@ -126,8 +127,7 @@ public final class DSim implements Mobsim {
 
 		Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
 
-		log.info("Starting simulation");
-
+		log.info("#{} Simulation initialized", comm.getRank());
 		listenerManager.fireQueueSimulationInitializedEvent();
 
 		long start = System.currentTimeMillis();
@@ -138,6 +138,8 @@ public final class DSim implements Mobsim {
 		long afterListener = 0;
 
 		double time = timer.getTimeOfDay();
+		log.info("#{} Starting Simulation at: {}", comm.getRank(), Time.writeTime(time));
+
 		while (timer.getTimeOfDay() < dsimConfig.getEndTime()) {
 
 			long t = System.nanoTime();
