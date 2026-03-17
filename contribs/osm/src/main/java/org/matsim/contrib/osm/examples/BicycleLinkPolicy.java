@@ -84,7 +84,7 @@ public final class BicycleLinkPolicy {
 //		if (!ok) removeMode(link, BICYCLE_MODE);
 //	}
 
-	// ERSETZT deine alte Version:
+	// ERSETZT die alte Version:
 	private static void enforceFootwayPedestrianWhitelist(Link link, Map<String, String> tags) {
 		String h = tags.get("highway");
 		if (!("footway".equals(h) || "pedestrian".equals(h))) return;
