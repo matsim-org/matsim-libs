@@ -28,7 +28,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.geometry.GeometryUtils;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
@@ -338,18 +337,22 @@ class AgentWiseComparisonKNUtils{
 		final double line_switch_score = deltaTable.doubleColumn( deltaOf( U_LINESWITCHES ) ).sum() * factor;
 		final double acts_score = deltaTable.doubleColumn( deltaOf( ACTS_SCORE ) ).sum() * factor;
 		final double non_monetary = ascs_sum + u_trav_score + line_switch_score + acts_score;
+		final double u_trav_direct_all = ascs_sum + u_trav_score + line_switch_score;
+
+		// Wenn ich an u_trav_direct drehe, dann wird das durch eine entgegengesetzte Änderung an den ASCs aufgefangen.  Somit kann man die ASCs in erster Näherung zu den "direct disutilities of travelling" rechnen.
 
 		final StringBuilder score_cmt = new StringBuilder( "is the overall benefit (potentially negative) in score space. This has the following contributions:" );
 		final StringBuilder weighted_ttime_cmt = new StringBuilder( "... ... is the travel time benefit." );
 		final StringBuilder weighted_money_cmt = new StringBuilder( "... is the monetary benefit (re-weighted by indiv. mUoM)." );
-		final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC benefits." );
-		final StringBuilder u_trav_direct_cmt = new StringBuilder( "... ... are the direct travel score benefits (=less bike, less ride)." );
-		final StringBuilder u_lineswitches_cmt = new StringBuilder("... ... are the line switching benefits.");
+		final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC (= unobserved (travel) benefits." );
+		final StringBuilder u_trav_direct_cmt = new StringBuilder( "... ... is the direct travel score benefits (=less bike, less ride)." );
+		final StringBuilder u_lineswitches_cmt = new StringBuilder("... ... is the line switching benefit.");
 		final StringBuilder sum_cmt = new StringBuilder( "is the sum of these contributions." );
-		final StringBuilder acts_score_cmt = new StringBuilder( "... ... are the activities score (= pure travel time) benefits." );
+		final StringBuilder acts_score_cmt = new StringBuilder( "... is the activities score (= pure time) benefit." );
 		final StringBuilder alt_sum_cmt = new StringBuilder("is the sum of these contributions.") ;
 		final StringBuilder matsim_score_cmt = new StringBuilder("is the matsim score diff from the output population");
-		final StringBuilder non_monetary_cmt = new StringBuilder("... are the non-monetary benefits.  This has the following contributions:");
+//		final StringBuilder non_monetary_cmt = new StringBuilder("... are the non-monetary benefits.  This has the following contributions:");
+		final StringBuilder u_trav_direct_all_cmt = new StringBuilder("... are the direct travel benefits.  This has the following contributions:");
 
 		final int maxLen = score_cmt.length();
 		alignLeft( weighted_ttime_cmt, maxLen );
@@ -361,7 +364,8 @@ class AgentWiseComparisonKNUtils{
 		alignLeft( acts_score_cmt, maxLen );
 		alignLeft( alt_sum_cmt, maxLen );
 		alignLeft( matsim_score_cmt, maxLen );
-		alignLeft( non_monetary_cmt, maxLen );
+//		alignLeft( non_monetary_cmt, maxLen );
+		alignLeft( u_trav_direct_all_cmt, maxLen );
 
 		// ---
 
@@ -373,11 +377,14 @@ class AgentWiseComparisonKNUtils{
 		summaryTable.doubleColumn( "value" ).append( money_score );
 		summaryTable.stringColumn( "comment" ).append( weighted_money_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( non_monetary );
-		summaryTable.stringColumn( "comment" ).append( non_monetary_cmt.toString() );
+//		summaryTable.doubleColumn( "value" ).append( non_monetary );
+//		summaryTable.stringColumn( "comment" ).append( non_monetary_cmt.toString() );
 
 		summaryTable.doubleColumn( "value" ).append( acts_score );
 		summaryTable.stringColumn( "comment" ).append( acts_score_cmt.toString() );
+
+		summaryTable.doubleColumn( "value" ).append( u_trav_direct_all );
+		summaryTable.stringColumn( "comment" ).append( u_trav_direct_all_cmt.toString() );
 
 		summaryTable.doubleColumn( "value" ).append( u_trav_score );
 		summaryTable.stringColumn( "comment" ).append( u_trav_direct_cmt.toString() );
@@ -415,7 +422,17 @@ class AgentWiseComparisonKNUtils{
 
 		System.out.println( System.lineSeparator() + summaryTable + System.lineSeparator() );
 	}
-	static @NotNull Population readAndCleanPopulation( Path path, List<String> eventsFilePatterns ){
+	static void cleanPopulation( Path path, List<String> eventsFilePatterns, Population basePopulation ){
+		removeNonPersons( basePopulation );
+
+		removeNonMobilePersons( basePopulation );
+
+		for (String pattern : eventsFilePatterns ) {
+			handleEventsfile( path, pattern, basePopulation );
+			// (most of the time, this should be a filtered events file, and we only use money and stuck info)
+		}
+	}
+	static @NotNull String findPopulationFilename( Path path ){
 		String basePopulationFilename;
 		try {
 			basePopulationFilename = globFile( path, "*reduced_plans.xml" ).toString();
@@ -430,19 +447,7 @@ class AgentWiseComparisonKNUtils{
 				}
 			}
 		}
-
-		Population basePopulation = PopulationUtils.readPopulation( basePopulationFilename );
-
-		removeNonPersons( basePopulation );
-
-		removeNonMobilePersons( basePopulation );
-
-		for (String pattern : eventsFilePatterns) {
-			handleEventsfile( path, pattern, basePopulation );
-			// (most of the time, this should be a filtered events file, and we only use money and stuck info)
-		}
-
-		return basePopulation;
+		return basePopulationFilename;
 	}
 	static void computeAndSetMarginalUtilitiesOfMoney( Scenario scenario ){
 		Population basePopulation = scenario.getPopulation();
@@ -657,6 +662,10 @@ class AgentWiseComparisonKNUtils{
 		config.counts().setInputFile( null );
 
 		config.routing().setNetworkModes( Collections.emptySet() );
+
+		config.plans().setInputFile( findPopulationFilename( path ) );
+		// yy findPopulationFilename might be inlined eventually.
+
 		return config;
 	}
 }

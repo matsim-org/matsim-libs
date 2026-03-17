@@ -16,24 +16,20 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import org.matsim.utils.tablesaw.TablesawUtils;
 import picocli.CommandLine;
@@ -85,10 +81,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
 
-	MutableScenario baseScenario;
+	Scenario baseScenario;
 	private List<PreparedGeometry> geometries;
 
-	Injector baseInjector;
+	Injector baseCaseInjector;
 	Injector policyInjector;
 
 	private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
@@ -130,12 +126,16 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-none-it500-routesCleaned-20260218";
 
 		// -- "new":
-		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it500-20260218";
-		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-20260218";
+//		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it500-20260218";
+//		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-20260218";
 
 		// -- "new" with cleaned routes:
 //		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it500-cleaned-20260224";
 // 		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-routesCleaned-20260218";
+
+		// do last iteration again:
+		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
+		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
 
 		// iatbr glamobi:
 //		final String baseDir="/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
@@ -214,24 +214,24 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			eventsFilePatterns.add( "*output_events.xml.gz" );
 		}
 
-		// ===
+		// ############################
+		// ############################
+		// ### base case data:
 
 		final Config baseConfig = prepareConfig( baseCasePath );
 
 		// ===
 
-		baseScenario = (MutableScenario) ScenarioUtils.loadScenario( baseConfig );
+		baseScenario = ScenarioUtils.loadScenario( baseConfig );
 
-		final Population basePopulation = readAndCleanPopulation( baseCasePath, eventsFilePatterns );
-		baseScenario.setPopulation( basePopulation );
-		// yy could/should read the population in loadScenario, and then only clean it here.
+		cleanPopulation( baseCasePath, eventsFilePatterns, baseScenario.getPopulation() );
 
 		computeAndSetMarginalUtilitiesOfMoney( baseScenario );
-		computeAndSetIncomeDeciles( basePopulation );
+		computeAndSetIncomeDeciles( baseScenario.getPopulation() );
 
 		// ===
 
-		this.baseInjector = new org.matsim.core.controler.Injector.InjectorBuilder( baseScenario )
+		this.baseCaseInjector = new org.matsim.core.controler.Injector.InjectorBuilder( baseScenario )
 								.addStandardModules()
 								.addOverridingModule( new AbstractModule(){
 									@Override public void install(){
@@ -243,7 +243,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 //		Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
 		Table baseTableTrips = null;
-		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null, baseInjector.getInstance( ScoringFunctionFactory.class ) );
+		Table baseTablePersons = generatePersonTableFromPopulation( this.baseCaseInjector, null );
 
 		baseTablePersons.addColumns( baseTablePersons.doubleColumn( MATSIM_SCORE ).subtract( baseTablePersons.doubleColumn( SCORE ) ).setName( "error" ) );
 
@@ -273,44 +273,18 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		// ############################
 		// ############################
+		// ### policy data:
 
-		// ### next cometh the policy data:
-
-		Config policyConfig = ConfigUtils.loadConfig( globFile( inputPath, "*output_config_reduced.xml" ).toString() );
-		// (The reduced config has fewer problems with newly introduced config params.)
-
-		policyConfig.controller().setOutputDirectory( "output/dummyOutput2FromAgentWiseComparisonKN" );
-		policyConfig.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-		policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
-		policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike) ).setScoringThisActivityAtAll( false ) );
-		policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
-		policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
-
-		policyConfig.plans().setInputFile( null );
-		policyConfig.network().setChangeEventsInputFile( null );
-		policyConfig.transit().setVehiclesFile( null );
-		policyConfig.vehicles().setVehiclesFile( null );
-		policyConfig.counts().setInputFile( null );
-
-		policyConfig.routing().setNetworkModes( Collections.emptySet() );
+		Config policyConfig = prepareConfig( inputPath );
 
 		// ===
 
-		MutableScenario policyScenario = ScenarioUtils.createMutableScenario( policyConfig );
-		// Here, we do not want to use ScenarioUtils.loadScenario, because we might be able to rescue files from the base scenario.  (Not totally clear.)
+		Scenario policyScenario = ScenarioUtils.loadScenario( policyConfig );
 
-		String policyNetworkFilename = globFile( inputPath, "*output_" + DefaultFiles.network.getFilename() + ".gz" ).toString();
-		new MatsimNetworkReader( policyScenario.getNetwork() ).readFile( policyNetworkFilename );
+		cleanPopulation( inputPath, eventsFilePatterns, policyScenario.getPopulation() );
 
-		String policyTransitScheduleFilename = globFile( inputPath, "*output_" + DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
-		new TransitScheduleReader( policyScenario ).readFile( policyTransitScheduleFilename );
-
-		Population policyPopulation = readAndCleanPopulation( inputPath, eventsFilePatterns );
-		policyScenario.setPopulation( policyPopulation );
-		tagPersonsToAnalyse( policyPopulation, geometries, baseScenario );
+		tagPersonsToAnalyse( policyScenario.getPopulation(), geometries, baseScenario );
 		// (tagging is better than removing since (1) one can have multiple tags in one go, and (2) the average income becomes different once we start removing people)
-
-		policyScenario.setActivityFacilities( baseScenario.getActivityFacilities() );
 
 		// ===
 
@@ -321,19 +295,23 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 							 } ).build();
 
 
-		ScoringFunctionFactory policyScoringFunctionFactory = this.policyInjector.getInstance( ScoringFunctionFactory.class );
-		Table personsTablePolicy = generatePersonTableFromPopulation( policyPopulation, policyConfig, basePopulation, policyScoringFunctionFactory );
+		Table personsTablePolicy = generatePersonTableFromPopulation( policyInjector, baseScenario.getPopulation() );
 
 		// ############################
 		// ############################
+		// ### compare:
 
 		compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath );
 
 		return 0;
 	}
 
-	@NotNull Table generatePersonTableFromPopulation( Population population, Config config, Population basePopulation, ScoringFunctionFactory scoringFunctionFactory ){
+	@NotNull Table generatePersonTableFromPopulation( Injector injector, Population basePopulation ){
 		final boolean isBaseTable = (basePopulation == null);
+
+		Config config = injector.getInstance( Config.class );
+		Population population = injector.getInstance( Population.class );
+		ScoringFunctionFactory scoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
 
 		Table table = createPopulationTable();
 
@@ -556,7 +534,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	void compare( Scenario policyScenario, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Scenario baseScenario, Config baseConfig, Path outputPath ){
 
 		if( doRoh ){
-			new AgentWiseRuleOfHalfComputation( this.baseInjector, this.policyInjector ).somehowComputeRuleOfHalf();
+			new AgentWiseRuleOfHalfComputation( this.baseCaseInjector, this.policyInjector ).somehowComputeRuleOfHalf();
 			addRohValuesToTable( policyScenario.getPopulation(), personsTablePolicy );
 		}
 		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
@@ -644,7 +622,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 				log.info( "" );
 				log.info( "print sorted roh table:" );
-				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
+				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
 			}
 
 			// ===
