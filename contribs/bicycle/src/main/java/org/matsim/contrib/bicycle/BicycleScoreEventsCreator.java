@@ -47,6 +47,8 @@ import java.util.*;
  * <p>
  * True overtaking definition on a link L:
  * enter_car > enter_bike  AND  leave_car < leave_bike
+ * <p>
+ * TODO: How are events handeled if they enter at the same time?
  */
 class BicycleScoreEventsCreator implements
 	VehicleEntersTrafficEventHandler,
@@ -311,7 +313,7 @@ class BicycleScoreEventsCreator implements
 		Link l = network.getLinks().get(linkId);
 		if (l == null) return 300.0;
 		double free = l.getLength() / Math.max(0.1, l.getFreespeed());
-		//return Math.min(600.0, Math.max(60.0, 5.0 * free));
+		//return Math.min(600.0, Math.max(60.0, 5.0 * free));  // this should be better, but wont work if links are super long like equil
 		return Math.max(600.0, 20.0 * free); // TODO: needs to be adjusted, but the equil we need less prune
 	}
 

@@ -25,3 +25,5 @@ output/
 #
 *.jar
 .profileconfig.json
+
+*.zip
