@@ -32,6 +32,7 @@ import java.io.UncheckedIOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -413,60 +414,119 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	/**
 	 * Serialize message and put it into the outgoing buffer. This method can be called concurrently.
 	 *
-	 * @param partition receiving partition, if {@link Integer#MIN_VALUE} the message is send to the node inbox.
+	 * @param toPartition receiving partition, if {@link Integer#MIN_VALUE} the message is send to the node inbox.
 	 */
-	private void queueSend(Message msg, int rank, int partition) {
+	private void queueSend(Message message, int toRank, int toPartition) {
 
-		log.trace("#{} queue send to {}/{}: {}", this.getRank(), rank, partition, msg);
-		AtomicInteger oldPos = dataSize[rank + 1];
+		log.trace("#{} queue send to {}/{}: {}", this.getRank(), toRank, toPartition, message);
 
-		var fury = serialization.getFory();
-		MemoryBuffer buf = MemoryBuffer.newHeapBuffer(1024);
+		writeHeader(toRank);
+		writeMessage(toRank, toPartition, message);
+//
+//
+//		AtomicInteger oldPos = dataSize[toRank + 1];
+//
+//		var fury = serialization.getFory();
+//		MemoryBuffer buf = MemoryBuffer.newHeapBuffer(1024);
+//
+//		while (true) {
+//
+//			int pos = oldPos.get();
+//
+//			// Reset buffer
+//			buf.writerIndex(0);
+//
+//			// Add sender information at the beginning
+//			if (pos == 0) {
+//				// sequence number /  tag
+//				buf.writeInt32(seq);
+//				// sender rank
+//				buf.writeInt32(comm.getRank());
+//				// receiver rank
+//				buf.writeInt32(toRank);
+//			}
+//
+//			// message type
+//			buf.writeInt32(toPartition);
+//			buf.writeInt32(message.getType());
+//
+//			// Put message size after writing
+//			int sizeIdx = buf.writerIndex();
+//			buf.writeInt32(0);
+//
+//			fury.serializeJavaObject(buf, message);
+//			// Serialized size
+//			buf.putInt32(sizeIdx, buf.writerIndex() - sizeIdx - Integer.BYTES);
+//
+//			int length = buf.writerIndex();
+//
+//			if (pos + length > outgoing[toRank + 1].byteSize()) {
+//				throw new IllegalStateException("Outgoing buffer is full. Increase buffer size or reduce message size.");
+//			}
+//
+//			// Update length position of the buffer
+//			if (!oldPos.compareAndSet(pos, pos + length)) {
+//				continue;
+//			}
+//
+//			ByteBuffer buffer = outgoing[toRank + 1].asByteBuffer();
+//			buf.copyTo(0, MemoryBuffer.fromByteBuffer(buffer), pos, buf.writerIndex());
+//
+//			break;
+//		}
+	}
+
+	/**
+	 * Writes header bytes to the outBuffer of 'toRank'. The header is only written if no header is present yet.
+	 */
+	private void writeHeader(int toRank) {
+		// we only want to write a header if the outBuffer for 'toRank' is empty
+		var outBufPosition = dataSize[toRank + 1];
+		if (outBufPosition.get() == 0) {
+			// we allocate the bytes once, and then we do a cas loop in case another thread also tries to add a header.
+			// This is done by atomically updating the buffer position to after the header. If we succeed, the next
+			// thread will write its bytes after the header. We can safely operate on the buffer between 0 and header.position
+			// in the meantime.
+			var headerBuffer = headerFor(seq, getRank(), toRank);
+			while (true) {
+				if (outBufPosition.compareAndSet(0, headerBuffer.limit())) {
+					var outBuffer = outgoing[toRank + 1].asByteBuffer();
+					headerBuffer.flip();
+					outBuffer.put(headerBuffer);
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Writes message bytes to the outBuffer of 'toRank'. {@link #writeHeader(int)} must have been called before. To ensure that the message
+	 * can be read on the receiver side.
+	 */
+	private void writeMessage(int toRank, int toPartition, Message message) {
+
+		// allocate the message bytes once
+		var messageBuf = serialize(toPartition, message, this.serialization);
+		var messageBufSize = messageBuf.limit();
+		var outBufPosition = dataSize[toRank + 1];
 
 		while (true) {
+			var currentOutBufPosition = outBufPosition.get();
+			var finishedOutBufPosition = currentOutBufPosition + messageBufSize;
 
-			int pos = oldPos.get();
-
-			// Reset buffer
-			buf.writerIndex(0);
-
-			// Add sender information at the beginning
-			if (pos == 0) {
-				// sequence number /  tag
-				buf.writeInt32(seq);
-				// sender rank
-				buf.writeInt32(comm.getRank());
-				// receiver rank
-				buf.writeInt32(rank);
-			}
-
-			// message type
-			buf.writeInt32(partition);
-			buf.writeInt32(msg.getType());
-
-			// Put message size after writing
-			int sizeIdx = buf.writerIndex();
-			buf.writeInt32(0);
-
-			fury.serializeJavaObject(buf, msg);
-			// Serialized size
-			buf.putInt32(sizeIdx, buf.writerIndex() - sizeIdx - Integer.BYTES);
-
-			int length = buf.writerIndex();
-
-			if (pos + length > outgoing[rank + 1].byteSize()) {
+			if (currentOutBufPosition + messageBufSize > outgoing[toRank + 1].byteSize()) {
 				throw new IllegalStateException("Outgoing buffer is full. Increase buffer size or reduce message size.");
 			}
 
-			// Update length position of the buffer
-			if (!oldPos.compareAndSet(pos, pos + length)) {
-				continue;
+			// reserve a part in the out buffer by atomically setting the data size property for this buffer to the position of the
+			// buffer that points 'behind' the data we are about to write.
+			// if another thread has updated the dataSize in the meantime, we'll do another round in the while loop.
+			if (outBufPosition.compareAndSet(currentOutBufPosition, finishedOutBufPosition)) {
+				var outBuffer = outgoing[toRank + 1].asByteBuffer();
+				messageBuf.flip();
+				outBuffer.put(currentOutBufPosition, messageBuf, 0, messageBufSize);
+				break;
 			}
-
-			ByteBuffer buffer = outgoing[rank + 1].asByteBuffer();
-			buf.copyTo(0, MemoryBuffer.fromByteBuffer(buffer), pos, buf.writerIndex());
-
-			break;
 		}
 	}
 
@@ -536,6 +596,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	@Override
 	public void consume(ByteBuffer data) throws IOException {
 
+		// we have written little endian, hence read little endian.
 		int length = data.limit();
 
 		MemoryBuffer in = MemoryBuffer.fromByteBuffer(data);
@@ -607,5 +668,36 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 	public Histogram getSizes() {
 		return sizes;
+	}
+
+	static ByteBuffer headerFor(int seq, int sRank, int rRank) {
+
+		var buf = ByteBuffer.allocate(3 * Integer.BYTES);
+		buf.order(ByteOrder.LITTLE_ENDIAN);
+		// header data: sequence (depends on timestep, this rank, target rank)
+		buf.putInt(seq);
+		buf.putInt(sRank);
+		buf.putInt(rRank);
+
+		return buf;
+	}
+
+	static ByteBuffer serialize(int toPartition, Message message, SerializationProvider serializer) {
+
+		// important to use serializeJavaObject, so that we can parse with deserializeFromJavaObject on receive.
+		var msgBytes = serializer.getFory().serializeJavaObject(message);
+		var msgSize = msgBytes.length;
+		ByteBuffer buf = ByteBuffer.allocate(msgSize + 3 * Integer.BYTES);
+		buf.order(ByteOrder.LITTLE_ENDIAN);
+
+		// header data: toPartition, msgType, msgSize
+		buf.putInt(toPartition);
+		buf.putInt(message.getType());
+		buf.putInt(msgSize);
+
+		// msg data
+		buf.put(msgBytes);
+
+		return buf;
 	}
 }

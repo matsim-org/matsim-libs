@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.core.communication.Communicator;
@@ -23,8 +24,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class MessageBrokerTest {
@@ -128,7 +128,9 @@ public class MessageBrokerTest {
 		var otherRank = 1;
 		try (var comm = mock(Communicator.class)) {
 			var broker = new MessageBroker(comm, topology);
-			broker.register(lpTask(topology.getNodeByIndex(otherRank).getParts()), 0);
+			var lp = new StubLP(topology.getNodeByIndex(otherRank).getParts());
+			var receiverTask = lpTask(lp, 0);
+			broker.register(receiverTask, 0);
 			broker.beforeSimStep(0);
 			broker.syncToRank(otherRank);
 
@@ -137,9 +139,15 @@ public class MessageBrokerTest {
 			assertTrue(broker.expectsMoreMessages());
 			verify(comm, times(1)).send(eq(otherRank), any(), anyLong(), anyLong());
 
-			var receivedMsg = bytesOf(otherRank, broker.getRank(), 0, new MessageA("test message"), 0);
-			broker.consume(receivedMsg);
+			var msg = msgBytes(otherRank, broker.getRank(), 0, new MessageA("test message"), seq(0));
+			msg.flip();
+			broker.consume(msg);
 			assertFalse(broker.expectsMoreMessages());
+
+			receiverTask.beforeExecution();
+			receiverTask.run();
+			assertEquals(1, lp.received.size());
+			assertEquals("test message", lp.received.getFirst().payload());
 		}
 	}
 
@@ -226,6 +234,10 @@ public class MessageBrokerTest {
 
 	// --- helpers ---
 
+	private LPTask lpTask(LP lp, int partition) {
+		return new LPTask(lp, partition, mock(DistributedEventsManager.class), serializer);
+	}
+
 	private LPTask lpTask(IntCollection neighborParts) {
 		return new LPTask(new StubLP(neighborParts), 0, null, serializer);
 	}
@@ -243,6 +255,19 @@ public class MessageBrokerTest {
 		buf.putInt(sender);
 		buf.putInt(receiver);
 		buf.flip();
+		return buf;
+	}
+
+	private ByteBuffer msgBytes(int sender, int receiver, int partition, Message msg, int seq) {
+
+		var headerBytes = MessageBroker.headerFor(seq, sender, receiver);
+		var msgBytes = MessageBroker.serialize(partition, msg, serializer);
+
+		var buf = ByteBuffer.allocate(headerBytes.capacity() + msgBytes.capacity()).order(ByteOrder.LITTLE_ENDIAN);
+		headerBytes.flip();
+		buf.put(headerBytes);
+		msgBytes.flip();
+		buf.put(msgBytes);
 		return buf;
 	}
 
@@ -267,8 +292,9 @@ public class MessageBrokerTest {
 
 	// --- stub LP ---
 
-	private static class StubLP implements LP {
+	private static class StubLP implements LP, MessageAProcessor {
 		private final IntSet neighborParts;
+		final List<MessageA> received = new ArrayList<>();
 
 		StubLP(IntCollection neighborParts) {
 			this.neighborParts = new IntOpenHashSet(neighborParts);
@@ -278,6 +304,15 @@ public class MessageBrokerTest {
 		public IntSet waitForOtherParts(double time) {
 			return neighborParts;
 		}
+
+		@Override
+		public void process(MessageA msg) {
+			received.add(msg);
+		}
+	}
+
+	private static int seq(double time) {
+		return Math.abs(1000 + (int) (time * 100));
 	}
 
 	// --- test communicator ---
@@ -316,4 +351,8 @@ public class MessageBrokerTest {
 	}
 
 	public record MessageA(String payload) implements Message {}
+
+	public interface MessageAProcessor extends MessageProcessor {
+		void process(MessageA msg);
+	}
 }
