@@ -68,8 +68,8 @@ public class TripAnalysis implements MATSimAppCommand {
 	 */
 	public static final String ATTR_REF_WEIGHT = "ref_weight";
 
-	private static Map<String, List<String>> groupsOfSubpopulationsForPersonAnalysis = new HashMap<>();
-	private static Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis = new HashMap<>();
+	private Map<String, List<String>> groupsOfSubpopulationsForPersonAnalysis = new HashMap<>();
+	private Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis = new HashMap<>();
 
 	public enum ModelType {
 		PERSON_TRAFFIC("personTraffic"),
@@ -403,7 +403,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		return 0;
 	}
 
-	private static ModelType getModelType(String subpopulation) {
+	private ModelType getModelType(String subpopulation) {
 	    if (subpopulation == null || subpopulation.isEmpty()) return ModelType.UNASSIGNED;
 	    for (List<String> list : groupsOfSubpopulationsForPersonAnalysis.values()) {
 	        if (list.contains(subpopulation)) return ModelType.PERSON_TRAFFIC;
