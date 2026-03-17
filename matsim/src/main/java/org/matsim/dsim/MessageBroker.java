@@ -422,58 +422,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 		writeHeader(toRank);
 		writeMessage(toRank, toPartition, message);
-//
-//
-//		AtomicInteger oldPos = dataSize[toRank + 1];
-//
-//		var fury = serialization.getFory();
-//		MemoryBuffer buf = MemoryBuffer.newHeapBuffer(1024);
-//
-//		while (true) {
-//
-//			int pos = oldPos.get();
-//
-//			// Reset buffer
-//			buf.writerIndex(0);
-//
-//			// Add sender information at the beginning
-//			if (pos == 0) {
-//				// sequence number /  tag
-//				buf.writeInt32(seq);
-//				// sender rank
-//				buf.writeInt32(comm.getRank());
-//				// receiver rank
-//				buf.writeInt32(toRank);
-//			}
-//
-//			// message type
-//			buf.writeInt32(toPartition);
-//			buf.writeInt32(message.getType());
-//
-//			// Put message size after writing
-//			int sizeIdx = buf.writerIndex();
-//			buf.writeInt32(0);
-//
-//			fury.serializeJavaObject(buf, message);
-//			// Serialized size
-//			buf.putInt32(sizeIdx, buf.writerIndex() - sizeIdx - Integer.BYTES);
-//
-//			int length = buf.writerIndex();
-//
-//			if (pos + length > outgoing[toRank + 1].byteSize()) {
-//				throw new IllegalStateException("Outgoing buffer is full. Increase buffer size or reduce message size.");
-//			}
-//
-//			// Update length position of the buffer
-//			if (!oldPos.compareAndSet(pos, pos + length)) {
-//				continue;
-//			}
-//
-//			ByteBuffer buffer = outgoing[toRank + 1].asByteBuffer();
-//			buf.copyTo(0, MemoryBuffer.fromByteBuffer(buffer), pos, buf.writerIndex());
-//
-//			break;
-//		}
 	}
 
 	/**

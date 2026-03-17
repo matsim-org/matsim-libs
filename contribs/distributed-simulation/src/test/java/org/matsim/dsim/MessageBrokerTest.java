@@ -1,27 +1,25 @@
 package org.matsim.dsim;
 
-import it.unimi.dsi.fastutil.ints.IntCollection;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.fory.memory.MemoryBuffer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
-import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.api.core.v01.messages.EmptyMessage;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.MessageConsumer;
 import org.matsim.core.communication.MessageReceiver;
 import org.matsim.core.serialization.SerializationProvider;
+import org.mockito.ArgumentCaptor;
 
 import java.io.IOException;
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,18 +27,16 @@ import static org.mockito.Mockito.*;
 
 public class MessageBrokerTest {
 
-	// Topology: rank 0 → partitions [0,1], rank 1 → partitions [2,3], rank 2 → partitions [4,5]
-	private static final int SEQ_AT_T0 = 1000;
-
 	private static final SerializationProvider serializer = new SerializationProvider();
 
 	private MessageBroker broker;
-	private TestCommunicator communicator;
 	private Topology topology;
 
 	@BeforeEach
 	void setUp() {
-		this.communicator = new TestCommunicator(3, 0);
+		Communicator communicator = mock(Communicator.class);
+		when(communicator.getRank()).thenReturn(0);
+		when(communicator.getSize()).thenReturn(3);
 
 		var node0 = ComputeNode.builder().distributed(true).rank(0).parts(IntList.of(0, 1)).cores(1).hostname("localhost").build();
 		var node1 = ComputeNode.builder().distributed(true).rank(1).parts(IntList.of(2, 3)).cores(1).hostname("localhost").build();
@@ -65,7 +61,8 @@ public class MessageBrokerTest {
 
 		// clear the rank by simulating message receive
 		broker.beforeSimStep(time);
-		var msg = headerOf(waitForRank, broker.getRank(), time);
+		var msg = MessageBroker.headerFor(1000, waitForRank, broker.getRank());
+		msg.flip();
 		broker.consume(msg);
 		assertFalse(broker.expectsMoreMessages());
 	}
@@ -123,139 +120,177 @@ public class MessageBrokerTest {
 	}
 
 	@Test
-	void sendReceiveNeighborTasks() throws Exception {
+	void sendReceiveEmtpyMessages() throws Exception {
 
 		var otherRank = 1;
+		var receivedBytes = msgBytes(otherRank, broker.getRank(), 0, EmptyMessage.INSTANCE, seq(0));
+		receivedBytes.flip();
+
 		try (var comm = mock(Communicator.class)) {
+			doAnswer(i -> {
+				MessageReceiver expectsNext = i.getArgument(0);
+				MessageConsumer msgConsumer = i.getArgument(1);
+
+				// the receiver task has registered one wait rank
+				assertTrue(expectsNext.expectsMoreMessages());
+				// this should clear the wait ranks
+				msgConsumer.consume(receivedBytes);
+				assertFalse(expectsNext.expectsMoreMessages());
+
+				return null;
+			}).when(comm).recv(any(), any());
+
 			var broker = new MessageBroker(comm, topology);
-			var lp = new StubLP(topology.getNodeByIndex(otherRank).getParts());
-			var receiverTask = lpTask(lp, 0);
+			var receiverTask = mock(LPTask.class);
+			when(receiverTask.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+			var waitParts = new IntArraySet(topology.getNodeByIndex(otherRank).getParts());
+			when(receiverTask.waitForOtherParts(anyDouble())).thenReturn(waitParts);
 			broker.register(receiverTask, 0);
 			broker.beforeSimStep(0);
 			broker.syncToRank(otherRank);
 
-			assertFalse(broker.expectsMoreMessages());
 			broker.syncTimestep(0, false);
-			assertTrue(broker.expectsMoreMessages());
+
+			// we expect one emtpy message to be sent
 			verify(comm, times(1)).send(eq(otherRank), any(), anyLong(), anyLong());
-
-			var msg = msgBytes(otherRank, broker.getRank(), 0, new MessageA("test message"), seq(0));
-			msg.flip();
-			broker.consume(msg);
-			assertFalse(broker.expectsMoreMessages());
-
-			receiverTask.beforeExecution();
-			receiverTask.run();
-			assertEquals(1, lp.received.size());
-			assertEquals("test message", lp.received.getFirst().payload());
+			// we expect the broker to call recv once. This will trigger the 'doAnswer' on top.
+			verify(comm, times(1)).recv(any(), any());
+			// since we are only receiving empty messages, it should never be dispatched to a task
+			verify(receiverTask, never()).add(any());
 		}
 	}
 
 	@Test
-	void neighborPartitionAddsOwningRankToWaitFor() {
-		// Partition 2 is owned by rank 1; the broker should wait for rank 1
-		broker.register(lpTask(IntSet.of(2)), 0);
+	void sendMultipleRanks() throws Exception {
 
-		broker.beforeSimStep(0);
-		broker.syncTimestep(0, false);
+		try (var comm = mock(Communicator.class)) {
 
-		assertTrue(broker.expectsMoreMessages());
+			var broker = new MessageBroker(comm, topology);
+			var receiverTask = mock(LPTask.class);
+			when(receiverTask.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+			// we want to wait for/ sync from both other ranks
+			var waitParts = IntSet.of(2, 3, 4, 5);
+			when(receiverTask.waitForOtherParts(anyDouble())).thenReturn(waitParts);
+			broker.register(receiverTask, 0);
+			broker.beforeSimStep(0);
+			// we want to synt to both other ranks
+			broker.syncToRank(1);
+			broker.syncToRank(2);
+
+			// we register one message to rank 1
+			var msgToPart2 = new MessageA("message to part 2 on rank 1");
+			broker.send(msgToPart2, 2);
+
+			broker.syncTimestep(0, false);
+
+			var msgCaptor = ArgumentCaptor.forClass(MemorySegment.class);
+			var rankCaptor = ArgumentCaptor.forClass(Integer.class);
+			verify(comm, times(2)).send(
+				rankCaptor.capture(), msgCaptor.capture(), anyLong(), anyLong());
+
+			// verify ranks
+			var rankArgs = rankCaptor.getAllValues();
+			assertEquals(2, rankArgs.size());
+			assertTrue(rankArgs.contains(1));
+			assertTrue(rankArgs.contains(2));
+			var iRank1 = rankArgs.indexOf(1);
+			var iank2 = rankArgs.indexOf(2);
+
+			// verify messages
+			var msgArgs = msgCaptor.getAllValues();
+			assertEquals(2, msgArgs.size());
+
+			var bytes1 = msgArgs.get(iRank1);
+			var buf1 = bytes1.asByteBuffer();
+			var msg1 = verifyMsg(seq(0), 0, 1, 2, msgToPart2.getType(), buf1);
+			assertEquals(msgToPart2.payload(), ((MessageA) msg1).payload());
+
+			var bytes2 = msgArgs.get(iank2);
+			var buf2 = bytes2.asByteBuffer();
+			var msg2 = verifyMsg(seq(0), 0, 2, 4, EmptyMessage.INSTANCE.getType(), buf2);
+			assertInstanceOf(EmptyMessage.class, msg2); // nothin else to compare
+		}
 	}
 
 	@Test
-	void ownPartitionIsFilteredFromWaitFor() {
-		// Partition 0 is on rank 0 (this node); should not wait for itself
-		broker.register(lpTask(IntSet.of(0)), 0);
+	void recvMultipleRanks() throws Exception {
 
-		broker.beforeSimStep(0);
-		broker.syncTimestep(0, false);
+		var msgFromRank1 = EmptyMessage.INSTANCE;
+		var msgFromRank2 = new MessageA("message from rank 2 to part 1");
+		var bytesRank1 = msgBytes(1, 0, 0, msgFromRank1, seq(0));
+		bytesRank1.flip();
+		var bytesRank2 = msgBytes(2, 0, 1, msgFromRank2, seq(0));
+		bytesRank2.flip();
+		try (var comm = mock(Communicator.class)) {
+			doAnswer(i -> {
+				MessageReceiver expectsNext = i.getArgument(0);
+				MessageConsumer msgConsumer = i.getArgument(1);
 
-		assertFalse(broker.expectsMoreMessages());
+				// the receiver task has registered two wait ranks
+				assertTrue(expectsNext.expectsMoreMessages());
+				msgConsumer.consume(bytesRank1);
+
+				assertTrue(expectsNext.expectsMoreMessages());
+				msgConsumer.consume(bytesRank2);
+
+				assertFalse(expectsNext.expectsMoreMessages());
+
+				return null;
+			}).when(comm).recv(any(), any());
+
+			var broker = new MessageBroker(comm, topology);
+			var supportedMessages = IntSet.of(msgFromRank1.getType(), msgFromRank2.getType());
+			var waitForParts = IntSet.of(2, 3, 4, 5);
+			var receiverTask = mock(LPTask.class);
+			when(receiverTask.getSupportedMessages()).thenReturn(supportedMessages);
+			when(receiverTask.waitForOtherParts(anyDouble())).thenReturn(waitForParts);
+			broker.register(receiverTask, 1);
+
+			var nonReceivingTask = mock(LPTask.class);
+			when(nonReceivingTask.getSupportedMessages()).thenReturn(supportedMessages);
+			when(nonReceivingTask.waitForOtherParts(anyDouble())).thenReturn(waitForParts);
+			broker.register(nonReceivingTask, 0);
+
+			broker.beforeSimStep(0);
+			broker.syncToRank(1);
+			broker.syncToRank(2);
+
+			broker.syncTimestep(0, false);
+
+			// we expect two emtpy message to be sent
+			verify(comm, times(2)).send(anyInt(), any(), anyLong(), anyLong());
+			// we expect the broker to call recv once. This will trigger the 'doAnswer' on top.
+			verify(comm, times(1)).recv(any(), any());
+
+			// receiver task should have received one message
+			var captor = ArgumentCaptor.forClass(Message.class);
+			verify(receiverTask, times(1)).add(captor.capture());
+			var receivedMesssage = captor.getValue();
+			assertInstanceOf(MessageA.class, receivedMesssage);
+			assertEquals(msgFromRank2.payload(), ((MessageA) receivedMesssage).payload());
+
+			// non receiver task should have received no messages, as the empty message should not be dispatched to tasks
+			verify(nonReceivingTask, never()).add(any());
+		}
 	}
 
-	@Test
-	void multiplePartitionsOnSameNodeCollapseToOneWait() throws IOException {
-		// Partitions 2 and 3 are both on rank 1; a single message from rank 1 should clear the wait
-		broker.register(lpTask(IntSet.of(2, 3)), 0);
+	private Message verifyMsg(int expectedTag, int expectedSender, int expectedReceiver, int expectedPartition, int expectedType, ByteBuffer actualBytes) throws IOException {
 
-		broker.beforeSimStep(0);
-		broker.syncTimestep(0, false);
-		assertTrue(broker.expectsMoreMessages());
+		actualBytes.order(ByteOrder.LITTLE_ENDIAN);
+		var memBuf = MemoryBuffer.fromByteBuffer(actualBytes);
 
-		broker.consume(headerOf(1, 0, 0));
-		assertFalse(broker.expectsMoreMessages());
-	}
+		// verify rank header
+		assertEquals(expectedTag, memBuf.readInt32());
+		assertEquals(expectedSender, memBuf.readInt32());
+		assertEquals(expectedReceiver, memBuf.readInt32());
 
-	@Test
-	void consumeFromNeighborRankClearsWait() throws IOException {
-		broker.register(lpTask(IntSet.of(2)), 0);
+		//verify part header
+		assertEquals(expectedPartition, memBuf.readInt32());
+		assertEquals(expectedType, memBuf.readInt32());
+		memBuf.readInt32(); // we don't care about the message size
 
-		broker.beforeSimStep(0);
-		broker.syncTimestep(0, false);
-		assertTrue(broker.expectsMoreMessages());
-
-		broker.consume(headerOf(1, 0, 0));
-		assertFalse(broker.expectsMoreMessages());
-	}
-
-	@Test
-	void consumeFromUnrelatedRankDoesNotClearWait() throws IOException {
-		// Waiting for rank 1 (partition 2), receiving from rank 2 should not clear it
-		broker.register(lpTask(IntSet.of(2)), 0);
-
-		broker.beforeSimStep(0);
-		broker.syncTimestep(0, false);
-
-		broker.consume(headerOf(2, 0, 0));
-		assertTrue(broker.expectsMoreMessages());
-	}
-
-	@Test
-	void syncToPartSendsHeartbeatToOwningRank() {
-		// syncToPart(2) → partition 2 is on rank 1 → rank 1 should receive a heartbeat
-		broker.syncToPart(2);
-
-		broker.beforeSimStep(0);
-		broker.syncTimestep(0, false);
-
-		assertTrue(communicator.sentRanks.contains(1), "Expected a heartbeat sent to rank 1");
-	}
-
-	@Test
-	void syncToPartOnOwnPartitionIsIgnored() {
-		// Partition 0 is owned by rank 0 (ourselves); no heartbeat should be sent
-		broker.syncToPart(0);
-
-		broker.beforeSimStep(0);
-		broker.syncTimestep(0, false);
-
-		assertFalse(communicator.sentRanks.contains(0), "Should not send heartbeat to own rank");
-	}
-
-	// --- helpers ---
-
-	private LPTask lpTask(LP lp, int partition) {
-		return new LPTask(lp, partition, mock(DistributedEventsManager.class), serializer);
-	}
-
-	private LPTask lpTask(IntCollection neighborParts) {
-		return new LPTask(new StubLP(neighborParts), 0, null, serializer);
-	}
-
-	/**
-	 * Craft a minimal valid ByteBuffer representing a message header with no payload.
-	 * The broker clears the sender rank from waitForRanks after reading the header.
-	 */
-	private ByteBuffer headerOf(int sender, int receiver, double time) {
-		// mimic the sequence of the broker.
-		var seq = Math.abs(1000 + (int) (time * 100));
-		// MemoryBuffer uses native (little-endian on x86) byte order
-		ByteBuffer buf = ByteBuffer.allocate(12).order(ByteOrder.LITTLE_ENDIAN);
-		buf.putInt(seq); // tag must match current seq
-		buf.putInt(sender);
-		buf.putInt(receiver);
-		buf.flip();
-		return buf;
+		// verify msg
+		return serializer.getFuryParser(expectedType).parse(memBuf);
 	}
 
 	private ByteBuffer msgBytes(int sender, int receiver, int partition, Message msg, int seq) {
@@ -271,88 +306,9 @@ public class MessageBrokerTest {
 		return buf;
 	}
 
-	private ByteBuffer bytesOf(int sender, int receiver, int partition, Message msg, double time) {
-		var buf = ByteBuffer.allocate(1024).order(ByteOrder.LITTLE_ENDIAN);
-		var segment = MemoryBuffer.fromByteBuffer(buf);
-		var seq = Math.abs(1000 + (int) (time * 100));
-		segment.writeInt32(seq);
-		segment.writeInt32(sender);
-		segment.writeInt32(receiver);
-		segment.writeInt32(partition);
-		segment.writeInt32(msg.getType());
-
-		var sizeIdx = buf.position();
-		buf.putInt(0);
-
-		serializer.getFory().serializeJavaObject(segment, msg);
-		segment.putInt32(sizeIdx, buf.position() - sizeIdx - Integer.BYTES);
-
-		return segment.sliceAsByteBuffer();
-	}
-
-	// --- stub LP ---
-
-	private static class StubLP implements LP, MessageAProcessor {
-		private final IntSet neighborParts;
-		final List<MessageA> received = new ArrayList<>();
-
-		StubLP(IntCollection neighborParts) {
-			this.neighborParts = new IntOpenHashSet(neighborParts);
-		}
-
-		@Override
-		public IntSet waitForOtherParts(double time) {
-			return neighborParts;
-		}
-
-		@Override
-		public void process(MessageA msg) {
-			received.add(msg);
-		}
-	}
-
 	private static int seq(double time) {
 		return Math.abs(1000 + (int) (time * 100));
 	}
 
-	// --- test communicator ---
-
-	private static class TestCommunicator implements Communicator {
-
-		private final int size;
-		private final int rank;
-		final List<Integer> sentRanks = new ArrayList<>();
-
-		private TestCommunicator(int size, int rank) {
-			this.size = size;
-			this.rank = rank;
-		}
-
-		@Override
-		public int getRank() {
-			return rank;
-		}
-
-		@Override
-		public int getSize() {
-			return size;
-		}
-
-		@Override
-		public void send(int receiver, MemorySegment data, long offset, long length) {
-			sentRanks.add(receiver);
-		}
-
-		@Override
-		public void recv(MessageReceiver expectsNext, MessageConsumer handleReceive) {
-
-
-		}
-	}
-
 	public record MessageA(String payload) implements Message {}
-
-	public interface MessageAProcessor extends MessageProcessor {
-		void process(MessageA msg);
-	}
 }
