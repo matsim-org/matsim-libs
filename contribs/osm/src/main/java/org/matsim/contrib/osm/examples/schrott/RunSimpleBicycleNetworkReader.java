@@ -1,4 +1,4 @@
-package org.matsim.contrib.osm.examples;
+package org.matsim.contrib.osm.examples.schrott;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class RunSimpleBicycleNetworkReader {
 
-//	private static final String inputFile = "C://Users/metz_so/IdeaProjects/data/sample_illmensee.osm";
+	//	private static final String inputFile = "C://Users/metz_so/IdeaProjects/data/sample_illmensee.osm";
 //	private static final String inputFile = "C://Users/metz_so/IdeaProjects/data/berlin-260122.osm.pbf";
 	private static final String inputFile = "C://Users/metz_so/IdeaProjects/data/neukoelln.osm.pbf";
 	private static final String outputFile = "C://Users/metz_so/IdeaProjects/data/matsim-network_nk_bic-no.xml.gz";
@@ -28,41 +28,37 @@ public class RunSimpleBicycleNetworkReader {
 
 		//Network network = new SupersonicOsmNetworkReader.Builder()
 		Network network = new OsmBicycleReader.Builder()
-				.setCoordinateTransformation(coordinateTransformation)
-				.setAfterLinkCreated((link, tags, direction) -> {
+			.setCoordinateTransformation(coordinateTransformation)
+			.setAfterLinkCreated((link, tags, direction) -> {
 
-						String infra = computeBicycleInfra(tags, direction);
-						link.getAttributes().putAttribute("bicycle_infra", infra);
+				String infra = computeBicycleInfra(tags, direction);
+				link.getAttributes().putAttribute("bicycle_infra", infra);
 
-						// optional: wenn infra == NONE, bike entfernen (aber car lassen)
-						if ("NONE".equals(infra)) {
-							var modes = new java.util.HashSet<>(link.getAllowedModes());
-							modes.remove(org.matsim.api.core.v01.TransportMode.bike);
-							link.setAllowedModes(modes);
-						}
-
-
+				// optional: wenn infra == NONE, bike entfernen (aber car lassen)
+				if ("NONE".equals(infra)) {
+					var modes = new java.util.HashSet<>(link.getAllowedModes());
+					modes.remove(org.matsim.api.core.v01.TransportMode.bike);
+					link.setAllowedModes(modes);
+				}
 
 
+				// Beispiel: cycleway, cycleway:left/right
+				copyTag(link, tags, "cycleway");
+				copyTag(link, tags, "cycleway:left");
+				copyTag(link, tags, "cycleway:right");
+				copyTag(link, tags, "cycleway:both");
 
+				copyTag(link, tags, "highway");
+				copyTag(link, tags, "bicycle");
 
-					// Beispiel: cycleway, cycleway:left/right
-					copyTag(link, tags, "cycleway");
-					copyTag(link, tags, "cycleway:left");
-					copyTag(link, tags, "cycleway:right");
-					copyTag(link, tags, "cycleway:both");
+				// 2) Fahrrad-Regeln anwenden
+				applyBikeRules(link, tags);
 
-					copyTag(link, tags, "highway");
-					copyTag(link, tags, "bicycle");
-
-					// 2) Fahrrad-Regeln anwenden
-					applyBikeRules(link, tags);
-
-					// Optional: Richtung als Attribut
-					// link.getAttributes().putAttribute("osm:dir", direction.name());
-				})
-				.build()
-				.read(inputFile);
+				// Optional: Richtung als Attribut
+				// link.getAttributes().putAttribute("osm:dir", direction.name());
+			})
+			.build()
+			.read(inputFile);
 
 		new NetworkWriter(network).write(outputFile);
 	}
@@ -73,7 +69,6 @@ public class RunSimpleBicycleNetworkReader {
 			link.getAttributes().putAttribute("osm:" + key, v);
 		}
 	}
-
 
 
 	private static void applyBikeRules(Link link, Map<String, String> tags) {
@@ -114,10 +109,6 @@ public class RunSimpleBicycleNetworkReader {
 		modes.remove(TransportMode.bike);
 		link.setAllowedModes(modes);
 	}
-
-
-
-
 
 
 	private static String computeBicycleInfra(Map<String, String> tags, Direction direction) {
@@ -299,8 +290,6 @@ public class RunSimpleBicycleNetworkReader {
 		for (String v : vals) if (v != null && !v.isBlank()) return v;
 		return "";
 	}
-
-
 
 
 }

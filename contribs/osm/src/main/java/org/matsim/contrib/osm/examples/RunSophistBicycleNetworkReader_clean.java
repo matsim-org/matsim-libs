@@ -76,6 +76,8 @@ public class RunSophistBicycleNetworkReader_clean {
 		new NetworkWriter(network).write(outputFile);
 	}
 
+	/// rename from bike to bicycle
+	/// why? would need to change the OsmBicycleReader (?)
 	static void renameMode(Network network, String from, String to) {
 		for (var link : network.getLinks().values()) {
 
@@ -95,9 +97,10 @@ public class RunSophistBicycleNetworkReader_clean {
 		}
 	}
 
-
-	///  why wee need this?
-	/// the default simplyier ignors the additional bicylce attributes
+	/// bicycle simplifier
+	/// why we need this?
+	/// the default simplifier ignors the additional bicycle attributes
+	/// TODO: this simplifier does not simplify well enough ("allowed_speed" issue)
 	private static final String BICYCLE_INFRA = "bicycle_infra";
 	private static final String SURFACE = "surface";
 	private static final String TYPE = "type";

@@ -1,4 +1,4 @@
-package org.matsim.contrib.osm.examples;
+package org.matsim.contrib.osm.examples.schrott;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -32,13 +32,13 @@ public class RunFullyConfiguredNetworkReader {
 	public static void main(String[] args) {
 
 		Network network = new SupersonicOsmNetworkReader.Builder()
-				.setCoordinateTransformation(coordinateTransformation)
-				.setIncludeLinkAtCoordWithHierarchy((coord, hierachyLevel) -> hierachyLevel == LinkProperties.LEVEL_MOTORWAY)
-				.setPreserveNodeWithId(id -> id == 2)
-				.addOverridingLinkProperties("residential", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false))
-				.setAfterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.bike))))
-				.build()
-				.read(inputFile);
+			.setCoordinateTransformation(coordinateTransformation)
+			.setIncludeLinkAtCoordWithHierarchy((coord, hierachyLevel) -> hierachyLevel == LinkProperties.LEVEL_MOTORWAY)
+			.setPreserveNodeWithId(id -> id == 2)
+			.addOverridingLinkProperties("residential", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false))
+			.setAfterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.bike))))
+			.build()
+			.read(inputFile);
 
 		new NetworkWriter(network).write(outputFile);
 	}
