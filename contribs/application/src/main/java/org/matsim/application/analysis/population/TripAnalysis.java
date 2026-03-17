@@ -113,8 +113,6 @@ public class TripAnalysis implements MATSimAppCommand {
 		new TripAnalysis().execute(args);
 	}
 
-
-
 	private static int[] durationToHour(String d) {
 		return Arrays.stream(d.split(":")).mapToInt(Integer::valueOf).toArray();
 	}
@@ -263,9 +261,9 @@ public class TripAnalysis implements MATSimAppCommand {
 			if (generalFilteredRowIds != null) {
 				persons = persons.where(Selection.with(generalFilteredRowIds.intStream().toArray()));
 			}
+			log.info("After filtering by set personFilter {} out of {} persons are remaining for the TripAnalysis.", persons.rowCount(), total);
 		}
 
-		log.info("Filtered {} out of {} persons", persons.rowCount(), total);
 
 		// Home filter by standard attribute
 		if (shp.isDefined() && filter == LocationFilter.home) {
@@ -288,14 +286,14 @@ public class TripAnalysis implements MATSimAppCommand {
 			}
 
 			persons = persons.where(Selection.with(idx.toIntArray()));
+			log.info("After filtering by set shp file and location filter 'LocationFilter.home' {} of initially {} persons are remaining for the TripAnalysis", persons.rowCount(), total);
 		}
-
-		log.info("Filtered {} out of {} persons", persons.rowCount(), total);
 
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(getColumnTypes())
 			.sample(false)
 			.separator(CsvOptions.detectDelimiter(input.getPath("trips.csv"))).build());
+		int initialNumberOfTrips = trips.rowCount();
 
 		// Trip filter with start AND end
 		if (shp.isDefined() && filter == LocationFilter.trip_start_and_end) {
@@ -313,6 +311,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			}
 
 			trips = trips.where(Selection.with(idx.toIntArray()));
+			log.info("After filtering by set shp file and location filter 'LocationFilter.trip_start_and_end' {} of initially {} trips are remaining for the TripAnalysis", trips.rowCount(), initialNumberOfTrips);
 //		trip filter with start OR end
 		} else if (shp.isDefined() && filter == LocationFilter.trip_start_or_end) {
 			Geometry geometry = shp.getGeometry();
@@ -329,6 +328,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			}
 
 			trips = trips.where(Selection.with(idx.toIntArray()));
+			log.info("After filtering by set shp file and location filter 'LocationFilter.trip_start_or_end' {} of initially {} trips are remaining for the TripAnalysis", trips.rowCount(), initialNumberOfTrips);
 		}
 
 		TripBySociodemographicGroupsAnalysis sociodemographicGroups = null;
@@ -344,7 +344,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		Table joined = new DataFrameJoiner(trips, "person").inner(persons);
 
-		log.info("Filtered {} out of {} trips", joined.rowCount(), trips.rowCount());
+		log.info("After filtering of trips and persons {} of initially {} trips are remaining for the TripAnalysis", joined.rowCount(), initialNumberOfTrips);
 
 		if (modeOrder == null)
 			modeOrder = new ArrayList<>(joined.stringColumn("main_mode").unique().asList());
