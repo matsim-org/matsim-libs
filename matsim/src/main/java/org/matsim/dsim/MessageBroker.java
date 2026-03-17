@@ -24,7 +24,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.MessageConsumer;
 import org.matsim.core.communication.MessageReceiver;
-import org.matsim.core.serialization.FuryBufferParser;
+import org.matsim.core.serialization.ForyBufferParser;
 import org.matsim.core.serialization.SerializationProvider;
 
 import java.io.IOException;
@@ -571,7 +571,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 				int type = in.readInt32();
 				int _ = in.readInt32();
 
-				FuryBufferParser parser = serialization.getFuryParser(type);
+				ForyBufferParser parser = serialization.getForyParser(type);
 				Message msg = parser.parse(in);
 				log.error("#Partition {}: {}", partition, msg.toString());
 			}
@@ -591,7 +591,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			int type = in.readInt32();
 			int _ = in.readInt32();
 
-			FuryBufferParser parser = serialization.getFuryParser(type);
+			ForyBufferParser parser = serialization.getForyParser(type);
 			Message msg = parser.parse(in);
 			log.trace("#{} received from {}: {}", receiver, sender, msg);
 

@@ -133,7 +133,7 @@ public class SerializationProvider {
 		return (in) -> fory.deserializeJavaObject(in, msgType);
 	}
 
-	public FuryBufferParser getFuryParser(int type) {
+	public ForyBufferParser getForyParser(int type) {
 		if (!type2Class.containsKey(type)) {
 			throw new IllegalArgumentException("No provider for type " + type);
 		}

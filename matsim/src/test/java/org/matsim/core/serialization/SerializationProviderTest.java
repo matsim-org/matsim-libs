@@ -28,7 +28,7 @@ class SerializationProviderTest {
 
 		for (Event event : events) {
 
-			FuryBufferParser parser = provider.getFuryParser(event.getType());
+			ForyBufferParser parser = provider.getForyParser(event.getType());
 
 			byte[] bytes = provider.getFory().serializeJavaObject(event);
 

@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Message;
 import java.io.IOException;
 
 @FunctionalInterface
-public interface FuryBufferParser {
+public interface ForyBufferParser {
 
 	Message parse(MemoryBuffer in) throws IOException;
 

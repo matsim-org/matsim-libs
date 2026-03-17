@@ -276,7 +276,7 @@ public class MessageBrokerTest {
 		assertEquals(expectedType, memBuf.readInt32());
 		memBuf.readInt32(); // we don't care about the message size
 
-		return (T) serializer.getFuryParser(expectedType).parse(memBuf);
+		return (T) serializer.getForyParser(expectedType).parse(memBuf);
 	}
 
 	private ByteBuffer msgBytes(int sender, int receiver, int partition, Message msg, int seq) {
