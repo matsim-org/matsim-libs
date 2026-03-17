@@ -27,7 +27,7 @@ import java.util.Set;
 	showDefaultValues = true
 )
 public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgorithm {
-	private static final Logger log = LogManager.getLogger( SplitActivityTypesDuration.class );
+	private static final Logger log = LogManager.getLogger(SplitActivityTypesDuration.class);
 
 	@CommandLine.Option(names = "--input", description = "Path to input population", required = true)
 	private Path input;
@@ -41,9 +41,9 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	@CommandLine.Option(names = {"--max-typical-duration", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds.")
 	private int maxTypicalDuration = 86400;
 
-	@CommandLine.Option(names={"--overlong-plans-factor"}, description = "Plans where adding up their durations becomes larger than overlongPlansFactor * 24hrs lead to an abort.  " +
-																			 "Set to very large value if you want to accept all plans.")
-		// yyyy unclear how all of this work work with simulations > 24 hrs.  kai, nov'25
+	@CommandLine.Option(names = {"--overlong-plans-factor"}, description = "Plans where adding up their durations becomes larger than overlongPlansFactor * 24hrs lead to an abort.  " +
+		"Set to very large value if you want to accept all plans.")
+	// yyyy unclear how all of this will work with simulations > 24 hrs.  kai, nov'25
 	double overlongPlansFactor = 1.2;
 
 	@CommandLine.Option(names = {"--end-time-to-duration"}, description = "Remove the end time and encode as duration for activities shorter than this value.")
@@ -88,9 +88,9 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	@Override
 	public Integer call() throws Exception {
 
-		if ( this.maxTypicalDuration != 24*3600 ) {
-			throw new RuntimeException( "You have used maxTypicalDuration=" + this.maxTypicalDuration
-												+ "; as of now, it is not clear what other values than 24*3600 mean.  See comments in code."  );
+		if (this.maxTypicalDuration != 24 * 3600) {
+			throw new RuntimeException("You have used maxTypicalDuration=" + this.maxTypicalDuration
+				+ "; as of now, it is not clear what other values than 24*3600 mean.  See comments in code.");
 			// comments:
 
 			// In principle, it should be possible to read, say, 7-day activity plans.  In this case, the last activity would have a start time of,
@@ -129,10 +129,10 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 					continue;
 
 				double duration;
-				if (act.getMaximumDuration().isDefined()){
+				if (act.getMaximumDuration().isDefined()) {
 					duration = act.getMaximumDuration().seconds();
-				} else{
-					duration = act.getEndTime().orElse( maxTypicalDuration ) - act.getStartTime().orElse( 0 );
+				} else {
+					duration = act.getEndTime().orElse(maxTypicalDuration) - act.getStartTime().orElse(0);
 				}
 				// (Under normal circumstances, maxTypicalDuration is NOT changed from its default value, which is 24*3600.   Then, we
 				// generate durations from or to midnight.  Note that overnight activities are merged below.  kai, feb'25)
@@ -142,9 +142,9 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 
 				// kn, ts, feb'25
 
-				final int roundedDuration = roundDuration( duration );
+				final int roundedDuration = roundDuration(duration);
 				sumDurations += roundedDuration;
-				String newType = String.format("%s_%d", act.getType(), roundedDuration );
+				String newType = String.format("%s_%d", act.getType(), roundedDuration);
 				act.setType(newType);
 
 				// activities that are shorter than endTimeToDuration will be forced to have their initial duration.
@@ -160,11 +160,11 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 				}
 			}
 
-			if ( sumDurations > maxTypicalDuration * this.overlongPlansFactor ) {
-				log.error( "sumDurations={} is considerably longer than maxTypicalDuration={}, despite the fact travel is not even included.  " +
-								   "Implies some issue with the incoming data.  The default is to fail here; ignoring the issue can be forced with --overlong-plans-factor = <some very large value>."
-						 , sumDurations, maxTypicalDuration );
-				throw new RuntimeException( "See error message above." );
+			if (sumDurations > maxTypicalDuration * this.overlongPlansFactor) {
+				log.error("sumDurations={} for {} is considerably longer than maxTypicalDuration={}, despite the fact travel is not even included.  " +
+						"Implies some issue with the incoming data.  The default is to fail here; ignoring the issue can be forced with --overlong-plans-factor = <some very large value>."
+					, sumDurations, person.getId().toString(), maxTypicalDuration);
+				throw new RuntimeException("See error message above.");
 			}
 
 			mergeOvernightActivities(activities);

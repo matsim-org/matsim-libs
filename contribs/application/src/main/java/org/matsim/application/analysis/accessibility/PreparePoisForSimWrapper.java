@@ -49,6 +49,9 @@ public class PreparePoisForSimWrapper implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(PreparePoisForSimWrapper.class);
 	@CommandLine.Mixin
+	private final OutputOptions output = OutputOptions.ofCommand(PreparePoisForSimWrapper.class);
+
+
 	public SimpleFeatureBuilder builder;
 
 	@CommandLine.Mixin
