@@ -440,7 +440,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			System.out.flush();
 			log.log(lvl, "You are not setting fractionOfIterationsToStartScoreMSA; vsp default is to set this to something like 0.8.  " +
 				"This means you have to add the following lines to your config file: ");
-			log.log(lvl, "<module name=\"planCalcScore\">");
+			log.log(lvl, "<module name=\"" + ScoringConfigGroup.GROUP_NAME + "\">");
 			log.log(lvl, "	<param name=\"fractionOfIterationsToStartScoreMSA\" value=\"0.8\" />");
 			log.log(lvl, "</module>");
 		}
