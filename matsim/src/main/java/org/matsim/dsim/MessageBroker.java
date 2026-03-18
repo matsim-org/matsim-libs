@@ -53,6 +53,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	private static final Logger log = LogManager.getLogger(MessageBroker.class);
 
 	private static final boolean CHECK_SEQ = Objects.equals(System.getenv("CHECK_SEQ"), "1");
+	static final int ANY_PARTITION = -42;
 
 	/**
 	 * Indicates that a message is sent to the node inbox.
@@ -460,13 +461,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			if (rank == comm.getRank()) continue;
 			int length = dataSize[rank + 1].get();
 			if (length == 0) {
-
-				// we want to send a null/sync message to the compute node. We don't care which partition receives it on the other side.
-				var parts = topology.getNodeByIndex(rank).getParts();
-				var anyPartition = parts.getInt(0);
-				if (!parts.isEmpty()) {
-					queueSend(EmptyMessage.INSTANCE, rank, anyPartition);
-				}
+				queueSend(EmptyMessage.INSTANCE, rank, ANY_PARTITION);
 			}
 		}
 		sendToRanks.clear();

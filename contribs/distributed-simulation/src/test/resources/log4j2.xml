@@ -20,7 +20,7 @@
 		</Logger>
 
 		<!-- Root logger for other logging -->
-		<Root level="${sys:log4j2.level:-TRACE}">
+		<Root level="${sys:log4j2.level:-INFO}">
 			<AppenderRef ref="Console"/>
 		</Root>
 	</Loggers>
