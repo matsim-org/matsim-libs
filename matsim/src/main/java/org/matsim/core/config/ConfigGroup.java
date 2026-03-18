@@ -166,21 +166,14 @@ public class ConfigGroup implements MatsimExtensionPoint {
 
 	public void addParameterSet(final ConfigGroup set) {
 		checkParameterSet( set );
-		Collection<ConfigGroup> parameterSets = parameterSetsPerType.get( set.getName() );
-
-		if ( parameterSets == null ) {
-			parameterSets = new ArrayList<>();
-			parameterSetsPerType.put( set.getName() ,  parameterSets );
-		}
+		Collection<ConfigGroup> parameterSets = parameterSetsPerType.computeIfAbsent(set.getName(), k -> new ArrayList<>());
 
 		parameterSets.add( set );
 	}
 
 	public boolean removeParameterSet( final ConfigGroup set ) {
 		final Collection<ConfigGroup> parameterSets = parameterSetsPerType.get( set.getName() );
-		return parameterSets != null ?
-			parameterSets.remove( set ) :
-			false;
+		return parameterSets != null && parameterSets.remove(set);
 	}
 
 	/**
