@@ -164,17 +164,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		this.ownParts = new IntOpenHashSet(topology.getNodeByIndex(comm.getRank()).getParts());
 	}
 
-	static long address(int part, int type) {
-		return (((long) part) << 32) | (type & 0xffffffffL);
-	}
-
-	static ByteBuffer clone(ByteBuffer original) {
-		ByteBuffer clone = ByteBuffer.allocate(original.capacity());
-		clone.put(original);
-		clone.flip();
-		return clone;
-	}
-
 	/**
 	 * Return events. This list needs to be mutable, as events will be cleared.
 	 */
@@ -321,6 +310,38 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		}
 	}
 
+	void beforeSimStep(double time) {
+		seq = seqFrom(time);
+	}
+
+	void syncTimestep(double now, boolean last) {
+
+		if (comm.getSize() == 1) {
+			return;
+		}
+
+		long t = System.nanoTime();
+
+		determineWaitFor(now, last);
+		queueNullMessages();
+		sendOutBuffers();
+		processAheadMessages();
+		comm.recv(this, this);
+
+		try {
+			histogram.recordValue(System.nanoTime() - t);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// Ignore
+		}
+	}
+
+	void afterSim() {
+		waitForRanks.clear();
+		nodesMessages.clear();
+		histogram.reset();
+		sizes.reset();
+	}
+
 	/**
 	 * Put message into local queues of the tasks.
 	 */
@@ -339,78 +360,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		list.forEach(t -> t.add(msg));
 	}
 
-	void beforeSimStep(double time) {
-		// Offset the sequence to avoid interference with other seq ids
-		// to trigger final sync, we pass Infinity as time. To avoid overflow and a negative sequence value,
-		// get the absolute value.
-		seq = Math.abs(1000 + (int) (time * 100));
-	}
-
-	void syncTimestep(double time, boolean last) {
-
-		// TODO remove
-		this.currentTime = time;
-
-		if (comm.getSize() == 1) {
-			return;
-		}
-
-		long t = System.nanoTime();
-
-		for (SimTask task : tasks) {
-			IntSet otherParts = task.waitForOtherParts(time);
-
-			// On last iteration the lps are not executed
-			if (last && task instanceof LPTask)
-				continue;
-
-			// event manager also determines when to wait for ranks,
-			// this might be not necesarry for event handler here
-			if (otherParts == LP.ALL_PARTS_BROADCAST) {
-				for (int i = 0; i < topology.getNodesCount(); i++) {
-					syncFromRank(i);
-				}
-			} else {
-				for (int partition : otherParts) {
-					var rank = addresses[partition];
-					syncFromRank(rank);
-				}
-			}
-		}
-
-		waitForRanks.remove(comm.getRank());
-
-//		for (int rank : nullMessages) {
-//			// No need to send a heartbeat to ourselves; waitFor already removes own partitions.
-//			if (rank == comm.getRank()) continue;
-//			int length = dataSize[rank + 1].get();
-//			if (length == 0) {
-//				// sendNullMsgs stores node ranks; send() expects a partition index.
-//				// Use the first partition of that node as the routing address.
-//				var parts = topology.getNodeByIndex(rank).getParts();
-//				if (!parts.isEmpty()) {
-//					send(EmptyMessage.INSTANCE, parts.getInt(0));
-//				}
-//			}
-//		}
-//
-//		nullMessages.clear();
-		sendRecvMessages();
-
-		try {
-			histogram.recordValue(System.nanoTime() - t);
-		} catch (ArrayIndexOutOfBoundsException e) {
-			// Ignore
-		}
-	}
-
-	void afterSim() {
-		waitForRanks.clear();
-		nodesMessages.clear();
-		histogram.reset();
-		sizes.reset();
-	}
-
 	/**
 	 * Serialize message and put it into the outgoing buffer. This method can be called concurrently.
 	 *
@@ -418,7 +367,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 */
 	private void queueSend(Message message, int toRank, int toPartition) {
 
-		log.trace("#{} queue send to {}/{}: {}", this.getRank(), toRank, toPartition, message);
+		log.trace("#{} at t:{} queue send to {}/{}: {}", this.getRank(), timeFrom(seq), toRank, toPartition, message);
 
 		writeHeader(toRank);
 		writeMessage(toRank, toPartition, message);
@@ -478,34 +427,31 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		}
 	}
 
-	private void sendRecvMessages() {
+	private void determineWaitFor(double now, boolean last) {
+		for (SimTask task : tasks) {
+			IntSet otherParts = task.waitForOtherParts(now);
 
-		// add null messages if that is necessary.
-		queueNullMessages();
+			// On last iteration the lps are not executed
+			if (last && task instanceof LPTask)
+				continue;
 
-		for (int i = 0; i < outgoing.length; i++) {
-			int length = dataSize[i].get();
-			if (length > 0) {
-				int receiver = i - 1;
-				sizes.recordValue(length);
-				comm.send(receiver, outgoing[i], 0, length);
-				dataSize[i].set(0);
+			// event manager also determines when to wait for ranks,
+			// this might be not necesarry for event handler here
+			if (otherParts == LP.ALL_PARTS_BROADCAST) {
+				for (int i = 0; i < topology.getNodesCount(); i++) {
+					syncFromRank(broadcastRank(i));
+				}
+			} else {
+				for (int partition : otherParts) {
+					var rank = addresses[partition];
+					syncFromRank(rank);
+				}
 			}
 		}
 
-		int size = aheadMsgs.size();
-		int i = 0;
-		// Process already received messages
-		// Need to check at most the size of the queue
-		ByteBuffer data;
-		while ((data = aheadMsgs.poll()) != null && i++ < size) {
-			try {
-				consume(data);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		}
-		comm.recv(this, this);
+		// we don't want to wait for messages from ourselves
+		waitForRanks.remove(getRank());
+		waitForRanks.remove(broadcastRank(getRank()));
 	}
 
 	private void queueNullMessages() {
@@ -526,7 +472,33 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		sendToRanks.clear();
 	}
 
-	private double currentTime = -1;
+	private void sendOutBuffers() {
+		for (int i = 0; i < outgoing.length; i++) {
+			int length = dataSize[i].get();
+			if (length > 0) {
+				int receiver = i - 1;
+				sizes.recordValue(length);
+				comm.send(receiver, outgoing[i], 0, length);
+				dataSize[i].set(0);
+			}
+		}
+	}
+
+	private void processAheadMessages() {
+		int size = aheadMsgs.size();
+		int i = 0;
+		// Process already received messages
+		// Need to check at most the size of the queue
+		ByteBuffer data;
+		while ((data = aheadMsgs.poll()) != null && i++ < size) {
+			try {
+				log.trace("#{} at t:{} polled ahead message", comm.getRank(), timeFrom(seq));
+				consume(data);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+	}
 
 	@Override
 	public boolean expectsMoreMessages() {
@@ -538,7 +510,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 	private String traceWaiting() {
 		var waitForParts = waitForRanks.intStream().mapToObj(String::valueOf).collect(Collectors.joining(","));
-		return "#" + getRank() + " at t:" + currentTime + " waiting for: [" + waitForParts + "]";
+		return "#" + getRank() + " at t:" + timeFrom(seq) + " waiting for: [" + waitForParts + "]";
 	}
 
 	@Override
@@ -558,13 +530,13 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			return;
 
 		if (tag < seq && CHECK_SEQ) {
-			String error = "Out of order received sequence current seq: %d, received seq: %d".formatted(seq, tag);
+			String error = "#%d Out of order received sequence current seq: %d, received seq: %d".formatted(getRank(), seq, tag);
 			log.error(error);
-			log.error("Sender node: {}, Receiver node: {}", sender, receiver);
-			log.error("Node {} contains partitions: {}", comm.getRank(), ownParts);
-			log.error("Node {} currently supposed to wait for partitions: {}", comm.getRank(), waitForRanks);
-			log.error("Message covered partitions: {}", topology.getNodeByIndex(sender).getParts());
-			log.error("Message contents:");
+			log.error("#{} Sender node: {}, Receiver node: {}", getRank(), sender, receiver);
+			log.error("#{} contains partitions: {}", getRank(), ownParts);
+			log.error("#{} currently supposed to wait for partitions: {}", getRank(), waitForRanks);
+			log.error("#{} Message covered partitions: {}", getRank(), topology.getNodeByIndex(sender).getParts());
+			log.error("#{} Message contents:", getRank());
 
 			while (in.readerIndex() < length) {
 				int partition = in.readInt32();
@@ -573,9 +545,9 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 				ForyBufferParser parser = serialization.getForyParser(type);
 				Message msg = parser.parse(in);
-				log.error("#Partition {}: {}", partition, msg.toString());
+				log.error("#{}: {}", partition, msg.toString());
 			}
-			log.error("End of message contents");
+			log.error("#{} End of message contents", getRank());
 
 			throw new IllegalStateException(error);
 		}
@@ -593,7 +565,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 			ForyBufferParser parser = serialization.getForyParser(type);
 			Message msg = parser.parse(in);
-			log.trace("#{} received from {}: {}", receiver, sender, msg);
+			log.trace("#{} at t:{} received from {}: {}", getRank(), timeFrom(seq), sender, msg);
 
 			if (partition == NODE_MESSAGE) {
 				nodesMessages.computeIfAbsent(type, _ -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
@@ -607,7 +579,8 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			}
 		}
 
-		waitForRanks.remove(sender);
+		var rankForRemoval = receiver == Communicator.BROADCAST_TO_ALL ? broadcastRank(sender) : sender;
+		waitForRanks.remove(rankForRemoval);
 	}
 
 	public Histogram getRuntime() {
@@ -616,6 +589,33 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 	public Histogram getSizes() {
 		return sizes;
+	}
+
+	static int seqFrom(double time) {
+		// Offset the sequence to avoid interference with other seq ids
+		// to trigger final sync, we pass Infinity as time. To avoid overflow and a negative sequence value,
+		// get the absolute value.
+		return Math.abs(1000 + (int) (time * 100));
+	}
+
+	static double timeFrom(int seq) {
+		return (seq - 1000) / 100.0;
+	}
+
+	static long address(int part, int type) {
+		return (((long) part) << 32) | (type & 0xffffffffL);
+	}
+
+	static int broadcastRank(int rank) {
+		// shift rank by one, because broadcasts from 0 cannot be turned into a negative.
+		return (rank + 1) * -1;
+	}
+
+	static ByteBuffer clone(ByteBuffer original) {
+		ByteBuffer clone = ByteBuffer.allocate(original.capacity());
+		clone.put(original);
+		clone.flip();
+		return clone;
 	}
 
 	static ByteBuffer headerFor(int seq, int sRank, int rRank) {
