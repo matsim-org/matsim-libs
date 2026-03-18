@@ -183,19 +183,17 @@ class AgentWiseComparisonKNUtils{
 		return (String) person.getAttributes().getAttribute( "isInShp" );
 	}
 
-	static void processMUoM( boolean isBaseTable, Person person, Table table ){
-		if ( isBaseTable ){
-			final Double marginalUtilityOfMoney = getMarginalUtilityOfMoney( person );
-			if ( marginalUtilityOfMoney != null ){
-				table.doubleColumn( UTL_OF_MONEY ).append( marginalUtilityOfMoney );
-			} else {
-				table.doubleColumn( UTL_OF_MONEY ).append( 1. );
-				if ( wrnCnt<10 ){
-					log.warn( "marginalUtlOfMoney is null; personId={}", person.getId() );
-					wrnCnt++;
-					if( wrnCnt == 10 ){
-						log.warn( Gbl.FUTURE_SUPPRESSED );
-					}
+	static void processMUoM( Person person, Table table ){
+		final Double marginalUtilityOfMoney = getMarginalUtilityOfMoney( person );
+		if ( marginalUtilityOfMoney != null ){
+			table.doubleColumn( UTL_OF_MONEY ).append( marginalUtilityOfMoney );
+		} else {
+			table.doubleColumn( UTL_OF_MONEY ).append( 1. );
+			if ( wrnCnt<10 ){
+				log.warn( "marginalUtlOfMoney is null; personId={}", person.getId() );
+				wrnCnt++;
+				if( wrnCnt == 10 ){
+					log.warn( Gbl.FUTURE_SUPPRESSED );
 				}
 			}
 		}

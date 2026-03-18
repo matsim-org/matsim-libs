@@ -336,23 +336,20 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			table.stringColumn( ANALYSIS_POPULATION ).append( getIsInShp( person ) );
 
-			processMUoM( isBaseTable, person, table );
 
 			if ( isBaseTable ){
+				processMUoM( person, table );
 				table.intColumn( INCOME_DECILE ).append( getIncomeDecileBetween0And9( person ) );
 			}
 
-			double computedPersonScore = 0.;
 			{
-				// activity times:
-				ScoringFunction sf = scoringFunctionFactory.createNewScoringFunction( person );
+				// compute MUSE for rule-of-half:
 				ScoringFunction sfNormal = scoringFunctionFactory.createNewScoringFunction( person );
 				ScoringFunction sfEarly = scoringFunctionFactory.createNewScoringFunction( person );
 				Activity firstActivity = null;
 				double sumMuse_h = 0.;
 				double cntMuse_h = 0.;
 				for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), ExcludeStageActivities ) ){
-					sf.handleActivity( act );
 					if( isBaseTable ){
 						if( act.getStartTime().isDefined() && act.getEndTime().isDefined() ){
 							// Ihab-style MarginalSumScoringFct computation but w/o leg:
@@ -373,18 +370,30 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 							// handle the before-midnight-activity
 							sumMuse_h += computeMUSE_h( act, sfNormal, pf, sfEarly, scoreNormalBefore, scoreEarlyBefore );
 							cntMuse_h++;
+
+							// yyyyyy if before and after mightnight act are not of the same type, is the above computation then still correct?
+
+							// --> I think it is correct, in the sense that starting the after-midnight activity early is not possible.  But it is not clear if the MUSE averages
+							// over the two activity types, or only uses the before-midnight activity.  yyyyyy check!
 						}
 					}
 				}
-
-				sf.finish();
-
-				table.doubleColumn( HeadersKN.ACTS_SCORE ).append( sf.getScore() );
-				computedPersonScore += sf.getScore();
-
 				if( isBaseTable ){
 					AddVttsEtcToActivities.setMUSE_h( person.getSelectedPlan(), sumMuse_h / cntMuse_h );
 				}
+			}
+
+			double computedPersonScore = 0.;
+			{
+				// activity times:
+				ScoringFunction sf = scoringFunctionFactory.createNewScoringFunction( person );
+				Activity firstActivity = null;
+				for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), ExcludeStageActivities ) ){
+					sf.handleActivity( act );
+				}
+				sf.finish();
+				table.doubleColumn( HeadersKN.ACTS_SCORE ).append( sf.getScore() );
+				computedPersonScore += sf.getScore();
 			}
 
 			double sumMoney = 0.;
