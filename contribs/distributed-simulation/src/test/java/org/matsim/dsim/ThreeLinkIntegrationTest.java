@@ -153,8 +153,14 @@ public class ThreeLinkIntegrationTest {
 				}))
 				.toList();
 
-			for (var f : futures) {
-				f.get(1, TimeUnit.MINUTES);
+			try {
+				for (var f : futures) {
+					f.get(1, TimeUnit.MINUTES);
+				}
+			} catch (ExecutionException | TimeoutException e) {
+				// interrupt surviving rank threads so pool.close() doesn't hang
+				pool.shutdownNow();
+				throw e;
 			}
 		}
 
@@ -202,16 +208,22 @@ public class ThreeLinkIntegrationTest {
 				}))
 				.toList();
 
-			for (var f : futures) {
-				var result = f.get(1, TimeUnit.MINUTES);
-				assertEquals(1, result.getSecond().getPopulation().getPersons().size());
-				var person = result.getSecond().getPopulation().getPersons().values().iterator().next();
-				// make sure that the score is sent back to the person.
-				if (result.getFirst() == 0) {
-					assertNotNull(person.getSelectedPlan().getScore());
-				} else {
-					assertNull(person.getSelectedPlan().getScore());
+			try {
+				for (var f : futures) {
+					var result = f.get(1, TimeUnit.MINUTES);
+					assertEquals(1, result.getSecond().getPopulation().getPersons().size());
+					var person = result.getSecond().getPopulation().getPersons().values().iterator().next();
+					// make sure that the score is sent back to the person.
+					if (result.getFirst() == 0) {
+						assertNotNull(person.getSelectedPlan().getScore());
+					} else {
+						assertNull(person.getSelectedPlan().getScore());
+					}
 				}
+			} catch (ExecutionException | TimeoutException e) {
+				// interrupt surviving rank threads so pool.close() doesn't hang
+				pool.shutdownNow();
+				throw e;
 			}
 		}
 	}
