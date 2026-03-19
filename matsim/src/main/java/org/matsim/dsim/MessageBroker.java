@@ -52,7 +52,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 */
 	private static final Logger log = LogManager.getLogger(MessageBroker.class);
 
-	private static final boolean CHECK_SEQ = Objects.equals(System.getenv("CHECK_SEQ"), "1");
 	static final int ANY_PARTITION = -42;
 
 	/**
@@ -524,7 +523,9 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		if (receiver != comm.getRank() && receiver != Communicator.BROADCAST_TO_ALL)
 			return;
 
-		if (tag < seq && CHECK_SEQ) {
+		// we don't want messages from the past from ranks we sync with.
+		// we do allow messages from the past for ranks we don't sync with
+		if (tag < seq && waitForRanks.contains(sender)) {
 			String error = "#%d Out of order received sequence current seq: %d, received seq: %d".formatted(getRank(), seq, tag);
 			log.error(error);
 			log.error("#{} Sender node: {}, Receiver node: {}", getRank(), sender, receiver);
@@ -547,12 +548,14 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			throw new IllegalStateException(error);
 		}
 
+		// in any case, we allow messages from the future and store them for later.
 		if (tag > seq || tag < 0) {
 			log.trace("#{} on seq {} received ahead msg from #{} for seq {}", comm.getRank(), seq, sender, tag);
 			aheadMsgs.add(clone(data));
 			return;
 		}
 
+		// the standard case is that we have a message for the current time. Deserialize and dispatch it to message processors.
 		while (in.readerIndex() < length) {
 			int partition = in.readInt32();
 			int type = in.readInt32();
@@ -574,6 +577,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			}
 		}
 
+		// remove the sender rank from the ranks we expect messages from.
 		var rankForRemoval = receiver == Communicator.BROADCAST_TO_ALL ? broadcastRank(sender) : sender;
 		waitForRanks.remove(rankForRemoval);
 	}

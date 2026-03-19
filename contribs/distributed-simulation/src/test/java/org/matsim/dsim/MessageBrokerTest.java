@@ -122,7 +122,6 @@ public class MessageBrokerTest {
 		var otherRank = 1;
 		var time = 43;
 		var receivedBytes = msgBytes(otherRank, 0, MessageBroker.ANY_PARTITION, EmptyMessage.INSTANCE, MessageBroker.seqFrom(time));
-		receivedBytes.flip();
 		var comm = mockComm(0);
 		doAnswer(i -> {
 			MessageReceiver expectsNext = i.getArgument(0);
@@ -163,7 +162,6 @@ public class MessageBrokerTest {
 	void sendReceiveEmptyMessages() {
 		var otherRank = 1;
 		var receivedBytes = msgBytes(otherRank, 0, MessageBroker.ANY_PARTITION, EmptyMessage.INSTANCE, seq(0));
-		receivedBytes.flip();
 
 		var comm = mockComm(0);
 		doAnswer(i -> {
@@ -248,9 +246,7 @@ public class MessageBrokerTest {
 		var msgFromRank1 = EmptyMessage.INSTANCE;
 		var msgFromRank2 = new MessageA("message from rank 2 to part 1");
 		var bytesRank1 = msgBytes(1, 0, 0, msgFromRank1, seq(0));
-		bytesRank1.flip();
 		var bytesRank2 = msgBytes(2, 0, 1, msgFromRank2, seq(0));
-		bytesRank2.flip();
 
 		var comm = mockComm(0);
 		doAnswer(i -> {
@@ -329,11 +325,9 @@ public class MessageBrokerTest {
 
 		var msgFromRank1 = new MessageA("incoming broadcast from rank 1");
 		var bytesFromRank1 = msgBytes(1, Communicator.BROADCAST_TO_ALL, Communicator.BROADCAST_TO_ALL, msgFromRank1, seq(0));
-		bytesFromRank1.flip();
 
 		var msgFromRank2 = new MessageA("incoming broadcast from rank 2");
 		var bytesFromRank2 = msgBytes(2, Communicator.BROADCAST_TO_ALL, Communicator.BROADCAST_TO_ALL, msgFromRank2, seq(0));
-		bytesFromRank2.flip();
 
 		var comm = mockComm(0);
 		doAnswer(i -> {
@@ -410,15 +404,12 @@ public class MessageBrokerTest {
 
 		var msgFromRank1 = new MessageA("incoming broadcast from rank 1");
 		var bytesFromRank1 = msgBytes(1, Communicator.BROADCAST_TO_ALL, Communicator.BROADCAST_TO_ALL, msgFromRank1, seq(0));
-		bytesFromRank1.flip();
 
 		var msgFromRank2 = new MessageA("incoming broadcast from rank 2");
 		var bytesFromRank2 = msgBytes(2, Communicator.BROADCAST_TO_ALL, Communicator.BROADCAST_TO_ALL, msgFromRank2, seq(0));
-		bytesFromRank2.flip();
 
 		var msgBFromRank2 = new MessageB("message B from rank 2");
 		var msgBBytes = msgBytes(2, 0, 1, msgBFromRank2, seq(0));
-		msgBBytes.flip();
 
 		var comm = mockComm(0);
 		doAnswer(i -> {
@@ -472,6 +463,150 @@ public class MessageBrokerTest {
 		assertEquals(msgBFromRank2.payload(), ((MessageB) captor1.getValue()).payload());
 	}
 
+	@Test
+	void recvAheadMessage() {
+		var time = 43;
+		var aheadTime = time + 5;
+		var aheadMsg = new MessageA("ahead message");
+		var aheadBytes = msgBytes(1, 0, 0, aheadMsg, seq(aheadTime));
+		var inSequenceMessage = new MessageA("in sequence message");
+		var inSequenceBytes = msgBytes(1, 0, 0, inSequenceMessage, seq(time));
+
+		var comm = mockComm(0);
+		doAnswer(i -> {
+			MessageReceiver expectsNext = i.getArgument(0);
+			MessageConsumer msgConsumer = i.getArgument(1);
+
+			// first message goes into ahead buffer
+			assertTrue(expectsNext.expectsMoreMessages());
+			msgConsumer.consume(aheadBytes);
+
+			// second message is processed and the expected ranks are cleared.
+			assertTrue(expectsNext.expectsMoreMessages());
+			msgConsumer.consume(inSequenceBytes);
+			assertFalse(expectsNext.expectsMoreMessages());
+
+			return null;
+		})
+			// the second invocation does not have messages for the broker.
+			.doAnswer(i -> {
+				MessageReceiver expectsNext = i.getArgument(0);
+
+				// the ahead message should be processed before receive and the ahead message should have cleared
+				// the expected ranks.
+				assertFalse(expectsNext.expectsMoreMessages());
+				return null;
+			})
+			.when(comm).recv(any(), any());
+
+		var task0 = mock(LPTask.class);
+		when(task0.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+		when(task0.waitForOtherParts(anyDouble())).thenReturn(IntSet.of(2));
+
+		var broker = new MessageBroker(comm, TOPOLOGY);
+		broker.register(task0, 0);
+
+		broker.beforeSimStep(time);
+		broker.syncTimestep(time, false);
+
+		broker.beforeSimStep(aheadTime);
+		broker.syncTimestep(aheadTime, false);
+
+		var inOrder = inOrder(task0);
+		inOrder.verify(task0).add(argThat(m ->
+			m instanceof MessageA(String payload) && payload.equals(inSequenceMessage.payload()))
+		);
+		inOrder.verify(task0).add(argThat(m ->
+			m instanceof MessageA(String payload) && payload.equals(aheadMsg.payload()))
+		);
+	}
+
+	@Test
+	void recvUnexpectedPastMessage() {
+
+		// it is allowed that partitions which are not direct neighbors, send messages with a timestamp older than the current one.
+		// this can happen when some partition, which is not a neighbor, sends a teleported agent. Since the synchronization is done
+		// with direct neighbors, partitions can divert in time with each partition in between them. This means it is not allowed for
+		// neighbor partitions (syncFrom) to send out-of-sequence messages. Non-neighbor partitions may send such messages though.
+
+		var time = 43;
+		var pastTime = time - 5;
+		var syncRank = 1;
+		var nonSyncRank = 2;
+		var unexpectedPastMessage = new MessageA("ahead message");
+		var unexpectedPastBytes = msgBytes(nonSyncRank, 0, 0, unexpectedPastMessage, seq(pastTime));
+		var inSequenceMessage = new MessageA("in sequence message");
+		var inSequenceBytes = msgBytes(syncRank, 0, 0, inSequenceMessage, seq(time));
+
+		var comm = mockComm(0);
+		doAnswer(i -> {
+			MessageReceiver expectsNext = i.getArgument(0);
+			MessageConsumer msgConsumer = i.getArgument(1);
+
+			// first message is unexpected but is processed
+			assertTrue(expectsNext.expectsMoreMessages());
+			msgConsumer.consume(unexpectedPastBytes);
+
+			// second message is processed and the expected ranks are cleared.
+			assertTrue(expectsNext.expectsMoreMessages());
+			msgConsumer.consume(inSequenceBytes);
+			assertFalse(expectsNext.expectsMoreMessages());
+
+			return null;
+		}).when(comm).recv(any(), any());
+
+		var task0 = mock(LPTask.class);
+		when(task0.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+		when(task0.waitForOtherParts(anyDouble())).thenReturn(IntSet.of(2));
+
+		var broker = new MessageBroker(comm, TOPOLOGY);
+		broker.register(task0, 0);
+
+		broker.beforeSimStep(time);
+		broker.syncTimestep(time, false);
+
+		var inOrder = inOrder(task0);
+		inOrder.verify(task0).add(argThat(m ->
+			m instanceof MessageA(String payload) && payload.equals(unexpectedPastMessage.payload()))
+		);
+		inOrder.verify(task0).add(argThat(m ->
+			m instanceof MessageA(String payload) && payload.equals(inSequenceMessage.payload()))
+		);
+	}
+
+	@Test
+	void crashOnExpectedPastMessage() {
+
+		// Maybe find a better name? Neighbor partitions, or those the MessageBroker is supposed to sync with may not send
+		// messages with a timestep smaller than the current one. Ranks, that sync are expected to proceed in lock step.
+
+		var time = 43;
+		var pastTime = time - 5;
+		var syncRank = 1;
+		var pastMessageFromSyncedRank = new MessageA("illegal past message");
+		var pastBytesFromSyncRank = msgBytes(syncRank, 0, 0, pastMessageFromSyncedRank, seq(pastTime));
+
+		var comm = mockComm(0);
+		doAnswer(i -> {
+			MessageReceiver expectsNext = i.getArgument(0);
+			MessageConsumer msgConsumer = i.getArgument(1);
+
+			// first message is unexpected but is processed
+			assertTrue(expectsNext.expectsMoreMessages());
+			assertThrows(IllegalStateException.class, () -> msgConsumer.consume(pastBytesFromSyncRank));
+
+			return null;
+		}).when(comm).recv(any(), any());
+
+		var broker = new MessageBroker(comm, TOPOLOGY);
+		broker.beforeSimStep(time);
+		broker.syncFromRank(syncRank);
+		broker.syncTimestep(time, false);
+
+		// verify that the do answer has been invoked!
+		verify(comm, times(1)).recv(any(), any());
+	}
+
 	@SuppressWarnings("unchecked")
 	private <T extends Message> T verifyMsg(int expectedTag, int expectedSender, int expectedReceiver, int expectedPartition, int expectedType, ByteBuffer actualBytes) throws IOException {
 		actualBytes.order(ByteOrder.LITTLE_ENDIAN);
@@ -499,6 +634,7 @@ public class MessageBrokerTest {
 		buf.put(headerBytes);
 		msgBytes.flip();
 		buf.put(msgBytes);
+		buf.flip();
 		return buf;
 	}
 
