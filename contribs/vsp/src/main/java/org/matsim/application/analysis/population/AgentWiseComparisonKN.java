@@ -29,14 +29,10 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
-import org.matsim.utils.tablesaw.TablesawUtils;
 import picocli.CommandLine;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.Table;
-import tech.tablesaw.plotly.components.Figure;
-import tech.tablesaw.plotly.components.Layout;
-import tech.tablesaw.plotly.traces.HistogramTrace;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -131,8 +127,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 // 		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-routesCleaned-20260218";
 
 		// do last iteration again:
-//		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
-//		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
+		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
+		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
 
 		// iatbr glamobi:
 //		final String baseDir="/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
@@ -143,15 +139,15 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/output/berlin-v6.4-10pct";
 
 		// autofrei:
-		final String baseDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-baseCaseCtdExtended/";
-		final String policyDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-policy";
+//		final String baseDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-baseCaseCtdExtended/";
+//		final String policyDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-policy";
 
 		// ===
 
-		generateExperiencedPlans( baseDir );
-		generateExperiencedPlans( policyDir );
-		generateFilteredEventsFile( baseDir );
-		generateFilteredEventsFile( policyDir );
+//		generateExperiencedPlans( baseDir );
+//		generateExperiencedPlans( policyDir );
+//		generateFilteredEventsFile( baseDir );
+//		generateFilteredEventsFile( policyDir );
 		agentWiseComparison( baseDir, policyDir, shpFile );
 	}
 
@@ -243,28 +239,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		baseTablePersons.addColumns( baseTablePersons.doubleColumn( MATSIM_SCORE ).subtract( baseTablePersons.doubleColumn( SCORE ) ).setName( "error" ) );
 
 		printTable( baseTablePersons.sortOn( "error" ), "sorted by score differences bw mw and self-computed" );
-		{
-			HistogramTrace histogramTrace = HistogramTrace.builder( baseTablePersons.doubleColumn( MUSE_h ) ).build();
-			final Layout.LayoutBuilder layoutBuilder = Layout.builder().width( 1000 );
-			Figure figure = new Figure( layoutBuilder.build(), histogramTrace );
-
-			Path htmlPath = inputPath.resolve( "muse.html" );
-			TablesawUtils.writeFigureToHtmlFile( htmlPath.toString(), figure );
-		}
-		{
-			DoubleColumn column = baseTablePersons.doubleColumn( MUSE_h ).divide( baseTablePersons.doubleColumn( UTL_OF_MONEY ) ).setName( "VSE[Eu/h]");
-//			HistogramTrace histogramTrace = HistogramTrace.builder( column ).nBinsX( 50 ).build();
-			HistogramTrace histogramTrace = HistogramTrace.builder( column ).build();
-			final Layout.LayoutBuilder layoutBuilder = Layout.builder().width( 1000 );
-			Figure figure = new Figure( layoutBuilder.build(), histogramTrace );
-
-//			Path htmlPath = inputPath.resolve( "vse50.html" );
-			Path htmlPath = inputPath.resolve( "vse.html" );
-			TablesawUtils.writeFigureToHtmlFile( htmlPath.toString(), figure );
-
-			log.warn("vse mean value=" + column.mean() );
-
-		}
+		writeMuseHtml( baseTablePersons, inputPath );
+		writeVseHtml( baseTablePersons, inputPath );
 
 		// ############################
 		// ############################
@@ -314,6 +290,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		double popSumMuse_h = 0.;
 		double popCntMuse_h = 0.;
 		Counter counter = new Counter( "in method generatePersonTableFromPopulation(...); processing person #  ");
+		MuseComputation museComputation = new MuseComputation( scoringFunctionFactory, pf );
 		for( Person person : population.getPersons().values() ){
 			counter.incCounter();
 
@@ -326,61 +303,18 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			table.stringColumn( ANALYSIS_POPULATION ).append( getIsInShp( person ) );
 
-
 			if ( isBaseTable ){
 				processMUoM( person, table );
 				table.intColumn( INCOME_DECILE ).append( getIncomeDecileBetween0And9( person ) );
-			}
 
-			{
-				// compute MUSE for rule-of-half:
-				ScoringFunction sfNormal = scoringFunctionFactory.createNewScoringFunction( person );
-				ScoringFunction sfEarly = scoringFunctionFactory.createNewScoringFunction( person );
-				Activity firstActivity = null;
-				double sumMuse_h = 0.;
-				double cntMuse_h = 0.;
-				for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), ExcludeStageActivities ) ){
-					if( isBaseTable ){
-						if( act.getStartTime().isDefined() && act.getEndTime().isDefined() ){
-							// Ihab-style MarginalSumScoringFct computation but w/o leg:
-							double scoreNormalBefore = sfNormal.getScore();
-							double scoreEarlyBefore = sfEarly.getScore();
-							sumMuse_h += computeMUSE_h( act, sfNormal, pf, sfEarly, scoreNormalBefore, scoreEarlyBefore );
-							cntMuse_h++;
-						} else if( act.getStartTime().isUndefined() ){
-							firstActivity = act;
-						} else{
-							Gbl.assertIf( act.getEndTime().isUndefined() );
-							// Ihab-style MarginalSumScoringFct computation but w/o leg:
-							double scoreNormalBefore = sfNormal.getScore();
-							double scoreEarlyBefore = sfEarly.getScore();
-							// treat the after-midnight-activity:
-							sfNormal.handleActivity( firstActivity );
-							sfEarly.handleActivity( firstActivity );
-							// handle the before-midnight-activity
-							sumMuse_h += computeMUSE_h( act, sfNormal, pf, sfEarly, scoreNormalBefore, scoreEarlyBefore );
-							cntMuse_h++;
-
-							// yyyyyy if before and after mightnight act are not of the same type, is the above computation then still correct?
-
-							// --> I think it is correct, in the sense that starting the after-midnight activity early is not possible.  But it is not clear if the MUSE averages
-							// over the two activity types, or only uses the before-midnight activity.  yyyyyy check!
-						}
-					}
-				}
-				if( isBaseTable ){
-					AddVttsEtcToActivities.setMUSE_h( person.getSelectedPlan(), sumMuse_h / cntMuse_h );
-				}
+				museComputation.computeMuseForAllActs( person );
 			}
 
 			double computedPersonScore = 0.;
 			{
 				// activity times:
 				ScoringFunction sf = scoringFunctionFactory.createNewScoringFunction( person );
-				Activity firstActivity = null;
-				for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), ExcludeStageActivities ) ){
-					sf.handleActivity( act );
-				}
+				TripStructureUtils.getActivities( person.getSelectedPlan(), ExcludeStageActivities ).stream().forEach( act -> sf.handleActivity( act ) );
 				sf.finish();
 				table.doubleColumn( HeadersKN.ACTS_SCORE ).append( sf.getScore() );
 				computedPersonScore += sf.getScore();
@@ -415,7 +349,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 				if( isBaseTable ){
 					Double musl_h = getMUSE_h( trip.getDestinationActivity() );
-					if( musl_h != null && musl_h > 0 && musl_h < 16.30 ){
+//					if( musl_h != null && musl_h > 0 && musl_h < 16.30 ){
+//					if( musl_h != null && musl_h > 0 ){
+					if( musl_h != null ) {
 						sumMuse_h += musl_h;
 						cntMuse_h++;
 					}
@@ -630,8 +566,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			// ===
 
 			writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
-		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
-		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+//		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
+//		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
 
 			if( doRoh ){
 				writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );

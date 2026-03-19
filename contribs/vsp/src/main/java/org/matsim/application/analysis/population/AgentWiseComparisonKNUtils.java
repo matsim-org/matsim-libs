@@ -28,14 +28,17 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.geometry.GeometryUtils;
+import org.matsim.utils.tablesaw.TablesawUtils;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
+import tech.tablesaw.plotly.components.Figure;
+import tech.tablesaw.plotly.components.Layout;
+import tech.tablesaw.plotly.traces.HistogramTrace;
 
 import java.nio.file.Path;
 import java.text.NumberFormat;
@@ -475,20 +478,6 @@ class AgentWiseComparisonKNUtils{
 			}
 		}
 	}
-	static double computeMUSE_h( Activity act, ScoringFunction sfNormal, PopulationFactory pf, ScoringFunction sfEarly, double scoreNormalBefore, double scoreEarlyBefore ){
-		sfNormal.handleActivity( act );
-		Activity earlyActivity = pf.createActivityFromLinkId( act.getType(), act.getLinkId() );
-		PopulationUtils.copyFromTo( act, earlyActivity );
-		earlyActivity.setStartTime( earlyActivity.getStartTime().seconds() - 1 );
-		sfEarly.handleActivity( earlyActivity );
-		sfNormal.finish();
-		sfEarly.finish();
-		double scoreDiffNormal = sfNormal.getScore() - scoreNormalBefore;
-		double scoreDiffEarly = sfEarly.getScore() - scoreEarlyBefore;
-		final double muse_h = (scoreDiffEarly - scoreDiffNormal) * 3600.;
-		AddVttsEtcToActivities.setMUSE_h( act, muse_h );
-		return muse_h;
-	}
 	public static void setIncomeDecileBetween0And9( Person person, int decile ) {
 		person.getAttributes().putAttribute( "incomeDecile", decile );
 	}
@@ -680,5 +669,26 @@ class AgentWiseComparisonKNUtils{
 						   bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
 					   }
 				   } ).build();
+	}
+	static void writeMuseHtml( Table baseTablePersons, Path inputPath ){
+		HistogramTrace histogramTrace = HistogramTrace.builder( baseTablePersons.doubleColumn( MUSE_h ) ).build();
+		final Layout.LayoutBuilder layoutBuilder = Layout.builder().width( 1000 );
+		Figure figure = new Figure( layoutBuilder.build(), histogramTrace );
+
+		Path htmlPath = inputPath.resolve( "muse.html" );
+		TablesawUtils.writeFigureToHtmlFile( htmlPath.toString(), figure );
+	}
+	static void writeVseHtml( Table baseTablePersons, Path inputPath ){
+		DoubleColumn column = baseTablePersons.doubleColumn( MUSE_h ).divide( baseTablePersons.doubleColumn( UTL_OF_MONEY ) ).setName( "VSE[Eu/h]" );
+//			HistogramTrace histogramTrace = HistogramTrace.builder( column ).nBinsX( 50 ).build();
+		HistogramTrace histogramTrace = HistogramTrace.builder( column ).build();
+		final Layout.LayoutBuilder layoutBuilder = Layout.builder().width( 1000 );
+		Figure figure = new Figure( layoutBuilder.build(), histogramTrace );
+
+//			Path htmlPath = inputPath.resolve( "vse50.html" );
+		Path htmlPath = inputPath.resolve( "vse.html" );
+		TablesawUtils.writeFigureToHtmlFile( htmlPath.toString(), figure );
+
+		log.warn("VSE mean value=" + column.mean() );
 	}
 }
