@@ -40,6 +40,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
@@ -59,7 +60,7 @@ import java.util.Objects;
  * @author Ricardo Ewert
  *
  */
-public class RunGenerateSmallScaleCommercialTrafficTest {
+public class CommercialTrafficIT {
 
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
@@ -76,13 +77,15 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String smallScaleCommercialTrafficType = "completeSmallScaleCommercialTraffic";
 		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
 		String zoneShapeFileNameColumn = "name";
-		String shapeCRS = "EPSG:4326";
+		String shapeCRS = "Atlantis";
 		String resultPopulation = "testPopulation.xml.gz";
+		String network = String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml"));
 
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
 			pathToConfig,
 			"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
 			"--pathToCommercialFacilities", pathToCommercialFacilities,
+			"--network", network,
 			"--sample", sample,
 			"--jspritIterations", jspritIterations,
 			"--creationOption", creationOption,
@@ -94,9 +97,11 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 			"--shapeCRS", shapeCRS,
 			"--nameOutputPopulation", resultPopulation,
 			"--pathOutput", output,
-			"--resistanceFactor_commercialPersonTraffic", "0.005",
-			"--resistanceFactor_goodsTraffic", "0.005",
-			"--MATSimIterationsAfterDemandGeneration", "0");
+			"--resistanceFactor_commercialPersonTraffic", "0.3",
+			"--resistanceFactor_goodsTraffic", "0.2",
+			"--MATSimIterationsAfterDemandGeneration", "0",
+			"--factorForTravelBufferCalculation", "1.2",
+			"--maxNumberOfLoopsForVRPSolving", "2");
 
 		// test results of complete run before
 		Config config = ConfigUtils.createConfig();
@@ -106,7 +111,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_noPlans.xml.gz";
 		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_withPlans.xml.gz";
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_allVehicles.xml.gz");
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_vehicles.xml.gz");
 
 		freightCarriersConfigGroup.setCarriersFile(carriersWOSolutionFileLocation);
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioWOSolution);

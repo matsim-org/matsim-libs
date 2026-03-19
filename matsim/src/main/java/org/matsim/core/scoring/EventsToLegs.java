@@ -41,7 +41,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
-import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -69,11 +68,6 @@ public final class EventsToLegs
 	PersonContinuesInVehicleEventHandler,
 	VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	/**
-	 * @deprecated This constant is no longer needed, as {@link TransitPassengerRoute#getBoardingTime()} provides this information. Network and
-	 * generic routes do not need this attribute.
-	 */
-	@Deprecated(forRemoval = true)
 	public static final String ENTER_VEHICLE_TIME_ATTRIBUTE_NAME = "enterVehicleTime";
 	public static final String VEHICLE_ID_ATTRIBUTE_NAME = "vehicleId";
 
@@ -219,7 +213,7 @@ public final class EventsToLegs
 					new PendingTransitTravel(event.getVehicleId(), lineAndRoute.lastFacilityId, event.getTime()));
 			}
 		} else {
-			VehicleRoute route = vehicle2route.computeIfAbsent(event.getVehicleId(), vehicleId -> new VehicleRoute());
+			VehicleRoute route = vehicle2route.computeIfAbsent(event.getVehicleId(), _ -> new VehicleRoute());
 			int currentLinkIdx = Math.max(0, route.links.size() - 1);
 			PendingVehicleTravel vehicleTravel = new PendingVehicleTravel(route, currentLinkIdx);
 			vehicleTravels.put(event.getPersonId(), vehicleTravel);
@@ -229,7 +223,7 @@ public final class EventsToLegs
 
 	@Override
 	public void handleEvent(PersonContinuesInVehicleEvent event) {
-		transitChains.computeIfAbsent(event.getPersonId(), (k) -> new ArrayList<>())
+		transitChains.computeIfAbsent(event.getPersonId(), _ -> new ArrayList<>())
 			.add(new PendingTransitChain(event.getTime(), event.getVehicleId(), event.getStopFacilityId()));
 	}
 
@@ -328,8 +322,6 @@ public final class EventsToLegs
 
 			final TransitStopFacility egressFacility = transitSchedule.getFacilities().get(lastFacilityId);
 			assert egressFacility != null : "egressFacility for lastFacilityId " + lastFacilityId + " is null.";
-			for (TransitLine value : transitSchedule.getTransitLines().values()) {
-			}
 
 			DefaultTransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(accessFacility, line, route, egressFacility,
 				createChainedRoute(transitChains.remove(event.getPersonId())));
