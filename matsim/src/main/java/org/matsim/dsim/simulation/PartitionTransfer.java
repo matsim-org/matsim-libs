@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.dsim.MessageBroker;
-import org.matsim.dsim.messages.SimStepMessage;
 
 import java.util.ArrayList;
 import java.util.List;

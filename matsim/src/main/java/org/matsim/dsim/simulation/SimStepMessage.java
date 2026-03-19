@@ -1,10 +1,10 @@
-package org.matsim.dsim.messages;
+package org.matsim.dsim.simulation;
 
 import org.matsim.api.core.v01.Message;
 
 import java.util.List;
 
-public record SimStepMessage(double timeStep, long messageType, List<Message> messages) implements Message {
+public record SimStepMessage(double timeStep, int messageType, List<Message> messages) implements Message {
 // this is intended to be used with one message type. Should we make it generic, to enforce it at compile time?
 
 	public void add(Message message) {

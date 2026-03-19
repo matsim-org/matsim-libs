@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.dsim.MessageBroker;
 import org.matsim.dsim.TestUtils;
-import org.matsim.dsim.messages.SimStepMessage;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -128,8 +127,8 @@ class PartitionTransferTest {
 			.map(m -> (SimStepMessage) m)
 			.map(SimStepMessage::messageType)
 			.toList();
-		assertTrue(types.contains((long) msgA.getType()));
-		assertTrue(types.contains((long) msgB.getType()));
+		assertTrue(types.contains(msgA.getType()));
+		assertTrue(types.contains(msgB.getType()));
 	}
 
 	@Test

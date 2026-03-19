@@ -33,8 +33,6 @@ import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.DistributedEventsManager;
-import org.matsim.dsim.messages.SimStepMessage;
-import org.matsim.dsim.messages.SimStepMessageProcessor;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.scoring.BackpackScoringModule;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
@@ -53,7 +51,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final List<DistributedActivityHandler> activityHandlers = new ArrayList<>();
 	private final MobsimListenerManager listenerManager = new MobsimListenerManager(this);
 	private final Int2ObjectMap<List<MessageHandler>> dispatch = new Int2ObjectOpenHashMap<>();
-	//	private final SimStepMessaging messaging;
 	private final PartitionTransfer partitionTransfer;
 	private final Scenario scenario;
 	private final NetworkPartition partition;
@@ -172,7 +169,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void process(SimStepMessage msg) {
-		var handlers = dispatch.get((int) msg.messageType());
+		var handlers = dispatch.get(msg.messageType());
 		if (handlers != null) {
 			handlers.forEach(h -> h.handle(msg.messages(), msg.timeStep()));
 		}

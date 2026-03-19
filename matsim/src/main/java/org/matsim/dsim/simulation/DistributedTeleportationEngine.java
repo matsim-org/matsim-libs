@@ -22,7 +22,6 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 	private final EventsManager em;
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
-	//private final SimStepMessaging simStepMessaging;
 	private final PartitionTransfer partitionTransfer;
 	private final AgentSourcesContainer asc;
 	private final BackpackDataCollector bdc;

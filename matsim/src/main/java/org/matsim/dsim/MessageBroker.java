@@ -452,7 +452,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	@Override
 	public void consume(ByteBuffer data) throws IOException {
 
-		// we have written little endian, hence read little endian.
 		int length = data.limit();
 
 		MemoryBuffer in = MemoryBuffer.fromByteBuffer(data);
@@ -497,7 +496,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			return;
 		}
 
-		// the standard case is that we have a message for the current time. Deserialize and dispatch it to message processors.
+		// the standard case is that we have messages for the current time. Deserialize and dispatch them to message processors.
 		while (in.readerIndex() < length) {
 			int partition = in.readInt32();
 			int type = in.readInt32();
@@ -661,8 +660,8 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 		/**
 		 * Writes message bytes to the memory segment of this buffer. {@link #writeHeader(int)} must have been called before.
-		 * To ensure that the messagecan be read on the receiver side.
-		 * DON'T call it from outside the buffer. Use {@link #add(Message, int, int) instead.}
+		 * To ensure that the message can be read on the receiver side.
+		 * DON'T call it from outside the buffer. Use {@link #add(Message, int, int)} instead.
 		 */
 		private void writeMessage(int toPartition, Message message) {
 			var messageBuf = serialize(toPartition, message, serialization);

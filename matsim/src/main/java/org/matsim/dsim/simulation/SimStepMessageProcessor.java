@@ -1,4 +1,4 @@
-package org.matsim.dsim.messages;
+package org.matsim.dsim.simulation;
 
 import org.matsim.api.core.v01.MessageProcessor;
 
