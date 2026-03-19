@@ -10,7 +10,6 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
-import org.matsim.core.mobsim.dsim.Teleportation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -73,7 +72,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		} else {
 			// TODO: replace with general mechanism for notifying person is leaving
 			bdc.teleportedPersonLeavesPartition(person);
-			partitionTransfer.collect(new Teleportation(person.getClass(), person.toMessage(), exitTime), person.getDestinationLinkId());
+			partitionTransfer.collect(new TeleportationMessage(person.getClass(), person.toMessage(), exitTime), person.getDestinationLinkId());
 		}
 
 		return true;
@@ -89,7 +88,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 	private void processTeleportationMessages(List<Message> messages, double now) {
 		for (var m : messages) {
-			var msg = (Teleportation) m;
+			var msg = (TeleportationMessage) m;
 			if (msg.exitTime() < now) {
 				throw new IllegalStateException("Teleportation message was received too late. Exit time is supposed to be " +
 					msg.exitTime() + " but simulation time is already at: " + now + ". This might happen, if partitions " +
@@ -145,5 +144,6 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	private record TeleportationEntry(DistributedMobsimAgent person, double exitTime) {
 	}
 
-	record TeleportationMessage(Class<? extends DistributedMobsimAgent> type, Message agent, double exitTime) implements Message {}
+	// intentionally public, so that the SerializationProvider can pick up this class
+	public record TeleportationMessage(Class<? extends DistributedMobsimAgent> type, Message agent, double exitTime) implements Message {}
 }

@@ -43,7 +43,7 @@ public class TestSplitInLink {
 
 		simLink.doSimStep(0);
 
-		var captor = ArgumentCaptor.forClass(SimLink.SplitInLink.CapacityUpdate.class);
+		var captor = ArgumentCaptor.forClass(CapacityUpdate.class);
 		verify(messaging1).collect(captor.capture(), eq(fromPart));
 		assertEquals(simLink.getId(), captor.getValue().linkId());
 		assertEquals(0, captor.getValue().released());
@@ -74,7 +74,7 @@ public class TestSplitInLink {
 		// verify the call to the messaging:
 		// 3 PCEs are consumed because of both vehicles entering the link. 2 PCE is released because vehicle-2 moved to
 		// the buffer (vehicle 2 is pushed to the head of the q)
-		var captor = ArgumentCaptor.forClass(SimLink.SplitInLink.CapacityUpdate.class);
+		var captor = ArgumentCaptor.forClass(CapacityUpdate.class);
 		verify(messaging).collect(captor.capture(), eq(fromPart));
 		assertEquals(simLink.getId(), captor.getValue().linkId());
 		assertEquals(2, captor.getValue().released());
@@ -108,7 +108,7 @@ public class TestSplitInLink {
 
 		// verify message transfer
 		var inOrder = inOrder(messaging); // we need in order, so that we can have separate captors for verifying the calls to the messaging mock
-		var captor1 = ArgumentCaptor.forClass(SimLink.SplitInLink.CapacityUpdate.class);
+		var captor1 = ArgumentCaptor.forClass(CapacityUpdate.class);
 		inOrder.verify(messaging).collect(captor1.capture(), eq(fromPart));
 		assertEquals(simLink.getId(), captor1.getValue().linkId());
 		assertEquals(0, captor1.getValue().released());
@@ -120,7 +120,7 @@ public class TestSplitInLink {
 
 		// the hole should arrive after 24 seconds. Then it is sent upstream
 		assertFalse(simLink.doSimStep(24));
-		var captor2 = ArgumentCaptor.forClass(SimLink.SplitInLink.CapacityUpdate.class);
+		var captor2 = ArgumentCaptor.forClass(CapacityUpdate.class);
 		inOrder.verify(messaging).collect(captor2.capture(), eq(fromPart));
 		assertEquals(simLink.getId(), captor2.getValue().linkId());
 		assertEquals(42, captor2.getValue().released());
@@ -150,7 +150,7 @@ public class TestSplitInLink {
 
 
 		simLink.doSimStep(100);
-		var captor = ArgumentCaptor.forClass(SimLink.SplitInLink.CapacityUpdate.class);
+		var captor = ArgumentCaptor.forClass(CapacityUpdate.class);
 		verify(messaging).collect(captor.capture(), eq(fromPart));
 		assertEquals(simLink.getId(), captor.getValue().linkId());
 		assertEquals(3, captor.getValue().released());
@@ -185,7 +185,7 @@ public class TestSplitInLink {
 		assertEquals(5, wasActivated.get());
 		assertFalse(simLink.doSimStep(124));
 
-		var captor = ArgumentCaptor.forClass(SimLink.SplitInLink.CapacityUpdate.class);
+		var captor = ArgumentCaptor.forClass(CapacityUpdate.class);
 		verify(messaging).collect(captor.capture(), eq(fromPart));
 		assertEquals(simLink.getId(), captor.getValue().linkId());
 		assertEquals(3, captor.getValue().released());

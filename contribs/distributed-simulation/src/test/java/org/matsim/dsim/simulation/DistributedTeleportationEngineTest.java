@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.dsim.Teleportation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -113,9 +112,13 @@ class DistributedTeleportationEngineTest {
 		when(messaging.isLocal(any())).thenReturn(false);
 		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class), mock(BackpackDataCollector.class));
 
+		var msgTypes = engine.getMessageHandlers().keySet();
+		assertEquals(1, msgTypes.size());
+		assertEquals(DistributedTeleportationEngine.TeleportationMessage.class.getName(), msgTypes.iterator().next().getName());
+
 		engine.handleDeparture(11, agent, agent.getCurrentLinkId());
 
-		var captor = ArgumentCaptor.forClass(Teleportation.class);
+		var captor = ArgumentCaptor.forClass(DistributedTeleportationEngine.TeleportationMessage.class);
 		verify(messaging).collect(captor.capture(), eq(agent.getDestinationLinkId()));
 		var teleportation = captor.getValue();
 		assertEquals(agent.getClass(), teleportation.type());
@@ -135,7 +138,7 @@ class DistributedTeleportationEngineTest {
 
 		engine.setInternalInterface(mock(InternalInterface.class));
 
-		var msg = new Teleportation(agent.getClass(), agent.toMessage(), 42);
+		var msg = new DistributedTeleportationEngine.TeleportationMessage(agent.getClass(), agent.toMessage(), 42);
 		var handler = engine.getMessageHandlers().get(DistributedTeleportationEngine.TeleportationMessage.class);
 		handler.handle(List.of(msg), 20);
 
@@ -157,7 +160,7 @@ class DistributedTeleportationEngineTest {
 		when(messaging.isLocal(any())).thenReturn(true);
 		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class), mock(BackpackDataCollector.class));
 
-		var msg = new Teleportation(agent.getClass(), agent.toMessage(), 42);
+		var msg = new DistributedTeleportationEngine.TeleportationMessage(agent.getClass(), agent.toMessage(), 42);
 		var handler = engine.getMessageHandlers().get(DistributedTeleportationEngine.TeleportationMessage.class);
 
 		assertThrows(IllegalStateException.class, () -> handler.handle(List.of(msg), 100));

@@ -33,8 +33,8 @@ import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.DistributedEventsManager;
-import org.matsim.dsim.messages.SimStepMessage2;
-import org.matsim.dsim.messages.SimStepMessage2Processor;
+import org.matsim.dsim.messages.SimStepMessage;
+import org.matsim.dsim.messages.SimStepMessageProcessor;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.scoring.BackpackScoringModule;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
@@ -44,7 +44,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 
 import java.util.*;
 
-public class SimProcess implements Steppable, LP, SimStepMessage2Processor, Netsim, InternalInterface {
+public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsim, InternalInterface {
 
 	private static final Logger log = LogManager.getLogger(SimProcess.class);
 
@@ -171,7 +171,7 @@ public class SimProcess implements Steppable, LP, SimStepMessage2Processor, Nets
 	}
 
 	@Override
-	public void process(SimStepMessage2 msg) {
+	public void process(SimStepMessage msg) {
 		var handlers = dispatch.get((int) msg.messageType());
 		if (handlers != null) {
 			handlers.forEach(h -> h.handle(msg.messages(), msg.timeStep()));

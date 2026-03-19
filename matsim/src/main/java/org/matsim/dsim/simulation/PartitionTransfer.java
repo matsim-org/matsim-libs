@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.dsim.MessageBroker;
-import org.matsim.dsim.messages.SimStepMessage2;
+import org.matsim.dsim.messages.SimStepMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class PartitionTransfer {
 			for (var types : partitions.getValue().int2ObjectEntrySet()) {
 				var messageType = types.getIntKey();
 				var messages = types.getValue();
-				var simStepMessage = new SimStepMessage2(now, messageType, messages);
+				var simStepMessage = new SimStepMessage(now, messageType, messages);
 				messageBroker.send(simStepMessage, toPartition);
 			}
 			// remove reference to the list of message for given type.

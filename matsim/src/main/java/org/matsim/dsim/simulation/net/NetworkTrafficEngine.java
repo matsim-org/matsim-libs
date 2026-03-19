@@ -10,11 +10,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
+import org.matsim.dsim.simulation.VehicleContainer;
 
 import java.util.Map;
 
@@ -88,8 +88,8 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		return Map.of(
 			VehicleContainer.class,
 			(msgs, now) -> msgs.forEach(m -> processVehicleMessage((VehicleContainer) m, now)),
-			SimLink.SplitInLink.CapacityUpdate.class,
-			(msgs, now) -> msgs.forEach(m -> processUpdateMessage((SimLink.SplitInLink.CapacityUpdate) m))
+			CapacityUpdate.class,
+			(msgs, now) -> msgs.forEach(m -> processUpdateMessage((CapacityUpdate) m))
 		);
 	}
 
@@ -101,7 +101,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		link.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
 	}
 
-	private void processUpdateMessage(SimLink.SplitInLink.CapacityUpdate updateMessage) {
+	private void processUpdateMessage(CapacityUpdate updateMessage) {
 
 		Id<Link> linkId = updateMessage.linkId();
 		double released = updateMessage.released();

@@ -15,11 +15,11 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine.MessageHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.dsim.NetworkDecomposition;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.PartitionTransfer;
+import org.matsim.dsim.simulation.VehicleContainer;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;

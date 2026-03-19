@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.dsim.MessageBroker;
 import org.matsim.dsim.TestUtils;
-import org.matsim.dsim.messages.SimStepMessage2;
+import org.matsim.dsim.messages.SimStepMessage;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -59,7 +59,7 @@ class PartitionTransferTest {
 
 		var captor = ArgumentCaptor.forClass(Message.class);
 		verify(broker, times(1)).send(captor.capture(), eq(1));
-		assertSame(msg, ((SimStepMessage2) captor.getValue()).messages().getFirst());
+		assertSame(msg, ((SimStepMessage) captor.getValue()).messages().getFirst());
 	}
 
 	@Test
@@ -71,7 +71,7 @@ class PartitionTransferTest {
 
 		var captor = ArgumentCaptor.forClass(Message.class);
 		verify(broker).send(captor.capture(), eq(2));
-		assertSame(msg, ((SimStepMessage2) captor.getValue()).messages().getFirst());
+		assertSame(msg, ((SimStepMessage) captor.getValue()).messages().getFirst());
 	}
 
 	// --- collect(Message, int) + send() ---
@@ -85,7 +85,7 @@ class PartitionTransferTest {
 		var captor = ArgumentCaptor.forClass(Message.class);
 		verify(broker).send(captor.capture(), eq(1));
 
-		var sent = (SimStepMessage2) captor.getValue();
+		var sent = (SimStepMessage) captor.getValue();
 		assertEquals(42.0, sent.timeStep(), 1e-9);
 		assertEquals(msg.getType(), sent.messageType());
 		assertEquals(1, sent.messages().size());
@@ -105,7 +105,7 @@ class PartitionTransferTest {
 		var captor = ArgumentCaptor.forClass(Message.class);
 		verify(broker, times(1)).send(captor.capture(), eq(1));
 
-		var sent = (SimStepMessage2) captor.getValue();
+		var sent = (SimStepMessage) captor.getValue();
 		assertEquals(3, sent.messages().size());
 		assertTrue(sent.messages().containsAll(java.util.List.of(m1, m2, m3)));
 	}
@@ -125,8 +125,8 @@ class PartitionTransferTest {
 		assertEquals(2, sentMessages.size());
 		// Each SimStepMessage2 must contain exactly one message of the correct type
 		var types = sentMessages.stream()
-			.map(m -> (SimStepMessage2) m)
-			.map(SimStepMessage2::messageType)
+			.map(m -> (SimStepMessage) m)
+			.map(SimStepMessage::messageType)
 			.toList();
 		assertTrue(types.contains((long) msgA.getType()));
 		assertTrue(types.contains((long) msgB.getType()));
@@ -164,7 +164,7 @@ class PartitionTransferTest {
 		transfer.send(2.0, IntSet.of());  // second send — buffer should be empty
 
 		// send() called for SimStepMessage2 only once (from first send)
-		verify(broker, times(1)).send(any(SimStepMessage2.class), anyInt());
+		verify(broker, times(1)).send(any(SimStepMessage.class), anyInt());
 	}
 
 	@Test
@@ -181,7 +181,7 @@ class PartitionTransferTest {
 		transfer.send(1.0, IntSet.of(1));
 
 		// real data was sent AND null message was registered — broker guards against double-send
-		verify(broker).send(any(SimStepMessage2.class), eq(1));
+		verify(broker).send(any(SimStepMessage.class), eq(1));
 		verify(broker).syncToPart(1);
 	}
 
