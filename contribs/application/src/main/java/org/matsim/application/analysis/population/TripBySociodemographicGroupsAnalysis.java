@@ -18,12 +18,12 @@ import java.util.function.Function;
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
 /**
- * Helper class to analyze trips by groups.
+ * Helper class to analyze trips by sociodemographic groups.
  * This class can not be used on its own, but will be called by {@link TripAnalysis}.
  */
-final class TripByGroupAnalysis {
+final class TripBySociodemographicGroupsAnalysis {
 
-	private final static Logger log = LogManager.getLogger(TripByGroupAnalysis.class);
+	private final static Logger log = LogManager.getLogger(TripBySociodemographicGroupsAnalysis.class);
 
 	/**
 	 * Contains detected groups and their reference data.
@@ -32,7 +32,7 @@ final class TripByGroupAnalysis {
 
 	private final Map<String, Category> categories;
 
-	TripByGroupAnalysis(String refData) throws IOException {
+	TripBySociodemographicGroupsAnalysis(String refData) throws IOException {
 
 		try (BufferedReader reader = IOUtils.getBufferedReader(refData)) {
 			Table ref = Table.read().csv(CsvReadOptions.builder(reader)
@@ -84,7 +84,7 @@ final class TripByGroupAnalysis {
 			// Norm shares per instance of each group to sum of 1
 			for (Group group : this.groups) {
 
-				String norm = group.columns.get(0);
+				String norm = group.columns.getFirst();
 				if (group.columns.size() > 1)
 					throw new UnsupportedOperationException("Multiple columns not supported yet");
 
@@ -100,7 +100,7 @@ final class TripByGroupAnalysis {
 		}
 	}
 
-	void writeModeShare(Table trips, List<String> dists, List<String> modeOrder, Function<String, Path> output) {
+	void writeModeShare(Table filteredForPersons, List<String> dists, List<String> modeOrder, Function<String, Path> output) {
 
 		for (Group group : groups) {
 
@@ -109,7 +109,7 @@ final class TripByGroupAnalysis {
 
 			String[] join = columns.toArray(new String[0]);
 
-			Table aggr = trips.summarize("trip_id", count).by(join);
+			Table aggr = filteredForPersons.summarize("trip_id", count).by(join);
 
 			int idx = aggr.columnCount() - 1;
 			DoubleColumn share = aggr.numberColumn(idx).divide(aggr.numberColumn(idx).sum()).setName("sim_share");
@@ -120,7 +120,7 @@ final class TripByGroupAnalysis {
 			aggr = aggr.sortOn(cmp.thenComparingInt(row -> modeOrder.indexOf(row.getString("main_mode"))));
 
 			// Norm each group to 1
-			String norm = group.columns.get(0);
+			String norm = group.columns.getFirst();
 			if (group.columns.size() > 1)
 				throw new UnsupportedOperationException("Multiple columns not supported yet");
 

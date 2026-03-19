@@ -1,23 +1,35 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.analysis.LogFileAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Dashboard with general overview.
  */
 public class OverviewDashboard implements Dashboard {
+
+	private final Set<String> modes;
+
+	public OverviewDashboard() {
+		this(Set.of(TransportMode.car));
+	}
+
+	public OverviewDashboard(Set<String> modes) {
+		this.modes = modes;
+	}
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
+
+		String[] argsForTrafficAnalysis = new String[]{"--transport-modes", String.join(",", this.modes)};
 
 		header.title = "Overview";
 		header.description = "General overview of the MATSim run.";
@@ -30,13 +42,14 @@ public class OverviewDashboard implements Dashboard {
 		}).el(MapPlot.class, (viz, data) -> {
 
 			viz.title = "Simulated traffic volume";
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("Volume for the modes " + modes + ".", data, true);
 			viz.center = data.context().getCenter();
 			viz.zoom = data.context().getMapZoomLevel();
 			viz.height = 7.5;
 			viz.width = 2.0;
 
 			viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "linkId");
-			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv"));
+			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv", argsForTrafficAnalysis));
 
 			viz.display.lineColor.dataset = "traffic";
 			viz.display.lineColor.columnName = "simulated_traffic_volume";
@@ -64,7 +77,7 @@ public class OverviewDashboard implements Dashboard {
 
 		}).el(PieChart.class, (viz, data) -> {
 			viz.title = "Mode Share";
-			viz.description = "at final Iteration";
+			viz.description = "at final Iteration; result of the complete population and without filtering by area or person attributes";
 			viz.dataset = data.output("(*.)?modestats.csv");
 			viz.ignoreColumns = List.of("iteration");
 			viz.useLastRow = true;
@@ -75,7 +88,7 @@ public class OverviewDashboard implements Dashboard {
 
 			viz.title = "Score";
 			viz.dataset = data.output("(*.)?scorestats.csv");
-			viz.description = "per Iteration";
+			viz.description = "per Iteration; result of the complete population and without filtering by area or person attributes";
 			viz.x = "iteration";
 			viz.columns = List.of("avg_executed", "avg_worst", "avg_best");
 			viz.xAxisName = "Iteration";
@@ -86,7 +99,7 @@ public class OverviewDashboard implements Dashboard {
 		layout.row("third")
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Mode Share Progression";
-				viz.description = "per Iteration";
+				viz.description = "per Iteration; result of the complete population and without filtering by area or person attributes";
 				viz.dataset = data.output("(*.)?modestats.csv");
 				viz.x = "iteration";
 				viz.xAxisName = "Iteration";

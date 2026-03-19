@@ -253,7 +253,7 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 		stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 		stratSets.setWeight(1.);
 		config.replanning().addStrategySettings(stratSets);
-			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 		config.controller().setLastIteration(lastMATSimIteration);
 		config.global().setCoordinateSystem(coordinateSystem);

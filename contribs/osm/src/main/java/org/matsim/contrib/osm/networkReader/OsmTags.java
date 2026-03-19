@@ -57,7 +57,10 @@ public class OsmTags {
 	public static final String ELECTRIFIED = "electrified";
 	public static final String VOLTAGE = "voltage";
 	public static final String ETCS = "etcs";
+	public static final String RAILWAY_TRACK_CLASS = "railway:track_class"; // apparently track_class is only used for railways
+	public static final String RAILWAY_TRAFFIC_MODE = "railway:traffic_mode"; // apparently traffic_mode is only used for railways
 	public static final String OPERATOR = "operator";
 
+	public static final String PROPOSED = "proposed:"; // used as a prefix, e.g. proposed:voltage
 
 }
