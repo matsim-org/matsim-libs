@@ -2,6 +2,7 @@ package org.matsim.dsim.simulation;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -9,23 +10,19 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
-import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class DistributedTeleportationEngine implements DistributedDepartureHandler, DistributedMobsimEngine, TeleportationEngine {
 
 	private final EventsManager em;
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
-	private final SimStepMessaging simStepMessaging;
+	private final PartitionTransfer partitionTransfer;
 	private final AgentSourcesContainer asc;
 	private final BackpackDataCollector bdc;
 
@@ -39,11 +36,11 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	}
 
 	@Inject
-	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, AgentSourcesContainer asc,
+	DistributedTeleportationEngine(EventsManager em, PartitionTransfer partitionTransfer, AgentSourcesContainer asc,
 								   BackpackDataCollector bdc) {
-		this.simStepMessaging = simStepMessaging;
-		this.em = em;
+		this.partitionTransfer = partitionTransfer;
 		this.asc = asc;
+		this.em = em;
 		this.bdc = bdc;
 	}
 
@@ -69,29 +66,36 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		var travelTime = person.getExpectedTravelTime().seconds();
 		var exitTime = now + travelTime;
 
-		if (simStepMessaging.isLocal(person.getDestinationLinkId())) {
+		if (partitionTransfer.isLocal(person.getDestinationLinkId())) {
 			personsTeleporting.add(new TeleportationEntry(person, exitTime));
 		} else {
+			// TODO: replace with general mechanism for notifying person is leaving
 			bdc.teleportedPersonLeavesPartition(person);
-			simStepMessaging.collectTeleportation(person, exitTime);
+			partitionTransfer.collect(new TeleportationMessage(person.getClass(), person.toMessage(), exitTime), person.getDestinationLinkId());
 		}
 
 		return true;
 	}
 
 	@Override
-	public void process(SimStepMessage stepMessage, double now) {
-		for (var teleportation : stepMessage.teleportations()) {
-			var exitTime = teleportation.exitTime();
-			if (exitTime < now) {
-				throw new IllegalStateException("Teleportation message was received too late. Exit time is supposed to be" +
-					exitTime + " but simulation time is already at: " + now + ". This might happen, if partitions " +
-					"diverge in simulation time. We don't really have a solution to this problem yet. However, this" +
-					" error might be an indicator, that the speed of the teleported leg is too fast.");
-			}
+	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
+		return Map.of(
+			TeleportationMessage.class,
+			this::processTeleportationMessages
+		);
+	}
 
-			DistributedMobsimAgent agent = asc.agentFromMessage(teleportation.type(), teleportation.agent());
-			personsTeleporting.add(new TeleportationEntry(agent, exitTime));
+	private void processTeleportationMessages(List<Message> messages, double now) {
+		for (var m : messages) {
+			var msg = (TeleportationMessage) m;
+			if (msg.exitTime() < now) {
+				throw new IllegalStateException("Teleportation message was received too late. Exit time is supposed to be " +
+					msg.exitTime() + " but simulation time is already at: " + now + ". This might happen, if partitions " +
+					"diverge in simulation time. We don't really have a solution to this problem yet. However, this " +
+					"error might be an indicator, that the speed of the teleported leg is too fast.");
+			}
+			var agent = asc.agentFromMessage(msg.type(), msg.agent());
+			personsTeleporting.add(new TeleportationEntry(agent, msg.exitTime()));
 		}
 	}
 
@@ -138,4 +142,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 	private record TeleportationEntry(DistributedMobsimAgent person, double exitTime) {
 	}
+
+	// intentionally public, so that the SerializationProvider can pick up this class
+	public record TeleportationMessage(Class<? extends DistributedMobsimAgent> type, Message agent, double exitTime) implements Message {}
 }

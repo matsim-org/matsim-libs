@@ -2,16 +2,21 @@ package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.dsim.*;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
+import org.matsim.dsim.simulation.VehicleContainer;
+
+import java.util.Map;
 
 public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
@@ -79,14 +84,13 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Override
-	public void process(SimStepMessage stepMessage, double now) {
-		for (VehicleContainer vehicleMessage : stepMessage.vehicles()) {
-			processVehicleMessage(vehicleMessage, now);
-		}
-
-		for (CapacityUpdate updateMessage : stepMessage.capUpdates()) {
-			processUpdateMessage(updateMessage);
-		}
+	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
+		return Map.of(
+			VehicleContainer.class,
+			(msgs, now) -> msgs.forEach(m -> processVehicleMessage((VehicleContainer) m, now)),
+			CapacityUpdate.class,
+			(msgs, now) -> msgs.forEach(m -> processUpdateMessage((CapacityUpdate) m))
+		);
 	}
 
 	private void processVehicleMessage(VehicleContainer vehicleContainer, double now) {

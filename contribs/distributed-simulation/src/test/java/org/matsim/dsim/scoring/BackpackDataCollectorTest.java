@@ -13,8 +13,6 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.dsim.SimStepMessage;
-import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.PersonEntersPtVehicleEvent;
 import org.matsim.core.mobsim.qsim.pt.PersonLeavesPtVehicleEvent;
@@ -26,7 +24,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
-import org.matsim.dsim.simulation.SimStepMessaging;
+import org.matsim.dsim.simulation.PartitionTransfer;
+import org.matsim.dsim.simulation.VehicleContainer;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -57,7 +56,7 @@ class BackpackDataCollectorTest {
 		var distAggent = mock(DistributedMobsimAgent.class);
 		when(distAggent.getId()).thenReturn(pId);
 
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1001, 0));
@@ -132,7 +131,7 @@ class BackpackDataCollectorTest {
 		var distAggent = mock(DistributedMobsimAgent.class);
 		when(distAggent.getId()).thenReturn(pId);
 
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1001, 0));
@@ -159,12 +158,13 @@ class BackpackDataCollectorTest {
 
 		// capture the backpack that was passed to messaging.
 		var backPackCaptor = ArgumentCaptor.forClass(Backpack.Msg.class);
-		verify(messaging, times(1)).collectBackPack(backPackCaptor.capture(), anyInt());
+		verify(messaging, times(1)).collect(backPackCaptor.capture(), anyInt());
 		var backpack = backPackCaptor.getValue();
 
-		// create a message from the backpack and pass it back to the collector.
-		var msg = SimStepMessage.builder().addBackPack(backpack).build();
-		collector.process(msg);
+		// pass the backpack back to the collector via its message handler.
+		collector.getMessageHandlers()
+			.get(Backpack.Msg.class)
+			.handle(List.of(backpack), 0);
 
 		// now, process the remaining events.
 		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
@@ -227,7 +227,7 @@ class BackpackDataCollectorTest {
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.pt, new BackpackTransitRouteProvider(network, schedule));
 
-		var collector = new BackpackDataCollector(mock(SimStepMessaging.class), network, pop, mock(AgentSourcesContainer.class), fbc, providers);
+		var collector = new BackpackDataCollector(mock(PartitionTransfer.class), network, pop, mock(AgentSourcesContainer.class), fbc, providers);
 
 		collector.registerAgent(distAgent);
 
@@ -286,7 +286,7 @@ class BackpackDataCollectorTest {
 		var distAggent = mock(DistributedMobsimAgent.class);
 		when(distAggent.getId()).thenReturn(pId);
 
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
@@ -369,7 +369,7 @@ class BackpackDataCollectorTest {
 		when(distAgent1.getId()).thenReturn(pId1);
 		when(distAgent2.getId()).thenReturn(pId2);
 
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
@@ -460,7 +460,7 @@ class BackpackDataCollectorTest {
 		pop.addPerson(pop.getFactory().createPerson(pId));
 		var link1 = Id.createLinkId("l1");
 
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
@@ -505,7 +505,7 @@ class BackpackDataCollectorTest {
 		pop.addPerson(pop.getFactory().createPerson(registeredAgent.getId()));
 
 		var link1 = Id.createLinkId("l1");
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
@@ -544,7 +544,7 @@ class BackpackDataCollectorTest {
 		pop.addPerson(pop.getFactory().createPerson(registeredAgent.getId()));
 
 		var link1 = Id.createLinkId("l1");
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
@@ -564,11 +564,12 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
 
-		var msg = SimStepMessage.builder()
-			.addBackPack(new Backpack.Msg(registered, List.of(), 0, new BackpackPlan.Msg(null, null, null)))
-			.addVehicleContainer(new VehicleContainer(null, null, new VehicleContainer.Occupant(ignoredAgent), List.of()))
-			.build();
-		collector.process(msg);
+		collector.getMessageHandlers()
+			.get(Backpack.Msg.class)
+			.handle(List.of(new Backpack.Msg(registered, List.of(), 0, new BackpackPlan.Msg(null, null, null))), 0);
+		collector.getMessageHandlers()
+			.get(VehicleContainer.class)
+			.handle(List.of(new VehicleContainer(null, null, new VehicleContainer.Occupant(ignoredAgent), List.of())), 0);
 
 		// make sure the collector doesn't crash when we send it events with the ignored agent.
 		collector.handleEvent(new ActivityEndEvent(100., ignored, link1, null, "home", new Coord(0, 0)));

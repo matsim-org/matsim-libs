@@ -7,8 +7,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.dsim.SimStepMessage;
-import org.matsim.core.mobsim.dsim.Teleportation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -20,6 +18,8 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -53,10 +53,9 @@ class DistributedTeleportationEngineTest {
 
 		var em = mock(EventsManager.class);
 		var simPerson = createPerson("some", em);
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		when(messaging.isLocal(any())).thenReturn(true);
-		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class),
-			mock(BackpackDataCollector.class));
+		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class), mock(BackpackDataCollector.class));
 		var internalInterface = mock(InternalInterface.class);
 		engine.setInternalInterface(internalInterface);
 
@@ -84,11 +83,10 @@ class DistributedTeleportationEngineTest {
 		var leg2 = (Leg) agent2.getCurrentPlan().getPlanElements().getFirst();
 		leg2.setTravelTime(31);
 
-		var messaging = Mockito.mock(SimStepMessaging.class);
+		var messaging = Mockito.mock(PartitionTransfer.class);
 		when(messaging.isLocal(any())).thenReturn(true);
 		var internalInterface = mock(InternalInterface.class);
-		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class),
-			mock(BackpackDataCollector.class));
+		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class), mock(BackpackDataCollector.class));
 		engine.setInternalInterface(internalInterface);
 
 		engine.handleDeparture(10, agent1, agent1.getCurrentLinkId());
@@ -110,13 +108,21 @@ class DistributedTeleportationEngineTest {
 	public void sendPersonWithSplitLeg() {
 		var em = mock(EventsManager.class);
 		var agent = createPerson("some", em);
-		var messaging = Mockito.mock(SimStepMessaging.class);
+		var messaging = Mockito.mock(PartitionTransfer.class);
 		when(messaging.isLocal(any())).thenReturn(false);
-		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class),
-			mock(BackpackDataCollector.class));
+		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class), mock(BackpackDataCollector.class));
+
+		var msgTypes = engine.getMessageHandlers().keySet();
+		assertEquals(1, msgTypes.size());
+		assertEquals(DistributedTeleportationEngine.TeleportationMessage.class.getName(), msgTypes.iterator().next().getName());
 
 		engine.handleDeparture(11, agent, agent.getCurrentLinkId());
-		verify(messaging).collectTeleportation(eq(agent), eq(11 + 42.));
+
+		var captor = ArgumentCaptor.forClass(DistributedTeleportationEngine.TeleportationMessage.class);
+		verify(messaging).collect(captor.capture(), eq(agent.getDestinationLinkId()));
+		var teleportation = captor.getValue();
+		assertEquals(agent.getClass(), teleportation.type());
+		assertEquals(11 + 42., teleportation.exitTime(), 1e-6);
 	}
 
 	@Test
@@ -124,7 +130,7 @@ class DistributedTeleportationEngineTest {
 
 		var em = mock(EventsManager.class);
 		var agent = createPerson("some", em);
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		when(messaging.isLocal(any())).thenReturn(true);
 		var asc = mock(AgentSourcesContainer.class);
 		when(asc.agentFromMessage(any(), any())).thenReturn(agent);
@@ -132,13 +138,9 @@ class DistributedTeleportationEngineTest {
 
 		engine.setInternalInterface(mock(InternalInterface.class));
 
-		SimStepMessage message = SimStepMessage.builder()
-			.addTeleportation(new Teleportation(
-				agent.getClass(), agent.toMessage(), 42
-			))
-			.build();
-
-		engine.process(message, 20);
+		var msg = new DistributedTeleportationEngine.TeleportationMessage(agent.getClass(), agent.toMessage(), 42);
+		var handler = engine.getMessageHandlers().get(DistributedTeleportationEngine.TeleportationMessage.class);
+		handler.handle(List.of(msg), 20);
 
 		for (var i = 20; i < 100; i++) {
 			engine.doSimStep(i);
@@ -154,18 +156,14 @@ class DistributedTeleportationEngineTest {
 	void receivePersonTooLate() {
 		var em = mock(EventsManager.class);
 		var agent = createPerson("some", em);
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		when(messaging.isLocal(any())).thenReturn(true);
-		var asc = mock(AgentSourcesContainer.class);
-		when(asc.agentFromMessage(any(), any())).thenReturn(agent);
-		var engine = new DistributedTeleportationEngine(em, messaging, asc, mock(BackpackDataCollector.class));
-		var message = SimStepMessage.builder()
-			.addTeleportation(new Teleportation(
-				agent.getClass(), agent.toMessage(), 42
-			))
-			.build();
+		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class), mock(BackpackDataCollector.class));
 
-		assertThrows(IllegalStateException.class, () -> engine.process(message, 100));
+		var msg = new DistributedTeleportationEngine.TeleportationMessage(agent.getClass(), agent.toMessage(), 42);
+		var handler = engine.getMessageHandlers().get(DistributedTeleportationEngine.TeleportationMessage.class);
+
+		assertThrows(IllegalStateException.class, () -> handler.handle(List.of(msg), 100));
 	}
 
 	@Test
@@ -174,11 +172,9 @@ class DistributedTeleportationEngineTest {
 		var expectedStuckTime = 43;
 		var em = mock(EventsManager.class);
 		var agent = createPerson("some", em);
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		when(messaging.isLocal(any())).thenReturn(true);
-		var asc = mock(AgentSourcesContainer.class);
-		when(asc.agentFromMessage(any(), any())).thenReturn(agent);
-		var engine = new DistributedTeleportationEngine(em, messaging, asc, mock(BackpackDataCollector.class));
+		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class), mock(BackpackDataCollector.class));
 
 		engine.handleDeparture(10, agent, agent.getCurrentLinkId());
 		engine.doSimStep(expectedStuckTime);

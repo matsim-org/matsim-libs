@@ -26,7 +26,7 @@ import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
-import org.matsim.dsim.simulation.SimStepMessaging;
+import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.dsim.simulation.SimpleVehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -50,9 +50,10 @@ class NetworkTrafficEngineTest {
 		var timeInterpretation = TimeInterpretation.create(scenario.getConfig());
 		var wait2link = new DefaultWait2Link(eventsManager);
 		var activeNodes = new ActiveNodes(eventsManager);
-		var activeLinks = new ActiveLinks(mock(SimStepMessaging.class));
+		var activeLinks = new ActiveLinks();
+		var partitionTransfer = mock(PartitionTransfer.class);
 		var parkedVehicles = new MassConservingParking();
-		var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes);
+		var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes, partitionTransfer);
 		var config = new DSimConfigGroup();
 		var asc = mock(AgentSourcesContainer.class);
 		var networkDepartureHandler = new NetworkTrafficDepartureHandler(simNetwork, config, parkedVehicles, wait2link, eventsManager);

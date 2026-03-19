@@ -3,6 +3,7 @@ package org.matsim.dsim.scoring;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
@@ -12,18 +13,16 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine.MessageHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.dsim.SimStepMessage;
-import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.dsim.NetworkDecomposition;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
-import org.matsim.dsim.simulation.SimStepMessaging;
+import org.matsim.dsim.simulation.PartitionTransfer;
+import org.matsim.dsim.simulation.VehicleContainer;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Event handler to collect data relevant for an agents backpack. At the moment, this includes data for experienced plans
@@ -45,7 +44,8 @@ public class BackpackDataCollector implements BasicEventHandler {
 	private final Map<Id<Vehicle>, Set<Backpack>> backpackByVehicle = new HashMap<>();
 	private final Set<Id<Person>> ignoredAgents = new HashSet<>();
 
-	private final SimStepMessaging simStepMessaging;
+	//private final SimStepMessaging simStepMessaging;
+	private final PartitionTransfer partitionTransfer;
 	private final Network network;
 	private final Population population;
 
@@ -54,9 +54,10 @@ public class BackpackDataCollector implements BasicEventHandler {
 	private final Map<String, BackpackRouteProvider> providers;
 
 	@Inject
-	BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population,
+	BackpackDataCollector(PartitionTransfer partitionTransfer, Network network, Population population,
 						  AgentSourcesContainer asc, FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
-		this.simStepMessaging = simStepMessaging;
+		this.partitionTransfer = partitionTransfer;
+		//this.simStepMessaging = simStepMessaging;
 		this.network = network;
 		this.population = population;
 		this.asc = asc;
@@ -78,9 +79,16 @@ public class BackpackDataCollector implements BasicEventHandler {
 		}
 	}
 
-	public void process(SimStepMessage msg) {
+	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
+		return Map.of(
+			Backpack.Msg.class, this::processBackpackMessages,
+			VehicleContainer.class, this::processVehicleMessages
+		);
+	}
 
-		for (var backpackMsg : msg.backpacks()) {
+	private void processBackpackMessages(List<Message> messages, double now) {
+		for (var m : messages) {
+			var backpackMsg = (Backpack.Msg) m;
 			var backpack = new Backpack(backpackMsg, providers);
 			this.backpackByPerson.put(backpack.personId(), backpack);
 			if (backpack.isInVehicle()) {
@@ -89,28 +97,31 @@ public class BackpackDataCollector implements BasicEventHandler {
 					.add(backpack);
 			}
 		}
+	}
 
+	private void processVehicleMessages(List<Message> messages, double now) {
 		// we tap into the vehicle messages to get the state of the transit vehicle. In particular, we need to connect the driver id
 		// with the line and route information. This information is needed to recreate TransitPassengerRoutes.
 		// It is a little dirty to do this, as the vehicle messages are kinda private to the NetworkTrafficEngine and we are creating
 		// transit vehicles and drivers from the message in two places.
 		// The alternative would have been to introduce new events for passengers entering and leaving pt and we decided not to do this
 		// janek, marcel Dec' 2025
-		for (VehicleContainer vehicle : msg.vehicles()) {
-			var veh = asc.vehicleFromContainer(vehicle);
-
-			// if the driver does not bring a backpack, we can ignore it.
+		for (var m : messages) {
+			var veh = asc.vehicleFromContainer((VehicleContainer) m);
+			// Transit drivers are not part of the population and do not carry backpacks.
+			// Using population membership (not backpack presence) avoids a race condition where
+			// the backpack message for a population agent may arrive in a different order than the vehicle message.
 			var driverId = veh.getDriver().getId();
-			if (!backpackByPerson.containsKey(driverId)) {
+			if (!population.getPersons().containsKey(driverId)) {
 				ignoredAgents.add(driverId);
 			}
 		}
-
 	}
 
 	public void vehicleLeavesPartition(DistributedMobsimVehicle vehicle) {
 		var driverId = vehicle.getDriver().getId();
-		var targetPart = network.getPartitioning().getPartition(vehicle.getCurrentLinkId());
+		var link = network.getLinks().get(vehicle.getCurrentLinkId());
+		var targetPart = (int) link.getToNode().getAttributes().getAttribute(NetworkDecomposition.PARTITION_ATTR_KEY);
 
 		if (!ignoredAgents.contains(driverId)) {
 			personLeavingPartition(driverId, targetPart);
@@ -164,8 +175,8 @@ public class BackpackDataCollector implements BasicEventHandler {
 				backpackByVehicle.remove(backpack.currentVehicle());
 			}
 		}
-		var msg = backpack.toMessage();
-		simStepMessaging.collectBackPack(msg, toPart);
+		var message = backpack.toMessage();
+		partitionTransfer.collect(message, toPart);
 	}
 
 	@Override

@@ -65,7 +65,7 @@ public final class SingleNodeAsyncEventHandlerTask extends EventHandlerTask {
 	}
 
 	@Override
-	public IntSet waitForOtherRanks(double time) {
+	public IntSet waitForOtherParts(double time) {
 		return LP.NO_NEIGHBORS;
 	}
 
