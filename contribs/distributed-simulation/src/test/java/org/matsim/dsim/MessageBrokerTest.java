@@ -52,7 +52,7 @@ public class MessageBrokerTest {
 	@Test
 	void waitForRank() throws IOException {
 		var comm = mockComm(0);
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 
 		// register rank to wait for
 		var waitForRank = 1;
@@ -70,7 +70,7 @@ public class MessageBrokerTest {
 	@Test
 	void dontWaitForOwnRank() {
 		var comm = mockComm(0);
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 
 		broker.syncFromRank(broker.getRank());
 		assertFalse(broker.expectsMoreMessages());
@@ -79,7 +79,7 @@ public class MessageBrokerTest {
 	@Test
 	void sendEmptyMessageToOtherRank() {
 		var comm = mockComm(0);
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 
 		broker.beforeSimStep(0);
 		broker.syncToRank(1);
@@ -91,7 +91,7 @@ public class MessageBrokerTest {
 	@Test
 	void sendOneEmptyMessageToRemotePart() {
 		var comm = mockComm(0);
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 
 		broker.beforeSimStep(0);
 		// add both partitions of the 'otherRank'
@@ -107,7 +107,7 @@ public class MessageBrokerTest {
 	@Test
 	void sendNoEmptyMessageToOwnRank() {
 		var comm = mockComm(0);
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 
 		broker.beforeSimStep(0);
 		broker.syncToPart(TOPOLOGY.getNodeByIndex(broker.getRank()).getParts().getFirst());
@@ -141,7 +141,7 @@ public class MessageBrokerTest {
 		var waitParts = new IntArraySet(TOPOLOGY.getNodeByIndex(otherRank).getParts());
 		when(task.waitForOtherParts(anyDouble())).thenReturn(waitParts);
 
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 		broker.register(task, 0);
 		broker.beforeSimStep(time);
 		broker.syncFromRank(otherRank);
@@ -177,7 +177,7 @@ public class MessageBrokerTest {
 			return null;
 		}).when(comm).recv(any(), any());
 
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 		var receiverTask = mock(LPTask.class);
 		when(receiverTask.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
 		var waitParts = new IntArraySet(TOPOLOGY.getNodeByIndex(otherRank).getParts());
@@ -199,7 +199,7 @@ public class MessageBrokerTest {
 	@Test
 	void sendMultipleRanks() throws Exception {
 		var comm = mockComm(0);
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 
 		var receiverTask = mock(LPTask.class);
 		when(receiverTask.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
@@ -265,7 +265,7 @@ public class MessageBrokerTest {
 			return null;
 		}).when(comm).recv(any(), any());
 
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 		var supportedMessages = IntSet.of(msgFromRank1.getType(), msgFromRank2.getType());
 		var waitForParts = IntSet.of(2, 3, 4, 5);
 
@@ -303,7 +303,7 @@ public class MessageBrokerTest {
 	@Test
 	public void sendBroadcast() throws IOException {
 		var comm = mockComm(0);
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 
 		var msgA = new MessageA("broadcast payload");
 		broker.beforeSimStep(0);
@@ -352,7 +352,7 @@ public class MessageBrokerTest {
 		when(task1.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
 		when(task1.waitForOtherParts(anyDouble())).thenReturn(LP.ALL_PARTS_BROADCAST);
 
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 		broker.register(task0, 0);
 		broker.register(task1, 1);
 		broker.beforeSimStep(0);
@@ -379,7 +379,7 @@ public class MessageBrokerTest {
 	@Test
 	public void sendBroadcastMessageAndEmptyMessage() {
 		var comm = mockComm(0);
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 
 		var msgA = new MessageA("broadcast with empty");
 		broker.beforeSimStep(0);
@@ -440,7 +440,7 @@ public class MessageBrokerTest {
 		// wait for partition 4 on rank 2
 		when(task1.waitForOtherParts(anyDouble())).thenReturn(IntSet.of(4));
 
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 		broker.register(task0, 0);
 		broker.register(task1, 1);
 		broker.beforeSimStep(0);
@@ -503,7 +503,7 @@ public class MessageBrokerTest {
 		when(task0.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
 		when(task0.waitForOtherParts(anyDouble())).thenReturn(IntSet.of(2));
 
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 		broker.register(task0, 0);
 
 		broker.beforeSimStep(time);
@@ -559,7 +559,7 @@ public class MessageBrokerTest {
 		when(task0.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
 		when(task0.waitForOtherParts(anyDouble())).thenReturn(IntSet.of(2));
 
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 		broker.register(task0, 0);
 
 		broker.beforeSimStep(time);
@@ -598,7 +598,7 @@ public class MessageBrokerTest {
 			return null;
 		}).when(comm).recv(any(), any());
 
-		var broker = new MessageBroker(comm, TOPOLOGY);
+		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 		broker.beforeSimStep(time);
 		broker.syncFromRank(syncRank);
 		broker.syncTimestep(time, false);

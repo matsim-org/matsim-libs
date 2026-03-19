@@ -63,6 +63,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 */
 	private final Communicator comm;
 	private final Topology topology;
+	private final SerializationProvider serialization;
 
 	/**
 	 * For all partitions, the outgoing rank is stored.
@@ -70,14 +71,10 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	private final int[] addresses;
 
 	/**
-	 * Outgoing data for the broadcast channel + all other nodes.
+	 * We store outgoing messages as plain bytes backed by a MemorySegment. This contains one buffer for each other rank, plus
+	 * one buffer (0th) for broadcast messages.
 	 */
-	private final MemorySegment[] outgoing;
-
-	/**
-	 * Length of the outgoing data.
-	 */
-	private final AtomicInteger[] dataSize;
+	private final MessageBuffer[] outgoing;
 
 	/**
 	 * All local tasks.
@@ -110,11 +107,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	private final IntSet ownParts;
 
 	/**
-	 * Serialization provider.
-	 */
-	private final SerializationProvider serialization = new SerializationProvider();
-
-	/**
 	 * Store events that have been received. These will be accessed and cleared by the {@link EventsManager}.
 	 */
 	private final List<Event> events = new ArrayList<>();
@@ -139,9 +131,10 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	private volatile int seq = 0;
 
 	@Inject
-	public MessageBroker(Communicator comm, Topology topology) {
+	public MessageBroker(Communicator comm, Topology topology, SerializationProvider serialization) {
 		this.comm = comm;
 		this.topology = topology;
+		this.serialization = serialization;
 
 		this.addresses = new int[topology.getTotalPartitions()];
 		for (int i = 0; i < topology.getNodesCount(); i++) {
@@ -151,13 +144,14 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			}
 		}
 
-		this.outgoing = new MemorySegment[topology.getNodesCount() + 1];
-		this.dataSize = new AtomicInteger[topology.getNodesCount() + 1];
+		// reserve some memory for each other rank and one for broadcast messages.
+		this.outgoing = new MessageBuffer[topology.getNodesCount() + 1];
 		for (int i = 0; i < outgoing.length; i++) {
 			String bufferSize = System.getenv("MSG_BUFFER_SIZE");
-			outgoing[i] = Arena.ofAuto().allocate(bufferSize != null ? Integer.parseInt(bufferSize) : 32 * 1024 * 1024,
-				BitUtil.CACHE_LINE_LENGTH);
-			dataSize[i] = new AtomicInteger(0);
+			var segmentSize = bufferSize != null ? Integer.parseInt(bufferSize) : 32 * 1024 * 1024;
+			var segment = Arena.ofAuto().allocate(segmentSize, BitUtil.CACHE_LINE_LENGTH);
+			// sender is always our rank. Receiver is i -1, as we reserve the 0th slot for broadcasts.
+			outgoing[i] = new MessageBuffer(getRank(), i - 1, serialization, segment);
 		}
 
 		this.ownParts = new IntOpenHashSet(topology.getNodeByIndex(comm.getRank()).getParts());
@@ -368,62 +362,9 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 		log.trace("#{} at t:{} queue send to {}/{}: {}", this.getRank(), timeFrom(seq), toRank, toPartition, message);
 
-		writeHeader(toRank);
-		writeMessage(toRank, toPartition, message);
-	}
-
-	/**
-	 * Writes header bytes to the outBuffer of 'toRank'. The header is only written if no header is present yet.
-	 */
-	private void writeHeader(int toRank) {
-		// we only want to write a header if the outBuffer for 'toRank' is empty
-		var outBufPosition = dataSize[toRank + 1];
-		if (outBufPosition.get() == 0) {
-			// we allocate the bytes once, and then we do a cas loop in case another thread also tries to add a header.
-			// This is done by atomically updating the buffer position to after the header. If we succeed, the next
-			// thread will write its bytes after the header. We can safely operate on the buffer between 0 and header.position
-			// in the meantime.
-			var headerBuffer = headerFor(seq, getRank(), toRank);
-			while (true) {
-				if (outBufPosition.compareAndSet(0, headerBuffer.limit())) {
-					var outBuffer = outgoing[toRank + 1].asByteBuffer();
-					headerBuffer.flip();
-					outBuffer.put(headerBuffer);
-					break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Writes message bytes to the outBuffer of 'toRank'. {@link #writeHeader(int)} must have been called before. To ensure that the message
-	 * can be read on the receiver side.
-	 */
-	private void writeMessage(int toRank, int toPartition, Message message) {
-
-		// allocate the message bytes once
-		var messageBuf = serialize(toPartition, message, this.serialization);
-		var messageBufSize = messageBuf.limit();
-		var outBufPosition = dataSize[toRank + 1];
-
-		while (true) {
-			var currentOutBufPosition = outBufPosition.get();
-			var finishedOutBufPosition = currentOutBufPosition + messageBufSize;
-
-			if (currentOutBufPosition + messageBufSize > outgoing[toRank + 1].byteSize()) {
-				throw new IllegalStateException("Outgoing buffer is full. Increase buffer size or reduce message size.");
-			}
-
-			// reserve a part in the out buffer by atomically setting the data size property for this buffer to the position of the
-			// buffer that points 'behind' the data we are about to write.
-			// if another thread has updated the dataSize in the meantime, we'll do another round in the while loop.
-			if (outBufPosition.compareAndSet(currentOutBufPosition, finishedOutBufPosition)) {
-				var outBuffer = outgoing[toRank + 1].asByteBuffer();
-				messageBuf.flip();
-				outBuffer.put(currentOutBufPosition, messageBuf, 0, messageBufSize);
-				break;
-			}
-		}
+		// 0th slot is for broadcasts
+		var buffer = outgoing[toRank + 1];
+		buffer.add(message, seq, toPartition);
 	}
 
 	private void determineWaitFor(double now, boolean last) {
@@ -457,8 +398,10 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		sendToRanks.forEach(rank -> {
 			// No need to send a heartbeat to ourselves; waitFor already removes own partitions.
 			if (rank == comm.getRank()) return;
-			int length = dataSize[rank + 1].get();
-			if (length == 0) {
+
+			// 0th slot is for broadcasts
+			var buffer = outgoing[rank + 1];
+			if (buffer.isEmpty()) {
 				queueSend(EmptyMessage.INSTANCE, rank, ANY_PARTITION);
 			}
 		});
@@ -466,14 +409,13 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	}
 
 	private void sendOutBuffers() {
-		for (int i = 0; i < outgoing.length; i++) {
-			int length = dataSize[i].get();
-			if (length > 0) {
-				int receiver = i - 1;
-				sizes.recordValue(length);
-				comm.send(receiver, outgoing[i], 0, length);
-				dataSize[i].set(0);
-			}
+
+		for (var buffer : outgoing) {
+			if (buffer.isEmpty()) continue;
+
+			sizes.recordValue(buffer.size());
+			comm.send(buffer.toReceiver(), buffer.segment(), 0, buffer.size());
+			buffer.clear();
 		}
 	}
 
@@ -648,10 +590,106 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		return buf;
 	}
 
+	private static class MessageBuffer {
+
+		// this is our rank
+		private final int fromSender;
+		// this is the rank the messages are supposed to go to.
+		private final int toReceiver;
+		private final SerializationProvider serialization;
+
+		private final MemorySegment segment;
+		private final AtomicInteger size = new AtomicInteger(0);
+
+		private MessageBuffer(int fromSender, int toReceiver, SerializationProvider serialization, MemorySegment segment) {
+			this.fromSender = fromSender;
+			this.toReceiver = toReceiver;
+			this.serialization = serialization;
+			this.segment = segment;
+		}
+
+		boolean isEmpty() {
+			return size.get() == 0;
+		}
+
+		void clear() {
+			size.set(0);
+		}
+
+		int toReceiver() {
+			return toReceiver;
+		}
+
+		int size() {
+			return size.get();
+		}
+
+		MemorySegment segment() {
+			return segment;
+		}
+
+		/**
+		 * The outfacing api to add messages to this buffer.
+		 */
+		void add(Message message, int seq, int toPartition) {
+			writeHeader(seq);
+			writeMessage(toPartition, message);
+		}
+
+		/**
+		 * Writes header bytes to the outBuffer of 'toRank'. The header is only written if no header is present yet.
+		 * DON'T call it from outside the buffer. Use {@link #add(Message, int, int) instead.}
+		 */
+		private void writeHeader(int seq) {
+			// we only want to write a header if the outBuffer for 'toRank' is empty
+			if (size.get() != 0) return;
+
+			// we allocate the bytes once, and then we do a cas loop in case another thread also tries to add a header.
+			// This is done by atomically updating the buffer position to after the header. If we succeed, the next
+			// thread will write its bytes after the header. We can safely operate on the buffer between 0 and header.position
+			// in the meantime.
+			var headerBuffer = headerFor(seq, fromSender, toReceiver);
+			while (true) {
+				if (size.compareAndSet(0, headerBuffer.limit())) {
+					var outBuffer = segment.asByteBuffer();
+					headerBuffer.flip();
+					outBuffer.put(headerBuffer);
+					break;
+				}
+			}
+		}
+
+		/**
+		 * Writes message bytes to the memory segment of this buffer. {@link #writeHeader(int)} must have been called before.
+		 * To ensure that the messagecan be read on the receiver side.
+		 * DON'T call it from outside the buffer. Use {@link #add(Message, int, int) instead.}
+		 */
+		private void writeMessage(int toPartition, Message message) {
+			var messageBuf = serialize(toPartition, message, serialization);
+			var messageBufSize = messageBuf.limit();
+
+			while (true) {
+				var currentOutBufPosition = size.get();
+				var finishedOutBufPosition = currentOutBufPosition + messageBufSize;
+
+				if (finishedOutBufPosition > segment.byteSize()) {
+					throw new IllegalStateException("Outgoing buffer is full. Increase buffer size or reduce message size.");
+				}
+
+				if (size.compareAndSet(currentOutBufPosition, finishedOutBufPosition)) {
+					var outBuffer = segment.asByteBuffer();
+					messageBuf.flip();
+					outBuffer.put(currentOutBufPosition, messageBuf, 0, messageBufSize);
+					return;
+				}
+			}
+		}
+	}
+
 	/**
 	 * We allow multiple processes to store which rank they want to sync from and to. We use this concurrent set for this purpose.
 	 * It is backed by an AtomicLong, allowing lock-free updates. Since it is backed by a long and we have positive and negative ranks
-	 * (for broadcasts) the message broker is limited to work with at most 32 ranks. If more is needed an AtomicLongArray could be used
+	 * (for broadcasts), the message broker is limited to work with at most 32 ranks. If more is needed, an AtomicLongArray could be used
 	 * instead, which would make the number of compute nodes added to one simulation run unbounded.
 	 * <p>
 	 * Mostly generated by GPT-5.4 mini, revised by @janekdererste.
