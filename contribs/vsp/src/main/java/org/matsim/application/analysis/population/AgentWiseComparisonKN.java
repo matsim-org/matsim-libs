@@ -15,7 +15,6 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -28,12 +27,10 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import org.matsim.utils.tablesaw.TablesawUtils;
 import picocli.CommandLine;
-import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.Table;
@@ -134,8 +131,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 // 		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-routesCleaned-20260218";
 
 		// do last iteration again:
-		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
-		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
+//		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
+//		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
 
 		// iatbr glamobi:
 //		final String baseDir="/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
@@ -145,12 +142,16 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 // 		final String baseDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/output/berlin-v6.4-10pct";
 //		final String policyDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/output/berlin-v6.4-10pct";
 
+		// autofrei:
+		final String baseDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-baseCaseCtdExtended/";
+		final String policyDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-policy";
+
 		// ===
 
-//		generateExperiencedPlans( baseDir );
-//		generateExperiencedPlans( policyDir );
-//		generateFilteredEventsFile( baseDir );
-//		generateFilteredEventsFile( policyDir );
+		generateExperiencedPlans( baseDir );
+		generateExperiencedPlans( policyDir );
+		generateFilteredEventsFile( baseDir );
+		generateFilteredEventsFile( policyDir );
 		agentWiseComparison( baseDir, policyDir, shpFile );
 	}
 
@@ -231,19 +232,13 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		// ===
 
-		this.baseCaseInjector = new org.matsim.core.controler.Injector.InjectorBuilder( baseScenario )
-								.addStandardModules()
-								.addOverridingModule( new AbstractModule(){
-									@Override public void install(){
-										bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
-									}
-								} ).build();
+		this.baseCaseInjector = createInjector( baseScenario );
 
 		// ###
 
 //		Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
 		Table baseTableTrips = null;
-		Table baseTablePersons = generatePersonTableFromPopulation( this.baseCaseInjector, null );
+		Table baseTablePersons = generatePersonTableFromPopulation( baseCaseInjector, null );
 
 		baseTablePersons.addColumns( baseTablePersons.doubleColumn( MATSIM_SCORE ).subtract( baseTablePersons.doubleColumn( SCORE ) ).setName( "error" ) );
 
@@ -288,12 +283,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		// ===
 
-		this.policyInjector = new org.matsim.core.controler.Injector.InjectorBuilder( policyScenario )
-							 .addStandardModules()
-							 .addOverridingModule( new AbstractModule(){
-								 @Override public void install(){ bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class ); }
-							 } ).build();
-
+		this.policyInjector = createInjector( policyScenario );
 
 		Table personsTablePolicy = generatePersonTableFromPopulation( policyInjector, baseScenario.getPopulation() );
 
@@ -301,7 +291,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		// ############################
 		// ### compare:
 
-		compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath );
+		compare( baseCaseInjector, policyInjector, personsTablePolicy, baseTableTrips, baseTablePersons, inputPath );
 
 		return 0;
 	}
@@ -540,10 +530,13 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	}
 
 
-	void compare( Scenario policyScenario, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Scenario baseScenario, Config baseConfig, Path outputPath ){
+	void compare( Injector baseCaseInjector, Injector policyCaseInjector, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Path outputPath ){
+		Config baseConfig = baseCaseInjector.getInstance( Config.class );
+
+		Scenario policyScenario = policyCaseInjector.getInstance( Scenario.class );
 
 		if( doRoh ){
-			new AgentWiseRuleOfHalfComputation( this.baseCaseInjector, this.policyInjector ).somehowComputeRuleOfHalf();
+			new AgentWiseRuleOfHalfComputation( baseCaseInjector, this.policyInjector ).somehowComputeRuleOfHalf();
 			addRohValuesToTable( policyScenario.getPopulation(), personsTablePolicy );
 		}
 		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
@@ -637,8 +630,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			// ===
 
 			writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
-//		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
-//		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
+		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
 
 			if( doRoh ){
 				writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );

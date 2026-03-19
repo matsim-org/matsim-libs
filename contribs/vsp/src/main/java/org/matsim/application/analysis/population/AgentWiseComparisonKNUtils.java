@@ -1,5 +1,6 @@
 package org.matsim.application.analysis.population;
 
+import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +19,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
@@ -27,7 +29,9 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.geometry.GeometryUtils;
+import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
@@ -665,5 +669,16 @@ class AgentWiseComparisonKNUtils{
 		// yy findPopulationFilename might be inlined eventually.
 
 		return config;
+	}
+	static Injector createInjector( Scenario baseScenario ){
+		// (this should, apart from the scenario, be the same for base and policy case)
+
+		return new org.matsim.core.controler.Injector.InjectorBuilder( baseScenario )
+				   .addStandardModules()
+				   .addOverridingModule( new AbstractModule(){
+					   @Override public void install(){
+						   bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
+					   }
+				   } ).build();
 	}
 }
