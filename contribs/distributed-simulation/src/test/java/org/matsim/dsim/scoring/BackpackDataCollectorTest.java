@@ -163,7 +163,7 @@ class BackpackDataCollectorTest {
 
 		// pass the backpack back to the collector via its message handler.
 		collector.getMessageHandlers()
-			.get(Backpack.Msg.class.getName().hashCode())
+			.get(Backpack.Msg.class)
 			.handle(List.of(backpack), 0);
 
 		// now, process the remaining events.
@@ -565,10 +565,10 @@ class BackpackDataCollectorTest {
 		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
 
 		collector.getMessageHandlers()
-			.get(Backpack.Msg.class.getName().hashCode())
+			.get(Backpack.Msg.class)
 			.handle(List.of(new Backpack.Msg(registered, List.of(), 0, new BackpackPlan.Msg(null, null, null))), 0);
 		collector.getMessageHandlers()
-			.get(VehicleContainer.class.getName().hashCode())
+			.get(VehicleContainer.class)
 			.handle(List.of(new VehicleContainer(null, null, new VehicleContainer.Occupant(ignoredAgent), List.of())), 0);
 
 		// make sure the collector doesn't crash when we send it events with the ignored agent.
