@@ -31,6 +31,7 @@ import org.matsim.core.mobsim.qsim.MobsimListenerManager;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.DistributedEventsManager;
 import org.matsim.dsim.messages.SimStepMessage2;
 import org.matsim.dsim.messages.SimStepMessage2Processor;
@@ -58,6 +59,7 @@ public class SimProcess implements Steppable, LP, SimStepMessage2Processor, Nets
 	private final NetworkPartition partition;
 	private final AgentSourcesContainer asc;
 	private final EventsManager em;
+	private final SerializationProvider serialization;
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
 	private NetworkTrafficEngine networkTrafficEngine;
@@ -73,11 +75,12 @@ public class SimProcess implements Steppable, LP, SimStepMessage2Processor, Nets
 
 	@Inject
 	SimProcess(Scenario scenario, NetworkPartition partition, PartitionTransfer messaging, AgentSourcesContainer asc, DistributedEventsManager em,
-			   BackpackDataCollector bdc, BackpackScoringModule.BackpackDataCollectorRegistry registry) {
+			   BackpackDataCollector bdc, BackpackScoringModule.BackpackDataCollectorRegistry registry, SerializationProvider serialization) {
 		this.scenario = scenario;
 		this.partition = partition;
 		this.asc = asc;
 		this.em = em;
+		this.serialization = serialization;
 		this.currentTime = new MobsimTimer();
 		this.backpackDataCollector = bdc;
 		this.partitionTransfer = messaging;
@@ -87,8 +90,10 @@ public class SimProcess implements Steppable, LP, SimStepMessage2Processor, Nets
 		// Wire up the scoring data collector as single partition events handler.
 		em.addHandler(backpackDataCollector, partition.getIndex());
 		// Register BackpackDataCollector message handlers into the dispatch table.
-		bdc.getMessageHandlers().forEach((type, handler) ->
-			dispatch.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler));
+		bdc.getMessageHandlers().forEach((clazz, handler) -> {
+			var type = serialization.getType(clazz);
+			dispatch.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler);
+		});
 	}
 
 	/**
@@ -99,8 +104,10 @@ public class SimProcess implements Steppable, LP, SimStepMessage2Processor, Nets
 			this.engines.add(d);
 			d.setInternalInterface(this);
 			engines.sort(Comparator.comparingDouble(DistributedMobsimEngine::getEnginePriority).reversed());
-			d.getMessageHandlers().forEach((type, handler) ->
-				dispatch.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler));
+			d.getMessageHandlers().forEach((clazz, handler) -> {
+				var type = serialization.getType(clazz);
+				dispatch.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler);
+			});
 		} else if (component instanceof MobsimEngine e) {
 			log.warn("Ignoring non-distributed mobsim engine : {}", e.getClass().getName());
 		}

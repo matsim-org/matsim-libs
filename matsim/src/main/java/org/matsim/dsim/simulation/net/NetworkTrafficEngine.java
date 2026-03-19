@@ -2,6 +2,7 @@ package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -83,11 +84,11 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Override
-	public Map<Integer, MessageHandler> getMessageHandlers() {
-		return Map.<Integer, MessageHandler>of(
-			VehicleContainer.class.getName().hashCode(),
+	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
+		return Map.of(
+			VehicleContainer.class,
 			(msgs, now) -> msgs.forEach(m -> processVehicleMessage((VehicleContainer) m, now)),
-			SimLink.SplitInLink.CapacityUpdate.class.getName().hashCode(),
+			SimLink.SplitInLink.CapacityUpdate.class,
 			(msgs, now) -> msgs.forEach(m -> processUpdateMessage((SimLink.SplitInLink.CapacityUpdate) m))
 		);
 	}

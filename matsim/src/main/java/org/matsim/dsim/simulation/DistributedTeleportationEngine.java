@@ -80,9 +80,9 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	}
 
 	@Override
-	public Map<Integer, MessageHandler> getMessageHandlers() {
+	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
 		return Map.of(
-			Teleportation.class.getName().hashCode(),
+			TeleportationMessage.class,
 			this::processTeleportationMessages
 		);
 	}
@@ -142,6 +142,8 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		throw new RuntimeException("Snapshot Positions are not implemented for Distributed Teleportation Engine. This method is only here because the 'TeleportationInterface' requires it.");
 	}
 
-	record TeleportationEntry(DistributedMobsimAgent person, double exitTime) {
+	private record TeleportationEntry(DistributedMobsimAgent person, double exitTime) {
 	}
+
+	record TeleportationMessage(Class<? extends DistributedMobsimAgent> type, Message agent, double exitTime) implements Message {}
 }

@@ -16,7 +16,7 @@ public interface DistributedMobsimEngine extends MobsimEngine {
 	 * Called once during engine registration in {@link org.matsim.dsim.simulation.SimProcess}.
 	 * Engines that receive no inter-partition messages can leave this as the default empty map.
 	 */
-	default Map<Integer, MessageHandler> getMessageHandlers() {
+	default Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
 		return Map.of();
 	}
 

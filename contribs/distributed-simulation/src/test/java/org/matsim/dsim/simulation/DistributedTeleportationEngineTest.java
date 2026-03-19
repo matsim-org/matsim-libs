@@ -136,7 +136,7 @@ class DistributedTeleportationEngineTest {
 		engine.setInternalInterface(mock(InternalInterface.class));
 
 		var msg = new Teleportation(agent.getClass(), agent.toMessage(), 42);
-		var handler = engine.getMessageHandlers().get(Teleportation.class.getName().hashCode());
+		var handler = engine.getMessageHandlers().get(DistributedTeleportationEngine.TeleportationMessage.class);
 		handler.handle(List.of(msg), 20);
 
 		for (var i = 20; i < 100; i++) {
@@ -158,7 +158,7 @@ class DistributedTeleportationEngineTest {
 		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class), mock(BackpackDataCollector.class));
 
 		var msg = new Teleportation(agent.getClass(), agent.toMessage(), 42);
-		var handler = engine.getMessageHandlers().get(Teleportation.class.getName().hashCode());
+		var handler = engine.getMessageHandlers().get(DistributedTeleportationEngine.TeleportationMessage.class);
 
 		assertThrows(IllegalStateException.class, () -> handler.handle(List.of(msg), 100));
 	}

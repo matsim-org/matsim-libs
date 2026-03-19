@@ -79,10 +79,10 @@ public class BackpackDataCollector implements BasicEventHandler {
 		}
 	}
 
-	public Map<Integer, MessageHandler> getMessageHandlers() {
+	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
 		return Map.of(
-			Backpack.Msg.class.getName().hashCode(), this::processBackpackMessages,
-			VehicleContainer.class.getName().hashCode(), this::processVehicleMessages
+			Backpack.Msg.class, this::processBackpackMessages,
+			VehicleContainer.class, this::processVehicleMessages
 		);
 	}
 
