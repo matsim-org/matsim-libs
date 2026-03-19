@@ -608,7 +608,7 @@ public class MessageBrokerTest {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends Message> T verifyMsg(int expectedTag, int expectedSender, int expectedReceiver, int expectedPartition, int expectedType, ByteBuffer actualBytes) throws IOException {
+	private <T extends Message> T verifyMsg(int expectedTag, int expectedSender, int expectedReceiver, int expectedPartition, int expectedType, ByteBuffer actualBytes) {
 		actualBytes.order(ByteOrder.LITTLE_ENDIAN);
 		var memBuf = MemoryBuffer.fromByteBuffer(actualBytes);
 
@@ -622,7 +622,7 @@ public class MessageBrokerTest {
 		assertEquals(expectedType, memBuf.readInt32());
 		memBuf.readInt32(); // we don't care about the message size
 
-		return (T) serializer.getForyParser(expectedType).parse(memBuf);
+		return (T) serializer.deserialize(memBuf, expectedType);
 	}
 
 	private ByteBuffer msgBytes(int sender, int receiver, int partition, Message msg, int seq) {

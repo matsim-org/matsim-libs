@@ -24,7 +24,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.MessageConsumer;
 import org.matsim.core.communication.MessageReceiver;
-import org.matsim.core.serialization.ForyBufferParser;
 import org.matsim.core.serialization.SerializationProvider;
 
 import java.io.IOException;
@@ -480,8 +479,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 				int type = in.readInt32();
 				int _ = in.readInt32();
 
-				ForyBufferParser parser = serialization.getForyParser(type);
-				Message msg = parser.parse(in);
+				var msg = serialization.deserialize(in, type);
 				log.error("#{}: {}", partition, msg.toString());
 			}
 			log.error("#{} End of message contents", getRank());
@@ -502,8 +500,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			int type = in.readInt32();
 			int _ = in.readInt32();
 
-			ForyBufferParser parser = serialization.getForyParser(type);
-			Message msg = parser.parse(in);
+			Message msg = serialization.deserialize(in, type);
 			log.trace("#{} at t:{} received from {}: {}", getRank(), timeFrom(seq), sender, msg);
 
 			if (partition == NODE_MESSAGE) {
@@ -573,7 +570,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	static ByteBuffer serialize(int toPartition, Message message, SerializationProvider serializer) {
 
 		// important to use serializeJavaObject, so that we can parse with deserializeFromJavaObject on receive.
-		var msgBytes = serializer.getFory().serializeJavaObject(message);
+		var msgBytes = serializer.serialize(message);
 		var msgSize = msgBytes.length;
 		ByteBuffer buf = ByteBuffer.allocate(msgSize + 3 * Integer.BYTES);
 		buf.order(ByteOrder.LITTLE_ENDIAN);

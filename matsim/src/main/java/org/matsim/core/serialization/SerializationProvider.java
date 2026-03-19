@@ -125,11 +125,17 @@ public class SerializationProvider {
 		return (T) fory.deserialize(buf);
 	}
 
-	public <T extends Message> T deserialize(MemoryBuffer in, Class<T> msgType) {
-		if (!class2Type.containsKey(msgType)) {
-			throw new IllegalArgumentException("Class " + msgType + " was not registered for serialization. Messages that should be serialized must be at least package private to be detected.");
+	public Message deserialize(MemoryBuffer in, int type) {
+		var msgClass = type2Class.get(type);
+		if (msgClass == null) {
+			throw new IllegalArgumentException("Type " + type + " was not registered for serialization. Messages that should be serialized must be at least package private to be detected.");
 		}
-		return fory.deserialize(in, msgType);
+
+		return deserialize(in, msgClass);
+	}
+
+	public <T extends Message> T deserialize(MemoryBuffer in, Class<T> clazz) {
+		return fory.deserialize(in, clazz);
 	}
 
 	public <T extends Message> byte[] serialize(T message) {
