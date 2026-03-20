@@ -92,7 +92,7 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		// Nothing to do here
 	}
 

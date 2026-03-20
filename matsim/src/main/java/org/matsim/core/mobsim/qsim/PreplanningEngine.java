@@ -102,7 +102,8 @@ public final class PreplanningEngine implements DistributedMobsimEngine {
 		this.timeInterpretation = timeInterpretation;
 	}
 
-	@Override public void onPrepareSim() {
+	@Override
+	public void beforeSim() {
 		log.warn( "running onPrepareSim");
 		for (DepartureHandler departureHandler : internalInterface.getDepartureHandlers()) {
 			if (departureHandler instanceof TripInfo.Provider) {

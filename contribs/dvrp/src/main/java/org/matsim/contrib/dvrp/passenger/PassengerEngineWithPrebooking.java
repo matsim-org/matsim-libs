@@ -19,13 +19,12 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -46,10 +45,9 @@ import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.facilities.FacilitiesUtils;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multimap;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 public final class PassengerEngineWithPrebooking
 		implements PassengerEngine, TripInfo.Provider, PassengerRequestRejectedEventHandler,
@@ -97,7 +95,8 @@ public final class PassengerEngineWithPrebooking
 		return mode;
 	}
 
-	@Override public void onPrepareSim() { }
+	@Override
+	public void beforeSim() {}
 
 	@Override public void doSimStep(double time) {
 		processPassengerRequestEvents();

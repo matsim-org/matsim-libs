@@ -20,6 +20,7 @@
 
  package org.matsim.core.mobsim.qsim.changeeventsengine;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +33,6 @@ import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 
-import com.google.inject.Inject;
 import java.util.Queue;
 
 class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
@@ -49,7 +49,7 @@ class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(this.network);
 		for (final NetworkChangeEvent changeEvent : changeEvents) {
 			addNetworkChangeEventToMessageQ(changeEvent);

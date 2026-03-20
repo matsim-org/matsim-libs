@@ -71,7 +71,7 @@ class NetworkTrafficEngineTest {
 		SimpleVehicle vehicle = TestUtils.createVehicle("person", 1.0, 10);
 		vehicle.setDriver(agent);
 		agent.setVehicle(vehicle);
-		engine.onPrepareSim();
+		engine.beforeSim();
 
 		engine.addParkedVehicle(vehicle, agent.getCurrentLinkId());
 

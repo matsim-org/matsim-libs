@@ -54,7 +54,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		for (SimLink link : simNetwork.getLinks().values()) {
 
 			// Split out links put vehicles into the messaging. Before they do so, we intercept and

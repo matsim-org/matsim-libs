@@ -19,10 +19,10 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
+import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
@@ -34,18 +34,12 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.modal.ModalProviders;
 
-import com.google.common.base.Preconditions;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -107,7 +101,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 	}
 
 	@Override

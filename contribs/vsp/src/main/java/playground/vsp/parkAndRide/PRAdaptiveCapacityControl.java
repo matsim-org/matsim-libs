@@ -36,26 +36,26 @@ import java.util.Map;
 
 /**
  * An adaptive traffic light observing the number of vehicles per park-and-ride facility.
- * 
+ *
  * @author ikaddoura
  *
  */
 public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHandler, LinkLeaveEventHandler {
-	
+
 //	private static final Logger log = LogManager.getLogger(PRAdaptiveCapacityControl.class);
 	private Map<Id, Integer> prId2vehicles = new HashMap<Id, Integer>();
 	private Map<Id, SignalizeableItem> prId2ampel = new HashMap<Id, SignalizeableItem>();
 	private Map<Id<PRFacility>, PRFacility> id2prFacility = new HashMap<>();
-	
+
 	private InternalInterface internalInterface;
-	
+
 	public PRAdaptiveCapacityControl(Map<Id<PRFacility>, PRFacility> id2prFacility) {
 		this.id2prFacility = id2prFacility;
 	}
 
 	@Override
 	public void doSimStep(double time) {
-		
+
 		for (Id<PRFacility> prId : this.prId2ampel.keySet()){
 			if (this.prId2vehicles.get(prId) >= this.id2prFacility.get(prId).getCapacity()){
 				this.prId2ampel.get(prId).setSignalStateAllTurningMoves(SignalGroupState.RED);
@@ -66,7 +66,7 @@ public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHa
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 
 		for (PRFacility pr : this.id2prFacility.values()){
 			this.prId2vehicles.put(pr.getId(), 0);
@@ -84,7 +84,7 @@ public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHa
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;		
+		this.internalInterface = internalInterface;
 	}
 
 	public Netsim getMobsim() {

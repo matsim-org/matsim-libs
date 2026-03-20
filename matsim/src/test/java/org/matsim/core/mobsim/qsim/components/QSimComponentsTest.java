@@ -21,13 +21,8 @@
 
  package org.matsim.core.mobsim.qsim.components;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.google.inject.BindingAnnotation;
+import com.google.inject.Inject;
 import com.google.inject.ProvisionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,7 +43,11 @@ import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Inject;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -402,7 +401,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 		}
 
 		@Override
-		public void onPrepareSim() {
+		public void beforeSim() {
 
 		}
 

@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,8 +41,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngineI;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -54,11 +55,9 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
-import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
-import com.google.inject.Inject;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
@@ -282,7 +281,7 @@ public final class QSim implements Netsim {
 		// timestep already
 
 		for (MobsimEngine mobsimEngine : this.mobsimEngines) {
-			mobsimEngine.onPrepareSim();
+			mobsimEngine.beforeSim();
 		}
 	}
 

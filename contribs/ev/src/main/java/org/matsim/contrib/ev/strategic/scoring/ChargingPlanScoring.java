@@ -1,12 +1,6 @@
 package org.matsim.contrib.ev.strategic.scoring;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.util.concurrent.AtomicDouble;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -21,16 +15,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.ev.charging.ChargingEndEvent;
-import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
-import org.matsim.contrib.ev.charging.ChargingStartEvent;
-import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
-import org.matsim.contrib.ev.charging.EnergyChargedEvent;
-import org.matsim.contrib.ev.charging.EnergyChargedEventHandler;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEvent;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEventHandler;
-import org.matsim.contrib.ev.charging.QuitQueueAtChargerEvent;
-import org.matsim.contrib.ev.charging.QuitQueueAtChargerEventHandler;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEvent;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEventHandler;
 import org.matsim.contrib.ev.discharging.IdlingEnergyConsumptionEvent;
@@ -61,13 +46,13 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import com.google.common.util.concurrent.AtomicDouble;
+import java.util.*;
 
 /**
  * This class manages the scoring of charging plans. See the documentation of
  * the package or the respective ChargingPlanScoringParameters for more
  * information on the individaul scoring dimensions.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class ChargingPlanScoring implements IterationStartsListener, ScoringListener, AbortChargingProcessEventHandler,
@@ -614,7 +599,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 	}
 
 	@Override

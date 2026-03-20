@@ -137,7 +137,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		// not much to do, all pre-processing is done in insertAgentsIntoMobsim
 		if (this.context != null) {
 			int iteration = this.context.getIteration();

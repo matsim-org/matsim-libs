@@ -20,13 +20,8 @@
 
 package org.matsim.withinday.mobsim;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -35,7 +30,6 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.ActivityEndReschedulerProvider;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
@@ -43,6 +37,10 @@ import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * This Class implements the MobsimEngine interface. If added to a
@@ -188,7 +186,7 @@ public class WithinDayEngine implements DistributedMobsimEngine, ActivityEndResc
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		this.parallelInitialReplanner.onPrepareSim();
 		this.parallelDuringActivityReplanner.onPrepareSim();
 		this.parallelDuringLegReplanner.onPrepareSim();

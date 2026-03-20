@@ -19,23 +19,22 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
-
 import com.google.inject.Inject;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public final class ActivityEngineWithWakeup implements ActivityEngine {
 	public static final String COMPONENT_NAME = "ActivityEngineWithWakeup";
@@ -56,9 +55,9 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		log.warn( "running onPrepareSim");
-		delegate.onPrepareSim();
+		delegate.beforeSim();
 	}
 
 	@Override

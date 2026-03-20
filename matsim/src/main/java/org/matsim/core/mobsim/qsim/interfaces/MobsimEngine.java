@@ -38,7 +38,7 @@ public interface MobsimEngine extends Steppable, QSimComponent {
   /**
    * called in a predefined Order when the simulation is started
    */
-  default void onPrepareSim() {}
+  default void beforeSim() {}
 
   /**
    * Do some clean up.

@@ -21,16 +21,8 @@
 
 package playground.vsp.pt.ptdisturbances;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.inject.Inject;
 import com.google.inject.Provider;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
@@ -46,11 +38,7 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.builder.Signals;
 import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
@@ -85,14 +73,19 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.config.TransitConfigGroup.BoardingAcceptance;
-import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Inject;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
 * @author smueller, gleich
@@ -637,7 +630,7 @@ public class EditTripsTest {
 		}
 
 		@Override
-		public void onPrepareSim() {
+		public void beforeSim() {
 		}
 
 		@Override

@@ -19,16 +19,16 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
-
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.NoopEventsManager;
+import ch.sbb.matsim.contrib.railsim.events.RailsimFormationEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.AlwaysApprovingDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.NoopResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -53,13 +53,7 @@ import org.matsim.core.network.TimeDependentNetwork;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-
-import ch.sbb.matsim.contrib.railsim.RailsimUtils;
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.events.RailsimFormationEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import java.util.*;
 
 /**
  * QSim Engine to integrate microscopically simulated train movement.
@@ -103,7 +97,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 
 		Network network = qsim.getScenario().getNetwork();
 

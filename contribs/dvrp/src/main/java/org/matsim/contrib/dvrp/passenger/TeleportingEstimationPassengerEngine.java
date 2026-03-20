@@ -21,9 +21,9 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import com.google.common.base.Preconditions;
-import it.unimi.dsi.fastutil.doubles.DoubleObjectPair;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import it.unimi.dsi.fastutil.doubles.DoubleObjectPair;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -112,8 +112,8 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 	}
 
 	@Override
-	public void onPrepareSim() {
-		teleportationEngine.onPrepareSim();
+	public void beforeSim() {
+		teleportationEngine.beforeSim();
 	}
 
 	@Override

@@ -20,12 +20,11 @@
 package org.matsim.contrib.socnetsim.jointtrips.qsim;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-
-import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
 
 public class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngine {
 	private final AgentFactory delegate;
@@ -52,7 +51,7 @@ public class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngi
 	public void doSimStep(double time) {}
 
 	@Override
-	public void onPrepareSim() {}
+	public void beforeSim() {}
 
 	@Override
 	public void afterSim() {}

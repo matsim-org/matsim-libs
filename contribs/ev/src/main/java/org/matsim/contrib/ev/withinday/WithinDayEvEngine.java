@@ -1,10 +1,6 @@
 package org.matsim.contrib.ev.withinday;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -16,25 +12,11 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.ev.charging.ChargingStartEvent;
-import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
-import org.matsim.contrib.ev.charging.ChargingStrategy;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEvent;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEventHandler;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.AbortChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.FinishChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.FinishChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.StartChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.StartChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.UpdateChargingAttemptEvent;
+import org.matsim.contrib.ev.withinday.events.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -56,7 +38,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import com.google.common.base.Preconditions;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This engine is the core of the within-day electric vehicle charging package.
@@ -138,7 +123,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	private final IdSet<Vehicle> relevantVehicles = new IdSet<>(Vehicle.class);
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		logger.info("Implementing charging slots ..");
 
 		int activityBasedCount = 0;

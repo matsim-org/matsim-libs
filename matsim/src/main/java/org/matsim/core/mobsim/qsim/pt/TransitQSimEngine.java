@@ -135,7 +135,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		//nothing to do here
 	}
 

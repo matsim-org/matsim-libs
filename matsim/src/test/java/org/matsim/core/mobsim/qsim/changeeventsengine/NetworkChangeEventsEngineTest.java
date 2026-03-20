@@ -71,7 +71,7 @@ public class NetworkChangeEventsEngineTest {
 		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		qsim.addMobsimEngine(engine);
 
-		engine.onPrepareSim();
+		 engine.beforeSim();
 		for (int i = 0; i < 30; i++) {
 			engine.doSimStep(i);
 		}
@@ -107,7 +107,7 @@ public class NetworkChangeEventsEngineTest {
 		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		engine.setInternalInterface(new DummyInternalInterfaceImpl(qsim));
 
-		engine.onPrepareSim();
+		 engine.beforeSim();
 		for (int i = 0; i < 30; i++) {
 			engine.doSimStep(i);
 		}
@@ -143,7 +143,7 @@ public class NetworkChangeEventsEngineTest {
 		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		engine.setInternalInterface(new DummyInternalInterfaceImpl(qsim));
 
-		engine.onPrepareSim();
+		 engine.beforeSim();
 		for (int i = 0; i < 30; i++) {
 			engine.doSimStep(i);
 		}

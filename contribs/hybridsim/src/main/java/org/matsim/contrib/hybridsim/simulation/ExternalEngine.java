@@ -20,11 +20,6 @@
 package org.matsim.contrib.hybridsim.simulation;
 
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-//import de.dlr.sumo.hybridsim.HybridSimProto;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,7 +31,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.hybridsim.grpc.GRPCExternalClient;
-//import org.matsim.contrib.hybridsim.proto.HybridSimProto;
 import org.matsim.contrib.hybridsim.proto.HybridSimProto;
 import org.matsim.contrib.hybridsim.run.RunExample;
 import org.matsim.contrib.hybridsim.utils.IdIntMapper;
@@ -48,6 +42,10 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkInternalIAdapter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceGrpc.MATSimInterfaceService {
 
@@ -127,7 +125,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	//rpc MATSim --> extern
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 
 		HybridSimProto.Scenario hsc = (HybridSimProto.Scenario) sc.getScenarioElement("hybrid_scenario");
 

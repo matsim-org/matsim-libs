@@ -21,18 +21,15 @@
 
 package playground.vsp.pt.ptdisturbances;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.inject.Inject;
 import com.google.inject.Provider;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -40,7 +37,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -51,16 +47,15 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -78,7 +73,9 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.withinday.utils.EditTrips;
 import org.matsim.withinday.utils.ReplanningException;
 
-import com.google.inject.Inject;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * @author smueller, gleich
@@ -231,7 +228,7 @@ public class RunExamplePtDisturbances {
 		}
 
 		@Override
-		public void onPrepareSim(){
+		public void beforeSim() {
 		}
 
 		@Override

@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.prebooking;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.IdSet;
@@ -19,7 +20,6 @@ import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
@@ -28,7 +28,6 @@ import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -486,7 +485,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	// Engine code
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		eventsManager.addHandler(this);
 	}
 

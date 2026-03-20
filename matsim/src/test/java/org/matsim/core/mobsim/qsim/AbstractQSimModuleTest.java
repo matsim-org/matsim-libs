@@ -21,9 +21,9 @@
 
  package org.matsim.core.mobsim.qsim;
 
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicLong;
-
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -43,9 +43,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicLong;
 
 	public class AbstractQSimModuleTest {
 	 @Test
@@ -199,7 +198,7 @@ import com.google.inject.Injector;
 		}
 
 		@Override
-		public void onPrepareSim() {
+		public void beforeSim() {
 		}
 
 		@Override

@@ -49,6 +49,7 @@ import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -274,7 +275,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 
 	}
 

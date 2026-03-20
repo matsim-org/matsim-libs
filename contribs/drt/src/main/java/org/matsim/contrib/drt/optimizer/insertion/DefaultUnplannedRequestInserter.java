@@ -184,7 +184,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 
 	}
 

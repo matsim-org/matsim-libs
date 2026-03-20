@@ -1,10 +1,5 @@
 package org.matsim.contrib.ev.strategic.reservation;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -27,6 +22,11 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
 
 public class StrategicChargingReservationEngine implements MobsimEngine {
     static public final String PERSON_ATTRIBUTE = "sevc:reservationSlack";
@@ -79,7 +79,7 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
     }
 
     @Override
-    public void onPrepareSim() {
+	public void beforeSim() {
         for (Person person : population.getPersons().values()) {
             if (!WithinDayEvEngine.isActive(person)) {
                 continue; // not relevant

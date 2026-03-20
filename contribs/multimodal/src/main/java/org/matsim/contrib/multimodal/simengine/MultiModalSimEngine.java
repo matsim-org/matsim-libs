@@ -51,22 +51,22 @@ class MultiModalSimEngine implements MobsimEngine {
 
 	private final Map<Id<Node>, MultiModalQNodeExtension> nodes = new HashMap<>();
 	private final Map<Id<Link>, MultiModalQLinkExtension> links = new HashMap<>();
-	
+
 	/*package*/ InternalInterface internalInterface = null;
 
 	private final int numOfThreads;
-	
+
 	private MultiModalSimEngineRunner[] runners;
 	private Phaser startBarrier;
     private Phaser endBarrier;
-	    
-    /*package*/ MultiModalSimEngine(Map<String, TravelTime> multiModalTravelTimes, MultiModalConfigGroup multiModalConfigGroup) {		
+
+	/*package*/ MultiModalSimEngine(Map<String, TravelTime> multiModalTravelTimes, MultiModalConfigGroup multiModalConfigGroup) {
     	this.multiModalTravelTimes = multiModalTravelTimes;
     	this.numOfThreads = multiModalConfigGroup.getNumberOfThreads();
-    	
+
     	if (this.numOfThreads > 1) log.info("Using " + multiModalConfigGroup.getNumberOfThreads() + " threads for MultiModalSimEngine.");
     }
-    
+
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
@@ -79,20 +79,20 @@ class MultiModalSimEngine implements MobsimEngine {
 	/*package*/ EventsManager getEventsManager() {
         return ((QSim) this.internalInterface.getMobsim()).getEventsManager();
 	}
-	
+
 	@Override
-	public void onPrepareSim() {
-		
+	public void beforeSim() {
+
 		// debug message
 		log.info("TravelTime classes used for multi-modal simulation: ");
 		for (Entry<String, TravelTime> entry : multiModalTravelTimes.entrySet()) {
 			log.info("\t" + entry.getKey() + "\t" + entry.getValue().getClass().toString());
 		}
-		
+
 		Scenario scenario = ((QSim) this.internalInterface.getMobsim()).getScenario();
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 		Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
-		
+
 		/*
 		 * Identify links and nodes that allow one of the simulated modes.
 		 */
@@ -115,7 +115,7 @@ class MultiModalSimEngine implements MobsimEngine {
 				}
 			}
 		}
-		
+
 		for (Node node : simulatedNodes) {
 			int numInLinks = 0;
 			for (Link inLink : node.getInLinks().values()) {
@@ -124,13 +124,13 @@ class MultiModalSimEngine implements MobsimEngine {
 			MultiModalQNodeExtension extension = new MultiModalQNodeExtension(this, numInLinks);
 			this.nodes.put(node.getId(), extension);
 		}
-		
+
 		for (Link link : simulatedLinks) {
 			Id<Node> toNodeId = link.getToNode().getId();
 			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, this, getMultiModalQNodeExtension(toNodeId));
 			this.links.put(link.getId(), extension);
 		}
-		
+
 		for (Node node : simulatedNodes) {
 			MultiModalQNodeExtension extension = this.getMultiModalQNodeExtension(node.getId());
 			List<MultiModalQLinkExtension> inLinks = new ArrayList<>();
@@ -139,20 +139,20 @@ class MultiModalSimEngine implements MobsimEngine {
 			}
 			extension.init(inLinks);
 		}
-		
+
 		/*
-		 * InfoTime may be < simStartTime, this ensures to print out the info 
+		 * InfoTime may be < simStartTime, this ensures to print out the info
 		 * at the very first timestep already
 		 */
 		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
-		
+
 		initMultiModalSimEngineRunners();
 	}
 
 	/*
-	 * The threads are waiting at the startBarrier. We trigger them by reaching this barrier. Now the threads will start 
-	 * moving the nodes and links. We wait until all of them reach the endBarrier to move on. We should not have any 
-	 * problems with race conditions since even if the threads would be faster than this thread, means they reach the 
+	 * The threads are waiting at the startBarrier. We trigger them by reaching this barrier. Now the threads will start
+	 * moving the nodes and links. We wait until all of them reach the endBarrier to move on. We should not have any
+	 * problems with race conditions since even if the threads would be faster than this thread, means they reach the
 	 * endBarrier before this Method does, it should work anyway.
 	 */
 	@Override
@@ -161,13 +161,13 @@ class MultiModalSimEngine implements MobsimEngine {
 		for (MultiModalSimEngineRunner runner : this.runners) {
 			runner.setTime(time);
 		}
-		
+
 		/*
 		 * Triggering the barrier will cause calls to moveLinks and moveNodes
 		 * in the threads.
 		 */
 		this.startBarrier.arriveAndAwaitAdvance();
-		
+
 		this.endBarrier.arriveAndAwaitAdvance();
 
         this.printSimLog(time);
@@ -178,7 +178,7 @@ class MultiModalSimEngine implements MobsimEngine {
 			this.infoTime += INFO_PERIOD;
 			int nofActiveLinks = this.getNumberOfSimulatedLinks();
 			int nofActiveNodes = this.getNumberOfSimulatedNodes();
-			log.info("SIMULATION (MultiModalSimEngine) AT " + Time.writeTime(time) 
+			log.info("SIMULATION (MultiModalSimEngine) AT " + Time.writeTime(time)
 					+ " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes);
 		}
 	}
@@ -191,12 +191,12 @@ class MultiModalSimEngine implements MobsimEngine {
 		}
 
 		/*
-		 * Triggering the startBarrier of the MultiModalSimEngineRunners. They will check whether the Simulation is 
+		 * Triggering the startBarrier of the MultiModalSimEngineRunners. They will check whether the Simulation is
 		 * still running. It is not, so the Threads will stop running.
 		 */
 		this.startBarrier.arriveAndAwaitAdvance();
-		
-		/* Reset vehicles on ALL links. We cannot iterate only over the active links (this.simLinksArray), because there 
+
+		/* Reset vehicles on ALL links. We cannot iterate only over the active links (this.simLinksArray), because there
 		 * may be links that have vehicles only in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
@@ -220,7 +220,7 @@ class MultiModalSimEngine implements MobsimEngine {
 		}
 		return numNodes;
 	}
-	
+
 	/*package*/ Map<String, TravelTime> getMultiModalTravelTimes() {
 		return this.multiModalTravelTimes;
 	}
@@ -232,7 +232,7 @@ class MultiModalSimEngine implements MobsimEngine {
 	/*package*/ MultiModalQLinkExtension getMultiModalQLinkExtension(Id<Link> linkId) {
 		return this.links.get(linkId);
 	}
-	
+
 	private void initMultiModalSimEngineRunners() {
 
 		this.runners = new MultiModalSimEngineRunner[numOfThreads];
@@ -243,9 +243,9 @@ class MultiModalSimEngine implements MobsimEngine {
 
 		// setup runners
 		for (int i = 0; i < numOfThreads; i++) {
-			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(this.startBarrier, 
+			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(this.startBarrier,
 					separationBarrier, this.endBarrier);
-			
+
 			Thread thread = new Thread(engine);
 			thread.setName("MultiModalSimEngineRunner_" + i);
 
@@ -254,7 +254,7 @@ class MultiModalSimEngine implements MobsimEngine {
 
 			thread.start();
 		}
-		
+
 		// assign the Links and Nodes to the SimEngines
 		assignSimEngines();
 	}
@@ -264,20 +264,20 @@ class MultiModalSimEngine implements MobsimEngine {
 		// only for statistics
 		int nodes[] = new int[this.runners.length];
 		int links[] = new int[this.runners.length];
-		
+
 		int roundRobin = 0;
 		Scenario scenario = ((QSim) this.internalInterface.getMobsim()).getScenario();
-		
+
 		for (Node node : scenario.getNetwork().getNodes().values()) {
 			MultiModalQNodeExtension multiModalQNodeExtension = this.getMultiModalQNodeExtension(node.getId());
-			
+
 			// if the node is simulated by the MultiModalSimulation
 			if (multiModalQNodeExtension != null) {
 				int i = roundRobin % this.numOfThreads;
 				MultiModalSimEngineRunner simEngineRunner = this.runners[i];
 				multiModalQNodeExtension.setNetworkElementActivator(simEngineRunner);
 				nodes[i]++;
-				
+
 				/*
 				 * Assign each link to its in-node to ensure that they are processed by the same
 				 * thread which should avoid running into some race conditions.
@@ -289,11 +289,11 @@ class MultiModalSimEngine implements MobsimEngine {
 						links[i]++;
 					}
 				}
-				
+
 				roundRobin++;
 			}
 		}
-		
+
 		// print some statistics
 		for (int i = 0; i < this.runners.length; i++) {
 			log.info("Assigned " + nodes[i] + " nodes and " + links[i] + " links to MultiModalSimEngineRunner #" + i);
