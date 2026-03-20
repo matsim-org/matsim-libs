@@ -1230,25 +1230,42 @@ public final class PopulationUtils {
 
 	/**
 	 * Method samples down the population separately for each subpopulation.
-	 * The group of persons with no subpopulation is handled as a separate subpopulation.
+	 * The group of persons with no subpopulation is handled as a separate subpopulation. The same sampling rate is
+	 * applied to each group, and the number of remaining persons per subpopulation is chosen deterministically via
+	 * rounding so that a single population scale can still be used consistently afterwards.
 	 *
 	 * @param pop    population to be downsampled
 	 * @param sampleTo sample rate, e.g. 0.1 for 10% of the population
 	 */
 	public static void sampleDown(Population pop, double sampleTo) {
+		if (sampleTo < 0 || sampleTo > 1) {
+			throw new IllegalArgumentException("sampleTo must be within [0, 1], but is " + sampleTo);
+		}
+
 		final Random rnd = MatsimRandom.getLocalInstance();
 		log.info("population size before downsampling={}", pop.getPersons().size());
 
-		List<String> subpopulations = new ArrayList<>(pop.getPersons().values().stream()
-				.map(PopulationUtils::getSubpopulation)
-				.distinct()
-				.toList());
-		subpopulations.forEach(subpopulation ->
-			pop.getPersons().values().removeIf(
-				person -> Objects.equals(PopulationUtils.getSubpopulation(person), subpopulation)
-					&& rnd.nextDouble() >= sampleTo
-			)
+		Map<String, List<Id<Person>>> personsPerSubpopulation = new LinkedHashMap<>();
+		pop.getPersons().values().forEach(person ->
+			personsPerSubpopulation
+				.computeIfAbsent(PopulationUtils.getSubpopulation(person), ignored -> new ArrayList<>())
+				.add(person.getId())
 		);
+
+		for (Map.Entry<String, List<Id<Person>>> entry : personsPerSubpopulation.entrySet()) {
+			List<Id<Person>> personIds = entry.getValue();
+			Collections.shuffle(personIds, rnd);
+
+			int targetSize = (int) Math.round(personIds.size() * sampleTo);
+			for (int i = targetSize; i < personIds.size(); i++) {
+				pop.removePerson(personIds.get(i));
+			}
+		}
+
+		Double scale = ScenarioUtils.getScale(pop);
+		if (scale != null) {
+			ScenarioUtils.putScale(pop, scale * sampleTo);
+		}
 		log.info("population size after downsampling={}", pop.getPersons().size());
 	}
 

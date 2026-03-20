@@ -198,6 +198,38 @@ public class PopulationUtilsTest {
 	}
 
 	@Test
+	void testPopulationSamplingPerSubpopulationUpdatesScale() {
+		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig(), 1.0);
+		PopulationFactory factory = population.getFactory();
+
+		for (int i = 0; i < 100; i++) {
+			Person person = factory.createPerson(Id.createPersonId("a_" + i));
+			PopulationUtils.putSubpopulation(person, "a");
+			population.addPerson(person);
+		}
+		for (int i = 0; i < 6; i++) {
+			Person person = factory.createPerson(Id.createPersonId("b_" + i));
+			PopulationUtils.putSubpopulation(person, "b");
+			population.addPerson(person);
+		}
+
+		PopulationUtils.sampleDown(population, 0.5);
+
+		long subpopA = population.getPersons().values().stream()
+			.filter(person -> "a".equals(PopulationUtils.getSubpopulation(person)))
+			.count();
+		long subpopB = population.getPersons().values().stream()
+			.filter(person -> "b".equals(PopulationUtils.getSubpopulation(person)))
+			.count();
+
+		Assertions.assertEquals(50, subpopA);
+		Assertions.assertEquals(3, subpopB);
+		Assertions.assertEquals(0.5, ScenarioUtils.getScale(population));
+		Assertions.assertEquals(100., subpopA / ScenarioUtils.getScale(population), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(6., subpopB / ScenarioUtils.getScale(population), MatsimTestUtils.EPSILON);
+	}
+
+	@Test
 	void testPlanAttributesCopy() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 
