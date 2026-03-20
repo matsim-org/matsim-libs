@@ -293,7 +293,7 @@ public interface SimLink {
 		private final FlowCapacity inflowCapacity;
 		private final Consumer<SimLink> activateLink;
 		private final PartitionTransfer partitionTransfer;
-		private OnLeaveQueue onLeaveHandler = (_, _, _) -> OnLeaveQueueInstruction.RemoveVehicle;
+		private NotifyVehicleLeavesPartition notifyVehicleLeavingPartition = (_, _) -> {};
 
 		SplitOutLink(Link link, SimpleStorageCapacity storageCapacity, FlowCapacity inflowCapacity, Consumer<SimLink> activateLink, PartitionTransfer partitionTransfer) {
 			id = link.getId();
@@ -357,7 +357,7 @@ public interface SimLink {
 		@Override
 		public boolean doSimStep(double now) {
 			for (var vehicle : q) {
-				onLeaveHandler.apply(vehicle, this, now);
+				notifyVehicleLeavingPartition.accept(vehicle, toPart);
 				partitionTransfer.collect(AgentSourcesContainer.vehicleToContainer(vehicle), toPart);
 			}
 			q.clear();
@@ -368,12 +368,16 @@ public interface SimLink {
 
 		@Override
 		public void addLeaveHandler(OnLeaveQueue onLeaveQueue) {
-			this.onLeaveHandler = onLeaveQueue;
+			// don't do anything, as vehicles never leave the split out link.
 		}
 
-		public void applyCapacityUpdate(double released, double consumed) {
+		void applyCapacityUpdate(double released, double consumed) {
 			storageCapacity.consume(consumed);
 			storageCapacity.release(released, 0);
+		}
+
+		void setNotifyVehicleLeavingPartition(NotifyVehicleLeavesPartition callback) {
+			notifyVehicleLeavingPartition = callback;
 		}
 
 		@Override
@@ -385,6 +389,11 @@ public interface SimLink {
 		public String toString() {
 			var vehicles = q.stream().map(v -> v.getId().toString()).collect(Collectors.joining(", "));
 			return "SplitOut: id=" + this.id + ", veh=[" + vehicles + "], storageCap=[" + storageCapacity + "], inflowCap=[" + inflowCapacity + "]";
+		}
+
+		@FunctionalInterface
+		interface NotifyVehicleLeavesPartition {
+			void accept(DistributedMobsimVehicle vehicle, int toPart);
 		}
 	}
 

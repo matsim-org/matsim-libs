@@ -14,12 +14,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine.MessageHandler;
-import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.dsim.NotifyAgentPartitionTransfer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.dsim.NetworkDecomposition;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.PartitionTransfer;
-import org.matsim.dsim.simulation.VehicleContainer;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -38,7 +36,7 @@ import java.util.*;
  * agents might have left the partition already.
  */
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
-public class BackpackDataCollector implements BasicEventHandler {
+public class BackpackDataCollector implements BasicEventHandler, NotifyAgentPartitionTransfer {
 
 	private final Map<Id<Person>, Backpack> backpackByPerson = new HashMap<>();
 	private final Map<Id<Vehicle>, Set<Backpack>> backpackByVehicle = new HashMap<>();
@@ -57,7 +55,6 @@ public class BackpackDataCollector implements BasicEventHandler {
 	BackpackDataCollector(PartitionTransfer partitionTransfer, Network network, Population population,
 						  AgentSourcesContainer asc, FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
 		this.partitionTransfer = partitionTransfer;
-		//this.simStepMessaging = simStepMessaging;
 		this.network = network;
 		this.population = population;
 		this.asc = asc;
@@ -79,11 +76,15 @@ public class BackpackDataCollector implements BasicEventHandler {
 		}
 	}
 
-	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
-		return Map.of(
-			Backpack.Msg.class, this::processBackpackMessages,
-			VehicleContainer.class, this::processVehicleMessages
-		);
+	@Override
+	public void onAgentLeavesPartition(DistributedMobsimAgent agent, int toPartition) {
+		personLeavingPartition(agent.getId(), toPartition);
+	}
+
+	@Override
+	public void onAgentEntersPartition(DistributedMobsimAgent agent) {
+
+		// actually, don't do anything for now. Maybe we can highjack this method for adding agents in the first place.
 	}
 
 	private void processBackpackMessages(List<Message> messages, double now) {
@@ -99,37 +100,10 @@ public class BackpackDataCollector implements BasicEventHandler {
 		}
 	}
 
-	private void processVehicleMessages(List<Message> messages, double now) {
-		// we tap into the vehicle messages to get the state of the transit vehicle. In particular, we need to connect the driver id
-		// with the line and route information. This information is needed to recreate TransitPassengerRoutes.
-		// It is a little dirty to do this, as the vehicle messages are kinda private to the NetworkTrafficEngine and we are creating
-		// transit vehicles and drivers from the message in two places.
-		// The alternative would have been to introduce new events for passengers entering and leaving pt and we decided not to do this
-		// janek, marcel Dec' 2025
-		for (var m : messages) {
-			var veh = asc.vehicleFromContainer((VehicleContainer) m);
-			// Transit drivers are not part of the population and do not carry backpacks.
-			// Using population membership (not backpack presence) avoids a race condition where
-			// the backpack message for a population agent may arrive in a different order than the vehicle message.
-			var driverId = veh.getDriver().getId();
-			if (!population.getPersons().containsKey(driverId)) {
-				ignoredAgents.add(driverId);
-			}
-		}
-	}
-
-	public void vehicleLeavesPartition(DistributedMobsimVehicle vehicle) {
-		var driverId = vehicle.getDriver().getId();
-		var link = network.getLinks().get(vehicle.getCurrentLinkId());
-		var targetPart = (int) link.getToNode().getAttributes().getAttribute(NetworkDecomposition.PARTITION_ATTR_KEY);
-
-		if (!ignoredAgents.contains(driverId)) {
-			personLeavingPartition(driverId, targetPart);
-		}
-
-		for (var passenger : vehicle.getPassengers()) {
-			personLeavingPartition(passenger.getId(), targetPart);
-		}
+	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
+		return Map.of(
+			Backpack.Msg.class, this::processBackpackMessages
+		);
 	}
 
 	public void teleportedPersonLeavesPartition(DistributedMobsimAgent agent) {

@@ -13,7 +13,6 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 import java.util.*;
@@ -24,7 +23,6 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
 	private final PartitionTransfer partitionTransfer;
 	private final AgentSourcesContainer asc;
-	private final BackpackDataCollector bdc;
 
 	private InternalInterface internalInterface;
 	// store the current time, so we can use it for after sim.
@@ -36,12 +34,10 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	}
 
 	@Inject
-	DistributedTeleportationEngine(EventsManager em, PartitionTransfer partitionTransfer, AgentSourcesContainer asc,
-								   BackpackDataCollector bdc) {
+	DistributedTeleportationEngine(EventsManager em, PartitionTransfer partitionTransfer, AgentSourcesContainer asc) {
 		this.partitionTransfer = partitionTransfer;
 		this.asc = asc;
 		this.em = em;
-		this.bdc = bdc;
 	}
 
 	@Override
@@ -69,9 +65,9 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		if (partitionTransfer.isLocal(person.getDestinationLinkId())) {
 			personsTeleporting.add(new TeleportationEntry(person, exitTime));
 		} else {
-			// TODO: replace with general mechanism for notifying person is leaving
-			bdc.teleportedPersonLeavesPartition(person);
-			partitionTransfer.collect(new TeleportationMessage(person.getClass(), person.toMessage(), exitTime), person.getDestinationLinkId());
+			var toPartition = partitionTransfer.getPartitionIndex(person.getDestinationLinkId());
+			internalInterface.notifyAgentLeavesPartition(person, toPartition);
+			partitionTransfer.collect(new TeleportationMessage(person.getClass(), person.toMessage(), exitTime), toPartition);
 		}
 
 		return true;
@@ -96,6 +92,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 			}
 			var agent = asc.agentFromMessage(msg.type(), msg.agent());
 			personsTeleporting.add(new TeleportationEntry(agent, msg.exitTime()));
+			internalInterface.notifyAgentEntersPartition(agent);
 		}
 	}
 

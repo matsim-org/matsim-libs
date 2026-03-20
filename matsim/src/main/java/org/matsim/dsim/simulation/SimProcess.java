@@ -49,6 +49,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final List<DistributedMobsimEngine> engines = new ArrayList<>();
 	private final List<DistributedDepartureHandler> departureHandlers = new ArrayList<>();
 	private final List<DistributedActivityHandler> activityHandlers = new ArrayList<>();
+	private final List<NotifyAgentPartitionTransfer> notifyAgentPartitionTransfers = new ArrayList<>();
+	private final List<NotifyVehiclePartitionTransfer> notifyVehiclePartitionTransfers = new ArrayList<>();
 	private final MobsimListenerManager listenerManager = new MobsimListenerManager(this);
 	private final Int2ObjectMap<List<MessageHandler>> dispatch = new Int2ObjectOpenHashMap<>();
 	private final PartitionTransfer partitionTransfer;
@@ -91,6 +93,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			var type = serialization.getType(clazz);
 			dispatch.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler);
 		});
+
+		notifyAgentPartitionTransfers.add(bdc);
 	}
 
 	/**
@@ -236,6 +240,34 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			return agents.remove(agentId);
 		else
 			throw new IllegalArgumentException("Link " + linkId + " is not on a link in the partition");
+	}
+
+	@Override
+	public void notifyAgentEntersPartition(DistributedMobsimAgent agent) {
+		for (var handler : notifyAgentPartitionTransfers) {
+			handler.onAgentEntersPartition(agent);
+		}
+	}
+
+	@Override
+	public void notifyAgentLeavesPartition(DistributedMobsimAgent agent, int toPartition) {
+		for (var handler : notifyAgentPartitionTransfers) {
+			handler.onAgentLeavesPartition(agent, toPartition);
+		}
+	}
+
+	@Override
+	public void notifyVehicleEntersPartition(DistributedMobsimVehicle vehicle) {
+		for (var handler : notifyVehiclePartitionTransfers) {
+			handler.onVehicleEntersPartition(vehicle);
+		}
+	}
+
+	@Override
+	public void notifyVehicleLeavesPartition(DistributedMobsimVehicle vehicle, int toPartition) {
+		for (var handler : notifyVehiclePartitionTransfers) {
+			handler.onVehicleLeavesPartition(vehicle, toPartition);
+		}
 	}
 
 	@Override
