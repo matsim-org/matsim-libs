@@ -71,7 +71,7 @@ class BackpackDataCollectorTest {
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
@@ -146,7 +146,7 @@ class BackpackDataCollectorTest {
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, eps, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, eps, providers);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
@@ -154,7 +154,7 @@ class BackpackDataCollectorTest {
 
 		// the following simulates how a pId leaves and enters a partition. The simulation calls the leave method, which passes a pId's backpack
 		// to the messaging. Then the other partition passes the received message to its collector, which then receives the events for that agent.
-		collector.teleportedPersonLeavesPartition(distAggent);
+		collector.onAgentLeavesPartition(distAggent, 43);
 
 		// capture the backpack that was passed to messaging.
 		var backPackCaptor = ArgumentCaptor.forClass(Backpack.Msg.class);
@@ -227,7 +227,7 @@ class BackpackDataCollectorTest {
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.pt, new BackpackTransitRouteProvider(network, schedule));
 
-		var collector = new BackpackDataCollector(mock(PartitionTransfer.class), network, pop, mock(AgentSourcesContainer.class), fbc, providers);
+		var collector = new BackpackDataCollector(mock(PartitionTransfer.class), network, pop, fbc, providers);
 
 		collector.registerAgent(distAgent);
 
@@ -311,7 +311,7 @@ class BackpackDataCollectorTest {
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
@@ -394,7 +394,7 @@ class BackpackDataCollectorTest {
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
 		providers.put(TransportMode.ride, new BackpackNetworkRouteProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
 		collector.registerAgent(distAgent1);
 		collector.registerAgent(distAgent2);
@@ -473,7 +473,7 @@ class BackpackDataCollectorTest {
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
 		var distAgent = mock(DistributedMobsimAgent.class);
 		when(distAgent.getId()).thenReturn(pId);
@@ -518,7 +518,7 @@ class BackpackDataCollectorTest {
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
 		collector.registerAgent(ignoredAgent);
 		collector.registerAgent(registeredAgent);
@@ -562,7 +562,7 @@ class BackpackDataCollectorTest {
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
 		collector.getMessageHandlers()
 			.get(Backpack.Msg.class)

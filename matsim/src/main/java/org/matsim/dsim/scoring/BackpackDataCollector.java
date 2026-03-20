@@ -16,7 +16,6 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine.MessageHandler;
 import org.matsim.core.mobsim.dsim.NotifyAgentPartitionTransfer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.vehicles.Vehicle;
 
@@ -47,17 +46,15 @@ public class BackpackDataCollector implements BasicEventHandler, NotifyAgentPart
 	private final Network network;
 	private final Population population;
 
-	private final AgentSourcesContainer asc;
 	private final FinishedBackpackCollector backpackCollector;
 	private final Map<String, BackpackRouteProvider> providers;
 
 	@Inject
 	BackpackDataCollector(PartitionTransfer partitionTransfer, Network network, Population population,
-						  AgentSourcesContainer asc, FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
+						  FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
 		this.partitionTransfer = partitionTransfer;
 		this.network = network;
 		this.population = population;
-		this.asc = asc;
 		this.backpackCollector = fbc;
 		this.providers = providers;
 	}
@@ -78,13 +75,29 @@ public class BackpackDataCollector implements BasicEventHandler, NotifyAgentPart
 
 	@Override
 	public void onAgentLeavesPartition(DistributedMobsimAgent agent, int toPartition) {
-		personLeavingPartition(agent.getId(), toPartition);
+		var backpack = backpackByPerson.remove(agent.getId());
+
+		if (backpack == null) return; // this agent is ingored. We don't need to send anything.
+
+		if (backpack.isInVehicle()) {
+			var backpacksInVehicle = backpackByVehicle
+				.get(backpack.currentVehicle());
+			backpacksInVehicle.remove(backpack);
+			if (backpacksInVehicle.isEmpty()) {
+				backpackByVehicle.remove(backpack.currentVehicle());
+			}
+		}
+		var message = backpack.toMessage();
+		partitionTransfer.collect(message, toPartition);
 	}
 
 	@Override
 	public void onAgentEntersPartition(DistributedMobsimAgent agent) {
 
-		// actually, don't do anything for now. Maybe we can highjack this method for adding agents in the first place.
+		// we don't want to do anything if we don't know the person
+		if (!population.getPersons().containsKey(agent.getId())) {
+			ignoredAgents.add(agent.getId());
+		}
 	}
 
 	private void processBackpackMessages(List<Message> messages, double now) {
@@ -104,11 +117,6 @@ public class BackpackDataCollector implements BasicEventHandler, NotifyAgentPart
 		return Map.of(
 			Backpack.Msg.class, this::processBackpackMessages
 		);
-	}
-
-	public void teleportedPersonLeavesPartition(DistributedMobsimAgent agent) {
-		var targetPart = network.getPartitioning().getPartition(agent.getDestinationLinkId());
-		personLeavingPartition(agent.getId(), targetPart);
 	}
 
 	public void finishPerson(Id<Person> agentId) {
@@ -137,20 +145,6 @@ public class BackpackDataCollector implements BasicEventHandler, NotifyAgentPart
 	private void finishBackpack(Backpack backpack) {
 		var finishedBackpack = backpack.finish();
 		backpackCollector.addBackpack(finishedBackpack);
-	}
-
-	private void personLeavingPartition(Id<Person> id, int toPart) {
-		var backpack = backpackByPerson.remove(id);
-		if (backpack.isInVehicle()) {
-			var backpacksInVehicle = backpackByVehicle
-				.get(backpack.currentVehicle());
-			backpacksInVehicle.remove(backpack);
-			if (backpacksInVehicle.isEmpty()) {
-				backpackByVehicle.remove(backpack.currentVehicle());
-			}
-		}
-		var message = backpack.toMessage();
-		partitionTransfer.collect(message, toPart);
 	}
 
 	@Override

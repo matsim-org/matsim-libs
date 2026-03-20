@@ -107,9 +107,14 @@ class DistributedTeleportationEngineTest {
 	public void sendPersonWithSplitLeg() {
 		var em = mock(EventsManager.class);
 		var agent = createPerson("some", em);
+		var targetPartition = 43;
 		var messaging = Mockito.mock(PartitionTransfer.class);
 		when(messaging.isLocal(any())).thenReturn(false);
+		when(messaging.getPartitionIndex(any())).thenReturn(targetPartition);
 		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class));
+
+		var internalInterface = mock(InternalInterface.class);
+		engine.setInternalInterface(internalInterface);
 
 		var msgTypes = engine.getMessageHandlers().keySet();
 		assertEquals(1, msgTypes.size());
@@ -118,10 +123,12 @@ class DistributedTeleportationEngineTest {
 		engine.handleDeparture(11, agent, agent.getCurrentLinkId());
 
 		var captor = ArgumentCaptor.forClass(DistributedTeleportationEngine.TeleportationMessage.class);
-		verify(messaging).collect(captor.capture(), eq(agent.getDestinationLinkId()));
+		verify(messaging).collect(captor.capture(), eq(targetPartition));
 		var teleportation = captor.getValue();
 		assertEquals(agent.getClass(), teleportation.type());
 		assertEquals(11 + 42., teleportation.exitTime(), 1e-6);
+
+		verify(internalInterface).notifyAgentLeavesPartition(eq(agent), eq(targetPartition));
 	}
 
 	@Test

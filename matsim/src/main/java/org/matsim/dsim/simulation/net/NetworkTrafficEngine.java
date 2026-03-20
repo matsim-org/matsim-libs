@@ -76,6 +76,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	private void processVehicleMessage(VehicleContainer vehicleContainer, double now) {
 		DistributedMobsimVehicle vehicle = asc.vehicleFromContainer(vehicleContainer);
+		notifyVehicleEntersPartition(vehicle);
 
 		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);
@@ -157,6 +158,14 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		}
 	}
 
+	private void notifyVehicleEntersPartition(DistributedMobsimVehicle vehicle) {
+		internalInterface.notifyVehicleEntersPartition(vehicle);
+		notifyAgentEntersPartition(vehicle.getDriver());
+		for (var passenger : vehicle.getPassengers()) {
+			notifyAgentEntersPartition(passenger);
+		}
+	}
+
 	private void notifyAgentLeavesPartition(NetworkAgent agent, int toPartition) {
 		if (agent instanceof DistributedMobsimAgent dma) {
 			internalInterface.notifyAgentLeavesPartition(dma, toPartition);
@@ -164,6 +173,14 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 			// let's see if we have to be this restrictive. But I think we only want to have DistributedMobsimAgents,
 			// otherwise we'll have trouble serializing them.
 			throw new IllegalArgumentException("Expected DistributedMobsimAgent as drier, but got: " + agent.getClass().getName());
+		}
+	}
+
+	private void notifyAgentEntersPartition(NetworkAgent agent) {
+		if (agent instanceof DistributedMobsimAgent dma) {
+			internalInterface.notifyAgentEntersPartition(dma);
+		} else {
+			throw new IllegalArgumentException("Expected DistributedMobsimAgent as agent, but got: " + agent.getClass().getName());
 		}
 	}
 
