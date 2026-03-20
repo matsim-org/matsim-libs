@@ -290,7 +290,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		double popSumMuse_h = 0.;
 		double popCntMuse_h = 0.;
 		Counter counter = new Counter( "in method generatePersonTableFromPopulation(...); processing person #  ");
-		MuseComputation museComputation = new MuseComputation( scoringFunctionFactory, pf );
+		MuseComputation museComputation = baseCaseInjector.getInstance( MuseComputation.class );
 		for( Person person : population.getPersons().values() ){
 			counter.incCounter();
 
@@ -311,6 +311,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			}
 
 			double computedPersonScore = 0.;
+			// yy since we are doing the tablesaw columns, may not need the overall sum here.
+			// --> or put first into person attributes and generate tablesaw at the end
 			{
 				// activity times:
 				ScoringFunction sf = scoringFunctionFactory.createNewScoringFunction( person );

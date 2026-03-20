@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -437,23 +438,6 @@ class AgentWiseComparisonKNUtils{
 			// (most of the time, this should be a filtered events file, and we only use money and stuck info)
 		}
 	}
-	static @NotNull String findPopulationFilename( Path path ){
-		String basePopulationFilename;
-		try {
-			basePopulationFilename = globFile( path, "*reduced_plans.xml" ).toString();
-		} catch ( IllegalStateException e0 ) {
-			try {
-				basePopulationFilename = globFile( path, "*vtts_experienced_plans.xml.gz" ).toString();
-			} catch ( IllegalStateException ee ){
-				try{
-					basePopulationFilename = globFile( path, "*postproc_experienced_plans.xml.gz" ).toString();
-				} catch( IllegalStateException e2 ){
-					basePopulationFilename = globFile( path, "*experienced_plans.xml.gz" ).toString();
-				}
-			}
-		}
-		return basePopulationFilename;
-	}
 	static void computeAndSetMarginalUtilitiesOfMoney( Scenario scenario ){
 		Population basePopulation = scenario.getPopulation();
 		double sumIncome = 0.;
@@ -622,29 +606,32 @@ class AgentWiseComparisonKNUtils{
 
 	}
 	static @NotNull Config prepareConfig( Path path ){
-		Config config = ConfigUtils.loadConfig( globFile( path, "*output_config_reduced.xml" ).toString() );
-		// (The reduced config has fewer problems with newly introduced config params.)
+//		Config config = ConfigUtils.loadConfig( globFile( path, "*output_config_reduced.xml" ).toString() );
+		// (The reduced config has fewer problems with newly introduced config params.  But then it has problems with changed defaults, e.g. compression type.)
+		Config config = ConfigUtils.loadConfig( globFile( path, "*output_config.xml" ).toString() );
+
+		ControllerConfigGroup.CompressionType ct = config.controller().getCompressionType();
 
 		config.controller().setOutputDirectory( "output/dummyOutputFromAgentWiseComparisonKN" );
 		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
-		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
-		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
-		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
-		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
 		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the reduced config specifies them in an incomplete
 		// way, but I am not sure if that is the problem. --> that probably is indeed the problem.  In general, they are created automatically,
 		// but if they already exist in some other way (i.e., in this case coming from the reduced config), then those are not over-written.
 
-		config.facilities().setInputFile( globFile( path, "*output_" + Controler.DefaultFiles.facilities.getFilename() + ".gz" ).toString() );
+		config.facilities().setInputFile( globFile( path, "*output_" + Controler.DefaultFiles.facilities.getFilename() + ct.fileEnding ).toString() );
 
 		String baseTransitScheduleFilename = null;
 		if ( config.transit().isUseTransit() ){
-			baseTransitScheduleFilename = globFile( path, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
+			baseTransitScheduleFilename = globFile( path, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ct.fileEnding ).toString();
 		}
 		config.transit().setTransitScheduleFile( baseTransitScheduleFilename );
 
-		config.network().setInputFile( globFile( path, "*output_" + Controler.DefaultFiles.network.getFilename() + ".gz" ).toString() );
+		config.network().setInputFile( globFile( path, "*output_" + Controler.DefaultFiles.network.getFilename() + ct.fileEnding ).toString() );
 
 		config.plans().setInputFile( null );
 		config.network().setChangeEventsInputFile( null );
@@ -654,8 +641,21 @@ class AgentWiseComparisonKNUtils{
 
 		config.routing().setNetworkModes( Collections.emptySet() );
 
-		config.plans().setInputFile( findPopulationFilename( path ) );
-		// yy findPopulationFilename might be inlined eventually.
+		String basePopulationFilename;
+		try {
+			basePopulationFilename = globFile( path, "*reduced_plans.xml" ).toString();
+		} catch ( IllegalStateException e0 ) {
+			try {
+				basePopulationFilename = globFile( path, "*vtts_experienced_plans.xml.gz" ).toString();
+			} catch ( IllegalStateException ee ){
+				try{
+					basePopulationFilename = globFile( path, "*postproc_experienced_plans.xml.gz" ).toString();
+				} catch( IllegalStateException e2 ){
+					basePopulationFilename = globFile( path, "*experienced_plans.xml.gz" ).toString();
+				}
+			}
+		}
+		config.plans().setInputFile( basePopulationFilename );
 
 		return config;
 	}
@@ -667,6 +667,7 @@ class AgentWiseComparisonKNUtils{
 				   .addOverridingModule( new AbstractModule(){
 					   @Override public void install(){
 						   bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
+						   bind( MuseComputation.class );
 					   }
 				   } ).build();
 	}
