@@ -25,7 +25,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.PartitionTransfer;
-import org.matsim.dsim.simulation.VehicleContainer;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -66,7 +65,6 @@ class BackpackDataCollectorTest {
 		network.addNode(node3);
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link1), node1, node2));
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link2), node2, node3));
-		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
@@ -141,7 +139,6 @@ class BackpackDataCollectorTest {
 		network.addNode(node3);
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link1), node1, node2));
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link2), node2, node3));
-		var asc = mock(AgentSourcesContainer.class);
 		var eps = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
@@ -306,7 +303,6 @@ class BackpackDataCollectorTest {
 			network.addLink(link);
 		}
 
-		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
@@ -388,7 +384,6 @@ class BackpackDataCollectorTest {
 			network.addLink(link);
 		}
 
-		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
@@ -468,7 +463,6 @@ class BackpackDataCollectorTest {
 		network.addNode(node2);
 		network.addLink(network.getFactory().createLink(link1, node1, node2));
 
-		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
@@ -513,7 +507,6 @@ class BackpackDataCollectorTest {
 		network.addNode(node2);
 		network.addLink(network.getFactory().createLink(link1, node1, node2));
 
-		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
@@ -567,9 +560,6 @@ class BackpackDataCollectorTest {
 		collector.getMessageHandlers()
 			.get(Backpack.Msg.class)
 			.handle(List.of(new Backpack.Msg(registered, List.of(), 0, new BackpackPlan.Msg(null, null, null))), 0);
-		collector.getMessageHandlers()
-			.get(VehicleContainer.class)
-			.handle(List.of(new VehicleContainer(null, null, new VehicleContainer.Occupant(ignoredAgent), List.of())), 0);
 
 		// make sure the collector doesn't crash when we send it events with the ignored agent.
 		collector.handleEvent(new ActivityEndEvent(100., ignored, link1, null, "home", new Coord(0, 0)));
