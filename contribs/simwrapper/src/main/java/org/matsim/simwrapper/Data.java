@@ -354,6 +354,12 @@ public final class Data {
 		return this;
 	}
 
+	/**
+	 * Returns the already registered args for the current context and command.
+	 */
+	public String[] getArgs(Class<? extends MATSimAppCommand> command) {
+		return currentContext.getArgs(command);
+	}
 
 	void setPath(Path path) {
 		this.path = path;

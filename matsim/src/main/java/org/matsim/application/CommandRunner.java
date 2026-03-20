@@ -293,6 +293,14 @@ public final class CommandRunner {
 	}
 
 	/**
+	 * Returns registered args for the command or an empty array if the command was not added.
+	 */
+	public String[] getArgs(Class<? extends MATSimAppCommand> command) {
+		String[] args = this.args.get(command);
+		return args == null ? new String[0] : Arrays.copyOf(args, args.length);
+	}
+
+	/**
 	 * Add a command with certain arguments to the runner.
 	 */
 	public void add(Class<? extends MATSimAppCommand> command, String... args) {
