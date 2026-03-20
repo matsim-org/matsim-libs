@@ -126,6 +126,14 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		if (component instanceof NetworkTrafficEngine n) {
 			this.networkTrafficEngine = n;
 		}
+
+		if (component instanceof NotifyAgentPartitionTransfer n) {
+			this.notifyAgentPartitionTransfers.add(n);
+		}
+
+		if (component instanceof NotifyVehiclePartitionTransfer n) {
+			this.notifyVehiclePartitionTransfers.add(n);
+		}
 	}
 
 	@Override
