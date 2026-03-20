@@ -23,7 +23,7 @@ package org.matsim.contrib.multimodal.router.util;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 public class UnknownTravelTimeFactory implements Provider<TravelTime> {
 

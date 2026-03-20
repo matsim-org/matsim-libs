@@ -74,7 +74,16 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
         return stopTime;
     }
 
-    void depart(TransitStopFacility stop, double now) {
+	@Override
+	protected void handleEndRoute(double now) {
+
+		// Delegates call to the correct access egress
+		if (getDeparture() != null)
+			accessEgress.relocatePassengers( this, getDeparture().getChainedDepartures(), now);
+
+	}
+
+	void depart(TransitStopFacility stop, double now) {
         handleDeparture(stop, now);
     }
 

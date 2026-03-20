@@ -1,18 +1,11 @@
 package org.matsim.contrib.drt.extension.reconfiguration;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
+import com.google.common.base.Verify;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.reconfiguration.logic.CapacityReconfigurationLogic;
 import org.matsim.contrib.drt.extension.reconfiguration.logic.DefaultCapacityReconfigurationLogic;
-import org.matsim.contrib.drt.schedule.DefaultDrtCapacityChangeTask;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
+import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
@@ -27,7 +20,9 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.common.base.Verify;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This {@link MobsimEngine} allows to plan the capacity change activities of
@@ -37,7 +32,7 @@ import com.google.common.base.Verify;
  * changes to be inserted in the vehicles' schedules and perform the insertion.
  * The desired capacity changes determined by the logic might be scheduled with
  * a later time if the vehicle cannot be there on time.
- * 
+ *
  * @author Tarek Chouaki (tkchouaki), IRT SystemX
  */
 public class CapacityReconfigurationEngine implements MobsimEngine {
@@ -61,7 +56,7 @@ public class CapacityReconfigurationEngine implements MobsimEngine {
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		for (DvrpVehicle vehicle : fleet.getVehicles().values()) {
 			Optional<DvrpLoad> updatedLoad = logic.getUpdatedStartCapacity(vehicle);
 
@@ -113,7 +108,7 @@ public class CapacityReconfigurationEngine implements MobsimEngine {
 						capacityChangeItem.time(), link);
 			}
 
-			// Then we insert a capacity change with a duration of one minute
+			// Then we insert a capacity change with duration = this.reconfigurationDuration
 			Task capacityChangeTask = new DefaultDrtCapacityChangeTask(capacityChangeBeginTime,
 					capacityChangeBeginTime + this.reconfigurationDuration, link, capacityChangeItem.capacity());
 

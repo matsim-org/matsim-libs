@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ControlerListenerManager.java
@@ -21,11 +20,7 @@
 
  package org.matsim.core.controler;
 
-import org.matsim.core.api.internal.MatsimManager;
-import org.matsim.core.controler.listener.ControlerListener;
-
-public interface ControlerListenerManager extends MatsimManager {
-
-	void addControlerListener(ControlerListener controlerListener);
+@Deprecated(since = "2025-07-19") // use ControllerListenerManager, with 2 'l'
+public interface ControlerListenerManager extends ControllerListenerManager {
 
 }

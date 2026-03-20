@@ -20,16 +20,23 @@
 
 package org.matsim.contrib.multimodal;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
- * 
+ *
  * This class shows an example how to set up a controler and with
  * an initialized multi-modal simulation.
  **
@@ -39,6 +46,7 @@ public class RunMultimodalExample {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig( args, new MultiModalConfigGroup() ) ;
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PrepareMultiModalScenario.run(scenario);
 		Controler controler = new Controler(scenario);

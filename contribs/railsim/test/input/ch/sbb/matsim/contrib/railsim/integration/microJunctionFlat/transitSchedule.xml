@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="A12" name="Platform A Outbound" x="-1227.5" y="0.0" linkRefId="A1-A2" stopAreaId="station_A"/>
+		<stopFacility id="A34" name="Platform A Inbound" x="-1505.0" y="-20.0" linkRefId="A3-A4" stopAreaId="station_A"/>
+
+		<stopFacility id="B12" name="Platform B Inbound" x="4030.0" y="0.0" linkRefId="B1-B2" stopAreaId="station_B"/>
+		<stopFacility id="B34" name="Platform B Outbound" x="3775.0" y="-20.0" linkRefId="B3-B4" stopAreaId="station_B"/>
+
+		<stopFacility id="C12" name="Platform C Inbound" x="3225.0" y="1167.5" linkRefId="C1-C2" stopAreaId="station_C"/>
+		<stopFacility id="C34" name="Platform C Outbound" x="3090.0" y="1065.0" linkRefId="C3-C4" stopAreaId="station_C"/>
+	</transitStops>
+
+	<transitLine id="linie_AB">
+		<transitRoute id="linie_AB_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="A12" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="B12" arrivalOffset="01:00:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="A1-A2"/>
+				<link refId="A2-SigA"/>
+				<link refId="SigA-Abzw1"/>
+				<link refId="Abzw1-Abzw1Post"/>
+				<link refId="Abzw1Post-Abzw3"/>
+				<link refId="Abzw3-ToB"/>
+				<link refId="ToB-B1"/>
+				<link refId="B1-B2"/>
+			</route>
+			<departures>
+				<departure id="AB0" departureTime="08:30:00" vehicleRefId="trainAB0"/>
+				<departure id="AB1" departureTime="08:30:05" vehicleRefId="trainAB1"/>
+				<departure id="AB2" departureTime="08:30:10" vehicleRefId="trainAB2"/>
+				<departure id="AB3" departureTime="08:30:15" vehicleRefId="trainAB3"/>
+				<departure id="AB4" departureTime="08:30:20" vehicleRefId="trainAB4"/>
+				<departure id="AB5" departureTime="08:30:25" vehicleRefId="trainAB5"/>
+				<departure id="AB6" departureTime="08:30:30" vehicleRefId="trainAB6"/>
+				<departure id="AB7" departureTime="08:30:33" vehicleRefId="trainAB7"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+	<transitLine id="linie_BA">
+		<transitRoute id="linie_BA_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="B34" arrivalOffset="01:00:00" awaitDeparture="false"/>
+				<stop refId="A34" departureOffset="00:00:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="B3-B4"/>
+				<link refId="B4-SigB"/>
+				<link refId="SigB-Abzw2"/>
+				<link refId="Abzw2-ToA"/>
+				<link refId="ToA-A3"/>
+				<link refId="A3-A4"/>
+			</route>
+			<departures>
+				<!-- Departure times for all vehicles from B to A-->
+				<departure id="BA0" departureTime="08:30:01" vehicleRefId="trainBA0"/>
+				<departure id="BA1" departureTime="08:30:03" vehicleRefId="trainBA1"/>
+				<departure id="BA2" departureTime="08:30:11" vehicleRefId="trainBA2"/>
+				<departure id="BA3" departureTime="08:30:14" vehicleRefId="trainBA3"/>
+				<departure id="BA4" departureTime="08:30:20" vehicleRefId="trainBA4"/>
+				<departure id="BA5" departureTime="08:30:23" vehicleRefId="trainBA5"/>
+				<departure id="BA6" departureTime="08:30:27" vehicleRefId="trainBA6"/>
+				<departure id="BA7" departureTime="08:30:33" vehicleRefId="trainBA7"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+	<transitLine id="linie_AC">
+		<transitRoute id="linie_CA_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="A12" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="C12" arrivalOffset="00:01:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="A1-A2"/>
+				<link refId="A2-SigA"/>
+				<link refId="SigA-Abzw1"/>
+				<link refId="Abzw1-ToC"/>
+				<link refId="ToC-C1"/>
+				<link refId="C1-C2"/>
+			</route>
+			<departures>
+				<departure id="AC0" departureTime="08:30:02" vehicleRefId="trainAC0"/>
+				<departure id="AC1" departureTime="08:30:07" vehicleRefId="trainAC1"/>
+				<departure id="AC2" departureTime="08:30:12" vehicleRefId="trainAC2"/>
+				<departure id="AC3" departureTime="08:30:17" vehicleRefId="trainAC3"/>
+				<departure id="AC4" departureTime="08:30:23" vehicleRefId="trainAC4"/>
+				<departure id="AC5" departureTime="08:30:28" vehicleRefId="trainAC5"/>
+				<departure id="AC6" departureTime="08:30:33" vehicleRefId="trainAC6"/>
+				<departure id="AC7" departureTime="08:30:36" vehicleRefId="trainAC7"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+	<transitLine id="linie_CA">
+		<transitRoute id="linie_CA_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="C34" arrivalOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="A34" departureOffset="00:01:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="C3-C4"/>
+				<link refId="C4-SigC"/>
+				<link refId="SigC-Abzw3"/>
+				<link refId="Abzw3-Abzw3Post"/>
+				<link refId="Abzw3Post-Abzw2"/>
+				<link refId="Abzw2-ToA"/>
+				<link refId="ToA-A3"/>
+				<link refId="A3-A4"/>
+			</route>
+			<departures>
+				<departure id="CA0" departureTime="08:30:02" vehicleRefId="trainCA0"/>
+				<departure id="CA1" departureTime="08:30:07" vehicleRefId="trainCA1"/>
+				<departure id="CA2" departureTime="08:30:11" vehicleRefId="trainCA2"/>
+				<departure id="CA3" departureTime="08:30:15" vehicleRefId="trainCA3"/>
+				<departure id="CA4" departureTime="08:30:25" vehicleRefId="trainCA4"/>
+				<departure id="CA5" departureTime="08:30:27" vehicleRefId="trainCA5"/>
+				<departure id="CA6" departureTime="08:30:35" vehicleRefId="trainCA6"/>
+				<departure id="CA7" departureTime="08:30:38" vehicleRefId="trainCA7"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+</transitSchedule>

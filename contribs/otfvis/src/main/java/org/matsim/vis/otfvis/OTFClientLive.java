@@ -43,6 +43,9 @@ import java.awt.*;
 
 public class OTFClientLive {
 
+	/**
+	 * Configures the OTFViz window and opens it.
+	 */
 	public static void run(final Config config, final OTFServer server) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -58,12 +61,12 @@ public class OTFClientLive {
 				connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 				// I think that this essentially just connects the quad tree ... so that not all links are used, but only those
 				// that are seen. kai, jun'16
-				
+
 				connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 
 				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 				// I think that this only works if at least one corresponding OTFDataWriter is added via OnTheFlyServer.addAdditionalElement(...).
-				
+
 				// Can we say something like
 				//     connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.WriteToProtocolBuffers.class);
 				// ???  But why would we set this on the client side?  Maybe the client has to tell the server what to send?  kai, jun'16
@@ -74,7 +77,7 @@ public class OTFClientLive {
 					connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
 				}
 
-				
+
 				Component canvas = OTFOGLDrawer.createGLCanvas(visconf);
 				OTFHostControl hostControl = new OTFHostControl(server, canvas);
 				OTFClientControl.getInstance().setOTFVisConfig(visconf); // has to be set before OTFClientQuadTree.getConstData() is invoked!
@@ -106,13 +109,13 @@ public class OTFClientLive {
 			}
 		});
 	}
-	
+
 	private static void assertZoomLevel17(Config config) {
 		if(ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).getMaximumZoom() != 17) {
 			throw new RuntimeException("The OSM layer only works with maximumZoomLevel = 17. Please adjust your config.");
 		}
 	}
-	
+
 	private static TileFactory osmTileFactory() {
 		final int max=17;
 		TileFactoryInfo info = new TileFactoryInfo(0, 17, 17,
@@ -130,7 +133,7 @@ public class OTFClientLive {
 		TileFactory tf = new DefaultTileFactory(info);
 		return tf;
 	}
-	
+
 	private static class OTFVisWMSTileFactory extends DefaultTileFactory {
 		public OTFVisWMSTileFactory(final WMSService wms, final int maxZoom) {
 			super(new TileFactoryInfo(0, maxZoom, maxZoom,

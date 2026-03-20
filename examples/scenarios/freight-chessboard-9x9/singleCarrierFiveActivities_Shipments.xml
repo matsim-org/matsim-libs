@@ -8,7 +8,8 @@
 		</attributes>
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
-				<vehicle id="freight_carrier1_veh_heavyVehicle_1" depotLinkId="j(0,1)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
+				<vehicle id="carrier_1_heavyVehicle" depotLinkId="j(0,1)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
+				<vehicle id="carrier_1_lightVehicle" depotLinkId="j(0,1)R" typeId="light" earliestStart="06:00:00" latestEnd="16:00:00"/>
 			</vehicles>
 		</capabilities>
 		<shipments>
@@ -23,7 +24,7 @@
 				<attributes>
 					<attribute name="jspritScore" class="java.lang.Double">-215.4666666666667</attribute>
 				</attributes>
-				<tour tourId="1" vehicleId="freight_carrier1_veh_heavyVehicle_1">
+				<tour tourId="1" vehicleId="carrier_1_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg expected_dep_time="06:00:00" expected_transp_time="00:00:00">
 						<route></route>

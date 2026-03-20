@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 
 /**
  * Marker interface, allowing to replace the element providing
@@ -28,4 +28,4 @@ import org.matsim.core.controler.listener.ControlerListener;
  *
  * @author thibautd
  */
-public interface PlansReplanning extends ControlerListener {}
+public interface PlansReplanning extends ControllerListener {}

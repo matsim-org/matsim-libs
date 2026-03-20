@@ -11,7 +11,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.geometry.GeometryUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 

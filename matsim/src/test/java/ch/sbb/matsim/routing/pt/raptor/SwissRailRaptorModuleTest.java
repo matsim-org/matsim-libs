@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -41,12 +41,12 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.controler.events.ControlerEvent;
+import org.matsim.core.controler.events.ControllerEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -298,7 +298,7 @@ public class SwissRailRaptorModuleTest {
             @Override
             public void install() {
                 install(new SwissRailRaptorModule());
-                addControlerListenerBinding().to(ScheduleModifierControlerListener.class);
+                addControllerListenerBinding().to(ScheduleModifierControllerListener.class);
             }
         });
 
@@ -382,7 +382,7 @@ public class SwissRailRaptorModuleTest {
         Assertions.assertEquals(-60.0, parameters.getRaptorParameters(personB).getMarginalUtilityOfWaitingPt_utl_s(), 1e-3);
     }
 
-    private static class ScheduleModifierControlerListener implements StartupListener, IterationStartsListener {
+    private static class ScheduleModifierControllerListener implements StartupListener, IterationStartsListener {
 
         @Override
         public void notifyIterationStarts(IterationStartsEvent event) {
@@ -397,7 +397,7 @@ public class SwissRailRaptorModuleTest {
             event.getServices().getEvents().processEvent(new TransitScheduleChangedEvent(0.0));
         }
 
-        private void addLineAndStop(ControlerEvent event, int iteration) {
+        private void addLineAndStop(ControllerEvent event, int iteration) {
             TransitSchedule schedule = event.getServices().getScenario().getTransitSchedule();
             TransitScheduleFactory scheduleFactory = schedule.getFactory();
             Vehicles transitVehicles = event.getServices().getScenario().getTransitVehicles();
@@ -436,7 +436,7 @@ public class SwissRailRaptorModuleTest {
             schedule.addTransitLine(addedLine);
         }
 
-        private void removeGreenLineAndStop(ControlerEvent event) {
+        private void removeGreenLineAndStop(ControllerEvent event) {
             TransitSchedule schedule = event.getServices().getScenario().getTransitSchedule();
 
             // Remove a line and a stop only served by that line
@@ -445,6 +445,41 @@ public class SwissRailRaptorModuleTest {
             schedule.removeStopFacility(schedule.getFacilities().get(Id.create("13", TransitStopFacility.class)));
         }
 
+    }
+
+    @Test
+	void testModeToModeTransferPenalty() {
+        Config config = ConfigUtils.createConfig();
+        config.controller().setLastIteration(0);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setCreateGraphs(false);
+        config.controller().setDumpDataAtEnd(false);
+        config.transit().setUseTransit(true);
+
+        SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
+        
+        SwissRailRaptorConfigGroup.ModeToModeTransferPenalty trainToShip = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty("train",TransportMode.ship,1000000.0);
+		SwissRailRaptorConfigGroup.ModeToModeTransferPenalty shipToTrain = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty(TransportMode.ship,"train",1000000.0);
+		srrConfig.addModeToModeTransferPenalty(trainToShip);
+		srrConfig.addModeToModeTransferPenalty(shipToTrain);
+
+        Scenario scenario = ScenarioUtils.createScenario(config);
+        Controler controler = new Controler(scenario);
+
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                install(new SwissRailRaptorModule());
+            }
+        });
+        controler.run();
+
+        TripRouter tripRouter = controler.getInjector().getInstance(TripRouter.class);
+
+        // this test mostly checks that no exception occurred
+
+        RoutingModule module = tripRouter.getRoutingModule(TransportMode.pt);
+        Assertions.assertTrue(module instanceof SwissRailRaptorRoutingModule);
     }
 
 }

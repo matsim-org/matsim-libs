@@ -17,11 +17,13 @@ bin
 .settings
 bin
 target
-accessibility/test/output/
 matsim4urbansim/.gitignore
 matsim4urbansim/test/.gitignore
-#
-#contrib/signals
+
+# contribs test output
+
+accessibility/test/output/
+
 signals/output
 signals/**/output
 signals/**/*.aux
@@ -32,3 +34,20 @@ signals/**/*.bbl
 signals/**/*.blg
 signals/**/*.bak
 
+noise/nullaverage_damages_link/*.csv*
+noise/nullaverage_damages_link_car/*.csv*
+noise/nullaverage_damages_link_hgv/*.csv*
+noise/nulldamages_receiverPoint/*.csv*
+
+atap/exact-replanning.log
+
+discrete_mode_choice/test_determinism/*
+
+application/test/input/org/matsim/application/analysis/population/TripAnalysisTest/defaultParametersTest/persons.csv
+application/test/input/org/matsim/application/analysis/population/TripAnalysisTest/defaultParametersTest/trips.csv
+application/test/input/org/matsim/application/analysis/population/TripAnalysisTest/personFilterTest/persons.csv
+application/test/input/org/matsim/application/analysis/population/TripAnalysisTest/personFilterTest/trips.csv
+application/mode_chains.csv
+application/mode_share_per_purpose.csv
+application/status.md
+application/warnings.csv

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="0" x="0.0" y="0.0" linkRefId="0" isBlocking="false"/>
+		<stopFacility id="1" x="1000.0" y="0.0" linkRefId="1" isBlocking="false"/>
+		<stopFacility id="2" x="2000.0" y="0.0" linkRefId="2" isBlocking="false"/>
+		<stopFacility id="3" x="3000.0" y="0.0" linkRefId="3" isBlocking="false"/>
+		<stopFacility id="4" x="4000.0" y="0.0" linkRefId="4" isBlocking="false"/>
+	</transitStops>
+</transitSchedule>

@@ -37,7 +37,7 @@ public class RoadPricingUtils {
 		return new RoadPricingConfigGroup();
 	}
 
-	//	public static RoadPricingModule createModule(RoadPricingScheme scheme) {
+	//	public static RoadPricingModule createModule(RoadPricingScheme scheme)
 //		return new RoadPricingModule(scheme);
 //	}
 
@@ -50,6 +50,18 @@ public class RoadPricingUtils {
 	}
 	public static RoadPricingSchemeImpl addOrGetMutableRoadPricingScheme( Scenario scenario ) {
 		return (RoadPricingSchemeImpl) addOrGetRoadPricingScheme( scenario );
+	}
+
+	/**
+	 * Creates a new RoadPricingSchemeImpl.
+	 * KMT Jun'25: This is a bit hacky, but I need a way to create an empty RoadPricingSchemeImpl and does not want to make it public.
+	 * Reason: I want to use a RoadPricingSchemeUsingTollFactor, but all many other methods here return a RoadPricingSchemeImpl.
+	 * <p></p>
+	 * @deprecated: Since this is a hack, please do not use use this method in new code. We will need to find a better way to directly add
+	 * @return an empty RoadPricingSchemeImpl.
+	 */
+	public static RoadPricingSchemeImpl createRoadPricingSchemeImpl(){
+		return new RoadPricingSchemeImpl();
 	}
 
 	/**
@@ -80,7 +92,7 @@ public class RoadPricingUtils {
 		}
 		return (RoadPricingScheme) sc.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 	}
-	
+
 	public static void addRoadPricingScheme( Scenario scenario, RoadPricingScheme roadPricingScheme ) {
 		scenario.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, roadPricingScheme);
 	}

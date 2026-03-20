@@ -21,19 +21,18 @@
 package org.matsim.core.scoring;
 
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerListenerManager;
-import org.matsim.core.controler.ControlerListenerManagerImpl;
+import org.matsim.core.controler.ControllerListenerManager;
+import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
-
-import jakarta.inject.Inject;
 
 
 /**
@@ -41,7 +40,7 @@ import jakarta.inject.Inject;
  * based on events. The final scores are written to the selected plans of each person in the
  * scenario when you call finish on this instance if you created this instance with the corresponding
  * factory method.
- *
+ * <p>
  * The Controler does not use this class, but rather uses its delegates directly.
  * Create your own instance if you want to compute scores from an Event file, for example.
  *
@@ -50,18 +49,18 @@ import jakarta.inject.Inject;
 public final class EventsToScore {
 
 	private final NewScoreAssigner newScoreAssigner;
-	private final ControlerListenerManagerImpl controlerListenerManager;
-	private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
+	private final ControllerListenerManagerImpl controllerListenerManager;
+	private final ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	private final Population population;
 
 	private boolean finished = false;
 
-	private int iteration = -1 ;
+	private int iteration = -1;
 	private boolean isLastIteration = false;
 
 	@Inject
-	private EventsToScore(ControlerListenerManagerImpl controlerListenerManager, ScoringFunctionsForPopulation scoringFunctionsForPopulation, final Scenario scenario, NewScoreAssigner newScoreAssigner) {
-		this.controlerListenerManager = controlerListenerManager;
+	private EventsToScore(ControllerListenerManagerImpl controllerListenerManager, ScoringFunctionsForPopulation scoringFunctionsForPopulation, final Scenario scenario, NewScoreAssigner newScoreAssigner) {
+		this.controllerListenerManager = controllerListenerManager;
 		this.scoringFunctionsForPopulation = scoringFunctionsForPopulation;
 		this.population = scenario.getPopulation();
 		this.newScoreAssigner = newScoreAssigner;
@@ -69,48 +68,48 @@ public final class EventsToScore {
 
 	public static EventsToScore createWithScoreUpdating(final Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
-				new ScenarioByInstanceModule(scenario),
-				new StandaloneExperiencedPlansModule(false),
-				new AbstractModule() {
-					@Override
-					public void install() {
-						bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
-						bind(ScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
-						bind(NewScoreAssigner.class).to(NewScoreAssignerImpl.class).asEagerSingleton();
-						bind(EventsToScore.class).asEagerSingleton();
-						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
-						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
-						bind(EventsManager.class).toInstance(eventsManager);
-						bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
-					}
-				});
+			new ScenarioByInstanceModule(scenario),
+			new StandaloneExperiencedPlansModule(false),
+			new AbstractModule() {
+				@Override
+				public void install() {
+					bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
+					bind(ScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
+					bind(NewScoreAssigner.class).to(NewScoreAssignerImpl.class).asEagerSingleton();
+					bind(EventsToScore.class).asEagerSingleton();
+					bind(ControllerListenerManagerImpl.class).asEagerSingleton();
+					bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class);
+					bind(EventsManager.class).toInstance(eventsManager);
+					bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
+				}
+			});
 		return injector.getInstance(EventsToScore.class);
 	}
 
 	public static EventsToScore createWithoutScoreUpdating(Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
-				new ScenarioByInstanceModule(scenario),
-				new StandaloneExperiencedPlansModule(false),
-				new AbstractModule() {
-					@Override
-					public void install() {
-						bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
-						bind(ScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
-						bind(NewScoreAssigner.class).to(NoopNewScoreAssignerImpl.class).asEagerSingleton();
-						bind(EventsToScore.class).asEagerSingleton();
-						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
-						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
-						bind(EventsManager.class).toInstance(eventsManager);
-						bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
-					}
-				});
+			new ScenarioByInstanceModule(scenario),
+			new StandaloneExperiencedPlansModule(false),
+			new AbstractModule() {
+				@Override
+				public void install() {
+					bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
+					bind(ScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
+					bind(NewScoreAssigner.class).to(NoopNewScoreAssignerImpl.class).asEagerSingleton();
+					bind(EventsToScore.class).asEagerSingleton();
+					bind(ControllerListenerManagerImpl.class).asEagerSingleton();
+					bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class);
+					bind(EventsManager.class).toInstance(eventsManager);
+					bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
+				}
+			});
 		return injector.getInstance(EventsToScore.class);
 	}
 
 	public void beginIteration(int iteration, boolean isLastIteration) {
 		this.iteration = iteration;
 		this.isLastIteration = isLastIteration;
-		this.controlerListenerManager.fireControlerIterationStartsEvent(iteration, isLastIteration);
+		this.controllerListenerManager.fireControllerIterationStartsEvent(iteration, isLastIteration);
 	}
 
 	/**
@@ -121,9 +120,13 @@ public final class EventsToScore {
 		if (iteration == -1) {
 			throw new RuntimeException("Please initialize me before the iteration starts.");
 		}
-		controlerListenerManager.fireControlerAfterMobsimEvent(iteration, isLastIteration);
+		controllerListenerManager.fireControllerAfterMobsimEvent(iteration, isLastIteration);
 		scoringFunctionsForPopulation.finishScoringFunctions();
-		newScoreAssigner.assignNewScores(this.iteration, scoringFunctionsForPopulation, population);
+
+		for (var person : population.getPersons().values()) {
+			var sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
+			newScoreAssigner.assignNewScore(this.iteration, sf, person);
+		}
 		finished = true;
 	}
 
@@ -131,8 +134,7 @@ public final class EventsToScore {
 	 * Returns the score of a single agent. This method only returns useful
 	 * values if the method {@link #finish() } was called before. description
 	 *
-	 * @param agentId
-	 *            The id of the agent the score is requested for.
+	 * @param agentId The id of the agent the score is requested for.
 	 * @return The score of the specified agent.
 	 */
 	public Double getAgentScore(final Id<Person> agentId) {
@@ -146,8 +148,9 @@ public final class EventsToScore {
 	}
 
 	private static class NoopNewScoreAssignerImpl implements NewScoreAssigner {
+
 		@Override
-		public void assignNewScores(int iteration, ScoringFunctionsForPopulation scoringFunctionsForPopulation, Population population) {
+		public void assignNewScore(int iteration, ScoringFunction scoringFunction, Person person) {
 
 		}
 	}

@@ -43,7 +43,7 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerD
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.router.util.TravelTime;
@@ -76,7 +76,8 @@ public class SimpleResponsiveSignal extends AbstractSignalController implements 
 
 	public final static class SimpleResponsiveSignalFactory implements SignalControllerFactory {
 
-		@Inject ControlerListenerManager manager;
+		@Inject
+		ControllerListenerManager manager;
 		@Inject Scenario scenario;
 		@Inject SignalModelFactory factory;
 
@@ -89,7 +90,7 @@ public class SimpleResponsiveSignal extends AbstractSignalController implements 
 
 			/* add the responsive signal as a controler listener to be able to listen to
 			 * AfterMobsimEvents (which provide the TravelTime object): */
-			manager.addControlerListener(controller);
+			manager.addControllerListener(controller);
 
 			return controller;
 		}

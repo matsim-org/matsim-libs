@@ -84,7 +84,7 @@ public class RunReceiverChessboardWithEqualProportionCost {
 	 */
 	static void prepareFreightOutputDataAndStats(MatsimServices controler) {
 		CarrierScoreStats scoreStats = new CarrierScoreStats(CarriersUtils.getCarriers(controler.getScenario()), controler.getScenario().getConfig().controller().getOutputDirectory() + "/carrier_scores", true);
-		controler.addControlerListener(scoreStats);
+		controler.addControllerListener(scoreStats);
 	}
 
 }

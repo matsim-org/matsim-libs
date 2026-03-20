@@ -20,11 +20,10 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.*;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Id;
@@ -37,11 +36,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -50,8 +45,7 @@ import org.matsim.core.modal.ModalProviders;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
+import java.util.*;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -81,14 +75,14 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 
 	TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
-			Network network, PassengerRequestValidator requestValidator, Scenario scenario) {
-		this(mode, eventsManager, mobsimTimer, requestCreator, teleportedRouteCalculator, network, requestValidator,
+			DvrpPassengerTracker tracker, Network network, PassengerRequestValidator requestValidator, Scenario scenario) {
+		this(mode, eventsManager, mobsimTimer, requestCreator, teleportedRouteCalculator, tracker, network, requestValidator,
 				new DefaultTeleportationEngine(scenario, eventsManager, false));
 	}
 
 	TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
-			Network network, PassengerRequestValidator requestValidator, TeleportationEngine teleportationEngine) {
+			DvrpPassengerTracker tracker, Network network, PassengerRequestValidator requestValidator, TeleportationEngine teleportationEngine) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
@@ -97,8 +91,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		this.network = network;
 		this.requestValidator = requestValidator;
 		this.teleportationEngine = teleportationEngine;
-
-		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
+		this.internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager, tracker);
 	}
 
 	@Override
@@ -109,8 +102,8 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	}
 
 	@Override
-	public void onPrepareSim() {
-		teleportationEngine.onPrepareSim();
+	public void beforeSim() {
+		teleportationEngine.beforeSim();
 	}
 
 	@Override
@@ -225,7 +218,9 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 			public TeleportingPassengerEngine get() {
 				return new TeleportingPassengerEngine(getMode(), eventsManager, mobsimTimer,
 						getModalInstance(PassengerRequestCreator.class),
-						getModalInstance(TeleportedRouteCalculator.class), getModalInstance(Network.class),
+						getModalInstance(TeleportedRouteCalculator.class),
+						getModalInstance(DvrpPassengerTracker.class),
+						getModalInstance(Network.class),
 						getModalInstance(PassengerRequestValidator.class), scenario);
 			}
 		};

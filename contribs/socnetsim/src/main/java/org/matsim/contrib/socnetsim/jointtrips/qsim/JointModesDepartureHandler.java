@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.qsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,7 +27,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
-import org.matsim.contrib.socnetsim.qsim.NetsimWrappingQVehicleProvider;
 import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
 import org.matsim.contrib.socnetsim.utils.IdentifiableCollectionsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -44,6 +38,11 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -59,7 +58,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 	// map driverId -> driver info
 	private final Map<Id , WaitingDriver> waitingDrivers =
 		new LinkedHashMap<Id , WaitingDriver>();
-	
+
 	public JointModesDepartureHandler(
 			final QNetsimEngineI netsimEngine) {
 //		this( new NetsimWrappingQVehicleProvider( netsimEngine ),
@@ -250,7 +249,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		// do nothing
 	}
 

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Creates a Link Volume Map for simwrapper.
  */
-public class Links extends Viz {
+public class Links extends VizMap<Links> {
 
 	/**
 	 * Sets the path of the network file.
@@ -24,6 +24,11 @@ public class Links extends Viz {
 	 * Sets the center coordinates.
 	 */
 	public double[] center;
+
+	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
 
 	/**
 	 * Sets the display options for the map.

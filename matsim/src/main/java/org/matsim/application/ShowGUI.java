@@ -28,10 +28,6 @@ class ShowGUI implements Callable<Integer> {
 
 		File configFile = null;
 
-		// Try to load default config file
-		if (parent.getDefaultScenario() != null && new File(parent.getDefaultScenario()).exists())
-			configFile = new File(parent.getDefaultScenario());
-
 		// override the default if present
 		if (parent.getConfigPath() != null)
 			configFile = new File(parent.getConfigPath());

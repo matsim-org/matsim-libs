@@ -63,7 +63,7 @@ public class OccupancyTrackerTest {
 		events.addHandler(tracker);
 
 		events.initProcessing();
-		f.generateEvents(events);
+		f.generateEvents_regular(events);
 
 		DepartureData data;
 		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:45:00")); // before there is any vehicle
@@ -120,6 +120,9 @@ public class OccupancyTrackerTest {
 		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:40:00"));
 		Assertions.assertEquals(f.dep5, data.departureId);
 
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:46:00"));
+		Assertions.assertEquals(f.dep5, data.departureId);
+
 		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:50:00"));
 		Assertions.assertEquals(f.dep5, data.departureId);
 
@@ -127,6 +130,197 @@ public class OccupancyTrackerTest {
 		Assertions.assertEquals(f.dep5, data.departureId);
 
 		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:50:30"));
+		Assertions.assertNull(data);
+	}
+
+	@Test
+	void testGetNextDeparture_withBusAtStop() {
+		Fixture f = new Fixture();
+
+		EventsManager events = EventsUtils.createEventsManager();
+		OccupancyData occData = new OccupancyData();
+		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events, new SubpopulationScoringParameters(f.scenario));
+		events.addHandler(tracker);
+
+		events.initProcessing();
+		f.generateEvents_WithBusAtStop(events);
+		events.finishProcessing();
+
+		DepartureData data;
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:45:00")); // before there is any vehicle
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:55:00")); // before we have any pax observations
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:00"));
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:30"));
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:31"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:05:00"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:06:00"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:10:00"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:10:20"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:10:21"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:11:00"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:18:00"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:20:10"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:20:11"));
+		Assertions.assertEquals(f.dep3, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:22:00"));
+		Assertions.assertEquals(f.dep3, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:30:00"));
+		Assertions.assertEquals(f.dep3, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:31:00"));
+		Assertions.assertEquals(f.dep3, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("08:30:00"));
+		Assertions.assertEquals(f.dep3, data.departureId);
+	}
+
+	@Test
+	void testGetNextDeparture_NoPax() {
+		Fixture f = new Fixture();
+
+		EventsManager events = EventsUtils.createEventsManager();
+		OccupancyData occData = new OccupancyData();
+		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events, new SubpopulationScoringParameters(f.scenario));
+		events.addHandler(tracker);
+
+		events.initProcessing();
+		f.generateEvents_NoPax(events);
+		events.finishProcessing();
+
+		DepartureData data;
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:45:00")); // before there is any vehicle
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:55:00")); // before we have any pax observations
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:00"));
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:30"));
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:31"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:05:00"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:06:00"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:10:00"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:10:20"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:10:21"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:11:00"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:18:00"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:20:10"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		// we can only detect vehicles that depart at a stop, or pick up passengers at a stop
+		// without either of these two, we cannot detect the departure, thus expect null.
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:20:11"));
+		Assertions.assertNull(data);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:22:00"));
+		Assertions.assertNull(data);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("08:30:00"));
+		Assertions.assertNull(data);
+	}
+
+	@Test
+	void testGetNextDeparture_SinglePax() {
+		Fixture f = new Fixture();
+
+		EventsManager events = EventsUtils.createEventsManager();
+		OccupancyData occData = new OccupancyData();
+		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events, new SubpopulationScoringParameters(f.scenario));
+		events.addHandler(tracker);
+
+		events.initProcessing();
+		f.generateEvents_SinglePax(events);
+		events.finishProcessing();
+
+		DepartureData data;
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:45:00")); // before there is any vehicle
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:55:00")); // before we have any pax observations
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:00"));
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:10"));
+		Assertions.assertEquals(f.dep0, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:11"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:10:00"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:10:10"));
+		Assertions.assertEquals(f.dep1, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:10:11"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:11:00"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:20:20"));
+		Assertions.assertEquals(f.dep2, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:20:21"));
+		Assertions.assertEquals(f.dep3, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:22:00"));
+		Assertions.assertEquals(f.dep3, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:30:00"));
+		Assertions.assertEquals(f.dep3, data.departureId);
+
+		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:31:00"));
 		Assertions.assertNull(data);
 	}
 
@@ -140,7 +334,8 @@ public class OccupancyTrackerTest {
 		events.addHandler(tracker);
 
 		events.initProcessing();
-		f.generateEvents(events);
+		f.generateEvents_regular(events);
+		events.finishProcessing();
 
 		DepartureData data;
 		data = occData.getDepartureData(f.line1, f.route1, f.stop1, f.dep0);
@@ -212,7 +407,11 @@ public class OccupancyTrackerTest {
 			line.addRoute(route);
 		}
 
-		public void generateEvents(EventsManager events) {
+		/**
+		 * generates events for 7 vehicles serving stop1 with 8 passengers.
+		 * all vehicles leave stop1, no vehicle is located at a stop.
+		 */
+		public void generateEvents_regular(EventsManager events) {
 
 			/*
 			 *       7:00      7:10      7:20      7:30      7:40      7:50      8:00
@@ -283,8 +482,140 @@ public class OccupancyTrackerTest {
 			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:50:00"), this.veh5, this.stop1, 0.0));
 			events.processEvent(new PersonEntersVehicleEvent(Time.parseTime("07:50:10"), this.pax8, this.veh5));
 			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:50:20"), this.veh5, this.stop1, 0.0));
+		}
 
-			events.finishProcessing();
+		/**
+		 * generates events for 4 vehicles serving stop1 with 2 passengers.
+		 * vehicles 0-2 leave stop1, but vehicle 3 is currently at stop1 and does not leave it.
+		 */
+		public void generateEvents_WithBusAtStop(EventsManager events) {
+
+			/*
+			 *       7:00      7:10      7:20      7:30      7:40      7:50      8:00
+			 *        |---------|---------|---------|---------|---------|---------|----> time
+			 *
+			 *   dep: ^         ^         ^         ^
+			 *        0         1         2         3
+			 *
+			 *   pax:       ^                  ^
+			 *              1                  2
+			 *
+			 *                  |         |         |
+			 * pax-dep    1     |  2      |     3   |
+			 *                  |         |         |
+			 */
+
+			Id<Link> linkId = Id.create("1", Link.class);
+
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:00:00"), this.veh0, this.stop1, 0.0));
+			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:00:30"), this.veh0, this.stop1, 0.0));
+
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:03:00"), this.pax1, linkId, "pt", "pt"));
+			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:03:00"), this.pax1, this.stop1, this.stop2));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:10:00"), this.veh1, this.stop1, 0.0));
+			events.processEvent(new PersonEntersVehicleEvent(Time.parseTime("07:10:10"), this.pax1, this.veh1));
+			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:10:20"), this.veh1, this.stop1, 0.0));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:20:00"), this.veh2, this.stop1, 0.0));
+			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:20:10"), this.veh2, this.stop1, 0.0));
+
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:26:00"), this.pax2, linkId, "pt", "pt"));
+			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:26:00"), this.pax2, this.stop1, this.stop2));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:30:00"), this.veh3, this.stop1, 0.0));
+			events.processEvent(new PersonEntersVehicleEvent(Time.parseTime("07:30:10"), this.pax2, this.veh3));
+		}
+
+		/**
+		 * generates events for 5 vehicles serving stop1, but there are no passengers.
+		 * vehicles 0-3 leave stop1, but vehicle 4 is currently at stop1 and does not leave it.
+		 */
+		public void generateEvents_NoPax(EventsManager events) {
+
+			/*
+			 *       7:00      7:10      7:20      7:30      7:40      7:50      8:00
+			 *        |---------|---------|---------|---------|---------|---------|----> time
+			 *
+			 *   dep: ^         ^         ^         ^
+			 *        0         1         2         3
+			 *
+			 *   pax:
+			 *
+			 *
+			 *                  |         |         |
+			 * pax-dep    1     |  2      |     3   |
+			 *                  |         |         |
+			 */
+
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:00:00"), this.veh0, this.stop1, 0.0));
+			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:00:30"), this.veh0, this.stop1, 0.0));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:10:00"), this.veh1, this.stop1, 0.0));
+			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:10:20"), this.veh1, this.stop1, 0.0));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:20:00"), this.veh2, this.stop1, 0.0));
+			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:20:10"), this.veh2, this.stop1, 0.0));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:30:00"), this.veh3, this.stop1, 0.0));
+		}
+
+		/**
+		 * generates events for 5 vehicles serving stop1, but there are no passengers.
+		 * vehicles 0-3 leave stop1, but vehicle 4 is currently at stop1 and does not leave it.
+		 */
+		public void generateEvents_SinglePax(EventsManager events) {
+
+			/*
+			 *       7:00      7:10      7:20      7:30      7:40      7:50      8:00
+			 *        |---------|---------|---------|---------|---------|---------|----> time
+			 *
+			 *   dep: ^         ^         ^         ^         ^
+			 *        0         1         2         3         4
+			 *
+			 *   pax:                ^
+			 *                       1
+			 *
+			 *                  |         |         |         |
+			 * pax-dep     1    |    2    |     3   |    4    |
+			 *                  |         |         |         |
+			 */
+
+			Id<Link> linkId = Id.create("1", Link.class);
+
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
+			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:59:00"), this.driver4, this.veh4, this.line1, this.route1, this.dep4));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:00:00"), this.veh0, this.stop1, 0.0));
+			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:00:10"), this.veh0, this.stop1, 0.0));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:10:00"), this.veh1, this.stop1, 0.0));
+			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:10:10"), this.veh1, this.stop1, 0.0));
+
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:15:00"), this.pax1, linkId, "pt", "pt"));
+			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:15:00"), this.pax1, this.stop1, this.stop2));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:20:00"), this.veh2, this.stop1, 0.0));
+			events.processEvent(new PersonEntersVehicleEvent(Time.parseTime("07:20:10"), this.pax1, this.veh1));
+			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:20:20"), this.veh2, this.stop1, 0.0));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:30:00"), this.veh3, this.stop1, 0.0));
+			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:30:10"), this.veh3, this.stop1, 0.0));
+
+			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:40:00"), this.veh4, this.stop1, 0.0));
 		}
 
 	}

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Collection;
 
 

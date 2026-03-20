@@ -20,11 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,7 +31,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -47,6 +41,11 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -117,9 +116,9 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 			}
 		}
 
-		qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
+		qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory, this, sim.getAgentCounter(), sim.getSimTimer()  ) ;
 
-		qNetwork.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
+//		qNetwork.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
 		// yyyy this now looks like the initialize could be integrated into the constructor?!  kai, jan'25
 		// It is not possible to define these two in a simple way ...
 		// ... since inside the initialize method there is a call qNetsimEnge.getQNetwork(), and that is not there until the ctor is completed
@@ -150,7 +149,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	}
 
 	@Override
-	public final void onPrepareSim() {
+	public final void beforeSim() {
 		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
 		// (infoTime may be < simStartTime, this ensures to print out the * info at the very first timestep already)
 
@@ -202,7 +201,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	protected abstract void run(double time);
 
 	/**
-	 * create all necessary {@link AbstractQNetsimEngineRunner}. Will be called during {@link #onPrepareSim()}.
+	 * create all necessary {@link AbstractQNetsimEngineRunner}. Will be called during {@link #beforeSim()}.
 	 *
 	 * @return the list of {@link AbstractQNetsimEngineRunner}
 	 */
@@ -237,8 +236,10 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		}
 		QLinkI qlink = qNetwork.getNetsimLinks().get(startLinkId );
 		if (qlink == null) {
-			throw new RuntimeException("requested link with id=" + startLinkId + " does not exist in network. Possible vehicles "
-					+ "or activities or facilities are registered to a different network.") ;
+			final String message = "vehicleId=" + veh.getId() + " requested link with id=" + startLinkId + ", which does not exist in network. Possibly, vehicles "
+									   + "or activities or facilities are registered to a different network.";
+			log.fatal( message );
+			throw new RuntimeException( message ) ;
 		}
 		qlink.addParkedVehicle(veh);
 	}

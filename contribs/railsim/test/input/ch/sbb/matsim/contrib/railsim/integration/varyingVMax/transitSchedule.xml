@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="stop_A" x="0" y="0" linkRefId="link_A-B" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="stop_B" x="10000" y="0" linkRefId="link_B-C" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="stop_C" x="20000" y="0" linkRefId="link_C-D" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="stop_D" x="30000" y="0" linkRefId="link_C-D" isBlocking="false">
+		</stopFacility>
+	</transitStops>
+
+	<transitLine id="line1">
+		<transitRoute id="line1_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="stop_A" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="stop_B" arrivalOffset="00:08:00" departureOffset="00:10:00" awaitDeparture="true" minimumStopDuration="60"/>
+				<stop refId="stop_C" arrivalOffset="00:18:00" departureOffset="00:20:00" awaitDeparture="true" minimumStopDuration="60"/>
+				<stop refId="stop_D" arrivalOffset="00:28:00"/>
+			</routeProfile>
+			<route>
+				<link refId="link_A-B"/>
+				<link refId="link_B-C"/>
+				<link refId="link_C-D"/>
+				<link refId="link_D-E"/>
+			</route>
+			<departures>
+				<departure id="1" departureTime="08:00:00" vehicleRefId="train1"/>
+				<departure id="2" departureTime="08:00:00" vehicleRefId="train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

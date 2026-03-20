@@ -20,8 +20,9 @@
 
 package org.matsim.pt.transitSchedule;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -80,6 +81,19 @@ public class TransitRouteStopTest {
 	}
 
 	@Test
+	void testMinimumStopDuration() {
+		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
+		double arrivalDelay = 4;
+		double departureDelay = 5;
+		TransitRouteStop routeStop = createTransitRouteStop(stopFacility, arrivalDelay, departureDelay);
+		assertEquals(0.0, routeStop.getMinimumStopDuration(), MatsimTestUtils.EPSILON);
+		routeStop.setMinimumStopDuration(30.0);
+		assertEquals(30.0, routeStop.getMinimumStopDuration(), MatsimTestUtils.EPSILON);
+		routeStop.setMinimumStopDuration(0.0);
+		assertEquals(0.0, routeStop.getMinimumStopDuration(), MatsimTestUtils.EPSILON);
+	}
+
+	@Test
 	void testEquals() {
 		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
 		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
@@ -90,6 +104,8 @@ public class TransitRouteStopTest {
 		TransitRouteStop stop5 = createTransitRouteStop(stopFacility1, 20, 50);
 		TransitRouteStop stop6 = createTransitRouteStop(null, 10, 50);
 		TransitRouteStop stop7 = createTransitRouteStop(null, 10, 50);
+		TransitRouteStop stop8 = createTransitRouteStop(stopFacility1, 10, 50);
+		stop8.setMinimumStopDuration(30.0);
 
 		assertTrue(stop1.equals(stop2));
 		assertTrue(stop2.equals(stop1));
@@ -101,6 +117,8 @@ public class TransitRouteStopTest {
 		assertFalse(stop4.equals(stop1));
 		assertFalse(stop1.equals(stop5)); // different arrivalDelay
 		assertFalse(stop5.equals(stop1));
+		assertFalse(stop1.equals(stop8)); // different minimumStopDuration
+		assertFalse(stop8.equals(stop1));
 
 		assertFalse(stop1.equals(stop6)); // null stop facility in stop6
 		assertFalse(stop6.equals(stop1));

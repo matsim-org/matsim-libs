@@ -26,7 +26,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
  * @author dgrether
  *
  */
-public interface IterationEndsListener extends ControlerListener {
+public interface IterationEndsListener extends ControllerListener {
 	/**
 	 * Notifies all observers of the Controler that a iteration is finished
 	 * @param event

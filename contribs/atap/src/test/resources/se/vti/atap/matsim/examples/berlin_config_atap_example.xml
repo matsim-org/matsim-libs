@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	
+	<module name="atap">	
+		<param name="reduceLogging" value="true" />
+		<!-- Otherwise using default configuration, see ATAPConfigGroup for options. -->
+	</module>
+	
+	<module name="emulation">
+		<!-- Using default configuration, see EmulationConfigGroup for options. -->
+	</module>
+
+	<!-- Configuration not specfic to ATAP below. -->
+
+	<module name="global">
+		<param name="coordinateSystem" value="GK4" />
+	</module>
+	
+	<module name="network">
+		<param name="inputNetworkFile" value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/zz_archive/2014-08-01_car_1pct/network.xml.gz" />
+	</module>
+	
+	<module name="plans">
+		<param name="inputPlansFile" value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/zz_archive/2014-08-01_car_1pct/run_160.150.plans_selected.xml.gz" />
+	</module>
+	
+	<module name="qsim">
+		<param name="flowCapacityFactor" value="0.02" />
+		<param name="storageCapacityFactor" value="0.02" />
+		<param name="removeStuckVehicles" value="false" />
+	</module>
+	
+	<module name="vspExperimental">
+		<param name="vspDefaultsCheckingLevel" value="ignore" />
+	</module>
+	
+	<module name="controler">
+		<param name="outputDirectory" value="output/berlin" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="300" />
+		<param name="eventsFileFormat" value="xml" />
+		<param name="mobsim" value="qsim" />
+		<param name="writePlansInterval" value="50" />
+		<param name="writeEventsInterval" value="50" />
+		<param name="snapshotFormat" value="" />
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="10" /> <!-- 0 means unlimited -->
+		
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="ChangeExpBeta" />
+			<param name="weight" value="0.8" />
+		</parameterset>
+
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="ReRoute" />
+			<param name="weight" value="0.2" />
+			<param name="disableAfterIteration" value="200" />
+		</parameterset>
+	</module>
+	
+	<module name="planCalcScore" >
+		<parameterset type="activityParams" >
+			<param name="activityType" value="home" />
+			<param name="typicalDuration" value="43200.0" />
+		</parameterset>
+
+		<parameterset type="activityParams" >
+			<param name="activityType" value="work" />
+			<param name="typicalDuration" value="32400.0" />
+		</parameterset>
+
+		<parameterset type="activityParams" >
+			<param name="activityType" value="leis" />
+			<param name="typicalDuration" value="7200.0" />
+		</parameterset>
+
+		<parameterset type="activityParams" >
+			<param name="activityType" value="shop" />
+			<param name="typicalDuration" value="3600.0" />
+		</parameterset>
+
+		<parameterset type="activityParams" >
+			<param name="activityType" value="other" />
+			<param name="typicalDuration" value="1800.0" />
+		</parameterset>
+	</module>
+</config>

@@ -8,6 +8,7 @@ import picocli.CommandLine;
 import jakarta.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -20,7 +21,7 @@ public class LanduseOptions {
 	private static final Logger log = LogManager.getLogger(LanduseOptions.class);
 
 	@CommandLine.Option(names = "--landuse", description = "Optional path to shape-file to distribute coordinates according to landuse", required = false)
-	private Path landuse;
+	private String landuse;
 
 	@CommandLine.Option(names = "--landuse-iters", description = "Maximum number of points to generate trying to fit into landuse", defaultValue = "500")
 	private int iters;
@@ -35,6 +36,17 @@ public class LanduseOptions {
 	 * Holds the index of geometries
 	 */
 	private ShpOptions.Index index;
+
+	public LanduseOptions() {
+	}
+
+	/**
+	 * Create {@link LanduseOptions} with default options.
+	 */
+	public LanduseOptions(String landuse, Set<String> filter){
+		this.landuse = landuse;
+		this.filter = filter;
+	}
 
 	/**
 	 * Create an index of landuse shapes.

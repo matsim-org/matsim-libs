@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +43,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * EventHandling
@@ -66,7 +67,7 @@ public final class EventsManagerImpl implements EventsManager {
 	static private class HandlerData {
 
 		protected Class<? extends Event> eventClass;
-		protected ArrayList<EventHandler> handlerList = new ArrayList<EventHandler>(5);
+		protected List<EventHandler> handlerList = new CopyOnWriteArrayList<>();
 		protected Method method;
 
 		protected HandlerData(final Class<? extends Event> eventClass, final Method method) {
@@ -96,8 +97,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	private final Map<Class<? extends Event>, HandlerInfo[]> cacheHandlers = new ConcurrentHashMap<>(15);
 
-	private long counter = 0;
-	private long nextCounterMsg = 1;
+	private final Counter counter = new Counter("EventsManagerImpl; event #");
 
 	private HandlerData findHandler(final Class<? extends Event> evklass) {
 		for (HandlerData handler : this.handlerData) {
@@ -110,11 +110,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void processEvent(final Event event) {
-		this.counter++;
-		if (this.counter == this.nextCounterMsg) {
-			this.nextCounterMsg *= 4;
-			log.info(" event # " + this.counter);
-		}
+		counter.incCounter();
 		for (HandlerInfo info : getHandlersForClass( event.getClass() )) {
 			synchronized(info.eventHandler) {
 				if (callHandlerFast(info.eventClass, event, info.eventHandler )) {
@@ -138,7 +134,7 @@ public final class EventsManagerImpl implements EventsManager {
 		if (log.getLevel().isMoreSpecificThan(Level.DEBUG)) {
 			log.info("=== Logging of event-handlers skipped ===");
 			log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
-				+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+				+ "or use Configurator...Level.DEBUG) in your run class.");
 		}
 		log.debug("adding Event-Handler: " + test.getName());
 		do {
@@ -171,8 +167,7 @@ public final class EventsManagerImpl implements EventsManager {
 	@Override
 	public void resetHandlers(final int iteration) {
 		log.info("resetting Event-Handlers");
-		this.counter = 0;
-		this.nextCounterMsg = 1;
+		this.counter.reset();
 		Set<EventHandler> resetHandlers = new HashSet<EventHandler>();
 		for (HandlerData handlerdata : this.handlerData) {
 			for (EventHandler handler : handlerdata.handlerList) {
@@ -288,6 +283,9 @@ public final class EventsManagerImpl implements EventsManager {
 			return true;
 		} else if (klass == PersonLeavesVehicleEvent.class) {
 			((PersonLeavesVehicleEventHandler)handler).handleEvent((PersonLeavesVehicleEvent)ev);
+			return true;
+		} else if (klass == PersonContinuesInVehicleEvent.class) {
+			((PersonContinuesInVehicleEventHandler) handler).handleEvent((PersonContinuesInVehicleEvent) ev);
 			return true;
 		} else if (klass == VehicleDepartsAtFacilityEvent.class) {
 			((VehicleDepartsAtFacilityEventHandler) handler).handleEvent((VehicleDepartsAtFacilityEvent) ev);

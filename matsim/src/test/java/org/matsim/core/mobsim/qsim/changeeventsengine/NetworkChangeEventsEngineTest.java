@@ -40,6 +40,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -70,7 +71,7 @@ public class NetworkChangeEventsEngineTest {
 		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		qsim.addMobsimEngine(engine);
 
-		engine.onPrepareSim();
+		 engine.beforeSim();
 		for (int i = 0; i < 30; i++) {
 			engine.doSimStep(i);
 		}
@@ -106,7 +107,7 @@ public class NetworkChangeEventsEngineTest {
 		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		engine.setInternalInterface(new DummyInternalInterfaceImpl(qsim));
 
-		engine.onPrepareSim();
+		 engine.beforeSim();
 		for (int i = 0; i < 30; i++) {
 			engine.doSimStep(i);
 		}
@@ -142,7 +143,7 @@ public class NetworkChangeEventsEngineTest {
 		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		engine.setInternalInterface(new DummyInternalInterfaceImpl(qsim));
 
-		engine.onPrepareSim();
+		 engine.beforeSim();
 		for (int i = 0; i < 30; i++) {
 			engine.doSimStep(i);
 		}
@@ -166,7 +167,7 @@ public class NetworkChangeEventsEngineTest {
 		}
 
 		@Override
-		public QSim getMobsim() {
+		public Netsim getMobsim() {
 			return this.qsim;
 		}
 

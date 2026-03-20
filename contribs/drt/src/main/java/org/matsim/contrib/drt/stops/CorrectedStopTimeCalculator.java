@@ -17,29 +17,35 @@ public class CorrectedStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
-		// stop ends when pickup time has elapsed
-		return beginTime + stopDuration;
+	public Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+		// pickup at the end of the stop
+		return new Pickup(beginTime + stopDuration, beginTime + stopDuration);
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		// an additional stop may extend the stop duration
-		return Math.max(stop.getEndTime(), insertionTime + stopDuration);
+		double beginTime = Math.max(stop.getBeginTime(), insertionTime);
+		double endTime = beginTime + stopDuration;
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override
-	public double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		// stop ends after stopDuration has elapsed (dropoff happens at beginning)
-		return beginTime + stopDuration;
+		double endTime = beginTime + stopDuration;
+		return new Dropoff(endTime, beginTime);
 	}
 
 	@Override
-	public double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		// adding a dropoff may extend the stop duration
-		return Math.max(stop.getEndTime(), insertionTime + stopDuration);
+		// adding a dropoff does not change the end time, but the whole task may be
+		// shifted due to a previous pickup insertion
+		double beginTime = Math.max(insertionTime, stop.getBeginTime());
+		double endTime = beginTime + stopDuration;
+		return new Dropoff(endTime, beginTime);
 	}
 
 	@Override

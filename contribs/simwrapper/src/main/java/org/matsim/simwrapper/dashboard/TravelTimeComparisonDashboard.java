@@ -4,6 +4,7 @@ import org.matsim.application.analysis.traffic.traveltime.TravelTimeComparison;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.viz.Plotly;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.components.Line;
@@ -29,7 +30,7 @@ public class TravelTimeComparisonDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Travel time";
 		header.description = "Comparison of simulated travel times vs. results from routing services.";

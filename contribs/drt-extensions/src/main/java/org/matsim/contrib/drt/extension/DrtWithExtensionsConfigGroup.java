@@ -19,17 +19,19 @@
 
 package org.matsim.contrib.drt.extension;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
 import org.matsim.contrib.drt.extension.insertion.spatialFilter.DrtSpatialRequestFleetFilterParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
+import org.matsim.contrib.drt.extension.preemptive_rejection.PreemptiveRejectionParams;
 import org.matsim.contrib.drt.extension.services.services.params.DrtServicesParams;
-import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 
 import jakarta.annotation.Nullable;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * @author Steffen Axer
@@ -49,6 +51,9 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 
 	@Nullable
 	private DrtSpatialRequestFleetFilterParams drtSpatialRequestFleetFilterParams;
+
+	@Nullable
+	private PreemptiveRejectionParams preemptiveRejectionParams;
 
 	public DrtWithExtensionsConfigGroup() {
 		this(DrtOptimizationConstraintsSetImpl::new);
@@ -71,6 +76,10 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 		// Optional
 		addDefinition(DrtSpatialRequestFleetFilterParams.SET_NAME, DrtSpatialRequestFleetFilterParams::new, () -> drtSpatialRequestFleetFilterParams,
 			params -> drtSpatialRequestFleetFilterParams = (DrtSpatialRequestFleetFilterParams) params);
+
+		// Optional
+		addDefinition(PreemptiveRejectionParams.SET_NAME, PreemptiveRejectionParams::new, 
+			() -> preemptiveRejectionParams, params -> preemptiveRejectionParams = (PreemptiveRejectionParams) params);
 	}
 
 	public Optional<DrtCompanionParams> getDrtCompanionParams() {
@@ -87,5 +96,9 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 
 	public Optional<DrtSpatialRequestFleetFilterParams> getSpatialRequestFleetFilterParams() {
 		return Optional.ofNullable(drtSpatialRequestFleetFilterParams);
+	}
+
+	public Optional<PreemptiveRejectionParams> getPreemptiveRejectionParams() {
+		return Optional.ofNullable(preemptiveRejectionParams);
 	}
 }

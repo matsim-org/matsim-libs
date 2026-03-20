@@ -41,8 +41,8 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -52,7 +52,7 @@ import com.google.inject.Inject;
  * calculating the drive-related energy consumption. However, the time spent on the first link is used by the time-based
  * idle discharge process (see {@link IdleDischargingHandler}).
  */
-public final class DriveDischargingHandler
+public class DriveDischargingHandler
 	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler, MobsimEngine {
 
 	private static class EvDrive {
@@ -76,49 +76,53 @@ public final class DriveDischargingHandler
 	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
 
+	private final Queue<VehicleEntersTrafficEvent> trafficEnterEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<LinkLeaveEvent> linkLeaveEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<VehicleLeavesTrafficEvent> trafficLeaveEvents = new ConcurrentLinkedQueue<>();
-	private final QSim qsim;
+
+	private final Netsim netsim;
+
 	@Inject
-	DriveDischargingHandler(QSim qsim, ElectricFleet data, Network network, EventsManager eventsManager) {
-		this.qsim = qsim;
+	DriveDischargingHandler(Netsim netsim, ElectricFleet data, Network network, EventsManager eventsManager) {
+		this.netsim = netsim;
 		this.network = network;
 		this.eventsManager = eventsManager;
 		eVehicles = data.getElectricVehicles();
 		evDrives = new ConcurrentHashMap<>(eVehicles.size() / 10);
 	}
 
+	private ElectricVehicle getElectricVehicle(Id<Vehicle> vehicleId) {
+		return eVehicles.get(vehicleId);
+	}
+
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		Id<Vehicle> vehicleId = event.getVehicleId();
-		ElectricVehicle ev = eVehicles.get(vehicleId);
-		if (ev != null) {// handle only our EVs
-			evDrives.put(vehicleId, new EvDrive(vehicleId, ev));
+		if (getElectricVehicle(event.getVehicleId()) != null) {
+			// handle only evs
+			trafficEnterEvents.add(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (evDrives.containsKey(event.getVehicleId())) {// handle only our EVs
+		if (getElectricVehicle(event.getVehicleId()) != null) {
+			// handle only evs
 			linkLeaveEvents.add(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		if (evDrives.containsKey(event.getVehicleId())) {// handle only our EVs
+		if (getElectricVehicle(event.getVehicleId()) != null) {
+			// handle only evs
 			trafficLeaveEvents.add(event);
 		}
 	}
 
 	@Override
-	public void onPrepareSim() {
-	}
-
-	@Override
 	public void afterSim() {
 		// process remaining events
-		doSimStep(this.qsim.getSimTimer().getTimeOfDay());
+		doSimStep(this.netsim.getSimTimer().getTimeOfDay());
 	}
 
 	@Override
@@ -127,6 +131,18 @@ public final class DriveDischargingHandler
 
 	@Override
 	public void doSimStep(double time) {
+		while (!trafficEnterEvents.isEmpty()) {
+			var event = trafficEnterEvents.peek();
+
+			if (event.getTime() == time) {
+				break; // see below
+			}
+
+			ElectricVehicle ev = getElectricVehicle(event.getVehicleId());
+			evDrives.put(ev.getId(), new EvDrive(ev.getId(), ev));
+			trafficEnterEvents.remove();
+		}
+
 		handleQueuedEvents(linkLeaveEvents, time, false);
 		handleQueuedEvents(trafficLeaveEvents, time, true);
 	}
@@ -164,7 +180,7 @@ public final class DriveDischargingHandler
 			//===============================================================
 			//Added to handle cases when the negative energy discharged would surpass the battery capacity
 			//The new resulting energy should mean that the battery stays at the battery capacity when the energy is negative
-			if(ev.getBattery().getCharge() - energy > ev.getBattery().getCapacity()){
+			if (ev.getBattery().getCharge() - energy > ev.getBattery().getCapacity()) {
 				energy = ev.getBattery().getCharge() - ev.getBattery().getCapacity();
 			}
 			//===================================================================

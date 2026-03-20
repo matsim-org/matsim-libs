@@ -3,9 +3,12 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.MaxSpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManagerImpl;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
+import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -16,9 +19,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import jakarta.annotation.Nullable;
 import java.io.File;
 import java.util.function.Consumer;
+
+import static ch.sbb.matsim.contrib.railsim.qsimengine.RailsimTestUtils.createTrainTimeDistanceHandler;
 
 /**
  * Tests for moving block logic.
@@ -51,10 +55,14 @@ public class RailsimEngineMovingBlockTest {
 				f.accept(link);
 			}
 		}
-		RailResourceManager res = new RailResourceManager(eventsManager, config, net, new NoDeadlockAvoidance());
-		TrainRouter router = new TrainRouter(net, res);
 
-		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, router)), net);
+		TrainManager trains = new TrainManager();
+		RailResourceManager res = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, res);
+		TrainTimeDistanceHandler ttd = createTrainTimeDistanceHandler();
+
+		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, trains, new SimpleDisposition(res, speed, router), ttd), net);
 	}
 
 	private RailsimTestUtils.Holder getTestEngine(String network) {

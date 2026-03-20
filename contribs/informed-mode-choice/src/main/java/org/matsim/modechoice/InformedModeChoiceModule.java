@@ -9,7 +9,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -116,7 +116,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		bind(EstimateCalculator.class);
 
 		bind(PlanModelService.class).asEagerSingleton();
-		addControlerListenerBinding().to(PlanModelService.class).asEagerSingleton();
+		addControllerListenerBinding().to(PlanModelService.class).asEagerSingleton();
 
 		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {});
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
@@ -134,8 +134,8 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 			pBinder.addBinding(e.getKey()).toInstance(instance);
 
-			if (instance instanceof ControlerListener cl)
-				addControlerListenerBinding().toInstance(cl);
+			if (instance instanceof ControllerListener cl)
+				addControllerListenerBinding().toInstance(cl);
 		}
 
 		addPlanStrategyBinding(SELECT_BEST_K_PLAN_MODES_STRATEGY).toProvider(SelectBestKPlanModesStrategyProvider.class);
@@ -146,8 +146,8 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 		// Ensure that only one instance exists
 		bind(ModeChoiceWeightScheduler.class).in(Singleton.class);
-		addControlerListenerBinding().to(ModeChoiceWeightScheduler.class).in(Singleton.class);
-		addControlerListenerBinding().to(ModeConstraintChecker.class).in(Singleton.class);
+		addControllerListenerBinding().to(ModeChoiceWeightScheduler.class).in(Singleton.class);
+		addControllerListenerBinding().to(ModeConstraintChecker.class).in(Singleton.class);
 
 		bind(PlanSelector.class).toProvider(MultinomialLogitSelectorProvider.class);
 	}

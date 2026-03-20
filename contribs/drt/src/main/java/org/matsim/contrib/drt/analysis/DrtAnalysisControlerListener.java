@@ -126,7 +126,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 	private record DrtLeg(Id<Request> request, double submissionTime, double readyForPickupTime, double pickupTime, Id<Person> person,
 						  Id<DvrpVehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
-						  Id<Link> toLinkId, Coord toCoord, double waitTime, double unsharedDistanceEstimate_m, double unsharedTimeEstimate_m,
+						  Id<Link> toLinkId, Coord toCoord, double waitTime, double unsharedDistanceEstimate_m, double unsharedTimeEstimate,
 						  double arrivalTime, double fare, double earliestDepartureTime, double latestDepartureTime, double latestArrivalTime) {
 	}
 
@@ -144,7 +144,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		var toLinkId = submittedEvent.getToLinkId();
 		var toCoord = linkProvider.apply(toLinkId).getToNode().getCoord();
 		var unsharedDistanceEstimate_m = submittedEvent.getUnsharedRideDistance();
-		var unsharedTimeEstimate_m = submittedEvent.getUnsharedRideTime();
+		var unsharedTimeEstimate = submittedEvent.getUnsharedRideTime();
 		// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
 		var fare = sequence.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
 		var earliestDepartureTime = sequence.getSubmitted().getEarliestDepartureTime();
@@ -158,7 +158,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			var waitTime = pickedUp.getTime() - earliestDepartureTime;
 			var arrivalTime = personEvents.get(person).getDroppedOff().get().getTime();
 			legs.add(new DrtLeg(request, submissionTime, pickupReadyTime, pickedUp.getTime(), person, vehicle, fromLinkId, fromCoord, toLinkId, toCoord, waitTime, unsharedDistanceEstimate_m,
-					unsharedTimeEstimate_m, arrivalTime, fare, earliestDepartureTime, latestDepartureTime, latestArrivalTime));
+					unsharedTimeEstimate, arrivalTime, fare, earliestDepartureTime, latestDepartureTime, latestArrivalTime));
 		}
 		return legs;
 	}
@@ -240,9 +240,10 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					"toY",//
 					"waitTime",//
 					"arrivalTime",//
-					"inVehicleTravelTime",//
-					"travelDistance_m",//
-					"directTravelDistance_m",//
+					"inVehicleRideTime",//
+					"directRideTime",//
+					"inVehicleDistance",//
+					"directRideDistance",//
 					"fareForLeg", //
 					"earliestDepartureTime",
 					"latestDepartureTime", //
@@ -263,6 +264,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					leg.waitTime + "",//
 					leg.arrivalTime + "",//
 					(leg.arrivalTime - leg.pickupTime) + "",//
+					leg.unsharedTimeEstimate +"",//
 					format.format(drtVehicleStats.getTravelDistances().get(leg.request)),//
 					format.format(leg.unsharedDistanceEstimate_m),//
 					format.format(leg.fare), //
@@ -322,11 +324,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private String filename(int iteration, String prefix, String extension) {
-		return matsimServices.getControlerIO().getIterationFilename(iteration, prefix + "_" + drtCfg.getMode() + extension);
+		return matsimServices.getControllerIO().getIterationFilename(iteration, prefix + "_" + drtCfg.getMode() + extension);
 	}
 
 	private String outputFilename(String prefix, String extension) {
-		return matsimServices.getControlerIO().getOutputFilenameWithOutputPrefix(prefix + "_" + drtCfg.getMode() + extension);
+		return matsimServices.getControllerIO().getOutputFilenameWithOutputPrefix(prefix + "_" + drtCfg.getMode() + extension);
 	}
 
 	/**
@@ -419,7 +421,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private BufferedWriter getAppendingBufferedWriter(String prefix, String extension) {
-		return IOUtils.getAppendingBufferedWriter(matsimServices.getControlerIO().getOutputFilename(prefix + "_" + drtCfg.getMode() + extension));
+		return IOUtils.getAppendingBufferedWriter(matsimServices.getControllerIO().getOutputFilename(prefix + "_" + drtCfg.getMode() + extension));
 	}
 
 	@Override
@@ -643,18 +645,20 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			double travelTime = leg.arrivalTime - leg.readyForPickupTime;
 			if (createGraphs) {
 				distances.add(travelDistance, leg.unsharedDistanceEstimate_m);
-				travelTimes.add(travelTime, leg.unsharedTimeEstimate_m);
-				rideTimes.add(leg.arrivalTime - leg.pickupTime, leg.unsharedTimeEstimate_m);
+				travelTimes.add(travelTime, leg.unsharedTimeEstimate);
+				rideTimes.add(leg.arrivalTime - leg.pickupTime, leg.unsharedTimeEstimate);
 			}
 
 			double distanceDetour = travelDistance / leg.unsharedDistanceEstimate_m;
-			double timeDetour = travelTime / leg.unsharedTimeEstimate_m;
+			double rideTime = leg.arrivalTime - leg.pickupTime;
+			double timeDetour = rideTime / leg.unsharedTimeEstimate;
+
 			detours.add(String.join(delimiter, leg.person + "",//
 					travelDistance + "",//
 					leg.unsharedDistanceEstimate_m + "",//
 					distanceDetour + "",//
 					travelTime + "",//
-					leg.unsharedTimeEstimate_m + "",//
+					leg.unsharedTimeEstimate + "",//
 					timeDetour + ""));
 		}
 

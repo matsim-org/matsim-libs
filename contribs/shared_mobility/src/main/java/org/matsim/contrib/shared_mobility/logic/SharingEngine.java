@@ -1,9 +1,5 @@
 package org.matsim.contrib.shared_mobility.logic;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
@@ -21,6 +17,10 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 public class SharingEngine implements ActivityStartEventHandler, MobsimEngine, MobsimBeforeSimStepListener {
 	private final SharingService service;
@@ -47,10 +47,10 @@ public class SharingEngine implements ActivityStartEventHandler, MobsimEngine, M
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		// make sure to handle only those rentals that belong to this SharingService		
-		
+		// make sure to handle only those rentals that belong to this SharingService
+
 		if (event.getActType().equals(SharingUtils.BOOKING_ACTIVITY)) {
-			
+
 			MobsimAgent agent = internalInterface.getMobsim().getAgents().get(event.getPersonId());
 
 			Activity activity = (Activity)((PlanAgent)agent).getCurrentPlanElement();
@@ -100,7 +100,7 @@ public class SharingEngine implements ActivityStartEventHandler, MobsimEngine, M
 		}
 
 		List<MobsimAgent> stuckAgents = new LinkedList<>();
-		
+
 		for (MobsimAgent agent : processBookingAgents) {
 			if (!logic.tryBookVehicle(time, agent)) {
 				stuckAgents.add(agent);
@@ -140,7 +140,7 @@ public class SharingEngine implements ActivityStartEventHandler, MobsimEngine, M
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeSim() {
 		eventsManager.addHandler(this);
 	}
 

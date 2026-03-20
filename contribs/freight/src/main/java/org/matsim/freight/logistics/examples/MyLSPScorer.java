@@ -34,7 +34,7 @@ import org.matsim.freight.logistics.resourceImplementations.TransshipmentHubReso
  * @author Kai Martins-Turner (kturner)
  */
 public class MyLSPScorer implements LSPScorer {
-  final Logger logger = LogManager.getLogger(MyLSPScorer.class);
+  private final static Logger logger = LogManager.getLogger(MyLSPScorer.class);
   private double score = 0;
   private LSP lsp;
 

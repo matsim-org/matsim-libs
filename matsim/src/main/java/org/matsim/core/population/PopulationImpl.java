@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -43,8 +44,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	private String name;
 	private Map<Id<Person>, Person> persons = new LinkedHashMap<>();
 	private final PopulationFactory populationFactory;
-	private long counter = 0;
-	private long nextMsg = 1;
+	private Counter counter = new Counter("PopulationImpl; person # ");
 
 	PopulationImpl(PopulationFactory populationFactory, Double scale) {
 		this.populationFactory = populationFactory ;
@@ -62,14 +62,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 		if ( p instanceof Lockable ) {
 			((Lockable) p).setLocked();
 		}
-
-		// show counter
-		this.counter++;
-		if (this.counter % this.nextMsg == 0) {
-			this.nextMsg *= 4;
-			printPlansCount();
-		}
-
+		counter.incCounter();
 		this.persons.put( p.getId(), p ) ;
 	}
 

@@ -83,7 +83,7 @@ class SignalsModule extends AbstractModule {
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			// bindings for sensor-based signals (also works for fixed-time signals)
 			bind(SignalModelFactory.class).to(SignalModelFactoryImpl.class);
-			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
+			addControllerListenerBinding().to(SensorBasedSignalControlerListener.class);
 			bind(LinkSensorManager.class).in(Singleton.class);
 			bind(DownstreamSensor.class).in(Singleton.class);
 //			// bind factory for all specified signal controller
@@ -101,7 +101,7 @@ class SignalsModule extends AbstractModule {
 
 			// bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-			addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
+			addControllerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
 			addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
 
 			if (getConfig().qsim().isUsingFastCapacityUpdate()) {

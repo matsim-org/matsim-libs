@@ -20,17 +20,22 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AgentTracker;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -40,21 +45,32 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TransitStopAgentTracker implements AgentTracker {
 
 	private final static Logger log = LogManager.getLogger(TransitStopAgentTracker.class);
-	
+
 	private final EventsManager events;
 	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStops = new ConcurrentHashMap<>();
 
-	public TransitStopAgentTracker(final EventsManager events) {
+	/**
+	 * Map of departure ids to the number of chained departures that need to arrive.
+	 */
+	private final Object2IntMap<Id<Departure>> waitingDepartures;
+
+	public TransitStopAgentTracker(EventsManager events) {
 		this.events = events;
+		this.waitingDepartures = new Object2IntLinkedOpenHashMap<>();
 	}
-	
+
+	public TransitStopAgentTracker(final EventsManager events, TransitSchedule schedule) {
+		this.events = events;
+		this.waitingDepartures = UmlaufCache.calculateDeparturesDependingOnChains(schedule);
+	}
+
 	public void addAgentToStop(final double now, final PTPassengerAgent agent, final Id<TransitStopFacility> stopId) {
 		if (stopId == null) {
 			throw new NullPointerException("stop must not be null.");
 		}
 		List<PTPassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents == null) {
-			agents = new CopyOnWriteArrayList<>();// TODO check again. this might turn out to be slow, but we likely need something thread safe here. marcel/oct2014 
+			agents = new CopyOnWriteArrayList<>();// TODO check again. this might turn out to be slow, but we likely need something thread safe here. marcel/oct2014
 			this.agentsAtStops.put(stopId, agents);
 		}
 		if ( !agents.add(agent) ) {
@@ -77,6 +93,15 @@ public class TransitStopAgentTracker implements AgentTracker {
 			log.error("Agent " + agent.getId() + " could not be removed from waiting at stop " + stopId + " since agents list was null.");
 		}
 	}
+
+	/**
+	 * Tracks the arrival of a vehicle required for a chained departure and decreases the number of chained departures that need to arrive.
+	 * @return number of chained departures that still need to arrive for this departure.
+	 */
+	public int trackVehicleArrival(Id<Departure> chainedDepartureId) {
+		return waitingDepartures.mergeInt(chainedDepartureId, -1, Integer::sum);
+	}
+
 
 	@Override
 	public List<PTPassengerAgent> getAgentsAtFacility(final Id<TransitStopFacility> stopId) {

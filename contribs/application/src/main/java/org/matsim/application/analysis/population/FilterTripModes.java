@@ -36,7 +36,7 @@ public class FilterTripModes implements MATSimAppCommand {
 	public Integer call() throws Exception {
 
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath()))
-			.columnTypesPartial(Map.of("person", ColumnType.TEXT, "main_mode", ColumnType.STRING))
+			.columnTypesPartial(Map.of("person", ColumnType.STRING, "main_mode", ColumnType.STRING))
 			.sample(false)
 			.separator(';').build());
 

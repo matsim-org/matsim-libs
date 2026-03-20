@@ -46,6 +46,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
@@ -67,11 +68,11 @@ public final class PopulationUtils {
 	private static final PopulationFactory populationFactory = createPopulation(
 			new PlansConfigGroup(), null, null).getFactory();
 
-	/**
-	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
-	 */
-	@Deprecated
-	public static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
+//	/**
+//	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
+//	 */
+//	@Deprecated
+	private static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
 
 
 	/**
@@ -803,6 +804,16 @@ public final class PopulationUtils {
 		return getFactory().createPlan();
 	}
 
+	/**
+	 * Createa a plan out of the supplied elements. The element list is referenced by the plan.
+	 * If a deep copy of a plan is required use the @PopulationUtils.copyFromTo method.
+	 *
+	 * @return a new Plan instance, which references the supplied plan elements.
+	 */
+	public static Plan createPlan(List<PlanElement> fromElements) {
+		return new PlanImpl(fromElements);
+	}
+
 	public static Activity createActivityFromLinkId(String type, Id<Link> linkId) {
 		return getFactory().createActivityFromLinkId(type, linkId);
 	}
@@ -902,6 +913,14 @@ public final class PopulationUtils {
 
 	// --- static copy methods:
 
+	public static void copyFromTo( final Person in, final Person out ) {
+		AttributesUtils.copyAttributesFromTo( in, out );
+		for( Plan inPlan : in.getPlans() ){
+			Plan outPlan = getFactory().createPlan();
+			copyFromTo( inPlan, outPlan );
+		}
+	}
+
 	/**
 	 * loads a copy of an existing plan, but keeps the person reference
 	 *
@@ -912,10 +931,17 @@ public final class PopulationUtils {
 		/*
 		 * By default 'false' to be backwards compatible. As a result, InteractionActivities will be converted to ActivityImpl.
 		 */
+		// yyyy I am doubtful that the option with/wo interaction activities should even exist.  At least in the sense in which this
+		// is meant (population-based search algorithms), a copy should just be a full copy.  kai, nov'25
 		copyFromTo(in, out, false);
 	}
 
 	public static void copyFromTo(final Plan in, final Plan out, final boolean withInteractionActivities) {
+		// yyyy I am doubtful that the option with/wo interaction activities should even exist.  At least in the sense in which this
+		// is meant (population-based search algorithms), a copy should just be a full copy.  kai, nov'25
+		// yyyy Also, I think that this ended up being a bit of a misnomer ... since "isInteractionActivity" can now be understood
+		// in two different ways: (1) it is what is returned by isStageActivity (a conceptual thing); (2) it is what is returned by
+		// instanceof InteractionActivity (an implementation thing).  kai, nov'25
 		out.getPlanElements().clear();
 		out.setScore(in.getScore());
 		out.setType(in.getType());
@@ -952,7 +978,14 @@ public final class PopulationUtils {
 	}
 
 	public static void copyFromTo(Activity act, Activity newAct) {
-		Coord coord = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
+		Coord coord = null;
+		if (act.getCoord() != null) {
+			if (act.getCoord().hasZ()) {
+				coord = new Coord(act.getCoord().getX(), act.getCoord().getY(), act.getCoord().getZ());
+			} else {
+				coord = new Coord(act.getCoord().getX(), act.getCoord().getY());
+			}
+		}
 		// (we don't want to copy the coord ref, but rather the contents!)
 		newAct.setCoord(coord);
 		newAct.setType(act.getType());
@@ -1192,7 +1225,7 @@ public final class PopulationUtils {
 		Coord fromCoord = link.getFromNode().getCoord();
 		Coord toCoord = link.getToNode().getCoord();
 		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink();
-		return new Coord(fromCoord.getX() + rel * (toCoord.getX() - fromCoord.getX()), fromCoord.getY() + rel * (toCoord.getY() - fromCoord.getY()));
+		return CoordUtils.interpolate(fromCoord, toCoord, rel);
 	}
 
 	/**
@@ -1355,7 +1388,7 @@ public final class PopulationUtils {
 	}
 
 	/**
-	 * Checks if each link of a route has the mode of the respective leg. This may be the case, if network links were
+	 * Checks if each link of a route has the mode of the respective leg. This may be the case if network links were
 	 * If the route is not a {@link NetworkRoute}, nothing is changed. If there are inconsistencies, the route is reset.
 	 *
 	 * @param population
@@ -1366,5 +1399,10 @@ public final class PopulationUtils {
 		population.getPersons().values().forEach(
 			personRouteChecker::run
 		);
+		///  There is also a {@link PersonNetworkLinkCheck}
+	}
+	public static void cleanPopulation( Scenario scenario ) {
+		checkRouteModeAndReset( scenario.getPopulation(), scenario.getNetwork() );
+		///  There is also a {@link PersonNetworkLinkCheck}
 	}
 }

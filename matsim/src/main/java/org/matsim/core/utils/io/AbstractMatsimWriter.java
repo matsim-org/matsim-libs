@@ -53,8 +53,11 @@ public abstract class AbstractMatsimWriter {
 	 * the file is opened for writing. If not set explicitly, the usage of
 	 * compression is defined by the ending of the filename.
 	 *
-	 * @param useCompression
+	 * @deprecated Our writers determine which compression to use automatically based on the file extension.
+	 * I think it is confusing to have several routes on how to accomplish this. Deprecate this for version
+	 * 2026.0, which means anyone stumpling across this can remove this from 2027.0 or later.
 	 */
+	@Deprecated(forRemoval = true)
 	public final void useCompression(final boolean useCompression) {
 		this.useCompression = useCompression;
 	}

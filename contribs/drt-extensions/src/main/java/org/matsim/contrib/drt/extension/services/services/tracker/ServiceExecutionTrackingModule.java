@@ -45,6 +45,6 @@ public class ServiceExecutionTrackingModule extends AbstractDvrpModeModule {
 		))).asEagerSingleton();
 
 		addEventHandlerBinding().to(modalKey(ServiceExecutionTrackers.class));
-		addControlerListenerBinding().to(modalKey(ServiceExecutionTrackers.class));
+		addControllerListenerBinding().to(modalKey(ServiceExecutionTrackers.class));
 	}
 }

@@ -31,7 +31,7 @@ public final class VspPlansCleanerModule extends AbstractModule {
         PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = getConfig().plans().getActivityDurationInterpretation() ;
         if ( actDurInterpr != PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime
                 || getConfig().plans().isRemovingUnneccessaryPlanAttributes() ) {
-            addControlerListenerBinding().to(VspPlansCleaner.class);
+            addControllerListenerBinding().to(VspPlansCleaner.class);
         }
     }
 }

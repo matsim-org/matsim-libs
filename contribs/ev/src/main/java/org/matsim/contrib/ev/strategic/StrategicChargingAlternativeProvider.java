@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.Nullable;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -29,6 +27,8 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 
 import com.google.common.base.Verify;
+
+import jakarta.annotation.Nullable;
 
 /**
  * This is the ChargingAlternativeProvider of the strategic charging package.
@@ -125,8 +125,8 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 			// send the reservation if requested
 			if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
 				Verify.verify(
-						reservationManager.addReservation(selected.getSpecification(), vehicle, reservationStartTime,
-								reservationEndTime) != null);
+                        reservationManager.addReservation(selected.getSpecification(), vehicle, reservationStartTime,
+                                reservationEndTime).isPresent());
 			}
 
 			double duration = slot.isLegBased() ? slot.duration() : 0.0;
@@ -168,8 +168,8 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 			// if a reservation can be made now, keep the initial slot
 			if (reservationManager.isAvailable(slot.charger().getSpecification(), vehicle, reservationStartTime,
 					reservationEndTime)) {
-				Verify.verifyNotNull(reservationManager.addReservation(slot.charger().getSpecification(),
-						vehicle, reservationStartTime, reservationEndTime));
+				Verify.verify(reservationManager.addReservation(slot.charger().getSpecification(),
+						vehicle, reservationStartTime, reservationEndTime).isPresent());
 				return null;
 			} else {
 				updateRequired = true;

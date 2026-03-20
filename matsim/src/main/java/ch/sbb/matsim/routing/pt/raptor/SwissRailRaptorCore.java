@@ -104,8 +104,10 @@ public class SwissRailRaptorCore {
         this.bestArrivalCost = Double.POSITIVE_INFINITY;
     }
 
-    public RaptorRoute calcLeastCostRoute(double depTime, Facility fromFacility, Facility toFacility, List<InitialStop> accessStops, List<InitialStop> egressStops, RaptorParameters parameters, Person person) {
-        final int maxTransfers = 20; // sensible defaults, could be made configurable if there is a need for it.
+	// This function uses the above defined arrays to keep track of the best route. It minimizes the travel cost. For each request, all the internal
+	// state is reset. paul, feb '26.
+	public RaptorRoute calcLeastCostRoute(double depTime, Facility fromFacility, Facility toFacility, List<InitialStop> accessStops, List<InitialStop> egressStops, RaptorParameters parameters, Person person) {
+		final int maxTransfers = 20; // sensible defaults, could be made configurable if there is a need for it.
         final int maxTransfersAfterFirstArrival = 2;
 
         reset();
@@ -682,6 +684,7 @@ public class SwissRailRaptorCore {
         }
     }
 
+	// Among others, this function updates the least cost arrival paths to route stops if the total costs to a route stop is smaller than before. paul, feb'26
 	private int exploreRoute(RaptorParameters parameters, Person person, CachingTransferProvider transferProvider,
 							  int currentDepartureIndex, RRouteStop firstRouteStop, int agentFirstArrivalTime,
 							  PathElement boardingPE, RRoute route, int tmpRouteIndex,
@@ -719,6 +722,14 @@ public class SwissRailRaptorCore {
 		boolean hasChains = chains != null;
 
 		for (int toRouteStopIndex = firstRouteStopIndex + 1; toRouteStopIndex < route.indexFirstRouteStop + route.countRouteStops; toRouteStopIndex++) {
+			// In the original raptor algorithm, we step once through all route-stops in order,
+			// which ensures that we don't handle any stop or route twice.
+			// With chained departures, we actually jump out of this sequence,
+			// resulting in the state that the same stop or route might be handled a second time in the same round.
+			// To prevent this (as it could have unintended side-effects and even produce wrong results), we
+			// proactively clear the handled route stop. So if this a chained route, it already gets handled now
+			// and will not have to be handled (regularly) later on, thus we can just clear the corresponding bits.
+			this.improvedRouteStopIndices.clear(toRouteStopIndex);
 			RRouteStop toRouteStop = this.data.routeStops[toRouteStopIndex];
 			if (!toRouteStop.routeStop.isAllowAlighting()) {
 				continue;
@@ -739,6 +750,7 @@ public class SwissRailRaptorCore {
 				new PathElement(boardingPE, toRouteStop, firstDepartureTime, currentAgentBoardingTime, currentDepartureTime + firstRouteStop.departureOffset, arrivalTime, arrivalTravelCost, arrivalTransferCost, distance, boardingPE.transferCount, false, false, null, null) :
 				null;
 
+			// update the arrival information if we found a better connection, paul, feb'26
 			if (totalArrivalCost <= previousArrivalCost) {
 				this.arrivalPathPerRouteStop[toRouteStopIndex] = lastPE;
 				this.leastArrivalCostAtRouteStop[toRouteStopIndex] = totalArrivalCost;
@@ -801,11 +813,15 @@ public class SwissRailRaptorCore {
 			firstRouteStopIndex = toRouteStopIndex; // we've handled this route stop, so we can skip it in the outer loop
 		}
 
-		if (hasChains) {
+		if (hasChains && lastPE != null) {
+			// One could expect that there is always a lastPE when we have chains.
+			// But it might happen that we start searching for a connection at the end of a chained route,
+			// in this case lastPE is null. But in such a case we do not need to follow the chained routes,
+			// as those routes should be independently be found and handled.
+			// Also, we don't want to skip such TransitRouteStops completely, as they could be used for transfers
+			// at the beginning of a connection.
 
 			MutableInt tmp = new MutableInt(-1);
-
-			assert lastPE != null : "Path element should not be null if we have chains";
 
 			for (SwissRailRaptorData.RChained chain : chains) {
 
@@ -948,6 +964,8 @@ public class SwissRailRaptorCore {
 		for (Map.Entry<TransitStopFacility, InitialStop> e : destinationStops.entrySet()) {
             TransitStopFacility stop = e.getKey();
             int stopIndex = this.data.stopFacilityIndices.get(stop);
+
+			// this is set, if the raptor has already found a route to this stop (with fewer transfers).
             PathElement pe = this.arrivalPathPerStop[stopIndex];
 			if (pe!=null) {
 					InitialStop egressStop = e.getValue();

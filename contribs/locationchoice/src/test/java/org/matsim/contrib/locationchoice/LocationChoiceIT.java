@@ -22,7 +22,7 @@ package org.matsim.contrib.locationchoice;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -111,7 +111,7 @@ public class LocationChoiceIT {
 			@Override
 			public void install() {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				addPlanStrategyBinding("MyLocationChoice").toProvider(new jakarta.inject.Provider<PlanStrategy>() {
+				addPlanStrategyBinding("MyLocationChoice").toProvider(new Provider<PlanStrategy>() {
 					@Inject TimeInterpretation timeInterpretation;
 
 					@Override

@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.insertion.constraints;
 
 import org.matsim.contrib.drt.extension.insertion.DrtInsertionConstraint;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
@@ -38,9 +39,9 @@ public class ExclusivityConstraint implements DrtInsertionConstraint {
 			DetourTimeInfo detourTimeInfo) {
 		if (insertion.pickup.index == 0) {
 			if (insertion.vehicleEntry.stops.size() > 0) {
-				Waypoint.Stop nextStop = insertion.vehicleEntry.stops.get(0);
+				StopWaypoint nextStop = insertion.vehicleEntry.stops.get(0);
 
-				for (AcceptedDrtRequest dropoffRequest : nextStop.task.getDropoffRequests().values()) {
+				for (AcceptedDrtRequest dropoffRequest : nextStop.getTask().getDropoffRequests().values()) {
 					if (voter.isExclusive(dropoffRequest.getRequest())) {
 						// ongoing prebooking trip, we cannot insert at beginning of schedule
 						return false;
@@ -51,9 +52,9 @@ public class ExclusivityConstraint implements DrtInsertionConstraint {
 
 		int minimumIndex = Math.max(0, insertion.pickup.index - 1);
 		for (int index = minimumIndex; index < insertion.dropoff.index; index++) {
-			Waypoint.Stop stop = insertion.vehicleEntry.stops.get(index);
+			StopWaypoint stop = insertion.vehicleEntry.stops.get(index);
 
-			for (AcceptedDrtRequest pickupRequest : stop.task.getPickupRequests().values()) {
+			for (AcceptedDrtRequest pickupRequest : stop.getTask().getPickupRequests().values()) {
 				if (voter.isExclusive(pickupRequest.getRequest())) {
 					// covering a prebooked pickup
 					return false;
