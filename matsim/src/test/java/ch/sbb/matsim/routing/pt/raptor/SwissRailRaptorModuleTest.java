@@ -32,13 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
@@ -367,12 +361,12 @@ public class SwissRailRaptorModuleTest {
         Scenario scenario = ScenarioUtils.createScenario(config);
 
         Person personA = scenario.getPopulation().getFactory().createPerson(Id.createPersonId("A"));
-        PopulationUtils.putPersonAttribute( personA, "subpopulation", "default" );
+		PopulationUtils.putSubpopulation(personA, "default");
 
-        Person personB = scenario.getPopulation().getFactory().createPerson(Id.createPersonId("B"));
-        PopulationUtils.putPersonAttribute( personB, "subpopulation" , "sub" );
+		Person personB = scenario.getPopulation().getFactory().createPerson(Id.createPersonId("B"));
+		PopulationUtils.putSubpopulation(personB, "sub");
 
-        Controler controller = new Controler(scenario);
+		Controler controller = new Controler(scenario);
         controller.addOverridingModule(new SwissRailRaptorModule());
         controller.run();
 
@@ -457,7 +451,7 @@ public class SwissRailRaptorModuleTest {
         config.transit().setUseTransit(true);
 
         SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
-        
+
         SwissRailRaptorConfigGroup.ModeToModeTransferPenalty trainToShip = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty("train",TransportMode.ship,1000000.0);
 		SwissRailRaptorConfigGroup.ModeToModeTransferPenalty shipToTrain = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty(TransportMode.ship,"train",1000000.0);
 		srrConfig.addModeToModeTransferPenalty(trainToShip);

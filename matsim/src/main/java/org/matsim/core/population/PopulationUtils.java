@@ -1299,35 +1299,6 @@ public final class PopulationUtils {
 		return PopulationComparison.compare(population1, population2);
 	}
 
-	// ---
-
-	/**
-	 * @deprecated -- please inline.  kai, jun'22
-	 */
-	public static Object getPersonAttribute(HasPlansAndId<?, ?> person, String key) {
-		if (person == null) {
-			return null;
-		}
-		// (This was originally "if person instanceof Attributable then ...".  Since HasPlansAndId now implements Attributable, this is in
-		// principle always fulfilled.  However, if person==null, then person instanceof Attributable also fails.  kai, jul'22)
-
-		return person.getAttributes().getAttribute(key);
-	}
-
-	/**
-	 * @deprecated -- please inline.  kai, jun'22
-	 */
-	public static void putPersonAttribute(HasPlansAndId<?, ?> person, String key, Object value) {
-		person.getAttributes().putAttribute(key, value);
-	}
-
-	/**
-	 * @deprecated -- please inline.  kai, jun'22
-	 */
-	public static Object removePersonAttribute(Person person, String key) {
-		return person.getAttributes().removeAttribute(key);
-	}
-
 	/**
 	 * @deprecated -- this command is dangerous since it might clear some else's attributes.  Better just remove specificially the attributes that you "own".  kai, may'19
 	 */
@@ -1346,7 +1317,7 @@ public final class PopulationUtils {
 	}
 
 	public static void putSubpopulation(HasPlansAndId<?, ?> person, String subpopulation) {
-		putPersonAttribute(person, SUBPOPULATION_ATTRIBUTE_NAME, subpopulation);
+		person.getAttributes().putAttribute(SUBPOPULATION_ATTRIBUTE_NAME, subpopulation);
 	}
 
 	public static void removeSubpopulation(Person person) {
@@ -1416,10 +1387,10 @@ public final class PopulationUtils {
 		population.getPersons().values().forEach(
 			personRouteChecker::run
 		);
-		///  There is also a {@link PersonNetworkLinkCheck}
+		//  There is also a {@link PersonNetworkLinkCheck}
 	}
 	public static void cleanPopulation( Scenario scenario ) {
 		checkRouteModeAndReset( scenario.getPopulation(), scenario.getNetwork() );
-		///  There is also a {@link PersonNetworkLinkCheck}
+		//  There is also a {@link PersonNetworkLinkCheck}
 	}
 }
