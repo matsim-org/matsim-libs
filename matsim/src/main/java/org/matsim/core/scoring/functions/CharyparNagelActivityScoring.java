@@ -55,7 +55,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 		this.params = params;
 
 //		firstLastActWarning = 0 ;
-		firstLastActOpeningTimesWarning = 0 ;
+//		firstLastActOpeningTimesWarning = 0 ;
 		this.openingIntervalCalculator = openingIntervalCalculator;
 	}
 
@@ -88,7 +88,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 	private Score calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
-		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		ActivityUtilityParameters actParams = this.params.actParams.get(act.getType() );
 		if (actParams == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
 					"(module name=\"scoring\" in the config file).");

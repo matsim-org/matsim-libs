@@ -138,8 +138,8 @@ public final class LPTask implements SimTask {
 		return consumers.keySet();
 	}
 
-	public IntSet waitForOtherRanks(double time) {
-		return lp.waitForOtherRanks(time);
+	public IntSet waitForOtherParts(double time) {
+		return lp.waitForOtherParts(time);
 	}
 
 	@Override
@@ -155,6 +155,11 @@ public final class LPTask implements SimTask {
 	@Override
 	public float getAvgRuntime() {
 		return avgRuntime;
+	}
+
+	@Override
+	public void resetTask(int iteration) {
+		// nothing to do here.
 	}
 
 	@Override
@@ -193,6 +198,7 @@ public final class LPTask implements SimTask {
 
 	@Override
 	public void cleanup() {
+		manager.setContext(partition);
 		lp.onCleanupSim();
 	}
 

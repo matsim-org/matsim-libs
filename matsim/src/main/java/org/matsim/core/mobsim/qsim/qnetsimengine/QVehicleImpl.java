@@ -222,8 +222,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 
 	@Override
 	public boolean removePassenger(PassengerAgent passenger) {
-
-		return passengers != null && passengers.remove(passenger);
+		return passengers != null && passengers.removeIf(p -> p.getId().equals(passenger.getId()));
 	}
 
 	@Override

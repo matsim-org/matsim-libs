@@ -1,7 +1,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import java.util.List;
-
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -11,12 +11,12 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
-import jakarta.annotation.Nullable;
+import java.util.List;
 
 /**
  * Simple train state that can be used without simulation and exact positions on track.
@@ -156,6 +156,16 @@ final class SimpleTrainState implements TrainPosition {
 
 		@Override
 		public double handleTransitStop(TransitStopFacility stop, double now) {
+			throw new UnsupportedOperationException("Not supported.");
+		}
+
+		@Override
+		public TransitRoute getTransitRoute() {
+			throw new UnsupportedOperationException("Not supported.");
+		}
+
+		@Override
+		public TransitLine getTransitLine() {
 			throw new UnsupportedOperationException("Not supported.");
 		}
 

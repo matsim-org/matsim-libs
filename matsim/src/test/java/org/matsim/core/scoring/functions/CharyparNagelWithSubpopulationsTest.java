@@ -33,8 +33,11 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ScoringParameterSet;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
+
+import java.util.List;
 
 /**
  * @author thibautd
@@ -44,79 +47,86 @@ public class CharyparNagelWithSubpopulationsTest {
 	void testLegsScoredDifferently() {
 		final Scenario sc = createTestScenario();
 
-		final CharyparNagelScoringFunctionFactory functionFactory = new CharyparNagelScoringFunctionFactory( sc );
+		final CharyparNagelScoringFunctionFactory functionFactory = new CharyparNagelScoringFunctionFactory(sc);
 
 		final ScoringFunction function1 =
-				functionFactory.createNewScoringFunction(
-						sc.getPopulation().getPersons().get(
-								Id.createPersonId( 1 ) ) );
+			functionFactory.createNewScoringFunction(
+				sc.getPopulation().getPersons().get(
+					Id.createPersonId(1)));
 
 		final ScoringFunction function2 =
-				functionFactory.createNewScoringFunction(
-						sc.getPopulation().getPersons().get(
-								Id.createPersonId( 2 ) ) );
+			functionFactory.createNewScoringFunction(
+				sc.getPopulation().getPersons().get(
+					Id.createPersonId(2)));
+
+		final Activity startAct = PopulationUtils.createActivityFromCoordAndLinkId("chill", null, null);
+		startAct.setEndTime(8 * 3600d);
 
 		final Leg leg = PopulationUtils.createLeg("skateboard");
-		leg.setDepartureTime( 10 );
+		leg.setDepartureTime(8 * 3600d);
 		leg.setTravelTime(10);
 
 		final Route route = RouteUtils.createGenericRouteImpl(null, null);
-		route.setDistance( 10 );
-		route.setTravelTime( 10 );
-		leg.setRoute( route );
+		route.setDistance(10);
+		route.setTravelTime(10);
+		leg.setRoute(route);
 
-		function1.handleLeg(leg);
+		final Activity endAct = PopulationUtils.createActivityFromCoordAndLinkId("chill", null, null);
+		endAct.setStartTime(8 * 3600d + leg.getTravelTime().seconds());
+		var trip = TripStructureUtils.getTrips(List.of(startAct, leg, endAct)).getFirst();
+
+		function1.handleTrip(trip);
 		function1.finish();
 
-		function2.handleLeg(leg);
+		function2.handleTrip(trip);
 		function2.finish();
 
 		Assertions.assertFalse(
-				Math.abs( function1.getScore() - function2.getScore() ) < 1E-9,
-				"same score for legs of agents in different subpopulations" );
+			Math.abs(function1.getScore() - function2.getScore()) < 1E-9,
+			"same score for legs of agents in different subpopulations");
 	}
 
 	@Test
 	void testActivitiesScoredDifferently() {
 		final Scenario sc = createTestScenario();
 
-		final CharyparNagelScoringFunctionFactory functionFactory = new CharyparNagelScoringFunctionFactory( sc );
+		final CharyparNagelScoringFunctionFactory functionFactory = new CharyparNagelScoringFunctionFactory(sc);
 
 		final ScoringFunction function1 =
-				functionFactory.createNewScoringFunction(
-						sc.getPopulation().getPersons().get(
-								Id.createPersonId( 1 ) ) );
+			functionFactory.createNewScoringFunction(
+				sc.getPopulation().getPersons().get(
+					Id.createPersonId(1)));
 
 		final ScoringFunction function2 =
-				functionFactory.createNewScoringFunction(
-						sc.getPopulation().getPersons().get(
-								Id.createPersonId( 2 ) ) );
+			functionFactory.createNewScoringFunction(
+				sc.getPopulation().getPersons().get(
+					Id.createPersonId(2)));
 
 		final Activity act = PopulationUtils.createActivityFromCoordAndLinkId("chill", null, null);
-		act.setStartTime( 8 * 3600d );
-		act.setEndTime( 18 * 3600d );
+		act.setStartTime(8 * 3600d);
+		act.setEndTime(18 * 3600d);
 
-		function1.handleActivity( act );
+		function1.handleActivity(act);
 		function1.finish();
 
-		function2.handleActivity( act );
+		function2.handleActivity(act);
 		function2.finish();
 
 		Assertions.assertFalse(
-				Math.abs( function1.getScore() - function2.getScore() ) < 1E-9,
-				"same score for legs of agents in different subpopulations" );
+			Math.abs(function1.getScore() - function2.getScore()) < 1E-9,
+			"same score for legs of agents in different subpopulations");
 	}
 
 	private Scenario createTestScenario() {
 		final Config config = ConfigUtils.createConfig();
 		final Scenario sc = ScenarioUtils.createScenario(config);
 
-		for ( int i=1; i <= 2; i++ ) {
-			final String subpop = ""+i;
+		for (int i = 1; i <= 2; i++) {
+			final String subpop = "" + i;
 			final Person person = sc.getPopulation().getFactory().createPerson(Id.createPersonId(i));
 			sc.getPopulation().addPerson(person);
 //			sc.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", subpop);
-			PopulationUtils.putPersonAttribute( person, "subpopulation", subpop );
+			PopulationUtils.putPersonAttribute(person, "subpopulation", subpop);
 
 			final double util = (double) i;
 			final ScoringParameterSet params = config.scoring().getOrCreateScoringParameters(subpop);
@@ -129,14 +139,14 @@ public class CharyparNagelWithSubpopulationsTest {
 			params.setPerforming_utils_hr(util);
 			params.setUtilityOfLineSwitch(-util);
 
-			final ModeParams modeParams = params.getOrCreateModeParams( "skateboard" );
+			final ModeParams modeParams = params.getOrCreateModeParams("skateboard");
 			modeParams.setConstant(-util);
 			modeParams.setMarginalUtilityOfDistance(-util);
 			modeParams.setMarginalUtilityOfTraveling(-util);
 			modeParams.setMonetaryDistanceRate(util);
 
-			final ActivityParams activityParams = params.getOrCreateActivityParams( "chill" );
-			activityParams.setTypicalDuration( util * 3600d );
+			final ActivityParams activityParams = params.getOrCreateActivityParams("chill");
+			activityParams.setTypicalDuration(util * 3600d);
 		}
 
 		return sc;

@@ -136,6 +136,8 @@ public class BetaTravelTest6IT {
 		ConfigUtils.loadConfig(config, utils.getInputDirectory() + "config.xml"); // specific setting for this test
 		config.controller().setWritePlansInterval(0);
 		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
+		config.global().setRelativeToleranceForSampleSizeFactors( 5.1 );
+
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
 		 * to store the persons in the population, we have to sort the population manually.

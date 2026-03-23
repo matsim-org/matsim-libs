@@ -55,14 +55,13 @@ public class DistributedScoringListener implements ScoringListener {
 			// The head node is responsible for scoring the entire population
 
 			scoringFunctionsForPopulation.finishScoringFunctions();
-			newScoreAssigner.assignNewScores(event.getIteration(), this.scoringFunctionsForPopulation, this.population);
 
 			ScoringMessage msg = new ScoringMessage();
 
 			for (Person person : population.getPersons().values()) {
-
 				ScoringFunction f = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
-				msg.addScore(person.getId(), f.getScore());
+				newScoreAssigner.assignNewScore(event.getIteration(), f, person);
+				msg.addScore(person.getId(), person.getSelectedPlan().getScore());
 			}
 
 			comm.allGather(msg, 10, serializer);
@@ -79,7 +78,10 @@ public class DistributedScoringListener implements ScoringListener {
 				}
 			}
 
-			newScoreAssigner.assignNewScores(event.getIteration(), this.scoringFunctionsForPopulation, subset);
+			for (var person : subset.getPersons().values()) {
+				var f = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
+				newScoreAssigner.assignNewScore(event.getIteration(), f, person);
+			}
 		}
 	}
 }

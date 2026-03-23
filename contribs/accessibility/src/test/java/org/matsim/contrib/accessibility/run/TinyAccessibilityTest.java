@@ -19,11 +19,16 @@
 
 package org.matsim.contrib.accessibility.run;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -33,19 +38,30 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.accessibility.*;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.DirectTripBasedDrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.distribution.NoDistribution;
+import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantRideDurationEstimator;
+import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.ConstantWaitingTimeEstimator;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.*;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -57,31 +73,18 @@ public class TinyAccessibilityTest {
 
 	private static final Logger LOG = LogManager.getLogger(TinyAccessibilityTest.class);
 
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private static MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	void runFromEvents() {
-		final Config config = createTestConfig();
-
-		double min = 0.; // Values for bounding box usually come from a config file
-		double max = 200.;
-
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
-		acg.setBoundingBoxBottom(min);
-		acg.setBoundingBoxTop(max);
-		acg.setBoundingBoxLeft(min);
-		acg.setBoundingBoxRight(max);
-		acg.setUseParallelization(false);
-
-		final Scenario scenario = createTestScenario(config);
-
-		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
+	String emptyEventsFileName;
 
 
-		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
-		builder.addDataListener( new ResultsComparator() );
-		builder.build().run() ;
+	String congestedEventsFileName;
+
+
+	@BeforeEach
+	void prepare(){
+		emptyEventsFileName = utils.getClassInputDirectory() + "output_events.xml.gz";
+		congestedEventsFileName = utils.getClassInputDirectory() + "output_events_congested.xml.gz";
 
 	}
 
@@ -110,10 +113,237 @@ public class TinyAccessibilityTest {
 		controler.addOverridingModule(module);
 
 		controler.run();
+
+
+		Map<Tuple<ActivityFacility, Double>, Map<String, Double>> accessibilitiesMap = resultsComparator.accessibilitiesMap;
+		for (Tuple<ActivityFacility, Double> tuple : accessibilitiesMap.keySet()) {
+			LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- freespeed value = " + accessibilitiesMap.get(tuple).get("freespeed"));
+			LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- car value = " + accessibilitiesMap.get(tuple).get(TransportMode.car));
+			if (tuple.getFirst().getCoord().getX() == 50.) {
+				if (tuple.getFirst().getCoord().getY() == 50.) {
+					Assertions.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get(Modes4Accessibility.freespeed.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(-0.017240250823867296, accessibilitiesMap.get(tuple).get(Modes4Accessibility.car.name()), MatsimTestUtils.EPSILON);
+
+				} else if (tuple.getFirst().getCoord().getY() == 150.) {
+					Assertions.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get(Modes4Accessibility.freespeed.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(-0.017240250823867296, accessibilitiesMap.get(tuple).get(Modes4Accessibility.car.name()), MatsimTestUtils.EPSILON);
+
+				}
+			}
+			if (tuple.getFirst().getCoord().getX() == 150.) {
+				if (tuple.getFirst().getCoord().getY() == 50.) {
+					Assertions.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get(Modes4Accessibility.freespeed.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0.27582980607476704, accessibilitiesMap.get(tuple).get(Modes4Accessibility.car.name()), MatsimTestUtils.EPSILON);
+				} else if (tuple.getFirst().getCoord().getY() == 150.) {
+					Assertions.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get(Modes4Accessibility.freespeed.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0.27582980607476704, accessibilitiesMap.get(tuple).get(Modes4Accessibility.car.name()), MatsimTestUtils.EPSILON);
+				}
+			}
+		}
 	}
 
 
-	private Config createTestConfig() {
+	/**
+	 * Tests offline accessibility, based on events file. In this case, the events file is empty.
+	 */
+	@Test
+	void runFromEvents() {
+		final Config config = createTestConfig();
+
+		double min = 0.; // Values for bounding box usually come from a config file
+		double max = 200.;
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(min).setBoundingBoxTop(max ).setBoundingBoxLeft(min).setBoundingBoxRight(max );
+		acg.setUseParallelization(false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
+
+		addDrtParamsToConfig(config);
+
+		// ---
+
+		final Scenario scenario = createTestScenario(config);
+
+		// ---
+
+		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
+			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
+			.setWaitingTimeDistributionGenerator(new NoDistribution())
+			.setRideDurationEstimator(new ConstantRideDurationEstimator(1, 0))
+			.setRideDurationDistributionGenerator(new NoDistribution())
+			.build();
+
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , emptyEventsFileName );
+		ResultsComparator dataListener = new ResultsComparator();
+		builder.addDataListener(dataListener);
+		builder.setDrtEstimator(drtEstimator);
+
+		builder.build().run() ;
+
+
+		// ---
+		// Check results
+		Map<Tuple<ActivityFacility, Double>, Map<String, Double>> accessibilitiesMap = dataListener.accessibilitiesMap;
+
+		for (Tuple<ActivityFacility, Double> tuple : accessibilitiesMap.keySet()) {
+			LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- freespeed value = " + accessibilitiesMap.get(tuple).get("freespeed"));
+			LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- car value = " + accessibilitiesMap.get(tuple).get(TransportMode.car));
+			if (tuple.getFirst().getCoord().getX() == 50.) {
+				if (tuple.getFirst().getCoord().getY() == 50.) {
+					Assertions.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get(Modes4Accessibility.freespeed.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(-0.017240250823867296, accessibilitiesMap.get(tuple).get(Modes4Accessibility.car.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(-0.2570846664396534, accessibilitiesMap.get(tuple).get(Modes4Accessibility.estimatedDrt.name()), MatsimTestUtils.EPSILON);
+
+				} else if (tuple.getFirst().getCoord().getY() == 150.) {
+					Assertions.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get(Modes4Accessibility.freespeed.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(-0.017240250823867296, accessibilitiesMap.get(tuple).get(Modes4Accessibility.car.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(-0.2570846664396534, accessibilitiesMap.get(tuple).get(Modes4Accessibility.estimatedDrt.name()), MatsimTestUtils.EPSILON);
+
+				}
+			}
+			if (tuple.getFirst().getCoord().getX() == 150.) {
+				if (tuple.getFirst().getCoord().getY() == 50.) {
+					Assertions.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get(Modes4Accessibility.freespeed.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0.27582980607476704, accessibilitiesMap.get(tuple).get(Modes4Accessibility.car.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0.12528573066844936, accessibilitiesMap.get(tuple).get(Modes4Accessibility.estimatedDrt.name()), MatsimTestUtils.EPSILON);
+				} else if (tuple.getFirst().getCoord().getY() == 150.) {
+					Assertions.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get(Modes4Accessibility.freespeed.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0.27582980607476704, accessibilitiesMap.get(tuple).get(Modes4Accessibility.car.name()), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(0.12528573066844936, accessibilitiesMap.get(tuple).get(Modes4Accessibility.estimatedDrt.name()), MatsimTestUtils.EPSILON);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Tests offline accessibility, based on events file. In this case, the events file contains congestion.
+	 */
+	@Test
+	void runFromEventsCongested() {
+
+
+		double congestionTime = 10 * 60 * 60;
+
+		final Config config = createTestConfig();
+
+
+		config.scoring().getModes().get(TransportMode.walk).setConstant(-10);
+		double min = 0.; // Values for bounding box usually come from a config file
+		double max = 200.;
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(min).setBoundingBoxTop(max).setBoundingBoxLeft(min).setBoundingBoxRight(max);
+		acg.setTimeOfDay(congestionTime);
+		acg.setUseParallelization(false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
+		addDrtParamsToConfig(config);
+
+		// ---
+
+		final Scenario scenarioUncongested = createTestScenario(config);
+		final Scenario scenarioCongested = createTestScenario(config);
+
+
+		// ---
+
+		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
+			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
+			.setWaitingTimeDistributionGenerator(new NoDistribution())
+			.setRideDurationEstimator(new ConstantRideDurationEstimator(1, 0))
+			.setRideDurationDistributionGenerator(new NoDistribution())
+			.build();
+
+		AccessibilityFromEvents.Builder builderUncongested = new AccessibilityFromEvents.Builder( scenarioUncongested , emptyEventsFileName );
+		ResultsComparator dataListenerUncongested = new ResultsComparator();
+		builderUncongested.addDataListener(dataListenerUncongested);
+		builderUncongested.setDrtEstimator(drtEstimator);
+		builderUncongested.build().run() ;
+		Map<Tuple<ActivityFacility, Double>, Map<String, Double>> accessibilitiesMapUncongested = dataListenerUncongested.accessibilitiesMap;
+
+		AccessibilityFromEvents.Builder builderCongested = new AccessibilityFromEvents.Builder(scenarioCongested, congestedEventsFileName);
+		ResultsComparator dataListenerCongested = new ResultsComparator();
+		builderCongested.addDataListener(dataListenerCongested);
+		builderCongested.setDrtEstimator(drtEstimator);
+		builderCongested.build().run() ;
+		Map<Tuple<ActivityFacility, Double>, Map<String, Double>> accessibilitiesMapCongested = dataListenerCongested.accessibilitiesMap;
+
+		Coord testCoord = new Coord(150, 50);
+		Map<String, Double> uncongestedModeToAccessMap = accessibilitiesMapUncongested.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(testCoord)).map(entry -> entry.getValue()).findFirst().get();
+		Map<String, Double> congestedModeToAccessMap = accessibilitiesMapCongested.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(testCoord)).map(entry -> entry.getValue()).findFirst().get();
+
+		// Since freespeed isn't affected by congestion, the accessibilities should be equal
+		Assertions.assertEquals(congestedModeToAccessMap.get(Modes4Accessibility.freespeed.name()),uncongestedModeToAccessMap.get(Modes4Accessibility.freespeed.name()),MatsimTestUtils.EPSILON);
+		// Since car accessibility is affected by congestion, the accessibilities should NOT be equal
+		Assertions.assertTrue(congestedModeToAccessMap.get(Modes4Accessibility.car.name()) < uncongestedModeToAccessMap.get(Modes4Accessibility.car.name()));
+		// Since drt accessibility is affected by congestion, the accessibilities should NOT be equal
+		Assertions.assertTrue(congestedModeToAccessMap.get(Modes4Accessibility.estimatedDrt.name()) < uncongestedModeToAccessMap.get(Modes4Accessibility.estimatedDrt.name()));
+
+	}
+
+
+	private void addDrtParamsToConfig(Config config)  {
+		String stopsInputFileName = utils.getClassInputDirectory() + "drtStops.xml";
+
+		if (!Files.exists(Path.of(stopsInputFileName))) {
+			try {
+				createDrtStopsFile(stopsInputFileName);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+
+		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
+//		drtParams.setMarginalUtilityOfTraveling(0);
+		config.scoring().addModeParams(drtParams);
+
+		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );
+
+		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
+		drtConfigGroup.setTransitStopFile( stopsInputFileName);
+
+		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWalkDistance(200);
+
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+		config.addModule(multiModeDrtConfigGroup);
+		config.addModule(drtConfigGroup);
+	}
+
+
+
+	private void createDrtStopsFile(String stopsInputFileName) throws IOException {
+		Network network = createLessSymmetricTestNetwork();
+
+		Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		TransitScheduleFactory tf = dummyScenario.getTransitSchedule().getFactory();
+
+
+		for (Link link : network.getLinks().values()) {
+			TransitStopFacility stop = tf.createTransitStopFacility(Id.create(link.getId().toString(), TransitStopFacility.class), link.getCoord(), false);
+			stop.setLinkId(link.getId());
+			dummyScenario.getTransitSchedule().addStopFacility(stop);
+		}
+
+//		TransitStopFacility a = tf.createTransitStopFacility(Id.create("a", TransitStopFacility.class), new Coord(120, 100), false);
+//		a.setLinkId(Id.createLinkId("7"));
+//		dummyScenario.getTransitSchedule().addStopFacility(a);
+
+
+		if (!Files.exists(Path.of(utils.getInputDirectory()))) {
+			Files.createDirectories(Path.of(utils.getInputDirectory()));
+		}
+
+		new TransitScheduleWriter(dummyScenario.getTransitSchedule()).writeFile(stopsInputFileName);
+	}
+
+
+
+	static Config createTestConfig() {
 		final Config config = ConfigUtils.createConfig();
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
@@ -131,7 +361,7 @@ public class TinyAccessibilityTest {
 	}
 
 
-	private static Scenario createTestScenario(final Config config) {
+	static Scenario createTestScenario(final Config config) {
 //		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		Network network = createLessSymmetricTestNetwork();
@@ -243,7 +473,12 @@ public class TinyAccessibilityTest {
 
 
 	static class ResultsComparator implements FacilityDataExchangeInterface{
-		private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
+		private final Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
+
+
+		public Map<Tuple<ActivityFacility, Double>, Map<String, Double>> getAccessibilitiesMap() {
+			return accessibilitiesMap;
+		}
 
 		@Override
 		public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, String mode, double accessibility) {
@@ -257,28 +492,46 @@ public class TinyAccessibilityTest {
 
 		@Override
 		public void finish() {
-			for (Tuple<ActivityFacility, Double> tuple : accessibilitiesMap.keySet()) {
-				LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- freespeed value = " + accessibilitiesMap.get(tuple).get("freespeed"));
-				LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- car value = " + accessibilitiesMap.get(tuple).get(TransportMode.car));
-				if (tuple.getFirst().getCoord().getX() == 50.) {
-					if (tuple.getFirst().getCoord().getY() == 50.) {
-						Assertions.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
-						Assertions.assertEquals(-0.017240250823867296, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
-					} else if (tuple.getFirst().getCoord().getY() == 150.) {
-						Assertions.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
-						Assertions.assertEquals(-0.017240250823867296, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
-					}
-				}
-				if (tuple.getFirst().getCoord().getX() == 150.) {
-					if (tuple.getFirst().getCoord().getY() == 50.) {
-						Assertions.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
-						Assertions.assertEquals(0.27582980607476704, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
-					} else if (tuple.getFirst().getCoord().getY() == 150.) {
-						Assertions.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
-						Assertions.assertEquals(0.27582980607476704, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
-					}
-				}
-			}
+
 		}
+	}
+
+	void createCongestedEventsFile(String congestedFileName, double congestionTime){
+		final Config config = createTestConfig();
+		config.controller().setLastIteration(1);
+		config.replanning().addStrategySettings(new ReplanningConfigGroup.StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1.));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("dummy").setTypicalDuration(60));
+
+
+		final Scenario scenario = createTestScenario(config);
+
+		// ---
+
+		Random rnd = new Random();
+		PopulationFactory pf = scenario.getPopulation().getFactory();
+		for (int i = 0; i < 1000; i++) {
+			Person person = pf.createPerson(Id.createPersonId(i));
+			Plan plan = pf.createPlan();
+			Activity home = pf.createActivityFromCoord("dummy", new Coord(rnd.nextInt(200), rnd.nextInt(200)));
+			home.setEndTime(congestionTime);
+			Leg leg = pf.createLeg(TransportMode.car);
+			Activity work = pf.createActivityFromCoord("dummy", new Coord(rnd.nextInt(200), rnd.nextInt(200)));
+			plan.addActivity(home);
+			plan.addLeg(leg);
+			plan.addActivity(work);
+			person.addPlan(plan);
+			scenario.getPopulation().addPerson(person);
+		}
+
+
+		Controler controler = new Controler(scenario);
+		controler.run();
+
+		try {
+			Files.copy(Path.of(utils.getOutputDirectory() + "output_events.xml.gz"),Path.of(congestedFileName), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
 	}
 }

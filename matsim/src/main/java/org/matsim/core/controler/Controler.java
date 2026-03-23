@@ -113,6 +113,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	}
 
 	static final String OUTPUT_PREFIX = "output_";
+	static final String INPUT_PREFIX = "input_";
 
 	public static final String DIVIDER = "###################################################";
 

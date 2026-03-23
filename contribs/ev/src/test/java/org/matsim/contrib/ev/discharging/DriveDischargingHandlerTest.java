@@ -1,5 +1,8 @@
 package org.matsim.contrib.ev.discharging;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.beans.EventHandler;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
@@ -18,8 +21,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup.AuxEnergyConsumption;
+import org.matsim.contrib.ev.EvConfigGroup.DriveEnergyConsumption;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.EvUtils;
+import org.matsim.contrib.ev.example.RunEvExample;
 import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecificationDefaultImpl;
 import org.matsim.core.config.Config;
@@ -27,6 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
@@ -184,6 +192,64 @@ public class DriveDischargingHandlerTest {
              * NPE.
              * 
              */
+        }
+    }
+
+    @Test
+	public void ohdeSlaskiTest() {
+        String[] args = {
+            RunEvExample.DEFAULT_CONFIG_FILE,
+            "--config:controler.outputDirectory", utils.getOutputDirectory()
+        };
+
+        SummedEnergy energy = new SummedEnergy();
+
+        new RunEvExample().run(args, config -> {}, scenario -> {}, controller -> {
+            energy.install(controller);
+        });
+
+        assertEquals(925.38917, energy.energy_kWh, 1e-3);
+	}
+
+    @Test
+	public void attributeBasedTest() {
+        String[] args = {
+            RunEvExample.DEFAULT_CONFIG_FILE,
+            "--config:controler.outputDirectory", utils.getOutputDirectory()
+        };
+
+        SummedEnergy energy = new SummedEnergy();
+
+        new RunEvExample().run(args, config -> {
+            EvConfigGroup.get(config).setDriveEnergyConsumption(DriveEnergyConsumption.AttributeBased);
+        }, scenario -> {
+            for (Vehicle vehicle : scenario.getVehicles().getVehicles().values()) {
+                AttributeBasedDriveEnergyConsumption.assign(vehicle, 120.0);
+            }
+        }, controller -> {
+            energy.install(controller);
+        });
+
+        assertEquals(627.923475, energy.energy_kWh, 1e-3);
+	}
+
+    static public class SummedEnergy implements DrivingEnergyConsumptionEventHandler {
+        public double energy_kWh = 0.0;
+        
+        @Override
+        public void handleEvent(DrivingEnergyConsumptionEvent event) {
+            energy_kWh += EvUnits.J_to_kWh(event.getEnergy());
+        }
+
+        public void install(Controler controller) {
+            SummedEnergy self = this;
+
+            controller.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    addEventHandlerBinding().toInstance(self);
+                }
+            });
         }
     }
 }

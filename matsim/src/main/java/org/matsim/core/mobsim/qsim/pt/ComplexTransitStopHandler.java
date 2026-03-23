@@ -22,7 +22,6 @@ package org.matsim.core.mobsim.qsim.pt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Message;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -66,7 +65,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
 									List<PTPassengerAgent> enteringPassengers, List<PTPassengerAgent> relocatingPassengers,
-									PassengerAccessEgress handler, MobsimVehicle vehicle) {
+									PassengerAccessEgress handler, TransitVehicle vehicle) {
 
 		if (this.doorOperationMode == VehicleType.DoorOperationMode.parallel) {
 			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, relocatingPassengers, handler, vehicle);
@@ -80,7 +79,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 	private double handleSerialStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
 									List<PTPassengerAgent> enteringPassengers, List<PTPassengerAgent> relocatingPassengers,
-			PassengerAccessEgress handler, MobsimVehicle vehicle) {
+									PassengerAccessEgress handler, TransitVehicle vehicle) {
 		double stopTime = 0.0;
 
 		int cntEgress = leavingPassengers.size();
@@ -202,7 +201,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 	private double handleParallelStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
 									  List<PTPassengerAgent> enteringPassengers, List<PTPassengerAgent> relocatingPassengers,
-									  PassengerAccessEgress handler, MobsimVehicle vehicle) {
+									  PassengerAccessEgress handler, TransitVehicle vehicle) {
 		double stopTime = 0.0;
 
 		int cntEgress = leavingPassengers.size();

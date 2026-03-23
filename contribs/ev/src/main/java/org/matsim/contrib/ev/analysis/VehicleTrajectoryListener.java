@@ -14,6 +14,10 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.charging.ChargingEndEvent;
+import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
+import org.matsim.contrib.ev.charging.ChargingStartEvent;
+import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
 import org.matsim.contrib.ev.charging.EnergyChargedEvent;
 import org.matsim.contrib.ev.charging.EnergyChargedEventHandler;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEvent;
@@ -22,6 +26,8 @@ import org.matsim.contrib.ev.discharging.IdlingEnergyConsumptionEvent;
 import org.matsim.contrib.ev.discharging.IdlingEnergyConsumptionEventHandler;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -38,16 +44,19 @@ import com.google.common.io.Files;
 
 public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
         VehicleLeavesTrafficEventHandler, EnergyChargedEventHandler,
-        IdlingEnergyConsumptionEventHandler, DrivingEnergyConsumptionEventHandler, IterationStartsListener,
+        IdlingEnergyConsumptionEventHandler, DrivingEnergyConsumptionEventHandler, ChargingStartEventHandler,
+        ChargingEndEventHandler,
+        IterationStartsListener,
         IterationEndsListener, ShutdownListener {
-	static public final String OUTPUT_FILE = "ev_trajectories.csv";
+    static public final String OUTPUT_FILE = "ev_vehicle_trajectories.csv";
 
-    private final String fileEnding;
+    private final CompressionType compressionType;
     private final EventsManager eventsManager;
     private final OutputDirectoryHierarchy outputHierarchy;
 
     private final Network network;
     private final ElectricFleetSpecification electricFleet;
+    private final ChargingInfrastructureSpecification infrastructure;
 
     private final IdMap<Vehicle, Double> energy = new IdMap<>(Vehicle.class);
     private final IdMap<Vehicle, Double> capacity = new IdMap<>(Vehicle.class);
@@ -56,14 +65,16 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
     private final int interval;
 
     public VehicleTrajectoryListener(EventsManager eventsManager, Network network,
-            ElectricFleetSpecification electricFleet, OutputDirectoryHierarchy outputHierarchy, int interval,
+            ElectricFleetSpecification electricFleet, ChargingInfrastructureSpecification infrastructure,
+            OutputDirectoryHierarchy outputHierarchy, int interval,
             CompressionType compressionType) {
-        this.fileEnding = compressionType.fileEnding;
+        this.compressionType = compressionType;
         this.eventsManager = eventsManager;
         this.network = network;
         this.electricFleet = electricFleet;
         this.interval = interval;
         this.outputHierarchy = outputHierarchy;
+        this.infrastructure = infrastructure;
     }
 
     @Override
@@ -78,7 +89,7 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
             }
 
             String outputPath = outputHierarchy.getIterationFilename(event.getIteration(),
-                    OUTPUT_FILE + this.fileEnding);
+                    OUTPUT_FILE, compressionType);
 
             writer = IOUtils.getBufferedWriter(outputPath);
 
@@ -117,8 +128,8 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
     @Override
     public void notifyShutdown(ShutdownEvent event) {
         File iterationPath = new File(
-                outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE + this.fileEnding));
-        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE + this.fileEnding));
+                outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE, compressionType));
+        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE, compressionType));
 
         try {
             Files.copy(iterationPath, outputPath);
@@ -157,11 +168,19 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
         pingVehicle(event.getTime(), event.getVehicleId(), event.getLinkId(), false);
     }
 
-    private void pingVehicle(double time, Id<Vehicle> vehicleId, Id<Link> linkId, boolean useFromNode) {
-        if (!electricFleet.getVehicleSpecifications().containsKey(vehicleId)) {
-            return;
-        }
+    @Override
+    public void handleEvent(ChargingStartEvent event) {
+        ChargerSpecification charger = infrastructure.getChargerSpecifications().get(event.getChargerId());
+        pingVehicle(event.getTime(), event.getVehicleId(), charger.getLinkId(), false);
+    }
 
+    @Override
+    public void handleEvent(ChargingEndEvent event) {
+        ChargerSpecification charger = infrastructure.getChargerSpecifications().get(event.getChargerId());
+        pingVehicle(event.getTime(), event.getVehicleId(), charger.getLinkId(), false);
+    }
+
+    private void pingVehicle(double time, Id<Vehicle> vehicleId, Id<Link> linkId, boolean useFromNode) {
         Link link = network.getLinks().get(linkId);
         Coord location = useFromNode ? link.getFromNode().getCoord() : link.getToNode().getCoord();
 
