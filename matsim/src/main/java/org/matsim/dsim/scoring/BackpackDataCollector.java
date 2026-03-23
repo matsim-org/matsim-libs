@@ -16,8 +16,8 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.dsim.DSimComponentsMessageProcessor;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.NotifyAgentPartitionTransfer;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
+import org.matsim.core.mobsim.qsim.interfaces.AfterMobsim;
 import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.vehicles.Vehicle;
 
@@ -37,7 +37,7 @@ import java.util.*;
  * agents might have left the partition already.
  */
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
-public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEventHandler, NotifyAgentPartitionTransfer, QSimComponent {
+public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEventHandler, NotifyAgentPartitionTransfer, QSimComponent, DSimComponentsMessageProcessor, AfterMobsim {
 
 	private final Map<Id<Person>, Backpack> backpackByPerson = new HashMap<>();
 	private final Map<Id<Vehicle>, Set<Backpack>> backpackByVehicle = new HashMap<>();
@@ -60,20 +60,20 @@ public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEven
 		this.providers = providers;
 	}
 
-	// I think this can be done via agentarrives on partition.
-	public void registerAgent(MobsimAgent agent) {
-
-		// only persons which are part of the population are scored. Other agents such as transit drivers, or drt agents
-		// can be ignored. If this assumption turns out to be incorect, we should probably mark agents as 'scorable' instead
-		if (population.getPersons().containsKey(agent.getId())) {
-			var startLink = agent.getCurrentLinkId();
-			var startPartition = network.getPartitioning().getPartition(startLink);
-			var backpack = new Backpack(agent.getId(), startPartition, providers);
-			this.backpackByPerson.put(agent.getId(), backpack);
-		} else {
-			ignoredAgents.add(agent.getId());
-		}
-	}
+//	// I think this can be done via agentarrives on partition.
+//	public void registerAgent(MobsimAgent agent) {
+//
+//		// only persons which are part of the population are scored. Other agents such as transit drivers, or drt agents
+//		// can be ignored. If this assumption turns out to be incorect, we should probably mark agents as 'scorable' instead
+//		if (population.getPersons().containsKey(agent.getId())) {
+//			var startLink = agent.getCurrentLinkId();
+//			var startPartition = network.getPartitioning().getPartition(startLink);
+//			var backpack = new Backpack(agent.getId(), startPartition, providers);
+//			this.backpackByPerson.put(agent.getId(), backpack);
+//		} else {
+//			ignoredAgents.add(agent.getId());
+//		}
+//	}
 
 	@Override
 	public void onAgentLeavesPartition(DistributedMobsimAgent agent, int toPartition) {
@@ -138,7 +138,8 @@ public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEven
 	 * This is the terminating method. This collector will not clean up its state, as it is expected that a new
 	 * instance of ScoringDataCollector will be created for the next iteration.
 	 */
-	public void finishAllPersons() {
+	@Override
+	public void afterMobsim() {
 		for (var backpack : backpackByPerson.values()) {
 			finishBackpack(backpack);
 		}
@@ -159,6 +160,8 @@ public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEven
 			bookkeepingPersonEntersVehicle(peve);
 		} else if (e instanceof PersonContinuesInVehicleEvent pcive) {
 			bookkeepingPersonContinuesInVehicle(pcive);
+		} else if (e instanceof ActivityEndEvent aee) {
+			bookkeepingActivityEnd(aee);
 		}
 
 		// 2. take care of all person-related events
@@ -175,6 +178,25 @@ public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEven
 			bookkeepingPersonLeavesVehicle(plve);
 		} else if (e instanceof PersonStuckEvent pse) {
 			handleStuckEvent(pse);
+		}
+	}
+
+	private void bookkeepingActivityEnd(ActivityEndEvent aee) {
+
+		var id = aee.getPersonId();
+		if (backpackByPerson.containsKey(id) || ignoredAgents.contains(id)) return;
+
+		// if we don't have a backpack yet and the person is not ignored, this is the first activity of that person. Therefore, we must create a new
+		// backpack or add it to the ignored list.
+		//
+		// This favors implicitly registering agents and assumes that an agents starts its simulation with an activity.
+		if (population.getPersons().containsKey(id)) {
+			var startLink = aee.getLinkId();
+			var startPartition = network.getPartitioning().getPartition(startLink);
+			var backpack = new Backpack(id, startPartition, providers);
+			this.backpackByPerson.put(id, backpack);
+		} else {
+			ignoredAgents.add(id);
 		}
 	}
 

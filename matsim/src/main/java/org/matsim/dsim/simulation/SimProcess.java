@@ -32,7 +32,6 @@ import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.DistributedEventsManager;
-import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -44,13 +43,22 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	private static final Logger log = LogManager.getLogger(SimProcess.class);
 
+	// simulation-related handlers
 	private final List<DistributedMobsimEngine> engines = new ArrayList<>();
 	private final List<DistributedDepartureHandler> departureHandlers = new ArrayList<>();
 	private final List<DistributedActivityHandler> activityHandlers = new ArrayList<>();
+
+	// partition-communication-related handlers.
 	private final List<NotifyAgentPartitionTransfer> notifyAgentPartitionTransfers = new ArrayList<>();
 	private final List<NotifyVehiclePartitionTransfer> notifyVehiclePartitionTransfers = new ArrayList<>();
+	private final Int2ObjectMap<List<DSimComponentsMessageProcessor.MessageHandler>> messageHandlers = new Int2ObjectOpenHashMap<>();
+
+	// lifecycle hooks
+	private final List<BeforeMobsim> beforeMobsimListeners = new ArrayList<>();
+	private final List<AfterMobsim> afterMobsimListeners = new ArrayList<>();
 	private final MobsimListenerManager listenerManager = new MobsimListenerManager(this);
-	private final Int2ObjectMap<List<DSimComponentsMessageProcessor.MessageHandler>> dispatch = new Int2ObjectOpenHashMap<>();
+
+	// mechanics
 	private final PartitionTransfer partitionTransfer;
 	private final Scenario scenario;
 	private final NetworkPartition partition;
@@ -60,10 +68,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
 	private NetworkTrafficEngine networkTrafficEngine;
-	// this is hard-wired in the simulation, as the collector needs to know when agents enter or leave a partition. Once we have a second 'thing' which
-	// needs to know this, we can think about a more abstract way of doing this. For now, we didn't want to introduce yet another signaling mechanism
-	// for this. Janek jan' 26
-	private final BackpackDataCollector backpackDataCollector;
 	/**
 	 * Additional agents that have been registered using {@link #registerAdditionalAgentOnLink(MobsimAgent)}.
 	 * This map does not contain the full set of agents in the simulation.
@@ -72,21 +76,14 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Inject
 	SimProcess(Scenario scenario, NetworkPartition partition, PartitionTransfer messaging, AgentSourcesContainer asc, DistributedEventsManager em,
-			   BackpackDataCollector bdc, SerializationProvider serialization) {
+			   SerializationProvider serialization) {
 		this.scenario = scenario;
 		this.partition = partition;
 		this.asc = asc;
 		this.em = em;
 		this.serialization = serialization;
 		this.currentTime = new MobsimTimer();
-		this.backpackDataCollector = bdc;
 		this.partitionTransfer = messaging;
-
-		// Register BackpackDataCollector message handlers into the dispatch table.
-		bdc.getMessageHandlers().forEach((clazz, handler) -> {
-			var type = serialization.getType(clazz);
-			dispatch.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler);
-		});
 	}
 
 	/**
@@ -97,12 +94,23 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			this.engines.add(d);
 			d.setInternalInterface(this);
 			engines.sort(Comparator.comparingDouble(DistributedMobsimEngine::getEnginePriority).reversed());
-			d.getMessageHandlers().forEach((clazz, handler) -> {
-				var type = serialization.getType(clazz);
-				dispatch.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler);
-			});
 		} else if (component instanceof MobsimEngine e) {
 			log.warn("Ignoring non-distributed mobsim engine : {}", e.getClass().getName());
+		}
+
+		if (component instanceof BeforeMobsim b) {
+			this.beforeMobsimListeners.add(b);
+		}
+
+		if (component instanceof AfterMobsim a) {
+			this.afterMobsimListeners.add(a);
+		}
+
+		if (component instanceof DSimComponentsMessageProcessor p) {
+			p.getMessageHandlers().forEach((clazz, handler) -> {
+				var type = serialization.getType(clazz);
+				messageHandlers.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler);
+			});
 		}
 
 		if (component instanceof DistributedActivityHandler d) {
@@ -132,8 +140,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	public void onPrepareSim() {
 		currentTime.setSimStartTime(getScenario().getConfig().qsim().getStartTime().orElse(0));
 
-		for (DistributedMobsimEngine engine : engines) {
-			engine.beforeMobsim();
+		for (BeforeMobsim listener : beforeMobsimListeners) {
+			listener.beforeMobsim();
 		}
 
 		for (DistributedAgentSource source : asc.getAgentSources()) {
@@ -164,16 +172,14 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
-		for (DistributedMobsimEngine engine : engines) {
-			engine.afterMobsim();
+		for (AfterMobsim listener : afterMobsimListeners) {
+			listener.afterMobsim();
 		}
-
-		backpackDataCollector.finishAllPersons();
 	}
 
 	@Override
 	public void process(SimStepMessage msg) {
-		var handlers = dispatch.get(msg.messageType());
+		var handlers = messageHandlers.get(msg.messageType());
 		if (handlers != null) {
 			handlers.forEach(h -> h.handle(msg.messages(), msg.timeStep()));
 		}
@@ -290,7 +296,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void insertAgentIntoMobsim(MobsimAgent agent) {
-		backpackDataCollector.registerAgent(agent);
 		arrangeNextAgentState(agent);
 	}
 

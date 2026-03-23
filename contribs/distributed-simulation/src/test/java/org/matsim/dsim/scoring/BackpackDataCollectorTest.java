@@ -71,7 +71,6 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
-		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(1., pId, link1, "walk", "walk"));
 		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
@@ -145,7 +144,6 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, eps, providers);
 
-		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(1., pId, link1, "walk", "walk"));
 
@@ -225,8 +223,6 @@ class BackpackDataCollectorTest {
 		providers.put(TransportMode.pt, new BackpackTransitRouteProvider(network, schedule));
 
 		var collector = new BackpackDataCollector(mock(PartitionTransfer.class), network, pop, fbc, providers);
-
-		collector.registerAgent(distAgent);
 
 		// 1. Transit Driver starts (this populates transitInformation in the collector)
 		collector.handleEvent(new TransitDriverStartsEvent(0.0, driver, transitVehicle, lineId, routeId, Id.create("dep1", Departure.class)));
@@ -309,7 +305,6 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
-		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(100., pId, link1, "car", "car"));
 
@@ -391,9 +386,6 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
-		collector.registerAgent(distAgent1);
-		collector.registerAgent(distAgent2);
-
 		// Both end activities at l1
 		collector.handleEvent(new ActivityEndEvent(100., pId1, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(100., pId1, link1, "car", "car"));
@@ -471,7 +463,6 @@ class BackpackDataCollectorTest {
 
 		var distAgent = mock(DistributedMobsimAgent.class);
 		when(distAgent.getId()).thenReturn(pId);
-		collector.registerAgent(distAgent);
 
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(110., pId, link1, "walk", "walk"));
@@ -513,13 +504,11 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
-		collector.registerAgent(ignoredAgent);
-		collector.registerAgent(registeredAgent);
-
 		// make sure the collector doesn't crash when we send it events with the ignored agent.
 		collector.handleEvent(new ActivityEndEvent(100., ignored, link1, null, "home", new Coord(0, 0)));
+		collector.handleEvent(new ActivityEndEvent(100., registered, link1, null, "whatever", new Coord(0, 0)));
 
-		collector.finishAllPersons();
+		collector.afterMobsim();
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());
 		assertEquals(registered, backPackCaptor.getValue().personId());
@@ -564,7 +553,7 @@ class BackpackDataCollectorTest {
 		// make sure the collector doesn't crash when we send it events with the ignored agent.
 		collector.handleEvent(new ActivityEndEvent(100., ignored, link1, null, "home", new Coord(0, 0)));
 
-		collector.finishAllPersons();
+		collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());
