@@ -60,21 +60,6 @@ public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEven
 		this.providers = providers;
 	}
 
-//	// I think this can be done via agentarrives on partition.
-//	public void registerAgent(MobsimAgent agent) {
-//
-//		// only persons which are part of the population are scored. Other agents such as transit drivers, or drt agents
-//		// can be ignored. If this assumption turns out to be incorect, we should probably mark agents as 'scorable' instead
-//		if (population.getPersons().containsKey(agent.getId())) {
-//			var startLink = agent.getCurrentLinkId();
-//			var startPartition = network.getPartitioning().getPartition(startLink);
-//			var backpack = new Backpack(agent.getId(), startPartition, providers);
-//			this.backpackByPerson.put(agent.getId(), backpack);
-//		} else {
-//			ignoredAgents.add(agent.getId());
-//		}
-//	}
-
 	@Override
 	public void onAgentLeavesPartition(DistributedMobsimAgent agent, int toPartition) {
 		var backpack = backpackByPerson.remove(agent.getId());
