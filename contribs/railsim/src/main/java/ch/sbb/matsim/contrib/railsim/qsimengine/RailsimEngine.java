@@ -574,6 +574,10 @@ final class RailsimEngine implements Steppable {
 
 		// Train is on one link, only need to swap positions
 		if (headReverse.isOppositeLink(state.tailLink)) {
+			// TODO: Potentially refactor flow for single and multi-link cases to avoid logic duplication and make route index updates explicit:
+			//  1) Locate the corresponding opposite links in the route.
+			//  2) Apply a consistent coordinate flip (L - x) to maintain train length.
+			//  3) Explicitly update the route index (if needed).
 			state.headPosition = state.tailPosition;
 			state.tailPosition = 0;
 			return;
@@ -600,6 +604,11 @@ final class RailsimEngine implements Steppable {
 
 		// Head is now at the previous tail position
 		state.headLink = tailReverse.getLinkId();
+		// TODO: This logic is currently broken and requires a fix:
+		//  - The head position on the opposite link should be flipped (state.headPosition = tailReverse.length - state.tailPosition).
+		//  - Applying the coordinate flip currently causes the train to reverse one link earlier in the route for each circulation cycle
+		//    (see shuttleMicro test). This suggests routeIdx is being incremented twice (once in enterLink and once in the reverse logic),
+		//    causing the train to skip the actual turnaround link in the next cycle.
 		state.headPosition = state.tailPosition;
 
 		state.tailLink = headReverse.getLinkId();
@@ -618,7 +627,7 @@ final class RailsimEngine implements Steppable {
 			}
 		}
 
-		// CHeck element of previous route as well
+		// Check element of previous route as well
 		if (nextTailLink == null)
 			for (int i = state.previousRoute.size() - 1; i >= 0; i--) {
 				if (state.previousRoute.get(i).getLinkId().equals(state.tailLink)) {
