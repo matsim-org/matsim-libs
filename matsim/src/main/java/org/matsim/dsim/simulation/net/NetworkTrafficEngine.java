@@ -53,7 +53,6 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Override
 	public void beforeSim() {
-	public void beforeSim() {
 		var handler = new LeaveQHandler();
 
 		for (SimLink link : simNetwork.getLinks().values()) {
