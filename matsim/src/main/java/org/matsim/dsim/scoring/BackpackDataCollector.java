@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine.MessageHandler;
@@ -35,13 +36,12 @@ import java.util.*;
  * agents might have left the partition already.
  */
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
-public class BackpackDataCollector implements BasicEventHandler, NotifyAgentPartitionTransfer {
+public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEventHandler, NotifyAgentPartitionTransfer {
 
 	private final Map<Id<Person>, Backpack> backpackByPerson = new HashMap<>();
 	private final Map<Id<Vehicle>, Set<Backpack>> backpackByVehicle = new HashMap<>();
 	private final Set<Id<Person>> ignoredAgents = new HashSet<>();
 
-	//private final SimStepMessaging simStepMessaging;
 	private final PartitionTransfer partitionTransfer;
 	private final Network network;
 	private final Population population;
@@ -59,6 +59,7 @@ public class BackpackDataCollector implements BasicEventHandler, NotifyAgentPart
 		this.providers = providers;
 	}
 
+	// I think this can be done via agentarrives on partition.
 	public void registerAgent(MobsimAgent agent) {
 
 		// only persons which are part of the population are scored. Other agents such as transit drivers, or drt agents

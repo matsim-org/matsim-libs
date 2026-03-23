@@ -34,7 +34,6 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.DistributedEventsManager;
 import org.matsim.dsim.scoring.BackpackDataCollector;
-import org.matsim.dsim.scoring.BackpackScoringModule;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -74,7 +73,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Inject
 	SimProcess(Scenario scenario, NetworkPartition partition, PartitionTransfer messaging, AgentSourcesContainer asc, DistributedEventsManager em,
-			   BackpackDataCollector bdc, BackpackScoringModule.BackpackDataCollectorRegistry registry, SerializationProvider serialization) {
+			   BackpackDataCollector bdc, SerializationProvider serialization) {
 		this.scenario = scenario;
 		this.partition = partition;
 		this.asc = asc;
@@ -84,10 +83,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		this.backpackDataCollector = bdc;
 		this.partitionTransfer = messaging;
 
-		// register the collector, so it can be removed from the events manager eventually.
-		registry.register(bdc);
-		// Wire up the scoring data collector as single partition events handler.
-		em.addHandler(backpackDataCollector, partition.getIndex());
 		// Register BackpackDataCollector message handlers into the dispatch table.
 		bdc.getMessageHandlers().forEach((clazz, handler) -> {
 			var type = serialization.getType(clazz);

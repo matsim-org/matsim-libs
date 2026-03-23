@@ -10,6 +10,7 @@ import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.dsim.events.DSimEventHandlingModule;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.executors.PoolExecutor;
 import org.matsim.dsim.executors.SingleExecutor;
@@ -60,6 +61,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		Multibinder.newSetBinder(binder(), LPProvider.class);
 
 		install(new DSimModule());
+		install(new DSimEventHandlingModule());
 		install(new BackpackScoringModule());
 	}
 
