@@ -32,29 +32,23 @@ public class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngi
 	private InternalInterface internalInterface = null;
 
 	public PassengerUnboardingAgentFactory(
-			final AgentFactory delegate,
-			final QVehicleProvider vehicleProvider) {
+		final AgentFactory delegate,
+		final QVehicleProvider vehicleProvider) {
 		this.delegate = delegate;
 		this.vehicleProvider = vehicleProvider;
 	}
 
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(final Person p) {
-		if ( internalInterface == null ) throw new IllegalStateException( "no internal interface" );
+		if (internalInterface == null) throw new IllegalStateException("no internal interface");
 		return new PassengerUnboardingDriverAgent(
-				delegate.createMobsimAgentFromPerson( p ),
-				vehicleProvider,
-				internalInterface);
+			delegate.createMobsimAgentFromPerson(p),
+			vehicleProvider,
+			internalInterface);
 	}
 
 	@Override
 	public void doSimStep(double time) {}
-
-	@Override
-	public void beforeSim() {}
-
-	@Override
-	public void afterSim() {}
 
 	@Override
 	public void setInternalInterface(final InternalInterface internalInterface) {

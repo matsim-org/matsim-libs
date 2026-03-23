@@ -101,10 +101,6 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	}
 
 	@Override
-	public void beforeSim() {
-	}
-
-	@Override
 	public void doSimStep(double time) {
 
 		handleGroupDepartures(time);
@@ -129,7 +125,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 			if (passengers != null) {
 				// not much else can be done for immediate requests
 				// set the passenger agent to abort - the event will be thrown by the QSim
-				for (MobsimPassengerAgent passenger: passengers) {
+				for (MobsimPassengerAgent passenger : passengers) {
 					passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
 					internalInterface.arrangeNextAgentState(passenger);
 				}
@@ -151,7 +147,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		List<Id<Person>> groupIds = group.stream().map(Identifiable::getId).toList();
 
 		List<Route> routes = group.stream().map(agent -> {
-			Leg leg = (Leg)((PlanAgent) agent).getCurrentPlanElement();
+			Leg leg = (Leg) ((PlanAgent) agent).getCurrentPlanElement();
 			return leg.getRoute();
 		}).toList();
 
@@ -164,12 +160,12 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		Preconditions.checkArgument(group.stream().allMatch(a -> a.getDestinationLinkId().equals(toLinkId)));
 
 		// try to find a prebooked requests that is associated to this leg
-		Leg leg = (Leg)((PlanAgent)representative).getCurrentPlanElement();
+		Leg leg = (Leg) ((PlanAgent) representative).getCurrentPlanElement();
 		PassengerRequest request = advanceRequestProvider.retrieveRequest(representative, leg);
 
 		if (request == null) { // immediate request
 			request = requestCreator.createRequest(tracker.createRequestId(),
-					groupIds, routes, getLink(fromLinkId), getLink(toLinkId), now, now);
+				groupIds, routes, getLink(fromLinkId), getLink(toLinkId), now, now);
 
 			// must come before validateAndSubmitRequest (to come before rejection event)
 			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), groupIds));
@@ -201,12 +197,12 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 			return false;
 		}
 
-		MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
+		MobsimPassengerAgent passenger = (MobsimPassengerAgent) agent;
 		internalInterface.registerAdditionalAgentOnLink(passenger);
 
 		Optional<Id<PassengerGroupIdentifier.PassengerGroup>> groupId = passengerGroupIdentifier.getGroupId(passenger);
 
-		if(groupId.isPresent()) {
+		if (groupId.isPresent()) {
 			groupDepartureStage.computeIfAbsent(groupId.get(), k -> new ArrayList<>()).add(passenger);
 			//terminate early as more group members may depart later
 			return true;
@@ -267,9 +263,9 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	@Override
 	public boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-			Id<Request> requestId, double now) {
+									   Id<Request> requestId, double now) {
 		boolean pickedUp = internalPassengerHandling.tryPickUpPassengers(driver, tracker.activePassengers.get(requestId),
-				requestId, now);
+			requestId, now);
 		Verify.verify(pickedUp, "Not possible without prebooking");
 		return pickedUp;
 	}
@@ -291,6 +287,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 			rejectedRequestsEvents.add(event);
 		}
 	}
+
 	public static Provider<PassengerEngine> createProvider(String mode) {
 		return createProvider(mode, Collections.singleton(mode));
 	}

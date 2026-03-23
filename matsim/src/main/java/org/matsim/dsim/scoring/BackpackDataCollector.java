@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.mobsim.dsim.DSimComponentsMessageProcessor;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine.MessageHandler;
 import org.matsim.core.mobsim.dsim.NotifyAgentPartitionTransfer;
@@ -115,7 +116,7 @@ public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEven
 		}
 	}
 
-	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
+	public Map<Class<? extends Message>, DSimComponentsMessageProcessor.MessageHandler> getMessageHandlers() {
 		return Map.of(
 			Backpack.Msg.class, this::processBackpackMessages
 		);

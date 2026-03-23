@@ -52,7 +52,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Override
-	public void beforeSim() {
+	public void beforeMobsim() {
 		var handler = new LeaveQHandler();
 
 		for (SimLink link : simNetwork.getLinks().values()) {
@@ -108,8 +108,8 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Override
-	public void afterSim() {
-		wait2Link.afterSim();
+	public void afterMobsim() {
+		wait2Link.afterMobsim();
 		for (SimLink link : simNetwork.getLinks().values()) {
 			for (var veh : link.removeAllVehicles()) {
 				em.processEvent(new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLinkId(), veh.getDriver().getMode()));

@@ -125,7 +125,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	//rpc MATSim --> extern
 
 	@Override
-	public void beforeSim() {
+	public void beforeMobsim() {
 
 		HybridSimProto.Scenario hsc = (HybridSimProto.Scenario) sc.getScenarioElement("hybrid_scenario");
 
@@ -134,7 +134,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		HybridSimProto.Empty e = HybridSimProto.Empty.getDefaultInstance();
 		this.client.getBlockingStub().shutdown(e);
 		this.client.shutdown();

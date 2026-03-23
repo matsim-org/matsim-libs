@@ -137,7 +137,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 	}
 
 	@Override
-	public void beforeSim() {
+	public void beforeMobsim() {
 		// not much to do, all pre-processing is done in insertAgentsIntoMobsim
 		if (this.context != null) {
 			int iteration = this.context.getIteration();
@@ -168,7 +168,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		// check that all agents have arrived, generate stuck events otherwise
 		double now = this.netsim.getSimTimer().getTimeOfDay();
 		for (Map.Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
