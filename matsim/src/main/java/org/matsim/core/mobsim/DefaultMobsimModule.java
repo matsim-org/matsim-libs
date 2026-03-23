@@ -53,7 +53,7 @@ public class DefaultMobsimModule extends AbstractModule {
 		}
 
 		// dsim comes with its own scope event handling module
-		if (!mobsimType.equals(ControllerConfigGroup.MobsimType.dsim)) {
+		if (!mobsimType.equals(ControllerConfigGroup.MobsimType.dsim.name())) {
 			install(new MobsimScopeEventHandlingModule());
 		}
 	}
