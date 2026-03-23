@@ -19,7 +19,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.dsim.*;
-import org.matsim.core.mobsim.dsim.DistributedMobsimEngine.MessageHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -50,7 +49,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final List<DistributedDepartureHandler> departureHandlers = new ArrayList<>();
 	private final List<DistributedActivityHandler> activityHandlers = new ArrayList<>();
 	private final MobsimListenerManager listenerManager = new MobsimListenerManager(this);
-	private final Int2ObjectMap<List<MessageHandler>> dispatch = new Int2ObjectOpenHashMap<>();
+	private final Int2ObjectMap<List<DSimComponentsMessageProcessor.MessageHandler>> dispatch = new Int2ObjectOpenHashMap<>();
 	private final PartitionTransfer partitionTransfer;
 	private final Scenario scenario;
 	private final NetworkPartition partition;
