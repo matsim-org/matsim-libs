@@ -1,47 +1,43 @@
 version: 2
 updates:
-  # All Maven dependencies (except fory) are bundled into a single weekly PR.
-  # Created Monday at 04:00 Europe/Berlin. The "all-dependencies" group is required
-  # to bundle updates — without it, Dependabot opens one PR per dependency.
-  - package-ecosystem: "maven"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "04:00"
-      timezone: "Europe/Berlin"
-    open-pull-requests-limit: 15
-    ignore:
-      - dependency-name: "org.apache.fory:*"
-    groups:
-      all-dependencies:
-        patterns: ["*"]
-
-  # Fory is a fast-moving serialization library with frequent breaking changes.
-  # It is checked daily but the 7-day cooldown prevents PRs from being opened
-  # until a version has been available for at least a week, filtering out
-  # short-lived releases. The group is required to apply the cooldown setting.
+  # All Maven dependencies are bundled into a single daily PR.
+  # AWS SDK is excluded here and handled separately on Mondays (see below).
+  # Fory is excluded from the group so each artifact gets its own individual PR —
+  # it is fast-moving with frequent breaking changes that benefit from separate review.
+  # The group is required to bundle updates — without it, Dependabot opens one PR per dependency.
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 2
+    ignore:
+      - dependency-name: "software.amazon.awssdk:*"
     groups:
-      fory:
-        patterns: ["org.apache.fory:*"]
-        cooldown:
-          default: 7
+      all-dependencies:
+        patterns: ["*"]
+        exclude-patterns: ["org.apache.fory:*"]
 
-  # GitHub Actions dependencies bundled into a single weekly PR.
-  # Created Monday at 04:00 Europe/Berlin, same cadence as Maven.
-  # The group is required to bundle updates — without it, each action gets its own PR.
-  - package-ecosystem: "github-actions"
+  # AWS SDK releases very frequently. Updates are batched into a single PR on Monday.
+  # Ideally this would be merged into Monday's daily grouped PR, but Dependabot does
+  # not support combining groups across separate update blocks.
+  - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    ignore:
+      - dependency-name: "org.apache.fory:*"
+    groups:
+      aws-sdk:
+        patterns: ["software.amazon.awssdk:*"]
+
+  # GitHub Actions dependencies bundled into a single daily PR.
+  # The group is required to bundle updates — without it, each action gets its own PR.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
     groups:
       github-actions:
         patterns: ["*"]
