@@ -1,36 +1,19 @@
 version: 2
 updates:
-  # All Maven dependencies are bundled into a single daily PR.
-  # AWS SDK is excluded here and handled separately on Mondays (see below).
-  # Fory is excluded from the group so each artifact gets its own individual PR —
-  # it is fast-moving with frequent breaking changes that benefit from separate review.
-  # The group is required to bundle updates — without it, Dependabot opens one PR per dependency.
+  # All Maven dependencies checked daily.
+  # - "all-dependencies" bundles everything into one grouped PR (without a group,
+  #   Dependabot opens one PR per dependency).
+  # - Fory is excluded from the group so each artifact gets its own individual
+  #   PR — it is fast-moving with frequent breaking changes that benefit from
+  #   separate review.
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "daily"
-    ignore:
-      - dependency-name: "software.amazon.awssdk:*"
     groups:
       all-dependencies:
         patterns: ["*"]
         exclude-patterns: ["org.apache.fory:*"]
-
-  # AWS SDK releases very frequently. Updates are batched into a single PR on Monday.
-  # Ideally this would be merged into Monday's daily grouped PR, but Dependabot does
-  # not support combining groups across separate update blocks.
-  - package-ecosystem: "maven"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "04:00"
-      timezone: "Europe/Berlin"
-    ignore:
-      - dependency-name: "org.apache.fory:*"
-    groups:
-      aws-sdk:
-        patterns: ["software.amazon.awssdk:*"]
 
   # GitHub Actions dependencies bundled into a single daily PR.
   # The group is required to bundle updates — without it, each action gets its own PR.
