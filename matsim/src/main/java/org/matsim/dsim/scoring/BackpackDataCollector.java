@@ -15,7 +15,6 @@ import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.dsim.DSimComponentsMessageProcessor;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
-import org.matsim.core.mobsim.dsim.DistributedMobsimEngine.MessageHandler;
 import org.matsim.core.mobsim.dsim.NotifyAgentPartitionTransfer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
