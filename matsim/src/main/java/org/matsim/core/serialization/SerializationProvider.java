@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.fory.Fory;
 import org.apache.fory.ThreadSafeFory;
 import org.apache.fory.config.Language;
+import org.apache.fory.memory.MemoryBuffer;
 import org.apache.fory.reflect.ReflectionUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Message;
@@ -120,26 +121,28 @@ public class SerializationProvider {
 	 * Deserialize a message that was serialized using {@link #toBytes(Message)}.
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends Message> T parse(ByteBuffer buf) {
+	public <T extends Message> T deserialize(ByteBuffer buf) {
 		return (T) fory.deserialize(buf);
 	}
 
-	public ByteMessageParser getParser(int type) {
-		if (!type2Class.containsKey(type)) {
-			throw new IllegalArgumentException("No provider for type " + type);
+	public Message deserialize(MemoryBuffer in, int type) {
+		var msgClass = type2Class.get(type);
+		if (msgClass == null) {
+			throw new IllegalArgumentException("Type " + type + " was not registered for serialization. Messages that should be serialized must be at least package private to be detected.");
 		}
 
-		Class<? extends Message> msgType = type2Class.get(type);
-		return (in) -> fory.deserializeJavaObject(in, msgType);
+		return deserialize(in, msgClass);
 	}
 
-	public ForyBufferParser getForyParser(int type) {
-		if (!type2Class.containsKey(type)) {
-			throw new IllegalArgumentException("No provider for type " + type);
-		}
+	public <T extends Message> T deserialize(MemoryBuffer in, Class<T> clazz) {
+		return fory.deserialize(in, clazz);
+	}
 
-		Class<? extends Message> msgType = type2Class.get(type);
-		return (in) -> fory.deserializeJavaObject(in, msgType);
+	public <T extends Message> byte[] serialize(T message) {
+		if (!class2Type.containsKey(message.getClass())) {
+			throw new IllegalArgumentException("Class " + message.getClass() + " was not registered for serialization. Messages that should be serialized must be at least package private to be detected.");
+		}
+		return fory.serialize(message);
 	}
 
 	@Override
@@ -190,9 +193,5 @@ public class SerializationProvider {
 
 	public Class<?> getType(int type) {
 		return type == Event.ANY_TYPE ? Event.class : type2Class.get(type);
-	}
-
-	public ThreadSafeFory getFory() {
-		return fory;
 	}
 }
