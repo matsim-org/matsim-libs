@@ -164,7 +164,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (var entry : teleportationList) {
 			MobsimAgent agent = entry.agent();

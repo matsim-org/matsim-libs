@@ -71,7 +71,7 @@ class NetworkTrafficEngineTest {
 		SimpleVehicle vehicle = TestUtils.createVehicle("person", 1.0, 10);
 		vehicle.setDriver(agent);
 		agent.setVehicle(vehicle);
-		engine.beforeSim();
+		engine.beforeMobsim();
 
 		engine.addParkedVehicle(vehicle, agent.getCurrentLinkId());
 
@@ -147,7 +147,7 @@ class NetworkTrafficEngineTest {
 		when(link1.removeAllVehicles()).thenReturn(List.of(vehicle1));
 		when(link2.removeAllVehicles()).thenReturn(List.of(vehicle2));
 
-		engine.afterSim();
+		engine.afterMobsim();
 
 		verify(wait2Link, times(1)).afterSim();
 		verify(eventsManager, times(2)).processEvent(any(PersonStuckEvent.class));

@@ -118,7 +118,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		for (var entry : personsTeleporting) {
 			var person = entry.person();
 			em.processEvent(new PersonStuckEvent(now, person.getId(), person.getDestinationLinkId(), person.getMode()));

@@ -69,20 +69,20 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	private final InternalPassengerHandling internalPassengerHandling;
 	private final TeleportationEngine teleportationEngine;
 	private final Queue<Pair<Double, PassengerRequest>> teleportedRequests = new PriorityQueue<>(
-			Comparator.comparingDouble(Pair::getLeft));
+		Comparator.comparingDouble(Pair::getLeft));
 
 	private InternalInterface internalInterface;
 
 	TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
-			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
-			DvrpPassengerTracker tracker, Network network, PassengerRequestValidator requestValidator, Scenario scenario) {
+							   PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
+							   DvrpPassengerTracker tracker, Network network, PassengerRequestValidator requestValidator, Scenario scenario) {
 		this(mode, eventsManager, mobsimTimer, requestCreator, teleportedRouteCalculator, tracker, network, requestValidator,
-				new DefaultTeleportationEngine(scenario, eventsManager, false));
+			new DefaultTeleportationEngine(scenario, eventsManager, false));
 	}
 
 	TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
-			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
-			DvrpPassengerTracker tracker, Network network, PassengerRequestValidator requestValidator, TeleportationEngine teleportationEngine) {
+							   PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
+							   DvrpPassengerTracker tracker, Network network, PassengerRequestValidator requestValidator, TeleportationEngine teleportationEngine) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
@@ -102,8 +102,8 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	}
 
 	@Override
-	public void beforeSim() {
-		teleportationEngine.beforeSim();
+	public void beforeMobsim() {
+		teleportationEngine.beforeMobsim();
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 			PassengerRequest request = teleportedRequests.poll().getRight();
 			for (Id<Person> passenger : request.getPassengerIds()) {
 				eventsManager.processEvent(
-						new PassengerDroppedOffEvent(time, mode, request.getId(), passenger, null));
+					new PassengerDroppedOffEvent(time, mode, request.getId(), passenger, null));
 			}
 		}
 
@@ -122,8 +122,8 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	}
 
 	@Override
-	public void afterSim() {
-		teleportationEngine.afterSim();
+	public void afterMobsim() {
+		teleportationEngine.afterMobsim();
 	}
 
 	@Override
@@ -132,11 +132,11 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 			return false;
 		}
 
-		MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
+		MobsimPassengerAgent passenger = (MobsimPassengerAgent) agent;
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
-		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
+		Route route = ((Leg) ((PlanAgent) passenger).getCurrentPlanElement()).getRoute();
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-				List.of(passenger.getId()), List.of(route), getLink(fromLinkId), getLink(toLinkId), now, now);
+			List.of(passenger.getId()), List.of(route), getLink(fromLinkId), getLink(toLinkId), now, now);
 
 		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerIds()));
 
@@ -160,7 +160,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 
 
 		for (MobsimPassengerAgent passenger : passengers) {
-			Leg leg = (Leg)WithinDayAgentUtils.getCurrentPlanElement(passenger);//side effect: makes the plan modifiable
+			Leg leg = (Leg) WithinDayAgentUtils.getCurrentPlanElement(passenger);//side effect: makes the plan modifiable
 			Route originalRoute = leg.getRoute();
 			Verify.verify(originalRoute.getStartLinkId().equals(teleportedRoute.getStartLinkId()));
 			Verify.verify(originalRoute.getEndLinkId().equals(teleportedRoute.getEndLinkId()));
@@ -171,25 +171,25 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		}
 
 		eventsManager.processEvent(new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(),
-				request.getPassengerIds(), null, now, now + teleportedRoute.getTravelTime().seconds()));
+			request.getPassengerIds(), null, now, now + teleportedRoute.getTravelTime().seconds()));
 		return teleportedRoute;
 	}
 
 	private Link getLink(Id<Link> linkId) {
 		return Preconditions.checkNotNull(network.getLinks().get(linkId),
-				"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
-				linkId, mode);
+			"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
+			linkId, mode);
 	}
 
 	@Override
 	public boolean notifyWaitForPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-			Id<Request> requestId) {
+										   Id<Request> requestId) {
 		throw new UnsupportedOperationException("No notifying when teleporting");
 	}
 
 	@Override
 	public boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-			Id<Request> requestId, double now) {
+									   Id<Request> requestId, double now) {
 		throw new UnsupportedOperationException("No picking-up when teleporting");
 	}
 
@@ -217,11 +217,11 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 			@Override
 			public TeleportingPassengerEngine get() {
 				return new TeleportingPassengerEngine(getMode(), eventsManager, mobsimTimer,
-						getModalInstance(PassengerRequestCreator.class),
-						getModalInstance(TeleportedRouteCalculator.class),
-						getModalInstance(DvrpPassengerTracker.class),
-						getModalInstance(Network.class),
-						getModalInstance(PassengerRequestValidator.class), scenario);
+					getModalInstance(PassengerRequestCreator.class),
+					getModalInstance(TeleportedRouteCalculator.class),
+					getModalInstance(DvrpPassengerTracker.class),
+					getModalInstance(Network.class),
+					getModalInstance(PassengerRequestValidator.class), scenario);
 			}
 		};
 	}

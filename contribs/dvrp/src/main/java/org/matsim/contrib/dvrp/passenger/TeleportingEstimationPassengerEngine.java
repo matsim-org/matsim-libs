@@ -112,8 +112,8 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 	}
 
 	@Override
-	public void beforeSim() {
-		teleportationEngine.beforeSim();
+	public void beforeMobsim() {
+		teleportationEngine.beforeMobsim();
 	}
 
 	@Override
@@ -140,8 +140,8 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 	}
 
 	@Override
-	public void afterSim() {
-		teleportationEngine.afterSim();
+	public void afterMobsim() {
+		teleportationEngine.afterMobsim();
 	}
 
 	@Override

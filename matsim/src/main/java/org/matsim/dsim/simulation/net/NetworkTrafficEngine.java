@@ -54,7 +54,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Override
-	public void beforeSim() {
+	public void beforeMobsim() {
 		for (SimLink link : simNetwork.getLinks().values()) {
 
 			// Split out links put vehicles into the messaging. Before they do so, we intercept and
@@ -126,7 +126,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		wait2Link.afterSim();
 		for (SimLink link : simNetwork.getLinks().values()) {
 			for (var veh : link.removeAllVehicles()) {

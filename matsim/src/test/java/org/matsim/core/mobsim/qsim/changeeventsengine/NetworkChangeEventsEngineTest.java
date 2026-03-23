@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.changeeventsengine;
+package org.matsim.core.mobsim.qsim.changeeventsengine;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,13 +46,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.List;
 
-	/**
+/**
  * @author mrieser / Simunto GmbH
  */
 public class NetworkChangeEventsEngineTest {
 
-	 @Test
-	 void testActivation_inactive() {
+	@Test
+	void testActivation_inactive() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -71,7 +71,7 @@ public class NetworkChangeEventsEngineTest {
 		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		qsim.addMobsimEngine(engine);
 
-		 engine.beforeSim();
+		engine.beforeMobsim();
 		for (int i = 0; i < 30; i++) {
 			engine.doSimStep(i);
 		}
@@ -86,8 +86,8 @@ public class NetworkChangeEventsEngineTest {
 		}
 	}
 
-	 @Test
-	 void testActivation_timedepOnly_freespeed() {
+	@Test
+	void testActivation_timedepOnly_freespeed() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -107,7 +107,7 @@ public class NetworkChangeEventsEngineTest {
 		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		engine.setInternalInterface(new DummyInternalInterfaceImpl(qsim));
 
-		 engine.beforeSim();
+		engine.beforeMobsim();
 		for (int i = 0; i < 30; i++) {
 			engine.doSimStep(i);
 		}
@@ -122,8 +122,8 @@ public class NetworkChangeEventsEngineTest {
 		Assertions.assertEquals(50, link1.getFreespeed(40), 0, "it should be 50 now.");
 	}
 
-	 @Test
-	 void testActivation_timedepOnly_capacity() {
+	@Test
+	void testActivation_timedepOnly_capacity() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -143,7 +143,7 @@ public class NetworkChangeEventsEngineTest {
 		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		engine.setInternalInterface(new DummyInternalInterfaceImpl(qsim));
 
-		 engine.beforeSim();
+		engine.beforeMobsim();
 		for (int i = 0; i < 30; i++) {
 			engine.doSimStep(i);
 		}
@@ -185,8 +185,8 @@ public class NetworkChangeEventsEngineTest {
 		}
 
 		@Override
-		public List<DepartureHandler> getDepartureHandlers(){
-			throw new RuntimeException( "not implemented" );
+		public List<DepartureHandler> getDepartureHandlers() {
+			throw new RuntimeException("not implemented");
 		}
 
 	}

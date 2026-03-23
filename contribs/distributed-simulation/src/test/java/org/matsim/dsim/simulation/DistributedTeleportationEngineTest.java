@@ -178,7 +178,7 @@ class DistributedTeleportationEngineTest {
 
 		engine.handleDeparture(10, agent, agent.getCurrentLinkId());
 		engine.doSimStep(expectedStuckTime);
-		engine.afterSim();
+		engine.afterMobsim();
 
 		var captor = ArgumentCaptor.forClass(org.matsim.api.core.v01.events.PersonStuckEvent.class);
 		verify(em, times(1)).processEvent(captor.capture());

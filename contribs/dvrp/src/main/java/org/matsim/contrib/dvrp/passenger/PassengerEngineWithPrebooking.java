@@ -50,8 +50,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 public final class PassengerEngineWithPrebooking
-		implements PassengerEngine, TripInfo.Provider, PassengerRequestRejectedEventHandler,
-		PassengerRequestScheduledEventHandler {
+	implements PassengerEngine, TripInfo.Provider, PassengerRequestRejectedEventHandler,
+	PassengerRequestScheduledEventHandler {
 
 	private final String mode;
 	private final MobsimTimer mobsimTimer;
@@ -72,8 +72,8 @@ public final class PassengerEngineWithPrebooking
 	private final Map<Id<Request>, RequestEntry> activeRequests = new HashMap<>();
 
 	PassengerEngineWithPrebooking(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
-			PreplanningEngine preplanningEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
-			Network network, DvrpPassengerTracker tracker, PassengerRequestValidator requestValidator) {
+								  PreplanningEngine preplanningEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
+								  Network network, DvrpPassengerTracker tracker, PassengerRequestValidator requestValidator) {
 		this.mode = mode;
 		this.mobsimTimer = mobsimTimer;
 		this.preplanningEngine = preplanningEngine;
@@ -86,7 +86,8 @@ public final class PassengerEngineWithPrebooking
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager, tracker);
 	}
 
-	@Override public void setInternalInterface(InternalInterface internalInterface) {
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
 		internalPassengerHandling.setInternalInterface(internalInterface);
 	}
@@ -96,15 +97,12 @@ public final class PassengerEngineWithPrebooking
 	}
 
 	@Override
-	public void beforeSim() {}
-
-	@Override public void doSimStep(double time) {
+	public void doSimStep(double time) {
 		processPassengerRequestEvents();
 	}
 
-	@Override public void afterSim() { }
-
-	@Override public final List<TripInfo> getTripInfos(TripInfo.Request tripInfoRequest) {
+	@Override
+	public final List<TripInfo> getTripInfos(TripInfo.Request tripInfoRequest) {
 		// idea is to be able to return multiple trip options, cf. public transit router.  In the case here, we will need only one.  I.e. goals of this method are:
 
 		// (1) fill out TripInfo
@@ -120,8 +118,9 @@ public final class PassengerEngineWithPrebooking
 
 		//FIXME we need to send TripInfoRequest to VrpOptimizer and actually get TripInfos from there
 		// for the time being: generating TripInfo object that will be returned to the potential passenger:
-		return ImmutableList.of( new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now, tripInfoRequest, this));
+		return ImmutableList.of(new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now, tripInfoRequest, this));
 	}
+
 	/**
 	 * @param passenger will be changed to passengerId
 	 * @param tripInfo
@@ -133,27 +132,30 @@ public final class PassengerEngineWithPrebooking
 		double now = mobsimTimer.getTimeOfDay();
 		//TODO have a separate request creator for prebooking (accept TripInfo instead of Route)
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-				List.of(passenger.getId()), List.of(tripInfo.getOriginalRequest().getPlannedRoute()),
-				getLink(tripInfo.getPickupLocation().getLinkId()), getLink(tripInfo.getDropoffLocation().getLinkId()),
-				tripInfo.getExpectedBoardingTime(), now);
+			List.of(passenger.getId()), List.of(tripInfo.getOriginalRequest().getPlannedRoute()),
+			getLink(tripInfo.getPickupLocation().getLinkId()), getLink(tripInfo.getDropoffLocation().getLinkId()),
+			tripInfo.getExpectedBoardingTime(), now);
 		validateAndSubmitRequest(passenger, request, tripInfo.getOriginalRequest(), now);
 		// hard assumption that with this engine, passenger ids is always a singleton. nkuehnel oct '23
 		advanceRequests.put(request.getPassengerIds().stream().findFirst().orElseThrow(), request);
 	}
+
 	private Link getLink(Id<Link> linkId) {
 		return Preconditions.checkNotNull(network.getLinks().get(linkId),
-				"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
-				linkId, mode);
+			"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
+			linkId, mode);
 	}
-	@Override public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId) {
+
+	@Override
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId) {
 		if (!agent.getMode().equals(mode)) {
 			return false;
 		}
 
-		MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
+		MobsimPassengerAgent passenger = (MobsimPassengerAgent) agent;
 		internalInterface.registerAdditionalAgentOnLink(passenger);
 
-		List<PassengerRequest> prebookedRequests = removeRequests(passenger.getId(), fromLinkId, passenger.getDestinationLinkId() );
+		List<PassengerRequest> prebookedRequests = removeRequests(passenger.getId(), fromLinkId, passenger.getDestinationLinkId());
 
 		Preconditions.checkState(prebookedRequests.size() == 1, "Currently only one request is allowed for the same from-to link pair");
 		// (but this is a local restriction, which could be locally changed.  kai, apr'23)
@@ -172,12 +174,12 @@ public final class PassengerEngineWithPrebooking
 		return true;
 	}
 
-	private List<PassengerRequest> removeRequests( Id<Person> passengerId, Id<Link> fromLinkId, Id<Link> toLinkId ) {
+	private List<PassengerRequest> removeRequests(Id<Person> passengerId, Id<Link> fromLinkId, Id<Link> toLinkId) {
 		Collection<PassengerRequest> allRequestsForThisPassenger = advanceRequests.get(passengerId);
 		List<PassengerRequest> filteredRequests = advanceRequests.get(passengerId)
-				.stream()
-				.filter(r -> r.getFromLink().getId().equals(fromLinkId) && r.getToLink().getId().equals(toLinkId))
-				.collect(Collectors.toList());
+			.stream()
+			.filter(r -> r.getFromLink().getId().equals(fromLinkId) && r.getToLink().getId().equals(toLinkId))
+			.collect(Collectors.toList());
 
 		allRequestsForThisPassenger.removeAll(filteredRequests);
 
@@ -188,7 +190,7 @@ public final class PassengerEngineWithPrebooking
 
 	//TODO have not decided yet how VrpOptimizer determines if request is prebooked, maybe 'boolean prebooked'??
 	private void validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request,
-			TripInfo.Request originalRequest, double now) {
+										  TripInfo.Request originalRequest, double now) {
 		activeRequests.put(request.getId(), new RequestEntry(request, passenger, originalRequest));
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			optimizer.requestSubmitted(request);//optimizer can also reject request if cannot handle it
@@ -199,14 +201,14 @@ public final class PassengerEngineWithPrebooking
 
 	@Override
 	public boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-			Id<Request> requestId, double now) {
+									   Id<Request> requestId, double now) {
 		Id<Link> linkId = driver.getCurrentLinkId();
 		RequestEntry requestEntry = activeRequests.get(requestId);
 		MobsimPassengerAgent passenger = requestEntry.passenger;
 
 		if (passenger.getCurrentLinkId() != linkId
-				|| passenger.getState() != MobsimAgent.State.LEG
-				|| !passenger.getMode().equals(mode)) {
+			|| passenger.getState() != MobsimAgent.State.LEG
+			|| !passenger.getMode().equals(mode)) {
 			awaitingPickups.put(requestId, pickupActivity);
 			return false;// wait for the passenger
 		}
@@ -266,8 +268,8 @@ public final class PassengerEngineWithPrebooking
 		if (requestEntry != null) {
 			PassengerRequest request = requestEntry.request;
 			preplanningEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.of(
-					new DvrpTripInfo(mode, request.getFromLink(), request.getToLink(), event.getPickupTime(),
-							event.getTime(), requestEntry.originalRequest, this)));
+				new DvrpTripInfo(mode, request.getFromLink(), request.getToLink(), event.getPickupTime(),
+					event.getTime(), requestEntry.originalRequest, this)));
 		}
 	}
 
@@ -275,6 +277,7 @@ public final class PassengerEngineWithPrebooking
 		private final PassengerRequest request;
 		private final MobsimPassengerAgent passenger;
 		private final TripInfo.Request originalRequest;
+
 		private RequestEntry(PassengerRequest request, MobsimPassengerAgent passenger, TripInfo.Request originalRequest) {
 			this.request = request;
 			this.passenger = passenger;
@@ -284,15 +287,19 @@ public final class PassengerEngineWithPrebooking
 
 	public static Provider<PassengerEngine> createProvider(String mode) {
 		return new ModalProviders.AbstractProvider<>(mode, DvrpModes::mode) {
-			@Inject private EventsManager eventsManager;
-			@Inject private MobsimTimer mobsimTimer;
+			@Inject
+			private EventsManager eventsManager;
+			@Inject
+			private MobsimTimer mobsimTimer;
 			@Inject
 			private PreplanningEngine preplanningEngine;
-			@Override public PassengerEngineWithPrebooking get() {
+
+			@Override
+			public PassengerEngineWithPrebooking get() {
 				return new PassengerEngineWithPrebooking(getMode(), eventsManager, mobsimTimer, preplanningEngine,
-						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
-						getModalInstance(Network.class), getModalInstance(DvrpPassengerTracker.class),
-						getModalInstance(PassengerRequestValidator.class));
+					getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
+					getModalInstance(Network.class), getModalInstance(DvrpPassengerTracker.class),
+					getModalInstance(PassengerRequestValidator.class));
 			}
 		};
 	}
@@ -309,8 +316,8 @@ public final class PassengerEngineWithPrebooking
 		MobsimPassengerAgent passenger = requestEntry.passenger;
 
 		if (passenger.getCurrentLinkId() != linkId
-				|| passenger.getState() != MobsimAgent.State.LEG
-				|| !passenger.getMode().equals(mode)) {
+			|| passenger.getState() != MobsimAgent.State.LEG
+			|| !passenger.getMode().equals(mode)) {
 			awaitingPickups.put(requestId, pickupActivity);
 			return false;// wait for the passenger
 		}

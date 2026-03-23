@@ -129,7 +129,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		currentTime.setSimStartTime(getScenario().getConfig().qsim().getStartTime().orElse(0));
 
 		for (DistributedMobsimEngine engine : engines) {
-			engine.beforeSim();
+			engine.beforeMobsim();
 		}
 
 		for (DistributedAgentSource source : asc.getAgentSources()) {
@@ -161,7 +161,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
 		for (DistributedMobsimEngine engine : engines) {
-			engine.afterSim();
+			engine.afterMobsim();
 		}
 
 		backpackDataCollector.finishAllPersons();

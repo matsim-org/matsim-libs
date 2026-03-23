@@ -78,55 +78,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-* @author smueller, gleich
-*/
+ * @author smueller, gleich
+ */
 
 public class RunExamplePtDisturbances {
-	private static final Logger log = LogManager.getLogger( RunExamplePtDisturbances.class ) ;
-	private static final URL configURL = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("ptdisturbances"),"config.xml");
+	private static final Logger log = LogManager.getLogger(RunExamplePtDisturbances.class);
+	private static final URL configURL = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("ptdisturbances"), "config.xml");
 
 	public static void main(String[] args) {
-		if ( args==null || args.length == 0 ){
-			run( ConfigUtils.loadConfig( configURL ) );
+		if (args == null || args.length == 0) {
+			run(ConfigUtils.loadConfig(configURL));
 		} else {
-			run( ConfigUtils.loadConfig(  args ) ) ;
+			run(ConfigUtils.loadConfig(args));
 		}
 	}
 
 	static void adaptConfig(Config config) {
-		config.transit().setBoardingAcceptance( TransitConfigGroup.BoardingAcceptance.checkStopOnly );
+		config.transit().setBoardingAcceptance(TransitConfigGroup.BoardingAcceptance.checkStopOnly);
 
-		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.kinematicWaves );
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.kinematicWaves);
 
 		// This configures otfvis:
-		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
-		visConfig.setDrawTransitFacilities( false );
-		visConfig.setColoringScheme( OTFVisConfigGroup.ColoringScheme.bvg ) ;
+		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class);
+		visConfig.setDrawTransitFacilities(false);
+		visConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg);
 		visConfig.setDrawTime(true);
 		visConfig.setDrawNonMovingItems(true);
 		visConfig.setAgentSize(125);
 		visConfig.setLinkWidth(10);
-		visConfig.setShowTeleportedAgents( true );
+		visConfig.setShowTeleportedAgents(true);
 	}
 
-	public static Controler prepareControler( Scenario scenario ) {
+	public static Controler prepareControler(Scenario scenario) {
 
-		Controler controler = new Controler( scenario ) ;
+		Controler controler = new Controler(scenario);
 		{
-			QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( controler.getConfig(), QSimComponentsConfigGroup.class );
+			QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(controler.getConfig(), QSimComponentsConfigGroup.class);
 
 			// the following requests that a component registered under the name "...NAME" will be used:
 			List<String> cmps = qsimComponentsConfig.getActiveComponents();
-			cmps.add( DisturbanceAndReplanningEngine.NAME );
-			qsimComponentsConfig.setActiveComponents( cmps );
+			cmps.add(DisturbanceAndReplanningEngine.NAME);
+			qsimComponentsConfig.setActiveComponents(cmps);
 
-			controler.addOverridingQSimModule( new AbstractQSimModule(){
+			controler.addOverridingQSimModule(new AbstractQSimModule() {
 				@Override
-				protected void configureQSim(){
+				protected void configureQSim() {
 					// the following registers the component under the name "...NAME":
-					this.addQSimComponentBinding( DisturbanceAndReplanningEngine.NAME ).to( DisturbanceAndReplanningEngine.class );
+					this.addQSimComponentBinding(DisturbanceAndReplanningEngine.NAME).to(DisturbanceAndReplanningEngine.class);
 				}
-			} );
+			});
 		}
 
 		return controler;
@@ -141,84 +141,88 @@ public class RunExamplePtDisturbances {
 		adaptConfig(config);
 		config.network().setTimeVariantNetwork(true);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 //		Time variant network is used to depict the disturbance
-		NetworkChangeEvent networkChangeEvent1 = new NetworkChangeEvent(7.5*3600);
+		NetworkChangeEvent networkChangeEvent1 = new NetworkChangeEvent(7.5 * 3600);
 		Link link = scenario.getNetwork().getLinks().get(Id.createLinkId("pt6b"));
-		networkChangeEvent1.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, link.getLength()/3600));
+		networkChangeEvent1.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, link.getLength() / 3600));
 		networkChangeEvent1.addLink(link);
 		NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), networkChangeEvent1);
-		NetworkChangeEvent networkChangeEvent2 = new NetworkChangeEvent(8.5*3600);
+		NetworkChangeEvent networkChangeEvent2 = new NetworkChangeEvent(8.5 * 3600);
 		networkChangeEvent2.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 30. / 3.6));
 		networkChangeEvent2.addLink(link);
 		NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), networkChangeEvent2);
 
 		// ---
-		Controler controler = prepareControler( scenario );
+		Controler controler = prepareControler(scenario);
 
 		// This will print the event onto the console/into the logfile.  Sometimes useful for debugging.
-		controler.addOverridingModule( new AbstractModule(){
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public void install(){
-				this.addEventHandlerBinding().toInstance( new BasicEventHandler(){
+			public void install() {
+				this.addEventHandlerBinding().toInstance(new BasicEventHandler() {
 					@Override
-					public void handleEvent( Event event ){
-						if ( event instanceof HasPersonId && ((HasPersonId) event).getPersonId().toString().equals( "b1810066" ) ){
-							log.info( event.toString() );
+					public void handleEvent(Event event) {
+						if (event instanceof HasPersonId && ((HasPersonId) event).getPersonId().toString().equals("b1810066")) {
+							log.info(event.toString());
 						}
 					}
-				} );
+				});
 			}
-		} );
+		});
 
 		// This will start otfvis.  Comment out if not needed.
-		controler.addOverridingModule( new OTFVisLiveModule() );
+		controler.addOverridingModule(new OTFVisLiveModule());
 		controler.run();
 	}
 
-	private static class DisturbanceAndReplanningEngine implements MobsimEngine{
-		public static final String NAME="disturbanceAndReplanningEngine" ;
+	private static class DisturbanceAndReplanningEngine implements MobsimEngine {
+		public static final String NAME = "disturbanceAndReplanningEngine";
 
-		@Inject private Scenario scenario;
-		@Inject private EventsManager events;
-		@Inject private Provider<TripRouter> tripRouterProvider ;
+		@Inject
+		private Scenario scenario;
+		@Inject
+		private EventsManager events;
+		@Inject
+		private Provider<TripRouter> tripRouterProvider;
 		private InternalInterface internalInterface;
 
-		@Override public void doSimStep( double now ) {
+		@Override
+		public void doSimStep(double now) {
 
 			// replan after an affected bus has already departed -> pax on the bus are replanned to get off earlier
 			double replanTime = 7.5 * 3600.;
 
-			if ( (int) now == replanTime -1. ){ // yyyyyy this needs to come one sec earlier. :-(
+			if ((int) now == replanTime - 1.) { // yyyyyy this needs to come one sec earlier. :-(
 				// clear transit schedule from transit router provider:
-				events.processEvent( new TransitScheduleChangedEvent( now ) );
+				events.processEvent(new TransitScheduleChangedEvent(now));
 			}
 
-			if ( (int) now == replanTime ){
+			if ((int) now == replanTime) {
 
 				// modify transit schedule:
 
-				final Id<TransitLine> disturbedLineId = Id.create( "2", TransitLine.class );
-				TransitLine disturbedLine = scenario.getTransitSchedule().getTransitLines().get( disturbedLineId ) ;
+				final Id<TransitLine> disturbedLineId = Id.create("2", TransitLine.class);
+				TransitLine disturbedLine = scenario.getTransitSchedule().getTransitLines().get(disturbedLineId);
 				Gbl.assertNotNull(disturbedLine);
 
-				TransitRoute disturbedRoute = disturbedLine.getRoutes().get( Id.create("345", TransitRoute.class ) );
-				Gbl.assertNotNull( disturbedRoute );
+				TransitRoute disturbedRoute = disturbedLine.getRoutes().get(Id.create("345", TransitRoute.class));
+				Gbl.assertNotNull(disturbedRoute);
 
-				log.warn("before removal: nDepartures=" + disturbedRoute.getDepartures().size() ) ;
+				log.warn("before removal: nDepartures=" + disturbedRoute.getDepartures().size());
 
-				List<Departure> toRemove = new ArrayList<>() ;
-				for( Departure departure : disturbedRoute.getDepartures().values() ){
-					if ( departure.getDepartureTime() >= 7.5*3600. && departure.getDepartureTime() < 8.5*3600.) {
-						toRemove.add( departure ) ;
+				List<Departure> toRemove = new ArrayList<>();
+				for (Departure departure : disturbedRoute.getDepartures().values()) {
+					if (departure.getDepartureTime() >= 7.5 * 3600. && departure.getDepartureTime() < 8.5 * 3600.) {
+						toRemove.add(departure);
 					}
 				}
-				for( Departure departure : toRemove ){
-					disturbedRoute.removeDeparture( departure ) ;
+				for (Departure departure : toRemove) {
+					disturbedRoute.removeDeparture(departure);
 				}
 
-				log.warn("after removal: nDepartures=" + disturbedRoute.getDepartures().size() ) ;
+				log.warn("after removal: nDepartures=" + disturbedRoute.getDepartures().size());
 
 				// ---
 
@@ -228,32 +232,25 @@ public class RunExamplePtDisturbances {
 		}
 
 		@Override
-		public void beforeSim() {
-		}
-
-		@Override
-		public void afterSim(){
-		}
-
-		@Override
-		public void setInternalInterface( InternalInterface internalInterface ){
-			this.internalInterface = internalInterface ;
+		public void setInternalInterface(InternalInterface internalInterface) {
+			this.internalInterface = internalInterface;
 		}
 
 	}
 
 	static void replanPtPassengers(double now, final Id<TransitLine> disturbedLineId, Provider<TripRouter> tripRouterProvider, Scenario scenario, InternalInterface internalInterface) {
 
-		final Netsim qsim = internalInterface.getMobsim() ;
+		final Netsim qsim = internalInterface.getMobsim();
 
 		// force new transit router:
 		final TripRouter tripRouter = tripRouterProvider.get();
-		EditTrips editTrips = new EditTrips( tripRouter, scenario, internalInterface, TimeInterpretation.create(scenario.getConfig()) );;
+		EditTrips editTrips = new EditTrips(tripRouter, scenario, internalInterface, TimeInterpretation.create(scenario.getConfig()));
+		;
 
 		// find the affected agents and replan affected trips:
 
-		for( MobsimAgent agent : (qsim).getAgents().values() ){
-			if( agent instanceof TransitDriverAgentImpl ){
+		for (MobsimAgent agent : (qsim).getAgents().values()) {
+			if (agent instanceof TransitDriverAgentImpl) {
 				/* This is a pt vehicle driver. TransitDriverAgentImpl does not support getModifiablePlan(...). So we should skip him.
 				 * This probably means that the driver continues driving the pt vehicle according to the old schedule.
 				 * However, this cannot be resolved by the editTrips.replanCurrentTrip() method anyway.
@@ -261,28 +258,28 @@ public class RunExamplePtDisturbances {
 				continue;
 			}
 
-			Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
+			Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 			{
-				PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement( agent );
-				if ( pe instanceof Activity ) {
-					if ( StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() ) ) {
-						log.warn( "agent with ID=" + agent.getId() + " is at stage activity of type=" + ((Activity) pe).getType() ) ;
+				PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent);
+				if (pe instanceof Activity) {
+					if (StageActivityTypeIdentifier.isStageActivity(((Activity) pe).getType())) {
+						log.warn("agent with ID=" + agent.getId() + " is at stage activity of type=" + ((Activity) pe).getType());
 					} else {
-						log.warn( "agent with ID=" + agent.getId() + " is at real activity of type=" + ((Activity) pe).getType() ) ;
+						log.warn("agent with ID=" + agent.getId() + " is at real activity of type=" + ((Activity) pe).getType());
 					}
-				} else if ( pe instanceof Leg ) {
-					log.warn( "agent with ID=" + agent.getId() + " is at leg with mode=" + ((Leg) pe).getMode() ) ;
+				} else if (pe instanceof Leg) {
+					log.warn("agent with ID=" + agent.getId() + " is at leg with mode=" + ((Leg) pe).getMode());
 				}
 			}
 
-			int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );
+			int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
 			TripStructureUtils.Trip currentTrip;
 
-			try{
-				currentTrip = EditTrips.findCurrentTrip( agent );
-			} catch( ReplanningException e ){
+			try {
+				currentTrip = EditTrips.findCurrentTrip(agent);
+			} catch (ReplanningException e) {
 				// The agent might not be on a trip at the moment (but at a "real" activity).
 				currentTrip = null;
 			}
@@ -290,8 +287,8 @@ public class RunExamplePtDisturbances {
 			Activity nextRealActivity = null; // would be nicer to use TripStructureUtils to find trips, but how can we get back to the original plan to modify it?
 
 
-			for( int ii = currentPlanElementIndex ; ii < plan.getPlanElements().size() ; ii++ ){
-				PlanElement pe = plan.getPlanElements().get( ii );
+			for (int ii = currentPlanElementIndex; ii < plan.getPlanElements().size(); ii++) {
+				PlanElement pe = plan.getPlanElements().get(ii);
 				// Replan each trip at maximum once, otherwise bad things might happen.
 				// So we either have to keep track which Trip has already been re-planned
 				// or move on manually to the next real activity after we re-planned.
@@ -301,24 +298,24 @@ public class RunExamplePtDisturbances {
 				// replanFutureTrip might be called. - gl, jul '19
 				if (nextRealActivity != null) {
 					// we are trying to move on to the next trip in order not to replan twice the same trip
-					if( pe instanceof Activity && nextRealActivity.equals((Activity) pe)) {
-							nextRealActivity = null;
-						}
+					if (pe instanceof Activity && nextRealActivity.equals((Activity) pe)) {
+						nextRealActivity = null;
+					}
 					// continue to next pe if we still are on the trip we just replanned.
 					continue;
-				} else if( pe instanceof Leg ){
+				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
-					if( leg.getMode().equals( TransportMode.pt ) ){
+					if (leg.getMode().equals(TransportMode.pt)) {
 						TransitPassengerRoute transitRoute = (TransitPassengerRoute) leg.getRoute();
-						if( transitRoute.getLineId().equals( disturbedLineId ) ){
-							TripStructureUtils.Trip affectedTrip = editTrips.findTripAtPlanElement( agent, pe );
-							if( currentTrip != null && currentTrip.getTripElements().contains( pe ) ){
+						if (transitRoute.getLineId().equals(disturbedLineId)) {
+							TripStructureUtils.Trip affectedTrip = editTrips.findTripAtPlanElement(agent, pe);
+							if (currentTrip != null && currentTrip.getTripElements().contains(pe)) {
 								// current trip is disturbed
-								editTrips.replanCurrentTrip( agent, now, TransportMode.pt );
+								editTrips.replanCurrentTrip(agent, now, TransportMode.pt);
 //								break;
 							} else {
 								// future trip is disturbed
-								editTrips.replanFutureTrip( affectedTrip, plan, TransportMode.pt );
+								editTrips.replanFutureTrip(affectedTrip, plan, TransportMode.pt);
 							}
 							nextRealActivity = affectedTrip.getDestinationActivity();
 						}
@@ -328,11 +325,11 @@ public class RunExamplePtDisturbances {
 
 			{
 				// agents that abort their leg before boarding a vehicle need to be actively advanced:
-				PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement( agent );
-				if ( pe instanceof Activity ) {
-					if ( StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() ) ){
-						internalInterface.arrangeNextAgentState( agent );
-						internalInterface.unregisterAdditionalAgentOnLink( agent.getId(), agent.getCurrentLinkId() ) ;
+				PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent);
+				if (pe instanceof Activity) {
+					if (StageActivityTypeIdentifier.isStageActivity(((Activity) pe).getType())) {
+						internalInterface.arrangeNextAgentState(agent);
+						internalInterface.unregisterAdditionalAgentOnLink(agent.getId(), agent.getCurrentLinkId());
 					}
 				}
 				// yyyyyy would be much better to hide this inside EditXxx. kai, jun'19
@@ -340,7 +337,6 @@ public class RunExamplePtDisturbances {
 
 		}
 	}
-
 
 
 }
