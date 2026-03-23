@@ -149,7 +149,7 @@ class NetworkTrafficEngineTest {
 
 		engine.afterMobsim();
 
-		verify(wait2Link, times(1)).afterSim();
+		verify(wait2Link, times(1)).afterMobsim();
 		verify(eventsManager, times(2)).processEvent(any(PersonStuckEvent.class));
 		verify(eventsManager).processEvent(argThat(event -> event instanceof PersonStuckEvent e && e.getPersonId().equals(Id.createPersonId("p1"))));
 		verify(eventsManager).processEvent(argThat(event -> event instanceof PersonStuckEvent e && e.getPersonId().equals(Id.createPersonId("p2"))));

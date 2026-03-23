@@ -127,7 +127,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Override
 	public void afterMobsim() {
-		wait2Link.afterSim();
+		wait2Link.afterMobsim();
 		for (SimLink link : simNetwork.getLinks().values()) {
 			for (var veh : link.removeAllVehicles()) {
 				em.processEvent(new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLinkId(), veh.getDriver().getMode()));
