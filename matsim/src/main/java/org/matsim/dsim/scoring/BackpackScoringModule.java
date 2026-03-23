@@ -16,6 +16,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.scoring.NewScoreAssigner;
 import org.matsim.core.scoring.NewScoreAssignerImpl;
@@ -26,6 +27,9 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 public class BackpackScoringModule extends AbstractModule {
+
+	public static final String COMPONENT_NAME = "BackpackDataCollector";
+
 	@Override
 	public void install() {
 		addControllerListenerBinding().to(Cleanup.class).in(Singleton.class);
@@ -51,12 +55,24 @@ public class BackpackScoringModule extends AbstractModule {
 			addControllerListenerBinding().to(ExperiencedPlansMemorizer.class);
 		}
 
+		// requestInjection schedules the anonymous object's @Inject method to be called once after
+		// the injector is fully built. Since QSimComponentsConfig is a mutable singleton, this
+		// mutates the shared instance before SimProvider.create() first reads it — adding
+		// COMPONENT_NAME to the active component list so SimProvider picks up BackpackDataCollector.
+		binder().requestInjection(new Object() {
+			@Inject
+			void addToComponents(QSimComponentsConfig components) {
+				components.addNamedComponent(COMPONENT_NAME);
+			}
+		});
+
 		// each SimProcess must have its own data collector. So, bind it as QSimModule.
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
 				bind(BackpackDataCollector.class).in(Singleton.class);
 				addMobsimScopeEventHandlerBinding().to(BackpackDataCollector.class);
+				addQSimComponentBinding(COMPONENT_NAME).to(BackpackDataCollector.class);
 			}
 		});
 

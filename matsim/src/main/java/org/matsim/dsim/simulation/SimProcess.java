@@ -88,8 +88,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			var type = serialization.getType(clazz);
 			dispatch.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler);
 		});
-
-		notifyAgentPartitionTransfers.add(bdc);
 	}
 
 	/**
