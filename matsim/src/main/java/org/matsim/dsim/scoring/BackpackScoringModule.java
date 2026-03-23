@@ -62,7 +62,9 @@ public class BackpackScoringModule extends AbstractModule {
 		binder().requestInjection(new Object() {
 			@Inject
 			void addToComponents(QSimComponentsConfig components) {
-				components.addNamedComponent(COMPONENT_NAME);
+				if (!components.hasNamedComponent(COMPONENT_NAME)) {
+					components.addNamedComponent(COMPONENT_NAME);
+				}
 			}
 		});
 
