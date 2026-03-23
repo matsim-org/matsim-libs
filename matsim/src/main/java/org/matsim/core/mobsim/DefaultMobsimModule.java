@@ -57,13 +57,4 @@ public class DefaultMobsimModule extends AbstractModule {
 			install(new MobsimScopeEventHandlingModule());
 		}
 	}
-
-	private static ControllerConfigGroup.MobsimType parseMobsimType(String type) {
-
-		try {
-			return ControllerConfigGroup.MobsimType.valueOf(type);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(type + " is not supported. Supported types: [qsim, hermes, dsim]");
-		}
-	}
 }
