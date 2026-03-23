@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
@@ -32,6 +33,7 @@ public class DownSamplePopulation implements MATSimAppCommand {
     public Integer call() throws Exception {
 
         Population population = PopulationUtils.readPopulation(input.toString());
+        ScenarioUtils.putScale(population, sampleSize);
 
         samples.sort(Comparator.comparingDouble(Double::doubleValue).reversed());
 

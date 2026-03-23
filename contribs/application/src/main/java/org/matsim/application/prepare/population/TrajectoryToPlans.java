@@ -113,6 +113,9 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         }
         // (if set by command line, this will overwrite the above targetCRS.  How is this to be interpreted?  kai, feb'2024)
 
+        // Persist the population scale so follow-up down-sampling updates it consistently.
+        ScenarioUtils.putScale(scenario.getPopulation(), sampleSize);
+
         if ( maxTypicalDuration==null ){
             throw new RuntimeException( "maxTypicalDuration needs to be set explicitly.  The old default was 86400, which would run splitActivityTypesBasedOnDuration, " +
                                                 "which, however, is deprecated.  Normally, it should be set to 0, which means that splitActivityTypesBasedOnDuration is skipped.  Then, " +
