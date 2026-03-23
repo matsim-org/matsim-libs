@@ -113,7 +113,8 @@ public final class ControllerListenerManagerImpl implements ControllerListenerMa
 		StartupEvent event = new StartupEvent(this.controller);
 		StartupListener[] listener = this.coreListenerList.getListeners(StartupListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
-		new ConfigWriter(controller.getConfig()).write(controller.getControllerIO().getOutputFilename(Controler.DefaultFiles.config, ControllerConfigGroup.CompressionType.none).replace(".xml", "_initial.xml"));
+		if (controller != null)
+			new ConfigWriter(controller.getConfig()).write(controller.getControllerIO().getOutputFilename(Controler.DefaultFiles.config, ControllerConfigGroup.CompressionType.none).replace(".xml", "_initial.xml"));
 		for (StartupListener aListener : listener) {
             log.info("calling notifyStartup on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyStartup(event);
