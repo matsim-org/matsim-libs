@@ -48,7 +48,9 @@ public final class TrafficStatsCalculator {
 	}
 
 	/**
-	 * The expected percentage of extra travel time on a link over a period of time. Based on the idea of TomTom travel time index
+	 * Returns the average relative excess travel time on a link over a time period. For each time slice, the excess travel time is normalized by the corresponding free-speed travel time,
+	 * and the resulting ratios are averaged over the period.
+	 *
 	 * @return average value of excess travel time index for the time period
 	 */
 	public double getLinkExcessTravelTimeIndex(Link link, int startTime, int endTime) {
@@ -66,7 +68,10 @@ public final class TrafficStatsCalculator {
 	}
 
 	/**
-	 * Calculates the network TomTom congestion index (normalized excess travel time) for a given time period. Can be done for a certain road type.
+	 * Calculates a network-wide congestion index as the weighted ratio of total excess
+	 * travel time to total free-speed travel time over the given time period.
+	 * The formulation is analogous to the TomTom congestion index, but applied to the
+	 * simulated network and optionally restricted to a specific road type.
 	 */
 	public double getTomTomNetworkCongestionIndex(int startTime, int endTime, @Nullable String roadType) {
 		double sumExcessTravelTime = 0.;
@@ -101,7 +106,6 @@ public final class TrafficStatsCalculator {
 		}
 		return sumExcessTravelTime / sumFreeSpeedTravelTime;
 	}
-
 
 	// Previous analysis from here
 	/**
