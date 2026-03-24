@@ -49,6 +49,7 @@ import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -274,16 +275,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	}
 
 	@Override
-	public void onPrepareSim() {
-
-	}
-
-	@Override
-	public void afterSim() {
-
-	}
-
-	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 
 	}
@@ -356,7 +347,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	}
 
 	private InsertionRoundResult runInsertionRounds(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries,
-												   PerformanceLogger.CycleRecordBuilder cycleBuilder) {
+													PerformanceLogger.CycleRecordBuilder cycleBuilder) {
 		SortedSet<DrtRequest> finalRejections = new TreeSet<>(ConflictResolver.DRT_REQUEST_COMPARATOR);
 		Integer lastUnsolvedConflicts = null;
 		int scheduled = 0;
@@ -466,7 +457,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		inserterExecutorService.shutdown();
 		LOG.info("Avg. conflict share {} ", conflictResolver.getAverageConflictShare());
 	}
-
 
 
 }

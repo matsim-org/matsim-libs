@@ -22,6 +22,8 @@
 
 package org.matsim.core.mobsim;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.MobsimScopeEventHandlingModule;
@@ -29,26 +31,30 @@ import org.matsim.core.mobsim.hermes.HermesProvider;
 import org.matsim.core.mobsim.qsim.QSimModule;
 
 public class DefaultMobsimModule extends AbstractModule {
+	private static final Logger log = LogManager.getLogger(DefaultMobsimModule.class);
+
 	@Override
 	public void install() {
-		if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.qsim.toString())) {
+
+		var mobsimType = getConfig().controller().getMobsim();
+		if (mobsimType.equals(ControllerConfigGroup.MobsimType.qsim.name())) {
 			install(new QSimModule());
-//            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 1. );
-		} else if (getConfig().controller().getMobsim().equals("JDEQSim")) {
-			throw new IllegalArgumentException("JDEQSim is no longer supported as a mobsim. / March 2025");
-		} else if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.hermes.toString())) {
+		} else if (mobsimType.equals(ControllerConfigGroup.MobsimType.hermes.name())) {
 			bindMobsim().toProvider(HermesProvider.class);
-		} else if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.dsim.toString())) {
+		} else if (mobsimType.equals(ControllerConfigGroup.MobsimType.dsim.name())) {
 			// Install qsim components, but without the default qsim
 			// This has to be installed here, because of the shenanigans with the qsim components
 			// Installed qsim components might depend on the order of modules
 			install(new QSimModule(false, false));
-
+		} else if (mobsimType.equals("JDEQSim")) {
+			throw new IllegalArgumentException("JDEQSim is not supported anymore, since March 2025. Use one of: qsim, hermes, dsim instead");
+		} else {
+			log.warn("Unknown mobsim type: " + mobsimType + " When using something other than qsim, hermes or dsim, you have to provide your own mobsim implementation!");
 		}
 
-		install(new MobsimScopeEventHandlingModule());
+		// dsim comes with its own scope event handling module
+		if (!mobsimType.equals(ControllerConfigGroup.MobsimType.dsim.name())) {
+			install(new MobsimScopeEventHandlingModule());
+		}
 	}
-//    public interface RelativePositionOfEntryExitOnLink{
-//        double get() ;
-//    }
 }
