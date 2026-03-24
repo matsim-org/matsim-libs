@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<!-- DRT Scalability Benchmark Configuration -->
+	<!--
+	Usage:
+	  java -cp matsim.jar org.matsim.contrib.drt.extension.benchmark.RunScalabilityBenchmark benchmark-config.xml
+	-->
+
+	<module name="drtBenchmark">
+
+		<!-- ================================================================== -->
+		<!-- Agent & Vehicle Configuration                                      -->
+		<!-- ================================================================== -->
+
+		<!-- Comma-separated list of agent counts to test -->
+		<param name="agentCounts" value="50000,100000"/>
+
+		<!-- Number of vehicles per 100 agents (with 50000 agents and value 1 = 500 vehicles) -->
+		<param name="vehiclesPerHundredAgents" value="1"/>
+
+		<!-- ================================================================== -->
+		<!-- Partitioner Configuration                                          -->
+		<!-- ================================================================== -->
+
+		<!-- Vehicle partitioners to test (comma-separated)
+		     Options:
+		       - Replicating (or Repl): Each partition gets all vehicles (best quality, highest memory)
+		       - RoundRobin (or RR): Vehicles distributed round-robin across partitions
+		       - ShiftingRoundRobin (or ShiftRR): Like RR but shifts assignment each iteration
+		-->
+		<param name="vehiclePartitioners" value="Replicating,RoundRobin,ShiftingRoundRobin"/>
+
+		<!-- Request partitioners to test (comma-separated)
+		     Options:
+		       - RoundRobin (or RR): Requests distributed round-robin
+		       - LoadAware: Distributes based on partition load (slightly slower, often better quality)
+		-->
+		<param name="requestPartitioners" value="RoundRobin,LoadAware"/>
+
+		<!-- ================================================================== -->
+		<!-- Parallel Inserter Settings                                         -->
+		<!-- ================================================================== -->
+
+		<!-- Collection periods in seconds (comma-separated)
+		     How long to collect requests before processing them in batch -->
+		<param name="collectionPeriods" value="90"/>
+
+		<!-- Number of parallel partitions (typically = number of CPU cores) -->
+		<param name="maxPartitions" value="8"/>
+
+		<!-- Max iterations for parallel inserter optimization -->
+		<param name="maxIterations" value="3"/>
+
+		<!-- Log detailed performance statistics -->
+		<param name="logPerformanceStats" value="true"/>
+
+		<!-- ================================================================== -->
+		<!-- Benchmark Settings                                                 -->
+		<!-- ================================================================== -->
+
+		<!-- Number of warmup runs (results discarded, JIT warmup) -->
+		<param name="warmupRuns" value="0"/>
+
+		<!-- Number of measured runs (results averaged) -->
+		<param name="measuredRuns" value="1"/>
+
+		<!-- ================================================================== -->
+		<!-- Output Settings                                                    -->
+		<!-- ================================================================== -->
+
+		<!-- Output directory (timestamp subfolder will be created) -->
+		<param name="outputDirectory" value="output/benchmark"/>
+
+		<!-- Enable spatial request-fleet filter (reduces search space) -->
+		<param name="useSpatialFilter" value="true"/>
+
+	</module>
+</config>
+

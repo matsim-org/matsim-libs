@@ -21,8 +21,6 @@
 package org.matsim.pt.fakes;
 
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -46,6 +44,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.List;
+
 
 /**
  * @author mrieser
@@ -54,7 +54,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 
 	private final TransitStopFacility exitStop;
 	private final Leg dummyLeg;
-	private final Person dummyPerson = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+	private final Person dummyPerson;
 	// as long as all instance variables are final, the "resetCaches" method can remain empty.  kai, oct'10
 
 	/**
@@ -62,9 +62,13 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	 * the leg will have no route.
 	 *
 	 * @param enterStop may be <code>null</code>
-	 * @param exitStop may be <code>null</code>
+	 * @param exitStop  may be <code>null</code>
 	 */
 	public FakeAgent(final TransitStopFacility enterStop, final TransitStopFacility exitStop) {
+		this(Id.create(1, Person.class), enterStop, exitStop);
+	}
+
+	public FakeAgent(Id<Person> id, final TransitStopFacility enterStop, final TransitStopFacility exitStop) {
 		this.exitStop = exitStop;
 		this.dummyLeg = PopulationUtils.createLeg(TransportMode.pt);
 		if ((enterStop != null) && (exitStop != null)) {
@@ -72,12 +76,13 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 			route.setStartLinkId(enterStop.getLinkId());
 			route.setEndLinkId(exitStop.getLinkId());
 			route.setRouteDescription("{" +
-					"\"accessFacilityId\":\"" + enterStop.getId().toString() + "\"," +
-					"\"egressFacilityId\":\"" + exitStop.getId().toString() + "\"," +
-					"\"transitLineId\":\"T1\"" +
-			"}");
+				"\"accessFacilityId\":\"" + enterStop.getId().toString() + "\"," +
+				"\"egressFacilityId\":\"" + exitStop.getId().toString() + "\"," +
+				"\"transitLineId\":\"T1\"" +
+				"}");
 			this.dummyLeg.setRoute(route);
 		}
+		this.dummyPerson = PopulationUtils.getFactory().createPerson(id);
 	}
 
 	@Override
@@ -85,7 +90,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	}
 
 	@Override
-	public void setStateToAbort(final double now){
+	public void setStateToAbort(final double now) {
 	}
 
 	@Override
@@ -104,19 +109,19 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 		throw new UnsupportedOperationException("Not implemented");
 	}
 
-    @Override
-    public Double getExpectedTravelDistance() {
-        return null;
-    }
+	@Override
+	public Double getExpectedTravelDistance() {
+		return null;
+	}
 
-    @Override
+	@Override
 	public String getMode() {
 		return this.dummyLeg.getMode();
 	}
 
 	@Override
 	public Id<Vehicle> getPlannedVehicleId() {
-		return ((NetworkRoute)this.dummyLeg.getRoute()).getVehicleId(); // not sure if this is very clever.  kai, jun'11
+		return ((NetworkRoute) this.dummyLeg.getRoute()).getVehicleId(); // not sure if this is very clever.  kai, jun'11
 	}
 
 	@Override
@@ -187,17 +192,17 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 
 	@Override
 	public boolean isWantingToArriveOnCurrentLink() {
-		throw new RuntimeException("not implemented") ;
+		throw new RuntimeException("not implemented");
 	}
 
 	@Override
 	public Facility getCurrentFacility() {
-		throw new RuntimeException("not implemented") ;
+		throw new RuntimeException("not implemented");
 	}
 
 	@Override
 	public Facility getDestinationFacility() {
-		throw new RuntimeException("not implemented") ;
+		throw new RuntimeException("not implemented");
 	}
 
 }

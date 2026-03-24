@@ -86,6 +86,8 @@ public class CarrierConsistencyCheckers {
 		if (nuOfChecksFailed == 0) {
 			return CheckResult.CHECK_SUCCESSFUL;
 		} else {
+			log.error("Carrier consistency check failed! There will be carriers with unhandled jobs or other inconsistencies. " +
+				"Please check the log for details. To avoid this, please check your input files before running jsprit.");
 			return CheckResult.CHECK_FAILED;
 		}
 	}
@@ -107,6 +109,7 @@ public class CarrierConsistencyCheckers {
 		if (nuOfChecksFailed == 0) {
 			return CheckResult.CHECK_SUCCESSFUL;
 		} else {
+			log.warn("Not all jobs are handled within the tours. Please check the log messages for more details.");
 			return CheckResult.CHECK_FAILED;
 		}
 	}
@@ -331,19 +334,22 @@ public class CarrierConsistencyCheckers {
 			Map<Id<? extends CarrierJob>, Integer> serviceCount = new HashMap<>();
 			Map<String, Integer> shipmentCount = new HashMap<>();
 
-			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
-				for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
-					//carrier only has one job-type: services or shipments
-					//service is saved as an Id
-					if (tourElement instanceof Tour.ServiceActivity serviceActivity) {
-						serviceInTour.add(serviceActivity.getService().getId());
-					}
-					//shipment is saved as a string: jobId + activity type
-					if (tourElement instanceof Tour.ShipmentBasedActivity shipmentBasedActivity) {
-						shipmentInTour.add(shipmentBasedActivity.getShipment().getId() + " | " + shipmentBasedActivity.getActivityType());
+			if (carrier.getSelectedPlan() == null) {
+				log.log(level,"Carrier '{}': No selected plan found!", carrier.getId());
+			} else
+				for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
+					for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
+						//carrier only has one job-type: services or shipments
+						//service is saved as an Id
+						if (tourElement instanceof Tour.ServiceActivity serviceActivity) {
+							serviceInTour.add(serviceActivity.getService().getId());
+						}
+						//shipment is saved as a string: jobId + activity type
+						if (tourElement instanceof Tour.ShipmentBasedActivity shipmentBasedActivity) {
+							shipmentInTour.add(shipmentBasedActivity.getShipment().getId() + " | " + shipmentBasedActivity.getActivityType());
+						}
 					}
 				}
-			}
 
 			//save all jobs the current carrier should do
 			//shipments have to be picked up and delivered. To allow shipmentInTour being properly matched to shipmentList, shipments are saved with suffix CarrierConstants.PICKUP /.DELIVERY

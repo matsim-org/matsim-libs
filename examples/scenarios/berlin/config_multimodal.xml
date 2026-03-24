@@ -34,7 +34,7 @@
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 
 		<param name = "flowCapacityFactor" value="0.02" /> <!-- we simulate only 1% of the population, and reduce the network capacity to 2% -->
-		<param name = "storageCapacityFactor" value="0.05" />
+		<param name = "storageCapacityFactor" value="0.02" />
 	</module>
 
 	<module name="multimodal" >

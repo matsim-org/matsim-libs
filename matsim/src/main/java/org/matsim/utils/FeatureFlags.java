@@ -23,7 +23,7 @@ public abstract class FeatureFlags {
 		if (property != null) {
 			return Boolean.parseBoolean(property);
 		}
-		return true; // default fallback
+		return false; // default fallback
 	}
 
 }

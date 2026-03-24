@@ -60,6 +60,7 @@
 		<module>accidents</module>
 		<module>analysis</module>
 		<module>application</module>
+		<module>atap</module>
 		<module>av</module>
 		<module>aws</module>
 		<module>bicycle</module>

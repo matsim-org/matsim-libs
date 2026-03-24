@@ -2,17 +2,22 @@ package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.dsim.*;
+import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.framework.NetworkAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
+import org.matsim.dsim.simulation.VehicleContainer;
+
+import java.util.Map;
 
 public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
@@ -25,9 +30,9 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	private final AgentSourcesContainer asc;
 	private final Wait2Link wait2Link;
-	//private final Set<String> modes;
 
 	private InternalInterface internalInterface;
+	private double now;
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
@@ -35,9 +40,8 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Inject
-	public NetworkTrafficEngine(Scenario scenario, AgentSourcesContainer asc,
-								SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks, ParkedVehicles parkedVehicles,
-								Wait2Link wait2Link, EventsManager em) {
+	public NetworkTrafficEngine(AgentSourcesContainer asc, SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks,
+								ParkedVehicles parkedVehicles, Wait2Link wait2Link, EventsManager em) {
 		this.asc = asc;
 		this.em = em;
 		this.wait2Link = wait2Link;
@@ -45,48 +49,34 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		this.activeLinks = activeLinks;
 		this.parkedVehicles = parkedVehicles;
 		this.simNetwork = simNetwork;
-		var dsimConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), DSimConfigGroup.class);
-		//this.modes = new HashSet<>(dsimConfig.getNetworkModes());
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeMobsim() {
+		var handler = new LeaveQHandler();
+
 		for (SimLink link : simNetwork.getLinks().values()) {
+			link.addLeaveHandler(handler);
 
-			// Split out links don't have queue and buffer and have no leave handler
-			if (link instanceof SimLink.SplitOutLink)
-				continue;
-
-			// add a leave handler to each link that delegates to the 'handleVehicleIsFinished' method.
-			// also give it a low priority, to make sure that this handler is called last if more handlers
-			// are active
-			link.addLeaveHandler(new SimLink.OnLeaveQueue() {
-				@Override
-				public SimLink.OnLeaveQueueInstruction apply(DistributedMobsimVehicle vehicle, SimLink link, double now) {
-					return handleVehicleIsFinished(vehicle, link, now);
-				}
-
-				@Override
-				public double getPriority() {
-					return -10.;
-				}
-			});
+			if (link instanceof SimLink.SplitOutLink sol) {
+				sol.setNotifyVehicleLeavingPartition(this::notifyVehicleLeavesPartition);
+			}
 		}
 	}
 
 	@Override
-	public void process(SimStepMessage stepMessage, double now) {
-		for (VehicleContainer vehicleMessage : stepMessage.vehicles()) {
-			processVehicleMessage(vehicleMessage, now);
-		}
-
-		for (CapacityUpdate updateMessage : stepMessage.capUpdates()) {
-			processUpdateMessage(updateMessage);
-		}
+	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
+		return Map.of(
+			VehicleContainer.class,
+			(msgs, now) -> msgs.forEach(m -> processVehicleMessage((VehicleContainer) m, now)),
+			CapacityUpdate.class,
+			(msgs, now) -> msgs.forEach(m -> processUpdateMessage((CapacityUpdate) m))
+		);
 	}
 
 	private void processVehicleMessage(VehicleContainer vehicleContainer, double now) {
 		DistributedMobsimVehicle vehicle = asc.vehicleFromContainer(vehicleContainer);
+		notifyVehicleEntersPartition(vehicle);
 
 		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);
@@ -109,11 +99,22 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Override
 	public void doSimStep(double now) {
+		this.now = now;
 		// Move vehicles over nodes, then add waiting vehicles onto links and then move vehicles from the queue into link buffers
 		// This mimiks the order in which the QSim does it.
 		activeNodes.doSimStep(now);
 		wait2Link.moveWaiting(now);
 		activeLinks.doSimStep(now);
+	}
+
+	@Override
+	public void afterMobsim() {
+		wait2Link.afterMobsim();
+		for (SimLink link : simNetwork.getLinks().values()) {
+			for (var veh : link.removeAllVehicles()) {
+				em.processEvent(new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLinkId(), veh.getDriver().getMode()));
+			}
+		}
 	}
 
 	private SimLink.OnLeaveQueueInstruction handleVehicleIsFinished(DistributedMobsimVehicle vehicle, SimLink link, double now) {
@@ -145,6 +146,57 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 			parkedVehicles.park(dv, link);
 		} else {
 			throw new RuntimeException("Only QVehicles are supported");
+		}
+	}
+
+	private void notifyVehicleLeavesPartition(DistributedMobsimVehicle vehicle, int toPartition) {
+		internalInterface.notifyVehicleLeavesPartition(vehicle, toPartition);
+		notifyAgentLeavesPartition(vehicle.getDriver(), toPartition);
+
+		for (var passenger : vehicle.getPassengers()) {
+			notifyAgentLeavesPartition(passenger, toPartition);
+		}
+	}
+
+	private void notifyVehicleEntersPartition(DistributedMobsimVehicle vehicle) {
+		internalInterface.notifyVehicleEntersPartition(vehicle);
+		notifyAgentEntersPartition(vehicle.getDriver());
+		for (var passenger : vehicle.getPassengers()) {
+			notifyAgentEntersPartition(passenger);
+		}
+	}
+
+	private void notifyAgentLeavesPartition(NetworkAgent agent, int toPartition) {
+		if (agent instanceof DistributedMobsimAgent dma) {
+			internalInterface.notifyAgentLeavesPartition(dma, toPartition);
+		} else {
+			// let's see if we have to be this restrictive. But I think we only want to have DistributedMobsimAgents,
+			// otherwise we'll have trouble serializing them.
+			throw new IllegalArgumentException("Expected DistributedMobsimAgent as drier, but got: " + agent.getClass().getName());
+		}
+	}
+
+	private void notifyAgentEntersPartition(NetworkAgent agent) {
+		if (agent instanceof DistributedMobsimAgent dma) {
+			internalInterface.notifyAgentEntersPartition(dma);
+		} else {
+			throw new IllegalArgumentException("Expected DistributedMobsimAgent as agent, but got: " + agent.getClass().getName());
+		}
+	}
+
+	/**
+	 * deliberately non-static. This class is only here to make the for loop in beforeSim more consise.
+	 */
+	private class LeaveQHandler implements SimLink.OnLeaveQueue {
+
+		@Override
+		public SimLink.OnLeaveQueueInstruction apply(DistributedMobsimVehicle vehicle, SimLink link, double now) {
+			return handleVehicleIsFinished(vehicle, link, now);
+		}
+
+		@Override
+		public double getPriority() {
+			return -10;
 		}
 	}
 }

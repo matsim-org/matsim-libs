@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
@@ -127,6 +128,7 @@ public class NetworkReprojectionIOTest {
 		// but does not matter for tests. Just makes sure that (almost) every
 		// coordinate can be projected
 		config.global().setCoordinateSystem( TARGET_CRS );
+		 config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -201,6 +203,7 @@ public class NetworkReprojectionIOTest {
 		}
 
 		config.controller().setLastIteration( 0 );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controller().setOutputDirectory( outputDirectory );
 		final Controler controler = new Controler( scenario );

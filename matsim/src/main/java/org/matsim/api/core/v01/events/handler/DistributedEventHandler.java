@@ -12,21 +12,21 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DistributedEventHandler {
 
-    /**
-     * Defines the capability of the event handler to handle events in a distributed manner.
-     */
-    DistributedMode value() default DistributedMode.GLOBAL;
-
-    /**
-     * If true, events for this handler are not queued but processed directly.
-     */
-    boolean directProcessing() default false;
+	/**
+	 * Defines how this event handler is called. To be backwards compatible, the default is GLOBAL, which is how event handlers are
+	 * called when QSim is used as mobsim. GLOBAL event handlers possibly limit the scalability of a DSim run. Modes other than
+	 * GLOBAL require event handlers to sync the collected data. See {@link DistributedMode} for more details.
+	 */
+	DistributedMode value() default DistributedMode.GLOBAL;
 
 	/**
-	 * If true, the sim step will not block until the event handler is finished. Only at the very end end of the simulation event processing is ensured.
-	 * This has major implications, because the handler must not interact with the simulation state or vice versa.
-	 * Generally, it should only be enabled for handlers that react to events and are needed at the end of the simulation.
+	 * Defines how the event handler is called. See {@link ProcessingMode} for more details.
 	 */
-	boolean async() default false;
+	ProcessingMode processing() default ProcessingMode.TASK;
+
+	/**
+	 * Defines when the execution of the simulation is paused to await the execution of the event handler. See {@link BlockingMode} for more details.
+	 */
+	BlockingMode blocking() default BlockingMode.SIM_STEP;
 
 }

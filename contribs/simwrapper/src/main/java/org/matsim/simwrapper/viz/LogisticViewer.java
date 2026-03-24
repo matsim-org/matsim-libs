@@ -2,7 +2,7 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class LogisticViewer extends Viz {
+public class LogisticViewer extends VizMap<LogisticViewer> {
 
 	@JsonProperty(required = true)
 	public String network;

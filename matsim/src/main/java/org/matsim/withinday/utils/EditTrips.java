@@ -20,22 +20,12 @@
 
 package org.matsim.withinday.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -68,6 +58,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.withinday.events.ReplanningEvent;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * The methods here should modify trips, i.e. material between two non-stage-activities.
  *
@@ -96,6 +91,7 @@ public final class EditTrips {
 //	<level value="info"/>
 //</logger>
 		//  We need InternalInterface to move waiting passengers from a transit stop to the next leg if replanning tells them not to board a bus there.
+		// Current idea: convert waiting for PT to an activity. Then we would not need the internal interface here any more. paul/kai, feb'26
 		if (internalInterface == null) {
 			log.warn("InternalInterface is null. Replanning of pt/transit legs will not work properly and will likely fail.");
 		} else {
@@ -614,8 +610,7 @@ public final class EditTrips {
 		return replanFutureTrip( trip, plan, mainMode, departureTime ) ;
 	}
 
-	public List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
-																											double departureTime) {
+	public List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime) {
 		return replanFutureTrip(trip, plan, routingMode, departureTime, tripRouter, scenario );
 	}
 

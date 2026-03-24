@@ -3,7 +3,7 @@ package org.matsim.simwrapper.viz;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 
-public class FlowMap extends Viz {
+public class FlowMap extends VizMap<FlowMap> {
 
 	@JsonProperty(required = true)
 	public ArrayList<Metrics> metrics = new ArrayList<>();
@@ -17,6 +17,7 @@ public class FlowMap extends Viz {
 	public FlowMap() {
 		super("flowmap");
 	}
+
 	public static class Metrics {
 
 		@JsonProperty(required = true)

@@ -45,14 +45,15 @@ public final class Counter {
 	public Counter(final String prefix) {
 		this( prefix , "" );
 	}
-	
+
 	/**
 	 * @param prefix Some text that is output just before the counter-value.
 	 * @param suffix Some text that is output just after the counter-value.
 	 */
 	public Counter(final String prefix, final String suffix ) {
-		this( prefix, suffix, 2 ) ;
+		this( prefix, suffix, 4 ) ;
 	}
+
 		/**
 		 * @param prefix Some text that is output just before the counter-value.
 		 * @param suffix Some text that is output just after the counter-value.
