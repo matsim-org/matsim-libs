@@ -93,12 +93,12 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         // Clear wrong coordinate system
         scenario.getPopulation().getAttributes().clear();
 
-        scenario.getPopulation().getPersons().forEach((k, v) -> {
+		scenario.getPopulation().getPersons().forEach((k, v) -> {
 
-            if (PopulationUtils.getSubpopulation(v) != null)
-                PopulationUtils.putSubpopulation(v, "person");
-        });
-        // (if a <person/> does not yet have a subpopulation attribute, tag it as a "person".  kai, feb'2024)
+			if (PopulationUtils.getSubpopulation(v) == null)
+				PopulationUtils.putSubpopulation(v, "person");
+		});
+		// (if a <person/> does not yet have a subpopulation attribute, tag it as a "person".  kai, feb'2024)
 
         if (crs.getTargetCRS() != null) {
             ProjectionUtils.putCRS(scenario.getPopulation(), crs.getTargetCRS());
