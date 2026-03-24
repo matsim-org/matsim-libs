@@ -3,6 +3,7 @@ package org.matsim.application.analysis.population;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -16,21 +17,57 @@ import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.Ex
  * MUSE = marginal utility of starting early.  In score space, only time structure, i.e. no direct disutilities of travelling etc.
  */
 class MuseComputation{
-	// yyyy use injection?  We can bind directly since we do not need this separately for base case/policy population.
+	@Inject private ScoringFunctionFactory scoringFunctionFactory;
+	@Inject private PopulationFactory pf;
 
-	private final ScoringFunctionFactory scoringFunctionFactory;
-	private final PopulationFactory pf;
-	@Inject MuseComputation( ScoringFunctionFactory scoringFunctionFactory, PopulationFactory pf ){
-		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.pf = pf;
+	void computeMuseForAllActs( Plan plan ){
+		// yy we need the person to get the scoring function.  However, how do we know which plan to use?  Could provide the plan instead; person is available as backpointer.
+
+		// compute MUSE for rule-of-half:
+		ScoringFunction sfNormal = scoringFunctionFactory.createNewScoringFunction( plan.getPerson() );
+		ScoringFunction sfEarly = scoringFunctionFactory.createNewScoringFunction( plan.getPerson() );
+		MuseComputationForOneAct museComputation = new MuseComputationForOneAct( sfNormal, sfEarly );
+		Activity firstActivityOfPlan = null;
+		double sumMuse_h = 0.;
+		double cntMuse_h = 0.;
+		for( Activity act : TripStructureUtils.getActivities( plan, ExcludeStageActivities ) ){
+			// Ihab-style MarginalSumScoringFct computation but w/o leg:
+			if( act.getStartTime().isDefined() && act.getEndTime().isDefined() ){
+				double scoreNormalBefore = sfNormal.getScore();
+				double scoreEarlyBefore = sfEarly.getScore();
+				sumMuse_h += museComputation.computeMUSE_h( act, pf, scoreNormalBefore, scoreEarlyBefore );
+				cntMuse_h++;
+			} else if( act.getStartTime().isUndefined() ){
+				firstActivityOfPlan = act;
+			} else{
+				Gbl.assertIf( act.getEndTime().isUndefined() );
+
+				double scoreNormalBefore = sfNormal.getScore();
+				double scoreEarlyBefore = sfEarly.getScore();
+
+				// handle the first activity of the plan:
+				sfNormal.handleActivity( firstActivityOfPlan );
+				sfEarly.handleActivity( firstActivityOfPlan );
+				// (the standard scoring function treats an activity without startTime as firstActivityOfPlan.  no matter if it arrives in correct sequence or not, as long as
+				// it arrives before the evening activity)
+
+				// handle the last activity of the plan:
+				sumMuse_h += museComputation.computeMUSE_h( act, pf, scoreNormalBefore, scoreEarlyBefore );
+				// ("act" is now the evening activity; will be started once at the normal time and once one second early)
+
+				cntMuse_h++;
+			}
+		}
+		AddVttsEtcToActivities.setMUSE_h( plan, sumMuse_h / cntMuse_h );
 	}
-	static class MuseComputationForPerson{
+
+	static class MuseComputationForOneAct{
 		// yy not sure if this is a good design; it came out of refactoring. kai, mar'26
 
 		private final ScoringFunction sfNormal;
 		private final ScoringFunction sfEarly;
 
-		MuseComputationForPerson( ScoringFunction sfNormal, ScoringFunction sfEarly ){
+		MuseComputationForOneAct( ScoringFunction sfNormal, ScoringFunction sfEarly ){
 			this.sfNormal = sfNormal;
 			this.sfEarly = sfEarly;
 		}
@@ -61,42 +98,4 @@ class MuseComputation{
 		}
 	}
 
-	void computeMuseForAllActs( Person person ){
-		// compute MUSE for rule-of-half:
-		ScoringFunction sfNormal = scoringFunctionFactory.createNewScoringFunction( person );
-		ScoringFunction sfEarly = scoringFunctionFactory.createNewScoringFunction( person );
-		MuseComputationForPerson museComputation = new MuseComputationForPerson( sfNormal, sfEarly );
-		Activity firstActivityOfPlan = null;
-		double sumMuse_h = 0.;
-		double cntMuse_h = 0.;
-		for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), ExcludeStageActivities ) ){
-			// Ihab-style MarginalSumScoringFct computation but w/o leg:
-			if( act.getStartTime().isDefined() && act.getEndTime().isDefined() ){
-				double scoreNormalBefore = sfNormal.getScore();
-				double scoreEarlyBefore = sfEarly.getScore();
-				sumMuse_h += museComputation.computeMUSE_h( act, pf, scoreNormalBefore, scoreEarlyBefore );
-				cntMuse_h++;
-			} else if( act.getStartTime().isUndefined() ){
-				firstActivityOfPlan = act;
-			} else{
-				Gbl.assertIf( act.getEndTime().isUndefined() );
-
-				double scoreNormalBefore = sfNormal.getScore();
-				double scoreEarlyBefore = sfEarly.getScore();
-
-				// handle the first activity of the plan:
-				sfNormal.handleActivity( firstActivityOfPlan );
-				sfEarly.handleActivity( firstActivityOfPlan );
-				// (the standard scoring function treats an activity without startTime as firstActivityOfPlan.  no matter if it arrives in correct sequence or not, as long as
-				// it arrives before the evening activity)
-
-				// handle the last activity of the plan:
-				sumMuse_h += museComputation.computeMUSE_h( act, pf, scoreNormalBefore, scoreEarlyBefore );
-				// ("act" is now the evening activity; will be started once at the normal time and once one second early)
-
-				cntMuse_h++;
-			}
-		}
-		AddVttsEtcToActivities.setMUSE_h( person.getSelectedPlan(), sumMuse_h / cntMuse_h );
-	}
 }

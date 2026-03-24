@@ -286,7 +286,6 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		}
 
 		MainModeIdentifier mainModeIdentifier = new DefaultAnalysisMainModeIdentifier();
-		PopulationFactory pf = population.getFactory();
 		double popSumMuse_h = 0.;
 		double popCntMuse_h = 0.;
 		Counter counter = new Counter( "in method generatePersonTableFromPopulation(...); processing person #  ");
@@ -307,7 +306,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				processMUoM( person, table );
 				table.intColumn( INCOME_DECILE ).append( getIncomeDecileBetween0And9( person ) );
 
-				museComputation.computeMuseForAllActs( person );
+				museComputation.computeMuseForAllActs( person.getSelectedPlan() );
 			}
 
 			double computedPersonScore = 0.;
@@ -412,8 +411,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				// (means we are sometimes appending NaN.)
 
 				if ( cntMuse_h > 0 ){
-					popSumMuse_h += sumMuse_h / cntMuse_h;
-					popCntMuse_h++; // person-based weight; could also justify trip-based weight as more policy-relevant. kai, dec'25
+//					popSumMuse_h += sumMuse_h / cntMuse_h;
+//					popCntMuse_h++; // person-based weight; could also justify trip-based weight as more policy-relevant. kai, dec'25
+					popSumMuse_h += sumMuse_h;
+					popCntMuse_h += cntMuse_h;
 				}
 			}
 
