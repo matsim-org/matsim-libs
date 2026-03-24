@@ -82,36 +82,6 @@ public class TrafficDashboard implements Dashboard {
 				viz.enableFilter = false;
 			}));
 
-//		layout.row("index_by_hour").el(Plotly.class, (viz, data) -> {
-//
-//				viz.title = "Network excess travel time index";
-//				viz.description = "by hour";
-//
-//				Plotly.DataSet ds = viz.addDataset(data.compute(TrafficAnalysis.class, "traffic_stats_by_road_type_and_hour.csv", args));
-//
-//				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-//					.yAxis(Axis.builder().title("Index").build())
-//					.xAxis(Axis.builder().title("Hour").build())
-//					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
-//					.build();
-//
-//				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
-//					.x("hour")
-//					.y("excess_travel_time_index")
-//					.name("road_type", ColorScheme.Spectral)
-//				);
-//			})
-//			.el(Table.class, ((viz, data) -> {
-//
-//				viz.title = "Traffic stats per road type";
-//				viz.description = "daily";
-//
-//				viz.dataset = data.compute(TrafficAnalysis.class, "traffic_stats_by_road_type_daily.csv", args);
-//
-//				viz.showAllRows = true;
-//				viz.enableFilter = false;
-//			}));
-//
 //		// TODO: Could be done per mode, by using the tab feature
 
 		layout.row("map").el(MapPlot.class, (viz, data) -> {
