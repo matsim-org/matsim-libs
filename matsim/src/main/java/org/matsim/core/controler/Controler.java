@@ -242,7 +242,6 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 			config.removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
 			config.checkConsistency();
 			config.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
-			scenario.checkConsistency();
 
 			final Set<AbstractModule> standardModules = Collections.singleton(
 				new AbstractModule() {
@@ -259,6 +258,10 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 				}
 			);
 			this.injector = Injector.createInjector(config, simCtx, AbstractModule.override(standardModules, overrides));
+			if ( scenario != null )
+				scenario.checkConsistency();
+			else
+				injector.getInstance( Scenario.class ).checkConsistency();
 		}
 	}
 
