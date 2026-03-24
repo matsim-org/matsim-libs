@@ -3,7 +3,6 @@ package org.matsim.contrib.ev.dsim;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.communication.LocalCommunicator;
-import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
@@ -77,8 +76,8 @@ public class EvDriveDischargingIntegrationTest {
 		EvDSimTestFixture.configureDSim(config, 3);
 		var scenario = EvDSimTestFixture.createScenario(config, 3);
 
-		var ctx = DistributedContext.create(new NullCommunicator(), config);
-		var controller = new Controler(scenario, ctx);
+		//var ctx = DistributedContext.create(new NullCommunicator(), config);
+		var controller = new Controler(scenario);
 		EvDSimTestFixture.installEvModules(controller);
 		controller.run();
 

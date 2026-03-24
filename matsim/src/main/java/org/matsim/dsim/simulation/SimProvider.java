@@ -175,7 +175,8 @@ public class SimProvider implements LPProvider {
 				}
 
 				if (qSimComponent instanceof MobsimListener l) {
-					listeners.add(l);
+					simProcess.addQueueSimulationListeners(l);
+					//listeners.add(l);
 				}
 			}
 		}

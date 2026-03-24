@@ -20,14 +20,13 @@
 
 package org.matsim.contrib.ev.charging;
 
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -43,9 +42,9 @@ public class ChargingModule extends AbstractModule {
 
 		// The following returns the charging power/speed for a vehicle:
 		bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 1));
-
 		installQSimModule(new AbstractQSimModule() {
-			@Override protected void configureQSim() {
+			@Override
+			protected void configureQSim() {
 				// The following binds the ChargingHandler as MobsimAfterSimstepListener.  That is what goes through the chargers and calls the charging logic.
 				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargingHandler.class).asEagerSingleton();
 			}
@@ -58,22 +57,25 @@ public class ChargingModule extends AbstractModule {
 
 		// standard charging priority for all chargers
 		bind(ChargingPriority.Factory.class).toInstance(ChargingPriority.FIFO);
-	
-		// standard charger output power 
+
+		// standard charger output power
 		bind(ChargerPower.Factory.class).to(DefaultChargerPower.Factory.class);
 	}
 
-	@Provides @Singleton
+	@Provides
+	@Singleton
 	ChargingWithQueueingLogic.Factory provideChargingWithQueueingLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
 		return new ChargingWithQueueingLogic.Factory(eventsManager, chargingPriorityFactory, chargerPowerFactory);
 	}
 
-	@Provides @Singleton
+	@Provides
+	@Singleton
 	ChargingWithQueueingAndAssignmentLogic.Factory provideChargingWithQueueingAndAssignmentLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
 		return new ChargingWithQueueingAndAssignmentLogic.Factory(eventsManager, chargingPriorityFactory, chargerPowerFactory);
 	}
 
-	@Provides @Singleton
+	@Provides
+	@Singleton
 	DefaultChargerPower.Factory provideDefaultChargerPowerFactory(EvConfigGroup evConfig) {
 		return new DefaultChargerPower.Factory(evConfig.getChargeTimeStep());
 	}
