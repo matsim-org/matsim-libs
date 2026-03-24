@@ -242,6 +242,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 			config.removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
 			config.checkConsistency();
 			config.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
+			scenario.checkConsistency();
 
 			final Set<AbstractModule> standardModules = Collections.singleton(
 				new AbstractModule() {
