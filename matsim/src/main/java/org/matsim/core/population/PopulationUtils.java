@@ -1262,6 +1262,7 @@ public final class PopulationUtils {
 			}
 		}
 
+		// if the input population has no scale attribute, in this method it is not clear which sampleSize the input has and the new scale is not written to the pop.
 		Double scale = ScenarioUtils.getScale(pop);
 		if (scale != null) {
 			ScenarioUtils.putScale(pop, scale * sampleTo);
