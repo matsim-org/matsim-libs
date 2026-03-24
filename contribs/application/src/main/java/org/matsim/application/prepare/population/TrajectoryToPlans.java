@@ -95,9 +95,8 @@ public class TrajectoryToPlans implements MATSimAppCommand {
 
         scenario.getPopulation().getPersons().forEach((k, v) -> {
 
-            if (!v.getAttributes().getAsMap().containsKey("subpopulation"))
-                v.getAttributes().putAttribute("subpopulation", "person");
-
+            if (PopulationUtils.getSubpopulation(v) != null)
+                PopulationUtils.putSubpopulation(v, "person");
         });
         // (if a <person/> does not yet have a subpopulation attribute, tag it as a "person".  kai, feb'2024)
 
