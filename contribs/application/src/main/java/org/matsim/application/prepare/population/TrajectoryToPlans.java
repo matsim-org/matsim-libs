@@ -44,7 +44,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     private double sampleSize;
 
 	@Deprecated
-    @CommandLine.Option(names = "--samples", description = "Desired down-sampled sizes in (0, 1]. Deprecated: Use the separate down-sampling instead.", arity = "1..*")
+    @CommandLine.Option(names = "--samples", description = "Target sample sizes relative to a 100% population (range: (0,1]). These values are absolute shares, NOT relative to --sample-size. Example: with --sample-size=0.25 and --samples=0.1 0.05, the tool will create a 10% and 5% sample of the full population. Deprecated: Use the separate down-sampling instead.", arity = "1..*")
     private List<Double> samples;
 
     @CommandLine.Option(names = "--population", description = "Input original population file", required = true)
@@ -133,6 +133,16 @@ public class TrajectoryToPlans implements MATSimAppCommand {
             log.info("No sub samples requested. Done.");
             return 0;
         }
+
+		if (sampleSize <= 0 || sampleSize > 1)
+			throw new IllegalArgumentException("--sample-size must be in (0,1]");
+
+		for (double s : samples) {
+			if (s <= 0 || s > 1)
+				throw new IllegalArgumentException("All --samples must be in (0,1]");
+			if (s > sampleSize)
+				throw new IllegalArgumentException("Target sample " + s + " is larger than input sample size " + sampleSize);
+		}
 
         samples.sort(Comparator.comparingDouble(Double::doubleValue).reversed());
 
