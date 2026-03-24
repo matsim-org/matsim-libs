@@ -111,16 +111,24 @@ public class CommercialTrafficDashboard implements Dashboard {
 	}
 
 	/**
-	 * Reuses already registered {@link TripAnalysis} args if another dashboard configured the command first.
-	 * This keeps the {@link CommandRunner} registration consistent and makes mismatches visible via a warning.
+	 * Reuses already registered {@link TripAnalysis} args if another dashboard configured the command first
+	 * and appends missing commercial args. Registered args stay authoritative because the TripDashboard
+	 * usually defines the more specific TripAnalysis setup. We also need to update the registered args
+	 * in the current {@link Data} context, otherwise later compute calls would still see the old,
+	 * incomplete command line and fail with conflicting args.
 	 */
 	private String[] resolveTripAnalysisArgs(Data data) {
 		String[] registeredArgs = data.getArgs(TripAnalysis.class);
-		if (registeredArgs.length > 0 && !Arrays.equals(registeredArgs, argsTripAnalysis)) {
-			log.warn("TripAnalysis was already registered with args {} but CommercialTrafficDashboard would use {}. " +
-				"Reusing the registered args.", Arrays.toString(registeredArgs), Arrays.toString(argsTripAnalysis));
+		String[] mergedArgs = DashboardUtils.mergeArgsPreferBase(
+			registeredArgs.length > 0 ? registeredArgs : argsTripAnalysis,
+			registeredArgs.length > 0 ? argsTripAnalysis : new String[0]
+		);
+		if (registeredArgs.length > 0 && !Arrays.equals(registeredArgs, mergedArgs)) {
+			data.setArgs(TripAnalysis.class, mergedArgs);
+			log.info("TripAnalysis was already registered with args {}. Appending missing CommercialTrafficDashboard args {} -> {}.",
+				Arrays.toString(registeredArgs), Arrays.toString(argsTripAnalysis), Arrays.toString(mergedArgs));
 		}
-		return registeredArgs.length > 0 ? registeredArgs : argsTripAnalysis;
+		return mergedArgs;
 	}
 
 	@Override

@@ -64,7 +64,7 @@ public class CommercialTrafficDashboardTest {
 	}
 
 	@Test
-	void testCommercialViewerWithTripsDashboard() {
+	void testCommercialViewerWithTripsDashboardI() {
 		Scenario scenario = setUpScenario(utils);
 		final Controler controler = new Controler(scenario);
 
@@ -75,6 +75,42 @@ public class CommercialTrafficDashboardTest {
 				COMMERCIAL_GROUPS));
 		sw.addDashboard(new CommercialTrafficDashboard(scenario.getConfig().global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
 			COMMERCIAL_GROUPS));
+
+		controler.addOverridingModule(new SimWrapperModule(sw));
+		controler.run();
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis");
+		checkCommercialAnalysisSpecificFiles(out);
+		Assertions.assertThat(out)
+			// persons
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_personGroupEven.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_personGroupOdd.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_personTraffic.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_personTraffic.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_personGroupEven.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_personGroupOdd.csv");
+		Assertions.assertThat(sw.getData().getArgs(TripAnalysis.class))
+			.containsExactly(
+				"--groups-of-subpopulations-personAnalysis", PERSON_GROUPS,
+				"--groups-of-subpopulations-commercialAnalysis", COMMERCIAL_GROUPS
+			);
+	}
+
+	/**
+	 *  Has an opposite order of the dashboards to check if the dashboards are running if the TripAnalysis (called in both dashboards) works correctly.
+	 */
+	@Test
+	void testCommercialViewerWithTripsDashboardII() {
+		Scenario scenario = setUpScenario(utils);
+		final Controler controler = new Controler(scenario);
+
+		SimWrapper sw = SimWrapper.create(scenario.getConfig());
+
+		sw.addDashboard(new CommercialTrafficDashboard(scenario.getConfig().global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
+			COMMERCIAL_GROUPS));
+		sw.addDashboard(
+			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis(PERSON_GROUPS).setGroupsOfSubpopulationsForCommercialAnalysis(
+				COMMERCIAL_GROUPS));
 
 		controler.addOverridingModule(new SimWrapperModule(sw));
 		controler.run();

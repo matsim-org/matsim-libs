@@ -344,6 +344,14 @@ public final class CommandRunner {
 	}
 
 	/**
+	 * Replace args for an already existing command. If the command was not added yet, this behaves like {@link #add(Class, String...)}.
+	 */
+	public void setArgs(Class<? extends MATSimAppCommand> command, String... args) {
+		ApplicationUtils.checkCommand(command);
+		this.args.put(command, Arrays.copyOf(args, args.length));
+	}
+
+	/**
 	 * Set specific shape file for certain command.
 	 */
 	public void setShp(Class<? extends MATSimAppCommand> command, String path) {
