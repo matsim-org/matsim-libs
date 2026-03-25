@@ -510,8 +510,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Map<Id<Carrier>, Carrier> solvedCarriers = new HashMap<>();
 		List<Id<Carrier>> keyList = new ArrayList<>(allCarriers.keySet());
 		Map<Id<Carrier>, List<Id<Carrier>>> carrierId2subCarrierIds = new HashMap<>();
+		// sort out carriers which don't has to be solved
 		CarriersUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
-			if (CarriersUtils.getJspritIterations(carrier) == 0) {
+			if (CarriersUtils.getJspritIterations(carrier) == 0 || CarriersUtils.allJobsHandledBySelectedPlan(carrier)) {
 				allCarriers.remove(carrier.getId());
 				solvedCarriers.put(carrier.getId(), carrier);
 			}
