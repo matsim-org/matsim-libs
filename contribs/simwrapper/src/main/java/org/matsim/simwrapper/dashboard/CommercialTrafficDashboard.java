@@ -142,11 +142,11 @@ public class CommercialTrafficDashboard implements Dashboard {
 		createCommercialToursTab(layout);
 		createCommercialActivitiesTab(layout);
 
-		if (commercialTourDurationsRefCsv != null) {
-			addDurationRefDataComparison(layout);
-		}
 		if (commercialTourDistanceRefCsv != null) {
 			addDistanceRefDataComparison(layout);
+		}
+		if (commercialTourDurationsRefCsv != null) {
+			addDurationRefDataComparison(layout);
 		}
 		if (commercialActivityDurationsRefCsv != null) {
 			addActivityDurationRefDataComparison(layout);
