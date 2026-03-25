@@ -30,9 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -64,14 +62,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * Do not use this class for charging DVRP vehicles (DynAgents). In that case, vehicle charging is simulated with ChargingActivity (DynActivity).
  * (It may work together, but that would need to be tested. kai based on michal, dec'22)
  */
+@DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class VehicleChargingHandler
-		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler, QueuedAtChargerEventHandler, ChargingStartEventHandler,
-		ChargingEndEventHandler, QuitQueueAtChargerEventHandler,
+	implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler, QueuedAtChargerEventHandler, ChargingStartEventHandler,
+	ChargingEndEventHandler, QuitQueueAtChargerEventHandler,
 	MobsimBeforeSimStepListener, MobsimScopeEventHandler {
 
 	public static final String CHARGING_IDENTIFIER = " charging";
 	public static final String CHARGING_INTERACTION = ScoringConfigGroup.createStageActivityType(
-			CHARGING_IDENTIFIER);
+		CHARGING_IDENTIFIER);
 	/*
 	 * actually this set is not needed as long as driver id's equal the vehicle id's. Because the internal id handling would sort that out
 	 * (it seems id types are irrelevant, in the end. Meaning that agentsInChargerQueue.remove(vehicleId) with Id<Vehicle> vehicleId works out, actually.
@@ -94,7 +93,7 @@ public class VehicleChargingHandler
 		this.electricFleet = electricFleet;
 		this.evCfg = evConfigGroup;
 		this.strategyFactory = strategyFactory;
-		chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure );
+		chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure);
 	}
 
 	/**
@@ -112,9 +111,9 @@ public class VehicleChargingHandler
 					ElectricVehicle ev = electricFleet.getElectricVehicles().get(evId);
 					List<Charger> chargers = chargersAtLinks.get(event.getLinkId());
 					Charger c = chargers.stream()
-							.filter(ch -> ev.getChargerTypes().contains(ch.getChargerType()))
-							.findAny()
-							.get();
+						.filter(ch -> ev.getChargerTypes().contains(ch.getChargerType()))
+						.findAny()
+						.get();
 					c.getLogic().addVehicle(ev, strategyFactory.createStrategy(c.getSpecification(), ev), event.getTime());
 					vehiclesAtChargers.put(evId, c.getId());
 				}
@@ -161,7 +160,7 @@ public class VehicleChargingHandler
 		//vehiclesAtChargers should normally already contain the vehicle, but assure this nevertheless
 		vehiclesAtChargers.put(event.getVehicleId(), event.getChargerId());
 		Id<Person> driver = lastDriver.get(event.getVehicleId());
-		if (driver != null){
+		if (driver != null) {
 			//agents this set extend their activity if evCfg.enforceChargingInteractionDuration
 			agentsInChargerQueue.add(driver);
 		} // else this vehicle is driven by a DynAgent (who did not leave the vehicle for charging)
@@ -207,7 +206,7 @@ public class VehicleChargingHandler
 
 	@Override
 	public void handleEvent(QuitQueueAtChargerEvent event) {
-		if (evCfg.isEnforceChargingInteractionDuration()){
+		if (evCfg.isEnforceChargingInteractionDuration()) {
 			//this could actually happen when combining with edrt/etaxi/evrp
 			throw new RuntimeException("should currently not happen, as this event is only triggered in case the agent quits the charger queue without charging afterwards, " +
 				" and this should not happen with fixed charging activity duration.\n" +

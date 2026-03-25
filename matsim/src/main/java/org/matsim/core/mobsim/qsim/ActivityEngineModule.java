@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim;
+package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.Singleton;
 
@@ -28,7 +28,7 @@ public class ActivityEngineModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind( ActivityEngineDefaultImpl.class ).in( Singleton.class );
-		addQSimComponentBinding( COMPONENT_NAME ).to( ActivityEngineDefaultImpl.class );
+		bind(ActivityEngine.class).to(ActivityEngineDefaultImpl.class).in(Singleton.class);
+		addQSimComponentBinding(COMPONENT_NAME).to(ActivityEngineDefaultImpl.class);
 	}
 }
