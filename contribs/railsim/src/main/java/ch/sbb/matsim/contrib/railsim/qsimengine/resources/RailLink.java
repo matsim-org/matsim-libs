@@ -79,9 +79,11 @@ public final class RailLink implements HasLinkId {
 		this.isEntryLink = RailsimUtils.isEntryLink(link);
 		this.isExitLink = RailsimUtils.isExitLink(link);
 		this.isNonBlockingArea = RailsimUtils.isLinkNonBlockingArea(link);
-		// TODO: Since the opposite link's length is used for position calculations during head-tail flips (reversing), we should enforce that a link
-		//  and its opposite have the same length and throw an error if they do not.
 		this.oppositeLinkId = opposite != null ? opposite.getId() : null;
+		if (opposite != null && link.getLength() != opposite.getLength()) {
+			throw new IllegalArgumentException(String.format("Opposite link %s must have the same length as link %s", opposite.getId(), link.getId()));
+		}
+
 		this.vMax = vMax;
 		this.disallowedNextLinks = disallowedNextLinks;
 	}

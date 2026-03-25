@@ -79,10 +79,6 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microStationReversingTrack"));
 
 		assertThat(result)
-			// TODO: Resolve deadlock issue. The deadlock avoidance logic likely fails to recognize the stop in the reversing track as a valid
-			//  avoidance point. Currently, when a train is in the reversing track, following trains from the same direction are incorrectly blocked.
-			//  Upon detecting reversal in the route, we may need to reset the deadlock avoidance state for links beyond the point where the return
-			//  route diverges from the arrival path?
 			.allTrainsArrived()
 			.allTrainsHaveValidLengthAtDeparture()
 			.allTrainsHaveValidLengthAtArrival();
