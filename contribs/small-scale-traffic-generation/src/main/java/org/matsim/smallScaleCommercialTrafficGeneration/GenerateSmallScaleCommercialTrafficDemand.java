@@ -325,12 +325,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					CarriersUtils.getCarriers(scenario).getCarriers().values().forEach(carrier -> {
 						carrier.getPlans().clear();
 					});
-				}
-				else {
+				} else {
 					// if we use an existing carrier with a solution, we delete only the plans of carriers which have unhandled jobs.
 					List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(
 						CarriersUtils.getCarriers(scenario));
 					if (!nonCompleteSolvedCarriers.isEmpty()) {
+						log.info(
+							"By using the option {} {} carriers are found with unhandled jobs. These carriers will be solved and the plans of the fully planed carriers will remain. ",
+							CreationOption.useExistingCarrierFileWithSolution, nonCompleteSolvedCarriers.size());
 						nonCompleteSolvedCarriers.forEach((carrier -> carrier.getPlans().clear()));
 					}
 				}
