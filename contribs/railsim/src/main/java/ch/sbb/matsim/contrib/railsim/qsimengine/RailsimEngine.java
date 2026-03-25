@@ -580,6 +580,8 @@ final class RailsimEngine implements Steppable {
 			//  3) Explicitly update the route index (if needed).
 			state.headPosition = state.tailPosition;
 			state.tailPosition = 0;
+
+			assert RailsimCalc.checkTrainLength(state);
 			return;
 		}
 
@@ -613,6 +615,8 @@ final class RailsimEngine implements Steppable {
 
 		state.tailLink = headReverse.getLinkId();
 		state.tailPosition = 0;
+
+		assert RailsimCalc.checkTrainLength(state);
 	}
 
 	private void leaveLink(double time, UpdateEvent event) {
