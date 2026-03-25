@@ -62,14 +62,16 @@ public final class DischargingModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-//				this.bind(DriveDischargingHandler.class).in(Singleton.class);
-//				addMobsimScopeEventHandlerBinding().to(DriveDischargingHandler.class);
-//				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(DriveDischargingHandler.class);
 
-				this.bind(DistributedDriveDischargingHandler.class).in(Singleton.class);
-				addMobsimScopeEventHandlerBinding().to(DistributedDriveDischargingHandler.class);
-				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(DistributedDriveDischargingHandler.class);
-
+				if (getConfig().controller().getMobsim().equals("qsim")) {
+					this.bind(DriveDischargingHandler.class).in(Singleton.class);
+					addMobsimScopeEventHandlerBinding().to(DriveDischargingHandler.class);
+					this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(DriveDischargingHandler.class);
+				} else if (getConfig().controller().getMobsim().equals("dsim")) {
+					this.bind(DistributedDriveDischargingHandler.class).in(Singleton.class);
+					addMobsimScopeEventHandlerBinding().to(DistributedDriveDischargingHandler.class);
+					this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(DistributedDriveDischargingHandler.class);
+				}
 				// event handlers are not qsim components
 
 				this.bind(IdleDischargingHandler.class).in(Singleton.class);

@@ -26,15 +26,22 @@ import java.util.Map;
 
 /**
  * Reimplementation of {@link DriveDischargingHandler} until i have figured out what is going on.
- * <p>
- * The original implementation has some logic to apply the discharge in the next time step due to reace conditions
- * between the simulatin and the events processing. DSim does not have this. Therefore we handle the discharging in
- * the event handlers directly.
  */
 // I guess this could also be processing mode task?
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class DistributedDriveDischargingHandler implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
 	MobsimScopeEventHandler, NotifyVehiclePartitionTransfer, DSimComponentsMessageProcessor, QSimComponent {
+
+	// Implementation notes:
+	// The original implementation has some logic to apply the discharge in the next time step due to race conditions
+	// between the simulatin and the events processing. DSim does not have this. Therefore, we handle the discharging in
+	// the event handlers directly.
+	//
+	// Conceptually, this handler gets a reference to the entire ElectricFleet. We assume that it contains information for all
+	// electric vehicles in the simulation. At least this is what PopulationAgentSource does at the moment. When a VehicleEntersTraffic
+	// event is received, the handler starts tracking that vehicle in its evDrives list. When the tracked vehicle leaves the partition,
+	// the corresponding evDrive is transferred to that partition. When a tracked vehicle arrives on this partition, the corresponding
+	// evDrive is implicitly received as a message.
 
 	private final Network network;
 	private final EventsManager em;
