@@ -11,7 +11,8 @@
 			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="A" departureOffset="00:00:00" arrivalOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="B" departureOffset="00:05:00" arrivalOffset="00:05:00" awaitDeparture="true"/>
+				<!-- Train remains at stop B until end of day -->
+				<stop refId="B" departureOffset="24:00:00" arrivalOffset="24:00:00" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
 				<link refId="stop_loop_1"/>

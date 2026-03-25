@@ -69,13 +69,10 @@ public class RailsimTurnRestrictionTest extends AbstractIntegrationTest {
 		// detour via disallowed links.
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "turnRestrictionsWithRerouting"));
 
-		// TODO: Currently, the train router ignores turn restrictions and calculates a detour via disallowed links, which is then caught by the
-		//  engine: java.lang.IllegalStateException: Train pt_pt_1_veh_2_pt_1 is trying to enter the disallowed link 6 from link 2.
-
-		// Verify that the second train (pt_1_veh_2) never arrives at its final destination. It should remain stuck behind the first train
-		// (pt_1_veh_1) at stop B, because the only possible detour is prohibited by turn restrictions.
-
-		// TODO: This assertion needs to be implemented
-		//  assertThat(result).trainHasNotArrived("pt_1_veh_2");
+		// Verify that the second train (pt_1_veh_2) never arrives at its final destination.
+		// It remains stuck behind the first train (pt_1_veh_1) at stop B, because the only possible detour is prohibited by turn restrictions.
+		assertThat(result)
+			.trainHasLastArrival("pt_1_veh_1", 145.0)
+			.trainHasNotArrived("pt_1_veh_2");
 	}
 }

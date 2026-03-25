@@ -410,6 +410,53 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 	}
 
 	/**
+	 * Asserts that a specific train did not arrive at its final scheduled stop.
+	 *
+	 * @param trainId the train ID to check
+	 * @return this assert instance
+	 */
+	public SimulationResultAssert trainHasNotArrived(String trainId) {
+		isNotNull();
+
+		TransitRouteStop lastScheduledStop = null;
+		for (TransitLine line : actual.getScenario().getTransitSchedule().getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+					if (departure.getVehicleId().toString().equals(trainId)) {
+						if (route.getStops().isEmpty()) {
+							failWithMessage("Expected train <%s> to have scheduled stops but found none", trainId);
+						}
+						lastScheduledStop = route.getStops().get(route.getStops().size() - 1);
+						break;
+					}
+				}
+				if (lastScheduledStop != null) {
+					break;
+				}
+			}
+			if (lastScheduledStop != null) {
+				break;
+			}
+		}
+
+		if (lastScheduledStop == null) {
+			failWithMessage("Expected train <%s> to be present in the transit schedule but it was not found", trainId);
+		}
+
+		var trainStops = actual.stopTimes.get(trainId);
+		String lastStopId = lastScheduledStop.getStopFacility().getId().toString();
+		if (trainStops != null && trainStops.containsKey(lastStopId)) {
+			StopTimeData stopData = trainStops.get(lastStopId);
+			if (stopData.hasArrived()) {
+				failWithMessage("Expected train <%s> to not arrive at its final stop <%s> but it arrived at <%s> (%s). Stop data: %s",
+					trainId, lastStopId, stopData.arrivalTime, Time.writeTime(stopData.arrivalTime), stopData);
+			}
+		}
+
+		return this;
+	}
+
+	/**
 	 * Asserts that all delays satisfy the given predicate.
 	 *
 	 * @param predicate the predicate to test against delays
