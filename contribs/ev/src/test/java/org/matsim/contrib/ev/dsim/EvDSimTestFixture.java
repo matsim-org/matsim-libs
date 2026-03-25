@@ -45,10 +45,6 @@ import java.util.List;
  */
 public final class EvDSimTestFixture {
 
-	static final Id<Person> PERSON_ID = Id.createPersonId("ev-test-person");
-	static final Id<Vehicle> VEHICLE_ID = Id.createVehicleId("ev-test-person");
-	static final Id<VehicleType> EV_TYPE_ID = Id.create("electric", VehicleType.class);
-
 	/**
 	 * Vehicle range in metres with a 1 J/m drive consumption model.
 	 * Equals the energy capacity in Joules. Must exceed the total route length (1200 m).
@@ -135,7 +131,7 @@ public final class EvDSimTestFixture {
 	/** Creates and registers an electric vehicle type in {@code vehicles}. */
 	public static VehicleType createEvVehicleType(Vehicles vehicles) {
 		VehiclesFactory factory = vehicles.getFactory();
-		VehicleType type = factory.createVehicleType(EV_TYPE_ID);
+		VehicleType type = factory.createVehicleType(Id.create("electric", VehicleType.class));
 		type.setNetworkMode(TransportMode.car);
 		// Capacity in kWh = RANGE_M metres × 1 J/m converted to kWh
 		VehicleUtils.setEnergyCapacity(type.getEngineInformation(), EvUnits.J_to_kWh(RANGE_M));
@@ -155,7 +151,7 @@ public final class EvDSimTestFixture {
 	 */
 	public static Person createPerson(PopulationFactory factory, Vehicles vehicles, VehicleType evType) {
 		// Vehicle
-		Vehicle vehicle = vehicles.getFactory().createVehicle(VEHICLE_ID, evType);
+		Vehicle vehicle = vehicles.getFactory().createVehicle(Id.createVehicleId("ev-test-person"), evType);
 		vehicles.addVehicle(vehicle);
 		ElectricFleetUtils.setInitialSoc(vehicle, 1.0);  // start fully charged
 
@@ -177,11 +173,11 @@ public final class EvDSimTestFixture {
 		Activity work = factory.createActivityFromLinkId("work", Id.createLinkId("l3"));
 		plan.addActivity(work);
 
-		var person = factory.createPerson(PERSON_ID);
+		var person = factory.createPerson(Id.createPersonId("ev-test-person"));
 		person.addPlan(plan);
 
 		VehicleUtils.insertVehicleIdsIntoPersonAttributes(person,
-			Collections.singletonMap(TransportMode.car, VEHICLE_ID));
+			Collections.singletonMap(TransportMode.car, vehicle.getId()));
 
 		return person;
 	}
@@ -228,8 +224,6 @@ public final class EvDSimTestFixture {
 
 	/**
 	 * Configures DSim as the mobsim with the given number of partitions.
-	 * Must be called before {@link DistributedContext#create} so that
-	 * {@code ControlerDefaultsModule} installs {@code DistributedSimulationModule}.
 	 */
 	public static void configureDSim(Config config, int threads) {
 		config.controller().setMobsim("dsim");

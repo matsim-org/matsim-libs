@@ -1,22 +1,34 @@
 package org.matsim.contrib.ev.dsim;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEvent;
+import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEventHandler;
 import org.matsim.core.communication.LocalCommunicator;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.dsim.DistributedContext;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
-import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Integration test for EV drive discharging in a distributed (DSim) setting.
@@ -26,62 +38,54 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * Tests verify:
  * <ul>
- *   <li>DSim produces the same events as QSim (golden-reference pattern).</li>
- *   <li>Battery state is correctly transferred across partition boundaries
- *       (WP2 — battery state transfer).</li>
- *   <li>DriveDischargingHandler runs as a DistributedMobsimEngine (WP3).</li>
- *   <li>Drive discharging is partition-local and covers all three partitions
- *       (WP4).</li>
+ *   <li>Total energy consumed equals the expected value (l2: 1000 J + l3: 100 J = 1100 J).</li>
+ *   <li>Each {@link DrivingEnergyConsumptionEvent} fires at the correct time relative to
+ *       its triggering event: one step later in QSim (deferred processing), same step in
+ *       DSim (synchronous processing in {@code DistributedDriveDischargingHandler}).</li>
  * </ul>
  *
  * @see EvDSimTestFixture
  */
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class EvDriveDischargingIntegrationTest {
 
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
-	// -------------------------------------------------------------------------
-	// Order 1 — QSim reference run
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Runs the scenario with the standard QSim.  The output events file serves
-	 * as the golden reference for all subsequent DSim tests.
-	 */
 	@Test
-	@Order(1)
 	void qsim() {
 		var config = EvDSimTestFixture.createConfig(utils.getOutputDirectory());
 		var scenario = EvDSimTestFixture.createScenario(config, 1 /* single partition */);
 
 		var controller = new Controler(scenario);
 		EvDSimTestFixture.installEvModules(controller);
-		controller.run();
-	}
 
-	// -------------------------------------------------------------------------
-	// Order 2 — DSim runs (compare against QSim reference)
-	// -------------------------------------------------------------------------
+		// QSim defers discharge by one step: DrivingEnergyConsumptionEvent.time = triggeringEvent.time + 1
+		var verifier = new DriveDischargeVerifier(1);
+		verifier.install(controller);
+
+		controller.run();
+		verifier.assertExpected();
+	}
 
 	/**
 	 * Runs DSim with three partitions on a single thread pool (NullCommunicator).
 	 * All inter-partition communication is in-process.
 	 */
 	@Test
-	@Order(2)
 	void threePartitions() {
 		var config = EvDSimTestFixture.createConfig(utils.getOutputDirectory());
 		EvDSimTestFixture.configureDSim(config, 3);
 		var scenario = EvDSimTestFixture.createScenario(config, 3);
 
-		//var ctx = DistributedContext.create(new NullCommunicator(), config);
 		var controller = new Controler(scenario);
 		EvDSimTestFixture.installEvModules(controller);
-		controller.run();
 
-		assertEventsMatchQSim();
+		// DSim discharges synchronously: DrivingEnergyConsumptionEvent.time = triggeringEvent.time
+		var verifier = new DriveDischargeVerifier(0);
+		verifier.install(controller);
+
+		controller.run();
+		verifier.assertExpected();
 	}
 
 	/**
@@ -93,7 +97,6 @@ public class EvDriveDischargingIntegrationTest {
 	 * receive loops spin indefinitely waiting for peers that already failed.
 	 */
 	@Test
-	@Order(2)
 	@Timeout(value = 2, unit = TimeUnit.MINUTES)
 	@Disabled("Enable once EV handlers are partition-aware (WP3-WP5)")
 	void threeNodes() throws InterruptedException, ExecutionException, TimeoutException {
@@ -133,20 +136,73 @@ public class EvDriveDischargingIntegrationTest {
 			}
 		}
 
-		assertEventsMatchQSim();
+		// TODO: add DriveDischargeVerifier once multi-thread aggregation is solved
 	}
 
 	// -------------------------------------------------------------------------
-	// Helpers
+	// Verifier
 	// -------------------------------------------------------------------------
 
-	private void assertEventsMatchQSim() {
-		var expectedEventsPath = Paths.get(utils.getOutputDirectory())
-			.resolve("..").resolve("qsim").resolve("output_events.xml")
-			.toAbsolutePath().toString();
-		var actualEventsPath = utils.getOutputDirectory() + "output_events.xml";
+	/**
+	 * Collects triggering events ({@link LinkLeaveEvent}, {@link VehicleLeavesTrafficEvent})
+	 * and {@link DrivingEnergyConsumptionEvent}s, then asserts:
+	 * <ol>
+	 *   <li>Total energy == 1100 J (l2: 1000 J + l3: 100 J; l1 is the first link and is skipped).</li>
+	 *   <li>For each discharge event: {@code dischargeEvent.time == triggeringEvent.time + timeDelta}
+	 *       (timeDelta = 1 for QSim, 0 for DSim).</li>
+	 * </ol>
+	 */
+	static class DriveDischargeVerifier
+		implements DrivingEnergyConsumptionEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler {
 
-		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
-			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
+		private final int timeDelta;
+		private final Map<Id<Link>, Double> triggerTimes = new HashMap<>();
+		private final Map<Id<Link>, DrivingEnergyConsumptionEvent> dischargeEvents = new HashMap<>();
+
+		DriveDischargeVerifier(int timeDelta) {
+			this.timeDelta = timeDelta;
+		}
+
+		@Override
+		public void handleEvent(LinkLeaveEvent event) {
+			triggerTimes.put(event.getLinkId(), event.getTime());
+		}
+
+		@Override
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			triggerTimes.put(event.getLinkId(), event.getTime());
+		}
+
+		@Override
+		public void handleEvent(DrivingEnergyConsumptionEvent event) {
+			dischargeEvents.put(event.getLinkId(), event);
+		}
+
+		void install(Controler controller) {
+			DriveDischargeVerifier self = this;
+			controller.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addEventHandlerBinding().toInstance(self);
+				}
+			});
+		}
+
+		void assertExpected() {
+			double totalEnergy_J = dischargeEvents.values().stream()
+				.mapToDouble(DrivingEnergyConsumptionEvent::getEnergy)
+				.sum();
+			assertEquals(EvUnits.J_to_kWh(1100.0), EvUnits.J_to_kWh(totalEnergy_J), 1e-6,
+				"Total energy mismatch");
+
+			for (var entry : dischargeEvents.entrySet()) {
+				var linkId = entry.getKey();
+				var discharge = entry.getValue();
+				Double triggerTime = triggerTimes.get(linkId);
+				assertNotNull(triggerTime, "No triggering event recorded for link " + linkId);
+				assertEquals(triggerTime + timeDelta, discharge.getTime(), 1e-6,
+					"Discharge event time mismatch for link " + linkId);
+			}
+		}
 	}
 }
