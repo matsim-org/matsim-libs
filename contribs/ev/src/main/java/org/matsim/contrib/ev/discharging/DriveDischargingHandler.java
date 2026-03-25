@@ -116,7 +116,9 @@ public class DriveDischargingHandler
 	@Override
 	public void afterMobsim() {
 		// process remaining events
-		doSimStep(this.netsim.getSimTimer().getTimeOfDay());
+		// pass time + 1, because we delay the processing of events during the mobsim. Yet, afterMobsim is called with the last time step of the mobsim
+		// when passing the last timestep no events will be processed, as the logic waits for the next timestep.
+		doSimStep(this.netsim.getSimTimer().getTimeOfDay() + 1);
 	}
 
 	@Override
