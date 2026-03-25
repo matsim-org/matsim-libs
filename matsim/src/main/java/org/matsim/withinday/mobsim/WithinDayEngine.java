@@ -186,7 +186,7 @@ public class WithinDayEngine implements DistributedMobsimEngine, ActivityEndResc
 	}
 
 	@Override
-	public void beforeSim() {
+	public void beforeMobsim() {
 		this.parallelInitialReplanner.onPrepareSim();
 		this.parallelDuringActivityReplanner.onPrepareSim();
 		this.parallelDuringLegReplanner.onPrepareSim();
@@ -200,7 +200,7 @@ public class WithinDayEngine implements DistributedMobsimEngine, ActivityEndResc
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		this.parallelInitialReplanner.afterSim();
 		this.parallelDuringActivityReplanner.afterSim();
 		this.parallelDuringLegReplanner.afterSim();

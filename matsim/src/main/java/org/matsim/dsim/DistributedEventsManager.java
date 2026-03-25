@@ -169,7 +169,7 @@ public final class DistributedEventsManager implements EventsManager {
 		for (int part : computeNode.getParts()) {
 			var nextHandler = (part == computeNode.getParts().getInt(0)) ? firstHandler : provider.get();
 			if (handler == nextHandler) {
-				throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
+				throw new IllegalStateException("The provider for " + handler.getName() + " event handler must return a new instance of the handler or PARTITION_SINGLETON must be set.");
 			}
 			handler = nextHandler;
 			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), null);

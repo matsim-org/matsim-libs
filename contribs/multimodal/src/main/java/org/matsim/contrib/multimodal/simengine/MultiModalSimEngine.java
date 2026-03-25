@@ -58,14 +58,14 @@ class MultiModalSimEngine implements MobsimEngine {
 
 	private MultiModalSimEngineRunner[] runners;
 	private Phaser startBarrier;
-    private Phaser endBarrier;
+	private Phaser endBarrier;
 
 	/*package*/ MultiModalSimEngine(Map<String, TravelTime> multiModalTravelTimes, MultiModalConfigGroup multiModalConfigGroup) {
-    	this.multiModalTravelTimes = multiModalTravelTimes;
-    	this.numOfThreads = multiModalConfigGroup.getNumberOfThreads();
+		this.multiModalTravelTimes = multiModalTravelTimes;
+		this.numOfThreads = multiModalConfigGroup.getNumberOfThreads();
 
-    	if (this.numOfThreads > 1) log.info("Using " + multiModalConfigGroup.getNumberOfThreads() + " threads for MultiModalSimEngine.");
-    }
+		if (this.numOfThreads > 1) log.info("Using " + multiModalConfigGroup.getNumberOfThreads() + " threads for MultiModalSimEngine.");
+	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
@@ -77,11 +77,11 @@ class MultiModalSimEngine implements MobsimEngine {
 	}
 
 	/*package*/ EventsManager getEventsManager() {
-        return ((QSim) this.internalInterface.getMobsim()).getEventsManager();
+		return ((QSim) this.internalInterface.getMobsim()).getEventsManager();
 	}
 
 	@Override
-	public void beforeSim() {
+	public void beforeMobsim() {
 
 		// debug message
 		log.info("TravelTime classes used for multi-modal simulation: ");
@@ -170,7 +170,7 @@ class MultiModalSimEngine implements MobsimEngine {
 
 		this.endBarrier.arriveAndAwaitAdvance();
 
-        this.printSimLog(time);
+		this.printSimLog(time);
 	}
 
 	/*package*/ void printSimLog(double time) {
@@ -179,12 +179,12 @@ class MultiModalSimEngine implements MobsimEngine {
 			int nofActiveLinks = this.getNumberOfSimulatedLinks();
 			int nofActiveNodes = this.getNumberOfSimulatedNodes();
 			log.info("SIMULATION (MultiModalSimEngine) AT " + Time.writeTime(time)
-					+ " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes);
+				+ " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes);
 		}
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		// Calling the afterSim Method of the MultiModalSimEngineRunners will set their simulationRunning flag to false.
 		for (MultiModalSimEngineRunner engine : this.runners) {
 			engine.afterSim();
@@ -238,18 +238,18 @@ class MultiModalSimEngine implements MobsimEngine {
 		this.runners = new MultiModalSimEngineRunner[numOfThreads];
 
 		this.startBarrier = new Phaser(numOfThreads + 1);
-        Phaser separationBarrier = new Phaser(numOfThreads); // separates moveNodes and moveLinks
+		Phaser separationBarrier = new Phaser(numOfThreads); // separates moveNodes and moveLinks
 		this.endBarrier = new Phaser(numOfThreads + 1);
 
 		// setup runners
 		for (int i = 0; i < numOfThreads; i++) {
 			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(this.startBarrier,
-					separationBarrier, this.endBarrier);
+				separationBarrier, this.endBarrier);
 
 			Thread thread = new Thread(engine);
 			thread.setName("MultiModalSimEngineRunner_" + i);
 
-			thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
+			thread.setDaemon(true);    // make the Thread Daemons so they will terminate automatically
 			this.runners[i] = engine;
 
 			thread.start();
