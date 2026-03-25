@@ -24,6 +24,7 @@ import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.MaxSpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManagerImpl;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
@@ -31,17 +32,23 @@ import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.VehicleType;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.io.File;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static ch.sbb.matsim.contrib.railsim.qsimengine.RailsimTestUtils.createTrainTimeDistanceHandler;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RailsimEngineTest {
 
@@ -84,6 +91,15 @@ public class RailsimEngineTest {
 		return getTestEngine(network, null);
 	}
 
+	private void invokeReverseTrain(RailsimEngine engine, UpdateEvent event, RailLink nextLink,
+									Id<Link> previousHeadLink, double previousHeadPosition,
+									Id<Link> previousTailLink, double previousTailPosition,
+									int nextRouteIdx) throws ReflectiveOperationException {
+		Method reverseTrain = RailsimEngine.class.getDeclaredMethod("reverseTrain", TrainState.class, RailLink.class, Id.class, double.class, Id.class, double.class, int.class);
+		reverseTrain.setAccessible(true);
+		reverseTrain.invoke(engine, event.state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
+	}
+
 	@Test
 	void testSimple() {
 
@@ -109,6 +125,32 @@ public class RailsimEngineTest {
 			.hasTrainState("train", 144, 0, 44)
 			.hasTrainState("train", 234, 2000, 0);
 
+	}
+
+	@Test
+	void testReverseTrainSingleLinkKeepsExactState() throws ReflectiveOperationException {
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroBi.xml").toString());
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, new RailsimConfigGroup(), net, new NoDeadlockAvoidance(net), new TrainManager());
+		RailLink forward = resources.getLink(Id.createLinkId("l1-2"));
+		RailLink reverse = resources.getLink(Id.createLinkId("l2-1"));
+
+		TrainState state = new TrainState(null, new TrainInfo(Id.create("reversible", VehicleType.class), 200, 10, 1, 1, 1, 60),
+			0, forward.getLinkId(), new ArrayList<>(List.of(forward, reverse)));
+		state.headLink = forward.getLinkId();
+		state.headPosition = 1000;
+		state.tailLink = forward.getLinkId();
+		state.tailPosition = 800;
+		state.routeIdx = 1;
+
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.REVERSE_TRAIN);
+		invokeReverseTrain(new RailsimEngine(null, null, null, null, null, null), event, reverse, forward.getLinkId(), 1000, forward.getLinkId(), 800, 2);
+
+		assertThat(state.headLink).isEqualTo(reverse.getLinkId());
+		assertThat(state.headPosition).isEqualTo(200);
+		assertThat(state.tailLink).isEqualTo(forward.getLinkId());
+		assertThat(state.tailPosition).isEqualTo(1000);
+		assertThat(state.routeIdx).isEqualTo(2);
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
 	}
 
 	@Test

@@ -500,16 +500,16 @@ final class RailsimEngine implements Steppable {
 			}
 		}
 
-		// Get link and increment
-		RailLink nextLink = state.route.get(state.routeIdx++);
+		// Peek next link and only commit the route index once the final post-reverse state is known.
+		RailLink nextLink = state.route.get(state.routeIdx);
 
 		if (Objects.equals(nextLink.getLinkId(), state.headLink)) {
 			throw new IllegalStateException("Train %s is trying to enter link %s from itself. Such Loop connections are not supported".formatted(state.driver.getId(), state.headLink));
 		}
 
 		// Check for disallowed links
-		if (state.routeIdx > 1) {
-			RailLink currentLink = state.route.get(state.routeIdx - 2);
+		if (state.routeIdx > 0) {
+			RailLink currentLink = state.route.get(state.routeIdx - 1);
 
 			if (currentLink.isDisallowedNextLink(nextLink.getLinkId()))
 				throw new IllegalStateException("Train " + state.driver.getId() + " is trying to enter the disallowed link " + nextLink.getLinkId() + " from link " + currentLink.getLinkId() + ".");
@@ -519,9 +519,6 @@ final class RailsimEngine implements Steppable {
 		if (event.type != UpdateEvent.Type.REVERSE_TRAIN && nextLink.isOppositeLink(state.headLink)) {
 			if (state.train.reversible() < 0)
 				throw new IllegalStateException("Train " + state.driver.getId() + " is trying to enter the opposite link " + nextLink.getLinkId() + " with a non-reversible train.");
-
-			// Reverse the increment
-			state.routeIdx -= 1;
 
 			// Reschedule the event
 			if (event.lastArrivalTime > -1) {
@@ -534,17 +531,25 @@ final class RailsimEngine implements Steppable {
 			return;
 		}
 
+		int nextRouteIdx = state.routeIdx + 1;
+
 		// On route departure the head link is null
 		createEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
-		state.headLink = nextLink.getLinkId();
 
-		assert resources.isBlockedBy(resources.getLink(state.headLink), state) : "Link has to be blocked by driver when entered";
+		assert resources.isBlockedBy(nextLink, state) : "Link has to be blocked by driver when entered";
 
-		state.headPosition = 0;
-
-		// Swap head and tail position
 		if (event.type == UpdateEvent.Type.REVERSE_TRAIN) {
-			reverseTrain(time, event);
+			// Reverse-state reconstruction must use the pre-move geometry.
+			Id<Link> previousHeadLink = state.headLink;
+			Id<Link> previousTailLink = state.tailLink;
+			double previousHeadPosition = state.headPosition;
+			double previousTailPosition = state.tailPosition;
+
+			reverseTrain(state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
+		} else {
+			state.headLink = nextLink.getLinkId();
+			state.headPosition = 0;
+			state.routeIdx = nextRouteIdx;
 		}
 
 		// Reset waiting flag
@@ -567,54 +572,68 @@ final class RailsimEngine implements Steppable {
 	/**
 	 * Reverse the train.
 	 */
-	private void reverseTrain(double time, UpdateEvent event) {
-		TrainState state = event.state;
+	private void reverseTrain(TrainState state, RailLink nextLink, Id<Link> previousHeadLink, double previousHeadPosition,
+							  Id<Link> previousTailLink, double previousTailPosition, int nextRouteIdx) {
 
-		RailLink headReverse = resources.getLink(state.headLink);
+		// Train is fully contained on the current link. Keep the tail on the current link and flip the head
+		// onto the opposite link so routeIdx still means "first link the head has not entered yet".
+		if (nextLink.isOppositeLink(previousTailLink)) {
 
-		// Train is on one link, only need to swap positions
-		if (headReverse.isOppositeLink(state.tailLink)) {
-			// TODO: Potentially refactor flow for single and multi-link cases to avoid logic duplication and make route index updates explicit:
-			//  1) Locate the corresponding opposite links in the route.
-			//  2) Apply a consistent coordinate flip (L - x) to maintain train length.
-			//  3) Explicitly update the route index (if needed).
-			state.headPosition = state.tailPosition;
-			state.tailPosition = 0;
+			state.headLink = nextLink.getLinkId();
+			state.headPosition = nextLink.length - previousTailPosition;
+			state.tailLink = previousHeadLink;
+			state.tailPosition = previousHeadPosition;
+			state.routeIdx = nextRouteIdx;
 
-			assert RailsimCalc.checkTrainLength(state);
-			return;
-		}
+		} else {
+			state.tailLink = nextLink.getLinkId();
+			state.tailPosition = nextLink.length - previousHeadPosition;
 
-		RailLink tailReverse = null;
+			// Multi-link reverse: find the route element opposite to the old tail.
+			RailLink tailReverse = null;
+			int tailReverseIdx = nextRouteIdx;
+			for (; tailReverseIdx < state.route.size(); tailReverseIdx++) {
+				RailLink link = state.route.get(tailReverseIdx);
+				if (link.isOppositeLink(previousTailLink)) {
+					tailReverse = link;
+					break;
+				}
+			}
 
-		int i = state.routeIdx;
-		for (; i < state.route.size(); i++) {
-			RailLink link = state.route.get(i);
-			if (link.isOppositeLink(state.tailLink)) {
-				tailReverse = link;
-				break;
+			if (tailReverse != null) {
+				state.headLink = tailReverse.getLinkId();
+				state.headPosition = tailReverse.length - previousTailPosition;
+				state.routeIdx = tailReverseIdx + 1;
+
+			} else {
+				// Reconstruct the new head by walking train length along the reversed route.
+				double remainingLength = state.train.length();
+				RailLink headLink = nextLink;
+				double headPosition = state.tailPosition;
+				int headIdx = nextRouteIdx - 1;
+
+				double available = headLink.length - headPosition;
+				while (FuzzyUtils.greaterThan(remainingLength, available) || (FuzzyUtils.equals(remainingLength, available) && headIdx + 1 < state.route.size()
+					&& !state.isStop(headLink.getLinkId()))) {
+					remainingLength -= available;
+					headIdx++;
+
+					if (headIdx >= state.route.size()) {
+						throw new IllegalStateException(("Train %s is trying to reverse on a route that does not contain enough links for %s. " +
+							"Make sure that a single transit line contains all links and stops needed for reversing.")
+							.formatted(state.driver.getVehicle().getId(), previousTailLink));
+					}
+
+					headLink = state.route.get(headIdx);
+					headPosition = 0;
+					available = headLink.length;
+				}
+
+				state.headLink = headLink.getLinkId();
+				state.headPosition = headPosition + remainingLength;
+				state.routeIdx = headIdx + 1;
 			}
 		}
-
-		if (tailReverse == null) {
-			throw new IllegalStateException(("Train %s is trying to reverse on a route that does not contain the opposite link for %s. " +
-				"Make sure that a single transit line contains all links and stops needed for reversing.")
-				.formatted(state.driver.getVehicle().getId(), state.tailLink));
-		}
-
-		state.routeIdx = i + 1;
-
-		// Head is now at the previous tail position
-		state.headLink = tailReverse.getLinkId();
-		// TODO: This logic is currently broken and requires a fix:
-		//  - The head position on the opposite link should be flipped (state.headPosition = tailReverse.length - state.tailPosition).
-		//  - Applying the coordinate flip currently causes the train to reverse one link earlier in the route for each circulation cycle
-		//    (see shuttleMicro test). This suggests routeIdx is being incremented twice (once in enterLink and once in the reverse logic),
-		//    causing the train to skip the actual turnaround link in the next cycle.
-		state.headPosition = state.tailPosition;
-
-		state.tailLink = headReverse.getLinkId();
-		state.tailPosition = 0;
 
 		assert RailsimCalc.checkTrainLength(state);
 	}
