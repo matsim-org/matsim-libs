@@ -122,13 +122,17 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 //					// (e.g. activity type, or mode defined in config which is not in default)
 //					comparisonPSet = comparisonSets.iterator().next() ;   // just an arbitrary one
 //				}
-				if ( verbosity== Verbosity.minimal && comparisonPSet==null ) {
+				boolean writeModule = true;
+				if ( ( verbosity==Verbosity.minimal || verbosity==Verbosity.minimalAndWOActivities ) && comparisonPSet==null ) {
 					if ( pSet instanceof ScoringParameterSet) {
 						comparisonPSet = ((ScoringConfigGroup) comparisonModule).getOrCreateScoringParameters(((ScoringParameterSet) pSet).getSubpopulation());
 					} else if ( pSet instanceof ModeParams ) {
 						comparisonPSet = ((ScoringParameterSet) comparisonModule).getOrCreateModeParams(((ModeParams) pSet).getMode());
 					} else if ( pSet instanceof ActivityParams ) {
 						comparisonPSet = ((ScoringParameterSet) comparisonModule).getOrCreateActivityParams(((ActivityParams) pSet).getActivityType());
+						if ( verbosity==Verbosity.minimalAndWOActivities ){
+							writeModule = false;
+						}
 					} else if ( pSet instanceof RoutingConfigGroup.TeleportedModeParams ) {
 						comparisonPSet = ((RoutingConfigGroup) comparisonModule).getOrCreateModeRoutingParams( ((RoutingConfigGroup.TeleportedModeParams) pSet).getMode(), verbosity ) ;
 					} else {
@@ -149,7 +153,9 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 					headerHasBeenWritten = true ;
 					writeHeader(writer, indent, moduleTag, moduleNameAtt, moduleName, newline);
 				}
-				writeModule(writer, indent+"\t", PARAMETER_SET, TYPE, entry.getKey(), pSet, comparisonPSet );
+				if ( writeModule ){
+					writeModule( writer, indent + "\t", PARAMETER_SET, TYPE, entry.getKey(), pSet, comparisonPSet );
+				}
 			}
 		}
 		return headerHasBeenWritten;
@@ -162,7 +168,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		for (Entry<String, String> entry : params.entrySet()) {
 
 			final String actual = entry.getValue();
-			if ( verbosity== Verbosity.minimal ) {
+			if ( verbosity==Verbosity.minimal || verbosity==Verbosity.minimalAndWOActivities ) {
 				if ( comparisonModule!=null ) {
 					String defaultValue = comparisonModule.getParams().get( entry.getKey() ) ;
 					// exclude some cases manually for the time being (setting the default value to null means that
@@ -283,9 +289,14 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 			final ConfigGroup module,
 			final BufferedWriter out) {
 			ConfigGroup comparisonConfig = null ;
-			if ( verbosity==Verbosity.minimal) {
-				comparisonConfig = ConfigUtils.createConfig().getModules().get(module.getName());
-				// preference to generate this here multiple times to avoid having it as a field. kai, may'18
+			switch( verbosity ) {
+				case all -> {
+				}
+				case minimal, minimalAndWOActivities -> {
+					comparisonConfig = ConfigUtils.createConfig().getModules().get(module.getName());
+					// preference to generate this here multiple times to avoid having it as a field. kai, may'18
+				}
+				default -> throw new IllegalStateException("Unexpected value: " + verbosity);
 			}
 
 			writeModule(

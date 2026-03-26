@@ -114,5 +114,9 @@ public final class MapPlot extends VizMap<MapPlot> {
 			colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps);
 			return this;
 		}
+		public DisplaySettings setColorRamp(int steps, String breakpoints) {
+			colorRamp = Map.of("steps", steps, "breakpoints", breakpoints);
+			return this;
+		}
 	}
 }

@@ -135,13 +135,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	}
 
 	@Override
-	public void onPrepareSim() {
-		//nothing to do here
-	}
-
-
-	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
 		for (Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
@@ -151,6 +145,8 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 				this.qSim.getAgentCounter().incLost();
 			}
 		}
+		// clear all data. This way, we make sure that only one stuck event per person is generated.
+		this.agentTracker.getAgentsAtStop().clear();
 	}
 
 	private void createVehiclesAndDriversWithUmlaeufe(NetworkPartition partition, InsertableMobsim mobsim) {

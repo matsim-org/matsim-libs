@@ -23,7 +23,7 @@ public class DSimComponentsModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 
-		bind(SimStepMessaging.class).in(Singleton.class);
+		bind(PartitionTransfer.class).in(Singleton.class);
 		bind(AgentSourcesContainer.class).in(Singleton.class);
 
 		bind(TeleportationEngine.class).to(DistributedTeleportationEngine.class).in(Singleton.class);

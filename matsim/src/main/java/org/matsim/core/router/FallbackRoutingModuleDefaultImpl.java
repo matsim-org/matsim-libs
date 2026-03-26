@@ -44,8 +44,20 @@ class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 		 * would be better if we would try the walkRouter first and fall back to "UltimateFallbackRoutingModule" or a
 		 * handwritten teleported walk like below only if the walkRouter returns null. - gl/kn-dec'19
 		 */
-		NetworkRoutingInclAccessEgressModule.routeBushwhackingLeg( person, leg, fromCoord, toCoord, departureTime, dpLinkId, arLinkId, population.getFactory(),
-				pcrCfg.getModeRoutingParams().get(TransportMode.walk) ) ;
+		/*
+		 * For now, only use TransportMode.walk if it is configured as a teleported mode, otherwise use TransportMode.non_network_walk.
+		 */
+		String fallbackMode;
+		if (pcrCfg.getTeleportedModeSpeeds().containsKey(TransportMode.walk)) {
+			fallbackMode = TransportMode.walk;
+		} else if (pcrCfg.getTeleportedModeSpeeds().containsKey(TransportMode.non_network_walk)) {
+			fallbackMode = TransportMode.non_network_walk;
+		} else {
+			throw new IllegalStateException(String.format("Neither %s nor %s is configured as a teleported mode, cannot perform fallback routing.",
+					TransportMode.walk, TransportMode.non_network_walk));
+		}
+		NetworkRoutingInclAccessEgressModule.routeBushwhackingLeg(person, leg, fromCoord, toCoord, departureTime, dpLinkId, arLinkId,
+				population.getFactory(), pcrCfg.getTeleportedModeParams().get(fallbackMode));
 		return Collections.singletonList( leg ) ;
 	}
 }

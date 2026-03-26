@@ -38,6 +38,9 @@ public class RunEvExampleTest {
 			new RunEvExample().run(args, config -> {
 				EvConfigGroup.get(config).setWriteVehicleTrajectoriesInterval(1);
 				EvConfigGroup.get(config).setWriteZonalEnergyDemandInterval(1);
+				EvConfigGroup.get(config).setWriteVehicleSocInterval(1);
+				EvConfigGroup.get(config).setWriteChargingActivitiesInterval(1);
+				EvConfigGroup.get(config).setWriteChargersInterval(1);
 				config.global().setCoordinateSystem("EPSG:2154");
 
 				SquareGridZoneSystemParams params = new SquareGridZoneSystemParams();
@@ -64,11 +67,20 @@ public class RunEvExampleTest {
 			{
 				assertTrue(new File(utils.getOutputDirectory() + "/ev_analysis_zones.shp").exists());
 				
-				assertTrue(new File(utils.getOutputDirectory() + "/ITERS/it.0/0.ev_trajectories.csv.gz").exists());
-				assertTrue(new File(utils.getOutputDirectory() + "/ev_trajectories.csv.gz").exists());
+				assertTrue(new File(utils.getOutputDirectory() + "/ITERS/it.0/0.ev_vehicle_trajectories.csv.gz").exists());
+				assertTrue(new File(utils.getOutputDirectory() + "/ev_vehicle_trajectories.csv.gz").exists());
 
 				assertTrue(new File(utils.getOutputDirectory() + "/ITERS/it.0/0.ev_zonal_energy_demand.csv.gz").exists());
 				assertTrue(new File(utils.getOutputDirectory() + "/ev_zonal_energy_demand.csv.gz").exists());
+			
+				assertTrue(new File(utils.getOutputDirectory() + "/ITERS/it.0/0.ev_socs.csv.gz").exists());
+				assertTrue(new File(utils.getOutputDirectory() + "/ev_socs.csv.gz").exists());
+
+				assertTrue(new File(utils.getOutputDirectory() + "/ITERS/it.0/0.ev_charging_activities.csv.gz").exists());
+				assertTrue(new File(utils.getOutputDirectory() + "/ev_charging_activities.csv.gz").exists());
+				
+				assertTrue(new File(utils.getOutputDirectory() + "/ITERS/it.0/0.chargers.xml.gz").exists());
+				assertTrue(new File(utils.getOutputDirectory() + "/chargers.xml.gz").exists());
 			}
 
 		} catch (Exception ee) {
