@@ -1381,15 +1381,6 @@
 
 # ==== 4-bar Plot with relevant computationMethods ====
 {
-  # petrol
-  r <- read_matsim(glue("{diff2_path}/WLTP/diff_WLTP_petrol_output_useFirstDuplicate_InterpolationFraction_fromLinkAttributes_0.csv"), "IntFr")
-  MATSim.IntFr <- r[[1]]
-
-  plot_main(MATSim.IntFr, matsim_data=glue("{diff2_path}/WLTP/diff_WLTP_petrol_output_useFirstDuplicate_StopAndGoFraction_fromLinkAttributes_0.csv"), plot="bar", fuel="petrol")
-
-  # diesel
-  r <- read_matsim(glue("{diff2_path}/WLTP/diff_WLTP_diesel_output_useFirstDuplicate_InterpolationFraction_fromLinkAttributes_0.csv"), "IntFr")
-  MATSim.IntFr <- r[[1]]
-
-  plot_main(MATSim.IntFr, matsim_data=glue("{diff2_path}/WLTP/diff_WLTP_diesel_output_useFirstDuplicate_StopAndGoFraction_fromLinkAttributes_0.csv"), plot="bar", fuel="diesel")
+  plot_main2()
+  plot_main2(fuel="diesel")
 }

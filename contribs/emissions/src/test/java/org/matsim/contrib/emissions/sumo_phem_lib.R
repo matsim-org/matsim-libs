@@ -126,6 +126,76 @@ plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLengt
               subtitle=glue("{segment_method} {extra_notes}")) +
       theme_minimal()
   }
+}
+
+
+# Creates the default plot with all components and all computation methods
+# Additional datasets, can be attached (however, the function assumes, that it is formatted correctly)
+# Example: plot_main(extra_notes = "Test", data.TEST)
+plot_main2 <- function(..., fuel = "petrol", segment_method = "fromLinkAttributes_0", extra_notes = "", plot = "bar",
+                      title = glue("Comparison across WLTP-cycle for {fuel}"),
+                      matsim_data_avgsp = glue("{diff2_path}/WLTP/diff_WLTP_{fuel}_output_useFirstDuplicate_AverageSpeed_{segment_method}.csv"),
+                      matsim_data_sg = glue("{diff2_path}/WLTP/diff_WLTP_{fuel}_output_useFirstDuplicate_StopAndGoFraction_{segment_method}.csv"),
+                      matsim_data_intfr = glue("{diff2_path}/WLTP/diff_WLTP_{fuel}_output_useFirstDuplicate_InterpolationFraction_{segment_method}.csv"),
+                      pl5_data = glue("{sumo_path}/sumo_{fuel}_output_pl5.csv")){
+  # Load data from MATSim
+  # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
+  r <- read_matsim(matsim_data_avgsp, "AverageSpeed")
+  data.MATSIM.avgsp <- r[[1]]
+  intervals <- r[[2]]
+
+  r <- read_matsim(matsim_data_sg, "StopAndGoFraction")
+  data.MATSIM.sg <- r[[1]]
+
+  r <- read_matsim(matsim_data_intfr, "InterpolationFraction")
+  data.MATSIM.intfr <- r[[1]]
+
+  # Load data from SUMO with PHEMLight5 and summarize for each interval
+  data.SUMO_PHEMLight5 <- read_sumo(pl5_data, intervals, "PHEMLight5")
+
+  # Append all datasets together
+  data_list <- list(data.MATSIM.avgsp, data.MATSIM.sg, data.MATSIM.intfr, data.SUMO_PHEMLight5, ...)
+
+  # recalc: gram -> gram per kilometer
+  data <- do.call(rbind, data_list) %>%
+    merge(intervals, by="segment") %>%
+    mutate(gPkm = value/lengths)
+
+  # Generate colors (first 3 always the same)
+  colors <- c("#f5a200", "#d21717", "#00a4f5", "#17d2a4")
+  extra <- max(0, length(data_list)-3)
+  all_colors <- c(colors, hcl.colors(extra, palette = "viridis"))
+  names(all_colors) <- c("MATSIM_AverageSpeed", "MATSIM_StopAndGoFraction", "MATSIM_InterpolationFraction", "SUMO_PHEMLight5", unlist(lapply(list(...), function(df) unique(df$model))))
+
+  if (plot == "bar"){
+    # Bar-Plot
+    ggplot(data) +
+      geom_bar(aes(x=segment, y=gPkm, fill=model), stat="identity", position="dodge") +
+      scale_fill_manual(values=all_colors) +
+      facet_wrap(~component, scales="free") +
+      ylab("emissions in g/km") +
+      theme(text = element_text(size=18)) +
+      #geom_rect(data=min_max_vals_used, aes(xmin=0, xmax=3, ymin=min, ymax=max, fill=table), alpha=0.2) +
+      ggtitle(title) +
+      theme_minimal()
+  } else if (plot == "line"){
+    # Line-Plot (for scenarios with more links)
+    ggplot(data) +
+      geom_line(aes(x=startTime, y=gPkm, color=model), size=12/nrow(intervals)) +
+      geom_point(aes(x=startTime, y=gPkm, color=model), size=6/nrow(intervals)) +
+      scale_color_manual(values=all_colors) +
+      facet_wrap(~component, scales="free") +
+      ylab("emissions in g/km") +
+      theme(text = element_text(size=18)) +
+      ggtitle(title,
+              subtitle=glue("{segment_method} {extra_notes}")) +
+      theme_minimal()
+  }
+
+  ggsave(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/PL_Comparison_{fuel}.png"),
+         width = 16,
+         height = 9,
+         dpi = 300)
 
 }
 
