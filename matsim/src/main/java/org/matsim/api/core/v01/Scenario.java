@@ -127,6 +127,7 @@ public interface Scenario {
 
 	void removeScenarioConsistencyChecker(Class<? extends ScenarioConsistencyChecker> clazz);
 
-	void checkConsistency();
+	void checkConsistencyBeforeRun();
 
+	void checkConsistencyAfterRun();
 }

@@ -23,5 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 
 public interface ScenarioConsistencyChecker {
 
-	void checkConsistency(Scenario scenario);
+	void checkConsistencyBeforeRun(Scenario scenario);
+
+	void checkConsistencyAfterRun(Scenario scenario);
 }

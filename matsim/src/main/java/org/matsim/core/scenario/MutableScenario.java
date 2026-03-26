@@ -179,29 +179,36 @@ public final class MutableScenario implements Scenario, Lockable {
 	@Override
 	public void addScenarioConsistencyChecker(ScenarioConsistencyChecker checker) {
 		boolean alreadyExists = false;
-		for ( ScenarioConsistencyChecker consistencyChecker : consistencyCheckers ) {
+		for (ScenarioConsistencyChecker consistencyChecker : consistencyCheckers) {
 			if (consistencyChecker.getClass().equals(checker.getClass())) {
 				alreadyExists = true;
 				break;
 			}
 		}
-		if ( !alreadyExists ) {
-			this.consistencyCheckers.add( checker );
+		if (!alreadyExists) {
+			this.consistencyCheckers.add(checker);
 		} else {
-			log.info( "ScenarioConsistencyChecker with runtime type={} was already added; not adding it a second time",
-				checker.getClass() );
+			log.info("ScenarioConsistencyChecker with runtime type={} was already added; not adding it a second time",
+				checker.getClass());
 		}
 	}
 
 	@Override
 	public void removeScenarioConsistencyChecker(Class<? extends ScenarioConsistencyChecker> clazz) {
-		consistencyCheckers.removeIf( checker -> checker.getClass().equals( clazz ) );
+		consistencyCheckers.removeIf(checker -> checker.getClass().equals(clazz));
 	}
 
 	@Override
-	public void checkConsistency() {
-		for ( ScenarioConsistencyChecker checker : consistencyCheckers ) {
-			checker.checkConsistency( this );
+	public void checkConsistencyBeforeRun() {
+		for (ScenarioConsistencyChecker checker : consistencyCheckers) {
+			checker.checkConsistencyBeforeRun(this);
+		}
+	}
+
+	@Override
+	public void checkConsistencyAfterRun() {
+		for (ScenarioConsistencyChecker checker : consistencyCheckers) {
+			checker.checkConsistencyAfterRun(this);
 		}
 	}
 

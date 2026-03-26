@@ -16,32 +16,32 @@ class ScenarioConsistencyTest {
 	void startsWithoutScenarioConsistencyCheckerByDefault() {
 		MutableScenario scenario = createScenario();
 
-		Assertions.assertTrue( scenario.getScenarioConsistencyCheckers().isEmpty() );
+		Assertions.assertTrue(scenario.getScenarioConsistencyCheckers().isEmpty());
 	}
 
 	@Test
 	void doesNotAddDuplicateCheckerTypesViaScenario() {
 		MutableScenario scenario = createScenario();
 
-		scenario.addScenarioConsistencyChecker( new ActivityCheckerSubclass() );
-		scenario.addScenarioConsistencyChecker( new ActivityCheckerSubclass() );
+		scenario.addScenarioConsistencyChecker(new ActivityCheckerSubclass());
+		scenario.addScenarioConsistencyChecker(new ActivityCheckerSubclass());
 
 		long checkerCount = scenario.getScenarioConsistencyCheckers().stream()
-			.filter( checker -> checker.getClass().equals( ActivityCheckerSubclass.class ) )
+			.filter(checker -> checker.getClass().equals(ActivityCheckerSubclass.class))
 			.count();
 
-		Assertions.assertEquals( 1, checkerCount );
+		Assertions.assertEquals(1, checkerCount);
 	}
 
 	@Test
 	void removesScenarioCheckersByTypeViaScenario() {
 		MutableScenario scenario = createScenario();
-		scenario.addScenarioConsistencyChecker( new VspScenarioConsistencyCheckerImpl() );
+		scenario.addScenarioConsistencyChecker(new VspScenarioConsistencyCheckerImpl());
 
-		scenario.removeScenarioConsistencyChecker( VspScenarioConsistencyCheckerImpl.class );
+		scenario.removeScenarioConsistencyChecker(VspScenarioConsistencyCheckerImpl.class);
 
-		Assertions.assertTrue( scenario.getScenarioConsistencyCheckers().stream()
-			.noneMatch( checker -> checker.getClass().equals( VspScenarioConsistencyCheckerImpl.class ) ) );
+		Assertions.assertTrue(scenario.getScenarioConsistencyCheckers().stream()
+			.noneMatch(checker -> checker.getClass().equals(VspScenarioConsistencyCheckerImpl.class)));
 	}
 
 	@Test
@@ -49,34 +49,51 @@ class ScenarioConsistencyTest {
 		MutableScenario scenario = createScenario();
 		List<String> executionOrder = new ArrayList<>();
 
-		scenario.addScenarioConsistencyChecker( checkedScenario -> executionOrder.add( "first" ) );
-		scenario.addScenarioConsistencyChecker( new SecondChecker( executionOrder ) );
+		scenario.addScenarioConsistencyChecker(new FirstChecker(executionOrder));
+		scenario.addScenarioConsistencyChecker(new SecondChecker(executionOrder));
 
-		scenario.checkConsistency();
+		scenario.checkConsistencyBeforeRun();
 
-		Assertions.assertEquals( List.of( "first", "second" ), executionOrder );
+		Assertions.assertEquals(List.of("first", "second"), executionOrder);
 	}
 
 	private static MutableScenario createScenario() {
-		return ScenarioUtils.createMutableScenario( ConfigUtils.createConfig() );
+		return ScenarioUtils.createMutableScenario(ConfigUtils.createConfig());
 	}
 
 	private static class ActivityCheckerSubclass implements ScenarioConsistencyChecker {
 		@Override
-		public void checkConsistency(Scenario scenario) {
-		}
-	}
-
-	private static class SecondChecker implements ScenarioConsistencyChecker {
-		private final List<String> executionOrder;
-
-		private SecondChecker(List<String> executionOrder) {
-			this.executionOrder = executionOrder;
+		public void checkConsistencyBeforeRun(Scenario scenario) {
 		}
 
 		@Override
-		public void checkConsistency(Scenario scenario) {
-			executionOrder.add( "second" );
+		public void checkConsistencyAfterRun(Scenario scenario) {
+
+		}
+	}
+
+	private record FirstChecker(List<String> executionOrder) implements ScenarioConsistencyChecker {
+		@Override
+		public void checkConsistencyBeforeRun(Scenario scenario) {
+			executionOrder.add("first");
+		}
+
+		@Override
+		public void checkConsistencyAfterRun(Scenario scenario) {
+
+		}
+	}
+
+	private record SecondChecker(List<String> executionOrder) implements ScenarioConsistencyChecker {
+
+		@Override
+		public void checkConsistencyBeforeRun(Scenario scenario) {
+			executionOrder.add("second");
+		}
+
+		@Override
+		public void checkConsistencyAfterRun(Scenario scenario) {
+
 		}
 	}
 }

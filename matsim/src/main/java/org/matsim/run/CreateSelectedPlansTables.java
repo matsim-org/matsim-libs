@@ -198,13 +198,13 @@ public class CreateSelectedPlansTables {
 				Activity firstActivity = PopulationUtils.getFirstActivity( selectedPlanImpl );
 				Coord c = null;
 				String link_id = "-";
-				
+
 				if (firstActivity.getType().substring(0,1).equals("h")) {
 					// no home activity in the plan -> no home activity in the knowledge
 					c = firstActivity.getCoord();
 					link_id = firstActivity.getLinkId().toString();
 				}
-				
+
 				if (c != null) {
 					out.write(c.getX()+"\t");
 					out.write(c.getY()+"\t");
@@ -407,8 +407,13 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public void checkConsistency() {
-			scenario.checkConsistency();
+		public void checkConsistencyBeforeRun() {
+			scenario.checkConsistencyBeforeRun();
+		}
+
+		@Override
+		public void checkConsistencyAfterRun() {
+			scenario.checkConsistencyAfterRun();
 		}
 
 		@Override

@@ -287,8 +287,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 		}
 
 		@Override
-		public void checkConsistency() {
-			this.delegate.checkConsistency();
+		public void checkConsistencyBeforeRun() {
+			this.delegate.checkConsistencyBeforeRun();
+		}
+
+		@Override
+		public void checkConsistencyAfterRun() {
+			this.delegate.checkConsistencyAfterRun();
 		}
 
 		@Override
