@@ -165,9 +165,11 @@ public final class ControllerListenerManagerImpl implements ControllerListenerMa
         log.info("all ControlerShutdownListeners called.");
 
 		// perhaps this is not a final place, but it should work from here
-		log.info("Start running scenario consistency checker ...");
-		controller.getScenario().checkConsistencyAfterRun();
-		log.info("All ScenarioConsistencyChecker called.");
+		if (controller != null) {
+			log.info("Start running scenario consistency checker ...");
+			controller.getScenario().checkConsistencyAfterRun();
+			log.info("All ScenarioConsistencyChecker called.");
+		}
 	}
 
 	@Deprecated(since="2025-07-19")
