@@ -705,13 +705,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			fractionInterpolation = 1.0;
 		} else {
 			fractionInterpolation = (highSpeedFromTable_kmh - averageSpeed_kmh) / (highSpeedFromTable_kmh - lowSpeedFromTable_kmh);
-
-			// Emission Development dependant non-linear factor
-			if(lowFactorFromTable_kmh > highFactorFromTable_kmh){
-				fractionInterpolation *= lowSpeedFromTable_kmh / averageSpeed_kmh;
-			} else {
-				fractionInterpolation *= averageSpeed_kmh / lowSpeedFromTable_kmh;
-			}
+			fractionInterpolation *= lowSpeedFromTable_kmh / averageSpeed_kmh;
 		}
 
 		return fractionInterpolation;
