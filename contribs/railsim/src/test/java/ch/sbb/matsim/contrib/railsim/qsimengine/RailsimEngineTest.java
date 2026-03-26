@@ -37,9 +37,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.mockito.Answers;
+import org.mockito.Mockito;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -100,6 +106,12 @@ public class RailsimEngineTest {
 		reverseTrain.invoke(engine, event.state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
 	}
 
+	private void invokeUpdateDeparture(RailsimEngine engine, double time, UpdateEvent event) throws ReflectiveOperationException {
+		Method updateDeparture = RailsimEngine.class.getDeclaredMethod("updateDeparture", double.class, UpdateEvent.class);
+		updateDeparture.setAccessible(true);
+		updateDeparture.invoke(engine, time, event);
+	}
+
 	@Test
 	void testSimple() {
 
@@ -151,6 +163,62 @@ public class RailsimEngineTest {
 		assertThat(state.tailPosition).isEqualTo(1000);
 		assertThat(state.routeIdx).isEqualTo(2);
 		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+	}
+
+	@Test
+	void testUpdateDepartureKeepsExistingGeometryAcrossCirculationBoundary() throws ReflectiveOperationException {
+		File integrationDir = new File(new File(utils.getPackageInputDirectory()).getParentFile(), "integration/shuttleMicro");
+		Network net = NetworkUtils.readNetwork(new File(integrationDir, "trainNetwork.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
+			createTrainTimeDistanceHandler());
+
+		RailLink aToStop1 = resources.getLink(Id.createLinkId("link_A_to_stop_1"));
+		RailLink aToStop2 = resources.getLink(Id.createLinkId("link_A_to_stop_2"));
+		RailLink aToStop3 = resources.getLink(Id.createLinkId("link_A_to_stop_3"));
+		RailLink am1 = resources.getLink(Id.createLinkId("link_AM_1"));
+		RailLink am2 = resources.getLink(Id.createLinkId("link_AM_2"));
+
+		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("train_type", VehicleType.class));
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId("train_1"), vehicleType);
+		MobsimVehicle mobsimVehicle = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
+		RailsimTransitDriverAgent driver = Mockito.mock(RailsimTransitDriverAgent.class, Answers.RETURNS_MOCKS);
+		TransitStopFacility stop = Mockito.mock(TransitStopFacility.class);
+
+		Mockito.when(mobsimVehicle.getVehicle()).thenReturn(vehicle);
+		Mockito.when(mobsimVehicle.getId()).thenReturn(vehicle.getId());
+		Mockito.when(driver.getVehicle()).thenReturn(mobsimVehicle);
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_train_1"));
+		Mockito.when(driver.getMode()).thenReturn("rail");
+		Mockito.when(driver.getNextTransitStop()).thenReturn(stop);
+		Mockito.when(stop.getLinkId()).thenReturn(aToStop3.getLinkId());
+		Mockito.when(driver.handleTransitStop(stop, 1335.0)).thenReturn(60.0);
+
+		TrainState state = new TrainState(driver, new TrainInfo(Id.create("train_type", VehicleType.class), 150, 20, 1, 1, 1, 60),
+			1335, aToStop3.getLinkId(), new ArrayList<>(List.of(aToStop3, am1, am2)));
+		state.headLink = aToStop3.getLinkId();
+		state.headPosition = aToStop3.length;
+		state.tailLink = aToStop1.getLinkId();
+		state.tailPosition = 0;
+		state.previousRoute.addAll(List.of(aToStop1, aToStop2, aToStop3));
+
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.DEPARTURE);
+		invokeUpdateDeparture(engine, 1335, event);
+
+		assertThat(state.headLink).isEqualTo(aToStop3.getLinkId());
+		assertThat(state.headPosition).isEqualTo(aToStop3.length);
+		assertThat(state.tailLink).isEqualTo(aToStop1.getLinkId());
+		assertThat(state.tailPosition).isZero();
+		assertThat(state.routeIdx).isEqualTo(1);
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+		assertThat(event.type).isEqualTo(UpdateEvent.Type.ENTER_LINK);
+		assertThat(event.plannedTime).isEqualTo(1395);
 	}
 
 	@Test

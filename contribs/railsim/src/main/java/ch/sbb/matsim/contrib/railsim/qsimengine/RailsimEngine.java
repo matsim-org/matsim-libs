@@ -19,18 +19,22 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import ch.sbb.matsim.contrib.railsim.RailsimUtils;
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
-import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.DispositionResponse;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import java.util.List;
+import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -43,11 +47,14 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.stream.Collectors;
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.DispositionResponse;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 
 /**
  * Engine to simulate train movement.
@@ -347,9 +354,15 @@ final class RailsimEngine implements Steppable {
 		state.allowedMaxSpeed = retrieveAllowedMaxSpeed(state);
 
 		RailLink firstLink = resources.getLink(state.headLink);
+		boolean preserveGeometry = shouldPreserveDepartureGeometry(state, firstLink);
 
-		state.headPosition = firstLink.length;
-		state.tailPosition = firstLink.length - state.train.length();
+		// When a train reverses, it is already correctly positioned even across multiple links
+		// Otherwise trains are placed initially on the first link
+		// Note that tail position can be negative here when the train is longer than the first link
+		if (!preserveGeometry) {
+			state.headPosition = firstLink.length;
+			state.tailPosition = firstLink.length - state.train.length();
+		}
 
 		// reserve links and start if first one is free
 		if (blockLinkTracks(time, state) || resources.isBlockedBy(firstLink, state)) {
@@ -382,6 +395,12 @@ final class RailsimEngine implements Steppable {
 			// vehicle will wait and call departure again
 			event.plannedTime += config.getPollInterval();
 		}
+	}
+
+	private boolean shouldPreserveDepartureGeometry(TrainState state, RailLink firstLink) {
+		return Objects.equals(state.headLink, firstLink.getLinkId())
+			&& FuzzyUtils.equals(state.headPosition, firstLink.length)
+			&& RailsimCalc.checkTrainLength(state);
 	}
 
 	/**
@@ -552,6 +571,8 @@ final class RailsimEngine implements Steppable {
 			state.routeIdx = nextRouteIdx;
 		}
 
+		assert RailsimCalc.checkTrainLength(state) : String.format("Train %s length incorrect at t=%.2f, link=%s", state.driver.getId(), time, state.headLink);
+
 		// Reset waiting flag
 		event.waitingForLink = false;
 		event.lastArrivalTime = -1;
@@ -634,8 +655,6 @@ final class RailsimEngine implements Steppable {
 				state.routeIdx = headIdx + 1;
 			}
 		}
-
-		assert RailsimCalc.checkTrainLength(state);
 	}
 
 	private void leaveLink(double time, UpdateEvent event) {

@@ -321,10 +321,7 @@ public final class RailsimCalc {
 	 * Calculates train length and compares against the train definition.
 	 */
 	static boolean checkTrainLength(TrainState state) {
-		if (state == null || state.headLink == null || state.tailLink == null)
-			return false;
-
-		if (state.train == null)
+		if (state == null || state.headLink == null || state.tailLink == null || state.train == null)
 			return false;
 
 		if (!Double.isFinite(state.headPosition) || !Double.isFinite(state.tailPosition))
