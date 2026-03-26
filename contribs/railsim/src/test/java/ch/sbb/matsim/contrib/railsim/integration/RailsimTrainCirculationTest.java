@@ -85,6 +85,20 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 	}
 
 	@Test
+	void microStationReversingTrackUnconstrained() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microStationReversingTrack"), scenario -> {
+			scenario.getNetwork().getLinks().values().forEach(l -> RailsimUtils.setTrainCapacity(l, 99999));
+		});
+
+		assertThat(result)
+			.allTrainsArrived()
+			.allTrainsHaveValidLengthAtDeparture()
+			.allTrainsHaveValidLengthAtArrival()
+			.allDelaysAtStopsSatisfy(d -> d <= 0);
+	}
+
+	@Test
 	void errorNonReachableStops() {
 
 		Consumer<Scenario> setup = scenario -> {

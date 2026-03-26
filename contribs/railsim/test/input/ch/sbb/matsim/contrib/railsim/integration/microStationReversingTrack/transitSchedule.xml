@@ -17,8 +17,8 @@
 			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="L_F" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="M_F" arrivalOffset="00:05:00" departureOffset="00:08:30" awaitDeparture="true" minimumStopDuration="00:03:30"/>
-				<stop refId="R_F" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="true"/>
+				<stop refId="M_F" arrivalOffset="00:05:30" departureOffset="00:09:00" awaitDeparture="true" minimumStopDuration="00:03:30"/>
+				<stop refId="R_F" arrivalOffset="00:14:30" departureOffset="00:14:30" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
 				<link refId="loop02"/>
@@ -44,8 +44,8 @@
 			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="L_F" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="M_REVERSING" arrivalOffset="00:05:00" departureOffset="00:17:00" awaitDeparture="true" minimumStopDuration="00:12:00"/>
-				<stop refId="L_R" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="true"/>
+				<stop refId="M_REVERSING" arrivalOffset="00:05:30" departureOffset="00:17:30" awaitDeparture="true" minimumStopDuration="00:12:00"/>
+				<stop refId="L_R" arrivalOffset="00:23:00" departureOffset="00:23:00" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
 				<link refId="loop02"/>
@@ -73,8 +73,8 @@
 			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="R_R" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="M_R" arrivalOffset="00:05:00" departureOffset="00:08:30" awaitDeparture="true" minimumStopDuration="00:03:30"/>
-				<stop refId="L_R" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="true"/>
+				<stop refId="M_R" arrivalOffset="00:05:30" departureOffset="00:09:00" awaitDeparture="true" minimumStopDuration="00:03:30"/>
+				<stop refId="L_R" arrivalOffset="00:14:30" departureOffset="00:14:30" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
 				<link refId="loop03"/>
@@ -102,7 +102,7 @@
 			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="L_F" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="R_F" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="true"/>
+				<stop refId="R_F" arrivalOffset="00:15:00" departureOffset="00:15:00" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
 				<link refId="loop02"/>
@@ -128,7 +128,7 @@
 			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="R_R" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="L_R" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="true"/>
+				<stop refId="L_R" arrivalOffset="00:15:00" departureOffset="00:15:00" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
 				<link refId="loop03"/>
@@ -156,8 +156,8 @@
 			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="L_F" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="M_F" arrivalOffset="00:05:00" departureOffset="00:06:42" awaitDeparture="true" minimumStopDuration="00:01:42"/>
-				<stop refId="R_F" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="true"/>
+				<stop refId="M_F" arrivalOffset="00:05:30" departureOffset="00:07:00" awaitDeparture="true" minimumStopDuration="00:01:42"/>
+				<stop refId="R_F" arrivalOffset="00:12:30" departureOffset="00:12:30" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
 				<link refId="loop02"/>
@@ -183,8 +183,8 @@
 			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="L_F" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="M_REVERSING" arrivalOffset="00:05:00" departureOffset="00:13:00" awaitDeparture="true" minimumStopDuration="00:08:00"/>
-				<stop refId="L_R" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="true"/>
+				<stop refId="M_REVERSING" arrivalOffset="00:05:30" departureOffset="00:13:30" awaitDeparture="true" minimumStopDuration="00:08:00"/>
+				<stop refId="L_R" arrivalOffset="00:19:00" departureOffset="00:19:00" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
 				<link refId="loop02"/>
@@ -212,8 +212,8 @@
 			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="R_R" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="M_R" arrivalOffset="00:05:00" departureOffset="00:06:42" awaitDeparture="true" minimumStopDuration="00:01:42"/>
-				<stop refId="L_R" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="true"/>
+				<stop refId="M_R" arrivalOffset="00:05:30" departureOffset="00:07:00" awaitDeparture="true" minimumStopDuration="00:01:42"/>
+				<stop refId="L_R" arrivalOffset="00:12:00" departureOffset="00:12:00" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
 				<link refId="loop03"/>

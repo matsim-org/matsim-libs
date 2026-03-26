@@ -551,6 +551,28 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 	}
 
 	/**
+	 * Asserts that all facility arrival delays satisfy the given predicate.
+	 */
+	public SimulationResultAssert allFacilityArrivalDelaysSatisfy(DoublePredicate predicate) {
+		isNotNull();
+
+		List<String> failingDelays = actual.stopTimes.entrySet().stream()
+			.flatMap(trainEntry -> trainEntry.getValue().values().stream()
+				.filter(stop -> !Double.isNaN(stop.arrivalDelay))
+				.filter(stop -> !predicate.test(stop.arrivalDelay))
+				.map(stop -> String.format("train %s at facility %s @ %s: %s",
+					trainEntry.getKey(), stop.getFacilityId(), Time.writeTime(stop.arrivalTime), stop.arrivalDelay)))
+			.toList();
+
+		if (!failingDelays.isEmpty()) {
+			failWithMessage("Expected all facility arrival delays to satisfy the predicate but the following failed:\n\t%s",
+				String.join("\n\t", failingDelays));
+		}
+
+		return this;
+	}
+
+	/**
 	 * Asserts that all trains arrive at the transit stops as scheduled by disposition.
 	 */
 	public SimulationResultAssert allStopDelaysAreZero() {

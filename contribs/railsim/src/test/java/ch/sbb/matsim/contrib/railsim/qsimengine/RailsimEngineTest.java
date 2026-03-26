@@ -112,6 +112,12 @@ public class RailsimEngineTest {
 		updateDeparture.invoke(engine, time, event);
 	}
 
+	private void invokeEnterLink(RailsimEngine engine, double time, UpdateEvent event) throws ReflectiveOperationException {
+		Method enterLink = RailsimEngine.class.getDeclaredMethod("enterLink", double.class, UpdateEvent.class);
+		enterLink.setAccessible(true);
+		enterLink.invoke(engine, time, event);
+	}
+
 	@Test
 	void testSimple() {
 
@@ -152,6 +158,7 @@ public class RailsimEngineTest {
 		state.headPosition = 1000;
 		state.tailLink = forward.getLinkId();
 		state.tailPosition = 800;
+		state.cumulativeDistance = 1234;
 		state.routeIdx = 1;
 
 		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.REVERSE_TRAIN);
@@ -161,6 +168,7 @@ public class RailsimEngineTest {
 		assertThat(state.headPosition).isEqualTo(200);
 		assertThat(state.tailLink).isEqualTo(forward.getLinkId());
 		assertThat(state.tailPosition).isEqualTo(1000);
+		assertThat(state.cumulativeDistance).isEqualTo(1434);
 		assertThat(state.routeIdx).isEqualTo(2);
 		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
 	}
@@ -188,6 +196,7 @@ public class RailsimEngineTest {
 		MobsimVehicle mobsimVehicle = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
 		RailsimTransitDriverAgent driver = Mockito.mock(RailsimTransitDriverAgent.class, Answers.RETURNS_MOCKS);
 		TransitStopFacility stop = Mockito.mock(TransitStopFacility.class);
+		TransitStopFacility nextStop = Mockito.mock(TransitStopFacility.class);
 
 		Mockito.when(mobsimVehicle.getVehicle()).thenReturn(vehicle);
 		Mockito.when(mobsimVehicle.getId()).thenReturn(vehicle.getId());
@@ -219,6 +228,76 @@ public class RailsimEngineTest {
 		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
 		assertThat(event.type).isEqualTo(UpdateEvent.Type.ENTER_LINK);
 		assertThat(event.plannedTime).isEqualTo(1395);
+	}
+
+	@Test
+	void testReverseStopUsesScheduledDwellOnlyOnce() throws ReflectiveOperationException {
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroBi.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
+			createTrainTimeDistanceHandler());
+
+		RailLink forward = resources.getLink(Id.createLinkId("l1-2"));
+		RailLink reverse = resources.getLink(Id.createLinkId("l2-1"));
+
+		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("reversible", VehicleType.class));
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId("train_reverse_stop"), vehicleType);
+		MobsimVehicle mobsimVehicle = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
+		RailsimTransitDriverAgent driver = Mockito.mock(RailsimTransitDriverAgent.class, Answers.RETURNS_MOCKS);
+		TransitStopFacility stop = Mockito.mock(TransitStopFacility.class);
+		TransitStopFacility nextStop = Mockito.mock(TransitStopFacility.class);
+
+		Mockito.when(mobsimVehicle.getVehicle()).thenReturn(vehicle);
+		Mockito.when(mobsimVehicle.getId()).thenReturn(vehicle.getId());
+		Mockito.when(driver.getVehicle()).thenReturn(mobsimVehicle);
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_train_reverse_stop"));
+		Mockito.when(driver.getMode()).thenReturn("rail");
+		Mockito.when(driver.getNextTransitStop()).thenReturn(stop, nextStop);
+		Mockito.when(stop.getLinkId()).thenReturn(forward.getLinkId());
+		Mockito.when(nextStop.getLinkId()).thenReturn(reverse.getLinkId());
+		Mockito.when(driver.handleTransitStop(stop, 300.0)).thenReturn(60.0);
+		Mockito.when(driver.handleTransitStop(stop, 360.0)).thenReturn(10.0);
+		Mockito.when(driver.handleTransitStop(stop, 370.0)).thenReturn(0.0);
+
+		TrainState state = new TrainState(driver, new TrainInfo(vehicleType.getId(), 200, 20, 1, 1, 1, 60),
+			300, forward.getLinkId(), new ArrayList<>(List.of(forward, reverse)));
+		state.headLink = forward.getLinkId();
+		state.headPosition = forward.length;
+		state.tailLink = forward.getLinkId();
+		state.tailPosition = forward.length - state.train.length();
+		state.routeIdx = 1;
+		state.speed = 0;
+		state.acceleration = 0;
+
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.ENTER_LINK);
+
+		invokeEnterLink(engine, 300, event);
+
+		assertThat(event.plannedTime).isEqualTo(360);
+		assertThat(event.lastArrivalTime).isEqualTo(300);
+		assertThat(event.type).isEqualTo(UpdateEvent.Type.ENTER_LINK);
+
+		invokeEnterLink(engine, 360, event);
+
+		assertThat(event.plannedTime).isEqualTo(370);
+		assertThat(event.lastArrivalTime).isEqualTo(300);
+		assertThat(event.type).isEqualTo(UpdateEvent.Type.ENTER_LINK);
+
+		invokeEnterLink(engine, 370, event);
+
+		assertThat(event.plannedTime).isEqualTo(370);
+		assertThat(event.lastArrivalTime).isEqualTo(300);
+		assertThat(event.type).isEqualTo(UpdateEvent.Type.ENTER_LINK);
+
+		invokeEnterLink(engine, 370, event);
+
+		assertThat(event.type).isEqualTo(UpdateEvent.Type.REVERSE_TRAIN);
+		assertThat(event.plannedTime).isEqualTo(370);
+		assertThat(event.lastArrivalTime).isEqualTo(300);
 	}
 
 	@Test

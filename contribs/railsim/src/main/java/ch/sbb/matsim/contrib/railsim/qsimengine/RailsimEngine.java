@@ -465,9 +465,11 @@ final class RailsimEngine implements Steppable {
 			assert stopTime >= 0 : "Stop time must be positive";
 //			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at pt stop, but was " + state.speed;
 
-			// Same event is re-scheduled after stopping,
+			// Keep the original arrival time so repeated dwell checks do not restart the reverse timer.
 			event.plannedTime = time + stopTime;
-			event.lastArrivalTime = time;
+			if (event.lastArrivalTime < 0) {
+				event.lastArrivalTime = time;
+			}
 			state.speed = 0;
 
 			return;
@@ -655,6 +657,9 @@ final class RailsimEngine implements Steppable {
 				state.routeIdx = headIdx + 1;
 			}
 		}
+
+		// Keep the time-distance head reference aligned when the train flips direction.
+		state.cumulativeDistance += state.train.length();
 	}
 
 	private void leaveLink(double time, UpdateEvent event) {
