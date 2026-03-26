@@ -364,11 +364,11 @@ public class PHEMTest {
 	}
 
 	/// Sets up the {@link EmissionsConfigGroup}
-	private static Config configureTest(EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments){
+	private static Config configureTest(EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments, EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod){
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		// #090226: ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed );
-		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
+		ecg.setEmissionsComputationMethod( emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		// #090226: ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.overwriteOldDuplicates );
 		ecg.setDuplicateSubsegments( duplicateSubsegments );
@@ -681,12 +681,13 @@ public class PHEMTest {
 						  Fuel fuel,
 						  LinkCutSetting cutSetting,
 						  EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments,
+						  EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod,
 						  boolean ignoreSumo,
 						  boolean ignoreSubTests) throws IOException {
 		System.out.println(fuel.toString() + cutSetting + cutSetting.getAttr());
 
 		// Create config
-		Config config = configureTest(duplicateSubsegments);
+		Config config = configureTest(duplicateSubsegments, emissionsComputationMethod);
 
 		// Define the cycleLinkAttributes
 		Path cyclePath = Paths.get(utils.getClassInputDirectory()).resolve(cycle + ".csv");
@@ -711,8 +712,8 @@ public class PHEMTest {
 
 		// Print out the results as csv TODO Change path back to test-output folder
 		// #090226: String path = "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/ExplorativeAnalysis/OldModelAVGResults/";
-		String path = "/Users/aleksander/Documents/VSP/PHEMTest/diff/" + cycle + "/";
-		String diff_name = "diff_" + cycle + "_" + fuel + "_output_" + duplicateSubsegments + "_" + cutSetting + "_" + cutSetting.getAttr() + ".csv";
+		String path = "/Users/aleksander/Documents/VSP/PHEMTest/diff2/" + cycle + "/";
+		String diff_name = "diff_" + cycle + "_" + fuel + "_output_" + duplicateSubsegments + "_" + emissionsComputationMethod + "_" + cutSetting + "_" + cutSetting.getAttr() + ".csv";
 		writeDiffFile(path + diff_name, comparison);
 
 		// Start the tests
@@ -740,17 +741,20 @@ public class PHEMTest {
 
 		return Arrays.stream(Fuel.values())
 			.flatMap(fuel -> Arrays.stream(cutSettings)
-				.map(cutSetting -> DynamicTest.dynamicTest(
-					"Inv.-WLTP-Test: Fuel=" + fuel + "; CutSetting=" + cutSetting,
-					() -> startTest(
-						Cycle.WLTP,
-						fuel,
-						cutSetting,
-						EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate,
-						false,
-						false
-					)
-				))
+				.flatMap(cutSetting -> Arrays.stream(EmissionsConfigGroup.EmissionsComputationMethod.values())
+					.map(computationMethod -> DynamicTest.dynamicTest(
+						"Inv.-WLTP-Test: Fuel=" + fuel + "; CutSetting=" + cutSetting + "; ComputationMethod=" + computationMethod,
+						() -> startTest(
+							Cycle.WLTP,
+							fuel,
+							cutSetting,
+							EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate,
+							computationMethod,
+							false,
+							false
+						)
+					))
+				)
 			)
 			.toList();
 	}
@@ -772,6 +776,7 @@ public class PHEMTest {
 						fuel,
 						LinkCutSetting.fixedIntervalLength.setAttr(60),
 						EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate,
+						EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction,
 						true,
 						true
 					)
@@ -792,6 +797,7 @@ public class PHEMTest {
 					fuel,
 					LinkCutSetting.fixedIntervalLength.setAttr(60),
 					EmissionsConfigGroup.DuplicateSubsegments.aggregateByFleetComposition,
+					EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction,
 					true,
 					true
 				)
@@ -813,7 +819,7 @@ public class PHEMTest {
 	sinusCyclesExpTest(Fuel fuel) throws IOException {
 
 		// Create config
-		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate);
+		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate, EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction);
 
 		Path cyclePath = Paths.get("/Users/aleksander/Documents/VSP/PHEMTest/style/combined_cycle.csv");
 
@@ -844,7 +850,7 @@ public class PHEMTest {
 	void scaledWLTPExpTest(double scale, Fuel fuel) throws IOException {
 
 		// Create config
-		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate);
+		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate, EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction);
 
 		// Define the cycleLinkAttributes
 		Path cyclePath;
@@ -879,7 +885,7 @@ public class PHEMTest {
 	@EnumSource(Fuel.class)
 	void highwayOverestimationExpTest(Fuel fuel) throws IOException {
 		// Create config
-		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate);
+		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate, EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction);
 
 		// Define the cycleLinkAttributes
 		Path cyclePath = Paths.get(utils.getClassInputDirectory()).resolve( "WLTP.csv");

@@ -5,6 +5,7 @@
   # ==== Paths to ressources ====
   sumo_path <- "/Users/aleksander/Documents/VSP/PHEMTest/sumo"
   diff_path <- "/Users/aleksander/Documents/VSP/PHEMTest/diff"
+  diff2_path <- "/Users/aleksander/Documents/VSP/PHEMTest/diff2"
   hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
 }
 
@@ -1376,4 +1377,19 @@
            HC.percent,
            NOx.percent,
            PMx.percent)
+}
+
+# ==== 4-bar Plot with relevant computationMethods ====
+{
+  # petrol
+  r <- read_matsim(glue("{diff2_path}/WLTP/diff_WLTP_petrol_output_useFirstDuplicate_InterpolationFraction_fromLinkAttributes_0.csv"), "IntFr")
+  MATSim.IntFr <- r[[1]]
+
+  plot_main(MATSim.IntFr, matsim_data=glue("{diff2_path}/WLTP/diff_WLTP_petrol_output_useFirstDuplicate_StopAndGoFraction_fromLinkAttributes_0.csv"), plot="bar", fuel="petrol")
+
+  # diesel
+  r <- read_matsim(glue("{diff2_path}/WLTP/diff_WLTP_diesel_output_useFirstDuplicate_InterpolationFraction_fromLinkAttributes_0.csv"), "IntFr")
+  MATSim.IntFr <- r[[1]]
+
+  plot_main(MATSim.IntFr, matsim_data=glue("{diff2_path}/WLTP/diff_WLTP_diesel_output_useFirstDuplicate_StopAndGoFraction_fromLinkAttributes_0.csv"), plot="bar", fuel="diesel")
 }
