@@ -504,6 +504,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		boolean splitCarrier = true;
 		boolean splitVRPs = false;
+
+		// comparison of results for hannover: increasing to maxServicesPerCarrier = 300 results in:
+		// computationTime *4; numberOfVehicles -2%; Jsprit score: -0,4%, drivenDistanc: -4,4%
+		// RE: result is to set this to maxServicesPerCarrier = 100;
 		int maxServicesPerCarrier = 100;
 		Map<Id<Carrier>, Carrier> allCarriers = new HashMap<>(
 			CarriersUtils.getCarriers(originalScenario).getCarriers());
