@@ -128,7 +128,11 @@ public class VehicleChargingHandler2 implements DistributedActivityEngine, Charg
 				// wants to pass the agent to arrangeNextAgentState immediately. Since we have setup
 				// everything before passing the agent to the delegateEngine, we can revert all the
 				// bookkeeping in handleActivityEnd, as if the agent would regularly wake up from its activity
-				return delegateEngine.handleActivity(ma);
+				var wasAccepted = delegateEngine.handleActivity(ma);
+				if (!wasAccepted) {
+					throw new RuntimeException("VehicleChargingHandler expects the default activity engine to accept agents. ");
+				}
+				return true;
 			}
 		}
 		return false;
@@ -136,14 +140,15 @@ public class VehicleChargingHandler2 implements DistributedActivityEngine, Charg
 
 
 	private void endChargingActivity(MobsimAgent agent) {
-		// clear internal bookkeeping
 		var chargingActivity = personsCharging.remove(agent.getId());
-		vehiclesAtCharger.remove(chargingActivity.vehicleId);
-
-		// clear charger
-		var charger = chargingInfrastructure.getChargers().get(chargingActivity.chargerId);
-		var now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
-		charger.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(chargingActivity.vehicleId), now);
+		// vehiclesAtCharger is removed in notifyChargingEnded when charging completes naturally,
+		// or here when the agent departs while charging is still in progress.
+		var wasStillCharging = vehiclesAtCharger.remove(chargingActivity.vehicleId) != null;
+		if (wasStillCharging) {
+			var charger = chargingInfrastructure.getChargers().get(chargingActivity.chargerId);
+			var now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+			charger.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(chargingActivity.vehicleId), now);
+		}
 	}
 
 	private Charger getSuitableCharger(Id<Link> linkId, ElectricVehicle ev) {
@@ -191,7 +196,9 @@ public class VehicleChargingHandler2 implements DistributedActivityEngine, Charg
 
 	@Override
 	public void notifyChargingEnded(ElectricVehicle ev, double now) {
-		// nothing to do here yet.
+		// Charging completed naturally (strategy satisfied). Remove vehicle from tracking so that
+		// endChargingActivity() does not attempt to call removeVehicle() on an already-finished vehicle.
+		vehiclesAtCharger.remove(ev.getId());
 	}
 
 
