@@ -180,7 +180,9 @@ public class VehicleChargingHandler2Test {
 
 		var delegateEngine = mockDelegateEngine();
 		var internalInterface = buildMockInternalInterface();
-		var vch2 = buildVch2(new EvConfigGroup(), internalInterface, delegateEngine);
+		var config = new EvConfigGroup();
+		config.setEnforceChargingInteractionDuration(true);
+		var vch2 = buildVch2(config, internalInterface, delegateEngine);
 		var capturedDelegate = captureDelegate(delegateEngine);
 
 		var agent = buildChargingAgent(Id.createPersonId("person"), ev.getId(), 200.0);
@@ -325,9 +327,9 @@ public class VehicleChargingHandler2Test {
 		chargeVehicles(1.0);                        // ev queued
 		assertEventFired(QueuedAtChargerEvent.class, 1);
 
-		// While in charger queue, activity is being extended.
+		// While in charger queue, activity is not being extended as we dont set enforceChargingInteractionDuration.
 		vch2.doSimStep(1.0);
-		verify(delegateEngine).rescheduleActivityEnd(agent);
+		verify(delegateEngine, never()).rescheduleActivityEnd(agent);
 
 		// Agent quits queue → QuitQueueAtChargerEvent
 		charger.getLogic().removeVehicle(ev, 2.0);
@@ -336,7 +338,7 @@ public class VehicleChargingHandler2Test {
 		// After quit, doSimStep must no longer extend the activity.
 		verify(internalInterface, never()).arrangeNextAgentState(agent);
 		vch2.doSimStep(2.0);
-		verify(delegateEngine, times(1)).rescheduleActivityEnd(agent); // no new calls
+		verify(delegateEngine, never()).rescheduleActivityEnd(agent); // no new calls
 		verify(internalInterface, never()).arrangeNextAgentState(agent);
 	}
 

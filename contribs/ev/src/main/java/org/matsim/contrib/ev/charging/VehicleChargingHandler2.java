@@ -72,16 +72,19 @@ public class VehicleChargingHandler2 implements DistributedActivityEngine, Charg
 		// activity. The original code would use WithinDayAgentUtils.rescheduleActivityEnd for this. However,
 		// we know that the agent should be in our engine. Therefore, we can directly reschedule the activity
 		// end
-		for (var agentId : agentsInChargerQueue) {
-			// SAFETY: We know that we have a plan agent because we test for it in handleActivity.
-			var agent = personsCharging.get(agentId).agent;
-			checkReplanningConditions(agent);
+		if (evCfg.isEnforceChargingInteractionDuration()) {
+			for (var agentId : agentsInChargerQueue) {
+				// SAFETY: We know that we have a plan agent because we test for it in handleActivity.
+				var agent = personsCharging.get(agentId).agent;
+				checkReplanningConditions(agent);
 
-			// this magically sets the activity end time to now + actDur. Apparently, agents have access to the
-			// sim timer internally...
-			WithinDayAgentUtils.resetCaches(agent);
-			rescheduleActivityEnd(agent);
+				// this magically sets the activity end time to now + actDur. Apparently, agents have access to the
+				// sim timer internally...
+				WithinDayAgentUtils.resetCaches(agent);
+				rescheduleActivityEnd(agent);
+			}
 		}
+		delegateEngine.doSimStep(time);
 	}
 
 	private static void checkReplanningConditions(MobsimAgent agent) {
