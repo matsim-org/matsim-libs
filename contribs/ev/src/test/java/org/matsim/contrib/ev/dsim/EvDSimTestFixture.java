@@ -49,7 +49,7 @@ public final class EvDSimTestFixture {
 	 * Vehicle range in metres with a 1 J/m drive consumption model.
 	 * Equals the energy capacity in Joules. Must exceed the total route length (1200 m).
 	 */
-	static final double RANGE_M = 10_000.0;
+	static final double BATTERY_CAPACITY = 10_000.0;
 
 	/** Simple energy model: consume 1 Joule per metre of link length. */
 	static final DriveEnergyConsumption.Factory DRIVE_CONSUMPTION =
@@ -57,6 +57,9 @@ public final class EvDSimTestFixture {
 
 	static final AuxEnergyConsumption.Factory AUX_CONSUMPTION =
 		vehicle -> (beginTime, duration, linkId) -> 0.0;
+
+	static final String PERSON_ID = "ev-test-person";
+	static final String EV_ID = PERSON_ID + "-ev";
 
 	private EvDSimTestFixture() {}
 
@@ -134,7 +137,7 @@ public final class EvDSimTestFixture {
 		VehicleType type = factory.createVehicleType(Id.create("electric", VehicleType.class));
 		type.setNetworkMode(TransportMode.car);
 		// Capacity in kWh = RANGE_M metres × 1 J/m converted to kWh
-		VehicleUtils.setEnergyCapacity(type.getEngineInformation(), EvUnits.J_to_kWh(RANGE_M));
+		VehicleUtils.setEnergyCapacity(type.getEngineInformation(), EvUnits.J_to_kWh(BATTERY_CAPACITY));
 		VehicleUtils.setHbefaTechnology(type.getEngineInformation(), ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY);
 		vehicles.addVehicleType(type);
 		return type;
@@ -151,7 +154,7 @@ public final class EvDSimTestFixture {
 	 */
 	public static Person createPerson(PopulationFactory factory, Vehicles vehicles, VehicleType evType) {
 		// Vehicle
-		Vehicle vehicle = vehicles.getFactory().createVehicle(Id.createVehicleId("ev-test-person"), evType);
+		Vehicle vehicle = vehicles.getFactory().createVehicle(Id.createVehicleId(EV_ID), evType);
 		vehicles.addVehicle(vehicle);
 		ElectricFleetUtils.setInitialSoc(vehicle, 1.0);  // start fully charged
 
@@ -173,7 +176,7 @@ public final class EvDSimTestFixture {
 		Activity work = factory.createActivityFromLinkId("work", Id.createLinkId("l3"));
 		plan.addActivity(work);
 
-		var person = factory.createPerson(Id.createPersonId("ev-test-person"));
+		var person = factory.createPerson(Id.createPersonId(PERSON_ID));
 		person.addPlan(plan);
 
 		VehicleUtils.insertVehicleIdsIntoPersonAttributes(person,
@@ -270,6 +273,7 @@ public final class EvDSimTestFixture {
 			public void install() {
 				bind(DriveEnergyConsumption.Factory.class).toInstance(DRIVE_CONSUMPTION);
 				bind(AuxEnergyConsumption.Factory.class).toInstance(AUX_CONSUMPTION);
+				// this is necessary to prevent the ev module from loading chargeres from an xml file, which we don't have
 				bind(ChargingInfrastructureSpecification.class)
 					.toInstance(new ChargingInfrastructureSpecificationDefaultImpl());
 			}
