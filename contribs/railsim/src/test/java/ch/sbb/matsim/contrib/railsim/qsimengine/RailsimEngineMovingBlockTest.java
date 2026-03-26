@@ -162,8 +162,8 @@ public class RailsimEngineMovingBlockTest {
 		test.doSimStepUntil(2_000);
 		test.debugFiles(collector, utils.getOutputDirectory() + "/mixed");
 
-		RailsimTestUtils.assertThat(collector).hasTrainState("regio", 1418, 1000, 0).hasTrainState("cargo", 1241, 1000, 0)
-			.hasTrainState("sprinter", 1324, 1000, 0);
+		RailsimTestUtils.assertThat(collector).hasTrainState("regio", 1438, 1000, 0).hasTrainState("cargo", 1241, 1000, 0)
+			.hasTrainState("sprinter", 1321, 1000, 0);
 
 		test = getTestEngine("networkMixedTypes.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "1-2", "20-21");
@@ -173,8 +173,8 @@ public class RailsimEngineMovingBlockTest {
 		test.doStateUpdatesUntil(2_000, 1);
 		test.debugFiles(collector, utils.getOutputDirectory() + "/mixed_detailed");
 
-		RailsimTestUtils.assertThat(collector).hasTrainState("regio", 1418, 1000, 0).hasTrainState("cargo", 1241, 1000, 0)
-			.hasTrainState("sprinter", 1324, 1000, 0);
+		RailsimTestUtils.assertThat(collector).hasTrainState("regio", 1438, 1000, 0).hasTrainState("cargo", 1241, 1000, 0)
+			.hasTrainState("sprinter", 1321, 1000, 0);
 
 	}
 

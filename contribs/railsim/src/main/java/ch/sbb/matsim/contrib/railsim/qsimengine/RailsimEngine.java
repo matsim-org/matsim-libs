@@ -687,12 +687,22 @@ final class RailsimEngine implements Steppable {
 
 		updatePosition(time, event);
 
-		createEvent(new RailsimTrainLeavesLinkEvent(time, state.driver.getVehicle().getId(), state.tailLink));
-
 		RailLink tailLink = resources.getLink(state.tailLink);
+
+		// Forced position updates can make a queued leave-link event stale before the tail reaches the boundary.
+		if (FuzzyUtils.lessThan(state.tailPosition, tailLink.length)) {
+			assert RailsimCalc.checkTrainLength(state) : String.format("Train %s length incorrect at t=%.2f, link=%s", state.driver.getId(), time, state.tailLink);
+			decideTargetSpeed(event, state);
+			decideNextUpdate(event);
+			return;
+		}
+
+		createEvent(new RailsimTrainLeavesLinkEvent(time, state.driver.getVehicle().getId(), state.tailLink));
 
 		state.tailLink = nextTailLink.getLinkId();
 		state.tailPosition = 0;
+
+		assert RailsimCalc.checkTrainLength(state) : String.format("Train %s length incorrect at t=%.2f, link=%s", state.driver.getId(), time, state.headLink);
 
 		decideTargetSpeed(event, state);
 

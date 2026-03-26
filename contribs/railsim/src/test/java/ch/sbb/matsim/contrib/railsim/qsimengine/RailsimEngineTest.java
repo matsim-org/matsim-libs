@@ -19,6 +19,7 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
@@ -116,6 +117,12 @@ public class RailsimEngineTest {
 		Method enterLink = RailsimEngine.class.getDeclaredMethod("enterLink", double.class, UpdateEvent.class);
 		enterLink.setAccessible(true);
 		enterLink.invoke(engine, time, event);
+	}
+
+	private void invokeLeaveLink(RailsimEngine engine, double time, UpdateEvent event) throws ReflectiveOperationException {
+		Method leaveLink = RailsimEngine.class.getDeclaredMethod("leaveLink", double.class, UpdateEvent.class);
+		leaveLink.setAccessible(true);
+		leaveLink.invoke(engine, time, event);
 	}
 
 	@Test
@@ -298,6 +305,59 @@ public class RailsimEngineTest {
 		assertThat(event.type).isEqualTo(UpdateEvent.Type.REVERSE_TRAIN);
 		assertThat(event.plannedTime).isEqualTo(370);
 		assertThat(event.lastArrivalTime).isEqualTo(300);
+	}
+
+	@Test
+	void testLeaveLinkDoesNotAdvanceTailBeforeBoundary() throws ReflectiveOperationException {
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMixedTypes.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
+			createTrainTimeDistanceHandler());
+
+		RailLink link12 = resources.getLink(Id.createLinkId("1-2"));
+		RailLink link23 = resources.getLink(Id.createLinkId("2-3"));
+		RailLink link34 = resources.getLink(Id.createLinkId("3-4"));
+
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId("sprinter"), RailsimTestUtils.vehicles.get(TestVehicle.Sprinter));
+		MobsimVehicle mobsimVehicle = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
+		RailsimTransitDriverAgent driver = Mockito.mock(RailsimTransitDriverAgent.class, Answers.RETURNS_MOCKS);
+
+		Mockito.when(mobsimVehicle.getVehicle()).thenReturn(vehicle);
+		Mockito.when(mobsimVehicle.getId()).thenReturn(vehicle.getId());
+		Mockito.when(driver.getVehicle()).thenReturn(mobsimVehicle);
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_sprinter"));
+		Mockito.when(driver.getMode()).thenReturn("rail");
+
+		TrainState state = new TrainState(driver,
+			new TrainInfo(vehicle.getType().getId(), vehicle.getType().getLength(), 90, 0.7, 0.7, 0.7, -1),
+			707.298, link23.getLinkId(), new ArrayList<>(List.of(link12, link23, link34)));
+		state.headLink = link23.getLinkId();
+		state.headPosition = 7.561;
+		state.tailLink = link12.getLinkId();
+		state.tailPosition = 807.561;
+		state.routeIdx = 2;
+		state.speed = 0;
+		state.targetSpeed = 0;
+		state.acceleration = 0;
+		state.approvedDist = 0;
+		state.approvedSpeed = 0;
+
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.LEAVE_LINK);
+		event.plannedTime = 708.0;
+
+		invokeLeaveLink(engine, 708.0, event);
+
+		assertThat(state.tailLink).isEqualTo(link12.getLinkId());
+		assertThat(state.tailPosition).isEqualTo(807.561);
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+		assertThat(event.type).isNotEqualTo(UpdateEvent.Type.LEAVE_LINK);
+		assertThat(collector.events).noneMatch(RailsimTrainLeavesLinkEvent.class::isInstance);
 	}
 
 	@Test
