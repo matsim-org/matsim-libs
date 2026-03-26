@@ -100,6 +100,8 @@ public class CommercialTrafficAnalysisEventHandler implements LinkLeaveEventHand
 		this.distancesPerTrip_perPerson_all_inInvestigationArea.clear();
 		this.currentTrips_Started_inInvestigationArea.clear();
 		this.currentTrips_Started_OutsideOrNoSelectedArea.clear();
+		this.tourEndPerPerson.clear();
+		this.tourStartPerPerson.clear();
 	}
 
 	@Override
