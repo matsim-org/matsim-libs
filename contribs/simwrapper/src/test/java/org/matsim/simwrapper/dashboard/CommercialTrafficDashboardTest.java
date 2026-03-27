@@ -1,6 +1,7 @@
 package org.matsim.simwrapper.dashboard;
 
 import com.google.common.collect.Sets;
+import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -24,15 +25,20 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.simwrapper.*;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 
 public class CommercialTrafficDashboardTest {
+
+	private static final String COMMERCIAL_GROUPS = "commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight";
+	private static final String PERSON_GROUPS = "personGroupOdd=person_odd;personGroupEven=person_even";
 
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
@@ -42,57 +48,112 @@ public class CommercialTrafficDashboardTest {
 		Scenario scenario = setUpScenario(utils);
 		final Controler controler = new Controler(scenario);
 
-		ShpOptions shpOptions = new ShpOptions(utils.getClassInputDirectory() + "shp/testRegions.shp", TransformationFactory.ATLANTIS, null);
-		Geometry geometry = shpOptions.getGeometry().getCentroid();
-		CoordinateTransformation ts = TransformationFactory.getCoordinateTransformation(TransformationFactory.ATLANTIS, TransformationFactory.WGS84);
-		Coord coord = ts.transform(MGC.coordinate2Coord(geometry.getCoordinate()));
-		String center = coord.getX() + "," + coord.getY();
 		SimWrapper sw = SimWrapper.create(scenario.getConfig());
-		sw.getConfigGroup().defaultParams().setShp("shp/testRegions.shp");
-		sw.getConfigGroup().setSampleSize(0.1);
-		sw.getConfigGroup().defaultParams().setMapCenter(center);
-		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
-		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
-		sw.addDashboard(
-			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroupOdd=person_odd;personGroupEven=person_even").setGroupsOfSubpopulationsForCommercialAnalysis(
-				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
+
 		sw.addDashboard(new CommercialTrafficDashboard(scenario.getConfig().global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
-			"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
+			COMMERCIAL_GROUPS));
 
 		controler.addOverridingModule(new SimWrapperModule(sw));
-
 		controler.run();
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis");
+		checkCommercialAnalysisSpecificFiles(out);
+
+		Assertions.assertThat(sw.getData().getArgs(TripAnalysis.class))
+			.containsExactly("--groups-of-subpopulations-commercialAnalysis", COMMERCIAL_GROUPS);
+	}
+
+	@Test
+	void testCommercialViewerWithTripsDashboardI() {
+		Scenario scenario = setUpScenario(utils);
+		final Controler controler = new Controler(scenario);
+
+		SimWrapper sw = SimWrapper.create(scenario.getConfig());
+
+		sw.addDashboard(
+			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis(PERSON_GROUPS).setGroupsOfSubpopulationsForCommercialAnalysis(
+				COMMERCIAL_GROUPS));
+		sw.addDashboard(new CommercialTrafficDashboard(scenario.getConfig().global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
+			COMMERCIAL_GROUPS));
+
+		controler.addOverridingModule(new SimWrapperModule(sw));
+		controler.run();
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis");
+		checkCommercialAnalysisSpecificFiles(out);
+		Assertions.assertThat(out)
+			// persons
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_personGroupEven.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_personGroupOdd.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_personTraffic.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_personTraffic.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_personGroupEven.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_personGroupOdd.csv");
+		Assertions.assertThat(sw.getData().getArgs(TripAnalysis.class))
+			.containsExactly(
+				"--groups-of-subpopulations-personAnalysis", PERSON_GROUPS,
+				"--groups-of-subpopulations-commercialAnalysis", COMMERCIAL_GROUPS
+			);
+	}
+
+	/**
+	 *  Has an opposite order of the dashboards to check if the dashboards are running if the TripAnalysis (called in both dashboards) works correctly.
+	 */
+	@Test
+	void testCommercialViewerWithTripsDashboardII() {
+		Scenario scenario = setUpScenario(utils);
+		final Controler controler = new Controler(scenario);
+
+		SimWrapper sw = SimWrapper.create(scenario.getConfig());
+
+		sw.addDashboard(new CommercialTrafficDashboard(scenario.getConfig().global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
+			COMMERCIAL_GROUPS));
+		sw.addDashboard(
+			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis(PERSON_GROUPS).setGroupsOfSubpopulationsForCommercialAnalysis(
+				COMMERCIAL_GROUPS));
+
+		controler.addOverridingModule(new SimWrapperModule(sw));
+		controler.run();
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis");
+		checkCommercialAnalysisSpecificFiles(out);
+		Assertions.assertThat(out)
+			// persons
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_personGroupEven.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_personGroupOdd.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_personTraffic.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_personTraffic.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_personGroupEven.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_personGroupOdd.csv");
+		Assertions.assertThat(sw.getData().getArgs(TripAnalysis.class))
+			.containsExactly(
+				"--groups-of-subpopulations-personAnalysis", PERSON_GROUPS,
+				"--groups-of-subpopulations-commercialAnalysis", COMMERCIAL_GROUPS
+			);
 	}
 
 	@Test
 	void testCommercialViewerWithRef() {
 
-
 		Scenario scenario = setUpScenario(utils);
 		final Controler controler = new Controler(scenario);
 
-		ShpOptions shpOptions = new ShpOptions(utils.getClassInputDirectory() + "shp/testRegions.shp", TransformationFactory.ATLANTIS, null);
-		Geometry geometry = shpOptions.getGeometry().getCentroid();
-		CoordinateTransformation ts = TransformationFactory.getCoordinateTransformation(TransformationFactory.ATLANTIS, TransformationFactory.WGS84);
-		Coord coord = ts.transform(MGC.coordinate2Coord(geometry.getCoordinate()));
-		String center = coord.getX() + "," + coord.getY();
 		SimWrapper sw = SimWrapper.create(scenario.getConfig());
-		sw.getConfigGroup().defaultParams().setShp("shp/testRegions.shp");
-		sw.getConfigGroup().setSampleSize(0.1);
-		sw.getConfigGroup().defaultParams().setMapCenter(center);
-		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
-		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
-		sw.addDashboard(
-			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroupOdd=person_odd;personGroupEven=person_even").setGroupsOfSubpopulationsForCommercialAnalysis(
-				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
+
 		sw.addDashboard(new CommercialTrafficDashboard(scenario.getConfig().global().getCoordinateSystem(), "commercialTourDurations_ref.csv", "commercialTourDistances_ref.csv", "commercialActivityDurations_ref.csv").setGroupsOfSubpopulationsForCommercialAnalysis(
-			"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
+			COMMERCIAL_GROUPS));
 
 		controler.addOverridingModule(new SimWrapperModule(sw));
-
 		controler.run();
-	}
 
+		Path out = Path.of(utils.getOutputDirectory(), "analysis");
+		checkCommercialAnalysisSpecificFiles(out);
+		Assertions.assertThat(out)
+			// refs
+			.isDirectoryRecursivelyContaining("glob:**commercialActivityDurations_ref.csv")
+			.isDirectoryRecursivelyContaining("glob:**commercialTourDistances_ref.csv")
+			.isDirectoryRecursivelyContaining("glob:**commercialTourDurations_ref.csv");
+	}
 
 	private @NonNull Scenario setUpScenario(MatsimTestUtils utils) {
 		Config config = this.utils.createConfigWithTestInputFilePathAsContext();
@@ -182,11 +243,56 @@ public class CommercialTrafficDashboardTest {
 				cAct1.setEndTime(6 * 3600);
 				PopulationUtils.createAndAddLeg(commercialPlan, "truck40t");
 				Activity cAct2 = PopulationUtils.createAndAddActivityFromCoord(commercialPlan, "longDistance_end", link2.getCoord());
-				cAct2.setEndTime(10 * 360);
+				cAct2.setEndTime(10 * 3600);
 				commercialPerson.addPlan(commercialPlan);
 				scenario.getPopulation().addPerson(commercialPerson);
 			 }
 		}
+		ShpOptions shpOptions = new ShpOptions(utils.getClassInputDirectory() + "shp/testRegions.shp", TransformationFactory.ATLANTIS, null);
+		Geometry geometry = shpOptions.getGeometry().getCentroid();
+		CoordinateTransformation ts = TransformationFactory.getCoordinateTransformation(TransformationFactory.ATLANTIS, TransformationFactory.WGS84);
+		Coord coord = ts.transform(MGC.coordinate2Coord(geometry.getCoordinate()));
+		String center = coord.getX() + "," + coord.getY();
+		SimWrapper sw = SimWrapper.create(scenario.getConfig());
+		sw.getConfigGroup().defaultParams().setShp("shp/testRegions.shp");
+		sw.getConfigGroup().setSampleSize(0.1);
+		sw.getConfigGroup().defaultParams().setMapCenter(center);
+		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
+		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
 		return scenario;
+	}
+
+	private static void checkCommercialAnalysisSpecificFiles(Path out) {
+		Assertions.assertThat(out)
+			// mode shares
+			.isDirectoryRecursivelyContaining("glob:**mode_share.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_commercialPersonTrafficGroup.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_commercialTraffic.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_longDistanceFreight.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_smallScaleGoodsTraffic.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_distance_distribution_total.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_per_purpose.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_per_dist.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_users.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_chains.csv")
+			// Trip stats
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_smallScaleGoodsTraffic.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_commercialTraffic.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_commercialPersonTrafficGroup.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_longDistanceFreight.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_total.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_purposes_by_hour.csv")
+			.isDirectoryRecursivelyContaining("glob:**population_trip_stats.csv")
+			// Commercial Analysis
+			.isDirectoryRecursivelyContaining("glob:**activities.csv")
+			.isDirectoryRecursivelyContaining("glob:**commercialTraffic_link_volume.csv")
+			.isDirectoryRecursivelyContaining("glob:**generalTravelData.csv")
+			.isDirectoryRecursivelyContaining("glob:**relations.csv")
+			.isDirectoryRecursivelyContaining("glob:**tourAnalysis_distances.csv")
+			.isDirectoryRecursivelyContaining("glob:**tourAnalysis_durations.csv")
+			.isDirectoryRecursivelyContaining("glob:**tourAnalysis_jobsPerTour.csv")
+			.isDirectoryRecursivelyContaining("glob:**travelDistancesShares_perGroup.csv")
+			.isDirectoryRecursivelyContaining("glob:**travelDistancesShares_perMode.csv")
+			.isDirectoryRecursivelyContaining("glob:**travelDistancesShares_perSubpopulation.csv");
 	}
 }

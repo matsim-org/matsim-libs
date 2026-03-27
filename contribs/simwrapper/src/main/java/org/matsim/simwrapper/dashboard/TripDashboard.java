@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -186,6 +187,40 @@ public class TripDashboard implements Dashboard {
 		return "General information about modal share and trip distributions of the selected groups and related subpopulations (shown in parentheses) of the person agents: **" + groupsWithSubpops + "**.";
 	}
 
+	/**
+	 * TripAnalysis may already have been registered by another dashboard in the same {@link Data} context.
+	 * In that case we have to merge args against the registered command line and update the registration,
+	 * otherwise later {@code data.compute(...)} calls would fail with conflicting args.
+	 */
+	private String[] resolveTripAnalysisArgs(Data data, String[] localArgs) {
+		String[] registeredArgs = data.getArgs(TripAnalysis.class);
+		String[] mergedArgs = DashboardUtils.mergeArgsPreferBase(localArgs, registeredArgs);
+
+		if (registeredArgs.length > 0 && !Arrays.equals(registeredArgs, mergedArgs)) {
+			data.setArgs(TripAnalysis.class, mergedArgs);
+			log.info("TripAnalysis was already registered with args {}. Extending them with TripDashboard args {} -> {}.",
+				Arrays.toString(registeredArgs), Arrays.toString(localArgs), Arrays.toString(mergedArgs));
+		}
+
+		return mergedArgs;
+	}
+
+	/**
+	 * The resolved args depend on the current {@link Data} context, not just on {@code this.args}.
+	 * Cache them once per tab/section so each lambda sees the same merged command line without
+	 * recomputing and re-registering it for every row element.
+	 */
+	private String[] resolveTripAnalysisArgs(Data data, String[] localArgs, AtomicReference<String[]> cache) {
+		String[] cachedArgs = cache.get();
+		if (cachedArgs != null) {
+			return cachedArgs;
+		}
+
+		String[] resolvedArgs = resolveTripAnalysisArgs(data, localArgs);
+		cache.compareAndSet(null, resolvedArgs);
+		return cache.get();
+	}
+
 	@Override
 	public void configure(Header header, Layout layout, SimWrapperConfigGroup simWrapperConfigGroup) {
 
@@ -220,6 +255,7 @@ public class TripDashboard implements Dashboard {
 	}
 
 	private void createTripsDashboardTab(Layout layout, String tab, SimWrapperConfigGroup simWrapperConfigGroup, String[] args) {
+		AtomicReference<String[]> resolvedArgsCache = new AtomicReference<>();
 		String tabTitle;
 		String rowSuffix = "_" + tab;
 		// we only have one group, which should be shown as total trips
@@ -238,21 +274,22 @@ public class TripDashboard implements Dashboard {
 		Layout.Row first = layout.row("first" + rowSuffix, tabTitle);
 
 		first.el(Plotly.class, (viz, data) -> {
+			String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 			Plotly.DataSet ds;
 			String column;
 			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
 				viz.title = "Modal split";
-				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args));
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", resolvedArgs));
 				column = "share_total";
 			}
 			else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
 				viz.title = "Modal split * " + tabTitle + " *";
-				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args)).filter("groupOfSubpopulation", tabTitle);
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", resolvedArgs)).filter("groupOfSubpopulation", tabTitle);
 				column = "share_" + tabTitle;
 			}
 			else {
 				viz.title = "Modal split * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
-				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args)).filter("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", resolvedArgs)).filter("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
 				column = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
 			}
 
@@ -285,6 +322,7 @@ public class TripDashboard implements Dashboard {
 		// TODO: would like to have the distance distributions once per beeline and once per travelled distance. VSP coordination meeting mar'26
 
 		first.el(Plotly.class, (viz, data) -> {
+			String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 
 			viz.title = "Trip distance distribution";
 			viz.colorRamp = ColorScheme.Viridis;
@@ -292,17 +330,17 @@ public class TripDashboard implements Dashboard {
 			String column;
 			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
 				viz.title = "Trip distance distribution";
-				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args));
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", resolvedArgs));
 				column = "share_total";
 			}
 			else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
 				viz.title = "Trip distance distribution * " + tabTitle + " *";
-				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args)).filter("groupOfSubpopulation", tabTitle);
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", resolvedArgs)).filter("groupOfSubpopulation", tabTitle);
 				column = "share_" + tabTitle;
 			}
 			else {
 				viz.title = "Trip distance distribution * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
-				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args)).filter("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", resolvedArgs)).filter("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
 				column = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
 			}
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
@@ -343,37 +381,39 @@ public class TripDashboard implements Dashboard {
 		}
 
 		layout.row("second" + rowSuffix, tabTitle).el(Table.class, (viz, data) -> {
+			String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
 				viz.title = "Mode Statistics";
-				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.COMPLETE_MODEL.toString(), args);
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.COMPLETE_MODEL.toString(), resolvedArgs);
 			}
 			else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
 				viz.title = "Mode Statistics * " + tabTitle + " *";
-				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", tabTitle, args);
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", tabTitle, resolvedArgs);
 			}
 			else {
 				viz.title = "Mode Statistics * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
-				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args);
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), resolvedArgs);
 			}
 			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling( "by main mode, over whole trip (including access & egress).", data, false);
 			viz.showAllRows = true;
 		});
 		layout.row("second" + rowSuffix, tabTitle).el(Plotly.class, (viz, data) -> {
+			String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 			Plotly.DataSet ds;
 			String column;
 			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
 				viz.title = "Modal distance distribution";
-				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", args));
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", resolvedArgs));
 				column = "share_total";
 			}
 			else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
 				viz.title = "Modal distance distribution * " + tabTitle + " *";
-				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", args)).filter("groupOfSubpopulation", tabTitle);
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", resolvedArgs)).filter("groupOfSubpopulation", tabTitle);
 				column = "share_" + tabTitle;
 			}
 			else {
 				viz.title = "Modal distance distribution * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
-				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", args)).filter("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", resolvedArgs)).filter("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
 				column = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
 			}
 			viz.description = "Mode share within distance groups by main mode, over whole trip (including access & egress)";
@@ -438,6 +478,7 @@ public class TripDashboard implements Dashboard {
 				viz.show = headerPopStats;
 			})
 			.el(Plotly.class, (viz, data) -> {
+				String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 
 				viz.title = "Mode usage";
 				viz.description = "Share of persons using a main mode at least once per day";
@@ -446,17 +487,17 @@ public class TripDashboard implements Dashboard {
 				if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
 					viz.title = "Mode usage";
 					ds = viz.addDataset(
-						data.compute(TripAnalysis.class, "mode_users.csv", args)).filter("group", TripAnalysis.ModelType.COMPLETE_MODEL.toString());
+						data.compute(TripAnalysis.class, "mode_users.csv", resolvedArgs)).filter("group", TripAnalysis.ModelType.COMPLETE_MODEL.toString());
 				}
 				else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
 					viz.title = "Mode usage * " + tabTitle + " *";
 					ds = viz.addDataset(
-						data.compute(TripAnalysis.class, "mode_users.csv", args)).filter("group", tabTitle);
+						data.compute(TripAnalysis.class, "mode_users.csv", resolvedArgs)).filter("group", tabTitle);
 				}
 				else {
 					viz.title = "Mode usage * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
 					ds = viz.addDataset(
-						data.compute(TripAnalysis.class, "mode_users.csv", args)).filter("group", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
+						data.compute(TripAnalysis.class, "mode_users.csv", resolvedArgs)).filter("group", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
 				}
 
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
@@ -476,35 +517,37 @@ public class TripDashboard implements Dashboard {
 				}
 
 			}).el(Sankey.class, (viz, data) -> { //TODO perhaps find way to have the same colors for the modes as in the other plots
+				String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 				viz.title = "Mode shift";
 				viz.width = 1.5d;
 				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode. Compares initial input with output after the last iteration.", data, false);
 				if (groupsOfPersonSubpopulations.containsKey(tabTitle))
-					viz.csv = data.computeWithPlaceholder(TripAnalysis.class, "mode_shift_%s.csv", tabTitle, args);
+					viz.csv = data.computeWithPlaceholder(TripAnalysis.class, "mode_shift_%s.csv", tabTitle, resolvedArgs);
 				else if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString()))
-					viz.csv = data.computeWithPlaceholder(TripAnalysis.class, "mode_shift_%s.csv", "total", args);
+					viz.csv = data.computeWithPlaceholder(TripAnalysis.class, "mode_shift_%s.csv", "total", resolvedArgs);
 				else
-					viz.csv = data.computeWithPlaceholder(TripAnalysis.class, "mode_shift_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args);
+					viz.csv = data.computeWithPlaceholder(TripAnalysis.class, "mode_shift_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), resolvedArgs);
 			});
 
 		if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
-			createDistancePlot(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.COMPLETE_MODEL.toString());
-			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.COMPLETE_MODEL.toString());
+			createDistancePlot(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.COMPLETE_MODEL.toString(), args, resolvedArgsCache);
+			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.COMPLETE_MODEL.toString(), args, resolvedArgsCache);
 		}
 		else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
-			createDistancePlot(layout, rowSuffix, tabTitle, finalTab);
-			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, finalTab);
+			createDistancePlot(layout, rowSuffix, tabTitle, finalTab, args, resolvedArgsCache);
+			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, finalTab, args, resolvedArgsCache);
 		}
 		else {
-			createDistancePlot(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
-			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
+			createDistancePlot(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args, resolvedArgsCache);
+			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args, resolvedArgsCache);
 		}
 	}
 
-	private static void createArrivalsAndDepartures(Layout layout, String rowSuffix, String tabTitle, String finalTab) {
+	private void createArrivalsAndDepartures(Layout layout, String rowSuffix, String tabTitle, String finalTab, String[] args, AtomicReference<String[]> resolvedArgsCache) {
 		String [] typesOfTimeDifferentiation = {"departures", "arrivals"};
 		for (String type : typesOfTimeDifferentiation) {
 			layout.row(type + rowSuffix, tabTitle).el(Plotly.class, (viz, data) -> {
+				String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 
 				viz.title = StringUtils.capitalize(type) + " of the Trips";
 				viz.description = "by hour and the activity type at the destination.";
@@ -514,16 +557,17 @@ public class TripDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).filter("group", finalTab)
+					viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv", resolvedArgs)).filter("group", finalTab)
 						.mapping().name("purpose",
 						ColorScheme.Spectral).x("h").y(type));
 			});
 		}
 	}
 
-	private void createDistancePlot(Layout layout, String rowSuffix, String tabTitle, String finalTab) {
+	private void createDistancePlot(Layout layout, String rowSuffix, String tabTitle, String finalTab, String[] args, AtomicReference<String[]> resolvedArgsCache) {
 
 		layout.row("dist-dist" + rowSuffix, tabTitle).el(Plotly.class, (viz, data) -> {
+			String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 
 			viz.title = "Detailed mode share distance distribution";
 			viz.description = "by mode.";
@@ -537,7 +581,7 @@ public class TripDashboard implements Dashboard {
 			viz.interactive = Plotly.Interactive.dropdown;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", finalTab))
+					data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", finalTab, resolvedArgs))
 				.pivot(List.of("dist"), "main_mode", "share")
 				.constant("source", "Sim");
 
@@ -572,6 +616,7 @@ public class TripDashboard implements Dashboard {
 	}
 
 	private void createChoiceTab(Layout layout, String[] args) {
+		AtomicReference<String[]> resolvedArgsCache = new AtomicReference<>();
 
 		layout.row("choice-intro", "Mode Choice").el(TextBlock.class, (viz, data) -> {
 			viz.backgroundColor = "transparent";
@@ -590,20 +635,23 @@ public class TripDashboard implements Dashboard {
 		});
 
 		layout.row("choice", "Mode Choice").el(Table.class, (viz, data) -> {
+			String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 			viz.title = "Choice Evaluation";
 			viz.description = "Metrics for mode choice.";
 			viz.showAllRows = true;
-			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation.csv", args);
+			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation.csv", resolvedArgs);
 		});
 
 		layout.row("choice", "Mode Choice").el(Table.class, (viz, data) -> {
+			String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 			viz.title = "Choice Evaluation per Mode";
 			viz.description = "Metrics for choices per mode.";
 			viz.showAllRows = true;
-			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation_per_mode.csv", args);
+			viz.dataset = data.compute(TripAnalysis.class, "mode_choice_evaluation_per_mode.csv", resolvedArgs);
 		});
 
 		layout.row("choice-plots", "Mode Choice").el(Heatmap.class, (viz, data) -> {
+			String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 			viz.title = "Confusion Matrix";
 			viz.description = "Share of (mis)classified modes.";
 			viz.xAxisTitle = "Predicted";
@@ -611,10 +659,11 @@ public class TripDashboard implements Dashboard {
 			viz.y = "True/Pred";
 			viz.flipAxes = false;
 			viz.showLabels = true;
-			viz.dataset = data.compute(TripAnalysis.class, "mode_confusion_matrix.csv", args);
+			viz.dataset = data.compute(TripAnalysis.class, "mode_confusion_matrix.csv", resolvedArgs);
 		});
 
 		layout.row("choice-plots", "Mode Choice").el(Plotly.class, (viz, data) -> {
+			String[] resolvedArgs = resolveTripAnalysisArgs(data, args, resolvedArgsCache);
 			viz.title = "Mode Prediction Error";
 			viz.description = "Plot showing the number of (mis)classified modes.";
 
@@ -624,7 +673,7 @@ public class TripDashboard implements Dashboard {
 				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 				.build();
 
-			Plotly.DataMapping ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_prediction_error.csv", args))
+			Plotly.DataMapping ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_prediction_error.csv", resolvedArgs))
 				.mapping()
 				.x("true_mode")
 				.y("count")

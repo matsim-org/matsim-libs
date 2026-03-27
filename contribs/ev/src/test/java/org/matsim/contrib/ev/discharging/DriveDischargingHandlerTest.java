@@ -53,7 +53,8 @@ public class DriveDischargingHandlerTest {
 		// VehicleEntersTrafficEvent (t=1) creates a fresh EvDrive, overwriting the entry before
 		// the first VehicleLeavesTrafficEvent (also t=1) can remove it — leaving the second
 		// VehicleLeavesTrafficEvent (t=2) without a valid EvDrive, causing an NPE.
-		int retries = 1; // switch to a high number (1000) to stress-test the race condition
+
+		int retries = 1000; // switch to a high number (1000) to stress-test the race condition
 
 		for (int k = 0; k < retries; k++) {
 			Config config = createBaseConfig(utils.getOutputDirectory(), 5.0);
@@ -100,6 +101,42 @@ public class DriveDischargingHandlerTest {
 			createController(scenario).run();
 
 			// Reaching here means no exception was thrown — the regression is covered.
+
+			/*
+			 * What happens in this simulation:
+			 * - agent starts at 0.0 (VehicleEntersNetwork)
+			 * - agent arrives at 0.0 (VehicleLeavesNetwork)
+			 * - agent starts at 1.0 (VehicleEntersNetwork)
+			 * - agent arrives at 1.0 (VehicleLeavesNetwork)
+			 *
+			 * This leads to a NPE in the current version of DriveDischargingHandler:
+			 *
+			 * In second 0.0:
+			 *
+			 * - VehicleEntersNetwork is processed at 0.0 -> this creates an energy tracking
+			 * object
+			 *
+			 * - VehicleLeavesNetwork is tracked at 0.0 to be processed later
+			 *
+			 * In second 1.0:
+			 *
+			 * - VehicleEntersNetwork is processed at 1.0 -> this creates an energy tracking
+			 * object (but there is already one, it is overwritten - FIRST ISSUE)
+			 *
+			 * - VehicleLeavesNetwork from second 0.0 is processed -> this first works with
+			 * the energy tracking object, then removes it
+			 *
+			 * NOTE: The order here is important. The event handler that processes the
+			 * VehicleEntersNetwork event runs in parallel with the onSimStep. If the order
+			 * is inversed, everything will work without a problem.
+			 *
+			 * In second 2.0:
+			 *
+			 * - VehicleLeavesNetwork from second 1.0 is processed -> this tries to access
+			 * the energy tracking object, but it has already been deleted! This gives an
+			 * NPE.
+			 *
+			 */
 		}
 	}
 

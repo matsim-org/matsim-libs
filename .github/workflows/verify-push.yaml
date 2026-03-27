@@ -102,6 +102,21 @@ jobs:
         run: mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
         working-directory: ${{matrix.module}}
 
+      - name: Sanitize module name for artifact
+        if: failure()
+        id: sanitize
+        run: echo "name=$(echo '${{ matrix.module }}' | tr '/' '-')" >> $GITHUB_OUTPUT
+
+      - name: Upload test output on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-output-${{ steps.sanitize.outputs.name }}
+          path: |
+            ${{ matrix.module }}/test/output/
+            ${{ matrix.module }}/target/surefire-reports/
+          retention-days: 5
+
     env:
       MAVEN_OPTS: -Xmx2g
 
