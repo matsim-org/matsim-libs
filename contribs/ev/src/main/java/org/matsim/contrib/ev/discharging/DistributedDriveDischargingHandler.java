@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Reimplementation of {@link DriveDischargingHandler} until i have figured out what is going on.
+ * Reimplementation of {@link DriveDischargingHandler} which is aware of simulation partitions. For the time being we need both implementations, as this
+ * handler assumes it is run without race conditions between event handling and the mobsim, because it is processed directly (ProcessingMode.DIRECT).
  */
-// I guess this could also be processing mode task?
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class DistributedDriveDischargingHandler implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
 	MobsimScopeEventHandler, NotifyVehiclePartitionTransfer, DSimComponentsMessageProcessor, QSimComponent {
@@ -37,15 +37,19 @@ public class DistributedDriveDischargingHandler implements LinkLeaveEventHandler
 	// between the simulatin and the events processing. DSim does not have this. Therefore, we handle the discharging in
 	// the event handlers directly.
 	//
-	// Conceptually, this handler gets a reference to the entire ElectricFleet. We assume that it contains information for all
-	// electric vehicles in the simulation. At least this is what PopulationAgentSource does at the moment. When a VehicleEntersTraffic
-	// event is received, the handler starts tracking that vehicle in its evDrives list. When the tracked vehicle leaves the partition,
+	// Conceptually, this handler gets a reference to the ElectricFleet. We assume that it contains the electric vehicles present on this partition.
+	// When a VehicleEntersTraffic event is received, the handler starts tracking that vehicle in its evDrives list. When the tracked vehicle leaves the partition,
 	// the corresponding evDrive is transferred to that partition. When a tracked vehicle arrives on this partition, the corresponding
 	// evDrive is implicitly received as a message.
+	//
+	// Also, this handler mutates the state of EVs in the ElectricFleet. In terms of ownership it would make more sense to put the discharging logic
+	// into MobsimVehicles, as those are part of the simulated physics and capable of tracking their own discharging rate and so on. After all that
+	// would adhere to the agent based design of matsim... However, I found things as they were, so we keep the tracking approach and concern ourself
+	// with passing information around the distributed simulation.
 
 	private final Network network;
 	private final EventsManager em;
-	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
+	private final ElectricFleet fleet;
 	private final PartitionTransfer partitionTransfer;
 
 	private final Map<Id<Vehicle>, EvDrive> evDrives = new HashMap<>();
@@ -54,7 +58,7 @@ public class DistributedDriveDischargingHandler implements LinkLeaveEventHandler
 	public DistributedDriveDischargingHandler(Network network, EventsManager em, ElectricFleet fleet, PartitionTransfer partitionTransfer) {
 		this.network = network;
 		this.em = em;
-		this.eVehicles = fleet.getElectricVehicles();
+		this.fleet = fleet;
 		this.partitionTransfer = partitionTransfer;
 	}
 
@@ -66,9 +70,10 @@ public class DistributedDriveDischargingHandler implements LinkLeaveEventHandler
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent e) {
-		var ev = eVehicles.get(e.getVehicleId());
-		var drive = new EvDrive(e.getVehicleId(), ev);
-		evDrives.put(e.getVehicleId(), drive);
+
+		if (fleet.hasVehicle(e.getVehicleId())) {
+			evDrives.put(e.getVehicleId(), new EvDrive(e.getVehicleId()));
+		}
 	}
 
 	@Override
@@ -107,7 +112,8 @@ public class DistributedDriveDischargingHandler implements LinkLeaveEventHandler
 		if (!evDrive.isOnFirstLink()) {// skip the first link
 			Link link = network.getLinks().get(linkId);
 			double tt = now - evDrive.moveOverNodeTime;
-			ElectricVehicle ev = evDrive.ev;
+			// obtain a reference to the vehicle in the fleet. This should be fine, as we are executed from within the SimProcess...
+			ElectricVehicle ev = fleet.getVehicle(vehicleId);
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, now - tt) + ev.getAuxEnergyConsumption()
 				.calcEnergyConsumption(now - tt, tt, linkId);
 			//Energy consumption may be negative on links with negative slope
@@ -132,13 +138,12 @@ public class DistributedDriveDischargingHandler implements LinkLeaveEventHandler
 	public static class EvDrive implements Message {
 
 		private final Id<Vehicle> vehicleId;
-		private final ElectricVehicle ev;
+		//private final ElectricVehicle ev;
 
 		private double moveOverNodeTime = Double.NaN;
 
-		EvDrive(Id<Vehicle> vehicleId, ElectricVehicle ev) {
+		EvDrive(Id<Vehicle> vehicleId) {
 			this.vehicleId = vehicleId;
-			this.ev = ev;
 		}
 
 		boolean isOnFirstLink() {

@@ -20,10 +20,10 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -113,6 +113,27 @@ public class EvChargingIntegrationTest {
 	}
 
 
+	/**
+	 * DSim test with two agents competing for a single charger plug.
+	 * Agent 1 departs 10 s earlier than agent 2, so agent 1 is still charging
+	 * when agent 2 arrives — agent 2 is queued, then promoted once agent 1 finishes.
+	 */
+	@Test
+	void queueAtCharger() {
+		var config = createConfig(utils.getOutputDirectory());
+		EvDSimTestFixture.configureDSim(config, 3);
+		var scenario = createQueueingScenario(config, 3);
+
+		var controller = new Controler(scenario);
+		installModules(controller);
+
+		var verifier = new QueueingVerifier();
+		verifier.install(controller);
+
+		controller.run();
+		verifier.assertExpected();
+	}
+
 	private static Config createConfig(String outputDir) {
 		var config = EvDSimTestFixture.createConfig(outputDir);
 		var chargingParams = new ScoringConfigGroup.ActivityParams(VehicleChargingHandler.CHARGING_INTERACTION)
@@ -135,15 +156,56 @@ public class EvChargingIntegrationTest {
 	}
 
 	/**
+	 * Builds a two-agent scenario on the three-partition network.
+	 * Both agents have identical routes and 50 % initial SOC; agent 1 departs
+	 * 10 s before agent 2, ensuring agent 2 arrives at the charger while agent 1
+	 * is still charging and must queue.
+	 */
+	private static Scenario createQueueingScenario(Config config, int numParts) {
+		var scenario = EvDSimTestFixture.createScenario(config, numParts);
+
+		// Remove the default person/vehicle created by the fixture.
+		scenario.getPopulation().removePerson(Id.createPersonId(EvDSimTestFixture.PERSON_ID));
+		scenario.getVehicles().removeVehicle(Id.createVehicleId(EvDSimTestFixture.EV_ID));
+
+		var evType = scenario.getVehicles().getVehicleTypes()
+			.get(Id.create("electric", VehicleType.class));
+		evType.getEngineInformation().getAttributes()
+			.putAttribute(ElectricFleetUtils.CHARGER_TYPES, List.of("default"));
+
+		for (int i = 1; i <= 2; i++) {
+			var vehicleId = Id.createVehicleId("ev-queue-" + i);
+			var vehicle = scenario.getVehicles().getFactory().createVehicle(vehicleId, evType);
+			scenario.getVehicles().addVehicle(vehicle);
+			ElectricFleetUtils.setInitialSoc(vehicle, INITIAL_SOC);
+
+			var personId = Id.createPersonId("ev-queue-" + i);
+			var person = scenario.getPopulation().getFactory().createPerson(personId);
+			scenario.getPopulation().addPerson(person);
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes(person,
+				Collections.singletonMap(TransportMode.car, vehicleId));
+
+			// Agent 1 departs at t=10, agent 2 at t=20 — 10 s stagger guarantees overlap at charger.
+			setPlanWithCharging(person, vehicleId, 10.0 * i);
+		}
+
+		return scenario;
+	}
+
+	private static void setPlanWithCharging(Person person, Id<Vehicle> vehicleId) {
+		setPlanWithCharging(person, vehicleId, 10.0);
+	}
+
+	/**
 	 * Clears plans of a person and adds a plan with a charging activity.
 	 */
-	private static void setPlanWithCharging(Person person, Id<Vehicle> vehicleId) {
+	private static void setPlanWithCharging(Person person, Id<Vehicle> vehicleId, double departureTime) {
 		var f = PopulationUtils.getFactory();
 		var plan = f.createPlan();
 
 		// home → car → charger (l2) → charging → car → work (l3)
 		var home = f.createActivityFromLinkId("home", Id.createLinkId("l1"));
-		home.setEndTime(10.0);
+		home.setEndTime(departureTime);
 		plan.addActivity(home);
 
 		var leg1 = f.createLeg(TransportMode.car);
@@ -266,6 +328,70 @@ public class EvChargingIntegrationTest {
 				"Battery should be fully charged when ChargingEndEvent fires");
 			assertEquals(EXPECTED_DRIVE_CONSUMPTION, totalDriving_kWh, 1e-9,
 				"Drive consumption: l2 (1 000 J) + l3 (100 J)");
+		}
+	}
+
+	/**
+	 * Collects charging and queueing events for two agents, then asserts:
+	 * <ol>
+	 *   <li>Exactly 2 {@link ChargingStartEvent}s and 2 {@link ChargingEndEvent}s.</li>
+	 *   <li>Exactly 1 {@link QueuedAtChargerEvent} (only the second agent queues).</li>
+	 *   <li>Agent 1 ({@code ev-queue-1}) starts charging before agent 2.</li>
+	 *   <li>Total charged energy == 2 × {@link #EXPECTED_CHARGED}.</li>
+	 *   <li>Both batteries are at full capacity when their {@link ChargingEndEvent} fires.</li>
+	 * </ol>
+	 */
+	static class QueueingVerifier
+		implements ChargingStartEventHandler, ChargingEndEventHandler,
+		EnergyChargedEventHandler, QueuedAtChargerEventHandler {
+
+		private final List<Id<Vehicle>> chargingStartOrder = new ArrayList<>();
+		private final Map<Id<Vehicle>, Double> chargeAtEnd = new LinkedHashMap<>();
+		private int queuedCount = 0;
+		private double totalCharged = 0.0;
+
+		@Override
+		public void handleEvent(ChargingStartEvent event) {
+			chargingStartOrder.add(event.getVehicleId());
+		}
+
+		@Override
+		public void handleEvent(ChargingEndEvent event) {
+			chargeAtEnd.put(event.getVehicleId(), event.getCharge());
+		}
+
+		@Override
+		public void handleEvent(EnergyChargedEvent event) {
+			totalCharged += event.getEnergy();
+		}
+
+		@Override
+		public void handleEvent(QueuedAtChargerEvent event) {
+			queuedCount++;
+		}
+
+		void install(Controler controller) {
+			QueueingVerifier self = this;
+			controller.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addEventHandlerBinding().toInstance(self);
+				}
+			});
+		}
+
+		void assertExpected() {
+			assertEquals(2, chargingStartOrder.size(), "Expected exactly 2 ChargingStartEvents");
+			assertEquals(2, chargeAtEnd.size(), "Expected exactly 2 ChargingEndEvents");
+			assertEquals(1, queuedCount, "Expected exactly 1 QueuedAtChargerEvent");
+			assertEquals(Id.createVehicleId("ev-queue-1"), chargingStartOrder.get(0),
+				"Agent 1 should charge before agent 2");
+			assertEquals(2 * EXPECTED_CHARGED, totalCharged, 1e-9,
+				"Total charged energy should be 2 × EXPECTED_CHARGED");
+			for (var entry : chargeAtEnd.entrySet()) {
+				assertEquals(EvDSimTestFixture.BATTERY_CAPACITY, entry.getValue(), 1e-9,
+					"Battery of " + entry.getKey() + " should be fully charged when ChargingEndEvent fires");
+			}
 		}
 	}
 }

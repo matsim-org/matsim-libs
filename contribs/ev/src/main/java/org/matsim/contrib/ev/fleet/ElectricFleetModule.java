@@ -22,6 +22,7 @@ package org.matsim.contrib.ev.fleet;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup.InitialSocBehavior;
@@ -60,24 +61,15 @@ public final class ElectricFleetModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(ElectricFleet.class).toProvider(new Provider<>() {
-					@Inject
-					private ElectricFleetSpecification fleetSpecification;
-					@Inject
-					private DriveEnergyConsumption.Factory driveConsumptionFactory;
-					@Inject
-					private AuxEnergyConsumption.Factory auxConsumptionFactory;
-					@Inject
-					private ChargingPower.Factory chargingPowerFactory;
-					@Inject
-					private NetworkPartition networkPartition;
-
-					@Override
-					public ElectricFleet get() {
-						return ElectricFleetUtils.createDefaultFleet(fleetSpecification, driveConsumptionFactory, auxConsumptionFactory,
-							chargingPowerFactory);
-					}
-				}).asEagerSingleton();
+				if (getConfig().controller().getMobsim().equals("dsim")) {
+					// bind DistributedElectricFleet separately, so that the three bindings below use the same
+					// singleton binding.
+					bind(DistributedElectricFleet.class).in(Singleton.class);
+					bind(ElectricFleet.class).to(DistributedElectricFleet.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).to(DistributedElectricFleet.class);
+				} else {
+					bind(ElectricFleet.class).toProvider(new DefaultElectricFleetProvider()).in(Singleton.class);
+				}
 
 				if (evCfg.getInitialSocBehavior().equals(InitialSocBehavior.UpdateAfterIteration)) {
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toInstance(new MobsimBeforeCleanupListener() {
@@ -98,5 +90,24 @@ public final class ElectricFleetModule extends AbstractModule {
 				}
 			}
 		});
+	}
+
+	private static class DefaultElectricFleetProvider implements Provider<ElectricFleet> {
+		@Inject
+		private ElectricFleetSpecification fleetSpecification;
+		@Inject
+		private DriveEnergyConsumption.Factory driveConsumptionFactory;
+		@Inject
+		private AuxEnergyConsumption.Factory auxConsumptionFactory;
+		@Inject
+		private ChargingPower.Factory chargingPowerFactory;
+		@Inject
+		private NetworkPartition networkPartition;
+
+		@Override
+		public ElectricFleet get() {
+			return ElectricFleetUtils.createDefaultFleet(fleetSpecification, driveConsumptionFactory, auxConsumptionFactory,
+				chargingPowerFactory);
+		}
 	}
 }
