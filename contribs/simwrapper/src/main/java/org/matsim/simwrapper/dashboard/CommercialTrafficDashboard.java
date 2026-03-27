@@ -2,7 +2,10 @@ package org.matsim.simwrapper.dashboard;
 
 import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.NonNull;
+import org.matsim.application.CommandRunner;
 import org.matsim.application.analysis.commercialTraffic.CommercialAnalysis;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
@@ -22,9 +25,17 @@ import java.util.stream.Stream;
  */
 public class CommercialTrafficDashboard implements Dashboard {
 
+	private static final Logger log = LogManager.getLogger(CommercialTrafficDashboard.class);
+
 	private final LinkedHashMap<String, List<String>> groupsOfCommercialSubpopulations = new LinkedHashMap<>();
 	private final String crs;
-	private String[] args;
+	private String[] argsCommercialAnalysis;
+	private String [] argsTripAnalysis;
+	public enum AnalysisTypeArgs {
+		COMMERCIAL,
+		TRIP,
+		BOTH
+	}
 
 	@Nullable
 	private final String commercialTourDurationsRefCsv;
@@ -40,7 +51,8 @@ public class CommercialTrafficDashboard implements Dashboard {
 		this.commercialTourDurationsRefCsv = commercialTourDurationsRefCsv;
 		this.commercialTourDistanceRefCsv = commercialTourDistanceRefCsv;
 		this.commercialActivityDurationsRefCsv = commercialActivityDurationsRefCsv;
-		args = new String[0];
+		argsCommercialAnalysis = new String[0];
+		argsTripAnalysis = new String[0];
 	}
 
 	/**
@@ -50,7 +62,8 @@ public class CommercialTrafficDashboard implements Dashboard {
 	 */
 	public CommercialTrafficDashboard(String crs) {
 		this(crs, null, null, null);
-		args = new String[0];
+		argsCommercialAnalysis = new String[0];
+		argsTripAnalysis = new String[0];
 	}
 
 	/**
@@ -71,34 +84,69 @@ public class CommercialTrafficDashboard implements Dashboard {
 				: new ArrayList<>();
 			groupsOfCommercialSubpopulations.put(groupName, subpopulations);
 		}
-		return setAnalysisArgs("--groups-of-subpopulations-commercialAnalysis", groupsOfCommercialSubpopulationsString);
+		return appendAnalysisArgs(AnalysisTypeArgs.BOTH, "--groups-of-subpopulations-commercialAnalysis", groupsOfCommercialSubpopulationsString);
 	}
 
 	/**
-	 * Set an argument that will be passed to the analysis script. See {@link CommercialAnalysis}.
+	 * Append args to the specific analysis class. See {@link CommercialAnalysis}.
 	 */
-	public CommercialTrafficDashboard setAnalysisArgs(String... args) {
-		this.args = this.args == null
-			? args
-			: Stream.concat(Stream.of(this.args), Stream.of(args)).toArray(String[]::new);
+	private CommercialTrafficDashboard appendAnalysisArgs(AnalysisTypeArgs thisAnalysisTypeArgs, String... args) {
+		if (args == null || args.length == 0) return this;
+
+		switch (thisAnalysisTypeArgs) {
+			case COMMERCIAL -> this.argsCommercialAnalysis = append(this.argsCommercialAnalysis, args);
+			case TRIP -> this.argsTripAnalysis = append(this.argsTripAnalysis, args);
+			case BOTH -> {
+				this.argsCommercialAnalysis = append(this.argsCommercialAnalysis, args);
+				this.argsTripAnalysis = append(this.argsTripAnalysis, args);
+			}
+		}
 		return this;
+	}
+
+	private static String[] append(String[] existing, String... add) {
+		if (existing == null) return Arrays.copyOf(add, add.length);
+		return Stream.concat(Arrays.stream(existing), Arrays.stream(add))
+			.toArray(String[]::new);
+	}
+
+	/**
+	 * Reuses already registered {@link TripAnalysis} args if another dashboard configured the command first
+	 * and appends missing commercial args. Registered args stay authoritative because the TripDashboard
+	 * usually defines the more specific TripAnalysis setup. We also need to update the registered args
+	 * in the current {@link Data} context, otherwise later compute calls would still see the old,
+	 * incomplete command line and fail with conflicting args.
+	 */
+	private String[] resolveTripAnalysisArgs(Data data) {
+		String[] registeredArgs = data.getArgs(TripAnalysis.class);
+		String[] mergedArgs = DashboardUtils.mergeArgsPreferBase(
+			registeredArgs.length > 0 ? registeredArgs : argsTripAnalysis,
+			registeredArgs.length > 0 ? argsTripAnalysis : new String[0]
+		);
+		if (registeredArgs.length > 0 && !Arrays.equals(registeredArgs, mergedArgs)) {
+			data.setArgs(TripAnalysis.class, mergedArgs);
+			log.info("TripAnalysis was already registered with args {}. Appending missing CommercialTrafficDashboard args {} -> {}.",
+				Arrays.toString(registeredArgs), Arrays.toString(argsTripAnalysis), Arrays.toString(mergedArgs));
+		}
+		return mergedArgs;
 	}
 
 	@Override
 	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 		header.title = "Commercial Traffic";
 		header.description = getDescription();
-
+		double sampleSize = configGroup.getSampleSize();
+		appendAnalysisArgs(AnalysisTypeArgs.COMMERCIAL, "--sampleSize", String.valueOf(sampleSize));
 		createCommercialOverviewTab(layout);
 		createCommercialTripsTab(layout);
 		createCommercialToursTab(layout);
 		createCommercialActivitiesTab(layout);
 
-		if (commercialTourDurationsRefCsv != null) {
-			addDurationRefDataComparison(layout);
-		}
 		if (commercialTourDistanceRefCsv != null) {
 			addDistanceRefDataComparison(layout);
+		}
+		if (commercialTourDurationsRefCsv != null) {
+			addDurationRefDataComparison(layout);
 		}
 		if (commercialActivityDurationsRefCsv != null) {
 			addActivityDurationRefDataComparison(layout);
@@ -110,7 +158,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.title = "Origin-Destination of commercial trips";
 			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling(
 				"The OD can be filtered according to defined groups of commercial subpopulations.", data, false);
-			viz.file = data.compute(CommercialAnalysis.class, "relations.csv", args);
+			viz.file = data.compute(CommercialAnalysis.class, "relations.csv", argsCommercialAnalysis);
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addAggregation(group, "Origin", group + "_start_X", group + "_start_Y", "Destination", group + "_act_X", group + "_act_Y");
 
@@ -731,16 +779,14 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 	private void createCommercialOverviewTab(Layout layout) {
 		layout.row("General_first", "General").el(PieChart.class, (viz, data) -> {
-				double sampleSize = data.config().getSampleSize();
-				setAnalysisArgs("--sampleSize", String.valueOf(sampleSize));
-				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "travelDistancesShares_%s.csv", "perMode", args);
+				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "travelDistancesShares_%s.csv", "perMode", argsCommercialAnalysis);
 				viz.title = "Travel Distance Shares by Mode";
 				viz.description = "at final iteration";
 				viz.useLastRow = true;
 			})
 			.el(PieChart.class, (viz, data) -> {
 				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "travelDistancesShares_%s.csv",
-					"perSubpopulation", args);
+					"perSubpopulation", argsCommercialAnalysis);
 				viz.title = "Travel Distance Shares by subpopulation";
 				viz.useLastRow = true;
 				viz.description = "at final iteration";
@@ -748,7 +794,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			})
 			.el(PieChart.class, (viz, data) -> {
 				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "travelDistancesShares_%s.csv", "perGroup",
-					args);
+					argsCommercialAnalysis);
 				viz.title = "Travel Distance Shares by model type";
 				viz.useLastRow = true;
 				viz.description = "at final iteration";
@@ -757,7 +803,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		layout.row("General_second", "General").el(Links.class, (viz, data) -> {
 			viz.title = "Link volumes of the commercial traffic";
 			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("The volumes are scaled to 100% sample size.", data, true);
-			viz.datasets.csvFile = data.compute(CommercialAnalysis.class, "commercialTraffic_link_volume.csv", args);
+			viz.datasets.csvFile = data.compute(CommercialAnalysis.class, "commercialTraffic_link_volume.csv", argsCommercialAnalysis);
 			viz.network = data.compute(CreateAvroNetwork.class, "network.avro",
 				"--with-properties"); //, "--match-id", "linkId", "--mode-filter", "none"
 			viz.description = "The volumes can be filtered according to different types of traffic and vehicle types.";
@@ -773,7 +819,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 				Plotly.DataSet ds = viz.addDataset(
-						data.compute(TripAnalysis.class, "mode_share.csv")).filter("modelType", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString())
+						data.compute(TripAnalysis.class, "mode_share.csv", resolveTripAnalysisArgs(data))).filter("modelType", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString())
 					.constant("source", "Simulated")
 					.aggregate(List.of("main_mode"), "share_" + TripAnalysis.ModelType.COMMERCIAL_TRAFFIC, Plotly.AggrFunc.SUM);
 
@@ -791,7 +837,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 				Plotly.DataSet ds = viz.addDataset(
-						data.compute(TripAnalysis.class, "mode_share.csv")).filter("modelType", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString())
+						data.compute(TripAnalysis.class, "mode_share.csv", resolveTripAnalysisArgs(data))).filter("modelType", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString())
 					.constant("source", "Simulated")
 					.aggregate(List.of("subpopulation"), "share_" + TripAnalysis.ModelType.COMMERCIAL_TRAFFIC, Plotly.AggrFunc.SUM);
 
@@ -809,7 +855,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name(group).build(),
-						viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"), "data_" + group).filter("groupOfSubpopulation", group)
+						viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", resolveTripAnalysisArgs(data)), "data_" + group).filter("groupOfSubpopulation", group)
 							.aggregate(List.of("dist_group"), "share_" + group, Plotly.AggrFunc.SUM)
 							.mapping()
 							.x("dist_group")
@@ -828,7 +874,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				viz.multiIndex = Map.of("dist_group", "source");
 				var ds = viz.addDataset(
-						data.compute(TripAnalysis.class, "mode_share.csv")).filter("modelType", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString())
+						data.compute(TripAnalysis.class, "mode_share.csv", resolveTripAnalysisArgs(data))).filter("modelType", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString())
 					.aggregate(List.of("dist_group", "main_mode"), "share_" + TripAnalysis.ModelType.COMMERCIAL_TRAFFIC, Plotly.AggrFunc.SUM)
 					.constant("source", "Sim")
 					.mapping()
@@ -853,7 +899,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				viz.multiIndex = Map.of("dist_group", "source");
 				var ds = viz.addDataset(
-						data.compute(TripAnalysis.class, "mode_share.csv")).filter("modelType", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString())
+						data.compute(TripAnalysis.class, "mode_share.csv", resolveTripAnalysisArgs(data))).filter("modelType", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString())
 					.aggregate(List.of("dist_group", "subpopulation"), "share_" + TripAnalysis.ModelType.COMMERCIAL_TRAFFIC, Plotly.AggrFunc.SUM)
 					.constant("source", "Sim")
 					.mapping()
@@ -872,7 +918,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.title = "Mode Statistics of the complete: *commercialTraffic*";
 			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress).", data,
 				false);
-			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString());
+			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString(), resolveTripAnalysisArgs(data));
 			viz.showAllRows = true;
 		});
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
@@ -880,7 +926,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.title = "Mode Statistics of group: *" + group + "*";
 				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress).", data,
 					false);
-				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", group);
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", group, resolveTripAnalysisArgs(data));
 				viz.showAllRows = true;
 			});
 		}
@@ -889,7 +935,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.title = "Population statistics";
 				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("over simulated persons.", data, false);
 				viz.showAllRows = true;
-				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
+				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv", resolveTripAnalysisArgs(data));
 				List<String> headerPopStats = new ArrayList<>(List.of("Group"));
 				headerPopStats.addAll(groupsOfCommercialSubpopulations.keySet());
 				viz.show = headerPopStats;
@@ -900,7 +946,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					Plotly.DataSet dsSub = viz.addDataset(
-						data.compute(TripAnalysis.class, "mode_users.csv"), "data_" + group).filter("group", group);
+						data.compute(TripAnalysis.class, "mode_users.csv", resolveTripAnalysisArgs(data)), "data_" + group).filter("group", group);
 					viz.addTrace(
 						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 						dsSub.mapping()
@@ -923,7 +969,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 			viz.interactive = Plotly.Interactive.dropdown;
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
-				Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", group))
+				Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", group, resolveTripAnalysisArgs(data)))
 					.pivot(List.of("dist"), "main_mode", "share")
 					.constant("source", "Sim");
 
@@ -951,7 +997,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.build();
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 					viz.addDataset(
-							data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).filter("group",
+							data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv", resolveTripAnalysisArgs(data))).filter("group",
 							TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()).mapping()
 						.name("purpose", ColorScheme.Spectral)
 						.x("h")
