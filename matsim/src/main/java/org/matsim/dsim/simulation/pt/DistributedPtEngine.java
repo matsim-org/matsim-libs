@@ -43,7 +43,7 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 	}
 
 	@Override
-	public void beforeSim() {
+	public void beforeMobsim() {
 
 		// find out which links are pt links and hook into the leaveQ handler.
 		scenario.getTransitSchedule().getTransitLines().values().stream()
@@ -56,7 +56,7 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 			.filter(link -> link instanceof SimLink.LocalLink || link instanceof SimLink.SplitInLink)
 			.forEach(link -> link.addLeaveHandler(this::onLeaveQueue));
 
-		transitQSimEngine.beforeSim();
+		transitQSimEngine.beforeMobsim();
 	}
 
 	@Override
@@ -128,8 +128,8 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 	}
 
 	@Override
-	public void afterSim() {
-		transitQSimEngine.afterSim();
+	public void afterMobsim() {
+		transitQSimEngine.afterMobsim();
 	}
 
 	@Override

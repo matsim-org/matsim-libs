@@ -3,6 +3,10 @@ package org.matsim.simwrapper;
 import org.matsim.simwrapper.viz.GridMap;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DashboardUtils {
 	static final String DARK_BLUE = "#1175b3";
@@ -59,5 +63,53 @@ public class DashboardUtils {
 			df = new DecimalFormat("0.##'%'");
 		}
 		return df.format(percent);
+	}
+
+	/**
+	 * Merge CLI-style args while keeping the base args authoritative for conflicting options.
+	 * Missing options from {@code additionalArgs} are appended in their original order.
+	 */
+	public static String[] mergeArgsPreferBase(String[] baseArgs, String[] additionalArgs) {
+		if (baseArgs == null || baseArgs.length == 0)
+			return additionalArgs == null ? new String[0] : additionalArgs.clone();
+		if (additionalArgs == null || additionalArgs.length == 0)
+			return baseArgs.clone();
+
+		Map<String, String> merged = toArgMap(baseArgs);
+		Map<String, String> additional = toArgMap(additionalArgs);
+
+		for (Map.Entry<String, String> entry : additional.entrySet()) {
+			merged.putIfAbsent(entry.getKey(), entry.getValue());
+		}
+
+		return toArgArray(merged);
+	}
+
+	private static Map<String, String> toArgMap(String[] args) {
+		Map<String, String> map = new LinkedHashMap<>();
+
+		for (int i = 0; i < args.length; i++) {
+			String key = args[i];
+			String value = null;
+
+			if (i + 1 < args.length && !args[i + 1].startsWith("--")) {
+				value = args[++i];
+			}
+
+			map.put(key, value);
+		}
+
+		return map;
+	}
+
+	private static String[] toArgArray(Map<String, String> args) {
+		List<String> result = new ArrayList<>();
+		for (Map.Entry<String, String> entry : args.entrySet()) {
+			result.add(entry.getKey());
+			if (entry.getValue() != null) {
+				result.add(entry.getValue());
+			}
+		}
+		return result.toArray(String[]::new);
 	}
 }

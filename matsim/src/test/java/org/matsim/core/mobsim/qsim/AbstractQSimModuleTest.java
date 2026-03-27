@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim;
+package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -46,9 +46,9 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicLong;
 
-	public class AbstractQSimModuleTest {
-	 @Test
-	 void testOverrides() {
+public class AbstractQSimModuleTest {
+	@Test
+	void testOverrides() {
 		AbstractQSimModule moduleA = new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
@@ -66,7 +66,7 @@ import java.util.concurrent.atomic.AtomicLong;
 		};
 
 		AbstractQSimModule composite = AbstractQSimModule.overrideQSimModules(Collections.singleton(moduleA),
-				Collections.singletonList(moduleB));
+			Collections.singletonList(moduleB));
 
 		Config config = ConfigUtils.createConfig();
 		composite.setConfig(config);
@@ -79,8 +79,8 @@ import java.util.concurrent.atomic.AtomicLong;
 		Assertions.assertEquals("testBString", injector.getInstance(String.class));
 	}
 
-	 @Test
-	 void testOverrideAgentFactory() {
+	@Test
+	void testOverrideAgentFactory() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
@@ -89,8 +89,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		Person person = populationFactory.createPerson(Id.createPersonId("person"));
-		Plan plan =  populationFactory.createPlan();
-		plan.addActivity( populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
+		Plan plan = populationFactory.createPlan();
+		plan.addActivity(populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 
@@ -103,8 +103,8 @@ import java.util.concurrent.atomic.AtomicLong;
 		Assertions.assertTrue(value.get() > 0);
 	}
 
-	 @Test
-	 void testOverrideAgentFactoryTwice() {
+	@Test
+	void testOverrideAgentFactoryTwice() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
@@ -113,8 +113,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		Person person = populationFactory.createPerson(Id.createPersonId("person"));
-		Plan plan =  populationFactory.createPlan();
-		plan.addActivity( populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
+		Plan plan = populationFactory.createPlan();
+		plan.addActivity(populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 
@@ -161,8 +161,8 @@ import java.util.concurrent.atomic.AtomicLong;
 		}
 	}
 
-	 @Test
-	 void testAddEngine() {
+	@Test
+	void testAddEngine() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
@@ -195,14 +195,6 @@ import java.util.concurrent.atomic.AtomicLong;
 		@Override
 		public void doSimStep(double time) {
 			called = true;
-		}
-
-		@Override
-		public void beforeSim() {
-		}
-
-		@Override
-		public void afterSim() {
 		}
 
 		@Override

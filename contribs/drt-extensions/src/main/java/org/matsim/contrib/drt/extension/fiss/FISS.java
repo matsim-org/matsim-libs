@@ -162,12 +162,12 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 	}
 
 	@Override
-	public void beforeSim() {
+	public void beforeMobsim() {
 		if (switchOffFISS()) {
 			deflateVehicleTypes(matsimServices.getScenario(), this.fissConfigGroup);
 			// (This is before the QVehicles are generated, so it wil be taken into account when generating them.)
 		}
-		teleport.beforeSim();
+		teleport.beforeMobsim();
 	}
 
 	private void deflateVehicleTypes(Scenario scenario, FISSConfigGroup fissConfigGroup) {
@@ -178,8 +178,8 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 	}
 
 	@Override
-	public void afterSim() {
-		teleport.afterSim();
+	public void afterMobsim() {
+		teleport.afterMobsim();
 	}
 
 	private boolean switchOffFISS() {

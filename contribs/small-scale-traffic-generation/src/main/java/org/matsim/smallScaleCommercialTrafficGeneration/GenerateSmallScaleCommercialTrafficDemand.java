@@ -325,12 +325,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					CarriersUtils.getCarriers(scenario).getCarriers().values().forEach(carrier -> {
 						carrier.getPlans().clear();
 					});
-				}
-				else {
+				} else {
 					// if we use an existing carrier with a solution, we delete only the plans of carriers which have unhandled jobs.
 					List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(
 						CarriersUtils.getCarriers(scenario));
 					if (!nonCompleteSolvedCarriers.isEmpty()) {
+						log.info(
+							"By using the option {} {} carriers are found with unhandled jobs. These carriers will be solved and the plans of the fully planed carriers will remain. ",
+							CreationOption.useExistingCarrierFileWithSolution, nonCompleteSolvedCarriers.size());
 						nonCompleteSolvedCarriers.forEach((carrier -> carrier.getPlans().clear()));
 					}
 				}
@@ -502,14 +504,19 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		boolean splitCarrier = true;
 		boolean splitVRPs = false;
+
+		// comparison of results for hannover: increasing to maxServicesPerCarrier = 300 results in:
+		// computationTime *4; numberOfVehicles -2%; Jsprit score: -0,4%, drivenDistanc: -4,4%
+		// RE: result is to set this to maxServicesPerCarrier = 100;
 		int maxServicesPerCarrier = 100;
 		Map<Id<Carrier>, Carrier> allCarriers = new HashMap<>(
 			CarriersUtils.getCarriers(originalScenario).getCarriers());
 		Map<Id<Carrier>, Carrier> solvedCarriers = new HashMap<>();
 		List<Id<Carrier>> keyList = new ArrayList<>(allCarriers.keySet());
 		Map<Id<Carrier>, List<Id<Carrier>>> carrierId2subCarrierIds = new HashMap<>();
+		// sort out carriers which don't has to be solved
 		CarriersUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
-			if (CarriersUtils.getJspritIterations(carrier) == 0) {
+			if (CarriersUtils.getJspritIterations(carrier) == 0 || CarriersUtils.allJobsHandledBySelectedPlan(carrier)) {
 				allCarriers.remove(carrier.getId());
 				solvedCarriers.put(carrier.getId(), carrier);
 			}
@@ -776,13 +783,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// use overwriteExistingFiles because before setting up the OutputDirectoryHierarchy, the OverwriteFileSetting was failIfDirectoryExists
 		// in mean time some files were already written (e.g. carriers analysis), so we need to allow overwriting here
 		controller.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controller.addOverridingModule(new CarrierModule());
-		controller.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
-			}
-		});
+//		controller.addOverridingModule(new CarrierModule());
+//		controller.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
+//			}
+//		});
 
 		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 		return controller;

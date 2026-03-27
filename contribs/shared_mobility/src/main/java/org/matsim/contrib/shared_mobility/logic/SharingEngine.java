@@ -53,21 +53,21 @@ public class SharingEngine implements ActivityStartEventHandler, MobsimEngine, M
 
 			MobsimAgent agent = internalInterface.getMobsim().getAgents().get(event.getPersonId());
 
-			Activity activity = (Activity)((PlanAgent)agent).getCurrentPlanElement();
+			Activity activity = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
 			if (activity.getAttributes().getAttribute(SharingUtils.SERVICE_ID_ATTRIBUTE) != null &&
-					activity.getAttributes().getAttribute(SharingUtils.SERVICE_ID_ATTRIBUTE).equals(this.service.getId().toString()))
+				activity.getAttributes().getAttribute(SharingUtils.SERVICE_ID_ATTRIBUTE).equals(this.service.getId().toString()))
 				bookingAgents.add(agent);
 		} else if (event.getActType().equals(SharingUtils.PICKUP_ACTIVITY)) {
 			MobsimAgent agent = internalInterface.getMobsim().getAgents().get(event.getPersonId());
-			Activity activity = (Activity)((PlanAgent)agent).getCurrentPlanElement();
+			Activity activity = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
 			if (activity.getAttributes().getAttribute(SharingUtils.SERVICE_ID_ATTRIBUTE) != null &&
-					activity.getAttributes().getAttribute(SharingUtils.SERVICE_ID_ATTRIBUTE).equals(this.service.getId().toString()))
+				activity.getAttributes().getAttribute(SharingUtils.SERVICE_ID_ATTRIBUTE).equals(this.service.getId().toString()))
 				pickupAgents.add(agent);
 		} else if (event.getActType().equals(SharingUtils.DROPOFF_ACTIVITY)) {
 			MobsimAgent agent = internalInterface.getMobsim().getAgents().get(event.getPersonId());
-			Activity activity = (Activity)((PlanAgent)agent).getCurrentPlanElement();
+			Activity activity = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
 			if (activity.getAttributes().getAttribute(SharingUtils.SERVICE_ID_ATTRIBUTE) != null &&
-					activity.getAttributes().getAttribute(SharingUtils.SERVICE_ID_ATTRIBUTE).equals(this.service.getId().toString()))
+				activity.getAttributes().getAttribute(SharingUtils.SERVICE_ID_ATTRIBUTE).equals(this.service.getId().toString()))
 				dropoffAgents.add(agent);
 		}
 	}
@@ -94,7 +94,7 @@ public class SharingEngine implements ActivityStartEventHandler, MobsimEngine, M
 
 			for (SharingVehicle vehicle : service.getVehicles()) {
 				eventsManager.processEvent(new SharingVehicleEvent(time, service.getId(), vehicle.getLink().getId(),
-						vehicle.getId(), Optional.empty()));
+					vehicle.getId(), Optional.empty()));
 
 			}
 		}
@@ -132,7 +132,7 @@ public class SharingEngine implements ActivityStartEventHandler, MobsimEngine, M
 			internalInterface.getMobsim().rescheduleActivityEnd(agent);
 
 			eventsManager.processEvent(new PersonStuckEvent(time, agent.getId(), agent.getCurrentLinkId(),
-					SharingUtils.getServiceMode(service.getId())));
+				SharingUtils.getServiceMode(service.getId())));
 			internalInterface.getMobsim().getAgentCounter().incLost();
 		});
 
@@ -140,12 +140,12 @@ public class SharingEngine implements ActivityStartEventHandler, MobsimEngine, M
 	}
 
 	@Override
-	public void beforeSim() {
+	public void beforeMobsim() {
 		eventsManager.addHandler(this);
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		eventsManager.removeHandler(this);
 	}
 

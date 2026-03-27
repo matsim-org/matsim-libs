@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.components;
+package org.matsim.core.mobsim.qsim.components;
 
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
@@ -53,242 +53,248 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-	public class QSimComponentsTest {
-	private static final Logger log = LogManager.getLogger( QSimComponentsTest.class ) ;
+public class QSimComponentsTest {
+	private static final Logger log = LogManager.getLogger(QSimComponentsTest.class);
 
-	 @Test
-	 void testAddComponentViaString() {
+	@Test
+	void testAddComponentViaString() {
 
 		// request "abc" component by config:
 		Config config = ConfigUtils.createConfig();
 
-		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
-		List<String> list = new ArrayList<>( qsimComponentsConfig.getActiveComponents() ) ; // contains the "standard components" (*)
-		list.add( "abc" ) ;
-		qsimComponentsConfig.setActiveComponents( list );
+		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config, QSimComponentsConfigGroup.class);
+		List<String> list = new ArrayList<>(qsimComponentsConfig.getActiveComponents()); // contains the "standard components" (*)
+		list.add("abc");
+		qsimComponentsConfig.setActiveComponents(list);
 
-		log.warn( "" );
-		log.warn( "qsimComponentsConfig=" + qsimComponentsConfig + "; active components:");
-		for( String component : qsimComponentsConfig.getActiveComponents() ){
-			log.warn( component );
+		log.warn("");
+		log.warn("qsimComponentsConfig=" + qsimComponentsConfig + "; active components:");
+		for (String component : qsimComponentsConfig.getActiveComponents()) {
+			log.warn(component);
 		}
-		log.warn( "" );
+		log.warn("");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		// add event handler to catch event by MockMobsimListener:
-		AnalysisEventsHandler handler = new AnalysisEventsHandler() ;
-		eventsManager.addHandler( handler );
+		AnalysisEventsHandler handler = new AnalysisEventsHandler();
+		eventsManager.addHandler(handler);
 
 		// register the "abc" component to the QSim:
 		AbstractQSimModule module = new AbstractQSimModule() {
-			@Override protected void configureQSim() {
-				addQSimComponentBinding( "abc" ).to(  MockMobsimListener.class ) ;
+			@Override
+			protected void configureQSim() {
+				addQSimComponentBinding("abc").to(MockMobsimListener.class);
 			}
 		};
 
 		new QSimBuilder(config) //
-								.useDefaultComponents() // uses components from config
-								.useDefaultQSimModules() // registers the default modules (needed here because of (*))
-								.addQSimModule(module) // registers the additional modules
-								.build(scenario, eventsManager) //
-								.run();
+			.useDefaultComponents() // uses components from config
+			.useDefaultQSimModules() // registers the default modules (needed here because of (*))
+			.addQSimModule(module) // registers the additional modules
+			.build(scenario, eventsManager) //
+			.run();
 
-		Assertions.assertTrue( handler.hasBeenCalled(), "MockMobsimListener was not added to QSim" ) ;
+		Assertions.assertTrue(handler.hasBeenCalled(), "MockMobsimListener was not added to QSim");
 	}
 
-	 /**
-	  * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but without requesting the "abc"
-	  * component by config.  "abc" will not be activated (although it is "registered" = added as a qsim module).
-	  */
-	 @Test
-	 void testAddModuleOnly() {
+	/**
+	 * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but without requesting the "abc"
+	 * component by config.  "abc" will not be activated (although it is "registered" = added as a qsim module).
+	 */
+	@Test
+	void testAddModuleOnly() {
 
 		Config config = ConfigUtils.createConfig();
 
-		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
-		List<String> list = new ArrayList<>( qsimComponentsConfig.getActiveComponents() ) ; // contains the "standard components" (*)
+		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config, QSimComponentsConfigGroup.class);
+		List<String> list = new ArrayList<>(qsimComponentsConfig.getActiveComponents()); // contains the "standard components" (*)
 //		list.add( "abc" ) ;
-		qsimComponentsConfig.setActiveComponents( list );
+		qsimComponentsConfig.setActiveComponents(list);
 
-		log.warn( "" );
-		log.warn( "qsimComponentsConfig=" + qsimComponentsConfig + "; active components:");
-		for( String component : qsimComponentsConfig.getActiveComponents() ){
-			log.warn( component );
+		log.warn("");
+		log.warn("qsimComponentsConfig=" + qsimComponentsConfig + "; active components:");
+		for (String component : qsimComponentsConfig.getActiveComponents()) {
+			log.warn(component);
 		}
-		log.warn( "" );
+		log.warn("");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		AnalysisEventsHandler handler = new AnalysisEventsHandler() ;
-		eventsManager.addHandler( handler );
+		AnalysisEventsHandler handler = new AnalysisEventsHandler();
+		eventsManager.addHandler(handler);
 
 		AbstractQSimModule module = new AbstractQSimModule() {
-			@Override protected void configureQSim() {
-				addQSimComponentBinding( "abc" ).to(  MockMobsimListener.class ) ;
+			@Override
+			protected void configureQSim() {
+				addQSimComponentBinding("abc").to(MockMobsimListener.class);
 			}
 		};
 
 		new QSimBuilder(config) //
-								.useDefaultComponents() // uses components from config
-								.useDefaultQSimModules() // registers the default modules (needed here because of (*))
-								.addQSimModule(module) // registers the additional modules
-								.build(scenario, eventsManager) //
-								.run();
+			.useDefaultComponents() // uses components from config
+			.useDefaultQSimModules() // registers the default modules (needed here because of (*))
+			.addQSimModule(module) // registers the additional modules
+			.build(scenario, eventsManager) //
+			.run();
 
-		Assertions.assertFalse( handler.hasBeenCalled(), "MockMobsimListener was added to QSim although it should not have been added" ) ;
+		Assertions.assertFalse(handler.hasBeenCalled(), "MockMobsimListener was added to QSim although it should not have been added");
 	}
 
-	 /**
-	  * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but without registering the "abc"
-	  * module.  Evidently, it throws an exception.
-	  */
-	 @Test
-	 void testAddComponentOnly() {
-		 assertThrows(ProvisionException.class, () -> {
-				Config config = ConfigUtils.createConfig();
+	/**
+	 * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but without registering the "abc"
+	 * module.  Evidently, it throws an exception.
+	 */
+	@Test
+	void testAddComponentOnly() {
+		assertThrows(ProvisionException.class, () -> {
+			Config config = ConfigUtils.createConfig();
 
-				QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config, QSimComponentsConfigGroup.class);
-				List<String> list = new ArrayList<>( qsimComponentsConfig.getActiveComponents() ) ; // contains the "standard components" (*)
-				list.add("abc") ;
-				qsimComponentsConfig.setActiveComponents(list);
+			QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config, QSimComponentsConfigGroup.class);
+			List<String> list = new ArrayList<>(qsimComponentsConfig.getActiveComponents()); // contains the "standard components" (*)
+			list.add("abc");
+			qsimComponentsConfig.setActiveComponents(list);
 
-				log.warn("");
-				log.warn("qsimComponentsConfig=" + qsimComponentsConfig + "; active components:");
-				for (String component : qsimComponentsConfig.getActiveComponents()) {
-					log.warn(component);
+			log.warn("");
+			log.warn("qsimComponentsConfig=" + qsimComponentsConfig + "; active components:");
+			for (String component : qsimComponentsConfig.getActiveComponents()) {
+				log.warn(component);
+			}
+			log.warn("");
+
+			Scenario scenario = ScenarioUtils.createScenario(config);
+			EventsManager eventsManager = EventsUtils.createEventsManager();
+
+			AnalysisEventsHandler handler = new AnalysisEventsHandler();
+			eventsManager.addHandler(handler);
+
+			AbstractQSimModule module = new AbstractQSimModule() {
+				@Override
+				protected void configureQSim() {
+					addQSimComponentBinding("abc").to(MockMobsimListener.class);
 				}
-				log.warn("");
+			};
 
-				Scenario scenario = ScenarioUtils.createScenario(config);
-				EventsManager eventsManager = EventsUtils.createEventsManager();
-
-				AnalysisEventsHandler handler = new AnalysisEventsHandler() ;
-				eventsManager.addHandler(handler);
-
-				AbstractQSimModule module = new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
-						addQSimComponentBinding("abc").to(MockMobsimListener.class) ;
-					}
-				};
-
-				new QSimBuilder(config) //
-						.useDefaultComponents() // uses components from config
-						.useDefaultQSimModules() // registers the default modules (needed here because of (*))
+			new QSimBuilder(config) //
+				.useDefaultComponents() // uses components from config
+				.useDefaultQSimModules() // registers the default modules (needed here because of (*))
 //								.addQSimModule(module) // registers the additional modules
-						.build(scenario, eventsManager) //
-						.run();
+				.build(scenario, eventsManager) //
+				.run();
 
-			});
+		});
 
-		}
+	}
 
-	 /**
-	  * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but request the "abc" component twice.
-	  */
-	 //			( expected = IllegalStateException.class )
-	 @Test
-	 void testAddComponentViaStringTwice() {
+	/**
+	 * this tests what happens when we run the same as in {@link #testAddComponentViaString()}, but request the "abc" component twice.
+	 */
+	//			( expected = IllegalStateException.class )
+	@Test
+	void testAddComponentViaStringTwice() {
 
 		// request "abc" component by config:
 		Config config = ConfigUtils.createConfig();
 
-		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
-		List<String> list = new ArrayList<>( qsimComponentsConfig.getActiveComponents() ) ; // contains the "standard components" (*)
-		list.add( "abc" ) ;
-		list.add( "abc" ) ;
-		qsimComponentsConfig.setActiveComponents( list );
+		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config, QSimComponentsConfigGroup.class);
+		List<String> list = new ArrayList<>(qsimComponentsConfig.getActiveComponents()); // contains the "standard components" (*)
+		list.add("abc");
+		list.add("abc");
+		qsimComponentsConfig.setActiveComponents(list);
 
-		log.warn( "" );
-		log.warn( "qsimComponentsConfig=" + qsimComponentsConfig + "; active components:");
-		for( String component : qsimComponentsConfig.getActiveComponents() ){
-			log.warn( component );
+		log.warn("");
+		log.warn("qsimComponentsConfig=" + qsimComponentsConfig + "; active components:");
+		for (String component : qsimComponentsConfig.getActiveComponents()) {
+			log.warn(component);
 		}
-		log.warn( "" );
+		log.warn("");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		// add event handler to catch event by MockMobsimListener:
-		AnalysisEventsHandler handler = new AnalysisEventsHandler() ;
-		eventsManager.addHandler( handler );
+		AnalysisEventsHandler handler = new AnalysisEventsHandler();
+		eventsManager.addHandler(handler);
 
 		// register the "abc" component to the QSim:
 		AbstractQSimModule module = new AbstractQSimModule() {
-			@Override protected void configureQSim() {
-				addQSimComponentBinding( "abc" ).to(  MockMobsimListener.class ) ;
+			@Override
+			protected void configureQSim() {
+				addQSimComponentBinding("abc").to(MockMobsimListener.class);
 			}
 		};
 
 		new QSimBuilder(config) //
-								.useDefaultComponents() // uses components from config
-								.useDefaultQSimModules() // registers the default modules (needed here because of (*))
-								.addQSimModule(module) // registers the additional modules
-								.build(scenario, eventsManager) //
-								.run();
+			.useDefaultComponents() // uses components from config
+			.useDefaultQSimModules() // registers the default modules (needed here because of (*))
+			.addQSimModule(module) // registers the additional modules
+			.build(scenario, eventsManager) //
+			.run();
 
-		Assertions.assertTrue( handler.hasBeenCalled(), "MockMobsimListener was not added to QSim" ) ;
+		Assertions.assertTrue(handler.hasBeenCalled(), "MockMobsimListener was not added to QSim");
 	}
 
 
-	 @Test
-	 void testGenericAddComponentMethod() {
+	@Test
+	void testGenericAddComponentMethod() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		AnalysisEventsHandler handler = new AnalysisEventsHandler() ;
-		eventsManager.addHandler( handler );
+		AnalysisEventsHandler handler = new AnalysisEventsHandler();
+		eventsManager.addHandler(handler);
 
-		final QSimComponentsConfigurator configurator = new QSimComponentsConfigurator(){
-			@Override public void configure( QSimComponentsConfig components ){
-				components.addComponent( MockComponentAnnotation.class );
+		final QSimComponentsConfigurator configurator = new QSimComponentsConfigurator() {
+			@Override
+			public void configure(QSimComponentsConfig components) {
+				components.addComponent(MockComponentAnnotation.class);
 			}
 		};
 
 		AbstractQSimModule module = new AbstractQSimModule() {
-			@Override protected void configureQSim() {
+			@Override
+			protected void configureQSim() {
 				addQSimComponentBinding(MockComponentAnnotation.class).to(MockMobsimListener.class);
 			}
 		};
 
 		new QSimBuilder(config) //
-								.addQSimModule(module) //
-								.configureQSimComponents( configurator ) //
-								.build(scenario, eventsManager) //
-								.run();
+			.addQSimModule(module) //
+			.configureQSimComponents(configurator) //
+			.build(scenario, eventsManager) //
+			.run();
 
-		Assertions.assertTrue( handler.hasBeenCalled() ) ;
+		Assertions.assertTrue(handler.hasBeenCalled());
 	}
 
-	 @Test
-	 void testGenericAddComponentMethodWithoutConfiguringIt() {
+	@Test
+	void testGenericAddComponentMethodWithoutConfiguringIt() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		AnalysisEventsHandler handler = new AnalysisEventsHandler() ;
-		eventsManager.addHandler( handler );
+		AnalysisEventsHandler handler = new AnalysisEventsHandler();
+		eventsManager.addHandler(handler);
 
 		AbstractQSimModule module = new AbstractQSimModule() {
-			@Override protected void configureQSim() {
+			@Override
+			protected void configureQSim() {
 				addQSimComponentBinding(MockComponentAnnotation.class).to(MockMobsimListener.class);
 			}
 		};
 
 		new QSimBuilder(config) //
-								.addQSimModule(module) //
-								.build(scenario, eventsManager) //
-								.run();
+			.addQSimModule(module) //
+			.build(scenario, eventsManager) //
+			.run();
 
-		Assertions.assertFalse( handler.hasBeenCalled() ) ;
+		Assertions.assertFalse(handler.hasBeenCalled());
 	}
 
-	 @Test
-	 void testMultipleBindings() {
+	@Test
+	void testMultipleBindings() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -297,25 +303,25 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 		MockEngineB mockEngineB = new MockEngineB();
 
 		new QSimBuilder(config) //
-				.addQSimModule(new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
-						addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngineA);
-						addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngineB);
-					}
-				}) //
-				.configureQSimComponents( components -> {
-					components.addComponent(MockComponentAnnotation.class);
-				} ) //
-				.build(scenario, eventsManager) //
-				.run();
+			.addQSimModule(new AbstractQSimModule() {
+				@Override
+				protected void configureQSim() {
+					addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngineA);
+					addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngineB);
+				}
+			}) //
+			.configureQSimComponents(components -> {
+				components.addComponent(MockComponentAnnotation.class);
+			}) //
+			.build(scenario, eventsManager) //
+			.run();
 
 		Assertions.assertTrue(mockEngineA.isCalled);
 		Assertions.assertTrue(mockEngineB.isCalled);
 	}
 
-	 @Test
-	 void testExplicitAnnotationConfiguration() {
+	@Test
+	void testExplicitAnnotationConfiguration() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -323,23 +329,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 		MockEngine mockEngine = new MockEngine();
 
 		new QSimBuilder(config) //
-				.addQSimModule(new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
-						addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngine);
-					}
-				}) //
-				.configureQSimComponents( components -> {
-					components.addComponent(MockComponentAnnotation.class);
-				} ) //
-				.build(scenario, eventsManager) //
-				.run();
+			.addQSimModule(new AbstractQSimModule() {
+				@Override
+				protected void configureQSim() {
+					addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngine);
+				}
+			}) //
+			.configureQSimComponents(components -> {
+				components.addComponent(MockComponentAnnotation.class);
+			}) //
+			.build(scenario, eventsManager) //
+			.run();
 
 		Assertions.assertTrue(mockEngine.isCalled);
 	}
 
-	 @Test
-	 void testManualConfiguration() {
+	@Test
+	void testManualConfiguration() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -347,23 +353,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 		MockEngine mockEngine = new MockEngine();
 
 		new QSimBuilder(config) //
-				.addQSimModule(new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
-						addQSimComponentBinding("MockEngine").toInstance(mockEngine);
-					}
-				}) //
-				.configureQSimComponents( components -> {
-					components.addNamedComponent("MockEngine");
-				} ) //
-				.build(scenario, eventsManager) //
-				.run();
+			.addQSimModule(new AbstractQSimModule() {
+				@Override
+				protected void configureQSim() {
+					addQSimComponentBinding("MockEngine").toInstance(mockEngine);
+				}
+			}) //
+			.configureQSimComponents(components -> {
+				components.addNamedComponent("MockEngine");
+			}) //
+			.build(scenario, eventsManager) //
+			.run();
 
 		Assertions.assertTrue(mockEngine.isCalled);
 	}
 
-	 @Test
-	 void testUseConfigGroup() {
+	@Test
+	void testUseConfigGroup() {
 		Config config = ConfigUtils.createConfig();
 
 		QSimComponentsConfigGroup componentsConfig = new QSimComponentsConfigGroup();
@@ -377,15 +383,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 		MockEngine mockEngine = new MockEngine();
 
 		new QSimBuilder(config) //
-				.useDefaults() //
-				.addQSimModule(new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
-						addQSimComponentBinding("MockEngine").toInstance(mockEngine);
-					}
-				}) //
-				.build(scenario, eventsManager) //
-				.run();
+			.useDefaults() //
+			.addQSimModule(new AbstractQSimModule() {
+				@Override
+				protected void configureQSim() {
+					addQSimComponentBinding("MockEngine").toInstance(mockEngine);
+				}
+			}) //
+			.build(scenario, eventsManager) //
+			.run();
 
 		Assertions.assertTrue(mockEngine.isCalled);
 	}
@@ -398,16 +404,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 		@Override
 		public void doSimStep(double time) {
 			isCalled = true;
-		}
-
-		@Override
-		public void beforeSim() {
-
-		}
-
-		@Override
-		public void afterSim() {
-
 		}
 
 		@Override
@@ -425,35 +421,45 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 	}
 
 	private static class MockEvent extends Event {
-		MockEvent( double time ){
-			super( time );
+		MockEvent(double time) {
+			super(time);
 		}
-		@Override public String getEventType(){
-			throw new RuntimeException( "not implemented" );
+
+		@Override
+		public String getEventType() {
+			throw new RuntimeException("not implemented");
 		}
 	}
 
-	private static class MockMobsimListener implements MobsimInitializedListener{
-		@Inject EventsManager eventsManager ;
-		@Override public void notifyMobsimInitialized( MobsimInitializedEvent e ) {
-			eventsManager.processEvent( new MockEvent( Double.NEGATIVE_INFINITY ) );
+	private static class MockMobsimListener implements MobsimInitializedListener {
+		@Inject
+		EventsManager eventsManager;
+
+		@Override
+		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+			eventsManager.processEvent(new MockEvent(Double.NEGATIVE_INFINITY));
 		}
 	}
 
 	private static class AnalysisEventsHandler implements BasicEventHandler {
-		private boolean hasBeenCalled = false ;
-		@Override public void handleEvent( Event event ){
-			hasBeenCalled = true ;
+		private boolean hasBeenCalled = false;
+
+		@Override
+		public void handleEvent(Event event) {
+			hasBeenCalled = true;
 		}
-		@Override public void reset( int iteration ){
+
+		@Override
+		public void reset(int iteration) {
 		}
-		boolean hasBeenCalled(){
+
+		boolean hasBeenCalled() {
 			return hasBeenCalled;
 		}
 	}
 
 	@BindingAnnotation
-	@Target({ FIELD, PARAMETER, METHOD, TYPE })
+	@Target({FIELD, PARAMETER, METHOD, TYPE})
 	@Retention(RUNTIME)
 	static @interface MockComponentAnnotation {
 	}

@@ -135,13 +135,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	}
 
 	@Override
-	public void beforeSim() {
-		//nothing to do here
-	}
-
-
-	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
 		for (Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());

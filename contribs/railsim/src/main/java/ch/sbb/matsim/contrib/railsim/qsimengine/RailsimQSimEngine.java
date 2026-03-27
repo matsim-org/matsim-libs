@@ -97,7 +97,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	}
 
 	@Override
-	public void beforeSim() {
+	public void beforeMobsim() {
 
 		Network network = qsim.getScenario().getNetwork();
 
@@ -162,7 +162,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 
 		// It might be null if prepare sim fails
 		if (engine != null)

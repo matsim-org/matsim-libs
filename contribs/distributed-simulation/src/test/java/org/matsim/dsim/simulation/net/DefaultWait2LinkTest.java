@@ -128,7 +128,7 @@ public class DefaultWait2LinkTest {
 	}
 
 	@Test
-	public void testAfterSimStuckEvents() {
+	public void testAfterMobsimStuckEvents() {
 		DistributedMobsimVehicle veh1 = mock(DistributedMobsimVehicle.class);
 		DistributedMobsimVehicle veh2 = mock(DistributedMobsimVehicle.class);
 		DistributedMobsimVehicle veh3 = mock(DistributedMobsimVehicle.class);
@@ -164,7 +164,7 @@ public class DefaultWait2LinkTest {
 		verify(link, never()).pushVehicle(eq(veh2), any(), anyDouble());
 		verify(link, never()).pushVehicle(eq(veh3), any(), anyDouble());
 
-		wait2Link.afterSim();
+		wait2Link.afterMobsim();
 
 		ArgumentCaptor<PersonStuckEvent> captor = ArgumentCaptor.forClass(PersonStuckEvent.class);
 		verify(eventsManager, times(2)).processEvent(captor.capture());

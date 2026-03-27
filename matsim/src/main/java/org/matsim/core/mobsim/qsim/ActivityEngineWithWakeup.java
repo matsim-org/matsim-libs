@@ -38,13 +38,13 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public final class ActivityEngineWithWakeup implements ActivityEngine {
 	public static final String COMPONENT_NAME = "ActivityEngineWithWakeup";
-	private static final Logger log = LogManager.getLogger(ActivityEngineWithWakeup.class );
+	private static final Logger log = LogManager.getLogger(ActivityEngineWithWakeup.class);
 	private final EventsManager eventsManager;
 	private final PreplanningEngine preplanningEngine;
 	private final ActivityEngine delegate;
 
 	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500,
-			Comparator.comparingDouble((AgentEntry o) -> o.time).thenComparing(o -> o.agent.getId()));
+		Comparator.comparingDouble((AgentEntry o) -> o.time).thenComparing(o -> o.agent.getId()));
 	private InternalInterface internalInterface;
 
 	@Inject
@@ -55,9 +55,8 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	}
 
 	@Override
-	public void beforeSim() {
-		log.warn( "running onPrepareSim");
-		delegate.beforeSim();
+	public void beforeMobsim() {
+		delegate.beforeMobsim();
 	}
 
 	@Override
@@ -65,14 +64,14 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 		while (!wakeUpList.isEmpty() && wakeUpList.peek().time <= now) {
 			final AgentEntry entry = wakeUpList.poll();
 			this.eventsManager.processEvent(new AgentWakeupEvent(now, entry.agent.getId()));
-			entry.agentWakeup.executeOnWakeup(entry.agent, now );
+			entry.agentWakeup.executeOnWakeup(entry.agent, now);
 		}
 		delegate.doSimStep(now);
 	}
 
 	@Override
-	public void afterSim() {
-		delegate.afterSim();
+	public void afterMobsim() {
+		delegate.afterMobsim();
 	}
 
 	@Override
@@ -94,7 +93,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 
 //		Activity act = (Activity)WithinDayAgentUtils.getCurrentPlanElement(agent);
-		if ( agent instanceof PlanAgent ) {
+		if (agent instanceof PlanAgent) {
 			Activity act = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
 			if (!act.getType().contains("interaction")) {
 				wakeUpList.addAll(preplanningEngine.generateWakeups(agent, now));
@@ -105,7 +104,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	}
 
 	public interface AgentWakeup {
-		void executeOnWakeup( MobsimAgent agent, double now );
+		void executeOnWakeup(MobsimAgent agent, double now);
 	}
 
 	/**
@@ -131,7 +130,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	 * cdobler, apr'12
 	 */
 	static class AgentEntry {
-		AgentEntry( MobsimAgent agent, double time, AgentWakeup agentWakeup ) {
+		AgentEntry(MobsimAgent agent, double time, AgentWakeup agentWakeup) {
 			// yyyy Let us be careful that the executeOnWakeUp does not become overkill here; if we want something more
 			// general, rather move on a completely general MessageQueue.  kai, mar'19
 
@@ -148,7 +147,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	public final static class AgentWakeupEvent extends Event implements HasPersonId {
 		private final Id<Person> personId;
 
-		AgentWakeupEvent( double now, Id<Person> personId ) {
+		AgentWakeupEvent(double now, Id<Person> personId) {
 			super(now);
 			this.personId = personId;
 		}

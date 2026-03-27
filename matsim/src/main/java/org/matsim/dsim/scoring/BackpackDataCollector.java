@@ -11,15 +11,14 @@ import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.mobsim.dsim.DSimComponentsMessageProcessor;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
-import org.matsim.core.mobsim.dsim.DistributedMobsimEngine.MessageHandler;
-import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.dsim.NetworkDecomposition;
-import org.matsim.dsim.simulation.AgentSourcesContainer;
+import org.matsim.core.mobsim.dsim.NotifyAgentPartitionTransfer;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
+import org.matsim.core.mobsim.qsim.interfaces.AfterMobsim;
 import org.matsim.dsim.simulation.PartitionTransfer;
-import org.matsim.dsim.simulation.VehicleContainer;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -38,52 +37,54 @@ import java.util.*;
  * agents might have left the partition already.
  */
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
-public class BackpackDataCollector implements BasicEventHandler {
+public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEventHandler, NotifyAgentPartitionTransfer, QSimComponent, DSimComponentsMessageProcessor, AfterMobsim {
 
 	private final Map<Id<Person>, Backpack> backpackByPerson = new HashMap<>();
 	private final Map<Id<Vehicle>, Set<Backpack>> backpackByVehicle = new HashMap<>();
 	private final Set<Id<Person>> ignoredAgents = new HashSet<>();
 
-	//private final SimStepMessaging simStepMessaging;
 	private final PartitionTransfer partitionTransfer;
 	private final Network network;
 	private final Population population;
 
-	private final AgentSourcesContainer asc;
 	private final FinishedBackpackCollector backpackCollector;
 	private final Map<String, BackpackRouteProvider> providers;
 
 	@Inject
 	BackpackDataCollector(PartitionTransfer partitionTransfer, Network network, Population population,
-						  AgentSourcesContainer asc, FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
+						  FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
 		this.partitionTransfer = partitionTransfer;
-		//this.simStepMessaging = simStepMessaging;
 		this.network = network;
 		this.population = population;
-		this.asc = asc;
 		this.backpackCollector = fbc;
 		this.providers = providers;
 	}
 
-	public void registerAgent(MobsimAgent agent) {
+	@Override
+	public void onAgentLeavesPartition(DistributedMobsimAgent agent, int toPartition) {
+		var backpack = backpackByPerson.remove(agent.getId());
 
-		// only persons which are part of the population are scored. Other agents such as transit drivers, or drt agents
-		// can be ignored. If this assumption turns out to be incorect, we should probably mark agents as 'scorable' instead
-		if (population.getPersons().containsKey(agent.getId())) {
-			var startLink = agent.getCurrentLinkId();
-			var startPartition = network.getPartitioning().getPartition(startLink);
-			var backpack = new Backpack(agent.getId(), startPartition, providers);
-			this.backpackByPerson.put(agent.getId(), backpack);
-		} else {
-			ignoredAgents.add(agent.getId());
+		if (backpack == null) return; // this agent is ingored. We don't need to send anything.
+
+		if (backpack.isInVehicle()) {
+			var backpacksInVehicle = backpackByVehicle
+				.get(backpack.currentVehicle());
+			backpacksInVehicle.remove(backpack);
+			if (backpacksInVehicle.isEmpty()) {
+				backpackByVehicle.remove(backpack.currentVehicle());
+			}
 		}
+		var message = backpack.toMessage();
+		partitionTransfer.collect(message, toPartition);
 	}
 
-	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
-		return Map.of(
-			Backpack.Msg.class, this::processBackpackMessages,
-			VehicleContainer.class, this::processVehicleMessages
-		);
+	@Override
+	public void onAgentEntersPartition(DistributedMobsimAgent agent) {
+
+		// we don't want to do anything if we don't know the person
+		if (!population.getPersons().containsKey(agent.getId())) {
+			ignoredAgents.add(agent.getId());
+		}
 	}
 
 	private void processBackpackMessages(List<Message> messages, double now) {
@@ -99,42 +100,10 @@ public class BackpackDataCollector implements BasicEventHandler {
 		}
 	}
 
-	private void processVehicleMessages(List<Message> messages, double now) {
-		// we tap into the vehicle messages to get the state of the transit vehicle. In particular, we need to connect the driver id
-		// with the line and route information. This information is needed to recreate TransitPassengerRoutes.
-		// It is a little dirty to do this, as the vehicle messages are kinda private to the NetworkTrafficEngine and we are creating
-		// transit vehicles and drivers from the message in two places.
-		// The alternative would have been to introduce new events for passengers entering and leaving pt and we decided not to do this
-		// janek, marcel Dec' 2025
-		for (var m : messages) {
-			var veh = asc.vehicleFromContainer((VehicleContainer) m);
-			// Transit drivers are not part of the population and do not carry backpacks.
-			// Using population membership (not backpack presence) avoids a race condition where
-			// the backpack message for a population agent may arrive in a different order than the vehicle message.
-			var driverId = veh.getDriver().getId();
-			if (!population.getPersons().containsKey(driverId)) {
-				ignoredAgents.add(driverId);
-			}
-		}
-	}
-
-	public void vehicleLeavesPartition(DistributedMobsimVehicle vehicle) {
-		var driverId = vehicle.getDriver().getId();
-		var link = network.getLinks().get(vehicle.getCurrentLinkId());
-		var targetPart = (int) link.getToNode().getAttributes().getAttribute(NetworkDecomposition.PARTITION_ATTR_KEY);
-
-		if (!ignoredAgents.contains(driverId)) {
-			personLeavingPartition(driverId, targetPart);
-		}
-
-		for (var passenger : vehicle.getPassengers()) {
-			personLeavingPartition(passenger.getId(), targetPart);
-		}
-	}
-
-	public void teleportedPersonLeavesPartition(DistributedMobsimAgent agent) {
-		var targetPart = network.getPartitioning().getPartition(agent.getDestinationLinkId());
-		personLeavingPartition(agent.getId(), targetPart);
+	public Map<Class<? extends Message>, DSimComponentsMessageProcessor.MessageHandler> getMessageHandlers() {
+		return Map.of(
+			Backpack.Msg.class, this::processBackpackMessages
+		);
 	}
 
 	public void finishPerson(Id<Person> agentId) {
@@ -154,7 +123,8 @@ public class BackpackDataCollector implements BasicEventHandler {
 	 * This is the terminating method. This collector will not clean up its state, as it is expected that a new
 	 * instance of ScoringDataCollector will be created for the next iteration.
 	 */
-	public void finishAllPersons() {
+	@Override
+	public void afterMobsim() {
 		for (var backpack : backpackByPerson.values()) {
 			finishBackpack(backpack);
 		}
@@ -163,20 +133,6 @@ public class BackpackDataCollector implements BasicEventHandler {
 	private void finishBackpack(Backpack backpack) {
 		var finishedBackpack = backpack.finish();
 		backpackCollector.addBackpack(finishedBackpack);
-	}
-
-	private void personLeavingPartition(Id<Person> id, int toPart) {
-		var backpack = backpackByPerson.remove(id);
-		if (backpack.isInVehicle()) {
-			var backpacksInVehicle = backpackByVehicle
-				.get(backpack.currentVehicle());
-			backpacksInVehicle.remove(backpack);
-			if (backpacksInVehicle.isEmpty()) {
-				backpackByVehicle.remove(backpack.currentVehicle());
-			}
-		}
-		var message = backpack.toMessage();
-		partitionTransfer.collect(message, toPart);
 	}
 
 	@Override
@@ -189,6 +145,8 @@ public class BackpackDataCollector implements BasicEventHandler {
 			bookkeepingPersonEntersVehicle(peve);
 		} else if (e instanceof PersonContinuesInVehicleEvent pcive) {
 			bookkeepingPersonContinuesInVehicle(pcive);
+		} else if (e instanceof ActivityEndEvent aee) {
+			bookkeepingActivityEnd(aee);
 		}
 
 		// 2. take care of all person-related events
@@ -205,6 +163,25 @@ public class BackpackDataCollector implements BasicEventHandler {
 			bookkeepingPersonLeavesVehicle(plve);
 		} else if (e instanceof PersonStuckEvent pse) {
 			handleStuckEvent(pse);
+		}
+	}
+
+	private void bookkeepingActivityEnd(ActivityEndEvent aee) {
+
+		var id = aee.getPersonId();
+		if (backpackByPerson.containsKey(id) || ignoredAgents.contains(id)) return;
+
+		// if we don't have a backpack yet and the person is not ignored, this is the first activity of that person. Therefore, we must create a new
+		// backpack or add it to the ignored list.
+		//
+		// This favors implicitly registering agents and assumes that an agents starts its simulation with an activity.
+		if (population.getPersons().containsKey(id)) {
+			var startLink = aee.getLinkId();
+			var startPartition = network.getPartitioning().getPartition(startLink);
+			var backpack = new Backpack(id, startPartition, providers);
+			this.backpackByPerson.put(id, backpack);
+		} else {
+			ignoredAgents.add(id);
 		}
 	}
 

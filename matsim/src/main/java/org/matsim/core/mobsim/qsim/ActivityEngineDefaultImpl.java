@@ -56,6 +56,7 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 			this.agent = agent;
 			this.activityEndTime = activityEndTime;
 		}
+
 		private final MobsimAgent agent;
 		private final double activityEndTime;
 	}
@@ -92,11 +93,6 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 	}
 
 	@Override
-	public void beforeSim() {
-		// Nothing to do here
-	}
-
-	@Override
 	public void doSimStep(double time) {
 		beforeFirstSimStep = false;
 		while (activityEndsList.peek() != null) {
@@ -112,7 +108,7 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (AgentEntry entry : activityEndsList) {
 			if (entry.activityEndTime != Double.POSITIVE_INFINITY) {
