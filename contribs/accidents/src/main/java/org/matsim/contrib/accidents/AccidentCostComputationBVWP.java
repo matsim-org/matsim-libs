@@ -17,14 +17,16 @@ class AccidentCostComputationBVWP implements AccidentCostComputation {
 	private static final Logger log = LogManager.getLogger(AccidentCostComputationBVWP.class);
 
 	// do not change the sequence of these since the lookup downstream is an int
-	public enum StreckenTyp {planfrei, plangleich, tunnel}
+	// ( This might be "Alignment" but tunnel is not an alignment!)
+	public enum InfraType{gradeSeparated, atGrade, tunnel}
 
 	// do not change the sequence of these since the lookup downstream is an int
-	public enum RaeumlicheLage { ausserhalbBebautNurKfz, innerhalbBebautNurKfz, ausserhalbBebaut, innerhalbBebaut }
+	// (Germany puts the "onlyMotorVehs" or not into the location context.  kai, mar'26)
+	public enum LocationContext{outsideBuiltUpOnlyMotorVehs, builtUpOnlyMotorVehs, outsideBuiltUp, BuiltUp}
 
 	private final AccidentsConfigGroup accidentsConfig;
 
-	public record RoadType( StreckenTyp streckenTyp, RaeumlicheLage raeumlicheLage, double nLanes ) {
+	public record RoadType(InfraType infraType, LocationContext locationContext, double nLanes ) {
 	}
 
 	@Inject AccidentCostComputationBVWP( Config config ) {
@@ -96,7 +98,7 @@ class AccidentCostComputationBVWP implements AccidentCostComputation {
 		};
 
 //		double costRate = costRateTable[roadType.get(0)][roadType.get(2)-1][roadType.get(1)];
-		double costRate = costRateTable[roadType.streckenTyp.ordinal()][(int)roadType.nLanes-1][roadType.raeumlicheLage.ordinal()];
+		double costRate = costRateTable[roadType.infraType.ordinal()][(int)roadType.nLanes-1][roadType.locationContext.ordinal()];
 		// yy nLanes in MATSim can be fractional, since in some contexts it encodes width.  Not much we can do here, but not clear at which level we should clarify this.
 
 		if (costRate == 0) {
