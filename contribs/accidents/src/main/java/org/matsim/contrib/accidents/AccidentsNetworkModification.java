@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.accidents.runExample;
+package org.matsim.contrib.accidents;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.accidents.AccidentsConfigGroup;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -60,7 +59,7 @@ public class AccidentsNetworkModification {
 		this.scenario = scenario;
 	}
 
-	public Network setLinkAttributsBasedOnOSMFile(String landuseOsmFile, String osmCRS, String[] tunnelLinkIDs, String[] planfreeLinkIDs) throws MalformedURLException, IOException {
+	public Network setLinkAttributsBasedOnOSMFile(String landuseOsmFile, String osmCRS, String[] tunnelLinkIDs, String[] planfreeLinkIDs) throws IOException {
 
 		AccidentsConfigGroup accidentsCfg = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
 

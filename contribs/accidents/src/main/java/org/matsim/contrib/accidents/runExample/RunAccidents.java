@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.accidents.AccidentsConfigGroup;
 import org.matsim.contrib.accidents.AccidentsModule;
+import org.matsim.contrib.accidents.AccidentsNetworkModification;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
