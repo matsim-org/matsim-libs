@@ -26,7 +26,7 @@ class AccidentCostComputationBVWP implements AccidentCostComputation {
 
 	private final AccidentsConfigGroup accidentsConfig;
 
-	public record RoadType(InfraType infraType, LocationContext locationContext, double nLanes ) {
+	public record RoadType(InfraType infraType, LocationContext locationContext, int nLanes ) {
 	}
 
 	@Inject AccidentCostComputationBVWP( Config config ) {

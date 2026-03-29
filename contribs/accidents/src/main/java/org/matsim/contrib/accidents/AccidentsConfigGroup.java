@@ -31,14 +31,11 @@ public final class AccidentsConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "accidents" ;
 
-	/* package */ static final String BVWP_ROAD_TYPE_ATTRIBUTE_NAME = "bvwpRoadType";
-
 	public AccidentsConfigGroup() {
 		super(GROUP_NAME);
 	}
 
 	private boolean enableAccidentsModule = true;
-	private final String accidentsComputationMethodAttributeName = "accidentsComputationMethod";
 
 	private double scaleFactor = 10.;
 
@@ -75,14 +72,6 @@ public final class AccidentsConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "accidentsComputationMethod" )
 	public void AccidentsComputationMethod(AccidentsComputationMethod accidentsComputationMethod) {
 		this.accidentsComputationMethod = accidentsComputationMethod;
-	}
-
-	// ---
-
-	// yyyyyy this implies that you can change the accidents computation method PER LINK.  Is that what you want?  kai, sep'19
-	@Deprecated // can't say if this is useful or only complicating the design
-	String getAccidentsComputationMethodAttributeName() {
-		return accidentsComputationMethodAttributeName;
 	}
 
 	// ---

@@ -46,12 +46,12 @@ import org.matsim.core.utils.io.IOUtils;
 public class RunAccidents {
 	private static final Logger log = LogManager.getLogger(RunAccidents.class);
 
-	public static void main(String[] args) throws IOException {
+	static void main( String[] args ) throws IOException {
 		RunAccidents main = new RunAccidents();
 		main.run();
 	}
 
-	private void run() throws MalformedURLException, IOException {
+	private void run() throws IOException {
 		log.info("Loading scenario...");
 
 		String configFile = "path/to/configFile.xml";

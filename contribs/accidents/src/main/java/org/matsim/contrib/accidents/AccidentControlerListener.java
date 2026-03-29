@@ -85,18 +85,19 @@ import com.google.inject.Inject;
 
 				double accidentCosts = 0.;
 
-				String linkAccidentsComputationMethod = (String) this.scenario.getNetwork().getLinks().get(linkInfo.getLinkId()).getAttributes().getAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName());
+				String linkAccidentsComputationMethod = (String) this.scenario.getNetwork().getLinks().get(linkInfo.getLinkId()).getAttributes().getAttribute(
+					"accidentsComputationMethod" );
 
 				if (linkAccidentsComputationMethod == null) {
-					throw new RuntimeException("Required link attribute " + accidentsCfg.getAccidentsComputationMethodAttributeName() + " is null."
+					throw new RuntimeException("Required link attribute " + "accidentsComputationMethod" + " is null."
 							+ " Please pre-process your network and specify the link attributes that are required to compute accident costs. Aborting...");
 				}
 
 				if (linkAccidentsComputationMethod.equals( AccidentsComputationMethod.BVWP.toString() )) {
-					String bvwpRoadTypeString = (String) link.getAttributes().getAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME );
+					final String bvwpRoadTypeString = AccidentUtils.getRoadTypeString( link );
 
 					if (bvwpRoadTypeString == null) {
-						throw new RuntimeException("Required link attribute " + AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME + " is null."
+						throw new RuntimeException("Required link attribute " + AccidentUtils.BVWP_ROAD_TYPE_ARRAY_ATTRIBUTE_NAME + " is null."
 								+ " Please pre-process your network and specify the link attributes that are required to compute accident costs. Aborting...");
 					}
 

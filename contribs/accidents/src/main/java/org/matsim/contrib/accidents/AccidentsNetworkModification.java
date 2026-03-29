@@ -20,7 +20,6 @@
 package org.matsim.contrib.accidents;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,10 +32,7 @@ import org.geotools.api.data.FileDataStoreFinder;
 import org.geotools.api.data.SimpleFeatureSource;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -45,6 +41,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.GeoFileReader;
+
+import static org.matsim.contrib.accidents.AccidentCostComputationBVWP.*;
 
 /**
 * @author mmayobre, ikaddoura
@@ -104,16 +102,21 @@ public class AccidentsNetworkModification {
 			}
 			linkCounter++;
 
-			link.getAttributes().putAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName(), AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString());
+			link.getAttributes().putAttribute( "accidentsComputationMethod", AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() );
 
-			ArrayList<Integer> bvwpRoadType = new ArrayList<>();
+			ArrayList<Integer> bvwpRoadTypeArray = new ArrayList<>();
+
+			LocationContext locationContext;
+			InfraType infraType;
 
 			// 'plangleich', 'planfrei' or tunnel?
-			bvwpRoadType.add(0, 1);
+			bvwpRoadTypeArray.add(0, 1);
+			infraType = InfraType.atGrade;
 
 			for(int j=0; j < planfreeLinkIDs.length; j++){
 			    if(planfreeLinkIDs[j].equals(String.valueOf(link.getId()))){
-			    	bvwpRoadType.set(0, 0); // Change to Plan free
+			    	bvwpRoadTypeArray.set(0, 0); // Change to Plan free
+					infraType = InfraType.gradeSeparated;
 			    	log.info(link.getId() + " Changed to Plan free!");
 			    	break;
 			    }
@@ -121,7 +124,8 @@ public class AccidentsNetworkModification {
 
 			for(int i=0; i < tunnelLinkIDs.length; i++){
 				if(tunnelLinkIDs[i].equals(String.valueOf(link.getId()))){
-					bvwpRoadType.set(0, 2); // Change to Tunnel
+					bvwpRoadTypeArray.set(0, 2); // Change to Tunnel
+					infraType = InfraType.tunnel;
 					log.info(link.getId() + " Changed to Tunnel!");
 					break;
 				}
@@ -133,24 +137,30 @@ public class AccidentsNetworkModification {
 			if (osmLandUseFeatureBBId == null) {
 				log.warn("No area type found for link " + link.getId() + ". Using default value: not built-up area.");
 				if (link.getFreespeed() > 16.) {
-					bvwpRoadType.add(1, 0);
+					bvwpRoadTypeArray.add(1, 0);
+					locationContext = LocationContext.outsideBuiltUpOnlyMotorVehs;
 				} else {
-					bvwpRoadType.add(1, 2);
+					bvwpRoadTypeArray.add(1, 2);
+					locationContext = LocationContext.outsideBuiltUp;
 				}
 
 			} else {
 				String landUseTypeBB = landUseDataBB.get(osmLandUseFeatureBBId);
 				if (landUseTypeBB.matches("commercial|industrial|recreation_ground|residential|retail")) { //built-up area
 					if (link.getFreespeed() > 16.) {
-						bvwpRoadType.add(1, 1);
+						bvwpRoadTypeArray.add(1, 1);
+						locationContext = LocationContext.builtUpOnlyMotorVehs;
 					} else {
-						bvwpRoadType.add(1, 3);
+						bvwpRoadTypeArray.add(1, 3);
+						locationContext = LocationContext.outsideBuiltUp;
 					}
 				} else {
 					if (link.getFreespeed() > 16.) {
-						bvwpRoadType.add(1, 0);
+						bvwpRoadTypeArray.add(1, 0);
+						locationContext = LocationContext.outsideBuiltUpOnlyMotorVehs;
 					} else {
-						bvwpRoadType.add(1, 2);
+						bvwpRoadTypeArray.add(1, 2);
+						locationContext = LocationContext.outsideBuiltUp;
 					}
 				}
 			}
@@ -161,9 +171,11 @@ public class AccidentsNetworkModification {
 			} else {
 				numberOfLanesBVWP = (int) link.getNumberOfLanes();
 			}
-			bvwpRoadType.add(2, numberOfLanesBVWP);
+			bvwpRoadTypeArray.add(2, numberOfLanesBVWP);
 
-			link.getAttributes().putAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME, bvwpRoadType.get(0) + "," + bvwpRoadType.get(1) + "," + bvwpRoadType.get(2));
+			RoadType bvwpRoadType = new RoadType( infraType, locationContext, numberOfLanesBVWP );
+
+			AccidentUtils.setRoadTypeArrayForAccidents( link, bvwpRoadTypeArray );
 		}
 		log.info("Initializing all link-specific information... Done.");
 		return scenario.getNetwork();

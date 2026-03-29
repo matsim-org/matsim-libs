@@ -49,7 +49,7 @@ public class RunTestEquil {
 
     // pre-process network
     for (Link link : scenario.getNetwork().getLinks().values()) {
-			link.getAttributes().putAttribute(accidentsSettings.getAccidentsComputationMethodAttributeName(), AccidentsComputationMethod.BVWP.toString());
+		link.getAttributes().putAttribute( "accidentsComputationMethod", AccidentsComputationMethod.BVWP.toString() );
 
 			int numberOfLanesBVWP;
 			if (link.getNumberOfLanes() > 4){
@@ -59,9 +59,9 @@ public class RunTestEquil {
 			}
 
 			if (link.getFreespeed() > 16.) {
-				link.getAttributes().putAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME, "1,0," + numberOfLanesBVWP);
+				link.getAttributes().putAttribute( AccidentUtils.BVWP_ROAD_TYPE_ARRAY_ATTRIBUTE_NAME, "1,0," + numberOfLanesBVWP );
 			} else {
-				link.getAttributes().putAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME, "1,2," + numberOfLanesBVWP);
+				link.getAttributes().putAttribute( AccidentUtils.BVWP_ROAD_TYPE_ARRAY_ATTRIBUTE_NAME, "1,2," + numberOfLanesBVWP );
 			}
 		}
 
