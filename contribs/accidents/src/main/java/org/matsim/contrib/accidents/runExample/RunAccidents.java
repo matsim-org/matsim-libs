@@ -21,7 +21,6 @@ package org.matsim.contrib.accidents.runExample;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
@@ -69,7 +68,7 @@ public class RunAccidents {
 		String[] tunnelLinks = readCSVFile("tunnelLinksCSVfile");
 		String[] planfreeLinks = readCSVFile("planfreeLinksCSVfile");
 
-		networkModification.setLinkAttributsBasedOnOSMFile("osmlandUseFile", "EPSG:31468" , tunnelLinks, planfreeLinks );
+		networkModification.setLinkAttributesBasedOnOSMFile("osmlandUseFile", "EPSG:31468" , tunnelLinks, planfreeLinks );
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AccidentsModule());

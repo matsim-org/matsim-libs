@@ -57,7 +57,7 @@ public class AccidentsNetworkModification {
 		this.scenario = scenario;
 	}
 
-	public Network setLinkAttributsBasedOnOSMFile(String landuseOsmFile, String osmCRS, String[] tunnelLinkIDs, String[] planfreeLinkIDs) throws IOException {
+	public Network setLinkAttributesBasedOnOSMFile( String landuseOsmFile, String osmCRS, String[] tunnelLinkIDs, String[] planfreeLinkIDs ) throws IOException {
 
 		AccidentsConfigGroup accidentsCfg = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
 
@@ -111,12 +111,12 @@ public class AccidentsNetworkModification {
 
 			// 'plangleich', 'planfrei' or tunnel?
 			bvwpRoadTypeArray.add(0, 1);
-			infraType = InfraType.atGrade;
+			infraType = AccidentCostComputation.InfraType.atGrade;
 
 			for(int j=0; j < planfreeLinkIDs.length; j++){
 			    if(planfreeLinkIDs[j].equals(String.valueOf(link.getId()))){
 			    	bvwpRoadTypeArray.set(0, 0); // Change to Plan free
-					infraType = InfraType.gradeSeparated;
+					infraType = AccidentCostComputation.InfraType.gradeSeparated;
 			    	log.info(link.getId() + " Changed to Plan free!");
 			    	break;
 			    }
@@ -125,7 +125,7 @@ public class AccidentsNetworkModification {
 			for(int i=0; i < tunnelLinkIDs.length; i++){
 				if(tunnelLinkIDs[i].equals(String.valueOf(link.getId()))){
 					bvwpRoadTypeArray.set(0, 2); // Change to Tunnel
-					infraType = InfraType.tunnel;
+					infraType = AccidentCostComputation.InfraType.tunnel;
 					log.info(link.getId() + " Changed to Tunnel!");
 					break;
 				}
@@ -138,10 +138,10 @@ public class AccidentsNetworkModification {
 				log.warn("No area type found for link " + link.getId() + ". Using default value: not built-up area.");
 				if (link.getFreespeed() > 16.) {
 					bvwpRoadTypeArray.add(1, 0);
-					locationContext = LocationContext.outsideBuiltUpOnlyMotorVehs;
+					locationContext = AccidentCostComputation.LocationContext.outsideBuiltUpOnlyMotorVehs;
 				} else {
 					bvwpRoadTypeArray.add(1, 2);
-					locationContext = LocationContext.outsideBuiltUp;
+					locationContext = AccidentCostComputation.LocationContext.outsideBuiltUp;
 				}
 
 			} else {
@@ -149,18 +149,18 @@ public class AccidentsNetworkModification {
 				if (landUseTypeBB.matches("commercial|industrial|recreation_ground|residential|retail")) { //built-up area
 					if (link.getFreespeed() > 16.) {
 						bvwpRoadTypeArray.add(1, 1);
-						locationContext = LocationContext.builtUpOnlyMotorVehs;
+						locationContext = AccidentCostComputation.LocationContext.builtUpOnlyMotorVehs;
 					} else {
 						bvwpRoadTypeArray.add(1, 3);
-						locationContext = LocationContext.outsideBuiltUp;
+						locationContext = AccidentCostComputation.LocationContext.outsideBuiltUp;
 					}
 				} else {
 					if (link.getFreespeed() > 16.) {
 						bvwpRoadTypeArray.add(1, 0);
-						locationContext = LocationContext.outsideBuiltUpOnlyMotorVehs;
+						locationContext = AccidentCostComputation.LocationContext.outsideBuiltUpOnlyMotorVehs;
 					} else {
 						bvwpRoadTypeArray.add(1, 2);
-						locationContext = LocationContext.outsideBuiltUp;
+						locationContext = AccidentCostComputation.LocationContext.outsideBuiltUp;
 					}
 				}
 			}
@@ -196,23 +196,21 @@ public class AccidentsNetworkModification {
 		Coord linkEndCoordinateTransformedToOSMCRS = ctScenarioCRS2osmCRS.transform(link.getToNode().getCoord());
 		Point pEnd = MGC.xy2Point(linkEndCoordinateTransformedToOSMCRS.getX(), linkEndCoordinateTransformedToOSMCRS.getY());
 
-		String osmLandUseFeatureBBId = null;
-
 		for (SimpleFeature feature : landUseFeaturesBB.values()) {
 			if (((Geometry) feature.getDefaultGeometry()).contains(pMiddle)) {
-				return osmLandUseFeatureBBId = feature.getAttribute("osm_id").toString();
+				return feature.getAttribute("osm_id" ).toString();
 			}
 		}
 
 		for (SimpleFeature feature : landUseFeaturesBB.values()) {
 			if (((Geometry) feature.getDefaultGeometry()).contains(pStart)) {
-				return osmLandUseFeatureBBId = feature.getAttribute("osm_id").toString();
+				return feature.getAttribute("osm_id" ).toString();
 			}
 		}
 
 		for (SimpleFeature feature : landUseFeaturesBB.values()) {
 			if (((Geometry) feature.getDefaultGeometry()).contains(pEnd)) {
-				return osmLandUseFeatureBBId = feature.getAttribute("osm_id").toString();
+				return feature.getAttribute("osm_id" ).toString();
 			}
 		}
 
@@ -223,7 +221,8 @@ public class AccidentsNetworkModification {
 
 		double distance = 10.0;
 
-		while (osmLandUseFeatureBBId == null && distance <= 500) {
+		String osmLandUseFeatureBBId = null;
+		while ( distance <= 500 ) {
 			Coord coordGK4 = cTosmCRSToGK4.transform(MGC.coordinate2Coord(pMiddle.getCoordinate()));
 			Point pGK4 = geoFac.createPoint(MGC.coord2Coordinate(coordGK4));
 

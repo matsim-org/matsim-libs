@@ -19,13 +19,12 @@
 
 package org.matsim.contrib.accidents;
 
-import java.util.ArrayList;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.accidents.AccidentsConfigGroup.AccidentsComputationMethod;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -80,8 +79,8 @@ import com.google.inject.Inject;
 				final double time = (endTime - timeBinSize/2.);
 				final int timeBinNr = (int) (time / timeBinSize);
 
-				final AccidentsConfigGroup accidentSettings = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
-				final double demand = accidentSettings.getScaleFactor() * analzyer.getDemand(linkInfo.getLinkId(), timeBinNr);
+				final AccidentsConfigGroup accidentsConfig = ConfigUtils.addOrGetModule( scenario.getConfig(), AccidentsConfigGroup.class );
+				final double demand = accidentsConfig.getScaleFactor() * analzyer.getDemand(linkInfo.getLinkId(), timeBinNr);
 
 				double accidentCosts = 0.;
 
@@ -94,18 +93,9 @@ import com.google.inject.Inject;
 				}
 
 				if (linkAccidentsComputationMethod.equals( AccidentsComputationMethod.BVWP.toString() )) {
-					final String bvwpRoadTypeString = AccidentUtils.getRoadTypeString( link );
+					AccidentCostComputationBVWP.RoadType roadType = AccidentUtils.getRoadTypeForAccidents( link );
 
-					if (bvwpRoadTypeString == null) {
-						throw new RuntimeException("Required link attribute " + AccidentUtils.BVWP_ROAD_TYPE_ARRAY_ATTRIBUTE_NAME + " is null."
-								+ " Please pre-process your network and specify the link attributes that are required to compute accident costs. Aborting...");
-					}
-
-					ArrayList<Integer> bvwpRoadType = new ArrayList<>();
-					bvwpRoadType.add(0, Integer.valueOf(bvwpRoadTypeString.split(",")[0]));
-					bvwpRoadType.add(1, Integer.valueOf(bvwpRoadTypeString.split(",")[1]));
-					bvwpRoadType.add(2, Integer.valueOf(bvwpRoadTypeString.split(",")[2]));
-					accidentCosts = accidentCostComputation.computeAccidentCosts(demand, link, bvwpRoadType);
+					accidentCosts = accidentCostComputation.computeAccidentCosts( demand, link, roadType );
 
 				} else {
 					throw new RuntimeException("Unknown accident computation approach or value not set. Aborting...");
