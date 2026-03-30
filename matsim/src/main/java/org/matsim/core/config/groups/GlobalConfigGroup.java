@@ -117,11 +117,9 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		return this;
 	}
 	// ---
-	private boolean insistingOnDeprecatedConfigVersion = true ;
-	// yyyy this should be set to false eventually.  kai, aug'18
-	// IMO: Yes, false would be the default and if read in an older version, set it to true.
-	// That would also avoid the setting to "false" in ConfigUtils. This should not be needed, because creating
-	// a new Config should always result in the newest version. 	// kmt, Aug'24
+	private boolean insistingOnDeprecatedConfigVersion = false ;
+	// For programmatically created configs, the current config version is the default.
+	// Deprecated config support is re-enabled explicitly when reading config_v1.  kmt/assistant, Mar'26
 	private static final String INSITING_ON_DEPRECATED_CONFIG_VERSION = "insistingOnDeprecatedConfigVersion" ;
 	@StringGetter( INSITING_ON_DEPRECATED_CONFIG_VERSION )
 	public final boolean isInsistingOnDeprecatedConfigVersion() { return this.insistingOnDeprecatedConfigVersion ; }

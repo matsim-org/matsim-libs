@@ -63,6 +63,9 @@ import static org.matsim.core.config.ConfigV2XmlNames.NAME;
 		super(ValidationType.DTD_ONLY);
 		this.config = config;
 		this.aliases = new ConfigAliases();
+		if (this.config.getModule(GlobalConfigGroup.GROUP_NAME) != null) {
+			this.config.global().setInsistingOnDeprecatedConfigVersion(true);
+		}
 		log.warn(msg);
 	}
 
@@ -70,6 +73,9 @@ import static org.matsim.core.config.ConfigV2XmlNames.NAME;
 		super(ValidationType.DTD_ONLY);
 		this.config = config;
 		this.aliases = aliases;
+		if (this.config.getModule(GlobalConfigGroup.GROUP_NAME) != null) {
+			this.config.global().setInsistingOnDeprecatedConfigVersion(true);
+		}
 		log.warn(msg);
 	}
 
