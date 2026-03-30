@@ -768,8 +768,8 @@ public final class PopulationUtils {
 
 	public static boolean hasCarLeg(Plan plan) {
 		List<PlanElement> planElements = plan.getPlanElements();
-		for (int i = 0; i < planElements.size(); i++) {
-			if (planElements.get(i) instanceof Leg leg) {
+		for (PlanElement planElement : planElements) {
+			if (planElement instanceof Leg leg) {
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 					return true;
 				}
@@ -892,7 +892,7 @@ public final class PopulationUtils {
 	}
 
 	private static void verifyCreateLeg(Plan plan) throws IllegalStateException {
-		if (plan.getPlanElements().size() == 0) {
+		if (plan.getPlanElements().isEmpty()) {
 			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
 		}
 	}
@@ -1040,11 +1040,11 @@ public final class PopulationUtils {
 	// --- positional methods:
 
 	public static Activity getFirstActivity(Plan plan) {
-		return (Activity) plan.getPlanElements().get(0);
+		return (Activity) plan.getPlanElements().getFirst();
 	}
 
 	public static Activity getLastActivity(Plan plan) {
-		return (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+		return (Activity) plan.getPlanElements().getLast();
 	}
 
 	public static Activity getNextActivity(Plan plan, Leg leg) {
@@ -1228,11 +1228,46 @@ public final class PopulationUtils {
 		return CoordUtils.interpolate(fromCoord, toCoord, rel);
 	}
 
-	public static void sampleDown(Population pop, double sample) {
+	/**
+	 * Method samples down the population separately for each subpopulation.
+	 * The group of persons with no subpopulation is handled as a separate subpopulation. The same sampling rate is
+	 * applied to each group, and the number of remaining persons per subpopulation is chosen deterministically via
+	 * rounding so that a single population scale can still be used consistently afterwards.
+	 *
+	 * @param pop    population to be downsampled
+	 * @param sampleTo sample rate, e.g. 0.1 for 10% of the population
+	 */
+	public static void sampleDown(Population pop, double sampleTo) {
+		if (sampleTo < 0 || sampleTo > 1) {
+			throw new IllegalArgumentException("sampleTo must be within [0, 1], but is " + sampleTo);
+		}
+
 		final Random rnd = MatsimRandom.getLocalInstance();
-		log.info("population size before downsampling=" + pop.getPersons().size());
-		pop.getPersons().values().removeIf(person -> rnd.nextDouble() >= sample);
-		log.info("population size after downsampling=" + pop.getPersons().size());
+		log.info("population size before downsampling={}", pop.getPersons().size());
+
+		Map<String, List<Id<Person>>> personsPerSubpopulation = new LinkedHashMap<>();
+		pop.getPersons().values().forEach(person ->
+			personsPerSubpopulation
+				.computeIfAbsent(PopulationUtils.getSubpopulation(person), ignored -> new ArrayList<>())
+				.add(person.getId())
+		);
+
+		for (Map.Entry<String, List<Id<Person>>> entry : personsPerSubpopulation.entrySet()) {
+			List<Id<Person>> personIds = entry.getValue();
+			Collections.shuffle(personIds, rnd);
+
+			int targetSize = (int) Math.round(personIds.size() * sampleTo);
+			for (int i = targetSize; i < personIds.size(); i++) {
+				pop.removePerson(personIds.get(i));
+			}
+		}
+
+		// if the input population has no scale attribute, in this method it is not clear which sampleSize the input has and the new scale is not written to the pop.
+		Double scale = ScenarioUtils.getScale(pop);
+		if (scale != null) {
+			ScenarioUtils.putScale(pop, scale * sampleTo);
+		}
+		log.info("population size after downsampling={}", pop.getPersons().size());
 	}
 
 	public static void readPopulation(Population population, String filename) {
@@ -1265,35 +1300,6 @@ public final class PopulationUtils {
 		return PopulationComparison.compare(population1, population2);
 	}
 
-	// ---
-
-	/**
-	 * @deprecated -- please inline.  kai, jun'22
-	 */
-	public static Object getPersonAttribute(HasPlansAndId<?, ?> person, String key) {
-		if (person == null) {
-			return null;
-		}
-		// (This was originally "if person instanceof Attributable then ...".  Since HasPlansAndId now implements Attributable, this is in
-		// principle always fulfilled.  However, if person==null, then person instanceof Attributable also fails.  kai, jul'22)
-
-		return person.getAttributes().getAttribute(key);
-	}
-
-	/**
-	 * @deprecated -- please inline.  kai, jun'22
-	 */
-	public static void putPersonAttribute(HasPlansAndId<?, ?> person, String key, Object value) {
-		person.getAttributes().putAttribute(key, value);
-	}
-
-	/**
-	 * @deprecated -- please inline.  kai, jun'22
-	 */
-	public static Object removePersonAttribute(Person person, String key) {
-		return person.getAttributes().removeAttribute(key);
-	}
-
 	/**
 	 * @deprecated -- this command is dangerous since it might clear some else's attributes.  Better just remove specificially the attributes that you "own".  kai, may'19
 	 */
@@ -1312,7 +1318,7 @@ public final class PopulationUtils {
 	}
 
 	public static void putSubpopulation(HasPlansAndId<?, ?> person, String subpopulation) {
-		putPersonAttribute(person, SUBPOPULATION_ATTRIBUTE_NAME, subpopulation);
+		person.getAttributes().putAttribute(SUBPOPULATION_ATTRIBUTE_NAME, subpopulation);
 	}
 
 	public static void removeSubpopulation(Person person) {
@@ -1336,7 +1342,7 @@ public final class PopulationUtils {
 		if (person == null) {
 			if (tryStdCnt > 0) {
 				tryStdCnt--;
-				log.info("personId=" + personId + " not in allPersons; trying standard population container ...");
+				log.info("personId={} not in allPersons; trying standard population container ...", personId);
 				if (tryStdCnt == 0) {
 					log.info(Gbl.FUTURE_SUPPRESSED);
 				}
@@ -1344,7 +1350,7 @@ public final class PopulationUtils {
 			person = scenario.getPopulation().getPersons().get(personId);
 		}
 		if (person == null) {
-			log.info("unable to find person for personId=" + personId + "; will return null");
+			log.info("unable to find person for personId={}; will return null", personId);
 		}
 		return person;
 	}
@@ -1382,10 +1388,10 @@ public final class PopulationUtils {
 		population.getPersons().values().forEach(
 			personRouteChecker::run
 		);
-		///  There is also a {@link PersonNetworkLinkCheck}
+		//  There is also a {@link PersonNetworkLinkCheck}
 	}
 	public static void cleanPopulation( Scenario scenario ) {
 		checkRouteModeAndReset( scenario.getPopulation(), scenario.getNetwork() );
-		///  There is also a {@link PersonNetworkLinkCheck}
+		//  There is also a {@link PersonNetworkLinkCheck}
 	}
 }
