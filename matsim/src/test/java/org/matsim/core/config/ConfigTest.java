@@ -76,6 +76,20 @@ public class ConfigTest {
 	}
 
 	@Test
+	void loadingConfigV1IntoBareConfigCreatesGlobalModuleAndEnablesDeprecatedSupport() {
+		Config config = new Config();
+
+		String str = "<?xml version='1.0' encoding='UTF-8' ?>\n" +
+			"<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v1.dtd\">\n" +
+			"<config>\n" +
+			"</config>";
+		new ConfigReader(config).parse(new ByteArrayInputStream(str.getBytes()));
+
+		Assertions.assertNotNull(config.getModule("global"));
+		Assertions.assertTrue(config.global().isInsistingOnDeprecatedConfigVersion());
+	}
+
+	@Test
 	void testAddModule_afterLoading() {
 		Config config = new Config();
 		ConfigTestGroup group = new ConfigTestGroup();
