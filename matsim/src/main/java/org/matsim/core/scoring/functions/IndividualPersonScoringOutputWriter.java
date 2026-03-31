@@ -58,7 +58,7 @@ public class IndividualPersonScoringOutputWriter implements IterationEndsListene
 				subpopulations.add(e.getKey());
 				excludeSubpopulations.addAll(tasteVariationsParams.getExcludeSubpopulations());
 				paramsTypes.addAll(tasteVariationsParams.getVariationsOf());
-				modes.addAll(e.getValue().getModes().keySet());
+				modes.addAll(e.getValue().getModeParams().keySet());
 			}
 		}
 

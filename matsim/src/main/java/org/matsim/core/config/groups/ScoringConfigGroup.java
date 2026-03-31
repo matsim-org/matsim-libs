@@ -448,11 +448,11 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 */
 	public Collection<String> getAllModes() {
 		if (getScoringParameters(null) != null) {
-			return getScoringParameters(null).getModes().keySet();
+			return getScoringParameters(null).getModeParams().keySet();
 
 		} else {
 			Set<String> modes = new HashSet<>();
-			getScoringParametersPerSubpopulation().values().forEach(item -> modes.addAll(item.getModes().keySet()));
+			getScoringParametersPerSubpopulation().values().forEach(item -> modes.addAll(item.getModeParams().keySet()));
 			return modes;
 		}
 
@@ -470,9 +470,9 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public Map<String, ModeParams> getModes() {
 		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getModes();
+			return getScoringParameters(null).getModeParams();
 		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getModes();
+			return getScoringParameters(DEFAULT_SUBPOPULATION).getModeParams();
 		else
 			throw new RuntimeException("Default subpopulation is not defined");
 	}
@@ -645,7 +645,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			// There is, however, a test that checks if all network modes from planCalcRoute have
 			// interaction activities.  So we rather satisfy it than changing the test.  kai, jan'21
 
-			for (String mode : scoringParameterSet.getModes().keySet()) {
+			for (String mode : scoringParameterSet.getModeParams().keySet()) {
 				createAndAddInteractionActivity(scoringParameterSet, mode);
 			}
 		}
@@ -1395,7 +1395,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		@StringGetter(WAITING_PT)
 		public double getMarginalUtlOfWaitingPt_utils_hr() {
 			return waitingPt != null ? waitingPt
-				: this.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+				: this.getModeParams().get(TransportMode.pt).getMarginalUtilityOfTraveling();
 		}
 
 		@StringSetter(WAITING_PT)
@@ -1431,7 +1431,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 						throw new RuntimeException("wrong class for " + module);
 					}
 					final String m = ((ModeParams) module).getMode();
-					if (getModes().get(m) != null) {
+					if (getModeParams().get(m) != null) {
 						throw new IllegalStateException("already a parameter set for mode " + m);
 					}
 					break;
@@ -1489,7 +1489,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			return params;
 		}
 
-		public Map<String, ModeParams> getModes() {
+		public Map<String, ModeParams> getModeParams() {
 			@SuppressWarnings("unchecked") final Collection<ModeParams> modes = (Collection<ModeParams>) getParameterSets(ModeParams.SET_TYPE);
 			final Map<String, ModeParams> map = new LinkedHashMap<>();
 
@@ -1507,7 +1507,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 		public ModeParams getOrCreateModeParams(String modeName) {
-			ModeParams modeParams = getModes().get(modeName);
+			ModeParams modeParams = getModeParams().get(modeName);
 			if (modeParams == null) {
 				modeParams = new ModeParams(modeName);
 				addParameterSet(modeParams);
@@ -1516,7 +1516,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 		public void addModeParams(final ModeParams params) {
-			final ModeParams previous = this.getModes().get(params.getMode());
+			final ModeParams previous = this.getModeParams().get(params.getMode());
 
 			if (previous != null) {
 				final boolean removed = removeParameterSet(previous);
