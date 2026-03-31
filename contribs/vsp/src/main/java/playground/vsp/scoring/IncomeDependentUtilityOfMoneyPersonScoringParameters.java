@@ -56,7 +56,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements ScoringParametersForPerson {
 	Logger log = LogManager.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
-    private final ScoringConfigGroup config;
+    private final ScoringConfigGroup scoringConfigGroup;
     private final ScenarioConfigGroup scConfig;
     private final TransitConfigGroup transitConfigGroup;
     private final Map<Id<Person>, ScoringParameters> params = new IdMap<>(Person.class);
@@ -65,7 +65,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 
     @Inject
     IncomeDependentUtilityOfMoneyPersonScoringParameters(Population population, ScoringConfigGroup scoringConfigGroup, ScenarioConfigGroup scenarioConfigGroup, TransitConfigGroup transitConfigGroup) {
-        this.config = scoringConfigGroup;
+        this.scoringConfigGroup = scoringConfigGroup;
         this.scConfig = scenarioConfigGroup;
         this.transitConfigGroup = transitConfigGroup;
         this.globalAvgIncome = computeAvgIncome(population);
@@ -112,7 +112,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
              * point of view than giving each ScoringFunction its own copy of the params.
              */
 
-            ScoringConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
+            ScoringConfigGroup.ScoringParameterSet subpopulationScoringParams = this.scoringConfigGroup.getScoringParameters(subpopulation);
             // (we can set scoring params per subpopulation, so retrieve them as starting point.  kai, apr'22)
 
             // save the activityParams of the subpopulation so we need to build them only once.
@@ -127,8 +127,8 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
             // (I think that this is just an adapter class, converting the representation in the config to some internal representation.  kai, apr'22)
 
             //use the builder that does not make defensive copies of the activity params
-            ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, subpopulationScoringParams, this.activityParamsPerSubpopulation.get(subpopulation), scConfig);
-            // (odd that this now needs both the version from the config and the version from the adapter class.  kai, apr'22)
+            ScoringParameters.Builder builder = new ScoringParameters.Builder(this.scoringConfigGroup, subpopulationScoringParams, this.activityParamsPerSubpopulation.get(subpopulation), scConfig);
+            // (odd that this now needs both the version from the scoringConfigGroup and the version from the adapter class.  kai, apr'22)
 
             if (transitConfigGroup.isUseTransit()) {
                 // this is the PT stage activity:
