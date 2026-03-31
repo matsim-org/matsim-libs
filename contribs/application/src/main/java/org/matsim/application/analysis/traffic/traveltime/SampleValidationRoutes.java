@@ -288,7 +288,7 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 				continue;
 			}
 
-			LeastCostPathCalculator.Path path = router.calcLeastCostPath(link.getFromNode(), to.getToNode(), 0, null, null);
+			LeastCostPathCalculator.Path path = router.calcLeastCostPath(link, to, 0, null, null);
 
 			if (path.nodes.size() < 2) {
 				i--;

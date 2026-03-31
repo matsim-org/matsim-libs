@@ -6,7 +6,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 

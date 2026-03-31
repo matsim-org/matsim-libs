@@ -67,7 +67,7 @@ public class RunEvExampleWithOwnConsumptionModel{
 				args = new String[]{ DEFAULT_CONFIG_FILE };
 			} else {
 				log.info("Starting simulation run with the example config file from GitHub repository");
-				args = new String[]{"https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/"
+				args = new String[]{"https://raw.githubusercontent.com/matsim-org/matsim/main/contribs/ev/"
 						+ DEFAULT_CONFIG_FILE };
 			}
 		}

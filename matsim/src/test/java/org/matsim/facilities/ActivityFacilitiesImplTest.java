@@ -31,9 +31,9 @@ public class ActivityFacilitiesImplTest {
 
 	@Test
 	void testAddActivityFacility() {
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
+		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(200, 5000));
 
 		Assertions.assertEquals(0, facilities.getFacilities().size());
 
@@ -41,7 +41,7 @@ public class ActivityFacilitiesImplTest {
 
 		Assertions.assertEquals(1, facilities.getFacilities().size());
 
-		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord((double) 300, (double) 4000));
+		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord(300, 4000));
 		facilities.addActivityFacility(facility2);
 
 		Assertions.assertEquals(2, facilities.getFacilities().size());
@@ -49,10 +49,10 @@ public class ActivityFacilitiesImplTest {
 
 	@Test
 	void testAddActivityFacility_addingTwice() {
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
-		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord((double) 300, (double) 4000));
+		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(200, 5000));
+		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord(300, 4000));
 
 		Assertions.assertEquals(0, facilities.getFacilities().size());
 
@@ -70,10 +70,10 @@ public class ActivityFacilitiesImplTest {
 
 	@Test
 	void testAddActivityFacility_sameId() {
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
-		ActivityFacility facility2 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 300, (double) 4000));
+		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(200, 5000));
+		ActivityFacility facility2 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(300, 4000));
 
 		Assertions.assertEquals(0, facilities.getFacilities().size());
 
@@ -93,10 +93,10 @@ public class ActivityFacilitiesImplTest {
 	 */
 	@Test
 	void testRemove() {
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
-		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord((double) 300, (double) 4000));
+		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(200, 5000));
+		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord(300, 4000));
 		facilities.addActivityFacility(facility1);
 		facilities.addActivityFacility(facility2);
 		Assertions.assertEquals(2, facilities.getFacilities().size());

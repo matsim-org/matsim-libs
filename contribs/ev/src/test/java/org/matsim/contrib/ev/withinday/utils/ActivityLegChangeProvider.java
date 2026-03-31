@@ -3,7 +3,7 @@ package org.matsim.contrib.ev.withinday.utils;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;

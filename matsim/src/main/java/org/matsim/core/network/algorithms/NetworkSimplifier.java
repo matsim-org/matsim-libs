@@ -31,6 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinksUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -45,6 +46,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
 /**
  * Simplifies a given network, by merging links. All other criteria met, no 
@@ -70,32 +72,45 @@ public final class NetworkSimplifier {
 
 	private final Map<Id<Link>,List<Node>> mergedLinksToIntermediateNodes = new HashMap<>();
 
-	public static final BiPredicate<Link, Link> DEFAULT_IS_MERGEABLE_PREDICATE = (inLink, outLink) -> true;
-	public static final BiConsumer<Tuple<Link, Link>, Link> DEFAULT_TRANSFER_ATTRIBUTES_CONSUMER = (inOutLinks,
-			newLink) -> {
-		// do nothing
-	};
+	private final List<Consumer<Network>> preTransformations = new ArrayList<>();
+	private final List<BiPredicate<Link, Link>> isMergeablePredicates = new ArrayList<>();
+	private final List<BiConsumer<Tuple<Link, Link>, Link>> transferAttributesConsumers = new ArrayList<>();
+	private final List<Consumer<Network>> postTransformations = new ArrayList<>();
 
 	/**
-	 * Merges all qualifying links, ignoring length threshold.
-	 * @param network
+	 * @deprecated Use {@link #createNetworkSimplifier(Network)}
 	 */
-	public void run(final Network network){
-		run(network, Double.POSITIVE_INFINITY, ThresholdExceeded.EITHER);
+	@Deprecated
+	public NetworkSimplifier() {
+	}
+
+	/**
+	 * Use this to create an instance of a NetworkSimplifier that also considers
+	 * turn restrictions.
+	 * 
+	 * @param network
+	 * @return
+	 */
+	public static NetworkSimplifier createNetworkSimplifier(Network network) {
+		NetworkSimplifier networkSimplifier = new NetworkSimplifier();
+		networkSimplifier.registerPreTransformation(
+				DisallowedNextLinksUtils::annotateNetworkForSimplification);
+		networkSimplifier.registerIsMergeablePredicate(
+				DisallowedNextLinksUtils.createIsMergeablePredicate(network));
+		networkSimplifier.registerTransferAttributesConsumer(
+				DisallowedNextLinksUtils.createTransferAttributesConsumer(network));
+		networkSimplifier.registerPostTransformation(
+				DisallowedNextLinksUtils::removeAnnotation);
+		return networkSimplifier;
 	}
 
 	/**
 	 * Merges all qualifying links, ignoring length threshold.
 	 * 
 	 * @param network
-	 * @param isMergeable        predicate(inLink, outLink) to decide whether links
-	 *                           shall be merged
-	 * @param transferAttributes consumer(Tuple.of(inLink, outLink), newLink) to
-	 *                           customize merging of non-standard attributes
 	 */
-	public void run(final Network network, final BiPredicate<Link, Link> isMergeable,
-			final BiConsumer<Tuple<Link, Link>, Link> transferAttributes) {
-		run(network, Double.POSITIVE_INFINITY, ThresholdExceeded.EITHER, isMergeable, transferAttributes);
+	public void run(final Network network) {
+		run(network, Double.POSITIVE_INFINITY, ThresholdExceeded.EITHER);
 	}
 
 	/**
@@ -126,13 +141,8 @@ public final class NetworkSimplifier {
 			this.nodesNotToMerge.add(Id.createNodeId(l));
 		}
 	}
-	
-	private void run(final Network network, double thresholdLength, ThresholdExceeded type) {
-		run(network, thresholdLength, type, DEFAULT_IS_MERGEABLE_PREDICATE, DEFAULT_TRANSFER_ATTRIBUTES_CONSUMER);
-	}
 
-	private void run(final Network network, double thresholdLength, ThresholdExceeded type,
-			final BiPredicate<Link, Link> isMergeable, final BiConsumer<Tuple<Link, Link>, Link> transferAttributes) {
+	private void run(final Network network, double thresholdLength, ThresholdExceeded type) {
 
 		if(this.nodeTopoToMerge.size() == 0){
 			throw new RuntimeException("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
@@ -142,6 +152,8 @@ public final class NetworkSimplifier {
 
 		NetworkCalcTopoType nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(network);
+
+		this.preTransformations.forEach(c -> c.accept(network));
 
 		for (Node node : network.getNodes().values()) {
 			
@@ -155,7 +167,8 @@ public final class NetworkSimplifier {
 				for (Link inLink : iLinks) {
 					for (Link outLink : oLinks) {
 
-						if(areLinksMergeable(inLink, outLink) && isMergeable.test(inLink, outLink)) {
+						if (areLinksMergeable(inLink, outLink)
+								&& isMergeablePredicates.stream().allMatch(p -> p.test(inLink, outLink))) {
 							if(this.mergeLinksWithDifferentAttributes){
 
 								// Only merge if threshold criteria is met.
@@ -208,7 +221,7 @@ public final class NetworkSimplifier {
 										NetworkUtils.setOrigId(link, NetworkUtils.getOrigId(inLink) + "-" + NetworkUtils.getOrigId(outLink));
 									}
 									network.addLink(link);
-									transferAttributes.accept(Tuple.of(inLink, outLink), link);
+									transferAttributesConsumers.forEach(c -> c.accept(Tuple.of(inLink, outLink), link));
 									network.removeLink(inLink.getId());
 									network.removeLink(outLink.getId());
 									removedLinks.add(inLink);
@@ -241,7 +254,8 @@ public final class NetworkSimplifier {
 
 										newLink.setAllowedModes(inLink.getAllowedModes());
 
-										transferAttributes.accept(Tuple.of(inLink, outLink), newLink);
+										transferAttributesConsumers
+												.forEach(c -> c.accept(Tuple.of(inLink, outLink), newLink));
 										network.removeLink(inLink.getId());
 										network.removeLink(outLink.getId());
 										removedLinks.add(inLink);
@@ -258,6 +272,8 @@ public final class NetworkSimplifier {
 				}
 			}
 		}
+
+		this.postTransformations.forEach(c -> c.accept(network));
 
 		log.info("  resulting network contains " + network.getNodes().size() + " nodes and " +
 				network.getLinks().size() + " links.");
@@ -373,6 +389,22 @@ public final class NetworkSimplifier {
 		if(linkA.getNumberOfLanes() != linkB.getNumberOfLanes()){ bothLinksHaveSameLinkStats = false; }
 
 		return bothLinksHaveSameLinkStats;
+	}
+
+	public void registerPreTransformation(Consumer<Network> preTransformation) {
+		this.preTransformations.add(preTransformation);
+	}
+
+	public void registerIsMergeablePredicate(BiPredicate<Link, Link> isMergeablePredicate) {
+		this.isMergeablePredicates.add(isMergeablePredicate);
+	}
+
+	public void registerTransferAttributesConsumer(BiConsumer<Tuple<Link, Link>, Link> transferAttributesConsumer) {
+		this.transferAttributesConsumers.add(transferAttributesConsumer);
+	}
+
+	public void registerPostTransformation(Consumer<Network> postTransformation) {
+		this.postTransformations.add(postTransformation);
 	}
 
 	public static void main(String[] args) {

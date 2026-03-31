@@ -110,6 +110,9 @@ public class CapacityReconfigurationTest {
 
 		DrtConfigGroup drtConfig = configureDrt(config, true);
 
+		// do not rebalance before planned reconfiguration stops
+		drtConfig.getRebalancingParams().get().setRebalancingMinIdleGap(Double.MAX_VALUE);
+
 		Controler controller = DrtControlerCreator.createControler(config, false);
 		prepareLoads(controller.getScenario().getPopulation());
 
@@ -171,7 +174,7 @@ public class CapacityReconfigurationTest {
 
 		// rejections?
 		drtConfig.addOrGetDrtOptimizationConstraintsParams()
-				.addOrGetDefaultDrtOptimizationConstraintsSet().rejectRequestIfMaxWaitOrTravelTimeViolated = useRejections;
+				.addOrGetDefaultDrtOptimizationConstraintsSet().setRejectRequestIfMaxWaitOrTravelTimeViolated(useRejections);
 
 		DvrpLoadParams loadParams = drtConfig.addOrGetLoadParams();
 

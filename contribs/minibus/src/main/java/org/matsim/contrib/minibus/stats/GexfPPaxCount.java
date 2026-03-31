@@ -49,15 +49,15 @@ import java.util.Map.Entry;
 
 /**
  * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link and writes them to a gexf network as dynamic link attributes.
- * 
+ *
  * @author aneumann
  *
  */
 @Deprecated
 final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
-	
+
 	private static final Logger log = LogManager.getLogger(GexfPPaxCount.class);
-	
+
 	private final static String XSD_PATH = "http://www.gexf.net/1.2draft/gexf.xsd";
 	private final static String FILENAME = "pPaxCount.gexf.gz";
 
@@ -76,31 +76,31 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 	private GexfPPaxCount(PConfigGroup pConfig){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
 		this.pIdentifier = pConfig.getPIdentifier();
-		
+
 		if (this.getWriteGexfStatsInterval > 0) {
 			log.info("enabled");
 
 			this.gexfFactory = new ObjectFactory();
 			this.gexfContainer = this.gexfFactory.createXMLGexfContent();
 			this.gexfContainer.setVersion("1.2");
-		
+
 			XMLGraphContent graph = this.gexfFactory.createXMLGraphContent();
 			graph.setDefaultedgetype(XMLDefaultedgetypeType.DIRECTED);
 			graph.setIdtype(XMLIdtypeType.STRING);
 			graph.setMode(XMLModeType.DYNAMIC);
 			graph.setTimeformat(XMLTimeformatType.DOUBLE);
 			this.gexfContainer.setGraph(graph);
-			
+
 			XMLAttributesContent attsContent = new XMLAttributesContent();
 			attsContent.setClazz(XMLClassType.EDGE);
 			attsContent.setMode(XMLModeType.DYNAMIC);
-			
+
 			XMLAttributeContent attContent = new XMLAttributeContent();
 			attContent.setId("weight");
 			attContent.setTitle("Number of paratransit passengers per iteration");
 			attContent.setType(XMLAttrtypeType.FLOAT);
-			
-			attsContent.getAttribute().add(attContent);		
+
+			attsContent.getAttribute().add(attContent);
 			this.gexfContainer.getGraph().getAttributesOrNodesOrEdges().add(attsContent);
 		}
 	}
@@ -121,33 +121,33 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addValuesToGexf(event.getIteration(), this.eventsHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
-				this.write(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), GexfPPaxCount.FILENAME));
-			}			
-		}		
+				this.write(event.getServices().getControllerIO().getIterationFilename(event.getIteration(), GexfPPaxCount.FILENAME));
+			}
+		}
 	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.write(event.getServices().getControlerIO().getOutputFilename(GexfPPaxCount.FILENAME));
-		}		
+			this.write(event.getServices().getControllerIO().getOutputFilename(GexfPPaxCount.FILENAME));
+		}
 	}
 
 	private void createAttValues() {
 		this.attValueContentMap = new HashMap<>();
-		
+
 		for (Entry<Id<Link>, XMLEdgeContent> entry : this.edgeMap.entrySet()) {
 			XMLAttvaluesContent attValueContent = new XMLAttvaluesContent();
 			entry.getValue().getAttvaluesOrSpellsOrColor().add(attValueContent);
 			this.attValueContentMap.put(entry.getKey(), attValueContent);
-		}		
+		}
 	}
 
 	private void addValuesToGexf(int iteration, CountPPaxHandler handler) {
 		for (Entry<Id<Link>, XMLAttvaluesContent> entry : this.attValueContentMap.entrySet()) {
-			
+
 			int countForLink = handler.getPaxCountForLinkId(entry.getKey());
-			
+
 			if (this.linkId2CountsFromLastIteration.get(entry.getKey()) != null){
 				// There is already an entry
 				if (this.linkId2CountsFromLastIteration.get(entry.getKey()) == countForLink) {
@@ -155,7 +155,7 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 					continue;
 				}
 			}
-			
+
 			XMLAttvalue attValue = new XMLAttvalue();
 			attValue.setFor("weight");
 //			attValue.setValue(Integer.toString(Math.max(1, countForLink)));
@@ -182,21 +182,21 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
 
 	private void addNetworkAsLayer(Network network, int zCoord) {
 		List<Object> attr = this.gexfContainer.getGraph().getAttributesOrNodesOrEdges();
-		
+
 		// nodes
 		XMLNodesContent nodes = this.gexfFactory.createXMLNodesContent();
 		attr.add(nodes);
 		List<XMLNodeContent> nodeList = nodes.getNode();
-		
+
 		for (Node node : network.getNodes().values()) {
 			XMLNodeContent n = this.gexfFactory.createXMLNodeContent();
 			n.setId(node.getId().toString());
-			
+
 			org.matsim.contrib.minibus.genericUtils.gexf.viz.ObjectFactory vizFac = new org.matsim.contrib.minibus.genericUtils.gexf.viz.ObjectFactory();
 			PositionContent pos = vizFac.createPositionContent();
 			pos.setX((float) node.getCoord().getX());
@@ -207,16 +207,16 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 
 			nodeList.add(n);
 		}
-		
+
 		// edges
 		XMLEdgesContent edges = this.gexfFactory.createXMLEdgesContent();
 		attr.add(edges);
 		List<XMLEdgeContent> edgeList = edges.getEdge();
-		
+
 		this.edgeMap = new HashMap<>();
-		
+
 		for (Link link : network.getLinks().values()) {
-			
+
 			if(link.getFromNode().getId().toString().equalsIgnoreCase(link.getToNode().getId().toString())){
 				log.debug("Omitting link " + link.getId().toString() + " Gephi cannot display edges with the same to and fromNode, yet, Sep'11");
 			} else {
@@ -231,7 +231,7 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 
 				edgeMap.put(link.getId(), e);
 			}
-		}		
+		}
 	}
 
 }

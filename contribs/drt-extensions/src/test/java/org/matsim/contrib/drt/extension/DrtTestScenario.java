@@ -28,7 +28,7 @@ import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;

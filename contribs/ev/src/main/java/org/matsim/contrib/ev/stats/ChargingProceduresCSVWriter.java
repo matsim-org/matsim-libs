@@ -52,7 +52,7 @@ public final class ChargingProceduresCSVWriter implements IterationEndsListener 
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
 		try (CSVPrinter csvPrinter = new CSVPrinter(
-			Files.newBufferedWriter(Paths.get(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "chargingStats.csv"))),
+			Files.newBufferedWriter(Paths.get(event.getServices().getControllerIO().getIterationFilename(event.getIteration(), "chargingStats.csv"))),
 			CSVFormat.DEFAULT.withDelimiter(';')
 				.withHeader("chargerId", "vehicleId", "linkId",
 					"waitStartTime", "waitEndTime", "waitDuration",

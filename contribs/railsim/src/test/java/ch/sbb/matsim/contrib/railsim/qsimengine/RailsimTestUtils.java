@@ -38,13 +38,8 @@ import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
-import org.matsim.vehicles.MatsimVehicleReader;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.*;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 
@@ -74,6 +69,13 @@ public class RailsimTestUtils {
 	}
 
 	/**
+	 * Create a mock for the TrainTimeDistanceHandler.
+	 */
+	public static TrainTimeDistanceHandler createTrainTimeDistanceHandler() {
+		return Mockito.mock(TrainTimeDistanceHandler.class);
+	}
+
+	/**
 	 * Create a departure within the engine. Route will be determined automatically.
 	 */
 	public static void createDeparture(Holder test, TestVehicle type, String veh, double time, String from, String to) {
@@ -85,6 +87,10 @@ public class RailsimTestUtils {
 		Link fromLink = test.network.getLinks().get(Id.createLinkId(from));
 		Link toLink = test.network.getLinks().get(Id.createLinkId(to));
 
+		//TODO:
+		// this seems inconsistent with the TrainRouter.java class which routes from the _to_ node of the _from_ link
+		// to the _from_ node of the _to_ link, similar to the default MATSim behavior in the rest of the code.
+		// The tests result in arbitrarily different results when changing it here, so we leave it for now. Is this deliberate?
 		LeastCostPathCalculator.Path path = lcp.calcLeastCostPath(fromLink.getFromNode(), toLink.getToNode(), 0, null, null);
 		NetworkRoute route = RouteUtils.createNetworkRoute(path.links.stream().map(Link::getId).toList());
 
@@ -119,7 +125,7 @@ public class RailsimTestUtils {
 
 		RailsimUtils.setTrainCapacity(link, trainCapacity);
 
-		return new RailLink(link);
+		return new RailLink(link, null);
 	}
 
 	/**

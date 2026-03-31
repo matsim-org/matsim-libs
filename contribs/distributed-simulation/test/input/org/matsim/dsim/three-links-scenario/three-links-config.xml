@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+    <module name="controler">
+        <param name="lastIteration" value="0"/>
+        <param name="overwriteFiles" value="failIfDirectoryExists"/>
+        <param name="runId" value="three-links"/>
+        <param name="mobsim" value="dsim"/>
+		<param name="compressionType" value="none"/>
+    </module>
+    <module name="qsim">
+        <param name="mainMode" value="car,slow-car"/>
+        <param name="flowCapacityFactor" value="1.0"/>
+        <param name="storageCapacityFactor" value="1.0"/>
+        <param name="startTime" value="00:00:29"/>
+        <param name="endTime" value="00:30:00"/>
+        <param name="stuckTime" value="2000.0"/>
+        <param name="vehiclesSource" value="modeVehicleTypesFromVehiclesData"/>
+        <param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
+        <param name="usePersonIdForMissingVehicleId" value="false"/>
+    </module>
+    <module name="dsim">
+		<param name="partitioning" value="none"/>
+		<param name="networkModes" value="car,slow-car"/>
+		<param name="startTime" value="00:00:29"/>
+		<param name="endTime" value="00:30:00"/>
+		<param name="stuckTime" value="2000.0"/>
+		<param name="vehicleBehavior" value="exception"/>
+		<param name="trafficDynamics" value="queue"/>
+		<param name="linkDynamics" value="FIFO"/>
+    </module>
+    <module name="global">
+        <param name="coordinateSystem" value="ATLANTIS"/>
+    </module>
+    <module name="network">
+        <param name="inputNetworkFile" value="three-links-network.xml"/>
+    </module>
+    <module name="plans">
+        <param name="inputPlansFile" value="three-links-plans-1.xml"/>
+    </module>
+    <module name="vehicles">
+        <param name="vehiclesFile" value="three-links-vehicles.xml"/>
+    </module>
+    <module name="routing">
+        <!-- We have a one directional network, which will be cleaned by the network cleaner otherwise -->
+		<param name="networkRouteConsistencyCheck" value="disable"/>
+    </module>
+    <module name="scoring">
+        <parameterset type="scoringParameters">
+            <!-- apparently, this needs to be set, if pt is not part of the simulation -->
+			<param name="waitingPt" value="-1.0"/>
+            <parameterset type="modeParams">
+                <param name="mode" value="car"/>
+                <param name="constant" value="-1"/>
+            </parameterset>
+            <parameterset type="modeParams">
+                <param name="mode" value="slow-car"/>
+                <param name="constant" value="-1"/>
+            </parameterset>
+            <parameterset type="modeParams">
+                <param name="mode" value="walk"/>
+                <param name="constant" value="-1"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="start"/>
+                <param name="typicalDuration" value="00:00:30"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="end"/>
+                <param name="typicalDuration" value="00:00:30"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="car interaction"/>
+                <param name="typicalDuration" value="00:00:01"/>
+            </parameterset>
+             <parameterset type="activityParams">
+                <param name="activityType" value="slow-car interaction"/>
+                <param name="typicalDuration" value="00:00:01"/>
+            </parameterset>
+        </parameterset>
+    </module>
+</config>

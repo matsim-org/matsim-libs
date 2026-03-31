@@ -2,7 +2,7 @@ package org.matsim.modechoice.replanning;
 
 import org.matsim.modechoice.PlanCandidate;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Collection;
 import java.util.Random;
 

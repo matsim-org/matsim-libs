@@ -20,20 +20,6 @@
 
 package org.matsim.core.population;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -42,36 +28,25 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PersonRouteCheck;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactories;
-import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.population.routes.*;
 import org.matsim.core.population.routes.heavycompressed.HeavyCompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.mediumcompressed.MediumCompressedNetworkRouteFactory;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
@@ -82,18 +57,22 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.io.*;
+import java.util.*;
+
 /**
  * @author nagel, ikaddoura
  */
 public final class PopulationUtils {
 	private static final Logger log = LogManager.getLogger(PopulationUtils.class);
-	private static final PopulationFactory populationFactory = createPopulation(new PlansConfigGroup(), null).getFactory();
+	private static final PopulationFactory populationFactory = createPopulation(
+			new PlansConfigGroup(), null, null).getFactory();
 
-	/**
-	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
-	 */
-	@Deprecated
-	public static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
+//	/**
+//	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
+//	 */
+//	@Deprecated
+	private static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
 
 
 	/**
@@ -110,7 +89,19 @@ public final class PopulationUtils {
 	 * @return the new Population instance
 	 */
 	public static Population createPopulation(Config config) {
-		return createPopulation(config, null);
+		return createPopulation(config, null, null);
+	}
+
+	/**
+	 * Creates a new Population container. Population instances need a Config, because they need to know
+	 * about the modes of transport.
+	 *
+	 * @param config the configuration which is used to create the Population.
+	 * @param scale the scale (or sample fraction) of the population which is added as a container attribute.
+	 * @return the new Population instance
+	 */
+	public static Population createPopulation(Config config, Double scale) {
+		return createPopulation(config, null, scale);
 	}
 
 	/**
@@ -123,10 +114,34 @@ public final class PopulationUtils {
 	 * @return the new Population instance
 	 */
 	public static Population createPopulation(Config config, Network network) {
-		return createPopulation(config.plans(), network);
+		return createPopulation(config.plans(), network, null);
 	}
 
-	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network) {
+	/**
+	 * Creates a new Population container which, depending on
+	 * configuration, may make use of the specified Network instance to store routes
+	 * more efficiently.
+	 *
+	 * @param config  the configuration which is used to create the Population.
+	 * @param network the Network to which Plans in this Population will refer.
+	 * @param scale the scale (or sample fraction) of the population which is added as a container attribute.
+	 * @return the new Population instance
+	 */
+	public static Population createPopulation(Config config, Network network, Double scale) {
+		return createPopulation(config.plans(), network, scale);
+	}
+
+	/**
+	 * Creates a new Population container which, depending on
+	 * configuration, may make use of the specified Network instance to store routes
+	 * more efficiently.
+	 *
+	 * @param plansConfigGroup  the configuration which is used to create the Population.
+	 * @param network the Network to which Plans in this Population will refer.
+	 * @param scale the scale (or sample fraction) of the population which is added as a container attribute.
+	 * @return the new Population instance
+	 */
+	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network, Double scale) {
 		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
 		RouteFactories routeFactory = new RouteFactories();
 		String networkRouteType = plansConfigGroup.getNetworkRouteType();
@@ -143,7 +158,7 @@ public final class PopulationUtils {
 			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
 		}
 		routeFactory.setRouteFactory(NetworkRoute.class, factory);
-		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
+        return new PopulationImpl(new PopulationFactoryImpl(routeFactory), scale);
 	}
 
 	public static Leg unmodifiableLeg(Leg leg) {
@@ -753,8 +768,8 @@ public final class PopulationUtils {
 
 	public static boolean hasCarLeg(Plan plan) {
 		List<PlanElement> planElements = plan.getPlanElements();
-		for (int i = 0; i < planElements.size(); i++) {
-			if (planElements.get(i) instanceof Leg leg) {
+		for (PlanElement planElement : planElements) {
+			if (planElement instanceof Leg leg) {
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 					return true;
 				}
@@ -787,6 +802,16 @@ public final class PopulationUtils {
 
 	public static Plan createPlan() {
 		return getFactory().createPlan();
+	}
+
+	/**
+	 * Createa a plan out of the supplied elements. The element list is referenced by the plan.
+	 * If a deep copy of a plan is required use the @PopulationUtils.copyFromTo method.
+	 *
+	 * @return a new Plan instance, which references the supplied plan elements.
+	 */
+	public static Plan createPlan(List<PlanElement> fromElements) {
+		return new PlanImpl(fromElements);
 	}
 
 	public static Activity createActivityFromLinkId(String type, Id<Link> linkId) {
@@ -867,7 +892,7 @@ public final class PopulationUtils {
 	}
 
 	private static void verifyCreateLeg(Plan plan) throws IllegalStateException {
-		if (plan.getPlanElements().size() == 0) {
+		if (plan.getPlanElements().isEmpty()) {
 			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
 		}
 	}
@@ -888,6 +913,14 @@ public final class PopulationUtils {
 
 	// --- static copy methods:
 
+	public static void copyFromTo( final Person in, final Person out ) {
+		AttributesUtils.copyAttributesFromTo( in, out );
+		for( Plan inPlan : in.getPlans() ){
+			Plan outPlan = getFactory().createPlan();
+			copyFromTo( inPlan, outPlan );
+		}
+	}
+
 	/**
 	 * loads a copy of an existing plan, but keeps the person reference
 	 *
@@ -898,10 +931,17 @@ public final class PopulationUtils {
 		/*
 		 * By default 'false' to be backwards compatible. As a result, InteractionActivities will be converted to ActivityImpl.
 		 */
+		// yyyy I am doubtful that the option with/wo interaction activities should even exist.  At least in the sense in which this
+		// is meant (population-based search algorithms), a copy should just be a full copy.  kai, nov'25
 		copyFromTo(in, out, false);
 	}
 
 	public static void copyFromTo(final Plan in, final Plan out, final boolean withInteractionActivities) {
+		// yyyy I am doubtful that the option with/wo interaction activities should even exist.  At least in the sense in which this
+		// is meant (population-based search algorithms), a copy should just be a full copy.  kai, nov'25
+		// yyyy Also, I think that this ended up being a bit of a misnomer ... since "isInteractionActivity" can now be understood
+		// in two different ways: (1) it is what is returned by isStageActivity (a conceptual thing); (2) it is what is returned by
+		// instanceof InteractionActivity (an implementation thing).  kai, nov'25
 		out.getPlanElements().clear();
 		out.setScore(in.getScore());
 		out.setType(in.getType());
@@ -938,7 +978,14 @@ public final class PopulationUtils {
 	}
 
 	public static void copyFromTo(Activity act, Activity newAct) {
-		Coord coord = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
+		Coord coord = null;
+		if (act.getCoord() != null) {
+			if (act.getCoord().hasZ()) {
+				coord = new Coord(act.getCoord().getX(), act.getCoord().getY(), act.getCoord().getZ());
+			} else {
+				coord = new Coord(act.getCoord().getX(), act.getCoord().getY());
+			}
+		}
 		// (we don't want to copy the coord ref, but rather the contents!)
 		newAct.setCoord(coord);
 		newAct.setType(act.getType());
@@ -993,11 +1040,11 @@ public final class PopulationUtils {
 	// --- positional methods:
 
 	public static Activity getFirstActivity(Plan plan) {
-		return (Activity) plan.getPlanElements().get(0);
+		return (Activity) plan.getPlanElements().getFirst();
 	}
 
 	public static Activity getLastActivity(Plan plan) {
-		return (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+		return (Activity) plan.getPlanElements().getLast();
 	}
 
 	public static Activity getNextActivity(Plan plan, Leg leg) {
@@ -1178,14 +1225,49 @@ public final class PopulationUtils {
 		Coord fromCoord = link.getFromNode().getCoord();
 		Coord toCoord = link.getToNode().getCoord();
 		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink();
-		return new Coord(fromCoord.getX() + rel * (toCoord.getX() - fromCoord.getX()), fromCoord.getY() + rel * (toCoord.getY() - fromCoord.getY()));
+		return CoordUtils.interpolate(fromCoord, toCoord, rel);
 	}
 
-	public static void sampleDown(Population pop, double sample) {
+	/**
+	 * Method samples down the population separately for each subpopulation.
+	 * The group of persons with no subpopulation is handled as a separate subpopulation. The same sampling rate is
+	 * applied to each group, and the number of remaining persons per subpopulation is chosen deterministically via
+	 * rounding so that a single population scale can still be used consistently afterwards.
+	 *
+	 * @param pop    population to be downsampled
+	 * @param sampleTo sample rate, e.g. 0.1 for 10% of the population
+	 */
+	public static void sampleDown(Population pop, double sampleTo) {
+		if (sampleTo < 0 || sampleTo > 1) {
+			throw new IllegalArgumentException("sampleTo must be within [0, 1], but is " + sampleTo);
+		}
+
 		final Random rnd = MatsimRandom.getLocalInstance();
-		log.info("population size before downsampling=" + pop.getPersons().size());
-		pop.getPersons().values().removeIf(person -> rnd.nextDouble() >= sample);
-		log.info("population size after downsampling=" + pop.getPersons().size());
+		log.info("population size before downsampling={}", pop.getPersons().size());
+
+		Map<String, List<Id<Person>>> personsPerSubpopulation = new LinkedHashMap<>();
+		pop.getPersons().values().forEach(person ->
+			personsPerSubpopulation
+				.computeIfAbsent(PopulationUtils.getSubpopulation(person), ignored -> new ArrayList<>())
+				.add(person.getId())
+		);
+
+		for (Map.Entry<String, List<Id<Person>>> entry : personsPerSubpopulation.entrySet()) {
+			List<Id<Person>> personIds = entry.getValue();
+			Collections.shuffle(personIds, rnd);
+
+			int targetSize = (int) Math.round(personIds.size() * sampleTo);
+			for (int i = targetSize; i < personIds.size(); i++) {
+				pop.removePerson(personIds.get(i));
+			}
+		}
+
+		// if the input population has no scale attribute, in this method it is not clear which sampleSize the input has and the new scale is not written to the pop.
+		Double scale = ScenarioUtils.getScale(pop);
+		if (scale != null) {
+			ScenarioUtils.putScale(pop, scale * sampleTo);
+		}
+		log.info("population size after downsampling={}", pop.getPersons().size());
 	}
 
 	public static void readPopulation(Population population, String filename) {
@@ -1211,33 +1293,11 @@ public final class PopulationUtils {
 		return PopulationUtils.equalPopulation(population1, population2);
 	}
 
-	// ---
+	public static PopulationComparison.Result comparePopulations(String path1, String path2) {
+		Population population1 = PopulationUtils.readPopulation(path1);
+		Population population2 = PopulationUtils.readPopulation(path2);
 
-	/**
-	 * @deprecated -- please inline.  kai, jun'22
-	 */
-	public static Object getPersonAttribute(HasPlansAndId<?, ?> person, String key) {
-		if (person == null) {
-			return null;
-		}
-		// (This was originally "if person instanceof Attributable then ...".  Since HasPlansAndId now implements Attributable, this is in
-		// principle always fulfilled.  However, if person==null, then person instanceof Attributable also fails.  kai, jul'22)
-
-		return person.getAttributes().getAttribute(key);
-	}
-
-	/**
-	 * @deprecated -- please inline.  kai, jun'22
-	 */
-	public static void putPersonAttribute(HasPlansAndId<?, ?> person, String key, Object value) {
-		person.getAttributes().putAttribute(key, value);
-	}
-
-	/**
-	 * @deprecated -- please inline.  kai, jun'22
-	 */
-	public static Object removePersonAttribute(Person person, String key) {
-		return person.getAttributes().removeAttribute(key);
+		return PopulationComparison.compare(population1, population2);
 	}
 
 	/**
@@ -1258,18 +1318,18 @@ public final class PopulationUtils {
 	}
 
 	public static void putSubpopulation(HasPlansAndId<?, ?> person, String subpopulation) {
-		putPersonAttribute(person, SUBPOPULATION_ATTRIBUTE_NAME, subpopulation);
+		person.getAttributes().putAttribute(SUBPOPULATION_ATTRIBUTE_NAME, subpopulation);
 	}
 
 	public static void removeSubpopulation(Person person) {
 		person.getAttributes().removeAttribute(SUBPOPULATION_ATTRIBUTE_NAME);
 	}
 
-	public static Population getOrCreateAllpersons(Scenario scenario) {
+	public static Population getOrCreateAllPersons(Scenario scenario) {
 		Population map = (Population) scenario.getScenarioElement("allpersons");
 		if (map == null) {
 			log.info("adding scenario element for allpersons container");
-			map = new PopulationImpl(scenario.getPopulation().getFactory());
+			map = new PopulationImpl(scenario.getPopulation().getFactory(), null);
 			scenario.addScenarioElement("allpersons", map);
 		}
 		return map;
@@ -1278,11 +1338,11 @@ public final class PopulationUtils {
 	private static int tryStdCnt = 5;
 
 	public static Person findPerson(Id<Person> personId, Scenario scenario) {
-		Person person = getOrCreateAllpersons(scenario).getPersons().get(personId);
+		Person person = getOrCreateAllPersons(scenario).getPersons().get(personId);
 		if (person == null) {
 			if (tryStdCnt > 0) {
 				tryStdCnt--;
-				log.info("personId=" + personId + " not in allPersons; trying standard population container ...");
+				log.info("personId={} not in allPersons; trying standard population container ...", personId);
 				if (tryStdCnt == 0) {
 					log.info(Gbl.FUTURE_SUPPRESSED);
 				}
@@ -1290,7 +1350,7 @@ public final class PopulationUtils {
 			person = scenario.getPopulation().getPersons().get(personId);
 		}
 		if (person == null) {
-			log.info("unable to find person for personId=" + personId + "; will return null");
+			log.info("unable to find person for personId={}; will return null", personId);
 		}
 		return person;
 	}
@@ -1317,7 +1377,7 @@ public final class PopulationUtils {
 	}
 
 	/**
-	 * Checks if each link of a route has the mode of the respective leg. This may be the case, if network links were
+	 * Checks if each link of a route has the mode of the respective leg. This may be the case if network links were
 	 * If the route is not a {@link NetworkRoute}, nothing is changed. If there are inconsistencies, the route is reset.
 	 *
 	 * @param population
@@ -1328,5 +1388,10 @@ public final class PopulationUtils {
 		population.getPersons().values().forEach(
 			personRouteChecker::run
 		);
+		//  There is also a {@link PersonNetworkLinkCheck}
+	}
+	public static void cleanPopulation( Scenario scenario ) {
+		checkRouteModeAndReset( scenario.getPopulation(), scenario.getNetwork() );
+		//  There is also a {@link PersonNetworkLinkCheck}
 	}
 }

@@ -49,4 +49,6 @@ public interface TransitScheduleFactory extends MatsimFactory {
 
 	public abstract Departure createDeparture(final Id<Departure> departureId, final double time);
 
+	public abstract ChainedDeparture createChainedDeparture(final Id<TransitLine> transitLineId, final Id<TransitRoute> transitRouteId, final Id<Departure> departureId);
+
 }

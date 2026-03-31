@@ -24,10 +24,14 @@ package org.matsim.withinday.controller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -36,6 +40,9 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class ExampleWithinDayControllerTest {
 
@@ -45,6 +52,8 @@ public class ExampleWithinDayControllerTest {
 	@Test
 	void testRun() {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
+		// AccessEgress has problems when used with Dijkstra, but test does not work without Dijkstra
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		config.controller().setLastIteration(1);
 		config.controller().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
 		Scenario scenario = ScenarioUtils.loadScenario(config);

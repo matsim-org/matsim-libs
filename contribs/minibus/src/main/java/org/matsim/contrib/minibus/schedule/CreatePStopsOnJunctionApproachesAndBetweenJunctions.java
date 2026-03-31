@@ -46,8 +46,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks.LogInfoLevel;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks.MergeType;
@@ -293,14 +293,16 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 
 	/* Generate a simplified network to determine stop locations (the simplified network will not be used in simulation) */
 	private Network generateIntersectionSimplifiedNetwork(double pmin, int epsilon) {
+
+		final String mode = TransportMode.car;
+
 		// Extract road network
 		NetworkFilterManager nfmCar = new NetworkFilterManager(net, networkConfigGroup);
 		nfmCar.addLinkFilter(new NetworkLinkFilter() {
 
 			@Override
 			public boolean judgeLink(Link l) {
-				if (l.getAllowedModes().contains("car")) return true;
-				else return false;
+				return l.getAllowedModes().contains(mode);
 			}
 		});
 		Network roadNetwork = nfmCar.applyFilters();
@@ -316,12 +318,12 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 			}
 		});
 		Network newRoadNetwork = nfm.applyFilters();
-		new NetworkCleaner().run(newRoadNetwork);
+		NetworkUtils.cleanNetwork(newRoadNetwork, Set.of(mode));
 
 		// Run Johan's intersection clustering algorithm
 		IntersectionSimplifier ns = new IntersectionSimplifier(pmin, epsilon);
 		Network newClusteredIntersectionsRoadNetwork = ns.simplify(newRoadNetwork);
-		new NetworkCleaner().run(newClusteredIntersectionsRoadNetwork);
+		NetworkUtils.cleanNetwork(newClusteredIntersectionsRoadNetwork, Set.of(mode));
 
 		// intersection clustering leaves some duplicate links (same start and end node), merge them
 		NetworkMergeDoubleLinks mergeDoubleLinks = new NetworkMergeDoubleLinks(MergeType.MAXIMUM, LogInfoLevel.NOINFO);
@@ -332,7 +334,7 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 		// Merge links with different attributes, because we will not use the output network for simulation
 		simplifier.setMergeLinkStats(true);
 		simplifier.run(newClusteredIntersectionsRoadNetwork);
-		new NetworkCleaner().run(newClusteredIntersectionsRoadNetwork);
+		NetworkUtils.cleanNetwork(newClusteredIntersectionsRoadNetwork, Set.of(mode));
 
 		return(newClusteredIntersectionsRoadNetwork);
 	}

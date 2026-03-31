@@ -84,7 +84,7 @@ public class AverageCongestionPricingControlerListener implements StartupListene
 
 		for (LinkEnterEvent enterEvent : this.tollHandler.getLinkEnterEvents()) {
 			double amount = tollHandler.getAvgToll(enterEvent.getLinkId(), enterEvent.getTime());
-			PersonMoneyEvent moneyEvent = new PersonMoneyEvent(enterEvent.getTime(), Id.createPersonId(enterEvent.getVehicleId()), amount, "congestionPricing", null);
+			PersonMoneyEvent moneyEvent = new PersonMoneyEvent(enterEvent.getTime(), Id.createPersonId(enterEvent.getVehicleId()), amount, "congestionPricing", null, null);
 			events.processEvent(moneyEvent);
 		}
 	}

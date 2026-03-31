@@ -101,8 +101,8 @@ public class ConfigBehaviorTest{
             DrtOptimizationConstraintsParams drtOptimizationConstraintsParams = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams();
             DrtOptimizationConstraintsSetImpl optimizationConstraintsSet =
                     drtOptimizationConstraintsParams.addOrGetDefaultDrtOptimizationConstraintsSet();
-            optimizationConstraintsSet.maxTravelTimeAlpha = 2.;
-            optimizationConstraintsSet.maxTravelTimeBeta = 5. * 60;
+            optimizationConstraintsSet.setMaxTravelTimeAlpha(2.);
+            optimizationConstraintsSet.setMaxTravelTimeBeta(5. * 60);
 
             ConfigUtils.writeConfig( config, utils.getOutputDirectory() + "ad-hoc-config-default-optimization-constraints.xml");
         }
@@ -118,8 +118,8 @@ public class ConfigBehaviorTest{
             DrtOptimizationConstraintsSetImpl constraintsSet =
                     drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().
                             addOrGetDefaultDrtOptimizationConstraintsSet();
-            Assertions.assertEquals( 2., constraintsSet.maxTravelTimeAlpha, Double.MIN_VALUE );
-            Assertions.assertEquals( 300., constraintsSet.maxTravelTimeBeta, Double.MIN_VALUE );
+            Assertions.assertEquals( 2., constraintsSet.getMaxTravelTimeAlpha(), Double.MIN_VALUE );
+            Assertions.assertEquals( 300., constraintsSet.getMaxTravelTimeBeta(), Double.MIN_VALUE );
         }
     }
 

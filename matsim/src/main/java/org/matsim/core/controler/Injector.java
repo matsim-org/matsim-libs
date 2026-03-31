@@ -22,50 +22,55 @@
 
 package org.matsim.core.controler;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
-
-import com.google.inject.spi.LinkedKeyBinding;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Binder;
-import com.google.inject.Binding;
-import com.google.inject.Guice;
-import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.*;
 import com.google.inject.internal.BindingImpl;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import com.google.inject.spi.DefaultElementVisitor;
 import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
+import com.google.inject.spi.LinkedKeyBinding;
 import com.google.inject.util.Modules;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
+import org.matsim.dsim.ExecutionContext;
+import org.matsim.dsim.LocalContext;
+
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 public final class Injector {
-	private Injector(){} // namespace only, do not instantiate
+	private Injector() {} // namespace only, do not instantiate
 
-	private static final  Logger logger = LogManager.getLogger(Injector.class);
+	private static final Logger logger = LogManager.getLogger(Injector.class);
 
 	public static com.google.inject.Injector createInjector(final Config config, Module... modules) {
+		return createInjector(config, LocalContext.create(config), modules);
+	}
+
+	public static com.google.inject.Injector createInjector(final Config config, final ExecutionContext ctx, Module... modules) {
+		// A MATSim module needs the config at configuration time in order to decide what
+		// features to provide. So we create a bootstrapInjector which already has the config
+		// and provides it to the MATSim modules:
 		com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
 			@Override
 			public void configure(Binder binder) {
 				binder.requireExplicitBindings(); // For now, we are conservative and disable this kind of magic.
 				binder.install(new ExplodedConfigModule(config));
+				binder.bind(ExecutionContext.class).toInstance(ctx);
+				binder.bind(ComputeNode.class).toInstance(ctx.getComputeNode());
 			}
 		});
-		// A MATSim module needs the config at configuration time in order to decide what
-		// features to provide. So we create a bootstrapInjector which already has the config
-		// and provides it to the MATSim modules.
 		List<com.google.inject.Module> guiceModules = new ArrayList<>();
 		for (Module module : modules) {
 			bootstrapInjector.injectMembers(module);
@@ -77,26 +82,30 @@ public final class Injector {
 	}
 
 	public static void printInjector(com.google.inject.Injector injector, Logger log) {
-		Level level = Level.DEBUG ;
+		Level level = Level.DEBUG;
+		log.info("=== printInjector output skipped ===");
+		log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
+			+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+
 		log.log(level,"=== printInjector start ===") ;
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet()) {
-			if ( entry.getKey().toString().contains("type=org.matsim") ) {
+			if (entry.getKey().toString().contains("type=org.matsim")) {
 				Annotation annotation = entry.getKey().getAnnotation();
-				log.log( level, entry.getKey().getTypeLiteral() + " " + (annotation != null ? annotation.toString() : ""));
+				log.log(level, entry.getKey().getTypeLiteral() + " " + (annotation != null ? annotation.toString() : ""));
 				log.log(level, "  --> provider: " + entry.getValue().getProvider());
-				log.log(level, "  --> source: " + entry.getValue().getSource() );
-				if ( entry.getValue() instanceof BindingImpl ) {
-					log.log( level, "  --> scope: " + ((BindingImpl<?>)entry.getValue()).getScoping() ) ;
+				log.log(level, "  --> source: " + entry.getValue().getSource());
+				if (entry.getValue() instanceof BindingImpl) {
+					log.log(level, "  --> scope: " + ((BindingImpl<?>) entry.getValue()).getScoping());
 				}
-				if ( entry.getValue() instanceof LinkedKeyBinding) {
-					log.log( level, "  --> target: " + ((LinkedKeyBinding) entry.getValue()).getLinkedKey() ) ;
+				if (entry.getValue() instanceof LinkedKeyBinding) {
+					log.log(level, "  --> target: " + ((LinkedKeyBinding) entry.getValue()).getLinkedKey());
 				}
-				log.log(level, "  ==full==> " + entry.getValue() );
+				log.log(level, "  ==full==> " + entry.getValue());
 				// yy could probably format the above in a better way. kai, may'16
-				log.log(level,  "" );
+				log.log(level, "");
 			}
 		}
-		log.log(level,"=== printInjector end ===") ;
+		log.log(level, "=== printInjector end ===");
 	}
 
 	private static Module insertMapBindings(List<Module> guiceModules) {
@@ -137,22 +146,70 @@ public final class Injector {
 	 * objects where the standard constructor is deliberately package-private so that the object can only be constructed via injection.  It could also
 	 * be used to create MATSim instances that do not use the "override" syntax.  kai, jun'22
 	 */
-	public static com.google.inject.Injector createMinimalMatsimInjector( Config config, Scenario scenario, Module... modules ){
+	public static com.google.inject.Injector createMinimalMatsimInjector(Config config, Scenario scenario, Module... modules) {
 
 		final Collection<Module> theModules = new ArrayList<>();
-		theModules.add( new AbstractModule(){
+		theModules.add(new AbstractModule() {
 			@Override
-			public void install(){
-				install( new NewControlerModule() );
-				install( new ControlerDefaultCoreListenersModule() );
-				install( new ControlerDefaultsModule() );
-				install( new ScenarioByInstanceModule( scenario ) );
+			public void install() {
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				install(new ControlerDefaultsModule());
+				install(new ScenarioByInstanceModule(scenario));
 			}
 		});
-		theModules.addAll( Arrays.asList( modules ) );
+		theModules.addAll(Arrays.asList(modules));
 
-		return Injector.createInjector( config, theModules.toArray(new Module[0]) );
+		return Injector.createInjector(config, theModules.toArray(new Module[0]));
 	}
+
+	// If one cannot override the above, then for everything that needs overriding (e.g. income dep scoring fct) one needs to
+	// construct a full controller.  In general, guice allows the overriding of Modules before the injector is created.  However,
+	// with MATSim we need the bootstrap injector at an even earlier phase.  The following is an early attempt, but I don't think it quite works yet.
+
+	public final static class InjectorBuilder {
+		private final Config config;
+		// yy In the following, I do not fully understand when it should be matsim.AbstractModule, and when Module is enough.  kai, nov'25
+		List<AbstractModule> modules = new ArrayList<>();
+		AbstractModule overridingModule = AbstractModule.emptyModule();
+		private Scenario scenario;
+		public InjectorBuilder( Config config ) {
+			this.config = config;
+		}
+		public InjectorBuilder( Scenario scenario ) {
+			this.scenario = scenario;
+			this.config = this.scenario.getConfig();
+		}
+		public com.google.inject.Injector build() {
+			AbstractModule nearlyFinalModule = AbstractModule.override( modules, overridingModule );
+			return createInjector( config, nearlyFinalModule );
+		}
+
+		public InjectorBuilder addStandardModules( ) {
+			// the ScenarioByInstanceModule works with scenario=null so we allow it here as well. kai, nov'25
+			modules.add(new AbstractModule() {
+				@Override public void install() {
+					install(new NewControlerModule());
+					install(new ControlerDefaultCoreListenersModule());
+					install(new ControlerDefaultsModule());
+					install(new ScenarioByInstanceModule(scenario));
+				}
+			});
+			return this;
+		}
+		public InjectorBuilder addOverridingModule( AbstractModule newOverridingModule ) {
+			this.overridingModule = AbstractModule.override(Collections.singletonList(this.overridingModule ), newOverridingModule );
+			// I think that this can be used as we go, since it combines only a number of install methods, and they are executed
+			// much later (when, e.g., the bootstrap injector exists).  kai, nov'25
+			return this;
+		}
+		public InjectorBuilder addModule( AbstractModule module ) {
+			modules.add( module );
+			// yy Maybe Modules.combine would be easier here? Or have a AbstractModule.combine? kai, nov'25
+			return this;
+		}
+	}
+
 
 
 }

@@ -23,16 +23,15 @@ package org.matsim.core.events.algorithms;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
+import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
+@DistributedEventHandler(value = DistributedMode.NODE)
 public class EventWriterXML implements EventWriter, BasicEventHandler {
 
 	private static final Logger LOG = LogManager.getLogger(EventWriterXML.class);
@@ -53,7 +52,7 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 	 *
 	 * @param stream
 	 */
-	public EventWriterXML(final OutputStream stream ) {
+	public EventWriterXML(final OutputStream stream) {
 		this.out = new BufferedWriter(new OutputStreamWriter(stream, StandardCharsets.UTF_8));
 		this.writeHeader();
 	}

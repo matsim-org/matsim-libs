@@ -41,7 +41,7 @@ public class VrpPaths {
 			LeastCostPathCalculator router, TravelTime travelTime) {
 		Path path = fromLink == toLink ?
 				null :
-				router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,
+				router.calcLeastCostPath(fromLink, toLink, departureTime + FIRST_LINK_TT,
 						null, null);
 		return VrpPaths.createPath(fromLink, toLink, departureTime, path, travelTime);
 	}
@@ -50,7 +50,7 @@ public class VrpPaths {
 			LeastCostPathCalculator router, TravelTime travelTime) {
 		Path path = diversionPoint.link == toLink ?
 				null :
-				router.calcLeastCostPath(diversionPoint.link.getToNode(), toLink.getFromNode(), diversionPoint.time,
+				router.calcLeastCostPath(diversionPoint.link, toLink, diversionPoint.time,
 						null, null);
 		return VrpPaths.createPathForDiversion(diversionPoint, toLink, path, travelTime);
 	}

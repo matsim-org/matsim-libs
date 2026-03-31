@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+	<transitStops>
+		<stopFacility id="L1" x="-10700.0" y="0.0" linkRefId="stop_loop_10" name="L1" isBlocking="false"/>
+		<stopFacility id="M1" x="0.0" y="100.0" linkRefId="stop_loop_5" name="M1" stopAreaId="M" isBlocking="false"/>
+		<stopFacility id="M2" x="0.0" y="50.0" linkRefId="stop_loop_620" name="M2" stopAreaId="M" isBlocking="false"/>
+		<stopFacility id="M3" x="0.0" y="0.0" linkRefId="stop_loop_624" name="M3" stopAreaId="M" isBlocking="false"/>
+		<stopFacility id="R1" x="10730.0" y="0.0" linkRefId="stop_loop_12" name="R1" isBlocking="false"/>
+	</transitStops>
+	<transitLine id="FV1">
+		<transitRoute id="FV1_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="L1" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="R1" arrivalOffset="00:09:09" departureOffset="00:09:09" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="stop_loop_10"/>
+				<link refId="33"/>
+				<link refId="30"/>
+				<link refId="18"/>
+				<link refId="19"/>
+				<link refId="28"/>
+				<link refId="26"/>
+				<link refId="27"/>
+				<link refId="23"/>
+				<link refId="621"/>
+				<link refId="34"/>
+				<link refId="35"/>
+				<link refId="17"/>
+				<link refId="stop_loop_12"/>
+			</route>
+			<departures>
+				<departure id="FV1_route1_dep_1" departureTime="00:03:12" vehicleRefId="train_FV_1"/>
+				<departure id="FV1_route1_dep_2" departureTime="00:17:47" vehicleRefId="train_FV_2"/>
+				<departure id="FV1_route1_dep_3" departureTime="00:21:12" vehicleRefId="train_FV_3"/>
+				<departure id="FV1_route1_dep_4" departureTime="00:49:50" vehicleRefId="train_FV_4"/>
+				<departure id="FV1_route1_dep_5" departureTime="00:52:45" vehicleRefId="train_FV_5"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="GV1">
+		<transitRoute id="GV1_route_1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="L1" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="R1" arrivalOffset="00:14:18" departureOffset="00:14:18" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="stop_loop_10"/>
+				<link refId="33"/>
+				<link refId="30"/>
+				<link refId="31"/>
+				<link refId="622"/>
+				<link refId="623"/>
+				<link refId="624"/>
+				<link refId="32"/>
+				<link refId="34"/>
+				<link refId="35"/>
+				<link refId="17"/>
+				<link refId="stop_loop_12"/>
+			</route>
+			<departures>
+				<departure id="GV1_route_1_dep_1" departureTime="00:07:05" vehicleRefId="train_GV_1"/>
+				<departure id="GV1_route_1_dep_2" departureTime="00:18:13" vehicleRefId="train_GV_2"/>
+				<departure id="GV1_route_1_dep_3" departureTime="00:52:36" vehicleRefId="train_GV_3"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="RV1">
+		<transitRoute id="RV1_route_1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="L1" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="M1" arrivalOffset="00:04:35" departureOffset="00:06:17" awaitDeparture="true" minimumStopDuration="00:01:42"/>
+				<stop refId="R1" arrivalOffset="00:10:49" departureOffset="00:10:49" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="stop_loop_10"/>
+				<link refId="33"/>
+				<link refId="30"/>
+				<link refId="18"/>
+				<link refId="19"/>
+				<link refId="20"/>
+				<link refId="4"/>
+				<link refId="stop_loop_5"/>
+				<link refId="22"/>
+				<link refId="23"/>
+				<link refId="621"/>
+				<link refId="34"/>
+				<link refId="35"/>
+				<link refId="17"/>
+				<link refId="stop_loop_12"/>
+			</route>
+			<departures>
+				<departure id="RV1_route_1_dep_1" departureTime="00:13:09" vehicleRefId="train_RV_1"/>
+				<departure id="RV1_route_1_dep_2" departureTime="00:14:54" vehicleRefId="train_RV_2"/>
+				<departure id="RV1_route_1_dep_3" departureTime="00:20:33" vehicleRefId="train_RV_3"/>
+				<departure id="RV1_route_1_dep_4" departureTime="00:20:35" vehicleRefId="train_RV_4"/>
+				<departure id="RV1_route_1_dep_5" departureTime="00:23:28" vehicleRefId="train_RV_5"/>
+				<departure id="RV1_route_1_dep_6" departureTime="00:35:42" vehicleRefId="train_RV_6"/>
+				<departure id="RV1_route_1_dep_7" departureTime="00:42:14" vehicleRefId="train_RV_7"/>
+				<departure id="RV1_route_1_dep_8" departureTime="00:50:45" vehicleRefId="train_RV_8"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

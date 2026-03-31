@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.modechoice.*;
 import org.matsim.modechoice.pruning.CandidatePruner;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

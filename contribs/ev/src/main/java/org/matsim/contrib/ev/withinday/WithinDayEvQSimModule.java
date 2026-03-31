@@ -48,13 +48,13 @@ public class WithinDayEvQSimModule extends AbstractQSimModule {
 
 	@Provides
 	@Singleton
-	WithinDayEvEngine provideEvPlanningEngine(QSim qsim, ElectricFleet electricFleet,
+	WithinDayEvEngine provideEvPlanningEngine(QSim qsim, TimeInterpretation timeInterpretation, ElectricFleet electricFleet,
 			ChargingAlternativeProvider alternativeProvider, ChargingSlotProvider slotProvider,
 			EventsManager eventsManager,
 			ChargingScheduler chargingScheduler, WithinDayEvConfigGroup config, Vehicles vehicles,
 			QVehicleFactory qVehicleFactory, Scenario scenario,
 			WithinDayChargingStrategy.Factory chargingStrategyFactory) {
-		return new WithinDayEvEngine(config, qsim, electricFleet, alternativeProvider, slotProvider,
+		return new WithinDayEvEngine(config, qsim, timeInterpretation, electricFleet, alternativeProvider, slotProvider,
 				eventsManager, chargingScheduler, vehicles, qVehicleFactory, scenario, chargingStrategyFactory);
 	}
 

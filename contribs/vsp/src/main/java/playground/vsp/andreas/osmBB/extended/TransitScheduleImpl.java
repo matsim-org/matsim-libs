@@ -29,7 +29,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
@@ -40,11 +39,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author aneumann
  */
 public class TransitScheduleImpl implements TransitSchedule {
-	private final Map<Id<TransitLine>, TransitLine> transitLines = new TreeMap<Id<TransitLine>, TransitLine>();
-	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<Id<TransitStopFacility>, TransitStopFacility>();
+	private final Map<Id<TransitLine>, TransitLine> transitLines = new TreeMap<>();
+	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<>();
 	private final TransitScheduleFactory factory;
-	private final FailingObjectAttributes transitLinesAttributes = FailingObjectAttributes.createTransitLinesAttributes();
-	private final FailingObjectAttributes transitStopsAttributes = FailingObjectAttributes.createTransitStopsAttributes();
 
 	public TransitScheduleImpl(final TransitScheduleFactory builder) {
 		this.factory = builder;
@@ -52,7 +49,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 
 	@Override
 	public void addTransitLine(final TransitLine line) {
-		final Id id = line.getId();
+		final Id<TransitLine> id = line.getId();
 		if (this.transitLines.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
 		}
@@ -66,7 +63,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 
 	@Override
 	public void addStopFacility(final TransitStopFacility stop) {
-		final Id id = stop.getId();
+		final Id<TransitStopFacility> id = stop.getId();
 		if (this.stopFacilities.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a stop facility with id " + id.toString());
 		}
@@ -91,16 +88,6 @@ public class TransitScheduleImpl implements TransitSchedule {
 	@Override
 	public TransitScheduleFactory getFactory() {
 		return this.factory;
-	}
-
-	@Override
-	public FailingObjectAttributes getTransitLinesAttributes() {
-		return this.transitLinesAttributes;
-	}
-
-	@Override
-	public FailingObjectAttributes getTransitStopsAttributes() {
-		return this.transitStopsAttributes;
 	}
 
 	@Override

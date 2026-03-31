@@ -88,7 +88,7 @@ public class PRRunner {
 		final PRAdaptiveCapacityControl adaptiveControl = new PRAdaptiveCapacityControl(id2prFacility);
 
 		PRControlerListener prControlerListener = new PRControlerListener(controler, adaptiveControl);
-		controler.addControlerListener(prControlerListener);
+		controler.addControllerListener(prControlerListener);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

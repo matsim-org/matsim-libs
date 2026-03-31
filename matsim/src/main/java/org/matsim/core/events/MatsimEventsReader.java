@@ -89,11 +89,6 @@ public final class MatsimEventsReader implements MatsimReader {
 		}
 	}
 
-	@Deprecated // use readStream(InputStream, EventsFileFormat)
-	public void readStream(final InputStream stream) {
-		new XmlEventsReader(this.events, this.customEventMappers).parse(stream );
-	}
-
 	public void readStream(final InputStream stream, final ControllerConfigGroup.EventsFileFormat format) {
 		switch (format) {
 			case xml:

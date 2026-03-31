@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author nkuehnel / MOIA
@@ -12,17 +13,18 @@ import java.util.Map;
 public abstract class AbstractShiftEvent extends Event {
 
     public static final String ATTRIBUTE_MODE = "mode";
-    private final Id<DrtShift> shiftId;
-
     public static final String ATTRIBUTE_SHIFT_ID = "shift_id";
+    public static final String ATTRIBUTE_SHIFT_TYPE = "shift_type";
 
-
+    private final Id<DrtShift> shiftId;
+    private final String shiftType;
     private final String mode;
 
-    public AbstractShiftEvent(double time, String mode, Id<DrtShift> id) {
+    public AbstractShiftEvent(double time, String mode, Id<DrtShift> id, String shiftType) {
         super(time);
         this.mode = mode;
-        shiftId = id;
+        this.shiftId = id;
+        this.shiftType = shiftType;
     }
 
     public String getMode() {
@@ -33,11 +35,18 @@ public abstract class AbstractShiftEvent extends Event {
         return shiftId;
     }
 
+    public Optional<String> getShiftType() {
+        return Optional.ofNullable(shiftType);
+    }
+
     @Override
     public Map<String, String> getAttributes() {
         Map<String, String> attr = super.getAttributes();
         attr.put(ATTRIBUTE_MODE, mode);
         attr.put(ATTRIBUTE_SHIFT_ID, shiftId + "");
+        if(shiftType != null) {
+            attr.put(ATTRIBUTE_SHIFT_TYPE, shiftType);
+        }
         return attr;
     }
 }

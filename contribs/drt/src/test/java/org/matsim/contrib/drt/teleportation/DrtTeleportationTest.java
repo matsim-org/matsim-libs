@@ -49,9 +49,9 @@ class DrtTeleportationTest {
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 		DrtOptimizationConstraintsSetImpl defaultConstraintsSet = drtConfigGroup
 				.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		defaultConstraintsSet.maxTravelTimeAlpha = 1.2;
-		defaultConstraintsSet.maxTravelTimeBeta = 600;
-		defaultConstraintsSet.maxWaitTime = 300;
+		defaultConstraintsSet.setMaxTravelTimeAlpha(1.2);
+		defaultConstraintsSet.setMaxTravelTimeBeta(600);
+		defaultConstraintsSet.setMaxWaitTime(300);
 		DrtFareParams fareParams = new DrtFareParams();
 		fareParams.setBaseFare(1.0);
 		fareParams.setDistanceFare_m(0.001);
@@ -80,12 +80,12 @@ class DrtTeleportationTest {
 
 			double waitAvg = Double.parseDouble(row.get("wait_average"));
 
-			assertThat(waitAvg).isEqualTo(defaultConstraintsSet.maxWaitTime);
+			assertThat(waitAvg).isEqualTo(defaultConstraintsSet.getMaxWaitTime());
 
 			double distMean = Double.parseDouble(row.get("distance_m_mean"));
 			double directDistMean = Double.parseDouble(row.get("directDistance_m_mean"));
 
-			assertThat(distMean / directDistMean).isCloseTo(defaultConstraintsSet.maxTravelTimeAlpha, Offset.offset(0.0001));
+			assertThat(distMean / directDistMean).isCloseTo(defaultConstraintsSet.getMaxTravelTimeAlpha(), Offset.offset(0.0001));
 
 		}
 

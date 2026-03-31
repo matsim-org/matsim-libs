@@ -208,7 +208,7 @@ public class NetworkCleanerTest {
 		net.removeLink(Id.createLinkId(removedBefore));
 		int size = net.getLinks().size();
 
-		NetworkUtils.runNetworkCleaner(net);
+		new NetworkCleaner().run(net);
 		Assertions.assertFalse(net.getLinks().containsKey(Id.createLinkId(expectedRemovedAfter)));
 		assertEquals(net.getLinks().size(), size - 1);
 	}

@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.application.ApplicationUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -83,48 +84,29 @@ public class CarriersAnalysis {
 	 * The default folder for the analysis results is "CarriersAnalysis".
 	 *
 	 * @param simOutputPath The output directory of the simulation run
-	 * @param runId         The CRS of the simulation
-	 */
-	public CarriersAnalysis(String simOutputPath, String runId) {
-		this(simOutputPath, Path.of(simOutputPath).resolve("analysis").resolve("freight").toString(), runId, null);
-	}
-
-	/**
-	 * This constructor automatically searches for the necessary output file in a simulation run output.
-	 * The default folder for the analysis results is "CarriersAnalysis".
-	 *
-	 * @param simOutputPath The output directory of the simulation run
 	 */
 	public CarriersAnalysis(String simOutputPath) {
-		this(simOutputPath, Path.of(simOutputPath).resolve("analysis").resolve("freight").toString(), null, null);
+		this(simOutputPath, Path.of(simOutputPath).resolve("analysis").resolve("freight").toString(), null);
 	}
 
 	/**
 	 * This constructor automatically searches for the necessary output file in a simulation run output.
 	 *
-	 * @param simOutputPath      The output directory of the simulation run
+	 * @param simOutput      The output directory of the simulation run
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 * @param globalCrs          The CRS of the simulation
 	 */
-	public CarriersAnalysis(String simOutputPath, String analysisOutputPath, String runId, String globalCrs) {
+	public CarriersAnalysis(String simOutput, String analysisOutputPath, String globalCrs) {
 
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
-//		this.EVENTS_PATH = globFile(simOutputPath, "*output_events.*");
-//		Path vehiclesPath = globFile(simOutputPath, "*output_allVehicles.*");
-//		Path networkPath = globFile(simOutputPath, "*output_network.*");
-//		Path carriersPath = globFile(simOutputPath, "*output_carriers.*");
-//		Path carriersVehicleTypesPath = globFile(simOutputPath, "*output_carriersVehicleTypes.*");
+		Path simOutputPath = Path.of(simOutput);
+		this.EVENTS_PATH = ApplicationUtils.globFile(simOutputPath, "*output_events.*").toString();
+		String vehiclesPath = ApplicationUtils.globFile(simOutputPath, "*output_allVehicles.*").toString();
+		String networkPath = ApplicationUtils.globFile(simOutputPath, "*output_network.*").toString();
+		String carriersPath = ApplicationUtils.globFile(simOutputPath, "*output_carriers.*").toString();
+		String carriersVehicleTypesPath = ApplicationUtils.globFile(simOutputPath, "*output_carriersVehicleTypes.*").toString();
 
-		// the better version with the globFile method is not available since there is a circular dependency between the modules application and freight
-		String runIdWithDelimiter = runId != null ? runId + "." : "";
-		final Path path = Path.of(simOutputPath);
-		this.EVENTS_PATH = path.resolve(runIdWithDelimiter + "output_events.xml.gz").toString();
-		String vehiclesPath = path.resolve(runIdWithDelimiter + "output_allVehicles.xml.gz").toString();
-		String networkPath = path.resolve(runIdWithDelimiter + "output_network.xml.gz").toString();
-		String carriersPath = path.resolve(runIdWithDelimiter + "output_carriers.xml.gz").toString();
-		String carriersVehicleTypesPath = path.resolve(runIdWithDelimiter + "output_carriersVehicleTypes.xml.gz").toString();
-
-		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
+		createScenarioForCarriersAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
 	}
 
 	/**
@@ -138,12 +120,11 @@ public class CarriersAnalysis {
 	 * @param analysisOutputPath       Path to the output directory
 	 * @param globalCrs                The CRS of the simulation
 	 */
-	public CarriersAnalysis(String networkPath, String vehiclesPath, String carriersPath, String carriersVehicleTypesPath, String eventsPath,
-							String analysisOutputPath, String globalCrs) {
+	public CarriersAnalysis(String networkPath, String vehiclesPath, String carriersPath, String carriersVehicleTypesPath, String eventsPath, String analysisOutputPath, String globalCrs) {
 		this.EVENTS_PATH = eventsPath;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 
-		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
+		createScenarioForCarriersAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
 	}
 
 	/**
@@ -157,9 +138,8 @@ public class CarriersAnalysis {
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 	}
 
-	private void createScenarioForFreightAnalysis(String vehiclesPath, String networkPath, String carriersPath, String carriersVehicleTypesPath,
-												  String globalCrs) {
-		log.info("########## Starting Freight Analysis ##########");
+	private void createScenarioForCarriersAnalysis(String vehiclesPath, String networkPath, String carriersPath, String carriersVehicleTypesPath, String globalCrs) {
+		log.info("########## Starting Carriers Analysis ##########");
 
 		Config config = ConfigUtils.createConfig();
 		config.vehicles().setVehiclesFile(vehiclesPath);
@@ -213,9 +193,9 @@ public class CarriersAnalysis {
 				// Prepare eventsManager - start of event based Analysis;
 				EventsManager eventsManager = EventsUtils.createEventsManager();
 
-				FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler = new FreightTimeAndDistanceAnalysisEventsHandler(
+				CarrierTimeAndDistanceAnalysis carrierTimeAndDistanceAnalysis = new CarrierTimeAndDistanceAnalysis(
 					delimiter, scenario);
-				eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
+				eventsManager.addHandler(carrierTimeAndDistanceAnalysis);
 
 				CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter);
 				eventsManager.addHandler(carrierLoadAnalysis);
@@ -228,9 +208,9 @@ public class CarriersAnalysis {
 
 				log.info("Analysis completed.");
 				log.info("Writing output...");
-				freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
-				freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(ANALYSIS_OUTPUT_PATH, scenario);
-				freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerCarrier(ANALYSIS_OUTPUT_PATH, scenario);
+				carrierTimeAndDistanceAnalysis.writeTravelTimeAndDistancePerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
+				carrierTimeAndDistanceAnalysis.writeTravelTimeAndDistancePerVehicleType(ANALYSIS_OUTPUT_PATH, scenario);
+				carrierTimeAndDistanceAnalysis.writeTravelTimeAndDistancePerCarrier(ANALYSIS_OUTPUT_PATH, scenario);
 				carrierLoadAnalysis.writeLoadPerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
 			}
 		}

@@ -49,7 +49,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.matsim.testcases.MatsimTestUtils.EPSILON;
@@ -93,6 +93,8 @@ public class EquilTwoAgentsTest {
 		ConfigUtils.loadConfig(config, IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
 		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans2.xml").toString());
 
+		config.scoring().setWriteExperiencedPlans( true );
+
 		ScoringConfigGroup pcsConfig = config.scoring() ;
 		ActivityParams params = new ActivityParams("h") ;
         params.setTypicalDuration(123456789.0) ; // probably dummy
@@ -106,7 +108,7 @@ public class EquilTwoAgentsTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().toInstance(new StartupListener() {
+				addControllerListenerBinding().toInstance(new StartupListener() {
 					@Inject
 					EventsManager eventsManager;
 

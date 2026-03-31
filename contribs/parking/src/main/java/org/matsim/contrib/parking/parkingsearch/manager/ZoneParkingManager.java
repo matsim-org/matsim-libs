@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.ParkingSearchUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -99,8 +99,8 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 						String t = "Occupied: " + this.infoByFacilityId.get(this.parkingFacilityLocationByVehicleId.get(vehicleId)).occupation;
 						String u =
 							"Capacity: " + this.parkingFacilitiesById.get(this.parkingFacilityLocationByVehicleId.get(vehicleId)).getActivityOptions()
-																	 .get(
-																		 ParkingUtils.ParkingStageInteractionType).getCapacity();
+								.get(
+									ParkingSearchUtils.ParkingStageInteractionType).getCapacity();
 						String v = "TotalCapacityOnLink: " + getNrOfAllParkingSpacesOnLink(linkId);
 						throw new RuntimeException("occupancy of zone " + zone + " is higher than 100%. Capacity= " + this.totalCapByZone.get(
 							zone) + "  occupancy=" + newOcc + "time = " + time

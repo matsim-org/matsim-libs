@@ -22,8 +22,8 @@ public class PassengerDelayObjective implements DrtInsertionObjective {
 	public double calculateObjective(DrtRequest request, Insertion insertion, DetourTimeInfo detourTimeInfo) {
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
 
-		double totalPickupValue = detourTimeInfo.pickupDetourInfo.departureTime - request.getEarliestStartTime();
-		double totalDropoffValue = detourTimeInfo.dropoffDetourInfo.arrivalTime - request.getEarliestStartTime();
+		double totalPickupValue = detourTimeInfo.pickupDetourInfo.requestPickupTime - request.getEarliestStartTime();
+		double totalDropoffValue = detourTimeInfo.dropoffDetourInfo.requestDropoffTime - request.getEarliestStartTime();
 
 		double remainingTimeLoss = detourTimeInfo.pickupDetourInfo.pickupTimeLoss;
 
@@ -31,9 +31,9 @@ public class PassengerDelayObjective implements DrtInsertionObjective {
 			remainingTimeLoss -= insertion.vehicleEntry.getPrecedingStayTime(i);
 			remainingTimeLoss = Math.max(0.0, remainingTimeLoss);
 
-			totalPickupValue += getPassengers(vehicleEntry.stops.get(i).task.getPickupRequests().values())
+			totalPickupValue += getPassengers(vehicleEntry.stops.get(i).getTask().getPickupRequests().values())
 					* remainingTimeLoss;
-			totalDropoffValue += getPassengers(vehicleEntry.stops.get(i).task.getDropoffRequests().values())
+			totalDropoffValue += getPassengers(vehicleEntry.stops.get(i).getTask().getDropoffRequests().values())
 					* remainingTimeLoss;
 		}
 
@@ -43,9 +43,9 @@ public class PassengerDelayObjective implements DrtInsertionObjective {
 			remainingTimeLoss -= insertion.vehicleEntry.getPrecedingStayTime(i);
 			remainingTimeLoss = Math.max(0.0, remainingTimeLoss);
 
-			totalPickupValue += getPassengers(vehicleEntry.stops.get(i).task.getPickupRequests().values())
+			totalPickupValue += getPassengers(vehicleEntry.stops.get(i).getTask().getPickupRequests().values())
 					* remainingTimeLoss;
-			totalDropoffValue += getPassengers(vehicleEntry.stops.get(i).task.getDropoffRequests().values())
+			totalDropoffValue += getPassengers(vehicleEntry.stops.get(i).getTask().getDropoffRequests().values())
 					* remainingTimeLoss;
 		}
 

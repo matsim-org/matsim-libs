@@ -115,9 +115,7 @@ public class VehicleChoiceAgentImpl implements VehicleChoiceAgent {
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility,
 				travelTime);
 		Link endLink = network.getLinks().get(leg.getRoute().getEndLinkId());
-		Vehicle vehicle = null;
-		Path path = pathCalculator.calcLeastCostPath(vehicleLocation.getToNode(), endLink.getFromNode(), now, null,
-				vehicle);
+		Path path = pathCalculator.calcLeastCostPath(vehicleLocation, endLink, now, null, null);
 
 		return path.travelTime;
 

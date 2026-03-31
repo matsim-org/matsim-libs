@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.ParkingSearchUtils;
 import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.gbl.Gbl;
@@ -81,7 +81,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	@Inject
 	public FacilityBasedParkingManager(Scenario scenario) {
 		psConfigGroup = (ParkingSearchConfigGroup) scenario.getConfig().getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
-		parkingFacilitiesById = scenario.getActivityFacilities().getFacilitiesForActivityType(ParkingUtils.ParkingStageInteractionType);
+		parkingFacilitiesById = scenario.getActivityFacilities().getFacilitiesForActivityType(ParkingSearchUtils.ParkingStageInteractionType);
 
 		logger.info(parkingFacilitiesById.toString());
 
@@ -104,7 +104,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		this.parkingFacilitiesByLink.put(linkId, parkingOnLink);
 		this.waitingVehiclesByLinkId.put(linkId, new TreeMap<>());
 
-		ActivityOption activityOption = fac.getActivityOptions().get(ParkingUtils.ParkingStageInteractionType);
+		ActivityOption activityOption = fac.getActivityOptions().get(ParkingSearchUtils.ParkingStageInteractionType);
 		this.infoByFacilityId.put(fac.getId(), new ParkingFacilityInfo(activityOption));
 	}
 
@@ -126,7 +126,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		for (Id<ActivityFacility> facility : facilities) {
 			double maxParkingDurationAtFacilityInSeconds =
 				Optional.ofNullable(this.parkingFacilitiesById.get(facility).getAttributes().getAsMap().get("maxParkingDurationInHours"))
-						.map(attribute -> 3600 * (double) attribute).orElse(Double.MAX_VALUE);
+					.map(attribute -> 3600 * (double) attribute).orElse(Double.MAX_VALUE);
 
 			if (maxParkingDurationAtFacilityInSeconds < totalDuration) {
 				//Parking duration is limited, so we can't park here.
@@ -238,7 +238,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		for (Entry<Id<ActivityFacility>, ParkingFacilityInfo> e : this.infoByFacilityId.entrySet()) {
 			Id<Link> linkId = this.parkingFacilitiesById.get(e.getKey()).getLinkId();
 			double capacity = this.parkingFacilitiesById.get(e.getKey()).getActivityOptions()
-														.get(ParkingUtils.ParkingStageInteractionType).getCapacity();
+				.get(ParkingSearchUtils.ParkingStageInteractionType).getCapacity();
 			double x = this.parkingFacilitiesById.get(e.getKey()).getCoord().getX();
 			double y = this.parkingFacilitiesById.get(e.getKey()).getCoord().getY();
 
@@ -270,7 +270,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.parkingFacilitiesByLink.get(linkId);
 		if (!(parkingFacilitiesAtLink == null)) {
 			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
-				allSpaces += this.parkingFacilitiesById.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
+				allSpaces += this.parkingFacilitiesById.get(fac).getActivityOptions().get(ParkingSearchUtils.ParkingStageInteractionType).getCapacity();
 			}
 		}
 		return allSpaces;
@@ -283,7 +283,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			return 0;
 		} else {
 			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
-				int cap = (int) this.parkingFacilitiesById.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
+				int cap = (int) this.parkingFacilitiesById.get(fac).getActivityOptions().get(ParkingSearchUtils.ParkingStageInteractionType).getCapacity();
 				allFreeSpaces += (cap - this.infoByFacilityId.get(fac).occupation);
 			}
 		}
@@ -348,8 +348,8 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 				break;
 			}
 			for (Id<ActivityFacility> fac : this.parkingFacilitiesByLink.get(linkId)) {
-				int capacity = (int) this.parkingFacilitiesById.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType)
-															   .getCapacity();
+				int capacity = (int) this.parkingFacilitiesById.get(fac).getActivityOptions().get(ParkingSearchUtils.ParkingStageInteractionType)
+					.getCapacity();
 
 				while (this.infoByFacilityId.get(fac).occupation < capacity && !vehicleIdByTime.isEmpty()) {
 					double startWaitingTime = vehicleIdByTime.firstKey();

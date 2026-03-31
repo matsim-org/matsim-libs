@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -35,7 +36,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -100,14 +100,15 @@ public class PositionEmissionsModule extends AbstractModule {
 
 			var vehicleAttributes = getVehicleAttributes(vehicle);
 			var roadType = EmissionUtils.getHbefaRoadType(link);
-			return emissionModule.getWarmEmissionAnalysisModule().calculateWarmEmissions(time, roadType, link.getFreespeed(), distance, vehicleAttributes);
+			return emissionModule.getWarmEmissionAnalysisModule()
+				.calculateWarmEmissions(time, roadType, link.getFreespeed(), distance, vehicleAttributes);
 		}
 
 		Map<Pollutant, Double> calculateColdEmissions(Vehicle vehicle, double parkingDuration, int distance) {
 
 			// linkid and event time are never used in the underlying code.
 			return emissionModule.getColdEmissionAnalysisModule()
-					.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), null, -1, parkingDuration, distance);
+				.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), null, -1, parkingDuration, distance);
 		}
 
 		private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> getVehicleAttributes(Vehicle vehicle) {
@@ -160,22 +161,23 @@ public class PositionEmissionsModule extends AbstractModule {
 			var type = event.getEventType();
 			switch (type) {
 
-				case PositionEvent.EVENT_TYPE:
-					handlePositionEvent((PositionEvent) event);
-					break;
-				case VehicleEntersTrafficEvent.EVENT_TYPE:
-					handleVehicleEntersTrafficEvent((VehicleEntersTrafficEvent) event);
-					break;
-				case VehicleLeavesTrafficEvent.EVENT_TYPE:
-					handleVehicleLeavesTraffic((VehicleLeavesTrafficEvent) event);
-					break;
-				default:
-					// we're not interested in anything else
+			case PositionEvent.EVENT_TYPE:
+				handlePositionEvent((PositionEvent) event);
+				break;
+			case VehicleEntersTrafficEvent.EVENT_TYPE:
+				handleVehicleEntersTrafficEvent((VehicleEntersTrafficEvent) event);
+				break;
+			case VehicleLeavesTrafficEvent.EVENT_TYPE:
+				handleVehicleLeavesTraffic((VehicleLeavesTrafficEvent) event);
+				break;
+			default:
+				// we're not interested in anything else
 			}
 		}
 
 		private void handleVehicleEntersTrafficEvent(VehicleEntersTrafficEvent event) {
-			if (!event.getNetworkMode().equals(TransportMode.car)) return;
+			if (!event.getNetworkMode().equals(TransportMode.car))
+				return;
 
 			vehiclesInTraffic.put(event.getVehicleId(), event);
 			vehiclesEmittingColdEmissions.add(event.getVehicleId());
@@ -197,7 +199,8 @@ public class PositionEmissionsModule extends AbstractModule {
 		}
 
 		private void handleVehicleLeavesTraffic(VehicleLeavesTrafficEvent event) {
-			if (!event.getNetworkMode().equals(TransportMode.car)) return;
+			if (!event.getNetworkMode().equals(TransportMode.car))
+				return;
 
 			trajectories.remove(event.getVehicleId());
 			parkedVehicles.put(event.getVehicleId(), event);
@@ -244,10 +247,10 @@ public class PositionEmissionsModule extends AbstractModule {
 			int distanceClass = distance <= 1000 ? 1 : 2;
 
 			var coldEmissionsFor1km = emissionCalculator.calculateColdEmissions(
-					vehicle, parkingDurations.get(vehicle.getId()), distanceClass
+				vehicle, parkingDurations.get(vehicle.getId()), distanceClass
 			);
 			return coldEmissionsFor1km.entrySet().stream()
-					.collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue() * distanceToLastPosition / 1000));
+				.collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue() * distanceToLastPosition / 1000));
 		}
 
 		private double calculateTravelledDistance(PositionEvent event) {
@@ -261,7 +264,8 @@ public class PositionEmissionsModule extends AbstractModule {
 				}
 				previousCoord = position.getCoord();
 			}
-			assert previousCoord != null;
+			assert previousCoord != null : String.format("previousCoord is null, no positions were found for vehicle %s",
+				event.getVehicleId().toString());
 			distance += CoordUtils.calcEuclideanDistance(previousCoord, event.getCoord());
 			return distance;
 		}
@@ -285,12 +289,13 @@ public class PositionEmissionsModule extends AbstractModule {
 					var coldEmissions = computeColdEmissions(event, vehicle, distanceToLastPosition);
 					var warmEmissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime);
 					var combinedEmissions = Stream.concat(coldEmissions.entrySet().stream(), warmEmissions.entrySet().stream())
-							.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
+						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
 
 					eventsManager.processEvent(new PositionEmissionEvent(event, combinedEmissions, "combined"));
 
 				} else {
-					log.warn("speed was too fast: {}m/s Current time: {} prev time: {} current linkId: {} prev linkId: {} agentId: {}", speed, event.getTime(), previousPosition.getTime(), event.getLinkId(), previousPosition.getLinkId(), event.getPersonId());
+					log.warn("speed was too fast: {}m/s Current time: {} prev time: {} current linkId: {} prev linkId: {} agentId: {}", speed,
+						event.getTime(), previousPosition.getTime(), event.getLinkId(), previousPosition.getLinkId(), event.getPersonId());
 				}
 			} else {
 				// if the vehicle hasn't moved, issue an event with 0 emissions. This way there is an event for every timestep
@@ -353,7 +358,6 @@ public class PositionEmissionsModule extends AbstractModule {
 			return position.getCoord();
 		}
 
-
 		@Override
 		public Map<String, String> getAttributes() {
 
@@ -376,19 +380,19 @@ public class PositionEmissionsModule extends AbstractModule {
 		public static MatsimEventsReader.CustomEventMapper getEventMapper() {
 			return event -> {
 				var position = new PositionInfo.DirectBuilder()
-						.setAgentState(AgentSnapshotInfo.AgentState.valueOf(event.getAttributes().get("state")))
-						.setEasting(Double.parseDouble(event.getAttributes().get(Event.ATTRIBUTE_X)))
-						.setNorthing(Double.parseDouble(event.getAttributes().get(Event.ATTRIBUTE_Y)))
-						.setPersonId(Id.createPersonId(event.getAttributes().get(HasPersonId.ATTRIBUTE_PERSON)))
-						.setLinkId(Id.createLinkId(event.getAttributes().get("linkId")))
-						.setVehicleId(Id.createVehicleId(event.getAttributes().get("vehicleId")))
-						.build();
+					.setAgentState(AgentSnapshotInfo.AgentState.valueOf(event.getAttributes().get("state")))
+					.setEasting(Double.parseDouble(event.getAttributes().get(Event.ATTRIBUTE_X)))
+					.setNorthing(Double.parseDouble(event.getAttributes().get(Event.ATTRIBUTE_Y)))
+					.setPersonId(Id.createPersonId(event.getAttributes().get(HasPersonId.ATTRIBUTE_PERSON)))
+					.setLinkId(Id.createLinkId(event.getAttributes().get("linkId")))
+					.setVehicleId(Id.createVehicleId(event.getAttributes().get("vehicleId")))
+					.build();
 
 				var positionEvent = new PositionEvent(event.getTime(), position);
 				var emissions = Arrays.stream(Pollutant.values())
-						.filter(pollutant -> event.getAttributes().containsKey(pollutant.toString()))
-						.map(pollutant -> Tuple.of(pollutant, Double.parseDouble(event.getAttributes().get(pollutant.toString()))))
-						.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+					.filter(pollutant -> event.getAttributes().containsKey(pollutant.toString()))
+					.map(pollutant -> Tuple.of(pollutant, Double.parseDouble(event.getAttributes().get(pollutant.toString()))))
+					.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
 				var type = event.getAttributes().get("emissionType");
 
 				return new PositionEmissionEvent(positionEvent, emissions, type);

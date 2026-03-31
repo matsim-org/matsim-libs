@@ -38,7 +38,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
  * @author mrieser
  */
 public class TransitStopFacilityImpl implements TransitStopFacility {
-	
+
 	private final Id<TransitStopFacility> id;
 	private Id<TransitStopArea> stopAreaId;
 	private Coord coord;
@@ -68,7 +68,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	public Coord getCoord() {
 		return this.coord;
 	}
-	
+
 	@Override
 	public void setCoord(Coord coord) {
 		this.coord = coord;
@@ -98,6 +98,9 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	public String toString() {
 		StringBuilder strb = new StringBuilder(  ) ;
 		strb.append( "[ facility id=" ).append( id ) ;
+		if (name != null) {
+			strb.append( " | name=" ).append( name ) ;
+		}
 		strb.append ( " | coord=").append( coord ) ;
 		strb.append( " | linkId=" ).append( linkId ) ;
 
@@ -114,7 +117,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	public void setStopAreaId(Id<TransitStopArea> stopAreaId) {
 		this.stopAreaId = stopAreaId;
 	}
-	
+
 	@Override
 	public Map<String, Object> getCustomAttributes() {
 		if (this.customizableDelegate == null) {

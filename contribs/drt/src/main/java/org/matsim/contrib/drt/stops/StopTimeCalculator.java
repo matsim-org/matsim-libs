@@ -54,17 +54,23 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  */
 public interface StopTimeCalculator {
 	// a new stop with a pickup is created
-	double initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request);
+	Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request);
 
 	// a pickup is added to an existing stop
-	double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime, DrtRequest request);
+	Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime, DrtRequest request);
 
 	// a new stop with a dropoff is created
-	double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request);
+	Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request);
 
 	// a dropoff is added to an existing stop
-	double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime, DrtRequest request);
+	Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime, DrtRequest request);
 
 	// the begin time of an existing stop is shifted
 	double shiftEndTime(DvrpVehicle vehicle, DrtStopTask stop, double beginTime);
+
+	public record Pickup(double endTime, double pickupTime) {
+	}
+
+	public record Dropoff(double endTime, double dropoffTime) {
+	}
 }

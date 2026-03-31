@@ -32,19 +32,17 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.IntegerValueHashMap;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 
 public final class ParkingChoiceSimulation
-		implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
+	implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
 
 	private final ParkingInfrastructure parkingInfrastructureManager;
 	private final Scenario scenario;
@@ -198,8 +196,8 @@ public final class ParkingChoiceSimulation
 			if (PopulationUtils.hasCarLeg(person.getSelectedPlan()) && isNotTransitAgent(person.getId())) {
 				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
 
-				Activity firstActivityOfDayBeforeDepartingWithCar = PopulationUtils.getFirstActivityOfDayBeforeDepartingWithCar(person.getSelectedPlan());
-				Activity firstActivityAfterLastCarLegOfDay = PopulationUtils.getFirstActivityAfterLastCarLegOfDay(person.getSelectedPlan());
+				Activity firstActivityOfDayBeforeDepartingWithCar = getFirstNonStagingActivityOfDayBeforeDepartingWithCar(person.getSelectedPlan());
+				Activity firstActivityAfterLastCarLegOfDay = getFirstNonStagingActivityAfterLastCarLegOfDay(person.getSelectedPlan());
 
 				parkingAttributes.destCoordinate = firstActivityAfterLastCarLegOfDay.getCoord();
 				// parkingAttributes.arrivalTime=firstActivityAfterLastCarLegOfDay.getStartTime();
@@ -212,10 +210,10 @@ public final class ParkingChoiceSimulation
 				OptionalTime startTime = firstActivityAfterLastCarLegOfDay.getStartTime();
 				if (startTime.isUndefined() || startTime.seconds() == Double.POSITIVE_INFINITY) {
 					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(0,
-							firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());
+						firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());
 				} else {
 					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(startTime.seconds(),
-							firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());
+						firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());
 				}
 				parkingAttributes.legIndex = 0;
 
@@ -285,8 +283,9 @@ public final class ParkingChoiceSimulation
 		}
 
 		for (int i = indexOfNextCarLeg - 1; i >= 0; i--) {
-			if (planElements.get(i) instanceof Activity) {
-				return (Activity) planElements.get(i);
+			if (planElements.get(i) instanceof Activity act) {
+				if(!TripStructureUtils.isStageActivityType(act.getType()))
+					return act;
 			}
 		}
 
@@ -303,4 +302,53 @@ public final class ParkingChoiceSimulation
 		}
 		return null;
 	}
+
+	/**
+	 * This is a modified version of {@link PopulationUtils#getFirstActivityOfDayBeforeDepartingWithCar(Plan)}.
+	 * @return the first non-staging/non-interaction activity before the first car link of this plan.
+	 */
+	private Activity getFirstNonStagingActivityOfDayBeforeDepartingWithCar(Plan plan) {
+		List<PlanElement> planElements = plan.getPlanElements();
+		int indexOfFirstCarLegOfDay = -1;
+		for (int i = 0; i < planElements.size(); i++) {
+			if (planElements.get(i) instanceof Leg leg) {
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+					indexOfFirstCarLegOfDay = i;
+					break;
+				}
+
+			}
+		}
+		for (int i = indexOfFirstCarLegOfDay - 1; i >= 0; i--) {
+			if (planElements.get(i) instanceof Activity act) {
+				if(!TripStructureUtils.isStageActivityType(act.getType()))
+					return act;
+			}
+		}
+		return null;
+	}
+
+	private Activity getFirstNonStagingActivityAfterLastCarLegOfDay(Plan plan) {
+		List<PlanElement> planElements = plan.getPlanElements();
+		int indexOfLastCarLegOfDay = -1;
+		for (int i = planElements.size() - 1; i >= 0; i--) {
+			if (planElements.get(i) instanceof Leg leg) {
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+					indexOfLastCarLegOfDay = i;
+					break;
+				}
+
+			}
+		}
+
+		for (int i = indexOfLastCarLegOfDay + 1; i < planElements.size(); i++) {
+			if (planElements.get(i) instanceof Activity act) {
+				if(!TripStructureUtils.isStageActivityType(act.getType()))
+					return act;
+			}
+		}
+		return null;
+	}
+
+
 }

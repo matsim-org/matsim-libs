@@ -1,10 +1,6 @@
 package org.matsim.contrib.ev.withinday;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -16,25 +12,11 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.ev.charging.ChargingStartEvent;
-import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
-import org.matsim.contrib.ev.charging.ChargingStrategy;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEvent;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEventHandler;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.AbortChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.FinishChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.FinishChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.StartChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.StartChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.UpdateChargingAttemptEvent;
+import org.matsim.contrib.ev.withinday.events.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -50,11 +32,16 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import com.google.common.base.Preconditions;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This engine is the core of the within-day electric vehicle charging package.
@@ -66,11 +53,11 @@ import com.google.common.base.Preconditions;
  * that a planned charger is blocked. The engine maanges the successive
  * adaptation of the plan to the actions intended by the agent (pluggin the car,
  * unpluggin the car, ...).
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandler, ChargingStartEventHandler,
-		QueuedAtChargerEventHandler, PersonDepartureEventHandler, MobsimScopeEventHandler {
+	QueuedAtChargerEventHandler, PersonDepartureEventHandler, MobsimScopeEventHandler {
 	static public final String ACTIVE_PERSON_ATTRIBUTE = "wevc:active";
 	static public final String MAXIMUM_QUEUE_TIME_PERSON_ATTRIBUTE = "wevc:maximumQueueTime";
 
@@ -98,6 +85,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	private final ChargingAlternativeProvider alternativeProvider;
 	private final ChargingSlotProvider slotProvider;
 	private final EventsManager eventsManager;
+	private final TimeInterpretation timeInterpretation;
 	private ChargingScheduler chargingScheduler;
 
 	private final boolean performAbort;
@@ -106,12 +94,13 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 	private final Logger logger = LogManager.getLogger(WithinDayEvEngine.class);
 
-	public WithinDayEvEngine(WithinDayEvConfigGroup config, QSim qsim, ElectricFleet electricFleet,
-			ChargingAlternativeProvider onlineSlotProvider, ChargingSlotProvider offlineSlotProvider,
-			EventsManager eventsManager,
-			ChargingScheduler chargingScheduler, Vehicles vehicles, QVehicleFactory qVehicleFactory,
-			Scenario scenario, WithinDayChargingStrategy.Factory chargingStrategyFactory) {
+	public WithinDayEvEngine(WithinDayEvConfigGroup config, QSim qsim, TimeInterpretation timeInterpretation, ElectricFleet electricFleet,
+							 ChargingAlternativeProvider onlineSlotProvider, ChargingSlotProvider offlineSlotProvider,
+							 EventsManager eventsManager,
+							 ChargingScheduler chargingScheduler, Vehicles vehicles, QVehicleFactory qVehicleFactory,
+							 Scenario scenario, WithinDayChargingStrategy.Factory chargingStrategyFactory) {
 		this.qsim = qsim;
+		this.timeInterpretation = timeInterpretation;
 		this.electricFleet = electricFleet;
 		this.alternativeProvider = onlineSlotProvider;
 		this.slotProvider = offlineSlotProvider;
@@ -134,7 +123,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	private final IdSet<Vehicle> relevantVehicles = new IdSet<>(Vehicle.class);
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeMobsim() {
 		logger.info("Implementing charging slots ..");
 
 		int activityBasedCount = 0;
@@ -166,10 +155,10 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 					List<ChargingSlot> slots = slotProvider.findSlots(plan.getPerson(), plan, vehicle);
 					Collections.sort(slots, (first, second) -> {
 						int firstIndex = plan.getPlanElements()
-								.indexOf(first.isLegBased() ? first.leg() : first.startActivity());
+							.indexOf(first.isLegBased() ? first.leg() : first.startActivity());
 
 						int secondIndex = plan.getPlanElements()
-								.indexOf(second.isLegBased() ? second.leg() : second.startActivity());
+							.indexOf(second.isLegBased() ? second.leg() : second.startActivity());
 
 						return Integer.compare(firstIndex, secondIndex);
 					});
@@ -197,7 +186,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 							Preconditions.checkState(slot.leg() == null);
 							Preconditions.checkState(wholeDaySlot == null);
 							Activity plugActivity = chargingScheduler.scheduleInitialPlugActivity(agent,
-									slot.startActivity(), slot.charger());
+								slot.startActivity(), slot.charger());
 							plugActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
 							activityBasedCount++;
 						} else {
@@ -207,7 +196,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 							Preconditions.checkState(slot.leg() != null);
 
 							Activity plugActivity = chargingScheduler.scheduleOnroutePlugActivity(agent, slot.leg(),
-									slot.charger());
+								slot.charger());
 							plugActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
 							legBasedCount++;
 						}
@@ -227,7 +216,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 		}
 
 		logger.info(String.format("  activity: %d, leg: %d, overnight: %d, whole day: %d", activityBasedCount,
-				legBasedCount, overnightCount, wholeDayCount));
+			legBasedCount, overnightCount, wholeDayCount));
 	}
 
 	private Activity findOvernightActivity(Plan plan) {
@@ -237,7 +226,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 			if (mode.equals(chargingMode)) {
 				Id<Link> originLinkId = PopulationUtils.decideOnLinkIdForActivity(trip.getOriginActivity(), scenario);
 				Id<Link> destinationLinkId = PopulationUtils.decideOnLinkIdForActivity(trip.getDestinationActivity(),
-						scenario);
+					scenario);
 
 				if (!originLinkId.equals(destinationLinkId)) {
 					return trip.getOriginActivity();
@@ -257,7 +246,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 			qsim.addParkedVehicle(vehicle, slot.charger().getLink().getId());
 		}
 
-		Id<Link> initialLinkId = vehicle.getCurrentLink().getId();
+		Id<Link> initialLinkId = vehicle.getCurrentLinkId();
 
 		QLinkI originalLink = (QLinkI) qsim.getNetsimNetwork().getNetsimLink(initialLinkId);
 		QVehicle qVehicle = originalLink.removeParkedVehicle(vehicleId);
@@ -277,10 +266,10 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 		// Handle end time from here
 
-		Preconditions.checkState(endActivity.getEndTime().isDefined());
-		double endTime = endActivity.getEndTime().seconds();
+		OptionalTime endTime = timeInterpretation.decideOnActivityEndTimeAlongPlan(endActivity, WithinDayAgentUtils.getModifiablePlan(agent));
+		Preconditions.checkState(endTime.isDefined());
 
-		endActivity.getAttributes().putAttribute(INITIAL_ACTIVITY_END_TIME_ATTRIBUTE, endTime);
+		endActivity.getAttributes().putAttribute(INITIAL_ACTIVITY_END_TIME_ATTRIBUTE, endTime.seconds());
 		endActivity.setEndTime(Double.MAX_VALUE);
 
 		WithinDayAgentUtils.resetCaches(agent);
@@ -289,7 +278,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 		 * We would usually include the following line, but we must not call it here
 		 * because it is called automatically by the QSim at simulation startup.
 		 * Otherwise, the agent will appear twice in the agent queue:
-		 * 
+		 *
 		 * WithinDayAgentUtils.rescheduleActivityEnd(agent, qsim);
 		 */
 
@@ -404,12 +393,12 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	}
 
 	private ChargingProcess createChargingProcessFromPlugActivity(Id<Person> personId, double now,
-			Activity plugActivity,
-			boolean isSpontaneous) {
+																  Activity plugActivity,
+																  boolean isSpontaneous) {
 		Preconditions.checkState(plugActivity.getType().equals(PLUG_ACTIVITY_TYPE));
 
 		ChargingProcess chargingProcess = (ChargingProcess) plugActivity.getAttributes()
-				.getAttribute(CHARGING_PROCESS_ATTRIBUTE);
+			.getAttribute(CHARGING_PROCESS_ATTRIBUTE);
 		if (chargingProcess != null) {
 			// we are continuing an ongoing search process
 			chargingProcess.isFirstAttempt = false;
@@ -423,8 +412,8 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	private final IdMap<Person, Integer> chargingProcessIndex = new IdMap<>(Person.class);
 
 	private ChargingProcess createChargingProcess(Id<Person> personId, double now, ChargingSlot slot,
-			Activity plugActivity,
-			boolean isSpontaneous) {
+												  Activity plugActivity,
+												  boolean isSpontaneous) {
 		MobsimAgent agent = qsim.getAgents().get(personId);
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
@@ -441,11 +430,11 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 		process.initialSlot = slot;
 
 		eventsManager.processEvent(new StartChargingProcessEvent(now, process.agent.getId(), process.vehicle.getId(),
-				process.processIndex));
+			process.processIndex));
 		eventsManager.processEvent(
-				new StartChargingAttemptEvent(now, personId, vehicleId, process.currentSlot.charger().getId(),
-						process.attemptIndex, process.processIndex, process.currentSlot.isLegBased(), isSpontaneous,
-						process.currentSlot.duration()));
+			new StartChargingAttemptEvent(now, personId, vehicleId, process.currentSlot.charger().getId(),
+				process.attemptIndex, process.processIndex, process.currentSlot.isLegBased(), isSpontaneous,
+				process.currentSlot.duration()));
 
 		if (plugActivity != null) {
 			plugActivity.getAttributes().putAttribute(CHARGING_PROCESS_ATTRIBUTE, process);
@@ -464,7 +453,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 			if (element instanceof Activity activity) {
 				if (!TripStructureUtils.isStageActivityType(activity.getType())
-						|| isManagedActivityType(activity.getType())) {
+					|| isManagedActivityType(activity.getType())) {
 					if (activity.getType().equals(PLUG_ACTIVITY_TYPE)) {
 						return activity;
 					} else {
@@ -590,14 +579,14 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 						// a plug activity was found and we may implement an alternative proposal
 
 						ChargingAlternative alternative = alternativeProvider.findEnrouteAlternative(time,
-								plan.getPerson(),
-								plan,
-								process.vehicle, process.currentSlot);
+							plan.getPerson(),
+							plan,
+							process.vehicle, process.currentSlot);
 
 						if (alternative != null) {
 							if (process.currentSlot.isLegBased() && !alternative.isLegBased()) {
 								throw new IllegalStateException(
-										"Cannot switch from a leg-based charging slot to an activity-based alternative because activities are not known");
+									"Cannot switch from a leg-based charging slot to an activity-based alternative because activities are not known");
 							}
 
 							if (alternative.charger() != process.currentSlot.charger()) {
@@ -605,32 +594,32 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 								// drive to different charger and schedule a plug activity
 								Activity plugActivity = chargingScheduler.changePlugActivity(process.agent,
-										followingPlugActivity, alternative.charger(),
-										time);
+									followingPlugActivity, alternative.charger(),
+									time);
 								plugActivity.getAttributes().putAttribute(CHARGING_PROCESS_ATTRIBUTE, process);
 
 								// update slot
 								process.currentSlot = new ChargingSlot(process.currentSlot.startActivity(),
-										process.currentSlot.endActivity(),
-										process.currentSlot.leg(), alternative.duration(),
-										alternative.charger());
+									process.currentSlot.endActivity(),
+									process.currentSlot.leg(), alternative.duration(),
+									alternative.charger());
 
 								// send event for scoring
 								eventsManager.processEvent(new UpdateChargingAttemptEvent(time, process.agent.getId(),
-										process.vehicle.getId(), alternative.charger().getId(),
-										alternative.isLegBased(), alternative.duration()));
+									process.vehicle.getId(), alternative.charger().getId(),
+									alternative.isLegBased(), alternative.duration()));
 							} else if (alternative.duration() != process.currentSlot.duration()) {
 								// update slot with custom duration (either switch between leg- and
 								// activity-based slot, or change of duration)
 								process.currentSlot = new ChargingSlot(process.currentSlot.startActivity(),
-										process.currentSlot.endActivity(),
-										process.currentSlot.leg(), alternative.duration(),
-										process.currentSlot.charger());
+									process.currentSlot.endActivity(),
+									process.currentSlot.leg(), alternative.duration(),
+									process.currentSlot.charger());
 
 								// send event for scoring
 								eventsManager.processEvent(new UpdateChargingAttemptEvent(time, process.agent.getId(),
-										process.vehicle.getId(), alternative.charger().getId(),
-										alternative.isLegBased(), alternative.duration()));
+									process.vehicle.getId(), alternative.charger().getId(),
+									alternative.isLegBased(), alternative.duration()));
 							}
 						}
 					} else if (process == null && allowSpontaneousCharging) {
@@ -640,14 +629,14 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 						ElectricVehicle vehicle = getElectricVehicle(plan);
 
 						ChargingAlternative alternative = alternativeProvider.findEnrouteAlternative(time,
-								plan.getPerson(), plan, vehicle, null);
+							plan.getPerson(), plan, vehicle, null);
 
 						if (alternative != null) {
 							ChargingSlot slot = new ChargingSlot(leg, alternative.duration(),
-									alternative.charger());
+								alternative.charger());
 
 							Activity plugActivity = chargingScheduler.insertPlugActivity(agent,
-									alternative.charger(), time);
+								alternative.charger(), time);
 							plugActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
 
 							createChargingProcessFromPlugActivity(personId, time, plugActivity, true);
@@ -662,11 +651,12 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 	private ElectricVehicle getElectricVehicle(Plan plan) {
 		Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(plan.getPerson(), chargingMode);
-		if  (!electricFleet.getElectricVehicles().containsKey(vehicleId)){
+		if (!electricFleet.getElectricVehicles().containsKey(vehicleId)) {
 			throw new IllegalArgumentException("You have configured agent " + plan.getPerson().getId() + " to be active for charging" +
-					", and the mode " + chargingMode + " to be an electric vehicle mode, but the vehicle " + vehicleId + " is not an electric vehicle. " +
-					"In order to change that, you can call VehicleUtils.setHbefaTechnology(vehicle.getType().getEngineInformation(), ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY (see ElectricFleetUtils)." );
-		};
+				", and the mode " + chargingMode + " to be an electric vehicle mode, but the vehicle " + vehicleId + " is not an electric vehicle. " +
+				"In order to change that, you can call VehicleUtils.setHbefaTechnology(vehicle.getType().getEngineInformation(), ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY (see ElectricFleetUtils).");
+		}
+		;
 		ElectricVehicle vehicle = electricFleet.getElectricVehicles().get(vehicleId);
 		return vehicle;
 	}
@@ -679,8 +669,8 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 			if (!process.isSubmitted) {
 				Double personMaximumQueueWaitTime = getMaximumQueueTime(
-						((HasModifiablePlan) process.agent).getModifiablePlan()
-								.getPerson());
+					((HasModifiablePlan) process.agent).getModifiablePlan()
+						.getPerson());
 
 				if (personMaximumQueueWaitTime == null) {
 					personMaximumQueueWaitTime = maximumQueueWaitTime;
@@ -688,7 +678,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 				// add vehicle to charger, it will be either queued or plugged
 				ChargingStrategy chargingStrategy = chargingStrategyFactory
-						.createStrategy(process.currentSlot.charger().getSpecification(), process.vehicle);
+					.createStrategy(process.currentSlot.charger().getSpecification(), process.vehicle);
 				process.currentSlot.charger().getLogic().addVehicle(process.vehicle, chargingStrategy, now);
 				process.latestPlugTime = now + personMaximumQueueWaitTime;
 				process.isSubmitted = true;
@@ -701,7 +691,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 					// vehicle was plugged overnight, reset end time of the first activity after
 					// which the vehilce will be picked up and schedule the pickup walk
 					double plannedEndTime = (Double) process.currentSlot.endActivity().getAttributes()
-							.getAttribute(INITIAL_ACTIVITY_END_TIME_ATTRIBUTE);
+						.getAttribute(INITIAL_ACTIVITY_END_TIME_ATTRIBUTE);
 					process.currentSlot.endActivity().setEndTime(Math.max(now, plannedEndTime));
 
 					// following only necessary if this is the very first activity of the day
@@ -709,7 +699,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 					WithinDayAgentUtils.rescheduleActivityEnd(process.agent, qsim);
 
 					chargingScheduler.scheduleUnplugActivityAfterOvernightCharge(process.agent,
-							process.currentSlot.endActivity(), process.currentSlot.charger());
+						process.currentSlot.endActivity(), process.currentSlot.charger());
 				} else {
 					// stadard case, we are in a plug activity, need to end it, and let agent to to
 					// main activity
@@ -724,12 +714,12 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 					if (process.currentSlot.isLegBased()) {
 						// schedule unplug at the charger then continue to main activity
 						chargingScheduler.scheduleUnplugActivityAtCharger(process.agent,
-								process.currentSlot.duration());
+							process.currentSlot.duration());
 					} else {
 						// walk to main activity, perform it, walk back to charger and unplug
 						chargingScheduler.scheduleUntilUnplugActivity(process.agent,
-								process.currentSlot.startActivity(),
-								process.currentSlot.endActivity());
+							process.currentSlot.startActivity(),
+							process.currentSlot.endActivity());
 					}
 				}
 
@@ -744,8 +734,8 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 					iterator.remove();
 
 					eventsManager
-							.processEvent(
-									new AbortChargingAttemptEvent(now, process.agent.getId(), process.vehicle.getId()));
+						.processEvent(
+							new AbortChargingAttemptEvent(now, process.agent.getId(), process.vehicle.getId()));
 
 					if (process.isWholeDay || process.isOvernight) {
 						// did not succeed charging overnight
@@ -753,7 +743,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 						// send event for scoring
 						eventsManager.processEvent(
-								new AbortChargingProcessEvent(now, process.agent.getId(), process.vehicle.getId()));
+							new AbortChargingProcessEvent(now, process.agent.getId(), process.vehicle.getId()));
 
 						if (performAbort) {
 							// abort the agent
@@ -766,7 +756,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 						} else if (process.isOvernight) {
 							Activity endActivity = process.currentSlot.endActivity();
 							double initialEndTime = (Double) endActivity.getAttributes()
-									.getAttribute(INITIAL_ACTIVITY_END_TIME_ATTRIBUTE);
+								.getAttribute(INITIAL_ACTIVITY_END_TIME_ATTRIBUTE);
 
 							// end current plug activity
 							endActivity.setEndTime(Math.max(now, initialEndTime));
@@ -774,13 +764,13 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 							WithinDayAgentUtils.rescheduleActivityEnd(process.agent, qsim);
 
 							chargingScheduler.scheduleAccessAfterOvernightCharge(process.agent,
-									process.currentSlot.endActivity(),
-									process.currentSlot.charger());
+								process.currentSlot.endActivity(),
+								process.currentSlot.charger());
 						}
 					} else {
 						// stadnard case
 						Activity plugActivity = (Activity) WithinDayAgentUtils
-								.getCurrentPlanElement(process.agent);
+							.getCurrentPlanElement(process.agent);
 						Preconditions.checkState(plugActivity.getType().equals(PLUG_ACTIVITY_TYPE));
 
 						// reset charging process
@@ -789,15 +779,15 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 						// try to find next charger
 						Plan plan = WithinDayAgentUtils.getModifiablePlan(process.agent);
 						ChargingAlternative alternative = alternativeProvider.findAlternative(now,
-								plan.getPerson(),
-								plan,
-								process.vehicle, process.initialSlot, process.trace);
+							plan.getPerson(),
+							plan,
+							process.vehicle, process.initialSlot, process.trace);
 
 						if (alternative != null) {
 							// found an alternative charger
 							if (process.currentSlot.isLegBased() && !alternative.isLegBased()) {
 								throw new IllegalStateException(
-										"Cannot switch from a leg-based charging slot to an activity-based alternative because activities are not known");
+									"Cannot switch from a leg-based charging slot to an activity-based alternative because activities are not known");
 							}
 
 							// end current plug activity
@@ -807,14 +797,14 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 							// drive to the next charger and schedule a plug activity
 							plugActivity = chargingScheduler.scheduleSubsequentPlugActivity(process.agent,
-									plugActivity, alternative.charger(), now);
+								plugActivity, alternative.charger(), now);
 							plugActivity.getAttributes().putAttribute(CHARGING_PROCESS_ATTRIBUTE, process);
 
 							// reset process for next attempt
 							process.currentSlot = new ChargingSlot(process.currentSlot.startActivity(),
-									process.currentSlot.endActivity(),
-									process.currentSlot.leg(), alternative.duration(),
-									alternative.charger());
+								process.currentSlot.endActivity(),
+								process.currentSlot.leg(), alternative.duration(),
+								alternative.charger());
 							process.isSubmitted = false;
 							process.isPlugged = false;
 							process.isQueued = false;
@@ -822,13 +812,13 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 							// send event for scoring
 							eventsManager.processEvent(
-									new StartChargingAttemptEvent(now, process.agent.getId(), process.vehicle.getId(),
-											alternative.charger().getId(), process.attemptIndex, process.processIndex,
-											alternative.isLegBased(), false, alternative.duration()));
+								new StartChargingAttemptEvent(now, process.agent.getId(), process.vehicle.getId(),
+									alternative.charger().getId(), process.attemptIndex, process.processIndex,
+									alternative.isLegBased(), false, alternative.duration()));
 						} else {
 							// send event for scoring
 							eventsManager.processEvent(
-									new AbortChargingProcessEvent(now, process.agent.getId(), process.vehicle.getId()));
+								new AbortChargingProcessEvent(now, process.agent.getId(), process.vehicle.getId()));
 
 							if (performAbort) {
 								// we abort the agent
@@ -862,13 +852,13 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 			// remove vehicle from charger, but may already be done
 			if (process.currentSlot.charger().getLogic().getPluggedVehicles().stream()
-					.anyMatch(candiate -> process.vehicle.getId().equals(candiate.ev().getId()))) {
+				.anyMatch(candiate -> process.vehicle.getId().equals(candiate.ev().getId()))) {
 				process.currentSlot.charger().getLogic().removeVehicle(process.vehicle, now);
 			} else {
 				logger.warn(String.format(
-						"Agent %s tried to unplug vehicle %s at charger %s, but was already unplugged. Is the correct ChargingStrategy configured?",
-						process.agent.getId().toString(), process.vehicle.getId().toString(),
-						process.currentSlot.charger().getId().toString()));
+					"Agent %s tried to unplug vehicle %s at charger %s, but was already unplugged. Is the correct ChargingStrategy configured?",
+					process.agent.getId().toString(), process.vehicle.getId().toString(),
+					process.currentSlot.charger().getId().toString()));
 			}
 
 			Activity unplugActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(process.agent);
@@ -881,18 +871,12 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 			chargingScheduler.scheduleDriveToNextActivity(process.agent);
 
 			eventsManager
-					.processEvent(new FinishChargingAttemptEvent(now, process.agent.getId(), process.vehicle.getId()));
+				.processEvent(new FinishChargingAttemptEvent(now, process.agent.getId(), process.vehicle.getId()));
 			eventsManager
-					.processEvent(new FinishChargingProcessEvent(now, process.agent.getId(), process.vehicle.getId()));
+				.processEvent(new FinishChargingProcessEvent(now, process.agent.getId(), process.vehicle.getId()));
 
 			iterator.remove();
 		}
-	}
-
-	// BOILERPLATE
-
-	@Override
-	public void afterSim() {
 	}
 
 	private InternalInterface internalInterface;
@@ -944,6 +928,6 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	 */
 	static public boolean isManagedActivityType(String activityType) {
 		return activityType.equals(PLUG_ACTIVITY_TYPE) || activityType.equals(UNPLUG_ACTIVITY_TYPE)
-				|| activityType.equals(WAIT_ACTIVITY_TYPE) || activityType.equals(ACCESS_ACTIVITY_TYPE);
+			|| activityType.equals(WAIT_ACTIVITY_TYPE) || activityType.equals(ACCESS_ACTIVITY_TYPE);
 	}
 }

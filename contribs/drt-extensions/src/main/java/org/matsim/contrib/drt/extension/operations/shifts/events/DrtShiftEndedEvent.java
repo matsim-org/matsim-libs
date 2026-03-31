@@ -20,14 +20,13 @@ public class DrtShiftEndedEvent extends AbstractShiftEvent {
 
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_OPERATION_FACILITY = "operationFacility";
-    public static final String ATTRIBUTE_SHIFT_ID = "id";
     public static final String ATTRIBUTE_VEHICLE_ID = "vehicle";
 
     public static final String EVENT_TYPE = "DRT shift ended";
 
     public DrtShiftEndedEvent(double time, String mode, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId,
-                              Id<Link> linkId, Id<OperationFacility> operationFacilityId) {
-        super(time, mode, shiftId);
+                              Id<Link> linkId, Id<OperationFacility> operationFacilityId, String shiftType) {
+        super(time, mode, shiftId, shiftType);
         this.vehicleId = vehicleId;
         this.linkId = linkId;
 		this.operationFacilityId = operationFacilityId;

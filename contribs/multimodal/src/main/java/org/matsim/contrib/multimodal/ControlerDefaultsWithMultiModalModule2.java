@@ -28,7 +28,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.util.TravelTime;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.util.Arrays;
 import java.util.Map;
 

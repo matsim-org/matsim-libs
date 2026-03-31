@@ -8,7 +8,7 @@ import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.ModeChoiceWeightScheduler;
 import org.matsim.modechoice.PlanCandidate;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

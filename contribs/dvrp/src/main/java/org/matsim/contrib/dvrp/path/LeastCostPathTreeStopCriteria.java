@@ -73,6 +73,7 @@ public class LeastCostPathTreeStopCriteria {
 					double departureTime) {
 				if (nodesToVisit.get(nodeIndex)) {
 					counter--;
+					nodesToVisit.clear(nodeIndex);
 				}
 				return counter == 0; // stop if all end nodes reached
 			}

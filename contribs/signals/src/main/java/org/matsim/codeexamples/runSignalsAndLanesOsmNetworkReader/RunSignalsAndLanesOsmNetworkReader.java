@@ -18,7 +18,10 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.runSignalsAndLanesOsmNetworkReader;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -28,7 +31,7 @@ import org.matsim.contrib.signals.data.consistency.LanesAndSignalsCleaner;
 import org.matsim.contrib.signals.network.SignalsAndLanesOsmNetworkReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -88,7 +91,7 @@ public class RunSignalsAndLanesOsmNetworkReader {
 		reader.parse(inputOSM);
 
         // Simplify the network except the junctions with signals as this might mess up already created plans
-		NetworkSimplifier netSimplify = new NetworkSimplifier();
+		NetworkSimplifier netSimplify = NetworkSimplifier.createNetworkSimplifier(network);
 		netSimplify.setNodesNotToMerge(reader.getNodesNotToMerge());
 		netSimplify.run(network);
 
@@ -97,7 +100,7 @@ public class RunSignalsAndLanesOsmNetworkReader {
          * afterwards there is a route from every link to every other link. This may not
          * be the case in the initial network converted from OpenStreetMap.
          */
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car));
 		new LanesAndSignalsCleaner().run(scenario);
 
 		// write the files out

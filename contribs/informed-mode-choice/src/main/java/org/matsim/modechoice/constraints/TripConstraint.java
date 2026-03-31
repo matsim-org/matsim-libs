@@ -4,7 +4,7 @@ import org.matsim.modechoice.EstimatorContext;
 import org.matsim.modechoice.ModeEstimate;
 import org.matsim.modechoice.PlanModel;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Interface to determine whether a solution is valid.

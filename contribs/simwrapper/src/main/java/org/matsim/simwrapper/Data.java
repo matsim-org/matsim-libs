@@ -6,7 +6,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.UncheckedIOException;
 import java.net.URI;
@@ -354,6 +354,19 @@ public final class Data {
 		return this;
 	}
 
+	/**
+	 * Returns the already registered args for the current context and command.
+	 */
+	public String[] getArgs(Class<? extends MATSimAppCommand> command) {
+		return currentContext.getArgs(command);
+	}
+
+	/**
+	 * Replaces args for a command in the current context.
+	 */
+	public void setArgs(Class<? extends MATSimAppCommand> command, String... args) {
+		currentContext.setArgs(command, args);
+	}
 
 	void setPath(Path path) {
 		this.path = path;

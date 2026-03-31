@@ -942,10 +942,10 @@
 			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
-					<vehicle id="carrier_19_lightVehicle_a" depotLinkId="j(0,1)R" typeId="small" earliestStart="06:00:00" latestEnd="16:00:00"/>
-					<vehicle id="carrier_19_lightVehicle_b" depotLinkId="j(9,1)" typeId="small" earliestStart="06:00:00" latestEnd="16:00:00"/>
-					<vehicle id="carrier_19_heavyVehicle_a" depotLinkId="j(0,1)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
-					<vehicle id="carrier_19_heavyVehicle_b" depotLinkId="j(9,1)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
+					<vehicle id="carrier_1_lightVehicle_a" depotLinkId="j(0,1)R" typeId="small" earliestStart="06:00:00" latestEnd="16:00:00"/>
+					<vehicle id="carrier_1_lightVehicle_b" depotLinkId="j(9,1)" typeId="small" earliestStart="06:00:00" latestEnd="16:00:00"/>
+					<vehicle id="carrier_1_heavyVehicle_a" depotLinkId="j(0,1)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
+					<vehicle id="carrier_1_heavyVehicle_b" depotLinkId="j(9,1)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
 				</vehicles>
 
 			</capabilities>

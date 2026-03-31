@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,6 +41,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.speedy.SpeedyGraph;
@@ -52,6 +54,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
+@NodeSingleton
 class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener {
 	public static final int MAX_THREADS = 4;
 
@@ -65,14 +68,16 @@ class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener 
 	MultiInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
 		SpeedyGraph graph = SpeedyGraphBuilder.build(network);
-		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
-		nodeMap.putAll(network.getNodes());
-
-		toPickupPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
+		toPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, allowsLazyPathCreation(drtCfg));
+		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility,  allowsLazyPathCreation(drtCfg));
+		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility,  allowsLazyPathCreation(drtCfg));
+		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility,  allowsLazyPathCreation(drtCfg));
 		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
+	}
+
+	private boolean allowsLazyPathCreation(DrtConfigGroup drtConfigGroup)
+	{
+		return drtConfigGroup.getDrtParallelInserterParams().isEmpty();
 	}
 
 	@VisibleForTesting

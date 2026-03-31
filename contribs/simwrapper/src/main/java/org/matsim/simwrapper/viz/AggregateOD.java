@@ -32,6 +32,11 @@ public class AggregateOD extends Viz {
 	public String projection;
 
 	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
+
+	/**
 	 * Factor to scale all values -- to handle 1% or 10% scenarios, for example
 	 */
 	@JsonProperty(required = true)

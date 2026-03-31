@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
@@ -51,11 +50,7 @@ public class CleanNetwork implements MATSimAppCommand {
 			}
 		}
 
-		var cleaner = new MultimodalNetworkCleaner(network);
-
-		for (String m : modes) {
-			cleaner.run(Set.of(m));
-		}
+		NetworkUtils.cleanNetwork(network, modes);
 
 		NetworkUtils.writeNetwork(network, output.toString());
 

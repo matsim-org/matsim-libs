@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>2025.0-SNAPSHOT</version>
+    <version>2026.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
@@ -32,5 +32,18 @@
 		    <version>${project.parent.version}</version>
 		    <scope>test</scope>
 	    </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.trove4j</groupId>
+        <artifactId>trove4j</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+      </dependency>
     </dependencies>
 </project>

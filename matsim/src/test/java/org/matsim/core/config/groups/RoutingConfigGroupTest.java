@@ -182,36 +182,49 @@ public class RoutingConfigGroupTest {
 	}
 
 	@Test
-	void testIODifferentVersions()
-	{
-		final RoutingConfigGroup initialGroup = createTestConfigGroup();
+	void testIODifferentVersionsV1() {
+		// V1 (flat params) format encodes all mode routing params as top-level key-value pairs.
+		// It supports per-mode teleportedModeSpeed and teleportedModeFreespeedFactor via the
+		// "teleportedModeSpeed_<mode>" and "teleportedModeFreespeedFactor_<mode>" keys, but
+		// beelineDistanceFactor only as a single GLOBAL value ("beelineDistanceFactor" key).
+		// See RoutingConfigGroup.addParam: there is no "beelineDistanceFactor_<mode>" handler.
+		//
+		// Circumvention: use a test config that contains only teleportedModeSpeed-based modes
+		// that all share the same beelineDistanceFactor, so the single global key faithfully
+		// represents all of them. Freespeed-teleported modes are excluded because:
+		//   (a) their beelineDistanceFactor is null (irrelevant for freespeed routing), which
+		//       would cause toUnderscoredModule to throw when comparing null vs non-null; and
+		//   (b) RoutingConfigGroup.setBeelineDistanceFactor (invoked during V1 read-back) pushes
+		//       the global value to ALL modes, so a freespeed mode would acquire a spurious
+		//       beelineDistanceFactor entry in the read-back group, making assertIdentical fail.
+		final RoutingConfigGroup initialGroup = createTestConfigGroupV1();
 
-		log.info( "constructing new config ...");
 		final Config configV1 = new Config();
-		log.info("... done constructing new config.");
-		log.info("adding undescored info ...");
 		configV1.addModule(toUnderscoredModule(initialGroup));
-		log.info("... done adding underscored info.") ;
 
-		log.info( "writing to file ...");
 		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";
 		new ConfigWriter( configV1 ).writeFileV1( v1path );
-		log.info( "... done writing to file.");
 
-		log.info( "creating new config ...");
 		final Config configV1In = ConfigUtils.createConfig();
-		log.info( "... done creating new config.");
-		log.info( "read file into new config ...");
 		new ConfigReader( configV1In ).readFile( v1path );
-		log.info("... done reading file into new config.") ;
 
-		log.info( "asserting ...");
 		assertIdentical("re-read v1", initialGroup, configV1In.routing());
-		log.info( "... done asserting.") ;
+	}
+
+	@Test
+	void testIODifferentVersionsV2() {
+		// V2 (nested parameterset) format stores beelineDistanceFactor inside each
+		// <parameterset type="teleportedModeParams"> element, so per-mode values are
+		// preserved exactly. No circumvention needed: the full test config with
+		// differing per-mode beelineDistanceFactors and freespeed-teleported modes
+		// can be round-tripped without loss.
+		final RoutingConfigGroup initialGroup = createTestConfigGroup();
+
+		final Config configOut = new Config();
+		configOut.addModule(initialGroup);
 
 		final String v2path = utils.getOutputDirectory() + "/configv2_out.xml";
-
-		new ConfigWriter( configV1In ).writeFileV2( v2path );
+		new ConfigWriter( configOut ).writeFileV2( v2path );
 
 		final Config configV2 = ConfigUtils.createConfig();
 		new ConfigReader( configV2 ).readFile( v2path );
@@ -273,6 +286,12 @@ public class RoutingConfigGroupTest {
 				"unexpected teleportedModeSpeeds" );
 	}
 
+	// Converts a RoutingConfigGroup into a flat V1-style ConfigGroup (key-value params only).
+	// Limitation: V1 format can represent beelineDistanceFactor only as a single global value.
+	// The caller is therefore responsible for ensuring that ALL modes in initialGroup share
+	// the same (non-null) beelineDistanceFactor. Passing a config that violates this
+	// (e.g. modes with differing factors, or freespeed-teleported modes whose
+	// getBeelineDistanceFactor() returns null) will throw a RuntimeException.
 	private static ConfigGroup toUnderscoredModule(final RoutingConfigGroup initialGroup) {
 		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
 
@@ -302,6 +321,9 @@ public class RoutingConfigGroupTest {
 		return module;
 	}
 
+	// Full test config used for V2 round-trip testing. Contains both a freespeed-teleported
+	// mode (null beelineDistanceFactor, irrelevant for freespeed routing) and a speed-teleported
+	// mode with an explicit beelineDistanceFactor, exercising per-mode beeline factor storage.
 	private static RoutingConfigGroup createTestConfigGroup() {
 		log.info( "creating test config group ... ");
 
@@ -310,13 +332,16 @@ public class RoutingConfigGroupTest {
 		group.setNetworkModes( Arrays.asList( "electricity" , "water_supply" ) );
 
 		// two modes with only one speed
-		group.setTeleportedModeFreespeedFactor( "inline skate" , 0.1 );
-//		group.getModeRoutingParams().get("inline skate").setBeelineDistanceFactor( 10000000. );
+		TeleportedModeParams params_freespeed = new TeleportedModeParams( "inline skate" );
+		params_freespeed.setTeleportedModeFreespeedFactor( 0.1 );
+		// Was made illegal: do not test
+		// params_freespeed.setBeelineDistanceFactor( 10000000. );
+		group.addTeleportedModeParams(params_freespeed);
 
-		group.setTeleportedModeSpeed( "ice skates" , 10 );
-//		group.getModeRoutingParams().get("ice skates").setBeelineDistanceFactor( 10000000. );
-
-		group.setBeelineDistanceFactor( 10000000 );
+		TeleportedModeParams params_speed = new TeleportedModeParams( "ice skates" );
+		params_speed.setTeleportedModeSpeed(10.);
+		params_speed.setBeelineDistanceFactor(10000000.);
+		group.addTeleportedModeParams(params_speed);
 
 		// one mode with both speeds
 		// Was made illegal: do not test
@@ -324,6 +349,35 @@ public class RoutingConfigGroupTest {
 		//group.setTeleportedModeSpeed( "overboard" , 999 );
 
 		log.info( "... done creating test config group.");
+		return group;
+	}
+
+	// Restricted test config for V1 round-trip testing. Contains only teleportedModeSpeed-based
+	// modes that all share the same beelineDistanceFactor. This is required because:
+	//   (1) V1 flat format only supports a single global "beelineDistanceFactor" key — there is
+	//       no "beelineDistanceFactor_<mode>" handler in RoutingConfigGroup.addParam.
+	//   (2) RoutingConfigGroup.setBeelineDistanceFactor (the @Deprecated global setter, invoked
+	//       during V1 read-back) pushes its value to ALL modes. Including a freespeed-teleported
+	//       mode (whose beelineDistanceFactor is null) would cause it to acquire a spurious
+	//       entry in getBeelineDistanceFactors() after read-back, breaking assertIdentical.
+	private static RoutingConfigGroup createTestConfigGroupV1() {
+		log.info( "creating V1-compatible test config group ... ");
+
+		final RoutingConfigGroup group = new RoutingConfigGroup();
+
+		group.setNetworkModes( Arrays.asList( "electricity" , "water_supply" ) );
+
+		TeleportedModeParams params1 = new TeleportedModeParams( "ice skates" );
+		params1.setTeleportedModeSpeed( 10. );
+		params1.setBeelineDistanceFactor( 1.5 );
+		group.addTeleportedModeParams( params1 );
+
+		TeleportedModeParams params2 = new TeleportedModeParams( "roller blades" );
+		params2.setTeleportedModeSpeed( 5. );
+		params2.setBeelineDistanceFactor( 1.5 ); // must match params1: V1 only supports one global value
+		group.addTeleportedModeParams( params2 );
+
+		log.info( "... done creating V1-compatible test config group.");
 		return group;
 	}
 }

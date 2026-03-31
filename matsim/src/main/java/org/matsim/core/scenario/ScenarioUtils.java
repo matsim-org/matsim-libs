@@ -27,12 +27,17 @@ import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.households.Households;
 import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.Vehicles;
 
 
@@ -115,14 +120,14 @@ public final class ScenarioUtils {
 		scenarioLoader.setAttributeConverters(attributeConverters);
 		scenarioLoader.loadScenario();
 	}
-	
+
 	public final static class ScenarioBuilder {
 		private MutableScenario scenario;
 		public ScenarioBuilder( Config config ) {
 			this.scenario = new MutableScenario( config ) ;
 		}
 		public ScenarioBuilder addScenarioElement(String name, Object o) {
-			scenario.addScenarioElement(name, o); 
+			scenario.addScenarioElement(name, o);
 			return this ;
 		}
 		public ScenarioBuilder setHouseholds( Households households ) {
@@ -158,6 +163,33 @@ public final class ScenarioUtils {
 			this.scenario.setLocked(); // prevents that one can cast to ScenarioImpl and change the containers again. kai, nov'14
 			return this.scenario ;
 		}
+	}
+
+	/**
+	 * Name of the attribute to add to top-level containers to specify the scale.
+	 * When possible, the utility methods should be used instead of directly querying the attributes.
+	 */
+	public static final String INPUT_SCALE_ATT = "scale";
+
+	public static <T extends MatsimToplevelContainer & Attributable> Double getScale(T container) {
+		return (Double) container.getAttributes().getAttribute(INPUT_SCALE_ATT);
+	}
+
+	/**
+	 * Adds scale metadata to the given container. The scale is meant for documentation and could be considered when
+	 * consuming the data. Potential meaningful containers:
+	 * - population (fraction of agents)
+	 * - network (flow capacities)
+	 * - vehicles (pce definition)
+	 */
+	public static <T extends MatsimToplevelContainer & Attributable> void putScale(T container, Double scale) {
+		container.getAttributes().putAttribute(INPUT_SCALE_ATT, scale);
+	}
+
+	public static void cleanScenario( Scenario scenario ) {
+		NetworkUtils.cleanNetwork( scenario );
+		PopulationUtils.cleanPopulation( scenario );
+		FacilitiesUtils.cleanFacilities( scenario );
 	}
 
 }

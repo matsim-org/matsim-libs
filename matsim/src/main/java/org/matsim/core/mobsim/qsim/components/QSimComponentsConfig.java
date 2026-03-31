@@ -35,7 +35,7 @@ import com.google.inject.name.Names;
  * Contains information about which QSim components should be used in the
  * simulation and in which order they are registered with the QSim.
  *
- * @deprecated -- one can achive many (all?) of the same functionality at the config level, see {@link QSimComponentsConfigGroup}.  Doing it through
+ * @deprecated -- one can achieve many (all?) of the same functionality at the config level, see {@link QSimComponentsConfigGroup}.  Doing it through
  * the config group is consistent with other places where we have similar functionality (which is to bind things by Guice, but activate them
  * separately), e.g. related to {@link org.matsim.core.config.groups.ReplanningConfigGroup}.  I think that the parallel functionality here just makes
  * it more difficult, since maintainers need to learn another dialect.  kai, jan'25

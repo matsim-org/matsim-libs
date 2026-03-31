@@ -54,6 +54,7 @@ abstract class Constants {
 	static final String ALLOW_BOARDING = "allowBoarding";
 	static final String ALLOW_ALIGHTING = "allowAlighting";
 	static final String AWAIT_DEPARTURE = "awaitDeparture";
+	static final String MINIMUM_STOP_DURATION = "minimumStopDuration";
 	static final String IS_BLOCKING = "isBlocking";
 	static final String STOP_AREA_ID = "stopAreaId";
 	static final String ATTRIBUTES = "attributes";
@@ -63,4 +64,8 @@ abstract class Constants {
 	static final String FROM_STOP = "fromStop";
 	static final String TO_STOP = "toStop";
 	static final String TRANSFER_TIME = "transferTime";
+	static final String CHAINED_DEPARTURE = "chainedDeparture";
+	static final String TO_DEPARTURE = "toDeparture";
+	static final String TO_TRANSIT_LINE = "toTransitLine";
+	static final String TO_TRANSIT_ROUTE = "toTransitRoute";
 }

@@ -15,6 +15,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
@@ -40,7 +42,13 @@ public class PlanInheritanceTest {
 			Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 			config.controller().setLastIteration(10);
 			config.controller().setOutputDirectory(outputDirectory);
+			config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 			config.planInheritance().setEnabled(true);
+
+			ScoringConfigGroup.ModeParams walkParams = new ScoringConfigGroup.ModeParams("walk");
+			walkParams.setMarginalUtilityOfTraveling(0);
+			config.scoring().addModeParams(walkParams);
+
 			Controler c = new Controler(config);
 
 			c.run();
@@ -98,6 +106,7 @@ public class PlanInheritanceTest {
 			Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 			config.controller().setLastIteration(1);
 			config.controller().setOutputDirectory(outputDirectory);
+			config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 			Controler c = new Controler(config);
 
 			c.run();

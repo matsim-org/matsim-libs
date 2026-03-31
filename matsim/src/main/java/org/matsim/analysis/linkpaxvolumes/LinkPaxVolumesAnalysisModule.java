@@ -27,7 +27,7 @@ import org.matsim.core.controler.AbstractModule;
 public final class LinkPaxVolumesAnalysisModule extends AbstractModule {
     @Override
     public void install() {
-        bind(LinkPaxVolumesControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(LinkPaxVolumesControlerListener.class);
+        bind(LinkPaxVolumesControllerListener.class).in(Singleton.class);
+        addControllerListenerBinding().to(LinkPaxVolumesControllerListener.class);
     }
 }

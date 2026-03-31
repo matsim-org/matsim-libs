@@ -1,5 +1,6 @@
 package org.matsim.contrib.ev.stats;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,11 +16,13 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
-public final class ChargerPowerTimeProfileCalculator implements ChargingStartEventHandler, ChargingEndEventHandler {
+public final class ChargerPowerTimeProfileCalculator implements ChargingStartEventHandler, ChargingEndEventHandler, IterationStartsListener {
 
 	private final Map<Id<Charger>, double[]> chargerProfiles = new HashMap<>();
 	private final Map<Id<Vehicle>, Double> chargingStartTimeMap = new HashMap<>();
@@ -78,5 +81,12 @@ public final class ChargerPowerTimeProfileCalculator implements ChargingStartEve
 
 	public TimeDiscretizer getTimeDiscretizer() {
 		return timeDiscretizer;
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		chargerProfiles.values().forEach(arr -> Arrays.fill(arr, 0.0));
+		chargingStartTimeMap.clear();
+		chargingStartEnergyMap.clear();
 	}
 }

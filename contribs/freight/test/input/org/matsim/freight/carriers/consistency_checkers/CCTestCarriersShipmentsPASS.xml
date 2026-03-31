@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
+	<carrier id="ccCarrierWithShipments1">
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="cargo_bike_1a" depotLinkId="1" typeId="cargo_bike" earliestStart="07:00:00" latestEnd="12:00:00"/>
+				<vehicle id="cargo_bike_1b" depotLinkId="1" typeId="cargo_bike" earliestStart="12:00:00" latestEnd="14:00:00"/>
+				<vehicle id="heavy_truck_1" depotLinkId="1" typeId="heavy_truck" earliestStart="14:00:00" latestEnd="17:00:00"/>
+			</vehicles>
+		</capabilities>
+		<shipments>
+			<shipment id="small_shipment_1" from="1" to="2" size="1" startPickup="08:00:00" endPickup="10:30:00" startDelivery="11:30:00" endDelivery="13:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+			<shipment id="large_shipment_1" from="1" to="2" size="29" startPickup="11:00:00" endPickup="15:30:00" startDelivery="13:00:00" endDelivery="15:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+		</shipments>
+	</carrier>
+	<carrier id="ccCarrierWithShipments2">
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="medium_van_2" depotLinkId="1" typeId="medium_van" earliestStart="17:00:00" latestEnd="20:00:00"/>
+				<vehicle id="medium_truck_2" depotLinkId="1" typeId="medium_truck" earliestStart="10:00:00" latestEnd="16:00:00"/>
+			</vehicles>
+		</capabilities>
+		<shipments>
+			<shipment id="large_shipment_2" from="1" to="2" size="15" startPickup="08:00:00" endPickup="12:30:00" startDelivery="00:00:00" endDelivery="15:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+			<shipment id="small_shipment_2" from="1" to="2" size="4" startPickup="15:00:00" endPickup="17:30:00" startDelivery="19:00:00" endDelivery="23:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+		</shipments>
+	</carrier>
+</carriers>

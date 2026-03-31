@@ -3,7 +3,6 @@ package org.matsim.contrib.drt.prebooking.unscheduler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -27,13 +26,16 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.base.Verify;
+import java.util.List;
+
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
 /**
  * This RequestUnscheduler searches for a request in a vehicle's schedule and
  * removes the request from the relevant stop tasks. Furthermore, the stops are
  * removed if they don't carry any other pickups or dropoffs. Accordingly, the
  * schedule will also be rerouted.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class ComplexRequestUnscheduler implements RequestUnscheduler {
@@ -63,45 +65,42 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 	@Override
 	public void unscheduleRequest(double now, Id<DvrpVehicle> vehicleId, Id<Request> requestId) {
 		DvrpVehicle vehicle = vehicleLookup.lookupVehicle(vehicleId);
-		VehicleEntry vEntry = vehicleEntryFactory.create(vehicle, now);
-
-		Waypoint pickupStop = null;
-		Waypoint.Stop dropoffStop = null;
 
 		DrtStopTask pickupStopTask = null;
 		DrtStopTask dropoffStopTask = null;
 
-		for (Waypoint.Stop stop : vEntry.stops) {
-			if (stop.task.getPickupRequests().containsKey(requestId)) {
-				Verify.verify(pickupStop == null);
-				Verify.verify(pickupStopTask == null);
+		Schedule schedule = vehicle.getSchedule();
+		List<? extends Task> tasks = schedule.getTasks();
 
-				pickupStop = stop;
-				pickupStopTask = stop.task;
-			}
+		Verify.verify(
+				schedule.getStatus() != Schedule.ScheduleStatus.UNPLANNED
+						&& schedule.getStatus() != Schedule.ScheduleStatus.COMPLETED,
+				"Unexpected DVRP schedule status when unscheduling prebooked request: %s (vehicle %s)",
+				schedule.getStatus(), vehicle.getId());
 
-			if (stop.task.getDropoffRequests().containsKey(requestId)) {
-				Verify.verify(dropoffStop == null);
-				Verify.verify(dropoffStopTask == null);
-
-				dropoffStop = stop;
-				dropoffStopTask = stop.task;
-			}
+		// Start searching from first task if schedule is planned but not yet started
+		int startIndex = 0;
+		if (schedule.getStatus() == Schedule.ScheduleStatus.STARTED) {
+			startIndex = schedule.getCurrentTask().getTaskIdx();
 		}
 
-		if(pickupStopTask == null) {
-			if(vEntry.start.task.orElseThrow() instanceof DrtStopTask stopTask) {
-				if(stopTask.getPickupRequests().containsKey(requestId)) {
+		for (int i = startIndex; i < tasks.size(); i++) {
+			Task task = tasks.get(i);
+			if (task instanceof DrtStopTask stopTask) {
+				if (stopTask.getPickupRequests().containsKey(requestId)) {
+					Verify.verify(pickupStopTask == null);
 					pickupStopTask = stopTask;
-					pickupStop = vEntry.start;
+				}
+
+				if (stopTask.getDropoffRequests().containsKey(requestId)) {
+					Verify.verify(dropoffStopTask == null);
+					dropoffStopTask = stopTask;
 				}
 			}
 		}
 
 		Verify.verifyNotNull(pickupStopTask, "Could not find request that I'm supposed to unschedule");
 		Verify.verifyNotNull(dropoffStopTask, "Could not find request that I'm supposed to unschedule");
-		Verify.verifyNotNull(pickupStop);
-		Verify.verifyNotNull(dropoffStop);
 
 		// remove request from stop, this we do in any case
 		pickupStopTask.removePickupRequest(requestId);
@@ -113,54 +112,57 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 		// - or we found a stop, then it is not started yet and we can remove it
 
 		boolean removePickup = pickupStopTask.getPickupRequests().isEmpty()
-				&& pickupStopTask.getDropoffRequests().isEmpty()
-				&& pickupStop instanceof Waypoint.Stop;
+				&& pickupStopTask.getDropoffRequests().isEmpty();
 		boolean removeDropoff = dropoffStopTask.getPickupRequests().isEmpty()
 				&& dropoffStopTask.getDropoffRequests().isEmpty();
 
-		Replacement pickupReplacement = removePickup ? findReplacement(vEntry, (Waypoint.Stop) pickupStop) : null;
-		Replacement dropoffReplacement = removeDropoff ? findReplacement(vEntry, dropoffStop) : null;
+		Replacement pickupReplacement = removePickup ? findReplacement(vehicle, pickupStopTask) : null;
+		Replacement dropoffReplacement = removeDropoff ? findReplacement(vehicle, dropoffStopTask) : null;
 
 		if (pickupReplacement != null && dropoffReplacement != null) {
 			if (pickupReplacement.endTask.getTaskIdx() >= dropoffReplacement.startTask.getTaskIdx()) {
 				// we have an overlap
-				pickupReplacement = new Replacement(pickupReplacement.startTask, dropoffReplacement.endTask,
-						vehicle.getSchedule());
-				dropoffReplacement = null;
+				if(pickupReplacement.endTask instanceof DrtStopTask && pickupReplacement.endTask.equals(dropoffReplacement.startTask)) {
+					// do not jump over stop task
+				} else {
+					pickupReplacement = new Replacement(pickupReplacement.startTask, dropoffReplacement.endTask,
+							vehicle.getSchedule());
+					dropoffReplacement = null;
+				}
 			}
 		}
 
 		if (pickupReplacement != null) {
-			unschedule(now, vEntry, pickupReplacement);
+			unschedule(now, vehicle, pickupReplacement);
 		}
 
 		if (dropoffReplacement != null) {
-			unschedule(now, vEntry, dropoffReplacement);
+			unschedule(now, vehicle, dropoffReplacement);
 		}
 	}
 
-	private Replacement findReplacement(VehicleEntry vEntry, Waypoint.Stop stop) {
-		int stopIndex = vEntry.stops.indexOf(stop);
-
-		final Task startTask;
-		if (stopIndex == 0) {
-			startTask = vEntry.vehicle.getSchedule().getCurrentTask();
-		} else {
-			startTask = vEntry.stops.get(stopIndex - 1).task;
+	private Replacement findReplacement(DvrpVehicle vehicle, DrtStopTask stopTask) {
+		// replace from current or previous task
+		Task startTask = vehicle.getSchedule().getCurrentTask();
+		for (Task task : Schedules.getTasksBetween(startTask.getTaskIdx(), stopTask.getTaskIdx(),
+				vehicle.getSchedule())) {
+			if (STOP.isBaseTypeOf(task)) {
+				startTask = task;
+			}
 		}
 
-		final Task endTask;
-		if (stopIndex == vEntry.stops.size() - 1) {
-			endTask = Schedules.getLastTask(vEntry.vehicle.getSchedule());
-		} else {
-			endTask = vEntry.stops.get(stopIndex + 1).task;
+		if (vehicle.getSchedule().getTaskCount() > startTask.getTaskIdx() + 1) {
+			for (Task task : Schedules.getTasksUntilLast(stopTask.getTaskIdx() + 1, vehicle.getSchedule())) {
+				if (STOP.isBaseTypeOf(task)) {
+					return new Replacement(startTask, task, vehicle.getSchedule());
+				}
+			}
 		}
-
-		return new Replacement(startTask, endTask, vEntry.vehicle.getSchedule());
+		return new Replacement(startTask, Schedules.getLastTask(vehicle.getSchedule()), vehicle.getSchedule());
 	}
 
-	private void unschedule(double now, VehicleEntry vEntry, Replacement replacement) {
-		Schedule schedule = vEntry.vehicle.getSchedule();
+	private void unschedule(double now, DvrpVehicle vehicle, Replacement replacement) {
+		Schedule schedule = vehicle.getSchedule();
 
 		if (replacement.startTask instanceof DrtStayTask) {
 			replacement.startTask.setEndTime(now);
@@ -190,7 +192,7 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 				schedule.removeLastTask();
 			}
 
-			schedule.addTask(taskFactory.createStayTask(vEntry.vehicle, replacement.startTask.getEndTime(),
+			schedule.addTask(taskFactory.createStayTask(vehicle, replacement.startTask.getEndTime(),
 					Math.max(replacement.startTask.getEndTime(), initialEndTime), stayLink));
 
 			return; // done
@@ -199,6 +201,10 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 		// remove everything between the two indicated tasks
 		while (replacement.startTask.getTaskIdx() + 1 != replacement.endTask.getTaskIdx()) {
 			Task removeTask = schedule.getTasks().get(replacement.startTask.getTaskIdx() + 1);
+			if(removeTask instanceof DrtStopTask stopTask) {
+				Verify.verify(stopTask.getPickupRequests().isEmpty());
+				Verify.verify(stopTask.getDropoffRequests().isEmpty());
+			}
 			schedule.removeTask(removeTask);
 		}
 
@@ -220,10 +226,10 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 
 			if (vrpPath.getArrivalTime() < endArrivalTime && scheduleWaitBeforeDrive) {
 				tracker.divertPath(VrpPaths.createZeroLengthPathForDiversion(diversion));
-				lastInsertedTask = insertDriveWithWait(vEntry.vehicle, replacement.startTask, vrpPath, endArrivalTime);
+				lastInsertedTask = insertDriveWithWait(vehicle, replacement.startTask, vrpPath, endArrivalTime);
 			} else {
 				tracker.divertPath(vrpPath);
-				lastInsertedTask = insertWait(vEntry.vehicle, replacement.startTask, endArrivalTime);
+				lastInsertedTask = insertWait(vehicle, replacement.startTask, endArrivalTime);
 			}
 		} else { // normal case
 			StayTask startStayTask = (StayTask) replacement.startTask;
@@ -231,7 +237,7 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 
 			if (startLink == endLink) { // no need to move, maybe just wait
 				if (startStayTask.getEndTime() < endArrivalTime) {
-					lastInsertedTask = insertWait(vEntry.vehicle, startStayTask, endArrivalTime);
+					lastInsertedTask = insertWait(vehicle, startStayTask, endArrivalTime);
 				} else {
 					lastInsertedTask = startStayTask; // nothing inserted
 				}
@@ -239,11 +245,11 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 				VrpPathWithTravelData vrpPath = VrpPaths.calcAndCreatePath(startLink, endLink,
 						startStayTask.getEndTime(), router, travelTime);
 
-				lastInsertedTask = insertDriveWithWait(vEntry.vehicle, startStayTask, vrpPath, endArrivalTime);
+				lastInsertedTask = insertDriveWithWait(vehicle, startStayTask, vrpPath, endArrivalTime);
 			}
 		}
 
-		timingUpdater.updateTimingsStartingFromTaskIdx(vEntry.vehicle, lastInsertedTask.getTaskIdx() + 1,
+		timingUpdater.updateTimingsStartingFromTaskIdx(vehicle, lastInsertedTask.getTaskIdx() + 1,
 				lastInsertedTask.getEndTime());
 	}
 

@@ -23,7 +23,6 @@ import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
@@ -234,7 +233,7 @@ public class SampleNetwork implements MATSimAppCommand {
 					continue;
 				}
 
-				LeastCostPathCalculator.Path path = router.calcLeastCostPath(link.getFromNode(), to.getToNode(), 0, null, null);
+				LeastCostPathCalculator.Path path = router.calcLeastCostPath(link, to, 0, null, null);
 
 				if (path == null || path.nodes.size() < 2) {
 					i--;
@@ -292,8 +291,7 @@ public class SampleNetwork implements MATSimAppCommand {
 
 		Network net = filter.applyFilters();
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(net);
-		cleaner.run(Set.of(TransportMode.car));
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car));
 
 		return net;
 	}

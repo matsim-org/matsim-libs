@@ -5,7 +5,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -39,7 +38,7 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
         Verify.verify(!drtOptimizationConstraintsSets.isEmpty(),
                 "At least one DrtOptimizationConstraintsParams is required.");
         Verify.verify(drtOptimizationConstraintsSets.stream()
-                        .map(params -> params.name)
+                        .map(DrtOptimizationConstraintsSet::getConstraintSetName)
                         .distinct()
                         .count() == drtOptimizationConstraintsSets.size(),
                 "Cannot have DrtOptimizationConstraintsParams with identical names.");
@@ -71,7 +70,7 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
 
     public void addParameterSet(final ConfigGroup set) {
         if(set instanceof DrtOptimizationConstraintsSetImpl defaultSetImpl) {
-            if(DEFAULT_PARAMS_NAME.equals(defaultSetImpl.name)) {
+            if(DEFAULT_PARAMS_NAME.equals(defaultSetImpl.getConstraintSetName())) {
                 if(defaultConstraintSet == null) {
                     defaultConstraintSet = defaultSetImpl;
                 } else {

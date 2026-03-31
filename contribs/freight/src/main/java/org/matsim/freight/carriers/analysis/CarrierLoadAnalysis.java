@@ -44,7 +44,7 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  * @author Kai Martins-Turner (kturner)
  */
-public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandler, CarrierShipmentDeliveryStartEventHandler {
+/*package-private*/ class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandler, CarrierShipmentDeliveryStartEventHandler {
 
 	private static final Logger log = LogManager.getLogger(CarrierLoadAnalysis.class);
 	private final String delimiter;
@@ -52,7 +52,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 	private final Map<Id<Vehicle>, LinkedList<Integer>> vehicle2Load = new LinkedHashMap<>();
 	private final Map<Id<Vehicle>, Integer> vehicle2DemandPerTour = new HashMap<>();
 
-	public CarrierLoadAnalysis(String delimiter) {
+	/*package-private*/ CarrierLoadAnalysis(String delimiter) {
 		this.delimiter = delimiter;
 	}
 
@@ -84,7 +84,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		vehicle2Load.put(vehicleId, list);
 	}
 
-	void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario) {
+	/*package-private*/ void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario) {
 		log.info("Writing out vehicle load analysis ...");
 		//Load per vehicle
 		String fileName = Path.of(analysisOutputDirectory).resolve("Load_perVehicle.tsv").toString();

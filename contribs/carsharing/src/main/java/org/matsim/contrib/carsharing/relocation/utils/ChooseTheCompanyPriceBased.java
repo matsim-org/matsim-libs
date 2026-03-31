@@ -121,8 +121,7 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 				travelDisutility, travelTime ) ;
 		Link endLink  = network.getLinks().get(leg.getRoute().getStartLinkId());
 		Vehicle vehicle = null ;
-		Path path = pathCalculator.calcLeastCostPath(vehicleLocation.getToNode(), endLink.getFromNode(), 
-				now, person, vehicle ) ;
+		Path path = pathCalculator.calcLeastCostPath(vehicleLocation, endLink, now, person, vehicle ) ;
 		
 		return path.travelTime;
 		

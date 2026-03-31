@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+
+<!-- Simple X-shaped track layout for formation testing -->
+
+	<nodes>
+		<!-- Branch A1 (top-left) -->
+		<node id="A1_start" x="-14000.0" y="5000.0" />
+		<node id="A1_1" x="-10000.0" y="4000.0" />
+		<node id="A1_2" x="-6000.0" y="3000.0" />
+		<node id="A1_3" x="-2000.0" y="1000.0" />
+		
+		<!-- Branch A2 (bottom-right, after middle section) -->
+		<node id="A2_1" x="20000.0" y="-1000.0" />
+		<node id="A2_2" x="24000.0" y="-3000.0" />
+		<node id="A2_3" x="28000.0" y="-4000.0" />
+		<node id="A2_end" x="32000.0" y="-5000.0" />
+		
+		<!-- Branch C1 (top-right, after middle section) -->
+		<node id="C1_1" x="20000.0" y="1000.0" />
+		<node id="C1_2" x="24000.0" y="3000.0" />
+		<node id="C1_3" x="28000.0" y="4000.0" />
+		<node id="C1_end" x="32000.0" y="5000.0" />
+		
+		<!-- Branch C2 (bottom-left) -->
+		<node id="C2_start" x="-14000.0" y="-5000.0" />
+		<node id="C2_1" x="-10000.0" y="-4000.0" />
+		<node id="C2_2" x="-6000.0" y="-3000.0" />
+		<node id="C2_3" x="-2000.0" y="-1000.0" />
+		
+		<!-- Junction point (center X) -->
+		<node id="junction" x="0.0" y="0.0" />
+		
+		<!-- Middle section nodes (straight horizontal section for merged train) -->
+		<node id="middle_1" x="600.0" y="0.0" />
+		<node id="middle_2" x="8000.0" y="0.0" />
+		<node id="middle_3" x="12000.0" y="0.0" />
+		<node id="middle_end" x="12600.0" y="0.0" />
+	</nodes>
+
+	<links>
+		<!-- Branch A1 links (A1_start -> junction) -->
+		<link id="A1_start_to_A1_1" from="A1_start" to="A1_1" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="A1_1_to_A1_2" from="A1_1" to="A1_2" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="A1_2_to_A1_3" from="A1_2" to="A1_3" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="A1_3_to_junction" from="A1_3" to="junction" length="2828.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		
+		<!-- Middle section links (junction -> middle_end) -->
+		<link id="junction_to_middle_1" from="junction" to="middle_1" length="600.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="middle_1_to_middle_2" from="middle_1" to="middle_2" length="7400.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="middle_2_to_middle_3" from="middle_2" to="middle_3" length="4000.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="middle_3_to_middle_end" from="middle_3" to="middle_end" length="600.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		
+		<!-- Branch A2 links (middle_end -> A2_end) -->
+		<link id="middle_end_to_A2_1" from="middle_end" to="A2_1" length="5656.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="A2_1_to_A2_2" from="A2_1" to="A2_2" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="A2_2_to_A2_3" from="A2_2" to="A2_3" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="A2_3_to_A2_end" from="A2_3" to="A2_end" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		
+		<!-- Branch C1 links (middle_end -> C1_end) -->
+		<link id="middle_end_to_C1_1" from="middle_end" to="C1_1" length="5656.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="C1_1_to_C1_2" from="C1_1" to="C1_2" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="C1_2_to_C1_3" from="C1_2" to="C1_3" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="C1_3_to_C1_end" from="C1_3" to="C1_end" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		
+		<!-- Branch C2 links (C2_start -> junction) -->
+		<link id="C2_start_to_C2_1" from="C2_start" to="C2_1" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="C2_1_to_C2_2" from="C2_1" to="C2_2" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="C2_2_to_C2_3" from="C2_2" to="C2_3" length="4472.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+		<link id="C2_3_to_junction" from="C2_3" to="junction" length="2828.0" freespeed="50.0" capacity="1000" permlanes="1" modes="rail" />
+	</links>
+
+</network>

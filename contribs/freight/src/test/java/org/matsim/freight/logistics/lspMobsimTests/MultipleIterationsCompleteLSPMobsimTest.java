@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controller;
@@ -73,6 +74,8 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 	@BeforeEach
 	public void initialize() {
 		Config config = ConfigUtils.createConfig();
+
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
@@ -289,7 +292,7 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
-			completeLSP.assignShipmentToLSP(shipment);
+			completeLSP.assignShipmentToLspPlan(shipment);
 		}
 		completeLSP.scheduleLogisticChains();
 
@@ -320,8 +323,8 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 		controller.run();
 
 		for (LSP lsp : LSPUtils.getLSPs(controller.getScenario()).getLSPs().values()) {
-			ResourceImplementationUtils.printResults_shipmentPlan(controller.getControlerIO().getOutputPath(), lsp);
-			ResourceImplementationUtils.printResults_shipmentLog(controller.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printResults_shipmentPlan(controller.getControllerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printResults_shipmentLog(controller.getControllerIO().getOutputPath(), lsp);
 		}
 	}
 

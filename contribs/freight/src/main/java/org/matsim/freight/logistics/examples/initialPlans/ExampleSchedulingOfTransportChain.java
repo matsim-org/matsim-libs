@@ -342,7 +342,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     // assign the shipments to the LSP
     for (LspShipment lspShipment : lspShipments) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     // schedule the LSP with the shipments and according to the scheduler of the Resource

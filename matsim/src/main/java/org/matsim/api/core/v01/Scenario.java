@@ -33,13 +33,13 @@ import org.matsim.vehicles.Vehicles;
 
 
 /**
- * 
+ *
  * The scenario is the entry point to MATSim
  * scenarios. An implementation of Scenario
  * has to provide implementations
  * for the different return types, e.g. Network,
  * Facilities or Population.
- * 
+ *
  * <h3> Design aspects </h3>
  * <p>
  * Scenario (and in particular {@link MutableScenario}) now accepts arbitrary implementations of the contributing containers.  As stated
@@ -48,9 +48,9 @@ import org.matsim.vehicles.Vehicles;
  * </p>
  * <h3> History </h3>
  * <p>
- * Originally, MATSim provided "global" variables such as access to the network with public static variables. 
+ * Originally, MATSim provided "global" variables such as access to the network with public static variables.
  * </p><p>
- * This was changed around 2010 towards an approach where everything was moved around by non-static references.  The Scenario 
+ * This was changed around 2010 towards an approach where everything was moved around by non-static references.  The Scenario
  * container was thus introduces to contain most of the objects that were public static before, so that reaching around one reference
  * would be enough for most purposes.  Reasons for that change include(d):<ul>
  * <li> Some people wanted to be able to have, say, two networks and/or two populations simultaneously in the code.  For example in order to compare them.
@@ -58,18 +58,18 @@ import org.matsim.vehicles.Vehicles;
  * static reference, run the method, and then change it back.  Yet, ...)
  * <li> We never noticed it a lot since consistent regression testing was introduced <i> after </i> this change.  Yet when I introduce regression
  * tests for other software that uses public static variables excessively, I have to use a mode that constructs a new JVM every time a test
- * is started.  This works for integration tests since they use a fair amount of time anyways, but presumably makes unit testing much slower. 
- * <li> As an argument going into the same direction: Without global static variables, a class or method has access to what is given into 
+ * is started.  This works for integration tests since they use a fair amount of time anyways, but presumably makes unit testing much slower.
+ * <li> As an argument going into the same direction: Without global static variables, a class or method has access to what is given into
  * it, but not more.  With global static variables, any class or method has access to everything that can be accessed that way.  This means
- * that one can never rely on a class or method to not change more than is visible from the outside, making reliably encapsulated modules 
+ * that one can never rely on a class or method to not change more than is visible from the outside, making reliably encapsulated modules
  * close to impossible.
  * </ul>
  * </p><p>
  * Around 2015, this was superseded by the (guice) injection approach.  Since with that it is possible to get the elements of the scenario
  * injected separately, the scenario container essentially does not seem to be necessary any more.  In retrospect, it might have been easier
- * to move from the public static approach to the injection approach right away, but we did not know this at that time.   
+ * to move from the public static approach to the injection approach right away, but we did not know this at that time.
  * </p>
- * 
+ *
  * @author dgrether
  * @author (of documentation) Kai Nagel
  */
@@ -80,7 +80,7 @@ public interface Scenario {
 	Population getPopulation();
 
 	TransitSchedule getTransitSchedule();
-	
+
 	Config getConfig();
 
 	/**
@@ -89,7 +89,7 @@ public interface Scenario {
 	 * the name given here as a key.
 	 * <br><br>
 	 * Design issues:<ul>
-	 * <li> This is currently set to deprecated, since the guice injection approach achieves something similar.  However, 
+	 * <li> This is currently set to deprecated, since the guice injection approach achieves something similar.  However,
 	 * at this point injection is only possible after {@link Controler} was started, which stands in the way of <i>first</i> constructing
 	 * the scenario and only <i>then</i> starting {@link Controler}.  So maybe we should un-deprecate this method.  Kai/Theresa, sep'16
 	 * Un-deprecated for the time being.   Kai, dec'16
@@ -97,12 +97,11 @@ public interface Scenario {
 	 *
 	 * @param name the name to which the object should be associated
 	 * @param o the object. <code>null</code> is not allowed.
-	 * 
+	 *
 	 * @throws NullPointerException if the object is null
 	 * @throws IllegalStateException if there is already an object
 	 * associated to this name.
 	 */
-//	@Deprecated // see javadoc
 	void addScenarioElement(String name, Object o);
 
 	/**
@@ -111,7 +110,6 @@ public interface Scenario {
 	 * @param name the name of the element to get
 	 * @return the object associated with that name, or null if none is associated
 	 */
-//	@Deprecated // see javadoc
 	Object getScenarioElement(String name);
 
 	ActivityFacilities getActivityFacilities();

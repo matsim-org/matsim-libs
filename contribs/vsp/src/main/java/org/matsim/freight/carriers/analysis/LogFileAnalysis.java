@@ -27,20 +27,23 @@ import java.util.stream.Collectors;
 
 public class LogFileAnalysis {
 
+	private static final String delimiter = ";";
+	//What are the settings?
+	private static final String fileExtension = ".csv";
 	private static final Logger log = LogManager.getLogger(LogFileAnalysis.class);
 
 	Logger oldLog;
 	String input;
 	String output;
 
-	private CsvOptions csv = new CsvOptions(CSVFormat.Predefined.Default);
+	private final CsvOptions csv = new CsvOptions(CSVFormat.Predefined.Default);
 
 
 	public LogFileAnalysis(Logger oldLog, String input, String output){
 		this.oldLog = oldLog;
 		this.input = input;
 		this.output = output;
-		csv.getFormat().builder().setDelimiter(RunFreightAnalysisEventBased.delimiter);
+		csv.getFormat().builder().setDelimiter(delimiter);
 	}
 
 	public void runLogFileAnalysis() throws Exception {
@@ -128,7 +131,7 @@ public class LogFileAnalysis {
 		}
 
 
-		try (CSVPrinter printer = csv.createPrinter(Path.of(output + "run_info"+RunFreightAnalysisEventBased.fileExtension))) {
+		try (CSVPrinter printer = csv.createPrinter(Path.of(output + "run_info"+ fileExtension))) {
 			printer.printRecord("info", "value");
 			for (Map.Entry<String, String> e : info.entrySet()) {
 				printer.printRecord(e.getKey(), e.getValue());
@@ -136,14 +139,14 @@ public class LogFileAnalysis {
 			printer.printRecord("MATSim iterations",iterations.size()-1);
 		}
 
-		try (CSVPrinter printer = csv.createPrinter(Path.of(output + "memory_stats"+RunFreightAnalysisEventBased.fileExtension))) {
+		try (CSVPrinter printer = csv.createPrinter(Path.of(output + "memory_stats"+ fileExtension))) {
 			printer.printRecord("time", "used", "free");
 			for (Memory m : memory) {
 				printer.printRecord(formatter.format(m.date), m.used, m.free);
 			}
 		}
 
-		try (CSVPrinter printer = csv.createPrinter(Path.of(output + "runtime_stats"+RunFreightAnalysisEventBased.fileExtension))) {
+		try (CSVPrinter printer = csv.createPrinter(Path.of(output + "runtime_stats"+ fileExtension))) {
 			printer.printRecord("Iteration", "seconds");
 			for (int i = 0; i < iterations.size(); i++) {
 				Iteration it = iterations.get(i);
@@ -151,7 +154,7 @@ public class LogFileAnalysis {
 			}
 		}
 
-		try (CSVPrinter printer = csv.createPrinter(Path.of(output + "warnings"+RunFreightAnalysisEventBased.fileExtension))) {
+		try (CSVPrinter printer = csv.createPrinter(Path.of(output + "warnings"+ fileExtension))) {
 			printer.printRecord("Module", "Message");
 			for (Warning warning : warnings) {
 				printer.printRecord(warning.module, warning.msg);

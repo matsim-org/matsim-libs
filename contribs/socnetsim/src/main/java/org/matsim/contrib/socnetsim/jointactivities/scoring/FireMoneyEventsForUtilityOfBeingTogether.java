@@ -253,7 +253,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			final BeingTogetherScoring scoring = e.getValue();
 
 			events.processEvent(
-					new PersonMoneyEvent(Time.MIDNIGHT, id, scoring.getScore() / marginalUtilityOfMoney, "utilityOfBeingTogether", null) );
+					new PersonMoneyEvent(Time.MIDNIGHT, id, scoring.getScore() / marginalUtilityOfMoney, "utilityOfBeingTogether", null, null));
 		}
 	}
 

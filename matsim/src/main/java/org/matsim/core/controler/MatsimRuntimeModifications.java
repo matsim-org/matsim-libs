@@ -21,6 +21,7 @@
 
  package org.matsim.core.controler;
 
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,7 +39,7 @@ class MatsimRuntimeModifications {
 
 	interface MyRunnable {
 		void run() throws UnexpectedShutdownException;
-		void shutdown(boolean unexpected);
+		void shutdown(boolean unexpected, @Nullable Throwable exception);
 	}
 
 
@@ -85,7 +86,7 @@ class MatsimRuntimeModifications {
 				log.error("Shutdown possibly caused by the following Exception:", uncaughtException);
 			}
 			try {
-				runnable.shutdown(unexpectedShutdown.get());
+				runnable.shutdown(unexpectedShutdown.get(), uncaughtException == null ? null: uncaughtException);
 			} catch (Exception e) {
 				unexpectedShutdown.set(true);
 				log.error("Exception during shutdown:", e);

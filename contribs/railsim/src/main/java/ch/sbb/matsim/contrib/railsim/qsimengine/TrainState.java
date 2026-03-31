@@ -26,7 +26,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,6 +62,11 @@ final class TrainState implements TrainPosition {
 	 * Route of this train.
 	 */
 	final List<RailLink> route;
+
+	/**
+	 * Contain all links of previously driven route elements. Only filled when Umlauf is involved.
+	 */
+	final List<RailLink> previousRoute;
 
 	/**
 	 * Current index in the list of route links.
@@ -128,15 +135,45 @@ final class TrainState implements TrainPosition {
 	 */
 	double acceleration;
 
+	/**
+	 * Cumulative driven distance since start of route in meter.
+	 */
+	double cumulativeDistance;
+
+	/**
+	 * Approximate delay in seconds. Can be negative if ahead of schedule.
+	 */
+	double delay;
+
 	TrainState(MobsimDriverAgent driver, TrainInfo train, double timestamp, @Nullable Id<Link> linkId, List<RailLink> route) {
 		this.driver = driver;
 		this.pt = driver instanceof RailsimTransitDriverAgent ptDriver ? ptDriver : null;
 		this.nextStop = pt != null ? pt.getNextTransitStop() : null;
 		this.train = train;
 		this.route = route;
+		this.previousRoute = new ArrayList<>();
 		this.timestamp = timestamp;
 		this.headLink = linkId;
 		this.tailLink = linkId;
+		this.targetDecelDist = Double.POSITIVE_INFINITY;
+	}
+
+	/**
+	 * Initialize a new route for this train.
+	 */
+	void reset(double time, List<RailLink> route) {
+		this.nextStop = pt != null ? pt.getNextTransitStop() : null;
+
+		// Need to remember prev route
+		this.previousRoute.addAll(this.route);
+
+		this.route.clear();
+		this.route.addAll(route);
+		this.timestamp = time;
+		this.routeIdx = 0;
+		this.acceleration = 0.0;
+		this.delay = 0;
+		this.cumulativeDistance = 0;
 		this.targetDecelDist = Double.POSITIVE_INFINITY;
 	}
 
@@ -154,6 +191,7 @@ final class TrainState implements TrainPosition {
 			", approvedDist=" + approvedDist +
 			", speed=" + speed +
 			", acceleration=" + acceleration +
+			", delay=" + delay +
 			'}';
 	}
 
@@ -171,7 +209,7 @@ final class TrainState implements TrainPosition {
 		return new RailsimTrainStateEvent(time, time, driver.getVehicle().getId(),
 			headLink, headPosition,
 			tailLink, tailPosition,
-			speed, acceleration, targetSpeed);
+			speed, acceleration, targetSpeed, delay);
 	}
 
 	@Override
@@ -211,6 +249,11 @@ final class TrainState implements TrainPosition {
 	}
 
 	@Override
+	public double getDelay() {
+		return delay;
+	}
+
+	@Override
 	public int getRouteIndex() {
 		return routeIdx;
 	}
@@ -240,5 +283,11 @@ final class TrainState implements TrainPosition {
 			}
 		}
 		return route.subList(from, route.size());
+	}
+
+	@Override
+	@Nullable
+	public TransitStopFacility getNextStop() {
+		return nextStop;
 	}
 }

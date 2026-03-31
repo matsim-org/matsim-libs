@@ -52,8 +52,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.vsp.andreas.utils.net.NetworkRemoveUnusedNodes;
-
 /**
  * Simplifies a given network, by merging links.
  *
@@ -226,8 +224,7 @@ public class PTNetworkSimplifier {
 
 		}
 
-		NetworkRemoveUnusedNodes nc = new NetworkRemoveUnusedNodes();
-		nc.run(this.network);
+		NetworkUtils.removeNodesWithoutLinks(this.network);
 
 		nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(this.network);

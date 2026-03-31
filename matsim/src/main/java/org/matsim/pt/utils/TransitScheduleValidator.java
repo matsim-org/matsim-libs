@@ -368,6 +368,82 @@ public abstract class TransitScheduleValidator {
 		return result;
 	}
 
+	/**
+	 * Validate that all chained departures reference existing departures in the schedule.
+	 */
+	public static ValidationResult validateChainedDepartures(final TransitSchedule schedule) {
+		ValidationResult result = new ValidationResult();
+		
+		// Track all available departures in the schedule
+		Map<Id<TransitLine>, TransitLine> allLines = schedule.getTransitLines();
+		
+		for (TransitLine line : allLines.values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+					if (!departure.getChainedDepartures().isEmpty()) {
+						for (ChainedDeparture chainedDep : departure.getChainedDepartures()) {
+							Id<TransitLine> transitLineId = chainedDep.getChainedTransitLineId();
+							Id<TransitRoute> transitRouteId = chainedDep.getChainedRouteId();
+							Id<Departure> departureId = chainedDep.getChainedDepartureId();
+							
+							// Check if the referenced transit line exists
+							TransitLine targetLine = allLines.get(transitLineId);
+							if (targetLine == null) {
+								result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, 
+									"Transit line " + line.getId() + ", route " + route.getId() + 
+									", departure " + departure.getId() + " has a chained departure reference to line " + 
+									transitLineId + " which does not exist in the schedule.", 
+									ValidationResult.Type.OTHER, Collections.singleton(departure.getId())));
+								continue;
+							}
+							
+							// Check if the referenced transit route exists
+							TransitRoute targetRoute = targetLine.getRoutes().get(transitRouteId);
+							if (targetRoute == null) {
+								result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, 
+									"Transit line " + line.getId() + ", route " + route.getId() + 
+									", departure " + departure.getId() + " has a chained departure reference to route " + 
+									transitRouteId + " in line " + transitLineId +
+									" which does not exist in the schedule.", 
+									ValidationResult.Type.OTHER, Collections.singleton(departure.getId())));
+								continue;
+							}
+							
+							// Check if the referenced departure exists
+							if (!targetRoute.getDepartures().containsKey(departureId)) {
+								result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, 
+									"Transit line " + line.getId() + ", route " + route.getId() + 
+									", departure " + departure.getId() + " has a chained departure reference to departure " + 
+									departureId + " in route " + targetRoute.getId() + ", line " + transitLineId +
+									" which does not exist in the schedule.", 
+									ValidationResult.Type.OTHER, Collections.singleton(departure.getId())));
+								continue;
+							}
+
+							// Check if the last stop of the route matches the first stop of the chained route
+							if (!route.getStops().isEmpty() && !targetRoute.getStops().isEmpty()) {
+								TransitRouteStop lastStop = route.getStops().get(route.getStops().size() - 1);
+								TransitRouteStop firstStop = targetRoute.getStops().get(0);
+								
+								if (!lastStop.getStopFacility().getId().equals(firstStop.getStopFacility().getId())) {
+									result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR,
+										"Transit line " + line.getId() + ", route " + route.getId() +
+										", departure " + departure.getId() + " has a chained departure where the last stop (" +
+										lastStop.getStopFacility().getId() + ") does not match the first stop (" +
+										firstStop.getStopFacility().getId() + ") of the chained route " + targetRoute.getId() +
+										" in line " + transitLineId,
+										ValidationResult.Type.OTHER, Collections.singleton(departure.getId())));
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return result;
+	}
+
 	public static ValidationResult validateAll(final TransitSchedule schedule, final Network network) {
 		ValidationResult v = validateUsedStopsHaveLinkId(schedule);
 		v.add(validateNetworkRoutes(schedule, network));
@@ -381,6 +457,7 @@ public abstract class TransitScheduleValidator {
 		v.add(validateTransfers(schedule));
 		v.add(validateStopCoordinates(schedule));
 		v.add(validateDepartures(schedule));
+		v.add(validateChainedDepartures(schedule));
 		return v;
 	}
 

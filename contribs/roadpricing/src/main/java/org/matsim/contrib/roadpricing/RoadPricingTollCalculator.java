@@ -21,9 +21,6 @@
 package org.matsim.contrib.roadpricing;
 
 import java.util.TreeMap;
-import java.util.stream.Collector;
-
-import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -216,9 +213,13 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId());
+			//Maybe also add that the costs should not be 0 (zero) for throwing an event?
+			//If using the TollFactor for tolling only some vehicleTypes, all other vehicles will have a cost of 0.
+			//Currently, they then also create a PersonMoneyEvent with 0 cost, which is not really necessary and make the Eventsfile larger.
+			//KMT, Aug'25
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
-				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-newToll,"toll",null));
+				events.processEvent(new PersonMoneyEvent(event.getTime(), driverId, -newToll, "toll", null, null));
 
 				AgentTollInfo info = RoadPricingTollCalculator.this.agents.computeIfAbsent( driverId, (key) -> new AgentTollInfo() );
 				info.toll += newToll;
@@ -240,8 +241,12 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
+			//Maybe also add that the costs should not be 0 (zero) for throwing an event?
+			//If using the TollFactor for tolling only some vehicleTypes, all other vehicles will have a cost of 0.
+			//Currently, they then also create a PersonMoneyEvent with 0 cost, which is not really necessary and make the Eventsfile larger.
+			//KMT, Aug'25
 			if (cost != null) {
-				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
+				events.processEvent(new PersonMoneyEvent(event.getTime(), driverId, -cost.amount, "toll", null, null));
 
 				AgentTollInfo info = RoadPricingTollCalculator.this.agents.computeIfAbsent( driverId, (key) -> new AgentTollInfo() );
 				info.toll += cost.amount;
@@ -272,6 +277,10 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
+			//Maybe also add that the costs should not be 0 (zero) for throwing an event?
+			//If using the TollFactor for tolling only some vehicleTypes, all other vehicles will have a cost of 0.
+			//Currently, they then also create a PersonMoneyEvent with 0 cost, which is not really necessary and make the Eventsfile larger.
+			//KMT, Aug'25
 			if (cost != null) {
 				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
 				if (info == null) {
@@ -285,7 +294,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 
 					/* The toll amount comes from the current link, but should
 					 * be the same for all links. */
-					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
+					events.processEvent(new PersonMoneyEvent(event.getTime(), driverId, -cost.amount, "toll", null, null));
 
 					info.toll = cost.amount;
 				}

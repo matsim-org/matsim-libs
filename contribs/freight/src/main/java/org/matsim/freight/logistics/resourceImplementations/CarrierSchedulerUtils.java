@@ -43,7 +43,7 @@ public class CarrierSchedulerUtils {
 	 * If a roadPricingScheme is given, the tolls are considered in the routing costs.
 	 * <p>
 	 * This looks for me (KMT) similar to what is done in {@link org.matsim.freight.carriers.CarriersUtils#runJsprit(Scenario)}.
-	 * So, maybe this can be more simplify.
+   * So, maybe this can be more simplified. (Most probably, the runJsprit method need this rpscheme - handling as well)
 	 *
 	 * @param carrier  Carrier for which the problem should be solved
 	 * @param scenario the scenario
@@ -54,6 +54,8 @@ public class CarrierSchedulerUtils {
 		// pro: save computation time
 		// con: interdependencies, if something changes in the network (load), the object is not up-to-date & it is not clear, if the object is thread safe
 		// Decision for the time being: rebuild it for each carrier to have a clear state KMT/KN Aug'24
+
+
 		NetworkBasedTransportCosts netbasedTransportCosts;
 		Network network = scenario.getNetwork();
 		RoadPricingScheme roadPricingScheme = null;

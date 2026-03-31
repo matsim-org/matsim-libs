@@ -70,16 +70,16 @@ public class MultiModeTaxiModule extends AbstractModule {
 		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                 drtCfg.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
-		defaultConstraintsSet.maxWaitTime = 3600;
-		defaultConstraintsSet.maxTravelTimeAlpha = 2;
-		defaultConstraintsSet.maxTravelTimeBeta = 3600;
-		defaultConstraintsSet.maxAbsoluteDetour = Double.MAX_VALUE;
+		defaultConstraintsSet.setMaxWaitTime(3600);
+		defaultConstraintsSet.setMaxTravelTimeAlpha(2);
+		defaultConstraintsSet.setMaxTravelTimeBeta(3600);
+		defaultConstraintsSet.setMaxAbsoluteDetour(Double.MAX_VALUE);
 
-		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+		defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 		drtCfg.setChangeStartLinkToLastLinkInSchedule(taxiCfg.changeStartLinkToLastLinkInSchedule);
 		drtCfg.setIdleVehiclesReturnToDepots(false);
 		drtCfg.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
-		defaultConstraintsSet.maxWalkDistance = Double.MAX_VALUE;
+		defaultConstraintsSet.setMaxWalkDistance(Double.MAX_VALUE);
 		drtCfg.setVehiclesFile(taxiCfg.taxisFile);
 		drtCfg.setTransitStopFile(null);
 		drtCfg.setDrtServiceAreaShapeFile(null);

@@ -19,55 +19,59 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 
 public final class QNetsimEngineModule extends AbstractQSimModule {
 	public final static String COMPONENT_NAME = "NetsimEngine";
 
 	/**
 	 * The {@link QNetsimEngineModule} fills the following interfaces with bindings:<ul>
-	 *         <li>{@link QNetsimEngineI}</li>
-	 *         <li>{@link QNetworkFactory}</li>
-	 *         <li> (Q){@link NetworkModeDepartureHandler} </li>
+	 * <li>{@link QNetsimEngineI}</li>
+	 * <li>{@link QNetworkFactory}</li>
+	 * <li> (Q){@link NetworkModeDepartureHandler} </li>
 	 * </ul>
 	 */
 	@Override
 	protected void configureQSim() {
 		// === QNetsimEngine:
 
-		bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).in( Singleton.class );
+		bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).in(Singleton.class);
 		// (given the "overriding" architecture, this is a default binding which may be overridden later)
 
-		addQSimComponentBinding( COMPONENT_NAME ).to( QNetsimEngineI.class );
+		addQSimComponentBinding(COMPONENT_NAME).to(QNetsimEngineI.class);
 		// (this will register the MobsimEngine functionality.  necessary since QNetsimEngineI is a MobsimEngine, which needs to be registered.)
 
 		// === QNetworkFactory:
 
-		if ( this.getConfig().qsim().isUseLanes() ) {
-			bind( DefaultQNetworkFactory.class ).in( Singleton.class );
+		if (this.getConfig().qsim().isUseLanes()) {
+			bind(DefaultQNetworkFactory.class).in(Singleton.class);
 			// (provide this as a delegate to QLanesNetworkFactory)
-			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ).in( Singleton.class ) ;
+			bind(QNetworkFactory.class).to(QLanesNetworkFactory.class).in(Singleton.class);
 		} else {
-			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ).in( Singleton.class) ;
+			bind(QNetworkFactory.class).to(DefaultQNetworkFactory.class).in(Singleton.class);
 		}
 
-		// === LinkSpeedCalculator(s):
+		// Calculators for QLink:
 
-		Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class );
+		Multibinder.newSetBinder(this.binder(), LinkSpeedCalculator.class);
+		Multibinder.newSetBinder(this.binder(), VehicleHandler.class);
+		Multibinder.newSetBinder(this.binder(), ParkingSearchTimeCalculator.class);
 		// (initialize this here so we do not have to hedge against "null".)
 
 //		addLinkSpeedCalculatorBinding().to(...);
 
 		// === departure handler:
-		bind( NetworkModeDepartureHandler.class ).to(NetworkModeDepartureHandlerDefaultImpl.class ).in( Singleton.class );
+		bind(NetworkModeDepartureHandler.class).to(NetworkModeDepartureHandlerDefaultImpl.class).in(Singleton.class);
 		// (given the "overriding" architecture, this is a default binding which may be overridden later)
 
-		addQSimComponentBinding( COMPONENT_NAME ).to( NetworkModeDepartureHandler.class );
+		addQSimComponentBinding(COMPONENT_NAME).to(NetworkModeDepartureHandler.class);
 		// (this will register the DepartureHandler functionality.  Necessary since departureHandlers need to be registered.  It will,
 		// however, use whatever is bound to the interface, and not necessarily the above binding.)
 

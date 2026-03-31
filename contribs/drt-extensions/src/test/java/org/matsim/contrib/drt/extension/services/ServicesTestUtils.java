@@ -2,7 +2,6 @@ package org.matsim.contrib.drt.extension.services;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
@@ -53,11 +52,11 @@ public class ServicesTestUtils {
                 drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                     .addOrGetDefaultDrtOptimizationConstraintsSet();
 		drtConfigGroup.setStopDuration(30.);
-		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
-		defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
-		defaultConstraintsSet.maxWaitTime = 600.;
-		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-		defaultConstraintsSet.maxWalkDistance = 1000.;
+		defaultConstraintsSet.setMaxTravelTimeAlpha(1.5);
+		defaultConstraintsSet.setMaxTravelTimeBeta(10. * 60.);
+		defaultConstraintsSet.setMaxWaitTime(600.);
+		defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
+		defaultConstraintsSet.setMaxWalkDistance(1000.);
 		drtConfigGroup.setUseModeFilteredSubnetwork(false);
 		drtConfigGroup.setVehiclesFile(fleetFile);
 		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
@@ -74,14 +73,13 @@ public class ServicesTestUtils {
 		strategyParams.setTargetAlpha(0.3);
 		strategyParams.setTargetBeta(0.3);
 
-		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
+		RebalancingParams rebalancingParams = drtConfigGroup.getRebalancingParams().get();
+		rebalancingParams.addParameterSet(strategyParams);
 
-		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
-		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rebalancingParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
 		zoneParams.setCellSize(500.);
-		drtZoneSystemParams.addParameterSet(zoneParams);
-		drtZoneSystemParams.setTargetLinkSelection(DrtZoneSystemParams.TargetLinkSelection.mostCentral);
-		drtConfigGroup.addParameterSet(drtZoneSystemParams);
+		rebalancingParams.addParameterSet(zoneParams);
+		rebalancingParams.setTargetLinkSelection(RebalancingParams.TargetLinkSelection.mostCentral);
 
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 

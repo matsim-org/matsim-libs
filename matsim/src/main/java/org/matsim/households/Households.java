@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
 /**
@@ -32,11 +31,9 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public interface Households extends MatsimToplevelContainer {
 
-	public Map<Id<Household>, Household> getHouseholds();
-	
+	Map<Id<Household>, Household> getHouseholds();
+
 	@Override
-	public HouseholdsFactory getFactory();
-	
-	public ObjectAttributes getHouseholdAttributes();
-	
+	HouseholdsFactory getFactory();
+
 }

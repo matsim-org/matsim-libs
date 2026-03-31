@@ -25,12 +25,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.bicycle.AdditionalBicycleLinkScore;
-import org.matsim.contrib.bicycle.BicycleConfigGroup;
-import org.matsim.contrib.bicycle.BicycleModule;
-import org.matsim.contrib.bicycle.BicycleUtils;
+import org.matsim.contrib.bicycle.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -39,6 +37,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
@@ -80,15 +79,15 @@ public class RunBicycleExample {
 	static void fillConfigWithBicycleStandardValues(Config config) {
 		config.controller().setWriteEventsInterval(1);
 
+		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
+		config.routing().setAccessEgressType( RoutingConfigGroup.AccessEgressType.accessEgressModeToLink );
+
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
 		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
-		bicycleConfigGroup.setMarginalUtilityOfGradient_m_100m(-0.02);
-		bicycleConfigGroup.setMarginalUtilityOfUserDefinedNetworkAttribute_m(-0.0000); // always needs to be negative
-		bicycleConfigGroup.setUserDefinedNetworkAttributeName("quietness"); // needs to be defined as a value from 0 to 1, 1 being best, 0 being worst
-		bicycleConfigGroup.setUserDefinedNetworkAttributeDefaultValue(0.1); // used for those links that do not have a value for the user-defined attribute
+		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.0002 );
 
-		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
+//		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
 
 
 		List<String> mainModeList = new ArrayList<>();
@@ -160,6 +159,7 @@ public class RunBicycleExample {
 		controler.addOverridingModule(new BicycleModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
+				this.bind( AdditionalBicycleLinkScoreDefaultImpl.class ); // so it can be used as delegate
 				this.bind( AdditionalBicycleLinkScore.class ).to( MyAdditionalBicycleLinkScore.class );
 			}
 		} );
@@ -169,14 +169,12 @@ public class RunBicycleExample {
 
 	private static class MyAdditionalBicycleLinkScore implements AdditionalBicycleLinkScore {
 
-		private final AdditionalBicycleLinkScore delegate;
-		@Inject MyAdditionalBicycleLinkScore( Scenario scenario ) {
-			this.delegate = BicycleUtils.createDefaultBicycleLinkScore( scenario );
-		}
-		@Override public double computeLinkBasedScore( Link link ){
+		@Inject private AdditionalBicycleLinkScoreDefaultImpl delegate;
+
+		@Override public double computeLinkBasedScore(Link link, Id<Vehicle> vehicleId, String bicycleMode ){
 			double result = (double) link.getAttributes().getAttribute( "carFreeStatus" );  // from zero to one
 
-			double amount = delegate.computeLinkBasedScore( link );
+			double amount = delegate.computeLinkBasedScore( link, vehicleId, bicycleMode );
 
 			return amount + result ;  // or some other way to augment the score
 

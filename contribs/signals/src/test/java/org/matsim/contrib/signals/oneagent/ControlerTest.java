@@ -69,7 +69,7 @@ public class ControlerTest {
 
 		Controler controler = new Controler(scenario);
         controler.getConfig().controller().setCreateGraphs(false);
-        controler.addControlerListener(new AfterMobsimListener() {
+        controler.addControllerListener(new AfterMobsimListener() {
 
 			@Override
 			public void notifyAfterMobsim(AfterMobsimEvent event) {
@@ -92,7 +92,7 @@ public class ControlerTest {
 			}
 		});
 
-		controler.addControlerListener((IterationStartsListener)event -> {
+		controler.addControllerListener((IterationStartsListener) event -> {
 			event.getServices().getEvents().addHandler(new EventsLogger());
 
 			TestLink2EnterEventHandler enterHandler = new TestLink2EnterEventHandler();

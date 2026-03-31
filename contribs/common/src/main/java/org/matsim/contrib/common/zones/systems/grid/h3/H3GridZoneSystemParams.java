@@ -4,7 +4,7 @@ import com.google.common.base.Verify;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
 import org.matsim.core.config.Config;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 
 /**
