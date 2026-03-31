@@ -59,7 +59,7 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 	public MarginalCongestionPricingHandler(EventsManager eventsManager, Scenario scenario, double factor) {
 		this.events = eventsManager;
 		this.scenario = scenario;
-		this.vtts_car = (this.scenario.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().scoring().getPerforming_utils_hr()) / this.scenario.getConfig().scoring().getMarginalUtilityOfMoney();
+		this.vtts_car = (this.scenario.getConfig().scoring().getModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().scoring().getPerforming_utils_hr()) / this.scenario.getConfig().scoring().getMarginalUtilityOfMoney();
 		this.factor = factor;
 
 		log.info("Using the toll factor " + factor);

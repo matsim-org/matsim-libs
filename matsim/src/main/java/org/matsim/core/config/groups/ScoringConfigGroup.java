@@ -286,65 +286,65 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		else if ("traveling".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingPt".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingWalk".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingOther".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.other).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.other).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingBike".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		}
 
 		// backward compatibility: "typed" util of distance
 		else if ("marginalUtlOfDistanceCar".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.car).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.car).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistancePt".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.pt).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistanceWalk".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.walk).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.walk).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistanceOther".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.other).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.other).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		}
 
 		// backward compatibility: "typed" constants
 		else if ("constantCar".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModes().get(TransportMode.car).setConstant(Double.parseDouble(value));
+			getModeParams().get(TransportMode.car).setConstant(Double.parseDouble(value));
 		} else if ("constantWalk".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModes().get(TransportMode.walk).setConstant(Double.parseDouble(value));
+			getModeParams().get(TransportMode.walk).setConstant(Double.parseDouble(value));
 		} else if ("constantOther".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModes().get(TransportMode.other).setConstant(Double.parseDouble(value));
+			getModeParams().get(TransportMode.other).setConstant(Double.parseDouble(value));
 		} else if ("constantPt".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModes().get(TransportMode.pt).setConstant(Double.parseDouble(value));
+			getModeParams().get(TransportMode.pt).setConstant(Double.parseDouble(value));
 		} else if ("constantBike".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModes().get(TransportMode.bike).setConstant(Double.parseDouble(value));
+			getModeParams().get(TransportMode.bike).setConstant(Double.parseDouble(value));
 		}
 
 		// old-fashioned scoring parameters: default subpopulation
@@ -467,8 +467,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			throw new RuntimeException("Default subpopulation is not defined");
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
-	public Map<String, ModeParams> getModes() {
+		@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	public Map<String, ModeParams> getModeParams() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getModeParams();
 		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)

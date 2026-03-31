@@ -169,7 +169,7 @@ class AgentWiseComparisonKNExample{
 		config.scoring().addActivityParams( new ActivityParams( "home_12" ).setTypicalDuration( 12. * 3600 ) );
 		config.scoring().addActivityParams( new ActivityParams( "work_12" ).setTypicalDuration( 12. * 3600 ) );
 
-		for( ModeParams modeParams : config.scoring().getModes().values() ){
+		for( ModeParams modeParams : config.scoring().getModeParams().values() ){
 			modeParams.setMarginalUtilityOfTraveling( 0. );
 		}
 	}

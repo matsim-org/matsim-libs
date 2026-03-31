@@ -228,7 +228,7 @@ public class TinyAccessibilityTest {
 		final Config config = createTestConfig();
 
 
-		config.scoring().getModes().get(TransportMode.walk).setConstant(-10);
+		config.scoring().getModeParams().get(TransportMode.walk).setConstant(-10);
 		double min = 0.; // Values for bounding box usually come from a config file
 		double max = 200.;
 

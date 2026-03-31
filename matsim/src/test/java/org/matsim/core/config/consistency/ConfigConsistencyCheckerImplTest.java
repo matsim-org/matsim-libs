@@ -58,7 +58,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
@@ -76,7 +76,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
@@ -94,7 +94,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
@@ -112,7 +112,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {

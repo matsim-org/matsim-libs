@@ -37,13 +37,13 @@ public class ConfigYamlUpdateTest {
 
 		ScoringConfigGroup scoring = ConfigUtils.addOrGetModule(config, ScoringConfigGroup.class);
 
-		assertThat(scoring.getModes())
+		assertThat(scoring.getModeParams())
 			.hasSize(7);
 
 		assertThat(scoring.getPerforming_utils_hr())
 			.isEqualTo(6.88);
 
-		ScoringConfigGroup.ModeParams car = scoring.getModes().get(TransportMode.car);
+		ScoringConfigGroup.ModeParams car = scoring.getModeParams().get(TransportMode.car);
 
 		assertThat(car.getConstant()).isEqualTo(-0.62);
 		assertThat(car.getMarginalUtilityOfTraveling()).isEqualTo(0);

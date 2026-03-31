@@ -83,7 +83,7 @@ public class FreespeedTravelTimeAndDisutility implements TravelDisutility, Trave
 	public FreespeedTravelTimeAndDisutility(ScoringConfigGroup cnScoringGroup){
 		this(cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0, cnScoringGroup.getPerforming_utils_hr() / 3600.0,
 //				cnScoringGroup.getMarginalUtlOfDistanceCar());
-				cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() *cnScoringGroup.getMarginalUtilityOfMoney());
+			scoringParamSet.getModeParams().get(TransportMode.car).getMonetaryDistanceRate() *scoringParamSet.getMarginalUtilityOfMoney());
 	}
 
 	@Override
