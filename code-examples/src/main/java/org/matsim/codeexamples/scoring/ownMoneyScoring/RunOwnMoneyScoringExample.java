@@ -60,7 +60,7 @@ class RunOwnMoneyScoringExample {
 						final ScoringParameters parameters = params.getScoringParameters( person );
 						SumScoringFunction sumScoringFunction = new SumScoringFunction() ;
 						sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(parameters));
-						sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(parameters, network));
+						sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(parameters));
 						sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(parameters));
 						
 						double income = (double) person.getAttributes().getAttribute( NET_INCOME_PER_MONTH );

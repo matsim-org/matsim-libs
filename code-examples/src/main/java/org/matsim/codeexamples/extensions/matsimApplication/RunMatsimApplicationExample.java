@@ -60,7 +60,10 @@ public class RunMatsimApplicationExample extends MATSimApplication {
 	}
 
 	public RunMatsimApplicationExample( ) {
-		super( "scenarios/equil/config.xml");
+//		super( "scenarios/equil/config.xml");
+		// (config filename now needs to be given explicitly as command line argument)
+
+		super();
 	}
 
 	@Override

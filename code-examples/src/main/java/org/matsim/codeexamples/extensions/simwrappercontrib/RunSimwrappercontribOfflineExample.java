@@ -28,7 +28,7 @@ class RunSimwrappercontribOfflineExample{
 
 	public static class MyDashboard implements Dashboard{
 
-		@Override public void configure( Header header, Layout layout ){
+		@Override public void configure( Header header, Layout layout, SimWrapperConfigGroup simWrapperConfig ){
 			header.title="mytitle";
 			header.description="description";
 

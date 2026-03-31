@@ -79,11 +79,9 @@ public class RunAddToScoringExample{
 //		final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			if (Integer.parseInt(person.getId().toString()) % 2 == 0) {
-//				personAttributes.putAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, true);
-				PopulationUtils.putPersonAttribute( person, DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, true );
+				person.getAttributes().putAttribute( DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, true );
 			} else {
-//				personAttributes.putAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, false);
-				PopulationUtils.putPersonAttribute( person, DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, false );
+				person.getAttributes().putAttribute( DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, false );
 			}
 		}
 

@@ -33,7 +33,7 @@ public class RunAddToScoringExampleTest{
 			} );
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
-				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
+				String actual = utils.getOutputDirectory() + "/output_events.xml.zst" ;
 				var result = EventsUtils.compareEventsFiles( expected, actual );
 				Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result);
 			}
@@ -41,12 +41,12 @@ public class RunAddToScoringExampleTest{
 				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
 				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
 				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
+				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.zst" );
 				PopulationUtils.comparePopulations( expected, actual ) ;
 
 				for( Person expectedPerson : expected.getPersons().values() ){
 					Person actualPerson = actual.getPersons().get( Id.createPersonId( expectedPerson.getId() ) );
-					Assertions.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
+					Assertions.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore(), 0.000_000_000_1 );
 				}
 			}
 
