@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.consistency.ScenarioConsistencyChecker;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.facilities.ActivityFacilities;
@@ -273,6 +274,26 @@ import java.util.concurrent.LinkedBlockingQueue;
 		@Override
 		public Lanes getLanes() {
 			return this.delegate.getLanes();
+		}
+
+		@Override
+		public void addScenarioConsistencyChecker(ScenarioConsistencyChecker checker) {
+			this.delegate.addScenarioConsistencyChecker( checker );
+		}
+
+		@Override
+		public void removeScenarioConsistencyChecker(Class<? extends ScenarioConsistencyChecker> clazz) {
+			this.delegate.removeScenarioConsistencyChecker( clazz );
+		}
+
+		@Override
+		public void checkConsistencyBeforeRun() {
+			this.delegate.checkConsistencyBeforeRun();
+		}
+
+		@Override
+		public void checkConsistencyAfterRun() {
+			this.delegate.checkConsistencyAfterRun();
 		}
 
 		@Override

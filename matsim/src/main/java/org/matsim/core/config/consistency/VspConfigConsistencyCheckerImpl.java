@@ -67,7 +67,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			case abort -> lvl = Level.WARN;
 			default -> throw new RuntimeException("not implemented");
 		}
-		log.info("running checkConsistency ...");
+		log.info("running checkConsistency of config ...");
 
 		boolean problem = false; // ini
 
