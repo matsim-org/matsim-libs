@@ -492,6 +492,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		String[] keys = new String[] {"dist_group", "main_mode", "subpopulation"};
 
 		for (String group : groupOfSubpopulation) {
+			if (group.equals(ModelType.UNASSIGNED.toString())) continue; // because we already added the unassigned group as modelType UNASSIGNED in the previous step.
 			Table countsGroup = aggr.where(aggr.stringColumn("groupOfSubpopulation").isEqualTo(group))
 				.selectColumns("dist_group", "main_mode", "subpopulation", "Count [trip_id]")
 				.copy();

@@ -36,7 +36,7 @@ public final class AggregateFromAll<T extends Message> implements EventMessaging
 	}
 
 	@Override
-	public IntSet waitForOtherRanks(double time) {
-		return LP.ALL_NODES_BROADCAST;
+	public IntSet waitForOtherParts(double time) {
+		return LP.ALL_PARTS_BROADCAST;
 	}
 }

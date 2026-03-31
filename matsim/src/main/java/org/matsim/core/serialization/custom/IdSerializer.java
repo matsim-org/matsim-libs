@@ -17,8 +17,8 @@ public class IdSerializer extends Serializer<Id<?>> {
 
 	private final Map<String, Class<?>> classMap = new HashMap<>();
 
-	public IdSerializer(Fory fury, Class<Id<?>> type) {
-		super(fury, type, false, true);
+	public IdSerializer(Fory fory, Class<Id<?>> type) {
+		super(fory, type, false, true);
 	}
 
 	@Override

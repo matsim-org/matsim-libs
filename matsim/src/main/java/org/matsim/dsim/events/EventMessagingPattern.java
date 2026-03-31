@@ -27,6 +27,6 @@ public sealed interface EventMessagingPattern<T extends EventHandler> extends Co
 	/**
 	 * Determine for which other precessed should be waited.
 	 */
-	IntSet waitForOtherRanks(double time);
+	IntSet waitForOtherParts(double time);
 
 }
