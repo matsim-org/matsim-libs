@@ -98,10 +98,10 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 		queue.add(msg);
 	}
 
-	public IntSet waitForOtherRanks(double time) {
+	public IntSet waitForOtherParts(double time) {
 
 		if (pattern != null && (isSyncTime() || cleanupState == CleanupState.LAST_RECEIVE)) {
-			return pattern.waitForOtherRanks(time);
+			return pattern.waitForOtherParts(time);
 		}
 
 		return LP.NO_NEIGHBORS;

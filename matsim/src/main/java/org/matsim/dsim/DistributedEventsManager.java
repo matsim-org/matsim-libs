@@ -5,7 +5,6 @@ import com.google.inject.Provider;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -170,7 +169,7 @@ public final class DistributedEventsManager implements EventsManager {
 		for (int part : computeNode.getParts()) {
 			var nextHandler = (part == computeNode.getParts().getInt(0)) ? firstHandler : provider.get();
 			if (handler == nextHandler) {
-				throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
+				throw new IllegalStateException("The provider for " + handler.getName() + " event handler must return a new instance of the handler or PARTITION_SINGLETON must be set.");
 			}
 			handler = nextHandler;
 			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), null);
@@ -408,11 +407,11 @@ public final class DistributedEventsManager implements EventsManager {
 					broker.send(e, receiver);
 				}
 
-				broker.addNullMessage(receiver);
+				broker.syncToRank(receiver);
 			}
 
 			if (!waitFor.isEmpty()) {
-				waitFor.forEach(broker::addWaitForRank);
+				waitFor.forEach(broker::syncFromRank);
 			}
 
 			lastSync = time;
