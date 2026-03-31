@@ -63,12 +63,11 @@ public class RunAccidents {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// Preprocess network
-		AccidentsNetworkModification networkModification = new AccidentsNetworkModification(scenario);
 
 		String[] tunnelLinks = readCSVFile("tunnelLinksCSVfile");
 		String[] planfreeLinks = readCSVFile("planfreeLinksCSVfile");
 
-		networkModification.setLinkAttributesBasedOnOSMFile("osmlandUseFile", "EPSG:31468" , tunnelLinks, planfreeLinks );
+		new AccidentsNetworkModification(scenario).setLinkAttributesBasedOnOSMFile("osmlandUseFile", "EPSG:31468" , tunnelLinks, planfreeLinks );
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AccidentsModule());

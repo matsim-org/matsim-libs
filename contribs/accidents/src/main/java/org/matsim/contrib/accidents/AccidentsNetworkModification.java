@@ -59,7 +59,7 @@ public class AccidentsNetworkModification {
 
 	public Network setLinkAttributesBasedOnOSMFile( String landuseOsmFile, String osmCRS, String[] tunnelLinkIDs, String[] planfreeLinkIDs ) throws IOException {
 
-		AccidentsConfigGroup accidentsCfg = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
+//		AccidentsConfigGroup accidentsCfg = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
 
 		Map<String, SimpleFeature> landUseFeaturesBB = new HashMap<>();
 		Map<String, String> landUseDataBB = new HashMap<>();
