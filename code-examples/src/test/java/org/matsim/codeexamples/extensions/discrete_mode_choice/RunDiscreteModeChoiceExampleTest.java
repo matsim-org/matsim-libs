@@ -31,15 +31,15 @@ public class RunDiscreteModeChoiceExampleTest{
 					, "--config:controler.lastIteration=2"
 			} );
 			{
-				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
-				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
+				String expected = utils.getInputDirectory() + "/output_events.xml.zst" ;
+				String actual = utils.getOutputDirectory() + "/output_events.xml.zst" ;
 				EventsUtils.compareEventsFiles( expected, actual );
 			}
 			{
 				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
+				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.zst" );
 				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
+				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.zst" );
 				PopulationUtils.comparePopulations( expected, actual ) ;
 
 				for( Person expectedPerson : expected.getPersons().values() ){
