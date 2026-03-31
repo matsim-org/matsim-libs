@@ -56,6 +56,8 @@ public class RunFreightFoodRetailingBerlinExampleTest {
 					File actualFile = new File(utils.getOutputDirectory()+ "analysis", expectedFile.getName());
 					MatsimTestUtils.assertEqualFilesLineByLine(expectedFile.getAbsolutePath(), actualFile.getAbsolutePath());
 				}
+				// (I do not exactly understand what the above does.  I think that it goes through all sub-directories of the "analysis" directory and then checks if the filenames
+				// in there are the same in test/input and in test/output.  So in consequence, if files are added there, they also need to be added in test/input.)
 			}
 
 
