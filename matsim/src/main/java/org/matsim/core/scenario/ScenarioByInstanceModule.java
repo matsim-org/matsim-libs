@@ -50,6 +50,8 @@ public final class ScenarioByInstanceModule extends AbstractModule {
 	public void install() {
 		// if no network provided, assume it comes from somewhere else, and this module just provides
 		// the scenario "elements"
+		// I think that the above comment means "scenario" and not "network".  And "comes from somewhere else" means "bound
+		// somewhere else". kai, nov;25
 		if ( scenario != null ) bind(Scenario.class).toInstance(scenario);
 		if (getConfig().transit().isUseTransit()) {
 			bind(TransitSchedule.class).toProvider(TransitScheduleProvider.class);

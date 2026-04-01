@@ -55,7 +55,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 		this.params = params;
 
 //		firstLastActWarning = 0 ;
-		firstLastActOpeningTimesWarning = 0 ;
+//		firstLastActOpeningTimesWarning = 0 ;
 		this.openingIntervalCalculator = openingIntervalCalculator;
 	}
 
@@ -88,7 +88,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 	private Score calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
-		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		ActivityUtilityParameters actParams = this.params.actParams.get(act.getType() );
 		if (actParams == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
 					"(module name=\"scoring\" in the config file).");
@@ -246,10 +246,11 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 
 		if (lastActivity.getType().equals(this.firstActivity.getType()) || this.firstActivity.getType().equals("not specified") ) {
+			// the first Act and the last Act have the same type:
+
 			// yyyy find better way to encode "not specified".  It is quite common for travel surveys that the type of the
 			// first activity is not encoded at all, and then we can as well assume that it is the same as that of the last.  kai, sep'16
 
-			// the first Act and the last Act have the same type:
 			if (firstLastActOpeningTimesWarning <= 10) {
 				OptionalTime[] openInterval = openingIntervalCalculator.getOpeningInterval(lastActivity);
 				if (openInterval[0].isDefined() || openInterval[1].isDefined()){

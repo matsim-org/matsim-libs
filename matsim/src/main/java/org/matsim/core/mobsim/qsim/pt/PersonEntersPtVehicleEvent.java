@@ -1,0 +1,64 @@
+package org.matsim.core.mobsim.qsim.pt;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
+
+/**
+ * Specialized version of the PersonEntersVehicleEvent, which has the transit line and transit route id of the entered vehicle.
+ */
+public class PersonEntersPtVehicleEvent extends PersonEntersVehicleEvent {
+// Implementation Note.
+// We derliberately extend the PersonEntersVehicleEvent here, so that we are backwards compatible, as event handlers which expect
+// PersonEntersVehicleEvent will also receive this event.
+
+
+	public static final String EVENT_TYPE = "PersonEntersPtVehicle";
+	public static final String ATTRIBUTE_LINE = "transitLine";
+	public static final String ATTRIBUTE_ROUTE = "transitRoute";
+
+	public Id<TransitRoute> getTransitRoute() {
+		return transitRoute;
+	}
+
+	public Id<TransitLine> getTransitLine() {
+		return transitLine;
+	}
+
+	private final Id<TransitLine> transitLine;
+	private final Id<TransitRoute> transitRoute;
+
+	public PersonEntersPtVehicleEvent(double time, Id<Person> personId, Id<Vehicle> vehicleId, Id<TransitLine> transitLine, Id<TransitRoute> transitRoute) {
+		super(time, personId, vehicleId);
+		this.transitLine = transitLine;
+		this.transitRoute = transitRoute;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		var atts = super.getAttributes();
+		atts.put(ATTRIBUTE_LINE, transitLine.toString());
+		atts.put(ATTRIBUTE_ROUTE, transitRoute.toString());
+		return atts;
+	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		// PersonEntersVehicle only calls writeXMLStart and writeXMLEnd and nothing else
+		// all attributes of PersonEntersVehicle are handled by the base Event class in writeXMLStart.
+		writeXMLStart(out);
+		out.append(" transitLine=\"").append(transitLine).append("\"");
+		out.append(" transitRoute=\"").append(transitRoute).append("\"");
+		writeXMLEnd(out);
+	}
+}

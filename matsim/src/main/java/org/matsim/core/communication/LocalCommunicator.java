@@ -100,6 +100,10 @@ public class LocalCommunicator implements Communicator {
 		ManyToOneConcurrentLinkedQueue<ByteBuffer> self = queues.get(rank);
 		while (expectsNext.expectsMoreMessages()) {
 
+			if (Thread.interrupted()) {
+				throw new RuntimeException(new InterruptedException("recv interrupted by shutdown"));
+			}
+
 			ByteBuffer poll = self.poll();
 			if (poll == null) {
 				idle.idle();

@@ -36,8 +36,8 @@ public class JspritIterationHistogram {
 	private final String title;
 
 	/**
-	 * @param carriers                    the carriers
-	 * @param bestJspritSolutionCollector Map: CarrierId -> (Iteration -> selectedCost)
+	 * @param carriers                       the carriers
+	 * @param bestJspritSolutionCollector    Map: CarrierId -> (Iteration -> selectedCost)
 	 */
 	public JspritIterationHistogram(Carriers carriers, Map<Id<Carrier>, ? extends NavigableMap<Integer, VehicleRoutingProblemSolution>> bestJspritSolutionCollector,
 									String title) {
@@ -48,8 +48,8 @@ public class JspritIterationHistogram {
 	/**
 	 * Analyze and aggregate the selected cost series of all carriers.
 	 *
-	 * @param carriers                    the carriers
-	 * @param bestJspritSolutionCollector results of all solved VRPs
+	 * @param carriers                       the carriers
+	 * @param bestJspritSolutionCollector    results of all solved VRPs
 	 */
 	private void aggregate(Carriers carriers, Map<Id<Carrier>, ? extends NavigableMap<Integer, VehicleRoutingProblemSolution>> bestJspritSolutionCollector) {
 		// get global max iterations for jsprit
@@ -84,21 +84,38 @@ public class JspritIterationHistogram {
 	 *
 	 * @return the created graphic
 	 */
-	private JFreeChart createGraphic() {
+	private JFreeChart createGraphic(NavigableMap<Integer, Double> sumSelectedCostBefore, NavigableMap<Integer, Integer> runCarrierCountBefore) {
 		XYSeries sumSelectedSeries = new XYSeries("Sum selected cost", false, true);
 		XYSeries runSeries = new XYSeries("Running carriers", false, true);
 
+		// add the series of the jsprit run before this analyzed run to the graphic, so that the series from before and after aggregation are shown in one graphic without overlapping
+		if (!sumSelectedCostBefore.isEmpty()) {
+			for (Integer iter : sumSelectedCostBefore.navigableKeySet()) {
+				Double sum = sumSelectedCostBefore.get(iter);
+				Integer run = runCarrierCountBefore.get(iter);
+
+				sumSelectedSeries.add(iter, sum);
+				if (run != null) {
+					runSeries.add(iter, run);
+				}
+			}
+		}
 		for (Integer iter : sumSelectedCost.navigableKeySet()) {
 			Double sum = sumSelectedCost.get(iter);
 			Integer run = runCarrierCount.get(iter);
-
+			iter = iter + sumSelectedCostBefore.size(); // shift iter to the right, so that the series from before and after aggregation are shown in one graphic without overlapping
 			sumSelectedSeries.add(iter, sum);
 			if (run != null) {
 				runSeries.add(iter, run);
 			}
 		}
 		int maxValue = sumSelectedCost.values().stream().max(Double::compareTo).orElse(0.0).intValue();
-		int minorValue = sumSelectedCost.values().stream().min(Double::compareTo).orElse(0.0).intValue();
+		int minorValue = sumSelectedCost.values().stream().min(Double::compareTo).orElse(1.0).intValue();
+		int maxValueBefore = sumSelectedCostBefore.values().stream().max(Double::compareTo).orElse(0.0).intValue();
+		int minorValueBefore = sumSelectedCostBefore.values().stream().min(Double::compareTo).orElse(1.0).intValue();
+		minorValue = Math.min(minorValue, minorValueBefore);
+		maxValue = Math.max(maxValue, maxValueBefore);
+
 		XYSeriesCollection costDataset = new XYSeriesCollection();
 		costDataset.addSeries(sumSelectedSeries);
 
@@ -163,13 +180,16 @@ public class JspritIterationHistogram {
 	 * Writes the graphic to a PNG file.
 	 *
 	 * @param aggegatedJspritAnalysisCSVPath Path to the CSV file where the aggregated jsprit analysis is written to. The PNG file will be created in the same directory.
+	 * @param sumSelectedCostBefore          selected costs of the jsprit run before this analyzed run.
+	 * @param runCarrierCountBefore          running carrier count of the jsprit run before this analyzed run.
 	 */
-	public void writeGraphic(Path aggegatedJspritAnalysisCSVPath) {
+	public void writeGraphic(Path aggegatedJspritAnalysisCSVPath, NavigableMap<Integer, Double> sumSelectedCostBefore,
+							 NavigableMap<Integer, Integer> runCarrierCountBefore) {
 		Path aggegatedJspritAnalysisPNGPath = Path.of(aggegatedJspritAnalysisCSVPath.toString().replace(".csv", ".png"));
 
 		try {
 			Files.createDirectories(aggegatedJspritAnalysisPNGPath.getParent());
-			ChartUtils.saveChartAsPNG(aggegatedJspritAnalysisPNGPath.toFile(), createGraphic(), 1200, 800);
+			ChartUtils.saveChartAsPNG(aggegatedJspritAnalysisPNGPath.toFile(), createGraphic(sumSelectedCostBefore, runCarrierCountBefore), 1200, 800);
 		} catch (IOException e) {
 			log.warn("IOException occurred while writing jsprit iteration graphic to {}", aggegatedJspritAnalysisPNGPath, e);
 		}
@@ -179,22 +199,25 @@ public class JspritIterationHistogram {
 	 * Writes the aggregated jsprit analysis to a CSV file.
 	 *
 	 * @param aggegatedJspritAnalysisCSVPath Path to the CSV file where the aggregated jsprit analysis is written to.
+	 * @param sumSelectedCostBefore          selected costs of the jsprit run before this analyzed run.
 	 * @param delimiter                      Delimiter used in the CSV file.
 	 */
-	public void writeAggregatedCsv(Path aggegatedJspritAnalysisCSVPath, String delimiter) {
+	public void writeAggregatedCsv(Path aggegatedJspritAnalysisCSVPath, NavigableMap<Integer, Double> sumSelectedCostBefore, String delimiter) {
 		try {
+
 			Path dir = aggegatedJspritAnalysisCSVPath.getParent();
 			if (dir != null) {
 				Files.createDirectories(dir);
 			}
 
-			try (BufferedWriter writer = IOUtils.getBufferedWriter(aggegatedJspritAnalysisCSVPath.toString())) {
-
-				writer.write(String.join(delimiter, "jsprit_iteration", "runCarrier", "sumJspritScores"));
-				writer.newLine();
-
+			try (BufferedWriter writer = IOUtils.getAppendingBufferedWriter(aggegatedJspritAnalysisCSVPath.toString())) {
+				if (sumSelectedCostBefore.isEmpty()) {
+					writer.write(String.join(delimiter, "jsprit_iteration", "runCarrier", "sumJspritScores"));
+					writer.newLine();
+				}
 				for (int iter = 0; iter < sumSelectedCost.size(); iter++) {
-					writer.write(iter + delimiter + runCarrierCount.get(iter) + delimiter + sumSelectedCost.get(iter));
+					int writtenIter = iter + sumSelectedCostBefore.size();
+					writer.write(writtenIter + delimiter + runCarrierCount.get(iter) + delimiter + sumSelectedCost.get(iter));
 					writer.newLine();
 				}
 			}
