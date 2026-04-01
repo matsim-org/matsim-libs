@@ -90,7 +90,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	public ScoringConfigGroup() {
 		super(GROUP_NAME);
 
-		this.addScoringParameters(new ScoringParameterSet());
+		this.addScoringParameterSet(new ScoringParameterSet());
 
 		// what follows now has weird consequences:
 		// * the material is added to the ScoringParameterSet of the default subpopulation
@@ -539,7 +539,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 		if (params == null) {
 			params = new ScoringParameterSet(subpopulation);
-			this.addScoringParameters(params);
+			this.addScoringParameterSet(params);
 		}
 
 		return params;
@@ -555,14 +555,14 @@ public final class ScoringConfigGroup extends ConfigGroup {
 				addModeParams((ModeParams) set);
 				break;
 			case ScoringParameterSet.SET_TYPE:
-				addScoringParameters((ScoringParameterSet) set);
+				addScoringParameterSet((ScoringParameterSet) set);
 				break;
 			default:
 				throw new IllegalArgumentException(set.getName());
 		}
 	}
 
-	private void addScoringParameters(final ScoringParameterSet params) {
+	private void addScoringParameterSet(final ScoringParameterSet params) {
 		final ScoringParameterSet previous = this.getScoringParameters(params.getSubpopulation());
 
 		if (previous != null) {
