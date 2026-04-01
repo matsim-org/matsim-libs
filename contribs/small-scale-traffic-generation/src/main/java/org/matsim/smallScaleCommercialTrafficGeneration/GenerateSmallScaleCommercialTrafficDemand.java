@@ -56,6 +56,8 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -436,6 +438,25 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
 				controller.addOverridingModule(new RoadPricingModule(RoadPricingUtils.addOrGetRoadPricingScheme(scenario)));
 			}
+			controller.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					ScoringFunctionFactory defaultScoringFunctionFactory =
+						new CharyparNagelScoringFunctionFactory(scenario);
+					ScoringFunctionFactory vehicleTypeBasedScoringFunctionFactory =
+						new VehicleTypeBasedScoringFunctionFactory(scenario);
+
+					bind(ScoringFunctionFactory.class).toInstance(
+						new SubpopulationDelegatingScoringFunctionFactory(
+							defaultScoringFunctionFactory,
+							Map.of(
+								"goodsTraffic", vehicleTypeBasedScoringFunctionFactory,
+								"commercialPersonTraffic", defaultScoringFunctionFactory
+							)
+						)
+					);
+				}
+			});
 			controller.addOverridingModule(new SimWrapperModule(sw));
 
 			// Creating inject always adds check for unmaterialized config groups.
