@@ -72,6 +72,11 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 		}
 	}
 
+	/**
+	 * For a first draft this is empty. But it can be extended in the future
+	 *
+	 * @param scenario
+	 */
 	@Override
 	public void checkConsistencyAfterRun(Scenario scenario) {
 		Level lvl;
