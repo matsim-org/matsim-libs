@@ -213,7 +213,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 				population.addPerson(p);
 
 				Id<Vehicle> vehId = Id.createVehicleId(i);
-				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(travelMode, vehId));
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes( p, Map.of(travelMode, vehId ) );
 				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
 				scenario.getVehicles().addVehicle(veh);
 			}
