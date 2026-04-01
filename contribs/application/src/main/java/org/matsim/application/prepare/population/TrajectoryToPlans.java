@@ -44,7 +44,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     private double sampleSize;
 
 	@Deprecated
-    @CommandLine.Option(names = "--samples", description = "Desired down-sampled sizes in (0, 1]. Deprecated: Use the separate down-sampling instead.", arity = "1..*")
+    @CommandLine.Option(names = "--samples", description = "Target sample sizes relative to a 100% population (range: (0,1]). These values are absolute shares, NOT relative to --sample-size. Example: with --sample-size=0.25 and --samples=0.1 0.05, the tool will create a 10% and 5% sample of the full population. Deprecated: Use the separate down-sampling instead.", arity = "1..*")
     private List<Double> samples;
 
     @CommandLine.Option(names = "--population", description = "Input original population file", required = true)
@@ -93,13 +93,12 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         // Clear wrong coordinate system
         scenario.getPopulation().getAttributes().clear();
 
-        scenario.getPopulation().getPersons().forEach((k, v) -> {
+		scenario.getPopulation().getPersons().forEach((k, v) -> {
 
-            if (!v.getAttributes().getAsMap().containsKey("subpopulation"))
-                v.getAttributes().putAttribute("subpopulation", "person");
-
-        });
-        // (if a <person/> does not yet have a subpopulation attribute, tag it as a "person".  kai, feb'2024)
+			if (PopulationUtils.getSubpopulation(v) == null)
+				PopulationUtils.putSubpopulation(v, "person");
+		});
+		// (if a <person/> does not yet have a subpopulation attribute, tag it as a "person".  kai, feb'2024)
 
         if (crs.getTargetCRS() != null) {
             ProjectionUtils.putCRS(scenario.getPopulation(), crs.getTargetCRS());
@@ -112,6 +111,9 @@ public class TrajectoryToPlans implements MATSimAppCommand {
             log.info("Setting crs to: {}", ProjectionUtils.getCRS(scenario.getPopulation()));
         }
         // (if set by command line, this will overwrite the above targetCRS.  How is this to be interpreted?  kai, feb'2024)
+
+        // Persist the population scale so follow-up down-sampling updates it consistently.
+        ScenarioUtils.putScale(scenario.getPopulation(), sampleSize);
 
         if ( maxTypicalDuration==null ){
             throw new RuntimeException( "maxTypicalDuration needs to be set explicitly.  The old default was 86400, which would run splitActivityTypesBasedOnDuration, " +
@@ -130,6 +132,16 @@ public class TrajectoryToPlans implements MATSimAppCommand {
             log.info("No sub samples requested. Done.");
             return 0;
         }
+
+		if (sampleSize <= 0 || sampleSize > 1)
+			throw new IllegalArgumentException("--sample-size must be in (0,1]");
+
+		for (double s : samples) {
+			if (s <= 0 || s > 1)
+				throw new IllegalArgumentException("All --samples must be in (0,1]");
+			if (s > sampleSize)
+				throw new IllegalArgumentException("Target sample " + s + " is larger than input sample size " + sampleSize);
+		}
 
         samples.sort(Comparator.comparingDouble(Double::doubleValue).reversed());
 

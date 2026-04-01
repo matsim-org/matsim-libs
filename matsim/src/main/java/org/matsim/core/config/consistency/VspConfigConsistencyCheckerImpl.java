@@ -179,6 +179,20 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log(lvl, "timeAllocationMutator is affecting duration; vsp default is to not do that.  Reason is that the upstream demand generation uses activityEndTimes " +
 				"for long activity types and duration for short activity types.  However, for a short activity of, say, 10min, a mutation of plus/minus the time mutation range leads to problems.");
 		}
+		// added feb'26
+		if ( config.timeAllocationMutator().isMutateAroundInitialEndTimeOnly() ) {
+			System.out.flush();
+			log.log(lvl, "timeAllocationMutator mutates around the initial end time only; vsp default is to not do that.  Reason is that mutating around the initial end time " +
+							 "destroys the economic interpretation of MATSim ... since travellers who stop adjusting because of this switch are no longer driven by the scoring function, " +
+							 "but by the computational process.");
+			problem = true;
+		}
+		// added feb'26
+		if ( config.timeAllocationMutator().getLatestActivityEndTime() < 27. * 3600 ) {
+			System.out.flush();
+			log.log( lvl, "The latest activity end time of the timeAllocationMutator is too early.  It should be infinity, but since that setting is not possible, it should " +
+							  "minimally be the last time step of the qsim.");
+		}
 		return problem;
 	}
 
@@ -387,7 +401,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				case relative:
 					break;
 				case uniform:
-//				problem = true ;
+				problem = true ;
 					log.log(lvl, "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should use `relative'. ");
 					break;
 				default:
@@ -426,7 +440,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			System.out.flush();
 			log.log(lvl, "You are not setting fractionOfIterationsToStartScoreMSA; vsp default is to set this to something like 0.8.  " +
 				"This means you have to add the following lines to your config file: ");
-			log.log(lvl, "<module name=\"planCalcScore\">");
+			log.log(lvl, "<module name=\"" + ScoringConfigGroup.GROUP_NAME + "\">");
 			log.log(lvl, "	<param name=\"fractionOfIterationsToStartScoreMSA\" value=\"0.8\" />");
 			log.log(lvl, "</module>");
 		}
@@ -522,6 +536,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			problem = true;
 			System.out.flush();
 			log.log(lvl, "found writePlansInterval==0.  vsp default is to write plans at least once (for simwrapper).");
+			// Aren't they written in the last iteration anyways?  Or does this need plans in iteration 0?  kai, nov'25
 		}
 
 		if (config.controller().getWriteTripsInterval() <= 0) {

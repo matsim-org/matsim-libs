@@ -61,8 +61,16 @@ public final class OsmRailwayReader extends SupersonicOsmNetworkReader {
 			link.getAttributes().putAttribute(OsmTags.ELECTRIFIED, tags.get(OsmTags.ELECTRIFIED));
 		}
 
+		if (tags.containsKey(OsmTags.PROPOSED + OsmTags.ELECTRIFIED)) {
+			link.getAttributes().putAttribute(OsmTags.PROPOSED + OsmTags.ELECTRIFIED, tags.get(OsmTags.PROPOSED + OsmTags.ELECTRIFIED));
+		}
+
 		if (tags.containsKey(OsmTags.VOLTAGE)) {
 			link.getAttributes().putAttribute(OsmTags.VOLTAGE, tags.get(OsmTags.VOLTAGE));
+		}
+
+		if (tags.containsKey(OsmTags.PROPOSED + OsmTags.VOLTAGE)) {
+			link.getAttributes().putAttribute(OsmTags.PROPOSED + OsmTags.VOLTAGE, tags.get(OsmTags.PROPOSED + OsmTags.VOLTAGE));
 		}
 
 		if (tags.containsKey(OsmTags.MAXSPEED)) {
@@ -73,6 +81,14 @@ public final class OsmRailwayReader extends SupersonicOsmNetworkReader {
 
 		if (tags.containsKey(OsmTags.ETCS)) {
 			link.getAttributes().putAttribute(OsmTags.ETCS, tags.get(OsmTags.ETCS));
+		}
+
+		if (tags.containsKey(OsmTags.RAILWAY_TRACK_CLASS)) {
+			link.getAttributes().putAttribute(OsmTags.RAILWAY_TRACK_CLASS, tags.get(OsmTags.RAILWAY_TRACK_CLASS));
+		}
+
+		if (tags.containsKey(OsmTags.RAILWAY_TRAFFIC_MODE)) {
+			link.getAttributes().putAttribute(OsmTags.RAILWAY_TRAFFIC_MODE, tags.get(OsmTags.RAILWAY_TRAFFIC_MODE));
 		}
 
 		if (tags.containsKey(OsmTags.OPERATOR)) {

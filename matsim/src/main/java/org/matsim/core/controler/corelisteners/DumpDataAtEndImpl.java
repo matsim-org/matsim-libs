@@ -30,9 +30,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -52,6 +53,7 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.lanes.Lanes;
 import org.matsim.lanes.LanesWriter;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -340,8 +342,28 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpConfig() {
 		// dump config
+
+		// the standard config which contains the input files:
 		new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.config, ControllerConfigGroup.CompressionType.none));
 		new ConfigWriter(this.config, ConfigWriter.Verbosity.minimal).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.configReduced, ControllerConfigGroup.CompressionType.none));
+
+//		// replacing the input with the output files and writing that to an "output_config" file:
+//		Config outputConfig = ConfigUtils.createConfig();
+//		for( Map.Entry<String, ConfigGroup> entry : this.config.getModules().entrySet() ){
+//			ConfigUtils.copyFromTo( entry.getValue(), outputConfig.getModules().get( entry.getKey() ) );
+//		}
+//		ConfigUtils.addOrGetModule( outputConfig, NetworkConfigGroup.class ).setInputFile( Controler.DefaultFiles.network.getFilename() );
+//		ConfigUtils.addOrGetModule( outputConfig, NetworkConfigGroup.class ).setLaneDefinitionsFile( Controler.DefaultFiles.lanes.getFilename() );
+//		ConfigUtils.addOrGetModule( outputConfig, NetworkConfigGroup.class ).setChangeEventsInputFile( Controler.DefaultFiles.changeEvents.getFilename() );
+//		ConfigUtils.addOrGetModule( outputConfig, PlansConfigGroup.class ).setInputFile( Controler.DefaultFiles.population.getFilename() );
+//		ConfigUtils.addOrGetModule( outputConfig, CountsConfigGroup.class ).setInputFile( Controler.DefaultFiles.counts.getFilename() );
+//		ConfigUtils.addOrGetModule( outputConfig, HouseholdsConfigGroup.class ).setInputFile( Controler.DefaultFiles.households.getFilename() );
+//		ConfigUtils.addOrGetModule( outputConfig, VehiclesConfigGroup.class ).setVehiclesFile( Controler.DefaultFiles.vehicles.getFilename() );
+//		ConfigUtils.addOrGetModule( outputConfig, TransitConfigGroup.class ).setTransitScheduleFile( Controler.DefaultFiles.transitSchedule.getFilename() );
+//		ConfigUtils.addOrGetModule( outputConfig, TransitConfigGroup.class ).setVehiclesFile( Controler.DefaultFiles.transitVehicles.getFilename() );
+//
+//		new ConfigWriter(outputConfig).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.config, ControllerConfigGroup.CompressionType.none));
+//		new ConfigWriter(outputConfig, ConfigWriter.Verbosity.minimal).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.configReduced, ControllerConfigGroup.CompressionType.none));
 	}
 
 	private void dumpNetwork() {

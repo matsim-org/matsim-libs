@@ -24,9 +24,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
-import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
-import org.matsim.dsim.simulation.SimStepMessaging;
+import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.dsim.simulation.SimpleVehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -50,16 +49,16 @@ class NetworkTrafficEngineTest {
 		var timeInterpretation = TimeInterpretation.create(scenario.getConfig());
 		var wait2link = new DefaultWait2Link(eventsManager);
 		var activeNodes = new ActiveNodes(eventsManager);
-		var activeLinks = new ActiveLinks(mock(SimStepMessaging.class));
+		var activeLinks = new ActiveLinks();
+		var partitionTransfer = mock(PartitionTransfer.class);
 		var parkedVehicles = new MassConservingParking();
-		var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes);
+		var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes, partitionTransfer);
 		var config = new DSimConfigGroup();
 		var asc = mock(AgentSourcesContainer.class);
 		var networkDepartureHandler = new NetworkTrafficDepartureHandler(simNetwork, config, parkedVehicles, wait2link, eventsManager);
-		var sdc = mock(BackpackDataCollector.class);
 
 		var engine = new NetworkTrafficEngine(asc, simNetwork,
-			activeNodes, activeLinks, parkedVehicles, wait2link, eventsManager, sdc);
+			activeNodes, activeLinks, parkedVehicles, wait2link, eventsManager);
 
 		var timer = mock(MobsimTimer.class);
 
@@ -70,7 +69,7 @@ class NetworkTrafficEngineTest {
 		SimpleVehicle vehicle = TestUtils.createVehicle("person", 1.0, 10);
 		vehicle.setDriver(agent);
 		agent.setVehicle(vehicle);
-		engine.onPrepareSim();
+		engine.beforeMobsim();
 
 		engine.addParkedVehicle(vehicle, agent.getCurrentLinkId());
 
@@ -116,9 +115,8 @@ class NetworkTrafficEngineTest {
 		var wait2Link = mock(Wait2Link.class);
 		var simNetwork = mock(SimNetwork.class);
 		var eventsManager = mock(EventsManager.class);
-		var sdc = mock(BackpackDataCollector.class);
 		var engine = new NetworkTrafficEngine(mock(AgentSourcesContainer.class), simNetwork, mock(ActiveNodes.class),
-			mock(ActiveLinks.class), mock(ParkedVehicles.class), wait2Link, eventsManager, sdc);
+			mock(ActiveLinks.class), mock(ParkedVehicles.class), wait2Link, eventsManager);
 
 		var link1 = mock(SimLink.class);
 		var linkId1 = Id.createLinkId("l1");
@@ -146,9 +144,9 @@ class NetworkTrafficEngineTest {
 		when(link1.removeAllVehicles()).thenReturn(List.of(vehicle1));
 		when(link2.removeAllVehicles()).thenReturn(List.of(vehicle2));
 
-		engine.afterSim();
+		engine.afterMobsim();
 
-		verify(wait2Link, times(1)).afterSim();
+		verify(wait2Link, times(1)).afterMobsim();
 		verify(eventsManager, times(2)).processEvent(any(PersonStuckEvent.class));
 		verify(eventsManager).processEvent(argThat(event -> event instanceof PersonStuckEvent e && e.getPersonId().equals(Id.createPersonId("p1"))));
 		verify(eventsManager).processEvent(argThat(event -> event instanceof PersonStuckEvent e && e.getPersonId().equals(Id.createPersonId("p2"))));

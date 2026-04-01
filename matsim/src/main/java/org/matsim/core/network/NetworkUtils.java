@@ -664,6 +664,9 @@ public final class NetworkUtils {
 		}
 	}
 
+	/**
+	 * See {@link #getHighwayType(Link)}.
+	 */
 	public static String getType(Link link) {
 //		if ( link instanceof LinkImpl ) {
 //			return ((LinkImpl)link).getType2() ;
@@ -676,6 +679,11 @@ public final class NetworkUtils {
 	/**
 	 * Returns the road type of a highway link. In OSM highway links contain links for car traffic.
 	 * If not set this method will return "unclassified".
+	 * <br>
+	 * We are speculating the following: At some point, matsim network generation takes a detour via a SUMO network.  And SUMO
+	 * seems to use "highway.[osmTag]".  Since matsim is used to have this without "highway.", the present method removes that.
+	 * At the same time, CR evidently decided to return an explicit "unclassified" instead of null or an empty string.
+	 * kai/daniel/simon/domink/gregorR/simon, mar'26
 	 */
 	public static String getHighwayType(Link link) {
 

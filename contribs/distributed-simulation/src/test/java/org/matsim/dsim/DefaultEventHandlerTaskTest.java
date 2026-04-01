@@ -25,12 +25,13 @@ import static org.mockito.Mockito.when;
 
 class DefaultEventHandlerTaskTest {
 
+	private static final SerializationProvider serializer = new SerializationProvider();
+
 	@Test
 	public void syncTimeStep() {
 
 		var handler1 = new TestEventHandler();
 		var handler2 = new TestEventHandler();
-		var serializationProvider = new SerializationProvider();
 		var computeNode = ComputeNode.builder()
 			.rank(0)
 			.parts(IntList.of(0, 1))
@@ -40,14 +41,14 @@ class DefaultEventHandlerTaskTest {
 			.computeNodes(List.of(computeNode))
 			.totalPartitions(2)
 			.build();
-		MessageBroker broker = new MessageBroker(new NullCommunicator(), topology);
+		MessageBroker broker = new MessageBroker(new NullCommunicator(), topology, serializer);
 		var em = mock(DistributedEventsManager.class);
 		when(em.getComputeNode()).thenReturn(computeNode);
 
-		var task1 = new DefaultEventHandlerTask(handler1, 0, 2, em, serializationProvider, null);
+		var task1 = new DefaultEventHandlerTask(handler1, 0, 2, em, serializer, null);
 		task1.setBroker(broker);
 		broker.register(task1, 0);
-		var task2 = new DefaultEventHandlerTask(handler2, 1, 2, em, serializationProvider, null);
+		var task2 = new DefaultEventHandlerTask(handler2, 1, 2, em, serializer, null);
 		task2.setBroker(broker);
 		broker.register(task2, 1);
 
@@ -90,7 +91,6 @@ class DefaultEventHandlerTaskTest {
 
 		var handler1 = new TestEventHandler();
 		var handler2 = new TestEventHandler();
-		var serializationProvider = new SerializationProvider();
 		var computeNode = ComputeNode.builder()
 			.rank(0)
 			.parts(IntList.of(0, 1))
@@ -100,14 +100,14 @@ class DefaultEventHandlerTaskTest {
 			.computeNodes(List.of(computeNode))
 			.totalPartitions(2)
 			.build();
-		MessageBroker broker = new MessageBroker(new NullCommunicator(), topology);
+		MessageBroker broker = new MessageBroker(new NullCommunicator(), topology, serializer);
 		var em = mock(DistributedEventsManager.class);
 		when(em.getComputeNode()).thenReturn(computeNode);
 
-		var task1 = new DefaultEventHandlerTask(handler1, 0, 2, em, serializationProvider, null);
+		var task1 = new DefaultEventHandlerTask(handler1, 0, 2, em, serializer, null);
 		task1.setBroker(broker);
 		broker.register(task1, 0);
-		var task2 = new DefaultEventHandlerTask(handler2, 1, 2, em, serializationProvider, null);
+		var task2 = new DefaultEventHandlerTask(handler2, 1, 2, em, serializer, null);
 		task2.setBroker(broker);
 		broker.register(task2, 1);
 

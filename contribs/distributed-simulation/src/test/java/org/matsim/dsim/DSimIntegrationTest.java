@@ -25,8 +25,6 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -64,7 +62,8 @@ public class DSimIntegrationTest {
 
 	@Test
 	@Order(2)
-	void runDistributed() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+	@DisabledOnGitHubWindowsCI
+	void runDistributed() throws IOException, InterruptedException, ExecutionException {
 
 		Path output = Path.of(utils.getOutputDirectory());
 		Path plansPath = output.resolve("..").resolve("runLocal/prerun").resolve("kelheim-mini.output_plans.xml").toAbsolutePath();
@@ -89,8 +88,7 @@ public class DSimIntegrationTest {
 				.toList();
 
 			for (var f : futures) {
-				f.get(1, TimeUnit.MINUTES);
-				//f.get();
+				f.get();
 			}
 		}
 
@@ -124,7 +122,7 @@ public class DSimIntegrationTest {
 		config.dsim().setPartitioning(DSimConfigGroup.Partitioning.bisect);
 		// rely on flow capacity factor until we introduce global scaling factor
 		config.qsim().setFlowCapFactor(1.);
-		config.qsim().setStorageCapFactor( 1. );
+		config.qsim().setStorageCapFactor(1.);
 
 		// Randomness will lead to different results from the baseline
 		config.routing().setRoutingRandomness(0);

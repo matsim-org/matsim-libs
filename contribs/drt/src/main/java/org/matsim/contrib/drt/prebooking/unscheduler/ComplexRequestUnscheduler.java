@@ -122,9 +122,13 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 		if (pickupReplacement != null && dropoffReplacement != null) {
 			if (pickupReplacement.endTask.getTaskIdx() >= dropoffReplacement.startTask.getTaskIdx()) {
 				// we have an overlap
-				pickupReplacement = new Replacement(pickupReplacement.startTask, dropoffReplacement.endTask,
-						vehicle.getSchedule());
-				dropoffReplacement = null;
+				if(pickupReplacement.endTask instanceof DrtStopTask && pickupReplacement.endTask.equals(dropoffReplacement.startTask)) {
+					// do not jump over stop task
+				} else {
+					pickupReplacement = new Replacement(pickupReplacement.startTask, dropoffReplacement.endTask,
+							vehicle.getSchedule());
+					dropoffReplacement = null;
+				}
 			}
 		}
 
@@ -197,6 +201,10 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 		// remove everything between the two indicated tasks
 		while (replacement.startTask.getTaskIdx() + 1 != replacement.endTask.getTaskIdx()) {
 			Task removeTask = schedule.getTasks().get(replacement.startTask.getTaskIdx() + 1);
+			if(removeTask instanceof DrtStopTask stopTask) {
+				Verify.verify(stopTask.getPickupRequests().isEmpty());
+				Verify.verify(stopTask.getDropoffRequests().isEmpty());
+			}
 			schedule.removeTask(removeTask);
 		}
 

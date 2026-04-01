@@ -22,6 +22,7 @@ package org.matsim.core.controler.corelisteners;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.router.TripRouterModule;
@@ -49,6 +50,7 @@ public class PlansDumpingIT {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(3);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		ScoringConfigGroup.ModeParams walkParams = new ScoringConfigGroup.ModeParams("walk");
 		walkParams.setMarginalUtilityOfTraveling(0);
@@ -78,6 +80,7 @@ public class PlansDumpingIT {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(0);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		ScoringConfigGroup.ModeParams walkParams = new ScoringConfigGroup.ModeParams("walk");
 		walkParams.setMarginalUtilityOfTraveling(0);
@@ -107,6 +110,7 @@ public class PlansDumpingIT {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(1);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		ScoringConfigGroup.ModeParams walkParams = new ScoringConfigGroup.ModeParams("walk");
 		walkParams.setMarginalUtilityOfTraveling(0);
