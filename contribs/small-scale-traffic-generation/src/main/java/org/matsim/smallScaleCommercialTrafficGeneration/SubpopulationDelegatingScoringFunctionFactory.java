@@ -1,5 +1,6 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -17,8 +18,8 @@ public class SubpopulationDelegatingScoringFunctionFactory implements ScoringFun
 	private final ScoringFunctionFactory defaultFactory;
 	private final Map<String, ScoringFunctionFactory> factoriesBySubpopulation;
 
-	public SubpopulationDelegatingScoringFunctionFactory(ScoringFunctionFactory defaultFactory,
-														 Map<String, ScoringFunctionFactory> factoriesBySubpopulation) {
+	@Inject SubpopulationDelegatingScoringFunctionFactory( ScoringFunctionFactory defaultFactory,
+														   Map<String, ScoringFunctionFactory> factoriesBySubpopulation ) {
 		this.defaultFactory = Objects.requireNonNull(defaultFactory, "defaultFactory must not be null");
 		Objects.requireNonNull(factoriesBySubpopulation, "factoriesBySubpopulation must not be null");
 
