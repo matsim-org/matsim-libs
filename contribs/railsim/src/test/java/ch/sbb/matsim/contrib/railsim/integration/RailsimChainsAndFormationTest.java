@@ -31,11 +31,13 @@ public class RailsimChainsAndFormationTest extends AbstractIntegrationTest {
 		Assertions.assertThat(result.getEvents())
 			.contains(new PersonContinuesInVehicleEvent(
 				32580, Id.createPersonId("person1"), Id.createVehicleId("351761_1"),
-				Id.createVehicleId("351761_1"), Id.create("f15", TransitStopFacility.class)))
+				Id.createVehicleId("351761_1"), Id.create("f15", TransitStopFacility.class), Id.create("l115", TransitLine.class),
+				Id.create("r116", TransitRoute.class)))
 			.contains(new PersonContinuesInVehicleEvent(
 				36720, Id.createPersonId("person2"),
 				Id.createVehicleId("351889_1"), Id.createVehicleId("351889_1"),
-				Id.create("f74", TransitStopFacility.class)))
+				Id.create("f74", TransitStopFacility.class), Id.create("l120", TransitLine.class),
+				Id.create("r128", TransitRoute.class)))
 			.contains(new ActivityStartEvent(77060, Id.createPersonId("person1"), Id.createLinkId("15m_8x41a_pt"),
 				null, "home", new Coord(679623, 5811182)))
 			.contains(new ActivityStartEvent(71308, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"),
