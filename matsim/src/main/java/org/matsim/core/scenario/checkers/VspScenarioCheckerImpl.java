@@ -119,10 +119,12 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 		final TimeTracker timeTracker = new TimeTracker(TimeInterpretation.create(scenario.getConfig()));
 		double violationCnt = 0.;
 		for (Person person : scenario.getPopulation().getPersons().values()) {
+			String subpopulation = PopulationUtils.getSubpopulation(person);
 			counter.incCounter();
 			timeTracker.setTime(0.);
 			for (Activity activity : TripStructureUtils.getActivities(person.getSelectedPlan(), ExcludeStageActivities)) {
-				ScoringConfigGroup.ActivityParams actParams = scenario.getConfig().scoring().getActivityParams(activity.getType());
+				ScoringConfigGroup.ActivityParams actParams = scenario.getConfig().scoring().getScoringParameters(subpopulation).getActivityParams(
+					activity.getType());
 
 				if (actParams.getClosingTime().isDefined()) {
 					if (actParams.getClosingTime().seconds() < timeTracker.getTime().seconds()) {
