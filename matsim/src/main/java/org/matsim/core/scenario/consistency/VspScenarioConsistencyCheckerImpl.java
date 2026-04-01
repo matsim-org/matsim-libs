@@ -27,10 +27,15 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
+
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
@@ -55,6 +60,8 @@ public final class VspScenarioConsistencyCheckerImpl implements ScenarioConsiste
 		log.info("running checkConsistency of scenario before run ...");
 
 		boolean problem = false; // ini
+
+		problem = checkSubpopulations(scenario, lvl, problem);
 
 		if (problem && scenario.getConfig().vspExperimental().getVspDefaultsCheckingLevel() == VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort) {
 			String str = "found a situation that leads to vsp-abort.  aborting ...";
@@ -83,7 +90,32 @@ public final class VspScenarioConsistencyCheckerImpl implements ScenarioConsiste
 		checkActivitiesOpeningTime(scenario, lvl);
 	}
 
-	static void checkActivitiesOpeningTime(Scenario scenario, Level lvl) {
+
+	private boolean checkSubpopulations(Scenario scenario, Level lvl, boolean problem) {
+
+		if (scenario.getPopulation().getPersons().values().stream().anyMatch(p -> PopulationUtils.getSubpopulation(p) == null)) {
+			log.log(lvl, "found person(s) without subpopulation.  The vsp default is, to set subpopulations for all agents.  Please check your population file and add subpopulation information to all persons.");
+			problem = true;
+		}
+
+		Set<String> subpopulations = scenario.getPopulation().getPersons().values().stream()
+			.map(PopulationUtils::getSubpopulation)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toSet());
+
+		// check if there are corresponding scoring params for all subpopulations.
+		for (String subpopulation : subpopulations) {
+			if (!scenario.getConfig().scoring().getScoringParametersPerSubpopulation().containsKey(subpopulation)) {
+				log.log(lvl,
+					"Found subpopulation '{}' but no corresponding scoring parameters. Please add scoring parameters for this subpopulation.",
+					subpopulation);
+				problem = true;
+			}
+		}
+		return problem;
+	}
+
+	private void checkActivitiesOpeningTime(Scenario scenario, Level lvl) {
 		log.info("start checking if activities are roughly within opening times ...");
 		Counter counter = new Counter("# person ");
 		final TimeTracker timeTracker = new TimeTracker(TimeInterpretation.create(scenario.getConfig()));
