@@ -530,6 +530,10 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		return params != null ? params : getScoringParametersPerSubpopulation().get(null);
 	}
 
+	/**
+	 * Returns the explicitly configured scoring parameter set for the given subpopulation,
+	 * creating one if necessary.
+	 */
 	public ScoringParameterSet getOrCreateScoringParameters(String subpopulation) {
 		ScoringParameterSet params = getScoringParametersPerSubpopulation().get(subpopulation);
 
