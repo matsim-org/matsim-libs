@@ -12,7 +12,7 @@
 	<name>vsp</name>
 
 	<properties>
-		<javafx.version>25.0.2</javafx.version>
+		<javafx.version>26</javafx.version>
 	</properties>
 
 	<repositories>
@@ -315,7 +315,6 @@
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
-			<version>4.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -330,7 +329,7 @@
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>26.0.2-1</version>
+			<version>26.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>tech.tablesaw</groupId>

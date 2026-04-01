@@ -33,4 +33,21 @@ public class CommandRunnerTest {
 				.isDirectoryContaining(p -> p.getFileName().toString().equals("out.xml"))
 				.isDirectoryContaining(p -> p.getFileName().toString().equals("processed.csv"));
 	}
+
+	@Test
+	void getArgs() {
+		CommandRunner runner = new CommandRunner();
+
+		Assertions.assertThat(runner.getArgs(TestOtherAnalysis.class)).isEmpty();
+
+		runner.add(TestOtherAnalysis.class, "--option", "1");
+		Assertions.assertThat(runner.getArgs(TestOtherAnalysis.class)).containsExactly("--option", "1");
+
+		String[] args = runner.getArgs(TestOtherAnalysis.class);
+		args[0] = "--changed";
+		Assertions.assertThat(runner.getArgs(TestOtherAnalysis.class)).containsExactly("--option", "1");
+
+		runner.insertArgs(TestOtherAnalysis.class, "--foo", "bar");
+		Assertions.assertThat(runner.getArgs(TestOtherAnalysis.class)).containsExactly("--foo", "bar", "--option", "1");
+	}
 }

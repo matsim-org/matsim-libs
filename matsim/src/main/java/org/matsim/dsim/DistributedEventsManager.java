@@ -169,7 +169,7 @@ public final class DistributedEventsManager implements EventsManager {
 		for (int part : computeNode.getParts()) {
 			var nextHandler = (part == computeNode.getParts().getInt(0)) ? firstHandler : provider.get();
 			if (handler == nextHandler) {
-				throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
+				throw new IllegalStateException("The provider for " + handler.getName() + " event handler must return a new instance of the handler or PARTITION_SINGLETON must be set.");
 			}
 			handler = nextHandler;
 			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), null);
@@ -197,6 +197,7 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	private void addTaskForPart(EventHandlerTask task, int part) {
+
 		for (var type : task.getSupportedMessages()) {
 			if (!serializer.hasType(type)) {
 				log.warn("No serializer for type {} from task {}", type, task.getName());
@@ -329,18 +330,17 @@ public final class DistributedEventsManager implements EventsManager {
 			return;
 		}
 
-		// Need to process two times, for handlers that registered for ANY_TYPE
-		boolean sent = processInternal(e, e.getType(), false);
-		processInternal(e, Event.ANY_TYPE, sent);
+		processInternal(e, e.getType());
 	}
 
 	/**
 	 * Return whether event was queued for remote sending.
 	 */
-	private boolean processInternal(Event e, int type, boolean alreadySent) {
-		// Send to all local tasks
-		long address = MessageBroker.address(ctxPartition.get().get(), type);
+	private void processInternal(Event e, int type) {
 
+		var address = MessageBroker.address(ctxPartition.get().get(), type);
+
+		// send to local listeners.
 		List<Consumer<Message>> direct = directListener.get(address);
 		if (direct != null)
 			direct.forEach(c -> c.accept(e));
@@ -350,12 +350,9 @@ public final class DistributedEventsManager implements EventsManager {
 			listener.forEach(t -> t.add(e));
 
 		// Send the event remotely
-		if (!alreadySent && remoteListener.containsKey(type)) {
+		if (remoteListener.containsKey(type)) {
 			remoteEvents.get(remoteListener.get(type)).add(e);
-			return true;
 		}
-
-		return false;
 	}
 
 	@Override
@@ -410,11 +407,11 @@ public final class DistributedEventsManager implements EventsManager {
 					broker.send(e, receiver);
 				}
 
-				broker.addNullMessage(receiver);
+				broker.syncToRank(receiver);
 			}
 
 			if (!waitFor.isEmpty()) {
-				waitFor.forEach(broker::addWaitForRank);
+				waitFor.forEach(broker::syncFromRank);
 			}
 
 			lastSync = time;

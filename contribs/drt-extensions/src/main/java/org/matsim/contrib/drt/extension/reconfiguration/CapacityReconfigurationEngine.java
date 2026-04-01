@@ -1,18 +1,11 @@
 package org.matsim.contrib.drt.extension.reconfiguration;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
+import com.google.common.base.Verify;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.reconfiguration.logic.CapacityReconfigurationLogic;
 import org.matsim.contrib.drt.extension.reconfiguration.logic.DefaultCapacityReconfigurationLogic;
-import org.matsim.contrib.drt.schedule.DefaultDrtCapacityChangeTask;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
+import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
@@ -27,7 +20,9 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.common.base.Verify;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This {@link MobsimEngine} allows to plan the capacity change activities of
@@ -50,8 +45,8 @@ public class CapacityReconfigurationEngine implements MobsimEngine {
 	private final double reconfigurationDuration;
 
 	public CapacityReconfigurationEngine(Fleet fleet, Network network, TravelDisutility travelDisutility,
-			TravelTime travelTime, CapacityReconfigurationLogic logic,
-			double reconfigurationDuration) {
+										 TravelTime travelTime, CapacityReconfigurationLogic logic,
+										 double reconfigurationDuration) {
 		this.fleet = fleet;
 		this.travelTime = travelTime;
 		this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
@@ -61,7 +56,7 @@ public class CapacityReconfigurationEngine implements MobsimEngine {
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeMobsim() {
 		for (DvrpVehicle vehicle : fleet.getVehicles().values()) {
 			Optional<DvrpLoad> updatedLoad = logic.getUpdatedStartCapacity(vehicle);
 
@@ -75,7 +70,7 @@ public class CapacityReconfigurationEngine implements MobsimEngine {
 
 	private void insertReconfigurationTasks(DvrpVehicle vehicle) {
 		List<DefaultCapacityReconfigurationLogic.ReconfigurationItem> items = this.logic
-				.getCapacityUpdates(vehicle);
+			.getCapacityUpdates(vehicle);
 
 		if (items.isEmpty()) {
 			return;
@@ -99,23 +94,23 @@ public class CapacityReconfigurationEngine implements MobsimEngine {
 			Link link = Objects.requireNonNull(network.getLinks().get(capacityChangeItem.linkId()));
 
 			VrpPathWithTravelData driveToCapacityChangeData = VrpPaths.calcAndCreatePath(previousLink, link,
-					currentTime, router, travelTime);
+				currentTime, router, travelTime);
 			DrtDriveTask drtDriveTask = new DrtDriveTask(driveToCapacityChangeData, taskType);
 
 			double capacityChangeBeginTime = Math.max(capacityChangeItem.time(),
-					driveToCapacityChangeData.getArrivalTime());
+				driveToCapacityChangeData.getArrivalTime());
 
 			Task stayBeforeCapacityChangeTask = null;
 			if (driveToCapacityChangeData.getArrivalTime() < capacityChangeItem.time()) {
 				// We are already arriving before, we need to insert a stay before the capacity
 				// change
 				stayBeforeCapacityChangeTask = new DrtStayTask(driveToCapacityChangeData.getArrivalTime(),
-						capacityChangeItem.time(), link);
+					capacityChangeItem.time(), link);
 			}
 
 			// Then we insert a capacity change with duration = this.reconfigurationDuration
 			Task capacityChangeTask = new DefaultDrtCapacityChangeTask(capacityChangeBeginTime,
-					capacityChangeBeginTime + this.reconfigurationDuration, link, capacityChangeItem.capacity());
+				capacityChangeBeginTime + this.reconfigurationDuration, link, capacityChangeItem.capacity());
 
 			schedule.addTask(drtDriveTask);
 			if (stayBeforeCapacityChangeTask != null) {
@@ -131,11 +126,6 @@ public class CapacityReconfigurationEngine implements MobsimEngine {
 
 	@Override
 	public void doSimStep(double time) {
-
-	}
-
-	@Override
-	public void afterSim() {
 
 	}
 

@@ -258,7 +258,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				modeToVehicle.put(mode, vehicleId);
 			}
 
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, modeToVehicle);
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, modeToVehicle );
 		}
 	}
 

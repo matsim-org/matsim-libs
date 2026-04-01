@@ -104,8 +104,10 @@ public class SwissRailRaptorCore {
         this.bestArrivalCost = Double.POSITIVE_INFINITY;
     }
 
-    public RaptorRoute calcLeastCostRoute(double depTime, Facility fromFacility, Facility toFacility, List<InitialStop> accessStops, List<InitialStop> egressStops, RaptorParameters parameters, Person person) {
-        final int maxTransfers = 20; // sensible defaults, could be made configurable if there is a need for it.
+	// This function uses the above defined arrays to keep track of the best route. It minimizes the travel cost. For each request, all the internal
+	// state is reset. paul, feb '26.
+	public RaptorRoute calcLeastCostRoute(double depTime, Facility fromFacility, Facility toFacility, List<InitialStop> accessStops, List<InitialStop> egressStops, RaptorParameters parameters, Person person) {
+		final int maxTransfers = 20; // sensible defaults, could be made configurable if there is a need for it.
         final int maxTransfersAfterFirstArrival = 2;
 
         reset();
@@ -681,6 +683,7 @@ public class SwissRailRaptorCore {
         }
     }
 
+	// Among others, this function updates the least cost arrival paths to route stops if the total costs to a route stop is smaller than before. paul, feb'26
 	private int exploreRoute(RaptorParameters parameters, Person person, CachingTransferProvider transferProvider,
 							  int currentDepartureIndex, RRouteStop firstRouteStop, int agentFirstArrivalTime,
 							  PathElement boardingPE, RRoute route, int tmpRouteIndex,
@@ -746,6 +749,7 @@ public class SwissRailRaptorCore {
 				new PathElement(boardingPE, toRouteStop, firstDepartureTime, currentAgentBoardingTime, currentDepartureTime + firstRouteStop.departureOffset, arrivalTime, arrivalTravelCost, arrivalTransferCost, distance, boardingPE.transferCount, false, false, null, null) :
 				null;
 
+			// update the arrival information if we found a better connection, paul, feb'26
 			if (totalArrivalCost <= previousArrivalCost) {
 				this.arrivalPathPerRouteStop[toRouteStopIndex] = lastPE;
 				this.leastArrivalCostAtRouteStop[toRouteStopIndex] = totalArrivalCost;
@@ -959,6 +963,8 @@ public class SwissRailRaptorCore {
 		for (Map.Entry<TransitStopFacility, InitialStop> e : destinationStops.entrySet()) {
             TransitStopFacility stop = e.getKey();
             int stopIndex = this.data.stopFacilityIndices.get(stop);
+
+			// this is set, if the raptor has already found a route to this stop (with fewer transfers).
             PathElement pe = this.arrivalPathPerStop[stopIndex];
 			if (pe!=null) {
 					InitialStop egressStop = e.getValue();

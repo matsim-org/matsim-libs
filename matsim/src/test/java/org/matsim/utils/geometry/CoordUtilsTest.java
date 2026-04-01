@@ -87,4 +87,40 @@ public class CoordUtilsTest {
 		double result = CoordUtils.length( coord1 ) ;
 		Assertions.assertEquals( Math.sqrt( 9. + 4. ), result, delta) ;
 	}
+
+	@Test
+	void testInterpolate() {
+		Coord coord1 = new Coord(1., 2.);
+		Coord coord2 = new Coord(3., 5.);
+		Coord result = CoordUtils.interpolate(coord1, coord2, 0.5);
+		Assertions.assertEquals(2., result.getX(), delta);
+		Assertions.assertEquals(3.5, result.getY(), delta);
+	}
+
+	@Test
+	void testInterpolateReverseOrder() {
+		Coord coord1 = new Coord(1., 2.);
+		Coord coord2 = new Coord(3., 5.);
+		Coord result = CoordUtils.interpolate(coord2, coord1, 0.5);
+		Assertions.assertEquals(2., result.getX(), delta);
+		Assertions.assertEquals(3.5, result.getY(), delta);
+	}
+
+	@Test
+	void testInterpolate1() {
+		Coord coord1 = new Coord(-1., -2.);
+		Coord coord2 = new Coord(3., 5.);
+		Coord result = CoordUtils.interpolate(coord1, coord2, 0.5);
+		Assertions.assertEquals(1., result.getX(), delta);
+		Assertions.assertEquals(1.5, result.getY(), delta);
+	}
+
+	@Test
+	void testInterpolate1ReverseOrder() {
+		Coord coord1 = new Coord(-1., -2.);
+		Coord coord2 = new Coord(3., 5.);
+		Coord result = CoordUtils.interpolate(coord2, coord1, 0.5);
+		Assertions.assertEquals(1., result.getX(), delta);
+		Assertions.assertEquals(1.5, result.getY(), delta);
+	}
 }

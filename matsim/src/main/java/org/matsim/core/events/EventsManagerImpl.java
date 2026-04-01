@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,7 +67,7 @@ public final class EventsManagerImpl implements EventsManager {
 	static private class HandlerData {
 
 		protected Class<? extends Event> eventClass;
-		protected ArrayList<EventHandler> handlerList = new ArrayList<EventHandler>(5);
+		protected List<EventHandler> handlerList = new CopyOnWriteArrayList<>();
 		protected Method method;
 
 		protected HandlerData(final Class<? extends Event> eventClass, final Method method) {

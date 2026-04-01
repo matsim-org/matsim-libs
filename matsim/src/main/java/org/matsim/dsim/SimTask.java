@@ -54,7 +54,7 @@ public sealed interface SimTask extends Runnable permits LPTask, EventHandlerTas
 	/**
 	 * Wait for messages from other ranks.
 	 */
-	IntSet waitForOtherRanks(double time);
+	IntSet waitForOtherParts(double time);
 
 	/**
 	 * Set the current simulation time.

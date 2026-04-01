@@ -4,10 +4,9 @@ import org.matsim.application.analysis.impact.ImpactAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.viz.Table;
 import org.matsim.simwrapper.viz.TextBlock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +29,7 @@ public class ImpactAnalysisDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Impact Analysis";
 		header.description = "Impact overview of the MATSim run.";
