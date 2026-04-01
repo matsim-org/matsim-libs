@@ -1,4 +1,4 @@
-package org.matsim.smallScaleCommercialTrafficGeneration;
+package org.matsim.core.scoring.functions;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.*;
+import org.matsim.smallScaleCommercialTrafficGeneration.VehicleTypeBasedLegScoring;
 
 /**
  * Standard Charypar-Nagel scoring, but with a leg scoring component that can resolve
