@@ -71,7 +71,7 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 				table.stringColumn( PERSON_ID ).append( person.getId().toString() );
 				table.doubleColumn( SCORE).append( person.getSelectedPlan().getScore() );
 
-				AgentWiseComparisonKNUtils.processMUoM( isBaseTable, person, table );
+				AgentWiseComparisonKNUtils.processMUoM( person, table );
 
 				// per trip:
 				table.intColumn( TRIP_IDX ).append( trips.indexOf( trip ) );

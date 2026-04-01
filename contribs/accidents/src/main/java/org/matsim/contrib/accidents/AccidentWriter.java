@@ -113,7 +113,8 @@ class AccidentWriter {
 			double accidentCostsPerDay_BVWP = 0.0;
 			double accidentCostsPerYear_BVWP = 0.0;
 
-			String linkComputationMethod = (String) scenario.getNetwork().getLinks().get(info.getLinkId()).getAttributes().getAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName());
+			String linkComputationMethod = (String) scenario.getNetwork().getLinks().get(info.getLinkId()).getAttributes().getAttribute(
+				"accidentsComputationMethod" );
 
 			try {
 				if (linkComputationMethod.equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
