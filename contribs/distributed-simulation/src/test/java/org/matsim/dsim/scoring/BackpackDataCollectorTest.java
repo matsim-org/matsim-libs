@@ -13,8 +13,6 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.dsim.SimStepMessage;
-import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.PersonEntersPtVehicleEvent;
 import org.matsim.core.mobsim.qsim.pt.PersonLeavesPtVehicleEvent;
@@ -26,7 +24,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
-import org.matsim.dsim.simulation.SimStepMessaging;
+import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -57,7 +55,7 @@ class BackpackDataCollectorTest {
 		var distAggent = mock(DistributedMobsimAgent.class);
 		when(distAggent.getId()).thenReturn(pId);
 
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1001, 0));
@@ -67,14 +65,12 @@ class BackpackDataCollectorTest {
 		network.addNode(node3);
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link1), node1, node2));
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link2), node2, node3));
-		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
-		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(1., pId, link1, "walk", "walk"));
 		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
@@ -132,7 +128,7 @@ class BackpackDataCollectorTest {
 		var distAggent = mock(DistributedMobsimAgent.class);
 		when(distAggent.getId()).thenReturn(pId);
 
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1001, 0));
@@ -142,29 +138,28 @@ class BackpackDataCollectorTest {
 		network.addNode(node3);
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link1), node1, node2));
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link2), node2, node3));
-		var asc = mock(AgentSourcesContainer.class);
 		var eps = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, eps, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, eps, providers);
 
-		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(1., pId, link1, "walk", "walk"));
 
 		// the following simulates how a pId leaves and enters a partition. The simulation calls the leave method, which passes a pId's backpack
 		// to the messaging. Then the other partition passes the received message to its collector, which then receives the events for that agent.
-		collector.teleportedPersonLeavesPartition(distAggent);
+		collector.onAgentLeavesPartition(distAggent, 43);
 
 		// capture the backpack that was passed to messaging.
 		var backPackCaptor = ArgumentCaptor.forClass(Backpack.Msg.class);
-		verify(messaging, times(1)).collectBackPack(backPackCaptor.capture(), anyInt());
+		verify(messaging, times(1)).collect(backPackCaptor.capture(), anyInt());
 		var backpack = backPackCaptor.getValue();
 
-		// create a message from the backpack and pass it back to the collector.
-		var msg = SimStepMessage.builder().addBackPack(backpack).build();
-		collector.process(msg);
+		// pass the backpack back to the collector via its message handler.
+		collector.getMessageHandlers()
+			.get(Backpack.Msg.class)
+			.handle(List.of(backpack), 0);
 
 		// now, process the remaining events.
 		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
@@ -227,9 +222,7 @@ class BackpackDataCollectorTest {
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.pt, new BackpackTransitRouteProvider(network, schedule));
 
-		var collector = new BackpackDataCollector(mock(SimStepMessaging.class), network, pop, mock(AgentSourcesContainer.class), fbc, providers);
-
-		collector.registerAgent(distAgent);
+		var collector = new BackpackDataCollector(mock(PartitionTransfer.class), network, pop, fbc, providers);
 
 		// 1. Transit Driver starts (this populates transitInformation in the collector)
 		collector.handleEvent(new TransitDriverStartsEvent(0.0, driver, transitVehicle, lineId, routeId, Id.create("dep1", Departure.class)));
@@ -286,7 +279,7 @@ class BackpackDataCollectorTest {
 		var distAggent = mock(DistributedMobsimAgent.class);
 		when(distAggent.getId()).thenReturn(pId);
 
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
@@ -306,14 +299,12 @@ class BackpackDataCollectorTest {
 			network.addLink(link);
 		}
 
-		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
-		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(100., pId, link1, "car", "car"));
 
@@ -369,7 +360,7 @@ class BackpackDataCollectorTest {
 		when(distAgent1.getId()).thenReturn(pId1);
 		when(distAgent2.getId()).thenReturn(pId2);
 
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
@@ -388,16 +379,12 @@ class BackpackDataCollectorTest {
 			network.addLink(link);
 		}
 
-		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
 		providers.put(TransportMode.ride, new BackpackNetworkRouteProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
-
-		collector.registerAgent(distAgent1);
-		collector.registerAgent(distAgent2);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
 		// Both end activities at l1
 		collector.handleEvent(new ActivityEndEvent(100., pId1, link1, null, "home", new Coord(0, 0)));
@@ -460,7 +447,7 @@ class BackpackDataCollectorTest {
 		pop.addPerson(pop.getFactory().createPerson(pId));
 		var link1 = Id.createLinkId("l1");
 
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
@@ -468,16 +455,14 @@ class BackpackDataCollectorTest {
 		network.addNode(node2);
 		network.addLink(network.getFactory().createLink(link1, node1, node2));
 
-		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
 		var distAgent = mock(DistributedMobsimAgent.class);
 		when(distAgent.getId()).thenReturn(pId);
-		collector.registerAgent(distAgent);
 
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(110., pId, link1, "walk", "walk"));
@@ -505,7 +490,7 @@ class BackpackDataCollectorTest {
 		pop.addPerson(pop.getFactory().createPerson(registeredAgent.getId()));
 
 		var link1 = Id.createLinkId("l1");
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
@@ -513,20 +498,17 @@ class BackpackDataCollectorTest {
 		network.addNode(node2);
 		network.addLink(network.getFactory().createLink(link1, node1, node2));
 
-		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
-
-		collector.registerAgent(ignoredAgent);
-		collector.registerAgent(registeredAgent);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
 		// make sure the collector doesn't crash when we send it events with the ignored agent.
 		collector.handleEvent(new ActivityEndEvent(100., ignored, link1, null, "home", new Coord(0, 0)));
+		collector.handleEvent(new ActivityEndEvent(100., registered, link1, null, "whatever", new Coord(0, 0)));
 
-		collector.finishAllPersons();
+		collector.afterMobsim();
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());
 		assertEquals(registered, backPackCaptor.getValue().personId());
@@ -544,7 +526,7 @@ class BackpackDataCollectorTest {
 		pop.addPerson(pop.getFactory().createPerson(registeredAgent.getId()));
 
 		var link1 = Id.createLinkId("l1");
-		var messaging = mock(SimStepMessaging.class);
+		var messaging = mock(PartitionTransfer.class);
 		var network = NetworkUtils.createNetwork();
 		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
 		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
@@ -562,18 +544,16 @@ class BackpackDataCollectorTest {
 		Map<String, BackpackRouteProvider> providers = new HashMap<>();
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, asc, fbc, providers);
+		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
-		var msg = SimStepMessage.builder()
-			.addBackPack(new Backpack.Msg(registered, List.of(), 0, new BackpackPlan.Msg(null, null, null)))
-			.addVehicleContainer(new VehicleContainer(null, null, new VehicleContainer.Occupant(ignoredAgent), List.of()))
-			.build();
-		collector.process(msg);
+		collector.getMessageHandlers()
+			.get(Backpack.Msg.class)
+			.handle(List.of(new Backpack.Msg(registered, List.of(), 0, new BackpackPlan.Msg(null, null, null))), 0);
 
 		// make sure the collector doesn't crash when we send it events with the ignored agent.
 		collector.handleEvent(new ActivityEndEvent(100., ignored, link1, null, "home", new Coord(0, 0)));
 
-		collector.finishAllPersons();
+		collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());

@@ -86,7 +86,7 @@ class AgentWiseComparisonKNExample{
 		ccc.baseScenario = scenario;
 
 		ScoringFunctionFactory baseScoringFunctionFactory;
-		{
+
 			com.google.inject.Injector injector = new Injector.InjectorBuilder( scenario )
 													  .addStandardModules()
 													  .addOverridingModule( new AbstractModule(){@Override public void install(){ bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class ); }} )
@@ -102,9 +102,9 @@ class AgentWiseComparisonKNExample{
 
 //			injector.getInstance( PrepareForMobsim.class ).run();
 */
-		}
 
-		@NotNull Table baseTable = ccc.generatePersonTableFromPopulation( basePopulation, config, null, baseScoringFunctionFactory );
+
+		@NotNull Table baseTable = ccc.generatePersonTableFromPopulation( injector, basePopulation);
 
 		System.out.println( baseTable );
 
@@ -126,9 +126,9 @@ class AgentWiseComparisonKNExample{
 			insertHWHPlan( policyPlan, pf, TransportMode.pt, 3600, link11, link22 );
 		}
 
-/*
-		{
-			com.google.inject.Injector injector = new Injector.InjectorBuilder( policyScenario )
+///*
+//		{
+			com.google.inject.Injector injector2 = new Injector.InjectorBuilder( policyScenario )
 													  .addStandardModules()
 													  .addOverridingModule( new AbstractModule(){@Override public void install(){ bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class ); }} )
 													  .build();
@@ -139,16 +139,17 @@ class AgentWiseComparisonKNExample{
 			// konzentrieren.  kai, dec'25
 
  //			injector.getInstance( PrepareForMobsim.class ).run();
-		}
-*/
+//		}
+//*/
 
 
-		Table policyTable = ccc.generatePersonTableFromPopulation( policyPopulation, config, basePopulation, baseScoringFunctionFactory );
+		Table policyTable = ccc.generatePersonTableFromPopulation( injector2, basePopulation );
 		// yyyyyy habe hier jetzt die baseScoringFunctionFactory eingesetzt!!!!
 
 		Path path = Paths.get("outputFromAgentWiseComparisonExample" );
 
-		ccc.compare( policyScenario, policyTable, null, baseTable, scenario, config, path );
+//		ccc.compare( policyScenario, policyTable, null, baseTable, path );
+		throw new RuntimeException("adjust compare method to new signature");
 
 
 	}

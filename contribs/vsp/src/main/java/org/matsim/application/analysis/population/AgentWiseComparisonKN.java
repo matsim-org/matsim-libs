@@ -1,11 +1,11 @@
 package org.matsim.application.analysis.population;
 
+import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -15,39 +15,24 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
-import org.matsim.utils.tablesaw.TablesawUtils;
 import picocli.CommandLine;
-import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.Table;
-import tech.tablesaw.plotly.components.Figure;
-import tech.tablesaw.plotly.components.Layout;
-import tech.tablesaw.plotly.traces.HistogramTrace;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,20 +50,13 @@ import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.Ex
 
 @CommandLine.Command(name = "monetary-utility", description = "List and compare fare, dailyRefund and utility values for agents in base and policy case.")
 public class AgentWiseComparisonKN implements MATSimAppCommand{
-	// I need a simpler way to organize this workflow.  Use case ZEZ (where I need to start from the basic matsim files).
-
-	// The main problem for me is that I repeatedly need to put the file paths into the IntelliJ run configurations.  I would like to do this at most once.
-
-	// My current intuition would be to build an umbrella class that implements the MATSimAppCommand and call the respective methods by one-liners.
-
-	// Alternatively (or even at the same time) I could put args into main methods and call from there.
-
 	private static final Logger log = LogManager.getLogger( AgentWiseComparisonKN.class );
+
 	public static final String KN_MONEY = "knMoney";
 
 	private static int scoreWrnCnt = 0;
 
-	private static final boolean doRoh = false;
+	private static final boolean doRoh = true;
 
 	@CommandLine.Parameters(description = "Path to run output directory for which analysis should be performed.")
 	private Path inputPath;
@@ -96,14 +74,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
 
-//	ScoringFunctionFactory scoringFunctionFactory;
-	MutableScenario baseScenario;
+	Scenario baseScenario;
 	private List<PreparedGeometry> geometries;
 
-	com.google.inject.Injector injector;
-	com.google.inject.Injector injector2;
-//	TripRouter tripRouter1;
-//	TripRouter tripRouter2;
+	Injector baseCaseInjector;
+	Injector policyInjector;
 
 	private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
 
@@ -135,19 +110,43 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Eduardo_Lima_Siemensbahn/output_final/output-SiBa-10pct-nach-3900it-S21Jungfernheide/";
 
 		// matsim-dresden wrap-around experiment:
-//		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-none-it3000-20260209/";
-		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-splitAndRemoveOpeningTimes-it3000-20260209/";
-		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-splitAndRemoveOpeningTimes-Caba-it3000-20260213";
+		// -- "old"
+//		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-none-it500-20260218";
+//		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-none-it500-20260218";
+
+		// -- "old" with cleaned routes:
+//		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-none-it500-routesCleaned-20260224";
+//		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-none-it500-routesCleaned-20260218";
+
+		// -- "new":
+//		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it500-20260218";
+//		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-20260218";
+
+		// -- "new" with cleaned routes:
+//		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it500-cleaned-20260224";
+// 		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-routesCleaned-20260218";
+
+		// do last iteration again:
+		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
+		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
 
 		// iatbr glamobi:
 //		final String baseDir="/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
 //		final String policyDir = "/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
 
+		// paul:
+// 		final String baseDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/output/berlin-v6.4-10pct";
+//		final String policyDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/output/berlin-v6.4-10pct";
+
+		// autofrei:
+//		final String baseDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-baseCaseCtdExtended/";
+//		final String policyDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-policy";
+
 		// ===
 
-		generateExperiencedPlans( baseDir );
+//		generateExperiencedPlans( baseDir );
 //		generateExperiencedPlans( policyDir );
-		generateFilteredEventsFile( baseDir );
+//		generateFilteredEventsFile( baseDir );
 //		generateFilteredEventsFile( policyDir );
 		agentWiseComparison( baseDir, policyDir, shpFile );
 	}
@@ -212,147 +211,73 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			eventsFilePatterns.add( "*output_events.xml.gz" );
 		}
 
-		Config baseConfig = ConfigUtils.loadConfig( globFile( baseCasePath, "*output_config_reduced.xml" ).toString() );
-		// (The reduced config has fewer problems with newly introduced config params.)
+		// ############################
+		// ############################
+		// ### base case data:
 
-		baseConfig.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-
-		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
-		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
-		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
-		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
-		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the reduced config specifies them in an incomplete
-		// way, but I am not sure if that is the problem. --> that probably is indeed the problem.  In general, they are created automatically,
-		// but if they already exist in some other way (i.e., in this case coming from the reduced config), then those are not over-written.
-
-//		baseConfig.routing().setNetworkModes( Collections.singletonList( TransportMode.car ) );  // the rail raptor tries to go to the links which are connected to facilities
-
-		baseConfig.facilities().setInputFile( globFile( baseCasePath, "*output_" + DefaultFiles.facilities.getFilename() + ".gz" ).toString() );
-
-		String baseTransitScheduleFilename = null;
-		if ( baseConfig.transit().isUseTransit() ){
-			baseTransitScheduleFilename = globFile( baseCasePath, "*output_" + DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
-		}
-		baseConfig.transit().setTransitScheduleFile( baseTransitScheduleFilename );
-
-		baseConfig.network().setInputFile( globFile( baseCasePath, "*output_" + DefaultFiles.network.getFilename() + ".gz" ).toString() );
-
-		baseConfig.plans().setInputFile( null );
-		baseConfig.network().setChangeEventsInputFile( null );
-		baseConfig.transit().setVehiclesFile( null );
-		baseConfig.vehicles().setVehiclesFile( null );
-		baseConfig.counts().setInputFile( null );
-
-		baseScenario = (MutableScenario) ScenarioUtils.loadScenario( baseConfig );
-
-		final Population basePopulation = readAndCleanPopulation( baseCasePath, eventsFilePatterns );
-		baseScenario.setPopulation( basePopulation );
-		// yy could/should read the population in loadScenario, and then only clean it here.
-
-		computeAndSetMarginalUtilitiesOfMoney( baseScenario );
-		computeAndSetIncomeDeciles( basePopulation );
-
-		ScoringFunctionFactory baseScoringFunctionFactory;
-		{
-			baseScenario.getConfig().controller().setOutputDirectory( "output2" );
-			this.injector = new Injector.InjectorBuilder( baseScenario )
-													  .addStandardModules()
-													  .addOverridingModule( new AbstractModule(){
-														  @Override public void install(){
-															  bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
-														  }
-													  } )
-													  .build();
-			baseScoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
-		}
-		{
-			// The following comes too early?!
-
-			Config policyConfig = ConfigUtils.loadConfig( globFile( inputPath, "*output_config_reduced.xml" ).toString() );
-			// (The reduced config has fewer problems with newly introduced config params.)
-			policyConfig.controller().setOutputDirectory( "output3" );
-			policyConfig.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
-			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike) ).setScoringThisActivityAtAll( false ) );
-			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
-			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
-
-			// Here, we do not want to use ScenarioUtils.loadScenario, because we might be able to rescue files from the base scenario.  (Not totally clear.)
-			String policyTransitScheduleFilename = globFile( inputPath, "*output_" + DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
-			String policyNetworkFilename = globFile( inputPath, "*output_" + DefaultFiles.network.getFilename() + ".gz" ).toString();
-			MutableScenario scenario2 = ScenarioUtils.createMutableScenario( policyConfig );
-			new MatsimNetworkReader( scenario2.getNetwork() ).readFile( policyNetworkFilename );
-			scenario2.setActivityFacilities( baseScenario.getActivityFacilities() );
-			scenario2.setPopulation( baseScenario.getPopulation() );
-			new TransitScheduleReader( scenario2 ).readFile( policyTransitScheduleFilename );
-			this.injector2 = new Injector.InjectorBuilder( scenario2 )
-													   .addStandardModules()
-													   .addOverridingModule( new AbstractModule(){
-														   @Override public void install(){ bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class ); }
-													   } )
-													   .build();
-		}
+		final Config baseConfig = prepareConfig( baseCasePath );
 
 		// ===
 
-		tagPersonsToAnalyse( basePopulation, geometries, baseScenario );
-		// (tagging is better than removing since (1) one can have multiple tags in one go, and (2) the average income becomes different once we start removing people)
+		baseScenario = ScenarioUtils.loadScenario( baseConfig );
+
+		cleanPopulation( baseCasePath, eventsFilePatterns, baseScenario.getPopulation() );
+
+		computeAndSetMarginalUtilitiesOfMoney( baseScenario );
+		computeAndSetIncomeDeciles( baseScenario.getPopulation() );
+
+		// ===
+
+		this.baseCaseInjector = createInjector( baseScenario );
+
+		// ###
 
 //		Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
 		Table baseTableTrips = null;
-		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null, baseScoringFunctionFactory );
+		Table baseTablePersons = generatePersonTableFromPopulation( baseCaseInjector, null );
 
-		{
-			HistogramTrace histogramTrace = HistogramTrace.builder( baseTablePersons.doubleColumn( MUSE_h ) ).build();
-			final Layout.LayoutBuilder layoutBuilder = Layout.builder().width( 1000 );
-			Figure figure = new Figure( layoutBuilder.build(), histogramTrace );
+		baseTablePersons.addColumns( baseTablePersons.doubleColumn( MATSIM_SCORE ).subtract( baseTablePersons.doubleColumn( SCORE ) ).setName( "error" ) );
 
-			Path htmlPath = inputPath.resolve( "muse.html" );
-			TablesawUtils.writeFigureToHtmlFile( htmlPath.toString(), figure );
-		}
-		{
-			DoubleColumn column = baseTablePersons.doubleColumn( MUSE_h ).divide( baseTablePersons.doubleColumn( UTL_OF_MONEY ) ).setName( "VSE[Eu/h]");
-//			HistogramTrace histogramTrace = HistogramTrace.builder( column ).nBinsX( 50 ).build();
-			HistogramTrace histogramTrace = HistogramTrace.builder( column ).build();
-			final Layout.LayoutBuilder layoutBuilder = Layout.builder().width( 1000 );
-			Figure figure = new Figure( layoutBuilder.build(), histogramTrace );
+		printTable( baseTablePersons.sortOn( "error" ), "sorted by score differences bw mw and self-computed" );
+		writeMuseHtml( baseTablePersons, inputPath );
+		writeVseHtml( baseTablePersons, inputPath );
 
-//			Path htmlPath = inputPath.resolve( "vse50.html" );
-			Path htmlPath = inputPath.resolve( "vse.html" );
-			TablesawUtils.writeFigureToHtmlFile( htmlPath.toString(), figure );
+		// ############################
+		// ############################
+		// ### policy data:
 
-			log.warn("vse mean value=" + column.mean() );
+		Config policyConfig = prepareConfig( inputPath );
 
-		}
+		// ===
 
-//		log.fatal("ending here because of iatbr vtts computation");
-//		System.exit(-1);
+		Scenario policyScenario = ScenarioUtils.loadScenario( policyConfig );
 
-		// ### next cometh the policy data:
+		cleanPopulation( inputPath, eventsFilePatterns, policyScenario.getPopulation() );
 
-		String policyConfigFilename = globFile( inputPath, "*output_config_reduced.xml" ).toString();
-		// (The reduced config has fewer problems with newly introduced config params.)
+		tagPersonsToAnalyse( policyScenario.getPopulation(), geometries, baseScenario );
+		// (tagging is better than removing since (1) one can have multiple tags in one go, and (2) the average income becomes different once we start removing people)
 
-		Config policyConfig = ConfigUtils.loadConfig( policyConfigFilename );
+		// ===
 
-		MutableScenario policyScenario = ScenarioUtils.createMutableScenario( policyConfig );
-		policyScenario.setNetwork( this.baseScenario.getNetwork() );
-		policyScenario.setTransitSchedule( this.baseScenario.getTransitSchedule() );
+		this.policyInjector = createInjector( policyScenario );
 
-		Population policyPopulation = readAndCleanPopulation( inputPath, eventsFilePatterns );
-		policyScenario.setPopulation( policyPopulation );
+		Table personsTablePolicy = generatePersonTableFromPopulation( policyInjector, baseScenario.getPopulation() );
 
-		ScoringFunctionFactory policyScoringFunctionFactory = this.injector2.getInstance( ScoringFunctionFactory.class );
-		Table personsTablePolicy = generatePersonTableFromPopulation( policyPopulation, policyConfig, basePopulation, policyScoringFunctionFactory );
+		// ############################
+		// ############################
+		// ### compare:
 
-		compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath );
+		compare( baseCaseInjector, policyInjector, personsTablePolicy, baseTableTrips, baseTablePersons, inputPath );
 
 		return 0;
 	}
 
-	@NotNull Table generatePersonTableFromPopulation( Population population, Config config, Population basePopulation,
-													  ScoringFunctionFactory scoringFunctionFactory ){
+	@NotNull Table generatePersonTableFromPopulation( Injector injector, Population basePopulation ){
 		final boolean isBaseTable = (basePopulation == null);
+
+		Config config = injector.getInstance( Config.class );
+		Population population = injector.getInstance( Population.class );
+		ScoringFunctionFactory scoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
 
 		Table table = createPopulationTable();
 
@@ -361,10 +286,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		}
 
 		MainModeIdentifier mainModeIdentifier = new DefaultAnalysisMainModeIdentifier();
-		PopulationFactory pf = population.getFactory();
 		double popSumMuse_h = 0.;
 		double popCntMuse_h = 0.;
 		Counter counter = new Counter( "in method generatePersonTableFromPopulation(...); processing person #  ");
+		MuseComputation museComputation = baseCaseInjector.getInstance( MuseComputation.class );
 		for( Person person : population.getPersons().values() ){
 			counter.incCounter();
 
@@ -377,55 +302,23 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			table.stringColumn( ANALYSIS_POPULATION ).append( getIsInShp( person ) );
 
-			processMUoM( isBaseTable, person, table );
-
 			if ( isBaseTable ){
+				processMUoM( person, table );
 				table.intColumn( INCOME_DECILE ).append( getIncomeDecileBetween0And9( person ) );
+
+				museComputation.computeMuseForAllActs( person.getSelectedPlan() );
 			}
 
 			double computedPersonScore = 0.;
+			// yy since we are doing the tablesaw columns, may not need the overall sum here.
+			// --> or put first into person attributes and generate tablesaw at the end
 			{
 				// activity times:
 				ScoringFunction sf = scoringFunctionFactory.createNewScoringFunction( person );
-				ScoringFunction sfNormal = scoringFunctionFactory.createNewScoringFunction( person );
-				ScoringFunction sfEarly = scoringFunctionFactory.createNewScoringFunction( person );
-				Activity firstActivity = null;
-				double sumMuse_h = 0.;
-				double cntMuse_h = 0.;
-				for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), ExcludeStageActivities ) ){
-					sf.handleActivity( act );
-					if( isBaseTable ){
-						if( act.getStartTime().isDefined() && act.getEndTime().isDefined() ){
-							// Ihab-style MarginalSumScoringFct computation but w/o leg:
-							double scoreNormalBefore = sfNormal.getScore();
-							double scoreEarlyBefore = sfEarly.getScore();
-							sumMuse_h += computeMUSE_h( act, sfNormal, pf, sfEarly, scoreNormalBefore, scoreEarlyBefore );
-							cntMuse_h++;
-						} else if( act.getStartTime().isUndefined() ){
-							firstActivity = act;
-						} else{
-							Gbl.assertIf( act.getEndTime().isUndefined() );
-							// Ihab-style MarginalSumScoringFct computation but w/o leg:
-							double scoreNormalBefore = sfNormal.getScore();
-							double scoreEarlyBefore = sfEarly.getScore();
-							// treat the after-midnight-activity:
-							sfNormal.handleActivity( firstActivity );
-							sfEarly.handleActivity( firstActivity );
-							// handle the before-midnight-activity
-							sumMuse_h += computeMUSE_h( act, sfNormal, pf, sfEarly, scoreNormalBefore, scoreEarlyBefore );
-							cntMuse_h++;
-						}
-					}
-				}
-
+				TripStructureUtils.getActivities( person.getSelectedPlan(), ExcludeStageActivities ).stream().forEach( act -> sf.handleActivity( act ) );
 				sf.finish();
-
 				table.doubleColumn( HeadersKN.ACTS_SCORE ).append( sf.getScore() );
 				computedPersonScore += sf.getScore();
-
-				if( isBaseTable ){
-					AddVttsEtcToActivities.setMUSE_h( person.getSelectedPlan(), sumMuse_h / cntMuse_h );
-				}
 			}
 
 			double sumMoney = 0.;
@@ -457,7 +350,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 				if( isBaseTable ){
 					Double musl_h = getMUSE_h( trip.getDestinationActivity() );
-					if( musl_h != null && musl_h > 0 && musl_h < 16.30 ){
+//					if( musl_h != null && musl_h > 0 && musl_h < 16.30 ){
+//					if( musl_h != null && musl_h > 0 ){
+					if( musl_h != null ) {
 						sumMuse_h += musl_h;
 						cntMuse_h++;
 					}
@@ -480,7 +375,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 					// ascs:
 					sumAscs += modeParams.getConstant();
-					if( TransportMode.pt.equals( leg.getMode() ) ){
+					if( pt.equals( leg.getMode() ) ){
 						if( haveAddedFirstPtAscOfTrip ){
 							//deduct this again:
 							sumAscs -= modeParams.getConstant();
@@ -516,8 +411,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				// (means we are sometimes appending NaN.)
 
 				if ( cntMuse_h > 0 ){
-					popSumMuse_h += sumMuse_h / cntMuse_h;
-					popCntMuse_h++; // person-based weight; could also justify trip-based weight as more policy-relevant. kai, dec'25
+//					popSumMuse_h += sumMuse_h / cntMuse_h;
+//					popCntMuse_h++; // person-based weight; could also justify trip-based weight as more policy-relevant. kai, dec'25
+					popSumMuse_h += sumMuse_h;
+					popCntMuse_h += cntMuse_h;
 				}
 			}
 
@@ -572,175 +469,113 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	}
 
 
-	private static int cnt = 0;
+	void compare( Injector baseCaseInjector, Injector policyCaseInjector, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Path outputPath ){
+		Config baseConfig = baseCaseInjector.getInstance( Config.class );
 
-	private void somehowComputeRuleOfHalf( Population basePopulation, Population policyPopulation, Table personsTablePolicy ){
-		var ttimeRemHom = DoubleColumn.create( W1_TTIME_DIFF_REM );
-		var ttimeRemHet = DoubleColumn.create( W2_TTIME_DIFF_REM );
-		var ixRem = DoubleColumn.create( IX_DIFF_REMAINING );
-		var ttimeSwiHom = DoubleColumn.create( W1_TTIME_DIFF_SWI );
-		var ttimeSwiHet = DoubleColumn.create( W2_TTIME_DIFF_SWI );
-		var ixSwi = DoubleColumn.create( IX_DIFF_SWITCHING );
+		Scenario policyScenario = policyCaseInjector.getInstance( Scenario.class );
 
-		TripRouter tripRouter1 = this.injector.getInstance( TripRouter.class );
-		TripRouter tripRouter2 = this.injector2.getInstance( TripRouter.class );
-
-		Counter counter = new Counter( "somehowComputeRuleOfHalf; person # " );
-		for( Person policyPerson : policyPopulation.getPersons().values() ){
-			counter.incCounter();
-
-			double sumTravTimeDiffsRemainersHom = 0.;
-			double sumTravTimeDiffsRemainersHet = 0.;
-			double sumTravTimeDiffsSwitchersHom = 0.;
-			double sumTravTimeDiffsSwitchersHet = 0.;
-
-			double sumIchangesDiffsRemainers = 0;
-			double sumIchangesDiffsSwitchers = 0.;
-
-			Person basePerson = basePopulation.getPersons().get( policyPerson.getId() );
-
-			if( basePerson != null ){
-				Double musl = (Double) getMUSE_h( basePerson.getSelectedPlan() );
-				if( musl == null ){
-					log.warn( "muse is null; I do not know why; personId={}", basePerson.getId() );
-					musl = MUTTS_AV;
-				}
-				List<TripStructureUtils.Trip> baseTrips = TripStructureUtils.getTrips( basePerson.getSelectedPlan() );
-				List<TripStructureUtils.Trip> policyTrips = TripStructureUtils.getTrips( policyPerson.getSelectedPlan() );
-				Gbl.assertIf( baseTrips.size() == policyTrips.size() );
-				for( int ii = 0 ; ii < baseTrips.size() ; ii++ ){
-					final TripStructureUtils.Trip policyTrip = policyTrips.get( ii );
-					final String policyMainMode = TripStructureUtils.identifyMainMode( policyTrip.getTripElements() );
-					if( TransportMode.pt.equals( policyMainMode ) ){
-						TripStructureUtils.Trip baseTrip = baseTrips.get( ii );
-						if( TransportMode.pt.equals( TripStructureUtils.identifyMainMode( baseTrip.getTripElements() ) ) ){
-							// Altnutzer; compute base ttime etc. from actual trip:
-							double sumBaseTtime = 0.;
-							double sumBaseLineSwitches = -1;
-							for( Leg leg : baseTrip.getLegsOnly() ){
-								sumBaseTtime += leg.getTravelTime().seconds();
-								if( TransportMode.pt.equals( leg.getMode() ) ){
-									sumBaseLineSwitches++;
-								}
-							}
-							// compute policy ttime from actual trip:
-							double sumPolicyTtime = 0.;
-							double sumPolicyLineSwitches = -1.;
-							for( Leg leg : policyTrip.getLegsOnly() ){
-								sumPolicyTtime += leg.getTravelTime().seconds();
-								if( TransportMode.pt.equals( leg.getMode() ) ){
-									sumPolicyLineSwitches++;
-								}
-							}
-							if ( cnt < 1 ){
-								log.warn( "MUTTS_AV={}", MUTTS_AV );
-								cnt++;
-//								if ( cnt==1 ) {
-//									log.warn( Gbl.FUTURE_SUPPRESSED );
-//								}
-							}
-							sumTravTimeDiffsRemainersHom += (sumPolicyTtime - sumBaseTtime) * MUTTS_AV * (-1);
-							sumTravTimeDiffsRemainersHet += (sumPolicyTtime - sumBaseTtime) * musl * (-1);
-							sumIchangesDiffsRemainers += (sumPolicyLineSwitches - sumBaseLineSwitches);
-						} else{
-							// Neunutzer; rule-of-half
-							// first need hypothetical base travel time
-							final Result baseResult = routeTrip( baseTrip, policyMainMode, basePerson, tripRouter1 );
-							// then compute hypothetical policy travel time
-							final Result policyResult = routeTrip( policyTrip, policyMainMode, policyPerson, tripRouter2 );
-							// sum up (rule-of-half is done later):
-							sumTravTimeDiffsSwitchersHom += (policyResult.sumTtime() - baseResult.sumTtime()) * MUTTS_AV * (-1);
-							sumTravTimeDiffsSwitchersHet += (policyResult.sumTtime() - baseResult.sumTtime()) * musl * (-1);
-							sumIchangesDiffsSwitchers += (policyResult.sumLineSwitches() - baseResult.sumLineSwitches());
-						}
-					}
-				}
-			}
-			ttimeRemHom.append( sumTravTimeDiffsRemainersHom / 3600. );
-			ttimeRemHet.append( sumTravTimeDiffsRemainersHet / 3600. );
-			ttimeSwiHom.append( sumTravTimeDiffsSwitchersHom / 3600. );
-			ttimeSwiHet.append( sumTravTimeDiffsSwitchersHet / 3600. );
-			ixRem.append( sumIchangesDiffsRemainers );
-			ixSwi.append( sumIchangesDiffsSwitchers );
-		}
-		personsTablePolicy.addColumns( ttimeRemHom, ttimeRemHet, ixRem, ttimeSwiHom, ttimeSwiHet, ixSwi );
-		log.info( "persons table policy after adding RoH entries:" );
-		System.out.println( personsTablePolicy );
-	}
-
-
-	private @NotNull Result routeTrip( TripStructureUtils.Trip baseTrip, String policyMainMode, Person basePerson, TripRouter tripRouter ){
-		Facility fromFacility = FacilitiesUtils.toFacility( baseTrip.getOriginActivity(), baseScenario.getActivityFacilities() );
-		Facility toFacility = FacilitiesUtils.toFacility( baseTrip.getDestinationActivity(), baseScenario.getActivityFacilities() );
-		final List<? extends PlanElement> planElements = tripRouter.calcRoute( policyMainMode, fromFacility, toFacility,
-			baseTrip.getOriginActivity().getEndTime().seconds(), basePerson, null );
-
-		// count the number of line switches:
-		double sumBaseTtime = 0.;
-		double sumBaseLineSwitches = -1;
-		for( Leg leg : TripStructureUtils.getLegs( planElements ) ){
-			sumBaseTtime += leg.getTravelTime().seconds();
-			if( TransportMode.pt.equals( leg.getMode() ) ){
-				sumBaseLineSwitches++;
-			}
-		}
-
-		// return the result:
-		return new Result( sumBaseTtime, sumBaseLineSwitches );
-	}
-
-	private record Result(double sumTtime, double sumLineSwitches){
-	}
-
-	void compare( Scenario policyScenario, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Scenario baseScenario,
-				  Config baseConfig, Path outputPath ) {
-
-		if ( doRoh ){
-			somehowComputeRuleOfHalf( baseScenario.getPopulation(), policyScenario.getPopulation(), personsTablePolicy );
+		if( doRoh ){
+			new AgentWiseRuleOfHalfComputation( baseCaseInjector, this.policyInjector ).somehowComputeRuleOfHalf();
+			addRohValuesToTable( policyScenario.getPopulation(), personsTablePolicy );
 		}
 		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
 
-		log.info(""); log.info( "print joined table:" );
+		log.info( "" );
+		log.info( "print joined table:" );
 		System.out.println( joinedTable );
 
 //		printSpecificPerson( joinedTable, "960148" );
 
 		joinedTable.addColumns( deltaColumn( joinedTable, TTIME ), deltaColumn( joinedTable, MONEY ) );
 
+		Table copyOfJoinedTable = Table.create( joinedTable.columns() );
+
+		// yy it might be possible to first create the deltaTalbe and then do the filtering
+		{
+			System.out.println("");
+			System.out.println("## REMAINERS: ===");
+			System.out.println("");
+
 //		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
-		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
-		joinedTable = joinedTable.where( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) );
-//		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
+			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
+			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
+			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
 
+			Table deltaTable = createDeltaTable( joinedTable );
 
-		Table deltaTable = createDeltaTable( joinedTable );
+			formatTable( deltaTable, 1 );
 
-		formatTable( deltaTable, 1 );
+			log.info( "" );
+			log.info( "print sorted table:" );
+			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
 
-		log.info("");log.info("print sorted table:");
-		System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ) );
+			// ===
 
-		// ===
+			Table rohDeltaTable = null;
+			if( doRoh ){
+				rohDeltaTable = createRohDeltaTable( joinedTable );
 
-		Table rohDeltaTable = null;
-		if ( doRoh ){
-			rohDeltaTable = createRohDeltaTable( joinedTable );
+				formatTable( rohDeltaTable, 1 );
 
-			formatTable( rohDeltaTable, 1 );
+				log.info( "" );
+				log.info( "print sorted roh table:" );
+				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+			}
 
-			System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ) );
+			// ===
+
+			writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
+//		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
+//		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+
+			if( doRoh ){
+				writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+			}
 		}
+//		log.error("stopping after remainers");
+//		System.exit(-1);
+		{
+			System.out.println();
+			System.out.println("## SWITCHERS: ===");
+			System.out.println();
 
-		// ===
+//		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
+			joinedTable = copyOfJoinedTable.where( copyOfJoinedTable.stringColumn( MODE_SEQ ).isNotEqualTo( copyOfJoinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
+			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or(
+				joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
+			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
 
-		writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
-		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
-		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+			Table deltaTable = createDeltaTable( joinedTable );
 
-		if ( doRoh ){
-			writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+			formatTable( deltaTable, 1 );
+
+//			log.info( "" );
+//			log.info( "print sorted table:" );
+//			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
+
+			// ===
+
+			Table rohDeltaTable = null;
+			if( doRoh ){
+				rohDeltaTable = createRohDeltaTable( joinedTable );
+
+				formatTable( rohDeltaTable, 1 );
+
+				log.info( "" );
+				log.info( "print sorted roh table:" );
+				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+			}
+
+			// ===
+
+			writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
+//		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
+//		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+
+			if( doRoh ){
+				writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+			}
 		}
-
 		writeAscTable( baseConfig );
 
 	}
