@@ -44,7 +44,7 @@ public final class VspScenarioConsistencyCheckerImpl implements ScenarioConsiste
 
 		switch (scenario.getConfig().vspExperimental().getVspDefaultsCheckingLevel()) {
 			case ignore -> {
-				log.info("NOT running vsp config consistency check because vsp defaults checking level is set to IGNORE");
+				log.info("NOT running vsp scenario consistency check because vsp defaults checking level is set to IGNORE. This can be changed in the vspExperimental configGroup.");
 				return;
 			}
 			case info -> lvl = Level.INFO;
@@ -70,7 +70,7 @@ public final class VspScenarioConsistencyCheckerImpl implements ScenarioConsiste
 
 		switch (scenario.getConfig().vspExperimental().getVspDefaultsCheckingLevel()) {
 			case ignore -> {
-				log.info("NOT running vsp config consistency check because vsp defaults checking level is set to IGNORE");
+				log.info("NOT running scenario config consistency check because vsp defaults checking level is set to IGNORE. This can be changed in the vspExperimental configGroup.");
 				return;
 			}
 			case info -> lvl = Level.INFO;
