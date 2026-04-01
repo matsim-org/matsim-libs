@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,10 +16,10 @@ import java.util.Objects;
  */
 public class SubpopulationDelegatingScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final ScoringFunctionFactory defaultFactory;
+	private final CharyparNagelScoringFunctionFactory defaultFactory;
 	private final Map<String, ScoringFunctionFactory> factoriesBySubpopulation;
 
-	@Inject SubpopulationDelegatingScoringFunctionFactory( ScoringFunctionFactory defaultFactory,
+	@Inject SubpopulationDelegatingScoringFunctionFactory( CharyparNagelScoringFunctionFactory defaultFactory,
 														   Map<String, ScoringFunctionFactory> factoriesBySubpopulation ) {
 		this.defaultFactory = Objects.requireNonNull(defaultFactory, "defaultFactory must not be null");
 		Objects.requireNonNull(factoriesBySubpopulation, "factoriesBySubpopulation must not be null");

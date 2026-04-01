@@ -18,7 +18,7 @@ public class VehicleTypeBasedScoringFunctionFactory implements ScoringFunctionFa
 	private final ScoringParametersForPerson params;
 
 	@Inject
-	public VehicleTypeBasedScoringFunctionFactory(Scenario scenario) {
+	VehicleTypeBasedScoringFunctionFactory(Scenario scenario) {
 		this.scenario = scenario;
 		this.params = new SubpopulationScoringParameters(scenario);
 	}
