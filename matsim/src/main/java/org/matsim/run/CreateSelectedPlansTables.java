@@ -43,7 +43,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scenario.consistency.ScenarioConsistencyChecker;
+import org.matsim.core.scenario.consistency.ScenarioChecker;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
@@ -397,13 +397,13 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public void addScenarioConsistencyChecker(ScenarioConsistencyChecker checker) {
-			scenario.addScenarioConsistencyChecker( checker );
+		public void addScenarioChecker(ScenarioChecker checker) {
+			scenario.addScenarioChecker( checker );
 		}
 
 		@Override
-		public void removeScenarioConsistencyChecker(Class<? extends ScenarioConsistencyChecker> clazz) {
-			scenario.removeScenarioConsistencyChecker( clazz );
+		public void removeScenarioChecker(Class<? extends ScenarioChecker> clazz) {
+			scenario.removeScenarioChecker( clazz );
 		}
 
 		@Override

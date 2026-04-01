@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ScenarioConsistencyChecker
+ * ScenarioChecker
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,7 +21,7 @@ package org.matsim.core.scenario.consistency;
 
 import org.matsim.api.core.v01.Scenario;
 
-public interface ScenarioConsistencyChecker {
+public interface ScenarioChecker {
 
 	void checkConsistencyBeforeRun(Scenario scenario);
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VspScenarioConsistencyCheckerImpl
+ * VspScenarioCheckerImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -39,8 +39,8 @@ import java.util.stream.Collectors;
 
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
-public final class VspScenarioConsistencyCheckerImpl implements ScenarioConsistencyChecker {
-	private static final Logger log = LogManager.getLogger(VspScenarioConsistencyCheckerImpl.class);
+public final class VspScenarioCheckerImpl implements ScenarioChecker {
+	private static final Logger log = LogManager.getLogger(VspScenarioCheckerImpl.class);
 
 	@Override
 	public void checkConsistencyBeforeRun(Scenario scenario) {

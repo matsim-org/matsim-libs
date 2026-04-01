@@ -168,7 +168,7 @@ public final class ControllerListenerManagerImpl implements ControllerListenerMa
 		if (controller != null) {
 			log.info("Start running scenario consistency checker ...");
 			controller.getScenario().checkConsistencyAfterRun();
-			log.info("All ScenarioConsistencyChecker called.");
+			log.info("All ScenarioChecker called.");
 		}
 	}
 

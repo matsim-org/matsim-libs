@@ -4,29 +4,29 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.consistency.ScenarioConsistencyChecker;
-import org.matsim.core.scenario.consistency.VspScenarioConsistencyCheckerImpl;
+import org.matsim.core.scenario.consistency.ScenarioChecker;
+import org.matsim.core.scenario.consistency.VspScenarioCheckerImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class ScenarioConsistencyTest {
+class ScenarioCheckerTest {
 
 	@Test
 	void startsWithoutScenarioConsistencyCheckerByDefault() {
 		MutableScenario scenario = createScenario();
 
-		Assertions.assertTrue(scenario.getScenarioConsistencyCheckers().isEmpty());
+		Assertions.assertTrue(scenario.getScenarioCheckers().isEmpty());
 	}
 
 	@Test
 	void doesNotAddDuplicateCheckerTypesViaScenario() {
 		MutableScenario scenario = createScenario();
 
-		scenario.addScenarioConsistencyChecker(new ActivityCheckerSubclass());
-		scenario.addScenarioConsistencyChecker(new ActivityCheckerSubclass());
+		scenario.addScenarioChecker(new ActivityCheckerSubclass());
+		scenario.addScenarioChecker(new ActivityCheckerSubclass());
 
-		long checkerCount = scenario.getScenarioConsistencyCheckers().stream()
+		long checkerCount = scenario.getScenarioCheckers().stream()
 			.filter(checker -> checker.getClass().equals(ActivityCheckerSubclass.class))
 			.count();
 
@@ -36,12 +36,12 @@ class ScenarioConsistencyTest {
 	@Test
 	void removesScenarioCheckersByTypeViaScenario() {
 		MutableScenario scenario = createScenario();
-		scenario.addScenarioConsistencyChecker(new VspScenarioConsistencyCheckerImpl());
+		scenario.addScenarioChecker(new VspScenarioCheckerImpl());
 
-		scenario.removeScenarioConsistencyChecker(VspScenarioConsistencyCheckerImpl.class);
+		scenario.removeScenarioChecker(VspScenarioCheckerImpl.class);
 
-		Assertions.assertTrue(scenario.getScenarioConsistencyCheckers().stream()
-			.noneMatch(checker -> checker.getClass().equals(VspScenarioConsistencyCheckerImpl.class)));
+		Assertions.assertTrue(scenario.getScenarioCheckers().stream()
+			.noneMatch(checker -> checker.getClass().equals(VspScenarioCheckerImpl.class)));
 	}
 
 	@Test
@@ -49,8 +49,8 @@ class ScenarioConsistencyTest {
 		MutableScenario scenario = createScenario();
 		List<String> executionOrder = new ArrayList<>();
 
-		scenario.addScenarioConsistencyChecker(new FirstChecker(executionOrder));
-		scenario.addScenarioConsistencyChecker(new SecondChecker(executionOrder));
+		scenario.addScenarioChecker(new FirstChecker(executionOrder));
+		scenario.addScenarioChecker(new SecondChecker(executionOrder));
 
 		scenario.checkConsistencyBeforeRun();
 
@@ -61,7 +61,7 @@ class ScenarioConsistencyTest {
 		return ScenarioUtils.createMutableScenario(ConfigUtils.createConfig());
 	}
 
-	private static class ActivityCheckerSubclass implements ScenarioConsistencyChecker {
+	private static class ActivityCheckerSubclass implements ScenarioChecker {
 		@Override
 		public void checkConsistencyBeforeRun(Scenario scenario) {
 		}
@@ -72,7 +72,7 @@ class ScenarioConsistencyTest {
 		}
 	}
 
-	private record FirstChecker(List<String> executionOrder) implements ScenarioConsistencyChecker {
+	private record FirstChecker(List<String> executionOrder) implements ScenarioChecker {
 		@Override
 		public void checkConsistencyBeforeRun(Scenario scenario) {
 			executionOrder.add("first");
@@ -84,7 +84,7 @@ class ScenarioConsistencyTest {
 		}
 	}
 
-	private record SecondChecker(List<String> executionOrder) implements ScenarioConsistencyChecker {
+	private record SecondChecker(List<String> executionOrder) implements ScenarioChecker {
 
 		@Override
 		public void checkConsistencyBeforeRun(Scenario scenario) {

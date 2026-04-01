@@ -25,7 +25,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.consistency.ScenarioConsistencyChecker;
+import org.matsim.core.scenario.consistency.ScenarioChecker;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.Lanes;
@@ -123,9 +123,9 @@ public interface Scenario {
 
 	Lanes getLanes();
 
-	void addScenarioConsistencyChecker(ScenarioConsistencyChecker checker);
+	void addScenarioChecker(ScenarioChecker checker);
 
-	void removeScenarioConsistencyChecker(Class<? extends ScenarioConsistencyChecker> clazz);
+	void removeScenarioChecker(Class<? extends ScenarioChecker> clazz);
 
 	void checkConsistencyBeforeRun();
 
