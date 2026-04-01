@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.*;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.consistency.ScenarioChecker;
+import org.matsim.core.scenario.checkers.ScenarioChecker;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.households.Households;

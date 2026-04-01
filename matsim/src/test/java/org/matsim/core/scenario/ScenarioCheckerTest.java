@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.consistency.ScenarioChecker;
-import org.matsim.core.scenario.consistency.VspScenarioCheckerImpl;
+import org.matsim.core.scenario.checkers.ScenarioChecker;
+import org.matsim.core.scenario.checkers.VspScenarioCheckerImpl;
 
 import java.util.ArrayList;
 import java.util.List;

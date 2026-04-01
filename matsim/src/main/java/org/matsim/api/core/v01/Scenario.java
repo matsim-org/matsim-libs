@@ -25,7 +25,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.consistency.ScenarioChecker;
+import org.matsim.core.scenario.checkers.ScenarioChecker;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.Lanes;
