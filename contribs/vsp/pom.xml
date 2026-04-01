@@ -335,5 +335,9 @@
 			<groupId>tech.tablesaw</groupId>
 			<artifactId>tablesaw-jsplot</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>tech.tablesaw</groupId>
+			<artifactId>tablesaw-jsplot</artifactId>
+		</dependency>
 	</dependencies>
 </project>
