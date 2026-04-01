@@ -62,6 +62,7 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 		boolean problem = false; // ini
 
 		problem = checkSubpopulations(scenario, lvl, problem);
+		problem = checkActivitiesOpeningTime(scenario, lvl, problem);
 
 		if (problem && scenario.getConfig().vspExperimental().getVspDefaultsCheckingLevel() == VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort) {
 			String str = "found a situation that leads to vsp-abort.  aborting ...";
@@ -85,9 +86,6 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 			case abort -> lvl = Level.WARN;
 			default -> throw new RuntimeException("not implemented");
 		}
-		log.info("running checkConsistency of scenario after run ...");
-
-		checkActivitiesOpeningTime(scenario, lvl);
 	}
 
 
@@ -115,7 +113,7 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 		return problem;
 	}
 
-	private void checkActivitiesOpeningTime(Scenario scenario, Level lvl) {
+	private boolean checkActivitiesOpeningTime(Scenario scenario, Level lvl, boolean problem) {
 		log.info("start checking if activities are roughly within opening times ...");
 		Counter counter = new Counter("# person ");
 		final TimeTracker timeTracker = new TimeTracker(TimeInterpretation.create(scenario.getConfig()));
@@ -147,6 +145,10 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 				}
 			}
 		}
-		log.warn("violationCnt={}", violationCnt);
+		if (violationCnt > 0) {
+			log.log(lvl, "For {} activities of a selected plan the are outside the opening time", violationCnt);
+			problem = true;
+		}
+		return problem;
 	}
 }
