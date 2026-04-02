@@ -80,7 +80,8 @@ import java.util.*;
 
 	private String name = null;
 
-	private int counter=0;
+//	private int counter=0;
+	private final Counter counter = new Counter( "adding link # ");
 
 	private int nextMsg=1;
 
@@ -147,12 +148,15 @@ import java.util.*;
 		}
 
 
-		// show counter
-		this.counter++;
-		if (this.counter % this.nextMsg == 0) {
-			this.nextMsg *= 4;
-			log.info(" link # " + this.counter );
-		}
+//		// show counter
+//		this.counter++;
+//		if (this.counter % this.nextMsg == 0) {
+//			this.nextMsg *= 4;
+//			log.info(" link # " + this.counter );
+//		}
+
+		counter.incCounter();
+
 		if ( this.locked && link instanceof Lockable ) {
 			((Lockable)link).setLocked() ;
 		}
