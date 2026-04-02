@@ -282,8 +282,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 		}
 
 		@Override
-		public void removeScenarioChecker(Class<? extends ScenarioChecker> clazz) {
-			this.delegate.removeScenarioChecker( clazz );
+		public void removeScenarioChecker(ScenarioChecker checker) {
+			this.delegate.removeScenarioChecker(checker);
+		}
+
+		@Override
+		public List<ScenarioChecker> getScenarioCheckers() {
+			return this.delegate.getScenarioCheckers();
 		}
 
 		@Override

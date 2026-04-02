@@ -32,6 +32,8 @@ import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
+import java.util.List;
+
 
 /**
  *
@@ -125,7 +127,9 @@ public interface Scenario {
 
 	void addScenarioChecker(ScenarioChecker checker);
 
-	void removeScenarioChecker(Class<? extends ScenarioChecker> clazz);
+	void removeScenarioChecker(ScenarioChecker checker);
+
+	List<ScenarioChecker> getScenarioCheckers();
 
 	void checkConsistencyBeforeRun();
 

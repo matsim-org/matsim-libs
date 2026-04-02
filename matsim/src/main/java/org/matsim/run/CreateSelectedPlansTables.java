@@ -22,6 +22,7 @@ package org.matsim.run;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -402,8 +403,13 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public void removeScenarioChecker(Class<? extends ScenarioChecker> clazz) {
-			scenario.removeScenarioChecker( clazz );
+		public void removeScenarioChecker(ScenarioChecker checker) {
+			scenario.removeScenarioChecker(checker);
+		}
+
+		@Override
+		public List<ScenarioChecker> getScenarioCheckers() {
+			return scenario.getScenarioCheckers();
 		}
 
 		@Override

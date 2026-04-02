@@ -194,8 +194,8 @@ public final class MutableScenario implements Scenario, Lockable {
 	}
 
 	@Override
-	public void removeScenarioChecker(Class<? extends ScenarioChecker> clazz) {
-		scenarioCheckers.removeIf(checker -> checker.getClass().equals(clazz));
+	public void removeScenarioChecker(ScenarioChecker checker) {
+		scenarioCheckers.remove(checker);
 	}
 
 	@Override
@@ -212,7 +212,8 @@ public final class MutableScenario implements Scenario, Lockable {
 		}
 	}
 
-	List<ScenarioChecker> getScenarioCheckers() {
+	@Override
+	public List<ScenarioChecker> getScenarioCheckers() {
 		return this.scenarioCheckers;
 	}
 
