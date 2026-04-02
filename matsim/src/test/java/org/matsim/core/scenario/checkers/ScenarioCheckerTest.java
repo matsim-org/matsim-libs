@@ -1,11 +1,11 @@
-package org.matsim.core.scenario;
+package org.matsim.core.scenario.checkers;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.checkers.ScenarioChecker;
-import org.matsim.core.scenario.checkers.VspScenarioCheckerImpl;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,12 +36,13 @@ class ScenarioCheckerTest {
 	@Test
 	void removesScenarioCheckersByTypeViaScenario() {
 		MutableScenario scenario = createScenario();
-		scenario.addScenarioChecker(new VspScenarioCheckerImpl());
+		VspScenarioCheckerImpl checker = new VspScenarioCheckerImpl();
+		scenario.addScenarioChecker(checker);
 
-		scenario.removeScenarioChecker(VspScenarioCheckerImpl.class);
+		scenario.removeScenarioChecker(checker);
 
 		Assertions.assertTrue(scenario.getScenarioCheckers().stream()
-			.noneMatch(checker -> checker.getClass().equals(VspScenarioCheckerImpl.class)));
+			.noneMatch(checker1 -> checker1.equals(checker)));
 	}
 
 	@Test
