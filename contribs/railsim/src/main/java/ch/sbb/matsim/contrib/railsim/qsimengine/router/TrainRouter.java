@@ -103,7 +103,6 @@ public final class TrainRouter {
 		if (nextStop != null) {
 			currentStopLinks = stopLinks.getOrDefault(nextStop.getId(), Collections.emptySet());
 		}
-
 		List<Link> path = dijkstra(fromLink, toLink, position, currentStopLinks);
 		return path.stream().map(l -> resources.getLink(l.getId())).toList();
 	}
@@ -170,6 +169,11 @@ public final class TrainRouter {
 					continue;
 				}
 
+				// Use either path data or the very first link to check for disallowed sequence
+				if (isDisallowedNextLink(outgoingLink, currentPathNode.link != null ? currentPathNode.link.getId() : fromLink.getId())) {
+					continue;
+				}
+
 				Node nextNode = outgoingLink.getToNode();
 				double linkCost = calculateLinkCost(outgoingLink, position, isStopLink);
 
@@ -219,6 +223,17 @@ public final class TrainRouter {
 				return true;
 		}
 
+		return false;
+	}
+
+	/**
+	 * Check if the next link is disallowed for the given incoming link.
+	 */
+	private boolean isDisallowedNextLink(Link nextLink, Id<Link> incomingLinkId) {
+		if (incomingLinkId != null) {
+			RailLink l = resources.getLink(incomingLinkId);
+			return l.isDisallowedNextLink(nextLink.getId());
+		}
 		return false;
 	}
 
