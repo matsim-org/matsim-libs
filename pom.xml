@@ -251,7 +251,7 @@
 			<dependency>
 				<groupId>org.codehaus.woodstox</groupId>
 				<artifactId>stax2-api</artifactId>
-				<version>4.2.2</version>
+				<version>4.3.0</version>
 			</dependency>
 
 			<dependency>
@@ -407,7 +407,7 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.18.7</version>
+				<version>1.18.8</version>
 				<scope>test</scope>
 			</dependency>
 
