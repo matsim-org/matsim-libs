@@ -41,7 +41,7 @@ public class ChargingModule extends AbstractModule {
 		bind(ChargingStrategy.Factory.class).toInstance(new ChargeUpToMaxSocStrategy.Factory(1.0));
 
 		// The following returns the charging power/speed for a vehicle:
-		bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 1));
+		bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev.getBattery(), 1));
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {

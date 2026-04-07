@@ -116,8 +116,9 @@ public class VehicleChargingHandler2 implements DistributedActivityEngine, Charg
 	private boolean handleActivity(MobsimAgent ma, Activity currentAct, Leg prevLeg) {
 		var route = prevLeg.getRoute();
 		if (route instanceof HasVehicleId hvid) {
+
 			var vehicleId = hvid.getVehicleId();
-			// we know it is a mobsim agent as we have just casted it.
+
 			if (electricFleet.hasVehicle(vehicleId)) {
 				var ev = electricFleet.getVehicle(vehicleId);
 				var charger = getSuitableCharger(currentAct.getLinkId(), ev);

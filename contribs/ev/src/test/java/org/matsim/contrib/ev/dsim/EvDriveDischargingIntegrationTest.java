@@ -1,6 +1,5 @@
 package org.matsim.contrib.ev.dsim;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -98,7 +97,7 @@ public class EvDriveDischargingIntegrationTest {
 	 */
 	@Test
 	@Timeout(value = 2, unit = TimeUnit.MINUTES)
-	@Disabled("Enable once EV handlers are partition-aware (WP3-WP5)")
+	//@Disabled("Enable once EV handlers are partition-aware (WP3-WP5)")
 	void threeNodes() throws InterruptedException, ExecutionException, TimeoutException {
 		var outputDirectory = utils.getOutputDirectory();
 		var size = 3;

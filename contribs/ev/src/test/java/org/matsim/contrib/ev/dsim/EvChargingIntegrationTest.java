@@ -252,7 +252,7 @@ public class EvChargingIntegrationTest {
 					.toInstance(createChargingInfraSpec());
 				// super powerfull vehicle batteries, they can handle 1000 per second
 				bind(ChargingPower.Factory.class)
-					.toInstance(ev -> new FixedSpeedCharging(ev, 360));
+					.toInstance(ev -> new FixedSpeedCharging(ev.getBattery(), 360));
 			}
 		});
 	}

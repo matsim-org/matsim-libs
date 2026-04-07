@@ -142,7 +142,11 @@ public class SerializationProvider {
 		if (!class2Type.containsKey(message.getClass())) {
 			throw new IllegalArgumentException("Class " + message.getClass() + " was not registered for serialization. Messages that should be serialized must be at least package private to be detected.");
 		}
-		return fory.serialize(message);
+		try {
+			return fory.serialize(message);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
