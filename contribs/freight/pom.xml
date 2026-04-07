@@ -10,7 +10,7 @@
 	<name>freight</name>
 
 	<properties>
-		<jsprit.version>1.8</jsprit.version>
+		<jsprit.version>2.0.0</jsprit.version>
 	</properties>
 
 	<dependencies>
