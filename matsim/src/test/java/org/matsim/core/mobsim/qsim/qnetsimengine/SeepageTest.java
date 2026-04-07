@@ -119,7 +119,7 @@ public class SeepageTest {
 			net.population.addPerson(p);
 
 			Id<Vehicle> vehicleId = Id.create(p.getId(), Vehicle.class);
-			VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(leg.getMode(), vehicleId));
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( p, Map.of(leg.getMode(), vehicleId ) );
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modesType.get(leg.getMode()));
 			sc.getVehicles().addVehicle(vehicle);
 		}

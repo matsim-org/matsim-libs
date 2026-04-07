@@ -22,6 +22,7 @@ package org.matsim.run;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -43,6 +44,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scenario.checkers.ScenarioChecker;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
@@ -197,13 +199,13 @@ public class CreateSelectedPlansTables {
 				Activity firstActivity = PopulationUtils.getFirstActivity( selectedPlanImpl );
 				Coord c = null;
 				String link_id = "-";
-				
+
 				if (firstActivity.getType().substring(0,1).equals("h")) {
 					// no home activity in the plan -> no home activity in the knowledge
 					c = firstActivity.getCoord();
 					link_id = firstActivity.getLinkId().toString();
 				}
-				
+
 				if (c != null) {
 					out.write(c.getX()+"\t");
 					out.write(c.getY()+"\t");
@@ -393,6 +395,31 @@ public class CreateSelectedPlansTables {
 		@Override
 		public Lanes getLanes() {
 			return scenario.getLanes();
+		}
+
+		@Override
+		public void addScenarioChecker(ScenarioChecker checker) {
+			scenario.addScenarioChecker( checker );
+		}
+
+		@Override
+		public void removeScenarioChecker(ScenarioChecker checker) {
+			scenario.removeScenarioChecker(checker);
+		}
+
+		@Override
+		public List<ScenarioChecker> getScenarioCheckers() {
+			return scenario.getScenarioCheckers();
+		}
+
+		@Override
+		public void checkConsistencyBeforeRun() {
+			scenario.checkConsistencyBeforeRun();
+		}
+
+		@Override
+		public void checkConsistencyAfterRun() {
+			scenario.checkConsistencyAfterRun();
 		}
 
 		@Override

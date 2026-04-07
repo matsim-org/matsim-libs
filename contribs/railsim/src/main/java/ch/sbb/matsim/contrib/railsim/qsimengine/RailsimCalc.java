@@ -317,6 +317,66 @@ public final class RailsimCalc {
 		return maxSpeed;
 	}
 
+	/**
+	 * Calculates train length and compares against the train definition.
+	 */
+	static boolean checkTrainLength(TrainState state) {
+		if (state == null || state.headLink == null || state.tailLink == null || state.train == null)
+			return false;
+
+		if (!Double.isFinite(state.headPosition) || !Double.isFinite(state.tailPosition))
+			return false;
+
+		double expected = state.train.length();
+		if (!Double.isFinite(expected) || expected < 0)
+			return false;
+
+		// Use previousRoute in case the train spans across a "Umlauf" boundary.
+		List<RailLink> links = new ArrayList<>(state.previousRoute.size() + (state.route == null ? 0 : state.route.size()));
+		links.addAll(state.previousRoute);
+		if (state.route != null)
+			links.addAll(state.route);
+
+		if (links.isEmpty())
+			return false;
+
+		double[] prefix = new double[links.size() + 1];
+		for (int i = 0; i < links.size(); i++) {
+			prefix[i + 1] = prefix[i] + links.get(i).length;
+		}
+
+		List<Integer> tailIdxs = new ArrayList<>();
+		List<Integer> headIdxs = new ArrayList<>();
+		for (int i = 0; i < links.size(); i++) {
+			RailLink link = links.get(i);
+			if (link.getLinkId().equals(state.tailLink))
+				tailIdxs.add(i);
+			if (link.getLinkId().equals(state.headLink))
+				headIdxs.add(i);
+		}
+
+		if (tailIdxs.isEmpty() || headIdxs.isEmpty())
+			return false;
+
+		// Train length is the implied distance from the tail-end to the head-end.
+		for (int tailIdx : tailIdxs) {
+			double tailEndCoord = prefix[tailIdx] + state.tailPosition;
+
+			for (int headIdx : headIdxs) {
+				if (headIdx < tailIdx)
+					continue;
+
+				double headCoord = prefix[headIdx] + state.headPosition;
+				double trainLength = headCoord - tailEndCoord;
+
+				if (FuzzyUtils.equals(trainLength, expected))
+					return true;
+			}
+		}
+
+		return false;
+	}
+
 	record SpeedTarget(double targetSpeed, double decelDist) implements Comparable<SpeedTarget> {
 
 		@Override

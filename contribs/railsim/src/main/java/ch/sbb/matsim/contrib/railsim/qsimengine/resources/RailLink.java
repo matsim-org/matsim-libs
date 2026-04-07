@@ -80,6 +80,10 @@ public final class RailLink implements HasLinkId {
 		this.isExitLink = RailsimUtils.isExitLink(link);
 		this.isNonBlockingArea = RailsimUtils.isLinkNonBlockingArea(link);
 		this.oppositeLinkId = opposite != null ? opposite.getId() : null;
+		if (opposite != null && link.getLength() != opposite.getLength()) {
+			throw new IllegalArgumentException(String.format("Opposite link %s must have the same length as link %s", opposite.getId(), link.getId()));
+		}
+
 		this.vMax = vMax;
 		this.disallowedNextLinks = disallowedNextLinks;
 	}
