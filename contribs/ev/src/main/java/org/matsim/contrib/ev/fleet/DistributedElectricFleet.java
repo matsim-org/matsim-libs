@@ -89,7 +89,7 @@ public class DistributedElectricFleet implements ElectricFleet, NotifyVehiclePar
 	public void onVehicleLeavesPartition(DistributedMobsimVehicle vehicle, int toPartition) {
 		if (electricVehicles.containsKey(vehicle.getId())) {
 			var ev = electricVehicles.remove(vehicle.getId());
-			partitionTransfer.collect(new ElectricVehicleMessage(ev), toPartition);
+			partitionTransfer.collect(new ElectricVehicleMessage(ev.getVehicleSpecification(), ev.getBattery()), toPartition);
 		}
 	}
 
@@ -107,13 +107,17 @@ public class DistributedElectricFleet implements ElectricFleet, NotifyVehiclePar
 		for (var m : messages) {
 			// SAFETY: we have only registered ElectricVehicleMessage.class as the message type to receive.
 			ElectricVehicleMessage evMessage = (ElectricVehicleMessage) m;
+			var id = evMessage.spec.getMatsimVehicle().getId();
 
-			if (electricVehicles.containsKey(evMessage.ev().getId())) {
-				throw new IllegalStateException("Received ElectricVehicleMessage for vehicle " + evMessage.ev().getId() + ". We already have" +
+			if (electricVehicles.containsKey(id)) {
+				throw new IllegalStateException("Received ElectricVehicleMessage for vehicle " + id + ". We already have" +
 					" this vehicle in the fleet. This indicates, that some component has queried the fleet for this vehicle, even though no corresponding" +
 					" MobsimVehicle is present on this partition. This is most probably a programming bug.");
 			}
-			electricVehicles.put(evMessage.ev().getId(), evMessage.ev());
+			// TODO When recreating the vehicle some attributes from the engine information are looked up. I guess we can send those in the message
+			// directly.
+			var ev = ElectricFleetUtils.create(evMessage.spec(), driveEnergyConsumptionFactory, auxEnergyConsumptionFactory, chargingPowerFactory);
+			electricVehicles.put(ev.getId(), ev);
 		}
 	}
 
@@ -127,5 +131,8 @@ public class DistributedElectricFleet implements ElectricFleet, NotifyVehiclePar
 		return ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY.equals(hbefaTechnology);
 	}
 
-	public record ElectricVehicleMessage(ElectricVehicle ev) implements Message {}
+	/**
+	 * The state of the ev actually is the specification and the battery, which contains the charging state.
+	 */
+	public record ElectricVehicleMessage(ElectricVehicleSpecification spec, Battery battery) implements Message {}
 }
