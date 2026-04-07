@@ -22,6 +22,9 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.algorithm.recreate.Insertion;
+import com.graphhopper.jsprit.core.algorithm.ruin.Ruin;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
@@ -31,9 +34,6 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.util.Solutions;
-import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
-import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
-import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -104,9 +104,6 @@ final class InitialCarrierPlanCreator {
         VehicleRoutingProblem vrp = vrpBuilder.build();
 
         //configure the algorithm
-        AlgorithmConfig algorithmConfig = new AlgorithmConfig();
-        AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
-        xmlReader.read("input/usecases/chessboard/vrpalgo/ini_algorithm_v2.xml");
 
         StateManager stateManager = new StateManager(vrp);
         stateManager.updateLoadStates();
@@ -116,7 +113,19 @@ final class InitialCarrierPlanCreator {
 
         boolean addDefaultCostCalculators = true;
 
-        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
+       // VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
+		VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp)
+			// Ruin operators with weights
+			.addRuinOperator(0.5, Ruin.radial(0.15))
+			.addRuinOperator(0.5, Ruin.random(0.3))
+
+			// Insertion operators with weights
+			.addInsertionOperator(1., Insertion.best())
+
+			.setProperty(Jsprit.Parameter.ITERATIONS, "500")
+			.setStateAndConstraintManager(stateManager, constraintManager)
+			.buildAlgorithm();
+
 
         //get configures algorithm
         //				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vrpAlgorithmConfig);

@@ -22,6 +22,12 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.algorithm.recreate.BestInsertion;
+import com.graphhopper.jsprit.core.algorithm.recreate.Insertion;
+import com.graphhopper.jsprit.core.algorithm.recreate.InsertionStrategyBuilder;
+import com.graphhopper.jsprit.core.algorithm.ruin.Ruin;
+import com.graphhopper.jsprit.core.algorithm.ruin.RuinRandom;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
@@ -29,7 +35,6 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.util.Solutions;
-import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import java.net.URL;
 import java.util.Collection;
 import org.matsim.api.core.v01.network.Network;
@@ -129,10 +134,20 @@ final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 				VehicleRoutingProblem vrp = vrpBuilder.build();
 
 				//get configures algorithm
-				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, IOUtils.extendUrl(url, "algorithm.xml"));
+//				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, IOUtils.extendUrl(url, "algorithm.xml"));
 //				vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrierPlan.getCarrier().getId() + "_" + carrierPlan.hashCode() + ".png"));
 				//add initial-solution - which is the initialSolution for the vehicle-routing-algo
 //				vra.addInitialSolution(MatsimJspritFactory.createSolution(carrierPlan, network));
+				VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp)
+					// Ruin operators with weights
+					.addRuinOperator(0.5, Ruin.radial(0.15))
+					.addRuinOperator(0.5, Ruin.random(0.3))
+
+					// Insertion operators with weights
+					.addInsertionOperator(1., Insertion.best())
+
+					.setProperty(Jsprit.Parameter.ITERATIONS, "500")
+					.buildAlgorithm();
 
 				//solve problem
 				Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();

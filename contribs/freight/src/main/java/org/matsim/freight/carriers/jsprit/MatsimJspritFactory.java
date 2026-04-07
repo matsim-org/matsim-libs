@@ -41,9 +41,6 @@ import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.Coordinate;
-import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
-import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
-import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,10 +87,10 @@ public final class MatsimJspritFactory {
 				Id.createLinkId(jspritShipment.getPickupLocation().getId()),
 				Id.createLinkId(jspritShipment.getDeliveryLocation().getId()), jspritShipment.getSize().get(0))
 			.setDeliveryDuration(jspritShipment.getDeliveryServiceTime())
-			.setDeliveryStartingTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getDeliveryTimeWindow().getStart(),
+			.setDeliveryStartingTimeWindow(TimeWindow.newInstance(jspritShipment.getDeliveryTimeWindow().getStart(),
 				jspritShipment.getDeliveryTimeWindow().getEnd()))
 			.setPickupDuration(jspritShipment.getPickupServiceTime())
-			.setPickupStartingTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getPickupTimeWindow().getStart(),
+			.setPickupStartingTimeWindow(TimeWindow.newInstance(jspritShipment.getPickupTimeWindow().getStart(),
 				jspritShipment.getPickupTimeWindow().getEnd()))
 			.build();
 		CarriersUtils.setSkills(carrierShipment, jspritShipment.getRequiredSkills().values());
@@ -199,7 +196,7 @@ public final class MatsimJspritFactory {
 	 * @return jsprit vehicle
 	 * @see Vehicle, CarrierVehicle
 	 */
-	static com.graphhopper.jsprit.core.problem.vehicle.Vehicle createJspritVehicle(CarrierVehicle carrierVehicle, Coord locationCoord) {
+	static Vehicle createJspritVehicle(CarrierVehicle carrierVehicle, Coord locationCoord) {
 		Location.Builder vehicleLocationBuilder = Location.Builder.newInstance();
 		vehicleLocationBuilder.setId(carrierVehicle.getLinkId().toString() );
 		if (locationCoord != null) {
@@ -234,7 +231,7 @@ public final class MatsimJspritFactory {
 	 * @return carrierVehicle
 	 * @see CarrierVehicle , Vehicle
 	 */
-	static CarrierVehicle createCarrierVehicle(com.graphhopper.jsprit.core.problem.vehicle.Vehicle jspritVehicle) {
+	static CarrierVehicle createCarrierVehicle(Vehicle jspritVehicle) {
 		VehicleType matsimVehicleType;
 		if (jspritVehicle.getType().getUserData() != null){
 			if ( addVehicleUsageCnt < maxVehicleUsageCnt ) {
@@ -657,34 +654,36 @@ public final class MatsimJspritFactory {
 	 */
 	public static VehicleRoutingAlgorithm loadOrCreateVehicleRoutingAlgorithm(Scenario scenario,
 																			  FreightCarriersConfigGroup freightConfig, NetworkBasedTransportCosts netBasedCosts, VehicleRoutingProblem problem) {
-		VehicleRoutingAlgorithm algorithm;
+		VehicleRoutingAlgorithm algorithm = null;
 		final String vehicleRoutingAlgorithmFile = freightConfig.getVehicleRoutingAlgorithmFile();
 
 		if (vehicleRoutingAlgorithmFile != null && !vehicleRoutingAlgorithmFile.isEmpty()) {
-			log.info("Will read in VehicleRoutingAlgorithm from {}", vehicleRoutingAlgorithmFile);
-			URL vraURL;
-			try {
-				vraURL = IOUtils.extendUrl(scenario.getConfig().getContext(), vehicleRoutingAlgorithmFile);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
-				case noDistanceConstraint -> algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
-				case basedOnEnergyConsumption -> {
-					log.info("Use the distanceConstraint based on energy consumption.");
-					StateManager stateManager = new StateManager(problem);
-					stateManager.addStateUpdater(new DistanceUpdater(stateManager.createStateId("distance"), stateManager, netBasedCosts));
-					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts), ConstraintManager.Priority.CRITICAL);
-					AlgorithmConfig algorithmConfig = new AlgorithmConfig();
-					AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
-					xmlReader.read(vraURL);
-					algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, algorithmConfig, 0, null, stateManager, constraintManager, true);
-				}
-				default -> throw new IllegalStateException("Unexpected value: " + freightConfig.getUseDistanceConstraintForTourPlanning());
-			}
+			log.error("Reading algorithm from file is no longer supported by jsprit.", new RuntimeException());
+//			log.info("Will read in VehicleRoutingAlgorithm from {}", vehicleRoutingAlgorithmFile);
+//			URL vraURL;
+//			try {
+//				vraURL = IOUtils.extendUrl(scenario.getConfig().getContext(), vehicleRoutingAlgorithmFile);
+//			} catch (Exception e) {
+//				throw new RuntimeException(e);
+//			}
+//			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
+//				case noDistanceConstraint -> algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
+//				case basedOnEnergyConsumption -> {
+//					log.info("Use the distanceConstraint based on energy consumption.");
+//					StateManager stateManager = new StateManager(problem);
+//					stateManager.addStateUpdater(new DistanceUpdater(stateManager.createStateId("distance"), stateManager, netBasedCosts));
+//					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
+//					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts), ConstraintManager.Priority.CRITICAL);
+//					AlgorithmConfig algorithmConfig = new AlgorithmConfig();
+//					AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
+//					xmlReader.read(vraURL);
+//					algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, algorithmConfig, 0, null, stateManager, constraintManager, true);
+//				}
+//				default -> throw new IllegalStateException("Unexpected value: " + freightConfig.getUseDistanceConstraintForTourPlanning());
+//			}
 
-		} else {
+		} //else
+		{
 			log.info("Use a VehicleRoutingAlgorithm out of the box.");
 			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
 				case noDistanceConstraint -> algorithm = new SchrimpfFactory().createAlgorithm(problem);
