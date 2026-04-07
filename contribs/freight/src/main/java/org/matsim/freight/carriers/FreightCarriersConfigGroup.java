@@ -24,10 +24,15 @@ package org.matsim.freight.carriers;
 import jakarta.validation.constraints.Positive;
 import java.net.URL;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
+
+   private static final Logger log = LogManager.getLogger(FreightCarriersConfigGroup.class);
 
     public static final String GROUPNAME="freightCarriers" ;
 
@@ -39,9 +44,9 @@ public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
     static final String CARRIERS_VEHICLE_TYPE = "carriersVehicleTypeFile";
     private static final String CARRIERS_VEHICLE_TYPE_DESC = "Carrier Vehicle Types file, according to MATSim freight contrib";
 
-    private String vehicleRoutingAlgorithmFile;
-    static final String VEHICLE_ROUTING_ALGORITHM = "vehicleRoutingAlgorithmFile";
-    private static final String VEHICLE_ROUTING_ALGORITHM_DESC = "(Optional) Vehicle Routing Algorithm File, according to jsprit library. "
+    @Deprecated private String vehicleRoutingAlgorithmFile;
+    @Deprecated static final String VEHICLE_ROUTING_ALGORITHM = "vehicleRoutingAlgorithmFile";
+    @Deprecated private static final String VEHICLE_ROUTING_ALGORITHM_DESC = "(Optional) Vehicle Routing Algorithm File, according to jsprit library. "
            + "Empty value \"\" means a default algorithm is used.";
 
     @Positive
@@ -107,21 +112,24 @@ public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
     //### VehicleRoutingAlgorithmFile ###
     /**
      * @return -- {@value #VEHICLE_ROUTING_ALGORITHM_DESC}
+	 * @Deprecated Reading the algorithm from xml is no longer supported in jsprit 2.0.0 (jsprit-io was removed).
      */
+	@Deprecated(since = "April 2026", forRemoval = true)
     @StringGetter(VEHICLE_ROUTING_ALGORITHM)
     public String getVehicleRoutingAlgorithmFile() {
-        return vehicleRoutingAlgorithmFile;
+       log.error("Reading algorithm from file is no longer supported by jsprit 2.0.0. See jsprit documentation for details.");
+	   return vehicleRoutingAlgorithmFile;
     }
 
-    URL getVehicleRoutingAlgorithmFileUrl(URL context) {
-        return ConfigGroup.getInputFileURL(context, this.vehicleRoutingAlgorithmFile);
-    }
-
-    /**
+	/**
      * @param vehicleRoutingAlgorithmFile {@value #VEHICLE_ROUTING_ALGORITHM_DESC}
+	 *
+	 * @deprecated Reading the algorithm from xml is no longer supported in jsprit 2.0.0 (jsprit-io was removed).
      */
+	@Deprecated (since = "April 2026", forRemoval = true)
     @StringSetter(VEHICLE_ROUTING_ALGORITHM)
     public void setVehicleRoutingAlgorithmFileFile(String vehicleRoutingAlgorithmFile) {
+		log.warn("Reading algorithm from file is no longer supported by jsprit 2.0.0. Whatever you are setting here will be ignored. See jsprit documentation for details.");
         this.vehicleRoutingAlgorithmFile = vehicleRoutingAlgorithmFile;
     }
 

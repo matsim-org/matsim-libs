@@ -408,10 +408,8 @@ public class CarrierControllerUtilsTest{
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
-		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm_v2.xml" ).toString();
 
 		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class ) ;
-		freightConfig.setVehicleRoutingAlgorithmFileFile(vraFile);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -425,7 +423,6 @@ public class CarrierControllerUtilsTest{
 			Assertions.fail();
 		}
 
-		Assertions.assertEquals(vraFile, ConfigUtils.addOrGetModule( controller.getConfig(), FreightCarriersConfigGroup.class ).getVehicleRoutingAlgorithmFile());
 	}
 
 	/**
