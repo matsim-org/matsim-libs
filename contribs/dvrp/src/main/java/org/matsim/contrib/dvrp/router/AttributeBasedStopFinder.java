@@ -55,6 +55,11 @@ public class AttributeBasedStopFinder implements AccessEgressFacilityFinder {
 		return facilityFinder.findFacilities(fromFacility, toFacility, attributes);
 	}
 
+	@Override
+	public Facility findClosestStop(Facility facility) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
 	static public <T extends Facility & Attributable> AttributeBasedStopFinder create(double maxDistance,
 			Network network, Collection<T> facilities) {
 		return create(maxDistance, network, facilities, AttributeBasedStopFinder::parseStopNetworks);
