@@ -12,18 +12,28 @@ import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEvent;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEventHandler;
 import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.contrib.ev.infrastructure.*;
+import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.dsim.DSimConfigGroup;
+import org.matsim.dsim.DistributedContext;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -96,7 +106,7 @@ public class EvChargingIntegrationTest {
 	}
 
 	@Test
-	void threePartitions() {
+	void dsimDischarge() {
 		var config = createConfig(utils.getOutputDirectory());
 		EvDSimTestFixture.configureDSim(config, 3);
 
@@ -110,6 +120,47 @@ public class EvChargingIntegrationTest {
 
 		controller.run();
 		verifier.assertExpected();
+	}
+
+	@Test
+	void dsimDistributedDischarge() throws IOException, ExecutionException, InterruptedException, TimeoutException {
+
+		int size = 2;
+		var comms = LocalCommunicator.create(size);
+		Files.createDirectories(Path.of(utils.getOutputDirectory()));
+
+		try (var pool = Executors.newFixedThreadPool(size)) {
+			var futures = comms.stream()
+				.map(comm -> pool.submit(() -> {
+
+					var config = createConfig(utils.getOutputDirectory());
+					config.dsim().setThreads(1);
+					config.dsim().setPartitioning(DSimConfigGroup.Partitioning.none);
+					config.controller().setMobsim("dsim");
+
+					var scenario = createScenario(config, size);
+
+					var ctx = DistributedContext.create(comm, config);
+					var controller = new Controler(scenario, ctx);
+					installModules(controller);
+
+					var verifier = new ChargingVerifier();
+					if (comm.getRank() == 0) {
+						verifier.install(controller);
+					}
+
+					controller.run();
+					if (comm.getRank() == 0) {
+						verifier.assertExpected();
+					}
+				}))
+				.toList();
+
+
+			for (var f : futures) {
+				f.get(2, TimeUnit.MINUTES);
+			}
+		}
 	}
 
 
