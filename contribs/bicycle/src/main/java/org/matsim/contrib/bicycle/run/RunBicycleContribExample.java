@@ -74,14 +74,14 @@ public final class RunBicycleContribExample {
 
 
 			//Random plans nord-Neukoelln
-			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim-py-helper/data/plans_nnk_5k_bicycle_ew.xml");
+			config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim-py-helper/data/plans_nnk_5k_bicycle_ew.xml");
 			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim-py-helper/data/plans_nk_5000_bike.xml");
 
 			//Random plans Berlin (weighted on zensus)
 			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim-py-helper/data/plans_berlin_50k_bicycle_ew.xml");
 
 			//Random plans Berlin (weighted on zensus and dist by SRV)
-			config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim-py-helper/data/plans_berlin_30k_lognormal_modes_car_bicycle.xml");
+			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim-py-helper/data/plans_berlin_30k_lognormal_modes_car_bicycle.xml");
 
 
 			config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(0.7));
@@ -98,14 +98,14 @@ public final class RunBicycleContribExample {
 			config.global().setNumberOfThreads(12);
 			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
-			config.controller().setLastIteration(30);
+			config.controller().setLastIteration(5);
 
 //			config.controller().setOutputDirectory(
 //				"C:/Users/metz_so/Workspace/data/matsim-output/26-02-18_nk_motorized_newRunner"
 //			);
 
 			String baseOut = "C:/Users/metz_so/Workspace/data/matsim-output/";
-			String scenarioName = "berlin_motorized_30k";
+			String scenarioName = "nnk_motorized_5k";
 
 
 			String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
