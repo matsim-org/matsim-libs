@@ -42,16 +42,16 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 	private final String chargingMode;
 
 	private record AdvanceReservation(double reservationTime, Person person, ChargerSpecification charger,
-									  ElectricVehicle vehicle,
-									  double startTime, double endTime) {
+	                                  ElectricVehicle vehicle,
+	                                  double startTime, double endTime) {
 	}
 
 	private final PriorityQueue<AdvanceReservation> queue = new PriorityQueue<>(
 		Comparator.comparing(AdvanceReservation::reservationTime));
 
 	public StrategicChargingReservationEngine(Population population, ChargerReservationManager manager,
-											  ChargingInfrastructureSpecification infrastructure, TimeInterpretation timeInterpretation,
-											  ElectricFleet electricFleet, String chargingMode, EventsManager eventsManager) {
+	                                          ChargingInfrastructureSpecification infrastructure, TimeInterpretation timeInterpretation,
+	                                          ElectricFleet electricFleet, String chargingMode, EventsManager eventsManager) {
 		this.population = population;
 		this.manager = manager;
 		this.electricFleet = electricFleet;
@@ -98,7 +98,7 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 			}
 
 			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, chargingMode);
-			ElectricVehicle vehicle = electricFleet.getElectricVehicles().get(vehicleId);
+			ElectricVehicle vehicle = electricFleet.getVehicle(vehicleId);
 
 			List<Double> startTimes = new LinkedList<>();
 			List<Double> endTimes = new LinkedList<>();

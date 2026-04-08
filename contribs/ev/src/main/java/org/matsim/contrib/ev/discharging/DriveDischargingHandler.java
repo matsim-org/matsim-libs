@@ -66,7 +66,7 @@ public class DriveDischargingHandler
 
 	private final Network network;
 	private final EventsManager eventsManager;
-	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
+	private final ElectricFleet fleet;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
 
 	private final Queue<VehicleEntersTrafficEvent> trafficEnterEvents = new ConcurrentLinkedQueue<>();
@@ -76,21 +76,21 @@ public class DriveDischargingHandler
 	private final Netsim netsim;
 
 	@Inject
-	DriveDischargingHandler(Netsim netsim, ElectricFleet data, Network network, EventsManager eventsManager) {
+	DriveDischargingHandler(Netsim netsim, ElectricFleet fleet, Network network, EventsManager eventsManager) {
 		this.netsim = netsim;
 		this.network = network;
 		this.eventsManager = eventsManager;
-		eVehicles = data.getElectricVehicles();
-		evDrives = new ConcurrentHashMap<>(eVehicles.size() / 10);
+		this.fleet = fleet;
+		evDrives = new ConcurrentHashMap<>();
 	}
 
-	private ElectricVehicle getElectricVehicle(Id<Vehicle> vehicleId) {
-		return eVehicles.get(vehicleId);
-	}
+//	private ElectricVehicle getElectricVehicle(Id<Vehicle> vehicleId) {
+//		return electricFleet.getVehicle(vehicleId);
+//	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			trafficEnterEvents.add(event);
 		}
@@ -98,7 +98,7 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			linkLeaveEvents.add(event);
 		}
@@ -106,7 +106,7 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			trafficLeaveEvents.add(event);
 		}
@@ -133,7 +133,7 @@ public class DriveDischargingHandler
 				break; // see below
 			}
 
-			ElectricVehicle ev = getElectricVehicle(event.getVehicleId());
+			ElectricVehicle ev = fleet.getVehicle(event.getVehicleId());
 			evDrives.put(ev.getId(), new EvDrive(ev.getId(), ev));
 			trafficEnterEvents.remove();
 		}

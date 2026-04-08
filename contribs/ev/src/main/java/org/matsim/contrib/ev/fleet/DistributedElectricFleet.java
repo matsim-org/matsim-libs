@@ -1,6 +1,5 @@
 package org.matsim.contrib.ev.fleet;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
@@ -48,11 +47,6 @@ public class DistributedElectricFleet implements ElectricFleet, NotifyVehiclePar
 		this.auxEnergyConsumptionFactory = auxEnergyConsumptionFactory;
 		this.chargingPowerFactory = chargingPowerFactory;
 		this.partitionTransfer = partitionTransfer;
-	}
-
-	@Override
-	public ImmutableMap<Id<Vehicle>, ElectricVehicle> getElectricVehicles() {
-		throw new UnsupportedOperationException("getElectricVehicles() not implemented for DistributedElectricFleet");
 	}
 
 	// we do this lazy initialization hoop in combination with hasVehicle, as some modules call this fleet from within a VehicleEntersTrafficEventHandler.

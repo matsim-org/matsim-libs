@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import com.google.common.collect.ImmutableMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
 
@@ -32,8 +31,6 @@ import org.matsim.vehicles.Vehicle;
  * @author michalm
  */
 public interface ElectricFleet {
-	ImmutableMap<Id<Vehicle>, ElectricVehicle> getElectricVehicles();
-
 	// the below methods should be the new interface. Remove the default block once everything is changed.
 	default ElectricVehicle getVehicle(Id<Vehicle> vehicleId) {
 		throw new UnsupportedOperationException("getVehicle() not implemented");

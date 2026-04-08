@@ -107,8 +107,8 @@ public class VehicleChargingHandler
 			Id<Vehicle> vehicleId = lastVehicleUsed.get(event.getPersonId());
 			if (vehicleId != null) {
 				Id<Vehicle> evId = Id.create(vehicleId, Vehicle.class);
-				if (electricFleet.getElectricVehicles().containsKey(evId)) {
-					ElectricVehicle ev = electricFleet.getElectricVehicles().get(evId);
+				if (electricFleet.hasVehicle(evId)) {
+					ElectricVehicle ev = electricFleet.getVehicle(evId);
 					List<Charger> chargers = chargersAtLinks.get(event.getLinkId());
 					Charger c = chargers.stream()
 						.filter(ch -> ev.getChargerTypes().contains(ch.getChargerType()))
@@ -130,7 +130,7 @@ public class VehicleChargingHandler
 				Id<Charger> chargerId = vehiclesAtChargers.remove(evId);
 				if (chargerId != null) {
 					Charger c = chargingInfrastructure.getChargers().get(chargerId);
-					c.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(evId), event.getTime());
+					c.getLogic().removeVehicle(electricFleet.getVehicle(evId), event.getTime());
 				}
 			}
 		}

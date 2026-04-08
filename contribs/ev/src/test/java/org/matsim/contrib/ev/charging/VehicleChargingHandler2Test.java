@@ -1,7 +1,6 @@
 package org.matsim.contrib.ev.charging;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -99,7 +98,10 @@ public class VehicleChargingHandler2Test {
 		charger = chargingInfrastructure.getChargers().get(CHARGER_ID);
 
 		ev = createEv(Id.create("ev", Vehicle.class), BATTERY_CAPACITY_J, 1.0);
-		electricFleet = () -> ImmutableMap.of(ev.getId(), ev);
+		var fleet = mock(ElectricFleet.class);
+		when(fleet.getVehicle(ev.getId())).thenReturn(ev);
+		when(fleet.hasVehicle(ev.getId())).thenReturn(true);
+		electricFleet = fleet;
 	}
 
 	// -------------------------------------------------------------------------
@@ -361,8 +363,8 @@ public class VehicleChargingHandler2Test {
 
 	private ElectricVehicle createEv(Id<Vehicle> vehicleId, double capacityJ, double initialSoc) {
 		record TestEvSpec(Id<Vehicle> getId, Vehicle getMatsimVehicle, String getVehicleType,
-						  ImmutableList<String> getChargerTypes, double getBatteryCapacity,
-						  double getInitialSoc) implements ElectricVehicleSpecification {}
+		                  ImmutableList<String> getChargerTypes, double getBatteryCapacity,
+		                  double getInitialSoc) implements ElectricVehicleSpecification {}
 
 		var evSpec = new TestEvSpec(vehicleId, null, "electric",
 			ImmutableList.of(ChargerSpecification.DEFAULT_CHARGER_TYPE), capacityJ, initialSoc);
@@ -374,7 +376,7 @@ public class VehicleChargingHandler2Test {
 	}
 
 	private VehicleChargingHandler2 buildVch2(EvConfigGroup evCfg, InternalInterface internalInterface,
-											  ActivityEngine delegateEngine) {
+	                                          ActivityEngine delegateEngine) {
 		var handler = new VehicleChargingHandler2(
 			chargingInfrastructure, electricFleet, evCfg,
 			(chargerSpec, vehicle) -> new ChargeUpToMaxSocStrategy(chargerSpec, vehicle, 1.0),
@@ -451,7 +453,7 @@ public class VehicleChargingHandler2Test {
 	 * {@code WithinDayAgentUtils.resetCaches} called from VCH2's {@code doSimStep}).
 	 */
 	private MobsimAgent buildPlanAgentMock(Id<Person> personId, Activity currentAct, Leg prevLeg,
-										   double activityEndTime) {
+	                                       double activityEndTime) {
 		var agent = mock(MobsimAgent.class,
 			withSettings().extraInterfaces(PlanAgent.class, HasModifiablePlan.class));
 		when(agent.getId()).thenReturn(personId);

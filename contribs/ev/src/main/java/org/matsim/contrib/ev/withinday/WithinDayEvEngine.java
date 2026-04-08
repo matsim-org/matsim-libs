@@ -95,10 +95,10 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	private final Logger logger = LogManager.getLogger(WithinDayEvEngine.class);
 
 	public WithinDayEvEngine(WithinDayEvConfigGroup config, QSim qsim, TimeInterpretation timeInterpretation, ElectricFleet electricFleet,
-							 ChargingAlternativeProvider onlineSlotProvider, ChargingSlotProvider offlineSlotProvider,
-							 EventsManager eventsManager,
-							 ChargingScheduler chargingScheduler, Vehicles vehicles, QVehicleFactory qVehicleFactory,
-							 Scenario scenario, WithinDayChargingStrategy.Factory chargingStrategyFactory) {
+	                         ChargingAlternativeProvider onlineSlotProvider, ChargingSlotProvider offlineSlotProvider,
+	                         EventsManager eventsManager,
+	                         ChargingScheduler chargingScheduler, Vehicles vehicles, QVehicleFactory qVehicleFactory,
+	                         Scenario scenario, WithinDayChargingStrategy.Factory chargingStrategyFactory) {
 		this.qsim = qsim;
 		this.timeInterpretation = timeInterpretation;
 		this.electricFleet = electricFleet;
@@ -141,7 +141,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 					relevantPersons.add(plan.getPerson().getId());
 
 					Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(plan.getPerson(), chargingMode);
-					ElectricVehicle vehicle = electricFleet.getElectricVehicles().get(vehicleId);
+					ElectricVehicle vehicle = electricFleet.getVehicle(vehicleId);
 					relevantVehicles.add(vehicleId);
 
 					Activity firstActivity = (Activity) plan.getPlanElements().get(0);
@@ -393,8 +393,8 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	}
 
 	private ChargingProcess createChargingProcessFromPlugActivity(Id<Person> personId, double now,
-																  Activity plugActivity,
-																  boolean isSpontaneous) {
+	                                                              Activity plugActivity,
+	                                                              boolean isSpontaneous) {
 		Preconditions.checkState(plugActivity.getType().equals(PLUG_ACTIVITY_TYPE));
 
 		ChargingProcess chargingProcess = (ChargingProcess) plugActivity.getAttributes()
@@ -412,13 +412,13 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	private final IdMap<Person, Integer> chargingProcessIndex = new IdMap<>(Person.class);
 
 	private ChargingProcess createChargingProcess(Id<Person> personId, double now, ChargingSlot slot,
-												  Activity plugActivity,
-												  boolean isSpontaneous) {
+	                                              Activity plugActivity,
+	                                              boolean isSpontaneous) {
 		MobsimAgent agent = qsim.getAgents().get(personId);
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 		Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(plan.getPerson(), chargingMode);
-		ElectricVehicle vehicle = electricFleet.getElectricVehicles().get(vehicleId);
+		ElectricVehicle vehicle = electricFleet.getVehicle(vehicleId);
 
 		ChargingProcess process = new ChargingProcess();
 		process.processIndex = chargingProcessIndex.compute(personId, (id, value) -> {
@@ -651,14 +651,13 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 	private ElectricVehicle getElectricVehicle(Plan plan) {
 		Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(plan.getPerson(), chargingMode);
-		if (!electricFleet.getElectricVehicles().containsKey(vehicleId)) {
+		if (!electricFleet.hasVehicle(vehicleId)) {
 			throw new IllegalArgumentException("You have configured agent " + plan.getPerson().getId() + " to be active for charging" +
 				", and the mode " + chargingMode + " to be an electric vehicle mode, but the vehicle " + vehicleId + " is not an electric vehicle. " +
 				"In order to change that, you can call VehicleUtils.setHbefaTechnology(vehicle.getType().getEngineInformation(), ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY (see ElectricFleetUtils).");
 		}
 		;
-		ElectricVehicle vehicle = electricFleet.getElectricVehicles().get(vehicleId);
-		return vehicle;
+		return electricFleet.getVehicle(vehicleId);
 	}
 
 	private void processPluggingProcesses(double now) {

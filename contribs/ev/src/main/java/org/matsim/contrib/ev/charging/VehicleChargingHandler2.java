@@ -151,7 +151,7 @@ public class VehicleChargingHandler2 implements DistributedActivityEngine, Charg
 		if (wasStillCharging) {
 			var charger = chargingInfrastructure.getChargers().get(chargingActivity.chargerId);
 			var now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
-			charger.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(chargingActivity.vehicleId), now);
+			charger.getLogic().removeVehicle(electricFleet.getVehicle(chargingActivity.vehicleId), now);
 		}
 	}
 
