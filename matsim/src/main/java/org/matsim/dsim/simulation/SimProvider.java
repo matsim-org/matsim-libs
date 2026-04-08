@@ -25,7 +25,6 @@ import org.matsim.dsim.utils.NodeSingletonModule;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SimProvider implements LPProvider {
 
@@ -59,8 +58,8 @@ public class SimProvider implements LPProvider {
 
 	@Inject
 	SimProvider(Injector injector, Collection<AbstractQSimModule> modules,
-				@Named("overrides") List<AbstractQSimModule> overridingModules,
-				@Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
+	            @Named("overrides") List<AbstractQSimModule> overridingModules,
+	            @Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
 		this.injector = injector;
 		this.modules = new ArrayList<>(modules);
 		// (these are the implementations)
@@ -133,15 +132,6 @@ public class SimProvider implements LPProvider {
 
 		AgentSourcesContainer agentSources = dsimInjector.getInstance(AgentSourcesContainer.class);
 
-		// Retrieve all mobsim listeners
-		Set<MobsimListener> listener = dsimInjector.getInstance(Key.get(new TypeLiteral<>() {
-		}));
-
-		// Add all listener that are not node singletons, or this is the first instance
-		listener = listener.stream()
-			.filter(l -> !l.getClass().isAnnotationPresent(NodeSingleton.class) || nodeSingletonInjector == null)
-			.collect(Collectors.toSet());
-
 		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
 			if (activeComponent instanceof Annotation) {
@@ -175,25 +165,52 @@ public class SimProvider implements LPProvider {
 				}
 
 				if (qSimComponent instanceof MobsimListener l) {
-					simProcess.addQueueSimulationListeners(l);
-					//listeners.add(l);
+					if (!l.getClass().isAnnotationPresent(NodeSingleton.class)) {
+						// mobsim listeners, that are not annotated are added to the simprocess. The most common case is, that we'll have one
+						// listener per partition.
+						simProcess.addQueueSimulationListeners(l);
+					} else if (nodeSingletonInjector == null) {
+						// the first partition of a compute node sets the nodeSingletonInjector below. Therefore, for the first partition, it is null
+						// we only want to add node singleton listeners once. We do it when the first partition is created.
+						listeners.add(l);
+					}
 				}
 			}
 		}
 
-		// Separate singleton listeners and partition specific ones
-		for (MobsimListener l : listener) {
-			if (l.getClass().isAnnotationPresent(NodeSingleton.class))
-				listeners.add(l);
-			else
-				simProcess.addQueueSimulationListeners(l);
-		}
+		// Retrieve all mobsim listeners that are not mobsim components
+		Set<MobsimListener> mobsimListeners = dsimInjector.getInstance(Key.get(new TypeLiteral<>() {}));
+		addNodeSingletonListeners(mobsimListeners);
+		addPartitionListeners(mobsimListeners, simProcess);
 
 		if (node.isFirstPartition(partition.getIndex())) {
 			nodeSingletonInjector = dsimInjector;
 		}
 
 		return simProcess;
+	}
+
+	private void addNodeSingletonListeners(Set<MobsimListener> mobsimListeners) {
+		// node singleton listeners are only added during the first call of create().
+		// The first create() call sets the injector for the next invocations of create(). Didn't understand this on first sight...
+		if (nodeSingletonInjector != null) return;
+
+		// listeners that are node singletons are added to the listeners set, which contains listeners, that want to be called
+		// once from the main dsim loop.
+		for (MobsimListener l : mobsimListeners) {
+			if (l.getClass().isAnnotationPresent(NodeSingleton.class)) {
+				listeners.add(l);
+			}
+		}
+	}
+
+	private void addPartitionListeners(Set<MobsimListener> mobsimListeners, SimProcess simProcess) {
+		// listeners, that are not node singletons, are added to the simProcess
+		for (MobsimListener l : mobsimListeners) {
+			if (!l.getClass().isAnnotationPresent(NodeSingleton.class)) {
+				simProcess.addQueueSimulationListeners(l);
+			}
+		}
 	}
 
 }

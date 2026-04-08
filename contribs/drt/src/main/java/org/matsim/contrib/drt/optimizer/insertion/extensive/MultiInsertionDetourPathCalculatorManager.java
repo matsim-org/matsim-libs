@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelDisutility;
@@ -10,6 +11,7 @@ import org.matsim.core.router.util.TravelTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@NodeSingleton
 public class MultiInsertionDetourPathCalculatorManager implements MobsimBeforeCleanupListener {
 
 	private final Network network;
@@ -19,8 +21,7 @@ public class MultiInsertionDetourPathCalculatorManager implements MobsimBeforeCl
 	private final List<MultiInsertionDetourPathCalculator> multiInsertionDetourPathCalculatorList;
 
 	MultiInsertionDetourPathCalculatorManager(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
-											  DrtConfigGroup drtCfg)
-	{
+	                                          DrtConfigGroup drtCfg) {
 		this.network = network;
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
@@ -34,10 +35,8 @@ public class MultiInsertionDetourPathCalculatorManager implements MobsimBeforeCl
 	}
 
 
-
-	MultiInsertionDetourPathCalculator create()
-	{
-		MultiInsertionDetourPathCalculator instance =  new MultiInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
+	MultiInsertionDetourPathCalculator create() {
+		MultiInsertionDetourPathCalculator instance = new MultiInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
 		this.multiInsertionDetourPathCalculatorList.add(instance);
 		return instance;
 	}
