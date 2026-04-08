@@ -75,8 +75,6 @@ public class RunEvExample {
 		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
-		config.controller().setMobsim("dsim");
-		config.dsim().setThreads(2);
 		configurator.accept(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenarioConfigurator.accept(scenario);
