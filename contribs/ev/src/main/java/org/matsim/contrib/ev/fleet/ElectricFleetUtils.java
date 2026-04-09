@@ -38,10 +38,8 @@ public final class ElectricFleetUtils {
 	private ElectricFleetUtils() {} // do not instantiate
 
 	/**
-	 * Sets the the state of charge at the beginning of the simulation for the vehicle.
+	 * Sets the state of charge at the beginning of the simulation for the vehicle.
 	 * The value must be provided in the range [0, 1].
-	 * @param vehicle
-	 * @param initialSoc
 	 */
 	public static void setInitialSoc(Vehicle vehicle, double initialSoc) {
 		Preconditions.checkArgument(initialSoc >= 0 && initialSoc <= 1,
@@ -51,8 +49,6 @@ public final class ElectricFleetUtils {
 
 	/**
 	 * Sets the charger types the vehicle type is compatible with.
-	 * @param vehicleType
-	 * @param chargerTypes
 	 */
 	public static void setChargerTypes(VehicleType vehicleType, Collection<String> chargerTypes) {
 		vehicleType.getEngineInformation().getAttributes().putAttribute(CHARGER_TYPES, chargerTypes);
@@ -60,7 +56,6 @@ public final class ElectricFleetUtils {
 
 	/**
 	 * Changes the attribute of the vehicle type's engine information such that the vehicle type is considered to be electric (by the EV contrib).
-	 * @param vehicleType
 	 */
 	public static void setElectricVehicleType(VehicleType vehicleType) {
 		VehicleUtils.setHbefaTechnology(vehicleType.getEngineInformation(), EV_ENGINE_HBEFA_TECHNOLOGY);
@@ -95,12 +90,18 @@ public final class ElectricFleetUtils {
 
 	public static void createAndAddVehicleSpecificationsFromMatsimVehicles(ElectricFleetSpecification fleetSpecification, Collection<Vehicle> vehicles) {
 		vehicles.stream()
-			.filter(vehicle -> EV_ENGINE_HBEFA_TECHNOLOGY.equals(VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())))
+			.filter(vehicle -> isElectricVehicleType(vehicle.getType()))
 			.map(ElectricVehicleSpecificationDefaultImpl::new)
 			.forEach(fleetSpecification::addVehicleSpecification);
 	}
 
 	public static ElectricVehicleSpecification createElectricVehicleSpecificationDefaultImpl(Vehicle matsimVehicle) {
 		return new ElectricVehicleSpecificationDefaultImpl(matsimVehicle);
+	}
+
+	public static boolean isElectricVehicleType(VehicleType vehicleType) {
+		var engineInformation = vehicleType.getEngineInformation();
+		var hbefaTechnology = VehicleUtils.getHbefaTechnology(engineInformation);
+		return EV_ENGINE_HBEFA_TECHNOLOGY.equals(hbefaTechnology);
 	}
 }

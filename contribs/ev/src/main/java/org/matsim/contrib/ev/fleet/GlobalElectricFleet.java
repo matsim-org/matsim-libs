@@ -18,6 +18,7 @@ public class GlobalElectricFleet implements ElectricFleet {
 	@Inject
 	GlobalElectricFleet(Vehicles scenarioVehicles, DriveEnergyConsumption.Factory driveEnergyConsumptionFactory, AuxEnergyConsumption.Factory auxEnergyConsumptionFactory, ChargingPower.Factory chargingPowerFactory) {
 		this.electricVehicles = scenarioVehicles.getVehicles().values().stream()
+			.filter(v -> ElectricFleetUtils.isElectricVehicleType(v.getType()))
 			.map(ElectricVehicleSpecificationDefaultImpl::new)
 			.map(s -> ElectricFleetUtils.create(s, driveEnergyConsumptionFactory, auxEnergyConsumptionFactory, chargingPowerFactory))
 			.collect(Collectors.toMap(ElectricVehicle::getId, v -> v));

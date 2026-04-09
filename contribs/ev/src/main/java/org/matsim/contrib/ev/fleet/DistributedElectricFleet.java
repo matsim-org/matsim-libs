@@ -12,7 +12,6 @@ import org.matsim.core.mobsim.dsim.NotifyVehiclePartitionTransfer;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import java.util.HashMap;
@@ -56,8 +55,7 @@ public class DistributedElectricFleet implements ElectricFleet, NotifyVehiclePar
 		var result = electricVehicles.get(vehicleId);
 
 		if (result == null) {
-			var hbefaTechnology = getHbefaTechnology(vehicleId);
-			if (isElectricVehicle(hbefaTechnology)) {
+			if (isElectricVehicle(vehicleId)) {
 				var specification = new ElectricVehicleSpecificationDefaultImpl(scenarioVehicles.getVehicles().get(vehicleId));
 				result = ElectricFleetUtils.create(specification, driveEnergyConsumptionFactory, auxEnergyConsumptionFactory, chargingPowerFactory);
 				electricVehicles.put(vehicleId, result);
@@ -75,8 +73,7 @@ public class DistributedElectricFleet implements ElectricFleet, NotifyVehiclePar
 		if (electricVehicles.containsKey(vehicleId)) return true;
 
 		// does the scenario have an electric vehicle with that id?
-		var hbefaTechnology = getHbefaTechnology(vehicleId);
-		return isElectricVehicle(hbefaTechnology);
+		return isElectricVehicle(vehicleId);
 	}
 
 	@Override
@@ -118,14 +115,9 @@ public class DistributedElectricFleet implements ElectricFleet, NotifyVehiclePar
 		}
 	}
 
-	private String getHbefaTechnology(Id<Vehicle> vehicleId) {
+	private boolean isElectricVehicle(Id<Vehicle> vehicleId) {
 		var vehicle = scenarioVehicles.getVehicles().get(vehicleId);
-		var engineInformation = vehicle.getType().getEngineInformation();
-		return VehicleUtils.getHbefaTechnology(engineInformation);
-	}
-
-	private boolean isElectricVehicle(String hbefaTechnology) {
-		return ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY.equals(hbefaTechnology);
+		return ElectricFleetUtils.isElectricVehicleType(vehicle.getType());
 	}
 
 	/**
