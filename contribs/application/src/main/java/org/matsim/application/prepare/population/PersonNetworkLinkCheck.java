@@ -25,6 +25,7 @@ import java.util.stream.Stream;
  */
 @CommandLine.Command(name = "person-network-link-check", description = "Check the plan of a person for non-existing link ids.")
 public final class PersonNetworkLinkCheck implements MATSimAppCommand, PersonAlgorithm {
+	///  yyyy There is also {@link org.matsim.core.population.algorithms.PersonRouteCheck}.  They should be merged.
 
 	private static final Logger log = LogManager.getLogger(PersonNetworkLinkCheck.class);
 

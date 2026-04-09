@@ -1,16 +1,17 @@
 package org.matsim.core.mobsim.dsim;
 
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+
+import java.util.Map;
 
 /**
  * A distributed engine accepts agents and processes simulation steps.
  */
-public interface DistributedMobsimEngine extends MobsimEngine {
+public interface DistributedMobsimEngine extends MobsimEngine, DSimComponentsMessageProcessor {
 
-	/**
-	 * Process receives {@link SimStepMessage} and updates the engine's internal state.
-	 */
-	default void process(SimStepMessage stepMessage, double now) {
+	default Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
+		return Map.of();
 	}
 
 	/**

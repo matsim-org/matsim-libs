@@ -1,5 +1,6 @@
 package org.matsim.application;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -180,6 +181,11 @@ public class MATSimApplicationTest {
 
 	}
 
+	@Test
+	void run_noConfig() {
+		Assertions.assertThrows(NullPointerException.class, () -> MATSimApplication.execute(TestScenario.class));
+	}
+
 	@MATSimApplication.Prepare({
 		TrajectoryToPlans.class, GenerateShortDistanceTrips.class, ExtractRelevantFreightTrips.class, MergePopulations.class
 	})
@@ -192,7 +198,6 @@ public class MATSimApplicationTest {
 			super(config);
 		}
 
-		// Public constructor is required to run the class
 		public TestScenario() {
 		}
 

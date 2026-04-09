@@ -19,8 +19,15 @@
  * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor.Builder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -54,16 +61,18 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleUtils;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Supplier;
-
-import static org.junit.jupiter.api.Assertions.*;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor.Builder;
 
 /**
  * Most of these tests were copied from org.matsim.pt.router.TransitRouterImplTest
@@ -73,10 +82,14 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class SwissRailRaptorTest {
 
-    private SwissRailRaptor createTransitRouter(TransitSchedule schedule, Config config, Network network) {
+    private SwissRailRaptor createTransitRouter(TransitSchedule schedule, Config config, Network network, Function<SwissRailRaptor.Builder, SwissRailRaptor.Builder> adapter) {
         SwissRailRaptorData data = SwissRailRaptorData.create(schedule, null, RaptorUtils.createStaticConfig(config), network, null);
-        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, config).build();
+        SwissRailRaptor raptor = adapter.apply(new SwissRailRaptor.Builder(data, config)).build();
         return raptor;
+    }
+
+    private SwissRailRaptor createTransitRouter(TransitSchedule schedule, Config config, Network network) {
+        return createTransitRouter(schedule, config, network, builder -> builder);
     }
 
 	@Test
@@ -348,8 +361,9 @@ public class SwissRailRaptorTest {
 		swissRailRaptorConfigGroup.addModeToModeTransferPenalty(trainToShip);
 		swissRailRaptorConfigGroup.addModeToModeTransferPenalty(shipToTrain);
 		swissRailRaptorConfigGroup.setTransferWalkMargin(0);
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
-        TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
+        TransitRouter router = createTransitRouter(f.schedule, f.config, f.network, builder -> {
+            return builder.with(new ModeSpecificTransferCostCalculator());
+        });
 		Coord fromCoord = new Coord(3800, 5100);
 		Coord toCoord = new Coord(16100, 10050);
 		List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600, null));

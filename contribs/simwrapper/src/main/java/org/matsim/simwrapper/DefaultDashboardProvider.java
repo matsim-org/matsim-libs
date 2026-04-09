@@ -19,7 +19,7 @@ public class DefaultDashboardProvider implements DashboardProvider {
 	@Override
 	public List<Dashboard> getDashboards(Config config, SimWrapper simWrapper) {
 		List<Dashboard> result = new ArrayList<>(List.of(
-			new OverviewDashboard(),
+			new OverviewDashboard(Set.copyOf(config.qsim().getMainModes())),
 			new TripDashboard(),
 			new TrafficDashboard(Set.copyOf(config.qsim().getMainModes()))
 		));

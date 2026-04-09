@@ -3,11 +3,14 @@ package org.matsim.dsim;
 import com.google.inject.Provider;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
@@ -211,6 +214,58 @@ class DistributedEventsManagerTest {
 		assertEquals(1, handler.counter.get());
 	}
 
+	@Test
+	public void eventClassHierachy() {
+
+		MessageBroker broker = mock(MessageBroker.class);
+		var serializationProvider = new SerializationProvider();
+		LPExecutor executor = new SingleExecutor(serializationProvider);
+		var computeNode = ComputeNode.builder()
+			.rank(0)
+			.parts(IntList.of(0, 1))
+			.build();
+
+		var manager = new DistributedEventsManager(broker, computeNode, executor, serializationProvider);
+
+		// this handler wants to be notified for subclassedEvents
+		var subclassedTestEventHandler = new SubclassedEvent.Handler() {
+
+			final AtomicInteger counter = new AtomicInteger(0);
+
+			@Override
+			public void handleEvent(SubclassedEvent e) {
+				counter.incrementAndGet();
+			}
+		};
+		// This handler wants to handle the intermediate Type
+		var testEventHandler = new GlobalTestHandler();
+		// This handler wants to handle the basic event type
+		var basicEventHandler = new BasicEventHandler() {
+
+			final AtomicInteger counter = new AtomicInteger(0);
+
+			@Override
+			public void handleEvent(Event event) {
+				counter.incrementAndGet();
+			}
+		};
+		manager.addHandler(subclassedTestEventHandler);
+		manager.addHandler(testEventHandler);
+		manager.addHandler(basicEventHandler);
+
+		var emittingPartition = 0;
+		manager.setContext(emittingPartition);
+
+		manager.processEvent(new SubclassedEvent(1., "first"));
+		manager.processEvent(new TestEvent(1., "second"));
+		manager.processEvent(new LinkEnterEvent(1., Id.createVehicleId("unimportant-data"), Id.createLinkId("unimportant-data")));
+		executor.runEventHandler();
+
+		assertEquals(1, subclassedTestEventHandler.counter.get());
+		assertEquals(2, testEventHandler.counter.get());
+		assertEquals(3, basicEventHandler.counter.get());
+	}
+
 	@DistributedEventHandler(value = DistributedMode.GLOBAL)
 	private static class GlobalTestHandler implements TestEvent.Handler {
 
@@ -308,6 +363,22 @@ class DistributedEventsManagerTest {
 			// it is in fact used, but through the events manager and not directly in the test code.
 			@SuppressWarnings("unused")
 			void handleEvent(TestEvent e);
+		}
+	}
+
+	public static class SubclassedEvent extends TestEvent {
+		public SubclassedEvent(double time, String data) {
+			super(time, data);
+		}
+
+		@Override
+		public String getEventType() {
+			return "DistributedEventsManagerTest::SubClassedEvent";
+		}
+
+		interface Handler extends EventHandler {
+
+			void handleEvent(SubclassedEvent e);
 		}
 	}
 }
