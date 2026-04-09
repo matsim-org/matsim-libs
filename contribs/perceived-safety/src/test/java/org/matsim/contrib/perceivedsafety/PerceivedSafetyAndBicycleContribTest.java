@@ -10,8 +10,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleModule;
@@ -43,7 +42,6 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static org.matsim.contrib.perceivedsafety.PerceivedSafetyAndBicycleContribTest.Setup.*;
-import static org.matsim.contrib.perceivedsafety.PerceivedSafetyScoringTest.createAndAddTestPopulation;
 
 public class PerceivedSafetyAndBicycleContribTest {
 	@RegisterExtension
@@ -131,7 +129,7 @@ public class PerceivedSafetyAndBicycleContribTest {
 
 //########################################################################### prepare scenario #######################################################################
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
-			createAndAddTestPopulation(scenario, TransportMode.bike, Id.createLinkId("1"), Id.createLinkId("20"));
+			createAndAddTestPopulation(scenario, Id.createLinkId("1"), Id.createLinkId("20"));
 
 			scenario.getNetwork().getLinks().values()
 				.forEach(l -> {
@@ -339,7 +337,7 @@ public class PerceivedSafetyAndBicycleContribTest {
 
 //########################################################################### prepare scenario #######################################################################
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
-			createAndAddTestPopulation(scenario, TransportMode.bike, Id.createLinkId("20"), Id.createLinkId("21"));
+			createAndAddTestPopulation(scenario, Id.createLinkId("20"), Id.createLinkId("21"));
 
 			switch (setup) {
 				case BASIC -> {
@@ -415,7 +413,7 @@ public class PerceivedSafetyAndBicycleContribTest {
 			controler.run();
 
 //            read experienced plans and get score of plan
-			String experiencedPlansPath = ApplicationUtils.globFile(outputPath, "*output_experienced_plans.xml.gz").toString();
+			String experiencedPlansPath = ApplicationUtils.globFile(outputPath, "*output_experienced_plans.xml*").toString();
 			Population experiencedPlans = PopulationUtils.readPopulation(experiencedPlansPath);
 
 //            score of plan should only consist of leg scores as all act types are set to "dont score"
@@ -478,6 +476,29 @@ public class PerceivedSafetyAndBicycleContribTest {
 					bind(QNetworkFactory.class).toInstance(factory);}
 			});
 		}
+	}
+
+	private void createAndAddTestPopulation(MutableScenario scenario, Id<Link> startLinkId, Id<Link> endLinkId) {
+		Population pop = PopulationUtils.createPopulation(scenario.getConfig());
+		PopulationFactory fac = pop.getFactory();
+
+		Activity home = fac.createActivityFromLinkId("h", startLinkId);
+		home.setEndTime(8 * 3600.);
+		Leg leg = fac.createLeg(TransportMode.bike);
+		Activity work = fac.createActivityFromLinkId("w", endLinkId);
+		work.setEndTime(9 * 3600.);
+
+		Plan plan = fac.createPlan();
+		plan.addActivity(home);
+		plan.addLeg(leg);
+		plan.addActivity(work);
+
+		Person person = fac.createPerson(Id.createPersonId("testPerson"));
+		person.addPlan(plan);
+		person.setSelectedPlan(plan);
+
+		pop.addPerson(person);
+		scenario.setPopulation(pop);
 	}
 
 	enum Setup {

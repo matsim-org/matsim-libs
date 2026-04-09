@@ -5,13 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonScoreEvent;
+import org.matsim.api.core.v01.events.handler.PersonScoreEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.application.ApplicationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -25,10 +27,7 @@ import org.matsim.vehicles.VehicleUtils;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.matsim.contrib.perceivedsafety.PerceivedSafetyUtils.E_BIKE;
 import static org.matsim.contrib.perceivedsafety.PerceivedSafetyUtils.E_SCOOTER;
@@ -38,21 +37,20 @@ public class PerceivedSafetyScoringTest {
     @RegisterExtension
     MatsimTestUtils utils = new MatsimTestUtils();
 
-    private static final Id<Person> PERSON_ID = Id.createPersonId("testPerson");
+    private static final String PERSON_ID = "testPerson";
+	private static final Map<String, List<Double>> ACTUAL_LEG_SCORES = new HashMap<>();
 
     @Test
     public void testPerceivedSafetyScoring() {
-//		expected cores come from the old approach, which is located at
+//		expected scores come from the old approach, which is located at
 //		https://github.com/panosgjuras/Psafe
         Map<String, Double> expectedLegScores = new HashMap<>();
-        expectedLegScores.put(E_BIKE, -3.2736575082122163);
-        expectedLegScores.put(E_SCOOTER, -2.5198001162493413);
-        expectedLegScores.put(TransportMode.car, -2.005143189283833);
-
-        Map<String, Double> actualLegScores = new HashMap<>();
+        expectedLegScores.put(PERSON_ID + "_" + E_BIKE, -3.2736575082122163);
+        expectedLegScores.put(PERSON_ID + "_" + E_SCOOTER, -2.5198001162493413);
+        expectedLegScores.put(PERSON_ID + "_" + TransportMode.car, -2.005143189283833);
 
         for (Map.Entry<String, Double> e : expectedLegScores.entrySet()) {
-            String mode = e.getKey();
+            String mode = e.getKey().split("_")[1];
             URL context = ExamplesUtils.getTestScenarioURL("equil");
             Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(context, "config.xml"));
 
@@ -112,22 +110,26 @@ public class PerceivedSafetyScoringTest {
 
             Controler controler = new Controler(scenario);
             controler.addOverridingModule(new PerceivedSafetyModule());
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addEventHandlerBinding().to(PerceivedSafetyScoreEventHandler.class);
+				}
+			});
             controler.run();
-
-//            read experienced plans and get score of plan
-            String experiencedPlansPath = ApplicationUtils.globFile(outputPath, "*output_experienced_plans.xml.gz").toString();
-            Population experiencedPlans = PopulationUtils.readPopulation(experiencedPlansPath);
-
-//            score of plan should only consist of leg scores as all act types are set to "dont score"
-            actualLegScores.put(e.getKey(), experiencedPlans.getPersons().get(PERSON_ID).getSelectedPlan().getScore());
         }
 
-        for (Map.Entry<String, Double> e : actualLegScores.entrySet()) {
-            Assertions.assertEquals(expectedLegScores.get(e.getKey()), e.getValue());
+        for (Map.Entry<String, List<Double>> e : ACTUAL_LEG_SCORES.entrySet()) {
+//			there should be 2 scores which are scored at LinkLeave link 20 and VehicleLeavesTraffic link 21
+			Assertions.assertEquals(2, e.getValue().size());
+//			we only want to compare the first value to the old approach.
+//			the old approach did not score perceived safety correctly as it ignores the VehicleLeavesTrafficEvent at link 21, there is no LinkLeaveEvent when
+//			the vehicle leaves traffic at the same link! -sm0426
+            Assertions.assertEquals(expectedLegScores.get(e.getKey()), e.getValue().getFirst());
         }
     }
 
-    static void createAndAddTestPopulation(MutableScenario scenario, String mode, Id<Link> startLinkId, Id<Link> endLinkId) {
+    private void createAndAddTestPopulation(MutableScenario scenario, String mode, Id<Link> startLinkId, Id<Link> endLinkId) {
         Population pop = PopulationUtils.createPopulation(scenario.getConfig());
         PopulationFactory fac = pop.getFactory();
 
@@ -142,11 +144,19 @@ public class PerceivedSafetyScoringTest {
         plan.addLeg(leg);
         plan.addActivity(work);
 
-        Person person = fac.createPerson(PERSON_ID);
+        Person person = fac.createPerson(Id.createPersonId(PERSON_ID + "_" + mode));
         person.addPlan(plan);
         person.setSelectedPlan(plan);
 
         pop.addPerson(person);
         scenario.setPopulation(pop);
     }
+
+	private static class PerceivedSafetyScoreEventHandler implements PersonScoreEventHandler {
+		@Override
+		public void handleEvent(PersonScoreEvent event) {
+			ACTUAL_LEG_SCORES.putIfAbsent(event.getPersonId().toString(), new ArrayList<>());
+			ACTUAL_LEG_SCORES.get(event.getPersonId().toString()).add(event.getAmount());
+		}
+	}
 }
