@@ -16,13 +16,13 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.mobsim.dsim.DistributedActivityHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.vehicles.Vehicle;
@@ -35,7 +35,7 @@ import java.util.Set;
 /**
  * Rewrite of {@link VehicleChargingHandler} as an Activity engine.
  */
-public class VehicleChargingHandler2 implements ActivityHandler, DistributedMobsimEngine, ChargingListener {
+public class VehicleChargingHandler2 implements DistributedActivityHandler, DistributedMobsimEngine, ChargingListener {
 
 	public static final String CHARGING_IDENTIFIER = " charging";
 	public static final String CHARGING_INTERACTION = ScoringConfigGroup.createStageActivityType(
@@ -165,7 +165,11 @@ public class VehicleChargingHandler2 implements ActivityHandler, DistributedMobs
 
 	@Override
 	public void rescheduleActivityEnd(MobsimAgent agent) {
-		delegateEngine.rescheduleActivityEnd(agent);
+		// ActivityEngineDefaultImpl happily reschedules and registers agents that it does not manage.
+		// Therefore, only delegate requests for agents which we actually have delegated to our default engine.
+		if (this.personsCharging.containsKey(agent.getId())) {
+			delegateEngine.rescheduleActivityEnd(agent);
+		}
 	}
 
 	@Override

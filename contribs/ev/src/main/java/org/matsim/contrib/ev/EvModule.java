@@ -22,7 +22,6 @@ package org.matsim.contrib.ev;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.matsim.contrib.ev.analysis.EvAnalysisModule;
-import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler2;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -45,17 +44,20 @@ public class EvModule extends AbstractModule {
 			@Override
 			protected void configureQSim() {
 
-				if (getConfig().controller().getMobsim().equals("dsim")) {
-					bind(VehicleChargingHandler2.class).in(Singleton.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).to(VehicleChargingHandler2.class);
-				} else {
-					bind(VehicleChargingHandler.class).in(Singleton.class);
-					addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class);
-					if (evCfg.isEnforceChargingInteractionDuration()) {
-						this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(VehicleChargingHandler.class);
-						addMobsimListenerBinding().to(VehicleChargingHandler.class);
-					}
-				}
+				bind(VehicleChargingHandler2.class).in(Singleton.class);
+				addQSimComponentBinding(EvModule.EV_COMPONENT).to(VehicleChargingHandler2.class);
+
+//				if (getConfig().controller().getMobsim().equals("dsim")) {
+//					bind(VehicleChargingHandler2.class).in(Singleton.class);
+//					addQSimComponentBinding(EvModule.EV_COMPONENT).to(VehicleChargingHandler2.class);
+//				} else {
+//					bind(VehicleChargingHandler.class).in(Singleton.class);
+//					addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class);
+//					if (evCfg.isEnforceChargingInteractionDuration()) {
+//						this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(VehicleChargingHandler.class);
+//						addMobsimListenerBinding().to(VehicleChargingHandler.class);
+//					}
+//				}
 			}
 		});
 
