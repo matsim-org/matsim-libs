@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Behavior-path tests for {@link VehicleChargingHandler2}.
+ * Behavior-path tests for {@link ChargingActivityEngine}.
  * <p>
  * Uses a mocked {@code ActivityEngine} as the delegate. The key interaction is that
  * VCH2 wraps the delegate's {@link InternalInterface} with its own
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.*;
  * {@link ArgumentCaptor} and call {@code arrangeNextAgentState} on it directly to
  * simulate the agent waking up from its activity.
  */
-public class VehicleChargingHandler2Test {
+public class ChargingActivityEngineTest {
 
 	private static final Id<Link> CHARGER_LINK = Id.createLinkId("l1");
 	private static final Id<Charger> CHARGER_ID = Id.create("charger", Charger.class);
@@ -262,7 +262,7 @@ public class VehicleChargingHandler2Test {
 		var vch2 = buildVch2(new EvConfigGroup(), buildMockInternalInterface(), delegateEngine);
 
 		Activity chargingAct = PopulationUtils.getFactory().createActivityFromLinkId(
-			VehicleChargingHandler2.CHARGING_INTERACTION, CHARGER_LINK);
+			ChargingActivityEngine.CHARGING_INTERACTION, CHARGER_LINK);
 		Leg leg = PopulationUtils.getFactory().createLeg("car");
 		// Route that does NOT implement HasVehicleId
 		leg.setRoute(RouteUtils.createGenericRouteImpl(CHARGER_LINK, CHARGER_LINK));
@@ -375,9 +375,9 @@ public class VehicleChargingHandler2Test {
 			vehicle -> chargerSpec -> CHARGER_POWER_W);
 	}
 
-	private VehicleChargingHandler2 buildVch2(EvConfigGroup evCfg, InternalInterface internalInterface,
-	                                          ActivityEngine delegateEngine) {
-		var handler = new VehicleChargingHandler2(
+	private ChargingActivityEngine buildVch2(EvConfigGroup evCfg, InternalInterface internalInterface,
+	                                         ActivityEngine delegateEngine) {
+		var handler = new ChargingActivityEngine(
 			chargingInfrastructure, electricFleet, evCfg,
 			(chargerSpec, vehicle) -> new ChargeUpToMaxSocStrategy(chargerSpec, vehicle, 1.0),
 			delegateEngine);
@@ -434,12 +434,12 @@ public class VehicleChargingHandler2Test {
 
 	/**
 	 * Creates an agent mock that implements both {@link MobsimAgent} and {@link PlanAgent},
-	 * with a {@link VehicleChargingHandler2#CHARGING_INTERACTION} activity preceded by a leg
+	 * with a {@link ChargingActivityEngine#CHARGING_INTERACTION} activity preceded by a leg
 	 * carrying the given vehicle ID.
 	 */
 	private MobsimAgent buildChargingAgent(Id<Person> personId, Id<Vehicle> vehicleId, double activityEndTime) {
 		var chargingAct = PopulationUtils.getFactory()
-			.createActivityFromLinkId(VehicleChargingHandler2.CHARGING_INTERACTION, CHARGER_LINK);
+			.createActivityFromLinkId(ChargingActivityEngine.CHARGING_INTERACTION, CHARGER_LINK);
 		var leg = PopulationUtils.getFactory().createLeg("car");
 		var route = RouteUtils.createLinkNetworkRouteImpl(CHARGER_LINK, CHARGER_LINK);
 		route.setVehicleId(vehicleId);

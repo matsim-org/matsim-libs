@@ -187,14 +187,14 @@ public class EvChargingIntegrationTest {
 
 	private static Config createConfig(String outputDir) {
 		var config = EvDSimTestFixture.createConfig(outputDir);
-		var chargingParams = new ScoringConfigGroup.ActivityParams(VehicleChargingHandler.CHARGING_INTERACTION)
+		var chargingParams = new ScoringConfigGroup.ActivityParams(ChargingActivityEngine.CHARGING_INTERACTION)
 			.setScoringThisActivityAtAll(false);
 		config.scoring().addActivityParams(chargingParams);
 		return config;
 	}
 
 	private static Scenario createScenario(Config config, int numParts) {
-		var scenario = EvDSimTestFixture.createScenario(config, 1);
+		var scenario = EvDSimTestFixture.createScenario(config, numParts);
 
 		var testPerson = scenario.getPopulation().getPersons().get(Id.createPersonId(EvDSimTestFixture.PERSON_ID));
 		setPlanWithCharging(testPerson, Id.createVehicleId(EvDSimTestFixture.EV_ID));
@@ -268,7 +268,7 @@ public class EvChargingIntegrationTest {
 		plan.addLeg(leg1);
 
 		var chargingAct = f.createActivityFromLinkId(
-			VehicleChargingHandler2.CHARGING_INTERACTION, Id.createLinkId("l2"));
+			ChargingActivityEngine.CHARGING_INTERACTION, Id.createLinkId("l2"));
 		chargingAct.setMaximumDuration(200.0); // 200 s >> ~44 s needed to fully charge at 50 C
 		plan.addActivity(chargingAct);
 
@@ -435,7 +435,7 @@ public class EvChargingIntegrationTest {
 			assertEquals(2, chargingStartOrder.size(), "Expected exactly 2 ChargingStartEvents");
 			assertEquals(2, chargeAtEnd.size(), "Expected exactly 2 ChargingEndEvents");
 			assertEquals(1, queuedCount, "Expected exactly 1 QueuedAtChargerEvent");
-			assertEquals(Id.createVehicleId("ev-queue-1"), chargingStartOrder.get(0),
+			assertEquals(Id.createVehicleId("ev-queue-1"), chargingStartOrder.getFirst(),
 				"Agent 1 should charge before agent 2");
 			assertEquals(2 * EXPECTED_CHARGED, totalCharged, 1e-9,
 				"Total charged energy should be 2 × EXPECTED_CHARGED");

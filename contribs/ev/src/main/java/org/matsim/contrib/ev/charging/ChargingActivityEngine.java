@@ -33,9 +33,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Rewrite of {@link VehicleChargingHandler} as an Activity engine.
+ * This class handles activities of type `** charging interaction`. It takes care of plugging electric vehicles into a suitable charger
+ * It will unplug electriv vehicles if the activity ends before the vehicle is fully charged. It will keep the agent at the activity until
+ * the activity end time even when the vehicle is fully charged.
+ * <p>
+ * Internally, a default bound {@link ActivityEngine} is used to manage agents at the activity.
  */
-public class VehicleChargingHandler2 implements DistributedActivityHandler, DistributedMobsimEngine, ChargingListener {
+public class ChargingActivityEngine implements DistributedActivityHandler, DistributedMobsimEngine, ChargingListener {
 
 	public static final String CHARGING_IDENTIFIER = " charging";
 	public static final String CHARGING_INTERACTION = ScoringConfigGroup.createStageActivityType(
@@ -56,7 +60,7 @@ public class VehicleChargingHandler2 implements DistributedActivityHandler, Dist
 	private InternalInterface internalInterface;
 
 	@Inject
-	public VehicleChargingHandler2(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet, EvConfigGroup evCfg, ChargingStrategy.Factory strategyFactory, ActivityEngine delegateEngine) {
+	public ChargingActivityEngine(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet, EvConfigGroup evCfg, ChargingStrategy.Factory strategyFactory, ActivityEngine delegateEngine) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.electricFleet = electricFleet;
 		this.chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure);
@@ -106,7 +110,7 @@ public class VehicleChargingHandler2 implements DistributedActivityHandler, Dist
 			var prevElement = pa.getPreviousPlanElement();
 
 			if (currentElement instanceof Activity a && prevElement instanceof Leg l) {
-				if (a.getType().equals(CHARGING_INTERACTION)) {
+				if (a.getType().endsWith(CHARGING_INTERACTION)) {
 					return handleActivity(agent, a, l);
 				}
 			}
@@ -146,6 +150,8 @@ public class VehicleChargingHandler2 implements DistributedActivityHandler, Dist
 
 	private void endChargingActivity(MobsimAgent agent) {
 		var chargingActivity = personsCharging.remove(agent.getId());
+		if (chargingActivity == null) return;
+
 		// vehiclesAtCharger is removed in notifyChargingEnded when charging completes naturally,
 		// or here when the agent departs while charging is still in progress.
 		var wasStillCharging = vehiclesAtCharger.remove(chargingActivity.vehicleId) != null;
