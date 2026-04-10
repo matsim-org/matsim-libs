@@ -124,6 +124,12 @@ public class BicycleTest {
 		RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
 		ensureBicycleModeParams(config);
 
+		// Override bicycle params to match old main-branch values
+		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule(config, BicycleConfigGroup.class);
+		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
+		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
+		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.0002);
+
 		config.routing().setRoutingRandomness(0.);  // overwrite radomness to match the reference results
 
 		// Links 4-8 and 13-17 have cobblestones
@@ -143,29 +149,32 @@ public class BicycleTest {
 		VehiclesFactory vf = VehicleUtils.getFactory();
 		scenario.getVehicles().addVehicleType(vf.createVehicleType(Id.createVehicleTypeId(TransportMode.car)).setNetworkMode(TransportMode.car));
 		scenario.getVehicles().addVehicleType(vf.createVehicleType(Id.createVehicleTypeId("bicycle"))
-			.setNetworkMode("bicycle")
-			.setMaximumVelocity(RunBicycleContribExample.BICYCLE_SPEED)
-			.setPcuEquivalents(0.25)
-			.setLength(2.0));
+				.setNetworkMode("bicycle")
+				.setMaximumVelocity(4.16666666)
+				.setPcuEquivalents(0.25)
+			//	.setLength(2.0)
+		);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new BicycleModule());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(BicycleParams.class).toInstance(new BicycleParamsDefaultImpl() {
-					@Override
-					public double getInfrastructureFactor(String type, String bicycleInfra) {
-						return 1.0; // neutralize infrastructure
-					}
 
-					@Override
-					public double getComfortFactor(String surface) {
-						if ("cobblestone".equals(surface)) return 0.85; // fixed value for test
-						return 1.0;
-					}
-				});
-			}
-		});
+
+//		controler.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bind(BicycleParams.class).toInstance(new BicycleParamsDefaultImpl() {
+//					@Override
+//					public double getInfrastructureFactor(String type, String bicycleInfra) {
+//						return 1.0; // neutralize infrastructure
+//					}
+//
+//					@Override
+//					public double getComfortFactor(String surface) {
+//						if ("cobblestone".equals(surface)) return 0.85; // fixed value for test
+//						return 1.0;
+//					}
+//				});
+//			}
+//		});
 
 		LOG.info("performing_utils_hr = " + config.scoring().getPerforming_utils_hr());
 		LOG.info("home typicalDuration = " + config.scoring().getActivityParams("home").getTypicalDuration());

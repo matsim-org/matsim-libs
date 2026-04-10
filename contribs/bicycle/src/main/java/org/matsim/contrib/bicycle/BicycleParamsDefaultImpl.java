@@ -38,8 +38,9 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 		};
 	}
 
+
 	@Override
-	public double getInfrastructureFactor(String type, String bicycleInfra) {
+	public double getInfrastructureFactor(String type, String cyclewaytype) {
 
 		// The method was unreadable before, so I hope I got the logic right. basically this differentiates between explicit cycleway tags, where the
 		// road type has an influence on the factor, i.e. cycling along a primary road without cycle lane is less attractive compared to a tertiary road.
@@ -48,73 +49,105 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 		// in case there is no road type a medium factor of 0.85 is assigned
 		// janek may '23
 
-		if (bicycleInfra != null) {
-			switch (bicycleInfra) {
-				// A: top
-				case "CYCLEWAY_ISOLATED":
-				case "CYCLEWAY_ADJOINING_OR_ISOLATED":
-				case "CYCLEWAY_ON_HIGHWAY_PROTECTED":
-				case "FOOT_AND_CYCLEWAY_SEGREGATED_ISOLATED":
-					return 1.0;
-
-				// B: sehr gut
-				case "CYCLEWAY_ADJOINING":
-				case "CYCLEWAY_ON_HIGHWAY_EXCLUSIVE":
-				case "CYCLEWAY_ON_HIGHWAY_ADVISORY_OR_EXCLUSIVE":
-				case "FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING":
-				case "FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING_OR_ISOLATED":
-				case "BICYCLE_ROAD":
-					return 0.95;
-
-				// C: ok
-				case "BICYCLE_ROAD_VEHICLE_DESTINATION":
-					return 0.90;
-
-				case "CYCLEWAY_ON_HIGHWAY_ADVISORY":
-				case "FOOTWAY_BICYCLE_YES_ISOLATED":
-				case "FOOTWAY_BICYCLE_YES_ADJOINING":
-				case "FOOTWAY_BICYCLE_YES_ADJOINING_OR_ISOLATED":
-					return 0.85;
-
-				case "FOOT_AND_CYCLEWAY_SHARED_ISOLATED":
-				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING":
-				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING_OR_ISOLATED":
-				case "PEDESTRIAN_AREA_BICYCLE_YES":
-				case "CYCLEWAY_LINK":
-					return 0.80;
-
-				// D: meh
-				case "SHARED_BUS_LANE_BUS_WITH_BIKE":
-				case "CROSSING":
-				case "NEEDS_CLARIFICATION":
-					return 0.75;
-
-				// E: fallback trigger
-				case "NONE":
-					break;
-
-				default:
-					// unbekannte Kategorie -> lieber nicht “top” geben
-					return 0.8;
-			}
+		//System.out.println("### getInfrastructureFactor called: type=" + type + " cyclewaytype=" + cyclewaytype);
+		if (type == null) return 0.85;
+		if (hasNoCycleway(cyclewaytype)) {
+			return switch (type) {
+				case "trunk" -> 0.05;
+				case "primary", "primary_link" -> 0.1;
+				case "secondary", "secondary_link" -> 0.3;
+				case "tertiary", "tertiary_link" -> 0.4;
+				case "unclassified" -> 0.9;
+				default -> 0.95;
+			};
+		} else {
+			return switch (type) {
+				case "cycleway", "path" -> 1.0;
+				case "steps" -> 0.1;
+				default -> 0.95;
+			};
 		}
-
-		// === Fallback: nur highway type ===
-		if (type == null) return 0.8;
-		return switch (type) {
-			case "trunk" -> 0.05;
-			case "primary", "primary_link" -> 0.10;
-			case "secondary", "secondary_link" -> 0.30;
-			case "tertiary", "tertiary_link" -> 0.40;
-			case "unclassified" -> 0.80;
-			default -> 0.8;  // da bspw fuer redsidentals etc.
-		};
 	}
+
+
+//	@Override
+//	public double getInfrastructureFactor(String type, String bicycleInfra) {
+//
+//		// The method was unreadable before, so I hope I got the logic right. basically this differentiates between explicit cycleway tags, where the
+//		// road type has an influence on the factor, i.e. cycling along a primary road without cycle lane is less attractive compared to a tertiary road.
+//		// On the other hand if cycleways are present the factor is always 0.95, exept the cycle tracks has steps (horrible) or the road type is a
+//		// cycleway anyway (very nice)
+//		// in case there is no road type a medium factor of 0.85 is assigned
+//		// janek may '23
+//
+//		if (bicycleInfra != null) {
+//			switch (bicycleInfra) {
+//				// A: top
+//				case "CYCLEWAY_ISOLATED":
+//				case "CYCLEWAY_ADJOINING_OR_ISOLATED":
+//				case "CYCLEWAY_ON_HIGHWAY_PROTECTED":
+//				case "FOOT_AND_CYCLEWAY_SEGREGATED_ISOLATED":
+//					return 1.0;
+//
+//				// B: sehr gut
+//				case "CYCLEWAY_ADJOINING":
+//				case "CYCLEWAY_ON_HIGHWAY_EXCLUSIVE":
+//				case "CYCLEWAY_ON_HIGHWAY_ADVISORY_OR_EXCLUSIVE":
+//				case "FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING":
+//				case "FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING_OR_ISOLATED":
+//				case "BICYCLE_ROAD":
+//					return 0.95;
+//
+//				// C: ok
+//				case "BICYCLE_ROAD_VEHICLE_DESTINATION":
+//					return 0.90;
+//
+//				case "CYCLEWAY_ON_HIGHWAY_ADVISORY":
+//				case "FOOTWAY_BICYCLE_YES_ISOLATED":
+//				case "FOOTWAY_BICYCLE_YES_ADJOINING":
+//				case "FOOTWAY_BICYCLE_YES_ADJOINING_OR_ISOLATED":
+//					return 0.85;
+//
+//				case "FOOT_AND_CYCLEWAY_SHARED_ISOLATED":
+//				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING":
+//				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING_OR_ISOLATED":
+//				case "PEDESTRIAN_AREA_BICYCLE_YES":
+//				case "CYCLEWAY_LINK":
+//					return 0.80;
+//
+//				// D: meh
+//				case "SHARED_BUS_LANE_BUS_WITH_BIKE":
+//				case "CROSSING":
+//				case "NEEDS_CLARIFICATION":
+//					return 0.75;
+//
+//				// E: fallback trigger
+//				case "NONE":
+//					break;
+//
+//				default:
+//					// unbekannte Kategorie -> lieber nicht “top” geben
+//					return 0.8;
+//			}
+//		}
+//
+//		// === Fallback: nur highway type ===
+//		if (type == null) return 0.8;
+//		return switch (type) {
+//			case "trunk" -> 0.05;
+//			case "primary", "primary_link" -> 0.10;
+//			case "secondary", "secondary_link" -> 0.30;
+//			case "tertiary", "tertiary_link" -> 0.40;
+//			case "unclassified" -> 0.80;
+//			default -> 0.8;  // da bspw fuer redsidentals etc.
+//		};
+//	}
 
 	@Override
 	public double computeSurfaceFactor(Link link) {
 		if (hasNotAttribute(link, BicycleUtils.WAY_TYPE)
-			|| BicycleUtils.BICYCLE_INFRA.equals(link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE))
+			|| BicycleUtils.CYCLEWAY.equals(link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE))
+			//|| BicycleUtils.BICYCLE_INFRA.equals(link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE))
 			|| hasNotAttribute(link, BicycleUtils.SURFACE)
 		) {
 			return 1.0;

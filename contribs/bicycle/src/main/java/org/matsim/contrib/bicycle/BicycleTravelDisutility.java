@@ -99,7 +99,8 @@ class BicycleTravelDisutility implements TravelDisutility {
 
 		String surface = BicycleUtils.getSurface(link);
 		String type = NetworkUtils.getType(link);
-		String bicycleInfraType = BicycleUtils.getBicycleInfraType(link);
+		//String bicycleInfraType = BicycleUtils.getBicycleInfraType(link);
+		String cyclewaytype = BicycleUtils.getCyclewaytype(link);
 
 
 //		//  debugging
@@ -151,7 +152,8 @@ class BicycleTravelDisutility implements TravelDisutility {
 		double comfortFactor = bicycleParams.getComfortFactor(surface);
 		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
 
-		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, bicycleInfraType);
+		//double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, bicycleInfraType);
+		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype);
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
 		double gradientFactor = bicycleParams.getGradient_pct(link);

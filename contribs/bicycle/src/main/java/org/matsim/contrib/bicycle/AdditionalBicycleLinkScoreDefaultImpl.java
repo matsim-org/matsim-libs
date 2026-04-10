@@ -39,14 +39,16 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 
 		String surface = BicycleUtils.getSurface(link);
 		String type = NetworkUtils.getType(link);
-		String bicycleinfratype = BicycleUtils.getBicycleInfraType(link);
+		//String bicycleinfratype = BicycleUtils.getBicycleInfraType(link);
+		String cyclewaytype = BicycleUtils.getCyclewaytype(link);
 
 		double distance_m = link.getLength();
 
 		double comfortFactor = bicycleParams.getComfortFactor(surface);
 		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance_m;
 
-		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, bicycleinfratype);
+		//double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, bicycleinfratype);
+		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype);
 		double infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance_m;
 
 		double gradient_pct = bicycleParams.getGradient_pct(link);

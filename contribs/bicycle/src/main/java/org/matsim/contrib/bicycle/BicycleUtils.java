@@ -32,6 +32,7 @@ public final class BicycleUtils {
 	public static final String SURFACE = "surface";
 	public static final String SMOOTHNESS = "smoothness";
 	public static final String BICYCLE_INFRA = "bicycle_infra";
+	public static final String CYCLEWAY = "cycleway";
 	static final String WAY_TYPE = "type";
 	/*package*/ static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 
@@ -39,8 +40,12 @@ public final class BicycleUtils {
 		// Don't allow to create instances of this class
 	}
 
-	public static String getBicycleInfraType(Link link) {
-		return (String) link.getAttributes().getAttribute(BICYCLE_INFRA);
+//	public static String getBicycleInfraType(Link link) {
+//		return (String) link.getAttributes().getAttribute(BICYCLE_INFRA);
+//	}
+
+	public static String getCyclewaytype(Link link) {
+		return (String) link.getAttributes().getAttribute(CYCLEWAY);
 	}
 
 	public static String getSurface(Link link) {
