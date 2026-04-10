@@ -8,20 +8,15 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleModule;
-import org.matsim.contrib.bicycle.BicycleUtils;
 //import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
@@ -32,24 +27,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
-import com.google.inject.Inject;
-import org.matsim.contrib.bicycle.AdditionalBicycleLinkScore;
-import org.matsim.contrib.bicycle.AdditionalBicycleLinkScoreDefaultImpl;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.core.controler.AbstractModule;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.matsim.core.config.groups.ReplanningConfigGroup.*;
 import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 
-public final class RunBicycleContribExample {
-	private static final Logger LOG = LogManager.getLogger(RunBicycleContribExample.class);
+public final class RunBicycleContribExampleMod {
+	private static final Logger LOG = LogManager.getLogger(RunBicycleContribExampleMod.class);
 
 	private static final String BICYCLE = "bicycle";
-	public static final double BICYCLE_SPEED = 4.16666; //6.944;
+	public static final double BICYCLE_SPEED = 6.944; //4.16666; //6.944;
 	//private static final boolean USE_OWN_SCORING = true;
 
 	public static void main(String[] args) {
@@ -115,7 +103,7 @@ public final class RunBicycleContribExample {
 			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		}
 
-		new RunBicycleContribExample().run(config);
+		new RunBicycleContribExampleMod().run(config);
 	}
 
 	static void fillConfigWithBicycleStandardValues(Config config) {
@@ -134,7 +122,8 @@ public final class RunBicycleContribExample {
 
 		config.routing().setNetworkModes(mainModeList);
 		config.routing().removeTeleportedModeParams(BICYCLE);
-		config.routing().setRoutingRandomness(2.);
+		//config.routing().setRoutingRandomness(2.);
+		config.routing().setRoutingRandomness(3.);
 	}
 
 	public void run(Config config) {

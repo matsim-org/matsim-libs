@@ -78,6 +78,51 @@ public class BicycleTest {
 
 	private static final String bicycleMode = "bicycle";
 
+
+//	// alternative if RunBicycleExample will be removed
+//	private static void applyStandardBicycleTestConfig(Config config) {
+//		config.controller().setWriteEventsInterval(1);
+//		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+//		config.replanning().setMaxAgentPlanMemorySize(5);
+//		config.global().setNumberOfThreads(1);
+//
+//		List<String> mainModeList = Arrays.asList(bicycleMode, TransportMode.car);
+//		config.qsim().setMainModes(mainModeList);
+//		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+//		config.routing().setNetworkModes(mainModeList);
+//		config.routing().removeTeleportedModeParams(bicycleMode);
+//
+//		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule(config, BicycleConfigGroup.class);
+//		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
+//		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
+//		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.0002);
+//
+//		config.routing().setRoutingRandomness(3.0);
+//	}
+//
+//	private static void ensureBicycleModeParams(Config config) {
+//		if (config.replanning().getStrategySettings().isEmpty()) {
+//			config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(0.8));
+//			config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ReRoute").setWeight(0.2));
+//		}
+//
+//		if (config.scoring().getActivityParams("home") == null) {
+//			config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(12 * 60 * 60));
+//		}
+//		if (config.scoring().getActivityParams("work") == null) {
+//			config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 60 * 60));
+//		}
+//
+//		if (!config.scoring().getModes().containsKey(bicycleMode)) {
+//			ModeParams bicycle = new ModeParams(bicycleMode);
+//			bicycle.setConstant(0.);
+//			bicycle.setMarginalUtilityOfDistance(-0.0004);
+//			bicycle.setMarginalUtilityOfTraveling(-6.0);
+//			bicycle.setMonetaryDistanceRate(0.);
+//			config.scoring().addModeParams(bicycle);
+//		}
+//	}
+
 	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -85,8 +130,10 @@ public class BicycleTest {
 	void testNormal() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory());
 		config.addModule(new BicycleConfigGroup());
-		RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
-		ensureBicycleModeParams(config);
+		//applyStandardBicycleTestConfig(config);
+		//ensureBicycleModeParams(config);
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+
 
 		// Normal network
 		config.network().setInputFile("network_normal.xml");
@@ -96,7 +143,8 @@ public class BicycleTest {
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
-		new RunBicycleContribExample().run(config);
+		//BicycleTestRunner.run(config);
+		new RunBicycleExample().run(config);
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -121,92 +169,50 @@ public class BicycleTest {
 	void testCobblestone() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory());
 		config.addModule(new BicycleConfigGroup());
-		RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
-		ensureBicycleModeParams(config);
+		//applyStandardBicycleTestConfig(config);
+		//ensureBicycleModeParams(config);
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
-		// Override bicycle params to match old main-branch values
-		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule(config, BicycleConfigGroup.class);
-		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
-		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
-		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.0002);
-
-		config.routing().setRoutingRandomness(0.);  // overwrite radomness to match the reference results
-
-		// Links 4-8 and 13-17 have cobblestones
 		config.network().setInputFile("network_cobblestone.xml");
-
 		config.plans().setInputFile("population_1200.xml");
-
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
-		//new RunBicycleContribExample().run(config);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		//NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car, "bicycle"));
-		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
-		VehiclesFactory vf = VehicleUtils.getFactory();
-		scenario.getVehicles().addVehicleType(vf.createVehicleType(Id.createVehicleTypeId(TransportMode.car)).setNetworkMode(TransportMode.car));
-		scenario.getVehicles().addVehicleType(vf.createVehicleType(Id.createVehicleTypeId("bicycle"))
-				.setNetworkMode("bicycle")
-				.setMaximumVelocity(4.16666666)
-				.setPcuEquivalents(0.25)
-			//	.setLength(2.0)
-		);
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new BicycleModule());
-
-
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bind(BicycleParams.class).toInstance(new BicycleParamsDefaultImpl() {
-//					@Override
-//					public double getInfrastructureFactor(String type, String bicycleInfra) {
-//						return 1.0; // neutralize infrastructure
-//					}
-//
-//					@Override
-//					public double getComfortFactor(String surface) {
-//						if ("cobblestone".equals(surface)) return 0.85; // fixed value for test
-//						return 1.0;
-//					}
-//				});
-//			}
-//		});
-
-		LOG.info("performing_utils_hr = " + config.scoring().getPerforming_utils_hr());
-		LOG.info("home typicalDuration = " + config.scoring().getActivityParams("home").getTypicalDuration());
-		LOG.info("work typicalDuration = " + config.scoring().getActivityParams("work").getTypicalDuration());
-		LOG.info("marginalUtilityOfTraveling bicycle = " + config.scoring().getModes().get("bicycle").getMarginalUtilityOfTraveling());
-		LOG.info("bicycle speed = " + RunBicycleContribExample.BICYCLE_SPEED);
-
-		controler.run();
+		//BicycleTestRunner.run(config);
+		new RunBicycleExample().run(config);
 
 		{
 			Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 			new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
-			assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
+			assertTrue(
+				PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()),
+				"Populations are different"
+			);
 		}
 		{
 			LOG.info("Checking MATSim events file ...");
 			final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 			final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-			assertEquals(FILES_ARE_EQUAL,
+			assertEquals(
+				FILES_ARE_EQUAL,
 				new EventsFileComparator().setIgnoringCoordinates(true).runComparison(eventsFilenameReference, eventsFilenameNew),
-				"Different event files.");
+				"Different event files."
+			);
 		}
 	}
+
 
 	@Test
 	void testPedestrian() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory());
 		config.addModule(new BicycleConfigGroup());
-		RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
-		ensureBicycleModeParams(config);
+		//applyStandardBicycleTestConfig(config);
+		//ensureBicycleModeParams(config);
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
 		// Links 4-8 and 13-17 are pedestrian zones
 		config.network().setInputFile("network_pedestrian.xml");
@@ -216,7 +222,8 @@ public class BicycleTest {
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
-		new RunBicycleContribExample().run(config);
+		//BicycleTestRunner.run(config);
+		new RunBicycleExample().run(config);
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -236,8 +243,9 @@ public class BicycleTest {
 	void testLane() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory());
 		config.addModule(new BicycleConfigGroup());
-		RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
-		ensureBicycleModeParams(config);
+		//applyStandardBicycleTestConfig(config);
+		//ensureBicycleModeParams(config);
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
 		// Links 2-4/8-10 and 11-13/17-19 have cycle lanes (cycleway=lane)
 		config.network().setInputFile("network_lane.xml");
@@ -247,7 +255,8 @@ public class BicycleTest {
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
-		new RunBicycleContribExample().run(config);
+		//BicycleTestRunner.run(config);
+		new RunBicycleExample().run(config);
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -268,8 +277,9 @@ public class BicycleTest {
 	void testGradient() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory());
 		config.addModule(new BicycleConfigGroup());
-		RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
-		ensureBicycleModeParams(config);
+		//applyStandardBicycleTestConfig(config);
+		//ensureBicycleModeParams(config);
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
 		// Nodes 5-8 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
 		config.network().setInputFile("network_gradient.xml");
@@ -279,7 +289,8 @@ public class BicycleTest {
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
-		new RunBicycleContribExample().run(config);
+		//BicycleTestRunner.run(config);
+		new RunBicycleExample().run(config);
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -299,8 +310,9 @@ public class BicycleTest {
 	void testGradientLane() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory());
 		config.addModule(new BicycleConfigGroup());
-		RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
-		ensureBicycleModeParams(config);
+		//applyStandardBicycleTestConfig(config);
+		//ensureBicycleModeParams(config);
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
 		// Nodes 5-9 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
 		// and links 4-5 and 13-14 have cycle lanes
@@ -311,7 +323,8 @@ public class BicycleTest {
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
-		new RunBicycleContribExample().run(config);
+		//BicycleTestRunner.run(config);
+		new RunBicycleExample().run(config);
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -331,8 +344,9 @@ public class BicycleTest {
 	void testNormal10It() {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory());
 		config.addModule(new BicycleConfigGroup());
-		RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
-		ensureBicycleModeParams(config);
+		//applyStandardBicycleTestConfig(config);
+		//ensureBicycleModeParams(config);
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
 		// Normal network
 		config.network().setInputFile("network_normal.xml");
@@ -345,7 +359,8 @@ public class BicycleTest {
 		config.controller().setWritePlansInterval(10);
 		config.controller().setCreateGraphs(false);
 
-		new RunBicycleContribExample().run(config);
+		//BicycleTestRunner.run(config);
+		new RunBicycleExample().run(config);
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -375,7 +390,7 @@ public class BicycleTest {
 			Config config2 = createConfig(0);
 			BicycleConfigGroup bicycleConfigGroup2 = (BicycleConfigGroup) config2.getModules().get("bicycle");
 //			bicycleConfigGroup2.setBicycleScoringType( BicycleScoringType.linkBased );
-			new RunBicycleContribExample().run(config2);
+			new RunBicycleExample().run(config2);
 		}
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
@@ -695,8 +710,9 @@ public class BicycleTest {
 		//		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory());
 		config.addModule(new BicycleConfigGroup());
-		RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
-		ensureBicycleModeParams(config);
+		//RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+		//ensureBicycleModeParams(config);
 
 		// Normal network
 		config.network().setInputFile("network_normal.xml");
@@ -710,30 +726,6 @@ public class BicycleTest {
 		config.controller().setCreateGraphs(false);
 		return config;
 	}
-
-	private static void ensureBicycleModeParams(Config config) {
-		if (config.replanning().getStrategySettings().isEmpty()) {
-			config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(0.8));
-			config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ReRoute").setWeight(0.2));
-		}
-
-		if (config.scoring().getActivityParams("home") == null) {
-			config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(12 * 60 * 60));
-		}
-		if (config.scoring().getActivityParams("work") == null) {
-			config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 60 * 60));
-		}
-
-		if (!config.scoring().getModes().containsKey(bicycleMode)) {
-			ModeParams bicycle = new ModeParams(bicycleMode);
-			bicycle.setConstant(0.);
-			bicycle.setMarginalUtilityOfDistance(-0.0004);
-			bicycle.setMarginalUtilityOfTraveling(-6.0);
-			bicycle.setMonetaryDistanceRate(0.);
-			config.scoring().addModeParams(bicycle);
-		}
-	}
-
 
 }
 
