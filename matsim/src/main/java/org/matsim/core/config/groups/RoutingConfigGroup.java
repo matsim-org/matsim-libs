@@ -580,6 +580,8 @@ public final class RoutingConfigGroup extends ConfigGroup {
 			this.setAccessEgressType(AccessEgressType.valueOf(value));
 		} else if (NETWORK_ROUTE_CONSISTENCY_CHECK.equals(key)){
 			this.setNetworkRouteConsistencyCheck(NetworkRouteConsistencyCheck.valueOf(value));
+		} else if (ACCESS_EGRESS_CONSISTENCY_CHECK.equals(key)) {
+			this.setAccessEgressConsistencyCheck(AccessEgressConsistencyCheck.valueOf(value));
 		}
 		else {
 			throw new IllegalArgumentException(key);
