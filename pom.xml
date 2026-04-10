@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim-all</artifactId>
 	<packaging>pom</packaging>
-	<version>2026.0-SNAPSHOT</version>
+	<version>2026.0</version>
 	<name>MATSim-All</name>
 	<modules>
 		<module>matsim</module>
@@ -27,7 +27,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.release>25</maven.compiler.release>
-		<argLine/>
+		<argLine />
 
 		<log4j.version>2.25.4</log4j.version>
 		<geotools.version>34.3</geotools.version>
@@ -47,7 +47,7 @@
 		<url>https://github.com/matsim-org/matsim</url>
 		<connection>scm:git:git://github.com/matsim-org/matsim.git</connection>
 		<developerConnection>scm:git:git@github.com:matsim-org/matsim.git</developerConnection>
-		<tag>MATSim 2025 (Spring)</tag>
+		<tag>2026.0</tag>
 	</scm>
 
 	<repositories>
@@ -461,8 +461,8 @@
 				</executions>
 				<configuration>
 					<rules>
-						<requireUpperBoundDeps/>
-						<banDuplicatePomDependencyVersions/>
+						<requireUpperBoundDeps />
+						<banDuplicatePomDependencyVersions />
 						<requireReleaseDeps>
 							<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
 							<excludes>
