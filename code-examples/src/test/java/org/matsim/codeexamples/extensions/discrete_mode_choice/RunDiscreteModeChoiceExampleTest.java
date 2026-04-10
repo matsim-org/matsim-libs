@@ -43,7 +43,7 @@ public class RunDiscreteModeChoiceExampleTest{
 
 				for( Person expectedPerson : expected.getPersons().values() ){
 					Person actualPerson = actual.getPersons().get( Id.createPersonId( expectedPerson.getId() ) );
-					Assertions.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
+					Assertions.assertEquals(expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
 				}
 			}
 

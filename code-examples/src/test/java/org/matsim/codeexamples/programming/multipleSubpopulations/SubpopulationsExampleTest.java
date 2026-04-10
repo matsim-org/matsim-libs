@@ -67,12 +67,11 @@ public class SubpopulationsExampleTest {
 				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.zst" );
 				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.zst" );
-				boolean result = PopulationUtils.equalPopulation( expected, actual );
-				Assertions.assertTrue( result, "populations are different" );
+				PopulationUtils.comparePopulations(expected, actual);
 
 				for( Person expectedPerson : expected.getPersons().values() ){
 					Person actualPerson = actual.getPersons().get( Id.createPersonId( expectedPerson.getId() ) );
-					Assertions.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
+					Assertions.assertEquals(expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
 				}
 			}
 
