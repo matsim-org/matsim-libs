@@ -341,8 +341,6 @@ public final class DistributedEventsManager implements EventsManager {
 	@Override
 	public void processEvent(Event e) {
 
-		log.info("#{}: {}", this.broker.getRank(), e);
-
 		if (eventsDisabled) {
 			return;
 		}
