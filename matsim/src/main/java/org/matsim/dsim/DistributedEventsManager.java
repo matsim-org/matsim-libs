@@ -115,9 +115,7 @@ public final class DistributedEventsManager implements EventsManager {
 
 		var distMode = getDistributedMode(handler);
 		switch (distMode) {
-			case GLOBAL -> {
-				if (computeNode.isHeadNode()) addAsNodeSingleton(handler);
-			}
+			case GLOBAL -> addAsGlobalHandler(handler);
 			case NODE -> addAsNodeSingleton(handler);
 			case NODE_CONCURRENT -> addAsConcurrentNodeSingleton(handler);
 			case PARTITION -> throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
@@ -147,6 +145,23 @@ public final class DistributedEventsManager implements EventsManager {
 		var part = computeNode.getParts().getInt(0);
 		EventHandlerTask task = executor.register(handler, this, part, 1, null);
 		addTaskForEachPart(task, part);
+	}
+
+	/**
+	 * Registers a GLOBAL event handler. The handler is registered similar to a node handler. It is also registered
+	 * as a global listener. The globalListener collection is used to tell other partitions that the handler is
+	 * interested in events from other compute nodes.
+	 */
+	private void addAsGlobalHandler(EventHandler handler) {
+		// only the head node registers global handlers all others send events to the head node
+		if (!computeNode.isHeadNode()) return;
+
+		var part = computeNode.getParts().getInt(0);
+		EventHandlerTask task = executor.register(handler, this, part, 1, null);
+		addTaskForEachPart(task, part);
+		for (int type : task.getSupportedMessages()) {
+			globalListener.computeIfAbsent(type, _ -> new ArrayList<>()).add(task);
+		}
 	}
 
 	public void addAsConcurrentNodeSingleton(EventHandler handler) {
@@ -325,6 +340,8 @@ public final class DistributedEventsManager implements EventsManager {
 
 	@Override
 	public void processEvent(Event e) {
+
+		log.info("#{}: {}", this.broker.getRank(), e);
 
 		if (eventsDisabled) {
 			return;

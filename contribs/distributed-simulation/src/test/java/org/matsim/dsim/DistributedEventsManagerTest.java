@@ -4,12 +4,14 @@ import com.google.inject.Provider;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
@@ -18,6 +20,8 @@ import org.matsim.dsim.executors.SingleExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -264,6 +268,56 @@ class DistributedEventsManagerTest {
 		assertEquals(1, subclassedTestEventHandler.counter.get());
 		assertEquals(2, testEventHandler.counter.get());
 		assertEquals(3, basicEventHandler.counter.get());
+	}
+	
+	@Test
+	public void globalHandlerReceivesRemoteEvent() throws Exception {
+		var communicators = LocalCommunicator.create(2);
+		var provider = new SerializationProvider();
+
+		var node0 = ComputeNode.builder().rank(0).parts(IntList.of(0)).build();
+		var node1 = ComputeNode.builder().rank(1).parts(IntList.of(1)).build();
+		var topology = Topology.builder()
+			.totalPartitions(2)
+			.computeNodes(List.of(node0, node1))
+			.build();
+
+		var executor0 = new SingleExecutor(provider);
+		var broker0 = new MessageBroker(communicators.getFirst(), topology, provider);
+		var manager0 = new DistributedEventsManager(broker0, node0, executor0, provider);
+
+		var executor1 = new SingleExecutor(provider);
+		var broker1 = new MessageBroker(communicators.getLast(), topology, provider);
+		var manager1 = new DistributedEventsManager(broker1, node1, executor1, provider);
+
+		// Register global handler on both nodes. It should only be registered with manager0
+		var globalHandler = new GlobalTestHandler();
+		manager0.addHandler(globalHandler);
+		manager1.addHandler(globalHandler);
+
+		// syncEventRegistry is a collective barrier: run both nodes concurrently
+		runConcurrently(
+			() -> manager0.syncEventRegistry(communicators.getFirst()),
+			() -> manager1.syncEventRegistry(communicators.getLast())
+		);
+
+		// Fire an event on node 1 — the global handler on node 0 must receive it
+		manager1.setContext(1);
+		manager1.processEvent(new TestEvent(0.0, "from-node1"));
+
+		// finishProcessing flushes queued remote events, syncs across nodes, and runs handlers
+		runConcurrently(manager0::finishProcessing, manager1::finishProcessing);
+
+		assertEquals(1, globalHandler.counter.get());
+	}
+
+	private static void runConcurrently(Runnable r0, Runnable r1) throws Exception {
+		try (ExecutorService exec = Executors.newFixedThreadPool(2)) {
+			var f0 = exec.submit(r0);
+			var f1 = exec.submit(r1);
+			f0.get();
+			f1.get();
+		}
 	}
 
 	@DistributedEventHandler(value = DistributedMode.GLOBAL)
