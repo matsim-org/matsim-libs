@@ -59,6 +59,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.utils.EditRoutes;
 
 import jakarta.inject.Singleton;
+import org.matsim.withinday.utils.EditTrips;
 
 /**
  * @author nagel
@@ -167,7 +168,7 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		}
 
 		editRoutes.relocateCurrentLegRoute(leg, person, linkIdx, newDestinationLinkId, now) ;
-		
+
 		// the route _from_ the modified activity also needs to be replanned:
 		Leg futureLeg = (Leg) plan.getPlanElements().get(planElementsIndex + 2);
 		editRoutes.relocateFutureLegRoute( futureLeg, newDestinationLinkId, futureLeg.getRoute().getEndLinkId(), person );

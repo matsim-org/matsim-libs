@@ -1,8 +1,8 @@
 package org.matsim.codeexamples.scoring.ownMoneyScoring;
 
 import com.google.inject.Inject;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -60,7 +60,7 @@ class RunOwnMoneyScoringExample {
 						final ScoringParameters parameters = params.getScoringParameters( person );
 						SumScoringFunction sumScoringFunction = new SumScoringFunction() ;
 						sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(parameters));
-						sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(parameters, network));
+						sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(parameters));
 						sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(parameters));
 						
 						double income = (double) person.getAttributes().getAttribute( NET_INCOME_PER_MONTH );

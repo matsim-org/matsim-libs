@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.scoring.kindergartenActivityScoring;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -62,7 +61,7 @@ public class RunScenarioWithCustomScoring {
 			}
 		});;
 		
-		controler.addControlerListener(new IterationEndsListener() {
+		controler.addControllerListener(new IterationEndsListener() {
 			
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
@@ -78,10 +77,9 @@ public class RunScenarioWithCustomScoring {
 
 				// Score activities, legs, payments and being stuck
 				// with the default MATSim scoring based on utility parameters in the config file.
-				final ScoringParameters params =
-						new ScoringParameters.Builder(scenario, person).build();
+				final ScoringParameters params = new ScoringParameters.Builder(scenario, person).build();
 				sumScoringFunction.addScoringFunction(new KindergartenActivityScoring(person.getId(), kindergartenArrivalHandler));
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params));
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				return sumScoringFunction;

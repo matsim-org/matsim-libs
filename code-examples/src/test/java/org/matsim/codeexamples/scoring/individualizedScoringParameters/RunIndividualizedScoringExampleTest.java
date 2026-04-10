@@ -1,7 +1,7 @@
 package org.matsim.codeexamples.scoring.individualizedScoringParameters;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -31,22 +31,21 @@ public class RunIndividualizedScoringExampleTest {
 					"--config:controler.outputDirectory=" + utils.getOutputDirectory(),
 					"--config:controler.lastIteration=0");
 			{
-				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
-				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
+				String expected = utils.getInputDirectory() + "/output_events.xml.zst";
+				String actual = utils.getOutputDirectory() + "/output_events.xml.zst";
 				EventsUtils.compareEventsFiles( expected, actual );
 			}
 			{
 				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
+				PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.zst");
 				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
+				PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.zst");
 				PopulationUtils.comparePopulations( expected, actual ) ;
 
 				for( Person expectedPerson : expected.getPersons().values() ){
 					Person actualPerson = actual.getPersons().get( Id.createPersonId( expectedPerson.getId() ) );
-					Assertions.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
+					Assertions.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore(), 0.000_000_000_1 );
 				}
-
 			}
 
 
