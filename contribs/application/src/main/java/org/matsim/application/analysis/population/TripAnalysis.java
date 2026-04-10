@@ -87,6 +87,8 @@ public class TripAnalysis implements MATSimAppCommand {
 	private LocationFilter filter;
 	@CommandLine.Mixin
 	private ShpOptions shp;
+	@CommandLine.Option(names = "--input-comparison-data", description = "Optional path to comparison scenario data", required = false)
+	private String comparisonData;
 
 	public static void main(String[] args) {
 		new TripAnalysis().execute(args);
@@ -259,6 +261,11 @@ public class TripAnalysis implements MATSimAppCommand {
 		TripByGroupAnalysis groups = null;
 		if (refData != null) {
 			groups = new TripByGroupAnalysis(refData);
+			groups.groupPersons(persons);
+		}
+
+		if (comparisonData != null) {
+			groups = new TripByGroupAnalysis(comparisonData);
 			groups.groupPersons(persons);
 		}
 

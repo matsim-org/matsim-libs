@@ -7,6 +7,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedAcyclicGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.matsim.application.options.*;
 
 import java.nio.file.Files;
@@ -87,8 +88,13 @@ public final class CommandRunner {
 			if (!hasDependencies)
 				start.add(clazz);
 		}
+//		BreadthFirst traverses level-by-level, not respecting dependencies. Topological seems to fix bug for scenarioComparison, so that all other dependent analyses run first.
+//		BreadthFirstIterator<Class<? extends MATSimAppCommand>, DefaultEdge> it = new BreadthFirstIterator<>(graph, start);
+		Iterator<Class<? extends MATSimAppCommand>> it = new org.jgrapht.traverse.TopologicalOrderIterator<>(graph);
 
-		BreadthFirstIterator<Class<? extends MATSimAppCommand>, DefaultEdge> it = new BreadthFirstIterator<>(graph, start);
+		log.info("Execution order of dashboard analysis classes will be:");
+		new TopologicalOrderIterator<>(graph).forEachRemaining(c -> log.info("  -> {}", c.getSimpleName()));
+
 		while (it.hasNext()) {
 			Class<? extends MATSimAppCommand> clazz = it.next();
 			try {

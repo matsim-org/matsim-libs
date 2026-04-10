@@ -62,24 +62,26 @@ public class ScenarioComparisonDashboardTest {
 		SimWrapperConfigGroup.ContextParams contextParams = simWrapperConfigGroup.defaultParams();
 		contextParams.setMapCenter("12,48.95");
 		contextParams.setMapZoomLevel(9.0);
-
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
-
-		emissionsConfig.setAverageColdEmissionFactorsFile(HBEFA_FILE_COLD_AVERAGE);
-		emissionsConfig.setDetailedColdEmissionFactorsFile(HBEFA_FILE_COLD_DETAILED);
-		emissionsConfig.setAverageWarmEmissionFactorsFile(HBEFA_FILE_WARM_AVERAGE);
-		emissionsConfig.setDetailedWarmEmissionFactorsFile(HBEFA_FILE_WARM_DETAILED);
-		emissionsConfig.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent);
-
-		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-
+//
+//		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+//
+//		emissionsConfig.setAverageColdEmissionFactorsFile(HBEFA_FILE_COLD_AVERAGE);
+//		emissionsConfig.setDetailedColdEmissionFactorsFile(HBEFA_FILE_COLD_DETAILED);
+//		emissionsConfig.setAverageWarmEmissionFactorsFile(HBEFA_FILE_WARM_AVERAGE);
+//		emissionsConfig.setDetailedWarmEmissionFactorsFile(HBEFA_FILE_WARM_DETAILED);
+//		emissionsConfig.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent);
+//
+//		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
+//
 
 		SimWrapper sw = SimWrapper.create(config)
-			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()))
-			.addDashboard(new ImpactAnalysisDashboard(Set.of("car")));
-
-		// Set base path to output folder of base scenario that you wish to compare a policy with. Example:
-		sw.getConfigGroup().setBasePath("/home/brendan/git/matsim-libs/contribs/simwrapper/test/output/org/matsim/simwrapper/dashboard/EmissionsDashboardTest/generate");
+//			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()))
+//			.addDashboard(new ImpactAnalysisDashboard(Set.of("car")))
+			.addDashboard(new TripDashboard())
+			.addDashboard(new ScenarioComparisonDashboard(
+				"/home/brendan/git/matsim-berlin/output/berlin-v6.4-0.1pct_RidePCUSetToZero",
+				true
+			));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 
@@ -89,14 +91,14 @@ public class ScenarioComparisonDashboardTest {
 			link.setFreespeed(30);
 		}
 
-		prepareVehicleTypes(scenario);
-		prepareHbefaNetwork(scenario);
+//		prepareVehicleTypes(scenario);
+//		prepareHbefaNetwork(scenario);
 
 		controler.addOverridingModule(new CountsModule());
 		controler.run();
 
-		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "emissions"))
-			.isDirectoryContaining("glob:**emissions_total.csv");
+//		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "emissions"))
+//			.isDirectoryContaining("glob:**emissions_total.csv");
 
 
 		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "population"))

@@ -82,8 +82,4 @@ public class EmissionsDashboard implements Dashboard {
 
 	}
 
-	@Override
-	public double priority() {
-		return 1;
-	}
 }

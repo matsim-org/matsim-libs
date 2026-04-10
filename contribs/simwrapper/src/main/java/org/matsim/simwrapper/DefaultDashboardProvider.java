@@ -41,7 +41,7 @@ public class DefaultDashboardProvider implements DashboardProvider {
 		}
 
 		if (simWrapper.getConfigGroup().getBasePath() != null) {
-			result.add(new ScenarioComparisonDashboard(simWrapper.getConfigGroup().getBasePath()));
+			result.add(new ScenarioComparisonDashboard(simWrapper.getConfigGroup().getBasePath(), true));
 		}
 
 		result.add(new StuckAgentDashboard());
