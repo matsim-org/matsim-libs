@@ -14,7 +14,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class RunFreightExampleTest{
 	private static final Logger log = LogManager.getLogger( RunFreightExampleTest.class );
@@ -34,17 +33,17 @@ public class RunFreightExampleTest{
 			RunFreightExample.run(args, false);
 			{
 				Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
+				PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.zst");
 
 				Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
+				PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.zst");
 
 				boolean result = PopulationUtils.comparePopulations( expected, actual );
 				Assertions.assertTrue( result );
 			}
 			{
-				String expected = utils.getInputDirectory() + "/output_events.xml.gz";
-				String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
+				String expected = utils.getInputDirectory() + "/output_events.xml.zst";
+				String actual = utils.getOutputDirectory() + "/output_events.xml.zst";
 				ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
 				Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
 			}

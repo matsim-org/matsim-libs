@@ -1,8 +1,8 @@
 package org.matsim.codeexamples.extensions.dvrp;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
-import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
@@ -24,15 +24,15 @@ public class RunDrtExampleTest{
 					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
 					, "--config:controler.lastIteration=1");
 			{
-				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
-				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
+				String expected = utils.getInputDirectory() + "/output_events.xml.zst";
+				String actual = utils.getOutputDirectory() + "/output_events.xml.zst";
 				EventsUtils.compareEventsFiles( expected, actual );
 			}
 			{
 				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
+				PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.zst");
 				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.zst" );
+				PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.zst");
 				PopulationUtils.comparePopulations( expected, actual ) ;
 			}
 

@@ -1,7 +1,7 @@
 package org.matsim.codeexamples;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -15,7 +15,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class RunAbcSimpleExampleTest{
 	private static final Logger log = LogManager.getLogger(RunAbcSimpleExampleTest.class) ;
@@ -30,15 +30,15 @@ public class RunAbcSimpleExampleTest{
 				  , "--config:controler.lastIteration=2"
 			} );
 			{
-				String expected = utils.getInputDirectory() + "/output_events.xml.zst" ;
-				String actual = utils.getOutputDirectory() + "/output_events.xml.zst" ;
+				String expected = utils.getInputDirectory() + "/output_events.xml.zst";
+				String actual = utils.getOutputDirectory() + "/output_events.xml.zst";
 				EventsUtils.compareEventsFiles( expected, actual );
 			}
 			{
 				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.zst" );
+				PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.zst");
 				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.zst" );
+				PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.zst");
 				PopulationUtils.comparePopulations( expected, actual ) ;
 
 				for( Person expectedPerson : expected.getPersons().values() ){

@@ -44,7 +44,7 @@ public class RunFreightFoodRetailingBerlinExampleTest {
 //			}
 
 			{
-				String expected = utils.getInputDirectory() + "output_events.xml.gz";
+				String expected = utils.getInputDirectory() + "output_events.xml.zst";
 				String actual = utils.getOutputDirectory() + "output_events.xml.zst";
 				MatsimTestUtils.assertEqualEventsFiles( expected, actual );
 			}

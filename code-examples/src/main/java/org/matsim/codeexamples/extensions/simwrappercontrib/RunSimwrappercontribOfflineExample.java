@@ -1,6 +1,10 @@
 package org.matsim.codeexamples.extensions.simwrappercontrib;
 
-import org.matsim.simwrapper.*;
+import org.matsim.simwrapper.Dashboard;
+import org.matsim.simwrapper.Header;
+import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.SimWrapper;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.viz.PieChart;
 
 import java.io.IOException;
@@ -28,7 +32,8 @@ class RunSimwrappercontribOfflineExample{
 
 	public static class MyDashboard implements Dashboard{
 
-		@Override public void configure( Header header, Layout layout, SimWrapperConfigGroup simWrapperConfig ){
+		@Override
+		public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 			header.title="mytitle";
 			header.description="description";
 
