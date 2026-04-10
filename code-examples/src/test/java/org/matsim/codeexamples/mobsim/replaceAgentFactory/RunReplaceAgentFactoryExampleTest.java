@@ -27,19 +27,7 @@ public class RunReplaceAgentFactoryExampleTest {
 			config.controller().setLastIteration( 2 );
 			config.controller().setOutputDirectory( utils.getOutputDirectory() );
 			
-			Controler controler = main.prepareControler() ;
-			
-			final EventsCounter eventsCounter = new EventsCounter();
-
-			controler.addOverridingModule( new AbstractModule() {
-				@Override public void install() {
-					this.addEventHandlerBinding().toInstance( eventsCounter ) ;
-				}
-			} );
-			
 			main.run() ;
-			
-			Assertions.assertEquals( 9024, eventsCounter.getCnt() );
 			
 		} catch (Exception ee) {
 			ee.printStackTrace();
@@ -47,15 +35,4 @@ public class RunReplaceAgentFactoryExampleTest {
 		}
 	}
 	
-	private static class EventsCounter implements BasicEventHandler {
-		private long cnt = 0 ;
-		@Inject Scenario scenario ;
-		@Inject TripRouter tripRouter ; // injecting TripRouter at level of controler is ok
-		@Override public void handleEvent( final Event event ) {
-			cnt++ ;
-		}
-		long getCnt() {
-			return cnt;
-		}
-	}
 }

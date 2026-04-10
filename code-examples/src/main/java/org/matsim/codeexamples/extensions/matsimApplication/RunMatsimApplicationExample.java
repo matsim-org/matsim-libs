@@ -22,7 +22,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
@@ -61,7 +60,10 @@ public class RunMatsimApplicationExample extends MATSimApplication {
 	}
 
 	public RunMatsimApplicationExample( ) {
-		super(ConfigUtils.loadConfig("scenarios/equil/config.xml"));
+//		super( "scenarios/equil/config.xml");
+		// (config filename now needs to be given explicitly as command line argument)
+
+		super();
 	}
 
 	@Override

@@ -23,6 +23,8 @@ class RunReplaceAgentFactoryExample {
 	private Config config ;
 	private Scenario scenario ;
 	private Controler controler ;
+
+	// yyyy the following is an odd dialect that was used for some time in between, but is no longer common.
 	
 	public static void main ( String [] args ) {
 		final RunReplaceAgentFactoryExample matsim = new RunReplaceAgentFactoryExample();;

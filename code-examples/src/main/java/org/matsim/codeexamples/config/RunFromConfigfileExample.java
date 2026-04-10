@@ -64,7 +64,7 @@ public final class RunFromConfigfileExample {
 
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				Vehicle vehicle = scenario.getVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
-				VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(vehicle.getType().getNetworkMode(), vehicle.getId()));
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, Map.of(vehicle.getType().getNetworkMode(), vehicle.getId() ) );
 			}
 		}
 

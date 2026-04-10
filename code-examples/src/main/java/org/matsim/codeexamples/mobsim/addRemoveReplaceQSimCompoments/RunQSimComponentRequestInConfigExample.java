@@ -55,16 +55,6 @@ class RunQSimComponentRequestInConfigExample{
 	private static class MyQSimComponent implements MobsimEngine {
 
 		@Override
-		public void onPrepareSim(){
-			log.info("calling onPrepareSim") ;
-		}
-
-		@Override
-		public void afterSim(){
-			log.info("calling afterSim") ;
-		}
-
-		@Override
 		public void setInternalInterface( InternalInterface internalInterface ){
 			log.info("calling setInternalInterface") ;
 		}

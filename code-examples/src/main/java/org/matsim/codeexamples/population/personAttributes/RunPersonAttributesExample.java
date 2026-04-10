@@ -65,25 +65,6 @@ public class RunPersonAttributesExample {
 		Person person = pf.createPerson(Id.createPersonId("1"));
 		
 		/* Add custom attributes */
-//		ObjectAttributes personAttributes = sc.getPopulation().getPersonAttributes();
-//		personAttributes.putAttribute(person.getId().toString(), "gender", "male");
-//		personAttributes.putAttribute(person.getId().toString(), "age", 35);
-//		personAttributes.putAttribute(person.getId().toString(), "employed", true);
-		PopulationUtils.putPersonAttribute( person, "gender", "male" );
-		PopulationUtils.putPersonAttribute( person, "age", 35 );
-		PopulationUtils.putPersonAttribute( person, "employed", true );
-
-		/* Report the attributes to the console. */
-		LOG.info("Attributes reported from `ObjectAttributes`");
-		//		LOG.info("   |_ gender: " + personAttributes.getAttribute(person.getId().toString(), "gender"));
-		//		LOG.info("   |_ age: " + personAttributes.getAttribute(person.getId().toString(), "age"));
-		//		LOG.info("   |_ employed: " + personAttributes.getAttribute(person.getId().toString(), "employed"));
-				LOG.info("   |_ gender: " + PopulationUtils.getPersonAttribute( person, "gender"));
-				LOG.info("   |_ age: " + PopulationUtils.getPersonAttribute( person, "age"));
-				LOG.info("   |_ employed: " + PopulationUtils.getPersonAttribute( person, "employed"));
-
-		
-		// with new "Attributes" functionality should also (and better) work as follows:
 		person.getAttributes().putAttribute("gender", "male") ;
 		person.getAttributes().putAttribute("age", 35 ) ;
 		person.getAttributes().putAttribute("employed", true) ;

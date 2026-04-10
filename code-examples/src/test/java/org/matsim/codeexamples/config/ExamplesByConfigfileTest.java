@@ -73,13 +73,13 @@ public class ExamplesByConfigfileTest {
 
 			if( configFile.contains( "config-with-mobsim" ) || configFile.contains( "example2-config" ) ){
 				final String[] args = {configFile
-					  , "--config:controler.outputDirectory=" + outputDir + "/" + fileName
+					  , "--config:controller.outputDirectory=" + outputDir + "/" + fileName.toString().replace( ".xml","-xml" )
 				};
 				RunFromConfigfileExample.main( args );
 			} else{
 				final String[] args = {configFile
-					  , "--config:controler.outputDirectory=" + outputDir + "/" + fileName
-					  , "--config:controler.lastIteration=2"
+					  , "--config:controller.outputDirectory=" + outputDir + "/" + fileName.toString().replace( ".xml","-xml" )
+					  , "--config:controller.lastIteration=2"
 				};
 				RunFromConfigfileExample.main( args );
 			}
