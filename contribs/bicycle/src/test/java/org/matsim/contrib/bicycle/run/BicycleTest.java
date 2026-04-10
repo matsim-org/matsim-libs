@@ -124,7 +124,7 @@ public class BicycleTest {
 		RunBicycleContribExample.fillConfigWithBicycleStandardValues(config);
 		ensureBicycleModeParams(config);
 
-		config.routing().setRoutingRandomness(0.);  // overvirde radomness to match the reference results
+		config.routing().setRoutingRandomness(0.);  // overwrite radomness to match the reference results
 
 		// Links 4-8 and 13-17 have cobblestones
 		config.network().setInputFile("network_cobblestone.xml");
@@ -155,11 +155,24 @@ public class BicycleTest {
 				bind(BicycleParams.class).toInstance(new BicycleParamsDefaultImpl() {
 					@Override
 					public double getInfrastructureFactor(String type, String bicycleInfra) {
-						return 1.0; // ignore infrastructure factor in this test, only comfort is tested
+						return 1.0; // neutralize infrastructure
+					}
+
+					@Override
+					public double getComfortFactor(String surface) {
+						if ("cobblestone".equals(surface)) return 0.85; // fixed value for test
+						return 1.0;
 					}
 				});
 			}
 		});
+
+		LOG.info("performing_utils_hr = " + config.scoring().getPerforming_utils_hr());
+		LOG.info("home typicalDuration = " + config.scoring().getActivityParams("home").getTypicalDuration());
+		LOG.info("work typicalDuration = " + config.scoring().getActivityParams("work").getTypicalDuration());
+		LOG.info("marginalUtilityOfTraveling bicycle = " + config.scoring().getModes().get("bicycle").getMarginalUtilityOfTraveling());
+		LOG.info("bicycle speed = " + RunBicycleContribExample.BICYCLE_SPEED);
+
 		controler.run();
 
 		{

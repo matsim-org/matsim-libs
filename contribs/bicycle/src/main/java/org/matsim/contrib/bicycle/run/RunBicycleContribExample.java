@@ -49,7 +49,7 @@ public final class RunBicycleContribExample {
 	private static final Logger LOG = LogManager.getLogger(RunBicycleContribExample.class);
 
 	private static final String BICYCLE = "bicycle";
-	public static final double BICYCLE_SPEED = 6.944;
+	public static final double BICYCLE_SPEED = 4.16666; //6.944;
 	//private static final boolean USE_OWN_SCORING = true;
 
 	public static void main(String[] args) {
