@@ -27,11 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -46,7 +42,6 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -138,6 +133,26 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					default -> throw new IllegalStateException("Unexpected PlanElement: " + pe);
 				}
 			}
+
+			// There is router without access/egress routing any more. Trips with one leg only are outdated.
+			if (this.scenario.getConfig().routing().getNetworkRouteConsistencyCheck() != RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
+				for (Trip trip : TripStructureUtils.getTrips(plan)) {
+					if (TripStructureUtils.getLegs(plan).size() > 1) {
+						// we are ok here, since trip consists of more than one leg. We assume that it has access/egress than.
+						continue;
+					}
+
+					// in this case, there is only one leg.
+					Leg leg = trip.getLegsOnly().getFirst();
+					if (leg.getMode().equals(TransportMode.walk) && !this.scenario.getConfig().qsim().getMainModes().contains(TransportMode.walk)) {
+						// we are ok here, since walk is the fallback mode. Thus, walk-only trips are not expected to have access/egress legs.
+						continue;
+					}
+
+					needsReRoute = true;
+				}
+			}
+
 			if (needsXY2Links) {
 				this.xy2links.run(plan);
 			}
