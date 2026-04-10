@@ -40,10 +40,19 @@ public final class BicycleUtils {
 		// Don't allow to create instances of this class
 	}
 
-//	public static String getBicycleInfraType(Link link) {
+	//	public static String getBicycleInfraType(Link link) {
+//		return (String) link.getAttributes().getAttribute(BICYCLE_INFRA);
+//	}
+//	public static String getBicycleInfrastructure(Link link) {
 //		return (String) link.getAttributes().getAttribute(BICYCLE_INFRA);
 //	}
 
+	public static String getBicycleInfrastructureValue(Link link, String bicycleInfraAttribute) {
+		Object value = link.getAttributes().getAttribute(bicycleInfraAttribute);
+		return value == null ? null : value.toString();
+	}
+
+	// legacy use; "cycleway" is deprecated
 	public static String getCyclewaytype(Link link) {
 		return (String) link.getAttributes().getAttribute(CYCLEWAY);
 	}

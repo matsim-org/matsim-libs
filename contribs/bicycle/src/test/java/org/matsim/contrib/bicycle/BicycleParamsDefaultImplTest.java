@@ -23,31 +23,31 @@ public class BicycleParamsDefaultImplTest {
 	@Test
 	void getGradientPctNoFromZ() {
 		Link link = createLink(new Coord(0, 0), new Coord(100, 0, 100));
-		assertEquals(0., params.getGradient_pct(link ), 0.00001 );
+		assertEquals(0., params.getGradient_pct(link), 0.00001);
 	}
 
 	@Test
 	void getGradientPctNoToZ() {
 		Link link = createLink(new Coord(0, 0, 100), new Coord(100, 0));
-		assertEquals(0., params.getGradient_pct(link ), 0.00001 );
+		assertEquals(0., params.getGradient_pct(link), 0.00001);
 	}
 
 	@Test
 	void getGradientPctFlat() {
 		Link link = createLink(new Coord(0, 0, 100), new Coord(100, 0, 100));
-		assertEquals(0., params.getGradient_pct(link ), 0.00001 );
+		assertEquals(0., params.getGradient_pct(link), 0.00001);
 	}
 
 	@Test
 	void getGradientPctUphill() {
 		Link link = createLink(new Coord(0, 0, 0), new Coord(100, 0, 100));
-		assertEquals(100., params.getGradient_pct(link ), 0.00001 );
+		assertEquals(100., params.getGradient_pct(link), 0.00001);
 	}
 
 	@Test
 	void getGradientPctDownhill() {
 		Link link = createLink(new Coord(0, 0, 100), new Coord(100, 0, 0));
-		assertEquals(0., params.getGradient_pct(link ), 0.00001 );
+		assertEquals(0., params.getGradient_pct(link), 0.00001);
 		// yyyy The method returns 0 when the gradient is downhill in order to set the corresponding scoring to zero.  I don't think it is
 		// good to change the "physics" in order to have a scoring consequence; the gradient should just be the gradient.  kai, jul'25
 	}
@@ -78,33 +78,107 @@ public class BicycleParamsDefaultImplTest {
 
 // ############################################# Test infrastructure factors ##################################################
 
+//	@Test
+//	void testInfrastructureFactors() {
+//		record InfraCase(String type, String bicycleInfra, double expected) {
+//		}
+//
+//		List<InfraCase> cases = List.of(
+//			new InfraCase("trunk", null, 0.05),
+//			new InfraCase("primary", null, 0.10),
+//			new InfraCase("secondary", null, 0.30),
+//			new InfraCase("tertiary", null, 0.40),
+//			new InfraCase("unclassified", null, 0.80),
+//			new InfraCase("residential", null, 0.80),
+//			new InfraCase(null, null, 0.80),
+//
+//			new InfraCase("primary", "CYCLEWAY_ISOLATED", 1.00),
+//			new InfraCase("primary", "CYCLEWAY_ADJOINING", 0.95),
+//			new InfraCase("primary", "BICYCLE_ROAD_VEHICLE_DESTINATION", 0.90),
+//			new InfraCase("primary", "CYCLEWAY_ON_HIGHWAY_ADVISORY", 0.85),
+//			new InfraCase("primary", "FOOT_AND_CYCLEWAY_SHARED_ADJOINING", 0.80),
+//			new InfraCase("primary", "CROSSING", 0.75),
+//
+//			new InfraCase("primary", "NONE", 0.10),
+//			new InfraCase("primary", "SOMETHING_UNKNOWN", 0.80)
+//		);
+//
+//		for (InfraCase testCase : cases) {
+//			double actual = params.getInfrastructureFactor(testCase.type(), testCase.bicycleInfra(), BicycleUtils.BICYCLE_INFRA);
+//			assertEquals(testCase.expected(), actual, 0.00001);
+//		}
+//	}
+
 	@Test
-	void testInfrastructureFactors() {
-		record InfraCase(String type, String bicycleInfra, double expected) {}
+	void testInfrastructureFactors_cycleway() {
+		record Case(String type, String cycleway, double expected) {
+		}
 
-		List<InfraCase> cases = List.of(
-			new InfraCase("trunk", null, 0.05),
-			new InfraCase("primary", null, 0.10),
-			new InfraCase("secondary", null, 0.30),
-			new InfraCase("tertiary", null, 0.40),
-			new InfraCase("unclassified", null, 0.80),
-			new InfraCase("residential", null, 0.80),
-			new InfraCase(null, null, 0.80),
+		List<Case> cases = List.of(
+			new Case("trunk", null, 0.05),
+			new Case("primary", null, 0.10),
+			new Case("secondary", null, 0.30),
+			new Case("tertiary", null, 0.40),
+			new Case("unclassified", null, 0.90),
+			new Case("residential", null, 0.95),
+			new Case(null, null, 0.85),
 
-			new InfraCase("primary", "CYCLEWAY_ISOLATED", 1.00),
-			new InfraCase("primary", "CYCLEWAY_ADJOINING", 0.95),
-			new InfraCase("primary", "BICYCLE_ROAD_VEHICLE_DESTINATION", 0.90),
-			new InfraCase("primary", "CYCLEWAY_ON_HIGHWAY_ADVISORY", 0.85),
-			new InfraCase("primary", "FOOT_AND_CYCLEWAY_SHARED_ADJOINING", 0.80),
-			new InfraCase("primary", "CROSSING", 0.75),
+			// mit cycleway vorhanden
+			new Case("cycleway", "lane", 1.00),
+			new Case("path", "track", 1.00),
+			new Case("steps", "track", 0.10),
+			new Case("primary", "lane", 0.95),
 
-			new InfraCase("primary", "NONE", 0.10),
-			new InfraCase("primary", "SOMETHING_UNKNOWN", 0.80)
+			// explizit "kein cycleway"
+			new Case("primary", "no", 0.10),
+			new Case("secondary", "none", 0.30)
 		);
 
-		for (InfraCase testCase : cases) {
-			double actual = params.getInfrastructureFactor(testCase.type(), testCase.bicycleInfra());
-			assertEquals(testCase.expected(), actual, 0.00001);
+		for (Case testCase : cases) {
+			double actual = params.getInfrastructureFactor(
+				testCase.type(),
+				testCase.cycleway(),
+				BicycleUtils.CYCLEWAY
+			);
+			assertEquals(testCase.expected(), actual, 1e-5);
+		}
+	}
+
+	@Test
+	void testInfrastructureFactors_bicycleInfra() {
+		record Case(String type, String bicycleInfra, double expected) {
+		}
+
+		List<Case> cases = List.of(
+			// Fallback (kein infra)
+			new Case("trunk", null, 0.05),
+			new Case("primary", null, 0.10),
+			new Case("secondary", null, 0.30),
+			new Case("tertiary", null, 0.40),
+			new Case("unclassified", null, 0.90),
+			new Case("residential", null, 0.95),
+			new Case(null, null, 0.85),
+
+			// Kategorien
+			new Case("primary", "CYCLEWAY_ISOLATED", 1.00),
+			new Case("primary", "CYCLEWAY_ADJOINING", 0.95),
+			new Case("primary", "BICYCLE_ROAD_VEHICLE_DESTINATION", 0.90),
+			new Case("primary", "CYCLEWAY_ON_HIGHWAY_ADVISORY", 0.85),
+			new Case("primary", "FOOT_AND_CYCLEWAY_SHARED_ADJOINING", 0.80),
+			new Case("primary", "CROSSING", 0.75),
+
+			// spezielle Fälle
+			new Case("primary", "NONE", 0.10),                // fällt zurück auf highway
+			new Case("primary", "SOMETHING_UNKNOWN", 0.80)   // default fallback
+		);
+
+		for (Case testCase : cases) {
+			double actual = params.getInfrastructureFactor(
+				testCase.type(),
+				testCase.bicycleInfra(),
+				BicycleUtils.BICYCLE_INFRA
+			);
+			assertEquals(testCase.expected(), actual, 1e-5);
 		}
 	}
 

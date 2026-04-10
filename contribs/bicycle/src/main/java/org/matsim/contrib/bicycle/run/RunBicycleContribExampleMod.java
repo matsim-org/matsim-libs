@@ -115,6 +115,8 @@ public final class RunBicycleContribExampleMod {
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.001);
 		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.001);
 		bicycleConfigGroup.setMotorizedInteraction(true);
+		//bicycleConfigGroup.setBicycleInfraAttribute("cycleway"); // default
+		bicycleConfigGroup.setBicycleInfraAttribute("bicycle_infra");
 
 		List<String> mainModeList = Arrays.asList(BICYCLE, TransportMode.car);
 		config.qsim().setMainModes(mainModeList);

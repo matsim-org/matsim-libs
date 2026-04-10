@@ -48,6 +48,8 @@ class BicycleTravelDisutility implements TravelDisutility {
 	private final double marginalCostOfComfort_m;
 	private final double marginalCostOfGradient_m_100m;
 
+	private final String bicycleInfrastructureAttribute;
+
 
 	private final double normalization;
 	private final double sigma;
@@ -85,6 +87,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 		this.marginalCostOfComfort_m = -(bicycleConfigGroup.getMarginalUtilityOfComfort_m());
 		this.marginalCostOfGradient_m_100m = -(bicycleConfigGroup.getMarginalUtilityOfGradient_pct_m());
 
+		this.bicycleInfrastructureAttribute = bicycleConfigGroup.getBicycleInfraAttribute();
 
 		this.timeCalculator = timeCalculator;
 
@@ -100,7 +103,9 @@ class BicycleTravelDisutility implements TravelDisutility {
 		String surface = BicycleUtils.getSurface(link);
 		String type = NetworkUtils.getType(link);
 		//String bicycleInfraType = BicycleUtils.getBicycleInfraType(link);
-		String cyclewaytype = BicycleUtils.getCyclewaytype(link);
+		//String cyclewaytype = BicycleUtils.getCyclewaytype(link);
+		String infrastructureValue =
+			BicycleUtils.getBicycleInfrastructureValue(link, bicycleInfrastructureAttribute);
 
 
 //		//  debugging
@@ -153,7 +158,9 @@ class BicycleTravelDisutility implements TravelDisutility {
 		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
 
 		//double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, bicycleInfraType);
-		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype);
+		//double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype);
+		double infrastructureFactor =
+			bicycleParams.getInfrastructureFactor(type, infrastructureValue, bicycleInfrastructureAttribute);
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
 		double gradientFactor = bicycleParams.getGradient_pct(link);

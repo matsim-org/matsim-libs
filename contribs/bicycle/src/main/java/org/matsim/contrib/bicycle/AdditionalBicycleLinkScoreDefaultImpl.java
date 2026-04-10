@@ -18,7 +18,9 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double marginalUtilityOfComfort_m;
 	private final double marginalUtilityOfGradient_pct_m;
+	private final String bicycleInfrastructureAttribute;
 	private final Vehicles vehicles;
+
 
 	@Inject
 	AdditionalBicycleLinkScoreDefaultImpl(Scenario scenario) {
@@ -26,6 +28,7 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();
 		this.marginalUtilityOfComfort_m = bicycleConfigGroup.getMarginalUtilityOfComfort_m();
 		this.marginalUtilityOfGradient_pct_m = bicycleConfigGroup.getMarginalUtilityOfGradient_pct_m();
+		this.bicycleInfrastructureAttribute = bicycleConfigGroup.getBicycleInfraAttribute();
 		this.vehicles = scenario.getVehicles();
 	}
 
@@ -40,7 +43,9 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 		String surface = BicycleUtils.getSurface(link);
 		String type = NetworkUtils.getType(link);
 		//String bicycleinfratype = BicycleUtils.getBicycleInfraType(link);
-		String cyclewaytype = BicycleUtils.getCyclewaytype(link);
+		//String cyclewaytype = BicycleUtils.getCyclewaytype(link);
+		String infrastructureValue =
+			BicycleUtils.getBicycleInfrastructureValue(link, bicycleInfrastructureAttribute);
 
 		double distance_m = link.getLength();
 
@@ -48,7 +53,9 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance_m;
 
 		//double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, bicycleinfratype);
-		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype);
+		//double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype);
+		double infrastructureFactor =
+			bicycleParams.getInfrastructureFactor(type, infrastructureValue, bicycleInfrastructureAttribute);
 		double infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance_m;
 
 		double gradient_pct = bicycleParams.getGradient_pct(link);
