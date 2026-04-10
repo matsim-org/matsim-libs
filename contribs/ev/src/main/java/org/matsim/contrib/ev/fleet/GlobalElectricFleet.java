@@ -23,9 +23,7 @@ public class GlobalElectricFleet implements ElectricFleet {
 			.map(s -> ElectricFleetUtils.create(s, driveEnergyConsumptionFactory, auxEnergyConsumptionFactory, chargingPowerFactory))
 			.collect(Collectors.toMap(ElectricVehicle::getId, v -> v));
 	}
-
-	// we do this lazy initialization hoop in combination with hasVehicle, as some modules call this fleet from within a VehicleEntersTrafficEventHandler.
-	// Since we don't know the order in which handlers are called, we cannot use that hook to lazily create EVs. Hence, we need to do it here.
+	
 	@Override
 	public ElectricVehicle getVehicle(Id<Vehicle> vehicleId) {
 		return electricVehicles.get(vehicleId);
