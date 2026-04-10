@@ -3,7 +3,7 @@ name: verify-push
 on:
   push:
     branches-ignore:
-      - 'main' # no need to run after merging to main
+      - '2026.x' # no need to run after merging to main
     tags-ignore:
       - '*' # do not run on pushing tags (see deploy-on-release-created)
   pull_request:
