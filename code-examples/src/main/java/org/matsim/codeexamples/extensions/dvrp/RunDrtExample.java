@@ -8,7 +8,10 @@ import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemP
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
-import org.matsim.contrib.drt.run.*;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtConfigs;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -133,6 +136,25 @@ class RunDrtExample{
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
 		ScenarioUtils.loadScenario( scenario );
 		// yyyy in long run, try to get rid of the route factory thing
+
+
+		// This is the recipe to add vehicles via code.
+
+
+		//we use the standard vehicle type for DRT_C. you could also create your own vehicle type and e.g. set a different maximum velocity.
+//		VehicleType vehicleType = VehicleUtils.createDefaultVehicleType();
+//		vehicleType.getCapacity().setSeats(2);
+//		scenario.getVehicles().addVehicleType(vehicleType);
+//
+//		// this is how you can provide DRT vehicles via code (ot within the standard MATSim vehicles (file),
+//		// i.e. not from a drt-mode-specific input file
+//		Vehicle vehicle_c = VehicleUtils.createVehicle(Id.createVehicleId("taxi_one_C"), vehicleType);
+//		Attributes attributes = vehicle_c.getAttributes();
+//		attributes.putAttribute(DVRP_MODE, DRT_C);
+//		attributes.putAttribute(START_LINK, "215");
+//		attributes.putAttribute(SERVICE_BEGIN_TIME, 0d);
+//		attributes.putAttribute(SERVICE_END_TIME, 8000d);
+//		scenario.getVehicles().addVehicle(vehicle_c);
 
 		// ===
 		Controler controler = new Controler( scenario ) ;
