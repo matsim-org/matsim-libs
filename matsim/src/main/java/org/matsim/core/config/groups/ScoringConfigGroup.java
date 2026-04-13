@@ -765,15 +765,24 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			}
 		}
 //		}
-
-		for (ActivityParams params : this.getActivityParams()) {
-			if (params.isScoringThisActivityAtAll() && params.getTypicalDuration().isUndefined()) {
-				throw new RuntimeException("In activity type=" + params.getActivityType()
-					+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
-					+ "so rather aborting here.");
+		if (hasDefaultScoringParameters()) {
+			for (ActivityParams params : getDefaultActivityParams()) {
+				if (params.isScoringThisActivityAtAll() && params.getTypicalDuration().isUndefined()) {
+					throw new RuntimeException("In activity type=" + params.getActivityType()
+						+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
+						+ "so rather aborting here.");
+				}
 			}
 		}
-
+		this.getScoringParametersPerSubpopulation().keySet().forEach(subpop -> {
+			for (ActivityParams params : getActivityParamsForSubpopulation(subpop)) {
+				if (params.isScoringThisActivityAtAll() && params.getTypicalDuration().isUndefined()) {
+					throw new RuntimeException("In activity type=" + params.getActivityType()
+						+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
+						+ "so rather aborting here.");
+				}
+			}
+		});
 	}
 
 	private static void createAndAddInteractionActivity(ScoringParameterSet scoringParameterSet, String mode) {
