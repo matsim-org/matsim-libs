@@ -77,11 +77,11 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	}
 
 	private static void checkScoringForDefaultParameters(final Config c) {
-		checkTravelingUtility(c.scoring().getModeParams().get(TransportMode.pt), ScoringConfigGroup.GROUP_NAME + ".travelingPt");
-		checkTravelingUtility(c.scoring().getModeParams().get(TransportMode.car), ScoringConfigGroup.GROUP_NAME + ".traveling");
-		checkTravelingUtility(c.scoring().getModeParams().get(TransportMode.bike), ScoringConfigGroup.GROUP_NAME + ".travelingBike");
-		checkTravelingUtility(c.scoring().getModeParams().get(TransportMode.walk), ScoringConfigGroup.GROUP_NAME + ".travelingWalk");
-		checkPtInteractionScoring(c, c.scoring().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE));
+		checkTravelingUtility(c.scoring().getDefaultModeParams().get(TransportMode.pt), ScoringConfigGroup.GROUP_NAME + ".travelingPt");
+		checkTravelingUtility(c.scoring().getDefaultModeParams().get(TransportMode.car), ScoringConfigGroup.GROUP_NAME + ".traveling");
+		checkTravelingUtility(c.scoring().getDefaultModeParams().get(TransportMode.bike), ScoringConfigGroup.GROUP_NAME + ".travelingBike");
+		checkTravelingUtility(c.scoring().getDefaultModeParams().get(TransportMode.walk), ScoringConfigGroup.GROUP_NAME + ".travelingWalk");
+		checkPtInteractionScoring(c, c.scoring().getDefaultActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE));
 	}
 
 	private static void checkScoringForSubpopulation(final Config c, final String subpopulation) {
