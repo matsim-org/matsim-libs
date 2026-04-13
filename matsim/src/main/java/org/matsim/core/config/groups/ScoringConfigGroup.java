@@ -492,6 +492,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	/**
 	 * @deprecated Use {@link #getDefaultModeParams()} for default scoring parameters.
 	 */
+	@Deprecated(since = "2026-02")
 	public Map<String, ModeParams> getModeParams() {
 		return getDefaultModeParams();
 	}
