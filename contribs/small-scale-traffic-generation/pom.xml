@@ -22,7 +22,11 @@
 			<artifactId>simwrapper</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>vsp</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>freight</artifactId>
