@@ -260,13 +260,13 @@ public final class Data {
 		// Final path where resource should be copied
 		Path resolved = baseDir.resolve(baseName);
 
-		try {
-			if (resources.containsKey(resolved) && !resources.get(resolved).toURI().equals(resource.toURI()))
-				throw new IllegalArgumentException(String.format("Resource '%s' was already mapped to resource '%s'. ", name, resources.get(resolved)));
-
-		} catch (URISyntaxException e) {
-			throw new RuntimeException("Illegal URL", e);
-		}
+//		try {
+//			if (resources.containsKey(resolved) && !resources.get(resolved).toURI().equals(resource.toURI()))
+//				throw new IllegalArgumentException(String.format("Resource '%s' was already mapped to resource '%s'. ", name, resources.get(resolved)));
+//
+//		} catch (URISyntaxException e) {
+//			throw new RuntimeException("Illegal URL", e);
+//		}
 
 		resources.put(resolved, resource);
 		return this.getUnixPath(this.path.getParent().relativize(resolved));
