@@ -58,6 +58,7 @@ final class SimulationResult {
 				StopTimeData stop = stops.computeIfAbsent(facilityId, k -> new StopTimeData(facilityId, stops.lastEntry()));
 
 				stop.arrivalTime = arrivalEvent.getTime();
+				stop.arrivalDelay = arrivalEvent.getDelay();
 				stop.stopCount++;
 
 			} else if (event instanceof VehicleDepartsAtFacilityEvent departureEvent) {
@@ -69,6 +70,7 @@ final class SimulationResult {
 
 				stops.computeIfAbsent(facilityId, k -> new StopTimeData(facilityId, stops.lastEntry()))
 					.departureTime = departureEvent.getTime();
+				stops.get(facilityId).departureDelay = departureEvent.getDelay();
 			} else if (event instanceof RailsimTrainStateEvent trainStateEvent) {
 				String trainId = trainStateEvent.getVehicleId().toString();
 				stateEvents.computeIfAbsent(trainId, (k) -> new ArrayList<>()).add(trainStateEvent);

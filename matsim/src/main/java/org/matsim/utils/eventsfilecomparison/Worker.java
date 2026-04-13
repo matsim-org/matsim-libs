@@ -48,6 +48,7 @@ class Worker extends Thread implements BasicEventHandler{
 	private final EventsManager eventsManager;
 	private final String eFile;
 	private final boolean ignoringCoordinates;
+	private final double delta;
 
 	private final CyclicBarrier doComparison;
 	private final AtomicBoolean allWorkersAlive;
@@ -58,11 +59,12 @@ class Worker extends Thread implements BasicEventHandler{
 	private volatile boolean finished = false;
 	private volatile int numEvents = 0;
 
-	Worker( String eFile1, final CyclicBarrier doComparison, AtomicBoolean allWorkersAlive, boolean ignoringCoordinates ) {
+	Worker( String eFile1, final CyclicBarrier doComparison, AtomicBoolean allWorkersAlive, boolean ignoringCoordinates, double delta ) {
 		this.eFile = eFile1;
 		this.doComparison = doComparison;
 		this.allWorkersAlive = allWorkersAlive;
 		this.ignoringCoordinates = ignoringCoordinates;
+		this.delta = delta;
 
 		this.eventsManager = new SingleHandlerEventsManager(this);
 	}
@@ -148,7 +150,7 @@ class Worker extends Thread implements BasicEventHandler{
 
 			tmp.append( key );
 			tmp.append("=");
-			tmp.append(e.getValue());
+			tmp.append(normalizeValue(e.getValue()));
 			strings.add(tmp.toString());
 		}
 		Collections.sort(strings);
@@ -160,6 +162,17 @@ class Worker extends Thread implements BasicEventHandler{
 
 		eventStr.append(" | ") ;
 		return eventStr.toString();
+	}
+
+	private String normalizeValue(String value) {
+		if (delta <= 0) return value;
+		try {
+			double d = Double.parseDouble(value);
+			int places = (int) Math.max(0, -Math.floor(Math.log10(delta)));
+			return String.format("%." + places + "f", d);
+		} catch (NumberFormatException e) {
+			return value;
+		}
 	}
 
 	private void syncWorkers() {

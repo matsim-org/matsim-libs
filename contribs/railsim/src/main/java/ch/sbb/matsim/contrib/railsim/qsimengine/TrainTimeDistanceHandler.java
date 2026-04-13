@@ -3,8 +3,6 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +17,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -71,7 +70,7 @@ public final class TrainTimeDistanceHandler {
 
 		String timeDistanceCSV = services.getControllerIO().getIterationFilename(services.getIterationNumber(), "railsimTimeDistance.csv", services.getConfig().controller().getCompressionType());
 
-		BufferedWriter writer = Files.newBufferedWriter(Path.of(timeDistanceCSV));
+		BufferedWriter writer = IOUtils.getBufferedWriter(timeDistanceCSV);
 		writer.append("vehicle_id,line_id,route_id,departure_id,time,distance,type,link_id,stop_id\n");
 
 		return writer;
@@ -148,7 +147,7 @@ public final class TrainTimeDistanceHandler {
 					Vehicle vehicle = vehicles.getVehicles().get(departure.getVehicleId());
 
 					Key key = new Key(route.getId(), vehicle.getType().getId());
-					targetData.computeIfAbsent(key, k -> initialTimeDistanceData(line, route, vehicle, speedProfile));
+					targetData.computeIfAbsent(key, _ -> initialTimeDistanceData(line, route, vehicle, speedProfile));
 
 				}
 			}

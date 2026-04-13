@@ -113,14 +113,14 @@ public class SwissRailRaptorCore {
         reset();
         CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
-		// Using a LinkedHashMap instead of a regular HashMap here is necessary to have a deterministic behaviour
         Map<TransitStopFacility, InitialStop> destinationStops = new LinkedHashMap<>();
 
         // go through all egressStops; check if already in destinationStops; if so, check if current cost is smaller; if so, then replace.  This can
         // presumably happen when the same stop can be reached at lower cost by a different egress mode. (*)
+		// IMO, this only makes sense if two different "egressStop" can encapsulate the same "stop".
         for (InitialStop egressStop : egressStops) {
-            InitialStop alternative = destinationStops.get(egressStop.stop);
-            if (alternative == null || egressStop.accessCost < alternative.accessCost) {
+            InitialStop alreadyExisting = destinationStops.get(egressStop.stop);
+            if (alreadyExisting == null || egressStop.accessCost < alreadyExisting.accessCost) {
                 destinationStops.put(egressStop.stop, egressStop);
             }
         }
@@ -137,7 +137,6 @@ public class SwissRailRaptorCore {
         }
 
         // same as (*) for access stops:
-		// Also, using a LinkedHashMap instead of a regular HashMap here is necessary to have a deterministic behaviour
         Map<TransitStopFacility, InitialStop> initialStops = new LinkedHashMap<>();
         for (InitialStop accessStop : accessStops) {
             InitialStop alternative = initialStops.get(accessStop.stop);
@@ -163,7 +162,7 @@ public class SwissRailRaptorCore {
                 // (intermodal access is if there are planElements that describe the intermodal access, which depends, I think, on which constructor was
                 // called (since also non-intermodal access has a leg). kai, jul'19
 
-                if (!isIntermodalAccess && routeStop.routeStop == routeStop.route.getStops().get(routeStop.route.getStops().size() - 1)) {
+                if (!isIntermodalAccess && routeStop.routeStop == routeStop.route.getStops().getLast()) {
                     // this is the last stop of a route, doesn't make sense to start here
                     // if it's intermodal, we still start here, as we might transfer to another close-by but non-intermodal stop.
                     continue;
@@ -762,7 +761,7 @@ public class SwissRailRaptorCore {
 				}
 			} else /*if (previousArrivalCost < arrivalCost)*/ {
 				// looks like we could reach this stop with better cost from somewhere else
-				// check if we can depart also with better cost, if yes, switch to this connection
+				// check if we can depart also with better cost, if yes, switch to that other connection
 				PathElement alternativeBoardingPE = this.arrivalPathPerRouteStop[toRouteStopIndex];
 				int alternativeAgentFirstArrivalTime = alternativeBoardingPE.arrivalTime;
 				int alternativeDepartureIndex = findNextDepartureIndex(route, toRouteStop, alternativeAgentFirstArrivalTime);

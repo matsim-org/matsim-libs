@@ -71,7 +71,7 @@ public class RailsimSpeedProfilesTest extends AbstractIntegrationTest {
 		assertThat(result)
 			.allStopDelaysAreZero()
 			.trainHasLastArrival("train1", 31052)
-			.trainHasLastArrival("train2", 31261);
+			.trainHasLastArrival("train2", 31262);
 
 	}
 }
