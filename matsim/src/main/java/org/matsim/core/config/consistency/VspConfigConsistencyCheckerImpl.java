@@ -38,7 +38,6 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.pt.PtConstants;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -385,54 +384,12 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added aug'13:
-		if (config.scoring().getMarginalUtlOfWaiting_utils_hr() != 0.) {
-			problem = true;
-			System.out.flush();
-			log.log(lvl, "found marginal utility of waiting != 0.  vsp default is setting this to 0. ");
-		}
+		Set<String> subPopulationsWithScoringParameters = config.scoring().getScoringParametersPerSubpopulation().keySet();
 
-		// added apr'15:
-		for (ActivityParams params : config.scoring().getActivityParams()) {
-			if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(params.getActivityType())) {
-				// they have typicalDurationScoreComputation==relative, but are not scored anyways. benjamin/kai, nov'15
-				continue;
-			}
-			switch (params.getTypicalDurationScoreComputation()) {
-				case relative:
-					break;
-				case uniform:
-				problem = true ;
-					log.log(lvl, "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should use `relative'. ");
-					break;
-				default:
-					throw new RuntimeException("unexpected setting; aborting ... ");
-			}
-		}
-		for (ModeParams params : config.scoring().getModes().values()) {
-			if (params.getMonetaryDistanceRate() > 0.) {
-				problem = true;
-				System.out.flush();
-				log.error("found monetary distance rate for mode " + params.getMode() + " > 0.  You probably want a value < 0 here.\n");
-			}
-			if (params.getMonetaryDistanceRate() < -0.01) {
-				System.out.flush();
-				log.error("found monetary distance rate for mode " + params.getMode() + " < -0.01.  -0.01 per meter means -10 per km.  You probably want to divide your value by 1000.");
-			}
-		}
-
-		if (config.scoring().getModes().get(TransportMode.car) != null && config.scoring().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0) {
-			problem = true;
-		}
-		final ModeParams modeParamsPt = config.scoring().getModes().get(TransportMode.pt);
-		if (modeParamsPt != null && modeParamsPt.getMonetaryDistanceRate() > 0) {
-			problem = true;
-			System.out.flush();
-			log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here.");
-		}
-		if (config.scoring().getMarginalUtilityOfMoney() < 0.) {
-			problem = true;
-			System.out.flush();
-			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. ");
+		for (String subpop : subPopulationsWithScoringParameters) {
+			problem = checkScoringParameterSet(lvl, problem, subpop, config.scoring().getActivityParamsForSubpopulation(subpop),
+				config.scoring().getModeParamsForSubpopulation(subpop).values(), config.scoring().getMarginalUtlOfWaiting_utils_hr(subpop),
+				config.scoring().getMarginalUtilityOfMoney(subpop));
 		}
 		// added oct'17:
 		if (config.scoring().getFractionOfIterationsToStartScoreMSA() == null || config.scoring().getFractionOfIterationsToStartScoreMSA() >= 1.) {
@@ -445,33 +402,86 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log(lvl, "</module>");
 		}
 
-		// added apr'21:
-		for (Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> entry : config.scoring().getScoringParametersPerSubpopulation().entrySet()) {
-			for (ActivityParams activityParam : entry.getValue().getActivityParams()) {
-				if (activityParam.getMinimalDuration().isDefined()) {
-					log.log(lvl, "Vsp default is to not define minimal duration.  Activity type=" + activityParam.getActivityType() + "; subpopulation=" + entry.getKey());
+		for (String subpop : subPopulationsWithScoringParameters) {
+			for (ModeParams params : config.scoring().getModeParamsForSubpopulation(subpop).values()) {
+				if (config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng() == CheckingOfMarginalUtilityOfTravellng.allZero) {
+					if (params.getMarginalUtilityOfTraveling() != 0. && !params.getMode().equals(TransportMode.ride) && !params.getMode().equals(
+						TransportMode.bike)) {
+						log.log(lvl,
+							"You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
+								+ ". VSP standard is to set this to zero.  Please document carefully why you are using a value different from zero, e.g. by showing distance distributions.");
+					}
 				}
-			}
-		}
-
-		// added may'23
-		for (ModeParams params : config.scoring().getModes().values()) {
-			if (config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng() == CheckingOfMarginalUtilityOfTravellng.allZero) {
-				if (params.getMarginalUtilityOfTraveling() != 0. && !params.getMode().equals(TransportMode.ride) && !params.getMode().equals(TransportMode.bike)) {
-					log.log(lvl, "You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
-						+ ". VSP standard is to set this to zero.  Please document carefully why you are using a value different from zero, e.g. by showing distance distributions.");
+				if (params.getMode().equals(TransportMode.walk) && params.getConstant() != 0.) {
+					problem = true;
+					log.log(lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
+						+ ".  Values different from zero cause problems here because the ASC is also used for access/egress modes");
 				}
-			}
-			if (params.getMode().equals(TransportMode.walk) && params.getConstant() != 0.) {
-				problem = true;
-				log.log(lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
-					+ ".  Values different from zero cause problems here because the ASC is also used for access/egress modes");
 			}
 		}
 		// added jun'25:
 		if (!config.scoring().isWriteExperiencedPlans()) {
 			log.log(lvl, "You are not writing experienced plans.  Vsp default is to do so.");
 		}
+		return problem;
+	}
+
+	private static boolean checkScoringParameterSet(Level lvl, boolean problem, String contextLabel,
+	                                                Collection<ActivityParams> activityParams, Collection<ModeParams> modeParams,
+	                                                double marginalUtilityOfWaiting, double marginalUtilityOfMoney) {
+		if (marginalUtilityOfWaiting != 0.0) {
+			problem = true;
+			System.out.flush();
+			log.log(lvl, "found marginal utility of waiting != 0 for {} scoring parameters. vsp default is setting this to 0.", contextLabel);
+		}
+
+		for (ActivityParams params : activityParams) {
+			if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(params.getActivityType())) {
+				continue;
+			}
+			switch (params.getTypicalDurationScoreComputation()) {
+				case relative:
+					break;
+				case uniform:
+					problem = true;
+					log.log(lvl,
+						"found `typicalDurationScoreComputation == uniform' for activity type {} for {} ; vsp should use `relative'. ",
+						params.getActivityType(), contextLabel);
+					break;
+				default:
+					throw new RuntimeException("unexpected setting; aborting ... ");
+			}
+
+			if (params.getMinimalDuration().isDefined()) {
+				log.log(lvl, "Vsp default is to not define minimal duration.  Activity type={}; scoringParameters={}", params.getActivityType(), contextLabel);
+			}
+		}
+
+		for (ModeParams params : modeParams) {
+			if (params.getMonetaryDistanceRate() > 0.) {
+				problem = true;
+				System.out.flush();
+				log.error("found monetary distance rate for mode {} > 0 in {} scoring parameters. You probably want a value < 0 here.", params.getMode(), contextLabel);
+			}
+			if (params.getMonetaryDistanceRate() < -0.01) {
+				System.out.flush();
+				log.error(
+					"found monetary distance rate for mode {} < -0.01 in {} scoring parameters. -0.01 per meter means -10 per km. You probably want to divide your value by 1000.",
+					params.getMode(), contextLabel);
+			}
+			if (params.getMode().equals(TransportMode.pt) && params.getMonetaryDistanceRate() > 0) {
+				problem = true;
+				System.out.flush();
+				log.error("found monetary distance rate pt > 0 in {} scoring parameters. You probably want a value < 0 here.", contextLabel);
+			}
+		}
+
+		if (marginalUtilityOfMoney < 0.) {
+			problem = true;
+			System.out.flush();
+			log.error("found marginal utility of money < 0 in {} scoring parameters. You almost certainly want a value > 0 here.", contextLabel);
+		}
+
 		return problem;
 	}
 
