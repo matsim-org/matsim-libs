@@ -497,6 +497,16 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		return getDefaultModeParams();
 	}
 
+	/**
+	 * Returns the mode parameters explicitly configured for the given subpopulation key.
+	 * In contrast to {@link #getScoringParameters(String)}, this method does not apply any fallback.
+	 */
+	public Map<String, ModeParams> getModeParamsForSubpopulation(String subpopulation) {
+		if (getScoringParametersPerSubpopulation().get(subpopulation) != null)
+			return getScoringParametersPerSubpopulation().get(subpopulation).getModeParams();
+		else
+			throw new RuntimeException("Mode parameters for subpopulation " + subpopulation + " are not defined");
+	}
 
 	public Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
 		@SuppressWarnings("unchecked") final Collection<ScoringParameterSet> parameters = (Collection<ScoringParameterSet>) getParameterSets(
@@ -664,8 +674,24 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		getScoringParameters(null).addModeParams(params);
 	}
 
+	public void addModeParamsForSubpopulation(final ModeParams params, String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getScoringParametersPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet == null) {
+			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
+		}
+		scoringParameterSet.addModeParams(params);
+	}
+
 	public void addActivityParams(final ActivityParams params) {
 		getScoringParameters(null).addActivityParams(params);
+	}
+
+	public void addActivityParamsForSubpopulation(final ActivityParams params, String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getScoringParametersPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet == null) {
+			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
+		}
+		scoringParameterSet.addActivityParams(params);
 	}
 
 	public enum TypicalDurationScoreComputation {
