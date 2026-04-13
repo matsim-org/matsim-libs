@@ -169,6 +169,13 @@ final class TrainState implements TrainPosition {
 
 		this.route.clear();
 		this.route.addAll(route);
+
+		// Avoid counting the shared handoff link twice across a circulation boundary.
+		if (!this.previousRoute.isEmpty() && !this.route.isEmpty()
+			&& this.previousRoute.getLast().getLinkId().equals(this.route.getFirst().getLinkId())) {
+			this.previousRoute.removeLast();
+		}
+
 		this.timestamp = time;
 		this.routeIdx = 0;
 		this.acceleration = 0.0;
