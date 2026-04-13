@@ -458,8 +458,10 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 	}
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
-	public Collection<ActivityParams> getActivityParams() {
+	/**
+	 * Returns all activity parameter sets of the default scoring parameters.
+	 */
+	public Collection<ActivityParams> getDefaultActivityParams() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getActivityParams();
 		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
@@ -468,14 +470,30 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			throw new RuntimeException("Default subpopulation is not defined");
 	}
 
-		@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
-	public Map<String, ModeParams> getModeParams() {
+	/**
+	 * @deprecated Use {@link #getDefaultActivityParams()} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
+	public Collection<ActivityParams> getActivityParams() {
+		return getDefaultActivityParams();
+	}
+	/**
+	 * Returns all mode parameters of the default/root scoring parameters.
+	 */
+	public Map<String, ModeParams> getDefaultModeParams() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getModeParams();
 		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
 			return getScoringParameters(DEFAULT_SUBPOPULATION).getModeParams();
 		else
 			throw new RuntimeException("Default subpopulation is not defined");
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultModeParams()} for default scoring parameters.
+	 */
+	public Map<String, ModeParams> getModeParams() {
+		return getDefaultModeParams();
 	}
 
 
@@ -496,8 +514,10 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	/* direct access */
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
-	public double getMarginalUtlOfWaitingPt_utils_hr() {
+	/**
+	 * Returns the PT waiting utility of the default/root scoring parameters.
+	 */
+	public double getDefaultMarginalUtlOfWaitingPt_utils_hr() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getMarginalUtlOfWaitingPt_utils_hr();
 		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
@@ -507,29 +527,92 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
-	public void setMarginalUtlOfWaitingPt_utils_hr(double val) {
+	/**
+	 * @deprecated Use {@link #getDefaultMarginalUtlOfWaitingPt_utils_hr()} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
+	public double getMarginalUtlOfWaitingPt_utils_hr() {
+		return getDefaultMarginalUtlOfWaitingPt_utils_hr();
+	}
+
+	/**
+	 * Returns the activity parameters explicitly configured for the given subpopulation key.
+	 * In contrast to {@link #getScoringParameters(String)}, this method does not apply any fallback.
+	 */
+	public Collection<ActivityParams> getActivityParamsForSubpopulation(String subpopulation) {
+		if (getScoringParametersPerSubpopulation().get(subpopulation) != null)
+			return getScoringParametersPerSubpopulation().get(subpopulation).getActivityParams();
+		else
+			throw new RuntimeException("Activity parameters for subpopulation " + subpopulation + " are not defined");
+	}
+
+	/**
+	 * Sets the PT waiting utility on the default scoring parameters.
+	 */
+	public void setDefaultMarginalUtlOfWaitingPt_utils_hr(double val) {
 		getScoringParameters(null).setMarginalUtlOfWaitingPt_utils_hr(val);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
-	public ActivityParams getActivityParams(final String actType) {
+	/**
+	 * @deprecated Use {@link #setDefaultMarginalUtlOfWaitingPt_utils_hr(double)} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
+	public void setMarginalUtlOfWaitingPt_utils_hr(double val) {
+		setDefaultMarginalUtlOfWaitingPt_utils_hr(val);
+	}
+
+
+	/**
+	 * Returns the activity parameters for one activity type from the default scoring parameters.
+	 * This is the type-specific accessor and differs from {@link #getDefaultActivityParams()}, which returns
+	 * the full collection of configured activity parameter sets.
+	 */
+	public ActivityParams getDefaultActivityParams(final String actType) {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getActivityParams(actType);
 		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
 			return getScoringParameters(DEFAULT_SUBPOPULATION).getActivityParams(actType);
 		else
 			throw new RuntimeException("Default subpopulation is not defined");
-
 	}
 
+	/**
+	 * @deprecated Use {@link #getDefaultActivityParams(String)} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
+	public ActivityParams getActivityParams(final String actType) {
+		return getDefaultActivityParams(actType);
+	}
+
+	/**
+	 * Returns the activity parameters for one activity type for the explicitly configured
+	 * scoring parameter set of the given subpopulation key.
+	 */
+	public ActivityParams getActivityParamsForSubpopulation(final String actType, String subpopulation) {
+		if (getScoringParametersPerSubpopulation().get(subpopulation) != null)
+			return getScoringParametersPerSubpopulation().get(subpopulation).getActivityParams(actType);
+		else
+			throw new RuntimeException("Activity parameters for subpopulation " + subpopulation + " are not defined");
+	}
+
+	/**
+	 * Looks up the scoring parameter set for the given subpopulation and falls back to the
+	 * default entry identified by {@code null}. This method is intentionally not using
+	 * {@link #DEFAULT_SUBPOPULATION} as an additional implicit fallback because config
+	 * management code relies on stable "exact-or-root" semantics.
+	 */
 	public ScoringParameterSet getScoringParameters(String subpopulation) {
 		final ScoringParameterSet params = getScoringParametersPerSubpopulation().get(subpopulation);
-		// If no config parameters defined for a specific subpopulation,
-		// use the ones of the "default" subpopulation
 		return params != null ? params : getScoringParametersPerSubpopulation().get(null);
 	}
-
+	public boolean hasDefaultScoringParameters() {
+		if (getScoringParameters(null) != null)
+			return true;
+		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
+			return true;
+		else
+			return false;
+	}
 	/**
 	 * Returns the explicitly configured scoring parameter set for the given subpopulation,
 	 * creating one if necessary.
