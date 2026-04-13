@@ -439,34 +439,19 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
 				controller.addOverridingModule(new RoadPricingModule(RoadPricingUtils.addOrGetRoadPricingScheme(scenario)));
 			}
-			controller.addOverridingModule( new AbstractModule(){
+			controller.addOverridingModule(new AbstractModule() {
 				@Override
-				public void install(){
-//					ScoringFunctionFactory defaultScoringFunctionFactory =
-//						new CharyparNagelScoringFunctionFactory( scenario );
-//					ScoringFunctionFactory vehicleTypeBasedScoringFunctionFactory =
-//						new VehicleTypeBasedScoringFunctionFactory( scenario );
-//
-//					bind( ScoringFunctionFactory.class ).toInstance(
-//						new SubpopulationDelegatingScoringFunctionFactory(
-//							defaultScoringFunctionFactory,
-//							Map.of(
-//								"goodsTraffic", vehicleTypeBasedScoringFunctionFactory,
-//								"commercialPersonTraffic", defaultScoringFunctionFactory
-//								  )
-//						)
-																   );
-					// ---
-					bind( CharyparNagelScoringFunctionFactory.class ); // so it can be used as delegate
-					bind( ScoringFunctionFactory.class ).to( SubpopulationDelegatingScoringFunctionFactory.class );
+				public void install() {
+					bind(CharyparNagelScoringFunctionFactory.class); // so it can be used as delegate
+					bind(ScoringFunctionFactory.class).to(SubpopulationDelegatingScoringFunctionFactory.class);
 
-					MapBinder<String, ScoringFunctionFactory> mapBinder = MapBinder.newMapBinder( this.binder(), String.class, ScoringFunctionFactory.class );
-					mapBinder.addBinding( "goodsTraffic" ).to( VehicleTypeBasedScoringFunctionFactory.class );
-					mapBinder.addBinding( "commercialPersonTraffic" ).to( CharyparNagelScoringFunctionFactory.class );
-
-
+					MapBinder<String, ScoringFunctionFactory> mapBinder = MapBinder.newMapBinder(this.binder(), String.class,
+						ScoringFunctionFactory.class);
+					mapBinder.addBinding("goodsTraffic").to(VehicleTypeBasedScoringFunctionFactory.class);
+					mapBinder.addBinding("commercialPersonTraffic").to(CharyparNagelScoringFunctionFactory.class);
 				}
-			} ).addOverridingModule( new SimWrapperModule( sw ) );
+			});
+			controller.addOverridingModule(new SimWrapperModule(sw));
 
 			// Creating inject always adds check for unmaterialized config groups.
 			controller.getInjector();
