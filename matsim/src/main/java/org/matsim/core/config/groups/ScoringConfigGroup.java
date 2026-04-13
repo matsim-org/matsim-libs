@@ -880,6 +880,13 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	}
 
+	public double getMarginalUtilityOfMoney(String subpopulation) {
+		if (getScoringParameters(subpopulation) != null)
+			return getScoringParameters(subpopulation).getMarginalUtilityOfMoney();
+		else
+			throw new RuntimeException("MarginalUtilityOfMoney for subpopulation " + subpopulation + " is not defined or the scoringParams for subpopulation is not defined");
+	}
+
 	public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
 		getScoringParameters(null).setMarginalUtilityOfMoney(marginalUtilityOfMoney);
 	}
@@ -925,6 +932,12 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		else
 			throw new RuntimeException("Default subpopulation is not defined");
 
+	}
+	public double getMarginalUtlOfWaiting_utils_hr(String subpopulation) {
+		if (getScoringParameters(subpopulation) != null)
+			return getScoringParameters(subpopulation).getMarginalUtlOfWaiting_utils_hr();
+		else
+			throw new RuntimeException("MarginalUtlOfWaiting_utils_hr for subpopulation " + subpopulation + " is not defined");
 	}
 
 	public void setMarginalUtlOfWaiting_utils_hr(double waiting) {
