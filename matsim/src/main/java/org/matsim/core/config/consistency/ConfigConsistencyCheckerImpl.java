@@ -68,44 +68,52 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	}
 
 	/*package because of test */ static void checkScoring(final Config c) {
-		ModeParams ptModeParams = c.scoring().getModes().get(TransportMode.pt);
-		if (ptModeParams!=null && ptModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(ScoringConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
-					"Typically, this should be a disutility, i.e. have a negative value.");
-		}
-		ModeParams carModeParams = c.scoring().getModes().get(TransportMode.car);
-		if (carModeParams!=null && carModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(ScoringConfigGroup.GROUP_NAME + ".traveling is > 0. This values specifies a utility. " +
-			"Typically, this should be a disutility, i.e. have a negative value.");
-		}
-		ModeParams bikeModeParams = c.scoring().getModes().get(TransportMode.bike);
-		if (bikeModeParams!=null && bikeModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(ScoringConfigGroup.GROUP_NAME + ".travelingBike is > 0. This values specifies a utility. " +
-			"Typically, this should be a disutility, i.e. have a negative value.");
-		}
-		ModeParams walkModeParams = c.scoring().getModes().get(TransportMode.walk);
-		if (walkModeParams!=null && walkModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(ScoringConfigGroup.GROUP_NAME + ".travelingWalk is > 0. This values specifies a utility. " +
-			"Typically, this should be a disutility, i.e. have a negative value.");
-		}
+		if (c.scoring().hasDefaultScoringParameters())
+			checkScoringForDefaultParameters(c);
 
+		c.scoring().getScoringParametersPerSubpopulation().keySet().forEach(subpopulation -> {
+			checkScoringForSubpopulation(c, subpopulation);
+		});
+	}
 
-		ActivityParams ptAct = c.scoring().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
-		if ( ptAct != null ) {
-//			if ( ptAct.getClosingTime()!=0. && ptAct.getClosingTime()!=Time.getUndefinedTime() ) {
-//				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
-//					throw new RuntimeException("setting the pt interaction activity closing time away from 0/undefined is not allowed because it breaks pt scoring." +
-//					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
-//				}
+	private static void checkScoringForDefaultParameters(final Config c) {
+		checkTravelingUtility(c.scoring().getModeParams().get(TransportMode.pt), ScoringConfigGroup.GROUP_NAME + ".travelingPt");
+		checkTravelingUtility(c.scoring().getModeParams().get(TransportMode.car), ScoringConfigGroup.GROUP_NAME + ".traveling");
+		checkTravelingUtility(c.scoring().getModeParams().get(TransportMode.bike), ScoringConfigGroup.GROUP_NAME + ".travelingBike");
+		checkTravelingUtility(c.scoring().getModeParams().get(TransportMode.walk), ScoringConfigGroup.GROUP_NAME + ".travelingWalk");
+		checkPtInteractionScoring(c, c.scoring().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE));
+	}
+
+	private static void checkScoringForSubpopulation(final Config c, final String subpopulation) {
+		checkTravelingUtility(c.scoring().getModeParamsForSubpopulation(subpopulation).get(TransportMode.pt), ScoringConfigGroup.GROUP_NAME + ".travelingPt");
+		checkTravelingUtility(c.scoring().getModeParamsForSubpopulation(subpopulation).get(TransportMode.car), ScoringConfigGroup.GROUP_NAME + ".traveling");
+		checkTravelingUtility(c.scoring().getModeParamsForSubpopulation(subpopulation).get(TransportMode.bike), ScoringConfigGroup.GROUP_NAME + ".travelingBike");
+		checkTravelingUtility(c.scoring().getModeParamsForSubpopulation(subpopulation).get(TransportMode.walk), ScoringConfigGroup.GROUP_NAME + ".travelingWalk");
+		checkPtInteractionScoring(c, c.scoring().getActivityParamsForSubpopulation(PtConstants.TRANSIT_ACTIVITY_TYPE, subpopulation));
+	}
+
+	private static void checkTravelingUtility(ModeParams modeParams, String parameterName) {
+		if (modeParams != null && modeParams.getMarginalUtilityOfTraveling() > 0) {
+			log.warn("{} is > 0. This values specifies a utility. Typically, this should be a disutility, i.e. have a negative value.",
+				parameterName);
+		}
+	}
+
+	private static void checkPtInteractionScoring(Config c, ActivityParams ptAct) {
+		if (ptAct != null) {
+//		if ( ptAct.getClosingTime()!=0. && ptAct.getClosingTime()!=Time.getUndefinedTime() ) {
+//			if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
+//				throw new RuntimeException("setting the pt interaction activity closing time away from 0/undefined is not allowed because it breaks pt scoring." +
+//				" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
 //			}
-			if ( ptAct.isScoringThisActivityAtAll() ) {
-				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams() ) {
+//		}
+			if (ptAct.isScoringThisActivityAtAll()) {
+				if (!c.vspExperimental().isAbleToOverwritePtInteractionParams()) {
 					throw new RuntimeException("Scoring " + ptAct.getActivityType() + " is not allowed because it breaks pt scoring." +
-					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
+						" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.");
 				}
 			}
 		}
-
 	}
 
 	private static void checkEventsFormatLanesSignals(final Config c) {
