@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.consistency.ScenarioConsistencyChecker;
+import org.matsim.core.scenario.checkers.ScenarioChecker;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.facilities.ActivityFacilities;
@@ -277,13 +277,18 @@ import java.util.concurrent.LinkedBlockingQueue;
 		}
 
 		@Override
-		public void addScenarioConsistencyChecker(ScenarioConsistencyChecker checker) {
-			this.delegate.addScenarioConsistencyChecker( checker );
+		public void addScenarioChecker(ScenarioChecker checker) {
+			this.delegate.addScenarioChecker( checker );
 		}
 
 		@Override
-		public void removeScenarioConsistencyChecker(Class<? extends ScenarioConsistencyChecker> clazz) {
-			this.delegate.removeScenarioConsistencyChecker( clazz );
+		public void removeScenarioChecker(ScenarioChecker checker) {
+			this.delegate.removeScenarioChecker(checker);
+		}
+
+		@Override
+		public List<ScenarioChecker> getScenarioCheckers() {
+			return this.delegate.getScenarioCheckers();
 		}
 
 		@Override

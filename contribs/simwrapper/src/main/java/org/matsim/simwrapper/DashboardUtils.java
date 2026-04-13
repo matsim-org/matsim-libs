@@ -39,7 +39,7 @@ public class DashboardUtils {
 
 		if (scaleBySampleSize) {
 			if (data.config().getSampleSize() != null && data.config().getSampleSize() < 1.0)
-				description += " Values are scaled by sample size. The shown values are sampled to 100 % based on the simulated sample size of " + getSampleName(data.config().getSampleSize()) + ".";
+				description += " Values are scaled by sample size. The shown values are scaled to represent 100 % based on a simulated sample size of " + getSampleName(data.config().getSampleSize()) + ".";
 			else if (data.config().getSampleSize() != null && data.config().getSampleSize() == 1.0)
 				description += " Values are for the full population (sample size 100%).";
 			else

@@ -22,6 +22,7 @@ package org.matsim.run;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -43,7 +44,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scenario.consistency.ScenarioConsistencyChecker;
+import org.matsim.core.scenario.checkers.ScenarioChecker;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
@@ -397,13 +398,18 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public void addScenarioConsistencyChecker(ScenarioConsistencyChecker checker) {
-			scenario.addScenarioConsistencyChecker( checker );
+		public void addScenarioChecker(ScenarioChecker checker) {
+			scenario.addScenarioChecker( checker );
 		}
 
 		@Override
-		public void removeScenarioConsistencyChecker(Class<? extends ScenarioConsistencyChecker> clazz) {
-			scenario.removeScenarioConsistencyChecker( clazz );
+		public void removeScenarioChecker(ScenarioChecker checker) {
+			scenario.removeScenarioChecker(checker);
+		}
+
+		@Override
+		public List<ScenarioChecker> getScenarioCheckers() {
+			return scenario.getScenarioCheckers();
 		}
 
 		@Override
