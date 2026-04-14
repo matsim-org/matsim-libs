@@ -156,7 +156,7 @@ public interface Communicator extends AutoCloseable {
 				buf.getInt(); // sender
 				buf.getInt(); // receiver
 
-				messages.add(provider.parse(buf));
+				messages.add(provider.deserialize(buf));
 			});
 
 			return messages;
@@ -200,7 +200,7 @@ public interface Communicator extends AutoCloseable {
 
 			var sender = buf.getInt(); // sender
 			buf.getInt(); // receiver
-			result.add(provider.parse(buf));
+			result.add(provider.deserialize(buf));
 			expectedSenders.remove(sender);
 		});
 		return result;
@@ -263,7 +263,7 @@ public interface Communicator extends AutoCloseable {
 			var sender = buf.getInt(); // sender
 			buf.getInt(); // receiver
 
-			messages.add(provider.parse(buf));
+			messages.add(provider.deserialize(buf));
 			senders.add(sender);
 		});
 

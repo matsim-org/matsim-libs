@@ -19,18 +19,9 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.HasLinkId;
-import org.matsim.api.core.v01.events.HasVehicleId;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
@@ -45,7 +36,10 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Because in QSim vehicles enter and leave traffic at the end of links, we skip the first link when
@@ -120,9 +114,11 @@ public class DriveDischargingHandler
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		// process remaining events
-		doSimStep(this.netsim.getSimTimer().getTimeOfDay());
+		// pass time + 1, because we delay the processing of events during the mobsim. Yet, afterMobsim is called with the last time step of the mobsim
+		// when passing the last timestep no events will be processed, as the logic waits for the next timestep.
+		doSimStep(this.netsim.getSimTimer().getTimeOfDay() + 1);
 	}
 
 	@Override

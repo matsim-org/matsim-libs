@@ -130,6 +130,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		this.addModeParams(new ModeParams(TransportMode.bike));
 		this.addModeParams(new ModeParams(TransportMode.ride));
 		this.addModeParams(new ModeParams(TransportMode.other));
+		///  (I do not know why the above works since the same does NOT work in {@link ScoringParameterSet}.)
 
 		this.addActivityParams(new ActivityParams("dummy").setTypicalDuration(2. * 3600.));
 		// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
@@ -1287,10 +1288,21 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		private ScoringParameterSet(final String subpopulation) {
 			this();
 			this.subpopulation = subpopulation;
+
 		}
 
 		private ScoringParameterSet() {
+			// (if this is called without the subpopulation parameter, it refers to the "null" subpopulation)
+
 			super(SET_TYPE);
+
+//			this.addModeParams(new ModeParams(TransportMode.car));
+//			this.addModeParams(new ModeParams(TransportMode.pt));
+//			this.addModeParams(new ModeParams(TransportMode.walk));
+//			this.addModeParams(new ModeParams(TransportMode.bike));
+//			this.addModeParams(new ModeParams(TransportMode.ride));
+//			this.addModeParams(new ModeParams(TransportMode.other));
+			// this is not possible since the parser expects explicitly set mode params to be empty before.
 		}
 
 		private String subpopulation = null;
@@ -1394,8 +1406,15 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 		@StringGetter(WAITING_PT)
 		public double getMarginalUtlOfWaitingPt_utils_hr() {
-			return waitingPt != null ? waitingPt
-				: this.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+			if( waitingPt != null ) return waitingPt;
+			final ModeParams modeParams = this.getModes().get( TransportMode.pt );
+
+			if ( modeParams==null ) {
+				log.fatal( "this.getModes().get( TransportMode.pt ) returns null; cannot continue; possibly some confusion with setting mode params for subpopulations. subpop={}", this.getSubpopulation() ) ;
+				throw new RuntimeException("see log statement" );
+			}
+
+			return modeParams.getMarginalUtilityOfTraveling();
 		}
 
 		@StringSetter(WAITING_PT)

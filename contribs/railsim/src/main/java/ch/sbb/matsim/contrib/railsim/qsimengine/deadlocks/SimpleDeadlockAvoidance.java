@@ -271,8 +271,7 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 		// This strategy cannot handle cases where one train reserves a segment of links efficiently.
 		// The non-blocking areas should already be designed such that trains don't block each other.
 		// Checking each link individually is possible but too restrictive,
-		// Instead it checks only the link used for entering the segment.
-		return checkLink(time, links.getLast(), position);
+		return true;
 	}
 
 	@Override
