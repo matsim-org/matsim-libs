@@ -116,10 +116,9 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		this.coordinateSystem = coordinateSystem;
 		return this;
 	}
-	// ---
-	private boolean insistingOnDeprecatedConfigVersion = false ;
 	// For programmatically created configs, the current config version is the default.
-	// Deprecated config support is re-enabled explicitly when reading config_v1.  kmt/assistant, Mar'26
+	// Deprecated config support is re-enabled explicitly when reading config_v1.
+	private boolean insistingOnDeprecatedConfigVersion = false ;
 	private static final String INSITING_ON_DEPRECATED_CONFIG_VERSION = "insistingOnDeprecatedConfigVersion" ;
 	@StringGetter( INSITING_ON_DEPRECATED_CONFIG_VERSION )
 	public final boolean isInsistingOnDeprecatedConfigVersion() { return this.insistingOnDeprecatedConfigVersion ; }
