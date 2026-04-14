@@ -21,6 +21,7 @@
 package org.matsim.freight.logistics.shipment;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
@@ -33,12 +34,14 @@ import org.matsim.freight.logistics.LogisticChainElement;
 	private final double endTime;
 	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
+	private final Id<Link> linkId;
 
 	LoggedLspShipmentLoad(LspShipmentUtils.LoggedShipmentLoadBuilder builder) {
 		this.startTime = builder.getStartTime();
 		this.endTime = builder.getEndTime();
 		this.element = builder.getElement();
 		this.resourceId = builder.getResourceId();
+		this.linkId = builder.getLinkId();
 	}
 
 	/**
@@ -71,5 +74,13 @@ import org.matsim.freight.logistics.LogisticChainElement;
 	@Override
 	public Id<LSPResource> getResourceId() {
 		return resourceId;
+	}
+
+	/**
+	 * @return
+	 */
+	@Override
+	public Id<Link> getLinkId() {
+		return linkId;
 	}
 }

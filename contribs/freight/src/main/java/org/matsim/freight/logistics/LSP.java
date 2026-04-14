@@ -48,6 +48,6 @@ public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<
   /**
    * @param lspShipment ok (LSP needs to be told that it is responsible for lspShipment)
    */
-  void assignShipmentToLSP(LspShipment lspShipment);
+  void assignShipmentToLspPlan(LspShipment lspShipment);
 
 }

@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.load.IntegerLoadType;
@@ -63,9 +64,17 @@ public class MultiInsertionDetourPathCalculatorTest {
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.fromLink(pickupLink)
 			.toLink(dropoffLink)
-			.earliestStartTime(100)
-			.latestStartTime(200)
-			.latestArrivalTime(500)
+			.earliestDepartureTime(100)
+			.constraints(
+					new DrtRouteConstraints(
+							400,
+							Double.POSITIVE_INFINITY,
+							100,
+							Double.POSITIVE_INFINITY,
+							0.,
+							false
+					)
+			)
 			.build();
 
 	private final OneToManyPathSearch pathSearch = mock(OneToManyPathSearch.class);

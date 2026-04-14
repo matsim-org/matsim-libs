@@ -129,7 +129,7 @@ public class RunEDrtScenarioIT {
 
 		controller.run();
 
-		assertEquals(1926, tracker.passengerPickupEvents);
+		assertEquals(1909, tracker.passengerPickupEvents);
 	}
 
 
@@ -146,6 +146,9 @@ public class RunEDrtScenarioIT {
 		prebookingParams.setAbortRejectedPrebookings(false);
 		drtConfig.addParameterSet(prebookingParams);
 
+		// do not schedule hub returns before prebooked stops
+		drtConfig.setReturnToDepotMinIdleGap(Double.MAX_VALUE);
+
 		Controler controller = RunEDrtScenario.createControler(config, false);
 		ProbabilityBasedPrebookingLogic.install(controller, drtConfig, 0.5, 4.0 * 3600.0);
 
@@ -154,10 +157,10 @@ public class RunEDrtScenarioIT {
 
 		controller.run();
 
-		assertEquals(112, tracker.immediateScheduled);
-		assertEquals(182, tracker.prebookedScheduled);
-		assertEquals(94, tracker.immediateRejected);
-		assertEquals(23, tracker.prebookedRejected);
+		assertEquals(106, tracker.immediateScheduled);
+		assertEquals(181, tracker.prebookedScheduled);
+		assertEquals(101, tracker.immediateRejected);
+		assertEquals(24, tracker.prebookedRejected);
 	}
 
 	static private class PassengerPickUpTracker implements PassengerPickedUpEventHandler {

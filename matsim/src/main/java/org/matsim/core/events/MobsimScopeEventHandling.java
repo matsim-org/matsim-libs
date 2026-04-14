@@ -23,8 +23,9 @@ package org.matsim.core.events;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import com.google.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -47,8 +48,11 @@ public class MobsimScopeEventHandling implements AfterMobsimListener {
 	}
 
 	public void addMobsimScopeHandler(MobsimScopeEventHandler handler) {
-		eventHandlers.add(handler);
-		eventsManager.addHandler(handler);
+		addMobsimScopeHandler(() -> handler);
+	}
+
+	public void addMobsimScopeHandler(Provider<MobsimScopeEventHandler> handler) {
+		eventHandlers.addAll(eventsManager.addHandler(handler));
 	}
 
 	@Override

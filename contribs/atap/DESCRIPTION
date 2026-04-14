@@ -1,0 +1,5 @@
+ATAP stands for “Agent-based/atomic dynamic traffic assignment problem”. The se.vti.atap package is a MATSim plugin for the approximation of Nash equilibria. 
+
+The se.vti.emulation package is a MATSim plugin that moves travelers and vehicles according to fixed travel times through the transport system. It generates an event stream following the specification of the MATSim mobility simulation, and it allows for replanning based on emulated travel experiences.
+
+The se.vti.utils java package contains relatively simple support functionality and scripts used in other se.vti packages.

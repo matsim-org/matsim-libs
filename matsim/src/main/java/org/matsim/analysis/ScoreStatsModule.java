@@ -29,7 +29,7 @@ public class ScoreStatsModule extends AbstractModule {
     @Override
     public void install() {
         bind(ScoreStatsControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(ScoreStatsControlerListener.class);
+        addControllerListenerBinding().to(ScoreStatsControlerListener.class);
         bind(ScoreStats.class).to(ScoreStatsControlerListener.class);
     }
 }

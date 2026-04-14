@@ -140,14 +140,31 @@ public class SpeedyALT implements LeastCostPathCalculator {
 
 		while (!this.pq.isEmpty()) {
 			final int nodeIdx = this.pq.poll();
-			if (nodeIdx == endNodeIndex) {
+			if (!hasTurnRestrictions && nodeIdx == endNodeIndex) {
 				foundEndNode = true;
 				break;
 			}
 			// if turn restrictions are used, we might be on a colored node, so check for the original node
 			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == endNodeIndex) {
 				foundEndNode = true;
-				endNodeIndex = nodeIdx;
+				int bestNodeIndex = nodeIdx;
+				double bestCost = getCost(bestNodeIndex);
+
+				// We could have arrived at this node from different directions.
+				// Because of the ALT conditions, the different directions might all have the same estimated cost.
+				// Thus, find out which one was the best:
+				DAryMinHeap.IntIterator iter = this.pq.iterator();
+				while (iter.hasNext()) {
+					int candidate = iter.next();
+					if (this.graph.getNode(candidate).getId().index() == endNodeIndex) {
+						double alternativeCost = getCost(candidate);
+						if (alternativeCost < bestCost) {
+							bestCost = alternativeCost;
+							bestNodeIndex = candidate;
+						}
+					}
+				}
+				endNodeIndex = bestNodeIndex;
 				break;
 			}
 

@@ -11,7 +11,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecifi
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;

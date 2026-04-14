@@ -32,7 +32,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestUtils;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 public class BestReplyLocationChoicePlanStrategyTest {
 

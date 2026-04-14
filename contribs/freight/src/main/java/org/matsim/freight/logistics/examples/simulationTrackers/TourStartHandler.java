@@ -46,7 +46,7 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHand
 
   @Override
   public void handleEvent(CarrierTourStartEvent event) {
-    log.warn("handling tour start event={}", event.toString());
+    log.debug("handling tour start event={}", event.toString());
 
     CarrierVehicle carrierVehicle = null;
     /*

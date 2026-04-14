@@ -5,6 +5,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -60,6 +61,16 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(UPPER_BOUND_FACTOR)
 	public void setUpperBoundFactor(double upperBoundFactor) {
 		this.upperBoundFactor = upperBoundFactor;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Collection<FareZoneBasedPtFareParams> getFareZoneBasedPtFareParams() {
+		return (Collection<FareZoneBasedPtFareParams>) getParameterSets(FareZoneBasedPtFareParams.SET_TYPE);
+	}
+
+	@SuppressWarnings("unchecked")
+	public Collection<DistanceBasedPtFareParams> getDistanceBasedPtFareParams() {
+		return (Collection<DistanceBasedPtFareParams>) getParameterSets(DistanceBasedPtFareParams.SET_TYPE);
 	}
 
 	@Override

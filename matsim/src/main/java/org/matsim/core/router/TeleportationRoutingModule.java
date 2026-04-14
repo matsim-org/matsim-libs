@@ -68,7 +68,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
-		
+
 		Leg newLeg = this.scenario.getPopulation().getFactory().createLeg( this.mode );
 		newLeg.setDepartureTime( departureTime );
 
@@ -106,16 +106,21 @@ public class TeleportationRoutingModule implements RoutingModule {
 		Id<Link> fromFacilityLinkId = fromFacility.getLinkId();
 		if ( fromFacilityLinkId==null ) {
 			// (yyyy there is a test that does not have a context, and thus the call below fails.  todo: adapt test.  kai, nov'19)
-			fromFacilityLinkId = FacilitiesUtils.decideOnLink( fromFacility, scenario.getNetwork() ).getId() ;
+//			fromFacilityLinkId = FacilitiesUtils.decideOnLink( fromFacility, scenario.getNetwork() ).getId() ;
 		}
 
 		Id<Link> toFacilityLinkId = toFacility.getLinkId();
 		if ( toFacilityLinkId==null ) {
 			// (yyyy: same as above)
-			toFacilityLinkId = FacilitiesUtils.decideOnLink( toFacility, scenario.getNetwork() ).getId() ;
+//			toFacilityLinkId = FacilitiesUtils.decideOnLink( toFacility, scenario.getNetwork() ).getId() ;
 		}
 
 		Route route = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, fromFacilityLinkId, toFacilityLinkId );
+//		Route route = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, null, null );
+		// This means that this generic route will not have a starting/endingLinkId.  In principle, this should be possible, but I
+		// do not know if code possibly depends on having a link.  kai, dec'25
+		// --> no, it is not possible, it fails several tests plus the SwissRailRaptor. kai, jan'26
+
 		double estimatedNetworkDistance = dist * this.beelineDistanceFactor;
 		int travTime = (int) (estimatedNetworkDistance / getTravelSpeed(person));
 		route.setTravelTime(travTime);
@@ -131,7 +136,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 	private double getTravelSpeed(Person person) {
 		if (personSpeedAttribute != null) {
 			Double personSpeed = (Double) person.getAttributes().getAttribute(personSpeedAttribute);
-			
+
 			if (personSpeed != null) {
 				return personSpeed;
 			}

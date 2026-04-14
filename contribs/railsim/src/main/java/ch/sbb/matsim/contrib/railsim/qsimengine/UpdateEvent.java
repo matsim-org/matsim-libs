@@ -38,6 +38,11 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 	double checkReservation = -1;
 
 	/**
+	 * Store last arrival time at a stop.
+	 */
+	double lastArrivalTime = -1;
+
+	/**
 	 * Whether train is waiting on the very link end for the next to be unblocked.
 	 */
 	boolean waitingForLink;
@@ -108,8 +113,13 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 		BLOCK_TRACK,
 		WAIT_FOR_RESERVATION,
 		SPEED_CHANGE,
-		UNBLOCK_LINK
+		UNBLOCK_LINK,
 
+		// Train finished its transit route and is waiting to start the next one
+		WAIT_DEPARTURE,
+
+		// Reverse the train to continue its route in opposite direction
+		REVERSE_TRAIN,
 	}
 
 }

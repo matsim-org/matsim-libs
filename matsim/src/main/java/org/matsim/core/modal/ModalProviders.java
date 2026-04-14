@@ -23,7 +23,7 @@ package org.matsim.core.modal;
 import java.lang.annotation.Annotation;
 import java.util.function.Function;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;

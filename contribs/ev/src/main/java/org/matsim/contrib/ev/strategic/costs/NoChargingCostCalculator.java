@@ -11,7 +11,13 @@ import org.matsim.contrib.ev.infrastructure.Charger;
  */
 public class NoChargingCostCalculator implements ChargingCostCalculator {
 	@Override
-	public double calculateChargingCost(Id<Person> personId, Id<Charger> charger, double duration, double energy) {
+	public double calculateChargingCost(Id<Person> personId, Id<Charger> charger, double startTime, double duration,
+			double energy) {
+		return 0;
+	}
+
+	@Override
+	public double calculateReservationCost(Id<Person> personId, Id<Charger> charger, double duration) {
 		return 0;
 	}
 }

@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -36,7 +38,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -50,7 +51,6 @@ import java.util.*;
  */
 final class CarrierReaderFromCSV {
 	private static final Logger log = LogManager.getLogger(CarrierReaderFromCSV.class);
-
 	/**
 	 * CarrierInformationElement is a set of information being read from the input
 	 * file. For one carrier several CarrierInformationElement can be read in. This
@@ -262,8 +262,8 @@ final class CarrierReaderFromCSV {
 	static Set<CarrierInformationElement> readCarrierInformation(Path csvLocationCarrier) throws IOException {
 		log.info("Start reading carrier csv file: {}", csvLocationCarrier);
 		Set<CarrierInformationElement> allNewCarrierInformation = new HashSet<>();
-		CSVParser parse = new CSVParser(Files.newBufferedReader(csvLocationCarrier),
-			CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build());
+		CSVParser parse = CSVFormat.Builder.create(CSVFormat.TDF).setDelimiter('\t').setHeader()
+			.setSkipHeaderRecord(true).get().parse(IOUtils.getBufferedReader(csvLocationCarrier.toString()));
 		for (CSVRecord record : parse) {
 			CarrierInformationElement.Builder builder;
 			if (!record.get("carrierName").isBlank())
@@ -414,13 +414,16 @@ final class CarrierReaderFromCSV {
 												   Set<CarrierInformationElement> allNewCarrierInformation, FreightCarriersConfigGroup freightCarriersConfigGroup,
 												   ShpOptions.Index indexShape, int defaultJspritIterations,
 												   CoordinateTransformation crsTransformationNetworkAndShape) {
-
+		Random rnd = MatsimRandom.getLocalInstance(scenario.getConfig().global().getRandomSeed());
+		List<CarrierInformationElement> carriersInfo = allNewCarrierInformation.stream()
+			.sorted(Comparator.comparing(CarrierInformationElement::getName))
+			.toList();
 		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		CarrierVehicleTypes usedCarrierVehicleTypes = CarriersUtils.getOrAddCarrierVehicleTypes(scenario);
 		new CarrierVehicleTypeReader(carrierVehicleTypes).readFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
-		for (CarrierInformationElement singleNewCarrier : allNewCarrierInformation) {
+		for (CarrierInformationElement singleNewCarrier : carriersInfo) {
 			if (singleNewCarrier.getVehicleTypes() == null) {
 				continue;
 			}
@@ -443,19 +446,18 @@ final class CarrierReaderFromCSV {
 			}
 			if (singleNewCarrier.getVehicleDepots() == null)
 				singleNewCarrier.setVehicleDepots(new ArrayList<>());
-			Random rand = new Random(singleNewCarrier.getName().hashCode());
-			int cnt = 0;
-			while (singleNewCarrier.getVehicleDepots().size() < singleNewCarrier.getNumberOfDepotsPerType()) {
-				Link link = scenario.getNetwork().getLinks().values().stream()
-					.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findAny().get();
-				cnt++;
-				if ((!singleNewCarrier.getVehicleDepots().contains(link.getId().toString())
-					|| cnt > scenario.getNetwork().getLinks().size())
-					&& !link.getId().toString().contains("pt")
-					&& (!link.getAttributes().getAsMap().containsKey("type")
-					|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))
-					&& CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-					singleNewCarrier.getAreaOfAdditionalDepots(), crsTransformationNetworkAndShape )) {
+
+			List<Link> links = new ArrayList<>(scenario.getNetwork().getLinks().values());
+			links.sort(Comparator.comparing(l -> l.getId().toString()));
+			Collections.shuffle(links, rnd);
+
+			for (Link link : links) {
+				if (singleNewCarrier.getVehicleDepots().size() >= singleNewCarrier.getNumberOfDepotsPerType()) break;
+				// Adds a link as depot if criteria are met
+				if (!singleNewCarrier.getVehicleDepots().contains(link.getId().toString()) && !link.getId().toString().contains(
+					"pt") && (!link.getAttributes().getAsMap().containsKey("type") || !link.getAttributes().getAsMap().get(
+					"type").toString().contains("motorway")) && CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+					singleNewCarrier.getAreaOfAdditionalDepots(), crsTransformationNetworkAndShape)) {
 					singleNewCarrier.getVehicleDepots().add(link.getId().toString());
 				}
 			}

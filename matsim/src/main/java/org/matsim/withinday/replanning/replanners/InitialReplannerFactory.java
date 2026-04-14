@@ -28,7 +28,7 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 public class InitialReplannerFactory extends WithinDayInitialReplannerFactory {
 

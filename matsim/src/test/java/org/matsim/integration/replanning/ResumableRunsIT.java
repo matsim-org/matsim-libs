@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,6 +63,7 @@ public class ResumableRunsIT {
 		config.controller().setWriteEventsInterval(1);
 		config.global().setNumberOfThreads(1); // only use one thread to rule out other disturbances for the test
 		config.controller().setWritePlansInterval(10);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// run1
 		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/run1/");

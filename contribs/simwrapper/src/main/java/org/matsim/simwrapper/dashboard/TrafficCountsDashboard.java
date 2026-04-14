@@ -6,6 +6,7 @@ import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
@@ -68,7 +69,7 @@ public class TrafficCountsDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Traffic Counts";
 		header.description = "Comparison of observed and simulated daily traffic volumes. Reported volumes are scaled-up according to simulated sample size. \nError metrics based on relative error: ";
@@ -82,7 +83,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				header.description += String.format(Locale.US, "%s: %.2f - %.2f; ", labels.get(i), limits.get(i - 1), limits.get(i));
 		}
 
-		header.description += "\n\n. The Scalable Quality Value (SQV) and the Geoffrey E. Havers (GEH) value are used to assess the quality of the simulated traffic counts. For the SQV a threshold of 0.75 is used, which is the threshold for an acceptable simulation quality. See: https://doi.org/10.1177/0361198119838849";
+		header.description += "\n\n. The Scalable Quality Value (SQV) and the Geoffrey E. Havers (GEH) value are used to assess the quality of the simulated traffic counts. For the SQV a threshold of 0.75 is used, which is the threshold for an acceptable simulation quality. See: https://doi.org/10.1177/0361198119838849 or https://fops.de/wp-content/uploads/2021/02/FE-70.0919-2015-Anf-an-staedt-Verkehrsnachfragemodelle-Schlussbericht.pdf";
 		List<String> argList = new ArrayList<>(List.of(
 			"--limits", limits.stream().map(String::valueOf).collect(Collectors.joining(",")),
 			"--labels", String.join(",", labels)

@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers.mobsim;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Disabled;

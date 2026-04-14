@@ -130,7 +130,7 @@ public class RunETaxiBenchmark {
 						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
 								getter.getModal(ExecutedScheduleCollector.class),
 								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
-				addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
+				addControllerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
 			}
 		});
 
@@ -141,7 +141,7 @@ public class RunETaxiBenchmark {
 						getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
 								getter.get(ChargingEventSequenceCollector.class),
 								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
-				addControlerListenerBinding().to(modalKey(ETaxiBenchmarkStats.class));
+				addControllerListenerBinding().to(modalKey(ETaxiBenchmarkStats.class));
 			}
 		});
 

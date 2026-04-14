@@ -28,25 +28,25 @@ import org.matsim.core.utils.io.IOUtils;
  * resets that latter so it can - theoretically - gather information during the new iteration. However, it is your own
  * responsibility to feed it with data. The penalty for each space-time-gridcell with non-zero penalty is dumped for each
  * iteration. In the zeroth iteration, {@linkplain PenaltyCalculator#getDummyHourCalculator()} is used to calculate the penalties.
- * 
+ *
  * @author tkohl / Senozon
  *
  */
 class CarEgressWalkObserver implements BeforeMobsimListener {
-	
+
 //	private static final String INSERTIONKEY = "[INSERTIONKEY]";
 	public static final String OUTFILE_PENALTIES = "penalties.csv.gz";
 	public static final String CARMODE = TransportMode.car;
-	
+
 	private final PenaltyGenerator penaltyGenerator;
 	private final PenaltyFunction penaltyFunction;
 	private final PenaltyCalculator iter0PenaltyCalculator;
-	
+
 	private PenaltyCalculator penaltyCalculator;
-	
+
 	/**
 	 * Sets the class up with the {@linkplain PenaltyCalculator.DefaultPenaltyFunction} and the specified {@linkplain PenaltyGenerator}.
-	 * 
+	 *
 	 * @param penaltyGenerator
 	 */
 	public CarEgressWalkObserver(PenaltyGenerator penaltyGenerator, PenaltyFunction penaltyFunction, PenaltyCalculator iter0PenaltyCalculator) {
@@ -65,11 +65,11 @@ class CarEgressWalkObserver implements BeforeMobsimListener {
 			this.penaltyCalculator.setPenaltyFunction(this.penaltyFunction);
 			this.penaltyGenerator.reset();
 		}
-		event.getServices().getControlerIO().createIterationDirectory(event.getIteration());
-		String file = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), OUTFILE_PENALTIES);
+		event.getServices().getControllerIO().createIterationDirectory(event.getIteration());
+		String file = event.getServices().getControllerIO().getIterationFilename(event.getIteration(), OUTFILE_PENALTIES);
 		this.penaltyCalculator.dump(IOUtils.getFileUrl(file));
 	}
-	
+
 	/*package*/ PenaltyCalculator getPenaltyCalculator() {
 		return this.penaltyCalculator;
 	}

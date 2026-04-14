@@ -28,8 +28,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.ReplanningContext;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import java.util.Collection;
 
 import static org.matsim.core.config.groups.ControllerConfigGroup.SnapshotFormat;

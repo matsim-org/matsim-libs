@@ -20,18 +20,27 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 
+import java.util.Collection;
 
-public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
+
+public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle {
 
 	private TransitStopHandler stopHandler;
+	private final QVehicleImpl baseVehicle;
 
 	public TransitQVehicle(final Vehicle basicVehicle) {
-		super(basicVehicle);
-		
+		baseVehicle = new QVehicleImpl(basicVehicle);
+
 		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
 		if (capacity == null) {
 			throw new NullPointerException("No capacity set in vehicle type.");
@@ -42,7 +51,11 @@ public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
 			throw new NullPointerException("No capacity set in vehicle type.");
 		}
 	}
-	
+
+	public TransitQVehicle(QVehicleImpl.Msg message) {
+		baseVehicle = new QVehicleImpl(message);
+	}
+
 	public void setStopHandler(TransitStopHandler stopHandler) {
 		this.stopHandler = stopHandler;
 	}
@@ -52,4 +65,101 @@ public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
 		return this.stopHandler;
 	}
 
+	@Override
+	public void setCurrentLinkId(Id<Link> link) {
+		baseVehicle.setCurrentLinkId(link);
+	}
+
+	@Override
+	public void setDriver(DriverAgent driver) {
+
+		if (driver == null || driver instanceof TransitDriverAgent) {
+			baseVehicle.setDriver(driver);
+		} else {
+			throw new IllegalArgumentException("Driver for TransitQVehicle must be of type TransitDriverAgent, but was: " + driver);
+		}
+
+	}
+
+	@Override
+	public double getLinkEnterTime() {
+		return baseVehicle.getLinkEnterTime();
+	}
+
+	@Override
+	public void setLinkEnterTime(double linkEnterTime) {
+		baseVehicle.setLinkEnterTime(linkEnterTime);
+	}
+
+	@Override
+	public double getMaximumVelocity() {
+		return baseVehicle.getMaximumVelocity();
+	}
+
+	@Override
+	public Id<Link> getCurrentLinkId() {
+		return baseVehicle.getCurrentLinkId();
+	}
+
+	@Override
+	public Vehicle getVehicle() {
+		return baseVehicle.getVehicle();
+	}
+
+	@Override
+	public TransitDriverAgent getDriver() {
+		// SAFETY: We guard setDriver, so we know that the driver should be a TransitDriverAgent, as long as no one sets
+		// the driver directly on the baseVehicle.
+		return (TransitDriverAgent) baseVehicle.getDriver();
+	}
+
+	@Override
+	public double getSizeInEquivalents() {
+		return baseVehicle.getSizeInEquivalents();
+	}
+
+	@Override
+	public boolean addPassenger(PassengerAgent passenger) {
+		return baseVehicle.addPassenger(passenger);
+	}
+
+	@Override
+	public boolean removePassenger(PassengerAgent passenger) {
+		return baseVehicle.removePassenger(passenger);
+	}
+
+	@Override
+	public Collection<? extends PassengerAgent> getPassengers() {
+		return baseVehicle.getPassengers();
+	}
+
+	@Override
+	public int getPassengerCapacity() {
+		return baseVehicle.getPassengerCapacity();
+	}
+
+	@Override
+	public double getEarliestLinkExitTime() {
+		return baseVehicle.getEarliestLinkExitTime();
+	}
+
+	@Override
+	public void setEarliestLinkExitTime(double earliestLinkEndTime) {
+		baseVehicle.setEarliestLinkExitTime(earliestLinkEndTime);
+	}
+
+	@Override
+	public Id<Vehicle> getId() {
+		return baseVehicle.getId();
+	}
+
+	@Override
+	public Message toMessage() {
+		var handler = stopHandler.toMessage();
+		var baseMessage = baseVehicle.toMessage();
+		return new Msg(baseMessage, handler);
+	}
+
+	record Msg(Message baseMessage, Message handlerMessage) implements Message {
+	}
 }

@@ -149,7 +149,7 @@ public class OTFVis {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		playScenario(scenario);
 	}
-	
+
 	public static void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
@@ -159,14 +159,17 @@ public class OTFVis {
 
 		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qSim);
 		OTFClientLive.run(scenario.getConfig(), server);
-		
+
 		qSim.run();
 	}
 
     public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
         return startServerAndRegisterWithQSim(config, scenario, events, qSim, null);
     }
-	
+
+	/**
+	 * This function essentially registers the PlayPauseSimulationControl in the QSim and builds the server
+	 */
     public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim,
             NonPlanAgentQueryHelper nonPlanAgentQueryHelper) {
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim, nonPlanAgentQueryHelper);

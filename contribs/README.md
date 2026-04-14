@@ -13,6 +13,7 @@ The MATSim core development team cannot make any guarantee that these extensions
 | accidents                                                                |
 | [analysis](analysis/README.md)                                           |  Collection of matsim analysis tools
 | [application](application/README.md)                                     | Build MATSim scenarios with preparation and analysis pipelines
+| [atap](atap/docs/README.md)                                              | Approximates Nash equilibria
 | [av](av/README.md)                                                       | Automated (autonomous) vehicle contrib
 | bicycle                                                                  |
 | [cadytsIntegration](cadytsIntegration/README.md)                         | Calibration of dynamics traffic simulations

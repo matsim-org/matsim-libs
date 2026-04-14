@@ -53,15 +53,15 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
-	private jakarta.inject.Provider<TripRouter> tripRouterProvider;
+	private Provider<TripRouter> tripRouterProvider;
 	private final MainModeIdentifier mainModeIdentifier;
 	private final TimeInterpretation timeInterpretation;
 
 	@Inject
 	public JointPrismLocationChoiceWithJointTripInsertionStrategyFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
 																		 Provider<TripRouter> tripRouterFactory, @Strong PlanLinkIdentifier planLinkIdentifier,
-																		 jakarta.inject.Provider<TripRouter> tripRouterProvider, MainModeIdentifier mainModeIdentifier,
-																		 TimeInterpretation timeInterpretation) {
+			Provider<TripRouter> tripRouterProvider, MainModeIdentifier mainModeIdentifier,
+																				 TimeInterpretation timeInterpretation) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;

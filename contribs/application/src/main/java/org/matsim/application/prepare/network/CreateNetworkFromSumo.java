@@ -67,6 +67,9 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	@CommandLine.Option(names = "--lane-restrictions", description = "Define how restricted lanes are handled: ${COMPLETION-CANDIDATES}", defaultValue = "IGNORE")
 	private SumoNetworkConverter.LaneRestriction laneRestriction = SumoNetworkConverter.LaneRestriction.IGNORE;
 
+	@CommandLine.Option(names = "--turn-restrictions", description = "Ignore turn restrictions for specified modes.", defaultValue = "ADD_TURN_RESTRICTIONS")
+	private SumoNetworkConverter.TurnRestriction turnRestrictionHandling;
+
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CreateNetworkFromSumo()).execute(args));
 	}
@@ -74,7 +77,7 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor, laneRestriction);
+		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor, laneRestriction, turnRestrictionHandling);
 
 		Network network = NetworkUtils.createNetwork();
 

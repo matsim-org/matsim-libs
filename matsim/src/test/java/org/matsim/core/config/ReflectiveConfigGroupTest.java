@@ -71,6 +71,7 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.enumSetField = Set.of(MyEnum.VALUE2);
 		dumpedModule.setField = ImmutableSet.of("a", "b", "c");
 		dumpedModule.listField = List.of("1", "2", "3");
+		dumpedModule.doubleListField = List.of(4., 5., 3., 2.); // deliberately unordered to check that order is preserved
 		dumpedModule.ints = List.of(1, 2, 3);
 		assertEqualAfterDumpAndRead(dumpedModule);
 	}
@@ -99,13 +100,13 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.listField = List.of("");
 		dumpedModule.setField = null;
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Collection [] contains blank elements. Only non-blank elements are supported.");
+				.hasMessage("List [] contains blank elements. Only non-blank elements are supported.");
 
 		//fail on set
 		dumpedModule.listField = null;
 		dumpedModule.setField = ImmutableSet.of("");
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Collection [] contains blank elements. Only non-blank elements are supported.");
+				.hasMessage("Set [] contains blank elements. Only non-blank elements are supported.");
 	}
 
 	@Test
@@ -116,13 +117,13 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.listField = List.of("non-empty", "");
 		dumpedModule.setField = ImmutableSet.of("non-empty");
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Collection [non-empty, ] contains blank elements. Only non-blank elements are supported.");
+				.hasMessage("List [non-empty, ] contains blank elements. Only non-blank elements are supported.");
 
 		//fail on set
 		dumpedModule.listField = List.of("non-empty");
 		dumpedModule.setField = ImmutableSet.of("non-empty", "");
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Collection [non-empty, ] contains blank elements. Only non-blank elements are supported.");
+				.hasMessage("Set [non-empty, ] contains blank elements. Only non-blank elements are supported.");
 	}
 
 	private void assertEqualAfterDumpAndRead(MyModule dumpedModule) {
@@ -166,6 +167,7 @@ public class ReflectiveConfigGroupTest {
 		expectedComments.put("localDateTimeField", "local datetime");
 		expectedComments.put("enumField", "Possible values: VALUE1,VALUE2");
 		expectedComments.put("enumListField", "list of enum");
+		expectedComments.put("doubleListField", "list of doubles");
 		expectedComments.put("enumSetField", "set of enum");
 		expectedComments.put("setField", "set");
 		expectedComments.put("ints", "list of ints");
@@ -478,6 +480,10 @@ public class ReflectiveConfigGroupTest {
 		@Comment("list of ints")
 		@Parameter
 		private List<Integer> ints;
+
+		@Comment("list of doubles")
+		@Parameter
+		private List<Double> doubleListField;
 
 		// Object fields:
 		// Id: string representation is toString

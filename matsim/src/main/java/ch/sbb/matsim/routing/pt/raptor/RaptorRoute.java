@@ -108,39 +108,39 @@ public class RaptorRoute {
         return this.parts;
     }
 
-    public static final class RoutePart {
-        public final TransitStopFacility fromStop;
-        public final TransitStopFacility toStop;
-        public final String mode;
-        // the agent's departure time, i.e. when the agent starts waiting for this bus/train/...
-        public final double depTime;
-        public final double boardingTime;
-        public final double vehicleDepTime;
-        public final double arrivalTime;
-        public final double distance;
-        public final TransitLine line;
-        public final TransitRoute route;
+	public static final class RoutePart {
+		public final TransitStopFacility fromStop;
+		public final TransitStopFacility toStop;
+		public final String mode;
+		// the agent's departure time, i.e. when the agent starts waiting for this bus/train/...
+		public final double depTime;
+		public final double boardingTime;
+		public final double vehicleDepTime;
+		public final double arrivalTime;
+		public final double distance;
+		public final TransitLine line;
+		public final TransitRoute route;
 
 		/**
 		 * Optional chained route part.
 		 */
 		public RoutePart chainedPart;
 
-        final List<? extends PlanElement> planElements;
+		final List<? extends PlanElement> planElements;
 
-        RoutePart(TransitStopFacility fromStop, TransitStopFacility toStop, String mode, double depTime, double boardingTime, double vehicleDepTime, double arrivalTime, double distance, TransitLine line, TransitRoute route, List<? extends PlanElement> planElements) {
-            this.fromStop = fromStop;
-            this.toStop = toStop;
-            this.mode = mode;
-            this.depTime = depTime;
-            this.boardingTime = boardingTime;
-            this.vehicleDepTime = vehicleDepTime;
-            this.arrivalTime = arrivalTime;
-            this.distance = distance;
-            this.line = line;
-            this.route = route;
-            this.planElements = planElements;
-        }
+		RoutePart(TransitStopFacility fromStop, TransitStopFacility toStop, String mode, double depTime, double boardingTime, double vehicleDepTime, double arrivalTime, double distance, TransitLine line, TransitRoute route, List<? extends PlanElement> planElements) {
+			this.fromStop = fromStop;
+			this.toStop = toStop;
+			this.mode = mode;
+			this.depTime = depTime;
+			this.boardingTime = boardingTime;
+			this.vehicleDepTime = vehicleDepTime;
+			this.arrivalTime = arrivalTime;
+			this.distance = distance;
+			this.line = line;
+			this.route = route;
+			this.planElements = planElements;
+		}
 
 		/**
 		 * Return the arrival time of the last part of the route.
@@ -150,19 +150,39 @@ public class RaptorRoute {
 				return this.arrivalTime;
 			}
 			return this.chainedPart.getChainedArrivalTime();
-    }
-
-			@Override
-			public String toString() {
-				return "RoutePart{" +
-					"fromStop=" + fromStop.getId() + " (" + fromStop.getName() + ")" +
-					", toStop=" + toStop.getId() + " (" + toStop.getName() + ")" +
-					", mode='" + mode + '\'' +
-					", depTime=" + depTime +
-					", line=" + line.getId() +
-					", route=" + route.getId() +
-					", chainedPart=" + chainedPart +
-					'}';
-			}
 		}
+
+		/**
+		 * Return the last stop of the route, i.e. the egress stop.
+		 */
+		public TransitStopFacility getChainedEgressStop() {
+			if (this.chainedPart == null) {
+				return this.toStop;
+			}
+			return this.chainedPart.getChainedEgressStop();
+		}
+
+		/**
+		 * The total distance of this and all chained parts.
+		 */
+		public double getChainedDistance() {
+			if (this.chainedPart == null)
+				return this.distance;
+
+			return this.distance + this.chainedPart.getChainedDistance();
+		}
+
+		@Override
+		public String toString() {
+			return "RoutePart{" +
+				"fromStop=" + fromStop.getId() + " (" + fromStop.getName() + ")" +
+				", toStop=" + toStop.getId() + " (" + toStop.getName() + ")" +
+				", mode='" + mode + '\'' +
+				", depTime=" + depTime +
+				", line=" + line.getId() +
+				", route=" + route.getId() +
+				", chainedPart=" + chainedPart +
+				'}';
+		}
+	}
 }

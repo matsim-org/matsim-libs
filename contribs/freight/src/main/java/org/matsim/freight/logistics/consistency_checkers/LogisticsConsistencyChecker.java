@@ -65,13 +65,13 @@ public class LogisticsConsistencyChecker {
 	 */
 	public static CheckResult checkBeforePlanning(LSPs lsps, Level lvl) {
 		Level level = setInternalLogLevel(lvl);
-		log.log(level, "Checking if all resource Ids are unique.");
+		log.info("Start checking if all resource Ids are unique.");
 		CheckResult result = resourcesAreUnique(lsps, level);
 		if (result == CheckResult.CHECK_FAILED) {
 			log.log(level, "Check failed. Please check the log messages for more information.");
 			return CheckResult.CHECK_FAILED;
 		}
-//		log.debug("All resource Ids are unique.");
+		log.info("Check passed: All resource Ids are unique.");
 		return CheckResult.CHECK_SUCCESSFUL;
 	}
 
@@ -96,6 +96,7 @@ public class LogisticsConsistencyChecker {
 
 		//If no Check has failed, everything is fine :)
 		if (nuOfChecksFailed == 0) {
+			log.info("Checks passed.");
 			return CheckResult.CHECK_SUCCESSFUL;
 		} else {
 			log.log(level, "Check(s) failed. Please check the log messages for more information.");

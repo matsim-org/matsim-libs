@@ -112,20 +112,27 @@ class BicycleScoreEventsCreator implements
 		}
 
 		if ( vehicle2driver.getDriverOfVehicle( event.getVehicleId() ) != null ){
-			double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ) );
+			double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ),
+				event.getVehicleId(), this.bicycleMode );
 
-			if ( this.bicycleConfig.isMotorizedInteraction() ) {
-				// yyyy this is the place where instead a data structure would need to be build that counts interaction with every car
-				// that entered the link after the bicycle, and left it before.  kai, jul'23
-				var carCounts = this.numberOfVehiclesOnLinkByMode.get( TransportMode.car );
-				if ( carCounts != null ){
-					amount -= 0.004 * carCounts.getOrDefault( event.getLinkId(), 0. );
+			// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.
+//			it would be more straight forward to do the mode check here,
+//			but we do not have the Vehicles Object in this class, which we need to retrieve the mode
+//			of the current vehicle. -sm0925
+			if (!Double.isNaN(amount)) {
+				if ( this.bicycleConfig.isMotorizedInteraction() ) {
+					// yyyy this is the place where instead a data structure would need to be build that counts interaction with every car
+					// that entered the link after the bicycle, and left it before.  kai, jul'23
+					var carCounts = this.numberOfVehiclesOnLinkByMode.get( TransportMode.car );
+					if ( carCounts != null ){
+						amount -= 0.004 * carCounts.getOrDefault( event.getLinkId(), 0. );
+					}
 				}
-			}
 
-			final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle( event.getVehicleId() );
-			Gbl.assertNotNull( driverOfVehicle );
-			this.eventsManager.processEvent( new PersonScoreEvent( event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore" ) );
+				final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle( event.getVehicleId() );
+				Gbl.assertNotNull( driverOfVehicle );
+				this.eventsManager.processEvent( new PersonScoreEvent( event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore" ) );
+			}
 		} else {
 			log.warn( "no driver found for vehicleId=" + event.getVehicleId() + "; not clear why this could happen");
 		}
@@ -145,13 +152,24 @@ class BicycleScoreEventsCreator implements
 
 				// yyyy in the link based scoring, it actually uses event.getReleativePositionOnLink.  Good idea!  kai, jul'23
 
-//				TODO: I am pretty sure that here the last link is scored twice. It is already scored for LinkLeaveEvent, so why are we doing it again here? -sm0325
+//				I am pretty sure that here the last link is scored twice. It is already scored for LinkLeaveEvent, so why are we doing it again here? -sm0325
+//				because when an agent gets to the final link of a route the sequence is NOT LinkEnter - LinkLeave
+//				but LinkEnter - VehicleLeavesTraffic. If we didn't throw the score here, the last link would be omitted. -sm0825
 
-				double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ) );
+//				yyyy still, the last link is not counted in for e.g. trip distance in output_trips nor trip distance in experienced_plans??
 
-				final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle( event.getVehicleId() );
-				Gbl.assertNotNull( driverOfVehicle );
-				this.eventsManager.processEvent( new PersonScoreEvent( event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore" ) );
+				double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ),
+					event.getVehicleId(), this.bicycleMode);
+
+				// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.
+//				it would be more straight forward to do the mode check here,
+//				but we do not have the Vehicles Object in this class, which we need to retrieve the mode
+//				of the current vehicle. -sm0925
+				if (!Double.isNaN(amount)) {
+					final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle( event.getVehicleId() );
+					Gbl.assertNotNull( driverOfVehicle );
+					this.eventsManager.processEvent( new PersonScoreEvent( event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore" ) );
+				}
 			}
 		} else {
 			log.warn( "no driver found for vehicleId=" + event.getVehicleId() + "; not clear why this could happen" );

@@ -40,9 +40,9 @@ class DistanceStats implements IterationEndsListener {
 	private String type = null;
 //	private ActTypeConverter actTypeConverter;
 	private String mode;
-	
+
 	public DistanceStats( Config config, String bestOrSelected, String type, String mode ) {
-		
+
 		this.dccg = (FrozenTastesConfigGroup) config.getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		double analysisBoundary = this.dccg.getAnalysisBoundary();
 		this.bestOrSelected = bestOrSelected;
@@ -52,17 +52,17 @@ class DistanceStats implements IterationEndsListener {
 		this.bins = new Bins(this.dccg.getAnalysisBinSize(), analysisBoundary, type + "_" + mode + "_distance");
 	}
 
-	public void notifyIterationEnds(final IterationEndsEvent event) {	
+	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.bins.clear();
 
         for (Person p : event.getServices().getScenario().getPopulation().getPersons().values()) {
-			
+
 			// continue if person is in the analysis population or if the id is not numeric
 			if (this.dccg.getIdExclusion() == null || !this.isLong(p.getId().toString()) ||
 					Long.parseLong(p.getId().toString()) > this.dccg.getIdExclusion()) continue;
-					
+
 			Plan plan = (Plan) p.getSelectedPlan();
-			
+
 			if (bestOrSelected.equals("best")) {
 				double bestPlanScore = -999.0;
 				int bestIndex = 0;
@@ -74,25 +74,25 @@ class DistanceStats implements IterationEndsListener {
 					}
 					cnt++;
 				}
-				plan = (Plan) p.getPlans().get(bestIndex);	
+				plan = (Plan) p.getPlans().get(bestIndex);
 				//log.info(plan.getScore() + "\t" + bestIndex + "\tperson " + p.getId());
-			}		
+			}
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					if ( ((Activity) pe).getType().equals( type ) &&
 							PopulationUtils.getPreviousLeg(plan, (Activity)pe).getMode().equals(this.mode)) {
-						double distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, (Activity)pe)).getCoord()); 
+						double distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, (Activity)pe)).getCoord());
 						this.bins.addVal(distance, 1.0);
-					}	
+					}
 				}
 			}
 		}
-		
-		// Actually, path is not the full file name - inside the plotBinnedDistribution some other stuff is added. 
-		String path = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "plan=" + this.bestOrSelected + "_");
+
+		// Actually, path is not the full file name - inside the plotBinnedDistribution some other stuff is added.
+		String path = event.getServices().getControllerIO().getIterationFilename(event.getIteration(), "plan=" + this.bestOrSelected + "_");
 		this.bins.plotBinnedDistribution(path, "#", "m");
 	}
-	
+
 	private boolean isLong(String str) {
 	    try {
 	        Long.parseLong(str);

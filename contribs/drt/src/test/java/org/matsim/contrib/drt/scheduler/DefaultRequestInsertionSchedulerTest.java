@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
+import org.matsim.contrib.drt.optimizer.StopWaypointImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
@@ -110,7 +113,7 @@ public class DefaultRequestInsertionSchedulerTest {
         vehicle.getSchedule().addTask(new DrtDriveTask(vrpPath, DrtDriveTask.TYPE));
 
         DefaultDrtStopTask stopTask0 = new DefaultDrtStopTask(R1_PU_TIME - STOP_DURATION, R1_PU_TIME, from1);
-        AcceptedDrtRequest acceptedExistingRequest = AcceptedDrtRequest.createFromOriginalRequest(existingRequest1);
+        AcceptedDrtRequest acceptedExistingRequest = AcceptedDrtRequest.createFromOriginalRequest(existingRequest1, 60);
         stopTask0.addPickupRequest(acceptedExistingRequest);
         vehicle.getSchedule().addTask(stopTask0);
 
@@ -126,16 +129,16 @@ public class DefaultRequestInsertionSchedulerTest {
         vehicle.getSchedule().addTask(new DrtDriveTask(vrpPath3, DrtDriveTask.TYPE));
 
         DefaultDrtStopTask stopTask2 = new DefaultDrtStopTask(stopTask1.getEndTime() + longPath.travelTime + 10., stopTask1.getEndTime() + longPath.travelTime + STOP_DURATION, to2);
-        AcceptedDrtRequest acceptedExistingRequest2 = AcceptedDrtRequest.createFromOriginalRequest(existingRequest2);
+        AcceptedDrtRequest acceptedExistingRequest2 = AcceptedDrtRequest.createFromOriginalRequest(existingRequest2, 60);
         stopTask2.addDropoffRequest(acceptedExistingRequest2);
         vehicle.getSchedule().addTask(stopTask2);
 
 
         // vehicle entry
         Waypoint.Start start = start(null, CURRENT_TIME, startLink, integerLoadType.fromInt(1));//not a STOP -> pickup cannot be appended
-        Waypoint.Stop stop0 = stop(stopTask0, integerLoadType.fromInt(2));
-        Waypoint.Stop stop1 = stop(stopTask1, integerLoadType.fromInt(1));
-        Waypoint.Stop stop2 = stop(stopTask2, integerLoadType.getEmptyLoad());
+        StopWaypoint stop0 = stop(stopTask0, integerLoadType.fromInt(2));
+        StopWaypoint stop1 = stop(stopTask1, integerLoadType.fromInt(1));
+        StopWaypoint stop2 = stop(stopTask2, integerLoadType.getEmptyLoad());
         var vehicleEntry = entry(vehicle, start, stop0, stop1, stop2);
 
         InsertionWithDetourData.InsertionDetourData detour = detourData(0, 10, 10, 10.);
@@ -144,7 +147,7 @@ public class DefaultRequestInsertionSchedulerTest {
                 detourTimeInfo);
 
         RequestInsertionScheduler.PickupDropoffTaskPair pickupDropoffTaskPair =
-                insertionScheduler.scheduleRequest(AcceptedDrtRequest.createFromOriginalRequest(newRequest), insertion);
+                insertionScheduler.scheduleRequest(AcceptedDrtRequest.createFromOriginalRequest(newRequest, 60), insertion);
 
         ScheduleInfo actualScheduleInfo = getScheduleInfo(vehicle.getSchedule());
         ScheduleInfo expectedScheduleInfo = ScheduleInfo.newBuilder()
@@ -211,7 +214,7 @@ public class DefaultRequestInsertionSchedulerTest {
     }
 
 
-    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, Waypoint.Stop... stops) {
+    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, StopWaypoint... stops) {
         List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
         return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
     }
@@ -220,8 +223,8 @@ public class DefaultRequestInsertionSchedulerTest {
         return new Waypoint.Start(task, link, time, occupancy);
     }
 
-    private Waypoint.Stop stop(DefaultDrtStopTask stopTask, DvrpLoad outgoingOccupancy) {
-        return new Waypoint.Stop(stopTask, outgoingOccupancy, integerLoadType);
+    private StopWaypoint stop(DefaultDrtStopTask stopTask, DvrpLoad outgoingOccupancy) {
+        return new StopWaypointImpl(stopTask, outgoingOccupancy, integerLoadType, false);
     }
 
 
@@ -231,9 +234,17 @@ public class DefaultRequestInsertionSchedulerTest {
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
                 .submissionTime(submissionTime)
-                .latestArrivalTime(latestArrivalTime)
-                .latestStartTime(latestStartTime)
-                .earliestStartTime(earliestStartTime)
+                .earliestDepartureTime(earliestStartTime)
+                .constraints(
+                        new DrtRouteConstraints(
+                                latestArrivalTime - earliestStartTime,
+                                Double.POSITIVE_INFINITY,
+                                latestStartTime - earliestStartTime,
+                                Double.POSITIVE_INFINITY,
+                                0.,
+                                false
+                        )
+                )
                 .fromLink(fromLink)
                 .toLink(toLink)
                 .mode(mode)

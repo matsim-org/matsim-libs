@@ -23,12 +23,12 @@
  * The Controler is responsible for complete simulation runs, including
  * the initialization of all required data, running the iterations and
  * the replanning, analyses, etc.
- * 
+ *
  * <h2>Package Maintainer:</h2>
  * <ul>
  *   <li>Marcel Rieser</li>
  * </ul>
- * 
+ *
   * <h2>Parameters:<a name="controler_parameters"></a></h2>
  * <ul>
  * 	<li><strong><font color="blue">outputDirectory</font></strong> <br>
@@ -72,7 +72,7 @@
  * 		Description: ...
  * 	</li>
  * </ul>
- * 
+ *
  * <h2>Details</h2>
  *
  * <h3>Conceptual Structure</h3>
@@ -87,7 +87,7 @@
  * The Controler offers several <em>extension points</em>, where additional functionality can be plugged in.
  * These extension points are realized with <em>Events</em> and <em>Listeners</em>:
  * Classes can implement one or more {@link org.matsim.core.controler.listener Listener Interfaces} and can be registered
- * with the Controler with {@link org.matsim.core.controler.Controler#addControlerListener(org.matsim.core.controler.listener.ControlerListener) addControlerListener()}.
+ * with the Controler with {@link org.matsim.core.controler.Controler#addControllerListener(ControllerListener) addControllerListener()}.
  * The Controler sends {@link org.matsim.core.controler.events Controler Events} at the corresponding points during the run
  * to the registered Listeners, at which point the Listeners can execute their own code.<br>
  *
@@ -120,24 +120,24 @@
  *
  * <h3>Best Practices</h3>
  * <h4>Using custom functionality</h4>
- * If you plan to write your own ControlerListener to provide additional functionality to MATSim, use the following
- * class as a starting point for integrating your ControlerListener into the Controler:
+ * If you plan to write your own ControllerListener to provide additional functionality to MATSim, use the following
+ * class as a starting point for integrating your ControllerListener into the Controler:
  * <pre>
  * import org.matsim.controler.Controler;
  * import org.matsim.myfunctionality.MyFunctionality;
  *
  * class MyClass {
  *   public static void main(final String[] args) {
- *     Controler controler = new Controler(args);
- *     controler.addControlerListener(new MyFunctionality());
- *     controler.run();
+ *     Controler controller = new Controler(args);
+ *     controller.addControllerListener(new MyFunctionality());
+ *     controller.run();
  *   }
  * }
  * </pre>
  *
  * <h4>Additional Configuration Parameters</h4>
  * If your additional functionality requires additional parameters in the configuration file, you can provide
- * a custom {@link org.matsim.core.config.groups Config-Group} and load it in the constructor of your ControlerListener.
+ * a custom {@link org.matsim.core.config.groups Config-Group} and load it in the constructor of your ControllerListener.
  * When the configuration file will be parsed later, your config-group gets loaded with the settings from the file,
  * and you can later on access the values.
  * <pre>
@@ -155,3 +155,5 @@
  * </pre>
  */
 package org.matsim.core.controler;
+
+import org.matsim.core.controler.listener.ControllerListener;

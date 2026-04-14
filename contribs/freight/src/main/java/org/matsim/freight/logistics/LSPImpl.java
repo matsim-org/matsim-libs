@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /* package-private */ class LSPImpl extends LSPDataObject<LSP> implements LSP {
   @SuppressWarnings("unused")
@@ -81,6 +82,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
   @Override
   public void scheduleLogisticChains() {
+
     logisticChainScheduler.scheduleLogisticChain();
   }
 
@@ -146,12 +148,13 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   }
 
   @Override
-  public void assignShipmentToLSP(LspShipment lspShipment) {
+  public void assignShipmentToLspPlan(LspShipment lspShipment) {
     //		shipment.setLspId(this.getId()); // und rückweg dann auch darüber und dann
     // lsp.getselectedPlan.getShipment...
     lspShipments.add(lspShipment);
     for (LSPPlan lspPlan : lspPlans) {
       lspPlan.getInitialShipmentAssigner().assignToPlan(lspPlan, lspShipment);
+		LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipment.getId());
     }
   }
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+    <!-- Mode types -->
+    <vehicleType id="car">
+        <width meter="1.0"/>
+        <maximumVelocity meterPerSecond="10.0"/>
+        <networkMode networkMode="car"/>
+    </vehicleType>
+    <vehicleType id="slow-car">
+        <maximumVelocity meterPerSecond="1.0"/>
+        <networkMode networkMode="car"/>
+    </vehicleType>
+</vehicleDefinitions>

@@ -1,4 +1,6 @@
 package playground.vsp.cadyts.marginals;
+
+import com.google.inject.Inject;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -35,8 +37,10 @@ import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import jakarta.inject.Inject;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,7 +73,7 @@ public class ModalDistanceAndCountsCadytsIT {
 
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		String outputDirectory = this.utils.getOutputDirectory();
-		config.controller().setOutputDirectory(outputDirectory.substring(0,outputDirectory.length()-1)+outputSuffix);
+		config.controller().setOutputDirectory(outputDirectory.substring(0, outputDirectory.length() - 1) + outputSuffix);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(40);
 
@@ -220,8 +224,8 @@ public class ModalDistanceAndCountsCadytsIT {
 
 		//home
 		Activity h = factory
-				.createActivityFromCoord("home",
-						network.getLinks().get(Id.createLinkId("start-link")).getFromNode().getCoord());
+			.createActivityFromCoord("home",
+				network.getLinks().get(Id.createLinkId("start-link")).getFromNode().getCoord());
 		h.setEndTime(0 * 3600. /*+ MatsimRandom.getRandom().nextInt(3600)*/);
 		plan.addActivity(h);
 
@@ -229,8 +233,8 @@ public class ModalDistanceAndCountsCadytsIT {
 
 		//work
 		Activity w = factory
-				.createActivityFromLinkId("work",
-						Id.createLinkId(endLink));
+			.createActivityFromLinkId("work",
+				Id.createLinkId(endLink));
 		w.setEndTime(1. * 3600. + MatsimRandom.getRandom().nextInt(3600));
 		plan.addActivity(w);
 
@@ -246,7 +250,7 @@ public class ModalDistanceAndCountsCadytsIT {
 	@MethodSource("arguments")
 	void test(double countsWeight, double modalDistanceWeight) {
 
-		Config config = createConfig(countsWeight+"_"+modalDistanceWeight);
+		Config config = createConfig(countsWeight + "_" + modalDistanceWeight);
 		CadytsConfigGroup cadytsConfigGroup = new CadytsConfigGroup();
 		cadytsConfigGroup.setWriteAnalysisFile(true);
 		config.addModule(cadytsConfigGroup);
@@ -285,23 +289,22 @@ public class ModalDistanceAndCountsCadytsIT {
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 
 				final ScoringParameters params = parameters.getScoringParameters(person);
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
-						controler.getScenario().getNetwork()));
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params));
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 				// add modal distance cadyts
 				final CadytsScoring<Id<DistanceDistribution.DistanceBin>> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
-						config,
-						modalDistanceCadytsContext);
+					config,
+					modalDistanceCadytsContext);
 
 				scoringFunctionMarginals.setWeightOfCadytsCorrection(modalDistanceWeight);
 				sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
 
 				// add counts cadyts
 				final CadytsScoring<Link> scoringFunctionCounts = new CadytsScoring<>(person.getSelectedPlan(),
-						config,
-						cadytsContext);
+					config,
+					cadytsContext);
 				scoringFunctionCounts.setWeightOfCadytsCorrection(countsWeight);
 				sumScoringFunction.addScoringFunction(scoringFunctionCounts);
 
@@ -318,17 +321,17 @@ public class ModalDistanceAndCountsCadytsIT {
 			Activity work = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size() - 1);
 
 			double distance = CoordUtils.calcEuclideanDistance(
-					scenario.getNetwork().getLinks().get(home.getLinkId()).getCoord(),
-					scenario.getNetwork().getLinks().get(work.getLinkId()).getCoord()
+				scenario.getNetwork().getLinks().get(home.getLinkId()).getCoord(),
+				scenario.getNetwork().getLinks().get(work.getLinkId()).getCoord()
 			);
 
 			String mode = person.getSelectedPlan().getPlanElements().stream()
-					.filter(element -> element instanceof Activity)
-					.map(element -> (Activity) element)
-					.filter(activity -> activity.getType().endsWith(" interaction"))
-					.map(activity -> activity.getType().substring(0, activity.getType().length() - " interaction".length()))
-					.findFirst()
-					.orElseThrow(() -> new RuntimeException("no interaction activities"));
+				.filter(element -> element instanceof Activity)
+				.map(element -> (Activity) element)
+				.filter(activity -> activity.getType().endsWith(" interaction"))
+				.map(activity -> activity.getType().substring(0, activity.getType().length() - " interaction".length()))
+				.findFirst()
+				.orElseThrow(() -> new RuntimeException("no interaction activities"));
 
 			modalDistanceCount.merge(mode + "_" + distance, 1, Integer::sum);
 		}
@@ -341,7 +344,7 @@ public class ModalDistanceAndCountsCadytsIT {
 			assertEquals(400, modalDistanceCount.get("bike_2150.0"), 80);
 		} else if (modalDistanceWeight == 0 && countsWeight > 0) {
 			assertTrue(modalDistanceCount.get("car_2250.0") > 500,
-					"expected more than 500 car trips on the long route but the number of trips was " + modalDistanceCount.get("car_2250.0")); // don't know. one would assume a stronger impact when only running the cadyts count correction but there isn't
+				"expected more than 500 car trips on the long route but the number of trips was " + modalDistanceCount.get("car_2250.0")); // don't know. one would assume a stronger impact when only running the cadyts count correction but there isn't
 		} else if (modalDistanceWeight > 0 && countsWeight > 0) {
 			/* This assumes that counts have a higher impact than distance distributions
 			 * (because counts request 1000 on car_2250 and the distance distribution requests 100 on car_2050 and car_2150 but 0 on car_2250).

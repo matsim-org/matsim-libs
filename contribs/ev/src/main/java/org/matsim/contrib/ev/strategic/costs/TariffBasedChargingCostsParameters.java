@@ -72,6 +72,12 @@ public class TariffBasedChargingCostsParameters extends ReflectiveConfigGroup im
 		@Parameter
 		private double blockingDuration_min = 0.0;
 
+		@Parameter
+		private String dynamicCostPerEnergy_kWh = null;
+
+		@Parameter
+		private double costPerReservation = 0.0;
+
 		public String getTariffName() {
 			return name;
 		}
@@ -126,6 +132,36 @@ public class TariffBasedChargingCostsParameters extends ReflectiveConfigGroup im
 
 		public void setBlockingDuration_min(double blockingDuration_min) {
 			this.blockingDuration_min = blockingDuration_min;
+		}
+
+		public String getDynamicCostPerEnergy_kWh() {
+			return dynamicCostPerEnergy_kWh;
+		}
+
+		public void setDynamicCostPerEnergy_kWh(String dynamicCostPerEnergy_kWh) {
+			this.dynamicCostPerEnergy_kWh = dynamicCostPerEnergy_kWh;
+		}
+
+		public double getCostPerReservation() {
+			return costPerReservation;
+		}
+
+		public void setCostPerReservation(double costPerReservation) {
+			this.costPerReservation = costPerReservation;
+		}
+
+		@Override
+		public boolean equals(Object other) {
+			if (other instanceof TariffParameters o) {
+				return o.getTariffName().equals(getTariffName());
+			}
+
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return getTariffName().hashCode();
 		}
 	}
 

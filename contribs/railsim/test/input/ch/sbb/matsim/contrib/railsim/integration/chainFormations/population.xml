@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "https://www.matsim.org/files/dtd/population_v6.dtd">
+
+<population desc="Population with two agents using chained PT routing with Raptor">
+
+	<person id="person1">
+		<plan selected="yes">
+			<activity type="home" x="682981.0" y="5807624.0" end_time="07:00:00"/>
+			<leg mode="pt"/>
+			<activity type="work" x="827212.0" y="5927195.0" start_time="08:30:00" end_time="09:00:00"/>
+			<leg mode="pt"/>
+			<activity type="work" x="924002.0" y="5943609.0" start_time="10:00:00" end_time="17:00:00"/>
+			<leg mode="pt"/>
+			<activity type="home" x="679623.0" y="5811182.0" start_time="18:30:00"/>
+		</plan>
+	</person>
+
+	<person id="person2">
+		<plan selected="yes">
+			<activity type="home" x="970034.0" y="6017382.0" end_time="08:00:00"/>
+			<leg mode="pt"/>
+			<activity type="work" x="1035555.0" y="5954992.0" start_time="09:15:00" end_time="17:00:00"/>
+			<leg mode="pt"/>
+			<activity type="home" x="970034.0" y="6017382.0" start_time="18:15:00"/>
+		</plan>
+	</person>
+
+</population>

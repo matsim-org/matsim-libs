@@ -79,51 +79,51 @@ public class MatricesToXY {
         }
 
         log.info("loading car travel times");
-        FloatMatrix<String> carTravelTimes = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> carTravelTimes = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(carTravelTimes, new File(matricesDirectory, CalculateSkimMatrices.CAR_TRAVELTIMES_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading car distances");
-        FloatMatrix<String> carDistances = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> carDistances = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(carDistances, new File(matricesDirectory, CalculateSkimMatrices.CAR_DISTANCES_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading pt adaption times");
-        FloatMatrix<String> ptAdaptionTimes = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> ptAdaptionTimes = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(ptAdaptionTimes, new File(matricesDirectory, CalculateSkimMatrices.PT_ADAPTIONTIMES_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading pt frequencies");
-        FloatMatrix<String> ptFrequencies = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> ptFrequencies = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(ptFrequencies, new File(matricesDirectory, CalculateSkimMatrices.PT_FREQUENCIES_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading pt distances");
-        FloatMatrix<String> ptDistances = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> ptDistances = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(ptDistances, new File(matricesDirectory, CalculateSkimMatrices.PT_DISTANCES_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading pt travel times");
-        FloatMatrix<String> ptTravelTimes = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> ptTravelTimes = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(ptTravelTimes, new File(matricesDirectory, CalculateSkimMatrices.PT_TRAVELTIMES_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading pt access times");
-        FloatMatrix<String> ptAccessTimes = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> ptAccessTimes = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(ptAccessTimes, new File(matricesDirectory, CalculateSkimMatrices.PT_ACCESSTIMES_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading pt egress times");
-        FloatMatrix<String> ptEgressTimes = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> ptEgressTimes = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(ptEgressTimes, new File(matricesDirectory, CalculateSkimMatrices.PT_EGRESSTIMES_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading pt transfer counts");
-        FloatMatrix<String> ptTransferCounts = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> ptTransferCounts = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(ptTransferCounts, new File(matricesDirectory, CalculateSkimMatrices.PT_TRANSFERCOUNTS_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading rail shares by distance");
-        FloatMatrix<String> ptRailShareDistances = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> ptRailShareDistances = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(ptRailShareDistances, new File(matricesDirectory, CalculateSkimMatrices.PT_TRAINSHARE_BYDISTANCE_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading rail shares by time");
-        FloatMatrix<String> ptRailShareTimes = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> ptRailShareTimes = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(ptRailShareTimes, new File(matricesDirectory, CalculateSkimMatrices.PT_TRAINSHARE_BYTIME_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("loading beeline distances");
-        FloatMatrix<String> beelineDistances = new FloatMatrix<>(zonesById.keySet(), Float.NaN);
+        FloatMatrix<String> beelineDistances = FloatMatrix.createFloatMatrix(zonesById.keySet(), Float.NaN);
         FloatMatrixIO.readAsCSV(beelineDistances, new File(matricesDirectory, CalculateSkimMatrices.BEELINE_DISTANCE_FILENAME).getAbsolutePath(), id -> id);
 
         log.info("Start writing xy csv to " + xyCsvOutputFilename);

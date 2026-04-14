@@ -54,46 +54,46 @@ import org.matsim.core.utils.io.IOUtils;
  * Add filters for:
  * - mode
  * - activity combination
- * 
+ *
  * @author cdobler
  */
 public class DistanceDistribution implements IterationEndsListener {
 
 	private final static Logger log = LogManager.getLogger(DistanceDistribution.class);
-	
+
 	private final Network network;
 	private final Population population;
 	private final MainModeIdentifier mainModeIdentifier;
 	private final List<DistributionClass> classes;
-	
+
 	public DistanceDistribution(final Network network, final Population population,
 			final MainModeIdentifier mainModeIdentifier) {
 		this.network = network;
 		this.population = population;
 		this.mainModeIdentifier = mainModeIdentifier;
-		
+
 		this.classes = new ArrayList<DistributionClass>();
 	}
-	
+
 	private void analyzePlans(Collection<Plan> plans) {
 		log.info("Analyzing distance distribution of " + plans.size() + " plans.");
 		for (Plan plan : plans) {
 			analyzePlan(plan);
 		}
 	}
-	
+
 	private void analyzePlan(Plan plan) {
 		List<Trip> trips = TripStructureUtils.getTrips(plan);
-		
+
 		for (Trip trip : trips) {
 			String originActivityType = trip.getOriginActivity().getType();
 			String destinationActivityType = trip.getDestinationActivity().getType();
 			String mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
-			
+
 			Tuple<String, String> tuple = new Tuple<String, String>(originActivityType, destinationActivityType);
 			for (DistributionClass distributionClass : classes) {
 				boolean containsMainMode = distributionClass.mainModes.contains(mainMode);
-				boolean containsActivityTypePair = distributionClass.activityTypesFromTo.contains(tuple) || distributionClass.activityTypesFromTo.size() == 0; 
+				boolean containsActivityTypePair = distributionClass.activityTypesFromTo.contains(tuple) || distributionClass.activityTypesFromTo.size() == 0;
 				if (containsMainMode && containsActivityTypePair) {
 					for (Leg leg : trip.getLegsOnly()) {
 						if (leg.getMode().equals(mainMode)) {
@@ -102,7 +102,7 @@ public class DistanceDistribution implements IterationEndsListener {
 							if (route instanceof NetworkRoute) {
 								distance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, this.network);
 							} else distance = route.getDistance();
-							
+
 							for (DistanceBin distanceBin : distributionClass.distributionBins) {
 								if (distance >= distanceBin.low && distance < distanceBin.high) {
 									distanceBin.count++;
@@ -117,37 +117,37 @@ public class DistanceDistribution implements IterationEndsListener {
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
+
 		// reset
 		for (DistributionClass distributionClass : classes) {
 			for (DistanceBin distanceBin : distributionClass.distributionBins) {
 				distanceBin.count = 0;
 			}
 		}
-		
+
 		List<Plan> plans = new ArrayList<Plan>();
 		for (Person person : this.population.getPersons().values()) plans.add(person.getSelectedPlan());
 		this.analyzePlans(plans);
-		
+
 		for (DistributionClass distributionClass : classes) {
-			writeDistanceDistributionClass(distributionClass, event.getIteration(), event.getServices().getControlerIO());
+			writeDistanceDistributionClass(distributionClass, event.getIteration(), event.getServices().getControllerIO());
 		}
 	}
-	
-	private void writeDistanceDistributionClass(DistributionClass distributionClass, int iteration, 
+
+	private void writeDistanceDistributionClass(DistributionClass distributionClass, int iteration,
 			OutputDirectoryHierarchy outputDirectoryHierarchy) {
-		
+
 		String fileName = outputDirectoryHierarchy.getIterationFilename(iteration, "DistanceDistribution_" + distributionClass.name);
-		
+
 		double[] referenceShare = new double[distributionClass.distributionBins.size()];
 		double[] simulationShare = new double[distributionClass.distributionBins.size()];
-		
+
 		// accumulate total count
 		int count = 0;
 		for (DistanceBin distanceBin : distributionClass.distributionBins) {
 			count += distanceBin.count;
 		}
-		
+
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(fileName + ".txt");
 			StringBuffer stringBuffer = new StringBuffer();
@@ -155,28 +155,28 @@ public class DistanceDistribution implements IterationEndsListener {
 			stringBuffer.append("high" + "\t");
 			stringBuffer.append("reference share" + "\t");
 			stringBuffer.append("simulation share");
-			
+
 			writer.write(stringBuffer.toString());
 			writer.newLine();
-			
+
 			int i = 0;
 			log.info("Distance distribution for class " + distributionClass.name);
 			for (DistanceBin distanceBin : distributionClass.distributionBins) {
-				
+
 				referenceShare[i] = distanceBin.referenceShare;
 				simulationShare[i] = (double) distanceBin.count / (double) count;
-				
+
 				stringBuffer = new StringBuffer();
 				stringBuffer.append(distanceBin.low + "\t");
 				stringBuffer.append(distanceBin.high + "\t");
 				stringBuffer.append(distanceBin.referenceShare + "\t");
 				stringBuffer.append(String.valueOf(simulationShare[i]));
-				
+
 				log.info("\t" + stringBuffer.toString());
-				
+
 				writer.write(stringBuffer.toString());
 				writer.newLine();
-				
+
 				i++;
 			}
 			writer.flush();
@@ -184,7 +184,7 @@ public class DistanceDistribution implements IterationEndsListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		String title = "Distance distribution for class " + distributionClass.name;
 		String xAxisLabel = "Distance class";
 		String yAxisLabel = "Share";
@@ -194,52 +194,52 @@ public class DistanceDistribution implements IterationEndsListener {
 			categories[i++] = distanceBin.low + "\n" + " .. " + "\n" + distanceBin.high;
 		}
 		BarChart chart = new BarChart(title, xAxisLabel, yAxisLabel, categories);
-		
+
 		CategoryPlot plot = chart.getChart().getCategoryPlot();
 		CategoryAxis categoryAxis = plot.getDomainAxis();
 		categoryAxis.setMaximumCategoryLabelLines(3);
-		
+
 		chart.addMatsimLogo();
 		chart.addSeries("reference share", referenceShare);
 		chart.addSeries("simulation share", simulationShare);
 		chart.saveAsPng(fileName + ".png", 1024, 768);
 	}
-	
+
 	public DistributionClass createAndAddDistributionClass(String className) {
 		DistributionClass distributionClass = new DistributionClass();
 		distributionClass.name = className;
 		this.classes.add(distributionClass);
 		return distributionClass;
 	}
-	
-	public void createAndAddDistanceBin(DistributionClass distributionClass, double low, 
+
+	public void createAndAddDistanceBin(DistributionClass distributionClass, double low,
 			double high, double referenceShare) {
 		DistanceBin distanceBin = new DistanceBin(low, high, referenceShare);
 		distributionClass.distributionBins.add(distanceBin);
 	}
-	
+
 	public void addActivityCombination(DistributionClass distributionClass, String fromActivity,
 			String toActivity) {
 		distributionClass.activityTypesFromTo.add(new Tuple<String, String>(fromActivity, toActivity));
 	}
-	
+
 	public void addMainMode(DistributionClass distributionClass, String mainMode) {
 		distributionClass.mainModes.add(mainMode);
 	}
-	
+
 	public static class DistributionClass {
 		String name;
 		Set<Tuple<String, String>> activityTypesFromTo = new LinkedHashSet<Tuple<String, String>>();
 		Set<String> mainModes = new LinkedHashSet<String>();
 		Set<DistanceBin> distributionBins = new LinkedHashSet<DistanceBin>();
 	}
-	
+
 	private static class DistanceBin {
 		final double low;
 		final double high;
 		final double referenceShare;
 		int count = 0;
-		
+
 		public DistanceBin(double low, double high, double referenceShare) {
 			this.low = low;
 			this.high = high;

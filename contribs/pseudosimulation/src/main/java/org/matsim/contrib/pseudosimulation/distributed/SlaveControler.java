@@ -244,7 +244,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 true ?
                         OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
                         OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
-        matsimControler.addControlerListener(this);
+        matsimControler.addControllerListener(this);
 
 //        init traveltime for when non yet has been received from master
         travelTime = new ReplaceableTravelTime();

@@ -28,6 +28,7 @@ import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -71,6 +72,7 @@ public class SignalSystemsIT {
 		config.qsim().setUsingFastCapacityUpdate(false);
 
 		config.controller().setLastIteration(10);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// ---
 
@@ -134,7 +136,7 @@ public class SignalSystemsIT {
 			}
 			Assertions.assertTrue(works, "different population files after iteration 10 ");
 		}
-		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControlerIO());
+		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControllerIO());
 		File file = new File(writer.getSignalSystemsOutputFilename());
 		Assertions.assertTrue(file.exists());
 		file = new File(writer.getSignalGroupsOutputFilename());
@@ -168,6 +170,7 @@ public class SignalSystemsIT {
 		config.qsim().setUsingFastCapacityUpdate(false);
 
 		config.controller().setLastIteration(10);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
@@ -228,7 +231,7 @@ public class SignalSystemsIT {
 			}
 			Assertions.assertTrue(works, "different population files after iteration 10 ");
 		}
-		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControlerIO());
+		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControllerIO());
 		File file = new File(writer.getSignalSystemsOutputFilename());
 		Assertions.assertTrue(file.exists());
 		file = new File(writer.getSignalGroupsOutputFilename());

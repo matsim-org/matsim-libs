@@ -32,7 +32,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.TreeMap;
@@ -172,7 +172,8 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
                     }
 
                     // copy other params from subpopulation config
-                    modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling());
+					// subpopulationModeParams.getMarginalUtilityOfTraveling() is in util/hour, needs conversion to utils/second
+                    modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling() / 3600);
                     modeUtilityParamsBuilder.setMarginalUtilityOfDistance_m(subpopulationModeParams.getMarginalUtilityOfDistance());
                     modeUtilityParamsBuilder.setMonetaryDistanceRate(subpopulationModeParams.getMonetaryDistanceRate());
                     modeUtilityParamsBuilder.setDailyMoneyConstant(subpopulationModeParams.getDailyMonetaryConstant());

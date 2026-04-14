@@ -26,8 +26,8 @@ import com.google.inject.Singleton;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scoring.PlansScoringModule;
-import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 
 import java.util.Map;
 
@@ -48,11 +48,13 @@ public class CharyparNagelScoringFunctionModule extends AbstractModule {
 		// If there are taste variations, the individual scoring parameters are used
 		if (tasteVariations) {
 			bind(ScoringParametersForPerson.class).to(IndividualPersonScoringParameters.class).in(Singleton.class);
-			addControlerListenerBinding().to(IndividualPersonScoringOutputWriter.class).in(jakarta.inject.Singleton.class);
+			addControllerListenerBinding().to(IndividualPersonScoringOutputWriter.class).in(Singleton.class);
 
 		} else {
 			bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);
 		}
+
+		// yyyyyy the above is actually quite dangerous since at least at VSP we quite often override the scoring parameters to income-dependent scoring parameters.  kai, nov'25
     }
 
 }

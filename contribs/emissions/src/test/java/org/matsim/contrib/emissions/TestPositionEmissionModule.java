@@ -38,7 +38,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.snapshotwriters.PositionEvent;
 
-import jakarta.inject.Singleton;
+import com.google.inject.Singleton;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashMap;
@@ -127,9 +127,9 @@ public class TestPositionEmissionModule {
         scenario.getVehicles().addVehicle(vehicle);
         var person = createPerson(scenario.getPopulation().getFactory());
         scenario.getPopulation().addPerson(person);
-        VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(vehicle.getType().getNetworkMode(), vehicle.getId()));
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, Map.of(vehicle.getType().getNetworkMode(), vehicle.getId() ) );
 
-        var controler = new Controler(scenario);
+		var controler = new Controler(scenario);
 
         controler.addOverridingModule(new PositionEmissionsModule());
         // exclude last link since both emission calculations work slightly different for the last link of a trip.

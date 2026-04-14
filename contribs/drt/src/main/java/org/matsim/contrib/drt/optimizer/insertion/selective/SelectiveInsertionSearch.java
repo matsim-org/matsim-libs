@@ -112,7 +112,7 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent event) {
-		String filename = matsimServices.getControlerIO()
+		String filename = matsimServices.getControllerIO()
 				.getIterationFilename(matsimServices.getIterationNumber(),
 						mode + "_selective_insertion_detour_time_estimation_errors_instance_"+instanceId+".csv");
 		try (CSVWriter writer = new CSVWriter(Files.newBufferedWriter(Paths.get(filename)), ';', '"', '"', "\n");) {

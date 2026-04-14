@@ -19,7 +19,7 @@ public class MemoryObserver {
 		startMillis(interval_seconds * 1000L);
 	}
 
-	static void startMillis(long interval) {
+	static synchronized void startMillis(long interval) {
 		stop();
 
 		runnable = new MemoryPrinter(interval);

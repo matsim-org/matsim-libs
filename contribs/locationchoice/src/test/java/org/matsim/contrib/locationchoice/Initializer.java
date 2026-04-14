@@ -23,18 +23,22 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.population.algorithms.PersonCalcTimes;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.List;
 
 public class Initializer {
 
@@ -48,6 +52,24 @@ public class Initializer {
 
 		//Config config = testCase.loadConfig(path);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				install(new ScenarioByInstanceModule(scenario));
+				install(AbstractModule.override(List.of(new TripRouterModule()), new AbstractModule() {
+					@Override
+					public void install() {
+						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
+						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+					}
+				}));
+				install(new TimeInterpretationModule());
+				install(new DefaultPrepareForSimModule());
+			}
+		});
+		injector.getInstance( PrepareForSim.class ).run();
+
 		preparePlans(scenario);
 
 		this.controler = new Controler(scenario);

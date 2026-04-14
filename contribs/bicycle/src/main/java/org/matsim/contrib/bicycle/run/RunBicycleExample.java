@@ -37,6 +37,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
@@ -85,9 +86,6 @@ public class RunBicycleExample {
 		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
 		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.0002 );
-		bicycleConfigGroup.setMarginalUtilityOfUserDefinedNetworkAttribute_m(-0.0000); // always needs to be negative
-		bicycleConfigGroup.setUserDefinedNetworkAttributeName("quietness"); // needs to be defined as a value from 0 to 1, 1 being best, 0 being worst
-		bicycleConfigGroup.setUserDefinedNetworkAttributeDefaultValue(0.1); // used for those links that do not have a value for the user-defined attribute
 
 //		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
 
@@ -173,10 +171,10 @@ public class RunBicycleExample {
 
 		@Inject private AdditionalBicycleLinkScoreDefaultImpl delegate;
 
-		@Override public double computeLinkBasedScore( Link link ){
+		@Override public double computeLinkBasedScore(Link link, Id<Vehicle> vehicleId, String bicycleMode ){
 			double result = (double) link.getAttributes().getAttribute( "carFreeStatus" );  // from zero to one
 
-			double amount = delegate.computeLinkBasedScore( link );
+			double amount = delegate.computeLinkBasedScore( link, vehicleId, bicycleMode );
 
 			return amount + result ;  // or some other way to augment the score
 

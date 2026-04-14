@@ -118,4 +118,12 @@ final class ScheduledLspShipmentTransport implements LspShipmentLeg {
 	public CarrierShipment getCarrierShipment() {
 		return carrierShipment;
 	}
+
+	/**
+	 * @return the fromLinkId -- Location of transport start.
+	 */
+	@Override
+	public Id<Link> getLinkId() {
+		return fromLinkId;
+	}
 }
