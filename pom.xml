@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim-all</artifactId>
 	<packaging>pom</packaging>
-	<version>2026.0-SNAPSHOT</version>
+	<version>2027.0-SNAPSHOT</version>
 	<name>MATSim-All</name>
 	<modules>
 		<module>matsim</module>
@@ -27,7 +27,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.release>25</maven.compiler.release>
-		<argLine/>
+		<argLine />
 
 		<log4j.version>2.25.4</log4j.version>
 		<geotools.version>34.3</geotools.version>
@@ -233,7 +233,7 @@
 			<dependency>
 				<groupId>com.google.errorprone</groupId>
 				<artifactId>error_prone_annotations</artifactId>
-				<version>2.48.0</version>
+				<version>2.49.0</version>
 			</dependency>
 
 			<dependency>
@@ -461,8 +461,8 @@
 				</executions>
 				<configuration>
 					<rules>
-						<requireUpperBoundDeps/>
-						<banDuplicatePomDependencyVersions/>
+						<requireUpperBoundDeps />
+						<banDuplicatePomDependencyVersions />
 						<requireReleaseDeps>
 							<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
 							<excludes>
