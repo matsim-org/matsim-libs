@@ -189,8 +189,7 @@ public final class ControllerListenerManagerImpl implements ControllerListenerMa
 		IterationStartsEvent event = new IterationStartsEvent(this.controller, iteration, isLastIteration);
 		IterationStartsListener[] listener = this.coreListenerList.getListeners(IterationStartsListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
-		if (controller != null)
-			new ConfigWriter(controller.getConfig()).write(controller.getControllerIO().getIterationFilename(iteration, Controler.DefaultFiles.config, ControllerConfigGroup.CompressionType.none));
+		new ConfigWriter(controller.getConfig()).write(controller.getControllerIO().getIterationFilename(iteration, Controler.DefaultFiles.config, ControllerConfigGroup.CompressionType.none));
         for (IterationStartsListener aListener : listener) {
             log.info("calling notifyIterationStarts on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyIterationStarts(event);
