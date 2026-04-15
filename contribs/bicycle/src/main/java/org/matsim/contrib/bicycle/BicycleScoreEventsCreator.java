@@ -60,8 +60,7 @@ import java.util.*;
  */
 class BicycleScoreEventsCreator implements
 //		SumScoringFunction.LegScoring, SumScoringFunction.ArbitraryEventScoring
-		VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler
-{
+	VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler {
 // -----------------------------------------------------------------------------
 // Historical note
 // -----------------------------------------------------------------------------
@@ -73,7 +72,7 @@ class BicycleScoreEventsCreator implements
 	private static final String BICYCLE_ADDITIONAL_LINK_SCORE = "bicycleAdditionalLinkScore";
 	private static final String BICYCLE_MOTORIZED_INTERACTION_SCORE = "bicycleMotorizedInteractionScore";
 	private static final double MARGINAL_UTILITY_OF_CAR_COUNT_ON_BICYCLE_LEAVE_LINK = -0.004;
-	private static final double MARGINAL_UTILITY_OF_CARS_PASSED_BICYCLE_ON_LINK = -0.008;
+	private static final double MARGINAL_UTILITY_OF_CARS_PASSED_BICYCLE_ON_LINK = -0.004;
 
 	private final Network network;
 	private final EventsManager eventsManager;
@@ -99,7 +98,8 @@ class BicycleScoreEventsCreator implements
 	private final Map<Id<Vehicle>, LinkEnterInfo> currentLinkEnterInfoByVehicle = new LinkedHashMap<>();
 	private final Map<Id<Link>, FinishedCarStore> finishedCarsByLink = new LinkedHashMap<>();
 
-	@Inject BicycleScoreEventsCreator(Scenario scenario, EventsManager eventsManager, AdditionalBicycleLinkScore additionalBicycleLinkScore) {
+	@Inject
+	BicycleScoreEventsCreator(Scenario scenario, EventsManager eventsManager, AdditionalBicycleLinkScore additionalBicycleLinkScore) {
 		this.eventsManager = eventsManager;
 		this.network = scenario.getNetwork();
 		this.additionalBicycleLinkScore = additionalBicycleLinkScore;
@@ -107,7 +107,8 @@ class BicycleScoreEventsCreator implements
 		this.bicycleMode = bicycleConfig.getBicycleMode();
 	}
 
-	@Override public void reset(int iteration) {
+	@Override
+	public void reset(int iteration) {
 		vehicle2driver.reset(iteration);
 		firstLinkIdMap.clear();
 		modeFromVehicle.clear();
@@ -116,7 +117,8 @@ class BicycleScoreEventsCreator implements
 		finishedCarsByLink.clear();
 	}
 
-	@Override public void handleEvent(VehicleEntersTrafficEvent event) {
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		// 1. Track vehicle and first link for bicycleAdditionalLinkScore.
 		vehicle2driver.handleEvent(event);
 
@@ -143,7 +145,8 @@ class BicycleScoreEventsCreator implements
 		}
 	}
 
-	@Override public void handleEvent(LinkEnterEvent event) {
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
 		if (this.bicycleConfig.isMotorizedInteraction()) {
 			String mode = this.modeFromVehicle.get(event.getVehicleId());
 			if (mode == null) {
@@ -165,7 +168,8 @@ class BicycleScoreEventsCreator implements
 		}
 	}
 
-	@Override public void handleEvent(LinkLeaveEvent event) {
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
 		String mode = this.modeFromVehicle.get(event.getVehicleId());
 
 		if (this.bicycleConfig.isCarCountOnBicycleLeaveLink() && mode != null) {
@@ -215,7 +219,8 @@ class BicycleScoreEventsCreator implements
 		}
 	}
 
-	@Override public void handleEvent(VehicleLeavesTrafficEvent event) {
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		String mode = this.modeFromVehicle.get(event.getVehicleId());
 
 		if (this.bicycleConfig.isCarCountOnBicycleLeaveLink() && mode != null) {
