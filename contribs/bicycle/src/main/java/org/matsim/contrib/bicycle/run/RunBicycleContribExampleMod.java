@@ -117,7 +117,7 @@ public final class RunBicycleContribExampleMod {
 		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.003);
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.001);
 		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.001);
-		bicycleConfigGroup.setMotorizedInteraction(true);
+		bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.CARS_PASSED_BICYCLE_ON_LINK);
 		//bicycleConfigGroup.setBicycleInfraAttribute("cycleway"); // default
 		bicycleConfigGroup.setBicycleInfraAttribute("bicycle_infra");
 

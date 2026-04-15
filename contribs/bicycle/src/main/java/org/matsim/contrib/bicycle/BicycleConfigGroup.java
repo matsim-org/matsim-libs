@@ -29,6 +29,36 @@ import java.util.Map;
 public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	// necessary to have this public
 
+	public enum MotorizedInteraction {
+		NONE("none"),
+		CAR_COUNT_ON_BICYCLE_LEAVE_LINK("carCountOnBicycleLeaveLink"),
+		CARS_PASSED_BICYCLE_ON_LINK("carsPassedBicycleOnLink");
+
+		private final String configValue;
+
+		MotorizedInteraction(String configValue) {
+			this.configValue = configValue;
+		}
+
+		public String getConfigValue() {
+			return this.configValue;
+		}
+
+		static MotorizedInteraction fromConfigValue(String configValue) {
+			for (MotorizedInteraction value : values()) {
+				if (value.configValue.equals(configValue)) {
+					return value;
+				}
+			}
+			throw new IllegalArgumentException(
+				"Unsupported motorizedInteraction: " + configValue
+					+ ". Supported values are '" + NONE.configValue
+					+ "', '" + CAR_COUNT_ON_BICYCLE_LEAVE_LINK.configValue
+					+ "' and '" + CARS_PASSED_BICYCLE_ON_LINK.configValue + "'."
+			);
+		}
+	}
+
 	public static final String GROUP_NAME = "bicycle";
 
 	private static final String INPUT_COMFORT = "marginalUtilityOfComfort_m";
@@ -42,7 +72,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	private double marginalUtilityOfInfrastructure;
 	private double marginalUtilityOfGradient;
 	private String bicycleMode = "bicycle";
-	private boolean motorizedInteraction = false;
+	private MotorizedInteraction motorizedInteraction = MotorizedInteraction.NONE;
 
 	public BicycleConfigGroup() {
 		super(GROUP_NAME);
@@ -55,6 +85,9 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		map.put(INPUT_COMFORT, "marginalUtilityOfSurfacetype"); //TODO: update these comments, whats does it?
 		map.put(INPUT_INFRASTRUCTURE, "marginalUtilityOfStreettype"); //TODO: update these comments, whats does it?
 		map.put(INPUT_GRADIENT, "marginalUtilityOfGradient"); //TODO: update these comments, whats does it?
+		map.put(MOTORIZED_INTERACTION,
+			"Defines the motorized interaction behavior. Possible values [none, carCountOnBicycleLeaveLink, carsPassedBicycleOnLink]. "
+				+ "Default: none.");
 		map.put(BICYCLE_INFRA_ATTRIBUTE,
 			"Network attribute used for bicycle infrastructure evaluation. "
 				+ "Supported values: 'cycleway' (legacy default) and 'bicycle_infra'.");
@@ -139,13 +172,41 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter(MOTORIZED_INTERACTION)
+	public String getMotorizedInteraction() {
+		return this.motorizedInteraction.getConfigValue();
+	}
+
+	public MotorizedInteraction getMotorizedInteractionType() {
+		return this.motorizedInteraction;
+	}
+
 	public boolean isMotorizedInteraction() {
-		return motorizedInteraction;
+		return this.motorizedInteraction != MotorizedInteraction.NONE;
+	}
+
+	public boolean isCarCountOnBicycleLeaveLink() {
+		return this.motorizedInteraction == MotorizedInteraction.CAR_COUNT_ON_BICYCLE_LEAVE_LINK;
+	}
+
+	public boolean isCarsPassedBicycleOnLink() {
+		return this.motorizedInteraction == MotorizedInteraction.CARS_PASSED_BICYCLE_ON_LINK;
 	}
 
 	@StringSetter(MOTORIZED_INTERACTION)
-	public BicycleConfigGroup setMotorizedInteraction(boolean motorizedInteraction) {
+	public BicycleConfigGroup setMotorizedInteraction(String motorizedInteraction) {
+		this.motorizedInteraction = MotorizedInteraction.fromConfigValue(motorizedInteraction);
+		return this;
+	}
+
+	public BicycleConfigGroup setMotorizedInteractionType(MotorizedInteraction motorizedInteraction) {
 		this.motorizedInteraction = motorizedInteraction;
+		return this;
+	}
+
+	public BicycleConfigGroup setMotorizedInteraction(boolean motorizedInteraction) {
+		this.motorizedInteraction = motorizedInteraction
+			? MotorizedInteraction.CAR_COUNT_ON_BICYCLE_LEAVE_LINK
+			: MotorizedInteraction.NONE;
 		return this;
 	}
 

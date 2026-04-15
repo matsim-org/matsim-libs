@@ -427,7 +427,7 @@ public class BicycleTest {
 			Config config = createConfig(0);
 			BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule(config, BicycleConfigGroup.class);
 //			bicycleConfigGroup.setBicycleScoringType( BicycleScoringType.legBased );
-			bicycleConfigGroup.setMotorizedInteraction(true);
+			bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.CAR_COUNT_ON_BICYCLE_LEAVE_LINK);
 
 			// the following comes from inlining RunBicycleExample, which we need since we need to modify scenario data:
 			config.global().setNumberOfThreads(1);

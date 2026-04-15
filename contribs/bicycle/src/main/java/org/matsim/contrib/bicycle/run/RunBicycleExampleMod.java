@@ -214,7 +214,7 @@ public class RunBicycleExampleMod {
 
 		if (considerMotorizedInteraction) {
 			BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule(config, BicycleConfigGroup.class);
-			bicycleConfigGroup.setMotorizedInteraction(considerMotorizedInteraction);
+			bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.CAR_COUNT_ON_BICYCLE_LEAVE_LINK);
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
