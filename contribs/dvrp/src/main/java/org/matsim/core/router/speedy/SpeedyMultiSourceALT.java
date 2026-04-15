@@ -95,13 +95,13 @@ public class SpeedyMultiSourceALT {
 			this.currentIteration = Integer.MIN_VALUE;
 		}
 
-		int endNodeIndex = endNode.getId().index();
+		int endNodeIndex = graph.getNodeIndex(endNode);
 		// TODO add support for dead ends
 		//  int endDeadend = this.astarData.getNodeDeadend(endNodeIndex);
 
 		this.pq.clear();
 		for (StartNode startNode : startNodes) {
-			int startNodeIndex = startNode.node.getId().index();
+			int startNodeIndex = graph.getNodeIndex(startNode.node);
 			// TODO add support for dead ends
 			//  int startDeadend = this.astarData.getNodeDeadend(startNodeIndex);
 			double estimation = estimateMinTravelcostToDestination(startNodeIndex, endNodeIndex, backward);
@@ -247,11 +247,11 @@ public class SpeedyMultiSourceALT {
 
 		double startTime;
 		if (backward) {
-			startTime = getTimeRaw(nodes.get(nodes.size() - 1).getId().index());
+			startTime = getTimeRaw(graph.getNodeIndex(nodes.get(nodes.size() - 1)));
 		} else {
 			Collections.reverse(nodes);
 			Collections.reverse(links);
-			startTime = getTimeRaw(nodes.get(0).getId().index());
+			startTime = getTimeRaw(graph.getNodeIndex(nodes.get(0)));
 		}
 
 		double travelTime = backward ? startTime - endTime : endTime - startTime;

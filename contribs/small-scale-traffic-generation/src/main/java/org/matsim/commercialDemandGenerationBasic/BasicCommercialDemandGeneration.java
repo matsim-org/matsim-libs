@@ -242,7 +242,6 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 	 */
 	private Config prepareConfig(int lastMATSimIteration, String coordinateSystem) {
 		Config config = ConfigUtils.createConfig();
-		config.global().setInsistingOnDeprecatedConfigVersion(false);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		config.controller().setOutputDirectory(outputLocation.toString());

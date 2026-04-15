@@ -108,10 +108,10 @@ public class ScoringRegressionTest {
 		var passenger7 = scenario.getPopulation().getPersons().get(Id.createPersonId("passenger_7"));
 		var passenger9 = scenario.getPopulation().getPersons().get(Id.createPersonId("passenger_9"));
 
-		assertEquals(142.59829307717007, passenger0.getSelectedPlan().getScore(), 0.1);
-		assertEquals(141.4610627925853, passenger3.getSelectedPlan().getScore(), 0.1);
-		assertEquals(140.53623115694026, passenger7.getSelectedPlan().getScore(), 0.1);
-		assertEquals(139.9389839062014, passenger9.getSelectedPlan().getScore(), 0.1);
+		assertEquals(142.98162641050342, passenger0.getSelectedPlan().getScore(), 0.1);
+		assertEquals(141.87772945925198, passenger3.getSelectedPlan().getScore(), 0.1);
+		assertEquals(141.88456449027356, passenger7.getSelectedPlan().getScore(), 0.1);
+		assertEquals(141.8190076482263, passenger9.getSelectedPlan().getScore(), 0.1);
 	}
 
 	/**

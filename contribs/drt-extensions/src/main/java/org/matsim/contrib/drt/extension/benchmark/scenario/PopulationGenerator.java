@@ -6,6 +6,7 @@ package org.matsim.contrib.drt.extension.benchmark.scenario;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -33,7 +34,15 @@ public class PopulationGenerator {
 
 	public void generate(int numberOfAgents, Scenario scenario) {
 		Population population = scenario.getPopulation();
-		List<Link> links = new ArrayList<>(scenario.getNetwork().getLinks().values());
+		// Match dvrp_routing default network mode (car) to avoid selecting PT-only links
+		List<Link> links = new ArrayList<>(scenario.getNetwork().getLinks().values().stream()
+			.filter(link -> link.getAllowedModes() == null
+				|| link.getAllowedModes().isEmpty()
+				|| link.getAllowedModes().contains(TransportMode.car))
+			.toList());
+		if (links.isEmpty()) {
+			throw new IllegalStateException("No car-routable links available for population generation.");
+		}
 
 		double centerX = links.stream().mapToDouble(l -> l.getCoord().getX()).average().orElse(0);
 		double centerY = links.stream().mapToDouble(l -> l.getCoord().getY()).average().orElse(0);

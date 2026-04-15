@@ -11,6 +11,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetWriter;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.load.IntegerLoadType;
+import org.matsim.api.core.v01.TransportMode;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -35,7 +36,18 @@ public class FleetGenerator {
 	}
 
 	public Path generate(int numberOfVehicles, Scenario scenario, Path outputPath) {
-		List<Link> links = new ArrayList<>(scenario.getNetwork().getLinks().values());
+		// Use links that are routable on the default dvrp_routing network (car)
+		List<Link> links = new ArrayList<>();
+		scenario.getNetwork().getLinks().values().forEach(link -> {
+			if (link.getAllowedModes() == null
+				|| link.getAllowedModes().isEmpty()
+				|| link.getAllowedModes().contains(TransportMode.car)) {
+				links.add(link);
+			}
+		});
+		if (links.isEmpty()) {
+			throw new IllegalStateException("No car-routable links available for fleet generation.");
+		}
 		Random random = new Random(42);
 		List<ImmutableDvrpVehicleSpecification> vehicles = new ArrayList<>();
 
