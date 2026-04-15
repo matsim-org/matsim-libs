@@ -33,6 +33,9 @@ import java.util.List;
 import static org.matsim.core.config.groups.ReplanningConfigGroup.*;
 import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 
+// this is based on https://github.com/matsim-org/matsim-code-examples/blob/2a40dd20336c55a0c8ca4c582d5d9489a4ff8d0c/src/main/java/org/matsim/codeexamples/extensions/bicycle/RunBicycleContribExample.java
+// modified to test some functionality
+
 public final class RunBicycleContribExampleMod {
 	private static final Logger LOG = LogManager.getLogger(RunBicycleContribExampleMod.class);
 

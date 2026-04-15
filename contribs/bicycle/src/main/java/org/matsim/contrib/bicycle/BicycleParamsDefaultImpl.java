@@ -100,7 +100,7 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 
 				case "FOOT_AND_CYCLEWAY_SHARED_ISOLATED":
 				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING":
-				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING_OR_ISOLATED":
+				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING_OR_ISOLATED": // TODO!
 				case "PEDESTRIAN_AREA_BICYCLE_YES":
 				case "CYCLEWAY_LINK":
 					return 0.80;

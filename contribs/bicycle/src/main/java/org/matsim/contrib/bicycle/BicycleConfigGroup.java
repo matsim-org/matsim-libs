@@ -71,6 +71,8 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		return bicycleInfraAttribute;
 	}
 
+
+	// TODO: change rather to enum here
 	@StringSetter(BICYCLE_INFRA_ATTRIBUTE)
 	public BicycleConfigGroup setBicycleInfraAttribute(String bicycleInfraAttribute) {
 		if (!BicycleUtils.CYCLEWAY.equals(bicycleInfraAttribute)
