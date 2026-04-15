@@ -29,11 +29,10 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -80,16 +79,12 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 		bindModal(DrtInsertionSearch.class).toProvider(modalProvider( getter -> getter.getModal(DrtInsertionSearchManager.class).create()));
 
-		addModalComponent(SingleInsertionDetourPathCalculatorManager.class,
-				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
-					@Override
-					public SingleInsertionDetourPathCalculatorManager get() {
-						var travelTime = getModalInstance(TravelTime.class);
-						Network network = getModalInstance(Network.class);
-						TravelDisutility travelDisutility = getModalInstance(
-								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new SingleInsertionDetourPathCalculatorManager(network, travelTime, travelDisutility, drtCfg);
-					}
-				});
+		addModalComponent(SingleInsertionDetourPathCalculatorManager.class, modalProvider(getter -> {
+			var travelTime = getter.getModal(TravelTime.class);
+			Network network = getter.getModal(Network.class);
+			TravelDisutility travelDisutility = getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+			LeastCostPathCalculatorFactory factory = getter.get(LeastCostPathCalculatorFactory.class);
+			return new SingleInsertionDetourPathCalculatorManager(network, travelTime, travelDisutility, drtCfg, factory);
+		}));
 	}
 }
