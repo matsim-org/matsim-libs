@@ -7,10 +7,7 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -533,6 +530,7 @@ public class TestScenarioBuilder {
 		return tracker;
 	}
 
+	@DistributedEventHandler(processing = ProcessingMode.DIRECT)
 	public class Tracker
 		implements ActivityStartEventHandler, ActivityEndEventHandler, //
 		StartChargingProcessEventHandler, AbortChargingProcessEventHandler,

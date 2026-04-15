@@ -50,7 +50,10 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 	private final Map<Id<Person>, ChargingProcess> personsToProcess = new HashMap<>();
 	private final Map<Id<Vehicle>, ChargingProcess> vehiclesToProcess = new HashMap<>();
-	private final Map<Id<Vehicle>, ChargingProcess> queuedVehicles = new HashMap<>();
+	//private final Map<Id<Vehicle>, ChargingProcess> queuedVehicles = new HashMap<>();
+
+	private final Map<Id<Person>, MobsimAgent> personsAtCharger = new HashMap<>();
+	private final Set<Id<Vehicle>> queuedVehicles = new HashSet<>();
 
 	private final WithinDayChargingStrategy.Factory chargingStrategyFactory;
 	private final ActivityEngine delegateEngine;
@@ -127,10 +130,10 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		var plan = ((HasModifiablePlan) agent).getModifiablePlan();
 
 		if (process != null && process.isFirstAttempt()) {
+			var ev = electricFleet.getVehicle(process.vehicleId);
 			ChargingAlternative alternative = alternativeProvider.findEnrouteAlternative(time,
 				plan.getPerson(),
-				plan,
-				process.ev, process.currentSlot);
+				plan, ev, process.currentSlot);
 
 			if (alternative != null) {
 				if (process.currentSlot.isLegBased() && !alternative.isLegBased()) {
@@ -142,7 +145,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 					Activity followingPlugActivity = findFollowingPlugActivity(agent);
 
 					// drive to different charger and schedule a plug activity
-					Activity plugActivity = chargingScheduler.changePlugActivity(process.agent,
+					Activity plugActivity = chargingScheduler.changePlugActivity(agent,
 						followingPlugActivity, alternative.charger(),
 						time);
 					plugActivity.getAttributes().putAttribute(CHARGING_PROCESS_ATTRIBUTE, process);
@@ -154,8 +157,8 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 						alternative.charger());
 
 					// send event for scoring
-					em.processEvent(new UpdateChargingAttemptEvent(time, process.agent.getId(),
-						process.ev.getId(), alternative.charger().getId(),
+					em.processEvent(new UpdateChargingAttemptEvent(time, agent.getId(),
+						process.vehicleId, alternative.charger().getId(),
 						alternative.isLegBased(), alternative.duration()));
 				} else if (alternative.duration() != process.currentSlot.duration()) {
 					// update slot with custom duration (either switch between leg- and
@@ -166,8 +169,8 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 						process.currentSlot.charger());
 
 					// send event for scoring
-					em.processEvent(new UpdateChargingAttemptEvent(time, process.agent.getId(),
-						process.ev.getId(), alternative.charger().getId(),
+					em.processEvent(new UpdateChargingAttemptEvent(time, agent.getId(),
+						process.vehicleId, alternative.charger().getId(),
 						alternative.isLegBased(), alternative.duration()));
 				}
 			}
@@ -210,11 +213,12 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		var process = getChargingProcessForPlugActivity(agent, activity, isSpontaneous);
 		process.isPersonAtCharger = true;
 
+
 		// we know that the process takes place at a charger on this partition. So, we can cache
 		// the process in our bookeeping instead of the activity attributes.
-		vehiclesToProcess.put(process.ev.getId(), process);
+		personsAtCharger.put(agent.getId(), agent);
+		vehiclesToProcess.put(process.vehicleId, process);
 		personsToProcess.put(agent.getId(), process);
-
 
 		submitToCharger(agent, process);
 		if (!delegateEngine.handleActivity(agent)) {
@@ -227,23 +231,45 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 		var now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		var process = personsToProcess.remove(agent.getId());
+		personsAtCharger.remove(agent.getId());
 		// vehicle to process is removed in notify charging ended
 
 		if (process.isPlugged) {
 			var chargingLogic = process.currentSlot.charger().getLogic();
-			chargingLogic.removeVehicle(process.ev, now);
+			var ev = electricFleet.getVehicle(process.vehicleId);
+			chargingLogic.removeVehicle(ev, now);
 			process.isPlugged = false;
 		}
 
 		activity.setEndTime(now);
-		WithinDayAgentUtils.resetCaches(process.agent);
+		WithinDayAgentUtils.resetCaches(agent);
 
-		chargingScheduler.scheduleDriveToNextActivity(process.agent);
-
-		em
-			.processEvent(new FinishChargingAttemptEvent(now, process.agent.getId(), process.ev.getId()));
-		em
-			.processEvent(new FinishChargingProcessEvent(now, process.agent.getId(), process.ev.getId()));
+		// in the case of an overnight or wholeday charging, it can happen that the process was aborted
+		// since the agent is not at the charger when this happens; the agent only finds out when it
+		// arrives for the unplug activity. It either aborts, or we switch the unplug actitiy into an
+		// access activity. Otherwise, we figure out how to drive to the next acvitity and dispatch some
+		// events. In any case we let the delegate activity engine handle the upcoming activity.
+		if (process.isAborted) {
+			var time = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+			if (performAbort) {
+				process.currentSlot.endActivity().setEndTime(Double.POSITIVE_INFINITY);
+				WithinDayAgentUtils.resetCaches(agent);
+				delegateEngine.rescheduleActivityEnd(agent);
+				agent.setStateToAbort(time);
+				// the dosimstep of the delegate engine will handle the rest
+			} else if (process.isOvernight) {
+				chargingScheduler.replaceUnplugWithAccessAfterOvernightCharge(agent,
+					activity,
+					process.currentSlot.charger(), time);
+				WithinDayAgentUtils.resetCaches(agent);
+			}
+		} else {
+			chargingScheduler.scheduleDriveToNextActivity(agent);
+			em
+				.processEvent(new FinishChargingAttemptEvent(now, agent.getId(), process.vehicleId));
+			em
+				.processEvent(new FinishChargingProcessEvent(now, agent.getId(), process.vehicleId));
+		}
 
 		return delegateEngine.handleActivity(agent);
 	}
@@ -257,7 +283,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 	public void notifyVehicleQueued(ElectricVehicle ev, double now) {
 		var process = vehiclesToProcess.get(ev.getId());
 		process.isQueued = true;
-		queuedVehicles.put(ev.getId(), process);
+		queuedVehicles.add(ev.getId());
 	}
 
 	@Override
@@ -268,23 +294,25 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		process.isPlugged = true;
 
 		// in case of overnight charging, persons can be somewhere else.
-		if (process.isOvernight) {
-			chargingScheduler.scheduleUnplugActivityAfterOvernightCharge(process.agent, process.currentSlot.endActivity(), process.currentSlot.charger());
-		} else if (process.isPersonAtCharger) {
-			var plugActivity = (Activity) ((PlanAgent) process.agent).getCurrentPlanElement();
+//		if (process.isOvernight) {
+//			chargingScheduler.scheduleUnplugActivityAfterOvernightCharge(agent, process.currentSlot.endActivity(), process.currentSlot.charger());
+//		} else
+		if (process.isPersonAtCharger) {
+			var agent = personsAtCharger.get(process.personId);
+			var plugActivity = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
 
 			// end activity
 			plugActivity.setEndTime(now);
-			WithinDayAgentUtils.resetCaches(process.agent);
-			delegateEngine.rescheduleActivityEnd(process.agent);
+			WithinDayAgentUtils.resetCaches(agent);
+			delegateEngine.rescheduleActivityEnd(agent);
 
 			if (process.currentSlot.isLegBased()) {
 				// schedule unplug at the charger then continue to main activity
-				chargingScheduler.scheduleUnplugActivityAtCharger(process.agent,
+				chargingScheduler.scheduleUnplugActivityAtCharger(agent,
 					process.currentSlot.duration());
 			} else {
 				// walk to main activity, perform it, walk back to charger and unplug
-				chargingScheduler.scheduleUntilUnplugActivity(process.agent,
+				chargingScheduler.scheduleUntilUnplugActivity(agent,
 					process.currentSlot.startActivity(),
 					process.currentSlot.endActivity());
 			}
@@ -301,7 +329,8 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 	@Override
 	public void notifyVehicleQuitChargerQueue(ElectricVehicle ev, double now) {
-		var process = queuedVehicles.remove(ev.getId());
+		queuedVehicles.remove(ev.getId());
+		var process = vehiclesToProcess.get(ev.getId());
 		process.isQueued = false;
 	}
 
@@ -410,13 +439,13 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 	}
 
 	private ChargingProcess getChargingProcessForLeg(MobsimAgent agent) {
-		var plugActivity = findFollowingPlugActivity(agent);
+		var plugActivity = findFollowingPlugActivity(agent, PLUG_ACTIVITY_TYPE);
 		if (plugActivity != null)
 			return getChargingProcessForPlugActivity(agent, plugActivity, false);
 		else return null;
 	}
 
-	private Activity findFollowingPlugActivity(MobsimAgent agent) {
+	private Activity findFollowingPlugActivity(MobsimAgent agent, String actType) {
 
 		var pa = (PlanAgent) agent;
 		var currentElement = pa.getCurrentPlanElement();
@@ -428,7 +457,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 			.filter(e -> e instanceof Activity)
 			.map(e -> (Activity) e)
 			.takeWhile(a -> !TripStructureUtils.isStageActivityType(a.getType()) || isManagedActivityType(a.getType()))
-			.filter(a -> a.getType().equals(PLUG_ACTIVITY_TYPE))
+			.filter(a -> a.getType().equals(actType))
 			.findFirst()
 			.orElse(null);
 	}
@@ -439,11 +468,10 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		var plan = ((HasModifiablePlan) agent).getModifiablePlan();
 		Person person = plan.getPerson();
 		Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, chargingMode);
-		ElectricVehicle vehicle = electricFleet.getVehicle(vehicleId);
 
 		ChargingProcess process = new ChargingProcess();
-		process.agent = agent;
-		process.ev = vehicle;
+		process.personId = agent.getId();
+		process.vehicleId = vehicleId;
 		process.currentSlot = slot;
 		process.initialSlot = slot;
 
@@ -475,10 +503,11 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		endActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
 
 		ChargingProcess process = createChargingProcess(agent, slot, null, false);
+		personsToProcess.put(agent.getId(), process);
+		vehiclesToProcess.put(process.vehicleId, process);
 		process.isOvernight = true;
-		submitToCharger(agent, process);
 
-		// Handle end time from here
+		submitToCharger(agent, process);
 
 		OptionalTime endTime = timeInterpretation.decideOnActivityEndTimeAlongPlan(endActivity, WithinDayAgentUtils.getModifiablePlan(agent));
 		Preconditions.checkState(endTime.isDefined());
@@ -488,13 +517,13 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 		WithinDayAgentUtils.resetCaches(agent);
 
-		//chargingScheduler.scheduleUnplugActivityAfterOvernightCharge(agent, endActivity, process.currentSlot.charger());
+		chargingScheduler.scheduleUnplugActivityAfterOvernightCharge(agent, endActivity, process.currentSlot.charger());
 	}
 
 	private void submitToCharger(MobsimAgent agent, ChargingProcess process) {
 
 		var spec = process.currentSlot.charger().getSpecification();
-		var ev = process.ev;
+		var ev = electricFleet.getVehicle(process.vehicleId);
 		var strategy = chargingStrategyFactory.createStrategy(spec, ev);
 		var chargingLogic = process.currentSlot.charger().getLogic();
 		var now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
@@ -534,14 +563,14 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		var vehicle = parkedVehicles.unpark(ev.getId(), startLinkId);
 
 		if (partitionTransfer.isLocal(startLinkId)) {
-			var simLink = simNetwork.getLinks().get(startLinkId);
+			var simLink = simNetwork.getLinks().get(slot.charger().getLink().getId());
 			parkedVehicles.park(vehicle, simLink);
 		} else {
 			// send charging process and vehicle to other partition
 			// Will this work? I guess the vehicle will only arrive one second after we schedule its sending.
 			// However, this method should usually be called when agents are put into activity engines before the simulation
 			// starts.
-			var msg = new InitialVehicleLocationMessage(vehicle, startLinkId);
+			var msg = new InitialVehicleLocationMessage(vehicle, startLinkId, );
 			partitionTransfer.collect(msg, startLinkId);
 		}
 	}
@@ -579,51 +608,33 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 	@Override
 	public void doSimStep(double time) {
 		// check queued vehicles
-		for (var process : queuedVehicles.values()) {
+		for (var id : queuedVehicles) {
+			var process = vehiclesToProcess.get(id);
 			if (process.latestPlugTime >= time) continue;
 
 			var chargingLogic = process.currentSlot.charger().getLogic();
-			chargingLogic.removeVehicle(process.ev, time);
-			em.processEvent(new AbortChargingAttemptEvent(time, process.agent.getId(), process.ev.getId()));
+			var ev = electricFleet.getVehicle(process.vehicleId);
+			var agent = personsAtCharger.get(process.personId);
+
+			chargingLogic.removeVehicle(ev, time);
+			em.processEvent(new AbortChargingAttemptEvent(time, process.personId, process.vehicleId));
 
 			if (process.isWholeDay || process.isOvernight) {
+				// notify that we abort the charging process. Mark the process as aborted so that the
+				// agent can figure out what to do once it arrives for the unplug activity
 				em.processEvent(
-					new AbortChargingProcessEvent(time, process.agent.getId(), process.ev.getId()));
-
-				if (performAbort) {
-					process.currentSlot.endActivity().setEndTime(Double.POSITIVE_INFINITY);
-					WithinDayAgentUtils.resetCaches(process.agent);
-					delegateEngine.rescheduleActivityEnd(process.agent);
-					process.agent.setStateToAbort(time);
-					// the dosimstep of the delegate engine will handle the rest
-				} else if (process.isOvernight) {
-					Activity endActivity = process.currentSlot.endActivity();
-					double initialEndTime = (Double) endActivity.getAttributes()
-						.getAttribute(INITIAL_ACTIVITY_END_TIME_ATTRIBUTE);
-
-					// end current plug activity
-					endActivity.setEndTime(Math.max(time, initialEndTime));
-					WithinDayAgentUtils.resetCaches(process.agent);
-
-					// i think we only need to reschedule when the person is at the charger.
-					if (process.isPersonAtCharger) {
-						delegateEngine.rescheduleActivityEnd(process.agent);
-					}
-
-					chargingScheduler.scheduleAccessAfterOvernightCharge(process.agent,
-						process.currentSlot.endActivity(),
-						process.currentSlot.charger());
-				}
+					new AbortChargingProcessEvent(time, process.personId, process.vehicleId));
+				process.isAborted = true;
 			} else {
 				// TODO add the standard case here.
-				var pa = (PlanAgent) process.agent;
+				var pa = (PlanAgent) agent;
 				var plugActivity = (Activity) pa.getCurrentPlanElement();
 				var plan = pa.getCurrentPlan();
 
 				process.attemptIndex++;
 
 				var alternative = alternativeProvider.findAlternative(
-					time, plan.getPerson(), plan, process.ev, process.initialSlot, process.trace);
+					time, plan.getPerson(), plan, ev, process.initialSlot, process.trace);
 
 				if (alternative != null) {
 					// found an alternative charger
@@ -634,11 +645,11 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 					// end current plug activity
 					plugActivity.setEndTime(time);
-					WithinDayAgentUtils.resetCaches(process.agent);
-					delegateEngine.rescheduleActivityEnd(process.agent);
+					WithinDayAgentUtils.resetCaches(agent);
+					delegateEngine.rescheduleActivityEnd(agent);
 
 					// drive to the next charger and schedule a plug activity
-					plugActivity = chargingScheduler.scheduleSubsequentPlugActivity(process.agent,
+					plugActivity = chargingScheduler.scheduleSubsequentPlugActivity(agent,
 						plugActivity, alternative.charger(), time);
 					plugActivity.getAttributes().putAttribute(CHARGING_PROCESS_ATTRIBUTE, process);
 
@@ -654,36 +665,37 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 					// send event for scoring
 					em.processEvent(
-						new StartChargingAttemptEvent(time, process.agent.getId(), process.ev.getId(),
+						new StartChargingAttemptEvent(time, process.personId, process.vehicleId,
 							alternative.charger().getId(), process.attemptIndex, process.processIndex,
 							alternative.isLegBased(), false, alternative.duration()));
 				} else {
 					// send event for scoring
 					em.processEvent(
-						new AbortChargingProcessEvent(time, process.agent.getId(), process.ev.getId()));
+						new AbortChargingProcessEvent(time, process.personId, process.vehicleId));
 
 					if (performAbort) {
 						// we abort the agent
 						plugActivity.setEndTime(Double.POSITIVE_INFINITY);
-						WithinDayAgentUtils.resetCaches(process.agent);
-						delegateEngine.rescheduleActivityEnd(process.agent);
+						WithinDayAgentUtils.resetCaches(agent);
+						delegateEngine.rescheduleActivityEnd(agent);
 
-						process.agent.setStateToAbort(time);
-						internalInterface.arrangeNextAgentState(process.agent);
+						agent.setStateToAbort(time);
+						internalInterface.arrangeNextAgentState(agent);
 					} else {
 						// end current plug activity
 						plugActivity.setEndTime(time);
-						WithinDayAgentUtils.resetCaches(process.agent);
-						delegateEngine.rescheduleActivityEnd(process.agent);
+						WithinDayAgentUtils.resetCaches(agent);
+						delegateEngine.rescheduleActivityEnd(agent);
 
-						chargingScheduler.scheduleDriveToNextActivity(process.agent);
+						chargingScheduler.scheduleDriveToNextActivity(agent);
 					}
 				}
-			}
 
-			// make sure the bookkeeping is cleared
-			personsToProcess.remove(process.agent.getId());
-			vehiclesToProcess.remove(process.ev.getId());
+
+				// make sure the bookkeeping is cleared
+				personsToProcess.remove(process.personId);
+				vehiclesToProcess.remove(process.vehicleId);
+			}
 		}
 
 		delegateEngine.doSimStep(time);
@@ -709,8 +721,8 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		if (process == null) return;
 
 		var msg = new ChargingProcessMessage(
-			process.agent.getId(),
-			process.ev.getId(),
+			process.personId,
+			process.vehicleId,
 			process.attemptIndex,
 			process.latestPlugTime,
 			process.initialSlot,
@@ -744,13 +756,36 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 	@Override
 	public void onAgentEntersPartition(DistributedMobsimAgent agent) {
+		var process = personsToProcess.get(agent.getId());
 
+		if (process != null && process.isAborted && process.isOvernight) {
+			// SAFETY: We only store processes for plan agents
+			var pa = (PlanAgent) agent;
+			// SAFETY: Agents can only change partitions during legs. (I hope)
+			var nextActivity = nextActivity(pa);
+			var now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+			if (nextActivity.getType().equals(UNPLUG_ACTIVITY_TYPE)) {
+				chargingScheduler.replaceUnplugWithAccessAfterOvernightCharge(agent, nextActivity, process.currentSlot.charger(), now);
+			}
+		}
+	}
+
+	private Activity nextActivity(PlanAgent pa) {
+		var ce = pa.getCurrentPlanElement();
+		var cei = pa.getCurrentPlan().getPlanElements().indexOf(ce);
+		for (var e : pa.getCurrentPlan().getPlanElements().subList(cei + 1, pa.getCurrentPlan().getPlanElements().size())) {
+			if (e instanceof Activity a) {
+				return a;
+			}
+		}
+		return null;
 	}
 
 
 	private static class ChargingProcess {
-		MobsimAgent agent;
-		ElectricVehicle ev;
+
+		Id<Person> personId;
+		Id<Vehicle> vehicleId;
 
 		// search process
 		int attemptIndex = 0;
@@ -769,6 +804,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		boolean isQueued = false;
 		boolean isPlugged = false;
 		boolean isPersonAtCharger = false;
+		public boolean isAborted = false;
 
 		// markers for special cases
 		boolean isOvernight = false;
@@ -777,7 +813,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		boolean isFirstAttempt() {return attemptIndex == 0;}
 	}
 
-	public record InitialVehicleLocationMessage(DistributedMobsimVehicle vehicle, Id<Link> startLinkId) implements Message {}
+	public record InitialVehicleLocationMessage(DistributedMobsimVehicle vehicle, Id<Link> startLinkId, ChargingProcess process) implements Message {}
 
 	private class InternalInterfaceDelegate implements InternalInterface {
 
@@ -791,6 +827,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 			// TODO update bookeeping when agent finishes activity
 
 			// person is leaving the activity. However, the vehicle might still charge.
+			personsAtCharger.remove(agent.getId());
 			var process = personsToProcess.get(agent.getId());
 			if (process != null) {
 				process.isPersonAtCharger = false;

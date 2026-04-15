@@ -58,6 +58,7 @@ public class WithinDayEvTest3 {
 			.addActivity("home", 0, 0, 10.0 * 3600.0) //
 			.addActivity("work", 8, 8, 18.0 * 3600.0) //
 			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
 			.build();
 
 		Controler controller = scenario.controller();
@@ -124,6 +125,8 @@ public class WithinDayEvTest3 {
 			.addActivity("home", 0, 0, 10.0 * 3600.0) //
 			.addActivity("work", 8, 8, 18.0 * 3600.0) //
 			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
 			.build();
 
 		Controler controller = scenario.controller();
@@ -184,8 +187,6 @@ public class WithinDayEvTest3 {
 
 	@Test
 	public void testChargeAtFirstActivitySameLocation() {
-
-		var builder = new TestScenarioBuilder(utils);
 
 		TestScenarioBuilder.TestScenario scenario = new TestScenarioBuilder(utils) //
 			.addCharger("charger", 0, 0, 1, 1.0) // located at home
@@ -769,7 +770,7 @@ public class WithinDayEvTest3 {
 
 		// check arrival at home
 		assertEquals("home", scenario.tracker().activityStartEvents.getLast().getActType());
-		assertEquals(68366.0, scenario.tracker().activityStartEvents.getLast().getTime());
+		assertEquals(68365.0, scenario.tracker().activityStartEvents.getLast().getTime());
 
 		// check charging process
 		assertEquals(1, scenario.tracker().startChargingProcessEvents.size());
