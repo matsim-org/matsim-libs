@@ -50,10 +50,11 @@ import java.util.*;
  *     <li>bicycleAdditionalLinkScore for static bicycle link attributes such as infrastructure, comfort and gradient</li>
  *     <li>bicycleMotorizedInteractionScore for motorized interaction effects</li>
  * </ul>
- * Motorized interaction can currently be modeled in two ways:
+ * Motorized interaction can currently be modeled in three ways:
  * <ul>
  *     <li>carCountOnBicycleLeaveLink</li>
  *     <li>carsPassedBicycleOnLink</li>
+ *     <li>avgCarOccupancyDuringBicycleTraversal: average car occupancy on the same link during the bicycle traversal</li>
  * </ul>
  *
  * @author dziemke, vizsim
@@ -73,6 +74,7 @@ class BicycleScoreEventsCreator implements
 	private static final String BICYCLE_MOTORIZED_INTERACTION_SCORE = "bicycleMotorizedInteractionScore";
 	private static final double MARGINAL_UTILITY_OF_CAR_COUNT_ON_BICYCLE_LEAVE_LINK = -0.004;
 	private static final double MARGINAL_UTILITY_OF_CARS_PASSED_BICYCLE_ON_LINK = -0.004;
+	private static final double MARGINAL_UTILITY_OF_AVG_CAR_OCCUPANCY_DURING_BICYCLE_TRAVERSAL = -0.004;
 
 	private final Network network;
 	private final EventsManager eventsManager;
@@ -91,6 +93,12 @@ class BicycleScoreEventsCreator implements
 	// State for bicycleMotorizedInteractionScore: carCountOnBicycleLeaveLink
 	// -----------------------------------------------------------------------------
 	private final Map<String, Map<Id<Link>, Double>> numberOfVehiclesOnLinkByMode = new LinkedHashMap<>();
+
+	// -----------------------------------------------------------------------------
+	// State for bicycleMotorizedInteractionScore: avgCarOccupancyDuringBicycleTraversal
+	// -----------------------------------------------------------------------------
+	private final Map<Id<Vehicle>, BikeExposureInfo> bikeExposureInfoByVehicle = new LinkedHashMap<>();
+	private final Map<Id<Link>, Set<Id<Vehicle>>> activeBicyclesByLink = new LinkedHashMap<>();
 
 	// -----------------------------------------------------------------------------
 	// State for bicycleMotorizedInteractionScore: carsPassedBicycleOnLink
@@ -113,6 +121,8 @@ class BicycleScoreEventsCreator implements
 		firstLinkIdMap.clear();
 		modeFromVehicle.clear();
 		numberOfVehiclesOnLinkByMode.clear();
+		bikeExposureInfoByVehicle.clear();
+		activeBicyclesByLink.clear();
 		currentLinkEnterInfoByVehicle.clear();
 		finishedCarsByLink.clear();
 	}
@@ -142,6 +152,16 @@ class BicycleScoreEventsCreator implements
 				// This is important, otherwise the very first link would miss enterTime.
 				registerEnter(event.getVehicleId(), event.getLinkId(), event.getTime(), event.getNetworkMode());
 			}
+
+			if (this.bicycleConfig.isAvgCarOccupancyDuringBicycleTraversal()) {
+				// 3c. avgCarOccupancyDuringBicycleTraversal: update the old car occupancy interval before mutating it.
+				if (TransportMode.car.equals(event.getNetworkMode())) {
+					updateBikeExposureOnLink(event.getLinkId(), event.getTime());
+					incrementVehicleCountOnLink(TransportMode.car, event.getLinkId());
+				} else if (bicycleMode.equals(event.getNetworkMode())) {
+					registerBikeExposureEnter(event.getVehicleId(), event.getLinkId(), event.getTime());
+				}
+			}
 		}
 	}
 
@@ -165,6 +185,16 @@ class BicycleScoreEventsCreator implements
 				// 2. carsPassedBicycleOnLink: update current link enter information.
 				registerEnter(event.getVehicleId(), event.getLinkId(), event.getTime(), mode);
 			}
+
+			if (this.bicycleConfig.isAvgCarOccupancyDuringBicycleTraversal()) {
+				// 3. avgCarOccupancyDuringBicycleTraversal: update exposure before changing car occupancy.
+				if (TransportMode.car.equals(mode)) {
+					updateBikeExposureOnLink(event.getLinkId(), event.getTime());
+					incrementVehicleCountOnLink(TransportMode.car, event.getLinkId());
+				} else if (bicycleMode.equals(mode)) {
+					registerBikeExposureEnter(event.getVehicleId(), event.getLinkId(), event.getTime());
+				}
+			}
 		}
 	}
 
@@ -178,6 +208,12 @@ class BicycleScoreEventsCreator implements
 			numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
 			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
 			Gbl.assertIf(map.merge(event.getLinkId(), -1., Double::sum) >= 0.);
+		}
+
+		if (this.bicycleConfig.isAvgCarOccupancyDuringBicycleTraversal() && TransportMode.car.equals(mode)) {
+			// 1b. avgCarOccupancyDuringBicycleTraversal: update exposure before changing car occupancy.
+			updateBikeExposureOnLink(event.getLinkId(), event.getTime());
+			decrementVehicleCountOnLink(TransportMode.car, event.getLinkId());
 		}
 
 		if (vehicle2driver.getDriverOfVehicle(event.getVehicleId()) != null) {
@@ -217,6 +253,11 @@ class BicycleScoreEventsCreator implements
 			// 4. bicycleMotorizedInteractionScore: evaluate carsPassedBicycleOnLink.
 			registerLeave(event.getVehicleId(), event.getLinkId(), event.getTime(), mode);
 		}
+
+		if (this.bicycleConfig.isAvgCarOccupancyDuringBicycleTraversal() && bicycleMode.equals(mode)) {
+			// 5. bicycleMotorizedInteractionScore: evaluate avgCarOccupancyDuringBicycleTraversal.
+			registerBikeExposureLeave(event.getVehicleId(), event.getLinkId(), event.getTime());
+		}
 	}
 
 	@Override
@@ -229,6 +270,12 @@ class BicycleScoreEventsCreator implements
 			numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
 			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
 			Gbl.assertIf(map.merge(event.getLinkId(), -1., Double::sum) >= 0.);
+		}
+
+		if (this.bicycleConfig.isAvgCarOccupancyDuringBicycleTraversal() && TransportMode.car.equals(mode)) {
+			// 1b. avgCarOccupancyDuringBicycleTraversal: update exposure before changing car occupancy.
+			updateBikeExposureOnLink(event.getLinkId(), event.getTime());
+			decrementVehicleCountOnLink(TransportMode.car, event.getLinkId());
 		}
 
 		if (vehicle2driver.getDriverOfVehicle(event.getVehicleId()) != null) {
@@ -267,12 +314,165 @@ class BicycleScoreEventsCreator implements
 			registerLeave(event.getVehicleId(), event.getLinkId(), event.getTime(), mode);
 		}
 
-		// 4. Cleanup.
+		if (this.bicycleConfig.isAvgCarOccupancyDuringBicycleTraversal() && bicycleMode.equals(mode)) {
+			// 4. avgCarOccupancyDuringBicycleTraversal: treat VehicleLeavesTraffic like leaving the current link.
+			registerBikeExposureLeave(event.getVehicleId(), event.getLinkId(), event.getTime());
+		}
+
+		// 5. Cleanup.
 		// Needs to be called last, because it will remove driver information
 		vehicle2driver.handleEvent(event);
 		this.firstLinkIdMap.remove(event.getVehicleId());
 		this.modeFromVehicle.remove(event.getVehicleId());
+		cleanupBikeExposureState(event.getVehicleId());
 		this.currentLinkEnterInfoByVehicle.remove(event.getVehicleId());
+	}
+
+	private void registerBikeExposureEnter(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
+		cleanupBikeExposureState(vehicleId);
+		this.bikeExposureInfoByVehicle.put(vehicleId, new BikeExposureInfo(linkId, time, time, 0.));
+		this.activeBicyclesByLink.computeIfAbsent(linkId, ignored -> new LinkedHashSet<>()).add(vehicleId);
+	}
+
+	private void updateBikeExposureOnLink(Id<Link> linkId, double time) {
+		Set<Id<Vehicle>> activeBicycles = this.activeBicyclesByLink.get(linkId);
+		if (activeBicycles == null || activeBicycles.isEmpty()) {
+			return;
+		}
+
+		double currentCarCount = getVehicleCountOnLink(TransportMode.car, linkId);
+		for (Iterator<Id<Vehicle>> iterator = activeBicycles.iterator(); iterator.hasNext(); ) {
+			Id<Vehicle> vehicleId = iterator.next();
+			BikeExposureInfo bikeExposureInfo = this.bikeExposureInfoByVehicle.get(vehicleId);
+			if (bikeExposureInfo == null || !Objects.equals(bikeExposureInfo.linkId, linkId)) {
+				iterator.remove();
+				continue;
+			}
+
+			double dt = time - bikeExposureInfo.lastUpdateTime;
+			if (dt > 0.) {
+				bikeExposureInfo.accumulatedCarSeconds += currentCarCount * dt;
+				bikeExposureInfo.lastUpdateTime = time;
+			}
+		}
+
+		if (activeBicycles.isEmpty()) {
+			this.activeBicyclesByLink.remove(linkId);
+		}
+	}
+
+	private void registerBikeExposureLeave(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
+		BikeExposureInfo bikeExposureInfo = this.bikeExposureInfoByVehicle.get(vehicleId);
+		if (bikeExposureInfo == null) {
+			return;
+		}
+		if (!Objects.equals(bikeExposureInfo.linkId, linkId)) {
+			cleanupBikeExposureState(vehicleId);
+			return;
+		}
+
+		double currentCarCount = getVehicleCountOnLink(TransportMode.car, linkId);
+		double dt = time - bikeExposureInfo.lastUpdateTime;
+		if (dt > 0.) {
+			bikeExposureInfo.accumulatedCarSeconds += currentCarCount * dt;
+			bikeExposureInfo.lastUpdateTime = time;
+		}
+
+		double travelTime = time - bikeExposureInfo.enterTime;
+		if (travelTime <= 0.) {
+			cleanupBikeExposureState(vehicleId);
+			return;
+		}
+
+		double avgCarOccupancy = bikeExposureInfo.accumulatedCarSeconds / travelTime;
+		if (avgCarOccupancy > 0.) {
+			Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle(vehicleId);
+			if (driverOfVehicle != null) {
+				this.eventsManager.processEvent(new PersonScoreEvent(
+					time,
+					driverOfVehicle,
+					MARGINAL_UTILITY_OF_AVG_CAR_OCCUPANCY_DURING_BICYCLE_TRAVERSAL * avgCarOccupancy,
+					BICYCLE_MOTORIZED_INTERACTION_SCORE
+				));
+			}
+		}
+
+		cleanupBikeExposureState(vehicleId);
+	}
+
+	private void cleanupBikeExposureState(Id<Vehicle> vehicleId) {
+		BikeExposureInfo bikeExposureInfo = this.bikeExposureInfoByVehicle.remove(vehicleId);
+		if (bikeExposureInfo == null) {
+			return;
+		}
+
+		Set<Id<Vehicle>> activeBicycles = this.activeBicyclesByLink.get(bikeExposureInfo.linkId);
+		if (activeBicycles == null) {
+			return;
+		}
+
+		activeBicycles.remove(vehicleId);
+		if (activeBicycles.isEmpty()) {
+			this.activeBicyclesByLink.remove(bikeExposureInfo.linkId);
+		}
+	}
+
+	private void incrementVehicleCountOnLink(String mode, Id<Link> linkId) {
+		this.numberOfVehiclesOnLinkByMode.computeIfAbsent(mode, ignored -> new LinkedHashMap<>())
+			.merge(linkId, 1., Double::sum);
+	}
+
+	private void decrementVehicleCountOnLink(String mode, Id<Link> linkId) {
+		Map<Id<Link>, Double> vehicleCounts = this.numberOfVehiclesOnLinkByMode.get(mode);
+		if (vehicleCounts == null) {
+			return;
+		}
+
+		double currentCount = vehicleCounts.getOrDefault(linkId, 0.);
+		if (currentCount <= 1.) {
+			vehicleCounts.remove(linkId);
+		} else {
+			vehicleCounts.put(linkId, currentCount - 1.);
+		}
+
+		if (vehicleCounts.isEmpty()) {
+			this.numberOfVehiclesOnLinkByMode.remove(mode);
+		}
+	}
+
+	private double getVehicleCountOnLink(String mode, Id<Link> linkId) {
+		Map<Id<Link>, Double> vehicleCounts = this.numberOfVehiclesOnLinkByMode.get(mode);
+		if (vehicleCounts == null) {
+			return 0.;
+		}
+		return vehicleCounts.getOrDefault(linkId, 0.);
+	}
+
+	// -----------------------------------------------------------------------------
+	// Support for bicycleMotorizedInteractionScore: avgCarOccupancyDuringBicycleTraversal
+	// -----------------------------------------------------------------------------
+
+	// TODO test avgCarOccupancyDuringBicycleTraversal:
+	// - no cars on link
+	// - constant one-car occupancy
+	// - occupancy change during bike traversal
+	// - bike travel time zero
+	// - multiple bikes on same link
+	// - car enters/leaves at same second as bike events
+	// - VehicleLeavesTraffic on final link
+
+	private static final class BikeExposureInfo {
+		final Id<Link> linkId;
+		final double enterTime;
+		double lastUpdateTime;
+		double accumulatedCarSeconds;
+
+		private BikeExposureInfo(Id<Link> linkId, double enterTime, double lastUpdateTime, double accumulatedCarSeconds) {
+			this.linkId = linkId;
+			this.enterTime = enterTime;
+			this.lastUpdateTime = lastUpdateTime;
+			this.accumulatedCarSeconds = accumulatedCarSeconds;
+		}
 	}
 
 	// -----------------------------------------------------------------------------

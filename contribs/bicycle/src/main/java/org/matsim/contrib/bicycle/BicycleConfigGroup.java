@@ -32,7 +32,8 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	public enum MotorizedInteraction {
 		NONE("none"),
 		CAR_COUNT_ON_BICYCLE_LEAVE_LINK("carCountOnBicycleLeaveLink"),
-		CARS_PASSED_BICYCLE_ON_LINK("carsPassedBicycleOnLink");
+		CARS_PASSED_BICYCLE_ON_LINK("carsPassedBicycleOnLink"),
+		AVG_CAR_OCCUPANCY_DURING_BICYCLE_TRAVERSAL("avgCarOccupancyDuringBicycleTraversal");
 
 		private final String configValue;
 
@@ -54,7 +55,8 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 				"Unsupported motorizedInteraction: " + configValue
 					+ ". Supported values are '" + NONE.configValue
 					+ "', '" + CAR_COUNT_ON_BICYCLE_LEAVE_LINK.configValue
-					+ "' and '" + CARS_PASSED_BICYCLE_ON_LINK.configValue + "'."
+					+ "', '" + CARS_PASSED_BICYCLE_ON_LINK.configValue
+					+ "' and '" + AVG_CAR_OCCUPANCY_DURING_BICYCLE_TRAVERSAL.configValue + "'."
 			);
 		}
 	}
@@ -86,7 +88,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		map.put(INPUT_INFRASTRUCTURE, "marginalUtilityOfStreettype"); //TODO: update these comments, whats does it?
 		map.put(INPUT_GRADIENT, "marginalUtilityOfGradient"); //TODO: update these comments, whats does it?
 		map.put(MOTORIZED_INTERACTION,
-			"Defines the motorized interaction behavior. Possible values [none, carCountOnBicycleLeaveLink, carsPassedBicycleOnLink]. "
+			"Defines the motorized interaction behavior. Possible values [none, carCountOnBicycleLeaveLink, carsPassedBicycleOnLink, avgCarOccupancyDuringBicycleTraversal]. "
 				+ "Default: none.");
 		map.put(BICYCLE_INFRA_ATTRIBUTE,
 			"Network attribute used for bicycle infrastructure evaluation. "
@@ -190,6 +192,10 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 
 	public boolean isCarsPassedBicycleOnLink() {
 		return this.motorizedInteraction == MotorizedInteraction.CARS_PASSED_BICYCLE_ON_LINK;
+	}
+
+	public boolean isAvgCarOccupancyDuringBicycleTraversal() {
+		return this.motorizedInteraction == MotorizedInteraction.AVG_CAR_OCCUPANCY_DURING_BICYCLE_TRAVERSAL;
 	}
 
 	@StringSetter(MOTORIZED_INTERACTION)
