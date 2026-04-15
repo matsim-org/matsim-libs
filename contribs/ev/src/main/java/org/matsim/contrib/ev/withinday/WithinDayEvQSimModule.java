@@ -13,7 +13,7 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -34,8 +34,12 @@ public class WithinDayEvQSimModule extends AbstractQSimModule {
 	protected void configureQSim() {
 		WithinDayEvConfigGroup config = WithinDayEvConfigGroup.get(getConfig());
 
-		addQSimComponentBinding(EvModule.EV_COMPONENT).to(WithinDayEvEngine.class);
-		addMobsimScopeEventHandlerBinding().to(WithinDayEvEngine.class);
+		if (getConfig().controller().getMobsim().equals("dsim")) {
+			addQSimComponentBinding(EvModule.EV_COMPONENT).to(WithinDayEvEngine3.class);
+		} else {
+			addQSimComponentBinding(EvModule.EV_COMPONENT).to(WithinDayEvEngine.class);
+			addMobsimScopeEventHandlerBinding().to(WithinDayEvEngine.class);
+		}
 
 		bind(Key.get(RoutingModule.class, Names.named(ROAD_MODE_BINDING)))
 			.to(Key.get(RoutingModule.class, Names.named(config.getCarMode())));
@@ -48,13 +52,13 @@ public class WithinDayEvQSimModule extends AbstractQSimModule {
 
 	@Provides
 	@Singleton
-	WithinDayEvEngine provideEvPlanningEngine(QSim qsim, TimeInterpretation timeInterpretation, ElectricFleet electricFleet,
+	WithinDayEvEngine provideEvPlanningEngine(Netsim netsim, TimeInterpretation timeInterpretation, ElectricFleet electricFleet,
 	                                          ChargingAlternativeProvider alternativeProvider, ChargingSlotProvider slotProvider,
 	                                          EventsManager eventsManager,
 	                                          ChargingScheduler chargingScheduler, WithinDayEvConfigGroup config, Vehicles vehicles,
 	                                          QVehicleFactory qVehicleFactory, Scenario scenario,
 	                                          WithinDayChargingStrategy.Factory chargingStrategyFactory) {
-		return new WithinDayEvEngine(config, qsim, timeInterpretation, electricFleet, alternativeProvider, slotProvider,
+		return new WithinDayEvEngine(config, netsim, timeInterpretation, electricFleet, alternativeProvider, slotProvider,
 			eventsManager, chargingScheduler, vehicles, qVehicleFactory, scenario, chargingStrategyFactory);
 	}
 

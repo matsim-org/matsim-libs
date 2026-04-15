@@ -75,8 +75,8 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 						var allChargers = ChargingInfrastructureUtils.createChargingInfrastructure(
 							chargingInfrastructureSpecification,
 							network.getLinks()::get, chargingLogicFactory);
-						var filtered = ChargingInfrastructureUtils.filterChargers(allChargers, c -> networkPartition.containsLink(c.getLink().getId()));
-						return filtered;
+						//var filtered = ChargingInfrastructureUtils.filterChargers(allChargers, c -> networkPartition.containsLink(c.getLink().getId()));
+						return allChargers;
 					}
 				}).asEagerSingleton();
 			}
@@ -86,7 +86,7 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 	@Provides
 	@Singleton
 	ChargerWriterListener provideChargerWriterListener(ChargingInfrastructureSpecification infrastructure,
-													   OutputDirectoryHierarchy outputDirectoryHierarchy) {
+	                                                   OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		EvConfigGroup evConfig = EvConfigGroup.get(getConfig());
 		return new ChargerWriterListener(infrastructure, outputDirectoryHierarchy, evConfig.getWriteChargersInterval(),
 			getConfig().controller().getCompressionType());
