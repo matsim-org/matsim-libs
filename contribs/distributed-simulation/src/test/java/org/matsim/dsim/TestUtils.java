@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.dsim.simulation.SimpleAgent;
 import org.matsim.dsim.simulation.SimpleVehicle;
 import org.matsim.dsim.simulation.net.SimLink;
@@ -26,14 +27,16 @@ public class TestUtils {
 
 	public static SimLink createLink(Link link, int part) {
 		var defaultDSimConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
-		return createLink(link, defaultDSimConfig, part);
+		return createLink(link, defaultDSimConfig, mock(PartitionTransfer.class), part);
 	}
 
 	public static SimLink createLink(Link link, DSimConfigGroup config, int part) {
+		return createLink(link, config, mock(PartitionTransfer.class), part);
+	}
+
+	public static SimLink createLink(Link link, DSimConfigGroup config, PartitionTransfer partitionTransfer, int part) {
 		var simNode = new SimNode(link.getToNode().getId());
-		return SimLink.create(link, simNode, config, 7.5, part, x -> {
-		}, x -> {
-		});
+		return SimLink.create(link, simNode, config, 7.5, part, _ -> {}, _ -> {}, partitionTransfer);
 	}
 
 	public static Link createSingleLink() {
@@ -112,10 +115,6 @@ public class TestUtils {
 		var result = new SimpleAgent();
 		result.setId(Id.createPersonId(id));
 		return result;
-	}
-
-	public static SimpleVehicle createVehicle() {
-		return createVehicle("vehicle", 1, 50);
 	}
 
 	public static SimpleVehicle createVehicle(String id, double pce, double maxV) {

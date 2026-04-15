@@ -59,6 +59,9 @@ public final class Injector {
 	}
 
 	public static com.google.inject.Injector createInjector(final Config config, final ExecutionContext ctx, Module... modules) {
+		// A MATSim module needs the config at configuration time in order to decide what
+		// features to provide. So we create a bootstrapInjector which already has the config
+		// and provides it to the MATSim modules:
 		com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
 			@Override
 			public void configure(Binder binder) {
@@ -68,9 +71,6 @@ public final class Injector {
 				binder.bind(ComputeNode.class).toInstance(ctx.getComputeNode());
 			}
 		});
-		// A MATSim module needs the config at configuration time in order to decide what
-		// features to provide. So we create a bootstrapInjector which already has the config
-		// and provides it to the MATSim modules.
 		List<com.google.inject.Module> guiceModules = new ArrayList<>();
 		for (Module module : modules) {
 			bootstrapInjector.injectMembers(module);
@@ -162,6 +162,54 @@ public final class Injector {
 
 		return Injector.createInjector(config, theModules.toArray(new Module[0]));
 	}
+
+	// If one cannot override the above, then for everything that needs overriding (e.g. income dep scoring fct) one needs to
+	// construct a full controller.  In general, guice allows the overriding of Modules before the injector is created.  However,
+	// with MATSim we need the bootstrap injector at an even earlier phase.  The following is an early attempt, but I don't think it quite works yet.
+
+	public final static class InjectorBuilder {
+		private final Config config;
+		// yy In the following, I do not fully understand when it should be matsim.AbstractModule, and when Module is enough.  kai, nov'25
+		List<AbstractModule> modules = new ArrayList<>();
+		AbstractModule overridingModule = AbstractModule.emptyModule();
+		private Scenario scenario;
+		public InjectorBuilder( Config config ) {
+			this.config = config;
+		}
+		public InjectorBuilder( Scenario scenario ) {
+			this.scenario = scenario;
+			this.config = this.scenario.getConfig();
+		}
+		public com.google.inject.Injector build() {
+			AbstractModule nearlyFinalModule = AbstractModule.override( modules, overridingModule );
+			return createInjector( config, nearlyFinalModule );
+		}
+
+		public InjectorBuilder addStandardModules( ) {
+			// the ScenarioByInstanceModule works with scenario=null so we allow it here as well. kai, nov'25
+			modules.add(new AbstractModule() {
+				@Override public void install() {
+					install(new NewControlerModule());
+					install(new ControlerDefaultCoreListenersModule());
+					install(new ControlerDefaultsModule());
+					install(new ScenarioByInstanceModule(scenario));
+				}
+			});
+			return this;
+		}
+		public InjectorBuilder addOverridingModule( AbstractModule newOverridingModule ) {
+			this.overridingModule = AbstractModule.override(Collections.singletonList(this.overridingModule ), newOverridingModule );
+			// I think that this can be used as we go, since it combines only a number of install methods, and they are executed
+			// much later (when, e.g., the bootstrap injector exists).  kai, nov'25
+			return this;
+		}
+		public InjectorBuilder addModule( AbstractModule module ) {
+			modules.add( module );
+			// yy Maybe Modules.combine would be easier here? Or have a AbstractModule.combine? kai, nov'25
+			return this;
+		}
+	}
+
 
 
 }

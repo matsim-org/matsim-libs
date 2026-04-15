@@ -52,11 +52,16 @@ public interface EventHandler extends MatsimExtensionPoint, MessageProcessor {
 	 * Events may be processed more frequently depending on the event handler.
 	 */
 	default double getProcessInterval() {
-		return 900 * 60;
+		return 900;
 	}
 
+	/**
+	 * By default, this is the same as {@link #getProcessInterval()}. This is necessary for global event handlers that
+	 * rely on the correct order of events. Distributed handlers may have varying intervals as for them processing is
+	 * independent of syncing.
+	 */
 	default double getSyncInterval() {
-		return Double.POSITIVE_INFINITY;
+		return getProcessInterval();
 	}
 
 	/**

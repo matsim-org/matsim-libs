@@ -291,7 +291,7 @@ class BicycleScoreEventsCreator implements
 
 //				yyyy still, the last link is not counted in for e.g. trip distance in output_trips nor trip distance in experienced_plans??
 
-				double amount = additionalBicycleLinkScore.computeLinkBasedScore(network.getLinks().get(event.getLinkId()),
+				double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ),
 					event.getVehicleId(), this.bicycleMode);
 
 				// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.

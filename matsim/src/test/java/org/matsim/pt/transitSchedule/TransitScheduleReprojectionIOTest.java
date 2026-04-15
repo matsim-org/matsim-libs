@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -113,6 +114,7 @@ public class TransitScheduleReprojectionIOTest {
 			config.global().setCoordinateSystem( TARGET_CRS );
 			config.controller().setLastIteration( -1 );
 			config.controller().setOutputDirectory( outputDirectory );
+			config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 			config.network().setInputFile("multimodalnetwork.xml");
 			scenario = ScenarioUtils.loadScenario( config );
 		}
@@ -181,6 +183,7 @@ public class TransitScheduleReprojectionIOTest {
 			config.global().setCoordinateSystem( TARGET_CRS );
 			config.controller().setLastIteration( -1 );
 			config.controller().setOutputDirectory( outputDirectory );
+			config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 			log.info( "" ) ;
 			log.info("just before we are getting the exception:") ;

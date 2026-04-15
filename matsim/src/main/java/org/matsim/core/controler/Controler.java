@@ -113,6 +113,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	}
 
 	static final String OUTPUT_PREFIX = "output_";
+	static final String INPUT_PREFIX = "input_";
 
 	public static final String DIVIDER = "###################################################";
 
@@ -257,6 +258,10 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 				}
 			);
 			this.injector = Injector.createInjector(config, simCtx, AbstractModule.override(standardModules, overrides));
+			if ( scenario != null )
+				scenario.checkConsistencyBeforeRun();
+			else
+				injector.getInstance( Scenario.class ).checkConsistencyBeforeRun();
 		}
 	}
 

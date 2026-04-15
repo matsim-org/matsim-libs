@@ -22,10 +22,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
@@ -126,9 +123,9 @@ public class CharyparNagelWithSubpopulationsTest {
 			final Person person = sc.getPopulation().getFactory().createPerson(Id.createPersonId(i));
 			sc.getPopulation().addPerson(person);
 //			sc.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", subpop);
-			PopulationUtils.putPersonAttribute(person, "subpopulation", subpop);
+            PopulationUtils.putSubpopulation(person, subpop);
 
-			final double util = (double) i;
+            final double util = (double) i;
 			final ScoringParameterSet params = config.scoring().getOrCreateScoringParameters(subpop);
 
 			params.setMarginalUtlOfWaitingPt_utils_hr(-util);

@@ -55,6 +55,7 @@ import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
 import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -64,8 +65,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
-
-import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 
 /**
  * this is an example of how to run MATSim with the UrbanEV module which inserts charging activities for all legs which use a EV.
@@ -112,6 +111,7 @@ public class RunUrbanEVExample {
 
 		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		//register charging interaction activities for car
 		config.scoring().addActivityParams(
@@ -170,7 +170,7 @@ public class RunUrbanEVExample {
 			mode2Vehicle.put(TransportMode.bike, bikeVehicle.getId());
 
 			//override the attribute - we assume to need car and bike only
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, mode2Vehicle);
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, mode2Vehicle );
 		}
 	}
 }

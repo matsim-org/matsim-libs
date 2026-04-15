@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
@@ -69,6 +70,7 @@ public class OnePercentBerlin10sIT {
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10.0);
 		config.scoring().setLearningRate(1.0);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 
@@ -117,6 +119,7 @@ public class OnePercentBerlin10sIT {
 		config.scoring().setLearningRate(1.0);
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

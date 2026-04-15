@@ -66,8 +66,9 @@ public class PopulationAttributeAnalysis implements MATSimAppCommand {
 					allIncomes.add(Double.valueOf(entry.getValue().toString()));
 				}
 
-				if (entry.getKey().equals("vehicles")) System.out.println(((PersonVehicles) entry.getValue()).getModeVehicles().toString());
-				else System.out.println(entry.getValue().toString());
+				// this seems to be not useful, and I commented it out, RE: '03/36'
+//				if (entry.getKey().equals("vehicles")) System.out.println(((PersonVehicles) entry.getValue()).getModeVehicles().toString());
+//				else System.out.println(entry.getValue().toString());
 
 				if (entry.getKey().equals("sex")) {
 					String sex = (String) entry.getValue();

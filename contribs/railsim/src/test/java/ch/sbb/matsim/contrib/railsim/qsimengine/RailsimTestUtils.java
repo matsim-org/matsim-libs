@@ -129,6 +129,46 @@ public class RailsimTestUtils {
 	}
 
 	/**
+	 * Create a TrainInfo with given length.
+	 */
+	public static TrainInfo createTrain(double length) {
+		return new TrainInfo(
+			Id.create("train", VehicleType.class),
+			length,
+			10, // maxVelocity
+			1, // acceleration
+			1, // deceleration
+			1, // maxDeceleration
+			-1 // reversible
+		);
+	}
+
+	/**
+	 * Create a TrainState with a given route.
+	 */
+	public static TrainState createState(
+		TrainInfo train,
+		List<RailLink> previousRoute,
+		List<RailLink> route,
+		RailLink headLink,
+		double headPosition,
+		RailLink tailLink,
+		double tailPosition
+	) {
+		MobsimDriverAgent driver = Mockito.mock(MobsimDriverAgent.class);
+
+		TrainState state = new TrainState(driver, train, 0, headLink.getLinkId(), route);
+		state.headLink = headLink.getLinkId();
+		state.tailLink = tailLink.getLinkId();
+		state.headPosition = headPosition;
+		state.tailPosition = tailPosition;
+
+		state.previousRoute.clear();
+		state.previousRoute.addAll(previousRoute);
+		return state;
+	}
+
+	/**
 	 * Collect events during testing
 	 */
 	public static class EventCollector implements BasicEventHandler {

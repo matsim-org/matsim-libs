@@ -57,7 +57,7 @@ public class DefaultWait2Link implements Wait2Link {
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		for (var q : waitingVehicles.values()) {
 			for (var veh : q) {
 				em.processEvent(new PersonStuckEvent(now, veh.vehicle().getDriver().getId(), veh.link().getId(), veh.vehicle().getDriver().getMode()));

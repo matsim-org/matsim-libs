@@ -3,9 +3,7 @@ package org.matsim.simwrapper.dashboard;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.ScatterTrace;
@@ -20,7 +18,7 @@ public class TrafficDashboard implements Dashboard {
 	private final Set<String> modes;
 
 	public TrafficDashboard() {
-		this(Set.of(TransportMode.car, "freight"));
+		this(Set.of(TransportMode.car));
 	}
 
 	public TrafficDashboard(Set<String> modes) {
@@ -28,12 +26,14 @@ public class TrafficDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		String[] args = new String[]{"--transport-modes", String.join(",", this.modes)};
-
-		header.title = "Car Traffic";
-		header.description = "Traffic related analyses.";
+		if (modes.size() == 1)
+			header.title = modes.stream().findFirst().get() + " Traffic";
+		else
+			header.title = "Network Traffic";
+		header.description = "Traffic related analyses for the modes " + modes + ". Volumes for PT are not shown in this dashboard.";
 
 		layout.row("index_by_hour").el(Plotly.class, (viz, data) -> {
 
@@ -70,6 +70,7 @@ public class TrafficDashboard implements Dashboard {
 		layout.row("map").el(MapPlot.class, (viz, data) -> {
 
 			viz.title = "Traffic statistics";
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("Volume for the modes " + modes + " (value: simulated_traffic_volume). For the different modes the volumes can set in the config in the plot.", data, true);
 			viz.center = data.context().getCenter();
 			viz.zoom = data.context().getMapZoomLevel();
 

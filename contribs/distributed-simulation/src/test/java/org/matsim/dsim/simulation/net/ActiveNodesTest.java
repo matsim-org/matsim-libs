@@ -26,7 +26,7 @@ class ActiveNodesTest {
 		config.setStuckTime(1000);
 		var offeringLink = TestUtils.createLink(link, config, 0);
 		offeringLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
-		offeringLink.doSimStep(null, 100.);
+		offeringLink.doSimStep(100.);
 		offeringLink = spy(offeringLink);
 		SimLink emptyInLink = mock(SimLink.class);
 		when(emptyInLink.isOffering()).thenReturn(false);
@@ -52,7 +52,6 @@ class ActiveNodesTest {
 		// method, but I think it is quite simple to test it this way
 		verify(offeringLink, times(1)).peekFirstVehicle();
 		verify(emptyInLink, times(3)).isOffering();
-
 	}
 
 	@Test
@@ -77,7 +76,7 @@ class ActiveNodesTest {
 		activeNodes.activate(node);
 
 		// move the vehicle into the buffer
-		inLink.doSimStep(null, 100);
+		inLink.doSimStep(100);
 		// attempt to move the vehicle which should not happen, as next link has no space
 		activeNodes.doSimStep(100);
 		// link should still be active as the vehicle has not left.
@@ -106,7 +105,7 @@ class ActiveNodesTest {
 			inLink.pushVehicle(TestUtils.createVehicle(String.valueOf(i), driver, 1, 200), SimLink.LinkPosition.QStart, 0);
 		}
 		// call dostimstep here, so that the first vehicle is moved to the buffer
-		inLink.doSimStep(null, 99);
+		inLink.doSimStep(99);
 		var nextLink = mock(SimLink.class);
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
 		when(nextLink.getId()).thenReturn(Id.createLinkId("next-link"));
@@ -120,7 +119,7 @@ class ActiveNodesTest {
 		for (var i = 0; i < 200; i++) {
 			var now = i + 100;
 			activeNodes.doSimStep(now);
-			inLink.doSimStep(null, now);
+			inLink.doSimStep(now);
 			verify(nextLink, times((i / 2) + 1)).pushVehicle(any(), any(), anyDouble());
 			activeNodes.activate(node);
 		}
@@ -139,7 +138,7 @@ class ActiveNodesTest {
 		config.setStuckTime(stuckThreshold);
 		var inLink = TestUtils.createLink(TestUtils.createSingleLink(0, 0), config, 0);
 		inLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
-		inLink.doSimStep(null, 100); // move vehicle into the buffer, which starts the stuck timer
+		inLink.doSimStep(100); // move vehicle into the buffer, which starts the stuck timer
 
 		var nextLink = mock(SimLink.class);
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);

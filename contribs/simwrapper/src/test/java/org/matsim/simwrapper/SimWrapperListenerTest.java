@@ -44,7 +44,7 @@ class SimWrapperListenerTest {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		simWrapperConfigGroup.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+		simWrapperConfigGroup.setDefaultDashboards( SimWrapperConfigGroup.DefaultDashboardsMode.disabled );
 
 		Controller controller = ControllerUtils.createController(ScenarioUtils.loadScenario(config));
 
