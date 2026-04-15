@@ -96,7 +96,7 @@ public final class RunBicycleContribExampleMod {
 //			);
 
 			String baseOut = "C:/Users/metz_so/Workspace/data/matsim-output/";
-			String scenarioName = "nnk_motorized_5k_MI_passed";
+			String scenarioName = "nnk_motorized_5k_MI_avgExp";
 
 
 			String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
@@ -117,8 +117,10 @@ public final class RunBicycleContribExampleMod {
 		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.003);
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.001);
 		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.001);
-		bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.CARS_PASSED_BICYCLE_ON_LINK);
+		//bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.CARS_PASSED_BICYCLE_ON_LINK);
 		//bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.CAR_COUNT_ON_BICYCLE_LEAVE_LINK);
+		bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.AVG_CAR_OCCUPANCY_DURING_BICYCLE_TRAVERSAL);
+
 
 		//bicycleConfigGroup.setBicycleInfraAttribute("cycleway"); // default
 		bicycleConfigGroup.setBicycleInfraAttribute("bicycle_infra");
