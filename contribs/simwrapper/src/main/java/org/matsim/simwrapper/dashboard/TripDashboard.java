@@ -681,6 +681,17 @@ public class TripDashboard implements Dashboard {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds);
 		});
+
+		layout.row("info").el(TextBlock.class, (viz, data) -> {
+			viz.backgroundColor = "transparent";
+			viz.content = """
+				### Notes
+				- The distance distributions from MATSim come from trips.csv, and there they come from experienced_plans, and they use whatever is encoded in the leg.
+				- The distance distributions from "ref" are generated upstream by some python script.  For SrV, they use so-called GIS_LAENGE.  That uses the routing distance from
+				HERE api by mode; for PT they actually use the car routing distance (not documented).  We do not know if the car routing distances are congested or not.
+				""";
+		});
+
 	}
 
 	private void createGroupedTab(Layout layout, String[] args) {
