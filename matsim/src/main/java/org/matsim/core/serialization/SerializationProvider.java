@@ -105,10 +105,6 @@ public class SerializationProvider {
 		}
 	}
 
-	public static void main() throws ClassNotFoundException {
-		System.out.println(SerializationProvider.getInstance());
-	}
-
 	/**
 	 * Serialize message object and return byte array.
 	 */
