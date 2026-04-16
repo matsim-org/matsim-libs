@@ -4,6 +4,10 @@ import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
+import org.matsim.contrib.ev.reservation.ChargerReservability;
+import org.matsim.contrib.ev.reservation.ChargerReservationModule;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder;
 import org.matsim.contrib.ev.withinday.utils.*;
 import org.matsim.core.controler.Controler;
@@ -811,6 +815,141 @@ public class WithinDayEvTest3 {
 			"activity:car interaction",
 			"leg:walk",
 			"activity:home")), scenario.tracker().sequences.get(Id.createPersonId("person")));
+	}
+
+	@Test
+	public void testTwoAgentsCompetition() {
+		/*
+		 * Two agents want to use the same charger at work, but there is only one plug.
+		 * The first agent therefore occupies the plug, so the second one that is
+		 * leaving 30s later must fall back to the other charger using online search.
+		 */
+		TestScenarioBuilder.TestScenario scenario = new TestScenarioBuilder(utils) //
+			.addCharger("charger1", 8, 8, 1, 1.0) // plug count zero
+			.addCharger("charger2", 7, 7, 1, 1.0) //
+			.addPerson("person1", 1.0) //
+			/**/.addActivity("home", 0, 0, 10.0 * 3600.0) //
+			/**/.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			/**/.addActivity("home", 0, 0) //
+			.addPerson("person2", 1.0) //
+			/**/.addActivity("home", 0, 0, 10.0 * 3600.0 + 30.0) // 30 seconds later
+			/**/.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			/**/.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
+			.build();
+
+		Controler controller = scenario.controller();
+
+		controller.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingSlotProvider.class).to(WorkActivitySlotProvider.class);
+				bind(ChargingAlternativeProvider.class).to(OrderedAlternativeProvider.class);
+			}
+		});
+
+		controller.run();
+
+		// check charging process
+		assertEquals(2, scenario.tracker().startChargingProcessEvents.size());
+		assertEquals(2, scenario.tracker().finishChargingProcessEvents.size());
+
+		assertEquals(3, scenario.tracker().startChargingAttemptEvents.size());
+		assertEquals(0, scenario.tracker().updateChargingAttemptEvents.size());
+		assertEquals(2, scenario.tracker().finishChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().abortCharingAttemptEvents.size());
+
+		// check charger interaction
+		assertEquals(2, scenario.tracker().chargingStartEvents.size());
+		assertEquals(2, scenario.tracker().chargingEndEvents.size());
+		assertEquals(1, scenario.tracker().queuedAtChargerEvents.size());
+		assertEquals(1, scenario.tracker().quitQueueAtChargerEvents.size());
+
+		assertEquals("person1", scenario.tracker().chargingStartEvents.getFirst().getVehicleId().toString());
+		assertEquals("charger1", scenario.tracker().chargingStartEvents.get(0).getChargerId().toString());
+		assertEquals(39224.0, scenario.tracker().chargingStartEvents.get(0).getTime());
+
+		assertEquals("person2", scenario.tracker().chargingStartEvents.get(1).getVehicleId().toString());
+		assertEquals("charger2", scenario.tracker().chargingStartEvents.get(1).getChargerId().toString());
+		assertEquals(40364.0, scenario.tracker().chargingStartEvents.get(1).getTime());
+
+		assertEquals("person2", scenario.tracker().queuedAtChargerEvents.getFirst().getVehicleId().toString());
+		assertEquals(39254.0, scenario.tracker().queuedAtChargerEvents.getFirst().getTime());
+
+		assertEquals("person2", scenario.tracker().quitQueueAtChargerEvents.getFirst().getVehicleId().toString());
+		assertEquals(39548.0, scenario.tracker().quitQueueAtChargerEvents.getFirst().getTime());
+	}
+
+	@Test
+	public void testTwoAgentsCompetitionWithReservation() {
+		/*
+		 * Two agents want to use the same charger at work. When departing, the second
+		 * agent is allowed to reserve the charger. Hence, it is the first agent that
+		 * will be queued at the charger and then falls back to the other one.
+		 */
+		TestScenarioBuilder.TestScenario scenario = new TestScenarioBuilder(utils) //
+			.addCharger("charger1", 8, 8, 1, 1.0) // plug count zero
+			.addCharger("charger2", 7, 7, 1, 1.0) //
+			.addPerson("person1", 1.0) //
+			/**/.addActivity("home", 0, 0, 10.0 * 3600.0) //
+			/**/.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			/**/.addActivity("home", 0, 0) //
+			.addPerson("person2", 1.0) //
+			/**/.addActivity("home", 0, 0, 10.0 * 3600.0 + 30.0) // 30 seconds later
+			/**/.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			/**/.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
+			.build();
+
+		ChargingInfrastructureSpecification infrastructure = (ChargingInfrastructureSpecification) scenario.scenario()
+			.getScenarioElement("infrastructure");
+		for (ChargerSpecification charger : infrastructure.getChargerSpecifications().values()) {
+			ChargerReservability.setReservable(charger, true);
+		}
+
+		Controler controller = scenario.controller();
+		controller.addOverridingModule(new ChargerReservationModule());
+
+		controller.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingSlotProvider.class).to(WorkActivitySlotProvider.class);
+				bind(ChargingAlternativeProvider.class).to(ReservationAlternativeProvider.class);
+			}
+		});
+
+		controller.run();
+
+		// check charging process
+		assertEquals(2, scenario.tracker().startChargingProcessEvents.size());
+		assertEquals(2, scenario.tracker().finishChargingProcessEvents.size());
+
+		assertEquals(3, scenario.tracker().startChargingAttemptEvents.size());
+		assertEquals(0, scenario.tracker().updateChargingAttemptEvents.size());
+		assertEquals(2, scenario.tracker().finishChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().abortCharingAttemptEvents.size());
+
+		// check charger interaction
+		assertEquals(2, scenario.tracker().chargingStartEvents.size());
+		assertEquals(2, scenario.tracker().chargingEndEvents.size());
+		assertEquals(1, scenario.tracker().queuedAtChargerEvents.size());
+		assertEquals(1, scenario.tracker().quitQueueAtChargerEvents.size());
+
+		assertEquals("person2", scenario.tracker().chargingStartEvents.get(0).getVehicleId().toString());
+		assertEquals("charger1", scenario.tracker().chargingStartEvents.get(0).getChargerId().toString());
+		assertEquals(39254.0, scenario.tracker().chargingStartEvents.get(0).getTime());
+
+		assertEquals("person1", scenario.tracker().chargingStartEvents.get(1).getVehicleId().toString());
+		assertEquals("charger2", scenario.tracker().chargingStartEvents.get(1).getChargerId().toString());
+		assertEquals(40334.0, scenario.tracker().chargingStartEvents.get(1).getTime());
+
+		assertEquals("person1", scenario.tracker().queuedAtChargerEvents.get(0).getVehicleId().toString());
+		assertEquals(39224.0, scenario.tracker().queuedAtChargerEvents.get(0).getTime());
+
+		assertEquals("person1", scenario.tracker().quitQueueAtChargerEvents.get(0).getVehicleId().toString());
+		assertEquals(39519.0, scenario.tracker().quitQueueAtChargerEvents.get(0).getTime());
 	}
 
 

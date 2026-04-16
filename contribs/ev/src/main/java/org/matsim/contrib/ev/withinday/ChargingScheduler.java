@@ -226,6 +226,9 @@ class ChargingScheduler {
 	 * is unsuccessful, but the agent should still continue, then we need to send
 	 * him from the current charger to the initially planned main activity for
 	 * charging.
+	 *
+	 * (3) when an overnight charging process is unsuccessful and the agent needs to
+	 * continue after the access activity to pick up the vehicle from the charger location
 	 */
 	public void scheduleDriveToNextActivity(MobsimAgent agent) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
@@ -235,7 +238,8 @@ class ChargingScheduler {
 		Activity currentActivity = (Activity) planElements.get(currentActivityIndex);
 
 		Preconditions.checkState(currentActivity.getType().equals(WithinDayEvEngine.PLUG_ACTIVITY_TYPE)
-			|| currentActivity.getType().equals(WithinDayEvEngine.UNPLUG_ACTIVITY_TYPE));
+			|| currentActivity.getType().equals(WithinDayEvEngine.UNPLUG_ACTIVITY_TYPE)
+			|| currentActivity.getType().equals(WithinDayEvEngine.ACCESS_ACTIVITY_TYPE));
 
 		int mainActivityIndex = findFollowingActivityIndex(planElements, currentActivityIndex);
 		Activity mainActivity = (Activity) planElements.get(mainActivityIndex);
@@ -434,7 +438,7 @@ class ChargingScheduler {
 	 * and reroutes the agent from the charger to the next main activity.
 	 */
 	public void replaceUnplugWithAccessAfterOvernightCharge(MobsimAgent agent, Activity unplugActivity,
-	                                                        Charger charger, double endTime) {
+	                                                        Charger charger) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		List<PlanElement> planElements = plan.getPlanElements();
 
@@ -447,8 +451,8 @@ class ChargingScheduler {
 			WithinDayEvEngine.ACCESS_ACTIVITY_TYPE,
 			charger.getLink().getId());
 		AttributesUtils.copyAttributesFromTo(unplugActivity, accessActivity);
-		accessActivity.setStartTime(endTime);
-		accessActivity.setEndTime(endTime);
+		accessActivity.setStartTime(unplugActivity.getStartTime().seconds());
+		accessActivity.setEndTime(unplugActivity.getEndTime().seconds());
 
 		// replace unplug activity with access activity
 		planElements.set(unplugActivityIndex, accessActivity);
