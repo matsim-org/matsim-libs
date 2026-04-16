@@ -32,7 +32,7 @@ class DistributedEventsManagerTest {
 	@Test
 	public void globalHandler() {
 		MessageBroker broker = mock(MessageBroker.class);
-		var provider = new SerializationProvider();
+		var provider = SerializationProvider.getInstance();
 		LPExecutor executor = new SingleExecutor(provider);
 		var computeNode = ComputeNode.builder()
 			.rank(0)
@@ -58,7 +58,7 @@ class DistributedEventsManagerTest {
 	@Test
 	public void globalHandlerNotHeadNode() {
 		MessageBroker broker = mock(MessageBroker.class);
-		var provider = new SerializationProvider();
+		var provider = SerializationProvider.getInstance();
 		LPExecutor executor = new SingleExecutor(provider);
 		var computeNode = ComputeNode.builder()
 			.rank(1)
@@ -82,7 +82,7 @@ class DistributedEventsManagerTest {
 	@Test
 	public void nodeHandler() {
 		MessageBroker broker = mock(MessageBroker.class);
-		var provider = new SerializationProvider();
+		var provider = SerializationProvider.getInstance();
 		LPExecutor executor = new SingleExecutor(provider);
 		var computeNode = ComputeNode.builder()
 			.rank(0)
@@ -108,7 +108,7 @@ class DistributedEventsManagerTest {
 	@Test
 	public void nodeConcurrentHandler() {
 		MessageBroker broker = mock(MessageBroker.class);
-		var provider = new SerializationProvider();
+		var provider = SerializationProvider.getInstance();
 		LPExecutor executor = new SingleExecutor(provider);
 		var computeNode = ComputeNode.builder()
 			.rank(0)
@@ -137,7 +137,7 @@ class DistributedEventsManagerTest {
 	@Test
 	public void nodeConcurrentHandlerDirect() {
 		MessageBroker broker = mock(MessageBroker.class);
-		var provider = new SerializationProvider();
+		var provider = SerializationProvider.getInstance();
 		LPExecutor executor = new SingleExecutor(provider);
 		var computeNode = ComputeNode.builder()
 			.rank(0)
@@ -164,7 +164,7 @@ class DistributedEventsManagerTest {
 	@Test
 	public void partitionHandler() {
 		MessageBroker broker = mock(MessageBroker.class);
-		var serializationProvider = new SerializationProvider();
+		var serializationProvider = SerializationProvider.getInstance();
 		LPExecutor executor = new SingleExecutor(serializationProvider);
 		var computeNode = ComputeNode.builder()
 			.rank(0)
@@ -196,7 +196,7 @@ class DistributedEventsManagerTest {
 	public void partitionHandlerParticularPart() {
 
 		MessageBroker broker = mock(MessageBroker.class);
-		var serializationProvider = new SerializationProvider();
+		var serializationProvider = SerializationProvider.getInstance();
 		LPExecutor executor = new SingleExecutor(serializationProvider);
 		var computeNode = ComputeNode.builder()
 			.rank(0)
@@ -222,7 +222,7 @@ class DistributedEventsManagerTest {
 	public void eventClassHierachy() {
 
 		MessageBroker broker = mock(MessageBroker.class);
-		var serializationProvider = new SerializationProvider();
+		var serializationProvider = SerializationProvider.getInstance();
 		LPExecutor executor = new SingleExecutor(serializationProvider);
 		var computeNode = ComputeNode.builder()
 			.rank(0)
@@ -273,7 +273,7 @@ class DistributedEventsManagerTest {
 	@Test
 	public void globalHandlerReceivesRemoteEvent() throws Exception {
 		var communicators = LocalCommunicator.create(2);
-		var provider = new SerializationProvider();
+		var provider = SerializationProvider.getInstance();
 
 		var node0 = ComputeNode.builder().rank(0).parts(IntList.of(0)).build();
 		var node1 = ComputeNode.builder().rank(1).parts(IntList.of(1)).build();

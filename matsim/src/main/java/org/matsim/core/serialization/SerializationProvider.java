@@ -30,12 +30,18 @@ import java.nio.ByteBuffer;
  */
 public class SerializationProvider {
 
+	private static final SerializationProvider INSTANCE = new SerializationProvider();
+
+	public static SerializationProvider getInstance() {
+		return INSTANCE;
+	}
+
 	private final Int2ObjectMap<Class<? extends Message>> type2Class = new Int2ObjectOpenHashMap<>(128);
 	private final Object2IntMap<Class<? extends Message>> class2Type = new Object2IntOpenHashMap<>();
 
 	private final ThreadSafeFory fory;
 
-	public SerializationProvider() {
+	private SerializationProvider() {
 
 		// Fory uses its own verbose logging. Disable this manually here, so users don't see the internals of how Fory compiles classes into
 		// wire formats.
@@ -99,17 +105,6 @@ public class SerializationProvider {
 		}
 	}
 
-	public static void main() throws ClassNotFoundException {
-		System.out.println(new SerializationProvider());
-	}
-
-	/**
-	 * Return whether the given type is an event.
-	 */
-	public boolean isEvent(int type) {
-		return type2Class.containsKey(type) && Event.class.isAssignableFrom(type2Class.get(type));
-	}
-
 	/**
 	 * Serialize message object and return byte array.
 	 */
@@ -157,10 +152,6 @@ public class SerializationProvider {
 	 */
 	public boolean hasType(int type) {
 		return type == Event.ANY_TYPE || type2Class.containsKey(type);
-	}
-
-	public boolean hasType(Class<?> msgClass) {
-		return msgClass == Event.class || class2Type.containsKey(msgClass);
 	}
 
 	/**
