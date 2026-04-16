@@ -1,9 +1,8 @@
 package org.matsim.contrib.ev.withinday.utils;
 
-import java.util.List;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import jakarta.annotation.Nullable;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -15,59 +14,58 @@ import org.matsim.contrib.ev.withinday.ChargingAlternative;
 import org.matsim.contrib.ev.withinday.ChargingAlternativeProvider;
 import org.matsim.contrib.ev.withinday.ChargingSlot;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.router.TripStructureUtils;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.List;
 
 @Singleton
 public class SpontaneousChargingProvider implements ChargingAlternativeProvider {
-    @Inject
-    ChargingInfrastructure infrastructure;
+	@Inject
+	ChargingInfrastructure infrastructure;
 
-    @Inject
-    QSim qsim;
+	@Inject
+	Netsim netsim;
 
-    private boolean hasCharged = false;
+	private boolean hasCharged = false;
 
-    @Override
-    public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
-            ElectricVehicle vehicle,
-            @Nullable ChargingSlot initialSlot) {
-        if (hasCharged) {
-            return null;
-        }
+	@Override
+	public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
+	                                                  ElectricVehicle vehicle,
+	                                                  @Nullable ChargingSlot initialSlot) {
+		if (hasCharged) {
+			return null;
+		}
 
-        MobsimAgent agent = qsim.getAgents().get(person.getId());
-        int currentIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
+		MobsimAgent agent = netsim.getAgents().get(person.getId());
+		int currentIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
-        Activity nextActivity = null;
-        for (int index = currentIndex; index < plan.getPlanElements().size(); index++) {
-            PlanElement element = plan.getPlanElements().get(index);
+		Activity nextActivity = null;
+		for (int index = currentIndex; index < plan.getPlanElements().size(); index++) {
+			PlanElement element = plan.getPlanElements().get(index);
 
-            if (element instanceof Activity activity) {
-                if (!TripStructureUtils.isStageActivityType(activity.getType())) {
-                    nextActivity = activity;
-                    break;
-                }
-            }
-        }
+			if (element instanceof Activity activity) {
+				if (!TripStructureUtils.isStageActivityType(activity.getType())) {
+					nextActivity = activity;
+					break;
+				}
+			}
+		}
 
-        if (nextActivity != null && nextActivity.getType().equals("work")) {
-            Charger charger = infrastructure.getChargers().values().iterator().next();
-            hasCharged = true;
-            return new ChargingAlternative(charger, 3600.0);
-        }
+		if (nextActivity != null && nextActivity.getType().equals("work")) {
+			Charger charger = infrastructure.getChargers().values().iterator().next();
+			hasCharged = true;
+			return new ChargingAlternative(charger, 3600.0);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    @Nullable
-    public ChargingAlternative findAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
-            ChargingSlot slot, List<ChargingAlternative> trace) {
-        return null;
-    }
+	@Override
+	@Nullable
+	public ChargingAlternative findAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
+	                                           ChargingSlot slot, List<ChargingAlternative> trace) {
+		return null;
+	}
 }

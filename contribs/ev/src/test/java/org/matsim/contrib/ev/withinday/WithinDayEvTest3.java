@@ -14,7 +14,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WithinDayEvTest3 {
 
@@ -28,6 +28,8 @@ public class WithinDayEvTest3 {
 			.addActivity("home", 0, 0, 10.0 * 3600.0) //
 			.addActivity("work", 8, 8, 18.0 * 3600.0) //
 			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
 			.build();
 
 		Controler controller = scenario.controller();
@@ -963,6 +965,8 @@ public class WithinDayEvTest3 {
 			.addActivity("work", 8, 8, 16.0 * 3600.0, "walk") //
 			.addActivity("work", 8, 8, 18.0 * 3600.0, "walk") //
 			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
 			.build();
 
 		Controler controller = scenario.controller();
@@ -1154,6 +1158,8 @@ public class WithinDayEvTest3 {
 			.addActivity("home", 0, 0, 10.0 * 3600.0) //
 			.addActivity("work", 8, 8, 18.0 * 3600.0) //
 			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
 			.build();
 
 		Controler controller = scenario.controller();
@@ -1188,7 +1194,7 @@ public class WithinDayEvTest3 {
 		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
 
 		assertEquals(37619.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
-		assertEquals(41223.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
+		assertEquals(41220.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
 
 		assertEquals("charger", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
 
@@ -1197,8 +1203,8 @@ public class WithinDayEvTest3 {
 		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
 
 		assertEquals(37609.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
-		assertEquals(41222.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
-		assertEquals(41224.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+		assertEquals(41220.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41220.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
 
 		assertEquals(Arrays.asList(Arrays.array(
 			// "activity:home",
@@ -1214,6 +1220,474 @@ public class WithinDayEvTest3 {
 			"activity:work",
 			"leg:walk",
 			"activity:car interaction",
+			"leg:car",
+			"activity:car interaction",
+			"leg:walk",
+			"activity:home")), scenario.tracker().sequences.get(Id.createPersonId("person")));
+	}
+
+	@Test
+	public void testChargeOnRouteWithChange() {
+		TestScenarioBuilder.TestScenario scenario = new TestScenarioBuilder(utils) //
+			.addCharger("charger1", 4, 4, 1, 1.0) //
+			.addCharger("charger2", 5, 5, 1, 1.0) //
+			.addPerson("person", 0.0) //
+			.addActivity("home", 0, 0, 10.0 * 3600.0) //
+			.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
+			.build();
+
+		Controler controller = scenario.controller();
+
+		controller.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingSlotProvider.class).to(FirstLegSlotProvider.class);
+				bind(ChargingAlternativeProvider.class).to(SwitchChargerAlternativeProvider.class);
+			}
+		});
+
+		controller.run();
+
+		// check arrival at home
+		assertEquals("home", scenario.tracker().activityStartEvents.getLast().getActType());
+		assertEquals(68419.0, scenario.tracker().activityStartEvents.getLast().getTime());
+
+		// check charging process
+		assertEquals(1, scenario.tracker().startChargingProcessEvents.size());
+		assertEquals(1, scenario.tracker().finishChargingProcessEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingProcessEvents.size());
+
+		assertEquals(1, scenario.tracker().startChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().updateChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().finishChargingAttemptEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingAttemptEvents.size());
+
+		// check charger interaction
+		assertEquals(1, scenario.tracker().chargingStartEvents.size());
+		assertEquals(1, scenario.tracker().chargingEndEvents.size());
+		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
+		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
+
+		assertEquals(38024.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
+		assertEquals(41625.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
+
+		assertEquals("charger2", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
+
+		// check engine logic
+		assertEquals(1, scenario.tracker().plugActivityEvents.size());
+		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
+
+		assertEquals(38011.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
+		assertEquals(41625.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41625.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+
+		assertEquals(Arrays.asList(Arrays.array(
+			// "activity:home",
+			"leg:walk",
+			"activity:car interaction",
+			"leg:car",
+			"activity:ev:plug interaction",
+			"activity:ev:wait interaction",
+			"activity:ev:unplug interaction",
+			"leg:car",
+			"activity:car interaction",
+			"leg:walk",
+			"activity:work",
+			"leg:walk",
+			"activity:car interaction",
+			"leg:car",
+			"activity:car interaction",
+			"leg:walk",
+			"activity:home")), scenario.tracker().sequences.get(Id.createPersonId("person")));
+	}
+
+	@Test
+	public void testChargeOnRouteWithTwoAttempts() {
+		TestScenarioBuilder.TestScenario scenario = new TestScenarioBuilder(utils) //
+			.addCharger("charger1", 4, 4, 0, 1.0) // blocked
+			.addCharger("charger2", 5, 5, 1, 1.0) //
+			.addPerson("person", 0.0) //
+			.addActivity("home", 0, 0, 10.0 * 3600.0) //
+			.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
+			.build();
+
+		Controler controller = scenario.controller();
+
+		controller.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingSlotProvider.class).to(FirstLegSlotProvider.class);
+				bind(ChargingAlternativeProvider.class).to(OrderedAlternativeProvider.class);
+			}
+		});
+
+		controller.run();
+
+		// check arrival at home
+		assertEquals("home", scenario.tracker().activityStartEvents.getLast().getActType());
+		assertEquals(68419.0, scenario.tracker().activityStartEvents.getLast().getTime());
+
+		// check charging process
+		assertEquals(1, scenario.tracker().startChargingProcessEvents.size());
+		assertEquals(1, scenario.tracker().finishChargingProcessEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingProcessEvents.size());
+
+		assertEquals(2, scenario.tracker().startChargingAttemptEvents.size());
+		assertEquals(0, scenario.tracker().updateChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().finishChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().abortCharingAttemptEvents.size());
+
+		// check charger interaction
+		assertEquals(1, scenario.tracker().chargingStartEvents.size());
+		assertEquals(1, scenario.tracker().chargingEndEvents.size());
+		assertEquals(1, scenario.tracker().queuedAtChargerEvents.size());
+		assertEquals(1, scenario.tracker().quitQueueAtChargerEvents.size());
+
+		assertEquals(38324.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
+		assertEquals(41925.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
+
+		assertEquals("charger2", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
+
+		// check engine logic
+		assertEquals(2, scenario.tracker().plugActivityEvents.size());
+		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
+
+		assertEquals(37609.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
+		assertEquals(38313.0, scenario.tracker().plugActivityEvents.getLast().getTime());
+		assertEquals(41925.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41925.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+
+		assertEquals(Arrays.asList(Arrays.array(
+			// "activity:home",
+			"leg:walk",
+			"activity:car interaction",
+			"leg:car",
+			"activity:ev:plug interaction",
+			"leg:car",
+			"activity:ev:plug interaction",
+			"activity:ev:wait interaction",
+			"activity:ev:unplug interaction",
+			"leg:car",
+			"activity:car interaction",
+			"leg:walk",
+			"activity:work",
+			"leg:walk",
+			"activity:car interaction",
+			"leg:car",
+			"activity:car interaction",
+			"leg:walk",
+			"activity:home")), scenario.tracker().sequences.get(Id.createPersonId("person")));
+	}
+
+	@Test
+	public void testChangeActivityToOnRoute() {
+		TestScenarioBuilder.TestScenario scenario = new TestScenarioBuilder(utils) //
+			.addCharger("charger1", 4, 4, 1, 1.0) //
+			.addCharger("charger2", 5, 5, 1, 1.0) //
+			.addPerson("person", 1.0) //
+			.addActivity("home", 0, 0, 10.0 * 3600.0) //
+			.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
+			.build();
+
+		Controler controller = scenario.controller();
+
+		controller.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingSlotProvider.class).toProvider(ActivityLegChangeProvider.createProvider(true));
+				bind(ChargingAlternativeProvider.class).toProvider(ActivityLegChangeProvider.createProvider(true));
+			}
+		});
+
+		controller.run();
+
+		// check arrival at home
+		assertEquals("home", scenario.tracker().activityStartEvents.getLast().getActType());
+		assertEquals(68419.0, scenario.tracker().activityStartEvents.getLast().getTime());
+
+		// check charging process
+		assertEquals(1, scenario.tracker().startChargingProcessEvents.size());
+		assertEquals(1, scenario.tracker().finishChargingProcessEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingProcessEvents.size());
+
+		assertEquals(1, scenario.tracker().startChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().updateChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().finishChargingAttemptEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingAttemptEvents.size());
+
+		// check charger interaction
+		assertEquals(1, scenario.tracker().chargingStartEvents.size());
+		assertEquals(1, scenario.tracker().chargingEndEvents.size());
+		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
+		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
+
+		assertEquals("charger2", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
+
+		// check engine logic
+		assertEquals(1, scenario.tracker().plugActivityEvents.size());
+		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
+
+		assertEquals(38011.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
+		assertEquals(41625.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41625.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+
+		assertEquals(Arrays.asList(Arrays.array(
+			// "activity:home",
+			"leg:walk",
+			"activity:car interaction",
+			"leg:car",
+			"activity:ev:plug interaction",
+			"activity:ev:wait interaction",
+			"activity:ev:unplug interaction",
+			"leg:car",
+			"activity:car interaction",
+			"leg:walk",
+			"activity:work",
+			"leg:walk",
+			"activity:car interaction",
+			"leg:car",
+			"activity:car interaction",
+			"leg:walk",
+			"activity:home")), scenario.tracker().sequences.get(Id.createPersonId("person")));
+	}
+
+	@Test
+	public void testChangeOnRouteToActivityBased() {
+		TestScenarioBuilder.TestScenario scenario = new TestScenarioBuilder(utils) //
+			.addCharger("charger1", 4, 4, 1, 1.0) //
+			.addCharger("charger2", 5, 5, 1, 1.0) //
+			.addPerson("person", 1.0) //
+			.addActivity("home", 0, 0, 10.0 * 3600.0) //
+			.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
+			.build();
+
+		Controler controller = scenario.controller();
+
+		controller.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingSlotProvider.class).toProvider(ActivityLegChangeProvider.createProvider(false));
+				bind(ChargingAlternativeProvider.class).toProvider(ActivityLegChangeProvider.createProvider(false));
+			}
+		});
+
+		try {
+			controller.run();
+		} catch (IllegalStateException e) {
+			assertTrue(e.getMessage().startsWith("Cannot switch from a leg-based"));
+			return;
+		}
+
+		fail();
+	}
+
+	@Test
+	public void testChangeOnrouteDuration() {
+		TestScenarioBuilder.TestScenario scenario = new TestScenarioBuilder(utils) //
+			.addCharger("charger", 4, 4, 1, 1.0) //
+			.addPerson("person", 0.0) //
+			.addActivity("home", 0, 0, 10.0 * 3600.0) //
+			.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
+			.build();
+
+		Controler controller = scenario.controller();
+
+		controller.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingSlotProvider.class).to(FirstLegSlotProvider.class);
+				bind(ChargingAlternativeProvider.class).to(ChangeDurationAlternativeProvider.class);
+			}
+		});
+
+		controller.run();
+
+		// check arrival at home
+		assertEquals("home", scenario.tracker().activityStartEvents.getLast().getActType());
+		assertEquals(68419.0, scenario.tracker().activityStartEvents.getLast().getTime());
+
+		// check charging process
+		assertEquals(1, scenario.tracker().startChargingProcessEvents.size());
+		assertEquals(1, scenario.tracker().finishChargingProcessEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingProcessEvents.size());
+
+		assertEquals(1, scenario.tracker().startChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().updateChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().finishChargingAttemptEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingAttemptEvents.size());
+
+		// check charger interaction
+		assertEquals(1, scenario.tracker().chargingStartEvents.size());
+		assertEquals(1, scenario.tracker().chargingEndEvents.size());
+		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
+		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
+
+		assertEquals(37619.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
+		assertEquals(39420.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
+
+		assertEquals("charger", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
+
+		// check engine logic
+		assertEquals(1, scenario.tracker().plugActivityEvents.size());
+		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
+
+		assertEquals(37609.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
+		assertEquals(39420.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(39420.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+	}
+
+	@Test
+	public void testSpontaneousCharging() {
+		TestScenarioBuilder.TestScenario scenario = new TestScenarioBuilder(utils) //
+			.addCharger("charger", 4, 4, 1, 1.0) //
+			.addPerson("person", 1.0) //
+			.addActivity("home", 0, 0, 10.0 * 3600.0) //
+			.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
+			.build();
+
+		WithinDayEvConfigGroup config = WithinDayEvConfigGroup.get(scenario.config());
+		config.setAllowSpoantaneousCharging(true);
+
+		Controler controller = scenario.controller();
+
+		controller.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingAlternativeProvider.class).to(SpontaneousChargingProvider.class);
+			}
+		});
+
+		controller.run();
+
+		// check arrival at home
+		assertEquals("home", scenario.tracker().activityStartEvents.getLast().getActType());
+		assertEquals(68419.0, scenario.tracker().activityStartEvents.getLast().getTime());
+
+		// check charging process
+		assertEquals(1, scenario.tracker().startChargingProcessEvents.size());
+		assertEquals(1, scenario.tracker().finishChargingProcessEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingProcessEvents.size());
+
+		assertEquals(1, scenario.tracker().startChargingAttemptEvents.size());
+		assertEquals(0, scenario.tracker().updateChargingAttemptEvents.size());
+		assertEquals(1, scenario.tracker().finishChargingAttemptEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingAttemptEvents.size());
+
+		// check charger interaction
+		assertEquals(1, scenario.tracker().chargingStartEvents.size());
+		assertEquals(1, scenario.tracker().chargingEndEvents.size());
+		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
+		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
+
+		assertEquals("charger", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
+
+		// check engine logic
+		assertEquals(1, scenario.tracker().plugActivityEvents.size());
+		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
+
+		assertEquals(37609.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
+		assertEquals(41222.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41224.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+	}
+
+	@Test
+	public void testTwoSlots() {
+		TestScenarioBuilder.TestScenario scenario = new TestScenarioBuilder(utils) //
+			.addCharger("charger", 8, 8, 1, 1.0) //
+			.addPerson("person", 1.0) //
+			.addActivity("home", 0, 0, 10.0 * 3600.0) //
+			.addActivity("work", 8, 8, 14.0 * 3600.0) //
+			.addActivity("home", 0, 0, 15.0 * 3600.0) //
+			.addActivity("work", 8, 8, 18.0 * 3600.0) //
+			.addActivity("home", 0, 0) //
+			.setMobsim("dsim")
+			.setNumberOfThreads(2)
+			.build();
+
+		Controler controller = scenario.controller();
+
+		controller.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingSlotProvider.class).to(WorkActivitySlotProvider.class);
+			}
+		});
+
+		controller.run();
+
+		// check arrival at home
+		assertEquals("home", scenario.tracker().activityStartEvents.getLast().getActType());
+		assertEquals(68576.0, scenario.tracker().activityStartEvents.getLast().getTime());
+
+		// check charging process
+		assertEquals(2, scenario.tracker().startChargingProcessEvents.size());
+		assertEquals(2, scenario.tracker().finishChargingProcessEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingProcessEvents.size());
+
+		assertEquals(2, scenario.tracker().startChargingAttemptEvents.size());
+		assertEquals(0, scenario.tracker().updateChargingAttemptEvents.size());
+		assertEquals(2, scenario.tracker().finishChargingAttemptEvents.size());
+		assertEquals(0, scenario.tracker().abortCharingAttemptEvents.size());
+
+		// check charger interaction
+		assertEquals(2, scenario.tracker().chargingStartEvents.size());
+		assertEquals(2, scenario.tracker().chargingEndEvents.size());
+		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
+		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
+
+		assertEquals("charger", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
+		assertEquals("charger", scenario.tracker().chargingStartEvents.getLast().getChargerId().toString());
+
+		// check engine logic
+		assertEquals(2, scenario.tracker().plugActivityEvents.size());
+		assertEquals(2, scenario.tracker().unplugActivityEvents.size());
+
+		assertEquals(39217.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
+		assertEquals(50556.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+
+		assertEquals(57393.0, scenario.tracker().plugActivityEvents.getLast().getTime());
+		assertEquals(64956.0, scenario.tracker().unplugActivityEvents.getLast().getTime());
+
+		assertEquals(Arrays.asList(Arrays.array(
+			// "activity:home",
+			"leg:walk",
+			"activity:car interaction",
+			"leg:car",
+			"activity:ev:plug interaction",
+			"leg:walk",
+			"activity:work",
+			"leg:walk",
+			"activity:ev:unplug interaction",
+			"leg:car",
+			"activity:car interaction",
+			"leg:walk",
+			"activity:home",
+			"leg:walk",
+			"activity:car interaction",
+			"leg:car",
+			"activity:ev:plug interaction",
+			"leg:walk",
+			"activity:work",
+			"leg:walk",
+			"activity:ev:unplug interaction",
 			"leg:car",
 			"activity:car interaction",
 			"leg:walk",
