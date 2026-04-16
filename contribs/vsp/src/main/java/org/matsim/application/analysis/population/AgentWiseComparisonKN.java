@@ -57,6 +57,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	private static int scoreWrnCnt = 0;
 
 	private static final boolean doRoh = true;
+	static final boolean doSwitchers = false;
+	static final boolean isDebugging = true;
 
 	@CommandLine.Parameters(description = "Path to run output directory for which analysis should be performed.")
 	private Path inputPath;
@@ -290,22 +292,19 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		double popCntMuse_h = 0.;
 		Counter counter = new Counter( "in method generatePersonTableFromPopulation(...); processing person #  ");
 		MuseComputation museComputation = baseCaseInjector.getInstance( MuseComputation.class );
+
+		// yyyyyy much/all of the following needs to be differentiated by subpopulation !!! yyyyyy
+
 		for( Person person : population.getPersons().values() ){
 			counter.incCounter();
 
-			// yyyyyy much/all of the following needs to be differentiated by subpopulation !!! yyyyyy
-
 			table.stringColumn( PERSON_ID ).append( person.getId().toString() );
-
-			final Double scoreFromMatsim = person.getSelectedPlan().getScore();
-			table.doubleColumn( MATSIM_SCORE ).append( scoreFromMatsim );
-
+			table.doubleColumn( MATSIM_SCORE ).append( person.getSelectedPlan().getScore() );
 			table.stringColumn( ANALYSIS_POPULATION ).append( getIsInShp( person ) );
 
 			if ( isBaseTable ){
 				processMUoM( person, table );
 				table.intColumn( INCOME_DECILE ).append( getIncomeDecileBetween0And9( person ) );
-
 				museComputation.computeMuseForAllActs( person.getSelectedPlan() );
 			}
 
@@ -322,9 +321,12 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			}
 
 			double sumMoney = 0.;
-			Double moneyFromEvents = (Double) person.getAttributes().getAttribute( KN_MONEY );
-			if( moneyFromEvents != null ){
-				sumMoney += moneyFromEvents;
+			{
+				// money from events.  money from normal scoring comes later
+				Double moneyFromEvents = (Double) person.getAttributes().getAttribute( KN_MONEY );
+				if( moneyFromEvents != null ){
+					sumMoney += moneyFromEvents;
+				}
 			}
 
 			Map<String, Double> dailyMoneyByMode = new TreeMap<>();
@@ -339,7 +341,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			List<String> actSeq = new ArrayList<>();
 			boolean firstTrip = true;
 			for( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( person.getSelectedPlan() ) ){
+				final String mainMode = TripStructureUtils.identifyMainMode( trip.getTripElements() );
+
 				// per trip:
+				double tripTTime = 0.;
 
 				if( firstTrip ){
 					firstTrip = false;
@@ -365,6 +370,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 					// ttime:
 					sumTtimes += leg.getTravelTime().seconds();
+					tripTTime += leg.getTravelTime().seconds();
 					directTravelScore += leg.getTravelTime().seconds() / 3600. * modeParams.getMarginalUtilityOfTraveling();
 
 					// money:
@@ -386,11 +392,18 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 						}
 					}
 				}
+				if ( isTestPerson( person.getId()  ) ){
+					log.error( "personId={}; tripTtimeMs={}", person.getId(), tripTTime );
+				}
 			}
 			// here we are done with the trip loop and now need to memorize the person values:
 
 			table.doubleColumn( TTIME ).append( sumTtimes / 3600. );
 			// (dies erzeugt keinen weiteren score!)
+
+			if ( isTestPerson( person.getId() ) ) {
+				log.error("personId={}; sumTTimes from ms calculation={}", person.getId(), sumTtimes );
+			}
 
 			// yyyy put the results of the utl computation first into person attributes, and convert to table separately
 
@@ -406,7 +419,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			}
 			if( isBaseTable ){
 				double muse_h = sumMuse_h / cntMuse_h;
-				// note that cntMuse_h can be 0 (because if "weird" activities) and then muse_h becomes NaN.
+				// note that cntMuse_h can be 0 (because of "weird" activities) and then muse_h becomes NaN.
 				table.doubleColumn( MUSE_h ).append( muse_h );
 				// (means we are sometimes appending NaN.)
 
@@ -443,8 +456,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			}
 
 			if ( scoreWrnCnt < 10 ){
-				if( !Gbl.equal( scoreFromMatsim, computedPersonScore, 1 ) ){
-					log.warn( "personId={}; scoreFromMS={}; computedPersonScore={}; possible reason: score averaging in ms", person.getId(), scoreFromMatsim, computedPersonScore );
+				if( !Gbl.equal( person.getSelectedPlan().getScore(), computedPersonScore, 1 ) ){
+					log.warn( "personId={}; scoreFromMS={}; computedPersonScore={}; possible reason: score averaging in ms", person.getId(),
+						person.getSelectedPlan().getScore(), computedPersonScore );
 					scoreWrnCnt++;
 					if ( scoreWrnCnt==10 ) {
 						log.warn( Gbl.FUTURE_SUPPRESSED );
@@ -520,6 +534,14 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				log.info( "" );
 				log.info( "print sorted roh table:" );
 				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+
+				log.info("");
+				log.info("print debugging table:");
+				rohDeltaTable.addColumns(  rohDeltaTable.doubleColumn( deltaOf(ACTS_SCORE) ).subtract( rohDeltaTable.doubleColumn(
+					U_TTIME_DIFF_REM_HET_PT ) ).setName( "ms - roh" ) );
+				formatTable( rohDeltaTable, 2 );
+				System.out.println( rohDeltaTable.sortOn( "ms - roh" ).print(20) );
+				log.info("");
 			}
 
 			// ===
@@ -532,8 +554,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
 			}
 		}
-//		log.error("stopping after remainers");
-//		System.exit(-1);
+		if ( !doSwitchers ) {
+			log.error("stopping here since switchers are switched off");
+			System.exit(-1);
+		}
 		{
 			System.out.println();
 			System.out.println("## SWITCHERS: ===");

@@ -45,8 +45,8 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.*;
 
-import static org.matsim.api.core.v01.TransportMode.*;
 import static org.matsim.application.ApplicationUtils.globFile;
+import static org.matsim.application.analysis.population.AgentWiseRuleOfHalfComputation.*;
 import static org.matsim.application.analysis.population.HeadersKN.*;
 import static org.matsim.core.population.PersonUtils.getMarginalUtilityOfMoney;
 
@@ -222,15 +222,17 @@ class AgentWiseComparisonKNUtils{
 //				"766222", "459926", "1279437", "1055071", "1083364", "1450752", "114301" , "203311",
 				 // lausitz:
 //				 "1012515",
-				 "960148",
+//				 "960148",
 					// dresden:
-					"1084690","34371","843219","588488",
+//					"1084690","34371","843219","588488",
 				// berlin:
-				 "berlin_c5d528ea",
+//				 "berlin_c5d528ea",
 				 // example:
-				 "person1",
+//				 "person1",
 				 // dresden CaBa debugging:
-				 "79496"
+//				 "79496",
+				// very different ttimes debugging:
+				"70040"
 					-> true;
 			default -> false;
 		};
@@ -262,24 +264,29 @@ class AgentWiseComparisonKNUtils{
 	static void writeRuleOfHalfSummaryTable( Path inputPath, Config config, Table deltaTable ){
 		final double factor = 1./ config.qsim().getFlowCapFactor();
 
-		double homTtimeBenefitRemainers = deltaTable.doubleColumn( W1_TTIME_DIFF_REM ).sum() * factor ;
-//		double hetTtimeBenefitRemainers = deltaTable.doubleColumn( W2_TTIME_DIFF_REM ).sum() * factor ;
+//		double homTtimeBenefitRemainers = deltaTable.doubleColumn( U_TTIME_DIFF_REM_UNI ).sum() * factor ;
+		double hetTtimeBenefitRemainersPt = deltaTable.doubleColumn( U_TTIME_DIFF_REM_HET_PT ).sum() * factor ;
+		double hetTtimeBenefitRemainersOther = deltaTable.doubleColumn( U_TTIME_DIFF_REM_HET_OTHER ).sum() * factor ;
 
-		double homTtimeBenfitSwitchers = deltaTable.doubleColumn( W1_TTIME_DIFF_SWI ).sum() * factor / 2 ;
-//		double hetTtimeBenfitSwitchers = deltaTable.doubleColumn( W2_TTIME_DIFF_SWI ).sum() * factor / 2 ;
+//		double homTtimeBenfitSwitchers = deltaTable.doubleColumn( U_TTIME_DIFF_SWI_UNI ).sum() * factor / 2 ;
+		double hetTtimeBenfitSwitchers = deltaTable.doubleColumn( U_TTIME_DIFF_SWI_HET ).sum() * factor / 2 ;
 
 		double ixBenefitRemainers = deltaTable.doubleColumn( IX_DIFF_REMAINING ).sum() * factor * (-1);
 		double ixBenefitSwitchers = deltaTable.doubleColumn( IX_DIFF_SWITCHING ).sum() * factor / 2 * (-1);
 
-		double roh = homTtimeBenefitRemainers + ixBenefitRemainers + homTtimeBenfitSwitchers + ixBenefitSwitchers;
+//		double roh = homTtimeBenefitRemainers + ixBenefitRemainers + homTtimeBenfitSwitchers + ixBenefitSwitchers;
+		double roh = hetTtimeBenefitRemainersPt + hetTtimeBenefitRemainersOther + ixBenefitRemainers + hetTtimeBenfitSwitchers + ixBenefitSwitchers;
 
 //		double ttimeBenefitRemainersUniformMutts = deltaTable.doubleColumn( deltaOf( TTIME)  ).sum() * factor * (-9.16) ; // 9.16 = mean mUTTS bln
 		// yy das geht so nicht, weil es nicht zwischen remainers und switchers unterscheidet
 
 		final StringBuilder score_cmt = new StringBuilder( "are the overall (hom.) \"anglo\" benefits (potentially negative). This has the following contributions:" );
 
-		final StringBuilder hom_ttime_uniform_rem_cmt = new StringBuilder( "... are the travel time benefits trips-w-same-mode (hom. mUTTS)." );
-		final StringBuilder het_ttime_rem_cmt = new StringBuilder( "... are the travel time benefits trips-w-same-mode (het. mUTTS)." );
+		final StringBuilder hom_ttime_uniform_rem_cmt_pt = new StringBuilder( "... are the travel time benefits trips-w-same-mode pt (hom. mUTTS)." );
+		final StringBuilder het_ttime_rem_cmt_pt = new StringBuilder( "... are the travel time benefits trips-w-same-mode pt (het. mUTTS)." );
+
+		final StringBuilder hom_ttime_uniform_rem_cmt_other = new StringBuilder( "... are the travel time benefits trips-w-same-mode other (hom. mUTTS)." );
+		final StringBuilder het_ttime_rem_cmt_other = new StringBuilder( "... are the travel time benefits trips-w-same-mode other (het. mUTTS)." );
 
 		final StringBuilder hom_ttime_swi_cmt = new StringBuilder( "... are the travel time benefits trips-w-other-mode (hom. mUTTS)." );
 		final StringBuilder het_ttime_swi_cmt = new StringBuilder( "... are the RoH travel time benefits trips-w-other-mode (het. mUTTS)." );
@@ -287,9 +294,11 @@ class AgentWiseComparisonKNUtils{
 		final StringBuilder u_lineswitches_rem_cmt = new StringBuilder("... are the iX benefits trips-w-same-mode.");
 		final StringBuilder u_lineswitches_swi_cmt = new StringBuilder("... are the RoH iX benefits trips-w-other-mode.");
 
-		final int maxLen = score_cmt.length();alignLeft( het_ttime_rem_cmt, maxLen );alignLeft( u_lineswitches_rem_cmt, maxLen );
+		final int maxLen = score_cmt.length();
+		alignLeft( het_ttime_rem_cmt_pt, maxLen ); alignLeft( het_ttime_rem_cmt_other, maxLen );
+		alignLeft( u_lineswitches_rem_cmt, maxLen );
 		alignLeft( hom_ttime_swi_cmt, maxLen ); alignLeft( het_ttime_swi_cmt, maxLen ); alignLeft( u_lineswitches_swi_cmt, maxLen );
-		alignLeft( hom_ttime_uniform_rem_cmt, maxLen );
+		alignLeft( hom_ttime_uniform_rem_cmt_pt, maxLen );
 
 		// ---
 
@@ -298,20 +307,23 @@ class AgentWiseComparisonKNUtils{
 		summaryTable.doubleColumn( "value" ).append( roh );
 		summaryTable.stringColumn( "comment" ).append( score_cmt.toString() );
 
-//		summaryTable.doubleColumn( "value" ).append( hetTtimeBenefitRemainers );
-//		summaryTable.stringColumn( "comment" ).append( het_ttime_rem_cmt.toString() );
+		summaryTable.doubleColumn( "value" ).append( hetTtimeBenefitRemainersPt );
+		summaryTable.stringColumn( "comment" ).append( het_ttime_rem_cmt_pt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( homTtimeBenefitRemainers );
-		summaryTable.stringColumn( "comment" ).append( hom_ttime_uniform_rem_cmt.toString() );
+		summaryTable.doubleColumn( "value" ).append( hetTtimeBenefitRemainersOther );
+		summaryTable.stringColumn( "comment" ).append( het_ttime_rem_cmt_other.toString() );
+
+//		summaryTable.doubleColumn( "value" ).append( homTtimeBenefitRemainers );
+//		summaryTable.stringColumn( "comment" ).append( hom_ttime_uniform_rem_cmt.toString() );
 
 		summaryTable.doubleColumn( "value" ).append( ixBenefitRemainers );
 		summaryTable.stringColumn( "comment" ).append( u_lineswitches_rem_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( homTtimeBenfitSwitchers );
-		summaryTable.stringColumn( "comment" ).append( hom_ttime_swi_cmt.toString() );
+//		summaryTable.doubleColumn( "value" ).append( homTtimeBenfitSwitchers );
+//		summaryTable.stringColumn( "comment" ).append( hom_ttime_swi_cmt.toString() );
 
-//		summaryTable.doubleColumn( "value" ).append( hetTtimeBenfitSwitchers );
-//		summaryTable.stringColumn( "comment" ).append( het_ttime_swi_cmt.toString() );
+		summaryTable.doubleColumn( "value" ).append( hetTtimeBenfitSwitchers );
+		summaryTable.stringColumn( "comment" ).append( het_ttime_swi_cmt.toString() );
 
 		summaryTable.doubleColumn( "value" ).append( ixBenefitSwitchers );
 		summaryTable.stringColumn( "comment" ).append( u_lineswitches_swi_cmt.toString() );
@@ -525,7 +537,7 @@ class AgentWiseComparisonKNUtils{
 						   );
 	}
 	static @NotNull Table createRohDeltaTable( Table joinedTable ){
-		return Table.create( joinedTable.column( PERSON_ID )
+		final Table table = Table.create( joinedTable.column( PERSON_ID )
 			, joinedTable.column( UTL_OF_MONEY )
 //			, joinedTable.column( MUSL_h )
 			, joinedTable.column( SCORE )
@@ -546,17 +558,27 @@ class AgentWiseComparisonKNUtils{
 			, deltaColumn( joinedTable, MONEY_SCORE )
 			, deltaColumn( joinedTable, ASCS )
 			//
-			, joinedTable.column( W1_TTIME_DIFF_REM )
-//			, joinedTable.column( W2_TTIME_DIFF_REM )
+			, joinedTable.column( TTIME_DIFF_REM_PT )
+			, joinedTable.column( TTIME_DIFF_REM_OTHER )
+			, joinedTable.column( U_TTIME_DIFF_REM_HET_PT )
+			, joinedTable.column( U_TTIME_DIFF_REM_HET_OTHER )
 			, joinedTable.column( IX_DIFF_REMAINING )
-			, joinedTable.column( W1_TTIME_DIFF_SWI )
-//			, joinedTable.column( W2_TTIME_DIFF_SWI )
-			, joinedTable.column( IX_DIFF_SWITCHING )
+										);
+//		if ( AgentWiseComparisonKN.doSwitchers ){
+		// (does not work; info is needed even when only remainers are computed. :-( )
+			table.addColumns(
+//				joinedTable.column( U_TTIME_DIFF_SWI_UNI )
+				joinedTable.column( U_TTIME_DIFF_SWI_HET )
+				, joinedTable.column( IX_DIFF_SWITCHING )
+							);
+//		}
+		table.addColumns(
 			// information:
-			, joinedTable.column( MODE_SEQ )
+			joinedTable.column( MODE_SEQ )
 			, joinedTable.column( keyTwoOf( MODE_SEQ ) )
 			, joinedTable.column( INCOME_DECILE )
-						   );
+						);
+		return table;
 	}
 	static @NotNull Table createPopulationTable(){
 		return Table.create( StringColumn.create( PERSON_ID )
@@ -583,24 +605,47 @@ class AgentWiseComparisonKNUtils{
 	static void addRohValuesToTable( Population policyPopulation, Table personsTablePolicy ) {
 		// yyyy note that this does not check that the person IDs are consistent.
 
-		var ttimeRemHom = DoubleColumn.create( W1_TTIME_DIFF_REM );
-		var ttimeRemHet = DoubleColumn.create( W2_TTIME_DIFF_REM );
-		var ixRem = DoubleColumn.create( IX_DIFF_REMAINING );
+		DoubleColumn tTimeRemPt = DoubleColumn.create( TTIME_DIFF_REM_PT );
+		DoubleColumn tTimeRemOther = DoubleColumn.create( TTIME_DIFF_REM_OTHER );
 
-		var ttimeSwiHom = DoubleColumn.create( W1_TTIME_DIFF_SWI );
-		var ttimeSwiHet = DoubleColumn.create( W2_TTIME_DIFF_SWI );
-		var ixSwi = DoubleColumn.create( IX_DIFF_SWITCHING );
+		DoubleColumn uTtimeRemHomPt = DoubleColumn.create( U_TTIME_DIFF_REM_UNI_PT );
+		DoubleColumn uTtimeRemHomOther = DoubleColumn.create( U_TTIME_DIFF_REM_UNI_OTHER );
+
+		DoubleColumn uTtimeRemHetPt = DoubleColumn.create( U_TTIME_DIFF_REM_HET_PT );
+		DoubleColumn uTtimeRemHetOther = DoubleColumn.create( U_TTIME_DIFF_REM_HET_OTHER );
+
+		DoubleColumn ixRem = DoubleColumn.create( IX_DIFF_REMAINING );
+
+		DoubleColumn uTttimeSwiHom = DoubleColumn.create( U_TTIME_DIFF_SWI_UNI );
+		DoubleColumn uTtimeSwiHet = DoubleColumn.create( U_TTIME_DIFF_SWI_HET );
+		DoubleColumn ixSwi = DoubleColumn.create( IX_DIFF_SWITCHING );
 
 		for( Person person : policyPopulation.getPersons().values() ){
-			ttimeRemHom.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.REM, AgentWiseRuleOfHalfComputation.HOM, person ) );
-			ttimeRemHet.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.REM, AgentWiseRuleOfHalfComputation.HET, person ) );
-			ttimeSwiHom.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.SWI, AgentWiseRuleOfHalfComputation.HOM, person ) );
-			ttimeSwiHet.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.TTIME_HR, AgentWiseRuleOfHalfComputation.SWI, AgentWiseRuleOfHalfComputation.HET, person ) );
-			ixRem.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.IX, AgentWiseRuleOfHalfComputation.REM, AgentWiseRuleOfHalfComputation.HOM, person ) );
-			ixSwi.append( AgentWiseRuleOfHalfComputation.getDiffs( AgentWiseRuleOfHalfComputation.IX, AgentWiseRuleOfHalfComputation.SWI, AgentWiseRuleOfHalfComputation.HOM, person ) );
+			{
+				EnumMap<Mode, Double> map = getDiffsAsMap( TTIME_HR, REM, NULL, person );
+				tTimeRemPt.append( map.get( Mode.pt ) );
+				tTimeRemOther.append( map.get( Mode.other ) );
+			}
+			{
+				EnumMap<Mode, Double> map = getDiffsAsMap( U_TTIME_HR, REM, HOM, person );
+				uTtimeRemHomPt.append(map.get( Mode.pt));
+				uTtimeRemHomOther.append( map.get( Mode.other ) );
+			}
+			{
+				EnumMap<Mode, Double> map = getDiffsAsMap( U_TTIME_HR, REM, HET, person );
+				uTtimeRemHetPt.append( map.get( Mode.pt ) );
+				uTtimeRemHetOther.append( map.get( Mode.other ) );
+			}
+
+			uTttimeSwiHom.append( getDiffs( U_TTIME_HR, SWI, HOM, person ) );
+			uTtimeSwiHet.append( getDiffs( U_TTIME_HR, SWI, HET, person ) );
+
+			ixRem.append( getDiffs( IX, REM, HOM, person ) );
+			ixSwi.append( getDiffs( IX, SWI, HOM, person ) );
 		}
 
-		personsTablePolicy.addColumns( ttimeRemHom, ttimeRemHet, ixRem, ttimeSwiHom, ttimeSwiHet, ixSwi );
+//		personsTablePolicy.addColumns( tTimeRem, uTtimeRemHom, uTtimeRemHet, ixRem, uTttimeSwiHom, uTtimeSwiHet, ixSwi );
+		personsTablePolicy.addColumns( tTimeRemPt, tTimeRemOther, uTtimeRemHetPt, uTtimeRemHetOther, ixRem, uTtimeSwiHet, ixSwi );
 		log.info( "persons table policy after adding RoH entries:" );
 		System.out.println( personsTablePolicy );
 

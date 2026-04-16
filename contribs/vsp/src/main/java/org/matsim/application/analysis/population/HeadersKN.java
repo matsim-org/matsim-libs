@@ -2,17 +2,24 @@ package org.matsim.application.analysis.population;
 
 // These are "excel" column headers so we use: (1) no spaces; (2) underscores instead of camel case.
 class HeadersKN{
-	public static final String ACTS_SCORE = "acts_score";
+	public static final String ACTS_SCORE = "actsScore";
 	public static final String INCOME_DECILE = "income_decile";
 	public static final String IX_DIFF_REMAINING = "ixDiffRem";
 	public static final String IX_DIFF_SWITCHING = "ixDiffSwi";
-	public static final String MONEY_SCORE = "money_score";
+	public static final String MONEY_SCORE = "moneyScore";
 	public static final String ANALYSIS_POPULATION = "analysis_population";
-	public static final String W1_TTIME_DIFF_REM = "ttimeDiffRemUni";
 
-	public static final String W2_TTIME_DIFF_REM = "ttimeDiffRemHet";
-	public static final String W2_TTIME_DIFF_SWI = "ttimeDiffSwiHet";
-	public static final String W1_TTIME_DIFF_SWI = "ttimeDiffSwiUni";
+	public static final String TTIME_DIFF_REM_PT = "d_tTimeRemPt";
+	public static final String TTIME_DIFF_REM_OTHER = "d_tTimeRemOth";
+
+	public static final String U_TTIME_DIFF_REM_UNI_PT = "d_uTtimeRemUniPt";
+	public static final String U_TTIME_DIFF_REM_UNI_OTHER = "d_uTtimeRemUniOth";
+
+	public static final String U_TTIME_DIFF_REM_HET_PT = "d_uTtimeRemHet";
+	public static final String U_TTIME_DIFF_REM_HET_OTHER = "d_uTtimeRemOther";
+
+	public static final String U_TTIME_DIFF_SWI_UNI = "d_uTtimeSwiUni";
+	public static final String U_TTIME_DIFF_SWI_HET = "d_uTtimeSwiHet";
 
 	public static final String personId = "personId";
 	public static final String tripIdx = "tripIdx";
@@ -37,7 +44,7 @@ class HeadersKN{
 	public static final String MODE ="modeSeq";
 	public static final String PERSON_ID = "personId";
 	public static final String INCOME = "income";
-	public static final String MATSIM_SCORE = "MATSim-score[u]";
+	public static final String MATSIM_SCORE = "MATSimScore[u]";
 	public static final String SCORE = "SCORE[u]";
 	public static final String BENEFIT = "wtp4score";
 	public static final String UTL_OF_MONEY = "UoM";
