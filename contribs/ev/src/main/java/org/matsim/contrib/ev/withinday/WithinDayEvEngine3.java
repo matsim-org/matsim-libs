@@ -13,6 +13,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.ev.charging.ChargingListener;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.withinday.events.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.*;
@@ -73,9 +75,10 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 	private final PartitionTransfer partitionTransfer;
 	private final SimNetwork simNetwork;
 	private final ChargingAlternativeProvider alternativeProvider;
+	private final ChargingInfrastructure chargingInfrastructure;
 
 	@Inject
-	public WithinDayEvEngine3(WithinDayEvConfigGroup config, WithinDayChargingStrategy.Factory chargingStrategyFactory, ActivityEngine delegateEngine, ElectricFleet electricFleet, ChargingSlotProvider slotProvider, ChargingScheduler chargingScheduler, EventsManager em, Scenario scenario, TimeInterpretation timeInterpretation, ParkedVehicles parkedVehicles, PartitionTransfer partitionTransfer, SimNetwork simNetwork, ChargingAlternativeProvider alternativeProvider) {
+	public WithinDayEvEngine3(WithinDayEvConfigGroup config, WithinDayChargingStrategy.Factory chargingStrategyFactory, ActivityEngine delegateEngine, ElectricFleet electricFleet, ChargingSlotProvider slotProvider, ChargingScheduler chargingScheduler, EventsManager em, Scenario scenario, TimeInterpretation timeInterpretation, ParkedVehicles parkedVehicles, PartitionTransfer partitionTransfer, SimNetwork simNetwork, ChargingAlternativeProvider alternativeProvider, ChargingInfrastructure chargingInfrastructure) {
 		this.chargingStrategyFactory = chargingStrategyFactory;
 		this.delegateEngine = delegateEngine;
 		this.maximumQueueWaitTime = config.getMaximumQueueTime();
@@ -92,6 +95,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		this.partitionTransfer = partitionTransfer;
 		this.simNetwork = simNetwork;
 		this.alternativeProvider = alternativeProvider;
+		this.chargingInfrastructure = chargingInfrastructure;
 	}
 
 
@@ -147,7 +151,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 						"Cannot switch from a leg-based charging slot to an activity-based alternative because activities are not known");
 				}
 
-				if (alternative.charger() != process.currentSlot.charger()) {
+				if (alternative.charger().getId() != process.currentSlot.charger().getId()) {
 					Activity followingPlugActivity = findFollowingActivity(agent, PLUG_ACTIVITY_TYPE);
 
 					// drive to different charger and schedule a plug activity
@@ -172,7 +176,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 					process.currentSlot = new ChargingSlot(process.currentSlot.startActivity(),
 						process.currentSlot.endActivity(),
 						process.currentSlot.leg(), alternative.duration(),
-						process.currentSlot.charger());
+						getLiveCharger(process.currentSlot));
 
 					// send event for scoring
 					em.processEvent(new UpdateChargingAttemptEvent(time, agent.getId(),
@@ -227,7 +231,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		vehiclesToProcess.put(process.vehicleId, process);
 		personsToProcess.put(agent.getId(), process);
 
-		submitToCharger(agent, process);
+		submitToCharger(process);
 		if (!delegateEngine.handleActivity(agent)) {
 			throw new RuntimeException("Activity engine is expected to accept agent");
 		}
@@ -248,9 +252,9 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		}
 		// remove the vehicle from the charger. This will also clear the charging process from vehicleToProcesses
 		if (process.isPlugged) {
-			var chargingLogic = process.currentSlot.charger().getLogic();
+			var charger = getLiveCharger(process.currentSlot);
 			var ev = electricFleet.getVehicle(process.vehicleId);
-			chargingLogic.removeVehicle(ev, now);
+			charger.getLogic().removeVehicle(ev, now);
 			process.isPlugged = false;
 		}
 
@@ -290,10 +294,6 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		queuedVehicles.remove(ev.getId());
 		process.isPlugged = true;
 
-		// in case of overnight charging, persons can be somewhere else.
-//		if (process.isOvernight) {
-//			chargingScheduler.scheduleUnplugActivityAfterOvernightCharge(agent, process.currentSlot.endActivity(), process.currentSlot.charger());
-//		} else
 		if (process.isPersonAtCharger) {
 			var agent = personsAtCharger.get(process.personId);
 			var plugActivity = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
@@ -372,8 +372,9 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 					// standard case: schedule a plug activity along the plan
 					Preconditions.checkState(slot.leg() == null);
 					Preconditions.checkState(wholeDaySlot == null);
+					var charger = getLiveCharger(slot);
 					Activity plugActivity = chargingScheduler.scheduleInitialPlugActivity(agent,
-						slot.startActivity(), slot.charger());
+						slot.startActivity(), charger);
 					plugActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
 					//activityBasedCount++;
 				} else {
@@ -382,16 +383,16 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 					Preconditions.checkState(slot.endActivity() == null);
 					Preconditions.checkState(slot.leg() != null);
 
-					Activity plugActivity = chargingScheduler.scheduleOnroutePlugActivity(agent, slot.leg(),
-						slot.charger());
+					var charger = getLiveCharger(slot);
+					Activity plugActivity = chargingScheduler.scheduleOnroutePlugActivity(agent, slot.leg(), charger);
 					plugActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
 					//legBasedCount++;
 				}
 			}
 
 			if (overnightSlot != null) {
-				startOvernightCharging(agent, overnightSlot);
-				updateInitialVehicleLocation(agent, ev, overnightSlot);
+				integrateOvernightUnplugActivity(agent, overnightSlot);
+				initializeOvernightCharging(agent, ev, overnightSlot);
 
 
 				//throw new UnsupportedOperationException("Overnight charging not yet implemented");
@@ -466,11 +467,8 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		Person person = plan.getPerson();
 		Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, chargingMode);
 
-		ChargingProcess process = new ChargingProcess();
-		process.personId = agent.getId();
-		process.vehicleId = vehicleId;
-		process.currentSlot = slot;
-		process.initialSlot = slot;
+		var maxQueueTime = getMaxQueueWaitTime(agent);
+		ChargingProcess process = new ChargingProcess(agent.getId(), vehicleId, maxQueueTime, slot);
 
 		var now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		em.processEvent(new StartChargingProcessEvent(now, person.getId(), vehicleId, process.processIndex));
@@ -492,19 +490,12 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		return personMax == null ? maximumQueueWaitTime : personMax;
 	}
 
-	private void startOvernightCharging(MobsimAgent agent, ChargingSlot slot) {
+	private void integrateOvernightUnplugActivity(MobsimAgent agent, ChargingSlot slot) {
 
 		// everything planned here stays with the agent's plan. Therefore, it can be done
 		// regardless of which partition the plug activity is located on.
 		Activity endActivity = slot.endActivity();
 		endActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
-
-		ChargingProcess process = createChargingProcess(agent, slot, null, false);
-		personsToProcess.put(agent.getId(), process);
-		vehiclesToProcess.put(process.vehicleId, process);
-		process.isOvernight = true;
-
-		submitToCharger(agent, process);
 
 		OptionalTime endTime = timeInterpretation.decideOnActivityEndTimeAlongPlan(endActivity, WithinDayAgentUtils.getModifiablePlan(agent));
 		Preconditions.checkState(endTime.isDefined());
@@ -514,21 +505,23 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 		WithinDayAgentUtils.resetCaches(agent);
 
-		var unplugActivity = chargingScheduler.scheduleUnplugActivityAfterOvernightCharge(agent, endActivity, process.currentSlot.charger());
+		var charger = getLiveCharger(slot);
+		var unplugActivity = chargingScheduler.scheduleUnplugActivityAfterOvernightCharge(agent, endActivity, charger);
 		unplugActivity.setEndTime(unplugActivity.getStartTime().seconds());
 	}
 
-	private void submitToCharger(MobsimAgent agent, ChargingProcess process) {
+	private void submitToCharger(ChargingProcess process) {
 
-		var spec = process.currentSlot.charger().getSpecification();
+		var charger = getLiveCharger(process.currentSlot);
+		var spec = charger.getSpecification();
 		var ev = electricFleet.getVehicle(process.vehicleId);
 		var strategy = chargingStrategyFactory.createStrategy(spec, ev);
-		var chargingLogic = process.currentSlot.charger().getLogic();
+		var chargingLogic = charger.getLogic();
 		var now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 
 		// add vehicle to charger, it will be either queued or plugged
 		chargingLogic.addVehicle(ev, strategy, this, now);
-		process.latestPlugTime = now + getMaxQueueWaitTime(agent);
+		process.latestPlugTime = now + process.maxQueueTime;
 		process.isSubmitted = true;
 	}
 
@@ -546,7 +539,13 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		return null;
 	}
 
-	private void updateInitialVehicleLocation(MobsimAgent agent, ElectricVehicle ev, ChargingSlot slot) {
+	private void initializeOvernightCharging(MobsimAgent agent, ElectricVehicle ev, ChargingSlot slot) {
+
+		// create a charging process
+		ChargingProcess process = createChargingProcess(agent, slot, null, false);
+		process.isOvernight = true;
+
+		// figure out where the vehicle is probably located at the moment
 
 		// usually, a vehicle is used at the first link of a plan. This will break if anything else is done.
 		var firstVehicleLeg = ((PlanAgent) agent).getCurrentPlan().getPlanElements().stream()
@@ -560,16 +559,20 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		// try to retrieve a vehicle from that link
 		var vehicle = parkedVehicles.unpark(ev.getId(), startLinkId);
 
+		// when things happen here, park the vehicle and put the process into the bookkeeping
 		if (partitionTransfer.isLocal(startLinkId)) {
 			var simLink = simNetwork.getLinks().get(slot.charger().getLink().getId());
 			parkedVehicles.park(vehicle, simLink);
+			personsToProcess.put(agent.getId(), process);
+			vehiclesToProcess.put(process.vehicleId, process);
 		} else {
 			// send charging process and vehicle to other partition
 			// Will this work? I guess the vehicle will only arrive one second after we schedule its sending.
 			// However, this method should usually be called when agents are put into activity engines before the simulation
 			// starts.
-			var process = vehiclesToProcess.get(ev.getId());
-			var msg = new InitialVehicleLocationMessage(vehicle, startLinkId, process);
+			var msg = new OvernightChargingMessage(vehicle, startLinkId, process);
+			var toPartition = partitionTransfer.getPartitionIndex(startLinkId);
+			internalInterface.notifyVehicleLeavesPartition(vehicle, toPartition);
 			partitionTransfer.collect(msg, startLinkId);
 		}
 	}
@@ -611,11 +614,11 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 			var process = vehiclesToProcess.get(id);
 			if (process.latestPlugTime >= time) continue;
 
-			var chargingLogic = process.currentSlot.charger().getLogic();
+			var charger = getLiveCharger(process.currentSlot);
 			var ev = electricFleet.getVehicle(process.vehicleId);
 			var agent = personsAtCharger.get(process.personId);
 
-			chargingLogic.removeVehicle(ev, time);
+			charger.getLogic().removeVehicle(ev, time);
 			em.processEvent(new AbortChargingAttemptEvent(time, process.personId, process.vehicleId));
 
 			if (process.isWholeDay || process.isOvernight) {
@@ -703,14 +706,18 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 	@Override
 	public Map<Class<? extends Message>, DistributedMobsimEngine.MessageHandler> getMessageHandlers() {
 		return Map.of(
-			InitialVehicleLocationMessage.class, this::handleInitialVehicleLocationMessage
+			OvernightChargingMessage.class, this::handleOvernightChargingMessage
 		);
 	}
 
-	private void handleInitialVehicleLocationMessage(List<Message> messages, double now) {
+	private void handleOvernightChargingMessage(List<Message> messages, double now) {
 		for (var m : messages) {
-			var ivlm = (InitialVehicleLocationMessage) m;
-			parkedVehicles.park(ivlm.vehicle, simNetwork.getLinks().get(ivlm.startLinkId));
+			var ocm = (OvernightChargingMessage) m;
+			parkedVehicles.park(ocm.vehicle, simNetwork.getLinks().get(ocm.startLinkId));
+			internalInterface.notifyVehicleEntersPartition(ocm.vehicle);
+			personsToProcess.put(ocm.process.personId, ocm.process);
+			vehiclesToProcess.put(ocm.process.vehicleId, ocm.process);
+			submitToCharger(ocm.process);
 		}
 	}
 
@@ -766,9 +773,9 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 			var pa = (PlanAgent) agent;
 			// SAFETY: Agents can only change partitions during legs. (I hope)
 			var nextActivity = nextActivity(pa);
-			var now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 			if (nextActivity.getType().equals(UNPLUG_ACTIVITY_TYPE)) {
-				chargingScheduler.replaceUnplugWithAccessAfterOvernightCharge(agent, nextActivity, process.currentSlot.charger());
+				var charger = getLiveCharger(process.currentSlot);
+				chargingScheduler.replaceUnplugWithAccessAfterOvernightCharge(agent, nextActivity, charger);
 			}
 		}
 	}
@@ -784,11 +791,19 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		return null;
 	}
 
+	/**
+	 * We store chargers in slots and other places. However, those can be stale instances of chargers on other partitions
+	 *  have this helper to obtain a live instance from the infrastructure for this partition
+	 */
+	private Charger getLiveCharger(ChargingSlot slot) {
+		return chargingInfrastructure.getChargers().get(slot.charger().getId());
+	}
+
 
 	private static class ChargingProcess {
 
-		Id<Person> personId;
-		Id<Vehicle> vehicleId;
+		final Id<Person> personId;
+		final Id<Vehicle> vehicleId;
 
 		// search process
 		int attemptIndex = 0;
@@ -796,9 +811,10 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 		// plugging process
 		double latestPlugTime;
+		final double maxQueueTime;
 
 		// charging slots
-		ChargingSlot initialSlot;
+		final ChargingSlot initialSlot;
 		ChargingSlot currentSlot;
 		List<ChargingAlternative> trace = new LinkedList<>();
 
@@ -813,10 +829,18 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		boolean isOvernight = false;
 		boolean isWholeDay = false;
 
+		private ChargingProcess(Id<Person> personId, Id<Vehicle> vehicleId, double maxQueueTime, ChargingSlot initialSlot) {
+			this.personId = personId;
+			this.vehicleId = vehicleId;
+			this.maxQueueTime = maxQueueTime;
+			this.initialSlot = initialSlot;
+			this.currentSlot = initialSlot;
+		}
+
 		boolean isFirstAttempt() {return attemptIndex == 0;}
 	}
 
-	public record InitialVehicleLocationMessage(DistributedMobsimVehicle vehicle, Id<Link> startLinkId, ChargingProcess process) implements Message {}
+	public record OvernightChargingMessage(DistributedMobsimVehicle vehicle, Id<Link> startLinkId, ChargingProcess process) implements Message {}
 
 	private class InternalInterfaceDelegate implements InternalInterface {
 
@@ -855,6 +879,16 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 		@Override
 		public Collection<? extends DepartureHandler> getDepartureHandlers() {
 			return delegate.getDepartureHandlers();
+		}
+
+		@Override
+		public void notifyVehicleLeavesPartition(DistributedMobsimVehicle vehicle, int toPartition) {
+			delegate.notifyVehicleLeavesPartition(vehicle, toPartition);
+		}
+
+		@Override
+		public void notifyVehicleEntersPartition(DistributedMobsimVehicle vehicle) {
+			delegate.notifyVehicleEntersPartition(vehicle);
 		}
 	}
 
