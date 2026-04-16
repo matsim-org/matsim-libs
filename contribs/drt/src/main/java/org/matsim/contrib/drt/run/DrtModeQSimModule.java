@@ -25,6 +25,8 @@ import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
+import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
+import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
@@ -101,6 +103,15 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		if (drtCfg.getPrebookingParams().isPresent()) {
 			install(new PrebookingModeQSimModule(getMode(), drtCfg.getPrebookingParams().get()));
 			bindModal(AdvanceRequestProvider.class).to(modalKey(PrebookingManager.class));
+
+			// Auto-install prebooking logic if configured
+			drtCfg.getPrebookingParams().get().getProbabilityBasedLogicParams().ifPresent(logicParams -> {
+				install(ProbabilityBasedPrebookingLogic.createModule(drtCfg, logicParams.getProbability(),
+						logicParams.getSubmissionSlack()));
+			});
+			drtCfg.getPrebookingParams().get().getAttributeBasedLogicParams().ifPresent(logicParams -> {
+				install(AttributeBasedPrebookingLogic.createModule(drtCfg, logicParams));
+			});
 		} else {
 			bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
 		}

@@ -75,7 +75,7 @@ public final class DistributedEventsManager implements EventsManager {
 
 	private final boolean eventsDisabled;
 	/**
-	 * The remote sync step for events, which is the minimum of all handlers.
+	 * Sync intervall for global event handlers. This value should be the minimum of all global event handlers.
 	 */
 	private double remoteSyncStep = Double.POSITIVE_INFINITY;
 	/**
@@ -115,9 +115,7 @@ public final class DistributedEventsManager implements EventsManager {
 
 		var distMode = getDistributedMode(handler);
 		switch (distMode) {
-			case GLOBAL -> {
-				if (computeNode.isHeadNode()) addAsNodeSingleton(handler);
-			}
+			case GLOBAL -> addAsGlobalHandler(handler);
 			case NODE -> addAsNodeSingleton(handler);
 			case NODE_CONCURRENT -> addAsConcurrentNodeSingleton(handler);
 			case PARTITION -> throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
@@ -147,6 +145,24 @@ public final class DistributedEventsManager implements EventsManager {
 		var part = computeNode.getParts().getInt(0);
 		EventHandlerTask task = executor.register(handler, this, part, 1, null);
 		addTaskForEachPart(task, part);
+	}
+
+	/**
+	 * Registers a GLOBAL event handler. The handler is registered similar to a node handler. It is also registered
+	 * as a global listener. The globalListener collection is used to tell other partitions that the handler is
+	 * interested in events from other compute nodes.
+	 */
+	private void addAsGlobalHandler(EventHandler handler) {
+		// only the head node registers global handlers all others send events to the head node
+		if (!computeNode.isHeadNode()) return;
+
+		var part = computeNode.getParts().getInt(0);
+		EventHandlerTask task = executor.register(handler, this, part, 1, null);
+		addTaskForEachPart(task, part);
+		for (int type : task.getSupportedMessages()) {
+			globalListener.computeIfAbsent(type, _ -> new ArrayList<>()).add(task);
+		}
+		remoteSyncStep = Math.min(remoteSyncStep, handler.getSyncInterval());
 	}
 
 	public void addAsConcurrentNodeSingleton(EventHandler handler) {
@@ -395,6 +411,9 @@ public final class DistributedEventsManager implements EventsManager {
 	@Override
 	public void afterSimStep(double time) {
 
+		// this works because lastSync is initially set to -1. Therefore we send events one timestep before the processing intervall.
+		// I.e. if processing/sync intervall is 900 this will trigger a send at 899. The event handlers will process the received events
+		// at 900
 		if (lastSync + remoteSyncStep <= time) {
 
 			for (Int2ObjectMap.Entry<ManyToOneConcurrentLinkedQueue<Event>> kv : remoteEvents.int2ObjectEntrySet()) {

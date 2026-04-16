@@ -86,7 +86,7 @@ public abstract class HbefaTables {
         return result;
     }
 
-    private static HbefaWarmEmissionFactorKey createWarmKey(CSVRecord record) {
+    static HbefaWarmEmissionFactorKey createWarmKey(CSVRecord record) {
         var key = new HbefaWarmEmissionFactorKey();
         setCommonParametersOnKey(key, record);
         var trafficSit = record.get("TrafficSit");
@@ -96,7 +96,7 @@ public abstract class HbefaTables {
         return key;
     }
 
-    private static HbefaColdEmissionFactorKey createColdKey(CSVRecord record) {
+    static HbefaColdEmissionFactorKey createColdKey(CSVRecord record) {
         var key = new HbefaColdEmissionFactorKey();
         setCommonParametersOnKey(key, record);
         key.setParkingTime(mapAmbientCondPattern2ParkingTime(record.get("AmbientCondPattern")));

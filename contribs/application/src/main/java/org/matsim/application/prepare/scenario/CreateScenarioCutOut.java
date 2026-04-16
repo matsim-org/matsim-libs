@@ -620,13 +620,14 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			personsToDelete.add(person.getId());
 		}
 
+//		Please note that we DO want to keep the unselected plans because otherwise agents might need too many iterations to find a good solution. -sm0426
 		// Remove all unselected plans because these are not handled
-		List<Plan> plans = new ArrayList<>(person.getPlans());
-		for(Plan p : plans){
-			if (p != person.getSelectedPlan()){
-				person.removePlan(p);
-			}
-		}
+//		List<Plan> plans = new ArrayList<>(person.getPlans());
+//		for(Plan p : plans){
+//			if (p != person.getSelectedPlan()){
+//				person.removePlan(p);
+//			}
+//		}
 	}
 
 

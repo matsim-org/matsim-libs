@@ -12,6 +12,7 @@ import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtParallelInserterPa
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,8 @@ import java.util.stream.Collectors;
  * <module name="drtBenchmark">
  *     <param name="agentCounts" value="50000,100000"/>
  *     <param name="vehiclesPerHundredAgents" value="1"/>
+ *     <param name="requestInserterTypes" value="Default,Parallel"/>
+ *     <param name="insertionSearchStrategies" value="Selective,Extensive"/>
  *     <param name="vehiclePartitioners" value="Replicating,RoundRobin"/>
  *     <param name="requestPartitioners" value="RoundRobin,LoadAware"/>
  *     <param name="collectionPeriods" value="90"/>
@@ -105,7 +108,73 @@ public class DrtBenchmarkConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	// =========================================================================
-	// Partitioner Configuration
+	// Request Inserter & Insertion Search Configuration
+	// =========================================================================
+
+	private static final String REQUEST_INSERTER_TYPES = "requestInserterTypes";
+	private static final String INSERTION_SEARCH_STRATEGIES = "insertionSearchStrategies";
+
+	@Comment("Comma-separated list of request inserter types to benchmark. " +
+		"Options: Default, Parallel. " +
+		"'Default' uses the standard sequential DefaultUnplannedRequestInserter. " +
+		"'Parallel' uses the partitioned ParallelUnplannedRequestInserter (requires partitioner settings).")
+	@NotBlank
+	private String requestInserterTypes = "Default";
+
+	@Comment("Comma-separated list of insertion search strategies to benchmark. " +
+		"Options: Selective, Extensive, RepeatedSelective. " +
+		"Each search strategy is combined with each inserter type (cross-product).")
+	@NotBlank
+	private String insertionSearchStrategies = "Selective";
+
+	@StringGetter(REQUEST_INSERTER_TYPES)
+	public String getRequestInserterTypesString() {
+		return requestInserterTypes;
+	}
+
+	@StringSetter(REQUEST_INSERTER_TYPES)
+	public void setRequestInserterTypesString(String requestInserterTypes) {
+		this.requestInserterTypes = requestInserterTypes;
+	}
+
+	public List<InsertionStrategy.RequestInserterType> getRequestInserterTypes() {
+		return Arrays.stream(requestInserterTypes.split(","))
+			.map(String::trim)
+			.map(this::parseRequestInserterType)
+			.collect(Collectors.toList());
+	}
+
+	public void setRequestInserterTypes(List<InsertionStrategy.RequestInserterType> types) {
+		this.requestInserterTypes = types.stream()
+			.map(Enum::name)
+			.collect(Collectors.joining(","));
+	}
+
+	@StringGetter(INSERTION_SEARCH_STRATEGIES)
+	public String getInsertionSearchStrategiesString() {
+		return insertionSearchStrategies;
+	}
+
+	@StringSetter(INSERTION_SEARCH_STRATEGIES)
+	public void setInsertionSearchStrategiesString(String insertionSearchStrategies) {
+		this.insertionSearchStrategies = insertionSearchStrategies;
+	}
+
+	public List<InsertionStrategy.InsertionSearchStrategy> getInsertionSearchStrategies() {
+		return Arrays.stream(insertionSearchStrategies.split(","))
+			.map(String::trim)
+			.map(this::parseInsertionSearchStrategy)
+			.collect(Collectors.toList());
+	}
+
+	public void setInsertionSearchStrategies(List<InsertionStrategy.InsertionSearchStrategy> strategies) {
+		this.insertionSearchStrategies = strategies.stream()
+			.map(Enum::name)
+			.collect(Collectors.joining(","));
+	}
+
+	// =========================================================================
+	// Partitioner Configuration (only applies to Parallel strategy)
 	// =========================================================================
 
 	private static final String VEHICLE_PARTITIONERS = "vehiclePartitioners";
@@ -175,6 +244,7 @@ public class DrtBenchmarkConfigGroup extends ReflectiveConfigGroup {
 	private static final String MAX_PARTITIONS = "maxPartitions";
 	private static final String MAX_ITERATIONS = "maxIterations";
 	private static final String LOG_PERFORMANCE_STATS = "logPerformanceStats";
+	private static final String MATRIX_CELL_SIZE = "matrixCellSize";
 
 	@Comment("Comma-separated list of collection periods in seconds to test (e.g., '60,90,120')")
 	private String collectionPeriods = "90";
@@ -189,6 +259,11 @@ public class DrtBenchmarkConfigGroup extends ReflectiveConfigGroup {
 
 	@Comment("Log detailed performance statistics for each partition")
 	private boolean logPerformanceStats = true;
+
+	@Comment("Cell size [m] for the DVRP travel-time matrix square-grid zone system. " +
+		"Larger values reduce matrix zones/memory/time; smaller values increase precision.")
+	@Positive
+	private double matrixCellSize = 200.0;
 
 	@StringGetter(COLLECTION_PERIODS)
 	public String getCollectionPeriodsString() {
@@ -238,6 +313,16 @@ public class DrtBenchmarkConfigGroup extends ReflectiveConfigGroup {
 		this.logPerformanceStats = logPerformanceStats;
 	}
 
+	@StringGetter(MATRIX_CELL_SIZE)
+	public double getMatrixCellSize() {
+		return matrixCellSize;
+	}
+
+	@StringSetter(MATRIX_CELL_SIZE)
+	public void setMatrixCellSize(double matrixCellSize) {
+		this.matrixCellSize = matrixCellSize;
+	}
+
 	// =========================================================================
 	// Benchmark Settings
 	// =========================================================================
@@ -279,6 +364,8 @@ public class DrtBenchmarkConfigGroup extends ReflectiveConfigGroup {
 
 	private static final String OUTPUT_DIRECTORY = "outputDirectory";
 	private static final String USE_SPATIAL_FILTER = "useSpatialFilter";
+	private static final String DETOUR_PATH_CALCULATOR_TYPES = "detourPathCalculatorTypes";
+	private static final String NETWORK_URL = "networkUrl";
 
 	@Comment("Output directory for benchmark results (timestamp subfolder will be created)")
 	@NotBlank
@@ -286,6 +373,17 @@ public class DrtBenchmarkConfigGroup extends ReflectiveConfigGroup {
 
 	@Comment("Enable spatial request-fleet filter (reduces search space)")
 	private boolean useSpatialFilter = true;
+
+	@Comment("Comma-separated list of routing algorithm types for detour path computation. " +
+		"Options: SpeedyALT, CHRouter. " +
+		"Maps directly to config.controller.routingAlgorithmType.")
+	@NotBlank
+	private String detourPathCalculatorTypes = "SpeedyALT";
+
+	@Comment("URL or file path to a MATSim network file (xml or xml.gz). " +
+		"If empty, a synthetic grid network is generated. " +
+		"Example: https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v7.0/input/berlin-v7.0-network.xml.gz")
+	private String networkUrl = "";
 
 	@StringGetter(OUTPUT_DIRECTORY)
 	public String getOutputDirectory() {
@@ -305,6 +403,43 @@ public class DrtBenchmarkConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(USE_SPATIAL_FILTER)
 	public void setUseSpatialFilter(boolean useSpatialFilter) {
 		this.useSpatialFilter = useSpatialFilter;
+	}
+
+	@StringGetter(DETOUR_PATH_CALCULATOR_TYPES)
+	public String getDetourPathCalculatorTypesString() {
+		return detourPathCalculatorTypes;
+	}
+
+	@StringSetter(DETOUR_PATH_CALCULATOR_TYPES)
+	public void setDetourPathCalculatorTypesString(String detourPathCalculatorTypes) {
+		this.detourPathCalculatorTypes = detourPathCalculatorTypes;
+	}
+
+	public List<ControllerConfigGroup.RoutingAlgorithmType> getRoutingAlgorithmTypes() {
+		return Arrays.stream(detourPathCalculatorTypes.split(","))
+			.map(String::trim)
+			.map(this::parseRoutingAlgorithmType)
+			.collect(Collectors.toList());
+	}
+
+	public void setRoutingAlgorithmTypes(List<ControllerConfigGroup.RoutingAlgorithmType> types) {
+		this.detourPathCalculatorTypes = types.stream()
+			.map(Enum::name)
+			.collect(Collectors.joining(","));
+	}
+
+	@StringGetter(NETWORK_URL)
+	public String getNetworkUrl() {
+		return networkUrl;
+	}
+
+	@StringSetter(NETWORK_URL)
+	public void setNetworkUrl(String networkUrl) {
+		this.networkUrl = networkUrl;
+	}
+
+	public boolean hasExternalNetwork() {
+		return networkUrl != null && !networkUrl.isBlank();
 	}
 
 	// =========================================================================
@@ -353,20 +488,53 @@ public class DrtBenchmarkConfigGroup extends ReflectiveConfigGroup {
 		};
 	}
 
+	private InsertionStrategy.RequestInserterType parseRequestInserterType(String name) {
+		return switch (name.toLowerCase()) {
+			case "default" -> InsertionStrategy.RequestInserterType.Default;
+			case "parallel" -> InsertionStrategy.RequestInserterType.Parallel;
+			default -> throw new IllegalArgumentException("Unknown request inserter type: " + name +
+				". Valid options: Default, Parallel");
+		};
+	}
+
+	private InsertionStrategy.InsertionSearchStrategy parseInsertionSearchStrategy(String name) {
+		return switch (name.toLowerCase()) {
+			case "selective" -> InsertionStrategy.InsertionSearchStrategy.Selective;
+			case "extensive" -> InsertionStrategy.InsertionSearchStrategy.Extensive;
+			case "repeatedselective" -> InsertionStrategy.InsertionSearchStrategy.RepeatedSelective;
+			default -> throw new IllegalArgumentException("Unknown insertion search strategy: " + name +
+				". Valid options: Selective, Extensive, RepeatedSelective");
+		};
+	}
+
+	private ControllerConfigGroup.RoutingAlgorithmType parseRoutingAlgorithmType(String name) {
+		return switch (name.toLowerCase()) {
+			case "speedyalt", "speedy" -> ControllerConfigGroup.RoutingAlgorithmType.SpeedyALT;
+			case "ch", "chrouter" -> ControllerConfigGroup.RoutingAlgorithmType.CHRouter;
+			default -> throw new IllegalArgumentException("Unknown detour path calculator type: " + name +
+				". Valid options: SpeedyALT, CHRouter");
+		};
+	}
+
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(AGENT_COUNTS, "Comma-separated list of agent counts to test (e.g., '50000,100000,200000')");
 		comments.put(VEHICLES_PER_HUNDRED_AGENTS, "Number of vehicles per 100 agents");
-		comments.put(VEHICLE_PARTITIONERS, "Vehicle partitioners: Replicating, RoundRobin, ShiftingRoundRobin");
-		comments.put(REQUEST_PARTITIONERS, "Request partitioners: RoundRobin, LoadAware");
-		comments.put(COLLECTION_PERIODS, "Collection periods in seconds (comma-separated)");
+		comments.put(REQUEST_INSERTER_TYPES, "Request inserter types: Default, Parallel");
+		comments.put(INSERTION_SEARCH_STRATEGIES, "Insertion search strategies: Selective, Extensive, RepeatedSelective");
+		comments.put(VEHICLE_PARTITIONERS, "Vehicle partitioners (Parallel inserter only): Replicating, RoundRobin, ShiftingRoundRobin");
+		comments.put(REQUEST_PARTITIONERS, "Request partitioners (Parallel inserter only): RoundRobin, LoadAware");
+		comments.put(COLLECTION_PERIODS, "Collection periods in seconds (Parallel inserter only, comma-separated)");
 		comments.put(MAX_PARTITIONS, "Number of parallel partitions");
 		comments.put(MAX_ITERATIONS, "Max iterations for parallel inserter");
+		comments.put(MATRIX_CELL_SIZE, "Cell size [m] for DVRP TT matrix zones (larger = fewer zones)");
 		comments.put(WARMUP_RUNS, "Number of warmup runs");
 		comments.put(MEASURED_RUNS, "Number of measured runs");
 		comments.put(OUTPUT_DIRECTORY, "Output directory for results");
 		comments.put(USE_SPATIAL_FILTER, "Enable spatial filter");
+		comments.put(DETOUR_PATH_CALCULATOR_TYPES, "Detour path calculator types: SpeedyALT, CHRouter");
+		comments.put(NETWORK_URL, "URL or file path to a MATSim network (empty = synthetic grid)");
 		return comments;
 	}
 }

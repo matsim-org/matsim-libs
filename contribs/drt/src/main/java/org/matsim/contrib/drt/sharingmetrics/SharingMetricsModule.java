@@ -19,7 +19,7 @@ public class SharingMetricsModule extends AbstractDvrpModeModule {
     @Override
     public void install() {
         bindModal(SharingMetricsTracker.class).toProvider(modalProvider(getter ->
-                new SharingMetricsTracker())).asEagerSingleton();
+                new SharingMetricsTracker(getMode()))).asEagerSingleton();
         addEventHandlerBinding().to(modalKey(SharingMetricsTracker.class));
         bindModal(SharingMetricsControllerListener.class).toProvider(modalProvider(getter ->
                 new SharingMetricsControllerListener(getConfig(), drtConfigGroup,

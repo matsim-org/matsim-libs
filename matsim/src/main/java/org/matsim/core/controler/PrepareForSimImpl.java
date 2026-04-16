@@ -179,6 +179,10 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		adaptOutdatedPlansForRoutingMode();
 
+		// (in principle, the above could be added as PersonPrepareForSimAlgorithm,
+		// see next.  However, what comes next is more like a hook for users and not central infrastructure,
+		// and in consequence having it as a separate call is also ok an maybe even better/safer.)
+
 		// Can be null if instantiated via constructor, which should only happen in tests
 		if (prepareForSimAlgorithms != null) {
 			// This does not nake use of multi-threading because it can not be assumed that these instances are thread-safe
