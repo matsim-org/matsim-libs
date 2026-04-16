@@ -551,6 +551,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 			parkedVehicles.park(mobsimVehicle, simLink);
 			personsToProcess.put(agent.getId(), process);
 			vehiclesToProcess.put(process.vehicleId, process);
+			submitToCharger(process);
 		} else {
 			// send charging process and vehicle to other partition
 			// Will this work? I guess the vehicle will only arrive one second after we schedule its sending.

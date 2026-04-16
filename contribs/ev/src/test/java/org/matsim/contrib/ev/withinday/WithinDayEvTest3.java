@@ -982,7 +982,7 @@ public class WithinDayEvTest3 {
 
 		// check arrival at home
 		assertEquals("home", scenario.tracker().activityStartEvents.getLast().getActType());
-		assertEquals(68576.0, scenario.tracker().activityStartEvents.getLast().getTime());
+		assertEquals(68575.0, scenario.tracker().activityStartEvents.getLast().getTime());
 
 		// check charging process
 		assertEquals(1, scenario.tracker().startChargingProcessEvents.size());
@@ -1635,7 +1635,7 @@ public class WithinDayEvTest3 {
 
 		// check arrival at home
 		assertEquals("home", scenario.tracker().activityStartEvents.getLast().getActType());
-		assertEquals(68576.0, scenario.tracker().activityStartEvents.getLast().getTime());
+		assertEquals(68575.0, scenario.tracker().activityStartEvents.getLast().getTime());
 
 		// check charging process
 		assertEquals(2, scenario.tracker().startChargingProcessEvents.size());
