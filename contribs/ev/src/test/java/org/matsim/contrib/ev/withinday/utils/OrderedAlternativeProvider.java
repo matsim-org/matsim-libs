@@ -3,6 +3,7 @@ package org.matsim.contrib.ev.withinday.utils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import jakarta.annotation.Nullable;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -14,11 +15,13 @@ import org.matsim.contrib.ev.withinday.ChargingSlot;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 public class OrderedAlternativeProvider implements ChargingAlternativeProvider {
 	@Inject
 	ChargingInfrastructure infrastructure;
+	private final AtomicInteger idCounter = new AtomicInteger(0);
 
 	@Override
 	public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
@@ -36,16 +39,16 @@ public class OrderedAlternativeProvider implements ChargingAlternativeProvider {
 		List<Charger> chargers = new LinkedList<>(infrastructure.getChargers().values());
 		chargers.removeIf(c -> c.getId().equals(slot.charger().getId()));
 		for (ChargingAlternative s : trace) {
-			chargers.removeIf(c -> c.getId().equals(s.charger().getId()));
+			chargers.removeIf(c -> c.getId().equals(s.charger()));
 		}
 
 		chargers.sort((a, b) -> String.CASE_INSENSITIVE_ORDER.compare(a.getId().toString(), b.getId().toString()));
 
 		if (!chargers.isEmpty()) {
 			if (!slot.isLegBased()) {
-				return new ChargingAlternative(chargers.getFirst());
+				return new ChargingAlternative(Id.create(idCounter.incrementAndGet(), ChargingAlternative.class), chargers.getFirst().getId());
 			} else {
-				return new ChargingAlternative(chargers.getFirst(), slot.duration());
+				return new ChargingAlternative(Id.create(idCounter.incrementAndGet(), ChargingAlternative.class), chargers.getFirst().getId(), slot.duration());
 			}
 		}
 

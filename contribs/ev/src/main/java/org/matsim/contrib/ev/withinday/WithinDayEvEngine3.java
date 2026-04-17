@@ -54,6 +54,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 	private final Map<Id<Person>, ChargingProcess> personsToProcess = new HashMap<>();
 	private final Map<Id<Vehicle>, ChargingProcess> vehiclesToProcess = new HashMap<>();
+	private final Collection<PendingAlternative> pendingAlternatives = new ArrayList<>();
 	//private final Map<Id<Vehicle>, ChargingProcess> queuedVehicles = new HashMap<>();
 
 	private final Map<Id<Person>, MobsimAgent> personsAtCharger = new HashMap<>();
@@ -156,38 +157,16 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 					throw new IllegalStateException(
 						"Cannot switch from a leg-based charging slot to an activity-based alternative because activities are not known");
 				}
+				personsToProcess.put(agent.getId(), process);
+				vehiclesToProcess.put(process.vehicleId, process);
 
-				if (alternative.charger().getId() != process.currentSlot.charger().getId()) {
-					Activity followingPlugActivity = findFollowingActivity(agent, PLUG_ACTIVITY_TYPE);
-
-					// drive to different charger and schedule a plug activity
-					Activity plugActivity = chargingScheduler.changePlugActivity(agent,
-						followingPlugActivity, alternative.charger(),
-						time);
-					plugActivity.getAttributes().putAttribute(CHARGING_PROCESS_ATTRIBUTE, process);
-
-					// update slot
-					process.currentSlot = new ChargingSlot(process.currentSlot.startActivity(),
-						process.currentSlot.endActivity(),
-						process.currentSlot.leg(), alternative.duration(),
-						alternative.charger());
-
-					// send event for scoring
-					em.processEvent(new UpdateChargingAttemptEvent(time, agent.getId(),
-						process.vehicleId, alternative.charger().getId(),
-						alternative.isLegBased(), alternative.duration()));
-				} else if (alternative.duration() != process.currentSlot.duration()) {
-					// update slot with custom duration (either switch between leg- and
-					// activity-based slot, or change of duration)
-					process.currentSlot = new ChargingSlot(process.currentSlot.startActivity(),
-						process.currentSlot.endActivity(),
-						process.currentSlot.leg(), alternative.duration(),
-						getLiveCharger(process.currentSlot));
-
-					// send event for scoring
-					em.processEvent(new UpdateChargingAttemptEvent(time, agent.getId(),
-						process.vehicleId, alternative.charger().getId(),
-						alternative.isLegBased(), alternative.duration()));
+				if (alternative.status() == ChargingAlternative.RequestStatus.PENDING) {
+					// keep the agent until we have a result
+					pendingAlternatives.add(new PendingAlternative(alternative.id(), agent));
+					return;
+				}
+				if (alternative.charger() != process.currentSlot.charger().getId()) {
+					handleAlternativeFirstAttempt(agent, alternative, process, time);
 				}
 			}
 		} else if (process == null && allowSpontaneousCharging) {
@@ -201,17 +180,67 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 				plan.getPerson(), plan, vehicle, null);
 
 			if (alternative != null) {
-				ChargingSlot slot = new ChargingSlot(leg, alternative.duration(),
-					alternative.charger());
-
-				Activity plugActivity = chargingScheduler.insertPlugActivity(agent,
-					alternative.charger(), time);
-				plugActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
-
-				getChargingProcessForPlugActivity(agent, plugActivity, true);
+				handleAlternativeSpontaneous(agent, alternative, time);
 			}
 		}
 	}
+
+	private void handleAlternativeSpontaneous(MobsimAgent agent, ChargingAlternative alternative, double time) {
+		var charger = getLiveCharger(alternative.charger());
+		var leg = (Leg) ((PlanAgent) agent).getCurrentPlanElement();
+		ChargingSlot slot = new ChargingSlot(leg, alternative.duration(),
+			charger);
+
+		Activity plugActivity = chargingScheduler.insertPlugActivity(agent,
+			charger, time);
+		plugActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
+
+		getChargingProcessForPlugActivity(agent, plugActivity, true);
+		//TODO figure out this branch
+//		em.processEvent(new StartChargingProcessEvent(now, process.agent.getId(), process.vehicle.getId(),
+//			process.processIndex));
+//		em.processEvent(
+//			new StartChargingAttemptEvent(now, personId, vehicleId, process.currentSlot.charger().getId(),
+//				process.attemptIndex, process.processIndex, process.currentSlot.isLegBased(), isSpontaneous,
+//				process.currentSlot.duration()));
+	}
+
+	private void handleAlternativeFirstAttempt(MobsimAgent agent, ChargingAlternative alternative, ChargingProcess process, double time) {
+		if (alternative.charger() != process.currentSlot.charger().getId()) {
+			Activity followingPlugActivity = findFollowingActivity(agent, PLUG_ACTIVITY_TYPE);
+
+			// drive to different charger and schedule a plug activity
+			var charger = getLiveCharger(alternative.charger());
+			Activity plugActivity = chargingScheduler.changePlugActivity(agent,
+				followingPlugActivity, charger,
+				time);
+			plugActivity.getAttributes().putAttribute(CHARGING_PROCESS_ATTRIBUTE, process);
+
+			// update slot
+			process.currentSlot = new ChargingSlot(process.currentSlot.startActivity(),
+				process.currentSlot.endActivity(),
+				process.currentSlot.leg(), alternative.duration(),
+				charger);
+
+			// send event for scoring
+			em.processEvent(new UpdateChargingAttemptEvent(time, agent.getId(),
+				process.vehicleId, alternative.charger(),
+				alternative.isLegBased(), alternative.duration()));
+		} else if (alternative.duration() != process.currentSlot.duration()) {
+			// update slot with custom duration (either switch between leg- and
+			// activity-based slot, or change of duration)
+			process.currentSlot = new ChargingSlot(process.currentSlot.startActivity(),
+				process.currentSlot.endActivity(),
+				process.currentSlot.leg(), alternative.duration(),
+				getLiveCharger(process.currentSlot));
+
+			// send event for scoring
+			em.processEvent(new UpdateChargingAttemptEvent(time, agent.getId(),
+				process.vehicleId, alternative.charger(),
+				alternative.isLegBased(), alternative.duration()));
+		}
+	}
+
 
 	private boolean handleModifiablePlanActivity(MobsimAgent agent) {
 
@@ -615,6 +644,29 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 	@Override
 	public void doSimStep(double time) {
+
+		var it = pendingAlternatives.iterator();
+		while (it.hasNext()) {
+			var pending = it.next();
+			var newAlternative = alternativeProvider.queryPendingAlternative(pending.id());
+			if (newAlternative == null) {
+				continue;
+			}
+			// we have a new alternative. remove it from the pending collection and act on it.
+			it.remove();
+			// if the alternative was accepted, do some plannning
+			if (newAlternative.status() == ChargingAlternative.RequestStatus.ACCEPTED) {
+				var process = personsToProcess.get(pending.agent().getId());
+				if (process.isFirstAttempt()) {
+					handleAlternativeFirstAttempt(pending.agent(), newAlternative, process, time);
+				} else if (allowSpontaneousCharging) {
+					handleAlternativeSpontaneous(pending.agent(), newAlternative, time);
+				}
+			}
+			// otherwise just pass the agent on to the next engine.
+			assert newAlternative.status() == ChargingAlternative.RequestStatus.ACCEPTED || newAlternative.status() == ChargingAlternative.RequestStatus.REJECTED;
+		}
+
 		// check queued vehicles
 		for (var id : queuedVehicles) {
 			var process = vehiclesToProcess.get(id);
@@ -657,15 +709,16 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 					delegateEngine.rescheduleActivityEnd(agent);
 
 					// drive to the next charger and schedule a plug activity
+					var alternativeCharger = getLiveCharger(alternative.charger());
 					plugActivity = chargingScheduler.scheduleSubsequentPlugActivity(agent,
-						plugActivity, alternative.charger(), time);
+						plugActivity, alternativeCharger, time);
 					plugActivity.getAttributes().putAttribute(CHARGING_PROCESS_ATTRIBUTE, process);
 
 					// reset process for next attempt
 					process.currentSlot = new ChargingSlot(process.currentSlot.startActivity(),
 						process.currentSlot.endActivity(),
 						process.currentSlot.leg(), alternative.duration(),
-						alternative.charger());
+						alternativeCharger);
 					process.isSubmitted = false;
 					process.isPlugged = false;
 					process.isQueued = false;
@@ -674,7 +727,7 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 					// send event for scoring
 					em.processEvent(
 						new StartChargingAttemptEvent(time, process.personId, process.vehicleId,
-							alternative.charger().getId(), process.attemptIndex, process.processIndex,
+							alternative.charger(), process.attemptIndex, process.processIndex,
 							alternative.isLegBased(), false, alternative.duration()));
 				} else {
 					// send event for scoring
@@ -802,8 +855,14 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 	 *  have this helper to obtain a live instance from the infrastructure for this partition
 	 */
 	private Charger getLiveCharger(ChargingSlot slot) {
-		return chargingInfrastructure.getChargers().get(slot.charger().getId());
+		return getLiveCharger(slot.charger().getId());
 	}
+
+	private Charger getLiveCharger(Id<Charger> chargerId) {
+		return chargingInfrastructure.getChargers().get(chargerId);
+	}
+
+	private record PendingAlternative(Id<ChargingAlternative> id, MobsimAgent agent) {}
 
 
 	private static class ChargingProcess {

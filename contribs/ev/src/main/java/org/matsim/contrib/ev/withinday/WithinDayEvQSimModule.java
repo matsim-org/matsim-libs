@@ -10,9 +10,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.router.RoutingModule;
@@ -57,9 +57,9 @@ public class WithinDayEvQSimModule extends AbstractQSimModule {
 	                                          EventsManager eventsManager,
 	                                          ChargingScheduler chargingScheduler, WithinDayEvConfigGroup config, Vehicles vehicles,
 	                                          QVehicleFactory qVehicleFactory, Scenario scenario,
-	                                          WithinDayChargingStrategy.Factory chargingStrategyFactory) {
+	                                          WithinDayChargingStrategy.Factory chargingStrategyFactory, ChargingInfrastructure chargingInfrastructure) {
 		return new WithinDayEvEngine(config, netsim, timeInterpretation, electricFleet, alternativeProvider, slotProvider,
-			eventsManager, chargingScheduler, vehicles, qVehicleFactory, scenario, chargingStrategyFactory);
+			eventsManager, chargingScheduler, vehicles, qVehicleFactory, scenario, chargingStrategyFactory, chargingInfrastructure);
 	}
 
 	@Provides
@@ -75,23 +75,5 @@ public class WithinDayEvQSimModule extends AbstractQSimModule {
 	@Singleton
 	WithinDayChargingStrategy.Factory provideWithinDayChargingStrategyFactory() {
 		return new WithinDayChargingStrategy.Factory();
-	}
-
-	/**
-	 * Provides {@link WithinDayEvEngine2}, the DSim-compatible port of {@link WithinDayEvEngine}.
-	 * This provider is available for injection but is NOT bound as a QSim component by default.
-	 * To use it, create a module that calls
-	 * {@code addQSimComponentBinding(EvModule.EV_COMPONENT).to(WithinDayEvEngine2.class)}
-	 * instead of the default binding to {@link WithinDayEvEngine}.
-	 */
-	@Provides
-	@Singleton
-	WithinDayEvEngine2 provideEvPlanningEngine2(TimeInterpretation timeInterpretation,
-	                                            ElectricFleet electricFleet, ChargingAlternativeProvider alternativeProvider,
-	                                            ChargingSlotProvider slotProvider, EventsManager eventsManager,
-	                                            ChargingScheduler chargingScheduler, WithinDayEvConfigGroup config, Scenario scenario,
-	                                            WithinDayChargingStrategy.Factory chargingStrategyFactory, ActivityEngine delegateEngine) {
-		return new WithinDayEvEngine2(config, timeInterpretation, electricFleet, alternativeProvider,
-			slotProvider, eventsManager, chargingScheduler, scenario, chargingStrategyFactory, delegateEngine);
 	}
 }

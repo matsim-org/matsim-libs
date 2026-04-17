@@ -69,7 +69,7 @@ public abstract class AbstractReservationManager<
 			}
 
 			Id<Reservation> reservationId = Id.create(resource.getId() + "_" + counter++, Reservation.class);
-			ReservationInfo<R, C> reservationInfo = new ReservationInfo<>(reservationId, resource, consumer, startTime, endTime);
+			ReservationInfo<R, C> reservationInfo = new ReservationInfo<>(reservationId, resource, consumer, startTime, endTime, ReservationStatus.CONFIRMED);
 			resourceReservations.put(reservationId, reservationInfo);
 
 			return Optional.of(reservationInfo);
@@ -125,7 +125,7 @@ public abstract class AbstractReservationManager<
 		if (isAvailable(removed.resource(), removed.consumer(), newStartTime, newEndTime)) {
 			ReservationInfo<R, C> updated =
 				new ReservationInfo<>(removed.reservationId(), removed.resource(), removed.consumer(),
-					newStartTime, newEndTime);
+					newStartTime, newEndTime, ReservationStatus.CONFIRMED);
 			resourceReservations.put(removed.reservationId(), updated);
 			return true;
 		} else {

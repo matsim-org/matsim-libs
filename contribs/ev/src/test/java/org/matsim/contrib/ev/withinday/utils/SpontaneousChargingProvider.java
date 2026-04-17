@@ -3,6 +3,7 @@ package org.matsim.contrib.ev.withinday.utils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import jakarta.annotation.Nullable;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -19,6 +20,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.router.TripStructureUtils;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 public class SpontaneousChargingProvider implements ChargingAlternativeProvider {
@@ -27,6 +29,8 @@ public class SpontaneousChargingProvider implements ChargingAlternativeProvider 
 
 	@Inject
 	Netsim netsim;
+
+	private final AtomicInteger idCounter = new AtomicInteger(0);
 
 	private boolean hasCharged = false;
 
@@ -56,7 +60,7 @@ public class SpontaneousChargingProvider implements ChargingAlternativeProvider 
 		if (nextActivity != null && nextActivity.getType().equals("work")) {
 			Charger charger = infrastructure.getChargers().values().iterator().next();
 			hasCharged = true;
-			return new ChargingAlternative(charger, 3600.0);
+			return new ChargingAlternative(Id.create(idCounter.incrementAndGet(), ChargingAlternative.class), charger.getId(), 3600.0);
 		}
 
 		return null;
