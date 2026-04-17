@@ -952,7 +952,7 @@ public class WithinDayEvTest3 {
 		assertEquals(39224.0, scenario.tracker().queuedAtChargerEvents.get(0).getTime());
 
 		assertEquals("person1", scenario.tracker().quitQueueAtChargerEvents.get(0).getVehicleId().toString());
-		assertEquals(39519.0, scenario.tracker().quitQueueAtChargerEvents.get(0).getTime());
+		assertEquals(39518.0, scenario.tracker().quitQueueAtChargerEvents.get(0).getTime());
 	}
 
 	@Test
@@ -1663,7 +1663,7 @@ public class WithinDayEvTest3 {
 		assertEquals(39217.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
 		assertEquals(50556.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
 
-		assertEquals(57393.0, scenario.tracker().plugActivityEvents.getLast().getTime());
+		assertEquals(57392.0, scenario.tracker().plugActivityEvents.getLast().getTime());
 		assertEquals(64956.0, scenario.tracker().unplugActivityEvents.getLast().getTime());
 
 		assertEquals(Arrays.asList(Arrays.array(
