@@ -10,35 +10,33 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleModule;
-//import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import org.matsim.core.network.NetworkUtils;
-
-import java.util.Set;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
-
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-import static org.matsim.core.config.groups.ReplanningConfigGroup.*;
-import static org.matsim.core.config.groups.ScoringConfigGroup.*;
+import static org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import static org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import static org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 
 // this is based on https://github.com/matsim-org/matsim-code-examples/blob/2a40dd20336c55a0c8ca4c582d5d9489a4ff8d0c/src/main/java/org/matsim/codeexamples/extensions/bicycle/RunBicycleContribExample.java
 // modified to test some functionality
 
-public final class RunBicycleContribExampleMod {
-	private static final Logger LOG = LogManager.getLogger(RunBicycleContribExampleMod.class);
+public final class RunBicycleContrib_MITester {
+	private static final Logger LOG = LogManager.getLogger(RunBicycleContrib_MITester.class);
 
 	private static final String BICYCLE = "bicycle";
 	public static final double BICYCLE_SPEED = 4.16666; //4.16666; //6.944;
@@ -50,30 +48,14 @@ public final class RunBicycleContribExampleMod {
 			LOG.info("A user-specified config.xml file was provided. Using it...");
 			config = ConfigUtils.loadConfig(args[0], new BicycleConfigGroup());
 		} else {
-//			config = ConfigUtils.createConfig("scenarios/bicycle_example/");
-//
-//			config.network().setInputFile("network_lane.xml");
-//			config.plans().setInputFile("population_1200.xml");
 
-			config = ConfigUtils.createConfig("contribs/bicycle/src/main/java/org/matsim/contrib/bicycle/run/scenarios/");
+			config = ConfigUtils.createConfig();  // kein Context-Argument
 
-			//Neukoelln bicycle network
-			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bike_rules_NEW3.xml.gz"); // Modify this
-			config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bicycle_custom_simp_cleanService.xml.gz"); // Modify this
+			String base = "C:/Users/metz_so/Workspace/matsim-libs/contribs/bicycle/"
+				+ "src/main/java/org/matsim/contrib/bicycle/run/scenarios/bicycle_example/";
 
-			//Berlin bicycle network
-			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_berlin_bicycle_simp_cleanService.xml.gz"); // Modify this
-
-
-			//Random plans nord-Neukoelln
-			config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim-py-helper/data/plans_nnk_5k_bicycle_ew.xml");
-			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim-py-helper/data/plans_nk_5000_bike.xml");
-
-			//Random plans Berlin (weighted on zensus)
-			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim-py-helper/data/plans_berlin_50k_bicycle_ew.xml");
-
-			//Random plans Berlin (weighted on zensus and dist by SRV)
-			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim-py-helper/data/plans_berlin_30k_lognormal_modes_car_bicycle.xml");
+			config.network().setInputFile(base + "network_MI_test2_stau.xml");
+			config.plans().setInputFile(base + "population_MI_test2.xml");
 
 
 			config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(0.7));
@@ -93,12 +75,12 @@ public final class RunBicycleContribExampleMod {
 			config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 			config.controller().setLastIteration(5);
 
-//			config.controller().setOutputDirectory(
-//				"C:/Users/metz_so/Workspace/data/matsim-output/26-02-18_nk_motorized_newRunner"
-//			);
 
 			String baseOut = "C:/Users/metz_so/Workspace/data/matsim-output/";
-			String scenarioName = "nnk_motorized_5k_MI_avgExp";
+
+			//String scenarioName = "MI-test_carCount";
+			String scenarioName = "MI-test_carsPassed_stau_seepage";
+			//String scenarioName = "MI-test_avgCar";
 
 
 			String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
@@ -108,7 +90,7 @@ public final class RunBicycleContribExampleMod {
 			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		}
 
-		new RunBicycleContribExampleMod().run(config);
+		new RunBicycleContrib_MITester().run(config);
 	}
 
 	static void fillConfigWithBicycleStandardValues(Config config) {
@@ -119,9 +101,9 @@ public final class RunBicycleContribExampleMod {
 		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.003);
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.001);
 		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.001);
-		//bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.CARS_PASSED_BICYCLE_ON_LINK);
 		//bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.CAR_COUNT_ON_BICYCLE_LEAVE_LINK);
-		bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.AVG_CAR_OCCUPANCY_DURING_BICYCLE_TRAVERSAL);
+		bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.CARS_PASSED_BICYCLE_ON_LINK);
+		//bicycleConfigGroup.setMotorizedInteractionType(BicycleConfigGroup.MotorizedInteraction.AVG_CAR_OCCUPANCY_DURING_BICYCLE_TRAVERSAL);
 
 
 		//bicycleConfigGroup.setBicycleInfraAttribute("cycleway"); // default
@@ -129,7 +111,9 @@ public final class RunBicycleContribExampleMod {
 
 		List<String> mainModeList = Arrays.asList(BICYCLE, TransportMode.car);
 		config.qsim().setMainModes(mainModeList);
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.SeepageQ);
+		config.qsim().setSeepModes(Collections.singleton(BICYCLE));
+		config.qsim().setRestrictingSeepage(true);
 
 		config.routing().setNetworkModes(mainModeList);
 		config.routing().removeTeleportedModeParams(BICYCLE);
@@ -141,7 +125,7 @@ public final class RunBicycleContribExampleMod {
 		fillConfigWithBicycleStandardValues(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car, BICYCLE));
+		//NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car, BICYCLE));
 
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		final VehiclesFactory vf = VehicleUtils.getFactory();
@@ -157,26 +141,6 @@ public final class RunBicycleContribExampleMod {
 		controler.run();
 
 	}
-
-//	private static class MyAdditionalBicycleLinkScore implements AdditionalBicycleLinkScore {
-//
-//		@com.google.inject.Inject
-//		private AdditionalBicycleLinkScoreDefaultImpl delegate;
-//
-//		@Override
-//		public double computeLinkBasedScore(Link link, Id<Vehicle> vehicleId, String bicycleMode) {
-//
-//			Object v = link.getAttributes().getAttribute("carFreeStatus");
-//			double carFree = (v instanceof Number) ? ((Number) v).doubleValue() : 0.0;
-//
-//			double base = delegate.computeLinkBasedScore(link, vehicleId, bicycleMode);
-//
-//			// Achtung: unskaliert kann das stark wirken. Besser: Gewichtung.
-//			double weight = 1.0; // TODO kalibrieren
-//			//return base + weight * carFree;
-//			return base + 1000.0;
-//		}
-//	}
 
 
 }

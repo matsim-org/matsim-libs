@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+
+	<!-- ======================================================================
+	  Simples Testnetzwerk fuer Ueberhol-Test Auto vs. Fahrrad.
+
+	  Struktur:
+	    Knoten 0 (Einfahr-Puffer) -> Knoten 1..10 (Teststrecke) -> Knoten 11 (Ausfahr-Puffer)
+
+	  Die eigentlichen Test-Links sind IDs 1..9 (zwischen Knoten 1 und 10).
+	  Links ID 0 (Einfahrt) und ID 10 (Ausfahrt) sind Puffer, damit Start- und
+	  Endartefakte (Fahrzeuge poppen am ersten Link auf, scheinen am letzten
+	  Link zurueckzurutschen) nicht auf der Teststrecke sichtbar sind.
+
+	  IDs 100..110 sind Rueckrichtungs-Links, die nur vom MATSim-NetworkCleaner
+	  gebraucht werden (das Netz muss stark zusammenhaengend sein). Die Agenten
+	  benutzen sie nicht.
+	====================================================================== -->
+
+	<nodes>
+		<!-- Einfahr-Puffer -->
+		<node id="0"  x="-200" y="0" z="0"/>
+		<!-- Teststrecke -->
+		<node id="1"  x="0"    y="0" z="0"/>
+		<node id="2"  x="50"   y="0" z="0"/>
+		<node id="3"  x="150"  y="0" z="0"/>
+		<node id="4"  x="300"  y="0" z="0"/>
+		<node id="5"  x="500"  y="0" z="0"/>
+		<node id="6"  x="580"  y="0" z="0"/>
+		<node id="7"  x="700"  y="0" z="0"/>
+		<node id="8"  x="760"  y="0" z="0"/>
+		<node id="9"  x="850"  y="0" z="0"/>
+		<node id="10" x="1000" y="0" z="0"/>
+		<!-- Ausfahr-Puffer -->
+		<node id="11" x="1100" y="0" z="0"/>
+	</nodes>
+
+	<links capperiod="01:00:00">
+
+		<!-- Einfahr-Puffer -->
+		<link id="0" from="0" to="1" length="200.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+
+		<!-- Teststrecke: 9 Links mit variierender Laenge (50..200 m) -->
+		<link id="1" from="1" to="2" length="50.00"  capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="2" from="2" to="3" length="100.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="3" from="3" to="4" length="150.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="4" from="4" to="5" length="200.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="5" from="5" to="6" length="80.00"  capacity="5" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="6" from="6" to="7" length="120.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="7" from="7" to="8" length="60.00"  capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="8" from="8" to="9" length="90.00"  capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="9" from="9" to="10" length="150.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+
+		<!-- Ausfahr-Puffer -->
+		<link id="10" from="10" to="11" length="100.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+
+		<!-- Rueckrichtungs-Links (nur fuer NetworkCleaner, werden nicht befahren) -->
+		<link id="100" from="1"  to="0"  length="200.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="101" from="2"  to="1"  length="50.00"  capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="102" from="3"  to="2"  length="100.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="103" from="4"  to="3"  length="150.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="104" from="5"  to="4"  length="200.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="105" from="6"  to="5"  length="80.00"  capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="106" from="7"  to="6"  length="120.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="107" from="8"  to="7"  length="60.00"  capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="108" from="9"  to="8"  length="90.00"  capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="109" from="10" to="9"  length="150.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+		<link id="110" from="11" to="10" length="100.00" capacity="1800" freespeed="13.89" permlanes="2" oneway="1" modes="car,bicycle">
+			<attributes><attribute name="type" class="java.lang.String">primary</attribute></attributes>
+		</link>
+
+	</links>
+
+</network>
