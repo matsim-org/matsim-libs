@@ -37,8 +37,8 @@ import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 // this is based on https://github.com/matsim-org/matsim-code-examples/blob/2a40dd20336c55a0c8ca4c582d5d9489a4ff8d0c/src/main/java/org/matsim/codeexamples/extensions/bicycle/RunBicycleContribExample.java
 // modified to test some functionality
 
-public final class RunBicycleContribExampleMod {
-	private static final Logger LOG = LogManager.getLogger(RunBicycleContribExampleMod.class);
+public final class RunBicycleContrib_ScenarioTester {
+	private static final Logger LOG = LogManager.getLogger(RunBicycleContrib_ScenarioTester.class);
 
 	private static final String BICYCLE = "bicycle";
 	public static final double BICYCLE_SPEED = 4.16666; //4.16666; //6.944;
@@ -108,7 +108,7 @@ public final class RunBicycleContribExampleMod {
 			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		}
 
-		new RunBicycleContribExampleMod().run(config);
+		new RunBicycleContrib_ScenarioTester().run(config);
 	}
 
 	static void fillConfigWithBicycleStandardValues(Config config) {

@@ -48,7 +48,7 @@ import java.util.List;
 /**
  * @author dziemke
  * @deprecated Legacy runner kept for backward compatibility. Prefer using
- * {@link RunBicycleContribExampleMod} for new development and tests.
+ * {@link RunSimpleBicycleExample} for new tests.
  */
 @Deprecated(forRemoval = true)
 public class RunBicycleExample {

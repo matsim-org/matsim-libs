@@ -50,7 +50,7 @@ import java.util.Set;
 /**
  * @author dziemke
  * @deprecated Legacy runner kept for backward compatibility. Prefer using
- * {@link RunBicycleContribExampleMod} for new development and tests.
+ * {@link RunBicycleContrib_ScenarioTester} for new development and tests.
  */
 @Deprecated(forRemoval = true)
 public class RunBicycleExampleMod {
