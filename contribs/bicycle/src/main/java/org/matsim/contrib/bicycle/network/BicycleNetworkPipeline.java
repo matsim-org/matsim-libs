@@ -13,15 +13,7 @@ import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 
 /**
@@ -58,8 +50,8 @@ public class BicycleNetworkPipeline {
 
 	//private static final String inputOsmFile = "C://Users/metz_so/Workspace/data/berlin-260122.osm.pbf";
 	private static final String inputOsmFile = "C://Users/metz_so/Workspace/data/neukoelln.osm.pbf";
-	private static final String inputTiffFile = "C:/Users/metz_so/Downloads/DTM Germany 20m v3b by Sonny.tif";
-	private static final String outputFile = "C://Users/metz_so/Workspace/data/networks/matsim-network_berlin_bicycle_full.xml.gz";
+	private static final String inputTiffFile = "C://Users/metz_so/Workspace/data/elevation/DTM Germany 20m v3b by Sonny.tif";
+	private static final String outputFile = "C://Users/metz_so/Workspace/data/networks/matsim-network_nk_bicycle_4.xml.gz";
 
 	// ---- CRS -------------------------------------------------------------------
 
@@ -129,14 +121,29 @@ public class BicycleNetworkPipeline {
 			.build()
 			.read(inputOsmFile);
 
+//		// ---- 1b. raw OSM attributes prefixen ---------------------------------
+//		renameLinkAttributes(network, Map.of(
+//			"type", "osm:type",
+//			"surface", "osm:surface",
+//			"smoothness", "osm:smoothness"
+//			//	"origid", "osm:way_id"        // siehe Punkt unten: Dedup
+//		));
+
 		// ---- 2. drop isolated components -------------------------------------
 		NetworkUtils.cleanNetwork(network, Set.of(FROM_MODE));
 
 		// ---- 3. bicycle-aware simplification ---------------------------------
 		simplifyWithBikeInfra(network);
 
+		// ---- 3b. origid -> osm:way_id -----------------------------------------
+		//renameLinkAttributes(network, Map.of("origid", "osm:way_id"));
+
 		// ---- 4. remove service dead-ends and hairline branches ---------------
 		removeNonConnectingService(network);
+
+		// ---- 4b. second pass: service cleanup may have created new isolated components
+		//NetworkUtils.cleanNetwork(network, Set.of(FROM_MODE));
+		simplifyWithBikeInfra(network);
 
 		// ---- 5. rename mode: bike -> bicycle ---------------------------------
 		renameMode(network, FROM_MODE, TO_MODE);
@@ -154,6 +161,18 @@ public class BicycleNetworkPipeline {
 		// ---- 7. write --------------------------------------------------------
 		new NetworkWriter(network).write(outputFile);
 	}
+
+//	private static void renameLinkAttributes(Network network, Map<String, String> renames) {
+//		for (Link link : network.getLinks().values()) {
+//			for (var e : renames.entrySet()) {
+//				Object v = link.getAttributes().getAttribute(e.getKey());
+//				if (v != null) {
+//					link.getAttributes().putAttribute(e.getValue(), v);
+//					link.getAttributes().removeAttribute(e.getKey());
+//				}
+//			}
+//		}
+//	}
 
 	// =========================================================================
 	// Elevation
@@ -175,9 +194,9 @@ public class BicycleNetworkPipeline {
 		link.getAttributes().putAttribute(LINK_ATTR_ELEVATION_GAIN, round(k.elevationGain(), 1));
 		link.getAttributes().putAttribute(LINK_ATTR_ELEVATION_LOSS, round(k.elevationLoss(), 1));
 
-		// Dimensionless ratios — 5 decimals = 0.001% resolution.
-		link.getAttributes().putAttribute(LINK_ATTR_GRADIENT, round(k.gradient(), 5));
-		link.getAttributes().putAttribute(LINK_ATTR_MAX_GRADIENT, round(k.maxGradient(), 5));
+		// Dimensionless ratios — 3 decimals = 0.1% resolution.
+		link.getAttributes().putAttribute(LINK_ATTR_GRADIENT, round(k.gradient(), 3));
+		link.getAttributes().putAttribute(LINK_ATTR_MAX_GRADIENT, round(k.maxGradient(), 3));
 	}
 
 	private static double round(double v, int decimals) {
@@ -236,14 +255,47 @@ public class BicycleNetworkPipeline {
 		// When two links merge, carry over the attributes from the first one
 		// (they're identical to the second by construction of the predicate).
 		simplifier.registerTransferAttributesConsumer((inOut, newLink) -> {
-			Link source = inOut.getFirst();
+			Link a = inOut.getFirst();
+			Link b = inOut.getSecond();
+
+			// bicycle-relevante Attribute: sind per Predicate bereits identisch
 			for (String key : SIMPLIFY_MATCH_KEYS) {
-				Object v = source.getAttributes().getAttribute(key);
+				Object v = a.getAttributes().getAttribute(key);
 				if (v != null) newLink.getAttributes().putAttribute(key, v);
+			}
+
+			// origid merge mit Dedup
+			Object idA = a.getAttributes().getAttribute("origid");
+			Object idB = b.getAttributes().getAttribute("origid");
+			String merged = mergeOrigIds(idA, idB);
+			if (merged != null) {
+				newLink.getAttributes().putAttribute("origid", merged);
 			}
 		});
 
 		simplifier.run(network);
+	}
+
+	/**
+	 * Merged zwei origid-Werte zu einem String, in dem jede Way-ID nur einmal
+	 * vorkommt und die Reihenfolge erhalten bleibt. Beide Inputs können selbst
+	 * schon mit '-' verkettete Mehrfach-IDs aus einem früheren Merge sein.
+	 */
+	static String mergeOrigIds(Object idA, Object idB) {
+		Set<String> seen = new LinkedHashSet<>();
+		addOrigIds(seen, idA);
+		addOrigIds(seen, idB);
+		if (seen.isEmpty()) return null;
+		return String.join("-", seen);
+	}
+
+	private static void addOrigIds(Set<String> acc, Object id) {
+		if (id == null) return;
+		String s = id.toString();
+		if (s.isBlank()) return;
+		for (String part : s.split("-")) {
+			if (!part.isBlank()) acc.add(part);
+		}
 	}
 
 	// =========================================================================
@@ -251,7 +303,7 @@ public class BicycleNetworkPipeline {
 	// =========================================================================
 
 	private static boolean isService(Link l) {
-		Object t = l.getAttributes().getAttribute("type");
+		Object t = l.getAttributes().getAttribute("type");  //"osm:type"
 		if (t == null) return false;
 		String s = t.toString().replaceFirst("^highway\\.", "");
 		return "service".equals(s);
@@ -360,3 +412,5 @@ public class BicycleNetworkPipeline {
 		return a.toString().compareTo(b.toString()) < 0 ? a + "_" + b : b + "_" + a;
 	}
 }
+
+
