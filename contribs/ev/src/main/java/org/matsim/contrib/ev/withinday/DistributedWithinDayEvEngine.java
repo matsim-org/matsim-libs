@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.MobsimMessageCollector;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -31,7 +32,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.dsim.simulation.net.ParkedVehicles;
 import org.matsim.dsim.simulation.net.SimNetwork;
 import org.matsim.vehicles.Vehicle;
@@ -40,7 +40,7 @@ import org.matsim.vehicles.Vehicles;
 
 import java.util.*;
 
-public class WithinDayEvEngine3 implements DistributedActivityHandler, DistributedDepartureHandler, DistributedMobsimEngine, NotifyAgentPartitionTransfer, ChargingListener {
+public class DistributedWithinDayEvEngine implements DistributedActivityHandler, DistributedDepartureHandler, DistributedMobsimEngine, NotifyAgentPartitionTransfer, ChargingListener {
 
 	static public final String PLUG_ACTIVITY_TYPE = "ev:plug interaction";
 	static public final String UNPLUG_ACTIVITY_TYPE = "ev:unplug interaction";
@@ -54,8 +54,6 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 
 	private final Map<Id<Person>, ChargingProcess> personsToProcess = new HashMap<>();
 	private final Map<Id<Vehicle>, ChargingProcess> vehiclesToProcess = new HashMap<>();
-	//private final Collection<PendingAlternative> pendingAlternatives = new ArrayList<>();
-	//private final Map<Id<Vehicle>, ChargingProcess> queuedVehicles = new HashMap<>();
 
 	private final Map<Id<Person>, MobsimAgent> personsAtCharger = new HashMap<>();
 	private final Set<Id<Vehicle>> queuedVehicles = new HashSet<>();
@@ -76,14 +74,14 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 	private final Scenario scenario;
 	private final TimeInterpretation timeInterpretation;
 	private final ParkedVehicles parkedVehicles;
-	private final PartitionTransfer partitionTransfer;
+	private final MobsimMessageCollector partitionTransfer;
 	private final SimNetwork simNetwork;
 	private final ChargingAlternativeProvider alternativeProvider;
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final QVehicleFactory qVehicleFactory;
 
 	@Inject
-	public WithinDayEvEngine3(WithinDayEvConfigGroup config, WithinDayChargingStrategy.Factory chargingStrategyFactory, ActivityEngine delegateEngine, ElectricFleet electricFleet, Vehicles vehicles, ChargingSlotProvider slotProvider, ChargingScheduler chargingScheduler, EventsManager em, Scenario scenario, TimeInterpretation timeInterpretation, ParkedVehicles parkedVehicles, PartitionTransfer partitionTransfer, SimNetwork simNetwork, ChargingAlternativeProvider alternativeProvider, ChargingInfrastructure chargingInfrastructure, QVehicleFactory qVehicleFactory) {
+	public DistributedWithinDayEvEngine(WithinDayEvConfigGroup config, WithinDayChargingStrategy.Factory chargingStrategyFactory, ActivityEngine delegateEngine, ElectricFleet electricFleet, Vehicles vehicles, ChargingSlotProvider slotProvider, ChargingScheduler chargingScheduler, EventsManager em, Scenario scenario, TimeInterpretation timeInterpretation, ParkedVehicles parkedVehicles, MobsimMessageCollector partitionTransfer, SimNetwork simNetwork, ChargingAlternativeProvider alternativeProvider, ChargingInfrastructure chargingInfrastructure, QVehicleFactory qVehicleFactory) {
 		this.chargingStrategyFactory = chargingStrategyFactory;
 		this.delegateEngine = delegateEngine;
 		this.maximumQueueWaitTime = config.getMaximumQueueTime();
@@ -224,14 +222,6 @@ public class WithinDayEvEngine3 implements DistributedActivityHandler, Distribut
 						var spontaneousProcess = getChargingProcessForPlugActivity(agent, plugActivity, true);
 						vehiclesToProcess.put(spontaneousProcess.vehicleId, spontaneousProcess);
 						personsToProcess.put(agent.getId(), spontaneousProcess);
-
-//						em.processEvent(new StartChargingProcessEvent(callbackTime, agent.getId(), spontaneousProcess.vehicleId,
-//							spontaneousProcess.processIndex));
-//						em.processEvent(
-//							new StartChargingAttemptEvent(callbackTime, agent.getId(), vehicleId, spontaneousProcess.currentSlot.charger().getId(),
-//								spontaneousProcess.attemptIndex, spontaneousProcess.processIndex, spontaneousProcess.currentSlot.isLegBased(), true,
-//								spontaneousProcess.currentSlot.duration()));
-
 					}
 				});
 		}

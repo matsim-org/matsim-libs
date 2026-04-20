@@ -35,7 +35,7 @@ public class WithinDayEvQSimModule extends AbstractQSimModule {
 		WithinDayEvConfigGroup config = WithinDayEvConfigGroup.get(getConfig());
 
 		if (getConfig().controller().getMobsim().equals("dsim")) {
-			addQSimComponentBinding(EvModule.EV_COMPONENT).to(WithinDayEvEngine3.class);
+			addQSimComponentBinding(EvModule.EV_COMPONENT).to(DistributedWithinDayEvEngine.class);
 		} else {
 			addQSimComponentBinding(EvModule.EV_COMPONENT).to(WithinDayEvEngine.class);
 			addMobsimScopeEventHandlerBinding().to(WithinDayEvEngine.class);

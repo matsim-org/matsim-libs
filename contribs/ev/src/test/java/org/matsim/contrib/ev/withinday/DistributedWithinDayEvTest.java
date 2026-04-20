@@ -16,7 +16,10 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class WithinDayEvTest3 {
+/**
+ * Takes the excellent test suite from {@link WithinDayEvTest} and applies it to the distributed version of the engine.
+ */
+public class DistributedWithinDayEvTest {
 
 	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
