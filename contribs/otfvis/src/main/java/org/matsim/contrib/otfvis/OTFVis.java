@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -45,16 +46,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vis.otfvis.OTFClientFile;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFEvent2MVI;
-import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.snapshotwriters.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -277,8 +277,13 @@ public class OTFVis {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario.getConfig().qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.equiDist );
+		OTFVisConfigGroup otfConfig = ConfigUtils.addOrGetModule( scenario.getConfig(), OTFVisConfigGroup.class );
+		otfConfig.setLinkWidth( 10 );
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		OTFEvent2MVI.convert(scenario, eventFile, mviFile, snapshotPeriod);
+		OTFVis.playMVI(args[3]);
+
 	}
 
 }
