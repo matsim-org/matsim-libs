@@ -27,6 +27,10 @@ public class ReservationAlternativeProvider extends OrderedAlternativeProvider {
 	@Nullable
 	public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
 	                                                  ElectricVehicle vehicle, @Nullable ChargingSlot initialSlot) {
+		if (person.getId().toString().equals("person2")) {
+			// ignore the results. We just want the reservation
+			manager.addLocalReservation(initialSlot.charger().getId(), vehicle.getId(), now, Double.POSITIVE_INFINITY);
+		}
 		return null;
 	}
 
@@ -36,12 +40,8 @@ public class ReservationAlternativeProvider extends OrderedAlternativeProvider {
 
 		if (person.getId().toString().equals("person2")) {
 			manager.addReservation(slot.charger().getId(), vehicle.getId(), now, Double.POSITIVE_INFINITY, optResrvation -> {
-				if (optResrvation.isPresent()) {
-					var result = new ChargingAlternative(slot.charger().getId(), slot.duration());
-					callback.accept(Optional.of(result));
-				} else {
-					callback.accept(Optional.empty());
-				}
+				// ignore the results. We just want the reservation
+				callback.accept(Optional.empty());
 			});
 		}
 		callback.accept(Optional.empty());

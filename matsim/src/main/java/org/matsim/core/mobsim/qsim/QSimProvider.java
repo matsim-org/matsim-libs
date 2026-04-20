@@ -26,6 +26,7 @@ import com.google.inject.*;
 import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.MobsimMessageCollector;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
@@ -59,9 +60,9 @@ public class QSimProvider implements Provider<QSim> {
 
 	@Inject
 	QSimProvider(Injector injector, Config config, IterationCounter iterationCounter,
-				 Collection<AbstractQSimModule> modules, QSimComponentsConfig components,
-				 @Named("overrides") List<AbstractQSimModule> overridingModules,
-				 @Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
+	             Collection<AbstractQSimModule> modules, QSimComponentsConfig components,
+	             @Named("overrides") List<AbstractQSimModule> overridingModules,
+	             @Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
@@ -99,9 +100,12 @@ public class QSimProvider implements Provider<QSim> {
 			@Override
 			protected void configure() {
 				install(finalQsimModule);
-				bind(NetworkPartition.class).toInstance(NetworkPartition.SINGLE_INSTANCE);
 				bind(QSim.class).asEagerSingleton();
 				bind(Netsim.class).to(QSim.class);
+				// as some infrastructure is used by both, QSim and DSim, I find it easiest to provide
+				// special (no-op) variants of assumed infrastructure.
+				bind(MobsimMessageCollector.class).to(NoopMessageCollector.class).in(Singleton.class);
+				bind(NetworkPartition.class).toInstance(NetworkPartition.SINGLE_INSTANCE);
 			}
 		};
 

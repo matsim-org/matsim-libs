@@ -6,13 +6,13 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.MobsimMessageCollector;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.mobsim.dsim.DSimComponentsMessageProcessor;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
-import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 public class DistributedChargerReservationManager implements DSimComponentsMessageProcessor, QSimComponent {
 
-	private final PartitionTransfer partitionTransfer;
+	private final MobsimMessageCollector partitionTransfer;
 	private final NetworkPartition networkPartition;
 	private final Provider<ChargingInfrastructure> chargingInfrastructure;
 
@@ -32,7 +32,7 @@ public class DistributedChargerReservationManager implements DSimComponentsMessa
 	private int requestCounter = 0;
 
 	@Inject
-	public DistributedChargerReservationManager(PartitionTransfer partitionTransfer, NetworkPartition networkPartition, Provider<ChargingInfrastructure>
+	public DistributedChargerReservationManager(MobsimMessageCollector partitionTransfer, NetworkPartition networkPartition, Provider<ChargingInfrastructure>
 		chargingInfrastructure) {
 		this.partitionTransfer = partitionTransfer;
 		this.networkPartition = networkPartition;
