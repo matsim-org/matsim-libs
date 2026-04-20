@@ -35,7 +35,7 @@
 		<jts.version>1.20.0</jts.version>
 		<guice.version>7.0.0</guice.version>
 		<jackson.version>2.21.2</jackson.version>
-		<fory.version>0.16.0</fory.version>
+		<fory.version>0.17.0</fory.version>
 		<jogl.version>2.6.0</jogl.version>
 		<junit.version>6.0.3</junit.version>
 		<fastutil.version>8.5.18</fastutil.version>
