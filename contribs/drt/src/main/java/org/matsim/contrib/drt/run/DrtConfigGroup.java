@@ -246,6 +246,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Store planned unshared drt route as a link sequence")
 	private boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
+
+
 	public enum SimulationType {
 		fullSimulation, estimateAndTeleport
 	}
@@ -357,7 +359,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 		// analysis zone systems
 		ZoneSystemUtils.registerDefaultZoneSystems(this::addDefinition,  //
-			(ZoneSystemParams params) -> analysisZoneSystemParams = params, // 
+			(ZoneSystemParams params) -> analysisZoneSystemParams = params, //
 			() -> analysisZoneSystemParams);
 
 		addDefinition(ZonalSystemWrapper.SET_NAME, ZonalSystemWrapper::new,

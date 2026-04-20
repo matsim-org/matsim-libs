@@ -12,7 +12,7 @@ import java.util.List;
 
 class SerializationProviderTest {
 
-	private final SerializationProvider provider = new SerializationProvider();
+	private final SerializationProvider provider = SerializationProvider.getInstance();
 
 	@Test
 	void serializeEvents() {
