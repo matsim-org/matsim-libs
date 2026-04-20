@@ -140,7 +140,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 			log.warn( "\t<module name=\"routing\" >" );
 			log.warn( "\t\t<param name=\"accessEgressType\" value=\"accessEgressModeToLink\" />" );
 			log.warn( "in the config xml.");
-			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
+			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, scenario, filteredNetwork, routeAlgo);
 		}	}
 
 	private void checkNetwork(Network filteredNetwork) {

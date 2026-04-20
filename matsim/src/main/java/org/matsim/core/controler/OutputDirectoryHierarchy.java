@@ -206,6 +206,16 @@ public final class OutputDirectoryHierarchy {
 		return getOutputFilename(file, this.defaultCompressionType);
 	}
 
+	public String getInputFilename(Controler.DefaultFiles file) {
+		return getInputFilename(file, this.defaultCompressionType);
+	}
+
+	public String getInputFilename(Controler.DefaultFiles file, ControllerConfigGroup.CompressionType compression) {
+		if (compression == null) {
+			return getOutputFilename(Controler.INPUT_PREFIX + file.filename);
+		}
+		return getOutputFilename(Controler.INPUT_PREFIX + file.filename + compression.fileEnding);
+	}
 	public String getOutputFilename(Controler.DefaultFiles file, ControllerConfigGroup.CompressionType compression) {
 		if (compression == null) {
 			return getOutputFilename(Controler.OUTPUT_PREFIX + file.filename);

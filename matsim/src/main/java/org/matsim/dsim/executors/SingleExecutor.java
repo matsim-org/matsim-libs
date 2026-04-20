@@ -56,6 +56,11 @@ public final class SingleExecutor implements LPExecutor {
 	}
 
 	@Override
+	public void pause() {
+		
+	}
+
+	@Override
 	public void doSimStep(double time) {
 
 		// the following iterates over all tasks twice. This is necessary,

@@ -77,10 +77,10 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	@CommandLine.Option(names = "--geographicalTripType", description = "Set the geographicalTripType: OUTGOING, INCOMING, TRANSIT, INTERNAL, ALL", defaultValue = "ALL")
 	private geographicalTripType geographicalTripType;
 
-	@CommandLine.Option(names = "--legMode", description = "Set leg mode for long distance freight legs.", defaultValue = "freight")
+	@CommandLine.Option(names = "--legMode", description = "Set leg mode for long distance freight legs.", defaultValue = "car")
 	private String legMode;
 
-	@CommandLine.Option(names = "--subpopulation", description = "Set subpopulation for the extracted freight trips", defaultValue = "freight")
+	@CommandLine.Option(names = "--subpopulation", description = "Set subpopulation for the extracted freight trips", defaultValue = "longDistanceFreight")
 	private String subpopulation;
 
 	private final SplittableRandom rnd = new SplittableRandom(4711);
@@ -163,8 +163,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			Coord endCoord = endActivity.getCoord();
 			double departureTime = startActivity.getEndTime().orElse(0);
 
-			boolean originIsInside = relevantArea.contains(MGC.coord2Point(sct.transform(startCoord)));
-			boolean destinationIsInside = relevantArea.contains(MGC.coord2Point(sct.transform(endCoord)));
+			boolean originIsInside = relevantArea.contains(MGC.coord2Point(sct.transform(startCoord))) || linksOnTheBoundary.contains(startLink);
+			boolean destinationIsInside = relevantArea.contains(MGC.coord2Point(sct.transform(endCoord))) || linksOnTheBoundary.contains(endLink);
 
 			Activity act0 = populationFactory.createActivityFromCoord("freight_start", null);
 			Leg leg = populationFactory.createLeg(legMode);

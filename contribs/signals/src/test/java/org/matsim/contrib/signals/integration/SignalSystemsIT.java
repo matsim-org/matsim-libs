@@ -28,6 +28,7 @@ import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -71,6 +72,7 @@ public class SignalSystemsIT {
 		config.qsim().setUsingFastCapacityUpdate(false);
 
 		config.controller().setLastIteration(10);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// ---
 
@@ -168,6 +170,7 @@ public class SignalSystemsIT {
 		config.qsim().setUsingFastCapacityUpdate(false);
 
 		config.controller().setLastIteration(10);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());

@@ -97,9 +97,9 @@ public class DynActivityEngine implements DistributedMobsimEngine, DistributedAc
 		} else {
 			// The agent commences an activity on this link.
 			if (beforeFirstSimStep) {
-				dynAgents.add((DynAgent)agent);
+				dynAgents.add((DynAgent) agent);
 			} else {
-				newDynAgents.add((DynAgent)agent);
+				newDynAgents.add((DynAgent) agent);
 			}
 
 			internalInterface.registerAdditionalAgentOnLink(agent);
@@ -109,7 +109,7 @@ public class DynActivityEngine implements DistributedMobsimEngine, DistributedAc
 	}
 
 	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		dynAgents.clear();
 	}
 

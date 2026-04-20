@@ -49,7 +49,22 @@ public class SpeedyALT implements LeastCostPathCalculator {
 	private final DAryMinHeap pq;
 
 	public SpeedyALT(SpeedyALTData astarData, TravelTime tt, TravelDisutility td) {
-		this.graph = astarData.graph;
+		this(astarData, astarData.graph, tt, td);
+	}
+
+	/**
+	 * Creates a SpeedyALT router using the given ALT landmark data but a separate
+	 * graph for iteration.  This allows sharing precomputed landmarks across
+	 * different graph instances for fair benchmarking.
+	 *
+	 * @param astarData precomputed ALT landmark data
+	 * @param graph     the graph to use for edge iteration during queries
+	 *                  (must have the same topology as the graph used to build astarData)
+	 * @param tt        travel time function
+	 * @param td        travel disutility function
+	 */
+	public SpeedyALT(SpeedyALTData astarData, SpeedyGraph graph, TravelTime tt, TravelDisutility td) {
+		this.graph = graph;
 		this.astarData = astarData;
 		this.tt = tt;
 		this.td = td;
@@ -84,13 +99,13 @@ public class SpeedyALT implements LeastCostPathCalculator {
 
 	public Path calcLeastCostPath(Link fromLink, Link toLink, double starttime, final Person person, final Vehicle vehicle) {
 
-		int startNodeIndex = fromLink.getToNode().getId().index();
-		int endNodeIndex = toLink.getFromNode().getId().index();
+		int startNodeIndex = this.graph.getNodeIndex(fromLink.getToNode());
+		int endNodeIndex = this.graph.getNodeIndex(toLink.getFromNode());
 
 		if(graph.getTurnRestrictions().isPresent()) {
 			Map<Id<Link>, TurnRestrictionsContext.ColoredLink> replacedLinks = graph.getTurnRestrictions().get().replacedLinks;
 			if(replacedLinks.containsKey(fromLink.getId())) {
-				startNodeIndex = replacedLinks.get(fromLink.getId()).toColoredNode.index();
+				startNodeIndex = graph.getInternalIndex(replacedLinks.get(fromLink.getId()).toColoredNode.index());
 			}
 		}
 
@@ -107,7 +122,7 @@ public class SpeedyALT implements LeastCostPathCalculator {
 
 	@Override
 	public Path calcLeastCostPath(Node startNode, Node endNode, double startTime, Person person, Vehicle vehicle) {
-		Path path = calcLeastCostPathImpl(startNode.getId().index(), endNode.getId().index(), startTime, person, vehicle);
+		Path path = calcLeastCostPathImpl(this.graph.getNodeIndex(startNode), this.graph.getNodeIndex(endNode), startTime, person, vehicle);
 		if(path == null) {
       LOG.warn("No route was found from node " + startNode.getId() + " to node " + endNode.getId() + ". Some possible reasons:");
 		  LOG.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(Network network, Set<String> modes).") ;
@@ -145,7 +160,7 @@ public class SpeedyALT implements LeastCostPathCalculator {
 				break;
 			}
 			// if turn restrictions are used, we might be on a colored node, so check for the original node
-			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == endNodeIndex) {
+			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == this.graph.getNode(endNodeIndex).getId().index()) {
 				foundEndNode = true;
 				int bestNodeIndex = nodeIdx;
 				double bestCost = getCost(bestNodeIndex);
@@ -156,7 +171,7 @@ public class SpeedyALT implements LeastCostPathCalculator {
 				DAryMinHeap.IntIterator iter = this.pq.iterator();
 				while (iter.hasNext()) {
 					int candidate = iter.next();
-					if (this.graph.getNode(candidate).getId().index() == endNodeIndex) {
+					if (this.graph.getNode(candidate).getId().index() == this.graph.getNode(endNodeIndex).getId().index()) {
 						double alternativeCost = getCost(candidate);
 						if (alternativeCost < bestCost) {
 							bestCost = alternativeCost;

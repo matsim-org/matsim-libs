@@ -404,12 +404,13 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Node startNode = fromLink.getToNode();    // start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
+		// use vehicle from routing request attribute, if defined
+		Id<Vehicle> vehicleId = (Id<Vehicle>) attributes.getAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID);
+		if (vehicleId == null) {
+			vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
+		}
+
 		if (toLink != fromLink) { // (a "true" route)
-			// use vehicle from routing request attribute, if defined
-			Id<Vehicle> vehicleId = (Id<Vehicle>) attributes.getAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID);
-			if (vehicleId == null) {
-				vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
-			}
 			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 
 			Path path;
@@ -433,13 +434,14 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			double maxSpeedOnToLink = Math.min(vehicle.getType().getMaximumVelocity(),toLink.getFreespeed());
 			double travelTimeEstimateOnToLink = (toLink.getLength() / maxSpeedOnToLink) * relPosOnArrivalLink;
-			route.setTravelTime((int) (path.travelTime+travelTimeEstimateOnToLink));
+			int travelTime = (int) (path.travelTime + travelTimeEstimateOnToLink);
+			route.setTravelTime(travelTime);
 
 			route.setTravelCost(path.travelCost);
 			route.setDistance(RouteUtils.calcDistance(route, relPosOnDepartureLink, relPosOnArrivalLink, this.filteredNetwork));
 			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
-			travTime = (int) path.travelTime; // yyyy Why are we casting to int here? This causes the link traveltime to be different from the route traveltime. aleks Jan'2025
+			travTime = travelTime;
 
 		} else {
 			// create an empty route == staying on place if toLink == endLink
@@ -447,7 +449,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
-			route.setVehicleId(VehicleUtils.getVehicleId(person, leg.getMode()));
+			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
 			travTime = 0;
 		}

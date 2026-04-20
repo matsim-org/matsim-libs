@@ -30,6 +30,13 @@ import org.junit.jupiter.api.Test;
 public class ConfigTest {
 
 	@Test
+	void programmaticallyCreatedConfigDoesNotInsistOnDeprecatedConfigVersion() {
+		Config config = ConfigUtils.createConfig();
+
+		Assertions.assertFalse(config.global().isInsistingOnDeprecatedConfigVersion());
+	}
+
+	@Test
 	void testAddModule_beforeLoading() {
 		Config config = new Config();
 		ConfigTestGroup group = new ConfigTestGroup();
@@ -51,6 +58,36 @@ public class ConfigTest {
 
 		Assertions.assertEquals("aaa", group.getA());
 		Assertions.assertEquals("bbb", group.getB());
+	}
+
+	@Test
+	void loadingConfigV1EnablesDeprecatedConfigVersionSupport() {
+		Config config = ConfigUtils.createConfig();
+
+		Assertions.assertFalse(config.global().isInsistingOnDeprecatedConfigVersion());
+
+		String str = "<?xml version='1.0' encoding='UTF-8' ?>\n" +
+			"<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v1.dtd\">\n" +
+			"<config>\n" +
+			"</config>";
+		new ConfigReader(config).parse(new ByteArrayInputStream(str.getBytes()));
+
+		Assertions.assertTrue(config.global().isInsistingOnDeprecatedConfigVersion());
+	}
+
+	@Test
+	void loadingConfigV2DisablesDeprecatedConfigVersionSupport() {
+		Config config = ConfigUtils.createConfig();
+
+		Assertions.assertFalse(config.global().isInsistingOnDeprecatedConfigVersion());
+
+		String str = "<?xml version='1.0' encoding='UTF-8' ?>\n" +
+			"<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
+			"<config>\n" +
+			"</config>";
+		new ConfigReader(config).parse(new ByteArrayInputStream(str.getBytes()));
+
+		Assertions.assertFalse(config.global().isInsistingOnDeprecatedConfigVersion());
 	}
 
 	@Test

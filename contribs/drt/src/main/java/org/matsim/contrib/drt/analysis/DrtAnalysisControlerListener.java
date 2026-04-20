@@ -650,7 +650,9 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			}
 
 			double distanceDetour = travelDistance / leg.unsharedDistanceEstimate_m;
-			double timeDetour = travelTime / leg.unsharedTimeEstimate;
+			double rideTime = leg.arrivalTime - leg.pickupTime;
+			double timeDetour = rideTime / leg.unsharedTimeEstimate;
+
 			detours.add(String.join(delimiter, leg.person + "",//
 					travelDistance + "",//
 					leg.unsharedDistanceEstimate_m + "",//

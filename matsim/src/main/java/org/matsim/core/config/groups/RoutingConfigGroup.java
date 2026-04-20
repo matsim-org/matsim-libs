@@ -52,7 +52,6 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	private static final String TELEPORTED_MODE_SPEEDS = "teleportedModeSpeed_";
 	private static final String TELEPORTED_MODE_FREESPEED_FACTORS = "teleportedModeFreespeedFactor_";
 
-
 	public static final String UNDEFINED = "undefined";
 
 	// For config file backward compatibility.
@@ -91,6 +90,10 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		 */
 		accessEgressModeToLinkPlusTimeConstant
 	}
+
+	private static final String NETWORK_ROUTING_LANDMARKS = "networkRoutingLandmarks";
+	private static final String NETWORK_ROUTING_LANDMARKS_CMT = "the number of landmarks that should be created to facilitate network routing";
+	private int networkRoutingLandmarks = 16;
 
 	private static final String ACCESSEGRESSTYPE = "accessEgressType";
 	private static final String ACCESSEGRESSTYPE_CMT = "Defines how access and egress to main mode is simulated. Either of [none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant], Current default=none which means no access or egress trips are simulated.";
@@ -197,6 +200,12 @@ public final class RoutingConfigGroup extends ConfigGroup {
 			if ( teleportedModeFreespeedFactor != null && personSpeedAttribute != null ) {
 				// this should not happen anyway as the setters forbid it
 				throw new RuntimeException( "cannot combine per-person speed attribute and freespeed factor for "+mode );
+			}
+
+			if (teleportedModeFreespeedFactor != null && beelineDistanceFactorForMode != null) {
+				// kept for backwards compatibility
+				log.warn("beelineDistanceFactor has no effect for freespeed-teleported mode " + mode
+						+ ", its use for freespeed teleportation is deprecated. This may be enforced in a future version of MATSim.");
 			}
 		}
 
@@ -452,7 +461,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		TeleportedModeParams pars = (TeleportedModeParams) set ;
 		// for the time being pushing the "global" factor into the local ones if they are not initialized by
 		// themselves.  Necessary for some tests; maybe we should eventually disable them.  kai, feb'15
-		if ( pars.getBeelineDistanceFactor()== null ) {
+		if ( pars.getTeleportedModeSpeed() != null && pars.getBeelineDistanceFactor() == null ) {
 			pars.setBeelineDistanceFactor( this.beelineDistanceFactor );
 		}
 		super.addParameterSet( set );
@@ -594,6 +603,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		map.put( CLEAR_MODE_ROUTING_PARAMS, CLEAR_MODE_ROUTING_PARAMS_CMT ) ;
 		map.put(ACCESSEGRESSTYPE, ACCESSEGRESSTYPE_CMT);
 		map.put(NETWORK_ROUTE_CONSISTENCY_CHECK, "Defines whether the network consistency should be checked.");
+		map.put(NETWORK_ROUTING_LANDMARKS, NETWORK_ROUTING_LANDMARKS_CMT);
 		return map;
 	}
 
@@ -705,6 +715,16 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	@StringSetter(NETWORK_ROUTE_CONSISTENCY_CHECK)
 	public void setNetworkRouteConsistencyCheck(NetworkRouteConsistencyCheck networkRouteConsistencyCheck) {
 		this.networkRouteConsistencyCheck = networkRouteConsistencyCheck;
+	}
+
+	@StringGetter(NETWORK_ROUTING_LANDMARKS)
+	public int getNetworkRoutingLandmarks() {
+		return networkRoutingLandmarks;
+	}
+
+	@StringSetter(NETWORK_ROUTING_LANDMARKS)
+	public void setNetworkRoutingLandmarks(int networkRoutingLandmarks) {
+		this.networkRoutingLandmarks = networkRoutingLandmarks;
 	}
 
 	@Override protected void checkConsistency(Config config) {

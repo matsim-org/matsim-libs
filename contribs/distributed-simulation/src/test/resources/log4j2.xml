@@ -11,8 +11,8 @@
 		<!-- Disable logging the injector in tests -->
 		<Logger name="org.matsim.core.controler.Injector" level="OFF" additivity="false"/>
 
-		<!-- Broadly suppress all Fury and Janino logs if they do eventually hit Log4j -->
-		<Logger name="org.apache.fury" level="WARN" additivity="false">
+		<!-- Broadly suppress all Fory and Janino logs if they do eventually hit Log4j -->
+		<Logger name="org.apache.fory" level="WARN" additivity="false">
 			<AppenderRef ref="Console"/>
 		</Logger>
 		<Logger name="org.codehaus.janino" level="WARN" additivity="false">
