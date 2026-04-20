@@ -21,7 +21,7 @@
 package org.matsim.freight.carriers.jsprit;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
@@ -93,7 +93,7 @@ public class SkillsIT {
 		vrpBuilder.setRoutingCost(networkBasedTransportCosts);
 		VehicleRoutingProblem problem = vrpBuilder.build();
 
-		VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
+		VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem).buildAlgorithm();
 
 		VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
 		CarrierPlan newPlan = MatsimJspritFactory.createPlan(solution);
