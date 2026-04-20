@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.ev.charging;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
@@ -194,6 +195,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 		private final ChargingPriority.Factory chargingPriorityFactory;
 		private final ChargerPower.Factory chargerPowerFactory;
 
+		@Inject
 		public Factory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
 			this.eventsManager = eventsManager;
 			this.chargingPriorityFactory = chargingPriorityFactory;

@@ -1,12 +1,13 @@
 package org.matsim.contrib.ev.withinday;
 
 import jakarta.annotation.Nullable;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * This interface provides alternative charging configurations online during the
@@ -24,9 +25,16 @@ public interface ChargingAlternativeProvider {
 	ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
 	                                           @Nullable ChargingSlot slot);
 
-	@Nullable
-	default ChargingAlternative queryPendingAlternative(Id<ChargingAlternative> id) {
-		throw new UnsupportedOperationException("async query pending is not yet implemented for " + this.getClass().getName());
+	default void findEnrouteAlternativeAsync(double now, Person person, Plan plan, ElectricVehicle vehicle,
+	                                         @Nullable ChargingSlot slot, Consumer<Optional<ChargingAlternative>> callback) {
+		var result = findEnrouteAlternative(now, person, plan, vehicle, slot);
+		callback.accept(Optional.ofNullable(result));
+	}
+
+	default void findAlternativeAsync(double now, Person person, Plan plan, ElectricVehicle vehicle, ChargingSlot slot, List<ChargingAlternative> trace,
+	                                  Consumer<Optional<ChargingAlternative>> callback) {
+		var result = findAlternative(now, person, plan, vehicle, slot, trace);
+		callback.accept(Optional.ofNullable(result));
 	}
 
 	static public final ChargingAlternativeProvider NOOP = new ChargingAlternativeProvider() {
@@ -41,11 +49,6 @@ public interface ChargingAlternativeProvider {
 		@Nullable
 		public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
 		                                                  @Nullable ChargingSlot slot) {
-			return null;
-		}
-
-		@Override
-		public @org.jspecify.annotations.Nullable ChargingAlternative queryPendingAlternative(Id<ChargingAlternative> id) {
 			return null;
 		}
 	};

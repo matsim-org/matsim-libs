@@ -12,20 +12,18 @@ import org.matsim.contrib.ev.infrastructure.Charger;
  *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public record ChargingAlternative(Id<ChargingAlternative> id, Id<Charger> charger, double duration, RequestStatus status) {
-	public ChargingAlternative(Id<ChargingAlternative> id, Id<Charger> charger) {
-		this(id, charger, 0.0, RequestStatus.ACCEPTED);
+public record ChargingAlternative(Id<Charger> charger, double duration) {
+	public ChargingAlternative(Id<Charger> charger) {
+		this(charger, 0.0);
 	}
 
 	public ChargingAlternative(Id<ChargingAlternative> id, Id<Charger> charger, double duration) {
-		this(id, charger, duration, RequestStatus.ACCEPTED);
+		this(charger, duration);
 	}
 
 	public boolean isLegBased() {
 		return duration > 0.0;
 	}
-
-	public enum RequestStatus {PENDING, ACCEPTED, REJECTED}
 }
 
 

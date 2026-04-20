@@ -20,11 +20,7 @@
 
 package org.matsim.contrib.ev.charging;
 
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
@@ -34,8 +30,6 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 public class ChargingModule extends AbstractModule {
 	@Override
 	public void install() {
-		// By default, charging logic with queue is used
-		bind(ChargingLogic.Factory.class).to(ChargingWithQueueingLogic.Factory.class);
 
 		// By default, charging strategy that chargers to 100% is used
 		bind(ChargingStrategy.Factory.class).toInstance(new ChargeUpToMaxSocStrategy.Factory(1.0));
@@ -47,6 +41,10 @@ public class ChargingModule extends AbstractModule {
 			protected void configureQSim() {
 				// The following binds the ChargingHandler as MobsimAfterSimstepListener.  That is what goes through the chargers and calls the charging logic.
 				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargingHandler.class).asEagerSingleton();
+				// standard charging priority for all chargers
+				bind(ChargingPriority.Factory.class).toInstance(ChargingPriority.FIFO);
+				// By default, charging logic with queue is used
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingLogic.Factory.class);
 			}
 		});
 		// One could instead have said addMobsimListenerBinding()... .  This would have been more expressive.  But it would no longer be
@@ -55,28 +53,26 @@ public class ChargingModule extends AbstractModule {
 //		this.addMobsimListenerBinding().to( ChargingHandler.class ).in( Singleton.class );
 		// does not work since ChargingInfrastructure is not available.
 
-		// standard charging priority for all chargers
-		bind(ChargingPriority.Factory.class).toInstance(ChargingPriority.FIFO);
 
 		// standard charger output power
 		bind(ChargerPower.Factory.class).to(DefaultChargerPower.Factory.class);
 	}
 
-	@Provides
-	@Singleton
-	ChargingWithQueueingLogic.Factory provideChargingWithQueueingLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
-		return new ChargingWithQueueingLogic.Factory(eventsManager, chargingPriorityFactory, chargerPowerFactory);
-	}
+//	@Provides
+//	@Singleton
+//	ChargingWithQueueingLogic.Factory provideChargingWithQueueingLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
+//		return new ChargingWithQueueingLogic.Factory(eventsManager, chargingPriorityFactory, chargerPowerFactory);
+//	}
 
-	@Provides
-	@Singleton
-	ChargingWithQueueingAndAssignmentLogic.Factory provideChargingWithQueueingAndAssignmentLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
-		return new ChargingWithQueueingAndAssignmentLogic.Factory(eventsManager, chargingPriorityFactory, chargerPowerFactory);
-	}
+//	@Provides
+//	@Singleton
+//	ChargingWithQueueingAndAssignmentLogic.Factory provideChargingWithQueueingAndAssignmentLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
+//		return new ChargingWithQueueingAndAssignmentLogic.Factory(eventsManager, chargingPriorityFactory, chargerPowerFactory);
+//	}
 
-	@Provides
-	@Singleton
-	DefaultChargerPower.Factory provideDefaultChargerPowerFactory(EvConfigGroup evConfig) {
-		return new DefaultChargerPower.Factory(evConfig.getChargeTimeStep());
-	}
+//	@Provides
+//	@Singleton
+//	DefaultChargerPower.Factory provideDefaultChargerPowerFactory(EvConfigGroup evConfig) {
+//		return new DefaultChargerPower.Factory(evConfig.getChargeTimeStep());
+//	}
 }

@@ -28,26 +28,24 @@ public class ChargerReservationModule extends AbstractModule {
 	@Override
 	public void install() {
 		if (getConfig().controller().getMobsim().equals("dsim")) {
-			installQSimModule(new AbstractQSimModule() {
+			installOverridingQSimModule(new AbstractQSimModule() {
 				@Override
 				protected void configureQSim() {
 					bind(DistributedChargerReservationManager.class).in(Singleton.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).to(DistributedChargerReservationManager.class);
+					if (bindPriority) {
+						bind(ReservationBasedChargingPriority.Factory.class).in(Singleton.class);
+						bind(ChargingPriority.Factory.class).to(ReservationBasedChargingPriority.Factory.class);
+					}
 				}
 			});
 		} else {
 			addControllerListenerBinding().to(ChargerReservationManager.class);
+			if (bindPriority) {
+				bind(ChargingPriority.Factory.class).to(ReservationBasedChargingPriority.Factory.class);
+			}
 		}
-		if (bindPriority) {
-			bind(ChargingPriority.Factory.class).to(ReservationBasedChargingPriority.Factory.class);
-		}
-	}
 
-	@Provides
-	@Singleton
-	ReservationBasedChargingPriority.Factory provideReservationBasedChargingPriorityFactory(
-		ChargerReservationManager reservationManager) {
-		return new ReservationBasedChargingPriority.Factory(reservationManager);
 	}
 
 	@Provides

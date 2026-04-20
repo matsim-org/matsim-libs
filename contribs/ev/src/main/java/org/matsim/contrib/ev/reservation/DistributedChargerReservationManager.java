@@ -1,15 +1,13 @@
 package org.matsim.contrib.ev.reservation;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
-import org.matsim.contrib.common.util.reservation.ReservationManager;
-import org.matsim.contrib.ev.fleet.ElectricFleet;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.mobsim.dsim.DSimComponentsMessageProcessor;
@@ -18,40 +16,60 @@ import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
+import java.util.function.Consumer;
 
-public class DistributedChargerReservationManager implements ReservationManager<Charger, ElectricVehicle>, DSimComponentsMessageProcessor, QSimComponent {
+public class DistributedChargerReservationManager implements DSimComponentsMessageProcessor, QSimComponent {
 
 	private final PartitionTransfer partitionTransfer;
 	private final NetworkPartition networkPartition;
-	private final ChargingInfrastructure chargingInfrastructure;
-	private final ElectricFleet electricFleet;
+	private final Provider<ChargingInfrastructure> chargingInfrastructure;
 
-	private final Map<Id<Charger>, Collection<Id<Reservation>>> chargerToReservation = new HashMap<>();
-	private final Map<Id<Reservation>, ChargerReservation> reservations = new HashMap<>();
-	//private final Map<Id<ElectricVehicle>, ReservationInfo<ElectricVehicle, Charger>> vehicleToReservation = new HashMap<>();
-	private final Int2ObjectMap<ReservationInfo<Charger, ElectricVehicle>> pendingReservationRequests = new Int2ObjectArrayMap<>();
-	private final Map<Id<Reservation>, ReservationInfo<Charger, ElectricVehicle>> receivedReservationRequests = new HashMap<>();
+	private final Map<Id<Charger>, Collection<Id<ChargerReservation>>> chargerToReservation = new HashMap<>();
+	private final Map<Id<ChargerReservation>, ChargerReservation> reservations = new HashMap<>();
+	private final Int2ObjectMap<Consumer<Optional<ChargerReservation>>> pendingReservationRequests = new Int2ObjectArrayMap<>();
 
 	private int reservationIdCounter = 0;
 	private int requestCounter = 0;
 
 	@Inject
-	public DistributedChargerReservationManager(PartitionTransfer partitionTransfer, NetworkPartition networkPartition, ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet) {
+	public DistributedChargerReservationManager(PartitionTransfer partitionTransfer, NetworkPartition networkPartition, Provider<ChargingInfrastructure>
+		chargingInfrastructure) {
 		this.partitionTransfer = partitionTransfer;
 		this.networkPartition = networkPartition;
 		this.chargingInfrastructure = chargingInfrastructure;
-		this.electricFleet = electricFleet;
 	}
 
-	@Override
-	public boolean isAvailable(Charger resource, ElectricVehicle consumer, double startTime, double endTime) {
-		return isAvailable(resource.getId(), resource.getLink().getId(), consumer.getId(), startTime, endTime);
+	public Optional<ChargerReservation> findReservation(Id<Charger> resource, Id<Vehicle> consumer, double now) {
+
+		var charger = getLiveCharger(resource);
+		if (!partitionTransfer.isLocal(charger.getLink().getId())) {
+			throw new IllegalArgumentException("Resource: " + resource + " is not present on this partition. Reservations may only be queried for local reservations.");
+		}
+
+		var chargerReservations = chargerToReservation.get(resource);
+		if (chargerReservations == null) return Optional.empty();
+
+		for (var reservationId : chargerReservations) {
+			var reservation = reservations.get(reservationId);
+			if (reservation.consumer().equals(consumer) && now >= reservation.startTime() && now < reservation.endTime()) {
+				return Optional.of(reservation);
+			}
+		}
+		return Optional.empty();
+	}
+
+	public void removeReservation(Id<ChargerReservation> reservationId, Id<Charger> chargerId) {
+		var reservation = reservations.remove(reservationId);
+		if (reservation != null) {
+			chargerToReservation.get(chargerId).remove(reservationId);
+			// we don't care about empty maps.
+		}
 	}
 
 	private boolean isAvailable(Id<Charger> chargerId, Id<Link> linkId, Id<Vehicle> vehicleId, double startTime, double endTime) {
 
 		if (!partitionTransfer.isLocal(linkId))
-			throw new IllegalStateException("We don't know whether remove chargers are available or not. Just call addReservation and check the result.");
+			throw new IllegalStateException("Charger " + chargerId + " is not present on this partition. addLocalReservation may only be called for local chargers.");
 
 		var charger = getLiveCharger(chargerId);
 		var overlappingReservations = new HashSet<>();
@@ -74,95 +92,48 @@ public class DistributedChargerReservationManager implements ReservationManager<
 		} else return startTime <= info.startTime() && endTime > info.endTime(); // new range covers existing range
 	}
 
-	@Override
-	public Optional<ReservationInfo<Charger, ElectricVehicle>> addReservation(Charger resource, ElectricVehicle consumer, double startTime, double endTime) {
+	public void addReservation(Id<Charger> resource, Id<Vehicle> consumer, double startTime, double endTime, Consumer<Optional<ChargerReservation>> callback) {
 
-		if (partitionTransfer.isLocal(resource.getLink().getId())) {
-			return addLocalReservation(resource, consumer, startTime, endTime);
+		var charger = getLiveCharger(resource);
+
+		if (partitionTransfer.isLocal(charger.getLink().getId())) {
+			callback.accept(addLocalReservation(resource, consumer, startTime, endTime));
 		} else {
-			return requestRemoteReservation(resource, consumer, startTime, endTime);
+			requestRemoteReservation(resource, consumer, startTime, endTime, callback);
 		}
 	}
 
-	private Optional<ReservationInfo<Charger, ElectricVehicle>> addLocalReservation(Charger resource, ElectricVehicle consumer, double startTime, double endTime) {
+	/**
+	 * Keep this synchronous version here, so that we don't have to rewrite the entire PlugginPriority code ase well.
+	 */
+	public Optional<ChargerReservation> addLocalReservation(Id<Charger> resource, Id<Vehicle> consumer, double startTime, double endTime) {
 
-		if (isAvailable(resource.getId(), resource.getLink().getId(), consumer.getId(), startTime, endTime)) {
+		var charger = getLiveCharger(resource);
+		if (isAvailable(resource, charger.getLink().getId(), consumer, startTime, endTime)) {
 			reservationIdCounter++;
-			var partitionIndex = partitionTransfer.getPartitionIndex(resource.getLink().getId());
-			var id = Id.create(resource.getId() + "_" + partitionIndex + "_" + reservationIdCounter, Reservation.class);
-			var externalReservation = new ReservationInfo<>(id, resource, consumer, startTime, endTime, ReservationStatus.CONFIRMED);
-			// internally, we only store ids, because we cannot hold references of moving objects, as they might leave the partition.
-			var internalReservation = ChargerReservation.fromExternalReservation(externalReservation);
-			reservations.put(id, internalReservation);
-			chargerToReservation.computeIfAbsent(resource.getId(), k -> new ArrayList<>()).add(id);
-			return Optional.of(externalReservation);
+			var partitionIndex = partitionTransfer.getPartitionIndex(charger.getLink().getId());
+			var id = Id.create(resource + "_" + partitionIndex + "_" + reservationIdCounter, ChargerReservation.class);
+			var reservation = new ChargerReservation(id, resource, consumer, startTime, endTime);
+			reservations.put(id, reservation);
+			chargerToReservation.computeIfAbsent(resource, _ -> new ArrayList<>()).add(id);
+			return Optional.of(reservation);
 		}
 
 		return Optional.empty();
 	}
 
-	private Optional<ReservationInfo<Charger, ElectricVehicle>> requestRemoteReservation(Charger resource, ElectricVehicle consumer, double startTime, double endTime) {
-
+	private void requestRemoteReservation(Id<Charger> resource, Id<Vehicle> consumer, double startTime, double endTime, Consumer<Optional<ChargerReservation>> callback) {
 		requestCounter++;
-		var request = new ReservationRequest(networkPartition.getIndex(), requestCounter, resource.getId(), consumer.getId(), startTime, endTime);
-		var info = new ReservationInfo<>(
-			Id.create(resource.getId() + "_pending_" + requestCounter, Reservation.class),
-			resource,
-			consumer,
-			startTime,
-			endTime,
-			ReservationStatus.PENDING
-		);
-		pendingReservationRequests.put(requestCounter, info);
-		partitionTransfer.collect(request, resource.getLink().getId());
-		return Optional.of(info);
+		var charger = getLiveCharger(resource);
+		var request = new ReservationRequest(networkPartition.getIndex(), requestCounter, resource, consumer, startTime, endTime);
+		pendingReservationRequests.put(requestCounter, callback);
+		partitionTransfer.collect(request, charger.getLink().getId());
 	}
-
-	@Override
-	public boolean removeReservation(Id<?> resourceId, Id<Reservation> reservationId) {
-		var reservation = reservations.remove(reservationId);
-		if (reservation != null) {
-			chargerToReservation.get(resourceId).remove(reservationId);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean updateReservation(Id<?> resourceId, Id<Reservation> reservationId, double newStartTime, double newEndTime) {
-		throw new UnsupportedOperationException("Updating reservations is not supported in this implementation.");
-	}
-
-	@Override
-	public Optional<ReservationInfo<Charger, ElectricVehicle>> findReservation(Charger resource, ElectricVehicle consumer, double now) {
-		var chargerReservations = chargerToReservation.get(resource.getId());
-		if (chargerReservations == null) return Optional.empty();
-		for (var reservationId : chargerReservations) {
-			var reservation = reservations.get(reservationId);
-			if (reservation.consumer().equals(consumer.getId()) && now >= reservation.startTime() && now < reservation.endTime()) {
-				return reservation.toExternalReservation(chargingInfrastructure, electricFleet);
-			}
-		}
-		return Optional.empty();
-	}
-
-	@Override
-	public Optional<ReservationInfo<Charger, ElectricVehicle>> findReservation(Id<?> resourceId, Id<Reservation> reservationId) {
-		var reservation = reservations.get(reservationId);
-		if (reservation == null) return Optional.empty();
-		return reservation.toExternalReservation(chargingInfrastructure, electricFleet);
-	}
-
 
 	@Override
 	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
 		return Map.of(ReservationRequest.class, this::handleReservationRequest,
 			ReservationResponse.class, this::handleReservationResponse);
-	}
-
-	public Optional<ReservationInfo<Charger, ElectricVehicle>> queryPendingReservation(Id<Reservation> id) {
-		var reservation = receivedReservationRequests.get(id);
-		return Optional.ofNullable(reservation);
 	}
 
 	private void handleReservationRequest(List<Message> messages, double now) {
@@ -171,18 +142,13 @@ public class DistributedChargerReservationManager implements ReservationManager<
 			var message = (ReservationRequest) m;
 
 			var localReservation = addLocalReservation(
-				getLiveCharger(message.chargerId()),
-				electricFleet.getVehicle(message.vehicleId),
+				message.chargerId(),
+				message.vehicleId,
 				message.startTime,
 				message.endTime
 			);
 			// send back the reservation response
-			if (localReservation.isPresent()) {
-				var reservationId = localReservation.get().reservationId();
-				partitionTransfer.collect(new ReservationResponse(message.requestId(), ReservationStatus.CONFIRMED, reservationId), message.requestPartition());
-			} else {
-				partitionTransfer.collect(new ReservationResponse(message.requestId(), ReservationStatus.REJECTED, null), message.requestPartition());
-			}
+			partitionTransfer.collect(new ReservationResponse(message.requestId(), localReservation), message.requestPartition());
 		}
 	}
 
@@ -190,20 +156,12 @@ public class DistributedChargerReservationManager implements ReservationManager<
 		for (var m : messages) {
 			ReservationResponse response = (ReservationResponse) m;
 			var pendingReservation = pendingReservationRequests.remove(response.requestId);
-			var reservation = new ReservationInfo<>(
-				response.reservationId,
-				pendingReservation.resource(),
-				pendingReservation.consumer(),
-				pendingReservation.startTime(),
-				pendingReservation.endTime(),
-				response.status()
-			);
-			receivedReservationRequests.put(pendingReservation.reservationId(), reservation);
+			pendingReservation.accept(response.reservation());
 		}
 	}
 
 	private Charger getLiveCharger(Id<Charger> chargerId) {
-		return chargingInfrastructure.getChargers().get(chargerId);
+		return chargingInfrastructure.get().getChargers().get(chargerId);
 	}
 
 	public record ReservationRequest(
@@ -212,45 +170,21 @@ public class DistributedChargerReservationManager implements ReservationManager<
 		Id<Charger> chargerId,
 		Id<Vehicle> vehicleId,
 		double startTime,
-		double endTime) implements Message {
-	}
+		double endTime) implements Message {}
 
 	public record ReservationResponse(
 		int requestId,
-		ReservationStatus status,
-		Id<Reservation> reservationId
-	) implements Message {
-	}
+		Optional<ChargerReservation> reservation
+	) implements Message {}
 
 	/**
 	 * Just like the orignal, but without actual references.
 	 */
 	public record ChargerReservation(
-		Id<Reservation> reservationId,
+		Id<ChargerReservation> reservationId,
 		Id<Charger> resource,
 		Id<Vehicle> consumer,
 		double startTime,
-		double endTime,
-		ReservationStatus status
-	) {
-
-		static ChargerReservation fromExternalReservation(ReservationInfo<Charger, ElectricVehicle> info) {
-			return new ChargerReservation(
-				info.reservationId(),
-				info.resource().getId(),
-				info.consumer().getId(),
-				info.startTime(),
-				info.endTime(),
-				info.status()
-			);
-		}
-
-		Optional<ReservationInfo<Charger, ElectricVehicle>> toExternalReservation(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet) {
-			var charger = chargingInfrastructure.getChargers().get(resource);
-			var vehicle = electricFleet.getVehicle(consumer);
-			if (charger == null || vehicle == null) return Optional.empty();
-			return Optional.of(new ReservationInfo<>(reservationId, charger, vehicle, startTime, endTime, status));
-		}
-	}
-
+		double endTime
+	) {}
 }

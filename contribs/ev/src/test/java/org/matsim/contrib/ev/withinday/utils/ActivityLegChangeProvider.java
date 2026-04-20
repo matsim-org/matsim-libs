@@ -17,15 +17,13 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ActivityLegChangeProvider implements ChargingAlternativeProvider, ChargingSlotProvider {
-	private boolean useFirstActivityBased;
-	private ChargingInfrastructure infrastructure;
+	private final boolean useFirstActivityBased;
+	private final ChargingInfrastructure infrastructure;
 
 	private Activity chargingActivity = null;
 	private Leg chargingLeg = null;
-	private final AtomicInteger idCounter = new AtomicInteger(0);
 
 	ActivityLegChangeProvider(ChargingInfrastructure infrasturcutre, boolean useFirstActivityBased) {
 		this.infrastructure = infrasturcutre;
@@ -74,10 +72,10 @@ public class ActivityLegChangeProvider implements ChargingAlternativeProvider, C
 
 		if (useFirstActivityBased) {
 			// now switch to leg-based
-			return new ChargingAlternative(Id.create(idCounter.incrementAndGet(), ChargingAlternative.class), charger.getId(), 3600.0);
+			return new ChargingAlternative(charger.getId(), 3600.0);
 		} else {
 			// now switch to activity-based
-			return new ChargingAlternative(Id.create(idCounter.incrementAndGet(), ChargingAlternative.class), charger.getId());
+			return new ChargingAlternative(charger.getId());
 		}
 	}
 

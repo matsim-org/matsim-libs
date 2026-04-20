@@ -79,10 +79,12 @@ public class ChargingActivityEngineTest {
 			.build();
 		var infraSpec = ChargingInfrastructureUtils.createChargingInfrastructureSpecification();
 		infraSpec.addChargerSpecification(spec);
+		var config = new EvConfigGroup();
+		config.setChargeTimeStep(1);
 
 		var logicFactory = new ChargingWithQueueingLogic.Factory(eventsManager,
 			_ -> (_, _) -> true,
-			new DefaultChargerPower.Factory(1.0));
+			new DefaultChargerPower.Factory(config));
 
 		// Build a minimal single-link network so ChargerDefaultImpl is happy
 		var network = org.matsim.core.network.NetworkUtils.createNetwork();

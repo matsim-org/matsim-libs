@@ -78,7 +78,7 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 						//var filtered = ChargingInfrastructureUtils.filterChargers(allChargers, c -> networkPartition.containsLink(c.getLink().getId()));
 						return allChargers;
 					}
-				}).asEagerSingleton();
+				}).in(Singleton.class);
 			}
 		});
 	}
