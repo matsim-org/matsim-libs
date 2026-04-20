@@ -120,8 +120,9 @@ public class TestScenarioBuilder {
 		Vehicles vehicles = scenario.getVehicles();
 		VehiclesFactory vehiclesFactory = vehicles.getFactory();
 
-		VehicleType vehicleType = vehiclesFactory.createVehicleType(Id.createVehicleTypeId("electric"));
-		vehicles.addVehicleType(vehicleType);
+        VehicleType vehicleType = vehiclesFactory.createVehicleType(Id.createVehicleTypeId("electric"));
+        vehicleType.setNetworkMode("car");
+        vehicles.addVehicleType(vehicleType);
 
 		ElectricFleetUtils.setElectricVehicleType(vehicleType);
 		ElectricFleetUtils.setChargerTypes(vehicleType, Collections.singleton("default"));

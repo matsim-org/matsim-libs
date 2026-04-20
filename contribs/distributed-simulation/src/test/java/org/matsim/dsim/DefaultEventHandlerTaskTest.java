@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 class DefaultEventHandlerTaskTest {
 
-	private static final SerializationProvider serializer = new SerializationProvider();
+	private static final SerializationProvider serializer = SerializationProvider.getInstance();
 
 	@Test
 	public void syncTimeStep() {
