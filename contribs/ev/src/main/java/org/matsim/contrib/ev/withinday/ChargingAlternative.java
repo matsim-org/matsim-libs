@@ -17,10 +17,6 @@ public record ChargingAlternative(Id<Charger> charger, double duration) {
 		this(charger, 0.0);
 	}
 
-	public ChargingAlternative(Id<ChargingAlternative> id, Id<Charger> charger, double duration) {
-		this(charger, duration);
-	}
-
 	public boolean isLegBased() {
 		return duration > 0.0;
 	}

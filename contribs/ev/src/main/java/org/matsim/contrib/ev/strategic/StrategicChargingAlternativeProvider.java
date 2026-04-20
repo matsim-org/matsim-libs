@@ -3,7 +3,6 @@ package org.matsim.contrib.ev.strategic;
 import com.google.common.base.Verify;
 import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -27,7 +26,6 @@ import org.matsim.core.utils.timing.TimeTracker;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -51,8 +49,6 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 
 	private final CriticalAlternativeProvider criticalProvider;
 	private final int maximumAlternatives;
-
-	private final AtomicInteger idCounter = new AtomicInteger(0);
 
 	public StrategicChargingAlternativeProvider(Scenario scenario, ChargerProvider chargerProvider,
 	                                            ChargingInfrastructure infrastructure,
@@ -132,7 +128,7 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 			}
 
 			double duration = slot.isLegBased() ? slot.duration() : 0.0;
-			return new ChargingAlternative(Id.create(idCounter.incrementAndGet(), ChargingAlternative.class), selected.getId(), duration);
+			return new ChargingAlternative(selected.getId(), duration);
 		}
 
 		// no new candidate found

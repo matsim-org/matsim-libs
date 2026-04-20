@@ -4,6 +4,7 @@ import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.core.mobsim.framework.PlanAgent;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +26,10 @@ public interface ChargingAlternativeProvider {
 	ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
 	                                           @Nullable ChargingSlot slot);
 
-	default void findEnrouteAlternativeAsync(double now, Person person, Plan plan, ElectricVehicle vehicle,
+	default void findEnrouteAlternativeAsync(double now, PlanAgent agent, ElectricVehicle vehicle,
 	                                         @Nullable ChargingSlot slot, Consumer<Optional<ChargingAlternative>> callback) {
+		var plan = agent.getCurrentPlan();
+		var person = plan.getPerson();
 		var result = findEnrouteAlternative(now, person, plan, vehicle, slot);
 		callback.accept(Optional.ofNullable(result));
 	}

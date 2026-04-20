@@ -3,7 +3,6 @@ package org.matsim.contrib.ev.withinday.utils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import jakarta.annotation.Nullable;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -13,20 +12,18 @@ import org.matsim.contrib.ev.withinday.ChargingAlternativeProvider;
 import org.matsim.contrib.ev.withinday.ChargingSlot;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 public class ChangeDurationAlternativeProvider implements ChargingAlternativeProvider {
 	@Inject
 	ChargingInfrastructure infrastructure;
-	private final AtomicInteger idCounter = new AtomicInteger(0);
 
 	@SuppressWarnings("null")
 	@Override
 	public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
 	                                                  ElectricVehicle vehicle,
 	                                                  @Nullable ChargingSlot initialSlot) {
-		return new ChargingAlternative(Id.create(idCounter.incrementAndGet(), ChargingAlternative.class), initialSlot.charger().getId(), 1800.0);
+		return new ChargingAlternative(initialSlot.charger().getId(), 1800.0);
 	}
 
 	@Override

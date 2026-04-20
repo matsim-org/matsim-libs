@@ -10,6 +10,7 @@ import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.reservation.DistributedChargerReservationManager;
 import org.matsim.contrib.ev.withinday.ChargingAlternative;
 import org.matsim.contrib.ev.withinday.ChargingSlot;
+import org.matsim.core.mobsim.framework.PlanAgent;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -35,10 +36,10 @@ public class ReservationAlternativeProvider extends OrderedAlternativeProvider {
 	}
 
 	@Override
-	public void findEnrouteAlternativeAsync(double now, Person person, Plan plan, ElectricVehicle vehicle,
+	public void findEnrouteAlternativeAsync(double now, PlanAgent agent, ElectricVehicle vehicle,
 	                                        @Nullable ChargingSlot slot, Consumer<Optional<ChargingAlternative>> callback) {
 
-		if (person.getId().toString().equals("person2")) {
+		if (agent.getCurrentPlan().getPerson().getId().toString().equals("person2")) {
 			manager.addReservation(slot.charger().getId(), vehicle.getId(), now, Double.POSITIVE_INFINITY, optResrvation -> {
 				// ignore the results. We just want the reservation
 				callback.accept(Optional.empty());

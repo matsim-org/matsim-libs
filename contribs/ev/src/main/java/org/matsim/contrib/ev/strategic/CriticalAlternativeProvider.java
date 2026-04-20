@@ -26,7 +26,6 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class is a special case that is implemented optionally in the
@@ -51,7 +50,6 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
 	private final ChargerProvider chargerProvider;
 	private final ChargingInfrastructure infrastructure;
 	private final double minimumDuration;
-	private final AtomicInteger idCounter = new AtomicInteger(0);
 
 	public CriticalAlternativeProvider(QSim qsim, Network network, TravelTime travelTime,
 	                                   ChargerProvider chargerProvider, ChargingInfrastructure infrastructure,
@@ -118,7 +116,7 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
 					double duration = calculator.calcChargingTime(selected, fixedDeltaCharge);
 					duration = Math.max(minimumDuration, duration);
 
-					return new ChargingAlternative(Id.create(idCounter.incrementAndGet(), ChargingAlternative.class), selected.getId(), duration);
+					return new ChargingAlternative(selected.getId(), duration);
 				}
 			}
 		}

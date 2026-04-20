@@ -1604,8 +1604,8 @@ public class WithinDayEvTest3 {
 		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
 
 		assertEquals(37609.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
-		assertEquals(41222.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
-		assertEquals(41224.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+		assertEquals(41220.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41220.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
 	}
 
 	@Test
