@@ -88,8 +88,7 @@ public final class TrafficStatsCalculator {
 				double excessTravelTime = this.getLinkExcessTravelTime(link, time);
 				double freeSpeedTravelTime = qSimFreeSpeedTravelTime.getLinkTravelTime(link, time, null, null);
 
-				// by default, every link contributes for 1 unit of weight
-				double volumeDuringTimeSlice = 1.0;
+				double volumeDuringTimeSlice = 0.;
 
 				if (volumesAnalyzer.getLinkIds().contains(link.getId())){
 					// We cannot get time-bin-size of the Volumes (as it is private). In the analysis, time-bin-size is always 3600, so we enter the value
@@ -139,7 +138,7 @@ public final class TrafficStatsCalculator {
 	 * Calculates the congestion index based on the ratio of actual travel time and free speed travel time.
 	 *
 	 * @deprecated -- // kai does not like this quantity.  In particular, he finds the re-weighting by the fraction of non-congested time arbitrary;
-	 * //	this is consistent with the fact that it cannot be interpreted in ecomics terms (other than, say, the TomTom congestion index).
+	 * //	this is consistent with the fact that it cannot be interpreted in economic terms (other than, say, the TomTom congestion index). -Chengqi 07.2025
 	 */
 	@Deprecated
 	public double getLinkCongestionIndex(Link link, int startTime, int endTime) {
