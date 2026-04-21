@@ -22,7 +22,7 @@ public class CarrierDashboard implements Dashboard  {
 	}
 
 	public CarrierDashboard() {
-		this.carrierFileName = "(*.)?output_carriers.xml.gz";
+		this.carrierFileName = "(*.)?output_carriers.xml(.*)?";
 	}
 
 
