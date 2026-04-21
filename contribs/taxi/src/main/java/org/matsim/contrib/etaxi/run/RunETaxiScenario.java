@@ -89,10 +89,16 @@ public class RunETaxiScenario {
 //				multiModeTaxiConfig.modes().collect(toList())));
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(multiModeTaxiConfig.modes().toArray(String[]::new)));
 
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
+			}
+		});
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
 				//TODO switch to VariableSpeedCharging for Nissan
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev.getBattery(), CHARGING_SPEED_FACTOR));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);

@@ -19,19 +19,20 @@
 
 package org.matsim.contrib.ev.charging;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic
-		implements ChargingWithAssignmentLogic {
+	implements ChargingWithAssignmentLogic {
 	private final Map<Id<Vehicle>, ChargingVehicle> assignedVehicles = new LinkedHashMap<>();
 
 	public ChargingWithQueueingAndAssignmentLogic(ChargerSpecification charger, EventsManager eventsManager, ChargingPriority priority, ChargerPower chargerPower) {
@@ -59,7 +60,7 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 	}
 
 	private final Collection<ChargingVehicle> unmodifiableAssignedVehicles = Collections.unmodifiableCollection(
-			assignedVehicles.values());
+		assignedVehicles.values());
 
 	@Override
 	public Collection<ChargingVehicle> getAssignedVehicles() {
@@ -71,6 +72,7 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 		private final ChargingPriority.Factory priorityFactory;
 		private final ChargerPower.Factory chargerPowerFactory;
 
+		@Inject
 		public Factory(EventsManager eventsManager, ChargingPriority.Factory priorityFactory, ChargerPower.Factory chargerPowerFactory) {
 			this.eventsManager = eventsManager;
 			this.priorityFactory = priorityFactory;

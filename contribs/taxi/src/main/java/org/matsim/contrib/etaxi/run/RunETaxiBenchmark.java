@@ -105,10 +105,16 @@ public class RunETaxiBenchmark {
 //				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
+			}
+		});
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
 				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(mode))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_SOC));
 				//TODO switch to VariableSpeedCharging for Nissan
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev.getBattery(), CHARGING_SPEED_FACTOR));
