@@ -35,7 +35,7 @@ public class CarrierDashboard implements Dashboard  {
 		layout.row("KPI", "Carrier Overview").el(Tile.class, (viz, data) -> {
 			viz.title = "Carrier KPIs";
 			viz.dataset = data.output("analysis/freight/Carriers_KPIs.tsv");
-			viz.description = "Key Performance Indicators of the Carrier";
+			viz.description = "Key performance indicators of the carrier. Note: Jsprit CPU time is the sum of the solving times of all individual VRPs. When using more than one thread, the wall-clock runtime can be shorter.";
 		});
 		layout.row("first", "Carrier Overview").el(Table.class, (viz, data) -> {
 			viz.title = "Run Info for MATSim";
@@ -85,6 +85,10 @@ public class CarrierDashboard implements Dashboard  {
 						.y("currentBestSolutionNumberOfVehicles")
 				);
 			});
+
+		layout.row("warnings", "Carrier Overview").el(TextBlock.class, (viz, data) -> {
+			viz.file = data.compute(LogFileAnalysis.class, "status.md");
+		});
 
 		layout.row("viewer", "Tour Visualizer").el(CarrierViewer.class, (viz, data) -> {
 			viz.title = "Carrier Viewer";
