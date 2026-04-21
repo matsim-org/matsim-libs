@@ -22,7 +22,6 @@ package org.matsim.freight.carriers.jsprit;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
@@ -687,7 +686,7 @@ public final class MatsimJspritFactory {
 		} else {
 			log.info("Use a VehicleRoutingAlgorithm out of the box.");
 			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
-				case noDistanceConstraint -> algorithm = new SchrimpfFactory().createAlgorithm(problem);
+				case noDistanceConstraint -> algorithm = Jsprit.Builder.newInstance(problem).buildAlgorithm();
 				case basedOnEnergyConsumption -> {
 					log.info("Use the distanceConstraint based on energy consumption.");
 					StateManager stateManager = new StateManager(problem);
