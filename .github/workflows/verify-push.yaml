@@ -71,6 +71,7 @@ jobs:
           - contribs/perceived-safety
           - contribs/atap
           - benchmark
+          - code-examples
 
     steps:
       - name: Checkout git repo
