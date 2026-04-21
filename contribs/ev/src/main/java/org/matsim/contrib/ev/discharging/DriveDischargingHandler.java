@@ -22,17 +22,15 @@ package org.matsim.contrib.ev.discharging;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.vehicles.Vehicle;
 
@@ -46,8 +44,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * calculating the drive-related energy consumption. However, the time spent on the first link is used by the time-based
  * idle discharge process (see {@link IdleDischargingHandler}).
  */
+@DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class DriveDischargingHandler
-	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler, MobsimEngine {
+	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler, DistributedMobsimEngine {
 
 	private static class EvDrive {
 		private final Id<Vehicle> vehicleId;
@@ -67,7 +66,7 @@ public class DriveDischargingHandler
 
 	private final Network network;
 	private final EventsManager eventsManager;
-	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
+	private final ElectricFleet fleet;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
 
 	private final Queue<VehicleEntersTrafficEvent> trafficEnterEvents = new ConcurrentLinkedQueue<>();
@@ -77,21 +76,21 @@ public class DriveDischargingHandler
 	private final Netsim netsim;
 
 	@Inject
-	DriveDischargingHandler(Netsim netsim, ElectricFleet data, Network network, EventsManager eventsManager) {
+	DriveDischargingHandler(Netsim netsim, ElectricFleet fleet, Network network, EventsManager eventsManager) {
 		this.netsim = netsim;
 		this.network = network;
 		this.eventsManager = eventsManager;
-		eVehicles = data.getElectricVehicles();
-		evDrives = new ConcurrentHashMap<>(eVehicles.size() / 10);
+		this.fleet = fleet;
+		evDrives = new ConcurrentHashMap<>();
 	}
 
-	private ElectricVehicle getElectricVehicle(Id<Vehicle> vehicleId) {
-		return eVehicles.get(vehicleId);
-	}
+//	private ElectricVehicle getElectricVehicle(Id<Vehicle> vehicleId) {
+//		return electricFleet.getVehicle(vehicleId);
+//	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			trafficEnterEvents.add(event);
 		}
@@ -99,7 +98,7 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			linkLeaveEvents.add(event);
 		}
@@ -107,7 +106,7 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			trafficLeaveEvents.add(event);
 		}
@@ -134,7 +133,7 @@ public class DriveDischargingHandler
 				break; // see below
 			}
 
-			ElectricVehicle ev = getElectricVehicle(event.getVehicleId());
+			ElectricVehicle ev = fleet.getVehicle(event.getVehicleId());
 			evDrives.put(ev.getId(), new EvDrive(ev.getId(), ev));
 			trafficEnterEvents.remove();
 		}

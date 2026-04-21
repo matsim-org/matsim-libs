@@ -113,7 +113,9 @@ public class PopulationComparison {
 				result = Result.notEqual;
 			}
 		}
-		log.warn(scoreCounter + "/" + overallCounter + " had varying scores.");
+		if ( scoreCounter!= 0 ){
+			log.warn( scoreCounter + "/" + overallCounter + " had different scores." );
+		}
 		return result;
 	}
 

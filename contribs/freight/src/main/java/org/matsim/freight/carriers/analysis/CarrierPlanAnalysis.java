@@ -31,6 +31,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -226,15 +227,17 @@ import org.matsim.freight.carriers.*;
 
 		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(path.resolve("Carriers_KPIs.tsv").toString()))) {
 
-
 			bw1.write("Number of Carrier" + delimiter + carriers.getCarriers().size());
 			bw1.newLine();
 			int numberOfVehicles = carriers.getCarriers().values().stream()
 				.mapToInt(c -> c.getSelectedPlan().getScheduledTours().size()).sum();
 			bw1.write("Number of Vehicles in Solution" + delimiter + numberOfVehicles);
 			bw1.newLine();
-			int jspritComputationTime = 0;
-			bw1.write("Jsprit Computation Time" + delimiter + jspritComputationTime);
+			double jspritComputationTime = carriers.getCarriers().values().stream()
+				.mapToDouble(CarriersUtils::getJspritComputationTime)
+				.filter(time -> time != Integer.MIN_VALUE)
+				.sum();
+			bw1.write("Jsprit CPU Time" + delimiter + DurationFormatUtils.formatDurationHMS(Math.round(jspritComputationTime * 1000)));
 			bw1.newLine();
 			double jspritScore = carriers.getCarriers().values().stream()
 				.mapToDouble(c -> {

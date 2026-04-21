@@ -9,7 +9,7 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
-import org.matsim.contrib.ev.reservation.ChargerReservationManager;
+import org.matsim.contrib.ev.reservation.DistributedChargerReservationManager;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlan;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlanActivity;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
@@ -33,7 +33,7 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 
 	private final Population population;
 
-	private final ChargerReservationManager manager;
+	private final DistributedChargerReservationManager manager;
 	private final ChargingInfrastructureSpecification infrastructure;
 	private final TimeInterpretation timeInterpretation;
 	private final ElectricFleet electricFleet;
@@ -42,16 +42,16 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 	private final String chargingMode;
 
 	private record AdvanceReservation(double reservationTime, Person person, ChargerSpecification charger,
-									  ElectricVehicle vehicle,
-									  double startTime, double endTime) {
+	                                  ElectricVehicle vehicle,
+	                                  double startTime, double endTime) {
 	}
 
 	private final PriorityQueue<AdvanceReservation> queue = new PriorityQueue<>(
 		Comparator.comparing(AdvanceReservation::reservationTime));
 
-	public StrategicChargingReservationEngine(Population population, ChargerReservationManager manager,
-											  ChargingInfrastructureSpecification infrastructure, TimeInterpretation timeInterpretation,
-											  ElectricFleet electricFleet, String chargingMode, EventsManager eventsManager) {
+	public StrategicChargingReservationEngine(Population population, DistributedChargerReservationManager manager,
+	                                          ChargingInfrastructureSpecification infrastructure, TimeInterpretation timeInterpretation,
+	                                          ElectricFleet electricFleet, String chargingMode, EventsManager eventsManager) {
 		this.population = population;
 		this.manager = manager;
 		this.electricFleet = electricFleet;
@@ -66,13 +66,12 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 		while (queue.size() > 0 && queue.peek().reservationTime <= time) {
 			AdvanceReservation advance = queue.poll();
 
-			var reservation = manager.addReservation(advance.charger, advance.vehicle, advance.startTime,
-				advance.endTime);
-
 			// TODO: What if the reservation is unsuccessful? Here we could implement some
 			// fallback strategy: Choose another charger
+			var reservation = manager.addLocalReservation(advance.charger.getId(), advance.vehicle.getId(),
+				advance.startTime, advance.endTime);
 
-			boolean successful = reservation != null;
+			boolean successful = reservation.isPresent();
 			eventsManager.processEvent(new AdvanceReservationEvent(time, advance.person.getId(),
 				advance.vehicle.getId(), advance.charger.getId(), advance.startTime, advance.endTime, successful));
 		}
@@ -98,7 +97,7 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 			}
 
 			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, chargingMode);
-			ElectricVehicle vehicle = electricFleet.getElectricVehicles().get(vehicleId);
+			ElectricVehicle vehicle = electricFleet.getVehicle(vehicleId);
 
 			List<Double> startTimes = new LinkedList<>();
 			List<Double> endTimes = new LinkedList<>();

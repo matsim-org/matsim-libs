@@ -1,10 +1,7 @@
 package org.matsim.contrib.ev.strategic;
 
-import java.util.Collection;
-import java.util.List;
-
+import com.google.common.base.Preconditions;
 import jakarta.annotation.Nullable;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -27,7 +24,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This class is a special case that is implemented optionally in the
@@ -44,115 +42,115 @@ import com.google.common.base.Preconditions;
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class CriticalAlternativeProvider implements ChargingAlternativeProvider {
-    static public final String CRITICAL_SOC_PERSON_ATTRIBUTE = "sevc:criticalSoc";
+	static public final String CRITICAL_SOC_PERSON_ATTRIBUTE = "sevc:criticalSoc";
 
-    private final QSim qsim;
-    private final Network network;
-    private final TravelTime travelTime;
-    private final ChargerProvider chargerProvider;
-    private final ChargingInfrastructure infrastructure;
-    private final double minimumDuration;
+	private final QSim qsim;
+	private final Network network;
+	private final TravelTime travelTime;
+	private final ChargerProvider chargerProvider;
+	private final ChargingInfrastructure infrastructure;
+	private final double minimumDuration;
 
-    public CriticalAlternativeProvider(QSim qsim, Network network, TravelTime travelTime,
-            ChargerProvider chargerProvider, ChargingInfrastructure infrastructure,
-            StrategicChargingConfigGroup config) {
-        this.qsim = qsim;
-        this.network = network;
-        this.travelTime = travelTime;
-        this.chargerProvider = chargerProvider;
-        this.infrastructure = infrastructure;
-        this.minimumDuration = config.getMinimumEnrouteChargingDuration();
-    }
+	public CriticalAlternativeProvider(QSim qsim, Network network, TravelTime travelTime,
+	                                   ChargerProvider chargerProvider, ChargingInfrastructure infrastructure,
+	                                   StrategicChargingConfigGroup config) {
+		this.qsim = qsim;
+		this.network = network;
+		this.travelTime = travelTime;
+		this.chargerProvider = chargerProvider;
+		this.infrastructure = infrastructure;
+		this.minimumDuration = config.getMinimumEnrouteChargingDuration();
+	}
 
-    @Override
-    @Nullable
-    public ChargingAlternative findAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
-            ChargingSlot slot, List<ChargingAlternative> trace) {
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	@Nullable
+	public ChargingAlternative findAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
+	                                           ChargingSlot slot, List<ChargingAlternative> trace) {
+		throw new UnsupportedOperationException();
+	}
 
-    @Override
-    @Nullable
-    public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
-            ElectricVehicle electricVehicle,
-            @Nullable ChargingSlot slot) {
-        Preconditions.checkArgument(slot == null);
+	@Override
+	@Nullable
+	public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
+	                                                  ElectricVehicle electricVehicle,
+	                                                  @Nullable ChargingSlot slot) {
+		Preconditions.checkArgument(slot == null);
 
-        Double criticalSoc = getCriticalSoc(person);
-        if (criticalSoc != null) {
-            // we must be on a leg when finding an enroute alternative
-            Leg leg = (Leg) WithinDayAgentUtils.getCurrentPlanElement(qsim.getAgents().get(person.getId()));
+		Double criticalSoc = getCriticalSoc(person);
+		if (criticalSoc != null) {
+			// we must be on a leg when finding an enroute alternative
+			Leg leg = (Leg) WithinDayAgentUtils.getCurrentPlanElement(qsim.getAgents().get(person.getId()));
 
-            double initialCharge = electricVehicle.getBattery().getCharge();
-            double targetCharge = criticalSoc * electricVehicle.getBattery().getCapacity();
+			double initialCharge = electricVehicle.getBattery().getCharge();
+			double targetCharge = criticalSoc * electricVehicle.getBattery().getCapacity();
 
-            // a priori no additional charge needed right now if zero
-            double deltaCharge = Math.max(0.0, targetCharge - initialCharge);
+			// a priori no additional charge needed right now if zero
+			double deltaCharge = Math.max(0.0, targetCharge - initialCharge);
 
-            if (deltaCharge == 0.0) {
-                // Can we obtain the vehicle parameter from somewhere here? For time
-                // calculation?
-                double consumption = calculateConsumption(now, person, leg, electricVehicle, null);
-                double finalCharge = initialCharge - consumption;
+			if (deltaCharge == 0.0) {
+				// Can we obtain the vehicle parameter from somewhere here? For time
+				// calculation?
+				double consumption = calculateConsumption(now, person, leg, electricVehicle, null);
+				double finalCharge = initialCharge - consumption;
 
-                // maybe not enough at the end
-                deltaCharge = Math.max(0.0, targetCharge - finalCharge);
-            }
+				// maybe not enough at the end
+				deltaCharge = Math.max(0.0, targetCharge - finalCharge);
+			}
 
-            if (deltaCharge > 0.0) {
-                // we need to charge, otherwise we don't get to the next activity
-                BatteryCharging calculator = (BatteryCharging) electricVehicle.getChargingPower();
+			if (deltaCharge > 0.0) {
+				// we need to charge, otherwise we don't get to the next activity
+				BatteryCharging calculator = (BatteryCharging) electricVehicle.getChargingPower();
 
-                Collection<ChargerSpecification> chargers = chargerProvider.findChargers(person, plan,
-                        new ChargerRequest(leg));
+				Collection<ChargerSpecification> chargers = chargerProvider.findChargers(person, plan,
+					new ChargerRequest(leg));
 
-                if (chargers.size() > 0) {
-                    final double fixedDeltaCharge = deltaCharge;
+				if (chargers.size() > 0) {
+					final double fixedDeltaCharge = deltaCharge;
 
-                    ChargerSpecification selected = chargers.stream().sorted((a, b) -> {
-                        double durationA = calculator.calcChargingTime(a, fixedDeltaCharge);
-                        double durationB = calculator.calcChargingTime(b, fixedDeltaCharge);
-                        return Double.compare(durationA, durationB);
-                    }).findFirst().get();
+					ChargerSpecification selected = chargers.stream().sorted((a, b) -> {
+						double durationA = calculator.calcChargingTime(a, fixedDeltaCharge);
+						double durationB = calculator.calcChargingTime(b, fixedDeltaCharge);
+						return Double.compare(durationA, durationB);
+					}).findFirst().get();
 
-                    double duration = calculator.calcChargingTime(selected, fixedDeltaCharge);
-                    duration = Math.max(minimumDuration, duration);
+					double duration = calculator.calcChargingTime(selected, fixedDeltaCharge);
+					duration = Math.max(minimumDuration, duration);
 
-                    return new ChargingAlternative(infrastructure.getChargers().get(selected.getId()), duration);
-                }
-            }
-        }
+					return new ChargingAlternative(selected.getId(), duration);
+				}
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private double calculateConsumption(double now, Person person, Leg leg, ElectricVehicle electricVehicle,
-            Vehicle vehicle) {
-        double consumption = 0.0;
+	private double calculateConsumption(double now, Person person, Leg leg, ElectricVehicle electricVehicle,
+	                                    Vehicle vehicle) {
+		double consumption = 0.0;
 
-        DriveEnergyConsumption calculator = electricVehicle.getDriveEnergyConsumption();
-        for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
-            Link link = network.getLinks().get(linkId);
-            double linkTravelTime = travelTime.getLinkTravelTime(link, now, person, vehicle);
+		DriveEnergyConsumption calculator = electricVehicle.getDriveEnergyConsumption();
+		for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
+			Link link = network.getLinks().get(linkId);
+			double linkTravelTime = travelTime.getLinkTravelTime(link, now, person, vehicle);
 
-            consumption += calculator.calcEnergyConsumption(link, linkTravelTime, now);
-            now += linkTravelTime;
-        }
+			consumption += calculator.calcEnergyConsumption(link, linkTravelTime, now);
+			now += linkTravelTime;
+		}
 
-        return consumption;
-    }
+		return consumption;
+	}
 
-    /**
-     * Sets the critical SoC for an agent.
-     */
-    static public void setCriticalSoC(Person person, double criticalSoc) {
-        person.getAttributes().putAttribute(CRITICAL_SOC_PERSON_ATTRIBUTE, criticalSoc);
-    }
+	/**
+	 * Sets the critical SoC for an agent.
+	 */
+	static public void setCriticalSoC(Person person, double criticalSoc) {
+		person.getAttributes().putAttribute(CRITICAL_SOC_PERSON_ATTRIBUTE, criticalSoc);
+	}
 
-    /**
-     * Retrieves the critical SoC from an agent.
-     */
-    static public Double getCriticalSoc(Person person) {
-        return (Double) person.getAttributes().getAttribute(CRITICAL_SOC_PERSON_ATTRIBUTE);
-    }
+	/**
+	 * Retrieves the critical SoC from an agent.
+	 */
+	static public Double getCriticalSoc(Person person) {
+		return (Double) person.getAttributes().getAttribute(CRITICAL_SOC_PERSON_ATTRIBUTE);
+	}
 }

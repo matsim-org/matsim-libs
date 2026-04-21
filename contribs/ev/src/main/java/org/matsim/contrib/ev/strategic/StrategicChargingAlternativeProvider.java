@@ -1,10 +1,7 @@
 package org.matsim.contrib.ev.strategic;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Verify;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -13,7 +10,7 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.ev.reservation.ChargerReservationManager;
+import org.matsim.contrib.ev.reservation.DistributedChargerReservationManager;
 import org.matsim.contrib.ev.strategic.StrategicChargingConfigGroup.AlternativeSearchStrategy;
 import org.matsim.contrib.ev.strategic.access.ChargerAccess;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
@@ -26,9 +23,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 
-import com.google.common.base.Verify;
-
-import jakarta.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This is the ChargingAlternativeProvider of the strategic charging package.
@@ -43,7 +41,7 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 	private final ChargerAccess access;
 	private final ChargingInfrastructure infrastruture;
 
-	private final ChargerReservationManager reservationManager;
+	private final DistributedChargerReservationManager reservationManager;
 	private final TimeInterpretation timeInterpretation;
 
 	private final AlternativeSearchStrategy onlineSearchStrategy;
@@ -53,12 +51,12 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 	private final int maximumAlternatives;
 
 	public StrategicChargingAlternativeProvider(Scenario scenario, ChargerProvider chargerProvider,
-			ChargingInfrastructure infrastructure,
-			ChargerAccess access,
-			AlternativeSearchStrategy onlineSearchStrategy, boolean useProactiveOnlineSearch,
-			TimeInterpretation timeInterpretation,
-			@Nullable ChargerReservationManager reservationManager, CriticalAlternativeProvider criticalProvider,
-			int maximumAlternatives) {
+	                                            ChargingInfrastructure infrastructure,
+	                                            ChargerAccess access,
+	                                            AlternativeSearchStrategy onlineSearchStrategy, boolean useProactiveOnlineSearch,
+	                                            TimeInterpretation timeInterpretation,
+	                                            @Nullable DistributedChargerReservationManager reservationManager, CriticalAlternativeProvider criticalProvider,
+	                                            int maximumAlternatives) {
 		this.maximumAlternatives = maximumAlternatives;
 		this.chargerProvider = chargerProvider;
 		this.infrastruture = infrastructure;
@@ -74,18 +72,18 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 	@Override
 	@Nullable
 	public ChargingAlternative findAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
-			ChargingSlot slot, List<ChargingAlternative> trace) {
+	                                           ChargingSlot slot, List<ChargingAlternative> trace) {
 		if (trace.size() >= maximumAlternatives) {
 			return null; // search limit has been reached
 		}
 
 		// obtain possible other chargers within the search radius
 		Coord initialLocation = slot.isLegBased() ? slot.charger().getCoord()
-				: PopulationUtils.decideOnCoordForActivity(slot.startActivity(), scenario);
+			: PopulationUtils.decideOnCoordForActivity(slot.startActivity(), scenario);
 
 		Collection<Charger> candidates = chargerProvider.findChargers(person, plan,
 				new ChargerRequest(slot.startActivity(), slot.endActivity(), slot.leg(), slot.duration())).stream()
-				.map(ChargerSpecification::getId).map(infrastruture.getChargers()::get).collect(Collectors.toList());
+			.map(ChargerSpecification::getId).map(infrastruture.getChargers()::get).collect(Collectors.toList());
 
 		// remove chargers that have already been visited
 		candidates.remove(slot.charger());
@@ -109,8 +107,8 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 
 		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
 			candidates.removeIf(candidate -> {
-				return !reservationManager.isAvailable(candidate.getSpecification(), vehicle, reservationStartTime,
-						reservationEndTime);
+				return !reservationManager.isAvailable(candidate.getSpecification().getId(), vehicle.getId(), reservationStartTime,
+					reservationEndTime);
 			});
 		}
 
@@ -125,12 +123,12 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 			// send the reservation if requested
 			if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
 				Verify.verify(
-                        reservationManager.addReservation(selected.getSpecification(), vehicle, reservationStartTime,
-                                reservationEndTime).isPresent());
+					reservationManager.addLocalReservation(selected.getSpecification().getId(), vehicle.getId(), reservationStartTime,
+						reservationEndTime).isPresent());
 			}
 
 			double duration = slot.isLegBased() ? slot.duration() : 0.0;
-			return new ChargingAlternative(selected, duration);
+			return new ChargingAlternative(selected.getId(), duration);
 		}
 
 		// no new candidate found
@@ -140,8 +138,8 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 	@Override
 	@Nullable
 	public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
-			ElectricVehicle vehicle,
-			@Nullable ChargingSlot slot) {
+	                                                  ElectricVehicle vehicle,
+	                                                  @Nullable ChargingSlot slot) {
 		if (slot == null) {
 			// no activity-based or leg-based charging planned, but we may add a critical
 			// charge
@@ -166,10 +164,10 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 			double reservationEndTime = estimateReservationEndTime(reservationStartTime, plan, slot);
 
 			// if a reservation can be made now, keep the initial slot
-			if (reservationManager.isAvailable(slot.charger().getSpecification(), vehicle, reservationStartTime,
-					reservationEndTime)) {
-				Verify.verify(reservationManager.addReservation(slot.charger().getSpecification(),
-						vehicle, reservationStartTime, reservationEndTime).isPresent());
+			if (reservationManager.isAvailable(slot.charger().getSpecification().getId(), vehicle.getId(), reservationStartTime,
+				reservationEndTime)) {
+				Verify.verify(reservationManager.addLocalReservation(slot.charger().getSpecification().getId(),
+					vehicle.getId(), reservationStartTime, reservationEndTime).isPresent());
 				return null;
 			} else {
 				updateRequired = true;
@@ -179,13 +177,13 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 		// proactively react if planned charger is occupied
 		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.OccupancyBased)) {
 			updateRequired |= slot.charger().getPlugCount() == slot.charger().getLogic().getPluggedVehicles()
-					.size();
+				.size();
 		}
 
 		if (updateRequired) {
 			// use logic from above to find a new charger, excluding the planned attempt
 			return findAlternative(now, person, plan, vehicle,
-					slot, Collections.emptyList());
+				slot, Collections.emptyList());
 		} else {
 			// keep initial slot
 			return null;

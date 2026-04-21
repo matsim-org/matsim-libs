@@ -24,7 +24,7 @@ package org.matsim.freight.carriers.utils;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
@@ -138,7 +138,7 @@ public class CarrierControllerUtilsTest{
 		VehicleRoutingProblem problem = vrpBuilder.build();
 
 		// get the algorithm out-of-the-box, search solution and get the best one.
-		VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
+		VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem).buildAlgorithm();
 		Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
 		VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
 
