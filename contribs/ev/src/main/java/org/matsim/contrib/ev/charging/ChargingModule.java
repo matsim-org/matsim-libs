@@ -55,6 +55,7 @@ public class ChargingModule extends AbstractModule {
 
 
 		// standard charger output power
+		bind(DefaultChargerPower.Factory.class);
 		bind(ChargerPower.Factory.class).to(DefaultChargerPower.Factory.class);
 	}
 

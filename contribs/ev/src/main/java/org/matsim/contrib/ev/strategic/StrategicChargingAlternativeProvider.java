@@ -10,7 +10,7 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.ev.reservation.ChargerReservationManager;
+import org.matsim.contrib.ev.reservation.DistributedChargerReservationManager;
 import org.matsim.contrib.ev.strategic.StrategicChargingConfigGroup.AlternativeSearchStrategy;
 import org.matsim.contrib.ev.strategic.access.ChargerAccess;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
@@ -41,7 +41,7 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 	private final ChargerAccess access;
 	private final ChargingInfrastructure infrastruture;
 
-	private final ChargerReservationManager reservationManager;
+	private final DistributedChargerReservationManager reservationManager;
 	private final TimeInterpretation timeInterpretation;
 
 	private final AlternativeSearchStrategy onlineSearchStrategy;
@@ -55,7 +55,7 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 	                                            ChargerAccess access,
 	                                            AlternativeSearchStrategy onlineSearchStrategy, boolean useProactiveOnlineSearch,
 	                                            TimeInterpretation timeInterpretation,
-	                                            @Nullable ChargerReservationManager reservationManager, CriticalAlternativeProvider criticalProvider,
+	                                            @Nullable DistributedChargerReservationManager reservationManager, CriticalAlternativeProvider criticalProvider,
 	                                            int maximumAlternatives) {
 		this.maximumAlternatives = maximumAlternatives;
 		this.chargerProvider = chargerProvider;
@@ -107,7 +107,7 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 
 		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
 			candidates.removeIf(candidate -> {
-				return !reservationManager.isAvailable(candidate.getSpecification(), vehicle, reservationStartTime,
+				return !reservationManager.isAvailable(candidate.getSpecification().getId(), vehicle.getId(), reservationStartTime,
 					reservationEndTime);
 			});
 		}
@@ -123,7 +123,7 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 			// send the reservation if requested
 			if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
 				Verify.verify(
-					reservationManager.addReservation(selected.getSpecification(), vehicle, reservationStartTime,
+					reservationManager.addLocalReservation(selected.getSpecification().getId(), vehicle.getId(), reservationStartTime,
 						reservationEndTime).isPresent());
 			}
 
@@ -164,10 +164,10 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 			double reservationEndTime = estimateReservationEndTime(reservationStartTime, plan, slot);
 
 			// if a reservation can be made now, keep the initial slot
-			if (reservationManager.isAvailable(slot.charger().getSpecification(), vehicle, reservationStartTime,
+			if (reservationManager.isAvailable(slot.charger().getSpecification().getId(), vehicle.getId(), reservationStartTime,
 				reservationEndTime)) {
-				Verify.verify(reservationManager.addReservation(slot.charger().getSpecification(),
-					vehicle, reservationStartTime, reservationEndTime).isPresent());
+				Verify.verify(reservationManager.addLocalReservation(slot.charger().getSpecification().getId(),
+					vehicle.getId(), reservationStartTime, reservationEndTime).isPresent());
 				return null;
 			} else {
 				updateRequired = true;

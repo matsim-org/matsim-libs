@@ -7,7 +7,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.MobsimMessageCollector;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
@@ -66,12 +65,13 @@ public class DistributedChargerReservationManager implements DSimComponentsMessa
 		}
 	}
 
-	private boolean isAvailable(Id<Charger> chargerId, Id<Link> linkId, Id<Vehicle> vehicleId, double startTime, double endTime) {
-
-		if (!partitionTransfer.isLocal(linkId))
-			throw new IllegalStateException("Charger " + chargerId + " is not present on this partition. addLocalReservation may only be called for local chargers.");
+	public boolean isAvailable(Id<Charger> chargerId, Id<Vehicle> vehicleId, double startTime, double endTime) {
 
 		var charger = getLiveCharger(chargerId);
+
+		if (!partitionTransfer.isLocal(charger.getLink().getId()))
+			throw new IllegalStateException("Charger " + chargerId + " is not present on this partition. addLocalReservation may only be called for local chargers.");
+
 		var overlappingReservations = new HashSet<>();
 		var chargerReservations = chargerToReservation.computeIfAbsent(chargerId, _ -> new ArrayList<>());
 		for (var reservationId : chargerReservations) {
@@ -89,7 +89,11 @@ public class DistributedChargerReservationManager implements DSimComponentsMessa
 			return true; // start time within existing range
 		} else if (endTime > info.startTime() && endTime < info.endTime()) {
 			return true; // end time within existing range
-		} else return startTime <= info.startTime() && endTime > info.endTime(); // new range covers existing range
+		} else if (startTime <= info.startTime() && endTime > info.endTime()) {
+			return true; // new range covers existing range
+		} else {
+			return false;
+		}
 	}
 
 	public void addReservation(Id<Charger> resource, Id<Vehicle> consumer, double startTime, double endTime, Consumer<Optional<ChargerReservation>> callback) {
@@ -108,9 +112,9 @@ public class DistributedChargerReservationManager implements DSimComponentsMessa
 	 */
 	public Optional<ChargerReservation> addLocalReservation(Id<Charger> resource, Id<Vehicle> consumer, double startTime, double endTime) {
 
-		var charger = getLiveCharger(resource);
-		if (isAvailable(resource, charger.getLink().getId(), consumer, startTime, endTime)) {
+		if (isAvailable(resource, consumer, startTime, endTime)) {
 			reservationIdCounter++;
+			var charger = getLiveCharger(resource);
 			var partitionIndex = partitionTransfer.getPartitionIndex(charger.getLink().getId());
 			var id = Id.create(resource + "_" + partitionIndex + "_" + reservationIdCounter, ChargerReservation.class);
 			var reservation = new ChargerReservation(id, resource, consumer, startTime, endTime);
