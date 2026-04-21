@@ -297,7 +297,7 @@ public class CarriersUtils {
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
 
 		int nThreads = Runtime.getRuntime().availableProcessors();
-		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carrierActivityCounterMap.size(), nThreads);
+		log.info("#### Starting VRP solving with Jsprit for {} carriers in parallel with {} threads. ####", carrierActivityCounterMap.size(), nThreads);
 
 		BestJspritSolutionCollector bestJspritSolutionCollector = new BestJspritSolutionCollector();
 		List<Future<?>> futures;
@@ -322,6 +322,7 @@ public class CarriersUtils {
 		writeAggregatedResultsForAllRunVRPs(carriers, aggegatedJspritAnalysisCSVPath, bestJspritSolutionCollector.snapshot());
 		// checks the consistency of the carriers after planning. This is especially important, because we want to check if there are unplanned jobs after the VRP solution and if the selected plans are consistent with the carrier's jobs.
 		CarrierConsistencyCheckers.checkAfterResults(carriers, Level.INFO);
+		log.info("#### Finished VRP solving with Jsprit for all {} carriers. ####", carrierActivityCounterMap.size());
 	}
 
 	/**
