@@ -35,6 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
@@ -65,10 +66,16 @@ public class RunEDrtScenario {
 			});
 		}
 
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
+			}
+		});
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev.getBattery(), CHARGING_SPEED_FACTOR));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 

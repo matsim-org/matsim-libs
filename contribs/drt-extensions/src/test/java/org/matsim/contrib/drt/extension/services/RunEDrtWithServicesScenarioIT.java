@@ -22,6 +22,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunEDrtWithServicesScenarioIT {
@@ -76,10 +77,16 @@ public class RunEDrtWithServicesScenarioIT {
 			}
 		});
 
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
+			}
+		});
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
 				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtConfigGroup.getMode()))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_SOC));
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev.getBattery(), RELATIVE_SPEED));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
