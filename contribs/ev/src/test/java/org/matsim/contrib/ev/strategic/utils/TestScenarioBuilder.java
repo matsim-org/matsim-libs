@@ -1,52 +1,26 @@
 package org.matsim.contrib.ev.strategic.utils;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.charging.ChargingEndEvent;
-import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
-import org.matsim.contrib.ev.charging.ChargingStartEvent;
-import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEvent;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEventHandler;
-import org.matsim.contrib.ev.charging.QuitQueueAtChargerEvent;
-import org.matsim.contrib.ev.charging.QuitQueueAtChargerEventHandler;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
-import org.matsim.contrib.ev.infrastructure.Charger;
-import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecificationDefaultImpl;
-import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
+import org.matsim.contrib.ev.infrastructure.*;
 import org.matsim.contrib.ev.strategic.StrategicChargingConfigGroup;
 import org.matsim.contrib.ev.strategic.StrategicChargingConfigGroup.SelectionStrategy;
 import org.matsim.contrib.ev.strategic.StrategicChargingModule;
@@ -59,20 +33,7 @@ import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoringParameters;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
 import org.matsim.contrib.ev.withinday.WithinDayEvEngine;
 import org.matsim.contrib.ev.withinday.WithinDayEvModule;
-import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEventHandler;
-import org.matsim.contrib.ev.withinday.events.AbortChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.AbortChargingProcessEventHandler;
-import org.matsim.contrib.ev.withinday.events.FinishChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.FinishChargingAttemptEventHandler;
-import org.matsim.contrib.ev.withinday.events.FinishChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.FinishChargingProcessEventHandler;
-import org.matsim.contrib.ev.withinday.events.StartChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.StartChargingAttemptEventHandler;
-import org.matsim.contrib.ev.withinday.events.StartChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.StartChargingProcessEventHandler;
-import org.matsim.contrib.ev.withinday.events.UpdateChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.UpdateChargingAttemptEventHandler;
+import org.matsim.contrib.ev.withinday.events.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -92,14 +53,12 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.*;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class TestScenarioBuilder {
 	private final MatsimTestUtils utils;
@@ -113,6 +72,8 @@ public class TestScenarioBuilder {
 	private Integer networkSize = 10; // nodes
 	private Double linkLength = 200.0; // meters
 	private Double linkSpeed = 1.0; // meters per second
+	private String mobsim = "qsim";
+	private int numberOfThreads = 1;
 
 	public TestScenarioBuilder setNetworkSize(int networkSize) {
 		this.networkSize = networkSize;
@@ -132,7 +93,7 @@ public class TestScenarioBuilder {
 		for (int i = 0; i < networkSize; i++) {
 			for (int j = 0; j < networkSize; j++) {
 				nodes[i][j] = networkFactory.createNode(Id.createNodeId(i + ":" + j),
-						new Coord(i * linkLength, j * linkLength));
+					new Coord(i * linkLength, j * linkLength));
 				network.addNode(nodes[i][j]);
 			}
 		}
@@ -145,12 +106,12 @@ public class TestScenarioBuilder {
 				Node secondNode = nodes[i][j + 1];
 
 				links.add(networkFactory.createLink(
-						Id.createLinkId(firstNode.getId().toString() + "::" + secondNode.getId().toString()), firstNode,
-						secondNode));
+					Id.createLinkId(firstNode.getId().toString() + "::" + secondNode.getId().toString()), firstNode,
+					secondNode));
 
 				links.add(networkFactory.createLink(
-						Id.createLinkId(secondNode.getId().toString() + "::" + firstNode.getId().toString()),
-						secondNode, firstNode));
+					Id.createLinkId(secondNode.getId().toString() + "::" + firstNode.getId().toString()),
+					secondNode, firstNode));
 			}
 		}
 
@@ -160,12 +121,12 @@ public class TestScenarioBuilder {
 				Node secondNode = nodes[i + 1][j];
 
 				links.add(networkFactory.createLink(
-						Id.createLinkId(firstNode.getId().toString() + "::" + secondNode.getId().toString()), firstNode,
-						secondNode));
+					Id.createLinkId(firstNode.getId().toString() + "::" + secondNode.getId().toString()), firstNode,
+					secondNode));
 
 				links.add(networkFactory.createLink(
-						Id.createLinkId(secondNode.getId().toString() + "::" + firstNode.getId().toString()),
-						secondNode, firstNode));
+					Id.createLinkId(secondNode.getId().toString() + "::" + firstNode.getId().toString()),
+					secondNode, firstNode));
 			}
 		}
 
@@ -183,7 +144,7 @@ public class TestScenarioBuilder {
 
 		for (Link link : links) {
 			ActivityFacility facility = facilitiesFactory.createActivityFacility(
-					Id.create(link.getId(), ActivityFacility.class), link.getCoord(), link.getId());
+				Id.create(link.getId(), ActivityFacility.class), link.getCoord(), link.getId());
 			facilities.addActivityFacility(facility);
 		}
 	}
@@ -191,44 +152,44 @@ public class TestScenarioBuilder {
 	// INFRASTRUCTURE PART
 
 	record ChargerItem(String identifier, int x, int y, int plugCount, double plugPower, Set<Id<Person>> personIds,
-			Set<Id<ActivityFacility>> facilityIds, boolean isPublic) {
+	                   Set<Id<ActivityFacility>> facilityIds, boolean isPublic) {
 	}
 
 	private List<ChargerItem> chargers = new LinkedList<>();
 
 	public TestScenarioBuilder addCharger(String identifier, int x, int y, int plugCount, double plugPower) {
 		chargers.add(new ChargerItem(identifier, x, y, plugCount, plugPower, Collections.emptySet(),
-				Collections.emptySet(), false));
+			Collections.emptySet(), false));
 		return this;
 	}
 
 	public TestScenarioBuilder addCharger(String identifier, int x, int y, int plugCount, double plugPower,
-			Set<Id<Person>> personIds,
-			Set<Id<ActivityFacility>> facilityIds, boolean isPublic) {
+	                                      Set<Id<Person>> personIds,
+	                                      Set<Id<ActivityFacility>> facilityIds, boolean isPublic) {
 		chargers.add(new ChargerItem(identifier, x, y, plugCount, plugPower, personIds, facilityIds, isPublic));
 		return this;
 	}
 
 	public TestScenarioBuilder addHomeCharger(String personId, int x, int y, int plugCount, double plugPower,
-			String type) {
+	                                          String type) {
 		String chargerId = "charger:person:" + personId;
 		return addCharger(chargerId, x, y, plugCount, plugPower, Collections.singleton(Id.createPersonId(personId)),
-				Collections.emptySet(), false);
+			Collections.emptySet(), false);
 	}
 
 	public TestScenarioBuilder addWorkCharger(int x, int y, int plugCount, double plugPower,
-			String type) {
+	                                          String type) {
 		Id<Link> linkId = Id.createLinkId(x + ":" + y + "::" + (x + 1) + ":" + y);
 		String chargerId = "charger:facility:" + linkId.toString();
 		return addCharger(chargerId, x, y, plugCount, plugPower, Collections.emptySet(),
-				Collections.singleton(Id.create(linkId.toString(), ActivityFacility.class)), false);
+			Collections.singleton(Id.create(linkId.toString(), ActivityFacility.class)), false);
 	}
 
 	public TestScenarioBuilder addPublicCharger(String chargerId, int x, int y, int plugCount, double plugPower,
-			String type) {
+	                                            String type) {
 		String publicChargerId = "charger:public" + chargerId;
 		return addCharger(publicChargerId, x, y, plugCount, plugPower, Collections.emptySet(),
-				Collections.emptySet(), true);
+			Collections.emptySet(), true);
 	}
 
 	private ChargingInfrastructureSpecification prepareInfrastructure(Controler controller) {
@@ -241,12 +202,12 @@ public class TestScenarioBuilder {
 			Id<Link> linkId = Id.createLinkId(item.x + ":" + item.y + "::" + (item.x + 1) + ":" + item.y);
 
 			ChargerSpecification specification = ImmutableChargerSpecification.newBuilder() //
-					.id(Id.create(item.identifier, Charger.class)) // ,
-					.linkId(linkId) //
-					.chargerType("default") //
-					.plugPower(item.plugPower) //
-					.plugCount(item.plugCount) //
-					.build();
+				.id(Id.create(item.identifier, Charger.class)) // ,
+				.linkId(linkId) //
+				.chargerType("default") //
+				.plugPower(item.plugPower) //
+				.plugCount(item.plugCount) //
+				.build();
 
 			if (item.personIds.size() > 0) {
 				PersonChargerProvider.setPersonIds(specification, item.personIds);
@@ -331,10 +292,10 @@ public class TestScenarioBuilder {
 
 			for (var activityItem : item.activities) {
 				Verify.verify(activityItem.x >= 0 && activityItem.y < networkSize - 1,
-						"Invalid location for person " + item.identifer);
+					"Invalid location for person " + item.identifer);
 
 				Id<Link> linkId = Id.createLinkId(
-						activityItem.x + ":" + activityItem.y + "::" + (activityItem.x + 1) + ":" + activityItem.y);
+					activityItem.x + ":" + activityItem.y + "::" + (activityItem.x + 1) + ":" + activityItem.y);
 				Activity activity = populationFactory.createActivityFromLinkId(activityItem.type, linkId);
 				activity.setFacilityId(Id.create(linkId, ActivityFacility.class));
 
@@ -383,7 +344,7 @@ public class TestScenarioBuilder {
 		VehicleUtils.setEnergyCapacity(electricVehicleType.getEngineInformation(), EvUnits.J_to_kWh(range_m));
 
 		VehicleUtils.setHbefaTechnology(electricVehicleType.getEngineInformation(),
-				ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY);
+			ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY);
 	}
 
 	// GENERAL PART
@@ -404,6 +365,16 @@ public class TestScenarioBuilder {
 	private boolean enableStrategicCharging = false;
 	private int iterations = 0;
 
+	public TestScenarioBuilder setMobsim(String mobsim) {
+		this.mobsim = mobsim;
+		return this;
+	}
+
+	public TestScenarioBuilder setNumberOfThreads(int numberOfThreads) {
+		this.numberOfThreads = numberOfThreads;
+		return this;
+	}
+
 	public TestScenarioBuilder enableStrategicCharging(int iterations) {
 		this.enableStrategicCharging = true;
 		this.iterations = iterations;
@@ -422,6 +393,7 @@ public class TestScenarioBuilder {
 
 		config.controller().setLastIteration(iterations);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
+		config.controller().setMobsim(mobsim);
 
 		config.qsim().setStartTime(simulationStartTime);
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
@@ -432,6 +404,11 @@ public class TestScenarioBuilder {
 		config.qsim().setFlowCapFactor(1e9);
 		config.qsim().setStorageCapFactor(1e9);
 		config.qsim().setVehicleBehavior(VehicleBehavior.exception);
+		config.qsim().setNumberOfThreads(numberOfThreads);
+
+		config.dsim().setThreads(numberOfThreads);
+		config.dsim().setStartTime(simulationStartTime);
+		config.dsim().setEndTime(simulationEndTime);
 
 		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
@@ -553,15 +530,16 @@ public class TestScenarioBuilder {
 		return tracker;
 	}
 
+	@DistributedEventHandler(processing = ProcessingMode.DIRECT)
 	public class Tracker
-			implements ActivityStartEventHandler, ActivityEndEventHandler, //
-			StartChargingProcessEventHandler, AbortChargingProcessEventHandler,
-			FinishChargingProcessEventHandler, //
-			StartChargingAttemptEventHandler, UpdateChargingAttemptEventHandler, AbortChargingAttemptEventHandler,
-			FinishChargingAttemptEventHandler, //
-			ChargingStartEventHandler,
-			ChargingEndEventHandler, QueuedAtChargerEventHandler, QuitQueueAtChargerEventHandler,
-			PersonStuckEventHandler, PersonDepartureEventHandler {
+		implements ActivityStartEventHandler, ActivityEndEventHandler, //
+		StartChargingProcessEventHandler, AbortChargingProcessEventHandler,
+		FinishChargingProcessEventHandler, //
+		StartChargingAttemptEventHandler, UpdateChargingAttemptEventHandler, AbortChargingAttemptEventHandler,
+		FinishChargingAttemptEventHandler, //
+		ChargingStartEventHandler,
+		ChargingEndEventHandler, QueuedAtChargerEventHandler, QuitQueueAtChargerEventHandler,
+		PersonStuckEventHandler, PersonDepartureEventHandler {
 		public final LinkedList<ActivityStartEvent> activityStartEvents = new LinkedList<>();
 		public final LinkedList<ActivityStartEvent> plugActivityEvents = new LinkedList<>();
 		public final LinkedList<ActivityStartEvent> unplugActivityEvents = new LinkedList<>();
@@ -587,7 +565,7 @@ public class TestScenarioBuilder {
 		@Override
 		synchronized public void handleEvent(ActivityStartEvent event) {
 			if (!TripStructureUtils.isStageActivityType(event.getActType())
-					|| WithinDayEvEngine.isManagedActivityType(event.getActType())) {
+				|| WithinDayEvEngine.isManagedActivityType(event.getActType())) {
 				activityStartEvents.add(event);
 
 				if (event.getActType().equals(WithinDayEvEngine.PLUG_ACTIVITY_TYPE)) {

@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.MobsimMessageCollector;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartition;
@@ -15,7 +16,7 @@ import org.matsim.dsim.MessageBroker;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PartitionTransfer {
+public class PartitionTransfer implements MobsimMessageCollector {
 
 	private final NetworkPartitioning networkPartitioning;
 	private final NetworkPartition partition;

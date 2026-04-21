@@ -22,14 +22,12 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
+import com.google.inject.*;
+import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.MobsimMessageCollector;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -43,14 +41,11 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.ConfigurationException;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class QSimProvider implements Provider<QSim> {
 	private static final Logger log = LogManager.getLogger(QSimProvider.class);
@@ -65,9 +60,9 @@ public class QSimProvider implements Provider<QSim> {
 
 	@Inject
 	QSimProvider(Injector injector, Config config, IterationCounter iterationCounter,
-			Collection<AbstractQSimModule> modules, QSimComponentsConfig components,
-			@Named("overrides") List<AbstractQSimModule> overridingModules,
-		     @Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule ) {
+	             Collection<AbstractQSimModule> modules, QSimComponentsConfig components,
+	             @Named("overrides") List<AbstractQSimModule> overridingModules,
+	             @Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
@@ -100,13 +95,17 @@ public class QSimProvider implements Provider<QSim> {
 		}
 
 		final AbstractQSimModule finalQsimModule = qsimModule;
-		
+
 		AbstractModule module = new AbstractModule() {
 			@Override
 			protected void configure() {
 				install(finalQsimModule);
 				bind(QSim.class).asEagerSingleton();
 				bind(Netsim.class).to(QSim.class);
+				// as some infrastructure is used by both, QSim and DSim, I find it easiest to provide
+				// special (no-op) variants of assumed infrastructure.
+				bind(MobsimMessageCollector.class).to(NoopMessageCollector.class).in(Singleton.class);
+				bind(NetworkPartition.class).toInstance(NetworkPartition.SINGLE_INSTANCE);
 			}
 		};
 
@@ -117,9 +116,9 @@ public class QSimProvider implements Provider<QSim> {
 		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
 			if (activeComponent instanceof Annotation) {
-				activeComponentKey = Key.get(new TypeLiteral<Collection<Provider<QSimComponent>>>(){}, (Annotation) activeComponent);
+				activeComponentKey = Key.get(new TypeLiteral<Collection<Provider<QSimComponent>>>() {}, (Annotation) activeComponent);
 			} else {
-				activeComponentKey = Key.get(new TypeLiteral<Collection<Provider<QSimComponent>>>(){}, (Class<? extends Annotation>) activeComponent);
+				activeComponentKey = Key.get(new TypeLiteral<Collection<Provider<QSimComponent>>>() {}, (Class<? extends Annotation>) activeComponent);
 			}
 
 			Collection<Provider<QSimComponent>> providers = qsimInjector.getInstance(activeComponentKey);

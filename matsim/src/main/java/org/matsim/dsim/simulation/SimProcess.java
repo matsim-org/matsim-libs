@@ -162,9 +162,9 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			engine.doSimStep(time);
 		}
 
-		partitionTransfer.send(time, partition.getNeighbors());
-
 		listenerManager.fireQueueSimulationAfterSimStepEvent(time);
+
+		partitionTransfer.send(time, partition.getNeighbors());
 	}
 
 	@Override

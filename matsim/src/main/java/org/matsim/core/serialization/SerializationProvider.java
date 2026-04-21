@@ -56,7 +56,7 @@ public class SerializationProvider {
 			.buildThreadSafeFory();
 
 		// Manually register some allowed types
-		fory.register(Coord.class, true);
+		fory.register(Coord.class);
 
 		Class<?> idImpl;
 		try {
@@ -66,7 +66,7 @@ public class SerializationProvider {
 		}
 
 		fory.registerSerializer(idImpl, IdSerializer.class);
-		fory.register(idImpl, true);
+		//fory.register(idImpl);
 
 		fory.registerSerializer(IntArrayList.class, IntArrayListSerializer.class);
 		fory.registerSerializer(AttributesImpl.class, AttributesSerializer.class);
@@ -90,7 +90,7 @@ public class SerializationProvider {
 				int msgType = msgClass.getName().hashCode();
 
 				// Protobuf message
-				fory.register(msgClass, true);
+				fory.register(msgClass);
 
 				if (type2Class.containsKey(msgType)) {
 					throw new IllegalArgumentException("Duplicate provider for type %s. %s already registered.".formatted(msgClass,
@@ -137,7 +137,11 @@ public class SerializationProvider {
 		if (!class2Type.containsKey(message.getClass())) {
 			throw new IllegalArgumentException("Class " + message.getClass() + " was not registered for serialization. Messages that should be serialized must be at least package private to be detected.");
 		}
-		return fory.serialize(message);
+		try {
+			return fory.serialize(message);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

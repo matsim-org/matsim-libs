@@ -1,6 +1,7 @@
 package org.matsim.core.serialization.custom;
 
-import org.apache.fory.Fory;
+import org.apache.fory.context.ReadContext;
+import org.apache.fory.context.WriteContext;
 import org.apache.fory.memory.MemoryBuffer;
 import org.apache.fory.serializer.Serializer;
 import org.matsim.api.core.v01.Id;
@@ -17,14 +18,15 @@ public class IdSerializer extends Serializer<Id<?>> {
 
 	private final Map<String, Class<?>> classMap = new HashMap<>();
 
-	public IdSerializer(Fory fory, Class<Id<?>> type) {
-		super(fory, type, false, true);
+	public IdSerializer(org.apache.fory.config.Config foryConfig, Class<Id<?>> type) {
+		super(foryConfig, type);
 	}
 
 	@Override
-	public void write(MemoryBuffer buffer, Id value) {
+	public void write(WriteContext context, Id<?> value) {
 
 		Class<?> type = value.classType();
+		var buffer = context.getBuffer();
 		// Person ids are not stable because of transit drivers which are created after simulations starts
 		if (type == Person.class)
 			writeHalfCompact(buffer, value, 0);
@@ -76,8 +78,9 @@ public class IdSerializer extends Serializer<Id<?>> {
 	}
 
 	@Override
-	public Id read(MemoryBuffer buffer) {
+	public Id<?> read(ReadContext context) {
 
+		var buffer = context.getBuffer();
 		int n = buffer.readInt32();
 		if (n == 0) {
 			return readHalfCompact(buffer, Person.class);
@@ -96,7 +99,7 @@ public class IdSerializer extends Serializer<Id<?>> {
 		n = buffer.readInt32();
 		byte[] bytes = buffer.readBytes(n);
 
-		Class<?> type = classMap.computeIfAbsent(new String(clazz), k -> {
+		Class<?> type = classMap.computeIfAbsent(new String(clazz), _ -> {
 			try {
 				return Class.forName(new String(clazz));
 			} catch (ClassNotFoundException e) {
