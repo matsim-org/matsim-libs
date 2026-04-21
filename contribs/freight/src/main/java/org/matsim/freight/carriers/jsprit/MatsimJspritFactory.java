@@ -702,4 +702,37 @@ public final class MatsimJspritFactory {
 		}
 		return algorithm;
 	}
+// ### This class could be an option to get both absolute and relative fixed costs into the algorithm. However, it is currently not used since it is not clear how to set the weight parameter and what the influence of this parameter is. Ricardo April'26
+//	private static VehicleRoutingAlgorithm createFixedCostAwareAlgorithm(VehicleRoutingProblem problem, StateManager stateManager, ConstraintManager constraintManager) {
+//		// Weight parameter - determines importance of fixed costs vs variable costs
+//		// 0.0 = fixed costs ignored, 1.0 = good starting point
+//		double weightOfFixedCosts = 0.5;
+//
+//		// Create your own StateManager and ConstraintManager
+//		if (stateManager == null)
+//			stateManager = new StateManager(problem);
+//		if (constraintManager == null)
+//			constraintManager = new ConstraintManager(problem, stateManager);
+//
+//		// Create both fixed cost constraints
+//		IncreasingAbsoluteFixedCosts absoluteFixedCosts = new IncreasingAbsoluteFixedCosts(problem.getJobs().size());
+//		absoluteFixedCosts.setWeightOfFixCost(weightOfFixedCosts);
+//
+//		DecreasingRelativeFixedCosts relativeFixedCosts = new DecreasingRelativeFixedCosts(stateManager, problem.getJobs().size());
+//		relativeFixedCosts.setWeightOfFixCost(weightOfFixedCosts);
+//
+//		// Add both as soft route constraints
+//		constraintManager.addConstraint(absoluteFixedCosts);
+//		constraintManager.addConstraint(relativeFixedCosts);
+//
+//		// Build algorithm with your managers
+//		VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem).setStateAndConstraintManager(stateManager,
+//			constraintManager).buildAlgorithm();
+//
+//		// Register both as listeners (required for solution completeness ratio updates)
+//		algorithm.addListener(absoluteFixedCosts);
+//		algorithm.addListener(relativeFixedCosts);
+//
+//		return algorithm;
+//	}
 }
