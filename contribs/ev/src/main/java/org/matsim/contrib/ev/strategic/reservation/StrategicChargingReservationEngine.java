@@ -68,12 +68,12 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 
 			// TODO: What if the reservation is unsuccessful? Here we could implement some
 			// fallback strategy: Choose another charger
-			manager.addReservation(advance.charger.getId(), advance.vehicle.getId(),
-				advance.startTime, advance.endTime, reservation -> {
-					boolean successful = reservation.isPresent();
-					eventsManager.processEvent(new AdvanceReservationEvent(time, advance.person.getId(),
-						advance.vehicle.getId(), advance.charger.getId(), advance.startTime, advance.endTime, successful));
-				});
+			var reservation = manager.addLocalReservation(advance.charger.getId(), advance.vehicle.getId(),
+				advance.startTime, advance.endTime);
+
+			boolean successful = reservation.isPresent();
+			eventsManager.processEvent(new AdvanceReservationEvent(time, advance.person.getId(),
+				advance.vehicle.getId(), advance.charger.getId(), advance.startTime, advance.endTime, successful));
 		}
 	}
 
@@ -110,7 +110,7 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 				double endTime = timeTracker.getTime().orElse(Double.POSITIVE_INFINITY);
 
 				if (element instanceof Activity activity) {
-					if (!TripStructureUtils.isStageActivityType(activity.getType())) {
+					if (TripStructureUtils.isStageActivityType(activity.getType())) {
 						startTimes.add(startTime);
 						endTimes.add(endTime);
 					}
