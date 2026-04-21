@@ -42,8 +42,7 @@ public class AvIncreasedCapacityModule extends AbstractDvrpModeModule {
 	 *                              A factor below 1 would mean that more capacity is used.
 	 */
 	public AvIncreasedCapacityModule(String mode, double flowEfficiencyFactor) {
-		this(mode, flowEfficiencyFactor,
-				VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class)));
+		this(mode, flowEfficiencyFactor, createVehicleType(mode));
 	}
 
 	public AvIncreasedCapacityModule(String mode, double flowEfficiencyFactor, VehicleType vehicleType) {
@@ -55,5 +54,11 @@ public class AvIncreasedCapacityModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		bindModal(VehicleType.class).toInstance(vehicleType);
+	}
+
+	private static VehicleType createVehicleType(String mode) {
+		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class));
+		vehicleType.setNetworkMode(mode);
+		return vehicleType;
 	}
 }

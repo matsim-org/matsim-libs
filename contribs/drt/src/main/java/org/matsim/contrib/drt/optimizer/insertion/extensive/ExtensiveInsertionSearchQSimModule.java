@@ -1,4 +1,3 @@
-
 /*
  * *********************************************************************** *
  * project: org.matsim.*
@@ -30,12 +29,12 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -74,16 +73,16 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 		bindModal(DrtInsertionSearch.class).toProvider(modalProvider( getter -> getter.getModal(DrtInsertionSearchManager.class).create()));
 
-		addModalComponent(MultiInsertionDetourPathCalculatorManager.class,
-				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
-					@Override
-					public MultiInsertionDetourPathCalculatorManager get() {
-						var travelTime = getModalInstance(TravelTime.class);
-						Network network = getModalInstance(Network.class);
-						TravelDisutility travelDisutility = getModalInstance(
-								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new MultiInsertionDetourPathCalculatorManager(network, travelTime, travelDisutility, drtCfg);
-					}
-				});
+		addModalComponent(MultiInsertionDetourPathCalculatorManager.class, modalProvider(getter -> {
+			var travelTime = getter.getModal(TravelTime.class);
+			Network network = getter.getModal(Network.class);
+			TravelDisutility travelDisutility = getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+
+			Config config = getter.get(Config.class);
+			boolean useCH = config.controller().getRoutingAlgorithmType()
+					== ControllerConfigGroup.RoutingAlgorithmType.CHRouter;
+
+			return new MultiInsertionDetourPathCalculatorManager(network, travelTime, travelDisutility, drtCfg, useCH);
+		}));
 	}
 }

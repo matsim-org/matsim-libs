@@ -60,7 +60,7 @@ public final class DistributedContext implements ExecutionContext {
 			throw new RuntimeException("Local communication problem", e);
 		}
 
-		SerializationProvider serializer = new SerializationProvider();
+		SerializationProvider serializer = SerializationProvider.getInstance();
 
 		log.info("Local topology has {} partitions.", topology.getTotalPartitions());
 
@@ -88,7 +88,7 @@ public final class DistributedContext implements ExecutionContext {
 
 		log.info("All nodes connected");
 
-		SerializationProvider serializer = new SerializationProvider();
+		SerializationProvider serializer = SerializationProvider.getInstance();
 
 		// This may be relevant if we want to partition the network or other lps
 		Topology topology = createTopology(comm, threads, serializer);
