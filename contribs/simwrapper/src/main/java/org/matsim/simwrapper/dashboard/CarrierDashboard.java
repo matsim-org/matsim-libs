@@ -168,6 +168,7 @@ public class CarrierDashboard implements Dashboard  {
 			viz.showAllRows = true;
 			viz.show = List.of(
 				"vehicleTypeId",
+				"nuOfVehicles",
 				"varCostsTime[EUR]",
 				"varCostsDist[EUR]",
 				"fixedCosts[EUR]",
