@@ -89,14 +89,12 @@ public final class TrafficStatsCalculator {
 				double freeSpeedTravelTime = qSimFreeSpeedTravelTime.getLinkTravelTime(link, time, null, null);
 
 				double volumeDuringTimeSlice = 0.;
-
 				if (volumesAnalyzer.getLinkIds().contains(link.getId())){
 					// We cannot get time-bin-size of the Volumes (as it is private). In the analysis, time-bin-size is always 3600, so we enter the value
 					// by hand.
 					int volumeIdx = (int) Math.floor(time / 3600.);
 					double volumeRatio = timeSlice / 3600.;
-					// additional weight for links with higher volumes
-					volumeDuringTimeSlice += volumesAnalyzer.getVolumesForLink(link.getId())[volumeIdx] * volumeRatio;
+					volumeDuringTimeSlice = volumesAnalyzer.getVolumesForLink(link.getId())[volumeIdx] * volumeRatio;
 				}
 
 				sumExcessTravelTime += excessTravelTime * volumeDuringTimeSlice;
@@ -110,6 +108,7 @@ public final class TrafficStatsCalculator {
 	/**
 	 * Calculates the speed performance index, which is the ratio of actual travel time and free speed travel time.
 	 */
+	@Deprecated
 	public double getSpeedPerformanceIndex(Link link, double time) {
 
 		double length = link.getLength();
@@ -123,6 +122,7 @@ public final class TrafficStatsCalculator {
 		return ratio > 1 ? 1 : ratio;
 	}
 
+	@Deprecated
 	public double getSpeedPerformanceIndex(Link link, int startTime, int endTime) {
 		DoubleList indices = new DoubleArrayList();
 

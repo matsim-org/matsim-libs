@@ -100,7 +100,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 
 		Table ds = createDataset(network, calc, volumes);
 
-		List<String> means = List.of("speed_performance_index", "excess_travel_time_index", "avg_speed",
+		List<String> means = List.of("excess_travel_time_index", "avg_speed",
 			"road_capacity_utilization", "lane_km");
 		Table dailyMean = normalizeColumns(ds.summarize(means, mean).by("link_id"));
 
@@ -151,7 +151,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		}
 
 		Table perRoadType = dailyCongestionIndex.joinOn("road_type").leftOuter(
-			weightedMeanBy(ds, means, "road_type").rejectColumns("speed_performance_index", "excess_travel_time_index")
+			weightedMeanBy(ds, means, "road_type").rejectColumns( "excess_travel_time_index")
 		);
 
 		DoubleColumn meanLaneKm = perRoadType.doubleColumn("lane_km").divide(24).multiply(1000).round().divide(1000).setName("lane_km");
@@ -227,8 +227,6 @@ public class TrafficAnalysis implements MATSimAppCommand {
 			IntColumn.create("hour"),
 			StringColumn.create("road_type"),
 			DoubleColumn.create("lane_km"),
-			DoubleColumn.create("speed_performance_index"),
-//			DoubleColumn.create("congestion_index"),
 			DoubleColumn.create("excess_travel_time_index"),
 			DoubleColumn.create("avg_speed"),
 			DoubleColumn.create("road_capacity_utilization"),
@@ -257,8 +255,6 @@ public class TrafficAnalysis implements MATSimAppCommand {
 				int startTime = h * 3600;
 				int endTime = (h + 1) * 3600;
 
-				row.setDouble("speed_performance_index", calc.getSpeedPerformanceIndex(link, startTime, endTime));
-//				row.setDouble("congestion_index", calc.getLinkCongestionIndex(link, startTime, endTime));
 				row.setDouble("excess_travel_time_index", calc.getLinkExcessTravelTimeIndex(link, startTime, endTime));
 
 				// as km/h
