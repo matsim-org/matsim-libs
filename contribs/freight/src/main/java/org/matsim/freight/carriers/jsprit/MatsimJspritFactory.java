@@ -686,14 +686,16 @@ public final class MatsimJspritFactory {
 		} else {
 			log.info("Use a VehicleRoutingAlgorithm out of the box.");
 			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
-				case noDistanceConstraint -> algorithm = Jsprit.Builder.newInstance(problem).buildAlgorithm();
+				//by default of Jsprit the fixed costs are not considered in the algorithm. Adding this property takes this into account.
+				case noDistanceConstraint -> algorithm = Jsprit.Builder.newInstance(problem).setProperty(Jsprit.Parameter.FIXED_COST_PARAM, "0.5").buildAlgorithm();
 				case basedOnEnergyConsumption -> {
 					log.info("Use the distanceConstraint based on energy consumption.");
 					StateManager stateManager = new StateManager(problem);
 					stateManager.addStateUpdater(new DistanceUpdater(stateManager.createStateId("distance"), stateManager, netBasedCosts));
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts), ConstraintManager.Priority.CRITICAL);
-					algorithm = Jsprit.Builder.newInstance(problem).setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
+					//by default of Jsprit the fixed costs are not considered in the algorithm. Adding this property takes this into account.
+					algorithm = Jsprit.Builder.newInstance(problem).setProperty(Jsprit.Parameter.FIXED_COST_PARAM, "0.5").setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
 				}
 				default -> throw new IllegalStateException("Unexpected value: " + freightConfig.getUseDistanceConstraintForTourPlanning());
 			}
