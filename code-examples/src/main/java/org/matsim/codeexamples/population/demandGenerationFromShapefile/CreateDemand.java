@@ -16,9 +16,11 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.gis.GeoFileReader;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,7 +76,13 @@ class CreateDemand {
 
 	CreateDemand() {
 
-		Path sampleFolder = Paths.get("examples/tutorial/population/demandGenerationFromShapefile");
+		URL url = IOUtils.resolveFileOrResource("examples/tutorial/population/demandGenerationFromShapefile");
+		Path sampleFolder = null;
+		try {
+			sampleFolder = Paths.get(url.toURI());
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 
 		this.interRegionCommuterStatistic = sampleFolder.resolve("commuters-inter-regional.csv");
 		this.innerRegionCommuterStatistic = sampleFolder.resolve("commuters-inner-regional.csv");
