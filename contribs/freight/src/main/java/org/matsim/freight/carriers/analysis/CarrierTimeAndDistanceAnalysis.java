@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
@@ -362,7 +361,7 @@ import org.matsim.vehicles.VehicleUtils;
 				double fixedCosts = 0.;
 				for (Id<Vehicle> vehicleId : vehicleId2VehicleType.keySet()) {
 					if (vehicleId2CarrierId.get(vehicleId).equals(carrierId)) {
-						final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
+						final VehicleType vehicleType = vehicleId2VehicleType.get(vehicleId);
 						final Double costsPerSecond = vehicleType.getCostInformation().getCostsPerSecond();
 						final Double costsPerMeter = vehicleType.getCostInformation().getCostsPerMeter();
 						fixedCosts = fixedCosts + vehicleType.getCostInformation().getFixedCosts();
@@ -419,7 +418,7 @@ import org.matsim.vehicles.VehicleUtils;
 				final Double travelTimeInSeconds = vehicleId2TravelTime.get(vehicleId);
 
 
-				final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
+				final VehicleType vehicleType = vehicleId2VehicleType.get(vehicleId);
 				final Double costsPerSecond = vehicleType.getCostInformation().getCostsPerSecond();
 				final Double costsPerMeter = vehicleType.getCostInformation().getCostsPerMeter();
 				final Double fixedCost = vehicleType.getCostInformation().getFixedCosts();
