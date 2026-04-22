@@ -93,7 +93,7 @@ public class DistributedStrategicChargingReservationEngineTest {
 			.addActivity("home", 0, 0, 10.0 * 3600.0)
 			.addActivity("work", 8, 8, 18.0 * 3600.0)
 			.addActivity("home", 0, 0)
-			.setMobsim("dsim")
+			//.setMobsim("dsim")
 			.setNumberOfThreads(2)
 			.build();
 

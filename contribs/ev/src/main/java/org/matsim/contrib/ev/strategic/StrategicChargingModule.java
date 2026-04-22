@@ -73,8 +73,7 @@ public class StrategicChargingModule extends AbstractModule {
 		WithinDayEvConfigGroup withinDayConfig = WithinDayEvConfigGroup.get(getConfig());
 
 		install(new DefaultChargerProvidersModule());
-		installOverridingQSimModule(new StrategicChargingQSimModule(
-			getConfig().controller().getMobsim().equals("dsim")));
+		installOverridingQSimModule(new StrategicChargingQSimModule());
 
 		addPlanStrategyBinding(StrategicChargingReplanningStrategy.STRATEGY)
 			.toProvider(StrategicChargingReplanningStrategy.class);

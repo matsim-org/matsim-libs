@@ -1,5 +1,6 @@
 package org.matsim.contrib.ev.strategic.reservation;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -28,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+
 public class StrategicChargingReservationEngine implements MobsimEngine {
 	static public final String PERSON_ATTRIBUTE = "sevc:reservationSlack";
 
@@ -49,6 +51,7 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 	private final PriorityQueue<AdvanceReservation> queue = new PriorityQueue<>(
 		Comparator.comparing(AdvanceReservation::reservationTime));
 
+	@Inject
 	public StrategicChargingReservationEngine(Population population, DistributedChargerReservationManager manager,
 	                                          ChargingInfrastructureSpecification infrastructure, TimeInterpretation timeInterpretation,
 	                                          ElectricFleet electricFleet, String chargingMode, EventsManager eventsManager) {
@@ -63,7 +66,7 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 
 	@Override
 	public void doSimStep(double time) {
-		while (queue.size() > 0 && queue.peek().reservationTime <= time) {
+		while (!queue.isEmpty() && queue.peek().reservationTime <= time) {
 			AdvanceReservation advance = queue.poll();
 
 			// TODO: What if the reservation is unsuccessful? Here we could implement some

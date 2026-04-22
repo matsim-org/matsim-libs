@@ -105,7 +105,7 @@ public class DistributedStrategicChargingReservationEngine
 
 	@Override
 	public double priority() {
-		return 100.0;
+		return 110.0;
 	}
 
 	// -------------------------------------------------------------------------
@@ -127,12 +127,6 @@ public class DistributedStrategicChargingReservationEngine
 						successful));
 				});
 		}
-	}
-
-	@Override
-	public void beforeMobsim() {
-		// Reservation scheduling happens per-agent in handleActivity() to avoid
-		// iterating the full population (which includes agents on other partitions).
 	}
 
 	@Override
