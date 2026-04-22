@@ -62,7 +62,7 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
 		this.network = network;
 		this.travelTime = travelTime;
 		this.chargerProvider = chargerProvider;
-		this.minimumDuration = config == null ? 0.0 : config.getMinimumEnrouteChargingDuration();
+		this.minimumDuration = config.getMinimumEnrouteChargingDuration();
 		this.netsim = netsim;
 	}
 
@@ -80,11 +80,11 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
 		var plan = agent.getCurrentPlan();
 		var person = plan.getPerson();
 		var leg = (Leg) agent.getCurrentPlanElement();
-		var result = findEnRouteAlternative1(now, person, plan, leg, electricVehicle, slot);
+		var result = findLegAlternative(now, person, plan, leg, electricVehicle, slot);
 		callback.accept(Optional.ofNullable(result));
 	}
 
-	private ChargingAlternative findEnRouteAlternative1(double now, Person person, Plan plan, Leg leg, ElectricVehicle electricVehicle, ChargingSlot slot) {
+	private ChargingAlternative findLegAlternative(double now, Person person, Plan plan, Leg leg, ElectricVehicle electricVehicle, ChargingSlot slot) {
 		Preconditions.checkArgument(slot == null);
 
 		Double criticalSoc = getCriticalSoc(person);
@@ -139,7 +139,7 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
 	                                                  ElectricVehicle electricVehicle,
 	                                                  @Nullable ChargingSlot slot) {
 		Leg leg = (Leg) WithinDayAgentUtils.getCurrentPlanElement(netsim.getAgents().get(person.getId()));
-		return findEnRouteAlternative1(now, person, plan, leg, electricVehicle, slot);
+		return findLegAlternative(now, person, plan, leg, electricVehicle, slot);
 	}
 
 	private double calculateConsumption(double now, Person person, Leg leg, ElectricVehicle electricVehicle,
