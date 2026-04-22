@@ -445,6 +445,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			controller.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
 
 			controller.run();
+			carriersAnalysis = new CarriersAnalysis(controller.getControllerIO().getOutputPath());
+			carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersFileOnly);
 		}
 		return 0;
 	}

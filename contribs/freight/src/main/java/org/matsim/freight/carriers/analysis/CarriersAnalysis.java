@@ -61,6 +61,8 @@ public class CarriersAnalysis {
 	private final String ANALYSIS_OUTPUT_PATH;
 	private Scenario scenario = null;
 	private Carriers carriers = null;
+	private String delimiter = "\t";
+
 
 	public enum CarrierAnalysisType {
 		/**
@@ -74,7 +76,11 @@ public class CarriersAnalysis {
 		/**
 		 * Analyzes the complete carriers plans and adds an event-based analysis of the carriers based on vehicles, vehicleTypes and carriers.
 		 */
-		carriersAndEvents
+		carriersAndEvents,
+		/**
+		 * Analyzes the selected carrier plans directly from the carriers input instead of using events.
+		 */
+		carriersFileOnly,
 	}
 
 	private final CarrierAnalysisType defaultAnalysisType = CarrierAnalysisType.carriersAndEvents;
@@ -100,7 +106,8 @@ public class CarriersAnalysis {
 
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 		Path simOutputPath = Path.of(simOutput);
-		this.EVENTS_PATH = ApplicationUtils.globFile(simOutputPath, "*output_events.*").toString();
+		Path eventsPath = ApplicationUtils.globFile(simOutputPath, "*output_events.*");
+		this.EVENTS_PATH = eventsPath == null ? null : eventsPath.toString();
 		String vehiclesPath = ApplicationUtils.globFile(simOutputPath, "*output_allVehicles.*").toString();
 		String networkPath = ApplicationUtils.globFile(simOutputPath, "*output_network.*").toString();
 		String carriersPath = ApplicationUtils.globFile(simOutputPath, "*output_carriers.*").toString();
@@ -182,12 +189,37 @@ public class CarriersAnalysis {
 			//noinspection ResultOfMethodCallIgnored
 			folder.mkdirs();
 		}
-		String delimiter = "\t";
-		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
 		switch (analysisType) {
-			case carriersPlans_unPlanned -> carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans_unPlanned);
-			case carriersPlans -> carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans);
+			case carriersPlans_unPlanned -> new CarrierPlanAnalysis(delimiter, carriers)
+				.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans_unPlanned);
+			case carriersPlans -> new CarrierPlanAnalysis(delimiter, carriers)
+				.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans);
+			case carriersFileOnly -> {
+
+				CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
+				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans);
+
+				CarrierTimeAndDistanceAnalysis carrierTimeAndDistanceAnalysis = new CarrierTimeAndDistanceAnalysis(
+					delimiter, scenario);
+				carrierTimeAndDistanceAnalysis.collectFromSelectedCarrierPlans();
+
+				CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter);
+				carrierLoadAnalysis.collectFromSelectedCarrierPlans(scenario);
+
+				log.info("Analysis completed.");
+				log.info("Writing output...");
+				carrierTimeAndDistanceAnalysis.writeTravelTimeAndDistancePerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
+				carrierTimeAndDistanceAnalysis.writeTravelTimeAndDistancePerVehicleType(ANALYSIS_OUTPUT_PATH, scenario);
+				carrierTimeAndDistanceAnalysis.writeTravelTimeAndDistancePerCarrier(ANALYSIS_OUTPUT_PATH, scenario);
+				carrierLoadAnalysis.writeLoadPerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
+			}
 			case carriersAndEvents -> {
+
+				if (EVENTS_PATH == null) {
+					throw new IllegalStateException("Event-based carrier analysis was selected, but no events file is available.");
+				}
+
+				CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
 				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersAndEvents);
 
 				// Prepare eventsManager - start of event based Analysis;
