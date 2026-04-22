@@ -1,11 +1,10 @@
-package org.matsim.smallScaleCommercialTrafficGeneration;
+package org.matsim.core.scoring.functions;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
