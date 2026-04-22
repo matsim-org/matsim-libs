@@ -12,13 +12,22 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Delegates scoring function creation to different factories based on a person's subpopulation.
+ * Delegates scoring function creation based on the MATSim subpopulation stored on a {@link Person}.
+ * <p>
+ * If a factory is registered for the person's subpopulation, that factory is used. If the person has no
+ * subpopulation or no factory is registered for it, the {@code defaultFactory} is used as a fallback.
  */
 public class SubpopulationDelegatingScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CharyparNagelScoringFunctionFactory defaultFactory;
 	private final Map<String, ScoringFunctionFactory> factoriesBySubpopulation;
 
+	/**
+	 * Creates a delegating scoring function factory.
+	 *
+	 * @param defaultFactory factory used when a person has no subpopulation or when no factory is registered for it
+	 * @param factoriesBySubpopulation factories keyed by subpopulation; keys must be non-null
+	 */
 	@Inject SubpopulationDelegatingScoringFunctionFactory( CharyparNagelScoringFunctionFactory defaultFactory,
 														   Map<String, ScoringFunctionFactory> factoriesBySubpopulation ) {
 		this.defaultFactory = Objects.requireNonNull(defaultFactory, "defaultFactory must not be null");
