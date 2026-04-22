@@ -21,7 +21,6 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import com.google.common.collect.Sets;
-import com.google.inject.multibindings.MapBinder;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
@@ -58,7 +57,6 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.VehicleTypeBasedScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
