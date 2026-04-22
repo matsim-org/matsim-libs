@@ -442,13 +442,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			controller.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bind(CharyparNagelScoringFunctionFactory.class); // so it can be used as delegate
-					bind(ScoringFunctionFactory.class).to(SubpopulationDelegatingScoringFunctionFactory.class);
-
-					MapBinder<String, ScoringFunctionFactory> mapBinder = MapBinder.newMapBinder(this.binder(), String.class,
-						ScoringFunctionFactory.class);
-					mapBinder.addBinding("goodsTraffic").to(VehicleTypeBasedScoringFunctionFactory.class);
-					mapBinder.addBinding("commercialPersonTraffic").to(CharyparNagelScoringFunctionFactory.class);
+					bind(ScoringFunctionFactory.class).to(VehicleTypeBasedScoringFunctionFactory.class);
 				}
 			});
 			controller.addOverridingModule(new SimWrapperModule(sw));
