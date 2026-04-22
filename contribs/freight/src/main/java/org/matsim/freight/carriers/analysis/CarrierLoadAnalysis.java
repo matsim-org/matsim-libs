@@ -33,6 +33,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.ScheduledTour;
+import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.events.CarrierShipmentDeliveryStartEvent;
 import org.matsim.freight.carriers.events.CarrierShipmentPickupStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierShipmentDeliveryStartEventHandler;
@@ -51,9 +55,45 @@ import org.matsim.vehicles.VehicleUtils;
 
 	private final Map<Id<Vehicle>, LinkedList<Integer>> vehicle2Load = new LinkedHashMap<>();
 	private final Map<Id<Vehicle>, Integer> vehicle2DemandPerTour = new HashMap<>();
+	private final Map<Id<Vehicle>, VehicleType> vehicle2VehicleType = new HashMap<>();
 
 	/*package-private*/ CarrierLoadAnalysis(String delimiter) {
 		this.delimiter = delimiter;
+	}
+
+	/*package-private*/ void collectFromSelectedCarrierPlans(Scenario scenario) {
+		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+			if (carrier.getSelectedPlan() == null) {
+				continue;
+			}
+			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+				collectTourLoad(scheduledTour);
+			}
+		}
+	}
+
+	private void collectTourLoad(ScheduledTour scheduledTour) {
+		Id<Vehicle> vehicleId = scheduledTour.getVehicle().getId();
+		LinkedList<Integer> load = new LinkedList<>();
+		int currentLoad = 0;
+		int handledDemand = 0;
+
+		for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
+			if (tourElement instanceof Tour.Pickup pickup) {
+				currentLoad += pickup.getShipment().getCapacityDemand();
+				handledDemand += pickup.getShipment().getCapacityDemand();
+				load.add(currentLoad);
+			} else if (tourElement instanceof Tour.Delivery delivery) {
+				currentLoad -= delivery.getShipment().getCapacityDemand();
+				load.add(currentLoad);
+			}
+		}
+
+		if (!load.isEmpty()) {
+			vehicle2Load.put(vehicleId, load);
+			vehicle2DemandPerTour.put(vehicleId, handledDemand);
+			vehicle2VehicleType.put(vehicleId, scheduledTour.getVehicle().getType());
+		}
 	}
 
 	@Override
@@ -106,7 +146,10 @@ import org.matsim.vehicles.VehicleUtils;
 				final LinkedList<Integer> load = vehicle2Load.get(vehicleId);
 				final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).orElseThrow();
 
-				final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
+				VehicleType vehicleType = vehicle2VehicleType.get(vehicleId);
+				if (vehicleType == null) {
+					vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
+				}
 				final Double capacity = vehicleType.getCapacity().getOther();
 
 				final Integer demand = vehicle2DemandPerTour.get(vehicleId);
