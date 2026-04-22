@@ -59,7 +59,7 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
 		this.travelTime = travelTime;
 		this.chargerProvider = chargerProvider;
 		this.infrastructure = infrastructure;
-		this.minimumDuration = config.getMinimumEnrouteChargingDuration();
+		this.minimumDuration = config == null ? 0.0 : config.getMinimumEnrouteChargingDuration();
 	}
 
 	@Override
@@ -138,6 +138,21 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
 		}
 
 		return consumption;
+	}
+
+	/**
+	 * Returns a no-op provider that never proposes a critical alternative.
+	 * Used in distributed simulation where QSim-based agent lookups are unavailable.
+	 */
+	static public CriticalAlternativeProvider noOp() {
+		return new CriticalAlternativeProvider(null, null, null, null, null, null) {
+			@Override
+			public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
+			                                                  ElectricVehicle electricVehicle,
+			                                                  @Nullable ChargingSlot slot) {
+				return null;
+			}
+		};
 	}
 
 	/**
