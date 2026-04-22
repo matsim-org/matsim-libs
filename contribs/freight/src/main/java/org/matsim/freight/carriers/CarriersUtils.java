@@ -951,6 +951,11 @@ public class CarriersUtils {
 		log.info("Carriers file written to: {}", file);
 	}
 
+	public static void writeCarrierVehicleTypes(CarrierVehicleTypes vehicleTypes, String file) {
+		new CarrierVehicleTypeWriter(vehicleTypes).write(file);
+		log.info("CarrierVehicleTypes file written to: {}", file);
+	}
+
 	/**
 	 * Writes the carriers to a file.
 	 *
@@ -984,6 +989,23 @@ public class CarriersUtils {
 			pathFile = outputPath + "/" + scenario.getConfig().controller().getRunId() + "." + filename;
 		}
 		writeCarriers(getCarriers(scenario), pathFile);
+	}
+
+	/**
+	 * Writes the carrierVehicleTypes to a file.
+	 *
+	 * @param scenario 	the scenario
+	 * @param filename   the name of the file including the file extension
+	 */
+	public static void writeCarrierVehicleTypes(Scenario scenario, String filename) {
+		String pathFile;
+		String outputPath = scenario.getConfig().controller().getOutputDirectory();
+		if (scenario.getConfig().controller().getRunId() == null) {
+			pathFile = outputPath + "/" + filename;
+		} else {
+			pathFile = outputPath + "/" + scenario.getConfig().controller().getRunId() + "." + filename;
+		}
+		writeCarrierVehicleTypes(getCarrierVehicleTypes(scenario), pathFile);
 	}
 
 	/**

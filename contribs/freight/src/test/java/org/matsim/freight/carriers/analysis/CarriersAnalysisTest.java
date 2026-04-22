@@ -81,6 +81,58 @@ public class CarriersAnalysisTest {
 	}
 
 	@Test
+	void runCarriersFileOnlyTest_Shipments() {
+		String carrierVehiclesPath = "test/input/org/matsim/freight/carriers/analysis/CarriersAnalysisTest/runShipmentEventTest/in/carrierVehicles.xml";
+
+		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(
+			IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toString(),
+			carrierVehiclesPath,
+			IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivities_Shipments.xml" ).toString(),
+			IOUtils.extendUrl(SCENARIO_URL, "vehicleTypes.xml" ).toString(),
+			null,
+			testUtils.getOutputDirectory(),
+			null);
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersFileOnly);
+
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats.tsv",  testUtils.getOutputDirectory() + "Carriers_stats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Load_perVehicle.tsv", testUtils.getOutputDirectory() + "Load_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perVehicle.tsv", testUtils.getOutputDirectory() + "TimeDistance_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perVehicleType.tsv", testUtils.getOutputDirectory() + "TimeDistance_perVehicleType.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perCarrier.tsv", testUtils.getOutputDirectory() + "TimeDistance_perCarrier.tsv");
+	}
+
+	@Test
+	void compareCarrierOnlyWithEventsAnalysis() {
+		String eventBasedOutputPath = testUtils.getOutputDirectory() + "eventBased/";
+		String carrierOnlyOutputPath = testUtils.getOutputDirectory() + "carrierOnly/";
+
+		CarriersAnalysis eventBasedAnalysis = new CarriersAnalysis(
+			IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toString(),
+			testUtils.getInputDirectory() + "in/carrierVehicles.xml",
+			testUtils.getInputDirectory() + "in/output_carriers.xml.gz",
+			IOUtils.extendUrl(SCENARIO_URL, "vehicleTypes.xml" ).toString(),
+			testUtils.getInputDirectory() + "in/output_events.xml.gz",
+			eventBasedOutputPath,
+			null);
+		eventBasedAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
+
+		CarriersAnalysis carrierOnlyAnalysis = new CarriersAnalysis(
+			IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toString(),
+			testUtils.getInputDirectory() + "in/carrierVehicles.xml",
+			testUtils.getInputDirectory() + "in/output_carriers.xml.gz",
+			IOUtils.extendUrl(SCENARIO_URL, "vehicleTypes.xml" ).toString(),
+			null,
+			carrierOnlyOutputPath,
+			null);
+		carrierOnlyAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersFileOnly);
+
+		MatsimTestUtils.assertEqualFilesLineByLine(eventBasedOutputPath + "Load_perVehicle.tsv", carrierOnlyOutputPath + "Load_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(eventBasedOutputPath + "TimeDistance_perVehicle.tsv", carrierOnlyOutputPath + "TimeDistance_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(eventBasedOutputPath + "TimeDistance_perVehicleType.tsv", carrierOnlyOutputPath + "TimeDistance_perVehicleType.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(eventBasedOutputPath + "TimeDistance_perCarrier.tsv", carrierOnlyOutputPath + "TimeDistance_perCarrier.tsv");
+	}
+
+	@Test
 	void runCarriersAnalysisUnPlannedTest_Services() {
 
 		URL carriersFile = IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivitiesWithoutRoutes.xml" );
