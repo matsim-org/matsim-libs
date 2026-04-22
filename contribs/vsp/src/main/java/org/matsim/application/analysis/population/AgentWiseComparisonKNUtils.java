@@ -15,6 +15,10 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -362,7 +366,7 @@ class AgentWiseComparisonKNUtils{
 		final StringBuilder score_cmt = new StringBuilder( "is the overall benefit (potentially negative) in score space. This has the following contributions:" );
 		final StringBuilder weighted_ttime_cmt = new StringBuilder( "... ... is the travel time benefit." );
 		final StringBuilder weighted_money_cmt = new StringBuilder( "... is the monetary benefit (re-weighted by indiv. mUoM)." );
-		final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC (= unobserved (travel) benefits." );
+		final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC (= unobserved (travel) benefits)." );
 		final StringBuilder u_trav_direct_cmt = new StringBuilder( "... ... is the direct travel score benefits (=less bike, less ride)." );
 		final StringBuilder u_lineswitches_cmt = new StringBuilder("... ... is the line switching benefit.");
 		final StringBuilder sum_cmt = new StringBuilder( "is the sum of these contributions." );
@@ -704,17 +708,23 @@ class AgentWiseComparisonKNUtils{
 
 		return config;
 	}
-	static Injector createInjector( Scenario baseScenario ){
+	static Injector createInjector( Scenario scenario ){
 		// (this should, apart from the scenario, be the same for base and policy case)
 
-		return new org.matsim.core.controler.Injector.InjectorBuilder( baseScenario )
+//		ConfigUtils.addOrGetModule( scenario.getConfig(), DvrpConfigGroup.class );
+
+		return new org.matsim.core.controler.Injector.InjectorBuilder( scenario )
 				   .addStandardModules()
 				   .addOverridingModule( new AbstractModule(){
 					   @Override public void install(){
 						   bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
 						   bind( MuseComputation.class );
 					   }
-				   } ).build();
+				   } )
+//				   .addOverridingModule(new DvrpModule() )
+//				   .addOverridingModule(new MultiModeDrtModule() )
+//				   .addOverridingModule(new MultiModeTaxiModule() )
+				   .build();
 	}
 	static void writeMuseHtml( Table baseTablePersons, Path inputPath ){
 		HistogramTrace histogramTrace = HistogramTrace.builder( baseTablePersons.doubleColumn( MUSE_h ) ).build();

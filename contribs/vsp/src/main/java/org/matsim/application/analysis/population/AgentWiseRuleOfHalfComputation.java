@@ -9,6 +9,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.application.prepare.network.CreateNetworkChangeEvents;
+import org.matsim.application.prepare.scenario.CreateScenarioCutOut;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -33,6 +35,10 @@ class AgentWiseRuleOfHalfComputation{
 	private final Population policyPopulation;
 	private final TripRouter tripRouter2;
 	private final Scenario baseScenario;
+
+	/// Code to generate the time-dependent network from events is {@link CreateNetworkChangeEvents}.
+	/// It mentions {@link CreateScenarioCutOut} as containing the same functionality.
+	/// I do not know if there are other codes doing the same thing.
 
 	public AgentWiseRuleOfHalfComputation( Injector injector, Injector injector2 ) {
 		// I cannot use this via normal injection since I need access to base and to policy.  So using the two injectors as

@@ -56,12 +56,12 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 	private static int scoreWrnCnt = 0;
 
-	private static final boolean doRoh = true;
-	static final boolean doSwitchers = false;
+	private static final boolean doRoh = false;
+	static final boolean doSwitchers = true;
 	static final boolean isDebugging = true;
 
 	@CommandLine.Parameters(description = "Path to run output directory for which analysis should be performed.")
-	private Path inputPath;
+	private Path policyCasePath;
 
 	@CommandLine.Option(names = "--base-path", description = "Path to run directory of base case.", required = true)
 	private Path baseCasePath;
@@ -129,8 +129,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 // 		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it500-routesCleaned-20260218";
 
 		// do last iteration again:
-		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
-		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
+//		final String baseDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-base-ctd-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
+//		final String policyDir = "/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/policies/tests/1pct-policy-wrap-around-handling-splitAndRemoveOpeningTimes-it0-20260315";
 
 		// iatbr glamobi:
 //		final String baseDir="/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
@@ -143,6 +143,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		// autofrei:
 //		final String baseDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-baseCaseCtdExtended/";
 //		final String policyDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-policy";
+
+		// lausitz ditrimo
+		final String baseDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
+		final String policyDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-1-ruhland-bhf_full_plans/";
+//		final String policyDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-1-ruhland-bhf_full_plans/";
 
 		// ===
 
@@ -241,20 +246,20 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		baseTablePersons.addColumns( baseTablePersons.doubleColumn( MATSIM_SCORE ).subtract( baseTablePersons.doubleColumn( SCORE ) ).setName( "error" ) );
 
 		printTable( baseTablePersons.sortOn( "error" ), "sorted by score differences bw mw and self-computed" );
-		writeMuseHtml( baseTablePersons, inputPath );
-		writeVseHtml( baseTablePersons, inputPath );
+		writeMuseHtml( baseTablePersons, policyCasePath );
+		writeVseHtml( baseTablePersons, policyCasePath );
 
 		// ############################
 		// ############################
 		// ### policy data:
 
-		Config policyConfig = prepareConfig( inputPath );
+		Config policyConfig = prepareConfig( policyCasePath );
 
 		// ===
 
 		Scenario policyScenario = ScenarioUtils.loadScenario( policyConfig );
 
-		cleanPopulation( inputPath, eventsFilePatterns, policyScenario.getPopulation() );
+		cleanPopulation( policyCasePath, eventsFilePatterns, policyScenario.getPopulation() );
 
 		tagPersonsToAnalyse( policyScenario.getPopulation(), geometries, baseScenario );
 		// (tagging is better than removing since (1) one can have multiple tags in one go, and (2) the average income becomes different once we start removing people)
@@ -269,7 +274,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		// ############################
 		// ### compare:
 
-		compare( baseCaseInjector, policyInjector, personsTablePolicy, baseTableTrips, baseTablePersons, inputPath );
+		compare( baseCaseInjector, policyInjector, personsTablePolicy, baseTableTrips, baseTablePersons, policyCasePath );
 
 		return 0;
 	}
@@ -498,13 +503,12 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		log.info( "print joined table:" );
 		System.out.println( joinedTable );
 
-//		printSpecificPerson( joinedTable, "960148" );
-
 		joinedTable.addColumns( deltaColumn( joinedTable, TTIME ), deltaColumn( joinedTable, MONEY ) );
 
 		Table copyOfJoinedTable = Table.create( joinedTable.columns() );
 
 		// yy it might be possible to first create the deltaTalbe and then do the filtering
+		// yy The filtering should be done before we split into switchers and remainers.
 		{
 			System.out.println("");
 			System.out.println("## REMAINERS: ===");
@@ -512,8 +516,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 //		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
 			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
-			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
+//			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
+//			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
+			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
 
 			Table deltaTable = createDeltaTable( joinedTable );
 
@@ -521,7 +527,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			log.info( "" );
 			log.info( "print sorted table:" );
-			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+//			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
 
 			// ===
 
@@ -533,7 +540,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 				log.info( "" );
 				log.info( "print sorted roh table:" );
-				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+//				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
 
 				log.info("");
 				log.info("print debugging table:");
@@ -551,7 +559,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
 
 			if( doRoh ){
-				writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+				writeRuleOfHalfSummaryTable( policyCasePath, baseConfig, rohDeltaTable );
 			}
 		}
 		if ( !doSwitchers ) {
@@ -565,17 +573,20 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 //		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
 			joinedTable = copyOfJoinedTable.where( copyOfJoinedTable.stringColumn( MODE_SEQ ).isNotEqualTo( copyOfJoinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
-			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or(
-				joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
+//			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or(
+//				joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
+//			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
+			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
 
 			Table deltaTable = createDeltaTable( joinedTable );
 
 			formatTable( deltaTable, 1 );
 
-//			log.info( "" );
-//			log.info( "print sorted table:" );
-//			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 40 ) );
+			log.info( "" );
+			log.info( "print sorted table:" );
+//			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
 
 			// ===
 
@@ -587,7 +598,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 				log.info( "" );
 				log.info( "print sorted roh table:" );
-				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+//				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
 			}
 
 			// ===
@@ -597,7 +609,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
 
 			if( doRoh ){
-				writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+				writeRuleOfHalfSummaryTable( policyCasePath, baseConfig, rohDeltaTable );
 			}
 		}
 		writeAscTable( baseConfig );
