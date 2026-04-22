@@ -539,6 +539,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				System.out.flush();
 				break;
 			case SpeedyALT:
+			case CHRouter:
 				break;
 		}
 

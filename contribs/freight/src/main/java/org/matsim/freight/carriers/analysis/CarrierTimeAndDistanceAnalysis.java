@@ -33,16 +33,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
@@ -53,7 +50,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
- * @author Kai Martins-Turner (kturner)
+ * @author Kai Martins-Turner (kturner), Ricardo Ewert
  */
 /*package-private*/ class CarrierTimeAndDistanceAnalysis implements CarrierTourStartEventHandler, CarrierTourEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
@@ -83,6 +80,157 @@ import org.matsim.vehicles.VehicleUtils;
 	/*package-private*/ CarrierTimeAndDistanceAnalysis(String delimiter, Scenario scenario) {
 		this.delimiter = delimiter;
 		this.scenario = scenario;
+	}
+
+	/*package-private*/ void collectFromSelectedCarrierPlans() {
+		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+			if (carrier.getSelectedPlan() == null) {
+				continue;
+			}
+			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+				collectTourStats(carrier, scheduledTour);
+			}
+		}
+	}
+
+	private void collectTourStats(Carrier carrier, ScheduledTour scheduledTour) {
+		Id<Vehicle> vehicleId = scheduledTour.getVehicle().getId();
+		Id<Tour> tourId = scheduledTour.getTour().getId();
+		VehicleType vehType = scheduledTour.getVehicle().getType();
+
+		double tourDuration = 0.;
+		double travelTime = 0.;
+		double distance = 0.;
+
+		for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
+			log.info("tourElement: {}", tourElement);
+			if (tourElement instanceof Tour.Leg leg) {
+				double legTravelTime = getLegTravelTime(leg, vehType);
+				travelTime += legTravelTime;
+				tourDuration += legTravelTime;
+				distance += getLegDistance(leg);
+			} else if (tourElement instanceof Tour.TourActivity activity) {
+				tourDuration += getActivityDuration(activity);
+			}
+		}
+
+		vehicleId2CarrierId.put(vehicleId, carrier.getId());
+		vehicleId2TourId.put(vehicleId, tourId);
+		vehicleId2VehicleType.put(vehicleId, vehType);
+		vehicleId2TourLength.put(vehicleId, distance);
+		vehicleId2TourDuration.put(vehicleId, tourDuration);
+		vehicleId2TravelTime.put(vehicleId, travelTime);
+
+		vehicleTypeId2SumOfTourDuration.merge(vehType.getId(), tourDuration, Double::sum);
+		vehicleTypeId2Mileage.merge(vehType.getId(), distance, Double::sum);
+		vehicleTypeId2TravelTime.merge(vehType.getId(), travelTime, Double::sum);
+	}
+
+	private double getLegDistance(Tour.Leg leg) {
+		if (leg.getRoute() != null && Double.isFinite(leg.getRoute().getDistance()) && leg.getRoute().getDistance() > 0) {
+			return leg.getRoute().getDistance();
+		}
+
+		if (!(leg.getRoute() instanceof NetworkRoute networkRoute)) {
+			return 0.;
+		}
+
+		if (isStationaryLeg(networkRoute)) {
+			return 0.;
+		}
+
+		double distance = 0.;
+		for (Id<Link> linkId : networkRoute.getLinkIds()) {
+			distance += getLinkLength(linkId);
+		}
+		distance += getLinkLength(networkRoute.getEndLinkId());
+		return distance;
+	}
+
+	private double getLegTravelTime(Tour.Leg leg, VehicleType vehicleType) {
+		if (!(leg.getRoute() instanceof NetworkRoute networkRoute)) {
+			return leg.getExpectedTransportTime();
+		}
+
+		if (isStationaryLeg(networkRoute)) {
+			return 0.;
+		}
+
+		// Reconstruct travel time from the routed links instead of trusting expectedTransportTime from the
+		// carriers file. The XML stores expected_transp_time only with second precision, so reloading the
+		// carrier plan truncates fractional seconds and drifts away from the event-based analysis.
+		double travelTime = 0.;
+		for (Id<Link> linkId : networkRoute.getLinkIds()) {
+			Double linkTravelTime = getDiscretizedLinkTravelTime(linkId, vehicleType);
+			if (linkTravelTime == null) {
+				return leg.getExpectedTransportTime();
+			}
+			travelTime += linkTravelTime;
+		}
+
+		Double endLinkTravelTime = getDiscretizedLinkTravelTime(networkRoute.getEndLinkId(), vehicleType);
+		if (endLinkTravelTime == null) {
+			return leg.getExpectedTransportTime();
+		}
+		return travelTime + endLinkTravelTime;
+	}
+
+	private boolean isStationaryLeg(NetworkRoute networkRoute) {
+		return networkRoute.getStartLinkId() == networkRoute.getEndLinkId()
+			&& (networkRoute.getLinkIds() == null || networkRoute.getLinkIds().isEmpty());
+	}
+
+	private Double getDiscretizedLinkTravelTime(Id<Link> linkId, VehicleType vehicleType) {
+		Link link = scenario.getNetwork().getLinks().get(linkId);
+		if (link == null) {
+			return null;
+		}
+
+		double maximumVelocity = vehicleType.getMaximumVelocity();
+		if (!Double.isFinite(maximumVelocity) || maximumVelocity <= 0.) {
+			maximumVelocity = link.getFreespeed();
+		}
+		double velocity = Math.min(maximumVelocity, link.getFreespeed());
+		if (!Double.isFinite(velocity) || velocity <= 0.) {
+			return null;
+		}
+
+		double rawTravelTime = link.getLength() / velocity;
+		if (rawTravelTime <= 0.) {
+			return 0.;
+		}
+
+		// QSim operates on discrete time steps. A link with a fractional free-speed travel time therefore
+		// effectively consumes the next full simulation step in the event stream. Applying the same
+		// discretization here keeps carriersFileOnly aligned with the event-based outputs.
+		double timeStepSize = scenario.getConfig().qsim().getTimeStepSize();
+		if (!Double.isFinite(timeStepSize) || timeStepSize <= 0.) {
+			timeStepSize = 1.;
+		}
+		return timeStepSize * Math.ceil(rawTravelTime / timeStepSize);
+	}
+
+	private double getActivityDuration(Tour.TourActivity activity) {
+		double duration = activity.getDuration();
+		if (duration <= 0.) {
+			return getTimeStepSize();
+		}
+		// Activities also advance in discrete QSim steps, so the realized tour duration is one time step
+		// longer than the nominal activity duration seen in the carrier plan.
+		return duration + getTimeStepSize();
+	}
+
+	private double getTimeStepSize() {
+		double timeStepSize = scenario.getConfig().qsim().getTimeStepSize();
+		if (!Double.isFinite(timeStepSize) || timeStepSize <= 0.) {
+			return 1.;
+		}
+		return timeStepSize;
+	}
+
+	private double getLinkLength(Id<Link> linkId) {
+		Link link = scenario.getNetwork().getLinks().get(linkId);
+		return link == null ? 0. : link.getLength();
 	}
 
 	@Override
@@ -213,7 +361,7 @@ import org.matsim.vehicles.VehicleUtils;
 				double fixedCosts = 0.;
 				for (Id<Vehicle> vehicleId : vehicleId2VehicleType.keySet()) {
 					if (vehicleId2CarrierId.get(vehicleId).equals(carrierId)) {
-						final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
+						final VehicleType vehicleType = vehicleId2VehicleType.get(vehicleId);
 						final Double costsPerSecond = vehicleType.getCostInformation().getCostsPerSecond();
 						final Double costsPerMeter = vehicleType.getCostInformation().getCostsPerMeter();
 						fixedCosts = fixedCosts + vehicleType.getCostInformation().getFixedCosts();
@@ -270,7 +418,7 @@ import org.matsim.vehicles.VehicleUtils;
 				final Double travelTimeInSeconds = vehicleId2TravelTime.get(vehicleId);
 
 
-				final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
+				final VehicleType vehicleType = vehicleId2VehicleType.get(vehicleId);
 				final Double costsPerSecond = vehicleType.getCostInformation().getCostsPerSecond();
 				final Double costsPerMeter = vehicleType.getCostInformation().getCostsPerMeter();
 				final Double fixedCost = vehicleType.getCostInformation().getFixedCosts();

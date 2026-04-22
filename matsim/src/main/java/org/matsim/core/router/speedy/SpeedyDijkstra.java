@@ -69,8 +69,8 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 
 	@Override
 	public Path calcLeastCostPath(Node startNode, Node endNode, double startTime, Person person, Vehicle vehicle) {
-		int startNodeIndex = startNode.getId().index();
-		int endNodeIndex = endNode.getId().index();
+		int startNodeIndex = this.graph.getNodeIndex(startNode);
+		int endNodeIndex = this.graph.getNodeIndex(endNode);
 		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, startTime, person, vehicle);
 
 		if(path == null) {
@@ -86,13 +86,13 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 
 	public Path calcLeastCostPath(Link fromLink, Link toLink, double starttime, final Person person, final Vehicle vehicle) {
 
-		int startNodeIndex = fromLink.getToNode().getId().index();
-		int endNodeIndex = toLink.getFromNode().getId().index();
+		int startNodeIndex = this.graph.getNodeIndex(fromLink.getToNode());
+		int endNodeIndex = this.graph.getNodeIndex(toLink.getFromNode());
 
 		if(graph.getTurnRestrictions().isPresent()) {
 			Map<Id<Link>, TurnRestrictionsContext.ColoredLink> replacedLinks = graph.getTurnRestrictions().get().replacedLinks;
 			if(replacedLinks.containsKey(fromLink.getId())) {
-				startNodeIndex = replacedLinks.get(fromLink.getId()).toColoredNode.index();
+				startNodeIndex = graph.getInternalIndex(replacedLinks.get(fromLink.getId()).toColoredNode.index());
 			}
 		}
 
@@ -130,7 +130,7 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 				break;
 			}
 			// if turn restrictions are used, we might be on a colored node, so check for the original node
-			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == endNodeIndex) {
+			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == this.graph.getNode(endNodeIndex).getId().index()) {
 				foundEndNode = true;
 				endNodeIndex = nodeIdx;
 				break;

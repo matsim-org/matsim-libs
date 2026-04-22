@@ -22,7 +22,7 @@ import java.util.concurrent.Future;
  *
  * @author mrieser / Simunto, sponsored by SBB Swiss Federal Railways
  */
-class SpeedyALTData {
+public class SpeedyALTData {
 
 	private final static Logger LOG = LogManager.getLogger(SpeedyALTData.class);
 
@@ -145,7 +145,7 @@ class SpeedyALTData {
 		Future<double[]>[] trees = new Future[this.landmarksCount * 2];
 		ExecutorService executor = Executors.newFixedThreadPool(threads);
 
-		int firstLandmarkIndex = firstNode.getId().index();
+		int firstLandmarkIndex = graph.getNodeIndex(firstNode);
 		this.landmarksNodeIndices[0] = firstLandmarkIndex;
 		trees[0] = executor.submit(() -> calculateTreeForward(firstLandmarkIndex));
 		trees[1] = executor.submit(() -> calculateTreeBackward(firstLandmarkIndex));
@@ -317,16 +317,16 @@ class SpeedyALTData {
 
 				// the index points to a node with a different index -> colored copy
 				if (uncoloredNode.getId().index() != i) {
-					int uncoloredIndex = uncoloredNode.getId().index();
-					double uncoloredCost = data[uncoloredIndex];
+					int uncoloredInternalIndex = graph.getInternalIndex(uncoloredNode.getId().index());
+					double uncoloredCost = data[uncoloredInternalIndex];
 					double coloredCost = data[i];
 
 					if (Double.isFinite(uncoloredCost)) {
 						if (coloredCost < uncoloredCost) {
-							data[uncoloredIndex] = coloredCost;
+							data[uncoloredInternalIndex] = coloredCost;
 						}
 					} else {
-						data[uncoloredIndex] = coloredCost;
+						data[uncoloredInternalIndex] = coloredCost;
 					}
 				}
 			}

@@ -167,7 +167,9 @@ public class RunFissDrtScenarioIT {
 			// provide mode vehicle types (in production code, one should set them more diligently):
 			Vehicles vehiclesContainer = controler.getScenario().getVehicles();
 			for( String sampledMode : fissConfigGroup.getSampledModes()){
-				vehiclesContainer.addVehicleType( VehicleUtils.createVehicleType( Id.create( sampledMode, VehicleType.class ) ) );
+				VehicleType vehicleType = VehicleUtils.createVehicleType( Id.create( sampledMode, VehicleType.class ) );
+				vehicleType.setNetworkMode(sampledMode);
+				vehiclesContainer.addVehicleType(vehicleType);
 			}
 
 			// add FISS module:
