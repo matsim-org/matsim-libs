@@ -362,7 +362,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				solveSeparatedVRPs(scenario);
 			}
 		}
-		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(CarriersUtils.addOrGetCarriers(scenario), output.resolve("analysis").resolve("freight").toString());
+		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(scenario, output.resolve("analysis").resolve("freight").toString());
 		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans);
 		CarriersUtils.writeCarrierVehicleTypes(scenario, "output_carriersVehicleTypes.xml.gz");
 		CarriersUtils.writeCarriers(scenario, "output_carriers_withPlans.xml.gz");
