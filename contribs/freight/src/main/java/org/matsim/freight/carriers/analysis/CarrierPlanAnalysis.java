@@ -74,11 +74,13 @@ import org.matsim.freight.carriers.*;
 
 		Path path = Path.of(analysisOutputDirectory);
 		String fileName = switch (analysisType) {
-			case carriersPlans_unPlanned -> path.resolve("Carriers_stats_unPlanned.tsv").toString();
-			case carriersPlans, carriersAndEvents, carriersFileOnly -> path.resolve("Carriers_stats.tsv").toString();
+			case carriersStats_unsolvedVRP -> path.resolve("Carriers_stats_unPlanned.tsv").toString();
+			case carriersStats_solvedVRP, carriersStatsAndDetailedTourAnalysisBasedOnEvents,
+			     carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans -> path.resolve("Carriers_stats.tsv").toString();
 		};
 		switch (analysisType) {
-			case carriersPlans, carriersAndEvents, carriersFileOnly -> createKPIOutput(path);
+			case carriersStats_solvedVRP, carriersStatsAndDetailedTourAnalysisBasedOnEvents,
+			     carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans -> createKPIOutput(path);
 		}
 		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
 			String headerGeneral = String.join(delimiter,
@@ -91,13 +93,14 @@ import org.matsim.freight.carriers.*;
 				"nuOfPickupLocations_planned",
 				"nuOfDeliveryLocations_planned");
 			String header = switch (analysisType) {
-				case carriersPlans_unPlanned -> String.join(delimiter,
+				case carriersStats_unsolvedVRP -> String.join(delimiter,
 					headerGeneral,
 					"jobType",
 					"nuOfJobs_planned",
 					"demandSize_planned"
 				);
-				case carriersPlans, carriersAndEvents, carriersFileOnly -> String.join(delimiter,
+				case carriersStats_solvedVRP, carriersStatsAndDetailedTourAnalysisBasedOnEvents,
+				     carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans -> String.join(delimiter,
 					headerGeneral,
 					"MATSimScoreSelectedPlan",
 					"jspritScoreSelectedPlan",
@@ -157,12 +160,13 @@ import org.matsim.freight.carriers.*;
 				bw1.write(delimiter + numberOfDifferentPickupLocations_demand);
 				bw1.write(delimiter + numberOfDifferentDeliveryLocations_demand);
 				switch (analysisType) {
-					case carriersPlans_unPlanned -> {
+					case carriersStats_unsolvedVRP -> {
 						bw1.write(delimiter + jobsType);
 						bw1.write(delimiter + numberOfPlannedJobs);
 						bw1.write(delimiter + numberOfPlannedDemandSize);
 					}
-					case carriersPlans, carriersAndEvents, carriersFileOnly -> {
+					case carriersStats_solvedVRP, carriersStatsAndDetailedTourAnalysisBasedOnEvents,
+					     carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans -> {
 						int numberOfHandledPickups = 0, nuOfServiceHandled = 0, numberOfHandledDemandSize = 0;
 						int notHandledJobs = numberOfPlannedJobs;
 						if (carrier.getSelectedPlan() != null) {

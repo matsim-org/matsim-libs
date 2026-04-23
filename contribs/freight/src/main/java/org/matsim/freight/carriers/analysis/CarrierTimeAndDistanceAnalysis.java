@@ -202,7 +202,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 		// QSim operates on discrete time steps. A link with a fractional free-speed travel time therefore
 		// effectively consumes the next full simulation step in the event stream. Applying the same
-		// discretization here keeps carriersFileOnly aligned with the event-based outputs.
+		// discretization here keeps carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans aligned with the event-based outputs.
 		double timeStepSize = scenario.getConfig().qsim().getTimeStepSize();
 		if (!Double.isFinite(timeStepSize) || timeStepSize <= 0.) {
 			timeStepSize = 1.;

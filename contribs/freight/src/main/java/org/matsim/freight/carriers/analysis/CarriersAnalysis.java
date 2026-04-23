@@ -43,20 +43,22 @@ import org.matsim.freight.carriers.events.CarrierEventsReaders;
 
 
 /**
- * A first approach for some analysis based on the freight events introduced in 2022/23.
- * This class comes from teaching SimGV in the winter term 2022/23.
+ * Runs freight carrier analyses based on MATSim carrier plans and, optionally, carrier-related events.
  * <p>
- * This class should get extended and prepared as a standardized analysis for freight output.
- * This should also get aligned with the current development in Simwrapper.
- * Todo: Add some tests.
+ * This class executes one of several predefined analysis variants. Depending on the selected {@link CarrierAnalysisType},
+ * it can write general carrier statistics, analyze selected carrier plans directly, or perform additional
+ * event-based analyzes such as travel time, travel distance, and vehicle load.
+ * <p>
+ * Event-based analysis requires an events file, while plan-based analysis can also be executed
+ * without one.
  *
  * @author kturner (Kai Martins-Turner)
+ * @author Ricardo Ewert
  */
 public class CarriersAnalysis {
 
 	private static final Logger log = LogManager.getLogger(CarriersAnalysis.class);
 
-	//Where is your simulation output, that should be analysed?
 	private String EVENTS_PATH = null;
 	private final String ANALYSIS_OUTPUT_PATH;
 	private Scenario scenario = null;
@@ -68,22 +70,22 @@ public class CarriersAnalysis {
 		/**
 		 * Analyzes only the unplanned part of the carriers
 		 */
-		carriersPlans_unPlanned,
+		carriersStats_unsolvedVRP,
 		/**
-		 * Analyzes the complete carriers plans including the selected tours.
+		 * Analyzes the complete carriers' plans, including the selected tours.
 		 */
-		carriersPlans,
+		carriersStats_solvedVRP,
 		/**
-		 * Analyzes the complete carriers plans and adds an event-based analysis of the carriers based on vehicles, vehicleTypes and carriers.
+		 * Analyzes the complete carriers' plans and adds an event-based analysis of the carriers based on vehicles, vehicleTypes, and carriers.
 		 */
-		carriersAndEvents,
+		carriersStatsAndDetailedTourAnalysisBasedOnEvents,
 		/**
-		 * Analyzes the selected carrier plans directly from the carriers input instead of using events.
+		 * Analyzes the complete carriers' plans and adds an analysis of the selected carrier plans directly from the carriers plans instead of using events.
 		 */
-		carriersFileOnly,
+		carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans,
 	}
 
-	private final CarrierAnalysisType defaultAnalysisType = CarrierAnalysisType.carriersAndEvents;
+	private final CarrierAnalysisType defaultAnalysisType = CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnEvents;
 
 	/**
 	 * This constructor automatically searches for the necessary output file in a simulation run output.
@@ -135,13 +137,19 @@ public class CarriersAnalysis {
 	}
 
 	/**
-	 * Constructor, if you only want to have the carrier analysis.
+	 * Constructor, if you only want to have the carrierStats analysis.
 	 *
 	 * @param carriers           The carriers to be analyzed
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 */
 	public CarriersAnalysis(Carriers carriers, String analysisOutputPath) {
 		this.carriers = carriers;
+		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
+	}
+
+	public CarriersAnalysis(Scenario scenario, String analysisOutputPath) {
+		this.scenario = scenario;
+		this.carriers = CarriersUtils.getCarriers(scenario);
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 	}
 
@@ -190,14 +198,14 @@ public class CarriersAnalysis {
 			folder.mkdirs();
 		}
 		switch (analysisType) {
-			case carriersPlans_unPlanned -> new CarrierPlanAnalysis(delimiter, carriers)
-				.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans_unPlanned);
-			case carriersPlans -> new CarrierPlanAnalysis(delimiter, carriers)
-				.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans);
-			case carriersFileOnly -> {
+			case carriersStats_unsolvedVRP -> new CarrierPlanAnalysis(delimiter, carriers)
+				.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersStats_unsolvedVRP);
+			case carriersStats_solvedVRP -> new CarrierPlanAnalysis(delimiter, carriers)
+				.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersStats_solvedVRP);
+			case carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans -> {
 
 				CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
-				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans);
+				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersStats_solvedVRP);
 
 				CarrierTimeAndDistanceAnalysis carrierTimeAndDistanceAnalysis = new CarrierTimeAndDistanceAnalysis(
 					delimiter, scenario);
@@ -213,14 +221,14 @@ public class CarriersAnalysis {
 				carrierTimeAndDistanceAnalysis.writeTravelTimeAndDistancePerCarrier(ANALYSIS_OUTPUT_PATH, scenario);
 				carrierLoadAnalysis.writeLoadPerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
 			}
-			case carriersAndEvents -> {
+			case carriersStatsAndDetailedTourAnalysisBasedOnEvents -> {
 
 				if (EVENTS_PATH == null) {
 					throw new IllegalStateException("Event-based carrier analysis was selected, but no events file is available.");
 				}
 
 				CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
-				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersAndEvents);
+				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnEvents);
 
 				// Prepare eventsManager - start of event based Analysis;
 				EventsManager eventsManager = EventsUtils.createEventsManager();
