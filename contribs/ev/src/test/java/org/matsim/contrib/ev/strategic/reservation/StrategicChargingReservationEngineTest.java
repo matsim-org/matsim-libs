@@ -22,17 +22,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for {@link DistributedStrategicChargingReservationEngine}.
- *
+ * Tests for {@link StrategicChargingReservationEngine}.
+ * <p>
  * All tests use mobsim "dsim" with two threads so that agents and chargers may
  * live on different partitions.
- *
+ * <p>
  * Note: {@link org.matsim.contrib.ev.strategic.StrategicChargingAlternativeProvider} is not fully
  * DSim-compatible when using {@code AlternativeSearchStrategy.ReservationBased} (it calls
  * {@code addLocalReservation} for potentially remote chargers). Tests here use the
  * default online search strategy and only verify advance-reservation behaviour.
  */
-public class DistributedStrategicChargingReservationEngineTest {
+public class StrategicChargingReservationEngineTest {
 
 	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -104,7 +104,7 @@ public class DistributedStrategicChargingReservationEngineTest {
 		enableAdvanceReservationPlanning(scenario);
 
 		Person person = scenario.scenario().getPopulation().getPersons().get(Id.createPersonId("person"));
-		DistributedStrategicChargingReservationEngine.setReservationSlack(person, 7200.0);
+		StrategicChargingReservationEngine.setReservationSlack(person, 7200.0);
 
 		ReservationTracker tracker = new ReservationTracker();
 		scenario.controller().addOverridingModule(new AbstractModule() {
@@ -169,7 +169,7 @@ public class DistributedStrategicChargingReservationEngineTest {
 	/**
 	 * Agent's home activity is at (0,0) and work charger is at (8,8). With two
 	 * DSim threads these typically reside on different partitions. The advance
-	 * reservation must still succeed because {@link DistributedStrategicChargingReservationEngine}
+	 * reservation must still succeed because {@link StrategicChargingReservationEngine}
 	 * routes the request via the async {@code addReservation()} path.
 	 */
 	@Test
@@ -193,7 +193,7 @@ public class DistributedStrategicChargingReservationEngineTest {
 		enableAdvanceReservationPlanning(scenario);
 
 		Person person = scenario.scenario().getPopulation().getPersons().get(Id.createPersonId("person"));
-		DistributedStrategicChargingReservationEngine.setReservationSlack(person, 7200.0);
+		StrategicChargingReservationEngine.setReservationSlack(person, 7200.0);
 
 		ReservationTracker tracker = new ReservationTracker();
 		scenario.controller().addOverridingModule(new AbstractModule() {
@@ -221,7 +221,7 @@ public class DistributedStrategicChargingReservationEngineTest {
 	 * agent crosses to the neighbouring partition. The engine must transfer the
 	 * pending reservation via {@link org.matsim.core.mobsim.dsim.NotifyAgentPartitionTransfer}
 	 * so that it is still processed on the receiving partition.
-	 *
+	 * <p>
 	 * We verify exactly one event fires per reservation (no duplicates, no drops).
 	 */
 	@Test
@@ -246,7 +246,7 @@ public class DistributedStrategicChargingReservationEngineTest {
 
 		Person person = scenario.scenario().getPopulation().getPersons().get(Id.createPersonId("person"));
 		// Small slack: reservation fires while agent is en-route, possibly after partition crossing
-		DistributedStrategicChargingReservationEngine.setReservationSlack(person, 600.0);
+		StrategicChargingReservationEngine.setReservationSlack(person, 600.0);
 
 		ReservationTracker tracker = new ReservationTracker();
 		scenario.controller().addOverridingModule(new AbstractModule() {

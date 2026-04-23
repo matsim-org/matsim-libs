@@ -8,7 +8,7 @@ import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.reservation.DistributedChargerReservationManager;
 import org.matsim.contrib.ev.strategic.access.ChargerAccess;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
-import org.matsim.contrib.ev.strategic.reservation.DistributedStrategicChargingReservationEngine;
+import org.matsim.contrib.ev.strategic.reservation.StrategicChargingReservationEngine;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoring;
 import org.matsim.contrib.ev.withinday.ChargingAlternativeProvider;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder;
@@ -32,8 +32,8 @@ public class StrategicChargingQSimModule extends AbstractQSimModule {
 
 		addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargingPlanScoring.class);
 
-		bind(DistributedStrategicChargingReservationEngine.class).in(Singleton.class);
-		addQSimComponentBinding(EvModule.EV_COMPONENT).to(DistributedStrategicChargingReservationEngine.class);
+		bind(StrategicChargingReservationEngine.class).in(Singleton.class);
+		addQSimComponentBinding(EvModule.EV_COMPONENT).to(StrategicChargingReservationEngine.class);
 	}
 
 	@Provides
