@@ -184,7 +184,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--MATSimIterationsAfterDemandGeneration", description = "If selected, the MATSim simulation will be run for the selected number of iterations after demand generation. if not selected, only demand generation is performed.")
 	private Integer MATSimIterationsAfterDemandGeneration;
 
-	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = " The factor describing how many vehicles should be created in relation to the number of created services. If maxNumberOfLoopsForVRPSolving > 0 more vehiclaes are added in the replanning process.", defaultValue = "1.2")
+	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = "The factor describing how many vehicles should be created in relation to the number of created services. If maxNumberOfLoopsForVRPSolving > 0 more vehicles are added in the replanning process.", defaultValue = "1.2")
 	private double factorForTravelBufferCalculation;
 
 	private Random rnd;
@@ -361,14 +361,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
-				CarriersUtils.writeCarriers(scenario, "output_carriers_noPlans.xml.gz");
+				CarriersUtils.writeCarriers(scenario, "output_carriers_unsolvedVRP.xml.gz");
 				solveSeparatedVRPs(scenario);
 			}
 		}
-		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(CarriersUtils.addOrGetCarriers(scenario), output.resolve("analysis").resolve("freight").toString());
-		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersPlans);
+		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(scenario, output.resolve("analysis").resolve("freight").toString());
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans);
 		CarriersUtils.writeCarrierVehicleTypes(scenario, "output_carriersVehicleTypes.xml.gz");
-		CarriersUtils.writeCarriers(scenario, "output_carriers_withPlans.xml.gz");
+		CarriersUtils.writeCarriers(scenario, "output_carriers_solvedVRP.xml.gz");
 
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(scenario,
 			usedSmallScaleCommercialTrafficType, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
@@ -452,8 +452,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			controller.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
 
 			controller.run();
-			carriersAnalysis = new CarriersAnalysis(controller.getControllerIO().getOutputPath());
-			carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersFileOnly);
 		}
 		return 0;
 	}

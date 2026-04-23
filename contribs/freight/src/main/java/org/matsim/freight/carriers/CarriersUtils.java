@@ -267,7 +267,7 @@ public class CarriersUtils {
 		}
 		String analysisOutputFolder = scenario.getConfig().controller().getOutputDirectory() + "/analysis/freight";
 		new CarriersAnalysis(getCarriers(scenario), analysisOutputFolder).runCarrierAnalysis(
-			CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
+			CarriersAnalysis.CarrierAnalysisType.carriersStats_unsolvedVRP);
 		Path jspritAnalysisPerCarrierCSVPath = Path.of(analysisOutputFolder).resolve("VRP_Solution_Stats_perCarrier.csv");
 		Path aggegatedJspritAnalysisCSVPath = Path.of(analysisOutputFolder).resolve("VRP_Solution_Stats.csv");
 
