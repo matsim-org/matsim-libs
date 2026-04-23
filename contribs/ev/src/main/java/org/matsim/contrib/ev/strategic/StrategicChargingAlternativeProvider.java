@@ -75,10 +75,70 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 	@Override
 	public void findAlternativeAsync(double now, PlanAgent agent, ElectricVehicle vehicle, ChargingSlot slot, List<ChargingAlternative> trace,
 	                                 Consumer<Optional<ChargingAlternative>> callback) {
+		if (trace.size() >= maximumAlternatives) {
+			callback.accept(Optional.empty());
+			return;
+		}
+
 		var plan = agent.getCurrentPlan();
 		var person = plan.getPerson();
-		var result = findAlternative(now, person, plan, vehicle, slot, trace);
-		callback.accept(Optional.ofNullable(result));
+
+		Coord initialLocation = slot.isLegBased() ? slot.charger().getCoord()
+			: PopulationUtils.decideOnCoordForActivity(slot.startActivity(), scenario);
+
+		Collection<Charger> candidates = chargerProvider.findChargers(person, plan,
+				new ChargerRequest(slot.startActivity(), slot.endActivity(), slot.leg(), slot.duration())).stream()
+			.map(ChargerSpecification::getId).map(infrastruture.getChargers()::get).collect(Collectors.toList());
+
+		candidates.remove(slot.charger());
+		trace.forEach(s -> candidates.removeIf(t -> t.getId().equals(s.charger())));
+		candidates.removeIf(candidate -> !access.hasAccess(person, candidate));
+
+		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.OccupancyBased)) {
+			// Is this needed from a modelling perspective? If we have a booking system, why does a user care about the current occupancy of a
+			// charger?
+			throw new UnsupportedOperationException("AlternativeSearchStrategy.OccupancyBased search strategy is not yet implemented for distributed" +
+				"simulation. We do not have access to the occupancy information of chargers. This would have to be implemented if it is important");
+		}
+
+		if (candidates.isEmpty()) {
+			callback.accept(Optional.empty());
+			return;
+		}
+
+		List<Charger> sortedCandidates = candidates.stream().sorted((a, b) -> {
+			double distanceA = CoordUtils.calcEuclideanDistance(initialLocation, a.getCoord());
+			double distanceB = CoordUtils.calcEuclideanDistance(initialLocation, b.getCoord());
+			return Double.compare(distanceA, distanceB);
+		}).collect(Collectors.toList());
+
+		double duration = slot.isLegBased() ? slot.duration() : 0.0;
+
+		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
+			double reservationEndTime = estimateReservationEndTime(now, plan, slot);
+			tryReservation(sortedCandidates, 0, vehicle, now, reservationEndTime, duration, callback);
+		} else {
+			// Naive or OccupancyBased: no reservation needed, pick the closest
+			callback.accept(Optional.of(new ChargingAlternative(sortedCandidates.getFirst().getId(), duration)));
+		}
+	}
+
+	private void tryReservation(List<Charger> candidates, int index, ElectricVehicle vehicle, double now,
+	                            double reservationEndTime, double duration,
+	                            Consumer<Optional<ChargingAlternative>> callback) {
+		if (index >= candidates.size()) {
+			callback.accept(Optional.empty());
+			return;
+		}
+
+		Charger candidate = candidates.get(index);
+		reservationManager.addReservation(candidate.getSpecification().getId(), vehicle.getId(), now, reservationEndTime, reservation -> {
+			if (reservation.isPresent()) {
+				callback.accept(Optional.of(new ChargingAlternative(candidate.getId(), duration)));
+			} else {
+				tryReservation(candidates, index + 1, vehicle, now, reservationEndTime, duration, callback);
+			}
+		});
 	}
 
 	@Override
@@ -101,7 +161,7 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 
 		// remove chargers that have already been visited
 		candidates.remove(slot.charger());
-		trace.forEach(s -> candidates.remove(s.charger()));
+		trace.forEach(s -> candidates.removeIf(t -> t.getId().equals(s.charger())));
 
 		// remove chargers to which the person has no access
 		candidates.removeIf(candidate -> !access.hasAccess(person, candidate));
