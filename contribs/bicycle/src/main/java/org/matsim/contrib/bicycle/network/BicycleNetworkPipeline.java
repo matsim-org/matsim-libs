@@ -12,6 +12,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.config.CommandLine;
 
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -48,14 +49,14 @@ public class BicycleNetworkPipeline {
 
 	// ---- paths -----------------------------------------------------------------
 
-	//private static final String inputOsmFile = "C://Users/metz_so/Workspace/data/berlin-260122.osm.pbf";
-	private static final String inputOsmFile = "C://Users/metz_so/Workspace/data/neukoelln.osm.pbf";
-	private static final String inputTiffFile = "C://Users/metz_so/Workspace/data/elevation/DTM Germany 20m v3b by Sonny.tif";
-	private static final String outputFile = "C://Users/metz_so/Workspace/data/networks/matsim-network_nk_bicycle_4.xml.gz";
-
-	// ---- CRS -------------------------------------------------------------------
-
-	private static final String outputCRS = "EPSG:25832";
+//	//private static final String inputOsmFile = "C://Users/metz_so/Workspace/data/berlin-260122.osm.pbf";
+//	private static final String inputOsmFile = "C://Users/metz_so/Workspace/data/neukoelln.osm.pbf";
+//	private static final String inputTiffFile = "C://Users/metz_so/Workspace/data/elevation/DTM Germany 20m v3b by Sonny.tif";
+//	private static final String outputFile = "C://Users/metz_so/Workspace/data/networks/matsim-network_nk_bicycle_4.xml.gz";
+//
+//	// ---- CRS -------------------------------------------------------------------
+//
+//	private static final String outputCRS = "EPSG:25832";
 
 	// ---- elevation tunables ----------------------------------------------------
 
@@ -100,7 +101,16 @@ public class BicycleNetworkPipeline {
 
 	// ============================================================================
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		CommandLine cmd = new CommandLine.Builder(args)
+			.requireOptions("osm-file", "tiff-file", "output-file", "crs")
+			.build();
+
+		String inputOsmFile = cmd.getOptionStrict("osm-file");
+		String inputTiffFile = cmd.getOptionStrict("tiff-file");
+		String outputFile = cmd.getOptionStrict("output-file");
+		String outputCRS = cmd.getOptionStrict("crs");
+
 
 		var elevationParser = new ElevationDataParser(inputTiffFile, outputCRS);
 		var transformation = TransformationFactory.getCoordinateTransformation(
