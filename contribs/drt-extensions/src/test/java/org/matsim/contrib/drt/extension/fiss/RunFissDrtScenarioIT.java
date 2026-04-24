@@ -1,5 +1,15 @@
 package org.matsim.contrib.drt.extension.fiss;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -9,8 +19,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -39,11 +53,20 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
@@ -51,21 +74,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
-import static org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
-import static org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 
 public class RunFissDrtScenarioIT {
 
@@ -73,6 +85,279 @@ public class RunFissDrtScenarioIT {
 
 	@Test void test() {
 
+		Config config = createDrtScenarioConfig();
+
+		final Controler controler = DrtOperationsControlerCreator.createControler(config, false);
+		configureFiss(controler, config);
+
+		// for testing:
+		LinkCounter linkCounter = new LinkCounter();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(linkCounter);
+			}
+		});
+
+		controler.run();
+		{
+			String expected = utils.getInputDirectory() + "0.events.xml.gz";
+			String actual = utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz";
+			ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
+			assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
+		}
+		{
+			String expected = utils.getInputDirectory() + "output_events.xml.gz";
+			String actual = utils.getOutputDirectory() + "output_events.xml.gz";
+			ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
+			assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
+		}
+		Assertions.assertEquals(20000, linkCounter.getLinkLeaveCount(), 2000);// yy why a delta of 2000? kai, jan'25
+
+	}
+
+	/**
+	 * Same as {@link #test()} but with
+	 * {@link QSimConfigGroup.VehicleBehavior#wait}.
+	 * Verifies that FISS correctly teleports vehicles alongside agents so that no
+	 * agent gets stuck
+	 * waiting for a vehicle that never arrives.
+	 */
+	@Test
+	void testWithVehicleBehaviorWait() {
+
+		Config config = createDrtScenarioConfig();
+		config.qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
+
+		final Controler controler = DrtOperationsControlerCreator.createControler(config, false);
+		configureFiss(controler, config);
+
+		StuckCounter stuckCounter = new StuckCounter();
+		LinkCounter linkCounter = new LinkCounter();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(linkCounter);
+				addEventHandlerBinding().toInstance(stuckCounter);
+			}
+		});
+
+		controler.run();
+
+		assertEquals(0, stuckCounter.getStuckCount(),
+				"No agents should get stuck with VehicleBehavior.wait + FISS vehicle teleportation");
+		Assertions.assertEquals(20000, linkCounter.getLinkLeaveCount(), 2000);
+	}
+
+	/**
+	 * Minimal programmatic scenario: one agent, two car trips (home-->work-->home),
+	 * sampleFactor near zero so the agent is always teleported. Verifies:
+	 * <ul>
+	 * <li>No stuck agents (vehicle arrives at destination and is available for the
+	 * return trip)</li>
+	 * <li>Agent completes both trips (2 PersonArrivalEvents)</li>
+	 * <li>No car LinkLeaveEvents (all car traffic is teleported)</li>
+	 * <li>Agent arrives at the correct time (travel time matches network
+	 * free-speed, not instant)</li>
+	 * <li>Vehicle arrives at the correct time (probed via
+	 * MobsimAfterSimStepListener)</li>
+	 * </ul>
+	 *
+	 * Network: 4 nodes, links 1000m at 10 m/s (100s per link).
+	 * 
+	 * <pre>
+	 * n1 --l1--> n2 --l2--> n3 --l3--> n4
+	 * n1 <--l4-- n2 <--l5-- n3 <--l6-- n4
+	 * </pre>
+	 * 
+	 * Trip 1: depart l1 at t=100, route [l2], arrive l3. Travel time = 202s
+	 * (l2 100s + l3 100s + 2 node transitions). Vehicle arrives at l3 at t=302.
+	 * Activity at l3 ends at t=400 (vehicle already parked).
+	 * Trip 2: depart l3 at t=400, route [l6, l5], arrive l4. Travel time = 303s
+	 * (l6 100s + l5 100s + l4 100s + 3 node transitions).
+	 */
+	@Test
+	void testVehicleTeleportationMinimalScenario() {
+		runMinimalTeleportationScenario(400); // activity ends at t=400, after vehicle arrival at t=302
+	}
+
+	/**
+	 * Same network and plan as {@link #testVehicleTeleportationMinimalScenario()},
+	 * but the activity ends at t=150, BEFORE the vehicle arrives at t=302. With
+	 * {@link QSimConfigGroup.VehicleBehavior#wait}, the agent calls
+	 * {@code registerDriverAgentWaitingForCar} and waits. When the vehicle arrives
+	 * at t=302 via FISS doSimStep, {@code makeVehicleAvailableToNextDriver} wakes
+	 * the agent and trip 2 starts right after t=302.
+	 */
+	@Test
+	void testVehicleTeleportationAgentWaitsForVehicle() {
+		runMinimalTeleportationScenario(150); // activity ends at t=150, before vehicle arrival at t=302
+	}
+
+	/**
+	 * Shared implementation for the minimal teleportation tests.
+	 *
+	 * @param activityEndTime when the intermediate activity ends. If before
+	 *                        vehicle arrival (t=302), the agent waits for the
+	 *                        vehicle.
+	 */
+	private void runMinimalTeleportationScenario(double activityEndTime) {
+
+		Config config = ConfigUtils.createConfig();
+		config.qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+		config.qsim().setMainModes(List.of(TransportMode.car));
+		config.qsim().setEndTime(24 * 3600);
+		config.routing().setNetworkModes(List.of(TransportMode.car));
+		config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
+		config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600));
+		config.scoring().addModeParams(new ModeParams(TransportMode.car));
+		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1));
+		config.controller().setLastIteration(0);
+		config.controller()
+				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+
+		// Network: 4 nodes, all links 1000m at 10 m/s = 100s per link
+		Network network = scenario.getNetwork();
+		NetworkFactory nf = network.getFactory();
+		Node node1 = nf.createNode(Id.createNodeId("1"), new Coord(0, 0));
+		Node node2 = nf.createNode(Id.createNodeId("2"), new Coord(1000, 0));
+		Node node3 = nf.createNode(Id.createNodeId("3"), new Coord(2000, 0));
+		Node node4 = nf.createNode(Id.createNodeId("4"), new Coord(3000, 0));
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		network.addNode(node4);
+		Link l1 = nf.createLink(Id.createLinkId("1"), node1, node2);
+		Link l2 = nf.createLink(Id.createLinkId("2"), node2, node3);
+		Link l3 = nf.createLink(Id.createLinkId("3"), node3, node4);
+		Link l4 = nf.createLink(Id.createLinkId("4"), node2, node1);
+		Link l5 = nf.createLink(Id.createLinkId("5"), node3, node2);
+		Link l6 = nf.createLink(Id.createLinkId("6"), node4, node3);
+		for (Link link : List.of(l1, l2, l3, l4, l5, l6)) {
+			link.setLength(1000);
+			link.setFreespeed(10);
+			link.setCapacity(1000);
+			link.setNumberOfLanes(1);
+			link.setAllowedModes(Set.of(TransportMode.car));
+			network.addLink(link);
+		}
+
+		// Vehicle type for car mode
+		Vehicles vehicles = scenario.getVehicles();
+		VehicleType carType = VehicleUtils.createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+		carType.setNetworkMode(TransportMode.car);
+		vehicles.addVehicleType(carType);
+
+		PopulationFactory pf = scenario.getPopulation().getFactory();
+
+		// Trip 1: depart l1 at t=100, arrive l3. TT = l2(100) + l3(100) + 2 nodes =
+		// 202.
+		// Trip 2: depart l3 at max(activityEndTime, vehicleArrivalTime), arrive l4.
+		// TT = l6(100) + l5(100) + l4(100) + 3 nodes = 303.
+		double departTrip1 = 100;
+		double expectedTravelTime1 = 202; // l2 + l3(arrival) + 2 node transitions
+		double vehicleArrivalTime = departTrip1 + expectedTravelTime1; // t=302
+		double expectedDepartTrip2 = Math.max(activityEndTime, vehicleArrivalTime);
+		double expectedTravelTime2 = 303; // l6 + l5 + l4(arrival) + 3 node transitions
+
+		Person agent = pf.createPerson(Id.createPersonId("agent1"));
+		Plan plan = pf.createPlan();
+
+		Activity home1 = pf.createActivityFromLinkId("home", l1.getId());
+		home1.setEndTime(departTrip1);
+		plan.addActivity(home1);
+
+		Leg leg1 = pf.createLeg(TransportMode.car);
+		TripStructureUtils.setRoutingMode(leg1, TransportMode.car);
+		NetworkRoute route1 = RouteUtils.createLinkNetworkRouteImpl(l1.getId(), List.of(l2.getId()), l3.getId());
+		leg1.setRoute(route1);
+		plan.addLeg(leg1);
+
+		Activity work = pf.createActivityFromLinkId("work", l3.getId());
+		work.setEndTime(activityEndTime);
+		plan.addActivity(work);
+
+		Leg leg2 = pf.createLeg(TransportMode.car);
+		TripStructureUtils.setRoutingMode(leg2, TransportMode.car);
+		NetworkRoute route2 = RouteUtils.createLinkNetworkRouteImpl(l3.getId(), List.of(l6.getId(), l5.getId()),
+				l4.getId());
+		leg2.setRoute(route2);
+		plan.addLeg(leg2);
+
+		Activity home2 = pf.createActivityFromLinkId("home", l4.getId());
+		plan.addActivity(home2);
+		agent.addPlan(plan);
+		scenario.getPopulation().addPerson(agent);
+
+		// FISS: sampleFactor near zero, so all car agents are (almost certainly)
+		// teleported.
+		// Using Double.MIN_VALUE instead of 0.0 because FISSConfigGroup requires
+		// sampleFactor > 0.
+		FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
+		fissConfigGroup.setSampleFactor(Double.MIN_VALUE);
+		fissConfigGroup.setSampledModes(Set.of(TransportMode.car));
+		fissConfigGroup.setSwitchOffFISSLastIteration(false);
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new FISSModule());
+
+		StuckCounter stuckCounter = new StuckCounter();
+		ArrivalTracker arrivalTracker = new ArrivalTracker();
+		LinkCounter linkCounter = new LinkCounter();
+		// The parking probe only works when the vehicle stays parked (activity ends
+		// after vehicle arrival). When the agent is already waiting, the vehicle is
+		// immediately taken in the same sim step and never appears as "parked".
+		boolean vehicleStaysParked = activityEndTime >= vehicleArrivalTime;
+		VehicleParkingProbe vehicleParkingProbe = vehicleStaysParked
+				? new VehicleParkingProbe(Id.createVehicleId("agent1"), l3.getId())
+				: null;
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(stuckCounter);
+				addEventHandlerBinding().toInstance(arrivalTracker);
+				addEventHandlerBinding().toInstance(linkCounter);
+				if (vehicleParkingProbe != null) {
+					addMobsimListenerBinding().toInstance(vehicleParkingProbe);
+				}
+			}
+		});
+
+		controler.run();
+
+		Id<Person> agentId = Id.createPersonId("agent1");
+
+		assertEquals(0, stuckCounter.getStuckCount(),
+				"No agents should get stuck -- vehicle must be available for the return trip");
+		assertEquals(0, linkCounter.getLinkLeaveCount(),
+				"No car LinkLeaveEvents expected -- all car traffic is teleported");
+
+		// Verify correct agent arrival times (not instant teleportation)
+		List<Double> arrivalTimes = arrivalTracker.getArrivalTimes(agentId);
+		assertEquals(2, arrivalTimes.size(), "Agent should complete both trips (2 arrivals)");
+		assertEquals(departTrip1 + expectedTravelTime1, arrivalTimes.get(0), 0,
+				"Trip 1 arrival time should reflect network travel time, not instant teleportation");
+		assertEquals(expectedDepartTrip2 + expectedTravelTime2, arrivalTimes.get(1), 0,
+				"Trip 2 arrival time should reflect departure + network travel time");
+
+		if (vehicleParkingProbe != null) {
+			// Verify vehicle arrives at the correct time on the destination link.
+			// The probe checks at every time step when the vehicle first appears on l3.
+			// It must appear at t=200 (departure + travel time), not at t=100 (instant).
+			assertFalse(Double.isNaN(vehicleParkingProbe.getFirstSeenTime()),
+					"Vehicle should have been detected on the destination link");
+			assertEquals(vehicleArrivalTime, vehicleParkingProbe.getFirstSeenTime(), 0,
+					"Vehicle should arrive at t=" + vehicleArrivalTime + " (not instantly teleported)");
+		}
+	}
+
+	// ==================== Helper methods ====================
+
+	private Config createDrtScenarioConfig() {
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
 
 		String fleetFile = "holzkirchenFleet.xml";
@@ -87,8 +372,8 @@ public class RunFissDrtScenarioIT {
 		drtConfigGroup.setMode(TransportMode.drt);
 		drtConfigGroup.setStopDuration(30.);
 		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
-                drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-                        .addOrGetDefaultDrtOptimizationConstraintsSet();
+				drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.setMaxTravelTimeAlpha(1.5);
 		defaultConstraintsSet.setMaxTravelTimeBeta(10. * 60.);
 		defaultConstraintsSet.setMaxWaitTime(600.);
@@ -121,7 +406,7 @@ public class RunFissDrtScenarioIT {
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
 		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup, dvrpConfigGroup);
+		Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup, dvrpConfigGroup);
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
 
@@ -129,8 +414,8 @@ public class RunFissDrtScenarioIT {
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
-		config.scoring().addModeParams( new ModeParams("drt") );
-		config.scoring().addModeParams( new ModeParams("walk") );
+		config.scoring().addModeParams(new ModeParams("drt"));
+		config.scoring().addModeParams(new ModeParams("walk"));
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
@@ -141,19 +426,19 @@ public class RunFissDrtScenarioIT {
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
 
-		config.scoring().addActivityParams( new ActivityParams("home").setTypicalDuration(8 * 3600 ) );
-		config.scoring().addActivityParams( new ActivityParams("other").setTypicalDuration(4 * 3600 ) );
-		config.scoring().addActivityParams( new ActivityParams("education").setTypicalDuration(6 * 3600 ) );
-		config.scoring().addActivityParams( new ActivityParams("shopping").setTypicalDuration(2 * 3600 ) );
-		config.scoring().addActivityParams( new ActivityParams("work").setTypicalDuration(2 * 3600 ) );
+		config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
+		config.scoring().addActivityParams(new ActivityParams("other").setTypicalDuration(4 * 3600));
+		config.scoring().addActivityParams(new ActivityParams("education").setTypicalDuration(6 * 3600));
+		config.scoring().addActivityParams(new ActivityParams("shopping").setTypicalDuration(2 * 3600));
+		config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(2 * 3600));
 
-		config.replanning().addStrategySettings( new StrategySettings().setStrategyName("ChangeExpBeta" ).setWeight(1 ) );
+		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1));
 
 		config.controller().setLastIteration(1);
 		config.controller().setWriteEventsInterval(1);
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
@@ -168,62 +453,30 @@ public class RunFissDrtScenarioIT {
 		shiftsParams.setShiftEndRelocationArrival(ShiftsParams.ShiftEndRelocationArrival.immediate);
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
-
 		if (!config.qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
 			config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		}
 
-		// ### controler:
-
-		final Controler controler = DrtOperationsControlerCreator.createControler(config, false);
-
-		//FISS part
-		{
-			// FISS config:
-			FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
-			fissConfigGroup.setSampleFactor(0.1);
-			fissConfigGroup.setSampledModes(Set.of(TransportMode.car));
-			fissConfigGroup.setSwitchOffFISSLastIteration(true);
-
-			// provide mode vehicle types (in production code, one should set them more diligently):
-			Vehicles vehiclesContainer = controler.getScenario().getVehicles();
-			for( String sampledMode : fissConfigGroup.getSampledModes()){
-				VehicleType vehicleType = VehicleUtils.createVehicleType( Id.create( sampledMode, VehicleType.class ) );
-				vehicleType.setNetworkMode(sampledMode);
-				vehiclesContainer.addVehicleType(vehicleType);
-			}
-
-			// add FISS module:
-			controler.addOverridingModule( new FISSModule() );
-
-		}
-
-		// for testing:
-		LinkCounter linkCounter = new LinkCounter();
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().toInstance(linkCounter);
-			}
-		});
-
-		controler.run();
-		{
-			String expected = utils.getInputDirectory() + "0.events.xml.gz" ;
-			String actual = utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz" ;
-			ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
-			assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
-		}
-		{
-			String expected = utils.getInputDirectory() + "output_events.xml.gz" ;
-			String actual = utils.getOutputDirectory() + "output_events.xml.gz" ;
-			ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
-			assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
-		}
-		Assertions.assertEquals(20000, linkCounter.getLinkLeaveCount(), 2000);// yy why a delta of 2000?  kai, jan'25
-
-
+		return config;
 	}
+
+	private void configureFiss(Controler controler, Config config) {
+		FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
+		fissConfigGroup.setSampleFactor(0.1);
+		fissConfigGroup.setSampledModes(Set.of(TransportMode.car));
+		fissConfigGroup.setSwitchOffFISSLastIteration(true);
+
+		Vehicles vehiclesContainer = controler.getScenario().getVehicles();
+		for (String sampledMode : fissConfigGroup.getSampledModes()) {
+			VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(sampledMode, VehicleType.class));
+			vehicleType.setNetworkMode(sampledMode);
+			vehiclesContainer.addVehicleType(vehicleType);
+		}
+
+		controler.addOverridingModule(new FISSModule());
+	}
+
+	// ==================== Event handlers ====================
 
 	static class LinkCounter implements LinkLeaveEventHandler {
 		private int counts = 0;
@@ -434,6 +687,81 @@ public class RunFissDrtScenarioIT {
 
 		public List<Double> getArrivalTimes(Id<Person> personId) {
 			return arrivalTimes.getOrDefault(personId, Collections.emptyList());
+		}
+	}
+
+	static class StuckCounter implements PersonStuckEventHandler {
+		private int stuckCount = 0;
+
+		@Override
+		public void handleEvent(PersonStuckEvent event) {
+			this.stuckCount++;
+		}
+
+		@Override
+		public void reset(int iteration) {
+			this.stuckCount = 0;
+		}
+
+		public int getStuckCount() {
+			return this.stuckCount;
+		}
+	}
+
+	static class VehicleEntryTracker implements PersonEntersVehicleEventHandler {
+		private final Map<Id<Person>, List<Double>> entryTimes = new HashMap<>();
+
+		@Override
+		public void handleEvent(PersonEntersVehicleEvent event) {
+			entryTimes.computeIfAbsent(event.getPersonId(), k -> new java.util.ArrayList<>())
+					.add(event.getTime());
+		}
+
+		@Override
+		public void reset(int iteration) {
+			entryTimes.clear();
+		}
+
+		public List<Double> getEntryTimes(Id<Person> personId) {
+			return entryTimes.getOrDefault(personId, Collections.emptyList());
+		}
+
+		public Double getFirstEntryTime(Id<Person> personId) {
+			List<Double> times = entryTimes.get(personId);
+			return times != null && !times.isEmpty() ? times.get(0) : null;
+		}
+	}
+
+	/**
+	 * Probes the QSim at every time step to detect when a vehicle first appears
+	 * (parked) on a target link. Used to verify vehicle teleportation timing.
+	 */
+	static class VehicleParkingProbe implements MobsimInitializedListener, MobsimAfterSimStepListener {
+		private final Id<Vehicle> vehicleId;
+		private final Id<Link> targetLinkId;
+		private QLinkI targetLink;
+		private double firstSeenTime = Double.NaN;
+
+		VehicleParkingProbe(Id<Vehicle> vehicleId, Id<Link> targetLinkId) {
+			this.vehicleId = vehicleId;
+			this.targetLinkId = targetLinkId;
+		}
+
+		@Override
+		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+			QSim qSim = (QSim) e.getQueueSimulation();
+			this.targetLink = (QLinkI) qSim.getNetsimNetwork().getNetsimLink(targetLinkId);
+		}
+
+		@Override
+		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+			if (Double.isNaN(firstSeenTime) && targetLink.getParkedVehicle(vehicleId) != null) {
+				firstSeenTime = e.getSimulationTime();
+			}
+		}
+
+		public double getFirstSeenTime() {
+			return firstSeenTime;
 		}
 	}
 
