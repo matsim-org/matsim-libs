@@ -47,6 +47,7 @@ public final class BicycleUtils {
 //		return (String) link.getAttributes().getAttribute(BICYCLE_INFRA);
 //	}
 
+	// TODO enum statt string!! stabiler
 	public static String getBicycleInfrastructureValue(Link link, String bicycleInfraAttribute) {
 		Object value = link.getAttributes().getAttribute(bicycleInfraAttribute);
 		return value == null ? null : value.toString();
