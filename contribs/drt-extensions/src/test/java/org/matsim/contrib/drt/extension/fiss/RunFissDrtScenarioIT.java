@@ -257,8 +257,22 @@ public class RunFissDrtScenarioIT {
 	 */
 	@Test
 	void testFissTeleportationMatchesQSimTiming() {
-		ArrivalTracker baselineArrivals = runTeleportationTimingScenario(false);
-		ArrivalTracker fissArrivals = runTeleportationTimingScenario(true);
+		runAndCompareTimings(Double.POSITIVE_INFINITY);
+	}
+
+	/**
+	 * Same as {@link #testFissTeleportationMatchesQSimTiming()} but with a
+	 * vehicle whose max speed (5 m/s) is lower than the links' free speed
+	 * (10 m/s). Verifies that FISS respects the vehicle speed limit.
+	 */
+	@Test
+	void testFissTeleportationMatchesQSimTimingWithSlowVehicle() {
+		runAndCompareTimings(5.0);
+	}
+
+	private void runAndCompareTimings(double vehicleMaxSpeed) {
+		ArrivalTracker baselineArrivals = runTeleportationTimingScenario(false, vehicleMaxSpeed);
+		ArrivalTracker fissArrivals = runTeleportationTimingScenario(true, vehicleMaxSpeed);
 
 		Id<Person> agentId = Id.createPersonId("agent1");
 		List<Double> baseline = baselineArrivals.getArrivalTimes(agentId);
@@ -273,7 +287,8 @@ public class RunFissDrtScenarioIT {
 				"Trip 2 arrival time should match baseline exactly");
 	}
 
-	private ArrivalTracker runTeleportationTimingScenario(boolean enableFiss) {
+	private ArrivalTracker runTeleportationTimingScenario(boolean enableFiss,
+			double vehicleMaxSpeed) {
 		Config config = ConfigUtils.createConfig();
 		config.qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.teleport);
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
@@ -289,7 +304,8 @@ public class RunFissDrtScenarioIT {
 		config.controller().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(
-				utils.getOutputDirectory() + "/" + (enableFiss ? "fiss" : "baseline"));
+				utils.getOutputDirectory() + "/" + (enableFiss ? "fiss" : "baseline")
+						+ "_vmax" + (int) vehicleMaxSpeed);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -322,6 +338,7 @@ public class RunFissDrtScenarioIT {
 		VehicleType carType = VehicleUtils.createVehicleType(
 				Id.create(TransportMode.car, VehicleType.class));
 		carType.setNetworkMode(TransportMode.car);
+		carType.setMaximumVelocity(vehicleMaxSpeed);
 		vehicles.addVehicleType(carType);
 
 		// One agent, two trips:
@@ -343,7 +360,12 @@ public class RunFissDrtScenarioIT {
 		plan.addLeg(leg1);
 
 		Activity work = pf.createActivityFromLinkId("work", l3.getId());
-		work.setEndTime(500);
+		// End time must be later than any possible trip-1 arrival so that the
+		// agent performs a real activity. A "back-to-back" departure (arriving
+		// and departing in the same QSim step) introduces a 1-second delay in
+		// the baseline that FISS cannot reproduce because the delay stems from
+		// QSim-internal node-processing order, not from link travel times.
+		work.setEndTime(800);
 		plan.addActivity(work);
 
 		Leg leg2 = pf.createLeg(TransportMode.car);
