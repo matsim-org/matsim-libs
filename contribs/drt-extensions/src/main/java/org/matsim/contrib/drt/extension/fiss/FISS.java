@@ -181,9 +181,12 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 	}
 
 	private void deflateVehicleTypes(Scenario scenario, FISSConfigGroup fissConfigGroup) {
-		for (String sampledQsimModes : fissConfigGroup.getSampledModes()) {
-			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create(sampledQsimModes, VehicleType.class));
-			vehicleType.setPcuEquivalents(vehicleType.getPcuEquivalents() * fissConfigGroup.getSampleFactor());
+		for (String sampledMode : fissConfigGroup.getSampledModes()) {
+			for (VehicleType vehicleType : scenario.getVehicles().getVehicleTypes().values()) {
+				if (vehicleType.hasNetworkMode() && vehicleType.getNetworkMode().equals(sampledMode)) {
+					vehicleType.setPcuEquivalents(vehicleType.getPcuEquivalents() * fissConfigGroup.getSampleFactor());
+				}
+			}
 		}
 	}
 
