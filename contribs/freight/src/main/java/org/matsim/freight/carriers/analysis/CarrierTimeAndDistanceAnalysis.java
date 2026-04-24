@@ -103,7 +103,6 @@ import org.matsim.vehicles.VehicleUtils;
 		double distance = 0.;
 
 		for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
-			log.info("tourElement: {}", tourElement);
 			if (tourElement instanceof Tour.Leg leg) {
 				double legTravelTime = getLegTravelTime(leg, vehType);
 				travelTime += legTravelTime;
