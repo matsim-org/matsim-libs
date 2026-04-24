@@ -27,14 +27,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**<p>
  * CostCalculator and TravelTimeCalculator for Links based on freespeed on links and
@@ -53,11 +49,8 @@ public class FreespeedTravelTimeAndDisutility implements TravelDisutility, Trave
 
 	private static final Logger log = LogManager.getLogger(FreespeedTravelTimeAndDisutility.class);
 
-	private final Double fixedTravelCostFactor;
-	private final Double fixedMarginalUtlOfDistance;
-	private final ScoringConfigGroup scoringConfigGroup;
-	private final String mode;
-	private final Map<String, CostCoefficients> coefficientsPerSubpopulation = new HashMap<>();
+	private final double travelCostFactor;
+	private final double marginalUtlOfDistance;
 	private static int wrnCnt = 0 ;
 	/**
 	 *
@@ -69,16 +62,13 @@ public class FreespeedTravelTimeAndDisutility implements TravelDisutility, Trave
 			double scaledMarginalUtilityOfDistance){
 		// usually, the travel-utility should be negative (it's a disutility)
 		// but for the cost, the cost should be positive.
-		this.fixedTravelCostFactor = -scaledMarginalUtilityOfTraveling + scaledMarginalUtilityOfPerforming;
-		this.fixedMarginalUtlOfDistance = scaledMarginalUtilityOfDistance;
-		this.scoringConfigGroup = null;
-		this.mode = null;
+		this.travelCostFactor = -scaledMarginalUtilityOfTraveling + scaledMarginalUtilityOfPerforming;
 
 		if ( wrnCnt < 1 ) {
 			wrnCnt++ ;
-			if (this.fixedTravelCostFactor <= 0) {
+			if (this.travelCostFactor <= 0) {
 				log.warn("The travel cost in " + this.getClass().getName() + " under normal circumstances should be > 0. " +
-						"Currently, it is " + this.fixedTravelCostFactor + "." +
+						"Currently, it is " + this.travelCostFactor + "." +
 						"That is the sum of the costs for traveling and the opportunity costs." +
 						" Please adjust the parameters" +
 						"'traveling' and 'performing' in the module 'planCalcScore' in your config file to be" +
@@ -86,68 +76,31 @@ public class FreespeedTravelTimeAndDisutility implements TravelDisutility, Trave
 				log.warn(Gbl.ONLYONCE) ;
 			}
 		}
+
+		this.marginalUtlOfDistance = scaledMarginalUtilityOfDistance;
 	}
 
 	public FreespeedTravelTimeAndDisutility(ScoringConfigGroup cnScoringGroup){
-		this(cnScoringGroup, TransportMode.car);
-	}
-
-	/**
-	 * Creates a freespeed disutility that resolves scoring parameters per person subpopulation.
-	 * If no exact subpopulation parameters exist, it falls back to the default or root scoring set.
-	 */
-	public FreespeedTravelTimeAndDisutility(ScoringConfigGroup scoringConfigGroup, String mode) {
-		this.fixedTravelCostFactor = null;
-		this.fixedMarginalUtlOfDistance = null;
-		this.scoringConfigGroup = scoringConfigGroup;
-		this.mode = mode;
+		this(cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0, cnScoringGroup.getPerforming_utils_hr() / 3600.0,
+//				cnScoringGroup.getMarginalUtlOfDistanceCar());
+			scoringParamSet.getModeParams().get(TransportMode.car).getMonetaryDistanceRate() *scoringParamSet.getMarginalUtilityOfMoney());
 	}
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		final CostCoefficients coefficients = getCostCoefficients(person);
-		if (coefficients.scaledMarginalUtilityOfDistance == 0.0) {
-			return (link.getLength() / link.getFreespeed(time)) * coefficients.travelCostFactor;
+		if (this.marginalUtlOfDistance == 0.0) {
+			return (link.getLength() / link.getFreespeed(time)) * this.travelCostFactor;
 		}
-		return (link.getLength() / link.getFreespeed(time)) * coefficients.travelCostFactor - coefficients.scaledMarginalUtilityOfDistance * link.getLength();
+		return (link.getLength() / link.getFreespeed(time)) * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		double minimumDisutility = Double.POSITIVE_INFINITY;
-		if (fixedTravelCostFactor != null) {
-			if (fixedMarginalUtlOfDistance == 0.0) {
-				return (link.getLength() / link.getFreespeed()) * fixedTravelCostFactor;
-			}
-			return (link.getLength() / link.getFreespeed()) * fixedTravelCostFactor - fixedMarginalUtlOfDistance * link.getLength();
+		if (this.marginalUtlOfDistance == 0.0) {
+			return (link.getLength() / link.getFreespeed()) * this.travelCostFactor;
 		}
-
-		final CostCoefficients coefficients = getDefaultCostCoefficients();
-		if (coefficients != null) {
-			if (coefficients.scaledMarginalUtilityOfDistance == 0.0) {
-				return (link.getLength() / link.getFreespeed()) * coefficients.travelCostFactor;
-			}
-			return (link.getLength() / link.getFreespeed()) * coefficients.travelCostFactor - coefficients.scaledMarginalUtilityOfDistance * link.getLength();
-		}
-
-		// If there is no canonical default scoring set, stay conservative and use the
-		// smallest disutility over all configured subpopulations.
-		for (ScoringConfigGroup.ScoringParameterSet scoringParams : scoringConfigGroup.getScoringParametersPerSubpopulation().values()) {
-			final CostCoefficients subpopCoefficients = createCostCoefficients(scoringParams);
-			final double disutility;
-			if (subpopCoefficients.scaledMarginalUtilityOfDistance == 0.0) {
-				disutility = (link.getLength() / link.getFreespeed()) * subpopCoefficients.travelCostFactor;
-			} else {
-				disutility = (link.getLength() / link.getFreespeed()) * subpopCoefficients.travelCostFactor
-					- subpopCoefficients.scaledMarginalUtilityOfDistance * link.getLength();
-			}
-			minimumDisutility = Math.min(minimumDisutility, disutility);
-		}
-
-		if (minimumDisutility == Double.POSITIVE_INFINITY) {
-			throw new IllegalStateException("No scoring parameters available for mode " + mode + ".");
-		}
-		return minimumDisutility;
+		return (link.getLength() / link.getFreespeed()) * this.travelCostFactor
+		- this.marginalUtlOfDistance * link.getLength();
 	}
 
 	@Override
@@ -163,74 +116,4 @@ public class FreespeedTravelTimeAndDisutility implements TravelDisutility, Trave
 		return this.getLinkTravelTime(fromLink, time, null, null);
 	}
 
-	/**
-	 * Resolves the coefficients for the person's subpopulation and applies the same fallback
-	 * behavior that is used in the routing disutility factory code paths.
-	 */
-	private CostCoefficients getCostCoefficients(Person person) {
-		if (fixedTravelCostFactor != null) {
-			return new CostCoefficients(fixedTravelCostFactor, fixedMarginalUtlOfDistance);
-		}
-
-		final String subpopulation = person == null ? null : PopulationUtils.getSubpopulation(person);
-		if (subpopulation != null && scoringConfigGroup.getScoringParametersPerSubpopulation().containsKey(subpopulation)) {
-			return coefficientsPerSubpopulation.computeIfAbsent(subpopulation, this::createCostCoefficients);
-
-		}
-		final CostCoefficients fallback = getDefaultCostCoefficients();
-		if (fallback != null) {
-			return fallback;
-		}
-		throw new IllegalStateException("No scoring parameters available for mode " + mode + ".");
-	}
-
-	/**
-	 * Returns the default scoring coefficients if possible. As a last resort, any configured
-	 * subpopulation is used so routing still has a well-defined lower bound.
-	 */
-	private CostCoefficients getDefaultCostCoefficients() {
-		if (scoringConfigGroup.getScoringParametersPerSubpopulation().containsKey(ScoringConfigGroup.DEFAULT_SUBPOPULATION)) {
-			return coefficientsPerSubpopulation.computeIfAbsent(ScoringConfigGroup.DEFAULT_SUBPOPULATION, this::createCostCoefficients);
-		}
-		if (scoringConfigGroup.getScoringParametersPerSubpopulation().containsKey(null)) {
-			return coefficientsPerSubpopulation.computeIfAbsent(null, this::createCostCoefficients);
-		}
-		if (!scoringConfigGroup.getScoringParametersPerSubpopulation().isEmpty()) {
-			final String anySubpopulation = scoringConfigGroup.getScoringParametersPerSubpopulation().keySet().iterator().next();
-			return coefficientsPerSubpopulation.computeIfAbsent(anySubpopulation, this::createCostCoefficients);
-		}
-		return null;
-	}
-
-	/**
-	 * Looks up the scoring parameter set directly by subpopulation key. Fallback resolution
-	 * is handled before this method is called.
-	 */
-	private CostCoefficients createCostCoefficients(String subpopulation) {
-		final ScoringConfigGroup.ScoringParameterSet scoringParams = scoringConfigGroup.getScoringParametersPerSubpopulation().get(subpopulation);
-		if (scoringParams == null) {
-			throw new IllegalStateException("No scoring parameters available for mode " + mode + " and subpopulation " + subpopulation + ".");
-		}
-		return createCostCoefficients(scoringParams);
-	}
-
-	/**
-	 * Converts MATSim scoring parameters into the coefficients used by the freespeed
-	 * router disutility calculation for one mode.
-	 */
-	private CostCoefficients createCostCoefficients(ScoringConfigGroup.ScoringParameterSet scoringParams) {
-		final ScoringConfigGroup.ModeParams modeParams = scoringParams.getModeParams().get(mode);
-		if (modeParams == null) {
-			throw new NullPointerException(mode + " is not part of the valid mode parameters " + scoringParams.getModeParams().keySet());
-		}
-
-		final double travelCostFactor =
-			(-modeParams.getMarginalUtilityOfTraveling() / 3600.0) + (scoringParams.getPerforming_utils_hr() / 3600.0);
-		final double scaledMarginalUtilityOfDistance =
-			modeParams.getMonetaryDistanceRate() * scoringParams.getMarginalUtilityOfMoney();
-
-		return new CostCoefficients(travelCostFactor, scaledMarginalUtilityOfDistance);
-	}
-
-	private record CostCoefficients(double travelCostFactor, double scaledMarginalUtilityOfDistance) {}
 }

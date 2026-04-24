@@ -62,8 +62,22 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(final TravelTime travelTime) {
-		logWarningsIfNecessary(cnScoringGroup);
+	public TravelDisutility createTravelDisutility( final TravelTime travelTime) {
+		// yyyy This here should honor subpopulations.  It is really not so difficult; something like cnScoringGroup.getScoringParameters( "subpop"
+		// ).getMarginalUtilityOfMoney(); That line, or some variant of it, would need to be in the TravelDisutility directly. And I am quite unsure what is the status of
+		// the "default" subpopulation anyways ... I seem to recall that Thibaut wanted to get rid of that.  The following method at least outputs
+		// a warning.  However, we know by now that few people think about such warnings. kai, mar'20
+		logWarningsIfNecessary( cnScoringGroup );
+
+		final ScoringConfigGroup.ModeParams params = cnScoringGroup.getModes().get( mode ) ;
+		if ( params == null ) {
+			throw new NullPointerException( mode+" is not part of the valid mode parameters "+cnScoringGroup.getModes().keySet() );
+		}
+
+		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
+		final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+		final double marginalCostOfDistance_m = - params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney()
+				- params.getMarginalUtilityOfDistance() ;
 
 		double normalization = 1;
 		if ( sigma != 0. ) {
@@ -75,49 +89,42 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 
 		return new RandomizingTimeDistanceTravelDisutility(
 				travelTime,
-				cnScoringGroup,
-				mode,
+				marginalCostOfTime_s,
+				marginalCostOfDistance_m,
 				normalization,
 				sigma);
 	}
 
 	private void logWarningsIfNecessary(final ScoringConfigGroup cnScoringGroup) {
-		if (wrnCnt.getAndIncrement() < 1) {
-			final Set<String> monoSubpopKeyset = Collections.singleton(null);
-			if (!cnScoringGroup.getScoringParametersPerSubpopulation().keySet().equals(monoSubpopKeyset)) {
-				log.warn("Scoring parameters are defined for different subpopulations."
-						+ " The routing disutility will use the matching subpopulation. getLinkMinimumTravelDisutility() uses the minimum over all subpopulations.");
-				log.warn("This warning can safely be ignored if disutility of traveling only depends on travel time.");
+		if ( wrnCnt.getAndIncrement() < 1 ) {
+			if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() > 0. ) {
+				log.warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
+						"behavior; just found positive.  Continuing anyway.") ;
 			}
 
-			for (ScoringConfigGroup.ScoringParameterSet params : cnScoringGroup.getScoringParametersPerSubpopulation().values()) {
-				final ScoringConfigGroup.ModeParams modeParams = params.getModeParams().get(mode);
-				if (modeParams == null) {
-					throw new NullPointerException(mode + " is not part of the valid mode parameters " + params.getModeParams().keySet());
-				}
+			final Set<String> monoSubpopKeyset = Collections.singleton( null );
+			if ( !cnScoringGroup.getScoringParametersPerSubpopulation().keySet().equals( monoSubpopKeyset ) ) {
+				log.warn( "Scoring parameters are defined for different subpopulations." +
+						" The routing disutility will only consider the ones of the default subpopulation.");
+				log.warn( "This warning can safely be ignored if disutility of traveling only depends on travel time.");
+			}
 
-				if (modeParams.getMonetaryDistanceRate() > 0.) {
-					log.warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal behavior; just found positive for subpopulation "
-							+ params.getSubpopulation() + ". Continuing anyway.");
-				}
-
-				if (modeParams.getMonetaryDistanceRate() == 0. && this.sigma != 0.) {
-					log.warn("There will be no routing randomness for mode={}. The randomization of the travel disutility requires the monetary distance rate "
+			if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() == 0. && this.sigma != 0. ) {
+				log.warn("There will be no routing randomness for mode={}. The randomization of the travel disutility requires the monetary distance rate "
 						+ "to be different than zero. Continuing anyway.", mode) ;
-					log.warn( "You can also set the width of the routing randomness to zero:");
-					log.warn("\t\tconfig.routing().setRoutingRandomness( 0. );");
-					log.warn( "in code, or");
-					log.warn("\t<module name=\"routing\" >");
-					log.warn("\t\t<param name=\"routingRandomness\" value=\"0.\" />");
-					log.warn("in the xml config");
-				}
+				log.warn( "You can also set the width of the routing randomness to zero:");
+				log.warn("\t\tconfig.routing().setRoutingRandomness( 0. );");
+				log.warn( "in code, or");
+				log.warn("\t<module name=\"routing\" >");
+				log.warn("\t\t<param name=\"routingRandomness\" value=\"0.\" />");
+				log.warn("in the xml config");
+			}
 
-				if ((modeParams.getMarginalUtilityOfTraveling() + params.getPerforming_utils_hr()) == 0. && this.sigma != 0.) {
-					log.warn(
-						"There will be no routing randomness for mode {} subpopulation {}. The randomization of the travel disutility requires the travel time cost rate to be different than zero. Continuing anyway.",
-						mode, params.getSubpopulation());
-				}
+			if ( (cnScoringGroup.getModes().get( mode ).getMarginalUtilityOfTraveling() + cnScoringGroup.getPerforming_utils_hr())  == 0. && this.sigma != 0. ) {
+				log.warn("There will be no routing randomness for mode={}. The randomization of the travel disutility requires the travel time cost rate "
+						+ "to be different than zero. Continuing anyway.", mode) ;
 			}
 		}
 	}
+
 }
