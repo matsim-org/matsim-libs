@@ -37,6 +37,12 @@ import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 // this is based on https://github.com/matsim-org/matsim-code-examples/blob/2a40dd20336c55a0c8ca4c582d5d9489a4ff8d0c/src/main/java/org/matsim/codeexamples/extensions/bicycle/RunBicycleContribExample.java
 // modified to test some functionality
 
+/**
+ * @deprecated This class does not belong in the contrib module and has been
+ * moved to the project-specific test infrastructure. Use
+ * {@link RunSimpleBicycleExample} instead.
+ */
+@Deprecated(forRemoval = true)
 public final class RunBicycleContrib_ScenarioTester {
 	private static final Logger LOG = LogManager.getLogger(RunBicycleContrib_ScenarioTester.class);
 
