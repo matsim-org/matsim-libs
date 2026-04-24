@@ -27,6 +27,15 @@ import java.util.Set;
  * before we spend effort sampling them.
  */
 
+
+/**
+ * @deprecated Prototype for testing DEM-based elevation enrichment only.
+ * Superseded by {@link BicycleNetworkPipeline}, which provides the full
+ * end-to-end pipeline including OSM reading, infrastructure classification,
+ * and bicycle-aware network simplification.
+ * This class will be removed in a future version.
+ */
+@Deprecated
 public class CreateBicycleNetworkWithElevation {
 
 

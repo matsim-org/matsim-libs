@@ -3,56 +3,54 @@
 Tools in `org.matsim.contrib.bicycle.network` for building MATSim bicycle networks from OSM data, with
 cycling-infrastructure classification and elevation KPIs.
 
-## Two entry points
+## Entry point
 
-| Class                               | Use it when                                                                                                           |
-|-------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| `BicycleNetworkPipeline`            | You want the full deal: infra classification, bicycle-aware simplification, service-link cleanup, and elevation KPIs. |
-| `CreateBicycleNetworkWithElevation` | You only want elevation KPIs on an otherwise plain bicycle network. Minimal variant, no infra classification.         |
-
-Both produce a MATSim network XML with Z coordinates on nodes and elevation attributes on links.
+`BicycleNetworkPipeline` — full pipeline: infra classification, bicycle-aware simplification, service-link cleanup,
+and elevation KPIs. Produces a MATSim network XML with Z coordinates on nodes and elevation attributes on links.
 
 ## What gets attached to links
 
-| Attribute          | Unit   | Source        | Meaning                                           |
-|--------------------|--------|---------------|---------------------------------------------------|
-| `bicycle_infra`    | string | Pipeline only | Cycling infrastructure category (see below)       |
-| `averageElevation` | m      | Both          | Mean elevation over the link                      |
-| `gradient`         | ratio  | Both          | Signed end-to-end gradient (`+0.03` = 3 % uphill) |
-| `maxGradient`      | ratio  | Both          | Steepest gradient on any sub-segment              |
-| `elevationGain`    | m      | Both          | Cumulative meters climbed                         |
-| `elevationLoss`    | m      | Both          | Cumulative meters descended                       |
+| Attribute          | Unit   | Meaning                                           |
+|--------------------|--------|---------------------------------------------------|
+| `bicycle_infra`    | string | Cycling infrastructure category (see below)       |
+| `averageElevation` | m      | Mean elevation over the link                      |
+| `gradient`         | ratio  | Signed end-to-end gradient (`+0.03` = 3 % uphill) |
+| `maxGradient`      | ratio  | Steepest gradient on any sub-segment              |
+| `elevationGain`    | m      | Cumulative meters climbed                         |
+| `elevationLoss`    | m      | Cumulative meters descended                       |
 
 Gradients are signed in the direction of travel, so reverse links get the opposite sign. `gradient` alone reads 0 % on a
 link with a hill between equal-height endpoints — `maxGradient`, `elevationGain` and `elevationLoss` fill that gap.
 
 ## Files
 
-- `ElevationDataParser` — reads a GeoTIFF DEM, handles CRS transformation
+- `ElevationDataParser` — reads a GeoTIFF DEM via GeoTools, handles CRS transformation, samples nearest-neighbor
 - `LinkElevationProfile` — samples along a link, applies Douglas-Peucker smoothing, computes KPIs
 - `BicycleInfraClassifier` — classifies OSM tags into a cycling infra category (GraphHopper-style precedence)
 - `BicycleLinkPolicy` — per-link hook: infra classification + access rule enforcement (footway whitelist, `bicycle=no`,
   oneway handling)
 - `TagCopy` — optional: copies selected raw OSM tags onto links with a prefix
 - `BicycleNetworkPipeline` — full pipeline, entry point
-- `CreateBicycleNetworkWithElevation` — minimal pipeline, entry point
 
-## Full pipeline (`BicycleNetworkPipeline`)
+## Pipeline
 
-1. Read OSM with `OsmBicycleReader`. During read, each link's endpoints get a Z from the DEM, and `BicycleLinkPolicy`
-   classifies the link and enforces access rules.
-2. `NetworkUtils.cleanNetwork` drops isolated components.
-3. Bicycle-aware simplification merges consecutive links only when their infra-relevant attributes agree (
-   `bicycle_infra`, `type`, `surface`, `bike`, `smoothness`). The default simplifier would happily merge across infra
+1. Read DEM (GeoTools, nearest-neighbor sampling).
+2. Read OSM with `OsmBicycleReader`. During read, each link's endpoints get a Z stamped from the DEM, and
+   `BicycleLinkPolicy` classifies the link and enforces access rules.
+3. `NetworkUtils.cleanNetwork` drops isolated components.
+4. Bicycle-aware simplification merges consecutive links only when their infra-relevant attributes agree
+   (`bicycle_infra`, `type`, `surface`, `bicycle`, `smoothness`). The default simplifier would happily merge across
+   infra
    changes and lose that information.
-4. Service-link cleanup removes service dead-ends and hairline branches that don't connect anything useful.
-5. Rename mode `bike` → `bicycle`.
-6. Sample elevation profile on each surviving link, compute KPIs.
-7. Write MATSim XML.
+5. Service-link cleanup removes service dead-ends and hairline branches that don't connect anything useful.
+6. Rename mode `bike` → `bicycle`.
+7. For each surviving link, sample elevations every `SAMPLE_STEP_M` along the straight line between endpoints.
+8. Apply Douglas-Peucker to the `(distance, elevation)` profile with tolerance `NOISE_TOLERANCE_M`.
+9. Compute KPIs on the filtered profile, write MATSim XML.
 
 Elevation KPIs are computed **after** the simplifier runs — on fewer, longer links — so we sample only what survives.
 
-## Elevation parameters (top of each main class)
+## Elevation parameters (top of `BicycleNetworkPipeline`)
 
 **`SAMPLE_STEP_M`** — distance between samples along a link. Pick roughly the DEM resolution: `10` for Sonny 20 m DTM,
 `50` for Sonny 50 m DTM. Finer than the DEM adds no information.
