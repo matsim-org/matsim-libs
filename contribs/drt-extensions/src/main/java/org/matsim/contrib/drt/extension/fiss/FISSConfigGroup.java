@@ -51,14 +51,10 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
 		super.checkConsistency( config );
 
 		switch( config.qsim().getVehicleBehavior() ){
-			case teleport -> {
+			case teleport, wait -> {
 			}
 			default -> {
-				throw new RuntimeException( "FISS only works together with vehicle behavior=teleport.  See code for more info." );
-				// This was previously implemented such that it also ran through with other settings.  However, it would teleport the
-				// vehicle immediately to its destination, thus leading to a faulty physical modelling of "wait" or "exception".   I
-				// can't say if a possibly waiting agent would wait for the driver of the vehicle, or for the vehicle itself; this
-				// would need to be checked.  kai, feb'25
+				throw new RuntimeException( "FISS only works together with vehicle behavior teleport or wait." );
 			}
 		}
 
