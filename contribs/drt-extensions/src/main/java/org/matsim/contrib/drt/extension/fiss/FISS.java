@@ -116,8 +116,7 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 			Person person = planAgent.getCurrentPlan().getPerson();
 			Vehicle vehicle = this.scenario.getVehicles().getVehicles().get(networkRoute.getVehicleId());
 
-			double newTravelTime = RouteUtils.calcTravelTimeExcludingStartEndLink(networkRoute, now, person, vehicle, network, travelTime);
-			// yyyy This travel time _should_ include start and end link.  Also in regular teleportation!  kai, jan'25
+			double newTravelTime = calcQSimTravelTime(networkRoute, now, person, vehicle);
 			LOG.debug("New travelTime: {}, was {}", newTravelTime, networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
 
 			networkRoute.setTravelTime(newTravelTime);
@@ -175,6 +174,34 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create(sampledQsimModes, VehicleType.class));
 			vehicleType.setPcuEquivalents(vehicleType.getPcuEquivalents() * fissConfigGroup.getSampleFactor());
 		}
+	}
+
+	/**
+	 * Calculates travel time to match QSim physical simulation timing:
+	 * <ul>
+	 * <li>Departure link is NOT traversed (vehicle goes from parking straight
+	 *     to the link's buffer via {@code addFromWait}).</li>
+	 * <li>Each intermediate link is fully traversed.</li>
+	 * <li>Arrival link IS fully traversed (agent arrives when the vehicle
+	 *     reaches the buffer at the downstream end).</li>
+	 * <li>Each link-to-link transition crosses a node, costing one QSim time
+	 *     step.</li>
+	 * </ul>
+	 */
+	private double calcQSimTravelTime(NetworkRoute networkRoute, double now, Person person, Vehicle vehicle) {
+		boolean zeroLengthRoute = networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())
+				&& networkRoute.getLinkIds().isEmpty();
+		if (zeroLengthRoute) {
+			return 0;
+		}
+		double intermediateLinksTT = RouteUtils.calcTravelTimeExcludingStartEndLink(
+				networkRoute, now, person, vehicle, network, travelTime);
+		Link endLink = network.getLinks().get(networkRoute.getEndLinkId());
+		double arrivalLinkTT = travelTime.getLinkTravelTime(
+				endLink, now + intermediateLinksTT, person, vehicle);
+		int numNodeTransitions = networkRoute.getLinkIds().size() + 1;
+		double nodeTransitionTime = numNodeTransitions * qsimConfig.getTimeStepSize();
+		return intermediateLinksTT + arrivalLinkTT + nodeTransitionTime;
 	}
 
 	@Override
