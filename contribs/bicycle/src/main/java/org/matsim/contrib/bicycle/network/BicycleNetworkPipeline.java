@@ -12,10 +12,14 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.config.CommandLine;
+
+import org.matsim.application.MATSimAppCommand;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 import java.util.*;
 import java.util.function.BiPredicate;
+
 
 /**
  * End-to-end pipeline for building a MATSim bicycle network from an OSM file,
@@ -45,30 +49,38 @@ import java.util.function.BiPredicate;
  * we sample only what survives. A simpler counterpart that skips the infra and
  * simplification steps is {@link CreateBicycleNetworkWithElevation}.
  */
-public class BicycleNetworkPipeline {
+@Command(
+	name = "BicycleNetworkPipeline",
+	description = "Builds a MATSim bicycle network from OSM + DEM elevation data.",
+	mixinStandardHelpOptions = true
+)
+public class BicycleNetworkPipeline implements MATSimAppCommand {
 
-	// ---- paths -----------------------------------------------------------------
+	@Option(names = "--osm-file", required = true, description = "Path to OSM input file (.osm.pbf)")
+	private String inputOsmFile;
 
-//	//private static final String inputOsmFile = "C://Users/metz_so/Workspace/data/berlin-260122.osm.pbf";
-//	private static final String inputOsmFile = "C://Users/metz_so/Workspace/data/neukoelln.osm.pbf";
-//	private static final String inputTiffFile = "C://Users/metz_so/Workspace/data/elevation/DTM Germany 20m v3b by Sonny.tif";
-//	private static final String outputFile = "C://Users/metz_so/Workspace/data/networks/matsim-network_nk_bicycle_4.xml.gz";
-//
-//	// ---- CRS -------------------------------------------------------------------
-//
-//	private static final String outputCRS = "EPSG:25832";
+	@Option(names = "--tiff-file", required = true, description = "Path to DEM GeoTIFF")
+	private String inputTiffFile;
+
+	@Option(names = "--output-file", required = true, description = "Path to output network (.xml.gz)")
+	private String outputFile;
+
+	@Option(names = "--crs", required = true, description = "Output CRS (e.g. EPSG:25832)")
+	private String outputCRS;
+
 
 	// ---- elevation tunables ----------------------------------------------------
 
-	/**
-	 * Distance between elevation samples along a link (meters). See README.
-	 */
-	private static final double SAMPLE_STEP_M = 10.0;
+	@Option(names = "--ele-sample-step",
+		description = "Distance between elevation samples along a link in meters (default: ${DEFAULT-VALUE})",
+		defaultValue = "10.0")
+	private double eleSampleStepM;
 
-	/**
-	 * Douglas-Peucker vertical tolerance for smoothing the profile (meters).
-	 */
-	private static final double NOISE_TOLERANCE_M = 3.0;
+	@Option(names = "--ele-noise-tolerance",
+		description = "Douglas-Peucker vertical tolerance for smoothing the profile in meters (default: ${DEFAULT-VALUE})",
+		defaultValue = "3.0")
+	private double eleNoiseToleranceM;
+
 
 	// ---- mode renaming ---------------------------------------------------------
 
@@ -99,17 +111,15 @@ public class BicycleNetworkPipeline {
 		LINK_ATTR_BICYCLE_INFRA, "type", "surface", FROM_MODE, "smoothness"
 	};
 
+
 	// ============================================================================
 
-	public static void main(String[] args) throws Exception {
-		CommandLine cmd = new CommandLine.Builder(args)
-			.requireOptions("osm-file", "tiff-file", "output-file", "crs")
-			.build();
+	public static void main(String[] args) {
+		new BicycleNetworkPipeline().execute(args);
+	}
 
-		String inputOsmFile = cmd.getOptionStrict("osm-file");
-		String inputTiffFile = cmd.getOptionStrict("tiff-file");
-		String outputFile = cmd.getOptionStrict("output-file");
-		String outputCRS = cmd.getOptionStrict("crs");
+	@Override
+	public Integer call() throws Exception {
 
 
 		var elevationParser = new ElevationDataParser(inputTiffFile, outputCRS);
@@ -161,15 +171,17 @@ public class BicycleNetworkPipeline {
 		// ---- 6. elevation KPIs on the final link set -------------------------
 		int counted = 0;
 		for (Link link : network.getLinks().values()) {
-			attachLinkElevationKpis(link, elevationParser);
+			attachLinkElevationKpis(link, elevationParser, eleSampleStepM, eleNoiseToleranceM);
 			counted++;
 		}
 		System.out.println("Attached elevation KPIs to " + counted + " links "
-			+ "(sample step = " + SAMPLE_STEP_M + " m, noise tolerance = "
-			+ NOISE_TOLERANCE_M + " m).");
+			+ "(sample step = " + eleSampleStepM + " m, noise tolerance = "
+			+ eleNoiseToleranceM + " m).");
 
 		// ---- 7. write --------------------------------------------------------
 		new NetworkWriter(network).write(outputFile);
+
+		return 0;
 	}
 
 //	private static void renameLinkAttributes(Network network, Map<String, String> renames) {
@@ -195,9 +207,10 @@ public class BicycleNetworkPipeline {
 		}
 	}
 
-	private static void attachLinkElevationKpis(Link link, ElevationDataParser parser) {
+	private static void attachLinkElevationKpis(Link link, ElevationDataParser parser,
+												double sampleStep, double noiseTolerance) {
 		LinkElevationProfile.Kpis k = LinkElevationProfile.compute(
-			link, SAMPLE_STEP_M, NOISE_TOLERANCE_M, parser);
+			link, sampleStep, noiseTolerance, parser);
 
 		// Elevations in meters — round to 1 decimal (matches DEM resolution).
 		link.getAttributes().putAttribute(BicycleUtils.AVERAGE_ELEVATION, round(k.averageElevation(), 1));
@@ -422,5 +435,6 @@ public class BicycleNetworkPipeline {
 		return a.toString().compareTo(b.toString()) < 0 ? a + "_" + b : b + "_" + a;
 	}
 }
+
 
 
