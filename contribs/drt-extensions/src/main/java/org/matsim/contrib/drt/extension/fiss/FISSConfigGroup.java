@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 
 import java.util.Collections;
 import java.util.Set;
@@ -58,9 +57,13 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
 			}
 		}
 
-		if( !config.qsim().getVehiclesSource().equals( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData ) ){
-			throw new IllegalArgumentException( "For the time being, FISS only works with mode vehicle types from vehicles data, please check config!" );
-			// reason is that FISS changes the PCE in the mode vehicles.
+		switch (config.qsim().getVehiclesSource()) {
+			case modeVehicleTypesFromVehiclesData, fromVehiclesData -> {
+			}
+			default -> {
+				throw new IllegalArgumentException(
+						"FISS only works with modeVehicleTypesFromVehiclesData or fromVehiclesData, please check config!");
+			}
 		}
 
 		for( String sampledMode : getSampledModes()){
