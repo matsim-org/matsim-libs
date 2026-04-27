@@ -107,7 +107,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 	private final IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
 	private final CommercialTourSpecifications commercialTourSpecifications;
-	protected final VehicleSelection vehicleSelection;
+	protected final OdMatrixEntryInformationProvider odMatrixEntryInformationProvider;
 	private final UnhandledServicesSolution unhandledServicesSolution;
 
 	private enum CreationOption {
@@ -210,14 +210,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-													 CommercialTourSpecifications commercialTourSpecifications, VehicleSelection vehicleSelection,
+													 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
 													 UnhandledServicesSolution unhandledServicesSolution) {
-		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, vehicleSelection,
+		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, odMatrixEntryInformationProvider,
 			unhandledServicesSolution);
 	}
 	public GenerateSmallScaleCommercialTrafficDemand(String[] configArgs,
 													 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-													 CommercialTourSpecifications commercialTourSpecifications, VehicleSelection vehicleSelection,
+													 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
 													 UnhandledServicesSolution unhandledServicesSolution) {
 
 		this.configArgs = (configArgs == null) ? new String[0] : configArgs;
@@ -236,12 +236,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			this.commercialTourSpecifications = commercialTourSpecifications;
 			log.info("Using {} for tour specifications!", commercialTourSpecifications.getClass().getSimpleName());
 		}
-		if (vehicleSelection == null) {
-			this.vehicleSelection = new DefaultVehicleSelection();
-			log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
+		if (odMatrixEntryInformationProvider == null) {
+			this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider();
+			log.info("Using default {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName());
 		} else {
-			this.vehicleSelection = vehicleSelection;
-			log.info("Using {} for tour vehicle-selection!", vehicleSelection.getClass().getSimpleName());
+			this.odMatrixEntryInformationProvider = odMatrixEntryInformationProvider;
+			log.info("Using {} for OD matrix entry information!", odMatrixEntryInformationProvider.getClass().getSimpleName());
 		}
 		if (unhandledServicesSolution == null) {
 			this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this);
@@ -842,7 +842,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 					if (isStartingLocation) {
 						// Get the vehicle-types and start/stop-categories
-						VehicleSelection.OdMatrixEntryInformation odMatrixEntry = vehicleSelection.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
+						OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
 
 						// use only types of the possibleTypes which are in the given types file
 						List<String> vehicleTypes = new ArrayList<>();
@@ -901,7 +901,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param odMatrixEntry odMatrixEntry
 	 * @return the selected start category
 	 */
-	protected StructuralAttribute getSelectedStartCategory(String startZone, VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {
+	protected StructuralAttribute getSelectedStartCategory(String startZone, OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry) {
 		// Find a start category with existing employees in this zone
 		StructuralAttribute selectedStartCategory = odMatrixEntry.startCategoryDistribution.sample();
 		// we start with count = 1 because the first category is already selected, and if this category has employees, we can use it.
@@ -1210,7 +1210,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	/**
 	 * The attributes of a carrier, used during the generation
-	 * @param purpose purpose of this carrier denoted as an index. Can be used in {@link VehicleSelection} to get more information about this carrier.
+	 * @param purpose purpose of this carrier denoted as an index. Can be used in {@link OdMatrixEntryInformationProvider} to get more information about this carrier.
 	 * @param startZone start zone of this carrier, entry from {@link TripDistributionMatrix#getListOfZones()}
 	 * @param selectedStartCategory start category of this carrier, selected randomly from
 	 * @param modeORvehType entry from {@link TripDistributionMatrix#getListOfModesOrVehTypes()}
@@ -1220,5 +1220,5 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	public record CarrierAttributes(int purpose, String startZone, StructuralAttribute selectedStartCategory, String modeORvehType,
 									SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, ArrayList<String> vehicleDepots,
-									VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {}
+									OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry) {}
 }

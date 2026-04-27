@@ -10,7 +10,8 @@ import org.matsim.smallScaleCommercialTrafficGeneration.data.GetGenerationRates;
 
 import java.util.*;
 
-public class DefaultVehicleSelection implements VehicleSelection{
+public class DefaultOdMatrixEntryInformationProvider implements OdMatrixEntryInformationProvider{
+	private final VehicleTypeSelection vehicleTypeSelection;
 	private final EnumMap<SmallScaleCommercialTrafficType,
 		Map<Integer, Map<StructuralAttribute, Double>>> generationRatesStartByType = new EnumMap<>(SmallScaleCommercialTrafficType.class);
 	private final EnumMap<SmallScaleCommercialTrafficType,
@@ -19,6 +20,14 @@ public class DefaultVehicleSelection implements VehicleSelection{
 		Map<String, Map<StructuralAttribute, Double>>> commitmentRatesStartByType = new EnumMap<>(SmallScaleCommercialTrafficType.class);
 	private final EnumMap<SmallScaleCommercialTrafficType,
 		Map<String, Map<StructuralAttribute, Double>>> commitmentRatesStopByType  = new EnumMap<>(SmallScaleCommercialTrafficType.class);
+
+	public DefaultOdMatrixEntryInformationProvider() {
+		this(new DefaultVehicleTypeSelection());
+	}
+
+	public DefaultOdMatrixEntryInformationProvider(VehicleTypeSelection vehicleTypeSelection) {
+		this.vehicleTypeSelection = Objects.requireNonNull(vehicleTypeSelection);
+	}
 
 	@Override
 	public List<StructuralAttribute> getAllCategories() {
@@ -45,7 +54,7 @@ public class DefaultVehicleSelection implements VehicleSelection{
 			commitmentRatesStopByType.computeIfAbsent(smallScaleCommercialTrafficType,
 				t -> GetGenerationRates.setCommitmentRates(t, "stop"));
 
-		VehicleSelection.OdMatrixEntryInformation information = new OdMatrixEntryInformation();
+		OdMatrixEntryInformation information = new OdMatrixEntryInformation();
 
 		if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 			//generate start category distribution based on generation rates
