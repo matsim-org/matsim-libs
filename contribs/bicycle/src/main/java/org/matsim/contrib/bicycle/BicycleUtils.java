@@ -47,8 +47,8 @@ public final class BicycleUtils {
 //		return (String) link.getAttributes().getAttribute(BICYCLE_INFRA);
 //	}
 
-	// TODO enum statt string!! stabiler
 	public static String getBicycleInfrastructureValue(Link link, String bicycleInfraAttribute) {
+		// TODO Simon: use enum instead of string, more stable -> for cycleway vs bicycle_infra or the categories itself CYCLEWAY_ISOLATED ...
 		Object value = link.getAttributes().getAttribute(bicycleInfraAttribute);
 		return value == null ? null : value.toString();
 	}

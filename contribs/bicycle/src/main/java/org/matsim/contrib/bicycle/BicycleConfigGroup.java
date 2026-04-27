@@ -162,6 +162,20 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		return this.marginalUtilityOfGradient;
 	}
 
+/// TODO Simon: bike is now used everywhere -> need to update example networks, plans and events
+/// set TransportMode.bike instead of bicycleConfigGroup.getBicycleMode() in BicycleLinkSpeedCalculatorDefaultImpl, BicycleModule, ...
+//	//	@Deprecated
+
+	/// /	@StringGetter(BICYCLE_MODE)
+	/// /	public String getBicycleMode() {
+	/// /		return TransportMode.bike;
+	/// /	}
+//
+//	@Deprecated
+//	@StringSetter(BICYCLE_MODE)
+//	public BicycleConfigGroup setBicycleMode(String bicycleMode) {
+//		throw new RuntimeException("This setter is no longe supported; bike is now used everywhere.");
+//	}
 	@StringGetter(BICYCLE_MODE)
 	public String getBicycleMode() {
 		return this.bicycleMode;

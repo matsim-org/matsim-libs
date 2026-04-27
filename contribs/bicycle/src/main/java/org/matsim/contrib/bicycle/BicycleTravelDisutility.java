@@ -92,7 +92,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 		this.timeCalculator = timeCalculator;
 
 		this.normalization = normalization;
-		this.sigma = routingConfigGroup.getRoutingRandomness();
+		this.sigma = routingConfigGroup.getRoutingRandomness();  //TODO unterschiedliche sigma??
 		this.random = sigma != 0 ? MatsimRandom.getLocalInstance() : null;
 	}
 
