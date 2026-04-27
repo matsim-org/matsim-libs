@@ -327,7 +327,8 @@ abstract class AbstractQLink implements QLinkI {
 		this.waitingList.clear();
 	}
 
-	void makeVehicleAvailableToNextDriver(QVehicle veh) {
+	@Override
+	public void makeVehicleAvailableToNextDriver(QVehicle veh) {
 
 		// this would (presumably) be the place where the "nature" of a vehicle could be changed (in the sense of PAVE), e.g. to
 		// a freight vehicle, or to an autonomous vehicle that can be sent around the block or home.  However, this would

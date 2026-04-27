@@ -1,7 +1,7 @@
 package org.matsim.contrib.ev.dsim;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -91,13 +91,10 @@ public class EvDriveDischargingIntegrationTest {
 	 * Runs DSim with three separate JVM threads, each owning one partition.
 	 * Uses {@link LocalCommunicator} for in-process message passing between ranks.
 	 * <p>
-	 * Disabled until WP3–WP5 are implemented: threads fail during Guice injection
-	 * (singleton EV handlers not yet partition-aware) and the {@link LocalCommunicator}
-	 * receive loops spin indefinitely waiting for peers that already failed.
 	 */
 	@Test
-	@Timeout(value = 2, unit = TimeUnit.MINUTES)
-	//@Disabled("Enable once EV handlers are partition-aware (WP3-WP5)")
+	@Order(2)
+	@org.matsim.testcases.DisabledOnGitHubWindowsCI
 	void threeNodes() throws InterruptedException, ExecutionException, TimeoutException {
 		var outputDirectory = utils.getOutputDirectory();
 		var size = 3;

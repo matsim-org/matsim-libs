@@ -34,8 +34,10 @@ public interface ChargingAlternativeProvider {
 		callback.accept(Optional.ofNullable(result));
 	}
 
-	default void findAlternativeAsync(double now, Person person, Plan plan, ElectricVehicle vehicle, ChargingSlot slot, List<ChargingAlternative> trace,
+	default void findAlternativeAsync(double now, PlanAgent agent, ElectricVehicle vehicle, ChargingSlot slot, List<ChargingAlternative> trace,
 	                                  Consumer<Optional<ChargingAlternative>> callback) {
+		var plan = agent.getCurrentPlan();
+		var person = plan.getPerson();
 		var result = findAlternative(now, person, plan, vehicle, slot, trace);
 		callback.accept(Optional.ofNullable(result));
 	}

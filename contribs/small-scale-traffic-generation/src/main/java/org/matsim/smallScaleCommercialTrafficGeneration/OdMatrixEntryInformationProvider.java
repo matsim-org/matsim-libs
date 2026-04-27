@@ -5,11 +5,11 @@ import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTraf
 
 import java.util.List;
 /**
- * Interface to set the categories needed by {@link GenerateSmallScaleCommercialTrafficDemand}.
- * Standard implementation is {@link DefaultVehicleSelection}.
+ * Provides the OD matrix entry information needed by {@link GenerateSmallScaleCommercialTrafficDemand}.
+ * Standard implementation is {@link DefaultOdMatrixEntryInformationProvider}.
  * Any configuration settings and external data-sources should be saved as attributes during initialization in the constructor of the class.
  */
-public interface VehicleSelection{
+public interface OdMatrixEntryInformationProvider{
 
 	class OdMatrixEntryInformation {
 		double occupancyRate;
