@@ -18,6 +18,7 @@ import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider.ChargerReq
 import org.matsim.contrib.ev.withinday.ChargingAlternative;
 import org.matsim.contrib.ev.withinday.ChargingAlternativeProvider;
 import org.matsim.contrib.ev.withinday.ChargingSlot;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -26,6 +27,8 @@ import org.matsim.core.utils.timing.TimeTracker;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -70,9 +73,80 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 	}
 
 	@Override
+	public void findAlternativeAsync(double now, PlanAgent agent, ElectricVehicle vehicle, ChargingSlot slot, List<ChargingAlternative> trace,
+	                                 Consumer<Optional<ChargingAlternative>> callback) {
+		if (trace.size() >= maximumAlternatives) {
+			callback.accept(Optional.empty());
+			return;
+		}
+
+		var plan = agent.getCurrentPlan();
+		var person = plan.getPerson();
+
+		Coord initialLocation = slot.isLegBased() ? slot.charger().getCoord()
+			: PopulationUtils.decideOnCoordForActivity(slot.startActivity(), scenario);
+
+		Collection<Charger> candidates = chargerProvider.findChargers(person, plan,
+				new ChargerRequest(slot.startActivity(), slot.endActivity(), slot.leg(), slot.duration())).stream()
+			.map(ChargerSpecification::getId).map(infrastruture.getChargers()::get).collect(Collectors.toList());
+
+		candidates.remove(slot.charger());
+		trace.forEach(s -> candidates.removeIf(t -> t.getId().equals(s.charger())));
+		candidates.removeIf(candidate -> !access.hasAccess(person, candidate));
+
+		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.OccupancyBased)) {
+			// Is this needed from a modelling perspective? If we have a booking system, why does a user care about the current occupancy of a
+			// charger?
+			throw new UnsupportedOperationException("AlternativeSearchStrategy.OccupancyBased search strategy is not yet implemented for distributed" +
+				"simulation. We do not have access to the occupancy information of chargers. This would have to be implemented if it is important");
+		}
+
+		if (candidates.isEmpty()) {
+			callback.accept(Optional.empty());
+			return;
+		}
+
+		List<Charger> sortedCandidates = candidates.stream().sorted((a, b) -> {
+			double distanceA = CoordUtils.calcEuclideanDistance(initialLocation, a.getCoord());
+			double distanceB = CoordUtils.calcEuclideanDistance(initialLocation, b.getCoord());
+			return Double.compare(distanceA, distanceB);
+		}).collect(Collectors.toList());
+
+		double duration = slot.isLegBased() ? slot.duration() : 0.0;
+
+		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
+			double reservationEndTime = estimateReservationEndTime(now, plan, slot);
+			tryReservation(sortedCandidates, 0, vehicle, now, reservationEndTime, duration, callback);
+		} else {
+			// Naive or OccupancyBased: no reservation needed, pick the closest
+			callback.accept(Optional.of(new ChargingAlternative(sortedCandidates.getFirst().getId(), duration)));
+		}
+	}
+
+	private void tryReservation(List<Charger> candidates, int index, ElectricVehicle vehicle, double now,
+	                            double reservationEndTime, double duration,
+	                            Consumer<Optional<ChargingAlternative>> callback) {
+		if (index >= candidates.size()) {
+			callback.accept(Optional.empty());
+			return;
+		}
+
+		Charger candidate = candidates.get(index);
+		reservationManager.addReservation(candidate.getSpecification().getId(), vehicle.getId(), now, reservationEndTime, reservation -> {
+			if (reservation.isPresent()) {
+				callback.accept(Optional.of(new ChargingAlternative(candidate.getId(), duration)));
+			} else {
+				tryReservation(candidates, index + 1, vehicle, now, reservationEndTime, duration, callback);
+			}
+		});
+	}
+
+	@Override
 	@Nullable
 	public ChargingAlternative findAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
 	                                           ChargingSlot slot, List<ChargingAlternative> trace) {
+
+
 		if (trace.size() >= maximumAlternatives) {
 			return null; // search limit has been reached
 		}
@@ -87,43 +161,36 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 
 		// remove chargers that have already been visited
 		candidates.remove(slot.charger());
-		trace.forEach(s -> {
-			candidates.remove(s.charger());
-		});
+		trace.forEach(s -> candidates.removeIf(t -> t.getId().equals(s.charger())));
 
 		// remove chargers to which the person has no access
 		candidates.removeIf(candidate -> !access.hasAccess(person, candidate));
 
 		// remove chargers that have no free spots
 		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.OccupancyBased)) {
-			candidates.removeIf(candidate -> {
-				return candidate.getLogic().getPluggedVehicles().size() == candidate.getPlugCount();
-			});
+			candidates.removeIf(candidate -> candidate.getLogic().getPluggedVehicles().size() == candidate.getPlugCount());
 		}
 
 		// remove chargers for which no reservation can be made
-		double reservationStartTime = now;
-		double reservationEndTime = estimateReservationEndTime(reservationStartTime, plan, slot);
+		double reservationEndTime = estimateReservationEndTime(now, plan, slot);
 
 		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
-			candidates.removeIf(candidate -> {
-				return !reservationManager.isAvailable(candidate.getSpecification().getId(), vehicle.getId(), reservationStartTime,
-					reservationEndTime);
-			});
+			candidates.removeIf(candidate -> !reservationManager.isAvailable(candidate.getSpecification().getId(), vehicle.getId(), now,
+				reservationEndTime));
 		}
 
 		// perform a random selection
-		if (candidates.size() > 0) {
-			Charger selected = candidates.stream().sorted((a, b) -> {
+		if (!candidates.isEmpty()) {
+			Charger selected = candidates.stream().min((a, b) -> {
 				double distanceA = CoordUtils.calcEuclideanDistance(initialLocation, a.getCoord());
 				double distanceB = CoordUtils.calcEuclideanDistance(initialLocation, b.getCoord());
 				return Double.compare(distanceA, distanceB);
-			}).findFirst().get();
+			}).get();
 
 			// send the reservation if requested
 			if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
 				Verify.verify(
-					reservationManager.addLocalReservation(selected.getSpecification().getId(), vehicle.getId(), reservationStartTime,
+					reservationManager.addLocalReservation(selected.getSpecification().getId(), vehicle.getId(), now,
 						reservationEndTime).isPresent());
 			}
 
@@ -133,6 +200,60 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 
 		// no new candidate found
 		return null;
+	}
+
+	@Override
+	public void findEnrouteAlternativeAsync(double now, PlanAgent agent, ElectricVehicle vehicle, ChargingSlot slot, Consumer<Optional<ChargingAlternative>> callback) {
+
+		var plan = agent.getCurrentPlan();
+
+		if (slot == null) {
+			// no activity-based or leg-based charging planned, but we may add a critical
+			// charge
+
+			if (criticalProvider != null) {
+				criticalProvider.findEnrouteAlternativeAsync(now, agent, vehicle, slot, callback);
+			} else {
+				callback.accept(Optional.empty());
+			}
+			return;
+		}
+
+		// only if proactive search is enabled
+		if (!useProactiveOnlineSearch) {
+			callback.accept(Optional.empty());
+			return;
+		}
+
+		// reserve upon approaching
+		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
+			double reservationEndTime = estimateReservationEndTime(now, plan, slot);
+
+			// try to make a reservation
+			reservationManager.addReservation(slot.charger().getId(), vehicle.getId(), now, reservationEndTime, r -> {
+				if (r.isPresent()) {
+					callback.accept(Optional.empty());
+				} else {
+					findAlternativeAsync(now, agent, vehicle, slot, Collections.emptyList(), callback);
+				}
+			});
+			return; // make sure the code below is not executed
+		}
+
+		var updateRequired = false;
+		// proactively react if planned charger is occupied
+		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.OccupancyBased)) {
+			updateRequired = slot.charger().getPlugCount() == slot.charger().getLogic().getPluggedVehicles()
+				.size();
+		}
+
+		if (updateRequired) {
+			findAlternativeAsync(now, agent, vehicle, slot, Collections.emptyList(), callback);
+		} else {
+			// keep initial slot
+			callback.accept(Optional.empty());
+		}
+
 	}
 
 	@Override
@@ -160,14 +281,13 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 
 		// reserve upon approaching
 		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
-			double reservationStartTime = now;
-			double reservationEndTime = estimateReservationEndTime(reservationStartTime, plan, slot);
+			double reservationEndTime = estimateReservationEndTime(now, plan, slot);
 
 			// if a reservation can be made now, keep the initial slot
-			if (reservationManager.isAvailable(slot.charger().getSpecification().getId(), vehicle.getId(), reservationStartTime,
+			if (reservationManager.isAvailable(slot.charger().getSpecification().getId(), vehicle.getId(), now,
 				reservationEndTime)) {
 				Verify.verify(reservationManager.addLocalReservation(slot.charger().getSpecification().getId(),
-					vehicle.getId(), reservationStartTime, reservationEndTime).isPresent());
+					vehicle.getId(), now, reservationEndTime).isPresent());
 				return null;
 			} else {
 				updateRequired = true;
@@ -176,7 +296,7 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 
 		// proactively react if planned charger is occupied
 		if (onlineSearchStrategy.equals(AlternativeSearchStrategy.OccupancyBased)) {
-			updateRequired |= slot.charger().getPlugCount() == slot.charger().getLogic().getPluggedVehicles()
+			updateRequired = slot.charger().getPlugCount() == slot.charger().getLogic().getPluggedVehicles()
 				.size();
 		}
 

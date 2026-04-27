@@ -1,6 +1,8 @@
 package org.matsim.contrib.ev.strategic;
 
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -12,20 +14,22 @@ import org.matsim.contrib.ev.charging.BatteryCharging;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider.ChargerRequest;
 import org.matsim.contrib.ev.withinday.ChargingAlternative;
 import org.matsim.contrib.ev.withinday.ChargingAlternativeProvider;
 import org.matsim.contrib.ev.withinday.ChargingSlot;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * This class is a special case that is implemented optionally in the
@@ -44,22 +48,22 @@ import java.util.List;
 public class CriticalAlternativeProvider implements ChargingAlternativeProvider {
 	static public final String CRITICAL_SOC_PERSON_ATTRIBUTE = "sevc:criticalSoc";
 
-	private final QSim qsim;
 	private final Network network;
 	private final TravelTime travelTime;
 	private final ChargerProvider chargerProvider;
-	private final ChargingInfrastructure infrastructure;
 	private final double minimumDuration;
+	private final Netsim netsim;
 
-	public CriticalAlternativeProvider(QSim qsim, Network network, TravelTime travelTime,
-	                                   ChargerProvider chargerProvider, ChargingInfrastructure infrastructure,
-	                                   StrategicChargingConfigGroup config) {
-		this.qsim = qsim;
+
+	@Inject
+	public CriticalAlternativeProvider(Network network, @Named("car") TravelTime travelTime,
+	                                   ChargerProvider chargerProvider,
+	                                   StrategicChargingConfigGroup config, Netsim netsim) {
 		this.network = network;
 		this.travelTime = travelTime;
 		this.chargerProvider = chargerProvider;
-		this.infrastructure = infrastructure;
 		this.minimumDuration = config.getMinimumEnrouteChargingDuration();
+		this.netsim = netsim;
 	}
 
 	@Override
@@ -70,16 +74,21 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
 	}
 
 	@Override
-	@Nullable
-	public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
-	                                                  ElectricVehicle electricVehicle,
-	                                                  @Nullable ChargingSlot slot) {
+	public void findEnrouteAlternativeAsync(double now, PlanAgent agent, ElectricVehicle electricVehicle,
+	                                        @Nullable ChargingSlot slot, Consumer<Optional<ChargingAlternative>> callback) {
+
+		var plan = agent.getCurrentPlan();
+		var person = plan.getPerson();
+		var leg = (Leg) agent.getCurrentPlanElement();
+		var result = findLegAlternative(now, person, plan, leg, electricVehicle, slot);
+		callback.accept(Optional.ofNullable(result));
+	}
+
+	private ChargingAlternative findLegAlternative(double now, Person person, Plan plan, Leg leg, ElectricVehicle electricVehicle, ChargingSlot slot) {
 		Preconditions.checkArgument(slot == null);
 
 		Double criticalSoc = getCriticalSoc(person);
 		if (criticalSoc != null) {
-			// we must be on a leg when finding an enroute alternative
-			Leg leg = (Leg) WithinDayAgentUtils.getCurrentPlanElement(qsim.getAgents().get(person.getId()));
 
 			double initialCharge = electricVehicle.getBattery().getCharge();
 			double targetCharge = criticalSoc * electricVehicle.getBattery().getCapacity();
@@ -104,14 +113,14 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
 				Collection<ChargerSpecification> chargers = chargerProvider.findChargers(person, plan,
 					new ChargerRequest(leg));
 
-				if (chargers.size() > 0) {
+				if (!chargers.isEmpty()) {
 					final double fixedDeltaCharge = deltaCharge;
 
-					ChargerSpecification selected = chargers.stream().sorted((a, b) -> {
+					ChargerSpecification selected = chargers.stream().min((a, b) -> {
 						double durationA = calculator.calcChargingTime(a, fixedDeltaCharge);
 						double durationB = calculator.calcChargingTime(b, fixedDeltaCharge);
 						return Double.compare(durationA, durationB);
-					}).findFirst().get();
+					}).get();
 
 					double duration = calculator.calcChargingTime(selected, fixedDeltaCharge);
 					duration = Math.max(minimumDuration, duration);
@@ -122,6 +131,15 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
 		}
 
 		return null;
+	}
+
+	@Override
+	@Nullable
+	public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
+	                                                  ElectricVehicle electricVehicle,
+	                                                  @Nullable ChargingSlot slot) {
+		Leg leg = (Leg) WithinDayAgentUtils.getCurrentPlanElement(netsim.getAgents().get(person.getId()));
+		return findLegAlternative(now, person, plan, leg, electricVehicle, slot);
 	}
 
 	private double calculateConsumption(double now, Person person, Leg leg, ElectricVehicle electricVehicle,
