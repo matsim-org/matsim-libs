@@ -1,4 +1,4 @@
-package org.matsim.dsim;
+package org.matsim.testcases;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
