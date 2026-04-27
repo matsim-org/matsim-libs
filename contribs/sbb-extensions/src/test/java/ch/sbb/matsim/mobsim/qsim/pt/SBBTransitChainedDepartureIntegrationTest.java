@@ -57,6 +57,8 @@ public class SBBTransitChainedDepartureIntegrationTest {
 		config.controller().setLastIteration(0);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
 		config.controller().setWritePlansInterval(1);
+		config.controller().setMobsim("dsim");
+		config.dsim().setThreads(1);
 		config.scoring().setWriteExperiencedPlans(true);
 		config.qsim().setEndTime(Time.parseTime("36:00:00"));
 
@@ -65,6 +67,7 @@ public class SBBTransitChainedDepartureIntegrationTest {
 
 		SBBTransitConfigGroup sbb = ConfigUtils.addOrGetModule(config, SBBTransitConfigGroup.class);
 		sbb.setDeterministicServiceModes(Set.of("rail"));
+		sbb.setCreateLinkEventsInterval(1);
 
 		return ScenarioUtils.loadScenario(config);
 	}

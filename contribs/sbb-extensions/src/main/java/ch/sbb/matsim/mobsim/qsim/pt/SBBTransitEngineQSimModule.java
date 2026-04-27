@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
+import jakarta.inject.Singleton;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
@@ -42,7 +43,12 @@ public class SBBTransitEngineQSimModule extends AbstractQSimModule implements QS
 
     @Override
     protected void configureQSim() {
-        bind(SBBTransitQSimEngine.class).asEagerSingleton();
-        addQSimComponentBinding(COMPONENT_NAME).to(SBBTransitQSimEngine.class);
+//        bind(SBBTransitQSimEngine.class).asEagerSingleton();
+//		addQSimComponentBinding(COMPONENT_NAME).to(SBBTransitQSimEngine.class);
+		bind(DistributedSBBTransitQSimEngine.class).in(Singleton.class);
+		addQSimComponentBinding(COMPONENT_NAME).to(DistributedSBBTransitQSimEngine.class);
+
+		bind(SBBTransitDriverAgentFactory.class);
+
     }
 }

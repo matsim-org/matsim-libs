@@ -97,7 +97,7 @@ public class SBBTransitQSimEngineTest {
         assertNextStop(driver, stops.get(3), depTime);
         assertNextStop(driver, stops.get(4), depTime);
 
-        Assertions.assertNull(driver.getNextRouteStop());
+        Assertions.assertNull(driver.getNextStop());
     }
 
     private void assertNextStop(SBBTransitDriverAgent driver, TransitRouteStop stop, double routeDepTime) {
@@ -105,7 +105,7 @@ public class SBBTransitQSimEngineTest {
         double depOffset = stop.getDepartureOffset().or(stop.getArrivalOffset()).seconds();
         TransitStopFacility f = stop.getStopFacility();
 
-        Assertions.assertEquals(stop, driver.getNextRouteStop());
+        Assertions.assertEquals(stop, driver.getNextStop());
 
         driver.arrive(stop, routeDepTime + arrOffset);
         double stopTimeSum = 0.0;

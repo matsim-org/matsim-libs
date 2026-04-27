@@ -9,10 +9,12 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEvent;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEventHandler;
 import org.matsim.core.communication.LocalCommunicator;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -74,6 +76,9 @@ public class EvDriveDischargingIntegrationTest {
 	void threePartitions() {
 		var config = EvDSimTestFixture.createConfig(utils.getOutputDirectory());
 		EvDSimTestFixture.configureDSim(config, 3);
+		var evConfig = ConfigUtils.addOrGetModule(config, EvConfigGroup.class);
+		evConfig.setWriteChargersInterval(1);
+		evConfig.setWriteChargingActivitiesInterval(1);
 		var scenario = EvDSimTestFixture.createScenario(config, 3);
 
 		var controller = new Controler(scenario);
