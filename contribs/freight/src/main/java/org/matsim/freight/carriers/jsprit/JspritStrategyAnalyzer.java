@@ -59,6 +59,7 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 	@Override
 	public void informIterationStarts(int i, VehicleRoutingProblem problem, Collection<VehicleRoutingProblemSolution> solutions) {
 		iterationsCounter = i;
+		iterationStartTime = System.currentTimeMillis();
 		// before the first iteration starts, take the initial solution costs and time
 		if (i == 1) {
 			double initialSolutionComputationTime = (System.currentTimeMillis() - algorithmStartTime) / 1000.0;
@@ -66,7 +67,6 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 			VehicleRoutingProblemSolution initialSolution = solutions.iterator().next();
 			iterationSolutionCosts.put(0, new IterationResult(initialSolutionCosts, "initialSolution", initialSolutionComputationTime,
 				initialSolution.getRoutes().size(), 0, 0));
-			iterationStartTime = System.currentTimeMillis();
 			foundNewBestSolutions.put(0, initialSolution);
 		}
 	}
