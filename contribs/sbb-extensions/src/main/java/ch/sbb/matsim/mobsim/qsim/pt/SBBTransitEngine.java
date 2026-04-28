@@ -223,15 +223,6 @@ public class SBBTransitEngine
 		TransitRouteStop nextStop = driver.getNextStop();
 		if (nextStop != null) {
 			var nextTransitEvent = event.context.computeEventsOnDeparture(scenario.getNetwork(), event.time);
-			// Zero travel time: fire link events immediately (same step) rather than queuing,
-			// matching the old engine's behavior to preserve correct event ordering.
-			//			while (nextTransitEvent.type() == TransitEventType.LinkTransition && nextTransitEvent.time() <= event.time) {
-			//				var transition = nextTransitEvent.context.precomputedLinkTransitions.peek();
-			//				var vehicle = driver.getVehicle();
-			//				em.processEvent(new LinkLeaveEvent(event.time, vehicle.getId(), transition.fromLink()));
-			//				em.processEvent(new LinkEnterEvent(event.time, vehicle.getId(), transition.toLink()));
-			//				nextTransitEvent = nextTransitEvent.context.computeEventOnLinkTransition(event.time);
-			//			}
 			enqueueOrSend(nextTransitEvent);
 		} else {
 			if (this.createLinkEvents) {
@@ -246,7 +237,7 @@ public class SBBTransitEngine
 	}
 
 	private void handleLinkTransition(TransitEvent e) {
-		var transition = e.context.precomputedLinkTransitions.peek();
+		var transition = e.context.precomputedLinkTransitions.element();
 		var vehicle = e.context.driver.getVehicle();
 		em.processEvent(new LinkLeaveEvent(e.time, vehicle.getId(), transition.fromLink()));
 		em.processEvent(new LinkEnterEvent(e.time, vehicle.getId(), transition.toLink()));
@@ -259,11 +250,15 @@ public class SBBTransitEngine
 		if (partitionTransfer.isLocal(e.linkId())) {
 			eventQueue.add(e);
 		} else {
+			// SAFETY: We can cast into distributed variants, as we only enter this branch using dsim.
 			var veh = (DistributedMobsimVehicle) e.context.driver.getVehicle();
 			var container = AgentSourcesContainer.vehicleToContainer(veh);
 			partitionTransfer.collect(new TransitEventMessage(e, container), e.linkId());
 			var toPartition = partitionTransfer.getPartitionIndex(e.linkId());
 			internalInterface.notifyAgentLeavesPartition(e.context.driver, toPartition);
+			for (var passenger : veh.getPassengers()) {
+				internalInterface.notifyAgentLeavesPartition((DistributedMobsimAgent) passenger, toPartition);
+			}
 		}
 	}
 
@@ -280,16 +275,20 @@ public class SBBTransitEngine
 		for (var m : messages) {
 			var msg = (TransitEventMessage) m;
 			var vehicle = asc.vehicleFromContainer(msg.vehicleContainer);
-			// SAFETY: We register as agent source (called from vehicleFromContainer) and produce this type.
+			// SAFETY: We register as agent source (called from vehicleFromContainer) and produce this type. as well as the passengers.
 			var driver = (SBBTransitDriverAgent) vehicle.getDriver();
 			internalInterface.notifyAgentEntersPartition(driver);
+			for (var passenger : vehicle.getPassengers()) {
+				internalInterface.notifyAgentEntersPartition((DistributedMobsimAgent) passenger);
+			}
+
 			var context = new TransitContext(this.createLinkEvents, driver, msg.precomputedLinks);
 			if (msg.eventType.equals(TransitEventType.ArrivalAtStop)) {
 				var event = new TransitEvent(msg.time, TransitEventType.ArrivalAtStop, context,
 					context.driver.getNextStop().getStopFacility().getLinkId());
 				enqueueOrSend(event);
 			} else if (msg.eventType.equals(TransitEventType.LinkTransition)) {
-				var linkId = context.precomputedLinkTransitions.peek().fromLink();
+				var linkId = context.precomputedLinkTransitions.element().fromLink();
 				var event = new TransitEvent(msg.time, TransitEventType.LinkTransition, context, linkId);
 				enqueueOrSend(event);
 			} else {

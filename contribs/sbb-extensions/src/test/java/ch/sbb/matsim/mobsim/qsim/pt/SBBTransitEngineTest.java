@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -661,16 +664,17 @@ public class SBBTransitEngineTest {
 	 */
 	@Test
 	@org.junit.jupiter.api.Timeout(value = 2, unit = TimeUnit.MINUTES)
-	void testDistributedDSim_driverCrossesPartition() throws ExecutionException, InterruptedException, TimeoutException {
+	void testDistributedDSim_driverCrossesPartition() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 		int size = 2;
 		var comms = LocalCommunicator.create(size);
+		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
 		try (var pool = Executors.newFixedThreadPool(size)) {
 			var futures = comms.stream()
 				.map(comm -> pool.submit(() -> {
 					TestFixture f = new TestFixture();
 
-					f.config.controller().setOutputDirectory(utils.getOutputDirectory() + "/rank_" + comm.getRank());
+					f.config.controller().setOutputDirectory(utils.getOutputDirectory());
 					f.config.controller().setLastIteration(0);
 					f.config.controller().setMobsim("dsim");
 					f.config.dsim().setPartitioning(DSimConfigGroup.Partitioning.none);
@@ -719,6 +723,35 @@ public class SBBTransitEngineTest {
 			for (var future : futures) {
 				future.get(2, TimeUnit.MINUTES);
 			}
+
+			// Replay the output events file and verify correctness
+			EventsManager replayManager = EventsUtils.createEventsManager();
+			EventsCollector collector = new EventsCollector();
+			replayManager.addHandler(collector);
+			String eventsFile = utils.getOutputDirectory() + "output_events.xml.gz";
+			EventsUtils.readEvents(replayManager, eventsFile);
+			List<Event> allEvents = collector.getEvents();
+
+			for (Event event : allEvents) {
+				System.out.println(event.toString());
+			}
+
+			Assertions.assertEquals(15, allEvents.size(), "wrong number of events.");
+			assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
+			assertEqualEvent(PersonDepartureEvent.class,     30000, allEvents.get(1));  // driver
+			assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));  // driver
+			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30000, allEvents.get(3));
+			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30000, allEvents.get(4));
+			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30100, allEvents.get(5));
+			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30120, allEvents.get(6));
+			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30300, allEvents.get(7));
+			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30300, allEvents.get(8));
+			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30570, allEvents.get(9));
+			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30600, allEvents.get(10));
+			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30720, allEvents.get(11));
+			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30720, allEvents.get(12));
+			assertEqualEvent(PersonLeavesVehicleEvent.class, 30720, allEvents.get(13)); // driver
+			assertEqualEvent(PersonArrivalEvent.class,       30720, allEvents.get(14)); // driver
 		}
 	}
 
