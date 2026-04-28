@@ -83,9 +83,7 @@ public class SBBTransitChainedDepartureIntegrationTest {
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new SBBTransitModule());
-		controler.configureQSimComponents(components -> {
-			new SBBTransitEngineQSimModule().configure(components);
-		});
+		controler.configureQSimComponents(components -> new SBBTransitEngineQSimModule().configure(components));
 
 		controler.run();
 
@@ -140,7 +138,7 @@ public class SBBTransitChainedDepartureIntegrationTest {
 	@Test
 	void withChainedDepartures() throws Exception {
 
-		List<Event> events = runScenario(scenario -> {
+		List<Event> events = runScenario(_ -> {
 		});
 
 		PersonContinuesInVehicleEvent c1 = new PersonContinuesInVehicleEvent(

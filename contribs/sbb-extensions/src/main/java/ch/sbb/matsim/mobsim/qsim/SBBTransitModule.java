@@ -34,11 +34,14 @@ public class SBBTransitModule extends AbstractModule {
 		ConfigGroup existing = getConfig().getModules().get(SBBTransitConfigGroup.GROUP_NAME);
 		if (!(existing instanceof SBBTransitConfigGroup)) {
 			throw new RuntimeException(
-				"SBBTransitConfigGroup is not registered in the Config. " +
-				"Please register it before constructing the Controler:\n\n" +
-				"  ConfigUtils.addOrGetModule(config, SBBTransitConfigGroup.class);\n\n" +
-				"This must be done before passing the config to ScenarioUtils.createScenario() " +
-				"or new Controler(), so that MATSim's ExplodedConfigModule can bind it for injection."
+				"""
+					SBBTransitConfigGroup is not registered in the Config. \
+					Please register it before constructing the Controler:
+
+					  ConfigUtils.addOrGetModule(config, SBBTransitConfigGroup.class);
+
+					This must be done before passing the config to ScenarioUtils.createScenario() \
+					or new Controler(), so that MATSim's ExplodedConfigModule can bind it for injection."""
 			);
 		}
 		installQSimModule(new SBBTransitEngineQSimModule());

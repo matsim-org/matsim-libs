@@ -21,6 +21,10 @@ package ch.sbb.matsim.mobsim.qsim.pt;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import ch.sbb.matsim.mobsim.qsim.SBBTransitModule;
 import org.apache.logging.log4j.LogManager;
@@ -46,9 +50,12 @@ import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.dsim.DistributedContext;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
@@ -67,15 +74,15 @@ import org.matsim.testcases.utils.EventsCollector;
 /**
  * @author mrieser / SBB
  */
-public class SBBTransitQSimEngineTest {
+public class SBBTransitEngineTest {
 
-	private static final Logger log = LogManager.getLogger(SBBTransitQSimEngineTest.class);
+	private static final Logger log = LogManager.getLogger(SBBTransitEngineTest.class);
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static void assertEqualEvent(Class<? extends Event> eventClass, double time, Event event) {
-		Assertions.assertTrue(event.getClass().isAssignableFrom(event.getClass()));
+		Assertions.assertTrue(eventClass.isAssignableFrom(event.getClass()), eventClass + " is not assignable from " + event.getClass());
 		Assertions.assertEquals(time, event.getTime(), 1e-7);
 	}
 
@@ -257,15 +264,15 @@ public class SBBTransitQSimEngineTest {
 		}
 
 		Assertions.assertEquals(36, allEvents.size(), "wrong number of events.");
-		assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(0)); // passenger 1
-		assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(1)); // passenger 2
-		assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(2)); // passenger 3
-		assertEqualEvent(PersonDepartureEvent.class, 29500, allEvents.get(3)); // passenger 1
+		assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(0)); // passenger 3
+		assertEqualEvent(PersonDepartureEvent.class, 29500, allEvents.get(1)); // passenger 3
+		assertEqualEvent(AgentWaitingForPtEvent.class, 29500, allEvents.get(2)); // passenge3
+		assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(3)); // passenger 2
 		assertEqualEvent(PersonDepartureEvent.class, 29500, allEvents.get(4)); // passenger 2
-		assertEqualEvent(PersonDepartureEvent.class, 29500, allEvents.get(5)); // passenger 3
-		assertEqualEvent(AgentWaitingForPtEvent.class, 29500, allEvents.get(6)); // passenger 1
-		assertEqualEvent(AgentWaitingForPtEvent.class, 29500, allEvents.get(7)); // passenger 2
-		assertEqualEvent(AgentWaitingForPtEvent.class, 29500, allEvents.get(8)); // passenger 3
+		assertEqualEvent(AgentWaitingForPtEvent.class, 29500, allEvents.get(5)); // passenger 2
+		assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(6)); // passenger 1
+		assertEqualEvent(PersonDepartureEvent.class, 29500, allEvents.get(7)); // passenger 1
+		assertEqualEvent(AgentWaitingForPtEvent.class, 29500, allEvents.get(8)); // passenger 1
 		assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(9));
 		assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(10)); // driver
 		assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(11)); // driver
@@ -575,8 +582,8 @@ public class SBBTransitQSimEngineTest {
 	}
 
 	/**
-	 * Verifies that SBBTransitEngine produces identical events when run via DSim (single partition)
-	 * as when run via QSim directly, exercising the DistributedAgentSource and beforeMobsim DSim code paths.
+	 * Verifies that SBBTransitEngine produces identical events when run via DSim (single partition) as when run via QSim directly, exercising the
+	 * DistributedAgentSource and beforeMobsim DSim code paths.
 	 */
 	@Test
 	void testDSimIntegration_withPassengers() {
@@ -642,6 +649,77 @@ public class SBBTransitQSimEngineTest {
 		assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30720, allEvents.get(19));
 		assertEqualEvent(PersonLeavesVehicleEvent.class, 30720, allEvents.get(20)); // driver
 		assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(21)); // driver
+	}
+
+	/**
+	 * Verifies that SBBTransitEngine works in a truly distributed simulation with 2 partitions. The transit driver starts on partition 0 (stops A–C
+	 * on links 1–2) and crosses to partition 1 (stops D–E on links 3–4), exercising SBBTransitDriverAgent and TransitQVehicle serialization via
+	 * LocalCommunicator. Serialization errors such as circular references would surface here.
+	 * <p>
+	 * Note: in-vehicle passengers are not yet serialized across partitions (QVehicleImpl.toMessage() omits the passenger list), so this test uses a
+	 * driver-only scenario.
+	 */
+	@Test
+	@org.junit.jupiter.api.Timeout(value = 2, unit = TimeUnit.MINUTES)
+	void testDistributedDSim_driverCrossesPartition() throws ExecutionException, InterruptedException, TimeoutException {
+		int size = 2;
+		var comms = LocalCommunicator.create(size);
+
+		try (var pool = Executors.newFixedThreadPool(size)) {
+			var futures = comms.stream()
+				.map(comm -> pool.submit(() -> {
+					TestFixture f = new TestFixture();
+
+					f.config.controller().setOutputDirectory(utils.getOutputDirectory() + "/rank_" + comm.getRank());
+					f.config.controller().setLastIteration(0);
+					f.config.controller().setMobsim("dsim");
+					f.config.dsim().setPartitioning(DSimConfigGroup.Partitioning.none);
+					f.config.dsim().setEndTime(f.config.qsim().getEndTime().orElse(86400));
+					f.config.dsim().setThreads(1);
+					f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
+					f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
+
+					// Partition 0: nodes 1–3, links 1–2 (stops A, B, C)
+					// Partition 1: nodes 4–5, links 3–4 (stops D, E)
+					// Transit driver crosses the boundary when departing stop C
+					var n = f.scenario.getNetwork();
+					n.getNodes().get(Id.create(1, org.matsim.api.core.v01.network.Node.class)).getAttributes()
+						.putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 0);
+					n.getNodes().get(Id.create(2, org.matsim.api.core.v01.network.Node.class)).getAttributes()
+						.putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 0);
+					n.getNodes().get(Id.create(3, org.matsim.api.core.v01.network.Node.class)).getAttributes()
+						.putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 0);
+					n.getNodes().get(Id.create(4, org.matsim.api.core.v01.network.Node.class)).getAttributes()
+						.putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 1);
+					n.getNodes().get(Id.create(5, org.matsim.api.core.v01.network.Node.class)).getAttributes()
+						.putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 1);
+					n.getLinks().get(Id.create(1, org.matsim.api.core.v01.network.Link.class)).getAttributes()
+						.putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 0);
+					n.getLinks().get(Id.create(2, org.matsim.api.core.v01.network.Link.class)).getAttributes()
+						.putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 0);
+					n.getLinks().get(Id.create(3, org.matsim.api.core.v01.network.Link.class)).getAttributes()
+						.putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 1);
+					n.getLinks().get(Id.create(4, org.matsim.api.core.v01.network.Link.class)).getAttributes()
+						.putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 1);
+
+					var ctx = DistributedContext.create(comm, f.config);
+					var controler = new Controler(f.scenario, ctx);
+					controler.addOverridingModule(new SBBTransitModule());
+					controler.configureQSimComponents(components -> new SBBTransitEngineQSimModule().configure(components));
+					controler.run();
+
+					try {
+						comm.close();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}))
+				.toList();
+
+			for (var future : futures) {
+				future.get(2, TimeUnit.MINUTES);
+			}
+		}
 	}
 
 	@Test

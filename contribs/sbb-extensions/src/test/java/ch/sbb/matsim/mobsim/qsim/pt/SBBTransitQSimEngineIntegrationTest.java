@@ -41,7 +41,6 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class SBBTransitQSimEngineIntegrationTest {
 
-	private static final Logger log = LogManager.getLogger(SBBTransitQSimEngineIntegrationTest.class);
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -54,9 +53,7 @@ public class SBBTransitQSimEngineIntegrationTest {
 
 		Controler controler = new Controler(f.scenario);
 		controler.addOverridingModule(new SBBTransitModule());
-		controler.configureQSimComponents(components -> {
-			new SBBTransitEngineQSimModule().configure(components);
-		});
+		controler.configureQSimComponents(components -> new SBBTransitEngineQSimModule().configure(components));
 
 		controler.run();
 
@@ -83,15 +80,12 @@ public class SBBTransitQSimEngineIntegrationTest {
 
 		Controler controler = new Controler(f.scenario);
 		controler.addOverridingModule(new SBBTransitModule());
-		controler.configureQSimComponents(components -> {
-			new SBBTransitEngineQSimModule().configure(components);
-		});
+		controler.configureQSimComponents(components -> new SBBTransitEngineQSimModule().configure(components));
 
 		try {
 			controler.run();
 			Assertions.fail("Expected exception, got none.");
 		} catch (RuntimeException e) {
-			e.printStackTrace();
 			Assertions.assertTrue(e.getMessage().endsWith("This will not work! common modes = train"));
 		}
 	}
