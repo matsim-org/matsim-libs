@@ -79,7 +79,7 @@ public class CarriersUtils {
 
 	private static final String ATTR_SKILLS = "skills";
 	private static final String ATTR_JSPRIT_SCORE = "jspritScore";
-	private static final String ATTR_JSPRIT_Time = "jspritComputationTime";
+	private static final String ATTR_JSPRIT_Time = "jspritComputationTimeInSeconds";
 	private static final String delimiter = "\t";
 
 	private static final Object CSV_LOCK_FOR_WRITING_OUTPUT_PER_CARRIER = new Object();
@@ -933,17 +933,29 @@ public class CarriersUtils {
 		return (Double) plan.getAttributes().getAttribute(ATTR_JSPRIT_SCORE);
 	}
 
+	/**
+	 * Gets the jsprit computation time from the carrier's attributes in seconds.
+	 *
+	 * @return computation time for solving and routing of the VRP in seconds
+	 */
 	public static double getJspritComputationTime(Carrier carrier) {
 		try {
 			return (double) carrier.getAttributes().getAttribute(ATTR_JSPRIT_Time);
 		} catch (Exception e) {
-			log.error("Requested attribute jspritComputationTime does not exists for carrier {}. Will return {}.", carrier.getId(), Integer.MIN_VALUE);
+			log.error("Requested attribute jspritComputationTime does not exists for carrier {}. Will return {}.", carrier.getId(),
+				Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		}
 	}
 
-	public static void setJspritComputationTime(Carrier carrier, double time) {
-		carrier.getAttributes().putAttribute(ATTR_JSPRIT_Time, time);
+	/**
+	 * Sets the jsprit computation time as an attribute of the carrier in seconds.
+	 *
+	 * @param carrier       this carrier
+	 * @param timeInSeconds timeInSeconds in seconds
+	 */
+	public static void setJspritComputationTime(Carrier carrier, double timeInSeconds) {
+		carrier.getAttributes().putAttribute(ATTR_JSPRIT_Time, timeInSeconds);
 	}
 
 	/**
