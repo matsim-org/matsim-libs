@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.*;
+import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
@@ -37,7 +38,7 @@ import org.matsim.vehicles.Vehicles;
 
 import java.util.*;
 
-public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine, DistributedDepartureHandler, DistributedAgentSource {
+public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine, DistributedDepartureHandler, AgentSource, DistributedAgentSource {
 
 	private final PriorityQueue<TransitEvent> eventQueue = new PriorityQueue<>();
 
@@ -86,6 +87,26 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 		final boolean writingEventsAtAll = createEventsInterval > 0;
 		final boolean regularWriteEvents = writingEventsAtAll && iteration % createEventsInterval == 0;
 		createLinkEvents = writingEventsAtAll && regularWriteEvents;
+		validateModeConfiguration();
+	}
+
+	private void validateModeConfiguration() {
+		Set<String> deterministicModes = this.config.getDeterministicServiceModes();
+		Set<String> passengerModes = this.ptConfig.getTransitModes();
+		Set<String> commonModes = new HashSet<>(deterministicModes);
+		commonModes.retainAll(passengerModes);
+		if (!commonModes.isEmpty()) {
+			throw new RuntimeException(
+				"There are modes configured to be pt passenger modes as well as deterministic service modes. This will not work! common modes = "
+					+ CollectionUtils.setToString(commonModes));
+		}
+		Set<String> mainModes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
+		mainModes.retainAll(deterministicModes);
+		if (!mainModes.isEmpty()) {
+			throw new RuntimeException(
+				"There are modes configured to be deterministic service modes as well as qsim main modes. This will not work! common modes = "
+					+ CollectionUtils.setToString(mainModes));
+		}
 	}
 
 	@Override
@@ -271,6 +292,11 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 
 	@Override
 	public void createAgentsAndVehicles(NetworkPartition partition, InsertableMobsim mobsim) {
+		createVehiclesAndDrivers();
+	}
+
+	@Override
+	public void insertAgentsIntoMobsim() {
 		createVehiclesAndDrivers();
 	}
 
