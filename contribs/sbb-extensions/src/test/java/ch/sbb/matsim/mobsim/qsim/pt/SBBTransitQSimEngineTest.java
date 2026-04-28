@@ -22,10 +22,12 @@ package ch.sbb.matsim.mobsim.qsim.pt;
 import java.util.List;
 import java.util.Map;
 
+import ch.sbb.matsim.mobsim.qsim.SBBTransitModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -44,6 +46,8 @@ import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.*;
@@ -51,9 +55,13 @@ import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.dsim.DSimConfigGroup;
+import org.matsim.dsim.NetworkDecomposition;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
 /**
@@ -62,6 +70,9 @@ import org.matsim.testcases.utils.EventsCollector;
 public class SBBTransitQSimEngineTest {
 
 	private static final Logger log = LogManager.getLogger(SBBTransitQSimEngineTest.class);
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static void assertEqualEvent(Class<? extends Event> eventClass, double time, Event event) {
 		Assertions.assertTrue(event.getClass().isAssignableFrom(event.getClass()));
@@ -561,6 +572,76 @@ public class SBBTransitQSimEngineTest {
 			log.info("Caught expected exception, all is fine.", e);
 		}
 
+	}
+
+	/**
+	 * Verifies that SBBTransitEngine produces identical events when run via DSim (single partition)
+	 * as when run via QSim directly, exercising the DistributedAgentSource and beforeMobsim DSim code paths.
+	 */
+	@Test
+	void testDSimIntegration_withPassengers() {
+		TestFixture f = new TestFixture();
+		f.addSingleTransitDemand();
+
+		f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+		f.config.controller().setLastIteration(0);
+		f.config.controller().setMobsim("dsim");
+		f.config.dsim().setPartitioning(DSimConfigGroup.Partitioning.none);
+		f.config.dsim().setEndTime(f.config.qsim().getEndTime().orElse(86400));
+
+		// DSim scoring requires activity type params to be declared
+		f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
+		f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
+
+		// DSim requires every node and link to carry a partition attribute
+		f.scenario.getNetwork().getNodes().values().forEach(
+			n -> n.getAttributes().putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 0));
+		f.scenario.getNetwork().getLinks().values().forEach(
+			l -> l.getAttributes().putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 0));
+
+		EventsCollector collector = new EventsCollector();
+
+		Controler controler = new Controler(f.scenario);
+		controler.addOverridingModule(new SBBTransitModule());
+		controler.configureQSimComponents(components -> new SBBTransitEngineQSimModule().configure(components));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(collector);
+			}
+		});
+
+		controler.run();
+
+		List<Event> allEvents = collector.getEvents();
+
+		for (Event event : allEvents) {
+			System.out.println(event);
+		}
+
+		Assertions.assertEquals(22, allEvents.size(), "wrong number of events.");
+		assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(0)); // passenger
+		assertEqualEvent(PersonDepartureEvent.class, 29500, allEvents.get(1)); // passenger
+		assertEqualEvent(AgentWaitingForPtEvent.class, 29500, allEvents.get(2)); // passenger
+		assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(3));
+		assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(4)); // driver
+		assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(5)); // driver
+		assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30000, allEvents.get(6));
+		assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30000, allEvents.get(7));
+		assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30100, allEvents.get(8));
+		assertEqualEvent(PersonEntersVehicleEvent.class, 30101, allEvents.get(9)); // passenger
+		assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30120, allEvents.get(10));
+		assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30300, allEvents.get(11));
+		assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30300, allEvents.get(12));
+		assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30570, allEvents.get(13));
+		assertEqualEvent(PersonLeavesVehicleEvent.class, 30571, allEvents.get(14)); // passenger
+		assertEqualEvent(PersonArrivalEvent.class, 30571, allEvents.get(15)); // passenger
+		assertEqualEvent(ActivityStartEvent.class, 30571, allEvents.get(16)); // passenger
+		assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30600, allEvents.get(17));
+		assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30720, allEvents.get(18));
+		assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30720, allEvents.get(19));
+		assertEqualEvent(PersonLeavesVehicleEvent.class, 30720, allEvents.get(20)); // driver
+		assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(21)); // driver
 	}
 
 	@Test
