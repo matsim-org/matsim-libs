@@ -55,6 +55,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.TimeDependentNetwork;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
@@ -276,7 +277,7 @@ public class CarriersUtils {
 		else
 			log.warn("Jsprit analysis per carrier CSV file already exists at {}. Will append results to this file. If you want to start with a new file, please delete or move the existing file.", jspritAnalysisPerCarrierCSVPath);
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
-		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
+		FreightCarriersConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
 		// Create the NetBasedCosts based on the network and the vehicle types
 		//Consider tolls if a RoadPricingScheme is available in the scenario.
@@ -287,9 +288,14 @@ public class CarriersUtils {
 			log.debug("Was not able to get a RoadPricingScheme from scenario. Tolls cannot be considered.", e);
 		}
 
-		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values())
-			.setRoadPricingScheme(roadPricingScheme)
-			.build();
+		NetworkBasedTransportCosts.Builder netBasedCostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values())
+			.setRoadPricingScheme(roadPricingScheme);
+
+		if (scenario.getNetwork() instanceof TimeDependentNetwork timeDependentNetwork && !timeDependentNetwork.getNetworkChangeEvents().isEmpty()) {
+			netBasedCostsBuilder.setTimeSliceWidth(freightConfigGroup.getTravelTimeSliceWidth());
+		}
+
+		final NetworkBasedTransportCosts netBasedCosts = netBasedCostsBuilder.build();
 
 		//Check if the inputs of the carrier(s) are consistent before starting the planning
 		CarrierConsistencyCheckers.checkBeforePlanning(carriers, Level.ERROR);
