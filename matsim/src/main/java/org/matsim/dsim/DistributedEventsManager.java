@@ -341,9 +341,6 @@ public final class DistributedEventsManager implements EventsManager {
 
 	@Override
 	public void processEvent(Event e) {
-
-		System.out.println(e.toString());
-
 		if (eventsDisabled) {
 			return;
 		}

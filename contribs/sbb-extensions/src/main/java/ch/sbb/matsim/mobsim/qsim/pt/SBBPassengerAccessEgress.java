@@ -117,7 +117,10 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 	public boolean handlePassengerLeaving(PTPassengerAgent passenger, TransitVehicle vehicle, Id<Link> toLinkId, double time) {
 		boolean removed = vehicle.removePassenger(passenger);
 		if (removed) {
-			this.eventsManager.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
+			passenger.setVehicle(null);
+			var driver = vehicle.getDriver();
+			this.eventsManager.processEvent(new PersonLeavesPtVehicleEvent(time, passenger.getId(), vehicle.getId(), driver.getTransitLine().getId(), driver.getTransitRoute().getId()));
+
 			MobsimAgent agent = (MobsimAgent) passenger;
 			agent.notifyArrivalOnLinkByNonNetworkMode(toLinkId);
 			agent.endLegAndComputeNextState(time);
@@ -131,11 +134,11 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 		boolean entered = vehicle.addPassenger(passenger);
 		if (entered) {
 			this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);
-			Id<Person> agentId = passenger.getId();
-			Id<Link> linkId = passenger.getCurrentLinkId();
-			this.internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
-			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
-			this.eventsManager.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
+			this.internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(), passenger.getCurrentLinkId());
+			passenger.setVehicle(vehicle);
+
+			var driver = vehicle.getDriver();
+			this.eventsManager.processEvent(new PersonEntersPtVehicleEvent(time, passenger.getId(), vehicle.getId(), driver.getTransitLine().getId(), driver.getTransitRoute().getId()));
 		}
 		return entered;
 	}

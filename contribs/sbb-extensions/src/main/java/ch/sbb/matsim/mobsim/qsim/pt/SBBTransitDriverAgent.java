@@ -58,6 +58,8 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 		super(message.delegateMessage(), umlauf, transportMode, thisAgentTracker, internalInterface);
 		eventsManager = internalInterface.getMobsim().getEventsManager();
 		accessEgress = new SBBPassengerAccessEgress(internalInterface, thisAgentTracker, internalInterface.getMobsim().getScenario(), this.eventsManager);
+		// we need to set the previous stop from the message. The nextStop is figured out in checkCurrentRoute.
+		previousStop = getTransitRoute().getStops().stream().filter(s -> s.getStopFacility().getId().equals(message.previousStop)).findAny().orElse(null);
 		checkCurrentRoute();
 	}
 
@@ -163,10 +165,10 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 	public Message toMessage() {
 		// SAFETY: We know that we inherit fom TransitDriverAgentImpl which creates this message.
 		var delegateMessage = (TransitDriverMessage) super.toMessage();
-		return new SBBTransitDriverMessage(delegateMessage);
+		return new SBBTransitDriverMessage(delegateMessage, previousStop.getStopFacility().getId());
 	}
 
 	public record SBBTransitDriverMessage(
-		TransitDriverMessage delegateMessage
+		TransitDriverMessage delegateMessage, Id<TransitStopFacility> previousStop
 	) implements Message {}
 }

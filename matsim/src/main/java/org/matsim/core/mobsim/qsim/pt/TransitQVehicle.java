@@ -160,6 +160,6 @@ public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle
 		return new Msg(baseMessage, handler);
 	}
 
-	record Msg(Message baseMessage, Message handlerMessage) implements Message {
+	public record Msg(Message baseMessage, Message handlerMessage) implements Message {
 	}
 }

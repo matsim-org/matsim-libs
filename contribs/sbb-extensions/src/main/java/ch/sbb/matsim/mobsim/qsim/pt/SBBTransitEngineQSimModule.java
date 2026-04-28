@@ -43,10 +43,14 @@ public class SBBTransitEngineQSimModule extends AbstractQSimModule implements QS
 
     @Override
     protected void configureQSim() {
-//        bind(SBBTransitQSimEngine.class).asEagerSingleton();
-//		addQSimComponentBinding(COMPONENT_NAME).to(SBBTransitQSimEngine.class);
-		bind(DistributedSBBTransitQSimEngine.class).in(Singleton.class);
-		addQSimComponentBinding(COMPONENT_NAME).to(DistributedSBBTransitQSimEngine.class);
+
+		if (getConfig().controller().getMobsim().equals("dsim")) {
+			bind(DistributedSBBTransitQSimEngine.class).in(Singleton.class);
+			addQSimComponentBinding(COMPONENT_NAME).to(DistributedSBBTransitQSimEngine.class);
+		} else {
+			bind(SBBTransitQSimEngine.class).asEagerSingleton();
+			addQSimComponentBinding(COMPONENT_NAME).to(SBBTransitQSimEngine.class);
+		}
 
 		bind(SBBTransitDriverAgentFactory.class);
 
