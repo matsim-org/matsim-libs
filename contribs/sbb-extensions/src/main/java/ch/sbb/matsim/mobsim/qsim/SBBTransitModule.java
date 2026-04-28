@@ -21,7 +21,7 @@ package ch.sbb.matsim.mobsim.qsim;
 
 import ch.sbb.matsim.config.SBBTransitConfigGroup;
 import ch.sbb.matsim.mobsim.qsim.pt.SBBTransitEngineQSimModule;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
 /**
@@ -31,9 +31,16 @@ public class SBBTransitModule extends AbstractModule {
 
 	@Override
 	public void install() {
+		ConfigGroup existing = getConfig().getModules().get(SBBTransitConfigGroup.GROUP_NAME);
+		if (!(existing instanceof SBBTransitConfigGroup)) {
+			throw new RuntimeException(
+				"SBBTransitConfigGroup is not registered in the Config. " +
+				"Please register it before constructing the Controler:\n\n" +
+				"  ConfigUtils.addOrGetModule(config, SBBTransitConfigGroup.class);\n\n" +
+				"This must be done before passing the config to ScenarioUtils.createScenario() " +
+				"or new Controler(), so that MATSim's ExplodedConfigModule can bind it for injection."
+			);
+		}
 		installQSimModule(new SBBTransitEngineQSimModule());
-		// make sure the config is registered before the simulation starts
-		// https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
-		var config = ConfigUtils.addOrGetModule(getConfig(), SBBTransitConfigGroup.class);
 	}
 }
