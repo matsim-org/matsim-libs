@@ -34,10 +34,13 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.TimeDependentNetwork;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -160,6 +163,45 @@ public class NetworkBasedTransportCostsTest {
 		Assertions.assertEquals(40000.0, networkBasedTransportCosts.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
 		Assertions.assertEquals(20000.0, networkBasedTransportCosts.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle1), 0.01);
 		Assertions.assertEquals(20000.0, networkBasedTransportCosts.getDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, vehicle2), 0.01);
+	}
+
+	@Test
+	void test_whenNetworkChangeEventsArePresent_itUsesTimeDependentFreespeed() {
+		Config config = ConfigUtils.createConfig();
+		config.network().setTimeVariantNetwork(true);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		String NETWORK_FILENAME = utils.getClassInputDirectory() + "network.xml";
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
+		Network network = scenario.getNetwork();
+
+		Id<Link> fromLinkId = Id.createLinkId("20");
+		Id<Link> toLinkId = Id.createLinkId("21");
+		Link toLink = network.getLinks().get(toLinkId);
+		double originalFreespeed = toLink.getFreespeed();
+
+		NetworkChangeEvent changeEvent = new NetworkChangeEvent(3600.0);
+		changeEvent.addLink(toLink);
+		changeEvent.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 1.0));
+		((TimeDependentNetwork) network).addNetworkChangeEvent(changeEvent);
+
+		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(network);
+		builder.addVehicleTypeSpecificCosts(TYPE_1, 0.0, 1.0, 0.0);
+		NetworkBasedTransportCosts c = builder
+			.setTimeSliceWidth(900)
+			.build();
+
+		Vehicle vehicle = mock(Vehicle.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type = mock(com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class);
+		when(type.getMaxVelocity()).thenReturn(100.0);
+		when(type.getTypeId()).thenReturn(TYPE_1);
+		when(vehicle.getType()).thenReturn(type);
+		when(vehicle.getId()).thenReturn("vehicle1");
+
+		double beforeChange = c.getTransportTime(Location.newInstance(fromLinkId.toString()), Location.newInstance(toLinkId.toString()), 0.0, mock(Driver.class), vehicle);
+		double afterChange = c.getTransportTime(Location.newInstance(fromLinkId.toString()), Location.newInstance(toLinkId.toString()), 3600.0, mock(Driver.class), vehicle);
+
+		Assertions.assertEquals(toLink.getLength() / originalFreespeed, beforeChange, 0.01);
+		Assertions.assertEquals(toLink.getLength(), afterChange, 0.01);
 	}
 
 
