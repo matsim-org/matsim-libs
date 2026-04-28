@@ -19,40 +19,48 @@
  * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
+import ch.sbb.matsim.config.SBBTransitConfigGroup;
 import jakarta.inject.Singleton;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
+import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
+import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 
 /**
  * @author Sebastian Hörl / ETHZ
  */
 public class SBBTransitEngineQSimModule extends AbstractQSimModule implements QSimComponentsConfigurator {
 
-    public static final String COMPONENT_NAME = "SBBTransit";
+	public static final String COMPONENT_NAME = "SBBTransit";
 
-    @Override
-    public void configure(QSimComponentsConfig components) {
-        if (components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME)) {
-            components.removeNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME);
-        }
-
-        components.addNamedComponent(COMPONENT_NAME);
-    }
-
-    @Override
-    protected void configureQSim() {
-
-		if (getConfig().controller().getMobsim().equals("dsim")) {
-			bind(DistributedSBBTransitQSimEngine.class).in(Singleton.class);
-			addQSimComponentBinding(COMPONENT_NAME).to(DistributedSBBTransitQSimEngine.class);
-		} else {
-			bind(SBBTransitQSimEngine.class).asEagerSingleton();
-			addQSimComponentBinding(COMPONENT_NAME).to(SBBTransitQSimEngine.class);
+	@Override
+	public void configure(QSimComponentsConfig components) {
+		if (components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME)) {
+			components.removeNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME);
 		}
 
-		bind(SBBTransitDriverAgentFactory.class);
+		components.addNamedComponent(COMPONENT_NAME);
+	}
 
-    }
+	@Override
+	protected void configureQSim() {
+
+		//if (getConfig().controller().getMobsim().equals("dsim")) {
+		bind(DistributedSBBTransitQSimEngine.class).in(Singleton.class);
+		addQSimComponentBinding(COMPONENT_NAME).to(DistributedSBBTransitQSimEngine.class);
+		//		//		} else {
+		//		bind(SBBTransitQSimEngine.class).asEagerSingleton();
+		//		addQSimComponentBinding(COMPONENT_NAME).to(SBBTransitQSimEngine.class);
+		//		}
+
+		bind(SBBTransitDriverAgentFactory.class);
+		//var config = ConfigUtils.addOrGetModule(getConfig(), SBBTransitConfigGroup.class);
+		//bind(SBBTransitConfigGroup.class).toInstance(config);
+		//bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class).in(Singleton.class);
+
+	}
 }

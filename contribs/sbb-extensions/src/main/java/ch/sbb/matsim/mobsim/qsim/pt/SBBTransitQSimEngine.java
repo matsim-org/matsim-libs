@@ -70,15 +70,16 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 	private InternalInterface internalInterface;
 	private TransitDriverAgentFactory deterministicDriverFactory;
 	private TransitDriverAgentFactory networkDriverFactory;
-	@Inject
-	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
+	private final TransitStopHandlerFactory stopHandlerFactory;
 	private boolean createLinkEvents = false;
 
 	@Inject
-	SBBTransitQSimEngine(Netsim netsim, ReplanningContext context, TransitStopAgentTracker agentTracker, TimeInterpretation timeInterpretation, TransitDriverAgentFactory networkDriverFactory) {
+	SBBTransitQSimEngine(Netsim netsim, ReplanningContext context, TransitStopAgentTracker agentTracker, TimeInterpretation timeInterpretation,
+		TransitDriverAgentFactory networkDriverFactory, TransitStopHandlerFactory stopHandlerFactory) {
 		// ( https://github.com/google/guice/wiki/KeepConstructorsHidden )
 
-		super(netsim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(netsim.getScenario()), agentTracker, timeInterpretation, networkDriverFactory);
+		super(netsim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(netsim.getScenario()), agentTracker, timeInterpretation,
+			networkDriverFactory);
 		// (it feels a bit odd to inject TransitStopHandlerFactory, but to put the simple version here as an argument.  kai, feb '25)
 
 		this.netsim = netsim;
@@ -87,6 +88,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 		this.ptConfig = netsim.getScenario().getConfig().transit();
 		this.schedule = netsim.getScenario().getTransitSchedule();
 		this.agentTracker = agentTracker;
+		this.stopHandlerFactory = stopHandlerFactory;
 		if (this.config.getCreateLinkEventsInterval() > 0) {
 			this.linkEventQueue = new PriorityQueue<>();
 			this.linksCache = new ConcurrentHashMap<>();
@@ -202,13 +204,15 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 		commonModes.retainAll(passengerModes);
 		if (!commonModes.isEmpty()) {
 			throw new RuntimeException(
-				"There are modes configured to be pt passenger modes as well as deterministic service modes. This will not work! common modes = " + CollectionUtils.setToString(commonModes));
+				"There are modes configured to be pt passenger modes as well as deterministic service modes. This will not work! common modes = "
+					+ CollectionUtils.setToString(commonModes));
 		}
 		Set<String> mainModes = new HashSet<>(this.netsim.getScenario().getConfig().qsim().getMainModes());
 		mainModes.retainAll(deterministicModes);
 		if (!mainModes.isEmpty()) {
 			throw new RuntimeException(
-				"There are modes configured to be deterministic service modes as well as qsim main modes. This will not work! common modes = " + CollectionUtils.setToString(mainModes));
+				"There are modes configured to be deterministic service modes as well as qsim main modes. This will not work! common modes = "
+					+ CollectionUtils.setToString(mainModes));
 		}
 
 		for (TransitLine line : schedule.getTransitLines().values()) {
@@ -270,20 +274,23 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 			this.agentTracker.addAgentToStop(now, passenger, stop.getId());
 			this.internalInterface.registerAdditionalAgentOnLink(agent);
 		} else {
-			throw new TransitAgentTriesToTeleportException("Agent " + passenger.getId() + " tries to enter a transit stop at link " + stop.getLinkId() + " but really is at " + linkId + "!");
+			throw new TransitAgentTriesToTeleportException(
+				"Agent " + passenger.getId() + " tries to enter a transit stop at link " + stop.getLinkId() + " but really is at " + linkId + "!");
 		}
 	}
 
 	private void handleDeterministicDriverDeparture(MobsimAgent agent, double now) {
 		SBBTransitDriverAgent driver = (SBBTransitDriverAgent) agent;
 		TransitRoute trRoute = driver.getTransitRoute();
-		List<Link[]> links = this.createLinkEvents ? this.linksCache.computeIfAbsent(trRoute, r -> getLinksPerStopAlongRoute(r, this.netsim.getScenario().getNetwork())) : null;
+		List<Link[]> links = this.createLinkEvents ? this.linksCache.computeIfAbsent(trRoute,
+			r -> getLinksPerStopAlongRoute(r, this.netsim.getScenario().getNetwork())) : null;
 		TransitContext context = new TransitContext(driver, links);
 		this.netsim.getEventsManager().processEvent(new PersonEntersVehicleEvent(now, driver.getId(), driver.getVehicle().getId()));
 		if (this.createLinkEvents) {
 			Id<Link> linkId = driver.getCurrentLinkId();
 			String mode = driver.getMode();
-			this.netsim.getEventsManager().processEvent(new VehicleEntersTrafficEvent(now, driver.getId(), linkId, driver.getVehicle().getId(), mode, 1.0));
+			this.netsim.getEventsManager()
+				.processEvent(new VehicleEntersTrafficEvent(now, driver.getId(), linkId, driver.getVehicle().getId(), mode, 1.0));
 		}
 		TransitEvent event = new TransitEvent(now, TransitEventType.ArrivalAtStop, context);
 		this.eventQueue.add(event);
@@ -291,17 +298,17 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 
 	private void handleTransitEvent(TransitEvent event) {
 		switch (event.type) {
-			case ArrivalAtStop:
-				handleArrivalAtStop(event);
-				break;
-			case PassengerExchange:
-				handlePassengerExchange(event);
-				break;
-			case DepartureAtStop:
-				handleDepartureAtStop(event);
-				break;
-			default:
-				throw new RuntimeException("Unsupported TransitEvent type.");
+		case ArrivalAtStop:
+			handleArrivalAtStop(event);
+			break;
+		case PassengerExchange:
+			handlePassengerExchange(event);
+			break;
+		case DepartureAtStop:
+			handleDepartureAtStop(event);
+			break;
+		default:
+			throw new RuntimeException("Unsupported TransitEvent type.");
 		}
 	}
 
@@ -347,7 +354,8 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 			if (this.createLinkEvents) {
 				Id<Link> linkId = driver.getDestinationLinkId();
 				String mode = driver.getMode();
-				this.netsim.getEventsManager().processEvent(new VehicleLeavesTrafficEvent(event.time, driver.getId(), linkId, driver.getVehicle().getId(), mode, 1.0));
+				this.netsim.getEventsManager()
+					.processEvent(new VehicleLeavesTrafficEvent(event.time, driver.getId(), linkId, driver.getVehicle().getId(), mode, 1.0));
 			}
 			this.netsim.getEventsManager().processEvent(new PersonLeavesVehicleEvent(event.time, driver.getId(), driver.getVehicle().getId()));
 			driver.endLegAndComputeNextState(event.time);
@@ -390,8 +398,9 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 	}
 
 	/**
-	 * Returns for each TransitRouteStop the Links leading from that stop to the next one. The returned list has the same number of entries as the TransitRoute has stops. The list for the last stop
-	 * might contain some links, depending on the provided NetworkRoute. If the NetworkRoute contains links before the first stop, they will be ignored and not returned.
+	 * Returns for each TransitRouteStop the Links leading from that stop to the next one. The returned list has the same number of entries as the
+	 * TransitRoute has stops. The list for the last stop might contain some links, depending on the provided NetworkRoute. If the NetworkRoute
+	 * contains links before the first stop, they will be ignored and not returned.
 	 * <p>
 	 * The first link of each link-list is the departure link, the last link in the list is the arrival link.
 	 *

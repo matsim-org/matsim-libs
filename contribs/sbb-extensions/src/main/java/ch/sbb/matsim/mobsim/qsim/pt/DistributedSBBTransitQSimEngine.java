@@ -3,10 +3,9 @@ package ch.sbb.matsim.mobsim.qsim.pt;
 import ch.sbb.matsim.config.SBBTransitConfigGroup;
 import com.google.inject.Inject;
 import jakarta.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.MobsimMessageCollector;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
@@ -26,7 +25,6 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
-import org.matsim.dsim.simulation.DistributedTeleportationEngine;
 import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.dsim.simulation.VehicleContainer;
 import org.matsim.pt.Umlauf;
@@ -36,41 +34,39 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.visum.VisumNetwork;
 
 import java.util.*;
 
 public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine, DistributedDepartureHandler, DistributedAgentSource {
 
-	private static final Logger log = LogManager.getLogger(DistributedSBBTransitQSimEngine.class);
-
 	private final PriorityQueue<TransitEvent> eventQueue = new PriorityQueue<>();
-	private final Map<Id<Umlauf>, Umlauf> umlaufCache = new HashMap<>();
 
 	private final ReplanningContext context;
 	private final SBBTransitConfigGroup config;
 	private final TransitConfigGroup ptConfig;
-
-	private final PartitionTransfer partitionTransfer;
 	private final Scenario scenario;
 	private final TransitStopAgentTracker agentTracker;
 	private final EventsManager em;
-	private final AgentSourcesContainer asc;
+	private final MobsimMessageCollector partitionTransfer;
 	private final TimeInterpretation timeInterpretation;
 
 	// we can use the implementation anyway, as we are relying on the types of drivers created by this factory.
 	private final SBBTransitDriverAgentFactory driverFactory;
-	@Inject
-	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
+	private final TransitStopHandlerFactory stopHandlerFactory;
+
+	// optionally required in case we run a distributed simulation
+	// currently, we don't hava a noop version for this. It is not even an interface.
+	@Inject(optional = true)
+	private AgentSourcesContainer asc;
 
 	private InternalInterface internalInterface;
 	private boolean createLinkEvents = false;
 
 	@Inject
 	public DistributedSBBTransitQSimEngine(ReplanningContext context, SBBTransitConfigGroup config, TransitConfigGroup ptConfig,
-		PartitionTransfer partitionTransfer, TransitStopAgentTracker agentTracker, Scenario scenario,
-		EventsManager em, AgentSourcesContainer asc, TimeInterpretation timeInterpretation,
-		SBBTransitDriverAgentFactory driverFactory) {
+		MobsimMessageCollector partitionTransfer, TransitStopAgentTracker agentTracker, Scenario scenario,
+		EventsManager em, TimeInterpretation timeInterpretation,
+		SBBTransitDriverAgentFactory driverFactory, TransitStopHandlerFactory stopHandlerFactory) {
 		this.context = context;
 		this.config = config;
 		this.ptConfig = ptConfig;
@@ -78,9 +74,9 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 		this.scenario = scenario;
 		this.agentTracker = agentTracker;
 		this.em = em;
-		this.asc = asc;
 		this.timeInterpretation = timeInterpretation;
 		this.driverFactory = driverFactory;
+		this.stopHandlerFactory = stopHandlerFactory;
 	}
 
 	@Override
@@ -237,7 +233,7 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 			var container = AgentSourcesContainer.vehicleToContainer(veh);
 			partitionTransfer.collect(new TransitEventMessage(e, container), e.linkId());
 			var toPartition = partitionTransfer.getPartitionIndex(e.linkId());
-			internalInterface.notifyAgentLeavesPartition(e.context.driver,toPartition);
+			internalInterface.notifyAgentLeavesPartition(e.context.driver, toPartition);
 		}
 	}
 
@@ -259,14 +255,16 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 			internalInterface.notifyAgentEntersPartition(driver);
 			var context = new TransitContext(this.createLinkEvents, driver, msg.precomputedLinks);
 			if (msg.eventType.equals(TransitEventType.ArrivalAtStop)) {
-				var event = new TransitEvent(msg.time, TransitEventType.ArrivalAtStop, context, context.driver.getNextStop().getStopFacility().getLinkId());
+				var event = new TransitEvent(msg.time, TransitEventType.ArrivalAtStop, context,
+					context.driver.getNextStop().getStopFacility().getLinkId());
 				enqueueOrSend(event);
 			} else if (msg.eventType.equals(TransitEventType.LinkTransition)) {
 				var linkId = context.precomputedLinkTransitions.peek().fromLink();
 				var event = new TransitEvent(msg.time, TransitEventType.LinkTransition, context, linkId);
 				enqueueOrSend(event);
 			} else {
-				throw new IllegalStateException("Only expecting Messages with event type ArrivalAtStop or LinkTransition but received: " + msg.eventType);
+				throw new IllegalStateException(
+					"Only expecting Messages with event type ArrivalAtStop or LinkTransition but received: " + msg.eventType);
 			}
 		}
 	}
@@ -303,8 +301,6 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 				for (Departure dep : route.getDepartures().values()) {
 					Vehicle veh = vehicles.getVehicles().get(dep.getVehicleId());
 					Umlauf umlauf = createUmlauf(line, route, dep);
-					// we want to cache all the umlaufs.
-					umlaufCache.put(umlauf.getId(), umlauf);
 					// but we only want to schedule local drivers, as other partitions will instantiate theirs.
 					if (partitionTransfer.isLocal(umlauf.getUmlaufStuecke().getFirst().getCarRoute().getStartLinkId())) {
 						createAndScheduleDriver(veh, umlauf, isDeterministic);
@@ -317,11 +313,6 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 	private void createAndScheduleDriver(Vehicle veh, Umlauf umlauf, boolean isDeterministic) {
 		// the driver factory should figure out which driver to create based on the config.
 		AbstractTransitDriverAgent driver = driverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
-		//		if (isDeterministic) {
-		//			driver = this.deterministicDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
-		//		} else {
-		//			driver = this.networkDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
-		//		}
 		TransitQVehicle qVeh = new TransitQVehicle(veh);
 		qVeh.setDriver(driver);
 		qVeh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh));
@@ -350,6 +341,11 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 		return line.getId().toString() + "_" + route.getId().toString() + "_" + departure.getId().toString();
 	}
 
+	// -----------------------------
+	// Below are AgentSource implementations. This needs to be inside an engine, as the transit driver has a references
+	// to the internal interface, which is only passed to mobsim engines.
+	// -----------------------------
+
 	@Override
 	public Set<Class<? extends DistributedMobsimAgent>> getAgentClasses() {
 		return Set.of(SBBTransitDriverAgent.class, TransitDriverAgentImpl.class, TransitAgent.class);
@@ -361,13 +357,18 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 
 		if (type.equals(SBBTransitDriverAgent.class)) {
 			var stdm = (SBBTransitDriverAgent.SBBTransitDriverMessage) message;
-			var umlauf = umlaufCache.get(stdm.delegateMessage().umlaufId());
+			var transitLine = scenario.getTransitSchedule().getTransitLines().get(stdm.transitLineId());
+			var transitRoute = transitLine.getRoutes().get(stdm.transitRouteId());
+			var departure = transitRoute.getDepartures().get(stdm.departureId());
+			var umlauf = createUmlauf(transitLine, transitRoute, departure);
 			return (DistributedMobsimAgent) driverFactory.createTransitDriverFromMessage(stdm, umlauf, internalInterface, agentTracker);
-		} else if (type.equals(TransitDriverAgentImpl.class)) {
-			var tdm = (TransitDriverAgentImpl.TransitDriverMessage) message;
-			var umlauf = umlaufCache.get(tdm.umlaufId());
-			return (DistributedMobsimAgent) driverFactory.createTransitDriverFromMessage(tdm, umlauf, internalInterface, agentTracker);
-		} else if (type.equals(TransitAgent.class)) {
+		}
+		//		else if (type.equals(TransitDriverAgentImpl.class)) {
+		//			var tdm = (TransitDriverAgentImpl.TransitDriverMessage) message;
+		//			var umlauf = umlaufCache.get(tdm.umlaufId());
+		//			return (DistributedMobsimAgent) driverFactory.createTransitDriverFromMessage(tdm, umlauf, internalInterface, agentTracker);
+		//		}
+		else if (type.equals(TransitAgent.class)) {
 			var timer = internalInterface.getMobsim().getSimTimer();
 			var baseAgent = new BasicPlanAgentImpl((BasicPlanAgentImpl.BasicPlanAgentMessage) message, scenario, em, timer, timeInterpretation);
 			return TransitAgent.createTransitAgent(baseAgent, scenario);
@@ -393,22 +394,16 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 		}
 	}
 
+	//-------------------
+	// Internal Data structures
+	//-------------------
+
 	private enum TransitEventType {ArrivalAtStop, PassengerExchange, DepartureAtStop, LinkTransition}
 
-	private static class TransitContext {
-
-		private final boolean createLinkEvents;
-		private final SBBTransitDriverAgent driver;
-		private final Deque<LinkTransition> precomputedLinkTransitions;
+	private record TransitContext(boolean createLinkEvents, SBBTransitDriverAgent driver, Deque<LinkTransition> precomputedLinkTransitions) {
 
 		private TransitContext(boolean createLinkEvents, SBBTransitDriverAgent driver) {
 			this(createLinkEvents, driver, new ArrayDeque<>());
-		}
-
-		private TransitContext(boolean createLinkEvents, SBBTransitDriverAgent driver, Deque<LinkTransition> precomputedLinkTransitions) {
-			this.createLinkEvents = createLinkEvents;
-			this.driver = driver;
-			this.precomputedLinkTransitions = precomputedLinkTransitions;
 		}
 
 		TransitEvent computeEventsOnDeparture(Network network, double now) {
@@ -446,7 +441,8 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 		private void precomputeLinksToNextStop(Network network, double now, double arrTime) {
 
 			// driver is just departing. We ignore links before the first stop.
-			if (driver.getPreviousStop() == null) return;
+			if (driver.getPreviousStop() == null)
+				return;
 
 			var links = linksBetweenStops(network);
 			var totalLength = links.stream().mapToDouble(Link::getLength).sum();
@@ -553,7 +549,6 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 
 		private final double time;
 		private final TransitEventType eventType;
-		//private final Message driver;
 		private final VehicleContainer vehicleContainer;
 		private final Deque<LinkTransition> precomputedLinks;
 
@@ -562,30 +557,6 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 			this.eventType = e.type;
 			this.vehicleContainer = vehicleContainer;
 			this.precomputedLinks = e.context.precomputedLinkTransitions;
-		}
-	}
-
-	private static class LinkEvent implements Comparable<LinkEvent> {
-
-		double time;
-		Id<Link> fromLinkId;
-		Id<Link> toLinkId;
-		Id<Vehicle> vehicleId;
-
-		LinkEvent(double time, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Vehicle> vehicleId) {
-			this.time = time;
-			this.fromLinkId = fromLinkId;
-			this.toLinkId = toLinkId;
-			this.vehicleId = vehicleId;
-		}
-
-		@Override
-		public int compareTo(LinkEvent o) {
-			int result = Double.compare(this.time, o.time);
-			if (result == 0) {
-				result = this.vehicleId.compareTo(o.vehicleId);
-			}
-			return result;
 		}
 	}
 }
