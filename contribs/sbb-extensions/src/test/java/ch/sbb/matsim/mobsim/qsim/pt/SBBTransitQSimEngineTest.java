@@ -46,11 +46,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.ActivityEngineModule;
-import org.matsim.core.mobsim.qsim.PopulationModule;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimBuilder;
-import org.matsim.core.mobsim.qsim.pt.DefaultTransitDriverAgentFactory;
+import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -78,8 +74,12 @@ public class SBBTransitQSimEngineTest {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager(f.config);
 		QSim qSim = new QSimBuilder(f.config).useDefaults().build(f.scenario, eventsManager);
-		SBBTransitQSimEngine trEngine = new SBBTransitQSimEngine(qSim, null, new TransitStopAgentTracker(eventsManager),
-			TimeInterpretation.create(qSim.getScenario().getConfig()), new DefaultTransitDriverAgentFactory(), new SimpleTransitStopHandlerFactory());
+
+		var trEngine = new SBBTransitEngine(null, f.sbbConfig, f.config.transit(), new NoopMessageCollector(),
+			new TransitStopAgentTracker(eventsManager),
+			f.scenario, eventsManager, TimeInterpretation.create(f.config), new SBBTransitDriverAgentFactory(f.sbbConfig),
+			new SimpleTransitStopHandlerFactory());
+
 		qSim.addMobsimEngine(trEngine);
 
 		trEngine.insertAgentsIntoMobsim();
@@ -87,7 +87,7 @@ public class SBBTransitQSimEngineTest {
 		Map<Id<Person>, MobsimAgent> agents = qSim.getAgents();
 		Assertions.assertEquals(1, agents.size(), "Expected one driver as agent.");
 		MobsimAgent agent = agents.values().iterator().next();
-		Assertions.assertTrue(agent instanceof SBBTransitDriverAgent);
+		Assertions.assertInstanceOf(SBBTransitDriverAgent.class, agent);
 		SBBTransitDriverAgent driver = (SBBTransitDriverAgent) agent;
 		TransitRoute route = driver.getTransitRoute();
 		List<TransitRouteStop> stops = route.getStops();

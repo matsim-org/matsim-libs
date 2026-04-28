@@ -26,7 +26,6 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
-import org.matsim.dsim.simulation.PartitionTransfer;
 import org.matsim.dsim.simulation.VehicleContainer;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufImpl;
@@ -38,7 +37,8 @@ import org.matsim.vehicles.Vehicles;
 
 import java.util.*;
 
-public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine, DistributedDepartureHandler, AgentSource, DistributedAgentSource {
+public class SBBTransitEngine
+	implements DistributedMobsimEngine, DistributedDepartureHandler, AgentSource, DistributedAgentSource {
 
 	private final PriorityQueue<TransitEvent> eventQueue = new PriorityQueue<>();
 
@@ -64,7 +64,7 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 	private boolean createLinkEvents = false;
 
 	@Inject
-	public DistributedSBBTransitQSimEngine(ReplanningContext context, SBBTransitConfigGroup config, TransitConfigGroup ptConfig,
+	public SBBTransitEngine(ReplanningContext context, SBBTransitConfigGroup config, TransitConfigGroup ptConfig,
 		MobsimMessageCollector partitionTransfer, TransitStopAgentTracker agentTracker, Scenario scenario,
 		EventsManager em, TimeInterpretation timeInterpretation,
 		SBBTransitDriverAgentFactory driverFactory, TransitStopHandlerFactory stopHandlerFactory) {
@@ -168,8 +168,8 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 		}
 
 		TransitContext context = new TransitContext(createLinkEvents, driver);
-		TransitEvent event = context.computeEventsOnDeparture(scenario.getNetwork(), now);
-		this.eventQueue.add(event);
+		Id<Link> firstStopLink = driver.getNextStop().getStopFacility().getLinkId();
+		this.eventQueue.add(new TransitEvent(now, TransitEventType.ArrivalAtStop, context, firstStopLink));
 	}
 
 	@Override
@@ -223,6 +223,15 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 		TransitRouteStop nextStop = driver.getNextStop();
 		if (nextStop != null) {
 			var nextTransitEvent = event.context.computeEventsOnDeparture(scenario.getNetwork(), event.time);
+			// Zero travel time: fire link events immediately (same step) rather than queuing,
+			// matching the old engine's behavior to preserve correct event ordering.
+			//			while (nextTransitEvent.type() == TransitEventType.LinkTransition && nextTransitEvent.time() <= event.time) {
+			//				var transition = nextTransitEvent.context.precomputedLinkTransitions.peek();
+			//				var vehicle = driver.getVehicle();
+			//				em.processEvent(new LinkLeaveEvent(event.time, vehicle.getId(), transition.fromLink()));
+			//				em.processEvent(new LinkEnterEvent(event.time, vehicle.getId(), transition.toLink()));
+			//				nextTransitEvent = nextTransitEvent.context.computeEventOnLinkTransition(event.time);
+			//			}
 			enqueueOrSend(nextTransitEvent);
 		} else {
 			if (this.createLinkEvents) {
@@ -444,7 +453,7 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 
 		TransitEvent computeEventOnLinkTransition(double now) {
 			var _ = precomputedLinkTransitions.poll();
-			return computeArrivalOrTransition(now);
+			return computeArrivalOrTransition(arrivalTime(now));
 		}
 
 		private TransitEvent computeArrivalOrTransition(double arrTime) {
@@ -481,6 +490,10 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 			var prevStopId = driver.getPreviousStop().getStopFacility().getLinkId();
 			var nextStopId = driver.getNextStop().getStopFacility().getLinkId();
 
+			if (prevStopId.equals(nextStopId)) {
+				return result;
+			}
+
 			var nr = driver.getTransitRoute().getRoute();
 
 			var startIndex = 0;
@@ -512,13 +525,17 @@ public class DistributedSBBTransitQSimEngine implements DistributedMobsimEngine,
 
 			double travelTime = arrTime - depTime;
 			double secondsPerMeter = totalLength > 0 ? travelTime / totalLength : 0;
+			// for zero travel time, it is expected that events are dispatched at the very same time as departure time...
+			double minTravelTime = travelTime == 0 ? 0 : 1;
 			double travelledLength = 0;
 			var it = linksToNextStop.iterator();
 			var fromLink = it.hasNext() ? it.next() : null;
 
 			while (it.hasNext()) {
 				var toLink = it.next();
-				var time = depTime + travelledLength * secondsPerMeter;
+				var elapsedTime = travelledLength * secondsPerMeter;
+				// the first transition after the departure is expected one second after departure. Therefore use either elapsed time or the minimum time.
+				var time = depTime + Math.max(elapsedTime, minTravelTime);
 				this.precomputedLinkTransitions.add(new LinkTransition(fromLink.getId(), toLink.getId(), time));
 
 				travelledLength += toLink.getLength();

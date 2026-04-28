@@ -56,8 +56,7 @@ public class SBBTransitChainedDepartureIntegrationTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
-		config.controller().setWritePlansInterval(0);
-		config.controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(1);
 		config.controller().setMobsim("qsim");
 		config.dsim().setThreads(2);
 		config.scoring().setWriteExperiencedPlans(true);

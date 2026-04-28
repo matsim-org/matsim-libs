@@ -22,14 +22,11 @@ package ch.sbb.matsim.mobsim.qsim.pt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonContinuesInVehicleEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.*;
@@ -39,8 +36,9 @@ import org.matsim.vehicles.Vehicle;
 import java.util.*;
 
 /**
- * This class contains a lot of code from org.matsim.core.mobsim.qsim.pt.PassengerAccessEgressImpl, some methods with small adaptations, other directly copied. The aforementioned class is
- * package-protected and thus not visible from this package, making it impossible to inherit from it and re-use parts of the code.
+ * This class contains a lot of code from org.matsim.core.mobsim.qsim.pt.PassengerAccessEgressImpl, some methods with small adaptations, other
+ * directly copied. The aforementioned class is package-protected and thus not visible from this package, making it impossible to inherit from it and
+ * re-use parts of the code.
  *
  * @author mrieser / SBB
  */
@@ -53,7 +51,8 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 	private final TransitSchedule transitSchedule;
 	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentRelocating = new LinkedHashMap<>();
 
-	SBBPassengerAccessEgress(InternalInterface internalInterface, TransitStopAgentTracker agentTracker, Scenario scenario, EventsManager eventsManager) {
+	SBBPassengerAccessEgress(InternalInterface internalInterface, TransitStopAgentTracker agentTracker, Scenario scenario,
+		EventsManager eventsManager) {
 		this.internalInterface = internalInterface;
 		this.agentTracker = agentTracker;
 		this.eventsManager = eventsManager;
@@ -64,12 +63,14 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 	/**
 	 * Allows passengers to leave and/or board a vehicle according to the vehicle's accessTime, egressTime and doorOperation mode.
 	 * <p>
-	 * The code is to a large part a copy of PassengerAccessEgressImpl.calculateStopTimeAndTriggerBoarding. It could not be directly used as the class itself is package-protected and not visible in
-	 * our package.
+	 * The code is to a large part a copy of PassengerAccessEgressImpl.calculateStopTimeAndTriggerBoarding. It could not be directly used as the class
+	 * itself is package-protected and not visible in our package.
 	 *
-	 * @return 0.0 (no more agents currently to board or leave), or 1.0 (there were passenger actions this time step, need to recheck next time step again)
+	 * @return 0.0 (no more agents currently to board or leave), or 1.0 (there were passenger actions this time step, need to recheck next time step
+	 * again)
 	 */
-	double handlePassengersWithPhysicalLimits(TransitStopFacility stop, TransitVehicle vehicle, TransitLine line, TransitRoute route, List<TransitRouteStop> upcomingStops, double now) {
+	double handlePassengersWithPhysicalLimits(TransitStopFacility stop, TransitVehicle vehicle, TransitLine line, TransitRoute route,
+		List<TransitRouteStop> upcomingStops, double now) {
 		ArrayList<PTPassengerAgent> passengersLeaving = findPassengersLeaving(vehicle, stop);
 
 		// Relocating passengers are only determined at the very last stop.
@@ -90,17 +91,18 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 	}
 
 	/**
-	 * Allows all passengers wanting to leave the vehicle to do so immediately in the current time step, not taking constraints like number of doors and their passenger capacity into account. Allows
-	 * all passengers wanting to board the vehicle to do so immediately, given there is still some free capacity left in the vehicle.
+	 * Allows all passengers wanting to leave the vehicle to do so immediately in the current time step, not taking constraints like number of doors
+	 * and their passenger capacity into account. Allows all passengers wanting to board the vehicle to do so immediately, given there is still some
+	 * free capacity left in the vehicle.
 	 */
-	double handleAllPassengersImmediately(TransitStopFacility stop, TransitVehicle vehicle, TransitLine line, TransitRoute route, List<TransitRouteStop> upcomingStops, double now) {
+	double handleAllPassengersImmediately(TransitStopFacility stop, TransitVehicle vehicle, TransitLine line, TransitRoute route,
+		List<TransitRouteStop> upcomingStops, double now) {
 		List<PTPassengerAgent> leavingPassengers = findPassengersLeaving(vehicle, stop);
 		for (PTPassengerAgent passenger : leavingPassengers) {
 			handlePassengerLeaving(passenger, vehicle, passenger.getDestinationLinkId(), now);
 		}
 
 		int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size();
-
 
 		List<PTPassengerAgent> boardingPassengers = findPassengersEntering(route, line, vehicle, stop, upcomingStops, freeCapacity, now);
 		for (PTPassengerAgent passenger : boardingPassengers) {
@@ -119,7 +121,8 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 		if (removed) {
 			passenger.setVehicle(null);
 			var driver = vehicle.getDriver();
-			this.eventsManager.processEvent(new PersonLeavesPtVehicleEvent(time, passenger.getId(), vehicle.getId(), driver.getTransitLine().getId(), driver.getTransitRoute().getId()));
+			this.eventsManager.processEvent(new PersonLeavesPtVehicleEvent(time, passenger.getId(), vehicle.getId(), driver.getTransitLine().getId(),
+				driver.getTransitRoute().getId()));
 
 			MobsimAgent agent = (MobsimAgent) passenger;
 			agent.notifyArrivalOnLinkByNonNetworkMode(toLinkId);
@@ -130,7 +133,8 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerEntering(PTPassengerAgent passenger, TransitVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
+	public boolean handlePassengerEntering(PTPassengerAgent passenger, TransitVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId,
+		double time) {
 		boolean entered = vehicle.addPassenger(passenger);
 		if (entered) {
 			this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);
@@ -138,7 +142,8 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 			passenger.setVehicle(vehicle);
 
 			var driver = vehicle.getDriver();
-			this.eventsManager.processEvent(new PersonEntersPtVehicleEvent(time, passenger.getId(), vehicle.getId(), driver.getTransitLine().getId(), driver.getTransitRoute().getId()));
+			this.eventsManager.processEvent(new PersonEntersPtVehicleEvent(time, passenger.getId(), vehicle.getId(), driver.getTransitLine().getId(),
+				driver.getTransitRoute().getId()));
 		}
 		return entered;
 	}
@@ -167,7 +172,7 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 			TransitRoute route = line.getRoutes().get(chain.getChainedRouteId());
 			Departure departure = route.getDepartures().get(chain.getChainedDepartureId());
 
-			Id<Person> newDriver = Id.createPersonId("pt_" + SBBTransitQSimEngine.createId(line, route, departure));
+			Id<Person> newDriver = Id.createPersonId("pt_" + SBBTransitEngine.createId(line, route, departure));
 			Id<Vehicle> newVehicle = departure.getVehicleId();
 			boolean sameVehicle = newVehicle.equals(driver.getVehicle().getId());
 
@@ -200,13 +205,15 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 		}
 
 		if (!passengers.isEmpty()) {
-			throw new IllegalStateException("There are still passengers at stop " + stop.getStopFacility().getId() + " that were not relocated to the next vehicle: " + passengers);
+			throw new IllegalStateException(
+				"There are still passengers at stop " + stop.getStopFacility().getId() + " that were not relocated to the next vehicle: "
+					+ passengers);
 		}
 
 	}
 
 	private ArrayList<PTPassengerAgent> findPassengersLeaving(TransitVehicle vehicle,
-															  final TransitStopFacility stop) {
+		final TransitStopFacility stop) {
 		ArrayList<PTPassengerAgent> passengersLeaving = new ArrayList<>();
 		for (PassengerAgent passenger : vehicle.getPassengers()) {
 			if (((PTPassengerAgent) passenger).getExitAtStop(stop)) {
@@ -232,7 +239,7 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 	 * Finds all agents that want to enter the specified line.
 	 */
 	private List<PTPassengerAgent> findPassengersEntering(TransitRoute transitRoute, TransitLine transitLine, TransitVehicle vehicle,
-														  final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, int freeCapacity, double now) {
+		final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, int freeCapacity, double now) {
 		List<PTPassengerAgent> passengers = this.agentTracker.getAgentsAtStop().get(stop.getId());
 		if (passengers != null) {
 			ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<>();
@@ -251,7 +258,7 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 	}
 
 	private List<PTPassengerAgent> findAllPassengersWaiting(TransitRoute transitRoute, TransitLine transitLine, TransitVehicle vehicle,
-															final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, double now) {
+		final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, double now) {
 		List<PTPassengerAgent> passengers = this.agentTracker.getAgentsAtStop().get(stop.getId());
 		if (passengers != null) {
 			ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<>();
