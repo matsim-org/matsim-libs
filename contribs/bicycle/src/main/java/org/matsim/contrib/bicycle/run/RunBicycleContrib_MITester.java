@@ -10,13 +10,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleModule;
+import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
@@ -26,7 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import static org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
@@ -113,7 +112,8 @@ public final class RunBicycleContrib_MITester {
 
 
 		//bicycleConfigGroup.setBicycleInfraAttribute("cycleway"); // default
-		bicycleConfigGroup.setBicycleInfraAttribute("bicycle_infra");
+		//bicycleConfigGroup.setBicycleInfraAttribute("bicycle_infra");
+		bicycleConfigGroup.setBicycleInfraAttribute(BicycleUtils.BicycleInfraAttribute.bicycle_infra);
 
 		List<String> mainModeList = Arrays.asList(BICYCLE, TransportMode.car);
 		config.qsim().setMainModes(mainModeList);

@@ -90,34 +90,27 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		map.put(MOTORIZED_INTERACTION,
 			"Defines the motorized interaction behavior. Possible values [none, carCountOnBicycleLeaveLink, carsPassedBicycleOnLink, avgCarOccupancyDuringBicycleTraversal]. "
 				+ "Default: none.");
-		map.put(BICYCLE_INFRA_ATTRIBUTE,
-			"Network attribute used for bicycle infrastructure evaluation. "
-				+ "Supported values: 'cycleway' (legacy default) and 'bicycle_infra'.");
+//		map.put(BICYCLE_INFRA_ATTRIBUTE,
+//			"Network attribute used for bicycle infrastructure evaluation. "
+//				+ "Supported values: 'cycleway' (legacy default) and 'bicycle_infra'.");
 		return map;
 	}
 
 
 	private static final String BICYCLE_INFRA_ATTRIBUTE = "bicycleInfraAttribute";
 
-	private String bicycleInfraAttribute = BicycleUtils.CYCLEWAY;
+
+	private BicycleUtils.BicycleInfraAttribute bicycleInfraAttribute
+		= BicycleUtils.BicycleInfraAttribute.cycleway;
 
 	@StringGetter(BICYCLE_INFRA_ATTRIBUTE)
-	public String getBicycleInfraAttribute() {
+	public BicycleUtils.BicycleInfraAttribute getBicycleInfraAttribute() {
 		return bicycleInfraAttribute;
 	}
 
-
-	// TODO: change rather to enum here
 	@StringSetter(BICYCLE_INFRA_ATTRIBUTE)
-	public BicycleConfigGroup setBicycleInfraAttribute(String bicycleInfraAttribute) {
-		if (!BicycleUtils.CYCLEWAY.equals(bicycleInfraAttribute)
-			&& !BicycleUtils.BICYCLE_INFRA.equals(bicycleInfraAttribute)) {
-			throw new IllegalArgumentException(
-				"Unsupported bicycle infrastructure attribute: " + bicycleInfraAttribute
-					+ ". Supported values are '" + BicycleUtils.CYCLEWAY
-					+ "' and '" + BicycleUtils.BICYCLE_INFRA + "'.");
-		}
-		this.bicycleInfraAttribute = bicycleInfraAttribute;
+	public BicycleConfigGroup setBicycleInfraAttribute(BicycleUtils.BicycleInfraAttribute attr) {
+		this.bicycleInfraAttribute = attr;
 		return this;
 	}
 

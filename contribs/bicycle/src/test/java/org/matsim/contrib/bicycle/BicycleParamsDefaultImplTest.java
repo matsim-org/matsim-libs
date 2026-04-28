@@ -138,7 +138,7 @@ public class BicycleParamsDefaultImplTest {
 			double actual = params.getInfrastructureFactor(
 				testCase.type(),
 				testCase.cycleway(),
-				BicycleUtils.CYCLEWAY
+				BicycleUtils.BicycleInfraAttribute.cycleway
 			);
 			assertEquals(testCase.expected(), actual, 1e-5);
 		}
@@ -176,7 +176,7 @@ public class BicycleParamsDefaultImplTest {
 			double actual = params.getInfrastructureFactor(
 				testCase.type(),
 				testCase.bicycleInfra(),
-				BicycleUtils.BICYCLE_INFRA
+				BicycleUtils.BicycleInfraAttribute.bicycle_infra
 			);
 			assertEquals(testCase.expected(), actual, 1e-5);
 		}

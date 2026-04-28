@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleModule;
 //import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -131,7 +132,8 @@ public final class RunBicycleContrib_ScenarioTester {
 
 
 		//bicycleConfigGroup.setBicycleInfraAttribute("cycleway"); // default
-		bicycleConfigGroup.setBicycleInfraAttribute("bicycle_infra");
+		//bicycleConfigGroup.setBicycleInfraAttribute("bicycle_infra");
+		bicycleConfigGroup.setBicycleInfraAttribute(BicycleUtils.BicycleInfraAttribute.bicycle_infra);
 
 		List<String> mainModeList = Arrays.asList(BICYCLE, TransportMode.car);
 		config.qsim().setMainModes(mainModeList);

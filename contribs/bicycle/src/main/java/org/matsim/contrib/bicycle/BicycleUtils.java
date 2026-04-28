@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.bicycle;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 
 /**
@@ -31,31 +30,35 @@ public final class BicycleUtils {
 	public static final String AVERAGE_ELEVATION = "averageElevation";
 	public static final String SURFACE = "surface";
 	public static final String SMOOTHNESS = "smoothness";
-	public static final String BICYCLE_INFRA = "bicycle_infra";
-	public static final String CYCLEWAY = "cycleway";
+	//public static final String BICYCLE_INFRA = "bicycle_infra";
+	//public static final String CYCLEWAY = "cycleway";
 	static final String WAY_TYPE = "type";
 	/*package*/ static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
+
+	public enum BicycleInfraAttribute {
+		cycleway, bicycle_infra
+		// Namen klein, damit existierende XMLs unverändert lesbar bleiben
+	}
 
 	private BicycleUtils() {
 		// Don't allow to create instances of this class
 	}
 
-	//	public static String getBicycleInfraType(Link link) {
-//		return (String) link.getAttributes().getAttribute(BICYCLE_INFRA);
-//	}
-//	public static String getBicycleInfrastructure(Link link) {
-//		return (String) link.getAttributes().getAttribute(BICYCLE_INFRA);
-//	}
 
-	public static String getBicycleInfrastructureValue(Link link, String bicycleInfraAttribute) {
-		// TODO Simon: use enum instead of string, more stable -> for cycleway vs bicycle_infra or the categories itself CYCLEWAY_ISOLATED ...
-		Object value = link.getAttributes().getAttribute(bicycleInfraAttribute);
+	//	public static String getBicycleInfrastructureValue(Link link, String bicycleInfraAttribute) {
+//		// TODO Simon: use enum instead of string, more stable -> for cycleway vs bicycle_infra or the categories itself CYCLEWAY_ISOLATED ...
+//		Object value = link.getAttributes().getAttribute(bicycleInfraAttribute);
+//		return value == null ? null : value.toString();
+//	}
+	public static String getBicycleInfrastructureValue(Link link, BicycleInfraAttribute attr) {
+		Object value = link.getAttributes().getAttribute(attr.name());
 		return value == null ? null : value.toString();
 	}
 
+
 	// legacy use; "cycleway" is deprecated
 	public static String getCyclewaytype(Link link) {
-		return (String) link.getAttributes().getAttribute(CYCLEWAY);
+		return (String) link.getAttributes().getAttribute(BicycleInfraAttribute.cycleway.name());
 	}
 
 	public static String getSurface(Link link) {
