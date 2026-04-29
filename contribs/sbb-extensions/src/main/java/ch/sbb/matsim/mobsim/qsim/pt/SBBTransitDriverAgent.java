@@ -43,13 +43,11 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 		this.eventsManager = internalInterface.getMobsim().getEventsManager();
 		this.accessEgress = new SBBPassengerAccessEgress(internalInterface, agentTracker, internalInterface.getMobsim().getScenario(),
 			this.eventsManager);
-		// stops and stopIndex are initialised by parent's init() called from super()
 	}
 
 	SBBTransitDriverAgent(SBBTransitDriverMessage message, Umlauf umlauf, String transportMode, TransitStopAgentTracker thisAgentTracker,
 		InternalInterface internalInterface) {
 		super(message.delegateMessage(), umlauf, transportMode, thisAgentTracker, internalInterface);
-		// parent's init(stopIndex, nextLinkIndex, atEnd) has already set stops and stopIndex correctly
 		eventsManager = internalInterface.getMobsim().getEventsManager();
 		accessEgress = new SBBPassengerAccessEgress(internalInterface, thisAgentTracker, internalInterface.getMobsim().getScenario(),
 			this.eventsManager);
@@ -131,6 +129,7 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 	private void processVehicleDeparture(final TransitStopFacility stop, final double now) {
 		if (currentStop != null) {
 			currentStop = null;
+			// directly set the index of the base class.
 			stopIndex++;
 			eventsManager.processEvent(new VehicleDepartsAtFacilityEvent(now, this.getVehicle().getId(), stop.getId(), 0.0));
 		}

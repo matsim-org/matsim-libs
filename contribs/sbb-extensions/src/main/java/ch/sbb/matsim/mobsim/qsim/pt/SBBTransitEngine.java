@@ -40,6 +40,7 @@ import java.util.*;
 public class SBBTransitEngine
 	implements DistributedMobsimEngine, DistributedDepartureHandler, AgentSource, DistributedAgentSource {
 
+	private final Map<Id<Umlauf>, Umlauf> umlaufCache = new HashMap<>(); // we are also the agent source for TransitDriverAgents, which expect to have an umlauf cache.
 	private final PriorityQueue<TransitEvent> eventQueue = new PriorityQueue<>();
 
 	private final ReplanningContext context;
@@ -331,13 +332,19 @@ public class SBBTransitEngine
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				String mode = route.getTransportMode();
-				boolean isDeterministic = deterministicModes.contains(mode);
 				for (Departure dep : route.getDepartures().values()) {
 					Vehicle veh = vehicles.getVehicles().get(dep.getVehicleId());
 					Umlauf umlauf = createUmlauf(line, route, dep);
+					// non-deterministic pt drivers need an umlauf from the cache. So store it. In the regular Transit engines, umlaufs can
+					// include multiple trips, and routess. I.e., a vehicle is dispatched on route A and later on route B. This class however,
+					// creates an umlauf for each departure. This is not the correct behavior, I think. My guess is that noone ever used deterministic
+					// transit in combination with non-deterministic pt and multi umlauf scenarios. janek apr' 26.
+					if (!deterministicModes.contains(mode)) {
+						umlaufCache.put(umlauf.getId(), umlauf);
+					}
 					// but we only want to schedule local drivers, as other partitions will instantiate theirs.
 					if (partitionTransfer.isLocal(umlauf.getUmlaufStuecke().getFirst().getCarRoute().getStartLinkId())) {
-						createAndScheduleDriver(veh, umlauf, isDeterministic);
+						createAndScheduleDriver(veh, umlauf, deterministicModes.contains(mode));
 					}
 				}
 			}
@@ -396,13 +403,11 @@ public class SBBTransitEngine
 			var departure = transitRoute.getDepartures().get(stdm.departureId());
 			var umlauf = createUmlauf(transitLine, transitRoute, departure);
 			return (DistributedMobsimAgent) driverFactory.createTransitDriverFromMessage(stdm, umlauf, internalInterface, agentTracker);
-		}
-		//		else if (type.equals(TransitDriverAgentImpl.class)) {
-		//			var tdm = (TransitDriverAgentImpl.TransitDriverMessage) message;
-		//			var umlauf = umlaufCache.get(tdm.umlaufId());
-		//			return (DistributedMobsimAgent) driverFactory.createTransitDriverFromMessage(tdm, umlauf, internalInterface, agentTracker);
-		//		}
-		else if (type.equals(TransitAgent.class)) {
+		} else if (type.equals(TransitDriverAgentImpl.class)) {
+			var tdm = (TransitDriverAgentImpl.TransitDriverMessage) message;
+			var umlauf = umlaufCache.get(tdm.umlaufId());
+			return (DistributedMobsimAgent) driverFactory.createTransitDriverFromMessage(tdm, umlauf, internalInterface, agentTracker);
+		} else if (type.equals(TransitAgent.class)) {
 			var timer = internalInterface.getMobsim().getSimTimer();
 			var baseAgent = new BasicPlanAgentImpl((BasicPlanAgentImpl.BasicPlanAgentMessage) message, scenario, em, timer, timeInterpretation);
 			return TransitAgent.createTransitAgent(baseAgent, scenario);
@@ -546,31 +551,12 @@ public class SBBTransitEngine
 	record LinkTransition(Id<Link> fromLink, Id<Link> toLink, double time) {
 	}
 
-	private static class TransitEvent implements Comparable<TransitEvent>, Message {
-
-		final double time;
-		final TransitEventType type;
-		final TransitContext context;
-		final Id<Link> linkId;
-
-		TransitEvent(double time, TransitEventType type, TransitContext context, Id<Link> linkId) {
-			this.time = time;
-			this.type = type;
-			this.context = context;
-			this.linkId = linkId;
-		}
-
-		double time() {
-			return time;
-		}
-
-		TransitEventType type() {
-			return type;
-		}
-
-		Id<Link> linkId() {
-			return linkId;
-		}
+	private record TransitEvent(
+		double time,
+		TransitEventType type,
+		TransitContext context,
+		Id<Link> linkId
+	) implements Comparable<TransitEvent>, Message {
 
 		@Override
 		public int compareTo(TransitEvent o) {

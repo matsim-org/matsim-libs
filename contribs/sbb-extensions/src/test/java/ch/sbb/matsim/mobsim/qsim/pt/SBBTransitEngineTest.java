@@ -78,6 +78,7 @@ import org.matsim.testcases.utils.EventsCollector;
 /**
  * @author mrieser / SBB
  */
+@SuppressWarnings("deprecation")
 public class SBBTransitEngineTest {
 
 	private static final Logger log = LogManager.getLogger(SBBTransitEngineTest.class);
