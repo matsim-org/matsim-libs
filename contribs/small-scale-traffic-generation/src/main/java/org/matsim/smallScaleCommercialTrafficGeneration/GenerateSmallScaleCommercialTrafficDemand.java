@@ -384,20 +384,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (!scenario.getVehicles().getVehicleTypes().containsKey(vehicleType.getId()))
 					scenario.getVehicles().addVehicleType(vehicleType);
 			});
-			Set<String> activityTypes = new HashSet<>(
-				scenario.getPopulation().getPersons().values().stream()
-					.flatMap(person -> PopulationUtils.getActivities(person.getSelectedPlan(),
-						TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream())
-					.map(Activity::getType)
-					.toList()
-			);
-			for (String activityType : activityTypes) {
-				config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams(activityType).setTypicalDuration(30 * 60));
-			}
-			List<String> subpopulations = scenario.getPopulation().getPersons().values().stream()
-				.map(PopulationUtils::getSubpopulation)
-				.filter(Objects::nonNull)
-				.toList();
+
+			Set<String> modes = NetworkUtils.getModes(scenario.getNetwork());
+			Set<String> subpopulations = PopulationUtils.getSubpopulationsOfPopulation(scenario.getPopulation());
 
 			subpopulations.forEach(subpopulation -> {
 				config.replanning().addStrategySettings(
@@ -407,29 +396,49 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				config.replanning().addStrategySettings(
 					new ReplanningConfigGroup.StrategySettings().setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute).setWeight(
 						0.1).setSubpopulation(subpopulation));
+
+				Set<String> activityTypesPerSubpopulation = new HashSet<>(
+					scenario.getPopulation().getPersons().values().stream()
+						.filter(person ->PopulationUtils.getSubpopulation(person).equals(subpopulation))
+						.flatMap(person -> PopulationUtils.getActivities(person.getSelectedPlan(),
+							TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream())
+						.map(Activity::getType)
+						.toList()
+				);
+
+				ScoringConfigGroup.ScoringParameterSet scoringParameters = config.scoring().getOrCreateScoringParameters(subpopulation);
+				scoringParameters.setPerforming_utils_hr(32.);
+				scoringParameters.setMarginalUtlOfWaitingPt_utils_hr(0.);
+				activityTypesPerSubpopulation.forEach(activityType -> {
+					ScoringConfigGroup.ActivityParams actParams = new ScoringConfigGroup.ActivityParams(activityType).setTypicalDuration(30 * 60);
+					scoringParameters.addActivityParams(actParams);
+				});
+				modes.forEach(mode -> {
+					ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
+					scoringParameters.addModeParams(thisModeParams);
+				});
+				scoringParameters.addModeParams(new ScoringConfigGroup.ModeParams("walk"));
 			});
-
-			Set<String> modes = scenario.getVehicles().getVehicleTypes().values().stream()
-				.map(vehicleType -> vehicleType.getId().toString())
-				.distinct().collect(Collectors.toSet());
-
-			modes.forEach(mode -> {
+			config.scoring().setExplainScores(true);
+			ScoringConfigGroup.ScoringParameterSet scoringParameters = config.scoring().getOrCreateScoringParameters(ScoringConfigGroup.DEFAULT_SUBPOPULATION);
+			scoringParameters.setPerforming_utils_hr(32.);
+			scoringParameters.setMarginalUtlOfWaitingPt_utils_hr(0.);
+						modes.forEach(mode -> {
 				ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
-				config.scoring().addModeParams(thisModeParams);
+				scoringParameters.addModeParams(thisModeParams);
 			});
-
 			Set<String> qsimModes = new HashSet<>(config.qsim().getMainModes());
 			config.qsim().setMainModes(Sets.union(qsimModes, modes));
 
 			Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
 			config.routing().setNetworkModes(Sets.union(networkModes, modes));
 
-			SimWrapper sw = SimWrapper.create();
+			SimWrapper sw = SimWrapper.create(config);
 			sw.getConfigGroup().defaultParams().setShp(null);
 			sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
 			sw.getConfigGroup().setSampleSize(sample);
 			sw.addDashboard(new OverviewDashboard(Set.copyOf(config.qsim().getMainModes())));
-			sw.addDashboard(new CarrierDashboard("(*.)?output_carriers_withPlans.xml.gz"));
+			sw.addDashboard(new CarrierDashboard("(*.)?output_carriers_solvedVRP.xml.gz"));
 			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
  			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
 			Controller controller = prepareController(scenario);
