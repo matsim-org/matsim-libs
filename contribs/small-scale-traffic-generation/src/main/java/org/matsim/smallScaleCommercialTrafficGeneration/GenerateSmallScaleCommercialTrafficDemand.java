@@ -184,6 +184,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = "The factor describing how many vehicles should be created in relation to the number of created services. If maxNumberOfLoopsForVRPSolving > 0 more vehicles are added in the replanning process.", defaultValue = "1.2")
 	private double factorForTravelBufferCalculation;
 
+	@CommandLine.Option(names = "--useRangeConstraintForTourPlanning", description = "Option to use range constraint for planning the tours. If this is selected, the range is restricted based on consumption information in the vehicle types file.")
+	private boolean useRangeConstraintForTourPlanning;
+
 	private Random rnd;
 	private RandomGenerator rng;
 	private final Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
@@ -274,6 +277,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		output = Path.of(config.controller().getOutputDirectory());
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		if (useRangeConstraintForTourPlanning) {
+			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
+			log.info("Using range constraint for tour planning based on energy consumption information in the vehicle types file.");
+		}
 		if (freightCarriersConfigGroup.getCarriersVehicleTypesFile() != null)
 			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
