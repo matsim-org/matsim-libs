@@ -202,23 +202,22 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private final String[] configArgs;
 
 	public GenerateSmallScaleCommercialTrafficDemand() {
-		this(null, null, null, null, null);
+		this(null, null, null, null, null, null);
 	}
 
 	public GenerateSmallScaleCommercialTrafficDemand(String[] configArgs) {
-		this(configArgs, null, null, null, null);
+		this(configArgs, null, null, null, null, null);
 	}
 
 	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-													 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
-													 UnhandledServicesSolution unhandledServicesSolution) {
-		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, odMatrixEntryInformationProvider,
-			unhandledServicesSolution);
+	                                                 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
+	                                                 VehicleTypeSelection vehicleTypeSelection, UnhandledServicesSolution unhandledServicesSolution) {
+		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, odMatrixEntryInformationProvider, vehicleTypeSelection, unhandledServicesSolution);
 	}
 	public GenerateSmallScaleCommercialTrafficDemand(String[] configArgs,
-													 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-													 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
-													 UnhandledServicesSolution unhandledServicesSolution) {
+	                                                 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
+	                                                 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
+	                                                 VehicleTypeSelection vehicleTypeSelection, UnhandledServicesSolution unhandledServicesSolution) {
 
 		this.configArgs = (configArgs == null) ? new String[0] : configArgs;
 
@@ -237,8 +236,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			log.info("Using {} for tour specifications!", commercialTourSpecifications.getClass().getSimpleName());
 		}
 		if (odMatrixEntryInformationProvider == null) {
-			this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider();
-			log.info("Using default {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName());
+			if (vehicleTypeSelection != null) {
+				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider(vehicleTypeSelection);
+				log.info("Using default {} with provided {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName(), vehicleTypeSelection.getClass().getSimpleName());
+			}
+			else {
+				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider();
+				log.info("Using default {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName());
+			}
 		} else {
 			this.odMatrixEntryInformationProvider = odMatrixEntryInformationProvider;
 			log.info("Using {} for OD matrix entry information!", odMatrixEntryInformationProvider.getClass().getSimpleName());
