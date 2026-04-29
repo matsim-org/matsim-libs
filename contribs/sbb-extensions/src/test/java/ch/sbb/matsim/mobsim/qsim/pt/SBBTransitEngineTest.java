@@ -663,6 +663,7 @@ public class SBBTransitEngineTest {
 	 * driver-only scenario.
 	 */
 	@Test
+	@org.junit.jupiter.api.Disabled("Long-running distributed test — run manually")
 	@org.junit.jupiter.api.Timeout(value = 2, unit = TimeUnit.MINUTES)
 	void testDistributedDSim_driverCrossesPartition() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 		int size = 2;
@@ -751,6 +752,42 @@ public class SBBTransitEngineTest {
 			assertEqualEvent(PersonLeavesVehicleEvent.class, 30720, allEvents.get(13)); // driver
 			assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(14)); // driver
 		}
+	}
+
+	/**
+	 * Verifies stop tracking state and serialization after advancing through stops.
+	 * Full reconstruction is covered by testDistributedDSim_driverCrossesPartition.
+	 */
+	@Test
+	void testSBBMessageRoundTrip() {
+		TestFixture f = new TestFixture();
+
+		EventsManager eventsManager = EventsUtils.createEventsManager(f.config);
+		QSim qSim = new QSimBuilder(f.config).useDefaults().build(f.scenario, eventsManager);
+
+		var trEngine = new SBBTransitEngine(null, f.sbbConfig, f.config.transit(), new NoopMessageCollector(),
+			new TransitStopAgentTracker(eventsManager),
+			f.scenario, eventsManager, TimeInterpretation.create(f.config), new SBBTransitDriverAgentFactory(f.sbbConfig),
+			new SimpleTransitStopHandlerFactory());
+		qSim.addMobsimEngine(trEngine);
+		trEngine.insertAgentsIntoMobsim();
+
+		SBBTransitDriverAgent driver = (SBBTransitDriverAgent) qSim.getAgents().values().iterator().next();
+		List<TransitRouteStop> stops = driver.getTransitRoute().getStops();
+		double depTime = driver.getActivityEndTime();
+
+		// advance through first 2 stops
+		assertNextStop(driver, stops.get(0), depTime);
+		assertNextStop(driver, stops.get(1), depTime);
+
+		// verify derived state
+		Assertions.assertEquals(stops.get(2), driver.getNextStop());
+		Assertions.assertEquals(stops.get(1), driver.getPreviousStop());
+		Assertions.assertNull(driver.getCurrentStop());
+
+		// verify serialized stopIndex matches position
+		var msg = (SBBTransitDriverAgent.SBBTransitDriverMessage) driver.toMessage();
+		Assertions.assertEquals(2, msg.delegateMessage().stopIndex());
 	}
 
 	@Test

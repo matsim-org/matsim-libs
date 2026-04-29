@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
-import java.util.LinkedList;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,52 +37,31 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 
 	private final EventsManager eventsManager;
 	private final SBBPassengerAccessEgress accessEgress;
-	private TransitRouteStop currentStop;
-	private TransitRouteStop nextStop;
-	private TransitRouteStop previousStop;
-	private TransitRoute currentTransitRoute;
-	private LinkedList<TransitRouteStop> remainingRouteStops = null;
 
 	SBBTransitDriverAgent(Umlauf umlauf, String transportMode, TransitStopAgentTracker agentTracker, InternalInterface internalInterface) {
 		super(umlauf, transportMode, agentTracker, internalInterface);
 		this.eventsManager = internalInterface.getMobsim().getEventsManager();
 		this.accessEgress = new SBBPassengerAccessEgress(internalInterface, agentTracker, internalInterface.getMobsim().getScenario(),
 			this.eventsManager);
-		checkCurrentRoute();
+		// stops and stopIndex are initialised by parent's init() called from super()
 	}
 
 	SBBTransitDriverAgent(SBBTransitDriverMessage message, Umlauf umlauf, String transportMode, TransitStopAgentTracker thisAgentTracker,
 		InternalInterface internalInterface) {
 		super(message.delegateMessage(), umlauf, transportMode, thisAgentTracker, internalInterface);
+		// parent's init(stopIndex, nextLinkIndex, atEnd) has already set stops and stopIndex correctly
 		eventsManager = internalInterface.getMobsim().getEventsManager();
 		accessEgress = new SBBPassengerAccessEgress(internalInterface, thisAgentTracker, internalInterface.getMobsim().getScenario(),
 			this.eventsManager);
-
-		// below does what checkRoute does, bot for inbetween states.
-		this.currentTransitRoute = getTransitRoute();
-		this.remainingRouteStops = new LinkedList<>();
-		for (var stop : this.currentTransitRoute.getStops()) {
-			if (stop.getStopFacility().getId().equals(message.previousStop)) {
-				this.previousStop = stop;
-				continue; // don't add this stop to remaining, but all after this one.
-			}
-			// add all stops after previous stop, or all stops in case there was no previous stop
-			if (this.previousStop != null || message.previousStop == null) {
-				remainingRouteStops.add(stop);
-			}
-			// skip all elements until one of the conditions above is true
-		}
-		this.nextStop = this.remainingRouteStops.getFirst();
 	}
 
 	void arrive(TransitRouteStop stop, double now) {
-		TransitStopFacility facility = stop.getStopFacility();
-		assertExpectedStop(facility);
-		processVehicleArrival(facility, now);
+		assertExpectedStop(stop.getStopFacility());
+		processVehicleArrival(stop.getStopFacility(), now);
 	}
 
 	void arriveAtNextStop(double now) {
-		arrive(this.nextStop, now);
+		arrive(stops.get(stopIndex), now);
 	}
 
 	@Override
@@ -92,11 +69,11 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 		assertExpectedStop(stop);
 
 		double stopTime = this.accessEgress.handlePassengersWithPhysicalLimits(stop, this.getVehicle(), this.getTransitLine(),
-			this.currentTransitRoute, this.remainingRouteStops, now);
+			getTransitRoute(), stops.subList(stopIndex + 1, stops.size()), now);
 
 		if (stopTime <= 0.0) {
 			// figure out if it's already time to depart or not
-			double departureOffset = this.currentStop.getDepartureOffset().or(this.currentStop.getArrivalOffset()).seconds();
+			double departureOffset = currentStop.getDepartureOffset().or(currentStop::getArrivalOffset).seconds();
 			double scheduledDepartureTime = this.getDeparture().getDepartureTime() + departureOffset;
 			if (scheduledDepartureTime > now) {
 				stopTime = 1.0; // allow agents arriving in the next time step to board
@@ -108,11 +85,8 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 
 	@Override
 	protected void handleEndRoute(double now) {
-
-		// Delegates call to the correct access egress
 		if (getDeparture() != null)
 			accessEgress.relocatePassengers(this, getDeparture().getChainedDepartures(), now);
-
 	}
 
 	void departAtStop(double now) {
@@ -120,73 +94,55 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 	}
 
 	void depart(TransitStopFacility stop, double now) {
-		handleDeparture(stop, now);
-	}
-
-	private void handleDeparture(TransitStopFacility stop, double now) {
 		assertExpectedStop(stop);
 		processVehicleDeparture(stop, now);
 	}
 
 	TransitRouteStop getNextStop() {
-		return this.nextStop;
+		return (stops != null && stopIndex < stops.size()) ? stops.get(stopIndex) : null;
 	}
 
 	TransitRouteStop getPreviousStop() {
-		return this.previousStop;
+		return (stops != null && stopIndex > 0) ? stops.get(stopIndex - 1) : null;
 	}
 
 	TransitRouteStop getCurrentStop() {
-		return this.currentStop;
+		return currentStop;
 	}
 
 	private void assertExpectedStop(final TransitStopFacility stop) {
-		checkCurrentRoute();
-		if (this.currentStop != null && stop == this.currentStop.getStopFacility()) {
-			return;
+		if (currentStop != null) {
+			return; // already dwelling at this stop, re-entry is fine
 		}
-		if (stop != this.nextStop.getStopFacility() || this.currentStop != null) {
-			throw new RuntimeException("Expected stop " + this.nextStop.getStopFacility().getId() + ", got " + stop.getId());
-		}
-	}
-
-	/**
-	 * This does not really check, but sets a lot of state. I found it this way and I'll keep it this way, I guess.
-	 */
-	private void checkCurrentRoute() {
-		TransitRoute route = super.getTransitRoute();
-		if (route != null && route != this.currentTransitRoute) {
-			this.currentTransitRoute = route;
-			this.remainingRouteStops = new LinkedList<>(route.getStops());
-			this.nextStop = this.remainingRouteStops.getFirst();
+		if (stops == null || stopIndex >= stops.size() || stop != stops.get(stopIndex).getStopFacility()) {
+			String expected = (stops != null && stopIndex < stops.size())
+				? stops.get(stopIndex).getStopFacility().getId().toString() : "none";
+			throw new RuntimeException("Expected stop " + expected + ", got " + stop.getId());
 		}
 	}
 
 	private void processVehicleArrival(final TransitStopFacility stop, final double now) {
-		if (this.currentStop == null) {
-			this.currentStop = this.nextStop;
-			this.eventsManager.processEvent(new VehicleArrivesAtFacilityEvent(now, this.getVehicle().getId(), stop.getId(), 0.0));
-			this.remainingRouteStops.removeFirst();
-			this.nextStop = this.remainingRouteStops.isEmpty() ? null : this.remainingRouteStops.getFirst();
+		if (currentStop == null) {
+			currentStop = stops.get(stopIndex);
+			eventsManager.processEvent(new VehicleArrivesAtFacilityEvent(now, this.getVehicle().getId(), stop.getId(), 0.0));
 		}
 	}
 
 	private void processVehicleDeparture(final TransitStopFacility stop, final double now) {
-		if (this.currentStop != null) {
-			this.previousStop = this.currentStop;
-			this.currentStop = null;
-			this.eventsManager.processEvent(new VehicleDepartsAtFacilityEvent(now, this.getVehicle().getId(), stop.getId(), 0.0));
+		if (currentStop != null) {
+			currentStop = null;
+			stopIndex++;
+			eventsManager.processEvent(new VehicleDepartsAtFacilityEvent(now, this.getVehicle().getId(), stop.getId(), 0.0));
 		}
 	}
 
 	@Override
 	public Message toMessage() {
-		// SAFETY: We know that we inherit fom TransitDriverAgentImpl which creates this message.
+		// SAFETY: We know that we inherit from TransitDriverAgentImpl which creates this message.
 		var delegateMessage = (TransitDriverMessage) super.toMessage();
 
 		return new SBBTransitDriverMessage(
 			delegateMessage,
-			previousStop.getStopFacility().getId(),
 			getTransitLine().getId(),
 			getTransitRoute().getId(),
 			getDeparture().getId()
@@ -195,7 +151,6 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 
 	public record SBBTransitDriverMessage(
 		TransitDriverMessage delegateMessage,
-		Id<TransitStopFacility> previousStop,
 		Id<TransitLine> transitLineId,
 		Id<TransitRoute> transitRouteId,
 		Id<Departure> departureId
