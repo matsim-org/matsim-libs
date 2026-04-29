@@ -653,8 +653,7 @@ public class SBBTransitEngineTest {
 	 */
 	@Test
 	@Timeout(value = 2, unit = TimeUnit.MINUTES)
-	//@DisabledOnGitHubWindowsCI
-	//@Disabled
+	@DisabledOnGitHubWindowsCI
 	void testDistributedDSimIntegration() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 		int size = 2;
 		var comms = LocalCommunicator.create(size);
