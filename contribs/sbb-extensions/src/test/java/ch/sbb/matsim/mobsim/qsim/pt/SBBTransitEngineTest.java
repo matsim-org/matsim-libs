@@ -663,14 +663,6 @@ public class SBBTransitEngineTest {
 		try (var pool = Executors.newFixedThreadPool(size)) {
 			var futures = comms.stream()
 				.map(comm -> pool.submit(() -> {
-					// defer startup of one controller to debug
-					try {
-						if (comm.getRank() == 0) {
-							Thread.sleep(1000);
-						}
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
 					TestFixture f = new TestFixture();
 
 					f.config.controller().setOutputDirectory(utils.getOutputDirectory());
