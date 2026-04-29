@@ -73,7 +73,7 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	private void collectTourLoad(ScheduledTour scheduledTour) {
-		Id<Vehicle> vehicleId = scheduledTour.getVehicle().getId();
+		Id<Vehicle> vehicleId = Id.createVehicleId(scheduledTour.getVehicle().getId().toString() + "_tour_" + scheduledTour.getTour().getId());
 		LinkedList<Integer> load = new LinkedList<>();
 		int currentLoad = 0;
 		int handledDemand = 0;

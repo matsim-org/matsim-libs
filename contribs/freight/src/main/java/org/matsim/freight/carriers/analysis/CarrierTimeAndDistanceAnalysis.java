@@ -94,7 +94,7 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	private void collectTourStats(Carrier carrier, ScheduledTour scheduledTour) {
-		Id<Vehicle> vehicleId = scheduledTour.getVehicle().getId();
+		Id<Vehicle> vehicleId = Id.createVehicleId(scheduledTour.getVehicle().getId().toString() + "_tour_" + scheduledTour.getTour().getId());
 		Id<Tour> tourId = scheduledTour.getTour().getId();
 		VehicleType vehType = scheduledTour.getVehicle().getType();
 
