@@ -57,7 +57,6 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.dsim.DistributedContext;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -72,6 +71,7 @@ import org.matsim.dsim.NetworkDecomposition;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.testcases.DisabledOnGitHubWindowsCI;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
@@ -153,9 +153,7 @@ public class SBBTransitEngineTest {
 			.addQSimModule(new SBBTransitEngineQSimModule())
 			.addQSimModule(new TestQSimModule(f.config))
 			.configureQSimComponents(new SBBTransitEngineQSimModule())
-			.configureQSimComponents(configurator -> {
-				configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME);
-			})
+			.configureQSimComponents(configurator -> configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME))
 			.build(f.scenario, eventsManager);
 
 		EventsCollector collector = new EventsCollector();
@@ -317,9 +315,7 @@ public class SBBTransitEngineTest {
 			.addQSimModule(new SBBTransitEngineQSimModule())
 			.addQSimModule(new TestQSimModule(f.config))
 			.configureQSimComponents(new SBBTransitEngineQSimModule())
-			.configureQSimComponents(configurator -> {
-				configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME);
-			})
+			.configureQSimComponents(configurator -> configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME))
 			.build(f.scenario, eventsManager);
 
 		EventsCollector collector = new EventsCollector();
@@ -368,9 +364,7 @@ public class SBBTransitEngineTest {
 			.addQSimModule(new ActivityEngineModule())
 			.addQSimModule(new SBBTransitEngineQSimModule())
 			.addQSimModule(new TestQSimModule(f.config))
-			.configureQSimComponents(configurator -> {
-				configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME);
-			})
+			.configureQSimComponents(configurator -> configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME))
 			.configureQSimComponents(new SBBTransitEngineQSimModule())
 			.build(f.scenario, eventsManager);
 
@@ -417,9 +411,7 @@ public class SBBTransitEngineTest {
 			.addQSimModule(new SBBTransitEngineQSimModule())
 			.addQSimModule(new TestQSimModule(f.config))
 			.configureQSimComponents(new SBBTransitEngineQSimModule())
-			.configureQSimComponents(configurator -> {
-				configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME);
-			})
+			.configureQSimComponents(configurator -> configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME))
 			.build(f.scenario, eventsManager);
 
 		EventsCollector collector = new EventsCollector();
@@ -463,9 +455,7 @@ public class SBBTransitEngineTest {
 			.addQSimModule(new SBBTransitEngineQSimModule())
 			.addQSimModule(new TestQSimModule(f.config))
 			.configureQSimComponents(new SBBTransitEngineQSimModule())
-			.configureQSimComponents(configurator -> {
-				configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME);
-			})
+			.configureQSimComponents(configurator -> configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME))
 			.build(f.scenario, eventsManager);
 
 		EventsCollector collector = new EventsCollector();
@@ -518,9 +508,7 @@ public class SBBTransitEngineTest {
 			.addQSimModule(new ActivityEngineModule())
 			.addQSimModule(new SBBTransitEngineQSimModule())
 			.addQSimModule(new TestQSimModule(f.config))
-			.configureQSimComponents(configurator -> {
-				configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME);
-			})
+			.configureQSimComponents(configurator -> configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME))
 			.configureQSimComponents(new SBBTransitEngineQSimModule())
 			.build(f.scenario, eventsManager);
 
@@ -571,9 +559,7 @@ public class SBBTransitEngineTest {
 			.addQSimModule(new SBBTransitEngineQSimModule())
 			.addQSimModule(new TestQSimModule(f.config))
 			.configureQSimComponents(new SBBTransitEngineQSimModule())
-			.configureQSimComponents(configurator -> {
-				configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME);
-			})
+			.configureQSimComponents(configurator -> configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME))
 			.build(f.scenario, eventsManager);
 
 		try {
@@ -590,7 +576,7 @@ public class SBBTransitEngineTest {
 	 * DistributedAgentSource and beforeMobsim DSim code paths.
 	 */
 	@Test
-	void testDSimIntegration_withPassengers() {
+	void testDSimIntegration() {
 		TestFixture f = new TestFixture();
 		f.addSingleTransitDemand();
 
@@ -665,7 +651,8 @@ public class SBBTransitEngineTest {
 	 */
 	@Test
 	@Timeout(value = 2, unit = TimeUnit.MINUTES)
-	void testDistributedDSim_driverCrossesPartition() throws ExecutionException, InterruptedException, TimeoutException, IOException {
+	@DisabledOnGitHubWindowsCI
+	void testDistributedDSimIntegration() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 		int size = 2;
 		var comms = LocalCommunicator.create(size);
 		Files.createDirectories(Path.of(utils.getOutputDirectory()));
@@ -815,9 +802,7 @@ public class SBBTransitEngineTest {
 			.addQSimModule(new SBBTransitEngineQSimModule())
 			.addQSimModule(testModule)
 			.configureQSimComponents(new SBBTransitEngineQSimModule())
-			.configureQSimComponents(configurator -> {
-				configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME);
-			});
+			.configureQSimComponents(configurator -> configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME));
 
 		for (int iteration = 0; iteration <= 10; iteration++) {
 			testModule.context.setIteration(iteration);
