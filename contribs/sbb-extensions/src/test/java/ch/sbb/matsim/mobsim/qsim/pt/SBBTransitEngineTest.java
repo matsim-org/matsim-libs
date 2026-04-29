@@ -34,6 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -663,8 +664,7 @@ public class SBBTransitEngineTest {
 	 * driver-only scenario.
 	 */
 	@Test
-	@org.junit.jupiter.api.Disabled("Long-running distributed test — run manually")
-	@org.junit.jupiter.api.Timeout(value = 2, unit = TimeUnit.MINUTES)
+	@Timeout(value = 2, unit = TimeUnit.MINUTES)
 	void testDistributedDSim_driverCrossesPartition() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 		int size = 2;
 		var comms = LocalCommunicator.create(size);
@@ -681,6 +681,11 @@ public class SBBTransitEngineTest {
 					f.config.dsim().setPartitioning(DSimConfigGroup.Partitioning.none);
 					f.config.dsim().setEndTime(f.config.qsim().getEndTime().orElse(86400));
 					f.config.dsim().setThreads(1);
+
+					f.addSingleTransitDemand();
+
+					f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
+					f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
 					// Partition 0: nodes 1–3, links 1–2 (stops A, B, C)
 					// Partition 1: nodes 4–5, links 3–4 (stops D, E)
@@ -735,28 +740,35 @@ public class SBBTransitEngineTest {
 				System.out.println(event.toString());
 			}
 
-			Assertions.assertEquals(15, allEvents.size(), "wrong number of events.");
-			assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
-			assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(1));  // driver
-			assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));  // driver
-			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30000, allEvents.get(3));
-			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30000, allEvents.get(4));
-			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30100, allEvents.get(5));
-			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30120, allEvents.get(6));
-			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30300, allEvents.get(7));
-			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30300, allEvents.get(8));
-			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30570, allEvents.get(9));
-			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30600, allEvents.get(10));
-			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30720, allEvents.get(11));
-			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30720, allEvents.get(12));
-			assertEqualEvent(PersonLeavesVehicleEvent.class, 30720, allEvents.get(13)); // driver
-			assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(14)); // driver
+			Assertions.assertEquals(22, allEvents.size(), "wrong number of events.");
+			assertEqualEvent(ActivityEndEvent.class, 29500, allEvents.get(0));   // passenger
+			assertEqualEvent(PersonDepartureEvent.class, 29500, allEvents.get(1));   // passenger
+			assertEqualEvent(AgentWaitingForPtEvent.class, 29500, allEvents.get(2));   // passenger
+			assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(3));
+			assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(4));   // driver
+			assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(5));   // driver
+			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30000, allEvents.get(6));
+			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30000, allEvents.get(7));
+			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30100, allEvents.get(8));
+			assertEqualEvent(PersonEntersVehicleEvent.class, 30101, allEvents.get(9));   // passenger boards
+			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30120, allEvents.get(10));
+			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30300, allEvents.get(11));
+			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30300, allEvents.get(12));
+			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30570, allEvents.get(13));
+			assertEqualEvent(PersonLeavesVehicleEvent.class, 30571, allEvents.get(14));  // passenger alights
+			assertEqualEvent(PersonArrivalEvent.class, 30571, allEvents.get(15));  // passenger
+			assertEqualEvent(ActivityStartEvent.class, 30571, allEvents.get(16));  // passenger
+			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30600, allEvents.get(17));
+			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30720, allEvents.get(18));
+			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30720, allEvents.get(19));
+			assertEqualEvent(PersonLeavesVehicleEvent.class, 30720, allEvents.get(20));  // driver
+			assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(21));  // driver
 		}
 	}
 
 	/**
-	 * Verifies stop tracking state and serialization after advancing through stops.
-	 * Full reconstruction is covered by testDistributedDSim_driverCrossesPartition.
+	 * Verifies stop tracking state and serialization after advancing through stops. Full reconstruction is covered by
+	 * testDistributedDSim_driverCrossesPartition.
 	 */
 	@Test
 	void testSBBMessageRoundTrip() {
