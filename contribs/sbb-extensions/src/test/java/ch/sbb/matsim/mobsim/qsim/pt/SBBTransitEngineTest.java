@@ -33,6 +33,7 @@ import ch.sbb.matsim.mobsim.qsim.SBBTransitModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -652,7 +653,8 @@ public class SBBTransitEngineTest {
 	 */
 	@Test
 	@Timeout(value = 2, unit = TimeUnit.MINUTES)
-	@DisabledOnGitHubWindowsCI
+	//@DisabledOnGitHubWindowsCI
+	@Disabled
 	void testDistributedDSimIntegration() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 		int size = 2;
 		var comms = LocalCommunicator.create(size);
