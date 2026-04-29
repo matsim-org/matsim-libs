@@ -21,58 +21,56 @@ jobs:
       fail-fast: false
       matrix:
         module:
-          # DEBUG: reduced to sbb-extensions only for faster iteration
-          # - matsim
+          - matsim
           # sorted from longest to shortest (to minimise the overall test stage duration)
-          # (used in travis; not respected in GitHub Action workflows)
-          # - contribs/vsp
-          # - contribs/common
-          # - contribs/taxi
-          # - contribs/minibus
-          # - contribs/signals
-          # - contribs/bicycle
-          # - contribs/cadytsIntegration
-          # - contribs/drt
-          # - contribs/drt-extensions
-          # - contribs/discrete_mode_choice
-          # - contribs/carsharing
-          # - contribs/commercialTrafficApplications
-          # - contribs/av
-          # - contribs/locationchoice
-          # - contribs/ev
-          # - contribs/dvrp
-          # - contribs/emissions
-          # - contribs/decongestion
-          # - contribs/noise
-          # - contribs/accidents
-          # - contribs/freight
-          # - contribs/freightreceiver
-          # - contribs/parking
-          # - contribs/matrixbasedptrouter
-          # - contribs/accessibility
-          # - contribs/integration
-          # - contribs/multimodal
-          # - contribs/protobuf
-          # - contribs/shared_mobility
-          # - contribs/socnetsim
-          # - contribs/sumo
-          # - contribs/pseudosimulation
-          # - contribs/railsim
-          # - contribs/roadpricing
-          # - contribs/analysis
-          # - contribs/hybridsim
-          # - contribs/informed-mode-choice
-          # - contribs/distributed-simulation
-          # - contribs/otfvis
-          # - contribs/osm
-          # - contribs/application
-          # - contribs/simwrapper
+          - contribs/vsp
+          - contribs/common
+          - contribs/taxi
+          - contribs/minibus
+          - contribs/signals
+          - contribs/bicycle
+          - contribs/cadytsIntegration
+          - contribs/drt
+          - contribs/drt-extensions
+          - contribs/discrete_mode_choice
+          - contribs/carsharing
+          - contribs/commercialTrafficApplications
+          - contribs/av
+          - contribs/locationchoice
+          - contribs/ev
+          - contribs/dvrp
+          - contribs/emissions
+          - contribs/decongestion
+          - contribs/noise
+          - contribs/accidents
+          - contribs/freight
+          - contribs/freightreceiver
+          - contribs/parking
+          - contribs/matrixbasedptrouter
+          - contribs/accessibility
+          - contribs/integration
+          - contribs/multimodal
+          - contribs/protobuf
+          - contribs/shared_mobility
+          - contribs/socnetsim
+          - contribs/sumo
+          - contribs/pseudosimulation
+          - contribs/railsim
+          - contribs/roadpricing
+          - contribs/analysis
+          - contribs/hybridsim
+          - contribs/informed-mode-choice
+          - contribs/distributed-simulation
+          - contribs/otfvis
+          - contribs/osm
+          - contribs/application
+          - contribs/simwrapper
           - contribs/sbb-extensions
-          # - contribs/simulatedannealing
-          # - contribs/small-scale-traffic-generation
-          # - contribs/perceived-safety
-          # - contribs/atap
-          # - benchmark
+          - contribs/simulatedannealing
+          - contribs/small-scale-traffic-generation
+          - contribs/perceived-safety
+          - contribs/atap
+          - benchmark
 
     steps:
       - name: Checkout git repo
@@ -102,9 +100,7 @@ jobs:
 
       - name: Test module
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        # DEBUG: output shown directly in console (removed -Dmaven.test.redirectTestOutputToFile)
         run: mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
-        #run: mvn verify --batch-mode -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
         working-directory: ${{matrix.module}}
 
       - name: Sanitize module name for artifact
