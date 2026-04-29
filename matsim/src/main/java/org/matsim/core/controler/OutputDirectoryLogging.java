@@ -62,7 +62,7 @@ public final class OutputDirectoryLogging {
 	 */
 	private static CollectLogMessagesAppender collectLogMessagesAppender = null;
 
-	public static void catchLogEntries() {
+	public static synchronized void catchLogEntries() {
 		if ( collectLogMessagesAppender != null ) {
 			// create a new instance only if there is not one yet, to allow
 			// collecting log messages issued _before_ controller construction.
@@ -85,7 +85,7 @@ public final class OutputDirectoryLogging {
 	 * Initializes log4j to write log output to files in output directory.
 	 * @param outputDirectoryHierarchy
 	 */
-	public final static void initLogging(OutputDirectoryHierarchy outputDirectoryHierarchy) {
+	public final static synchronized void initLogging(OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		if (collectLogMessagesAppender != null) {
 			final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 			ctx.getConfiguration().getRootLogger().removeAppender(collectLogMessagesAppender.getName());
@@ -112,7 +112,7 @@ public final class OutputDirectoryLogging {
 	 * @see OutputDirectoryLogging#closeOutputDirLogging()
 	 * @author dgrether
 	 */
-	public static void initLoggingWithOutputDirectory(final String outputDirectory) throws IOException {
+	public static synchronized void initLoggingWithOutputDirectory(final String outputDirectory) throws IOException {
 		if (collectLogMessagesAppender != null) {
 			final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 			ctx.getConfiguration().getRootLogger().removeAppender(collectLogMessagesAppender.getName());
@@ -167,7 +167,7 @@ public final class OutputDirectoryLogging {
 	 * This avoids problems concerning open streams after the termination of the program.
 	 * @see OutputDirectoryLogging#initLoggingWithOutputDirectory(String)
 	 */
-	public static void closeOutputDirLogging() {
+	public static synchronized void closeOutputDirLogging() {
 		//might also be sent to the warn logstream but then you end up with a warning even if everything is alright
 		String endLoggingInfo = "closing the logfile, i.e. messages sent to the logger after this message are not written to the logfile.";
 		log.info(endLoggingInfo);

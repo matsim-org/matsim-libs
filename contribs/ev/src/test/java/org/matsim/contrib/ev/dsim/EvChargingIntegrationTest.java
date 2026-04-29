@@ -106,7 +106,7 @@ public class EvChargingIntegrationTest {
 	}
 
 	@Test
-	void dsimDischarge() {
+	void dsimThreeParts() {
 		var config = createConfig(utils.getOutputDirectory());
 		EvDSimTestFixture.configureDSim(config, 3);
 
@@ -123,7 +123,7 @@ public class EvChargingIntegrationTest {
 	}
 
 	@Test
-	void dsimDistributedDischarge() throws IOException, ExecutionException, InterruptedException, TimeoutException {
+	void dsimThreeNodes() throws IOException, ExecutionException, InterruptedException, TimeoutException {
 
 		int size = 2;
 		var comms = LocalCommunicator.create(size);
