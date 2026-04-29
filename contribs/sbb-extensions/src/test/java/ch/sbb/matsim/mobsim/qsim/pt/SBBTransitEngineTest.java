@@ -680,8 +680,6 @@ public class SBBTransitEngineTest {
 					f.config.dsim().setPartitioning(DSimConfigGroup.Partitioning.none);
 					f.config.dsim().setEndTime(f.config.qsim().getEndTime().orElse(86400));
 					f.config.dsim().setThreads(1);
-					f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
-					f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
 					// Partition 0: nodes 1–3, links 1–2 (stops A, B, C)
 					// Partition 1: nodes 4–5, links 3–4 (stops D, E)
@@ -728,7 +726,7 @@ public class SBBTransitEngineTest {
 			EventsManager replayManager = EventsUtils.createEventsManager();
 			EventsCollector collector = new EventsCollector();
 			replayManager.addHandler(collector);
-			String eventsFile = utils.getOutputDirectory() + "output_events.xml.gz";
+			String eventsFile = utils.getOutputDirectory() + "output_events.xml.zst";
 			EventsUtils.readEvents(replayManager, eventsFile);
 			List<Event> allEvents = collector.getEvents();
 
@@ -738,7 +736,7 @@ public class SBBTransitEngineTest {
 
 			Assertions.assertEquals(15, allEvents.size(), "wrong number of events.");
 			assertEqualEvent(TransitDriverStartsEvent.class, 30000, allEvents.get(0));
-			assertEqualEvent(PersonDepartureEvent.class,     30000, allEvents.get(1));  // driver
+			assertEqualEvent(PersonDepartureEvent.class, 30000, allEvents.get(1));  // driver
 			assertEqualEvent(PersonEntersVehicleEvent.class, 30000, allEvents.get(2));  // driver
 			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30000, allEvents.get(3));
 			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30000, allEvents.get(4));
@@ -751,7 +749,7 @@ public class SBBTransitEngineTest {
 			assertEqualEvent(VehicleArrivesAtFacilityEvent.class, 30720, allEvents.get(11));
 			assertEqualEvent(VehicleDepartsAtFacilityEvent.class, 30720, allEvents.get(12));
 			assertEqualEvent(PersonLeavesVehicleEvent.class, 30720, allEvents.get(13)); // driver
-			assertEqualEvent(PersonArrivalEvent.class,       30720, allEvents.get(14)); // driver
+			assertEqualEvent(PersonArrivalEvent.class, 30720, allEvents.get(14)); // driver
 		}
 	}
 

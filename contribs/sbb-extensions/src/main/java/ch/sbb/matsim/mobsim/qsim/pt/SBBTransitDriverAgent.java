@@ -59,10 +59,22 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 		eventsManager = internalInterface.getMobsim().getEventsManager();
 		accessEgress = new SBBPassengerAccessEgress(internalInterface, thisAgentTracker, internalInterface.getMobsim().getScenario(),
 			this.eventsManager);
-		// we need to set the previous stop from the message. The nextStop is figured out in checkCurrentRoute.
-		previousStop = getTransitRoute().getStops().stream().filter(s -> s.getStopFacility().getId().equals(message.previousStop)).findAny()
-			.orElse(null);
-		checkCurrentRoute();
+
+		// below does what checkRoute does, bot for inbetween states.
+		this.currentTransitRoute = getTransitRoute();
+		this.remainingRouteStops = new LinkedList<>();
+		for (var stop : this.currentTransitRoute.getStops()) {
+			if (stop.getStopFacility().getId().equals(message.previousStop)) {
+				this.previousStop = stop;
+				continue; // don't add this stop to remaining, but all after this one.
+			}
+			// add all stops after previous stop, or all stops in case there was no previous stop
+			if (this.previousStop != null || message.previousStop == null) {
+				remainingRouteStops.add(stop);
+			}
+			// skip all elements until one of the conditions above is true
+		}
+		this.nextStop = this.remainingRouteStops.getFirst();
 	}
 
 	void arrive(TransitRouteStop stop, double now) {
@@ -138,6 +150,9 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 		}
 	}
 
+	/**
+	 * This does not really check, but sets a lot of state. I found it this way and I'll keep it this way, I guess.
+	 */
 	private void checkCurrentRoute() {
 		TransitRoute route = super.getTransitRoute();
 		if (route != null && route != this.currentTransitRoute) {
