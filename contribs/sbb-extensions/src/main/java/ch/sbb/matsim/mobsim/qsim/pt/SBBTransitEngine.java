@@ -240,8 +240,9 @@ public class SBBTransitEngine
 	private void handleLinkTransition(TransitEvent e) {
 		var transition = e.context.precomputedLinkTransitions.element();
 		var vehicle = e.context.driver.getVehicle();
-		em.processEvent(new LinkLeaveEvent(e.time, vehicle.getId(), transition.fromLink()));
-		em.processEvent(new LinkEnterEvent(e.time, vehicle.getId(), transition.toLink()));
+		double now = Math.floor(e.time);
+		em.processEvent(new LinkLeaveEvent(now, vehicle.getId(), transition.fromLink()));
+		em.processEvent(new LinkEnterEvent(now, vehicle.getId(), transition.toLink()));
 
 		var nextEvent = e.context.computeEventOnLinkTransition(e.time);
 		enqueueOrSend(nextEvent);
