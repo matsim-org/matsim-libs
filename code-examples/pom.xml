@@ -122,6 +122,20 @@
 			<artifactId>decongestion</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
+		<!-- Include the JUnit testing library -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 </project>
