@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.api.experimental.events.VehicleTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
@@ -85,6 +86,8 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 	private final QNetsimEngineI qNetsimEngine;
 
 	private final PriorityQueue<VehicleArrivalEntry> vehicleArrivals = new PriorityQueue<>();
+
+	private InternalInterface internalInterface;
 
 	@Inject
 	FISS(MatsimServices matsimServices, Scenario scenario, FISSConfigGroup fissConfigGroup, Network network, TeleportationEngine teleport,
@@ -150,6 +153,13 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 			}
 			double arrivalTime = now + newTravelTime;
 			vehicleArrivals.add(new VehicleArrivalEntry(arrivalTime, removedVehicle, destinationLinkId));
+
+			// Signal that a vehicular trip is being teleported. This fires at departure time
+			// (same timestamp as PersonDepartureEvent) and serves as the equivalent of
+			// PersonEntersVehicleEvent for teleported trips.
+			internalInterface.getMobsim().getEventsManager().processEvent(
+					new VehicleTeleportationDepartureEvent(now, driverAgent.getId(), vehicleId, linkId,
+							agent.getMode()));
 		}
 
 		boolean result = teleport.handleDeparture(now, agent, linkId);
@@ -261,6 +271,7 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
 		teleport.setInternalInterface(internalInterface);
 	}
 
