@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.pt.Umlauf;
@@ -29,5 +30,9 @@ import org.matsim.pt.Umlauf;
 public interface TransitDriverAgentFactory extends MatsimFactory {
 
 	AbstractTransitDriverAgent createTransitDriver(Umlauf umlauf, InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker);
+
+	default AbstractTransitDriverAgent createTransitDriverFromMessage(Message message, Umlauf umlauf, InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker){
+		throw new UnsupportedOperationException("Method not implemented. TransitDriverAgentFactory is not ready for being used with DSim.");
+	}
 
 }

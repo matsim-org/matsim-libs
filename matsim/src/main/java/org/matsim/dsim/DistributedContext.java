@@ -79,14 +79,14 @@ public final class DistributedContext implements ExecutionContext {
 	 */
 	private static DistributedContext create(Communicator comm, int threads) {
 
-		log.info("Waiting for {} other nodes to connect...", comm.getSize() - 1);
+		log.info("#{} Waiting for {} other nodes to connect...", comm.getRank(), comm.getSize() - 1);
 		try {
 			comm.connect();
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to connect to other nodes", e);
+			throw new RuntimeException("#" + comm.getRank() + " Failed to connect to other nodes", e);
 		}
 
-		log.info("All nodes connected");
+		log.info("#{} All nodes connected", comm.getRank());
 
 		SerializationProvider serializer = SerializationProvider.getInstance();
 
@@ -112,7 +112,6 @@ public final class DistributedContext implements ExecutionContext {
 
 		Topology.TopologyBuilder topology = Topology.builder();
 		List<ComputeNode> topoNodes = new ArrayList<>();
-
 
 		int total = 0;
 		for (ComputeNode computeNode : computeNodes) {

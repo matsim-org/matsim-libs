@@ -341,7 +341,6 @@ public final class DistributedEventsManager implements EventsManager {
 
 	@Override
 	public void processEvent(Event e) {
-
 		if (eventsDisabled) {
 			return;
 		}
