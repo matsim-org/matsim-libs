@@ -163,7 +163,7 @@ public class DistributedWithinDayEvEngine implements DistributedActivityHandler,
 
 					if (alternative.charger() != process.currentSlot.charger()) {
 
-						Activity followingPlugActivity = findFollowingActivity(agent, PLUG_ACTIVITY_TYPE);
+						Activity followingPlugActivity = findFollowingPlugActivity(agent);
 
 						// drive to different charger and schedule a plug activity
 						var charger = getLiveCharger(alternative.charger());
@@ -231,7 +231,7 @@ public class DistributedWithinDayEvEngine implements DistributedActivityHandler,
 
 		var activity = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
 		if (activity.getType().equals(PLUG_ACTIVITY_TYPE)) {
-			return handlePlugActivity(agent, activity, true);
+			return handlePlugActivity(agent, activity);
 		} else if (activity.getType().equals(UNPLUG_ACTIVITY_TYPE)) {
 			return handleUnplugActivity(agent, activity);
 		} else if (activity.getType().equals(ACCESS_ACTIVITY_TYPE)) {
@@ -240,9 +240,9 @@ public class DistributedWithinDayEvEngine implements DistributedActivityHandler,
 		return false;
 	}
 
-	private boolean handlePlugActivity(MobsimAgent agent, Activity activity, boolean isSpontaneous) {
+	private boolean handlePlugActivity(MobsimAgent agent, Activity activity) {
 
-		var process = getChargingProcessForPlugActivity(agent, activity, isSpontaneous);
+		var process = getChargingProcessForPlugActivity(agent, activity, true);
 		process.isPersonAtCharger = true;
 
 		// we know that the process takes place at a charger on this partition. So, we can cache
@@ -445,13 +445,13 @@ public class DistributedWithinDayEvEngine implements DistributedActivityHandler,
 	}
 
 	private ChargingProcess getChargingProcessForLeg(MobsimAgent agent) {
-		var plugActivity = findFollowingActivity(agent, PLUG_ACTIVITY_TYPE);
+		var plugActivity = findFollowingPlugActivity(agent);
 		if (plugActivity != null)
 			return getChargingProcessForPlugActivity(agent, plugActivity, false);
 		else return null;
 	}
 
-	private Activity findFollowingActivity(MobsimAgent agent, String actType) {
+	private Activity findFollowingPlugActivity(MobsimAgent agent) {
 
 		var pa = (PlanAgent) agent;
 		var currentElement = pa.getCurrentPlanElement();
@@ -463,7 +463,7 @@ public class DistributedWithinDayEvEngine implements DistributedActivityHandler,
 			.filter(e -> e instanceof Activity)
 			.map(e -> (Activity) e)
 			.takeWhile(a -> !TripStructureUtils.isStageActivityType(a.getType()) || isManagedActivityType(a.getType()))
-			.filter(a -> a.getType().equals(actType))
+			.filter(a -> a.getType().equals(DistributedWithinDayEvEngine.PLUG_ACTIVITY_TYPE))
 			.findFirst()
 			.orElse(null);
 	}
@@ -651,10 +651,9 @@ public class DistributedWithinDayEvEngine implements DistributedActivityHandler,
 			} else {
 				var pa = (PlanAgent) agent;
 				final var plugActivity = (Activity) pa.getCurrentPlanElement();
-				var plan = pa.getCurrentPlan();
 
 				alternativeProvider.findAlternativeAsync(
-					time, plan.getPerson(), plan, ev, process.initialSlot, process.trace, optAlternative -> {
+					time, pa, ev, process.initialSlot, process.trace, optAlternative -> {
 						if (optAlternative.isPresent()) {
 							var alternative = optAlternative.get();
 							// found an alternative charger
@@ -822,9 +821,6 @@ public class DistributedWithinDayEvEngine implements DistributedActivityHandler,
 	private Charger getLiveCharger(Id<Charger> chargerId) {
 		return chargingInfrastructure.getChargers().get(chargerId);
 	}
-
-	private record PendingAlternative(Id<ChargingAlternative> id, MobsimAgent agent) {}
-
 
 	private static class ChargingProcess {
 

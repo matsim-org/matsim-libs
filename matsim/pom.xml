@@ -327,12 +327,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-sampling</artifactId>
-			<version>1.6</version>
+			<version>1.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-client-api</artifactId>
-			<version>1.6</version>
+			<version>1.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -364,7 +364,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-core</artifactId>
-			<version>1.6</version>
+			<version>1.7</version>
 		</dependency>
 
 		<!-- Scan classpath to find providers -->
@@ -388,7 +388,7 @@
 		<dependency>
 			<groupId>org.agrona</groupId>
 			<artifactId>agrona</artifactId>
-			<version>2.4.0</version>
+			<version>2.4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hdrhistogram</groupId>

@@ -22,7 +22,6 @@ jobs:
         module:
           - matsim
           # sorted from longest to shortest (to minimise the overall test stage duration)
-          # (used in travis; not respected in GitHub Action workflows)
           - contribs/vsp
           - contribs/common
           - contribs/taxi

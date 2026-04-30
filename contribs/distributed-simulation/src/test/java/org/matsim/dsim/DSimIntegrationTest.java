@@ -62,7 +62,7 @@ public class DSimIntegrationTest {
 
 	@Test
 	@Order(2)
-	@DisabledOnGitHubWindowsCI
+	@org.matsim.testcases.DisabledOnGitHubWindowsCI
 	void runDistributed() throws IOException, InterruptedException, ExecutionException {
 
 		Path output = Path.of(utils.getOutputDirectory());

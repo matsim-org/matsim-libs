@@ -72,6 +72,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	public static void main(String[] args) throws Exception {
 		String inputCRS = "EPSG:4326"; // WGS84
 		String outputCRS = "EPSG:31468"; // DHDN Gauss-Krüger Zone 4
+		String tiffFileCRS = "EPSG:4326"; // WGS84
 //		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/osm/2017-08-29_mitte.osm";
 		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/osm/berlin-latest.osm";
 		String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/input/eu-dem/BerlinEUDEM.tif"; // Berlin EU-DEM
@@ -85,7 +86,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
 		
-		ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, outputCRS);
+		ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, outputCRS, tiffFileCRS);
 
 		BicycleOsmNetworkReaderV2 bicycleNetworkReader = new BicycleOsmNetworkReaderV2(network, ct, elevationDataParser);
 		bicycleNetworkReader.setKeepPaths(true);

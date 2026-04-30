@@ -108,8 +108,8 @@ public class CommercialTrafficIT {
 		Scenario scenarioWOSolution = ScenarioUtils.createScenario(config);
 		Scenario scenarioWSolution = ScenarioUtils.createScenario(config);
 		Population population = PopulationUtils.readPopulation(utils.getOutputDirectory() + "testPopulation.xml.gz");
-		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_noPlans.xml.gz";
-		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_withPlans.xml.gz";
+		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_unsolvedVRP.xml.gz";
+		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_solvedVRP.xml.gz";
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_vehicles.xml.gz");
 

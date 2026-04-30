@@ -1,7 +1,7 @@
 package org.matsim.contrib.ev.dsim;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -9,10 +9,12 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEvent;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEventHandler;
 import org.matsim.core.communication.LocalCommunicator;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -74,6 +76,9 @@ public class EvDriveDischargingIntegrationTest {
 	void threePartitions() {
 		var config = EvDSimTestFixture.createConfig(utils.getOutputDirectory());
 		EvDSimTestFixture.configureDSim(config, 3);
+		var evConfig = ConfigUtils.addOrGetModule(config, EvConfigGroup.class);
+		evConfig.setWriteChargersInterval(1);
+		evConfig.setWriteChargingActivitiesInterval(1);
 		var scenario = EvDSimTestFixture.createScenario(config, 3);
 
 		var controller = new Controler(scenario);
@@ -91,13 +96,10 @@ public class EvDriveDischargingIntegrationTest {
 	 * Runs DSim with three separate JVM threads, each owning one partition.
 	 * Uses {@link LocalCommunicator} for in-process message passing between ranks.
 	 * <p>
-	 * Disabled until WP3–WP5 are implemented: threads fail during Guice injection
-	 * (singleton EV handlers not yet partition-aware) and the {@link LocalCommunicator}
-	 * receive loops spin indefinitely waiting for peers that already failed.
 	 */
 	@Test
-	@Timeout(value = 2, unit = TimeUnit.MINUTES)
-	//@Disabled("Enable once EV handlers are partition-aware (WP3-WP5)")
+	@Order(2)
+	@org.matsim.testcases.DisabledOnGitHubWindowsCI
 	void threeNodes() throws InterruptedException, ExecutionException, TimeoutException {
 		var outputDirectory = utils.getOutputDirectory();
 		var size = 3;
