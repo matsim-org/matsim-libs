@@ -295,15 +295,20 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 			// already does that correctly by itself, so no need to do this again manually.
 
 			double queueEnd = this.link.getLength(); // the length of the queue jammed vehicles build at the end of the link
+
+
 			double vehLen = Math.min(    // the length of a vehicle in visualization
 				this.euklideanDist / this.spaceCap, // all vehicles must have place on the link
 				this.effectiveCellSize / this.storageCapFactor); // a vehicle should not be larger than it's actual size
+
+			vehLen = this.link.getLength() / this.spaceCap ;
 
 			// put all cars in the buffer one after the other
 			for (EventAgent agent : this.buffer) {
 				{
 					// agent properties, do not influence the longitudinal position
 					agent.lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt( time, this.link ));
+					agent.lane = -1;
 					int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 					agent.speed = (time > cmp) ? 0.0 : this.link.getFreespeed( time );
 				}
@@ -325,7 +330,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 			for (EventAgent agent : this.drivingQueue) {
 				double travelTimeUpToNow = time - agent.time;
 
-				double distanceOnLink = (this.freespeedTravelTime == 0.0 ? 0.0 : ((travelTimeUpToNow / this.freespeedTravelTime) * this.euklideanDist));
+				double distanceOnLink = (this.freespeedTravelTime == 0.0 ? 0.0 : ((travelTimeUpToNow / this.freespeedTravelTime) * this.link.getLength()));
 
 				// yyyy it is not clear to my why, in the following, "queueEnd" and "lastDistance" need to be separate variables.
 
@@ -348,7 +353,8 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 					// agent properties, do not influence the longitudinal position
 					int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 					agent.speed = (time > cmp) ? 0.0 : this.link.getFreespeed( time );
-					agent.lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt( this.link ));
+//					agent.lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt( this.link ));
+					agent.lane = -1;
 				}
 //				log.warn("drivingQueue; distanceOnLink={}",  distanceOnLink);
 				var position = builder.setPersonId( agent.id ).setLinkId( link.getId() ).setLane( agent.lane ).setDistanceOnLink( distanceOnLink )

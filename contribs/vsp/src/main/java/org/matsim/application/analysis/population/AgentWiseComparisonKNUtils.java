@@ -366,7 +366,7 @@ class AgentWiseComparisonKNUtils{
 		final StringBuilder score_cmt = new StringBuilder( "is the overall benefit (potentially negative) in score space. This has the following contributions:" );
 		final StringBuilder weighted_ttime_cmt = new StringBuilder( "... ... is the travel time benefit." );
 		final StringBuilder weighted_money_cmt = new StringBuilder( "... is the monetary benefit (re-weighted by indiv. mUoM)." );
-		final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC (= unobserved (travel) benefits)." );
+		final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC (= unobserved (travel)) benefits." );
 		final StringBuilder u_trav_direct_cmt = new StringBuilder( "... ... is the direct travel score benefits (=less bike, less ride)." );
 		final StringBuilder u_lineswitches_cmt = new StringBuilder("... ... is the line switching benefit.");
 		final StringBuilder sum_cmt = new StringBuilder( "is the sum of these contributions." );
