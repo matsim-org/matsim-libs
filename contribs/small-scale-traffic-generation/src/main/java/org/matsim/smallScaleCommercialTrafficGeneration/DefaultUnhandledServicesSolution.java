@@ -85,7 +85,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					log.warn("Carrier {} has no valid subpopulation. Skipping.", carrier.getId());
 					continue;
 				}
-				VehicleSelection.OdMatrixEntryInformation odMatrixEntry = generator.vehicleSelection.getOdMatrixEntryInformation(purpose,
+		OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = generator.odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose,
 					modeORvehType, smallScaleCommercialTrafficType);
 				String startZone = carrier.getAttributes().getAttribute("tourStartArea") == null ? "" : carrier.getAttributes().getAttribute(
 					"tourStartArea").toString();

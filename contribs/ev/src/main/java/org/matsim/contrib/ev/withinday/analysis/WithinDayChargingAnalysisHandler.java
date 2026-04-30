@@ -1,55 +1,35 @@
 package org.matsim.contrib.ev.withinday.analysis;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import com.google.common.base.Preconditions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.charging.ChargingEndEvent;
-import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
-import org.matsim.contrib.ev.charging.ChargingStartEvent;
-import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
-import org.matsim.contrib.ev.charging.EnergyChargedEvent;
-import org.matsim.contrib.ev.charging.EnergyChargedEventHandler;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEvent;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEventHandler;
-import org.matsim.contrib.ev.charging.QuitQueueAtChargerEvent;
-import org.matsim.contrib.ev.charging.QuitQueueAtChargerEventHandler;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.infrastructure.Charger;
-import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEventHandler;
-import org.matsim.contrib.ev.withinday.events.AbortChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.AbortChargingProcessEventHandler;
-import org.matsim.contrib.ev.withinday.events.FinishChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.FinishChargingAttemptEventHandler;
-import org.matsim.contrib.ev.withinday.events.FinishChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.FinishChargingProcessEventHandler;
-import org.matsim.contrib.ev.withinday.events.StartChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.StartChargingAttemptEventHandler;
-import org.matsim.contrib.ev.withinday.events.StartChargingProcessEvent;
-import org.matsim.contrib.ev.withinday.events.StartChargingProcessEventHandler;
-import org.matsim.contrib.ev.withinday.events.UpdateChargingAttemptEvent;
-import org.matsim.contrib.ev.withinday.events.UpdateChargingAttemptEventHandler;
+import org.matsim.contrib.ev.withinday.events.*;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Tracks detailed information on the electric vehilce charging processes and
  * attempts.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class WithinDayChargingAnalysisHandler implements //
-		StartChargingProcessEventHandler,
-		AbortChargingProcessEventHandler, FinishChargingProcessEventHandler, //
-		StartChargingAttemptEventHandler, UpdateChargingAttemptEventHandler, FinishChargingAttemptEventHandler,
-		AbortChargingAttemptEventHandler, //
-		ChargingStartEventHandler,
-		ChargingEndEventHandler, QueuedAtChargerEventHandler, QuitQueueAtChargerEventHandler,
-		EnergyChargedEventHandler {
+	StartChargingProcessEventHandler,
+	AbortChargingProcessEventHandler, FinishChargingProcessEventHandler, //
+	StartChargingAttemptEventHandler, UpdateChargingAttemptEventHandler, FinishChargingAttemptEventHandler,
+	AbortChargingAttemptEventHandler, //
+	ChargingStartEventHandler,
+	ChargingEndEventHandler, QueuedAtChargerEventHandler, QuitQueueAtChargerEventHandler,
+	EnergyChargedEventHandler {
+	private static final Logger log = LogManager.getLogger(WithinDayChargingAnalysisHandler.class);
 	private final List<ChargingProcessItem> chargingItems = new LinkedList<>();
 	private final List<ChargingAttemptItem> chargingAttemptItems = new LinkedList<>();
 	private boolean finished = false;
@@ -66,7 +46,9 @@ public class WithinDayChargingAnalysisHandler implements //
 
 	@Override
 	public void handleEvent(StartChargingProcessEvent event) {
-		Preconditions.checkState(!active.containsKey(event.getVehicleId()));
+		//Preconditions.checkState(!active.containsKey(event.getVehicleId()));
+		//TODO this needs to handle cross partition charging attempts
+		log.warn("Found active charging process for {}. Probably, the process was finished on another partition. TODO: Fix this event handler.", event.getVehicleId());
 		active.put(event.getVehicleId(), new ChargingProcessTracker(event));
 	}
 
@@ -184,19 +166,19 @@ public class WithinDayChargingAnalysisHandler implements //
 	}
 
 	static public record ChargingProcessItem( //
-			Id<Person> personId, Id<Vehicle> vehicleId, //
-			int processIndex, int attempts, boolean successful, //
-			double startTime, double endTime) {
+	                                          Id<Person> personId, Id<Vehicle> vehicleId, //
+	                                          int processIndex, int attempts, boolean successful, //
+	                                          double startTime, double endTime) {
 	}
 
 	static public record ChargingAttemptItem( //
-			Id<Person> personId, Id<Vehicle> vehicleId, //
-			int processIndex, int attemptIndex, boolean successful, //
-			double startTime, double updateTime, double endTime, //
-			double queueingStartTime, double queueingEndTime, boolean queued, //
-			double chargingStartTime, double chargingEndTime, boolean charged, //
-			Id<Charger> chargerId, Id<Charger> initialChargerId, boolean enroute, //
-			boolean spontaneous, double energy_kWh) {
+	                                          Id<Person> personId, Id<Vehicle> vehicleId, //
+	                                          int processIndex, int attemptIndex, boolean successful, //
+	                                          double startTime, double updateTime, double endTime, //
+	                                          double queueingStartTime, double queueingEndTime, boolean queued, //
+	                                          double chargingStartTime, double chargingEndTime, boolean charged, //
+	                                          Id<Charger> chargerId, Id<Charger> initialChargerId, boolean enroute, //
+	                                          boolean spontaneous, double energy_kWh) {
 	}
 
 	private void registerProcess(ChargingProcessTracker tracker) {
@@ -210,8 +192,8 @@ public class WithinDayChargingAnalysisHandler implements //
 		} // otherwise was still ongoing
 
 		ChargingProcessItem chargingItem = new ChargingProcessItem(tracker.start.getPersonId(),
-				tracker.start.getVehicleId(), tracker.start.getProcessIndex(), tracker.attempts.size(),
-				tracker.attempts.getLast().plug != null, tracker.start.getTime(), endTime);
+			tracker.start.getVehicleId(), tracker.start.getProcessIndex(), tracker.attempts.size(),
+			tracker.attempts.getLast().plug != null, tracker.start.getTime(), endTime);
 
 		synchronized (chargingItems) {
 			chargingItems.add(chargingItem);
@@ -270,15 +252,15 @@ public class WithinDayChargingAnalysisHandler implements //
 			double energy_kWh = 0.0;
 			if (attemptTracker.plug != null && attemptTracker.lastEnergyEvent != null) {
 				energy_kWh = EvUnits
-						.J_to_kWh(attemptTracker.lastEnergyEvent.getEndCharge() - attemptTracker.plug.getCharge());
+					.J_to_kWh(attemptTracker.lastEnergyEvent.getEndCharge() - attemptTracker.plug.getCharge());
 			}
 
 			ChargingAttemptItem attemptItem = new ChargingAttemptItem(tracker.start.getPersonId(),
-					tracker.start.getVehicleId(), tracker.start.getProcessIndex(),
-					attemptTracker.start.getAttemptIndex(), attemptTracker.plug != null,
-					attemptStartTime, attemptUpdateTime, attemptEndTime, queueingStartTime, queueingEndTime,
-					attemptTracker.queued != null, chargingStartTime, chargingEndTime,
-					attemptTracker.plug != null, chargerId, initialChargerId, isEnroute, isSponaneous, energy_kWh);
+				tracker.start.getVehicleId(), tracker.start.getProcessIndex(),
+				attemptTracker.start.getAttemptIndex(), attemptTracker.plug != null,
+				attemptStartTime, attemptUpdateTime, attemptEndTime, queueingStartTime, queueingEndTime,
+				attemptTracker.queued != null, chargingStartTime, chargingEndTime,
+				attemptTracker.plug != null, chargerId, initialChargerId, isEnroute, isSponaneous, energy_kWh);
 
 			synchronized (chargingAttemptItems) {
 				chargingAttemptItems.add(attemptItem);

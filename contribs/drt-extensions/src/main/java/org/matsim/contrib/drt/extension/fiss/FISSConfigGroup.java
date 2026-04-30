@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 
 import java.util.Collections;
 import java.util.Set;
@@ -51,20 +50,20 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
 		super.checkConsistency( config );
 
 		switch( config.qsim().getVehicleBehavior() ){
-			case teleport -> {
+			case teleport, wait -> {
 			}
 			default -> {
-				throw new RuntimeException( "FISS only works together with vehicle behavior=teleport.  See code for more info." );
-				// This was previously implemented such that it also ran through with other settings.  However, it would teleport the
-				// vehicle immediately to its destination, thus leading to a faulty physical modelling of "wait" or "exception".   I
-				// can't say if a possibly waiting agent would wait for the driver of the vehicle, or for the vehicle itself; this
-				// would need to be checked.  kai, feb'25
+				throw new RuntimeException( "FISS only works together with vehicle behavior teleport or wait." );
 			}
 		}
 
-		if( !config.qsim().getVehiclesSource().equals( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData ) ){
-			throw new IllegalArgumentException( "For the time being, FISS only works with mode vehicle types from vehicles data, please check config!" );
-			// reason is that FISS changes the PCE in the mode vehicles.
+		switch (config.qsim().getVehiclesSource()) {
+			case modeVehicleTypesFromVehiclesData, fromVehiclesData -> {
+			}
+			default -> {
+				throw new IllegalArgumentException(
+						"FISS only works with modeVehicleTypesFromVehiclesData or fromVehiclesData, please check config!");
+			}
 		}
 
 		for( String sampledMode : getSampledModes()){

@@ -28,23 +28,20 @@ package org.matsim.contrib.ev.charging;
  * This charging behavior is based on research conducted at LTH / University of Lund
  */
 
+import com.google.common.base.Preconditions;
 import org.matsim.contrib.ev.fleet.Battery;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
-import com.google.common.base.Preconditions;
-
 public class FastThenSlowCharging implements BatteryCharging {
-	private final ElectricVehicle electricVehicle;
+	private final Battery battery;
 
-	public FastThenSlowCharging(ElectricVehicle electricVehicle) {
-		this.electricVehicle = electricVehicle;
+	public FastThenSlowCharging(Battery battery) {
+		this.battery = battery;
 	}
 
 	public double calcChargingPower(double maxPower) {
-		Battery b = electricVehicle.getBattery();
-		double soc = b.getCharge() / b.getCapacity();
-		double c = b.getCapacity() / 3600;
+		double soc = battery.getCharge() / battery.getCapacity();
+		double c = battery.getCapacity() / 3600;
 		if (soc <= 0.5) {
 			return Math.min(maxPower, 1.75 * c);
 		} else if (soc <= 0.75) {
@@ -63,7 +60,6 @@ public class FastThenSlowCharging implements BatteryCharging {
 		double maxChargingPower = charger.getPlugPower();
 		double energyCharged = 0;
 
-		final Battery battery = electricVehicle.getBattery();
 		double maxRemainingEnergy = battery.getCapacity() - battery.getCharge();
 		double soc = battery.getCharge() / battery.getCapacity();
 
@@ -102,21 +98,20 @@ public class FastThenSlowCharging implements BatteryCharging {
 	public double calcChargingTime(ChargerSpecification charger, double energy) {
 		Preconditions.checkArgument(energy >= 0, "Energy is negative: %s", energy);
 
-		Battery b = electricVehicle.getBattery();
-		double startCharge = b.getCharge();
+		double startCharge = battery.getCharge();
 		double endCharge = startCharge + energy;
-		Preconditions.checkArgument(endCharge <= b.getCapacity(), "End charge greater than battery capacity: %s", endCharge);
+		Preconditions.checkArgument(endCharge <= battery.getCapacity(), "End charge greater than battery capacity: %s", endCharge);
 
-		double threshold1 = 0.5 * b.getCapacity();
-		double threshold2 = 0.75 * b.getCapacity();
-		double c = b.getCapacity() / 3600;
+		double threshold1 = 0.5 * battery.getCapacity();
+		double threshold2 = 0.75 * battery.getCapacity();
+		double c = battery.getCapacity() / 3600;
 
 		double energyA = startCharge >= threshold1 ? 0 : Math.min(threshold1, endCharge) - startCharge;
 		double timeA = energyA / Math.min(charger.getPlugPower(), 1.75 * c);
 
 		double energyB = startCharge >= threshold2 || endCharge <= threshold1 ?
-				0 :
-				Math.min(threshold2, endCharge) - Math.max(threshold1, startCharge);
+			0 :
+			Math.min(threshold2, endCharge) - Math.max(threshold1, startCharge);
 		double timeB = energyB / Math.min(charger.getPlugPower(), 1.25 * c);
 
 		double energyC = endCharge <= threshold2 ? 0 : endCharge - Math.max(threshold2, startCharge);

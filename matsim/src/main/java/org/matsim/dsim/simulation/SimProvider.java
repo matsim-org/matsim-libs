@@ -23,9 +23,9 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.dsim.utils.NodeSingletonModule;
 
+import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SimProvider implements LPProvider {
 
@@ -59,8 +59,8 @@ public class SimProvider implements LPProvider {
 
 	@Inject
 	SimProvider(Injector injector, Collection<AbstractQSimModule> modules,
-				@Named("overrides") List<AbstractQSimModule> overridingModules,
-				@Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
+	            @Named("overrides") List<AbstractQSimModule> overridingModules,
+	            @Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
 		this.injector = injector;
 		this.modules = new ArrayList<>(modules);
 		// (these are the implementations)
@@ -123,7 +123,10 @@ public class SimProvider implements LPProvider {
 			}
 		};
 
-		if (nodeSingletonInjector != null && !node.isFirstPartition(partition.getIndex())) {
+		// Partitions other than the first one re-use the injector from the first partition for node singletons. See the end of this
+		// method where the node singleton injector is assigend when this method is called for the first partition.
+		if (!isFirstPartition(partition)) {
+			Objects.requireNonNull(nodeSingletonInjector, "Node singleton injector must be present for non-first partitions");
 			module = Modules.override(module).with(new NodeSingletonModule(nodeSingletonInjector));
 		}
 
@@ -133,38 +136,16 @@ public class SimProvider implements LPProvider {
 
 		AgentSourcesContainer agentSources = dsimInjector.getInstance(AgentSourcesContainer.class);
 
-		// Retrieve all mobsim listeners
-		Set<MobsimListener> listener = dsimInjector.getInstance(Key.get(new TypeLiteral<>() {
-		}));
-
-		// Add all listener that are not node singletons, or this is the first instance
-		listener = listener.stream()
-			.filter(l -> !l.getClass().isAnnotationPresent(NodeSingleton.class) || nodeSingletonInjector == null)
-			.collect(Collectors.toSet());
-
 		for (Object activeComponent : components.getActiveComponents()) {
-			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
-			if (activeComponent instanceof Annotation) {
-				activeComponentKey = Key.get(new TypeLiteral<>() {
-				}, (Annotation) activeComponent);
-			} else {
-				activeComponentKey = Key.get(new TypeLiteral<>() {
-				}, (Class<? extends Annotation>) activeComponent);
-			}
 
-			Collection<Provider<QSimComponent>> providers;
-			try {
-				providers = dsimInjector.getInstance(activeComponentKey);
-			} catch (ProvisionException | ConfigurationException e) {
-				log.warn("Failed to load component %s: ".formatted(activeComponent), e.getMessage());
-				continue;
-			}
+			Key<Collection<Provider<QSimComponent>>> activeComponentKey = getComponentKey(activeComponent);
+			Collection<Provider<QSimComponent>> providers = getComponentProviders(activeComponentKey, activeComponent, dsimInjector);
 
 			for (Provider<QSimComponent> provider : providers) {
 				QSimComponent qSimComponent = provider.get();
 
 				// Skip component that is a node singleton, but this process is not the first
-				if (qSimComponent.getClass().isAnnotationPresent(NodeSingleton.class) && nodeSingletonInjector != null) {
+				if (!isFirstPartition(partition) && isNodeSingleton(qSimComponent)) {
 					continue;
 				}
 
@@ -175,24 +156,91 @@ public class SimProvider implements LPProvider {
 				}
 
 				if (qSimComponent instanceof MobsimListener l) {
-					listeners.add(l);
+					addMobsimListener(partition, l, listeners, simProcess);
 				}
 			}
 		}
 
-		// Separate singleton listeners and partition specific ones
-		for (MobsimListener l : listener) {
-			if (l.getClass().isAnnotationPresent(NodeSingleton.class))
-				listeners.add(l);
-			else
-				simProcess.addQueueSimulationListeners(l);
+		// Retrieve all mobsim listeners that are not mobsim components
+		Set<MobsimListener> mobsimListeners = dsimInjector.getInstance(Key.get(new TypeLiteral<>() {}));
+		for (var l : mobsimListeners) {
+			addMobsimListener(partition, l, listeners, simProcess);
 		}
 
-		if (node.isFirstPartition(partition.getIndex())) {
+		// We re-use the injector which was created on for the first partition of the compute node for all following partitions to provide
+		// instances that are node singletons.
+		if (isFirstPartition(partition)) {
 			nodeSingletonInjector = dsimInjector;
 		}
 
 		return simProcess;
 	}
 
+	/**
+	 * Helper to wire up a mobsim listener. By default, a listener is added to the sim process. Each sim process will call its instance of a listener.
+	 * If the listener is annotated with {@link NodeSingleton}, it is added to the list of node wide listeners. That list is ultimately handled by
+	 * {@link org.matsim.dsim.DSim}.
+	 */
+	private void addMobsimListener(NetworkPartition partition, MobsimListener l, Collection<MobsimListener> listeners, SimProcess simProcess) {
+		if (isFirstPartition(partition) && isNodeSingleton(l)) {
+			listeners.add(l);
+		} else {
+			simProcess.addQueueSimulationListeners(l);
+		}
+	}
+
+	private boolean isFirstPartition(NetworkPartition partition) {
+		return node.isFirstPartition(partition.getIndex());
+	}
+
+	/**
+	 * Helper that tests whether the given object is annotated with {@link NodeSingleton} or any interface or superclass in the hierarchy.
+	 */
+	private static boolean isNodeSingleton(Object o) {
+		var clazz = o.getClass();
+		while (clazz != null) {
+			if (clazz.isAnnotationPresent(NodeSingleton.class)) return true;
+			for (var iface : clazz.getInterfaces()) {
+				if (isNodeSingletonInterface(iface)) return true;
+			}
+			clazz = clazz.getSuperclass();
+		}
+		return false;
+	}
+
+	/**
+	 * Helper that tests whether any interface in the hierarchy is annotated with {@link NodeSingleton}.
+	 */
+	private static boolean isNodeSingletonInterface(Class<?> iface) {
+		if (iface.isAnnotationPresent(NodeSingleton.class)) return true;
+		for (Class<?> parent : iface.getInterfaces()) {
+			if (isNodeSingletonInterface(parent)) return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Helper that wraps the getInstance call to injector with a try-catch block.
+	 */
+	private static @Nonnull Collection<Provider<QSimComponent>> getComponentProviders(Key<Collection<Provider<QSimComponent>>> activeComponentKey, Object activeComponent, Injector dsimInjector) {
+		try {
+			return dsimInjector.getInstance(activeComponentKey);
+		} catch (ProvisionException | ConfigurationException e) {
+			log.warn("Failed to load component %s: ".formatted(activeComponent), e.getMessage());
+			return List.of();
+		}
+	}
+
+	/**
+	 * Helper that figures out what key to use for the given component.
+	 */
+	private static @Nonnull Key<Collection<Provider<QSimComponent>>> getComponentKey(Object activeComponent) {
+		if (activeComponent instanceof Annotation) {
+			return Key.get(new TypeLiteral<>() {
+			}, (Annotation) activeComponent);
+		} else {
+			return Key.get(new TypeLiteral<>() {
+			}, (Class<? extends Annotation>) activeComponent);
+		}
+	}
 }
