@@ -63,6 +63,7 @@ public class SBBTransitEngine
 
 	private InternalInterface internalInterface;
 	private boolean createLinkEvents = false;
+	private double currentSimStepTime = 0.0;
 
 	@Inject
 	public SBBTransitEngine(ReplanningContext context, SBBTransitConfigGroup config, TransitConfigGroup ptConfig,
@@ -180,6 +181,7 @@ public class SBBTransitEngine
 
 	@Override
 	public void doSimStep(double now) {
+		this.currentSimStepTime = now;
 
 		while (!eventQueue.isEmpty()) {
 			var head = eventQueue.peek();
@@ -240,9 +242,8 @@ public class SBBTransitEngine
 	private void handleLinkTransition(TransitEvent e) {
 		var transition = e.context.precomputedLinkTransitions.element();
 		var vehicle = e.context.driver.getVehicle();
-		double now = Math.floor(e.time);
-		em.processEvent(new LinkLeaveEvent(now, vehicle.getId(), transition.fromLink()));
-		em.processEvent(new LinkEnterEvent(now, vehicle.getId(), transition.toLink()));
+		em.processEvent(new LinkLeaveEvent(this.currentSimStepTime, vehicle.getId(), transition.fromLink()));
+		em.processEvent(new LinkEnterEvent(this.currentSimStepTime, vehicle.getId(), transition.toLink()));
 
 		var nextEvent = e.context.computeEventOnLinkTransition(e.time);
 		enqueueOrSend(nextEvent);
