@@ -37,6 +37,7 @@ public class RunWithinDayReplanningFromPlansExample {
 
 	public static void main(String[] args){
 		final Config config = ConfigUtils.loadConfig( "examples/tutorial/programming/veryExperimentalWithinDayReplanning/withinday-config.xml" );
+		config.global().setInsistingOnDeprecatedConfigVersion(true);
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 		final Controler controler = new Controler( scenario );
 
@@ -58,5 +59,5 @@ public class RunWithinDayReplanningFromPlansExample {
 		});
 		controler.run();
 	}
-	
+
 }
