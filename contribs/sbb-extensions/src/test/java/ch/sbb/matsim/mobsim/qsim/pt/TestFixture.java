@@ -118,6 +118,7 @@ class TestFixture {
         VehiclesFactory vf = vehicles.getFactory();
 
         VehicleType vehType1 = vf.createVehicleType(Id.create("some_train", VehicleType.class));
+        vehType1.setNetworkMode("train");
         VehicleCapacity vehCapacity = vehType1.getCapacity();
         vehCapacity.setSeats(300);
         vehCapacity.setStandingRoom(150);

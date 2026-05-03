@@ -75,7 +75,7 @@ public final class DistributedEventsManager implements EventsManager {
 
 	private final boolean eventsDisabled;
 	/**
-	 * The remote sync step for events, which is the minimum of all handlers.
+	 * Sync intervall for global event handlers. This value should be the minimum of all global event handlers.
 	 */
 	private double remoteSyncStep = Double.POSITIVE_INFINITY;
 	/**
@@ -115,9 +115,7 @@ public final class DistributedEventsManager implements EventsManager {
 
 		var distMode = getDistributedMode(handler);
 		switch (distMode) {
-			case GLOBAL -> {
-				if (computeNode.isHeadNode()) addAsNodeSingleton(handler);
-			}
+			case GLOBAL -> addAsGlobalHandler(handler);
 			case NODE -> addAsNodeSingleton(handler);
 			case NODE_CONCURRENT -> addAsConcurrentNodeSingleton(handler);
 			case PARTITION -> throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
@@ -149,6 +147,24 @@ public final class DistributedEventsManager implements EventsManager {
 		addTaskForEachPart(task, part);
 	}
 
+	/**
+	 * Registers a GLOBAL event handler. The handler is registered similar to a node handler. It is also registered
+	 * as a global listener. The globalListener collection is used to tell other partitions that the handler is
+	 * interested in events from other compute nodes.
+	 */
+	private void addAsGlobalHandler(EventHandler handler) {
+		// only the head node registers global handlers all others send events to the head node
+		if (!computeNode.isHeadNode()) return;
+
+		var part = computeNode.getParts().getInt(0);
+		EventHandlerTask task = executor.register(handler, this, part, 1, null);
+		addTaskForEachPart(task, part);
+		for (int type : task.getSupportedMessages()) {
+			globalListener.computeIfAbsent(type, _ -> new ArrayList<>()).add(task);
+		}
+		remoteSyncStep = Math.min(remoteSyncStep, handler.getSyncInterval());
+	}
+
 	public void addAsConcurrentNodeSingleton(EventHandler handler) {
 		AtomicInteger partitionCounter = new AtomicInteger();
 		for (int part : computeNode.getParts()) {
@@ -169,7 +185,7 @@ public final class DistributedEventsManager implements EventsManager {
 		for (int part : computeNode.getParts()) {
 			var nextHandler = (part == computeNode.getParts().getInt(0)) ? firstHandler : provider.get();
 			if (handler == nextHandler) {
-				throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
+				throw new IllegalStateException("The provider for " + handler.getName() + " event handler must return a new instance of the handler or PARTITION_SINGLETON must be set.");
 			}
 			handler = nextHandler;
 			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), null);
@@ -197,6 +213,7 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	private void addTaskForPart(EventHandlerTask task, int part) {
+
 		for (var type : task.getSupportedMessages()) {
 			if (!serializer.hasType(type)) {
 				log.warn("No serializer for type {} from task {}", type, task.getName());
@@ -324,23 +341,21 @@ public final class DistributedEventsManager implements EventsManager {
 
 	@Override
 	public void processEvent(Event e) {
-
 		if (eventsDisabled) {
 			return;
 		}
 
-		// Need to process two times, for handlers that registered for ANY_TYPE
-		boolean sent = processInternal(e, e.getType(), false);
-		processInternal(e, Event.ANY_TYPE, sent);
+		processInternal(e, e.getType());
 	}
 
 	/**
 	 * Return whether event was queued for remote sending.
 	 */
-	private boolean processInternal(Event e, int type, boolean alreadySent) {
-		// Send to all local tasks
-		long address = MessageBroker.address(ctxPartition.get().get(), type);
+	private void processInternal(Event e, int type) {
 
+		var address = MessageBroker.address(ctxPartition.get().get(), type);
+
+		// send to local listeners.
 		List<Consumer<Message>> direct = directListener.get(address);
 		if (direct != null)
 			direct.forEach(c -> c.accept(e));
@@ -350,12 +365,9 @@ public final class DistributedEventsManager implements EventsManager {
 			listener.forEach(t -> t.add(e));
 
 		// Send the event remotely
-		if (!alreadySent && remoteListener.containsKey(type)) {
+		if (remoteListener.containsKey(type)) {
 			remoteEvents.get(remoteListener.get(type)).add(e);
-			return true;
 		}
-
-		return false;
 	}
 
 	@Override
@@ -398,6 +410,9 @@ public final class DistributedEventsManager implements EventsManager {
 	@Override
 	public void afterSimStep(double time) {
 
+		// this works because lastSync is initially set to -1. Therefore we send events one timestep before the processing intervall.
+		// I.e. if processing/sync intervall is 900 this will trigger a send at 899. The event handlers will process the received events
+		// at 900
 		if (lastSync + remoteSyncStep <= time) {
 
 			for (Int2ObjectMap.Entry<ManyToOneConcurrentLinkedQueue<Event>> kv : remoteEvents.int2ObjectEntrySet()) {
@@ -410,11 +425,11 @@ public final class DistributedEventsManager implements EventsManager {
 					broker.send(e, receiver);
 				}
 
-				broker.addNullMessage(receiver);
+				broker.syncToRank(receiver);
 			}
 
 			if (!waitFor.isEmpty()) {
-				waitFor.forEach(broker::addWaitForRank);
+				waitFor.forEach(broker::syncFromRank);
 			}
 
 			lastSync = time;
@@ -428,7 +443,6 @@ public final class DistributedEventsManager implements EventsManager {
 		double time = lastSync + remoteSyncStep;
 
 		afterSimStep(time);
-		broker.beforeSimStep(time);
 		broker.syncTimestep(time, true);
 
 		beforeSimStep(time + 1);

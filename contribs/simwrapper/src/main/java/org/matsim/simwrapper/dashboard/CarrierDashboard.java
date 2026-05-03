@@ -8,14 +8,26 @@ import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
 
 import java.util.List;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
+import org.matsim.simwrapper.viz.CarrierViewer;
 
 /**
  * Standard dashboard for the carrier viewer.
  */
 public class CarrierDashboard implements Dashboard  {
+	private final String carrierFileName;
+
+	public CarrierDashboard(String carrierFileName) {
+		this.carrierFileName = carrierFileName;
+	}
+
+	public CarrierDashboard() {
+		this.carrierFileName = "(*.)?output_carriers.xml(.*)?";
+	}
+
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Carrier Viewer";
 		header.tab = "";
@@ -23,7 +35,7 @@ public class CarrierDashboard implements Dashboard  {
 		layout.row("KPI", "Carrier Overview").el(Tile.class, (viz, data) -> {
 			viz.title = "Carrier KPIs";
 			viz.dataset = data.output("analysis/freight/Carriers_KPIs.tsv");
-			viz.description = "Key Performance Indicators of the Carrier";
+			viz.description = "Key performance indicators of the carrier. Note: Jsprit CPU time is the sum of the solving times of all individual VRPs. When using more than one thread, the wall-clock runtime can be shorter.";
 		});
 		layout.row("first", "Carrier Overview").el(Table.class, (viz, data) -> {
 			viz.title = "Run Info for MATSim";
@@ -74,6 +86,10 @@ public class CarrierDashboard implements Dashboard  {
 				);
 			});
 
+		layout.row("warnings", "Carrier Overview").el(TextBlock.class, (viz, data) -> {
+			viz.file = data.compute(LogFileAnalysis.class, "status.md");
+		});
+
 		layout.row("viewer", "Tour Visualizer").el(CarrierViewer.class, (viz, data) -> {
 			viz.title = "Carrier Viewer";
 			viz.height = 12d;
@@ -83,7 +99,7 @@ public class CarrierDashboard implements Dashboard  {
 			viz.network = data.withContext("all").compute(CreateAvroNetwork.class, "network.avro",
 				"--mode-filter", "", "--shp", "none");
 
-			viz.carriers = data.output("(*.)?output_carriers.xml.gz");
+			viz.carriers = data.output(carrierFileName);
 		});
 
 		layout.row("veh-dist-violin", "Tour Analysis").el(Plotly.class, (viz, data) -> {
@@ -156,6 +172,7 @@ public class CarrierDashboard implements Dashboard  {
 			viz.showAllRows = true;
 			viz.show = List.of(
 				"vehicleTypeId",
+				"nuOfVehicles",
 				"varCostsTime[EUR]",
 				"varCostsDist[EUR]",
 				"fixedCosts[EUR]",

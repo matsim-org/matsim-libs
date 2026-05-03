@@ -2,34 +2,36 @@ package org.matsim.dsim.scoring;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.MapBinder;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.scoring.NewScoreAssigner;
 import org.matsim.core.scoring.NewScoreAssignerImpl;
+import org.matsim.dsim.events.DSimEventHandlerRegistry;
 import org.matsim.dsim.simulation.IterationInformation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.stream.Stream;
 
 public class BackpackScoringModule extends AbstractModule {
+
+	public static final String COMPONENT_NAME = "BackpackDataCollector";
+
 	@Override
 	public void install() {
-		bind(BackpackDataCollectorRegistry.class).in(Singleton.class);
 		addControllerListenerBinding().to(Cleanup.class).in(Singleton.class);
 		bind(IterationInformation.class).in(Singleton.class);
 		addControllerListenerBinding().to(IterationInformation.class);
@@ -53,13 +55,52 @@ public class BackpackScoringModule extends AbstractModule {
 			addControllerListenerBinding().to(ExperiencedPlansMemorizer.class);
 		}
 
+		// requestInjection schedules the anonymous object's @Inject method to be called once after
+		// the injector is fully built. Since QSimComponentsConfig is a mutable singleton, this
+		// mutates the shared instance before SimProvider.create() first reads it — adding
+		// COMPONENT_NAME to the active component list so SimProvider picks up BackpackDataCollector.
+		binder().requestInjection(new Object() {
+			@Inject
+			void addToComponents(QSimComponentsConfig components) {
+				if (!components.hasNamedComponent(COMPONENT_NAME)) {
+					components.addNamedComponent(COMPONENT_NAME);
+				}
+			}
+		});
+
 		// each SimProcess must have its own data collector. So, bind it as QSimModule.
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
 				bind(BackpackDataCollector.class).in(Singleton.class);
+				addMobsimScopeEventHandlerBinding().to(BackpackDataCollector.class);
+				addQSimComponentBinding(COMPONENT_NAME).to(BackpackDataCollector.class);
 			}
 		});
+
+		// the following binds providers to create experienced routes. We need one provider for each mode used
+		// during the simulation.
+		var binder = MapBinder.newMapBinder(binder(), String.class, BackpackRouteProvider.class);
+
+		// create generic routes for teleported modes. This includes all modes for which we have teleported speeds, freesped factors,
+		// as well as network modes in routing, which are not contained as network modes in the mobsim. Also, pt is handled separately.
+		Stream.of(
+				getConfig().routing().getTeleportedModeSpeeds().keySet(),
+				getConfig().routing().getTeleportedModeFreespeedFactors().keySet(),
+				getConfig().routing().getNetworkModes()
+			)
+			.flatMap(Collection::stream)
+			.filter(m -> !getConfig().dsim().getNetworkModes().contains(m))
+			.filter(m -> !getConfig().transit().getTransitModes().contains(m))
+			.forEach(m -> binder.addBinding(m).to(BackpackGenericRouteProvider.class));
+
+		// network routes for all modes that are registered as network modes.
+		getConfig().dsim().getNetworkModes().forEach(m -> binder.addBinding(m).to(BackpackNetworkRouteProvider.class));
+
+		// transit routes if pt is enabled
+		if (getConfig().transit().isUseTransit()) {
+			getConfig().transit().getTransitModes().forEach(m -> binder.addBinding(m).to(BackpackTransitRouteProvider.class));
+		}
 	}
 
 	/**
@@ -156,55 +197,21 @@ public class BackpackScoringModule extends AbstractModule {
 	}
 
 	/**
-	 * Cleanup code for this module. At the moment it:
-	 * 1. Removes all backpack data collectors from the events manager and clears the corresponding registry after an iteration finishes.
-	 * 2. Resests the backpack collector, so it is ready for the next iteration.
+	 * Resets the finished backpack collector at the start of each iteration so it is ready for new data.
+	 * Handler removal after the mobsim is handled by {@link DSimEventHandlerRegistry}.
 	 */
-	public static class Cleanup implements AfterMobsimListener, IterationStartsListener {
+	public static class Cleanup implements IterationStartsListener {
 
-		private final BackpackDataCollectorRegistry registry;
-		private final EventsManager em;
 		private final FinishedBackpackCollector backpackCollector;
 
 		@Inject
-		private Cleanup(BackpackDataCollectorRegistry registry, EventsManager em, FinishedBackpackCollector backpackCollector) {
-			this.registry = registry;
-			this.em = em;
+		private Cleanup(FinishedBackpackCollector backpackCollector) {
 			this.backpackCollector = backpackCollector;
-		}
-
-		@Override
-		public void notifyAfterMobsim(AfterMobsimEvent e) {
-			for (var collector : registry.collectors()) {
-				em.removeHandler(collector);
-			}
-			registry.clear();
 		}
 
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			backpackCollector.reset();
-		}
-	}
-
-	/**
-	 * This maintains a reference to all the backpack data collectors. We need to keep track of the collectors, so that we can remove them
-	 * from the events manager after an iteration finishes.
-	 */
-	public static class BackpackDataCollectorRegistry {
-
-		private final List<BackpackDataCollector> collectors = new ArrayList<>();
-
-		public void register(BackpackDataCollector collector) {
-			collectors.add(collector);
-		}
-
-		public List<BackpackDataCollector> collectors() {
-			return collectors;
-		}
-
-		public void clear() {
-			collectors.clear();
 		}
 	}
 }

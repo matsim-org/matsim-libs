@@ -1,16 +1,10 @@
 package org.matsim.contrib.ev.withinday;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -26,13 +20,14 @@ import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
-import com.google.common.base.Preconditions;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This is an internal utility class that manages the rewriting of agent plans
  * for everything that has to do with charging activities that are either
  * planned in the beginning of the day or online throughout the simulation.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 class ChargingScheduler {
@@ -44,8 +39,8 @@ class ChargingScheduler {
 	private final Network network;
 
 	public ChargingScheduler(PopulationFactory populationFactory, TimeInterpretation timeInterpretation,
-			ActivityFacilities facilities, RoutingModule roadRoutingModule, RoutingModule walkRoutingModule,
-			Network network) {
+	                         ActivityFacilities facilities, RoutingModule roadRoutingModule, RoutingModule walkRoutingModule,
+	                         Network network) {
 		this.populationFactory = populationFactory;
 		this.timeInterpretation = timeInterpretation;
 		this.facilities = facilities;
@@ -64,7 +59,7 @@ class ChargingScheduler {
 				Activity activity = (Activity) element;
 
 				if (!TripStructureUtils.isStageActivityType(activity.getType())
-						|| WithinDayEvEngine.isManagedActivityType(activity.getType())) {
+					|| WithinDayEvEngine.isManagedActivityType(activity.getType())) {
 					return index;
 				}
 			}
@@ -85,7 +80,7 @@ class ChargingScheduler {
 				Activity activity = (Activity) element;
 
 				if (!TripStructureUtils.isStageActivityType(activity.getType())
-						|| WithinDayEvEngine.isManagedActivityType(activity.getType())) {
+					|| WithinDayEvEngine.isManagedActivityType(activity.getType())) {
 					return index;
 				}
 			}
@@ -101,7 +96,7 @@ class ChargingScheduler {
 	}
 
 	public Activity scheduleSubsequentPlugActivity(MobsimAgent agent, Activity currentPlugActivity, Charger charger,
-			double departureTime) {
+	                                               double departureTime) {
 		Preconditions.checkArgument(currentPlugActivity.getType().equals(WithinDayEvEngine.PLUG_ACTIVITY_TYPE));
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
@@ -120,7 +115,7 @@ class ChargingScheduler {
 	 * for the charging procesess.
 	 */
 	private Activity schedulePlugActivity(MobsimAgent agent, Activity startActivity, Charger charger,
-			Double departureTime) {
+	                                      Double departureTime) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		List<PlanElement> planElements = plan.getPlanElements();
 
@@ -130,9 +125,9 @@ class ChargingScheduler {
 
 		Activity precedingActivity = (Activity) planElements.get(precedingActivityIndex);
 		Preconditions.checkState(!TripStructureUtils.isStageActivityType(startActivity.getType())
-				|| WithinDayEvEngine.isManagedActivityType(startActivity.getType()));
+			|| WithinDayEvEngine.isManagedActivityType(startActivity.getType()));
 		Preconditions.checkState(!TripStructureUtils.isStageActivityType(precedingActivity.getType())
-				|| WithinDayEvEngine.isManagedActivityType(precedingActivity.getType()));
+			|| WithinDayEvEngine.isManagedActivityType(precedingActivity.getType()));
 
 		// Find departure time
 		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
@@ -151,9 +146,9 @@ class ChargingScheduler {
 		Facility precedingFacility = FacilitiesUtils.toFacility(precedingActivity, facilities);
 
 		List<? extends PlanElement> driveToChargeElements = WithinDayAgentUtils
-				.convertInteractionActivities(roadRoutingModule.calcRoute(
-						DefaultRoutingRequest.of(precedingFacility, FacilitiesUtils.wrapLink(charger.getLink()),
-								departureTime, plan.getPerson(), precedingActivity.getAttributes())));
+			.convertInteractionActivities(roadRoutingModule.calcRoute(
+				DefaultRoutingRequest.of(precedingFacility, FacilitiesUtils.wrapLink(charger.getLink()),
+					departureTime, plan.getPerson(), precedingActivity.getAttributes())));
 
 		timeTracker.addElements(driveToChargeElements);
 
@@ -162,7 +157,7 @@ class ChargingScheduler {
 
 		// insert plug activity
 		Activity plugActivity = populationFactory.createActivityFromLinkId(WithinDayEvEngine.PLUG_ACTIVITY_TYPE,
-				charger.getLink().getId());
+			charger.getLink().getId());
 		AttributesUtils.copyAttributesFromTo(startActivity, plugActivity);
 		plugActivity.setStartTime(timeTracker.getTime().seconds());
 		plugActivity.setMaximumDuration(Double.MAX_VALUE);
@@ -183,7 +178,7 @@ class ChargingScheduler {
 
 		Activity precedingActivity = (Activity) planElements.get(precedingActivityIndex);
 		Preconditions.checkState(!TripStructureUtils.isStageActivityType(precedingActivity.getType())
-				|| WithinDayEvEngine.isManagedActivityType(precedingActivity.getType()));
+			|| WithinDayEvEngine.isManagedActivityType(precedingActivity.getType()));
 
 		// Find departure time
 		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
@@ -197,9 +192,9 @@ class ChargingScheduler {
 		Facility precedingFacility = FacilitiesUtils.toFacility(precedingActivity, facilities);
 
 		List<? extends PlanElement> driveToChargeElements = WithinDayAgentUtils
-				.convertInteractionActivities(roadRoutingModule.calcRoute(
-						DefaultRoutingRequest.of(precedingFacility, FacilitiesUtils.wrapLink(charger.getLink()),
-								departureTime, plan.getPerson(), precedingActivity.getAttributes())));
+			.convertInteractionActivities(roadRoutingModule.calcRoute(
+				DefaultRoutingRequest.of(precedingFacility, FacilitiesUtils.wrapLink(charger.getLink()),
+					departureTime, plan.getPerson(), precedingActivity.getAttributes())));
 
 		timeTracker.addElements(driveToChargeElements);
 
@@ -208,7 +203,7 @@ class ChargingScheduler {
 
 		// insert plug activity
 		Activity plugActivity = populationFactory.createActivityFromLinkId(WithinDayEvEngine.PLUG_ACTIVITY_TYPE,
-				charger.getLink().getId());
+			charger.getLink().getId());
 		AttributesUtils.copyAttributesFromTo(precedingActivity, plugActivity);
 		plugActivity.setStartTime(timeTracker.getTime().seconds());
 		plugActivity.setMaximumDuration(Double.MAX_VALUE);
@@ -222,15 +217,18 @@ class ChargingScheduler {
 	/**
 	 * This method lets an agent drive to the next main activity in the schedule.
 	 * This happens when
-	 * 
+	 *
 	 * (1) we are at an unplug activity, then charging process has
 	 * finished successfully, and we now need to guide the agent from the unplug
 	 * activity to the next planned main activity; and
-	 * 
+	 *
 	 * (2) when a charging process
 	 * is unsuccessful, but the agent should still continue, then we need to send
 	 * him from the current charger to the initially planned main activity for
 	 * charging.
+	 *
+	 * (3) when an overnight charging process is unsuccessful and the agent needs to
+	 * continue after the access activity to pick up the vehicle from the charger location
 	 */
 	public void scheduleDriveToNextActivity(MobsimAgent agent) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
@@ -240,7 +238,8 @@ class ChargingScheduler {
 		Activity currentActivity = (Activity) planElements.get(currentActivityIndex);
 
 		Preconditions.checkState(currentActivity.getType().equals(WithinDayEvEngine.PLUG_ACTIVITY_TYPE)
-				|| currentActivity.getType().equals(WithinDayEvEngine.UNPLUG_ACTIVITY_TYPE));
+			|| currentActivity.getType().equals(WithinDayEvEngine.UNPLUG_ACTIVITY_TYPE)
+			|| currentActivity.getType().equals(WithinDayEvEngine.ACCESS_ACTIVITY_TYPE));
 
 		int mainActivityIndex = findFollowingActivityIndex(planElements, currentActivityIndex);
 		Activity mainActivity = (Activity) planElements.get(mainActivityIndex);
@@ -255,8 +254,8 @@ class ChargingScheduler {
 		Facility mainFacility = FacilitiesUtils.toFacility(mainActivity, facilities);
 
 		List<PlanElement> driveToActivityElements = WithinDayAgentUtils
-				.convertInteractionActivities(roadRoutingModule.calcRoute(DefaultRoutingRequest.of(currentFacility,
-						mainFacility, departureTime, plan.getPerson(), currentActivity.getAttributes())));
+			.convertInteractionActivities(roadRoutingModule.calcRoute(DefaultRoutingRequest.of(currentFacility,
+				mainFacility, departureTime, plan.getPerson(), currentActivity.getAttributes())));
 
 		int insertionIndex = currentActivityIndex + 1;
 		planElements.addAll(insertionIndex, driveToActivityElements);
@@ -290,8 +289,8 @@ class ChargingScheduler {
 		Facility startFacility = FacilitiesUtils.toFacility(startActivity, facilities);
 
 		List<? extends PlanElement> walkToStartElements = WithinDayAgentUtils.convertInteractionActivities(
-				walkRoutingModule.calcRoute(DefaultRoutingRequest.of(plugFacility, startFacility,
-						timeTracker.getTime().seconds(), plan.getPerson(), plugActivity.getAttributes())));
+			walkRoutingModule.calcRoute(DefaultRoutingRequest.of(plugFacility, startFacility,
+				timeTracker.getTime().seconds(), plan.getPerson(), plugActivity.getAttributes())));
 
 		timeTracker.addElements(walkToStartElements);
 		timeTracker.addElement(startActivity);
@@ -317,8 +316,8 @@ class ChargingScheduler {
 
 		// insert walk from activity
 		List<? extends PlanElement> walkToChargerElements = WithinDayAgentUtils.convertInteractionActivities(
-				walkRoutingModule.calcRoute(DefaultRoutingRequest.of(endFacility, plugFacility,
-						timeTracker.getTime().seconds(), plan.getPerson(), endActivity.getAttributes())));
+			walkRoutingModule.calcRoute(DefaultRoutingRequest.of(endFacility, plugFacility,
+				timeTracker.getTime().seconds(), plan.getPerson(), endActivity.getAttributes())));
 
 		insertionIndex = endActivityIndex + 1;
 
@@ -327,7 +326,7 @@ class ChargingScheduler {
 
 		// insert unplug activity
 		Activity unplugActivity = populationFactory.createActivityFromLinkId(WithinDayEvEngine.UNPLUG_ACTIVITY_TYPE,
-				plugActivity.getLinkId());
+			plugActivity.getLinkId());
 		AttributesUtils.copyAttributesFromTo(endActivity, unplugActivity);
 		unplugActivity.setStartTime(timeTracker.getTime().seconds());
 		unplugActivity.setEndTime(Double.MAX_VALUE);
@@ -350,8 +349,8 @@ class ChargingScheduler {
 		Facility followingFacility = FacilitiesUtils.toFacility(followingActivity, facilities);
 
 		List<? extends PlanElement> driveToFollowingElements = WithinDayAgentUtils.convertInteractionActivities(
-				roadRoutingModule.calcRoute(DefaultRoutingRequest.of(unplugFacility, followingFacility,
-						timeTracker.getTime().seconds(), plan.getPerson(), plugActivity.getAttributes())));
+			roadRoutingModule.calcRoute(DefaultRoutingRequest.of(unplugFacility, followingFacility,
+				timeTracker.getTime().seconds(), plan.getPerson(), plugActivity.getAttributes())));
 
 		insertionIndex++;
 		planElements.addAll(insertionIndex, driveToFollowingElements);
@@ -366,7 +365,7 @@ class ChargingScheduler {
 	 * unplug activity and then we need to reroute the agent.
 	 */
 	public Activity scheduleUnplugActivityAfterOvernightCharge(MobsimAgent agent, Activity endActivity,
-			Charger charger) {
+	                                                           Charger charger) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		List<PlanElement> planElements = plan.getPlanElements();
 
@@ -378,7 +377,7 @@ class ChargingScheduler {
 
 		// create unplug activity
 		Activity unplugActivity = populationFactory.createActivityFromLinkId(WithinDayEvEngine.UNPLUG_ACTIVITY_TYPE,
-				charger.getLink().getId());
+			charger.getLink().getId());
 		AttributesUtils.copyAttributesFromTo(endActivity, unplugActivity);
 
 		// insert walk to unplug activity
@@ -386,8 +385,8 @@ class ChargingScheduler {
 		Facility unplugFacility = FacilitiesUtils.toFacility(unplugActivity, facilities);
 
 		List<? extends PlanElement> walkElements = WithinDayAgentUtils.convertInteractionActivities(
-				walkRoutingModule.calcRoute(DefaultRoutingRequest.of(endFacility, unplugFacility,
-						timeTracker.getTime().seconds(), plan.getPerson(), endActivity.getAttributes())));
+			walkRoutingModule.calcRoute(DefaultRoutingRequest.of(endFacility, unplugFacility,
+				timeTracker.getTime().seconds(), plan.getPerson(), endActivity.getAttributes())));
 
 		int insertionIndex = endActivityIndex + 1;
 		planElements.addAll(insertionIndex, walkElements);
@@ -416,11 +415,11 @@ class ChargingScheduler {
 		Preconditions.checkState(plugActivity.getType().equals(WithinDayEvEngine.PLUG_ACTIVITY_TYPE));
 
 		Activity waitActivity = populationFactory.createActivityFromLinkId(WithinDayEvEngine.WAIT_ACTIVITY_TYPE,
-				plugActivity.getLinkId());
+			plugActivity.getLinkId());
 		waitActivity.setMaximumDuration(duration);
 
 		Activity unplugActivity = populationFactory.createActivityFromLinkId(WithinDayEvEngine.UNPLUG_ACTIVITY_TYPE,
-				plugActivity.getLinkId());
+			plugActivity.getLinkId());
 		unplugActivity.setEndTime(Double.MAX_VALUE);
 
 		int insertionIndex = plugActivityIndex + 1;
@@ -430,6 +429,37 @@ class ChargingScheduler {
 		planElements.add(insertionIndex, unplugActivity);
 
 		return unplugActivity;
+	}
+
+	/**
+	 * This method is called when an overnight charge fails and an unplug activity
+	 * has already been scheduled. It replaces the unplug activity with an access
+	 * activity at the same charger location (the agent is already walking there),
+	 * and reroutes the agent from the charger to the next main activity.
+	 */
+	public void replaceUnplugWithAccessAfterOvernightCharge(MobsimAgent agent, Activity unplugActivity,
+	                                                        Charger charger) {
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
+		List<PlanElement> planElements = plan.getPlanElements();
+
+		int unplugActivityIndex = planElements.indexOf(unplugActivity);
+		Preconditions.checkState(unplugActivityIndex >= 0);
+		Preconditions.checkState(unplugActivity.getType().equals(WithinDayEvEngine.UNPLUG_ACTIVITY_TYPE));
+
+		// create access activity at the same location as the unplug activity
+		Activity accessActivity = populationFactory.createActivityFromLinkId(
+			WithinDayEvEngine.ACCESS_ACTIVITY_TYPE,
+			charger.getLink().getId());
+		AttributesUtils.copyAttributesFromTo(unplugActivity, accessActivity);
+		accessActivity.setStartTime(unplugActivity.getStartTime().seconds());
+		accessActivity.setEndTime(unplugActivity.getEndTime().seconds());
+
+		// replace unplug activity with access activity
+		planElements.set(unplugActivityIndex, accessActivity);
+
+		// set departure time of next leg to end time of access activity
+		var nextLeg = (Leg) planElements.get(unplugActivityIndex + 1);
+		nextLeg.setDepartureTime(accessActivity.getEndTime().seconds());
 	}
 
 	/**
@@ -450,8 +480,8 @@ class ChargingScheduler {
 
 		// create access activity
 		Activity accessActivity = populationFactory.createActivityFromLinkId(
-				WithinDayEvEngine.ACCESS_ACTIVITY_TYPE,
-				charger.getLink().getId());
+			WithinDayEvEngine.ACCESS_ACTIVITY_TYPE,
+			charger.getLink().getId());
 		AttributesUtils.copyAttributesFromTo(endActivity, accessActivity);
 
 		// insert walk to access activity
@@ -459,8 +489,8 @@ class ChargingScheduler {
 		Facility accessFacility = FacilitiesUtils.toFacility(accessActivity, facilities);
 
 		List<? extends PlanElement> walkElements = WithinDayAgentUtils.convertInteractionActivities(
-				walkRoutingModule.calcRoute(DefaultRoutingRequest.of(endFacility, accessFacility,
-						timeTracker.getTime().seconds(), plan.getPerson(), endActivity.getAttributes())));
+			walkRoutingModule.calcRoute(DefaultRoutingRequest.of(endFacility, accessFacility,
+				timeTracker.getTime().seconds(), plan.getPerson(), endActivity.getAttributes())));
 
 		int insertionIndex = endActivityIndex + 1;
 		planElements.addAll(insertionIndex, walkElements);
@@ -484,8 +514,8 @@ class ChargingScheduler {
 		Facility nextFacility = FacilitiesUtils.toFacility(nextActivity, facilities);
 
 		List<PlanElement> driveToActivityElements = WithinDayAgentUtils
-				.convertInteractionActivities(roadRoutingModule.calcRoute(DefaultRoutingRequest.of(accessFacility,
-						nextFacility, departureTime, plan.getPerson(), endActivity.getAttributes())));
+			.convertInteractionActivities(roadRoutingModule.calcRoute(DefaultRoutingRequest.of(accessFacility,
+				nextFacility, departureTime, plan.getPerson(), endActivity.getAttributes())));
 
 		insertionIndex++;
 		planElements.addAll(insertionIndex, driveToActivityElements);
@@ -497,7 +527,7 @@ class ChargingScheduler {
 	 * planned plug activity.
 	 */
 	public Activity changePlugActivity(MobsimAgent agent, Activity currentPlugActivity, Charger charger,
-			double now) {
+	                                   double now) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		Leg currentLeg = (Leg) plan.getPlanElements().get(currentLegIndex);
@@ -508,8 +538,8 @@ class ChargingScheduler {
 		Facility plugFacility = FacilitiesUtils.wrapLink(charger.getLink());
 
 		List<? extends PlanElement> driveToChargeElements = WithinDayAgentUtils
-				.convertInteractionActivities(roadRoutingModule.calcRoute(DefaultRoutingRequest.of(currentFacility,
-						plugFacility, now, plan.getPerson(), new AttributesImpl())));
+			.convertInteractionActivities(roadRoutingModule.calcRoute(DefaultRoutingRequest.of(currentFacility,
+				plugFacility, now, plan.getPerson(), new AttributesImpl())));
 
 		Preconditions.checkState(driveToChargeElements.size() == 1);
 		Leg updatedLeg = (Leg) driveToChargeElements.get(0);
@@ -538,7 +568,7 @@ class ChargingScheduler {
 
 		// insert new plug activity
 		Activity plugActivity = populationFactory.createActivityFromLinkId(WithinDayEvEngine.PLUG_ACTIVITY_TYPE,
-				charger.getLink().getId());
+			charger.getLink().getId());
 
 		if (currentPlugActivity != null) {
 			AttributesUtils.copyAttributesFromTo(currentPlugActivity, plugActivity);
@@ -557,7 +587,7 @@ class ChargingScheduler {
 	 * charging.
 	 */
 	public Activity insertPlugActivity(MobsimAgent agent, Charger charger,
-			double now) {
+	                                   double now) {
 		return changePlugActivity(agent, null, charger, now);
 	}
 

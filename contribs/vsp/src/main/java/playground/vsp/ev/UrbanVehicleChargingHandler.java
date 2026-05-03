@@ -20,9 +20,14 @@
 package playground.vsp.ev;
 
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.charging.*;
@@ -35,8 +40,9 @@ import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -51,8 +57,8 @@ import java.util.*;
  * @author tschlenther
  */
 class UrbanVehicleChargingHandler
-		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
-		ChargingEndEventHandler, ChargingStartEventHandler, QueuedAtChargerEventHandler, MobsimScopeEventHandler {
+	implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
+	ChargingEndEventHandler, ChargingStartEventHandler, QueuedAtChargerEventHandler, MobsimScopeEventHandler {
 
 	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
@@ -69,7 +75,7 @@ class UrbanVehicleChargingHandler
 	UrbanVehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet, ChargingStrategy.Factory chargingStrategyFactory) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.electricFleet = electricFleet;
-		this.chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure );
+		this.chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure);
 		this.chargingStrategyFactory = chargingStrategyFactory;
 	}
 
@@ -80,25 +86,25 @@ class UrbanVehicleChargingHandler
 	 */
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (event.getActType().endsWith( UrbanEVModule.PLUGIN_INTERACTION )) {
+		if (event.getActType().endsWith(UrbanEVModule.PLUGIN_INTERACTION)) {
 			Id<Vehicle> vehicleId = lastVehicleUsed.get(event.getPersonId());
 			if (vehicleId != null) {
 				Id<Vehicle> evId = Id.create(vehicleId, Vehicle.class);
-				if (electricFleet.getElectricVehicles().containsKey(evId)) {
-					ElectricVehicle ev = electricFleet.getElectricVehicles().get(evId);
+				if (electricFleet.hasVehicle(evId)) {
+					ElectricVehicle ev = electricFleet.getVehicle(evId);
 					List<Charger> chargers = chargersAtLinks.get(event.getLinkId());
 					Charger charger = chargers.stream()
-							.filter(ch -> ev.getChargerTypes().contains(ch.getChargerType()))
+						.filter(ch -> ev.getChargerTypes().contains(ch.getChargerType()))
 
-							.findAny()
-							.get();
+						.findAny()
+						.get();
 					ChargingStrategy strategy = chargingStrategyFactory.createStrategy(charger.getSpecification(), ev);
 					charger.getLogic().addVehicle(ev, strategy, event.getTime());
 					Map<Id<Person>, Tuple<Id<Vehicle>, Id<Charger>>> proceduresOnLink = this.chargingProcedures.get(event.getLinkId());
-					if(proceduresOnLink != null && proceduresOnLink.containsKey(event.getPersonId())){
+					if (proceduresOnLink != null && proceduresOnLink.containsKey(event.getPersonId())) {
 						throw new RuntimeException("person " + event.getPersonId() + " tries to charge 2 vehicles at the same time on link " + event.getLinkId() +
-								". this is not supported.");
-					} else if(proceduresOnLink == null) {
+							". this is not supported.");
+					} else if (proceduresOnLink == null) {
 						proceduresOnLink = new HashMap<>();
 					}
 					proceduresOnLink.put(event.getPersonId(), new Tuple<>(vehicleId, charger.getId()));
@@ -114,14 +120,14 @@ class UrbanVehicleChargingHandler
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (event.getActType().endsWith( UrbanEVModule.PLUGOUT_INTERACTION )) {
+		if (event.getActType().endsWith(UrbanEVModule.PLUGOUT_INTERACTION)) {
 			Tuple<Id<Vehicle>, Id<Charger>> tuple = chargingProcedures.get(event.getLinkId()).remove(event.getPersonId());
 			if (tuple != null) {
 				Id<Vehicle> evId = Id.create(tuple.getFirst(), Vehicle.class);
-				if(vehiclesAtChargers.remove(evId) != null){ //if null, vehicle is fully charged and de-plugged already (see handleEvent(ChargingEndedEvent) )
+				if (vehiclesAtChargers.remove(evId) != null) { //if null, vehicle is fully charged and de-plugged already (see handleEvent(ChargingEndedEvent) )
 					Id<Charger> chargerId = tuple.getSecond();
 					Charger c = chargingInfrastructure.getChargers().get(chargerId);
-					c.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(evId), event.getTime());
+					c.getLogic().removeVehicle(electricFleet.getVehicle(evId), event.getTime());
 				}
 			} else {
 				throw new RuntimeException("there is something wrong with the charging procedure of person=" + event.getPersonId() + " on link= " + event.getLinkId());

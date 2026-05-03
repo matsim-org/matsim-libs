@@ -9,21 +9,21 @@ import it.unimi.dsi.fastutil.ints.IntSet;
  */
 public interface LP {
 
-    /**
-     * Special value to indicate that no neighbors should be waited for.
-     */
-    IntSet NO_NEIGHBORS = IntSet.of();
+	/**
+	 * Special value to indicate that no neighbors should be waited for.
+	 */
+	IntSet NO_NEIGHBORS = IntSet.of();
 
-    /**
-     * Special value to indicate that all neighbors should be waited for.
-     */
-    IntSet ALL_NODES_BROADCAST = IntSet.of(-1);
+	/**
+	 * Special value to indicate that all neighbors should be waited for.
+	 */
+	IntSet ALL_PARTS_BROADCAST = IntSet.of(-1);
 
-    /**
-     * This method is called when the simulation is started.
-     */
-    default void onPrepareSim() {
-    }
+	/**
+	 * This method is called when the simulation is started.
+	 */
+	default void onPrepareSim() {
+	}
 
 	/**
 	 * Called after all simulation processes are finished.
@@ -31,10 +31,10 @@ public interface LP {
 	default void onCleanupSim() {
 	}
 
-    /**
-     * This method is used to determine when the LP should wait for neighboring messages.
-     */
-    default IntSet waitForOtherRanks(double time) {
-        return NO_NEIGHBORS;
-    }
+	/**
+	 * This method is used to determine when the LP should wait for neighboring messages.
+	 */
+	default IntSet waitForOtherParts(double time) {
+		return NO_NEIGHBORS;
+	}
 }
