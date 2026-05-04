@@ -59,8 +59,8 @@ public class SimProvider implements LPProvider {
 
 	@Inject
 	SimProvider(Injector injector, Collection<AbstractQSimModule> modules,
-	            @Named("overrides") List<AbstractQSimModule> overridingModules,
-	            @Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
+		@Named("overrides") List<AbstractQSimModule> overridingModules,
+		@Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
 		this.injector = injector;
 		this.modules = new ArrayList<>(modules);
 		// (these are the implementations)
@@ -123,9 +123,13 @@ public class SimProvider implements LPProvider {
 			}
 		};
 
-		// Partitions other than the first one re-use the injector from the first partition for node singletons. See the end of this
-		// method where the node singleton injector is assigend when this method is called for the first partition.
-		if (!isFirstPartition(partition)) {
+		if (isFirstPartition(partition)) {
+			// we need to clear listeners between iterations. The first partition handles node-singleton listeners. Therefore, the first
+			// partition must clear the listeners.
+			listeners.clear();
+		} else {
+			// Partitions other than the first one re-use the injector from the first partition for node singletons. See the end of this
+			// method where the node singleton injector is assigned when this method is called for the first partition.
 			Objects.requireNonNull(nodeSingletonInjector, "Node singleton injector must be present for non-first partitions");
 			module = Modules.override(module).with(new NodeSingletonModule(nodeSingletonInjector));
 		}
@@ -162,7 +166,8 @@ public class SimProvider implements LPProvider {
 		}
 
 		// Retrieve all mobsim listeners that are not mobsim components
-		Set<MobsimListener> mobsimListeners = dsimInjector.getInstance(Key.get(new TypeLiteral<>() {}));
+		Set<MobsimListener> mobsimListeners = dsimInjector.getInstance(Key.get(new TypeLiteral<>() {
+		}));
 		for (var l : mobsimListeners) {
 			addMobsimListener(partition, l, listeners, simProcess);
 		}
@@ -199,9 +204,11 @@ public class SimProvider implements LPProvider {
 	private static boolean isNodeSingleton(Object o) {
 		var clazz = o.getClass();
 		while (clazz != null) {
-			if (clazz.isAnnotationPresent(NodeSingleton.class)) return true;
+			if (clazz.isAnnotationPresent(NodeSingleton.class))
+				return true;
 			for (var iface : clazz.getInterfaces()) {
-				if (isNodeSingletonInterface(iface)) return true;
+				if (isNodeSingletonInterface(iface))
+					return true;
 			}
 			clazz = clazz.getSuperclass();
 		}
@@ -212,9 +219,11 @@ public class SimProvider implements LPProvider {
 	 * Helper that tests whether any interface in the hierarchy is annotated with {@link NodeSingleton}.
 	 */
 	private static boolean isNodeSingletonInterface(Class<?> iface) {
-		if (iface.isAnnotationPresent(NodeSingleton.class)) return true;
+		if (iface.isAnnotationPresent(NodeSingleton.class))
+			return true;
 		for (Class<?> parent : iface.getInterfaces()) {
-			if (isNodeSingletonInterface(parent)) return true;
+			if (isNodeSingletonInterface(parent))
+				return true;
 		}
 		return false;
 	}
@@ -222,7 +231,8 @@ public class SimProvider implements LPProvider {
 	/**
 	 * Helper that wraps the getInstance call to injector with a try-catch block.
 	 */
-	private static @Nonnull Collection<Provider<QSimComponent>> getComponentProviders(Key<Collection<Provider<QSimComponent>>> activeComponentKey, Object activeComponent, Injector dsimInjector) {
+	private static @Nonnull Collection<Provider<QSimComponent>> getComponentProviders(Key<Collection<Provider<QSimComponent>>> activeComponentKey,
+		Object activeComponent, Injector dsimInjector) {
 		try {
 			return dsimInjector.getInstance(activeComponentKey);
 		} catch (ProvisionException | ConfigurationException e) {
