@@ -182,7 +182,7 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 					}
 				}
 				// Vehicle not in FISS queue -- delegate to QSim.
-				LOG.info(
+				LOG.debug(
 						"Vehicle {} not found on link {} for agent {} at time {}. Falling back to standard departure.",
 						vehicleId, linkId, driverAgent.getId(), now);
 				return delegate.handleDeparture(now, agent, linkId);
