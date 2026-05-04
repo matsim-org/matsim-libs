@@ -63,7 +63,6 @@ public class SBBTransitEngine
 
 	private InternalInterface internalInterface;
 	private boolean createLinkEvents = false;
-	private double currentSimStepTime = 0.0;
 
 	@Inject
 	public SBBTransitEngine(ReplanningContext context, SBBTransitConfigGroup config, TransitConfigGroup ptConfig,
@@ -181,23 +180,21 @@ public class SBBTransitEngine
 
 	@Override
 	public void doSimStep(double now) {
-		this.currentSimStepTime = now;
-
 		while (!eventQueue.isEmpty()) {
 			var head = eventQueue.peek();
 			if (head.time() > now)
 				break;
 
-			handleTransitEvent(eventQueue.poll());
+			handleTransitEvent(eventQueue.poll(), now);
 		}
 	}
 
-	private void handleTransitEvent(TransitEvent e) {
+	private void handleTransitEvent(TransitEvent e, double now) {
 		switch (e.type()) {
 		case ArrivalAtStop -> handleArrivalAtStop(e);
 		case PassengerExchange -> handlePassengerExchange(e);
-		case DepartureAtStop -> handleDepartureAtStop(e);
-		case LinkTransition -> handleLinkTransition(e);
+		case DepartureAtStop -> handleDepartureAtStop(e, now);
+		case LinkTransition -> handleLinkTransition(e, now);
 		}
 	}
 
@@ -219,7 +216,7 @@ public class SBBTransitEngine
 		}
 	}
 
-	private void handleDepartureAtStop(TransitEvent event) {
+	private void handleDepartureAtStop(TransitEvent event, double now) {
 		SBBTransitDriverAgent driver = event.context.driver;
 		driver.departAtStop(event.time);
 
@@ -231,19 +228,20 @@ public class SBBTransitEngine
 			if (this.createLinkEvents) {
 				Id<Link> linkId = driver.getDestinationLinkId();
 				String mode = driver.getMode();
-				em.processEvent(new VehicleLeavesTrafficEvent(event.time, driver.getId(), linkId, driver.getVehicle().getId(), mode, 1.0));
+				em.processEvent(new VehicleLeavesTrafficEvent(now, driver.getId(), linkId, driver.getVehicle().getId(),
+						mode, 1.0));
 			}
-			em.processEvent(new PersonLeavesVehicleEvent(event.time, driver.getId(), driver.getVehicle().getId()));
-			driver.endLegAndComputeNextState(event.time);
+			em.processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), driver.getVehicle().getId()));
+			driver.endLegAndComputeNextState(now);
 			this.internalInterface.arrangeNextAgentState(driver);
 		}
 	}
 
-	private void handleLinkTransition(TransitEvent e) {
+	private void handleLinkTransition(TransitEvent e, double now) {
 		var transition = e.context.precomputedLinkTransitions.element();
 		var vehicle = e.context.driver.getVehicle();
-		em.processEvent(new LinkLeaveEvent(this.currentSimStepTime, vehicle.getId(), transition.fromLink()));
-		em.processEvent(new LinkEnterEvent(this.currentSimStepTime, vehicle.getId(), transition.toLink()));
+		em.processEvent(new LinkLeaveEvent(now, vehicle.getId(), transition.fromLink()));
+		em.processEvent(new LinkEnterEvent(now, vehicle.getId(), transition.toLink()));
 
 		var nextEvent = e.context.computeEventOnLinkTransition(e.time);
 		enqueueOrSend(nextEvent);
