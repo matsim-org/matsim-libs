@@ -15,6 +15,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.dsim.DistributedAgentSource;
 import org.matsim.core.mobsim.dsim.NodeSingleton;
+import org.matsim.core.mobsim.dsim.NodeSingletons;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
@@ -149,7 +150,7 @@ public class SimProvider implements LPProvider {
 				QSimComponent qSimComponent = provider.get();
 
 				// Skip component that is a node singleton, but this process is not the first
-				if (!isFirstPartition(partition) && isNodeSingleton(qSimComponent)) {
+				if (!isFirstPartition(partition) && NodeSingletons.isNodeSingleton(qSimComponent)) {
 					continue;
 				}
 
@@ -187,7 +188,7 @@ public class SimProvider implements LPProvider {
 	 * {@link org.matsim.dsim.DSim}.
 	 */
 	private void addMobsimListener(NetworkPartition partition, MobsimListener l, Collection<MobsimListener> listeners, SimProcess simProcess) {
-		if (isFirstPartition(partition) && isNodeSingleton(l)) {
+		if (isFirstPartition(partition) && NodeSingletons.isNodeSingleton(l)) {
 			listeners.add(l);
 		} else {
 			simProcess.addQueueSimulationListeners(l);
@@ -196,36 +197,6 @@ public class SimProvider implements LPProvider {
 
 	private boolean isFirstPartition(NetworkPartition partition) {
 		return node.isFirstPartition(partition.getIndex());
-	}
-
-	/**
-	 * Helper that tests whether the given object is annotated with {@link NodeSingleton} or any interface or superclass in the hierarchy.
-	 */
-	private static boolean isNodeSingleton(Object o) {
-		var clazz = o.getClass();
-		while (clazz != null) {
-			if (clazz.isAnnotationPresent(NodeSingleton.class))
-				return true;
-			for (var iface : clazz.getInterfaces()) {
-				if (isNodeSingletonInterface(iface))
-					return true;
-			}
-			clazz = clazz.getSuperclass();
-		}
-		return false;
-	}
-
-	/**
-	 * Helper that tests whether any interface in the hierarchy is annotated with {@link NodeSingleton}.
-	 */
-	private static boolean isNodeSingletonInterface(Class<?> iface) {
-		if (iface.isAnnotationPresent(NodeSingleton.class))
-			return true;
-		for (Class<?> parent : iface.getInterfaces()) {
-			if (isNodeSingletonInterface(parent))
-				return true;
-		}
-		return false;
 	}
 
 	/**
