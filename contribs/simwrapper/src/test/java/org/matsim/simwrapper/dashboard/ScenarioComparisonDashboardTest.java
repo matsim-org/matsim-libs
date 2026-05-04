@@ -73,9 +73,14 @@ public class ScenarioComparisonDashboardTest {
 //
 //		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		String[] scenarioComparisonpaths = new String[] {
-			"/home/brendan/git/matsim-berlin/output/berlin-v6.4-0.1pct_RidePCUSetToZero",
-			"/home/brendan/git/matsim-libs/contribs/simwrapper/test/output/org/matsim/simwrapper/dashboard/DashboardTests/ptCustom"
+		String[] scenarioComparisonPaths = new String[] {
+			"/home/brendan/cluster_data/matsim-berlin/output/berlin-v6.4-0.1pct_RidePCUSetToZero",
+			"/home/brendan/cluster_data/2026-03-13-basePolicy/output-base"
+		};
+
+		String[] comparisonScenarioPaths = new String[] {
+			"berlin_1pct",
+			"gunma_base"
 		};
 
 		SimWrapper sw = SimWrapper.create(config)
@@ -83,7 +88,8 @@ public class ScenarioComparisonDashboardTest {
 //			.addDashboard(new ImpactAnalysisDashboard(Set.of("car")))
 			.addDashboard(new TripDashboard())
 			.addDashboard(new ScenarioComparisonDashboard(
-				scenarioComparisonpaths,
+				scenarioComparisonPaths,
+				comparisonScenarioPaths,
 				true
 			));
 
