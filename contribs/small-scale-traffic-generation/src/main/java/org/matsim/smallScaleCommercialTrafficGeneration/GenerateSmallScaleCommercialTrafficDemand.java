@@ -279,14 +279,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		output = Path.of(config.controller().getOutputDirectory());
 
-		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		if (useRangeConstraintForTourPlanning) {
-			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
-			log.info("Using range constraint for tour planning based on energy consumption information in the vehicle types file.");
-		}
-		if (freightCarriersConfigGroup.getCarriersVehicleTypesFile() != null)
-			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
-
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
@@ -308,6 +300,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (includeExistingModels)
 					throw new Exception(
 						"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
+				FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+
 				if (freightCarriersConfigGroup.getCarriersFile() == null)
 					freightCarriersConfigGroup.setCarriersFile(carrierFilePath.toString());
 				if (config.vehicles() != null && freightCarriersConfigGroup.getCarriersVehicleTypesFile() == null)
@@ -769,6 +763,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		else
 			config.controller().setOutputDirectory(output.toString());
 
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		if (useRangeConstraintForTourPlanning) {
+			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
+			log.info("Using range constraint for tour planning based on energy consumption information in the vehicle types file.");
+		}
+		if (freightCarriersConfigGroup.getCarriersVehicleTypesFile() != null)
+			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
+
 		// Reset some config values that are not needed
 		config.controller().setFirstIteration(0);
 		if (MATSimIterationsAfterDemandGeneration != null)
@@ -782,7 +784,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		config.qsim().setFlowCapFactor(sample);
 		config.qsim().setStorageCapFactor(sample);
 		config.qsim().setUsePersonIdForMissingVehicleId(true);
-
+		config.timeAllocationMutator().setMutateAroundInitialEndTimeOnly(false);
 		// Overwrite network
 		if (network != null)
 			config.network().setInputFile(network);
