@@ -95,6 +95,11 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 
 	private InternalInterface internalInterface;
 
+	private long teleportedTrips = 0;
+	private long teleportedDeferredTrips = 0;
+	private long simulatedTrips = 0;
+	private long simulatedQsimFallbackTrips = 0;
+
 	@Inject
 	FISS(MatsimServices matsimServices, Scenario scenario, FISSConfigGroup fissConfigGroup, Network network, TeleportationEngine teleport,
 		 @Named(TransportMode.car) TravelTime travelTime,
@@ -117,12 +122,15 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 		if (!this.qsimConfig.getMainModes().contains(agent.getMode())) {
 			return false;
 		} else if (agent instanceof DynAgent) {
+			simulatedTrips++;
 			return delegate.handleDeparture(now, agent, linkId);
 		} else if (!this.fissConfigGroup.getSampledModes().contains(agent.getMode())) {
+			simulatedTrips++;
 			return delegate.handleDeparture(now, agent, linkId); // not covered by test
 			// (the earlier design would have such agents fall through, in which case they would be treated by the standard network mode
 			// dp handler)
 		} else if (random.nextDouble() < fissConfigGroup.getSampleFactor() || agent instanceof TransitDriverAgent || this.switchOffFISS()) {
+			simulatedTrips++;
 			return delegate.handleDeparture(now, agent, linkId);
 		}
 
@@ -160,6 +168,7 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 						internalInterface.getMobsim().getEventsManager().processEvent(
 								new VehicleTeleportationDepartureEvent(now, driverAgent.getId(), vehicleId, linkId,
 										agent.getMode()));
+						teleportedTrips++;
 						boolean result = teleport.handleDeparture(now, agent, linkId);
 						Gbl.assertIf(result);
 						return result;
@@ -178,13 +187,17 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 						// silently lost.
 						deferredDepartures.computeIfAbsent(vehicleId, k -> new ArrayDeque<>())
 								.addLast(new DeferredDeparture(now, agent, linkId));
+						teleportedTrips++;
+						teleportedDeferredTrips++;
 						return true;
 					}
 				}
 				// Vehicle not in FISS queue -- delegate to QSim.
-				LOG.info(
+				LOG.debug(
 						"Vehicle {} not found on link {} for agent {} at time {}. Falling back to standard departure.",
 						vehicleId, linkId, driverAgent.getId(), now);
+				simulatedTrips++;
+				simulatedQsimFallbackTrips++;
 				return delegate.handleDeparture(now, agent, linkId);
 			}
 			addVehicleArrival(now + newTravelTime, removedVehicle, destinationLinkId);
@@ -197,6 +210,7 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 							agent.getMode()));
 		}
 
+		teleportedTrips++;
 		boolean result = teleport.handleDeparture(now, agent, linkId);
 		Gbl.assertIf(result); // otherwise we are now confused
 
@@ -343,6 +357,26 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 			}
 		}
 		teleport.afterMobsim();
+
+		long total = teleportedTrips + simulatedTrips;
+		double teleportedShare = total > 0 ? (double) teleportedTrips / total : 0.0;
+		double fallbackShare = total > 0 ? (double) simulatedQsimFallbackTrips / total : 0.0;
+		LOG.info("FISS stats (sampleFactor={}):" +
+				"\n\ttotal departures: {}" +
+				"\n\t  teleported:     {} (share={})" +
+				"\n\t    of which deferred: {}" +
+				"\n\t  simulated:      {}" +
+				"\n\t    of which qsim fallback: {} (share={})",
+				fissConfigGroup.getSampleFactor(),
+				total,
+				teleportedTrips, String.format("%.4f", teleportedShare),
+				teleportedDeferredTrips,
+				simulatedTrips,
+				simulatedQsimFallbackTrips, String.format("%.4f", fallbackShare));
+		teleportedTrips = 0;
+		teleportedDeferredTrips = 0;
+		simulatedTrips = 0;
+		simulatedQsimFallbackTrips = 0;
 	}
 
 	private boolean switchOffFISS() {
