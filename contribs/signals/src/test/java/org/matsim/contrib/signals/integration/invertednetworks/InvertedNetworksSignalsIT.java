@@ -56,7 +56,7 @@ public class InvertedNetworksSignalsIT {
 		c.getConfig().controller().setDumpDataAtEnd(false);
 		c.getConfig().controller().setCreateGraphs(false);
         final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
-		c.addControlerListener(new StartupListener(){
+		c.addControllerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				event.getServices().getEvents().addHandler(testHandler);
@@ -84,7 +84,7 @@ public class InvertedNetworksSignalsIT {
 		c.getConfig().controller().setDumpDataAtEnd(false);
 		c.getConfig().controller().setCreateGraphs(false);
         final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
-		c.addControlerListener(new StartupListener(){
+		c.addControllerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				event.getServices().getEvents().addHandler(testHandler);

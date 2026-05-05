@@ -280,7 +280,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 
 		this.collectTravelTimes(travelTime, network, timeSlice, numSlots);
 
-		OutputDirectoryHierarchy controlerIO = event.getServices().getControlerIO();
+		OutputDirectoryHierarchy controlerIO = event.getServices().getControllerIO();
 		int iteration = event.getIteration();
 
 		String absoluteFile = TravelTimesWriter.travelTimesAbsoluteFile;

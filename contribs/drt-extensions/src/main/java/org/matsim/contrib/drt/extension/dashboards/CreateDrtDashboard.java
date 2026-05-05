@@ -61,7 +61,7 @@ final class CreateDrtDashboard implements MATSimAppCommand {
 			SimWrapperConfigGroup simwrapperCfg = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 
 			//skip default dashboards
-			simwrapperCfg.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+			simwrapperCfg.setDefaultDashboards( SimWrapperConfigGroup.DefaultDashboardsMode.disabled );
 
 			//add drt dashboards
 			new DrtDashboardProvider().getDashboards(config, sw).forEach(sw::addDashboard);

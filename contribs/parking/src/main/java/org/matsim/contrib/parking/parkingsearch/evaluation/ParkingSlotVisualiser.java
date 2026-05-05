@@ -193,7 +193,7 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String path = event.getServices().getControlerIO().getIterationFilename(event.getIteration(),
+		String path = event.getServices().getControllerIO().getIterationFilename(event.getIteration(),
 			"ParkingSlots_it" + event.getIteration() + ".csv");
 		this.finishDay();
 		this.plotSlotOccupation(path);

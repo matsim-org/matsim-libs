@@ -21,7 +21,7 @@
 
 package org.matsim.freight.logistics;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import org.matsim.core.replanning.GenericStrategyManager;
 
 /**

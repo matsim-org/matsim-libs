@@ -32,6 +32,8 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Design decisions:<ul>
  * <li>At this point, only those variables that are needed elsewhere (in particular in the scoring) are set from the
@@ -41,6 +43,7 @@ import org.matsim.pt.config.TransitRouterConfigGroup;
  */
 public class TransitRouterConfig implements MatsimParameters {
 	private static final Logger log = LogManager.getLogger( TransitRouterConfig.class ) ;
+	private static final CountedLog subPopulationWarning = new CountedLog(log, 10) ;
 
 	/**
 	 * The distance in meters in which stop facilities should be searched for
@@ -96,7 +99,7 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	private double utilityOfLineSwitch_utl;
 
-	private Double beelineDistanceFactor;
+	private final Double beelineDistanceFactor;
 
 	private final double directWalkFactor ;
 
@@ -112,9 +115,9 @@ public class TransitRouterConfig implements MatsimParameters {
 		pcsConfig.setLocked(); routingConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
 
 		if (pcsConfig.getScoringParametersPerSubpopulation().size()>1){
-			LogManager.getLogger(getClass()).warn("More than one subpopulation is used in plansCalcScore. "
-					+ "This is not currently implemented in the TransitRouter (but should work for scoring),"
-					+ " so the values for the \"default\" subpopulation will be used. (jb, Feb 2018)");
+			subPopulationWarning.warn("More than one subpopulation is used in plansCalcScore. "
+				+ "This is not currently implemented in the TransitRouter (but should work for scoring),"
+				+ " so the values for the \"default\" subpopulation will be used. (jb, Feb 2018)");
 		}
 
 		// walk:
@@ -281,5 +284,23 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	public void setCacheTree(boolean cacheTree) {
 		this.cacheTree = cacheTree;
+	}
+
+	private static class CountedLog {
+
+		private final Logger log;
+		private final int maxCount;
+		private final AtomicInteger count = new AtomicInteger(0);
+
+		private CountedLog(Logger log, int maxCount) {
+			this.log = log;
+			this.maxCount = maxCount;
+		}
+
+		private void warn(String msg) {
+			if (count.incrementAndGet() <= maxCount) {
+				log.warn(msg);
+			}
+		}
 	}
 }

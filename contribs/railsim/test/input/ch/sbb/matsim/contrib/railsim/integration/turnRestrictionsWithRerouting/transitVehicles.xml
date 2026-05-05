@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+	<vehicleType id="pt_1">
+		<attributes>
+			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">0.0</attribute>
+			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">0.0</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.6</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.56</attribute>
+		</attributes>
+		<capacity seats="9999" standingRoomInPersons="9999">
+
+		</capacity>
+		<length meter="400.0"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="44.444"/>
+		<costInformation/>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicle id="pt_1_veh_1" type="pt_1"/>
+	<vehicle id="pt_1_veh_2" type="pt_1"/>
+
+</vehicleDefinitions>

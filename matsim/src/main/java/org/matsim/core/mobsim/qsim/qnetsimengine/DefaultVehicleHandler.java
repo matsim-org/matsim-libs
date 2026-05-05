@@ -22,8 +22,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Inject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
@@ -33,7 +31,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 /**
- * Default implementation of a {{@link #VehicleHandler()}. It always allows
+ * Default implementation of a {{@link VehicleHandler}. It always allows
  * vehicles to arrive at a link.
  * <p>
  * The design of this class follows the design pattern of the {@link DefaultLinkSpeedCalculator}
@@ -41,7 +39,6 @@ import java.util.Objects;
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
 public class DefaultVehicleHandler implements VehicleHandler {
-	public static final Logger log = LogManager.getLogger(DefaultVehicleHandler.class);
 
 	private final Collection<VehicleHandler> handlers = new ArrayList<>();
 
@@ -89,8 +86,7 @@ public class DefaultVehicleHandler implements VehicleHandler {
 	/**
 	 * This is not meant to be used directly.  But rather through {@link AbstractQSimModule} addVehicleHandlerBinding().
 	 */
-	public final DefaultVehicleHandler addVehicleHandler(VehicleHandler vehicleHandler) {
+	public final void addVehicleHandler(VehicleHandler vehicleHandler) {
 		this.handlers.add(vehicleHandler);
-		return this;
 	}
 }

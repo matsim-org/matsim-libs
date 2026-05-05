@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.extension.services.dispatcher;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.services.schedule.DrtService;
+import org.matsim.contrib.drt.extension.services.tasks.DrtServiceTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**

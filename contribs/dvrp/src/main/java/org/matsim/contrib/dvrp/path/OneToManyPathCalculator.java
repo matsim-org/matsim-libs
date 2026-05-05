@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.router.speedy.LeastCostPathTree;
+import org.matsim.core.router.speedy.ShortestPathTree;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -32,6 +33,7 @@ import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -45,13 +47,13 @@ import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
  * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  */
 class OneToManyPathCalculator {
-	private final LeastCostPathTree dijkstraTree;
+	private final ShortestPathTree dijkstraTree;
 	private final TravelTime travelTime;
 	private final boolean forwardSearch;
 	private final Link fromLink;
 	private final double startTime;
 
-	OneToManyPathCalculator(LeastCostPathTree dijkstraTree, TravelTime travelTime,
+	OneToManyPathCalculator(ShortestPathTree dijkstraTree, TravelTime travelTime,
 							boolean forwardSearch, Link fromLink, double startTime) {
 		this.dijkstraTree = dijkstraTree;
 		this.travelTime = travelTime;
@@ -84,7 +86,7 @@ class OneToManyPathCalculator {
 			return PathData.EMPTY;
 		} else {
 			Node endNode = getEndNode(toLink);
-			double pathTravelTime = getTravelTime(endNode.getId().index());
+			double pathTravelTime = getTravelTime(dijkstraTree.getNodeIndex(endNode));
 			if (pathTravelTime == Double.POSITIVE_INFINITY) {
 				return PathData.INFEASIBLE;
 			}
@@ -99,7 +101,7 @@ class OneToManyPathCalculator {
 			return PathData.EMPTY;
 		} else {
 			Node endNode = getEndNode(toLink);
-			if (dijkstraTree.getTime(endNode.getId().index()).isUndefined()) {
+			if (dijkstraTree.getTime(dijkstraTree.getNodeIndex(endNode)).isUndefined()) {
 				return PathData.INFEASIBLE;
 			}
 			Path path = createPath(endNode);
@@ -109,7 +111,7 @@ class OneToManyPathCalculator {
 
 	@Nullable
 	Path createPath(Node toNode) {
-		int toNodeIndex = toNode.getId().index();
+		int toNodeIndex = dijkstraTree.getNodeIndex(toNode);
 		double travelTime = getTravelTime(toNodeIndex);
 		if (travelTime == Double.POSITIVE_INFINITY) {
 			return null;
@@ -129,11 +131,11 @@ class OneToManyPathCalculator {
 		return travelTimeMultiplier * (dijkstraTree.getTime(toNodeIndex).seconds() - startTime);
 	}
 
-	private List<Node> constructNodeSequence(LeastCostPathTree dijkstraTree, Node toNode, boolean forward) {
+	private List<Node> constructNodeSequence(ShortestPathTree dijkstraTree, Node toNode, boolean forward) {
 		ArrayList<Node> nodes = new ArrayList<>();
 		nodes.add(toNode);
 
-		LeastCostPathTree.PathIterator pathIterator = dijkstraTree.getNodePathIterator(toNode);
+		Iterator<Node> pathIterator = dijkstraTree.getNodePathIterator(toNode);
 		pathIterator.forEachRemaining(nodes::add);
 
 		if (forward) {
@@ -142,10 +144,10 @@ class OneToManyPathCalculator {
 		return nodes;
 	}
 
-	private List<Link> constructLinkSequence(LeastCostPathTree dijkstraTree, Node toNode, boolean forward) {
+	private List<Link> constructLinkSequence(ShortestPathTree dijkstraTree, Node toNode, boolean forward) {
 		ArrayList<Link> links = new ArrayList<>();
 
-		LeastCostPathTree.LinkPathIterator pathIterator = dijkstraTree.getLinkPathIterator(toNode);
+		Iterator<Link> pathIterator = dijkstraTree.getLinkPathIterator(toNode);
 		pathIterator.forEachRemaining(links::add);
 
 		if (forward) {

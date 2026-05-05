@@ -21,6 +21,9 @@ import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.vehicles.Vehicle;
+
+import jakarta.annotation.Nullable;
 
 public class SharingRoutingModule implements RoutingModule {
 	private final RoutingModule accessEgressRoutingModule;
@@ -32,13 +35,16 @@ public class SharingRoutingModule implements RoutingModule {
 	private final TimeInterpretation timeInterpretation;
 
 	private final Id<SharingService> serviceId;
+	@Nullable // for routing requests in replanning, null if not a routed mode
+	private final Id<Vehicle> routingVehicleId;
 
 	public SharingRoutingModule(Scenario scenario, RoutingModule accessEgressRoutingModule,
 			RoutingModule mainModeRoutingModule, InteractionFinder interactionFinder, Id<SharingService> serviceId,
-			TimeInterpretation timeInterpretation) {
+			@Nullable Id<Vehicle> routingVehicleId, TimeInterpretation timeInterpretation) {
 		this.interactionFinder = interactionFinder;
 		this.accessEgressRoutingModule = accessEgressRoutingModule;
 		this.mainModeRoutingModule = mainModeRoutingModule;
+		this.routingVehicleId = routingVehicleId;
 		this.network = scenario.getNetwork();
 		this.serviceId = serviceId;
 		this.populationFactory = scenario.getPopulation().getFactory();
@@ -128,8 +134,22 @@ public class SharingRoutingModule implements RoutingModule {
 		Facility originFacility = new LinkWrapperFacility(network.getLinks().get(originId));
 		Facility destinationFacility = new LinkWrapperFacility(network.getLinks().get(destinationId));
 
-		return mainModeRoutingModule.calcRoute(
-				DefaultRoutingRequest.of(originFacility, destinationFacility, departureTime, person, tripAttributes));
+		// set the vehicle id attribute to a dummy vehicle id for routing in replanning
+		RoutingRequest routingRequest = DefaultRoutingRequest.of(originFacility, destinationFacility, departureTime,
+				person, tripAttributes);
+		if (this.routingVehicleId != null) {
+			routingRequest.getAttributes().putAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID,
+					this.routingVehicleId);
+		}
+
+		List<? extends PlanElement> route = mainModeRoutingModule.calcRoute(routingRequest);
+
+		if (this.routingVehicleId != null) {
+			// we remove it, because the attributes object might be referenced elsewhere
+			routingRequest.getAttributes().removeAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID);
+		}
+
+		return route;
 	}
 
 	private Activity createBookingActivity(double now, Id<Link> linkId) {

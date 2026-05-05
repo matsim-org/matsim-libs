@@ -19,29 +19,42 @@ public class ParallelStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		// stop ends when pickup time has elapsed
-		return beginTime + stopDurationProvider.calcPickupDuration(vehicle, request);
+		double endTime = beginTime + stopDurationProvider.calcPickupDuration(vehicle, request);
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		// an additional stop may extend the stop duration
-		return Math.max(stop.getEndTime(), insertionTime + stopDurationProvider.calcPickupDuration(vehicle, request));
+		double beginTime = Math.max(stop.getBeginTime(), insertionTime);
+		double pickupTime = beginTime + stopDurationProvider.calcPickupDuration(vehicle, request);
+		double endTime = Math.max(stop.getEndTime(), pickupTime);
+
+		return new Pickup(endTime, pickupTime);
 	}
 
 	@Override
-	public double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
-		// stop ends after stopDuration has elapsed (dropoff happens at beginning)
-		return beginTime + stopDurationProvider.calcDropoffDuration(vehicle, request);
+	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+		// stop ends after dropoff duration
+		double endTime = beginTime + stopDurationProvider.calcDropoffDuration(vehicle, request);
+		return new Dropoff(endTime, endTime);
 	}
 
 	@Override
-	public double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		// adding a dropoff may extend the stop duration
-		return Math.max(stop.getEndTime(), insertionTime + stopDurationProvider.calcDropoffDuration(vehicle, request));
+		// update end time
+		double initialDuration = stop.getEndTime() - stop.getBeginTime();
+		double endTime = Math.max(stop.getEndTime(), initialDuration + insertionTime);
+
+		// add the dropoff
+		double dropoffTime = insertionTime + stopDurationProvider.calcDropoffDuration(vehicle, request);
+		endTime = Math.max(endTime, dropoffTime);
+
+		return new Dropoff(endTime, dropoffTime);
 	}
 
 	@Override

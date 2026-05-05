@@ -46,4 +46,12 @@ public interface DrtStopTask extends StayTask {
 	void removePickupRequest(Id<Request> requestId);
 	
 	void removeDropoffRequest(Id<Request> requestId);
+
+	double calcLatestArrivalTime();
+
+	double calcEarliestArrivalTime();
+
+	double calcEarliestDepartureTime();
+
+	double calcLatestDepartureTime();
 }

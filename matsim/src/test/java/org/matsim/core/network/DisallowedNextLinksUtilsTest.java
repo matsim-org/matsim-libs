@@ -337,8 +337,51 @@ class DisallowedNextLinksUtilsTest {
 
 	}
 
+	@Test
+	void testLoopLinksInDnl() {
+
+		Network network = createNetworkWithLoop();
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		DisallowedNextLinksUtils.clean(network);
+
+		// * --------------------------------------------------
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+
+		Link l11 = network.getLinks().get(Id.createLinkId("11"));
+		Assertions.assertNull(NetworkUtils.getDisallowedNextLinks(l11));
+
+		Link l01 = network.getLinks().get(Id.createLinkId("01"));
+		Assertions.assertEquals(List.of(List.of(Id.createLinkId("12"))),
+				NetworkUtils.getDisallowedNextLinks(l01).getDisallowedLinkSequences(TransportMode.car));
+
+	}
+
 	// Helpers
 
+	static Network createNetworkWithLoop() {
+		Network network = createNetwork();
+
+		// add loop link
+		Node n1 = network.getNodes().get(Id.createNodeId("1"));
+		Link l11 = NetworkUtils.createLink(Id.createLinkId("11"), n1, n1, network, 1, 1, 300, 1);
+		l11.setAllowedModes(Set.of(TransportMode.car));
+		network.addLink(l11);
+
+		// add DNL on loop link
+		DisallowedNextLinks dnl11 = NetworkUtils.getOrCreateDisallowedNextLinks(l11);
+		dnl11.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("12")));
+
+		// add DNL over loop link
+		Link l01 = network.getLinks().get(Id.createLinkId("01"));
+		DisallowedNextLinks dnl01 = NetworkUtils.getOrCreateDisallowedNextLinks(l01);
+		dnl01.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("11"), Id.createLinkId("12")));
+
+		return network;
+	}
 	static Network createNetwork() {
 		Network network = NetworkUtils.createNetwork();
 

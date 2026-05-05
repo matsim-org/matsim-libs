@@ -79,6 +79,14 @@ final class LoggedLspShipmentTransport implements LspShipmentLeg {
 		return endTime;
 	}
 
+	/**
+	 * @return
+	 */
+	@Override
+	public Id<Link> getLinkId() {
+		return toLinkId;
+	}
+
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;
 	}

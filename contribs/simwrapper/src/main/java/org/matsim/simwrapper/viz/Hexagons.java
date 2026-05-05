@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Produces a hexagon plot on a map.
  */
-public final class Hexagons extends Viz {
+public final class Hexagons extends VizMap<Hexagons> {
 
 	/**
 	 * The filepath containing the data.
@@ -29,6 +29,11 @@ public final class Hexagons extends Viz {
 
 	public Double radius;
 	public Double maxHeight;
+
+	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
 
 	/**
 	 * List of all shown aggregations

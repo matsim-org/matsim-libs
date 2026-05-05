@@ -1,0 +1,50 @@
+image: maven:3.9-eclipse-temurin-21-jammy
+
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+
+stages:
+  - test
+
+test-job:
+  stage: test
+  parallel:
+    matrix:
+      - module:
+          - matsim
+          # sorted from longest to shortest (to minimise the overall test stage duration)
+          # (used in travis; not respected in GitHub Action workflows)
+          # This contains only a small subset of modules, full build takes to long otherwise
+          - contribs/vsp
+          - contribs/bicycle
+          - contribs/drt
+          - contribs/drt-extensions
+          - contribs/dvrp
+          - contribs/distributed-simulation
+
+  cache:
+    paths:
+      - .m2/repository
+
+  variables:
+    MAVEN_OPTS: >-
+      -Xmx2G
+      -Dhttps.protocols=TLSv1.2
+      -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+      -Dorg.slf4j.simpleLogger.showDateTime=true
+      -Djava.awt.headless=true
+
+    MAVEN_CLI_OPTS: >-
+      --batch-mode
+      --errors
+      --fail-at-end
+      --show-version
+      --no-transfer-progress
+
+  script:
+    - mvn install --also-make --projects $module -DskipTests -Dsource.skip
+    - cd $module
+    - mvn verify -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true -Dsource.skip
+
+  interruptible: true

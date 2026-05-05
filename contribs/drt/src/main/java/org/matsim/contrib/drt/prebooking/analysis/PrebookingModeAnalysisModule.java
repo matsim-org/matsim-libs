@@ -13,7 +13,7 @@ public class PrebookingModeAnalysisModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		addControlerListenerBinding().to(modalKey(PrebookingAnalysisListener.class));
+		addControllerListenerBinding().to(modalKey(PrebookingAnalysisListener.class));
 
 		bindModal(PrebookingAnalysisListener.class).toProvider(modalProvider(getter -> {
 			EventsManager eventsManager = getter.get(EventsManager.class);

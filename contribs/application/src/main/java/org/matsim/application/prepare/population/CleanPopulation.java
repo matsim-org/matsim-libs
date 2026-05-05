@@ -95,7 +95,6 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 		cleanPopulation(population);
 
 		PopulationUtils.writePopulation(population, output.toString());
-
 		return 0;
 	}
 
@@ -171,7 +170,14 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 	public static void removeActivityLocation(PlanElement el) {
 		if (el instanceof Activity act) {
 			act.setLinkId(null);
-			act.setFacilityId(null);
+
+//			only remove facility id if the act has a coord.
+//			otherwise the act would have no location information (linkId=null, facilityId=null, coord=null). -sm0625
+			if (act.getCoord() != null) {
+				act.setFacilityId(null);
+			} else {
+				log.info("Activity {}\n has no coord. Its activity facility is therefore not removed because it would have ended up without any location: linkId=null, facilityId=null, coord=null.", act);
+			}
 		}
 	}
 

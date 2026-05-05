@@ -74,6 +74,18 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								getter.getModal(ZonalDemandEstimator.class), strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
 						break;
 
+					case EstimatedRelativeDemand:
+						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(getter -> {
+							ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {})
+								.get(REBALANCING_ZONE_SYSTEM).get();
+							return new RelativeDemandEstimatorAsTargetCalculator(
+								getter.getModal(ZonalDemandEstimator.class),
+								zoneSystem, strategyParams.getDemandEstimationPeriod(),
+								strategyParams.getTargetBeta()
+							);
+						})).asEagerSingleton();
+						break;
+
 					case EqualRebalancableVehicleDistribution:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(getter -> {
 							ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {})
@@ -126,7 +138,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
                         })).asEagerSingleton();
 				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				addEventHandlerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
-				addControlerListenerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
+				addControllerListenerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				break;
 
 			case None:

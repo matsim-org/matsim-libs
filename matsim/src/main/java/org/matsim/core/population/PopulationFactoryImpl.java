@@ -19,7 +19,7 @@
 
 package org.matsim.core.population;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -39,14 +40,14 @@ import java.util.Random;
 class BicycleTravelDisutility implements TravelDisutility {
 	private static final Logger LOG = LogManager.getLogger(BicycleTravelDisutility.class);
 
+	@Inject
+	private BicycleParams bicycleParams;
 	private final double marginalCostOfTime_s;
 	private final double marginalCostOfDistance_m;
 	private final double marginalCostOfInfrastructure_m;
 	private final double marginalCostOfComfort_m;
 	private final double marginalCostOfGradient_m_100m;
-	private final double marginalCostOfUserDefinedNetworkAttribute_m;
-	private final String nameOfUserDefinedNetworkAttribute;
-	private final double userDefinedNetworkAttributeDefaultValue;
+
 
 	private final double normalization;
 	private final double sigma;
@@ -66,22 +67,21 @@ class BicycleTravelDisutility implements TravelDisutility {
 
 
 	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, ScoringConfigGroup cnScoringGroup,
-													RoutingConfigGroup routingConfigGroup, TravelTime timeCalculator, double normalization) {
-		final ScoringConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
-		if (bicycleParams == null) {
+													RoutingConfigGroup routingConfigGroup, TravelTime timeCalculator, double normalization, BicycleParams bicycleParams) {
+		final ScoringConfigGroup.ModeParams bicycleModeParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
+		if (bicycleModeParams == null) {
 			throw new NullPointerException("Mode " + bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
 		}
 
-		this.marginalCostOfDistance_m = -(bicycleParams.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney())
-				- bicycleParams.getMarginalUtilityOfDistance();
-		this.marginalCostOfTime_s = -(bicycleParams.getMarginalUtilityOfTraveling() / 3600.0) + cnScoringGroup.getPerforming_utils_hr() / 3600.0;
+		this.bicycleParams = bicycleParams;
+		this.marginalCostOfDistance_m = -(bicycleModeParams.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney())
+				- bicycleModeParams.getMarginalUtilityOfDistance();
+		this.marginalCostOfTime_s = -(bicycleModeParams.getMarginalUtilityOfTraveling() / 3600.0) + cnScoringGroup.getPerforming_utils_hr() / 3600.0;
 
 		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());
 		this.marginalCostOfComfort_m = -(bicycleConfigGroup.getMarginalUtilityOfComfort_m());
-		this.marginalCostOfGradient_m_100m = -(bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m());
-		this.marginalCostOfUserDefinedNetworkAttribute_m = -(bicycleConfigGroup.getMarginalUtilityOfUserDefinedNetworkAttribute_m());
-		this.nameOfUserDefinedNetworkAttribute = bicycleConfigGroup.getUserDefinedNetworkAttributeName();
-		this.userDefinedNetworkAttributeDefaultValue = bicycleConfigGroup.getUserDefinedNetworkAttributeDefaultValue();
+		this.marginalCostOfGradient_m_100m = -(bicycleConfigGroup.getMarginalUtilityOfGradient_pct_m());
+
 
 		this.timeCalculator = timeCalculator;
 
@@ -102,22 +102,15 @@ class BicycleTravelDisutility implements TravelDisutility {
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;
 		double distanceDisutility = marginalCostOfDistance_m * distance;
 
-		double comfortFactor = BicycleUtils.getComfortFactor(surface );
+		double comfortFactor = bicycleParams.getComfortFactor(surface );
 		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
 
-		double infrastructureFactor = BicycleUtils.getInfrastructureFactor(type, cyclewaytype );
+		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype );
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
-		double gradientFactor = BicycleUtils.getGradient(link );
+		double gradientFactor = bicycleParams.getGradient_pct(link );
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 
-		double userDefinedNetworkAttritubeDisutility = 0.;
-		if (nameOfUserDefinedNetworkAttribute != null) {
-			String userDefinedNetworkAttributeString = BicycleUtils.getUserDefinedNetworkAttribute(link, nameOfUserDefinedNetworkAttribute);
-			double userDefinedNetworkAttributeFactor = BicycleUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString,
-					this.userDefinedNetworkAttributeDefaultValue );
-			userDefinedNetworkAttritubeDisutility = marginalCostOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance;
-		}
 
 //		LOG.warn("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
 //				+ comfortFactor	+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradientFactor);
@@ -176,7 +169,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 //				+ " / infD = " + infrastructureDisutility + " / comfD = " + comfortDisutility + " / gradD = " + gradientDisutility + " / rnd = " + normalRndLink
 //				+ " / rndDist = " + logNormalRndDist + " / rndInf = "	+ logNormalRndInf + " / rndComf = " + logNormalRndComf + " / rndGrad = " + logNormalRndGrad);
 		double disutility = (1 + normalRndLink) * travelTimeDisutility + logNormalRndDist * distanceDisutility + logNormalRndInf * infrastructureDisutility
-				+ logNormalRndComf * comfortDisutility + logNormalRndGrad * gradientDisutility + logNormalRndUserDef * userDefinedNetworkAttritubeDisutility;
+				+ logNormalRndComf * comfortDisutility + logNormalRndGrad * gradientDisutility ;
 		// note that "normalRndLink" follows a Gaussian distribution, not a lognormal one as the others do!
 //		double disutility = travelTimeDisutility + logNormalRndDist * distanceDisutility + (1 + normalRndLink) * logNormalRndInf * infrastructureDisutility
 //				+ (1 + normalRndLink) * logNormalRndComf * comfortDisutility + (1 + normalRndLink) * logNormalRndGrad * gradientDisutility;

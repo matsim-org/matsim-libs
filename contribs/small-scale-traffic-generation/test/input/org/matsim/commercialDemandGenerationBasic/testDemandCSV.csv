@@ -1,0 +1,6 @@
+carrierName	demandToDistribute	numberOfJobs	shareOfPopulationWithFirstJobElement	areasFirstJobElement	numberOfFirstJobElementLocations	locationsOfFirstJobElement	firstJobElementTimePerUnit	firstJobElementStartTime	firstJobElementEndTime	shareOfPopulationWithSecondJobElement	areasSecondJobElement	numberOfSecondJobElementLocations	locationsOfSecondJobElement	secondJobElementTimePerUnit	secondJobElementStartTime	secondJobElementEndTime
+testCarrier1	0	4		area2			180	3000	13000							
+testCarrier1	12	10			4	i(2,0)	100	5000	20000							
+testCarrier2	0	4					300	10000	45000			1	i(2,0)	350	11000	44000
+testCarrier2	15	7			1		200	11000	44000			2		200	20000	40000
+testCarrier3	20		0.125				400	8000	50000	0.4	area1			250	10000	60000

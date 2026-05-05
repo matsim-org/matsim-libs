@@ -117,13 +117,13 @@ public class RelocationExample {
 				// this is now the only MobsimListenerBinding. Should it be
 				// handled differently?
 				// addMobsimListenerBinding().to(MobismBeforeSimStepRelocationListener.class);
-				addControlerListenerBinding().toInstance(carsharingListener);
-				addControlerListenerBinding().toInstance(relocationListener);
-				addControlerListenerBinding().toInstance(setupListener);
-				addControlerListenerBinding().toInstance(demandTracker);
-				addControlerListenerBinding().toInstance(vehicleRentalsWriterListener);
-				addControlerListenerBinding().toInstance((CarsharingManagerNew) carsharingManager);
-				addControlerListenerBinding().toInstance(averageDemandRelocationListener);
+				addControllerListenerBinding().toInstance(carsharingListener);
+				addControllerListenerBinding().toInstance(relocationListener);
+				addControllerListenerBinding().toInstance(setupListener);
+				addControllerListenerBinding().toInstance(demandTracker);
+				addControllerListenerBinding().toInstance(vehicleRentalsWriterListener);
+				addControllerListenerBinding().toInstance((CarsharingManagerNew) carsharingManager);
+				addControllerListenerBinding().toInstance(averageDemandRelocationListener);
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
 				addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
 				addEventHandlerBinding().to(DemandHandler.class);

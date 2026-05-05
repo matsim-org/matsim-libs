@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.ControllerUtils;
@@ -152,10 +153,10 @@ public class ParkingTest {
 				bind(KernelDistance.class).toInstance(new ConstantKernelDistance(100));
 				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(2, -6));
 
-				addControlerListenerBinding().to(ParkingOccupancyObserver.class);
+				addControllerListenerBinding().to(ParkingOccupancyObserver.class);
 				addMobsimListenerBinding().to(ParkingOccupancyObserver.class);
 				addEventHandlerBinding().toInstance(testEventHandler);
-				addControlerListenerBinding().to(DumpParkingDataAtEnd.class);
+				addControllerListenerBinding().to(DumpParkingDataAtEnd.class);
 			}
 		});
 
@@ -230,10 +231,10 @@ public class ParkingTest {
 				//changed to beta=-10
 				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(2, -10));
 
-				addControlerListenerBinding().to(ParkingOccupancyObserver.class);
+				addControllerListenerBinding().to(ParkingOccupancyObserver.class);
 				addMobsimListenerBinding().to(ParkingOccupancyObserver.class);
 				addEventHandlerBinding().toInstance(testEventHandler);
-				addControlerListenerBinding().to(DumpParkingDataAtEnd.class);
+				addControllerListenerBinding().to(DumpParkingDataAtEnd.class);
 			}
 		});
 
@@ -260,6 +261,7 @@ public class ParkingTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.replanning().clearStrategySettings();
 		return config;
 	}

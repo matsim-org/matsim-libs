@@ -40,7 +40,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		public static final String HeavyCompressedNetworkRoute = "HeavyCompressedNetworkRoute";
 	}
 
-	public enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly }
+	public enum ActivityDurationInterpretation { @Deprecated minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly }
 
 	/**
 	 * Defines how trip durations are interpreted when routing along a plan
@@ -193,6 +193,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 //		this.setActivityDurationInterpretation(actDurInterpret);
 //	}
 	@StringSetter(ACTIVITY_DURATION_INTERPRETATION)
+	@Deprecated
 	public void setActivityDurationInterpretation( final PlansConfigGroup.ActivityDurationInterpretation actDurInterpret ) {
 		if ( PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly.equals(actDurInterpret) ){
 			/*
@@ -240,13 +241,13 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		this.inputCRS = inputCRS;
 	}
 
-	/**
-	 * @deprecated -- replace extraction of subpopulation by {@link PopulationUtils#getSubpopulation(HasPlansAndId)}
-	 */
-	@Deprecated
-	public String getSubpopulationAttributeName(){
-		return PopulationUtils.SUBPOPULATION_ATTRIBUTE_NAME;
-	}
+//	/**
+//	 * @deprecated -- replace extraction of subpopulation by {@link PopulationUtils#getSubpopulation(HasPlansAndId)}
+//	 */
+//	@Deprecated
+//	public String getSubpopulationAttributeName(){
+//		return PopulationUtils.SUBPOPULATION_ATTRIBUTE_NAME;
+//	}
 
 
 }

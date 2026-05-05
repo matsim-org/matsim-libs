@@ -7,8 +7,8 @@ import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import jakarta.annotation.Nullable;
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * Context for each separate thread.

@@ -191,7 +191,7 @@
 	</minimalTransferTimes>
 	<transitLine id="l103">
 		<transitRoute id="r104">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f35" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f36" arrivalOffset="00:01:30" departureOffset="00:02:00" awaitDeparture="true"/>
@@ -309,7 +309,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r105">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f80" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f89" arrivalOffset="00:00:30" departureOffset="00:01:00" awaitDeparture="true"/>
@@ -389,7 +389,7 @@
 	</transitLine>
 	<transitLine id="l106">
 		<transitRoute id="r107">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f80" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f39" arrivalOffset="00:06:30" departureOffset="00:07:00" awaitDeparture="true"/>
@@ -435,7 +435,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r108">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f37" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f39" arrivalOffset="00:08:30" departureOffset="00:09:00" awaitDeparture="true"/>
@@ -542,7 +542,7 @@
 	</transitLine>
 	<transitLine id="l109">
 		<transitRoute id="r110">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f15" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f3" arrivalOffset="00:22:00" departureOffset="00:27:00" awaitDeparture="true"/>
@@ -697,7 +697,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r111">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f15" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f3" arrivalOffset="00:22:00" departureOffset="00:27:00" awaitDeparture="true"/>
@@ -777,7 +777,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r112">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f15" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f3" arrivalOffset="00:22:00" departureOffset="00:27:00" awaitDeparture="true"/>
@@ -809,7 +809,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r113">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f64" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f20" arrivalOffset="00:06:30" departureOffset="00:07:00" awaitDeparture="true"/>
@@ -1000,7 +1000,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r114">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f91" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f3" arrivalOffset="00:56:00" departureOffset="01:02:00" awaitDeparture="true"/>
@@ -1084,7 +1084,7 @@
 	</transitLine>
 	<transitLine id="l115">
 		<transitRoute id="r116">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f17" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f16" arrivalOffset="00:07:00" departureOffset="00:10:00" awaitDeparture="true"/>
@@ -1220,7 +1220,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r117">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f33" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f15" arrivalOffset="00:43:00" departureOffset="00:43:00" awaitDeparture="true"/>
@@ -1261,7 +1261,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r118">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f15" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f33" arrivalOffset="00:44:00" departureOffset="00:47:00" awaitDeparture="true"/>
@@ -1361,7 +1361,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r119">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f15" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f33" arrivalOffset="00:44:00" departureOffset="00:47:00" awaitDeparture="true"/>
@@ -1402,7 +1402,7 @@
 	</transitLine>
 	<transitLine id="l120">
 		<transitRoute id="r121">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f74" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f26" arrivalOffset="00:02:30" departureOffset="00:03:00" awaitDeparture="true"/>
@@ -1592,7 +1592,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r122">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f74" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f26" arrivalOffset="00:02:30" departureOffset="00:03:00" awaitDeparture="true"/>
@@ -1726,7 +1726,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r123">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f74" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f26" arrivalOffset="00:02:30" departureOffset="00:03:00" awaitDeparture="true"/>
@@ -1835,7 +1835,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r124">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f74" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f26" arrivalOffset="00:02:30" departureOffset="00:03:00" awaitDeparture="true"/>
@@ -1873,7 +1873,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r125">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f77" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f34" arrivalOffset="00:01:30" departureOffset="00:02:00" awaitDeparture="true"/>
@@ -2011,7 +2011,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r126">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f64" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f65" arrivalOffset="00:02:30" departureOffset="00:03:00" awaitDeparture="true"/>
@@ -2123,7 +2123,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r127">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f57" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f41" arrivalOffset="00:01:30" departureOffset="00:02:00" awaitDeparture="true"/>
@@ -2172,7 +2172,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r128">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f74" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f59" arrivalOffset="00:05:30" departureOffset="00:06:00" awaitDeparture="true"/>
@@ -2365,7 +2365,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r129">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f74" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f59" arrivalOffset="00:05:30" departureOffset="00:06:00" awaitDeparture="true"/>
@@ -2483,7 +2483,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r130">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f74" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f59" arrivalOffset="00:05:30" departureOffset="00:06:00" awaitDeparture="true"/>
@@ -2593,7 +2593,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r131">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f57" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f63" arrivalOffset="00:06:30" departureOffset="00:07:00" awaitDeparture="true"/>
@@ -2707,7 +2707,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r132">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f74" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f59" arrivalOffset="00:05:30" departureOffset="00:06:00" awaitDeparture="true"/>
@@ -2731,7 +2731,7 @@
 	</transitLine>
 	<transitLine id="l92">
 		<transitRoute id="r93">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f15" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f90" arrivalOffset="00:01:30" departureOffset="00:02:00" awaitDeparture="true"/>
@@ -2851,7 +2851,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r94">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f3" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f82" arrivalOffset="00:02:30" departureOffset="00:03:00" awaitDeparture="true"/>
@@ -2897,7 +2897,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r95">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f15" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f90" arrivalOffset="00:01:30" departureOffset="00:02:00" awaitDeparture="true"/>
@@ -2947,7 +2947,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r96">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f69" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f73" arrivalOffset="00:03:30" departureOffset="00:04:00" awaitDeparture="true"/>
@@ -3067,7 +3067,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r97">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f3" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f4" arrivalOffset="00:03:30" departureOffset="00:04:00" awaitDeparture="true"/>
@@ -3117,7 +3117,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r98">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f69" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f73" arrivalOffset="00:03:30" departureOffset="00:04:00" awaitDeparture="true"/>
@@ -3165,7 +3165,7 @@
 	</transitLine>
 	<transitLine id="l99">
 		<transitRoute id="r100">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f3" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f28" arrivalOffset="00:15:00" departureOffset="00:16:00" awaitDeparture="true"/>
@@ -3271,7 +3271,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r101">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f31" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f71" arrivalOffset="00:04:00" departureOffset="00:05:00" awaitDeparture="true"/>
@@ -3304,7 +3304,7 @@
 			</departures>
 		</transitRoute>
 		<transitRoute id="r102">
-			<transportMode>pt</transportMode>
+			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="f80" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="f10" arrivalOffset="00:06:30" departureOffset="00:07:30" awaitDeparture="true"/>

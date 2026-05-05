@@ -87,12 +87,12 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 
 		// Reading the input csv
 		Table activities = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("activities.csv")))
-			.columnTypesPartial(Map.of("person", ColumnType.TEXT, "activity_type", ColumnType.TEXT))
+			.columnTypesPartial(Map.of("person", ColumnType.STRING, "activity_type", ColumnType.STRING))
 			.sample(false)
 			.separator(CsvOptions.detectDelimiter(input.getPath("activities.csv"))).build());
 
 		// remove the underscore and the number from the activity_type column
-		TextColumn activityType = activities.textColumn("activity_type");
+		StringColumn activityType = activities.stringColumn("activity_type");
 		activityType.set(Selection.withRange(0, activityType.size()), activityType.replaceAll("_[0-9]{2,}$", ""));
 
 		ShpOptions.Index index = crs.getInputCRS() == null ? shp.createIndex(idColumn) : shp.createIndex(crs.getInputCRS(), idColumn);
@@ -105,7 +105,7 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 		// iterate over the csv rows
 		for (Row row : activities) {
 			String person = row.getString("person");
-			String activity = row.getText("activity_type");
+			String activity = row.getString("activity_type");
 
 			for (Map.Entry<String, Set<String>> entry : formattedActivityMapping.entrySet()) {
 				String pattern = entry.getKey();
@@ -165,7 +165,7 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 
 		for (String activity : uniqueActivities) {
 			Table resultTable = Table.create();
-			TextColumn regionColumn = TextColumn.create("id");
+			StringColumn regionColumn = StringColumn.create("id");
 			DoubleColumn activityColumn = DoubleColumn.create("count");
 			DoubleColumn distributionColumn = DoubleColumn.create("relative_density");
 			DoubleColumn countRatioColumn = DoubleColumn.create("density");

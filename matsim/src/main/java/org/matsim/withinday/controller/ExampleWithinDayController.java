@@ -22,9 +22,9 @@ package org.matsim.withinday.controller;
 
 import java.util.Map;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -148,7 +148,7 @@ public final class ExampleWithinDayController implements StartupListener {
 			@Override
 			public void install() {
 				install(new WithinDayModule());
-				addControlerListenerBinding().to(ExampleWithinDayController.class);
+				addControllerListenerBinding().to(ExampleWithinDayController.class);
 
 				addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 

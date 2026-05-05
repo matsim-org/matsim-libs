@@ -27,8 +27,10 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
             + " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
             + " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
             + " InsertionCostCalculator.PenaltyCalculator")
-    private boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;//TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
+    public boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 
+
+    //TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
     @Parameter
     @Comment(
             "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt."
@@ -44,7 +46,7 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
                     "3 minutes away from her destination, even though her time window would allow it." +
                     " Delayed detours just before arrival are usually perceived very negatively.")
     @PositiveOrZero
-    private double lateDiversionthreshold = 0; // [s];
+    private double lateDiversionThreshold = 0; // [s];
 
     @Parameter
     @Comment(
@@ -93,12 +95,12 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
     }
 
     @PositiveOrZero
-    public double getLateDiversionthreshold() {
-        return lateDiversionthreshold;
+    public double getLateDiversionThreshold() {
+        return lateDiversionThreshold;
     }
 
-    public void setLateDiversionthreshold(@PositiveOrZero double lateDiversionthreshold) {
-        this.lateDiversionthreshold = lateDiversionthreshold;
+    public void setLateDiversionThreshold(@PositiveOrZero double lateDiversionThreshold) {
+        this.lateDiversionThreshold = lateDiversionThreshold;
     }
 
     @PositiveOrZero

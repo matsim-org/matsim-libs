@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Provider;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -88,8 +88,8 @@ public final class RunChessboard {
 				final LegHistogram withoutFreight = new LegHistogram(900);
 				addEventHandlerBinding().toInstance(withoutFreight);
 
-				addControlerListenerBinding().toInstance( new CarrierScoreStats(carriers, config.controller().getOutputDirectory() +"/carrier_scores", true) );
-				addControlerListenerBinding().toInstance( new IterationEndsListener() {
+				addControllerListenerBinding().toInstance( new CarrierScoreStats(carriers, config.controller().getOutputDirectory() +"/carrier_scores", true) );
+				addControllerListenerBinding().toInstance(new IterationEndsListener() {
 
 					@Inject private OutputDirectoryHierarchy controlerIO;
 

@@ -20,7 +20,7 @@
 
 package org.matsim.freight.logistics.analysis;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;

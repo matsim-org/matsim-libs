@@ -21,13 +21,15 @@ package org.matsim.contrib.drt.optimizer.constraints;
 
 /**
  * @author Sebastian Hörl, IRT SystemX
+ * @author nkuehnel / MOIA
  */
-public record DrtRouteConstraints( //
-		double maxTravelTime, //
-		double maxRideTime, //
-		double maxWaitTime, //
-		double maxPickupDelay, //
-        double lateDiversionThreshold
+public record DrtRouteConstraints(
+		double maxTravelDuration,
+		double maxRideDuration,
+		double maxWaitDuration,
+		double maxPickupDelay,
+		double lateDiversionThreshold,
+		boolean allowRejection
 ) {
 
 	public final static DrtRouteConstraints UNDEFINED =
@@ -36,6 +38,7 @@ public record DrtRouteConstraints( //
 					Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY,
-					0
+					0,
+					false
 			);
 }

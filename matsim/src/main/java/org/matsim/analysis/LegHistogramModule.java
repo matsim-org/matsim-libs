@@ -29,6 +29,6 @@ public final class LegHistogramModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(LegHistogram.class).in(Singleton.class);
-		addControlerListenerBinding().to(LegHistogramListener.class);
+		addControllerListenerBinding().to(LegHistogramListener.class);
 	}
 }

@@ -29,7 +29,7 @@ import java.util.Optional;
  *
  * @author dgrether
  */
-public final class ShutdownEvent extends ControlerEvent {
+public final class ShutdownEvent extends ControllerEvent {
 
 	/**
 	 * Flag to indicate if the controler was shutdown unexpected
@@ -37,7 +37,7 @@ public final class ShutdownEvent extends ControlerEvent {
 	private final boolean unexpected;
 	private final int iteration;
 	private final Throwable exception;
-	
+
 	public ShutdownEvent(final MatsimServices controler, final boolean unexpected, int iteration, Throwable exception) {
 		super(controler);
 		this.unexpected = unexpected;
@@ -51,7 +51,7 @@ public final class ShutdownEvent extends ControlerEvent {
 	public boolean isUnexpected() {
 		return this.unexpected;
 	}
-	
+
 	public int getIteration() {
 		return iteration;
 	}

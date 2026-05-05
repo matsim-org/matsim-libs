@@ -50,7 +50,7 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
-		String filename = event.getServices().getControlerIO().getOutputFilename("drt_estimates_" + mode + ".csv");
+		String filename = event.getServices().getControllerIO().getOutputFilename("drt_estimates_" + mode + ".csv");
 
 		try {
 			csv = new CSVPrinter(Files.newBufferedWriter(Path.of(filename), StandardCharsets.UTF_8), CSVFormat.DEFAULT);

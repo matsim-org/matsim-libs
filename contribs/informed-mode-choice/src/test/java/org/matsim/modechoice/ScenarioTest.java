@@ -7,6 +7,7 @@ import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.PrepareForSim;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ScenarioTest {
@@ -29,7 +30,7 @@ public class ScenarioTest {
 
 		controler = MATSimApplication.prepare(TestScenario.class, config, getArgs());
 		injector = controler.getInjector();
-
+		injector.getInstance( PrepareForSim.class ).run();
 	}
 
 	protected void prepareConfig(Config config) {

@@ -19,15 +19,11 @@
  * *********************************************************************** */
 package ch.sbb.matsim.analysis.skims;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
- * A simple m x m matrix storing float values, using arbitrary objects to identify rows and columns. The list of identifying objects must be known before-hand when instantiating a matrix.
- *
- * @param &lt;T&gt; identifier type for matrix entries
+ * A simple m x m matrix storing float values, using arbitrary objects to identify rows and columns. The list of identifying objects must be known beforehand when instantiating a matrix.
+ *  &lt;T&gt; identifier type for matrix entries
  * @author mrieser / SBB
  *         <p>
  *         Design considerations: The matrix stores all cell values in one big array in order to have it as compact as possible. Row/Column identifiers are indexed once at initialization in order to
@@ -40,7 +36,7 @@ import java.util.Set;
  *         <p>
  *         So, as long as the matrix has entries in at least 1/16.5 = 6% or 1/25 = 4% of all cells, the simple float array should be more efficient.
  *         <p>
- *         For larger matrices the absolute volumes become even more impressive. For an 8000x8000 matrix, the float array will use 250MB, while the alternatives will use 4.5 or 6.5 GB respectively.
+ *         For larger matrices the absolute volumes become even more impressive. For a 8000x8000 matrix, the float array will use 250MB, while the alternatives will use 4.5 or 6.5 GB respectively.
  */
 public class FloatMatrix<T> {
 
@@ -48,19 +44,74 @@ public class FloatMatrix<T> {
     private final int size;
     private final float[] data;
 
-    public FloatMatrix(Set<T> zones, float defaultValue) {
-        this.size = zones.size();
-        this.id2index = new HashMap<>((int) (this.size * 1.5));
-        this.data = new float[this.size * this.size];
-        Arrays.fill(this.data, defaultValue);
-        int index = 0;
-        for (T t : zones) {
-            this.id2index.put(t, index);
-            index++;
-        }
-    }
+	/**
+	 * Creates a new FloatMatrix initialized with a default value for all cells.
+	 *
+	 * @param zones The unique identifiers for the rows and columns.
+	 * @param defaultValue The value to assign to every cell.
+	 * @return A new FloatMatrix instance.
+	 */
+	public static <T> FloatMatrix<T> createFloatMatrix(Set<T> zones, float defaultValue) {
+		return new FloatMatrix<>(zones, defaultValue);
+	}
 
-    public float set(T from, T to, float value) {
+
+	/**
+	 * Creates a new FloatMatrix from a list of identifiers and a 2D data array.
+	 * The order of identifiers in the list must correspond to the rows and columns of the data array.
+	 *
+	 * @param identifiers The list of identifiers. The size must match the dimensions of the data array.
+	 * @param data The initial data for the matrix. Must be a square matrix.
+	 * @return A new FloatMatrix instance.
+	 * @throws IllegalArgumentException if the dimensions of identifiers and data do not match or if data is not a square matrix.
+	 */
+	public static <T> FloatMatrix<T> createFloatMatrix(List<T> identifiers, float[][] data) {
+		if (identifiers == null || data == null) {
+			throw new IllegalArgumentException("Identifiers and data cannot be null.");
+		}
+		int size = identifiers.size();
+		if (size != data.length) {
+			throw new IllegalArgumentException("The number of identifiers must match the dimension of the data array.");
+		}
+		return new FloatMatrix<>(identifiers, data);
+	}
+
+	private FloatMatrix(Set<T> zones, float defaultValue) {
+		this.size = zones.size();
+		this.id2index = new HashMap<>((int) (this.size * 1.5));
+		this.data = new float[this.size * this.size];
+		Arrays.fill(this.data, defaultValue);
+		int index = 0;
+		for (T t : zones) {
+			this.id2index.put(t, index);
+			index++;
+		}
+	}
+
+	private FloatMatrix(List<T> identifiers, float[][] data) {
+		this.size = identifiers.size();
+		this.id2index = new HashMap<>((int) (this.size * 1.5));
+		this.data = new float[this.size * this.size];
+
+		int index = 0;
+		for (T t : identifiers) {
+			// Check for duplicate identifiers
+			if (this.id2index.containsKey(t)) {
+				throw new IllegalArgumentException("Identifiers must be unique. Duplicate found: " + t);
+			}
+			this.id2index.put(t, index++);
+		}
+
+		// Copy data from the 2D array to the 1D array
+		for (int i = 0; i < this.size; i++) {
+			if (data[i] == null || data[i].length != this.size) {
+				throw new IllegalArgumentException("Data array must be a square matrix. Row " + i + " has incorrect length.");
+			}
+			System.arraycopy(data[i], 0, this.data, i * this.size, this.size);
+		}
+	}
+
+	public float set(T from, T to, float value) {
         int index = getIndex(from, to);
         float oldValue = this.data[index];
         this.data[index] = value;
@@ -81,9 +132,9 @@ public class FloatMatrix<T> {
     }
 
     /**
-     * @param from
-     * @param to
-     * @param factor
+     * @param from from
+     * @param to to
+     * @param factor factor to multiply the value with
      * @return the new value
      */
     public float multiply(T from, T to, float factor) {
@@ -104,10 +155,21 @@ public class FloatMatrix<T> {
             this.data[i] *= factor;
         }
     }
+	/**
+	 * Returns the size of the matrix, which is the number of rows and columns (the matrix is square).
+	 *
+	 * @return the size of the matrix
+	 */
+	public int getSize() {
+		return this.size;
+	}
 
     private int getIndex(T from, T to) {
         int fromIndex = this.id2index.get(from);
         int toIndex = this.id2index.get(to);
         return fromIndex * this.size + toIndex;
     }
+	public Set<T> getIdentifiers() {
+		return Collections.unmodifiableSet(this.id2index.keySet());
+	}
 }

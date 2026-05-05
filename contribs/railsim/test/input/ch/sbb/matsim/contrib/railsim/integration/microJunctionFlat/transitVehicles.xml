@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="trainType1">
+		<attributes>
+			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="doorOperationMode" class="org.matsim.vehicles.VehicleType$DoorOperationMode">serial</attribute>
+			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.5</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.5</attribute>
+		</attributes>
+		<capacity seats="40" standingRoomInPersons="0">
+		</capacity>
+		<length meter="200"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="50."/>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="0.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicle id="trainAB0" type="trainType1"/>
+	<vehicle id="trainAB1" type="trainType1"/>
+	<vehicle id="trainAB2" type="trainType1"/>
+	<vehicle id="trainAB3" type="trainType1"/>
+	<vehicle id="trainAB4" type="trainType1"/>
+	<vehicle id="trainAB5" type="trainType1"/>
+	<vehicle id="trainAB6" type="trainType1"/>
+	<vehicle id="trainAB7" type="trainType1"/>
+
+	<vehicle id="trainBA0" type="trainType1"/>
+	<vehicle id="trainBA1" type="trainType1"/>
+	<vehicle id="trainBA2" type="trainType1"/>
+	<vehicle id="trainBA3" type="trainType1"/>
+	<vehicle id="trainBA4" type="trainType1"/>
+	<vehicle id="trainBA5" type="trainType1"/>
+	<vehicle id="trainBA6" type="trainType1"/>
+	<vehicle id="trainBA7" type="trainType1"/>
+
+	<vehicle id="trainCA0" type="trainType1"/>
+	<vehicle id="trainCA1" type="trainType1"/>
+	<vehicle id="trainCA2" type="trainType1"/>
+	<vehicle id="trainCA3" type="trainType1"/>
+	<vehicle id="trainCA4" type="trainType1"/>
+	<vehicle id="trainCA5" type="trainType1"/>
+	<vehicle id="trainCA6" type="trainType1"/>
+	<vehicle id="trainCA7" type="trainType1"/>
+
+	<vehicle id="trainAC0" type="trainType1"/>
+	<vehicle id="trainAC1" type="trainType1"/>
+	<vehicle id="trainAC2" type="trainType1"/>
+	<vehicle id="trainAC3" type="trainType1"/>
+	<vehicle id="trainAC4" type="trainType1"/>
+	<vehicle id="trainAC5" type="trainType1"/>
+	<vehicle id="trainAC6" type="trainType1"/>
+	<vehicle id="trainAC7" type="trainType1"/>
+
+</vehicleDefinitions>

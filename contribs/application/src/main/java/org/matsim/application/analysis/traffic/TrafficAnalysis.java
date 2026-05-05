@@ -49,7 +49,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private ShpOptions shp;
 
-	@CommandLine.Option(names = "--transport-modes", description = "transport modes to analyze", defaultValue = "", split = ",")
+	@CommandLine.Option(names = "--transport-modes", description = "transport modes to analyze", split = ",")
 	private Set<String> modes;
 
 	public static void main(String[] args) {
@@ -217,7 +217,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 	private Table createDataset(Network network, TrafficStatsCalculator calc, VolumesAnalyzer volumes) {
 
 		Table all = Table.create(
-			TextColumn.create("link_id"),
+			StringColumn.create("link_id"),
 			IntColumn.create("hour"),
 			StringColumn.create("road_type"),
 			DoubleColumn.create("lane_km"),
