@@ -81,6 +81,21 @@ public class ScoringRegressionTest {
 	}
 
 	@Test
+	public void ptPassengerStuckAtSimEnd() {
+
+		var config = loadConfig("pt-simple-lineswitch", utils.getOutputDirectory());
+		config.dsim().setEndTime(18360); // 05:06:00 — person is inside gelb vehicle (departs 05:05:30, arrives 05:07:00)
+		config.controller().setLastIteration(0);
+
+		var scenario = ScenarioUtils.loadScenario(config);
+		var controler = new Controler(scenario);
+		controler.run();
+
+		var person = getSinglePerson(scenario);
+		assertEquals(-432.0, person.getSelectedPlan().getScore(), 0.1);
+	}
+
+	@Test
 	public void drtTrip() {
 
 		var config = loadConfig("dvrp-grid", utils.getOutputDirectory(), "one_shared_taxi_config.xml");
