@@ -190,12 +190,17 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			problem = true;
 		}
 		// added feb'26
-		if ( config.timeAllocationMutator().getLatestActivityEndTime() < config.qsim().getEndTime().seconds() ) {
-			System.out.flush();
-			log.log( lvl, "The latest activity end time of the timeAllocationMutator is too early.  It should be infinity, but since that setting is not possible, it should " +
-							  "minimally be the last time step of the qsim.");
-			problem = true;
+		if ( config.timeAllocationMutator().getLatestActivityEndTime() < Double.POSITIVE_INFINITY ) {
+			if ( config.qsim().getEndTime().isDefined() ) {
+				if ( config.timeAllocationMutator().getLatestActivityEndTime() < config.qsim().getEndTime().seconds() ) {
+					System.out.flush();
+					log.log( lvl, "The latest activity end time of the timeAllocationMutator is too early.  It should either be left at its (new) default of infinity, or " +
+									  "minimally be the last time step of the qsim.");
+					problem = true;
+				}
+			}
 		}
+
 		return problem;
 	}
 
