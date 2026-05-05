@@ -61,8 +61,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
-import org.matsim.freight.carriers.controller.*;
-import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.SimWrapperModule;
@@ -109,7 +107,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 	private final IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
 	private final CommercialTourSpecifications commercialTourSpecifications;
-	protected final VehicleSelection vehicleSelection;
+	protected final OdMatrixEntryInformationProvider odMatrixEntryInformationProvider;
 	private final UnhandledServicesSolution unhandledServicesSolution;
 
 	private enum CreationOption {
@@ -183,8 +181,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--MATSimIterationsAfterDemandGeneration", description = "If selected, the MATSim simulation will be run for the selected number of iterations after demand generation. if not selected, only demand generation is performed.")
 	private Integer MATSimIterationsAfterDemandGeneration;
 
-	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = " The factor describing how many vehicles should be created in relation to the number of created services. If maxNumberOfLoopsForVRPSolving > 0 more vehiclaes are added in the replanning process.", defaultValue = "1.2")
+	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = "The factor describing how many vehicles should be created in relation to the number of created services. If maxNumberOfLoopsForVRPSolving > 0 more vehicles are added in the replanning process.", defaultValue = "1.2")
 	private double factorForTravelBufferCalculation;
+
+	@CommandLine.Option(names = "--useRangeConstraintForTourPlanning", description = "Option to use range constraint for planning the tours. If this is selected, the range is restricted based on consumption information in the vehicle types file.")
+	private boolean useRangeConstraintForTourPlanning;
 
 	private Random rnd;
 	private RandomGenerator rng;
@@ -204,23 +205,22 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private final String[] configArgs;
 
 	public GenerateSmallScaleCommercialTrafficDemand() {
-		this(null, null, null, null, null);
+		this(null, null, null, null, null, null);
 	}
 
 	public GenerateSmallScaleCommercialTrafficDemand(String[] configArgs) {
-		this(configArgs, null, null, null, null);
+		this(configArgs, null, null, null, null, null);
 	}
 
 	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-													 CommercialTourSpecifications commercialTourSpecifications, VehicleSelection vehicleSelection,
-													 UnhandledServicesSolution unhandledServicesSolution) {
-		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, vehicleSelection,
-			unhandledServicesSolution);
+	                                                 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
+	                                                 VehicleTypeSelection vehicleTypeSelection, UnhandledServicesSolution unhandledServicesSolution) {
+		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, odMatrixEntryInformationProvider, vehicleTypeSelection, unhandledServicesSolution);
 	}
 	public GenerateSmallScaleCommercialTrafficDemand(String[] configArgs,
-													 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-													 CommercialTourSpecifications commercialTourSpecifications, VehicleSelection vehicleSelection,
-													 UnhandledServicesSolution unhandledServicesSolution) {
+	                                                 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
+	                                                 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
+	                                                 VehicleTypeSelection vehicleTypeSelection, UnhandledServicesSolution unhandledServicesSolution) {
 
 		this.configArgs = (configArgs == null) ? new String[0] : configArgs;
 
@@ -238,12 +238,18 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			this.commercialTourSpecifications = commercialTourSpecifications;
 			log.info("Using {} for tour specifications!", commercialTourSpecifications.getClass().getSimpleName());
 		}
-		if (vehicleSelection == null) {
-			this.vehicleSelection = new DefaultVehicleSelection();
-			log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
+		if (odMatrixEntryInformationProvider == null) {
+			if (vehicleTypeSelection != null) {
+				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider(vehicleTypeSelection);
+				log.info("Using default {} with provided {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName(), vehicleTypeSelection.getClass().getSimpleName());
+			}
+			else {
+				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider();
+				log.info("Using default {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName());
+			}
 		} else {
-			this.vehicleSelection = vehicleSelection;
-			log.info("Using {} for tour vehicle-selection!", vehicleSelection.getClass().getSimpleName());
+			this.odMatrixEntryInformationProvider = odMatrixEntryInformationProvider;
+			log.info("Using {} for OD matrix entry information!", odMatrixEntryInformationProvider.getClass().getSimpleName());
 		}
 		if (unhandledServicesSolution == null) {
 			this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this);
@@ -271,6 +277,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		output = Path.of(config.controller().getOutputDirectory());
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		if (useRangeConstraintForTourPlanning) {
+			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
+			log.info("Using range constraint for tour planning based on energy consumption information in the vehicle types file.");
+		}
 		if (freightCarriersConfigGroup.getCarriersVehicleTypesFile() != null)
 			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
@@ -360,14 +370,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
-				CarriersUtils.writeCarriers(scenario, "output_carriers_noPlans.xml.gz");
+				CarriersUtils.writeCarriers(scenario, "output_carriers_unsolvedVRP.xml.gz");
 				solveSeparatedVRPs(scenario);
 			}
 		}
-		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(CarriersUtils.addOrGetCarriers(scenario), output.resolve("analysis").resolve("freight").toString());
-		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersPlans);
-
-		CarriersUtils.writeCarriers(scenario, "output_carriers_withPlans.xml.gz");
+		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(scenario, output.resolve("analysis").resolve("freight").toString());
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans);
+		CarriersUtils.writeCarrierVehicleTypes(scenario, "output_carriersVehicleTypes.xml.gz");
+		CarriersUtils.writeCarriers(scenario, "output_carriers_solvedVRP.xml.gz");
 
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(scenario,
 			usedSmallScaleCommercialTrafficType, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
@@ -844,7 +854,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 					if (isStartingLocation) {
 						// Get the vehicle-types and start/stop-categories
-						VehicleSelection.OdMatrixEntryInformation odMatrixEntry = vehicleSelection.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
+						OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
 
 						// use only types of the possibleTypes which are in the given types file
 						List<String> vehicleTypes = new ArrayList<>();
@@ -903,7 +913,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param odMatrixEntry odMatrixEntry
 	 * @return the selected start category
 	 */
-	protected StructuralAttribute getSelectedStartCategory(String startZone, VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {
+	protected StructuralAttribute getSelectedStartCategory(String startZone, OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry) {
 		// Find a start category with existing employees in this zone
 		StructuralAttribute selectedStartCategory = odMatrixEntry.startCategoryDistribution.sample();
 		// we start with count = 1 because the first category is already selected, and if this category has employees, we can use it.
@@ -1212,7 +1222,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	/**
 	 * The attributes of a carrier, used during the generation
-	 * @param purpose purpose of this carrier denoted as an index. Can be used in {@link VehicleSelection} to get more information about this carrier.
+	 * @param purpose purpose of this carrier denoted as an index. Can be used in {@link OdMatrixEntryInformationProvider} to get more information about this carrier.
 	 * @param startZone start zone of this carrier, entry from {@link TripDistributionMatrix#getListOfZones()}
 	 * @param selectedStartCategory start category of this carrier, selected randomly from
 	 * @param modeORvehType entry from {@link TripDistributionMatrix#getListOfModesOrVehTypes()}
@@ -1222,5 +1232,5 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	public record CarrierAttributes(int purpose, String startZone, StructuralAttribute selectedStartCategory, String modeORvehType,
 									SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, ArrayList<String> vehicleDepots,
-									VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {}
+									OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry) {}
 }
