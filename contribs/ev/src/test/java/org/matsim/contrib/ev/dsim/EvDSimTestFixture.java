@@ -25,6 +25,7 @@ import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,16 +39,14 @@ import java.util.List;
 /**
  * Shared test fixture for EV + DSim integration tests.
  * <p>
- * Uses the same three-link network topology as {@code ThreeLinkTestFixture} in
- * the distributed-simulation contrib, adapted for EV: car mode on all links,
- * an electric vehicle type, and a simple home → car → work plan that crosses
- * all three partition boundaries.
+ * Uses the same three-link network topology as {@code ThreeLinkTestFixture} in the distributed-simulation contrib, adapted for EV: car mode on all
+ * links, an electric vehicle type, and a simple home → car → work plan that crosses all three partition boundaries.
  */
 public final class EvDSimTestFixture {
 
 	/**
-	 * Vehicle range in metres with a 1 J/m drive consumption model.
-	 * Equals the energy capacity in Joules. Must exceed the total route length (1200 m).
+	 * Vehicle range in metres with a 1 J/m drive consumption model. Equals the energy capacity in Joules. Must exceed the total route length (1200
+	 * m).
 	 */
 	static final double BATTERY_CAPACITY = 10_000.0;
 
@@ -61,7 +60,8 @@ public final class EvDSimTestFixture {
 	static final String PERSON_ID = "ev-test-person";
 	static final String EV_ID = PERSON_ID + "-ev";
 
-	private EvDSimTestFixture() {}
+	private EvDSimTestFixture() {
+	}
 
 	// -------------------------------------------------------------------------
 	// Network
@@ -121,8 +121,10 @@ public final class EvDSimTestFixture {
 			l3.getAttributes().putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 2);
 		}
 
-		for (var n : List.of(n1, n2, n3, n4)) network.addNode(n);
-		for (var l : List.of(l1, l2, l3)) network.addLink(l);
+		for (var n : List.of(n1, n2, n3, n4))
+			network.addNode(n);
+		for (var l : List.of(l1, l2, l3))
+			network.addLink(l);
 
 		return network;
 	}
@@ -148,8 +150,7 @@ public final class EvDSimTestFixture {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Creates one EV person with a simple home → car → work plan traversing the
-	 * full three-link network (l1 → l2 → l3).  No access/egress walk legs —
+	 * Creates one EV person with a simple home → car → work plan traversing the full three-link network (l1 → l2 → l3).  No access/egress walk legs —
 	 * use {@link RoutingConfigGroup.AccessEgressType#none} in the config.
 	 */
 	public static Person createPerson(PopulationFactory factory, Vehicles vehicles, VehicleType evType) {
@@ -196,7 +197,7 @@ public final class EvDSimTestFixture {
 		config.controller().setOutputDirectory(outputDir);
 		config.controller().setLastIteration(0);
 		config.controller().setOverwriteFileSetting(
-			org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+			OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
 
 		// No access/egress routing — plans are pre-built with explicit routes.
@@ -263,8 +264,7 @@ public final class EvDSimTestFixture {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Adds the EV modules and bindings required by all integration tests in this
-	 * package.  Provides an empty charging infrastructure (no chargers).
+	 * Adds the EV modules and bindings required by all integration tests in this package.  Provides an empty charging infrastructure (no chargers).
 	 */
 	public static void installEvModules(Controler controller) {
 		controller.addOverridingModule(new EvModule());
