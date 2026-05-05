@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
+package org.matsim.contrib.parking.parkingparameterization;
 
 import com.google.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
@@ -41,7 +41,7 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 	double lastTimeStep = -1;
 
 	@Inject
-	public ParkingOccupancyObserver(Network network, ParkingCapacityInitializer parkingCapacityInitializer, Config config, OutputDirectoryHierarchy outputDirectoryHierarchy) {
+	ParkingOccupancyObserver(Network network, ParkingCapacityInitializer parkingCapacityInitializer, Config config, OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		this.parkingCapacityInitializer = parkingCapacityInitializer;
 		this.network = network;
 		this.config = config;

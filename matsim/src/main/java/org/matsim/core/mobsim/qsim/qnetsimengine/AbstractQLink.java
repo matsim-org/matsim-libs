@@ -36,7 +36,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.network.NetworkUtils;
@@ -91,9 +90,10 @@ abstract class AbstractQLink implements QLinkI {
 	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
-	private final Queue<QVehicle> waitingList = new LinkedList<>();
+	private final Queue<QVehicle> departureList = new LinkedList<>();
 
-	private final PassingVehicleQ parkingSearchQueue = new PassingVehicleQ();
+	// this is a list for vehicles arriving on the link. it is the equivalent of departureList but for arrival rather than departure
+	private final PassingVehicleQ arrivalList = new PassingVehicleQ();
 
 	private boolean active = false;
 
@@ -106,17 +106,17 @@ abstract class AbstractQLink implements QLinkI {
 	private final NetsimInternalInterface netsimEngine;
 	private final LinkSpeedCalculator linkSpeedCalculator;
 
-	private final ParkingSearchTimeCalculator parkingSearchTimeCalculator;
+	private final ArrivalTimeCalculator arrivalTimeCalculator;
 	private final VehicleHandler vehicleHandler;
 
-	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler, ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
+	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler, ArrivalTimeCalculator arrivalTimeCalculator) {
 		this.link = link;
 		this.toQNode = toNode;
 		this.context = context;
 		this.netsimEngine = netsimEngine2;
 		this.linkSpeedCalculator = linkSpeedCalculator;
 		this.vehicleHandler = vehicleHandler;
-		this.parkingSearchTimeCalculator = parkingSearchTimeCalculator;
+		this.arrivalTimeCalculator = arrivalTimeCalculator;
 	}
 
 	@Override
@@ -179,9 +179,9 @@ abstract class AbstractQLink implements QLinkI {
 			context.getEventsManager().processEvent(
 				new VehicleStartsParkingSearch(now, qveh.getDriver().getId(), this.link.getId(), qveh.getId(), qveh.getDriver().getMode()));
 
-			double parkingSearchTime = parkingSearchTimeCalculator.calculateParkingSearchTime(now, qveh, this.link);
-			qveh.setEarliestLinkExitTime(now + parkingSearchTime);
-			parkingSearchQueue.add(qveh);
+			double arrivalTime = arrivalTimeCalculator.calculateArrivalTime(now, qveh, this.link);
+			qveh.setEarliestLinkExitTime(now + arrivalTime);
+			arrivalList.add(qveh);
 		} else if (vehicleArrival == VehicleHandler.VehicleArrival.ALLOWED) {
 			// in this case no parking search events are created
 			arriveAndPark(qveh, false);
@@ -212,7 +212,7 @@ abstract class AbstractQLink implements QLinkI {
 
 	private final void addDepartingVehicle(MobsimVehicle mvehicle) {
 		QVehicle vehicle = (QVehicle) mvehicle;
-		this.waitingList.add(vehicle);
+		this.departureList.add(vehicle);
 		vehicle.setCurrentLinkId(this.getLink().getId());
 		this.activateLink();
 		vehicleHandler.handleVehicleDeparture(vehicle, link);
@@ -310,7 +310,7 @@ abstract class AbstractQLink implements QLinkI {
 		}
 		this.passengersWaitingForCars.clear();
 
-		for (QVehicle veh : this.waitingList) {
+		for (QVehicle veh : this.departureList) {
 			if (stuckAgents.contains(veh.getDriver().getId())) {
 				continue;
 			} else {
@@ -324,7 +324,7 @@ abstract class AbstractQLink implements QLinkI {
 			this.context.getAgentCounter().incLost();
 			this.context.getAgentCounter().decLiving();
 		}
-		this.waitingList.clear();
+		this.departureList.clear();
 	}
 
 	@Override
@@ -508,12 +508,12 @@ abstract class AbstractQLink implements QLinkI {
 		this.active = active;
 	}
 
-	Queue<QVehicle> getWaitingList() {
-		return waitingList;
+	Queue<QVehicle> getDepartureList() {
+		return departureList;
 	}
 
-	public PassingVehicleQ getParkingSearchQueue() {
-		return parkingSearchQueue;
+	public PassingVehicleQ getArrivalList() {
+		return arrivalList;
 	}
 
 	TransitQLink getTransitQLink() {

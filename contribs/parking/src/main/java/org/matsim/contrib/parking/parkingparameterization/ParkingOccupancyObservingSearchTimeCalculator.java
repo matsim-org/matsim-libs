@@ -1,9 +1,10 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
+package org.matsim.contrib.parking.parkingparameterization;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ArrivalTimeCalculator;
 import org.matsim.core.network.kernel.NetworkKernelFunction;
 
 import java.util.Map;
@@ -17,7 +18,7 @@ import java.util.Map;
  *     <li> ParkingSearchTimeFunction: calculates the parking search time based on the parking occupancy
  * </ul>
  */
-public class ParkingOccupancyObservingSearchTimeCalculator implements ParkingSearchTimeCalculator {
+public class ParkingOccupancyObservingSearchTimeCalculator implements ArrivalTimeCalculator {
 	@Inject
 	private NetworkKernelFunction kernelFunction;
 
@@ -28,7 +29,7 @@ public class ParkingOccupancyObservingSearchTimeCalculator implements ParkingSea
 	private ParkingSearchTimeFunction parkingSearchTimeFunction;
 
 	@Override
-	public double calculateParkingSearchTime(double now, QVehicle vehicle, Link link) {
+	public double calculateArrivalTime(double now, QVehicle vehicle, Link link) {
 		Map<Id<Link>, Double> weightedLinkIds = kernelFunction.calculateWeightedKernel(vehicle, link);
 		Map<Id<Link>, ParkingCount> parkingCountPerLinkId = parkingOccupancyObserver.getParkingCount(now, weightedLinkIds);
 		double res = parkingSearchTimeFunction.calculateParkingSearchTime(parkingCountPerLinkId);

@@ -30,7 +30,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalIn
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.DefaultFlowEfficiencyCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -45,21 +44,21 @@ import java.util.*;
 /**
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed into something
  * like AbstractQLink) and QLinkImpl jointly. kai, nov'11
- * 
+ *
  * @author dstrippgen
  * @author dgrether
  * @author mrieser
- * 
+ *
  *         A QLinkLanes can consist of one or more QLanes, which may have the following layout
  *         (Dashes stand for the borders of the QLink, equal signs (===) depict one lane, plus signs
  *         (+) symbolize a decision point where one lane splits into several lanes) :
- * 
+ *
  *         <pre>
  * ----------------
  * ================
  * ----------------
  * </pre>
- * 
+ *
  *         <pre>
  * ----------------
  *          =======
@@ -67,7 +66,7 @@ import java.util.*;
  *          =======
  * ----------------
  * </pre>
- * 
+ *
  *         <pre>
  * ----------------
  *         							========
@@ -75,17 +74,17 @@ import java.util.*;
  *         							========
  * ----------------
  * </pre>
- * 
- * 
+ *
+ *
  *         The following layouts are not allowed:
- * 
+ *
  *         <pre>
  * ----------------
  * ================
  * ================
  * ----------------
  * </pre>
- * 
+ *
  *         <pre>
  * ----------------
  * =======
@@ -93,7 +92,7 @@ import java.util.*;
  * =======
  * ----------------
  * </pre>
- * 
+ *
  *         Queue Model Link implementation with the following properties:
  *         <ul>
  *         <li>The queue behavior itself is simulated by one or more instances of QueueLane</li>
@@ -113,7 +112,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		private LinkSpeedCalculator linkSpeedCalculator;
 		private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
 		private FlowEfficiencyCalculator flowEfficiencyCalculator = new DefaultFlowEfficiencyCalculator();
-		private ParkingSearchTimeCalculator parkingSearchTimeCalculator;
+		private ArrivalTimeCalculator arrivalTimeCalculator;
 
 		public Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
 			this.context = context;
@@ -128,17 +127,17 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			this.flowEfficiencyCalculator = flowEfficiencyCalculator;
 		}
 
-		public void setParkingSearchTimeCalculator(ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
-			this.parkingSearchTimeCalculator = parkingSearchTimeCalculator;
+		public void setParkingSearchTimeCalculator(ArrivalTimeCalculator arrivalTimeCalculator) {
+			this.arrivalTimeCalculator = arrivalTimeCalculator;
 		}
 
 		AbstractQLink build(Link link, QNodeI toNodeQ, List<ModelLane> lanes) {
 			Objects.requireNonNull(linkSpeedCalculator);
-			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator, flowEfficiencyCalculator, vehicleHandler, parkingSearchTimeCalculator);
+			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator, flowEfficiencyCalculator, vehicleHandler, arrivalTimeCalculator);
 		}
 
 	}
-	
+
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
@@ -179,8 +178,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 */
 	private QLinkLanesImpl(final Link link, final QNodeI toNodeQ, List<ModelLane> lanes, NetsimEngineContext context,
 						   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator, FlowEfficiencyCalculator flowEfficiencyCalculator,
-						   VehicleHandler vehicleHandler, ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
-		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator, vehicleHandler, parkingSearchTimeCalculator);
+						   VehicleHandler vehicleHandler, ArrivalTimeCalculator arrivalTimeCalculator) {
+		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator, vehicleHandler, arrivalTimeCalculator);
 		this.context = context;
 		this.toQueueNode = toNodeQ;
 		this.laneQueues = new LinkedHashMap<>();
@@ -231,7 +230,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 						toLinkIdDownstreamQueues);
 				for (ModelLane toLane : lane.getToLanes()) {
 					Set<Id<Link>> toLinks = laneIdToLinksMap.get(toLane.getLaneData().getId());
-					if (toLinks == null){ 
+					if (toLinks == null) {
 						// nothing to do here
 						break;
 					}
@@ -250,7 +249,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				}
 			}
 //			queue.changeSpeedMetersPerSecond( this.getLink().getFreespeed() );
-			
+
 		}
 		// reverse the order in the linked map, i.e. upstream to downstream
 		while (!stack.isEmpty()) {
@@ -275,7 +274,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	@Override
 	public boolean doSimStep() {
 		double now = context.getSimTimer().getTimeOfDay() ;
-		
+
 		boolean lanesActive = false;
 		boolean movedWaitToRoad = false;
 		if ( context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
@@ -284,7 +283,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		    //it should be executed before moveWaitToRoad() to keep the sequence fully consistent.
 		    //The sequence is broken only if isInsertingWaitingVehiclesBeforeDrivingVehicles==true.
 		    //Currently, the buffer of the accepting lane gets emptied after moveWaitToRoad(),
-		    //which gives preference to already driving vehicles 
+			//which gives preference to already driving vehicles
 		    //michalm, jan'17
 			this.moveWaitToRoad(now);
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
@@ -294,7 +293,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			lanesActive = this.moveLanes();
 			movedWaitToRoad = this.moveWaitToRoad(now);
 		}
-		this.setActive(lanesActive || movedWaitToRoad || (!this.getWaitingList().isEmpty())
+		this.setActive(lanesActive || movedWaitToRoad || (!this.getDepartureList().isEmpty())
 				|| !this.getTransitQLink().getTransitVehicleStopQueue().isEmpty());
 		return this.isActive();
 	}
@@ -303,11 +302,11 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		boolean activeLane = false;
 		for (QLaneI lane : this.laneQueues.values()) {
 			// (go through all lanes)
-			
+
 			/* part A */
 			if (!this.toNodeLaneQueues.contains(lane)) {
 				// (so it HAS a link-internal next lane)
-				
+
 				// move vehicles from the lane buffer to the next lane
 				this.moveBufferToNextLane(lane);
 			} else {
@@ -319,34 +318,34 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			}
 			/* end of part A */
 		}
-		
+
         for (QLaneI lane : this.laneQueues.values()) {
             lane.initBeforeSimStep();
         }
-        
+
 		for (QLaneI lane : this.laneQueues.values()) {
 			// (go through all lanes)
-		
+
 			/* part B */
 			// move vehicles to the lane buffer if they have reached their earliest lane exit time
 			lane.doSimStep();
 			/* end of part B */
-			
+
 			activeLane = activeLane || lane.isActive();
-			
+
 			/*
 			 * Remark: The order of part A and B influences the travel time on lanes.
-			 * 
+			 *
 			 * Before Jul'15 order B, A was used, such that travel time on lanes was practically
 			 * rounded down. This has the unintended effect that introducing lanes on a link may
 			 * decrease its travel time: Dividing the link into sufficient many lanes (each one
 			 * shorter than the number of meters that an agent may travel in 1 second) reduces the
 			 * link travel time to 1 second.
-			 * 
+			 *
 			 * Order A, B produces the same behavior for lanes as for links. I.e. up to one
 			 * additional second may occur for every lane, because travel times are now practically
 			 * rounded up.
-			 * 
+			 *
 			 * Theresa, Jul'15
 			 */
 		}
@@ -397,18 +396,18 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	/**
 	 * Move as many waiting cars to the link as it is possible
-	 * 
+	 *
 	 * @param now
 	 *            the current time
 	 * @return true if at least one vehicle is moved to the buffer of this lane
 	 */
 	private boolean moveWaitToRoad(final double now) {
 		boolean movedWaitToRoad = false;
-		while (!getWaitingList().isEmpty()) {
-		    if (!firstLaneQueue.isAcceptingFromWait(this.getWaitingList().peek())) {
+		while (!getDepartureList().isEmpty()) {
+			if (!firstLaneQueue.isAcceptingFromWait(this.getDepartureList().peek())) {
 		        return movedWaitToRoad;
 		    }
-		    QVehicle veh = this.getWaitingList().poll();
+			QVehicle veh = this.getDepartureList().poll();
 
 			movedWaitToRoad = true;
 			context .getEventsManager() .processEvent(
@@ -461,7 +460,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		if (ret != null) {
 			return ret;
 		}
-		for (QVehicle veh : this.getWaitingList()) {
+		for (QVehicle veh : this.getDepartureList()) {
 			if (veh.getId().equals(vehicleId))
 				return veh;
 		}
@@ -476,7 +475,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	@Override
 	public final Collection<MobsimVehicle> getAllNonParkedVehicles() {
-		Collection<MobsimVehicle> ret = new ArrayList<MobsimVehicle>(this.getWaitingList());
+		Collection<MobsimVehicle> ret = new ArrayList<MobsimVehicle>(this.getDepartureList());
 		for (QLaneI lane : this.laneQueues.values()) {
 			ret.addAll(lane.getAllVehicles());
 		}
@@ -507,7 +506,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * This method returns the normalized capacity of the link, i.e. the capacity of vehicles per
 	 * second. It is considering the capacity reduction factors set in the config and the
 	 * simulation's tick time.
-	 * 
+	 *
 	 * @return the flow capacity of this link per second, scaled by the config values and in
 	 *         relation to the SimulationTimer's simticktime.
 	 */
@@ -533,9 +532,9 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	/**
 	 * Inner class to capsulate visualization methods
-	 * 
+	 *
 	 * @author dgrether
-	 * 
+	 *
 	 */
 	class VisDataImpl implements VisData {
 		private VisLaneModelBuilder visModelBuilder = null;
@@ -556,7 +555,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		@Override
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(
 				final Collection<AgentSnapshotInfo> positions) {
-			
+
 			double now = context.getSimTimer().getTimeOfDay() ;
 
 
@@ -580,15 +579,15 @@ public final class QLinkLanesImpl extends AbstractQLink {
 					getTransitQLink().getTransitVehicleStopQueue(), cnt2);
 			// treat vehicles from waiting list:
 			context.snapshotInfoBuilder.positionVehiclesFromWaitingList(positions,
-					QLinkLanesImpl.this.getLink(), cnt2, QLinkLanesImpl.this.getWaitingList());
-			cnt2 = QLinkLanesImpl.this.getWaitingList().size();
+					QLinkLanesImpl.this.getLink(), cnt2, QLinkLanesImpl.this.getDepartureList());
+			cnt2 = QLinkLanesImpl.this.getDepartureList().size();
 			context.snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkLanesImpl.this.getLink(),
 					QLinkLanesImpl.this.getAdditionalAgentsOnLink(), cnt2);
 
 			return positions;
 		}
 	}
-	
+
 	@Override
 	public QLaneI getAcceptingQLane() {
 		return this.firstLaneQueue ;

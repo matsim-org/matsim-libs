@@ -1,4 +1,4 @@
-package org.matsim.examples;
+package org.matsim.contrib.parking.parkingparameterization;
 
 import com.google.inject.Singleton;
 import org.junit.jupiter.api.Assertions;
@@ -22,7 +22,7 @@ import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.parking.*;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConstantArrivalTime;
 import org.matsim.core.network.kernel.ConstantKernelDistance;
 import org.matsim.core.network.kernel.DefaultKernelFunction;
 import org.matsim.core.network.kernel.KernelDistance;
@@ -31,13 +31,14 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.util.List;
 
-import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingUtils.LINK_OFF_STREET_SPOTS;
-import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingUtils.LINK_ON_STREET_SPOTS;
+import static org.matsim.contrib.parking.parkingparameterization.ParkingUtils.LINK_OFF_STREET_SPOTS;
+import static org.matsim.contrib.parking.parkingparameterization.ParkingUtils.LINK_ON_STREET_SPOTS;
 
 public class ParkingTest {
 	@RegisterExtension
@@ -84,7 +85,7 @@ public class ParkingTest {
 			@Override
 			protected void configureQSim() {
 				addVehicleHandlerBinding().to(ParkingVehicleHandler.class);
-				addParkingSearchTimeCalculatorBinding().toInstance(new ConstantParkingSearchTime(100));
+				addParkingSearchTimeCalculatorBinding().toInstance(new ConstantArrivalTime(100));
 			}
 		});
 		controller.addOverridingModule(new AbstractModule() {

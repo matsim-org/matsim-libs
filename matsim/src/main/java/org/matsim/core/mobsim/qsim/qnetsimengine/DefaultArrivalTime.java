@@ -2,24 +2,23 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class DefaultParkingSearchTime implements ParkingSearchTimeCalculator {
-	private final Collection<ParkingSearchTimeCalculator> handlers = new ArrayList<>();
+public class DefaultArrivalTime implements ArrivalTimeCalculator {
+	private final Collection<ArrivalTimeCalculator> handlers = new ArrayList<>();
 
 	@Inject
-	DefaultParkingSearchTime() {
+    DefaultArrivalTime() {
 	}
 
 	@Override
-	public double calculateParkingSearchTime(double now, QVehicle vehicle, Link link) {
+	public double calculateArrivalTime(double now, QVehicle vehicle, Link link) {
 		double time = Double.NaN;
 
-		for (ParkingSearchTimeCalculator handler : handlers) {
-			double tmp = handler.calculateParkingSearchTime(now, vehicle, link);
+		for (ArrivalTimeCalculator handler : handlers) {
+			double tmp = handler.calculateArrivalTime(now, vehicle, link);
 
 			if (Double.isNaN(tmp)) {
 				// Handler was not able to calculate parking search time
@@ -41,7 +40,7 @@ public class DefaultParkingSearchTime implements ParkingSearchTimeCalculator {
 		return 0;
 	}
 
-	public final DefaultParkingSearchTime addHandler(ParkingSearchTimeCalculator handler) {
+	public final DefaultArrivalTime addHandler(ArrivalTimeCalculator handler) {
 		handlers.add(handler);
 		return this;
 	}

@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
+package org.matsim.contrib.parking.parkingparameterization;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

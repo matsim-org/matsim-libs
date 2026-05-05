@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
+package org.matsim.contrib.parking.parkingparameterization;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
