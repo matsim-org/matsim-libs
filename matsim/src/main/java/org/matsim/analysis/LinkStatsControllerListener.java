@@ -20,6 +20,7 @@
 package org.matsim.analysis;
 
 import com.google.common.base.Joiner;
+import com.google.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.matsim.api.core.v01.Scenario;
@@ -38,13 +39,15 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 
-import com.google.inject.Inject;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
 
 /**
  * @author mrieser
+ *
+ * Writes link stats at the end of the simulation and at the end of iterations (if configured). Output contains volume of each link.
+ * Output is not scaled by PCU or scale factor.
  */
 final class LinkStatsControllerListener implements IterationEndsListener, IterationStartsListener, ShutdownListener {
 

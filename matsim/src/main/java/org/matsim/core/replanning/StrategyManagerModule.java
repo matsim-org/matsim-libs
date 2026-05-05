@@ -28,6 +28,8 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import com.google.inject.Provider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
@@ -38,6 +40,7 @@ import org.matsim.core.replanning.conflicts.ConflictModule;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
 public class StrategyManagerModule extends AbstractModule {
+	private static final Logger log = LogManager.getLogger( StrategyManagerModule.class );
 	@Override
 	public void install() {
 		install(new DefaultPlanStrategiesModule());
@@ -56,9 +59,7 @@ public class StrategyManagerModule extends AbstractModule {
 			String name = settings.getStrategyName() ;
 			if (name.contains(".")) {
 				// plan strategy is in Java, but it is found via the class loader:
-				if (name.startsWith("org.matsim.core")
-						    // && !name.startsWith("org.matsim.contrib.")
-				) {
+				if (name.startsWith("org.matsim.core") ) {
 					// org.matsim.core strategies are not to be loaded via the class loader:
 					throw new RuntimeException("Strategies in the org.matsim.core package must not be loaded by name!");
 				} else {
@@ -67,6 +68,8 @@ public class StrategyManagerModule extends AbstractModule {
 						if (PlanStrategy.class.isAssignableFrom(klass)) {
 							planStrategyMapBinder.addBinding(settings).to(klass);
 						} else if (Provider.class.isAssignableFrom(klass)) {
+							planStrategyMapBinder.addBinding(settings).toProvider(klass);
+						} else if (jakarta.inject.Provider.class.isAssignableFrom(klass)) {
 							planStrategyMapBinder.addBinding(settings).toProvider(klass);
 						} else {
 							throw new RuntimeException("You specified a class name as a strategy, but it is neither a PlanStrategy nor a Provider.");

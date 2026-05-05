@@ -1,12 +1,6 @@
 package org.matsim.contrib.ev.strategic.scoring;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.util.concurrent.AtomicDouble;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -21,16 +15,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.ev.charging.ChargingEndEvent;
-import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
-import org.matsim.contrib.ev.charging.ChargingStartEvent;
-import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
-import org.matsim.contrib.ev.charging.EnergyChargedEvent;
-import org.matsim.contrib.ev.charging.EnergyChargedEventHandler;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEvent;
-import org.matsim.contrib.ev.charging.QueuedAtChargerEventHandler;
-import org.matsim.contrib.ev.charging.QuitQueueAtChargerEvent;
-import org.matsim.contrib.ev.charging.QuitQueueAtChargerEventHandler;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEvent;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEventHandler;
 import org.matsim.contrib.ev.discharging.IdlingEnergyConsumptionEvent;
@@ -61,23 +46,24 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import com.google.common.util.concurrent.AtomicDouble;
+import java.util.*;
 
 /**
  * This class manages the scoring of charging plans. See the documentation of
  * the package or the respective ChargingPlanScoringParameters for more
  * information on the individaul scoring dimensions.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class ChargingPlanScoring implements IterationStartsListener, ScoringListener, AbortChargingProcessEventHandler,
-		AbortChargingAttemptEventHandler, DrivingEnergyConsumptionEventHandler, IdlingEnergyConsumptionEventHandler,
-		ChargingEndEventHandler, QueuedAtChargerEventHandler, QuitQueueAtChargerEventHandler, ChargingStartEventHandler,
-		LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, EnergyChargedEventHandler,
-		AdvanceReservationEventHandler,
-		MobsimEngine {
+	AbortChargingAttemptEventHandler, DrivingEnergyConsumptionEventHandler, IdlingEnergyConsumptionEventHandler,
+	ChargingEndEventHandler, QueuedAtChargerEventHandler, QuitQueueAtChargerEventHandler, ChargingStartEventHandler,
+	LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, EnergyChargedEventHandler,
+	AdvanceReservationEventHandler,
+	MobsimEngine {
 	static public final String MINIMUM_SOC_PERSON_ATTRIBUTE = "sevc:minimumSoc";
 	static public final String MINIMUM_END_SOC_PERSON_ATTRIBUTE = "sevc:minimumEndSoc";
+	static public final String TARGET_SOC_PERSON_ATTRIBUTE = "sevc:targetSoc";
 
 	static public final String MONEY_EVENT_PURPOSE = "strategic charging";
 
@@ -98,10 +84,10 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	private final TimeInterpretation timeInterpretation;
 
 	public ChargingPlanScoring(EventsManager eventsManager, Population population, Network network,
-			TimeInterpretation timeInterpretation, ElectricFleetSpecification fleet,
-			ChargingInfrastructureSpecification infrastructure,
-			ChargingCostCalculator costCalculator,
-			ChargingPlanScoringParameters parameters, String chargingMode, ScoringTracker tracker) {
+							   TimeInterpretation timeInterpretation, ElectricFleetSpecification fleet,
+							   ChargingInfrastructureSpecification infrastructure,
+							   ChargingCostCalculator costCalculator,
+							   ChargingPlanScoringParameters parameters, String chargingMode, ScoringTracker tracker) {
 		this.eventsManager = eventsManager;
 		this.population = population;
 		this.network = network;
@@ -132,8 +118,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 
 				if (previousId != null) {
 					throw new IllegalStateException(
-							"Vehicle " + vehicleId + " is attached to multiple persons (at least " + person.getId()
-									+ " and " + previousId + ")");
+						"Vehicle " + vehicleId + " is attached to multiple persons (at least " + person.getId()
+							+ " and " + previousId + ")");
 				}
 			}
 		}
@@ -169,7 +155,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		eventsManager.addHandler(this);
 	}
 
-	private void addScoreForPerson(Id<Person> personId, double score) {
+	public void addScoreForPerson(Id<Person> personId, double score) {
 		if (score != 0.0) {
 			AtomicDouble item = scores.get(personId);
 
@@ -185,7 +171,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		}
 	}
 
-	private void addScoreForVehicle(Id<Vehicle> vehicleId, double score) {
+	public void addScoreForVehicle(Id<Vehicle> vehicleId, double score) {
 		Id<Person> personId = getPerson(vehicleId);
 
 		if (personId != null) {
@@ -194,7 +180,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	}
 
 	public void trackScoreForVehicle(double time, Id<Vehicle> vehicleId, String dimension, double score,
-			Double value) {
+									 Double value) {
 		Id<Person> personId = getPerson(vehicleId);
 
 		if (personId != null) {
@@ -341,8 +327,30 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 						if (entry.current / entry.total < minimumEndOfDaySoc) {
 							addScoreForPerson(person.getId(), parameters.getBelowMinimumEndSoc());
 							trackScoreForPerson(now, person.getId(), "minimum_end_soc",
-									parameters.getBelowMinimumEndSoc(),
-									entry.current / entry.total);
+								parameters.getBelowMinimumEndSoc(),
+								entry.current / entry.total);
+						}
+					}
+				}
+			}
+		}
+
+		if (parameters.getTargetSoc() != 0.0) {
+			for (Person person : activePersons) {
+				Double targetSoc = getTargetSoc(person);
+
+				if (targetSoc != null) {
+					Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, chargingMode);
+
+					if (energy.containsKey(vehicleId)) {
+						EnergyEntry entry = energy.get(vehicleId);
+
+						double delta = Math.abs(entry.current / entry.total - targetSoc);
+						if (delta > 0.0) {
+							addScoreForPerson(person.getId(), delta * parameters.getTargetSoc());
+							trackScoreForPerson(now, person.getId(), "target_soc",
+								delta * parameters.getTargetSoc(),
+								delta);
 						}
 					}
 				}
@@ -357,8 +365,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		// handles an unsuccessful charging attempt, but the agent tries another one
 		addScoreForPerson(event.getPersonId(), parameters.getFailedChargingAttempt());
 		trackScoreForPerson(event.getTime(), event.getPersonId(), "failed_attempt",
-				parameters.getFailedChargingAttempt(),
-				null);
+			parameters.getFailedChargingAttempt(),
+			null);
 	}
 
 	@Override
@@ -366,8 +374,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		// handles an unsuccessful charging process after trying several chargers
 		addScoreForPerson(event.getPersonId(), parameters.getFailedChargingProcess());
 		trackScoreForPerson(event.getTime(), event.getPersonId(), "failed_process",
-				parameters.getFailedChargingProcess(),
-				null);
+			parameters.getFailedChargingProcess(),
+			null);
 	}
 
 	// RESERVATION scoring
@@ -401,7 +409,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 			double waitTime_min = (quitTime - enterTime) / 60.0;
 			addScoreForVehicle(vehicleId, parameters.getWaitTime_min() * waitTime_min);
 			trackScoreForVehicle(quitTime, vehicleId, "wait_time_min", parameters.getWaitTime_min() * waitTime_min,
-					waitTime_min);
+				waitTime_min);
 		}
 	}
 
@@ -435,7 +443,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	}
 
 	private void handleStartCharging(ChargingStartEvent event) {
-		chargingStartStates.put(event.getVehicleId(), new ChargingStartState(event.getTime(), event.getCharge(), event.getChargerId()));
+		chargingStartStates.put(event.getVehicleId(),
+			new ChargingStartState(event.getTime(), event.getCharge(), event.getChargerId()));
 	}
 
 	private void handleFinishCharging(ChargingEndEvent event) {
@@ -453,7 +462,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 
 			if (personId != null) {
 				double cost = costCalculator.calculateChargingCost(personId, start.chargerId, start.time, duration,
-						energy);
+					energy);
 				addScoreForVehicle(vehicleId, cost * parameters.getCost());
 				trackScoreForVehicle(endTime, vehicleId, "cost", cost * parameters.getCost(), cost);
 
@@ -472,7 +481,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 
 	private void handleReservationCost(AdvanceReservationEvent event) {
 		double cost = costCalculator.calculateReservationCost(event.getPersonId(), event.getChargerId(),
-				event.getEndTime() - event.getStartTime());
+			event.getEndTime() - event.getStartTime());
 		moneyEvents.add(new MoneyRecord(event.getPersonId(), event.getChargerId(), cost));
 	}
 
@@ -561,14 +570,14 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 			if (detourTravelTime_min * parameters.getDetourTime_min() != 0.0) {
 				addScoreForVehicle(entry.getKey(), detourTravelTime_min * parameters.getDetourTime_min());
 				trackScoreForVehicle(now, entry.getKey(), "detour_time_min",
-						detourTravelTime_min * parameters.getDetourTime_min(),
-						detourTravelTime_min);
+					detourTravelTime_min * parameters.getDetourTime_min(),
+					detourTravelTime_min);
 			}
 
 			if (detourTravelDistance_km * parameters.getDetourDistance_km() != 0.0) {
 				addScoreForVehicle(entry.getKey(), detourTravelDistance_km * parameters.getDetourDistance_km());
 				trackScoreForVehicle(now, entry.getKey(), "detour_distance_km",
-						detourTravelDistance_km * parameters.getDetourDistance_km(), detourTravelDistance_km);
+					detourTravelDistance_km * parameters.getDetourDistance_km(), detourTravelDistance_km);
 			}
 		}
 	}
@@ -581,20 +590,12 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 
 		for (MoneyRecord moneyRecord : moneyEvents) {
 			eventsManager.processEvent(
-					new PersonMoneyEvent(time, moneyRecord.personId, moneyRecord.amount, MONEY_EVENT_PURPOSE,
-							moneyRecord.chargerId.toString(),
-							null));
+				new PersonMoneyEvent(time, moneyRecord.personId, moneyRecord.amount, MONEY_EVENT_PURPOSE,
+					moneyRecord.chargerId.toString(),
+					null));
 		}
 
 		moneyEvents.clear();
-	}
-
-	@Override
-	public void onPrepareSim() {
-	}
-
-	@Override
-	public void afterSim() {
 	}
 
 	@Override
@@ -629,5 +630,19 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	 */
 	static public Double getMinimumEndSoc(Person person) {
 		return (Double) person.getAttributes().getAttribute(MINIMUM_END_SOC_PERSON_ATTRIBUTE);
+	}
+
+	/**
+	 * Sets the target SoC at the end of the day.
+	 */
+	static public void setTargetSoc(Person person, double targetSoc) {
+		person.getAttributes().putAttribute(TARGET_SOC_PERSON_ATTRIBUTE, targetSoc);
+	}
+
+	/**
+	 * Returns the target SoC at the end of the day.
+	 */
+	static public Double getTargetSoc(Person person) {
+		return (Double) person.getAttributes().getAttribute(TARGET_SOC_PERSON_ATTRIBUTE);
 	}
 }

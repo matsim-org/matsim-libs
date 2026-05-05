@@ -1,15 +1,53 @@
 package org.matsim.contrib.drt.prebooking;
 
-import org.matsim.core.config.ReflectiveConfigGroup;
+import java.util.Optional;
 
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogicParams;
+import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogicParams;
+import org.matsim.core.config.ConfigGroup;
+
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public class PrebookingParams extends ReflectiveConfigGroup {
+public class PrebookingParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	public static final String SET_NAME = "prebooking";
+
+	@Nullable
+	private ConfigGroup logicParams;
 
 	public PrebookingParams() {
 		super(SET_NAME);
+		initLogicParameterSets();
+	}
+
+	private void initLogicParameterSets() {
+		addDefinition(ProbabilityBasedPrebookingLogicParams.SET_NAME,
+				ProbabilityBasedPrebookingLogicParams::new,
+				() -> logicParams,
+				params -> logicParams = (ProbabilityBasedPrebookingLogicParams) params);
+
+		addDefinition(AttributeBasedPrebookingLogicParams.SET_NAME,
+				AttributeBasedPrebookingLogicParams::new,
+				() -> logicParams,
+				params -> logicParams = (AttributeBasedPrebookingLogicParams) params);
+	}
+
+	public Optional<ConfigGroup> getLogicParams() {
+		return Optional.ofNullable(logicParams);
+	}
+
+	public Optional<ProbabilityBasedPrebookingLogicParams> getProbabilityBasedLogicParams() {
+		return getLogicParams()
+				.filter(ProbabilityBasedPrebookingLogicParams.class::isInstance)
+				.map(ProbabilityBasedPrebookingLogicParams.class::cast);
+	}
+
+	public Optional<AttributeBasedPrebookingLogicParams> getAttributeBasedLogicParams() {
+		return getLogicParams()
+				.filter(AttributeBasedPrebookingLogicParams.class::isInstance)
+				.map(AttributeBasedPrebookingLogicParams.class::cast);
 	}
 
 	@Parameter

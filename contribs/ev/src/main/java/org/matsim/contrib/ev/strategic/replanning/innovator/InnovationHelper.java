@@ -229,6 +229,27 @@ public class InnovationHelper {
         }
     }
 
+    public boolean isSame(ActivityBasedCandidate candidate, ChargingPlanActivity activity) {
+        if (activity.isEnroute()) {
+            return false;
+        }
+
+        int startIndex = startActivityIndex(candidate);
+        int endIndex = endActivityIndex(candidate);
+
+        return startIndex == activity.getStartActivityIndex() && endIndex == activity.getEndActivityIndex();
+    }
+
+    public boolean isSame(LegBasedCandidate candidate, ChargingPlanActivity activity) {
+        if (!activity.isEnroute()) {
+            return false;
+        }
+
+        int followingIndex = followingActivityIndex(candidate);
+
+        return followingIndex == activity.getFollowingActivityIndex();
+    }
+
     static public InnovationHelper build(Plan plan, TimeInterpretation timeInterpretation,
             ChargingSlotFinder candidateFinder, ChargerReservability reservability) {
         List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),

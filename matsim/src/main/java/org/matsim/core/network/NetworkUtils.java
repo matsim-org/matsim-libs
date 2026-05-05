@@ -32,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -663,6 +664,9 @@ public final class NetworkUtils {
 		}
 	}
 
+	/**
+	 * See {@link #getHighwayType(Link)}.
+	 */
 	public static String getType(Link link) {
 //		if ( link instanceof LinkImpl ) {
 //			return ((LinkImpl)link).getType2() ;
@@ -675,6 +679,11 @@ public final class NetworkUtils {
 	/**
 	 * Returns the road type of a highway link. In OSM highway links contain links for car traffic.
 	 * If not set this method will return "unclassified".
+	 * <br>
+	 * We are speculating the following: At some point, matsim network generation takes a detour via a SUMO network.  And SUMO
+	 * seems to use "highway.[osmTag]".  Since matsim is used to have this without "highway.", the present method removes that.
+	 * At the same time, CR evidently decided to return an explicit "unclassified" instead of null or an empty string.
+	 * kai/daniel/simon/domink/gregorR/simon, mar'26
 	 */
 	public static String getHighwayType(Link link) {
 
@@ -831,6 +840,11 @@ public final class NetworkUtils {
 
 	public static final String ORIGID = "origid";
 
+	public static void cleanNetwork( Scenario scenario ) {
+		Collection<String> modes = scenario.getConfig().routing().getNetworkModes();
+		cleanNetwork( scenario.getNetwork(), modes );
+	}
+
 	/**
 	 * This performs all currently recommended cleaning process on a network:
 	 * * clean network for selected modes to ensure reachability during routing
@@ -841,7 +855,9 @@ public final class NetworkUtils {
 	 * @param network
 	 * @param modes   set of modes to clean network (e.g. modes which are routed)
 	 */
-	public static void cleanNetwork(Network network, Set<String> modes) {
+	public static void cleanNetwork(Network network, Collection<String> modes) {
+		// this used to be a Set<String> modes.  One can see why that would make sense.  However, the matsim config stores this as a Collection. kai, jan'26
+
 //		The following cleaning process seems to be really slow.
 //		I do not understand why it is that slow.
 //		E.g. it is used in SumoNetworkConverter and increases run time from several minutes to several hours.
@@ -854,7 +870,7 @@ public final class NetworkUtils {
 		}
 
 		// remove links without any allowed modes
-		removeLinksWithoutModes(network);
+//		removeLinksWithoutModes(network);
 
 		// removing links could have made some DisallowedNextLinks invalid
 		DisallowedNextLinksUtils.clean(network);

@@ -20,21 +20,17 @@
 
 package org.matsim.analysis;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-
-import com.google.inject.Inject;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -54,7 +50,7 @@ import java.util.TreeMap;
  * This class could be moved to trafficmonitoring.
  *
  */
-@DistributedEventHandler(async = true)
+@DistributedEventHandler(blocking = BlockingMode.ASYNC)
 public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
 	public static final int DEFAULT_END_TIME = 30 * 3600;

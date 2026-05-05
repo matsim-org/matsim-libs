@@ -10,6 +10,7 @@ import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.logic.helpers.PrebookingQueue;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -26,7 +27,7 @@ import com.google.common.base.Preconditions;
  * whether there is a DRT leg coming up before the next main (non-stage)
  * activity. If so, the upcoming leg is prebooked in advance with the
  * submissionSlack parameter defining how much in advance.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class AdaptivePrebookingLogic implements PrebookingLogic, ActivityStartEventHandler, MobsimScopeEventHandler {
@@ -40,7 +41,7 @@ public class AdaptivePrebookingLogic implements PrebookingLogic, ActivityStartEv
 	private final double submissionSlack;
 
 	private AdaptivePrebookingLogic(String mode, QSim qsim, PrebookingManager prebookingManager,
-			PrebookingQueue prebookingQueue, TimeInterpretation timeInterpretation, double submissionSlack) {
+									PrebookingQueue prebookingQueue, TimeInterpretation timeInterpretation, double submissionSlack) {
 		this.prebookingManager = prebookingManager;
 		this.prebookingQueue = prebookingQueue;
 		this.qsim = qsim;
@@ -52,6 +53,9 @@ public class AdaptivePrebookingLogic implements PrebookingLogic, ActivityStartEv
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		MobsimAgent agent = qsim.getAgents().get(event.getPersonId());
+		if(agent instanceof DynAgent) {
+			return;
+		}
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);

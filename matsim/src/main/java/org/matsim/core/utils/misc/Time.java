@@ -28,20 +28,19 @@ public class Time {
 	// yy there is now java.time, which integrates joda.time into the standard
 	// jdk.  should we consider looking into this?  kai, dec'17
 
-	
 	private Time() {} // namespace only, do not instantiate
 
-	/** 
+	/**
 	 * Never change this to NaN, as a compare of any valid time
 	 * to this should result to "greater" for some algorithms to work
 	 * still we found the name "UNDEFINED" more suitable than TIME_MIN_VALUE
-	 * <br><b><i>Note:</i></b> do not interpret the "UNDEFINED" as "time does 
-	 * not matter", as this has implications for, example, routing. If start 
+	 * <br><b><i>Note:</i></b> do not interpret the "UNDEFINED" as "time does
+	 * not matter", as this has implications for, example, routing. If start
 	 * time is given as {@link Time#UNDEFINED_TIME} then {@link Path#travelTime}
 	 * will return {@link Double#NaN}, even though the {@link TravelTime#getLinkTravelTime}
 	 * is independent of the start time. */
-	// of the convention.  kai, nov'17
 	final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
+
 	/**
 	 * The end of a day in MATSim in seconds
 	 */
@@ -50,13 +49,13 @@ public class Time {
 	public static final String TIMEFORMAT_HHMM = "HH:mm";
 	public static final String TIMEFORMAT_HHMMSS = "HH:mm:ss";
 	public static final String TIMEFORMAT_SSSS = "ssss";
-	
+
 	public static final String TIMEFORMAT_HHMMSSDOTSS = "HH:mm:ss.ss" ;
 
 	private static String defaultTimeFormat = TIMEFORMAT_HHMMSS;
 
 	private final static String[] timeElements;
-	
+
 	static {
 		timeElements = new String[60];
 		for (int i = 0; i < 10; i++) {
@@ -226,7 +225,7 @@ public class Time {
 
 	/**
 	 * Converts a number like 1634 to the time value of 16:34:00.
-	 * 
+	 *
 	 * @param hhmm the time-representing number to convert.
 	 * @return the time as seconds after midnight.
 	 */

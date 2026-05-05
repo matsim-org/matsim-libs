@@ -19,10 +19,6 @@
 
 package org.matsim.core.utils.misc;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -36,7 +32,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class RouteUtilsTest {
 
@@ -50,7 +53,7 @@ public class RouteUtilsTest {
 		f.network.getLinks().get(f.linkIds[4]).setLength(500.0);
 		f.network.getLinks().get(f.linkIds[5]).setLength(600.0);
 
-		NetworkRoute route, route2, route3 ;
+		NetworkRoute route, route2, route3;
 		{
 			Link startLink = f.network.getLinks().get(f.linkIds[0]);
 			Link endLink = f.network.getLinks().get(f.linkIds[5]);
@@ -71,15 +74,15 @@ public class RouteUtilsTest {
 			Link startLink = f.network.getLinks().get(f.linkIds[0]);
 			Link endLink = f.network.getLinks().get(f.linkIds[5]);
 			List<Id<Link>> linkIds = new ArrayList<Id<Link>>(3);
-			Collections.addAll(linkIds, f.linkIds[1],  f.linkIds[3], f.linkIds[4]);
+			Collections.addAll(linkIds, f.linkIds[1], f.linkIds[3], f.linkIds[4]);
 			// (inconsistent route, but I don't think anything cares at this level here)
 			route3 = RouteUtils.createLinkNetworkRouteImpl(startLink.getId(), endLink.getId());
 			route3.setLinkIds(startLink.getId(), linkIds, endLink.getId());
 		}
 
-		Assertions.assertEquals( 1. , RouteUtils.calculateCoverage( route, route2, f.network ), 0.0001 );
-		Assertions.assertEquals( (200.+400.+500.)/(200.+300.+400.+500.) , RouteUtils.calculateCoverage( route, route3, f.network ), 0.0001 );
-		Assertions.assertEquals( 1. , RouteUtils.calculateCoverage( route3, route, f.network ), 0.0001 );
+		Assertions.assertEquals(1., RouteUtils.calculateCoverage(route, route2, f.network), 0.0001);
+		Assertions.assertEquals((200. + 400. + 500.) / (200. + 300. + 400. + 500.), RouteUtils.calculateCoverage(route, route3, f.network), 0.0001);
+		Assertions.assertEquals(1., RouteUtils.calculateCoverage(route3, route, f.network), 0.0001);
 
 	}
 
@@ -316,6 +319,50 @@ public class RouteUtilsTest {
 		route.setLinkIds(f.linkIds[2], linkIds, f.linkIds[4]);
 		Assertions.assertEquals(400.0, RouteUtils.calcDistanceExcludingStartEndLink(route, f.network), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(900.0, RouteUtils.calcDistance(route, 1.0, 1.0, f.network), MatsimTestUtils.EPSILON);
+	}
+
+	@Test
+	void testCalcDistance_TransitPassengerRoute() {
+		Fixture f = new Fixture();
+		// Set link lengths
+		f.network.getLinks().get(f.linkIds[0]).setLength(100.0);
+		f.network.getLinks().get(f.linkIds[1]).setLength(200.0);
+		f.network.getLinks().get(f.linkIds[2]).setLength(300.0);
+		f.network.getLinks().get(f.linkIds[3]).setLength(400.0);
+		f.network.getLinks().get(f.linkIds[4]).setLength(500.0);
+		f.network.getLinks().get(f.linkIds[5]).setLength(600.0);
+
+		// 1. Create TransitSchedule and Factory
+		TransitSchedule schedule = f.scenario.getTransitSchedule();
+		TransitScheduleFactory factory = schedule.getFactory();
+
+		// 2. Create TransitStopFacilities
+		TransitStopFacility accessStop = factory.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), f.network.getNodes().get(f.nodeIds[1]).getCoord(), false);
+		accessStop.setLinkId(f.linkIds[1]);
+		TransitStopFacility egressStop = factory.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), f.network.getNodes().get(f.nodeIds[4]).getCoord(), false);
+		egressStop.setLinkId(f.linkIds[4]);
+		schedule.addStopFacility(accessStop);
+		schedule.addStopFacility(egressStop);
+
+		// 3. Create NetworkRoute for the TransitRoute (links 1, 2, 3, 4)
+		var intermediateLinks = List.of(f.linkIds[2], f.linkIds[3]);
+		NetworkRoute networkRoute = RouteUtils.createLinkNetworkRouteImpl(f.linkIds[1], intermediateLinks, f.linkIds[4]);
+
+		// 4. Create TransitRoute and TransitLine
+		TransitRoute transitRoute = factory.createTransitRoute(Id.create("tr1", TransitRoute.class), networkRoute, new ArrayList<>(), "bus");
+		TransitLine transitLine = factory.createTransitLine(Id.create("line1", TransitLine.class));
+		transitLine.addRoute(transitRoute);
+		schedule.addTransitLine(transitLine);
+
+		// 5. Create TransitPassengerRoute (the one the user "travels")
+		// This route starts at accessStop (link 1) and ends at egressStop (link 4)
+		TransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(
+			f.linkIds[1], f.linkIds[4], accessStop.getId(), egressStop.getId(), transitLine.getId(), transitRoute.getId());
+
+		// 6. Calculate distance
+		// Expected: Links travelled: 2, 3, 4 -> 300 + 400 + 500 = 1200.0
+		double distance = RouteUtils.calcDistance(passengerRoute, schedule, f.network);
+		Assertions.assertEquals(1200., distance, MatsimTestUtils.EPSILON);
 	}
 
 	private static class Fixture {

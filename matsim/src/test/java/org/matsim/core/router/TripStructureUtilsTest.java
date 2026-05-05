@@ -19,28 +19,25 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,14 +45,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author thibautd
  */
 public class TripStructureUtilsTest {
-	private static final Logger log = LogManager.getLogger( TripStructureUtilsTest.class ) ;
+	private static final Logger log = LogManager.getLogger(TripStructureUtilsTest.class);
 	private static final PopulationFactory populationFactory =
-            ScenarioUtils.createScenario(
-	        ConfigUtils.createConfig()).getPopulation().getFactory();
-    private static final String dummyType = "dummy interaction";
+		ScenarioUtils.createScenario(
+			ConfigUtils.createConfig()).getPopulation().getFactory();
+	private static final String dummyType = "dummy interaction";
 	private static final String WITH_ACCESS_EGRESS = "with access/egress";
 
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
+
 	private static class Fixture {
 		public final Plan plan;
 		public final int expectedNActs;
@@ -64,11 +62,11 @@ public class TripStructureUtilsTest {
 		public final String name;
 
 		public Fixture(
-				final String name,
-				final Plan plan,
-				final int expectedNActs,
-				final int expectedNLegs,
-				final int expectedNTrips) {
+			final String name,
+			final Plan plan,
+			final int expectedNActs,
+			final int expectedNLegs,
+			final int expectedNTrips) {
 			this.plan = plan;
 			this.name = name;
 			this.expectedNActs = expectedNActs;
@@ -86,158 +84,158 @@ public class TripStructureUtilsTest {
 	public void createSimpleFixture() {
 		final Plan plan = populationFactory.createPlan();
 
-		final Id<Link> linkId = Id.create( 1, Link.class );
+		final Id<Link> linkId = Id.create(1, Link.class);
 		int nActs = 0;
 		int nTrips = 0;
 		int nLegs = 0;
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"breakfast",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"breakfast",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"snack",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"snack",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"lunch",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"lunch",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"tea",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"tea",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"dinner",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"dinner",
+				linkId));
 
 		fixtures.add(
-				new Fixture(
-					"strict alternation",
-					plan,
-					nActs,
-					nLegs,
-					nTrips));
+			new Fixture(
+				"strict alternation",
+				plan,
+				nActs,
+				nLegs,
+				nTrips));
 	}
 
 	@BeforeEach
 	public void createFixtureWithComplexTrips() {
 		final Plan plan = populationFactory.createPlan();
 
-		final Id<Link> linkId = Id.create( 1, Link.class );
+		final Id<Link> linkId = Id.create(1, Link.class);
 		int nActs = 0;
 		int nTrips = 0;
 		int nLegs = 0;
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"breakfast",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"breakfast",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					dummyType,
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				dummyType,
+				linkId));
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some other mode" ) );
+		plan.addLeg(populationFactory.createLeg("some other mode"));
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"snack",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"snack",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					dummyType,
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				dummyType,
+				linkId));
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some other mode" ) );
+		plan.addLeg(populationFactory.createLeg("some other mode"));
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					dummyType,
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				dummyType,
+				linkId));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"lunch",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"lunch",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"tea",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"tea",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					dummyType,
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				dummyType,
+				linkId));
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					dummyType,
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				dummyType,
+				linkId));
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"dinner",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"dinner",
+				linkId));
 
 		fixtures.add(
-				new Fixture(
-					"complex trips",
-					plan,
-					nActs,
-					nLegs,
-					nTrips));
+			new Fixture(
+				"complex trips",
+				plan,
+				nActs,
+				nLegs,
+				nTrips));
 	}
 
 
@@ -245,136 +243,136 @@ public class TripStructureUtilsTest {
 	public void createFixtureWithSuccessiveActivities() {
 		final Plan plan = populationFactory.createPlan();
 
-		final Id<Link> linkId = Id.create( 1, Link.class );
+		final Id<Link> linkId = Id.create(1, Link.class);
 		int nActs = 0;
 		int nTrips = 0;
 		int nLegs = 0;
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"fry eggs",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"fry eggs",
+				linkId));
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"breakfast",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"breakfast",
+				linkId));
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"wash dishes",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"wash dishes",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"snack",
-					linkId ));
-
-		nTrips++;
-		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
-
-		nActs++;
-		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"lunch",
-					linkId ));
-		nActs++;
-		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"coffee",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"snack",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"tea",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"lunch",
+				linkId));
+		nActs++;
+		plan.addActivity(
+			populationFactory.createActivityFromLinkId(
+				"coffee",
+				linkId));
 
 		nTrips++;
 		nLegs++;
-		plan.addLeg( populationFactory.createLeg( "some mode" ) );
+		plan.addLeg(populationFactory.createLeg("some mode"));
 
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"read",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"tea",
+				linkId));
+
+		nTrips++;
+		nLegs++;
+		plan.addLeg(populationFactory.createLeg("some mode"));
+
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"dinner",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"read",
+				linkId));
 		nActs++;
 		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"sleep",
-					linkId ));
+			populationFactory.createActivityFromLinkId(
+				"dinner",
+				linkId));
+		nActs++;
+		plan.addActivity(
+			populationFactory.createActivityFromLinkId(
+				"sleep",
+				linkId));
 
 		fixtures.add(
-				new Fixture(
-					"successive activities",
-					plan,
-					nActs,
-					nLegs,
-					nTrips));
+			new Fixture(
+				"successive activities",
+				plan,
+				nActs,
+				nLegs,
+				nTrips));
 	}
 
 	@BeforeEach
 	public void createFixtureWithAccessEgress() {
-		final Plan plan = populationFactory.createPlan() ;
+		final Plan plan = populationFactory.createPlan();
 
-		Id<Link> linkId = Id.createLinkId( 1 );
+		Id<Link> linkId = Id.createLinkId(1);
 		int nActs = 0;
 		int nTrips = 0;
 		int nLegs = 0;
 
-		nActs++ ;
-		plan.addActivity( populationFactory.createActivityFromLinkId( "home", linkId ) );
+		nActs++;
+		plan.addActivity(populationFactory.createActivityFromLinkId("home", linkId));
 
-		nTrips++ ;
+		nTrips++;
 
-		nLegs++ ;
-		plan.addLeg( populationFactory.createLeg( "walk mode" ) );
+		nLegs++;
+		plan.addLeg(populationFactory.createLeg("walk mode"));
 
 //		nActs++ ; // stage activities are not counted here
-		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "access mode" ), linkId ) );
+		plan.addActivity(populationFactory.createActivityFromLinkId(TripStructureUtils.createStageActivityType("access mode"), linkId));
 
-		nLegs++ ;
-		plan.addLeg( populationFactory.createLeg( "access mode" ) );
-
-//		nActs++ ;
-		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "access mode" ), linkId ) );
-
-		nLegs++ ;
-		plan.addLeg( populationFactory.createLeg( "walk mode" ) );
+		nLegs++;
+		plan.addLeg(populationFactory.createLeg("access mode"));
 
 //		nActs++ ;
-		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "main mode" ), linkId ) );
+		plan.addActivity(populationFactory.createActivityFromLinkId(TripStructureUtils.createStageActivityType("access mode"), linkId));
 
-		nLegs++ ;
-		plan.addLeg( populationFactory.createLeg( "main mode" ) );
+		nLegs++;
+		plan.addLeg(populationFactory.createLeg("walk mode"));
 
 //		nActs++ ;
-		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "main mode" ), linkId ) );
+		plan.addActivity(populationFactory.createActivityFromLinkId(TripStructureUtils.createStageActivityType("main mode"), linkId));
 
-		nLegs++ ;
-		plan.addLeg( populationFactory.createLeg( "walk mode" ) );
+		nLegs++;
+		plan.addLeg(populationFactory.createLeg("main mode"));
 
-		nActs++ ;
-		plan.addActivity( populationFactory.createActivityFromLinkId( "work", linkId ) );
+//		nActs++ ;
+		plan.addActivity(populationFactory.createActivityFromLinkId(TripStructureUtils.createStageActivityType("main mode"), linkId));
 
-		fixtures.add(  new Fixture( WITH_ACCESS_EGRESS, plan, nActs, nLegs, nTrips ) );
+		nLegs++;
+		plan.addLeg(populationFactory.createLeg("walk mode"));
+
+		nActs++;
+		plan.addActivity(populationFactory.createActivityFromLinkId("work", linkId));
+
+		fixtures.add(new Fixture(WITH_ACCESS_EGRESS, plan, nActs, nLegs, nTrips));
 	}
 
 
@@ -383,56 +381,140 @@ public class TripStructureUtilsTest {
 		for (Fixture fixture : fixtures) {
 			final List<Activity> acts =
 				TripStructureUtils.getActivities(
-						fixture.plan,
-						StageActivityHandling.ExcludeStageActivities);
+					fixture.plan,
+					StageActivityHandling.ExcludeStageActivities);
 
 			assertEquals(
-					fixture.expectedNActs,
-					acts.size(),
-					"unexpected number of activities in "+acts+" for fixture "+fixture.name );
+				fixture.expectedNActs,
+				acts.size(),
+				"unexpected number of activities in " + acts + " for fixture " + fixture.name);
 
 			for (Activity act : acts) {
 				assertFalse(
-						StageActivityTypeIdentifier.isStageActivity( act.getType() ),
-						"found a dummy act in "+acts+" for fixture "+fixture.name);
+					StageActivityTypeIdentifier.isStageActivity(act.getType()),
+					"found a dummy act in " + acts + " for fixture " + fixture.name);
 			}
 		}
 	}
 
 	@Test
-	void testTrips() throws Exception {
+	void testTripsOnlyAct() {
+		var activity = PopulationUtils.createActivityFromLinkId("some-type", Id.createLinkId("some-link-id"));
+		assertEquals(0, TripStructureUtils.getTrips2(List.of(activity)).size());
+	}
+
+	@Test
+	void testTripsSingleLeg() {
+		var leg = PopulationUtils.createLeg("some-mode");
+		assertEquals(1, TripStructureUtils.getTrips2(List.of(leg)).size());
+	}
+
+	@Test
+	void testOpenStart() {
+		var leg = PopulationUtils.createLeg("some-mode");
+		var act = PopulationUtils.createActivityFromLinkId("some-act", Id.createLinkId("some-link"));
+
+		var trips = TripStructureUtils.getTrips2(List.of(leg, act));
+
+		assertEquals(1, trips.size());
+		var trip = trips.getFirst();
+		assertNull(trip.getOriginActivity());
+		assertEquals(act, trip.getDestinationActivity());
+		assertEquals(1, trip.getTripElements().size());
+		assertEquals(leg, trip.getTripElements().getFirst());
+	}
+
+	@Test
+	void testOpenEnd() {
+		var leg = PopulationUtils.createLeg("some-mode");
+		var act = PopulationUtils.createActivityFromLinkId("some-act", Id.createLinkId("some-link"));
+
+		var trips = TripStructureUtils.getTrips2(List.of(act, leg));
+
+		assertEquals(1, trips.size());
+		var trip = trips.getFirst();
+		assertNull(trip.getDestinationActivity());
+		assertEquals(act, trip.getOriginActivity());
+		assertEquals(1, trip.getTripElements().size());
+		assertEquals(leg, trip.getTripElements().getFirst());
+	}
+
+	@Test
+	void testOpenStartEnd() {
+		var leg1 = PopulationUtils.createLeg("some-mode");
+		var act = PopulationUtils.createActivityFromLinkId("some-act", Id.createLinkId("some-link"));
+		var leg2 = PopulationUtils.createLeg("some-other-mode");
+
+		var trips = TripStructureUtils.getTrips2(List.of(leg1, act, leg2));
+
+		assertEquals(2, trips.size());
+		var trip1 = trips.getFirst();
+		assertNull(trip1.getOriginActivity());
+		assertEquals(act, trip1.getDestinationActivity());
+		assertEquals(1, trip1.getTripElements().size());
+		assertEquals(leg1, trip1.getTripElements().getFirst());
+
+		var trip2 = trips.getLast();
+		assertNull(trip2.getDestinationActivity());
+		assertEquals(act, trip2.getOriginActivity());
+		assertEquals(1, trip2.getTripElements().size());
+		assertEquals(leg2, trip2.getTripElements().getFirst());
+	}
+
+	@Test
+	void testStagingActivity() {
+		var act1 = PopulationUtils.createActivityFromLinkId("main", Id.createLinkId("some-link-id"));
+		var leg1 = PopulationUtils.createLeg("some-mode");
+		var act2 = PopulationUtils.createActivityFromLinkId("some interaction", Id.createLinkId("some-link"));
+		var leg2 = PopulationUtils.createLeg("some-other-mode");
+		var act3 = PopulationUtils.createActivityFromLinkId("main2", Id.createLinkId("some-link-id"));
+
+		var trips = TripStructureUtils.getTrips2(List.of(act1, leg1, act2, leg2, act3));
+
+		assertEquals(1, trips.size());
+		var trip = trips.getFirst();
+		assertEquals(act1, trip.getOriginActivity());
+		assertEquals(act3, trip.getDestinationActivity());
+		assertEquals(3, trip.getTripElements().size());
+		assertEquals(leg1, trip.getTripElements().get(0));
+		assertEquals(act2, trip.getTripElements().get(1));
+		assertEquals(leg2, trip.getTripElements().get(2));
+	}
+
+	@Test
+	void testTrips() {
 		for (Fixture fixture : fixtures) {
 			final List<Trip> trips =
 				TripStructureUtils.getTrips(fixture.plan);
 
 			assertEquals(
-					fixture.expectedNTrips,
-					trips.size(),
-					"unexpected number of trips in "+trips+" for fixture "+fixture.name );
+				fixture.expectedNTrips,
+				trips.size(),
+				"unexpected number of trips in " + trips + " for fixture " + fixture.name);
 
 			for (Trip trip : trips) {
 				for (PlanElement pe : trip.getTripElements()) {
 					if (pe instanceof Leg) continue;
 					assertTrue(
-							StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() ),
-							"found a non-dummy act in "+trip.getTripElements()+" for fixture "+fixture.name);
+						StageActivityTypeIdentifier.isStageActivity(((Activity) pe).getType()),
+						"found a non-dummy act in " + trip.getTripElements() + " for fixture " + fixture.name);
 				}
 
 				final int indexOfStart =
 					fixture.plan.getPlanElements().indexOf(
-							trip.getOriginActivity() );
+						trip.getOriginActivity());
 				final int indexOfEnd =
 					fixture.plan.getPlanElements().indexOf(
-							trip.getDestinationActivity() );
+						trip.getDestinationActivity());
 				final List<PlanElement> inPlan =
 					fixture.plan.getPlanElements().subList(
-							indexOfStart + 1,
-							indexOfEnd );
+						indexOfStart + 1,
+						indexOfEnd);
 
 				assertEquals(
-						inPlan,
-						trip.getTripElements(),
-						"trip in Trip is not the same as in plan for fixture "+fixture.name);
+					inPlan,
+					trip.getTripElements(),
+					"trip in Trip is not the same as in plan for fixture " + fixture.name);
 			}
 		}
 	}
@@ -449,9 +531,9 @@ public class TripStructureUtilsTest {
 			}
 
 			assertEquals(
-					fixture.expectedNLegs,
-					countLegs,
-					"getLegsOnly() does not returns the right number of legs");
+				fixture.expectedNLegs,
+				countLegs,
+				"getLegsOnly() does not returns the right number of legs");
 		}
 	}
 
@@ -466,14 +548,14 @@ public class TripStructureUtilsTest {
 
 			// link ids are null
 			plan.addActivity(
-					populationFactory.createActivityFromCoord(
-							"type",
-							new Coord((double) 0, (double) 0)));
+				populationFactory.createActivityFromCoord(
+					"type",
+					new Coord((double) 0, (double) 0)));
 			plan.addLeg(populationFactory.createLeg("mode"));
 			plan.addActivity(
-					populationFactory.createActivityFromCoord(
-							"type",
-							new Coord((double) 0, (double) 0)));
+				populationFactory.createActivityFromCoord(
+					"type",
+					new Coord((double) 0, (double) 0)));
 
 			TripStructureUtils.getSubtours(plan);
 		});
@@ -485,13 +567,13 @@ public class TripStructureUtilsTest {
 		final Plan plan = populationFactory.createPlan();
 
 		// link ids are null
-		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord(0,  0)) );
-		plan.addLeg( populationFactory.createLeg( "mode" ) );
-		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord( 50, 50)) );
-		plan.addLeg( populationFactory.createLeg( "mode" ) );
-		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord( 10, 10)) );
-		plan.addLeg( populationFactory.createLeg( "mode" ) );
-		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord( 0, 0)) );
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord(0, 0)));
+		plan.addLeg(populationFactory.createLeg("mode"));
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord(50, 50)));
+		plan.addLeg(populationFactory.createLeg("mode"));
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord(10, 10)));
+		plan.addLeg(populationFactory.createLeg("mode"));
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord(0, 0)));
 
 		Collection<TripStructureUtils.Subtour> st = TripStructureUtils.getSubtours(plan, 14);
 
@@ -512,52 +594,52 @@ public class TripStructureUtilsTest {
 
 	@Test
 	void testFindTripAtPlanElement() {
-		Fixture theFixture = null ;
-		for( Fixture fixture : fixtures ){
-			if ( fixture.name.equals( WITH_ACCESS_EGRESS ) ){
+		Fixture theFixture = null;
+		for (Fixture fixture : fixtures) {
+			if (fixture.name.equals(WITH_ACCESS_EGRESS)) {
 				theFixture = fixture;
-				log.info( "" );
-				for( PlanElement planElement : fixture.plan.getPlanElements() ){
-					log.info( planElement );
+				log.info("");
+				for (PlanElement planElement : fixture.plan.getPlanElements()) {
+					log.info(planElement);
 				}
-				log.info( "" );
+				log.info("");
 			}
 		}
 		{
-			Fixture f0 = theFixture ;
-			final Leg leg = (Leg) f0.plan.getPlanElements().get( 3 );
+			Fixture f0 = theFixture;
+			final Leg leg = (Leg) f0.plan.getPlanElements().get(3);
 			{
-				Trip trip = TripStructureUtils.findTripAtPlanElement( leg, f0.plan );
-				log.info( "" );
-				log.info( "Trip=" );
-				for( PlanElement tripElement : trip.getTripElements() ){
-					log.info( tripElement );
+				Trip trip = TripStructureUtils.findTripAtPlanElement(leg, f0.plan);
+				log.info("");
+				log.info("Trip=");
+				for (PlanElement tripElement : trip.getTripElements()) {
+					log.info(tripElement);
 				}
-				log.info( "" );
-				Assertions.assertEquals( 9, trip.getTripElements().size() );
-				Assertions.assertEquals( 5, trip.getLegsOnly().size() );
+				log.info("");
+				Assertions.assertEquals(9, trip.getTripElements().size());
+				Assertions.assertEquals(5, trip.getLegsOnly().size());
 			}
 			{
-				Trip trip = TripStructureUtils.findTripAtPlanElement( leg, f0.plan, TripStructureUtils::isStageActivityType ) ;
-				log.info( "" );
-				log.info( "Trip=" );
-				for( PlanElement tripElement : trip.getTripElements() ){
-					log.info( tripElement );
+				Trip trip = TripStructureUtils.findTripAtPlanElement(leg, f0.plan, TripStructureUtils::isStageActivityType);
+				log.info("");
+				log.info("Trip=");
+				for (PlanElement tripElement : trip.getTripElements()) {
+					log.info(tripElement);
 				}
-				log.info( "" );
-				Assertions.assertEquals( 9, trip.getTripElements().size() );
-				Assertions.assertEquals( 5, trip.getLegsOnly().size() );
+				log.info("");
+				Assertions.assertEquals(9, trip.getTripElements().size());
+				Assertions.assertEquals(5, trip.getLegsOnly().size());
 			}
 			{
-				Trip trip = TripStructureUtils.findTripAtPlanElement( leg, f0.plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals ) ;
-				log.info( "" );
-				log.info( "Trip=" );
-				for( PlanElement tripElement : trip.getTripElements() ){
-					log.info( tripElement );
+				Trip trip = TripStructureUtils.findTripAtPlanElement(leg, f0.plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals);
+				log.info("");
+				log.info("Trip=");
+				for (PlanElement tripElement : trip.getTripElements()) {
+					log.info(tripElement);
 				}
-				log.info( "" );
-				Assertions.assertEquals( 5, trip.getTripElements().size() );
-				Assertions.assertEquals( 3, trip.getLegsOnly().size() );
+				log.info("");
+				Assertions.assertEquals(5, trip.getTripElements().size());
+				Assertions.assertEquals(3, trip.getLegsOnly().size());
 			}
 		}
 

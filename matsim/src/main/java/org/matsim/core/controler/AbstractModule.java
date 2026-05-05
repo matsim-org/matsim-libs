@@ -266,7 +266,7 @@ public abstract class AbstractModule implements Module {
 		return binder.getProvider(Key.get(typeLiteral));
 	}
 
-	public static AbstractModule override(final Iterable<? extends AbstractModule> modules, final AbstractModule abstractModule) {
+	public static AbstractModule override(final Iterable<? extends AbstractModule> modules, final AbstractModule overridingModule) {
 		return new AbstractModule() {
 			@Override
 			public void install() {
@@ -275,8 +275,8 @@ public abstract class AbstractModule implements Module {
 					bootstrapInjector.injectMembers(module);
 					guiceModules.add(module);
 				}
-				bootstrapInjector.injectMembers(abstractModule);
-				binder().install(Modules.override(guiceModules).with(abstractModule));
+				bootstrapInjector.injectMembers(overridingModule);
+				binder().install(Modules.override(guiceModules).with(overridingModule));
 			}
 		};
 	}

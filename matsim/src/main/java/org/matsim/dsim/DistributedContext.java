@@ -39,7 +39,7 @@ public final class DistributedContext implements ExecutionContext {
 		this.comm = comm;
 		this.topology = topology;
 		this.serializer = serializer;
-		this.computeNode = topology.getNode(comm.getRank());
+		this.computeNode = topology.getNodeByIndex(comm.getRank());
 	}
 
 	/**
@@ -60,7 +60,7 @@ public final class DistributedContext implements ExecutionContext {
 			throw new RuntimeException("Local communication problem", e);
 		}
 
-		SerializationProvider serializer = new SerializationProvider();
+		SerializationProvider serializer = SerializationProvider.getInstance();
 
 		log.info("Local topology has {} partitions.", topology.getTotalPartitions());
 
@@ -79,22 +79,22 @@ public final class DistributedContext implements ExecutionContext {
 	 */
 	private static DistributedContext create(Communicator comm, int threads) {
 
-		log.info("Waiting for {} other nodes to connect...", comm.getSize() - 1);
+		log.info("#{} Waiting for {} other nodes to connect...", comm.getRank(), comm.getSize() - 1);
 		try {
 			comm.connect();
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to connect to other nodes", e);
+			throw new RuntimeException("#" + comm.getRank() + " Failed to connect to other nodes", e);
 		}
 
-		log.info("All nodes connected");
+		log.info("#{} All nodes connected", comm.getRank());
 
-		SerializationProvider serializer = new SerializationProvider();
+		SerializationProvider serializer = SerializationProvider.getInstance();
 
 		// This may be relevant if we want to partition the network or other lps
 		Topology topology = createTopology(comm, threads, serializer);
 
 		log.info("Topology has {} partitions on {} nodes. Node {} has parts: {}",
-			topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNode(comm.getRank()).getParts());
+			topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNodeByIndex(comm.getRank()).getParts());
 
 		return new DistributedContext(comm, topology, serializer);
 	}
@@ -112,7 +112,6 @@ public final class DistributedContext implements ExecutionContext {
 
 		Topology.TopologyBuilder topology = Topology.builder();
 		List<ComputeNode> topoNodes = new ArrayList<>();
-
 
 		int total = 0;
 		for (ComputeNode computeNode : computeNodes) {

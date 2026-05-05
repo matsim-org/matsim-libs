@@ -1,19 +1,19 @@
 /**
  * se.vti.atap
- * 
+ *
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
- * 
+ *
  * VTI = Swedish National Road and Transport Institute
  * LiU = Linköping University, Sweden
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms
- * of the GNU General Public License as published by the Free Software Foundation, either 
+ * of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with this program.
  * If not, see <https://www.gnu.org/licenses/>. See also COPYING and WARRANTY file.
  */
@@ -35,6 +35,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup.NetworkRouteConsistencyCheck;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -57,7 +58,7 @@ public class MinimalTest {
 
 	   @Test
 	    void testFileChecksum() throws Exception {
-		   
+
 			String scenarioFolder = this.tempDir.toString();
 			double sizeFactor = 3.0;
 			double inflowDuration_s = 900.0;
@@ -70,6 +71,7 @@ public class MinimalTest {
 			Config config = factory.createConfig();
 			config.controller().setOutputDirectory(Paths.get(scenarioFolder, "output").toString());
 			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		    config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 			config.controller().setLastIteration(3);
 			config.network().setInputFile("network.xml");
 			config.plans().setInputFile("population.xml");
@@ -109,7 +111,7 @@ public class MinimalTest {
 			var controler = new Controler(scenario);
 			atap.configure(controler);
 			controler.run();
-			
+
 	        String expectedChecksum = "8e6a6c65e59738357f702d5478b3f954";
 			try (InputStream is = Files.newInputStream(Paths.get(scenarioFolder, "output", "output_events.xml.gz"))) {
 					String actualChecksum = DigestUtils.md5Hex(is);
