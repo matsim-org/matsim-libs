@@ -6,11 +6,17 @@ import org.matsim.api.core.v01.network.Link;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Delegates arrival-time calculation to the registered specialized handlers.
+ *
+ * <p>At most one handler may claim a vehicle by returning a non-NaN value. If no
+ * handler claims it, vehicles arrive without an additional delay.</p>
+ */
 public class DefaultArrivalTime implements ArrivalTimeCalculator {
 	private final Collection<ArrivalTimeCalculator> handlers = new ArrayList<>();
 
 	@Inject
-    DefaultArrivalTime() {
+	DefaultArrivalTime() {
 	}
 
 	@Override
@@ -21,13 +27,11 @@ public class DefaultArrivalTime implements ArrivalTimeCalculator {
 			double tmp = handler.calculateArrivalTime(now, vehicle, link);
 
 			if (Double.isNaN(tmp)) {
-				// Handler was not able to calculate parking search time
 				continue;
 			}
 
 			if (!Double.isNaN(time)) {
-				// Time is already calculated by another handler. This is not allowed.
-				throw new RuntimeException("Two parking search time calculators feel responsible for vehicle; don't know what to do.");
+				throw new RuntimeException("Two arrival time calculators feel responsible for vehicle; don't know what to do.");
 			}
 
 			time = tmp;

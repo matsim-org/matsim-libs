@@ -86,13 +86,15 @@ abstract class AbstractQLink implements QLinkI {
 	private final Map<Id<Vehicle>, Set<MobsimAgent>> passengersWaitingForCars = new LinkedHashMap<>();
 
 	/**
-	 * All vehicles from parkingList move to the waitingList as soon as their time
-	 * has come. They are then filled into the vehQueue, depending on free space
-	 * in the vehQueue
+	 * Vehicles that have departed from an activity and are waiting for link storage
+	 * before entering the moving queue.
 	 */
 	private final Queue<QVehicle> departureList = new LinkedList<>();
 
-	// this is a list for vehicles arriving on the link. it is the equivalent of departureList but for arrival rather than departure
+	/**
+	 * Vehicles that have left traffic but still need to wait out an arrival-side
+	 * delay, for example parking search time, before they become parked vehicles.
+	 */
 	private final PassingVehicleQ arrivalList = new PassingVehicleQ();
 
 	private boolean active = false;
