@@ -31,7 +31,7 @@ import org.matsim.core.replanning.conflicts.ConflictManager;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 /**
  * A {@link ControllerListener} that manages the

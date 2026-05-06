@@ -64,12 +64,12 @@ public class MultiInsertionDetourPathCalculatorTest {
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.fromLink(pickupLink)
 			.toLink(dropoffLink)
+			.earliestDepartureTime(100)
 			.constraints(
 					new DrtRouteConstraints(
-							100,
-							200,
-							500,
+							400,
 							Double.POSITIVE_INFINITY,
+							100,
 							Double.POSITIVE_INFINITY,
 							0.,
 							false
@@ -91,8 +91,8 @@ public class MultiInsertionDetourPathCalculatorTest {
 	void calculatePaths() {
 		var pathToPickup = mockCalcPathData(pickupLink, beforePickupLink, request.getEarliestStartTime(), false, 11);
 		var pathFromPickup = mockCalcPathData(pickupLink, afterPickupLink, request.getEarliestStartTime(), true, 22);
-		var pathToDropoff = mockCalcPathData(dropoffLink, beforeDropoffLink, request.getConstraints().latestArrivalTime(), false, 33);
-		var pathFromDropoff = mockCalcPathData(dropoffLink, afterDropoffLink, request.getConstraints().latestArrivalTime(), true, 44);
+		var pathToDropoff = mockCalcPathData(dropoffLink, beforeDropoffLink, request.getLatestArrivalTime(), false, 33);
+		var pathFromDropoff = mockCalcPathData(dropoffLink, afterDropoffLink, request.getLatestArrivalTime(), true, 44);
 
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(afterPickupLink));
 		var dropoff = insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink));
@@ -136,7 +136,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 		when(pathSearch.calcPathDataMap(eq(pickupLink), eqSingleLinkCollection(pickupLink),
 				eq(request.getEarliestStartTime()), anyBoolean())).thenReturn(Map.of(pickupLink, PathData.EMPTY));
 		when(pathSearch.calcPathDataMap(eq(dropoffLink), eqSingleLinkCollection(dropoffLink),
-				eq(request.getConstraints().latestArrivalTime()), anyBoolean())).thenReturn(Map.of(dropoffLink, PathData.EMPTY));
+				eq(request.getLatestArrivalTime()), anyBoolean())).thenReturn(Map.of(dropoffLink, PathData.EMPTY));
 
 		var pickup = insertionPoint(waypoint(pickupLink), waypoint(pickupLink));
 		var dropoff = insertionPoint(waypoint(dropoffLink), waypoint(dropoffLink));

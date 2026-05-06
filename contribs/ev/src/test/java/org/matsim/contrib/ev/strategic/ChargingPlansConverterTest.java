@@ -18,7 +18,7 @@ public class ChargingPlansConverterTest {
         ChargingPlan chargingPlan = new ChargingPlan();
         chargingPlans.addChargingPlan(chargingPlan);
 
-        ChargingPlanActivity activity = new ChargingPlanActivity(5, 6, Id.create("charger", Charger.class));
+        ChargingPlanActivity activity = new ChargingPlanActivity(5, 6, Id.create("charger", Charger.class), false);
         chargingPlan.addChargingActivity(activity);
 
         ChargingPlansConverter converter = new ChargingPlansConverter();

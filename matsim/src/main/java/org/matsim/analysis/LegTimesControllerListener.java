@@ -33,7 +33,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.misc.Time;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 class LegTimesControllerListener implements AfterMobsimListener, IterationStartsListener, IterationEndsListener {
 

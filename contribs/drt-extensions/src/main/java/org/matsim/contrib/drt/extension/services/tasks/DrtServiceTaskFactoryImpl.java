@@ -39,8 +39,8 @@ public class DrtServiceTaskFactoryImpl implements ServiceTaskFactory {
 	}
 
 	@Override
-	public DrtServiceTask createServiceTask(Id<DrtService> drtServiceId, double beginTime, double endTime, Link link, OperationFacility operationFacility) {
-		return new DrtServiceTask(drtServiceId, beginTime, endTime, link, operationFacility);
+	public DrtServiceTask createServiceTask(Id<DrtService> drtServiceId, double beginTime, double endTime, Link link, OperationFacility facility) {
+		return new DrtServiceTask(drtServiceId, beginTime, endTime, link, facility);
 	}
 
 	@Override

@@ -44,7 +44,7 @@ import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import java.util.Arrays;
 import java.util.Locale;

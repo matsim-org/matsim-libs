@@ -182,11 +182,11 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 				if (nextStop.pickup) {
 					var request = Preconditions.checkNotNull(openRequests.get(nextStop.preplannedRequest.key),
 							"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
-					stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+					stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request, 60));
 				} else {
 					var request = Preconditions.checkNotNull(openRequests.remove(nextStop.preplannedRequest.key),
 							"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
-					stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+					stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request, 60));
 				}
 				schedule.addTask(stopTask);
 			}
@@ -217,7 +217,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 	static PreplannedRequest createFromRequest(DrtRequest request) {
 		return new PreplannedRequest(new PreplannedRequestKey(Set.copyOf(request.getPassengerIds()), request.getFromLink().getId(),
 				request.getToLink().getId()), request.getEarliestStartTime(), request.getLatestStartTime(),
-				request.getConstraints().latestArrivalTime());
+				request.getLatestArrivalTime());
 	}
 
 	// sequence of preplanned tasks is the output from the external optimiser and the input to the drt simulation

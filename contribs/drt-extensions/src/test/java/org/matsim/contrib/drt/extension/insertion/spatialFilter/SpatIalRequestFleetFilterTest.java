@@ -71,7 +71,7 @@ public class SpatIalRequestFleetFilterTest {
 		params.setMaxExpansion(10);
 		params.setReturnAllIfEmpty(true);
 
-		SpatialRequestFleetFilter filter = new SpatialRequestFleetFilter(fleet, timer, params);
+		SpatialRequestFleetFilter filter = new SpatialRequestFleetFilter(fleet, params);
 
 		int threadCount = 10;
 		int iterationsPerThread = 100;
@@ -118,7 +118,7 @@ public class SpatIalRequestFleetFilterTest {
         params.setMinExpansion(1);
         params.setMaxExpansion(0);
         params.setReturnAllIfEmpty(false);
-        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, params);
+        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, params);
         Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
         Assertions.assertThat(filtered).isEmpty();
     }
@@ -143,7 +143,7 @@ public class SpatIalRequestFleetFilterTest {
         params.setMinExpansion(1);
         params.setMaxExpansion(0);
         params.setReturnAllIfEmpty(true);
-        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, params);
+        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, params);
         Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
         Assertions.assertThat(filtered).isNotEmpty();
     }
@@ -195,14 +195,14 @@ public class SpatIalRequestFleetFilterTest {
         return DrtRequest.newBuilder()
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
+                .earliestDepartureTime(submissionTime)
                 .constraints(
                         new DrtRouteConstraints(
-                                submissionTime,
-                                earliestStartTime,
-                                latestStartTime,
-                                latestArrivalTime,
+                                latestArrivalTime - earliestStartTime,
                                 Double.POSITIVE_INFINITY,
+                                latestStartTime - earliestStartTime,
                                 Double.POSITIVE_INFINITY,
+                                0.,
                                 false
                         )
                 )

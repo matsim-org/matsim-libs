@@ -19,13 +19,16 @@
 
 package ch.sbb.matsim.contrib.railsim;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainManager;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+
+import com.google.inject.Singleton;
+
 import ch.sbb.matsim.contrib.railsim.analysis.linkstates.RailsimLinkStateControlerListener;
 import ch.sbb.matsim.contrib.railsim.analysis.trainstates.RailsimTrainStateControlerListener;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
-import com.google.inject.Singleton;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 
 /**
  * Railsim module installing all needed component.
@@ -36,6 +39,8 @@ public class RailsimModule extends AbstractModule {
 	public void install() {
 		installQSimModule(new RailsimQSimModule());
 		ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
+
+		addControllerListenerBinding().to(RailsimControllerListener.class);
 
 		bind(RailsimLinkStateControlerListener.class).in(Singleton.class);
 		addControllerListenerBinding().to(RailsimLinkStateControlerListener.class);

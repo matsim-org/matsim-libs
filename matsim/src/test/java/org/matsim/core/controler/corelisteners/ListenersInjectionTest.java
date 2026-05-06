@@ -25,6 +25,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.*;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.ControllerListenerManager;
@@ -47,61 +49,61 @@ public class ListenersInjectionTest {
 
 	@Test
 	void testDumpDataAtEndIsSingleton() {
-		testIsSingleton( DumpDataAtEnd.class );
+		testIsSingleton(DumpDataAtEnd.class);
 	}
 
 	@Test
 	void testEvensHandlingIsSingleton() {
-		testIsSingleton( EventsHandling.class );
+		testIsSingleton(EventsHandling.class);
 	}
 
 	@Test
 	void testPlansDumpingIsSingleton() {
-		testIsSingleton( PlansDumping.class );
+		testIsSingleton(PlansDumping.class);
 	}
 
 	@Test
 	void testPlansReplanningIsSingleton() {
-		testIsSingleton( PlansReplanning.class );
+		testIsSingleton(PlansReplanning.class);
 	}
 
 	@Test
 	void testPlansScoringIsSingleton() {
-		testIsSingleton( PlansScoring.class );
+		testIsSingleton(PlansScoring.class);
 	}
 
-	private void testIsSingleton( final Class<? extends ControllerListener> klass ) {
+	private void testIsSingleton(final Class<? extends ControllerListener> klass) {
 		final Config config = ConfigUtils.createConfig();
 		final String outputDir = utils.getOutputDirectory();
-		config.controller().setOutputDirectory( outputDir );
+		config.controller().setOutputDirectory(outputDir);
 
-        final com.google.inject.Injector injector = Injector.createInjector(
-                config,
-				// defaults needed as listeners depend on some stuff there
-				new ControlerDefaultsModule(),
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-						// put dummy dependencies to get the listenners happy
-						bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class);
-						bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(outputDir,
-								OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
-								config.controller().getCompressionType()));
-						bind(IterationStopWatch.class).toInstance(new IterationStopWatch());
-						bind(IterationCounter.class).toInstance(() -> 0);
-						install(new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)));
-					}
-                },
-				new ControlerDefaultCoreListenersModule());
+		final com.google.inject.Injector injector = Injector.createInjector(
+			config,
+			// defaults needed as listeners depend on some stuff there
+			new ControlerDefaultsModule(),
+			new AbstractModule() {
+				@Override
+				public void install() {
+					// put dummy dependencies to get the listenners happy
+					bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class);
+					bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(outputDir,
+						OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
+						config.controller().getCompressionType()));
+					bind(IterationStopWatch.class).toInstance(new IterationStopWatch());
+					bind(IterationCounter.class).toInstance(() -> 0);
+					install(new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)));
+				}
+			},
+			new ControlerDefaultCoreListenersModule());
 
 
-		final ControllerListener o1 = injector.getInstance( klass );
-		final ControllerListener o2 = injector.getInstance( klass );
+		final ControllerListener o1 = injector.getInstance(klass);
+		final ControllerListener o2 = injector.getInstance(klass);
 
 		Assertions.assertSame(
-				o1,
-				o2,
-				"Two different instances of "+klass.getName()+" returned by injector!" );
+			o1,
+			o2,
+			"Two different instances of " + klass.getName() + " returned by injector!");
 	}
 }
 

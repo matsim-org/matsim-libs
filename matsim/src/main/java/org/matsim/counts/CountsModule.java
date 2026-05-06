@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 public class CountsModule extends AbstractModule {
     private static final Logger log = LogManager.getLogger( CountsModule.class );

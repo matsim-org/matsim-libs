@@ -26,8 +26,8 @@ import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 class ReplanningContextImpl implements ReplanningContext, IterationStartsListener {

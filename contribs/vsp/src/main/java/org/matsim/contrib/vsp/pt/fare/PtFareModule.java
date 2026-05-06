@@ -20,13 +20,14 @@ public class PtFareModule extends AbstractModule {
 		Multibinder<PtFareCalculator> ptFareCalculator = Multibinder.newSetBinder(binder(), PtFareCalculator.class);
 
 		PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(this.getConfig(), PtFareConfigGroup.class);
-		Collection<? extends ConfigGroup> fareZoneBased = ptFareConfigGroup.getParameterSets(FareZoneBasedPtFareParams.SET_TYPE);
-		Collection<? extends ConfigGroup> distanceBased = ptFareConfigGroup.getParameterSets(DistanceBasedPtFareParams.SET_TYPE);
+		Collection<FareZoneBasedPtFareParams> fareZoneBased = ptFareConfigGroup.getFareZoneBasedPtFareParams();
+		Collection<DistanceBasedPtFareParams> distanceBased = ptFareConfigGroup.getDistanceBasedPtFareParams();
 
 		URL context = getConfig().getContext();
 
+//		although we have typed getters for fareZoneBased and distanceBased PtFareParams, we need to concat here
+//		because we have to maintain the order of the fare params. -sm0825
 		Stream.concat(fareZoneBased.stream(), distanceBased.stream())
-			  .map(c -> (PtFareParams) c)
 			  .sorted(Comparator.comparing(PtFareParams::getOrder))
 			  .forEach(p -> {
 				  if (p instanceof FareZoneBasedPtFareParams fareZoneBasedPtFareParams) {

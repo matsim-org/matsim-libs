@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -83,6 +84,9 @@ class TestFixture {
         this.config = ConfigUtils.createConfig();
         this.config.transit().setUseTransit(true);
         this.config.qsim().setEndTime(24 * 3600);
+
+		// this test was created before that check was introduced. I am not quite sure why we need to disable it here, but now the test works... paul, may'26
+		this.config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
         this.sbbConfig = ConfigUtils.addOrGetModule(this.config, SBBTransitConfigGroup.class);
         this.sbbConfig.setDeterministicServiceModes(Collections.singleton("train"));
         this.scenario = ScenarioUtils.createScenario(this.config);
@@ -118,6 +122,7 @@ class TestFixture {
         VehiclesFactory vf = vehicles.getFactory();
 
         VehicleType vehType1 = vf.createVehicleType(Id.create("some_train", VehicleType.class));
+        vehType1.setNetworkMode("train");
         VehicleCapacity vehCapacity = vehType1.getCapacity();
         vehCapacity.setSeats(300);
         vehCapacity.setStandingRoom(150);

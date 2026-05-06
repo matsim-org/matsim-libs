@@ -20,8 +20,6 @@
 
 package org.matsim.pt.fakes;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -34,6 +32,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.List;
+
 
 /**
  * A very simple implementation of the interface {@link PTPassengerAgent} for
@@ -44,17 +44,19 @@ import org.matsim.vehicles.Vehicle;
 public class FakePassengerAgent implements PTPassengerAgent {
 
 	private final TransitStopFacility exitStop;
+	private final Id<Person> id;
 
 	/**
 	 * @param exitStop can be <code>null</code>
 	 */
-	public FakePassengerAgent(final TransitStopFacility exitStop) {
+	public FakePassengerAgent(Id<Person> id, final TransitStopFacility exitStop) {
 		this.exitStop = exitStop;
+		this.id = id;
 	}
 
 	@Override
 	public Id<Person> getId() {
-		return null;
+		return id;
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class FakePassengerAgent implements PTPassengerAgent {
 
 	@Override
 	public boolean getEnterTransitRoute(TransitLine line,
-			TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
+										TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 		return true;
 	}
 
@@ -109,7 +111,7 @@ public class FakePassengerAgent implements PTPassengerAgent {
 
 	@Override
 	public String getMode() {
-		throw new RuntimeException("not implemented") ;
+		throw new RuntimeException("not implemented");
 	}
 
 }

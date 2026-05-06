@@ -63,7 +63,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.io.File;
 import java.util.*;
 

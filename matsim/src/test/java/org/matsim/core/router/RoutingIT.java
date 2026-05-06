@@ -145,7 +145,7 @@ public class RoutingIT {
 
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new AStarLandmarksFactory(2);
+				return new AStarLandmarksFactory(2, 16);
 			}
 		}, accessEgressType);
 	}

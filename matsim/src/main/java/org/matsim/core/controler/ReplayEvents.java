@@ -28,7 +28,7 @@ import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.MatsimEventsReader;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Set;
 
 /**

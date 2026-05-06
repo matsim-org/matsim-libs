@@ -22,7 +22,7 @@
 
 package org.matsim.modules;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;

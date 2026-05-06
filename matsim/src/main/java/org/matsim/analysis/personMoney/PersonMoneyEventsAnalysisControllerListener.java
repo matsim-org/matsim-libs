@@ -31,7 +31,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 /**
  * Adds aggregated personMoneyEvent table {@link PersonMoneyEventsAggregator} at each iteration and writes out all

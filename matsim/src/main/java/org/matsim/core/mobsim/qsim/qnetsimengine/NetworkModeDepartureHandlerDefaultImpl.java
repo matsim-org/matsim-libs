@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
 public class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHandler {
 	// needs to be public so it can be used as a delegate.  Constructor is package-private (and should remain so).  kai, jan'25
 
-	private static final Logger log = LogManager.getLogger( NetworkModeDepartureHandlerDefaultImpl.class );
+	private static final Logger log = LogManager.getLogger(NetworkModeDepartureHandlerDefaultImpl.class);
 
 	private static int cntTeleportVehicle = 0;
 
@@ -48,7 +48,7 @@ public class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepart
 	@Inject /* deliberately package-private */ NetworkModeDepartureHandlerDefaultImpl( QNetsimEngineI qNetsimEngine, QSimConfigGroup qsimConfig ) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = qsimConfig.getVehicleBehavior();
-		this.networkModes =qsimConfig.getMainModes();
+		this.networkModes = qsimConfig.getMainModes();
 	}
 
 	@Override public boolean handleDeparture( double now, MobsimAgent agent, Id<Link> linkId ) {
@@ -73,7 +73,7 @@ public class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepart
 		if (vehicle == null) {
 			if (vehicleBehavior == VehicleBehavior.teleport) {
 				vehicle = qNetsimEngine.getVehicles().get(vehicleId);
-				if ( vehicle==null ) {
+				if (vehicle == null) {
 					// log a maximum of information, to help the user identifying the cause of the problem
 					final String msg = "could not find requested vehicle "+vehicleId+" in simulation for agent "+agent+" with id "+agent.getId()+" on link "+agent.getCurrentLinkId()+" at time "+now+".";
 					log.error( msg );
@@ -83,39 +83,39 @@ public class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepart
 				teleportVehicleTo(vehicle, linkId, qNetsimEngine);
 
 				vehicle.setDriver(agent);
-				agent.setVehicle(vehicle) ;
+				agent.setVehicle(vehicle);
 
 				qlink.letVehicleDepart(vehicle);
 				// (since the "teleportVehicle" does not physically move the vehicle, this is finally achieved in the departure
 				// logic.  kai, nov'11)
-			} else if (vehicleBehavior == VehicleBehavior.wait ) {
+			} else if (vehicleBehavior == VehicleBehavior.wait) {
 				// While we are waiting for our car
 				qlink.registerDriverAgentWaitingForCar(agent);
 			} else {
-				throw new RuntimeException("vehicle " + vehicleId + " not available for agent " + agent.getId() + " on link " + linkId + " at time "+ now);
+				throw new RuntimeException("vehicle " + vehicleId + " not available for agent " + agent.getId() + " on link " + linkId + " at time " + now);
 			}
 		} else {
 			vehicle.setDriver(agent);
-			agent.setVehicle(vehicle) ;
+			agent.setVehicle(vehicle);
 			qlink.letVehicleDepart(vehicle);
 		}
 	}
 
 	public static void teleportVehicleTo(QVehicle vehicle, Id<Link> linkId, QNetsimEngineI qNetsimEngine ) {
-		if (vehicle.getCurrentLink() != null) {
+		if (vehicle.getCurrentLinkId() != null) {
 
 			if (cntTeleportVehicle < 9) {
 				cntTeleportVehicle++;
-				log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
+				log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLinkId() + " to link " + linkId);
 				if (cntTeleportVehicle == 9) {
 					log.info("No more occurrences of teleported vehicles will be reported.");
 				}
 			}
-			QLinkI qlinkOld = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
+			QLinkI qlinkOld = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLinkId());
 			QVehicle result = qlinkOld.removeParkedVehicle(vehicle.getId());
 			if ( result==null ) {
-				throw new RuntimeException( "Could not remove parked vehicle with id " + vehicle.getId() +" on the link id " 
-						+ vehicle.getCurrentLink().getId()
+				throw new RuntimeException( "Could not remove parked vehicle with id " + vehicle.getId() +" on the link id "
+						+ vehicle.getCurrentLinkId()
 						+ ".  Maybe it is currently used by someone else?"
 						+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
 						+ "Maybe was never placed onto a link?" );

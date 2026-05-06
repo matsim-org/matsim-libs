@@ -29,7 +29,8 @@ import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -48,9 +49,16 @@ public class DrtRequest implements PassengerRequest {
 
 	private final DrtRouteConstraints constraints;
 
+	private final double earliestStartTime;
+	private final double latestStartTime;
+	private final double latestArrivalTime;
+
 	private DrtRequest(Builder builder) {
 		id = builder.id;
 		submissionTime = builder.submissionTime;
+		earliestStartTime = builder.earliestDepartureTime;
+		latestStartTime = earliestStartTime + builder.constraints.maxWaitDuration();
+		latestArrivalTime = earliestStartTime + builder.constraints.maxTravelDuration();
 		constraints = builder.constraints;
 		passengerIds.addAll(builder.passengerIds);
 		mode = builder.mode;
@@ -71,6 +79,7 @@ public class DrtRequest implements PassengerRequest {
 		builder.mode = copy.getMode();
 		builder.fromLink = copy.getFromLink();
 		builder.toLink = copy.getToLink();
+		builder.earliestDepartureTime = copy.earliestStartTime;
 		builder.constraints = copy.constraints;
 		builder.load = copy.load;
 		return builder;
@@ -88,12 +97,16 @@ public class DrtRequest implements PassengerRequest {
 
 	@Override
 	public double getEarliestStartTime() {
-		return constraints.earliestStartTime();
+		return earliestStartTime;
 	}
 
 	@Override
 	public double getLatestStartTime() {
-		return constraints.latestStartTime();
+		return latestStartTime;
+	}
+
+	public double getLatestArrivalTime() {
+		return latestArrivalTime;
 	}
 
 	public DrtRouteConstraints getConstraints() {
@@ -130,9 +143,9 @@ public class DrtRequest implements PassengerRequest {
 		return MoreObjects.toStringHelper(this)
 				.add("id", id)
 				.add("submissionTime", submissionTime)
-				.add("earliestStartTime", constraints.earliestStartTime())
-				.add("latestStartTime", constraints.latestStartTime())
-				.add("latestArrivalTime", constraints.latestArrivalTime())
+				.add("earliestStartTime", earliestStartTime)
+				.add("latestStartTime", latestStartTime)
+				.add("latestArrivalTime", latestArrivalTime)
 				.add("maxRideDuration", constraints.maxRideDuration())
 				.add("passengerIds", passengerIds.stream().map(Object::toString).collect(Collectors.joining(",")))
 				.add("mode", mode)
@@ -144,8 +157,10 @@ public class DrtRequest implements PassengerRequest {
 	public static final class Builder {
 		private Id<Request> id;
 		private double submissionTime;
+		private double earliestDepartureTime;
 
 		private DrtRouteConstraints constraints = DrtRouteConstraints.UNDEFINED;
+
 		private List<Id<Person>> passengerIds = new ArrayList<>();
 
 		private String mode;
@@ -168,6 +183,11 @@ public class DrtRequest implements PassengerRequest {
 
 		public Builder constraints(DrtRouteConstraints val) {
 			constraints = val;
+			return this;
+		}
+
+		public Builder earliestDepartureTime(double val) {
+			earliestDepartureTime = val;
 			return this;
 		}
 

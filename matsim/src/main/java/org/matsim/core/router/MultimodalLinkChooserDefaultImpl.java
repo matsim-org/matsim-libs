@@ -8,13 +8,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 public final class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
     // the class is public so it can be used as a delegate ...
 
-    private static final Logger log = LogManager.getLogger( FacilitiesUtils.class ) ;
+	private static final Logger log = LogManager.getLogger(MultimodalLinkChooserDefaultImpl.class);
 
     @Inject MultimodalLinkChooserDefaultImpl(){}
     // ... but the constructor is non-public so one is forced to use it via injection.  kai, may'25

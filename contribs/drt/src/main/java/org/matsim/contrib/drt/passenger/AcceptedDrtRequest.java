@@ -34,19 +34,20 @@ import java.util.List;
  * @author Michal Maciejewski (michalm)
  */
 public class AcceptedDrtRequest {
-	public static AcceptedDrtRequest createFromOriginalRequest(DrtRequest request, double dropoffDuration) {
+	public static AcceptedDrtRequest createFromOriginalRequest(DrtRequest request, double pickupDuration, double dropoffDuration) {
 		return AcceptedDrtRequest.newBuilder()
 				.request(request)
 				.earliestStartTime(request.getEarliestStartTime())
 				.latestStartTime(request.getLatestStartTime())
-				.latestArrivalTime(request.getConstraints().latestArrivalTime())
+				.latestArrivalTime(request.getLatestArrivalTime())
 				.maxRideDuration(request.getConstraints().maxRideDuration())
+				.dropoffDuration(pickupDuration)
 				.dropoffDuration(dropoffDuration)
 				.build();
 	}
 
-	public static AcceptedDrtRequest createFromOriginalRequest(DrtRequest request) {
-		return createFromOriginalRequest(request, 0.0);
+	public static AcceptedDrtRequest createFromOriginalRequest(DrtRequest request, double pickupDuration) {
+		return createFromOriginalRequest(request, pickupDuration, 0.0);
 	}
 
 	private final DrtRequest request;
@@ -55,6 +56,7 @@ public class AcceptedDrtRequest {
 	private final double latestStartTime;
 	private final double latestArrivalTime;
 	private final double maxRideDuration;
+	private final double pickupDuration;
 	private final double dropoffDuration;
 	private final RequestTiming requestTiming;
 
@@ -64,6 +66,7 @@ public class AcceptedDrtRequest {
 		latestStartTime = builder.latestStartTime;
 		latestArrivalTime = builder.latestArrivalTime;
 		maxRideDuration = builder.maxRideDuration;
+		pickupDuration = builder.pickupDuration;
 		dropoffDuration = builder.dropoffDuration;
 		requestTiming = new RequestTiming(builder.plannedPickupTime, builder.plannedDropoffTime);
 	}
@@ -79,6 +82,7 @@ public class AcceptedDrtRequest {
 		builder.latestStartTime = copy.getLatestStartTime();
 		builder.latestArrivalTime = copy.getLatestArrivalTime();
 		builder.maxRideDuration = copy.getMaxRideDuration();
+		builder.pickupDuration = copy.getPickupDuration();
 		builder.dropoffDuration = copy.getDropoffDuration();
 		copy.requestTiming.getPlannedPickupTime().ifDefined(val -> builder.plannedPickupTime = val);
 		copy.requestTiming.getPlannedDropoffTime().ifDefined(val -> builder.plannedDropoffTime = val);
@@ -100,8 +104,13 @@ public class AcceptedDrtRequest {
 	public double getLatestArrivalTime() {
 		return latestArrivalTime;
 	}
+
 	public double getMaxRideDuration() {
 		return maxRideDuration;
+	}
+
+	public double getPickupDuration() {
+		return pickupDuration;
 	}
 
 	public double getDropoffDuration() {
@@ -156,6 +165,7 @@ public class AcceptedDrtRequest {
 		private double latestStartTime;
 		private double latestArrivalTime;
 		private double maxRideDuration;
+		private double pickupDuration;
 		private double dropoffDuration;
 		private double plannedPickupTime = RequestTiming.UNDEFINED_TIME;
 		private double plannedDropoffTime = RequestTiming.UNDEFINED_TIME;
@@ -190,6 +200,11 @@ public class AcceptedDrtRequest {
 
 		public Builder dropoffDuration(double val) {
 			this.dropoffDuration = val;
+			return this;
+		}
+
+		public Builder pickupDuration(double val) {
+			this.pickupDuration = val;
 			return this;
 		}
 

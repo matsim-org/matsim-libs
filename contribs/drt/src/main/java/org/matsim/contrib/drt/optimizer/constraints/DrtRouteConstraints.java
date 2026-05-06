@@ -19,18 +19,15 @@
 
 package org.matsim.contrib.drt.optimizer.constraints;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * @author Sebastian Hörl, IRT SystemX
  * @author nkuehnel / MOIA
  */
 public record DrtRouteConstraints(
-		double earliestStartTime, //
-		double latestStartTime, //
-		double latestArrivalTime, //
-		double maxRideDuration, //
-		double maxPickupDelay, //
+		double maxTravelDuration,
+		double maxRideDuration,
+		double maxWaitDuration,
+		double maxPickupDelay,
 		double lateDiversionThreshold,
 		boolean allowRejection
 ) {
@@ -41,13 +38,7 @@ public record DrtRouteConstraints(
 					Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY,
-					Double.POSITIVE_INFINITY,
 					0,
 					false
 			);
-
-	@JsonIgnore
-	public double getMaxWaitTime() {
-		return latestStartTime - earliestStartTime;
-	}
 }

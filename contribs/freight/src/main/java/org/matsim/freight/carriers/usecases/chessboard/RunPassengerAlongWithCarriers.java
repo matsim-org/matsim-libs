@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Provider;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.net.URL;
 import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
@@ -59,7 +59,10 @@ final class RunPassengerAlongWithCarriers {
 	}
 
 	public void run() {
-		Config config = prepareConfig();
+		run(prepareConfig());
+	}
+
+	public void run(Config config) {
 
 		Scenario scenario = prepareScenario(config);
 

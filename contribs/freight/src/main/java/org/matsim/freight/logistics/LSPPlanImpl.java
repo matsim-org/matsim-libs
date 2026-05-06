@@ -39,9 +39,9 @@ public class LSPPlanImpl implements LSPPlan {
 	}
 
 	@Override
-	public LSPPlan addLogisticChain(LogisticChain solution) {
-		this.logisticChains.add(solution);
-		solution.setLSP(this.lsp);
+	public LSPPlan addLogisticChain(LogisticChain logisticChain) {
+		this.logisticChains.add(logisticChain);
+		logisticChain.setLSP(this.lsp);
 		return this;
 	}
 

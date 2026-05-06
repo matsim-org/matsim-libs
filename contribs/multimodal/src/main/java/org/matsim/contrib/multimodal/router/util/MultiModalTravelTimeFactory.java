@@ -32,7 +32,7 @@ import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;

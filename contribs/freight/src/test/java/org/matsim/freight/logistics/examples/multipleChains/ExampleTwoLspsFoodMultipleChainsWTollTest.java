@@ -60,7 +60,7 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 					"--HubCostsFix=100.0",
 					"--typeOfLsps="+ ONE_PLAN_ONLY_DIRECT_CHAIN,
 					"--lsp1Name=Edeka",
-					"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
+					"--lsp1CarrierId=rewe_DISCOUNTER_TROCKEN",
 					"--lsp1HubLinkId=91085",
 					"--lsp1vehTypesDirect=" + HEAVY_40T,
 					"--lsp1vehTypesMain=null",				//set to null
@@ -79,10 +79,13 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
             fail();
         }
 
-        //Compare LSP files
+        //Compare LSP file
         MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
 
-        //Compare events files
+		//Compare Carriers file
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_carriers.xml.gz", utils.getOutputDirectory() + "output_carriers.xml.gz" );
+
+        //Compare events file
         MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 
 		//compare some freight statistics
@@ -113,7 +116,7 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 				"--HubCostsFix=100.0",
 				"--typeOfLsps="+ ONE_PLAN_ONLY_DIRECT_CHAIN,
 				"--lsp1Name=Edeka",
-				"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
+				"--lsp1CarrierId=rewe_DISCOUNTER_TROCKEN",
 				"--lsp1HubLinkId=91085",
 				"--lsp1vehTypesDirect=" + HEAVY_40T,
 			};
@@ -124,10 +127,13 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 			fail();
 		}
 
-		//Compare LSP files
+		//Compare LSP file
 		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
 
-		//Compare events files
+		//Compare Carriers file
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_carriers.xml.gz", utils.getOutputDirectory() + "output_carriers.xml.gz" );
+
+		//Compare events file
 		MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 
 		//compare some freight statistics
@@ -159,7 +165,7 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 				"--HubCostsFix=100.0",
 				"--typeOfLsps="+ ONE_PLAN_ONLY_TWO_ECHELON_CHAIN,
 				"--lsp1Name=Edeka",
-				"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
+				"--lsp1CarrierId=rewe_DISCOUNTER_TROCKEN",
 				"--lsp1HubLinkId=91085",
 //				"--lsp1vehTypesDirect=heavy40t",
 				"--lsp1vehTypesMain=" + HEAVY_40T,
@@ -178,10 +184,13 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 			fail();
 		}
 
-		//Compare LSP files
+		//Compare LSP file
 		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
 
-		//Compare events files
+		//Compare Carriers file
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_carriers.xml.gz", utils.getOutputDirectory() + "output_carriers.xml.gz" );
+
+		//Compare events file
 		MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 
 		//compare some freight statistics
@@ -215,7 +224,7 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 				"--HubCostsFix=100.0",
 				"--typeOfLsps="+ ONE_PLAN_BOTH_CHAINS,
 				"--lsp1Name=Edeka",
-				"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
+				"--lsp1CarrierId=rewe_DISCOUNTER_TROCKEN",
 				"--lsp1HubLinkId=91085",
 				"--lsp1vehTypesDirect=" + HEAVY_40T,
 				"--lsp1vehTypesMain=" + HEAVY_40T,
@@ -234,10 +243,13 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 			fail();
 		}
 
-		//Compare LSP files
+		//Compare LSP file
 		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
 
-		//Compare events files
+		//Compare Carriers file
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_carriers.xml.gz", utils.getOutputDirectory() + "output_carriers.xml.gz" );
+
+		//Compare events file
 		MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 
 		//compare some freight statistics

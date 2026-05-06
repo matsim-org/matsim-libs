@@ -10,7 +10,7 @@
 package org.matsim.contrib.drt.extension.operations.shifts.analysis.efficiency;
 
 import com.google.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;

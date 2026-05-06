@@ -22,7 +22,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 /**
  * A default implementation of {@link RaptorParametersForPerson} returning the

@@ -32,7 +32,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControllerListener;
 
-import jakarta.inject.Singleton;
+import com.google.inject.Singleton;
 import java.util.Collections;
 
 /**

@@ -87,7 +87,7 @@ public class DrtRoute extends AbstractRoute {
 	public void setConstraints(DrtRouteConstraints constraints) {
 		//TODO: consolidate constraints / route description
 		this.routeDescription.setConstraints(constraints);
-		super.setTravelTime(constraints.latestArrivalTime() - constraints.earliestStartTime());
+		super.setTravelTime(constraints.maxTravelDuration());
 	}
 
 	private DvrpLoad load;

@@ -58,12 +58,12 @@ public class CostCalculationStrategyTest {
 	private void assertRejectSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
 			DetourTimeInfo detourTimeInfo, double expectedCost) {
 		var drtRequest = DrtRequest.newBuilder()
+				.earliestDepartureTime(0.)
 				.constraints(
 						new DrtRouteConstraints(
-								Double.POSITIVE_INFINITY,
-								latestStartTime,
 								latestArrivalTime,
 								Double.POSITIVE_INFINITY,
+								latestStartTime,
 								Double.POSITIVE_INFINITY,
 								Double.POSITIVE_INFINITY,
 								true
@@ -97,12 +97,12 @@ public class CostCalculationStrategyTest {
 	private void assertDiscourageSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
 			DetourTimeInfo detourTimeInfo, double expectedCost) {
 		var drtRequest = DrtRequest.newBuilder()
+				.earliestDepartureTime(0.)
 				.constraints(
 						new DrtRouteConstraints(
-								Double.POSITIVE_INFINITY,
-								latestStartTime,
 								latestArrivalTime,
 								Double.POSITIVE_INFINITY,
+								latestStartTime,
 								Double.POSITIVE_INFINITY,
 								Double.POSITIVE_INFINITY,
 								false

@@ -8,38 +8,31 @@ import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFacto
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
-import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtAssignShiftToVehicleLogic;
-import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtShiftDispatcherImpl;
-import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtActionCreator;
-import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
-import org.matsim.contrib.drt.extension.operations.eshifts.scheduler.EShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityReservationManager;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.*;
-import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftStopWaypointFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtActionCreator;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsActionCreator;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
+import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskSchedulerImpl;
 import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
-import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
-import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -67,39 +60,33 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 				getter -> null)
 		).asEagerSingleton();
 
-		bindModal(AssignShiftToVehicleLogic.class).toProvider(modalProvider(getter ->
-						new EDrtAssignShiftToVehicleLogic(new DefaultAssignShiftToVehicleLogic(drtShiftParams), drtShiftParams)
-		));
-
-		bindModal(DrtShiftDispatcher.class).toProvider(modalProvider(
-				getter -> new EDrtShiftDispatcherImpl(((EShiftTaskScheduler) getter.getModal(ShiftTaskScheduler.class)),
-						getter.getModal(ChargingInfrastructure.class), drtShiftParams, getter.getModal(OperationFacilities.class),
-						new DrtShiftDispatcherImpl(getMode(), getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
-								getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
-								getter.getModal(ShiftTaskScheduler.class), getter.getModal(Network.class), getter.get(EventsManager.class),
-								drtShiftParams, new DefaultShiftStartLogic(), getter.getModal(AssignShiftToVehicleLogic.class),
-								getter.getModal(ShiftScheduler.class)),
-						getter.getModal(Fleet.class), getter.getModal(ChargingStrategy.Factory.class)))
-		).asEagerSingleton();
-
-
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
 				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0, getter.getModal(DvrpLoadType.class),
 						getter.getModal(StopWaypointFactory.class)),
                         drtShiftParams.isConsiderUpcomingShiftsForInsertion()))).asEagerSingleton();
 
-
 		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->
-						new ShiftEDrtTaskFactoryImpl(new EDrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class),
-								drtShiftParams, getter.get(ChargingInfrastructure.class), getter.getModal(ChargingStrategy.Factory.class))))
+						new DrtOperationsTaskFactory(new EDrtTaskFactoryImpl(),
+								getter.getModal(OperationFacilities.class),
+								getter.getModal(OperationFacilityReservationManager.class))))
 				.in(Singleton.class);
 		bindModal(ShiftDrtTaskFactory.class).toProvider(modalProvider(getter -> ((ShiftDrtTaskFactory) getter.getModal(DrtTaskFactory.class))));
 
 		bindModal(ShiftTaskScheduler.class).toProvider(modalProvider(
-				getter -> new EShiftTaskScheduler(getter.getModal(Network.class), getter.getModal(TravelTime.class),
+				getter -> new ShiftTaskSchedulerImpl(
+						getter.getModal(OperationFacilities.class),
+						getter.getModal(ShiftDrtTaskFactory.class),
+						getter.getModal(Network.class),
+						getter.getModal(OperationFacilityReservationManager.class),
+						drtShiftParams,
 						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
-						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), drtShiftParams)
-		)).asEagerSingleton();
+						getter.getModal(TravelTime.class),
+						getter.getModal(OperationFacilityFinder.class),
+						getter.getModal(VehicleEntry.EntryFactory.class),
+						getter.getModal(ScheduleTimingUpdater.class),
+						getter.getModal(ChargingStrategy.Factory.class),
+						getter.getModal(ChargingInfrastructure.class)
+						))).asEagerSingleton();
 
 		// See EDrtModeOptimizerQSimModule
 		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
@@ -110,16 +97,15 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 			return v -> EDrtActionCreator.createLeg(dvrpCfg.getMobsimMode(), v, timer);
 		})).in(Singleton.class);
 
-		bindModal(ShiftEDrtActionCreator.class).toProvider(modalProvider(getter -> {
+		bindModal(DrtOperationsActionCreator.class).toProvider(modalProvider(getter -> {
 			VrpAgentLogic.DynActionCreator delegate = drtCfg.getPrebookingParams().isPresent()
 					? getter.getModal(PrebookingActionCreator.class)
 					: getter.getModal(DrtActionCreator.class);
 
-			return new ShiftEDrtActionCreator(
-					new ShiftDrtActionCreator(getter.getModal(PassengerHandler.class), delegate),
-					getter.get(MobsimTimer.class), getter.getModal(PassengerHandler.class));
+			return new DrtOperationsActionCreator(
+					getter.getModal(PassengerHandler.class), new EDrtActionCreator(delegate,
+					getter.get(MobsimTimer.class)), getter.get(MobsimTimer.class));
 		})).asEagerSingleton();
 
-		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(ShiftEDrtActionCreator.class));
 	}
 }

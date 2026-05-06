@@ -72,7 +72,6 @@ public class InsertionGeneratorTest {
 	private static final double TIME_REPLACED_DRIVE = 100;
 
 	private static final DrtRouteConstraints DRT_ROUTE_CONSTRAINTS = new DrtRouteConstraints(
-			0,
 			Double.POSITIVE_INFINITY,
 			Double.POSITIVE_INFINITY,
 			Double.POSITIVE_INFINITY,
@@ -90,6 +89,7 @@ public class InsertionGeneratorTest {
 			.passengerIds(
 					List.of(Id.createPersonId("person"))
 			)
+			.earliestDepartureTime(0.)
 			.constraints(DRT_ROUTE_CONSTRAINTS)
 			.load(LOAD_TYPE.fromInt(1))
 			.build();
@@ -104,6 +104,7 @@ public class InsertionGeneratorTest {
 				)
 			)
 			.load(LOAD_TYPE.fromInt(2))
+			.earliestDepartureTime(0.)
 			.constraints(DRT_ROUTE_CONSTRAINTS)
 			.build();
 
@@ -120,17 +121,18 @@ public class InsertionGeneratorTest {
 				)
 			)
 			.load(LOAD_TYPE.fromInt(5))
+			.earliestDepartureTime(0.)
 			.constraints(DRT_ROUTE_CONSTRAINTS)
 			.build();
 
-	private final DrtRequest prebookedRequest = DrtRequest.newBuilder()
+		private final DrtRequest prebookedRequest = DrtRequest.newBuilder()
 			.fromLink(fromLink)
 			.toLink(toLink)
+			.earliestDepartureTime(100)
 			.constraints(
 					new DrtRouteConstraints(
-							100,
 							0,
-							0,
+							Double.POSITIVE_INFINITY,
 							Double.POSITIVE_INFINITY,
 							Double.POSITIVE_INFINITY,
 							0.,
@@ -490,7 +492,10 @@ public class InsertionGeneratorTest {
 		StopWaypoint stop1 = stop(70, link("stop"), LOAD_TYPE.getEmptyLoad());
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertionsOnly(prebookedRequest, entry,
-			new Insertion(prebookedRequest, entry, 2, 2));
+			new Insertion(prebookedRequest, entry, 1, 1),
+			new Insertion(prebookedRequest, entry, 1, 2),
+			new Insertion(prebookedRequest, entry, 2, 2)
+		);
 	}
 
 
@@ -529,8 +534,8 @@ public class InsertionGeneratorTest {
 	@Test
 	void testWaypointOccupancyChange() {
 		IntegerLoad occupancy = LOAD_TYPE.getEmptyLoad();
-		AcceptedDrtRequest acceptedReq5Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest5Pax);
-		AcceptedDrtRequest acceptedReq2Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest2Pax);
+		AcceptedDrtRequest acceptedReq5Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest5Pax, 60);
+		AcceptedDrtRequest acceptedReq2Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest2Pax, 60);
 
 		StopWaypoint stop2 = stop(0, link("stop2"), occupancy);
 		//dropoff 5 pax

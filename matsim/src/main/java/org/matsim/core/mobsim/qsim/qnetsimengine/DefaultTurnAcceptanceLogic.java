@@ -30,30 +30,31 @@ import org.matsim.api.core.v01.network.Link;
  * this class checks whether turning is physically possible, i.e. if the next link exists and if it is connected to the current link
  *
  * @author kainagel
- *
  */
 public final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
-	private static final Logger log = LogManager.getLogger( DefaultTurnAcceptanceLogic.class) ;
+	private static final Logger log = LogManager.getLogger(DefaultTurnAcceptanceLogic.class);
 
-	/** We need qNetwork to get the next QLink, because the link lookup may lead to a NullPointer otherwise */
+	/**
+	 * We need qNetwork to get the next QLink, because the link lookup may lead to a NullPointer otherwise
+	 */
 	@Override
-	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork, double now){
+	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork, double now) {
 		if (nextLinkId == null) {
-			log.error( "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
-					+ " currentLink=" + currentLink.getId().toString()
-					+ ". The agent is removed from the simulation.");
+			log.error("Agent has no or wrong route! agentId=" + veh.getDriver().getId()
+				+ " currentLink=" + currentLink.getId().toString()
+				+ ". The agent is removed from the simulation.");
 			return AcceptTurn.ABORT;
 		}
 		QLinkI nextQLink = qNetwork.getNetsimLinks().get(nextLinkId);
 
-		if (nextQLink == null){
+		if (nextQLink == null) {
 			log.warn("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() +
-					" plans to travel on that link from link " + veh.getCurrentLink().getId());
-			return AcceptTurn.ABORT ;
+				" plans to travel on that link from link " + veh.getCurrentLinkId());
+			return AcceptTurn.ABORT;
 		}
 		if (currentLink.getToNode() != nextQLink.getLink().getFromNode()) {
 			log.warn("Cannot move vehicle " + veh.getId() + " from link " + currentLink.getId() + " to link " + nextQLink.getLink().getId());
-			return AcceptTurn.ABORT ;
+			return AcceptTurn.ABORT;
 		}
 //		if ( !nextQLink.getLink().getAllowedModes().contains( veh.getDriver().getMode() ) ) {
 //			final String message = "The link with id " + nextLinkId + " does not allow the current mode, which is " + veh.getDriver().getMode();
@@ -69,7 +70,7 @@ public final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
 		 * a vehicle only enters a lane when that lane leads to the next link. see QLinkLanesImpl.moveBufferToNextLane() and .chooseNextLane()
 		 * tthunig, oct'17 */
 
-		return AcceptTurn.GO ;
+		return AcceptTurn.GO;
 	}
 
 }

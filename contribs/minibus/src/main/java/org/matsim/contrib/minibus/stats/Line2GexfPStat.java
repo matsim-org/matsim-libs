@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -15,15 +15,19 @@ public final class PromisedPickupTimeWindowDrtOfferAcceptor implements DrtOfferA
 	}
 
 	@Override
-	public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime, double dropoffDuration) {
+	public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request,
+													   double departureTime, double arrivalTime,
+													   double pickupDuration, double dropoffDuration) {
 		double updatedPickupTimeWindow = Math.min(departureTime
 				+ promisedPickupTimeWindow, request.getLatestStartTime());
 		return Optional.of(AcceptedDrtRequest
 				.newBuilder()
 				.request(request)
 				.earliestStartTime(request.getEarliestStartTime())
-				.latestArrivalTime(request.getConstraints().latestArrivalTime())
+				.latestArrivalTime(request.getLatestArrivalTime())
 				.latestStartTime(updatedPickupTimeWindow)
-				.dropoffDuration(dropoffDuration).build());
+				.pickupDuration(pickupDuration)
+				.dropoffDuration(dropoffDuration)
+				.build());
 	}
 }

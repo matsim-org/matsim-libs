@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * Implements a least-cost-path-tree upon a {@link SpeedyGraph} datastructure. Besides using the more efficient Graph datastructure, it also makes use of a custom priority-queue implementation (NodeMinHeap)
+ * Implements a least-cost-path-tree upon a {@link SpeedyGraph} datastructure. Besides using the more efficient Graph datastructure, it also makes use of a custom priority-queue implementation ({@link DAryMinHeap})
  * which operates directly on the least-cost-path-three data for additional performance gains.
  * <p>
  * In some limited tests, this resulted in a speed-up of at least a factor 2.5 compared to MATSim's default LeastCostPathTree.
@@ -27,7 +27,7 @@ import java.util.NoSuchElementException;
  * @author mrieser / Simunto, sponsored by SBB Swiss Federal Railways
  * @author hrewald, nkuehnel / MOIA turn restriction adjustments
  */
-public class LeastCostPathTree {
+public class LeastCostPathTree implements ShortestPathTree {
 
     private final SpeedyGraph graph;
     private final TravelTime tt;
@@ -38,7 +38,7 @@ public class LeastCostPathTree {
     private final int[] comingFromLink;
     private final SpeedyGraph.LinkIterator outLI;
     private final SpeedyGraph.LinkIterator inLI;
-    private final NodeMinHeap pq;
+    private final DAryMinHeap pq;
 
     public LeastCostPathTree(SpeedyGraph graph, TravelTime tt, TravelDisutility td) {
         this.graph = graph;
@@ -48,7 +48,7 @@ public class LeastCostPathTree {
         this.comingFrom = new int[graph.nodeCount];
         this.fromLink = new int[graph.nodeCount];
         this.comingFromLink = new int[graph.linkCount];
-        this.pq = new NodeMinHeap(graph.nodeCount, this::getCost, this::setCost);
+        this.pq = new DAryMinHeap(graph.nodeCount, 6);
         this.outLI = graph.getOutLinkIterator();
         this.inLI = graph.getInLinkIterator();
     }
@@ -58,7 +58,7 @@ public class LeastCostPathTree {
      */
     @Deprecated
     public void calculate(Node startNode, double startTime, Person person, Vehicle vehicle) {
-        this.calculateImpl(startNode.getId().index(), startTime, person, vehicle, (node, arrTime, cost, distance, depTime) -> false);
+        this.calculateImpl(graph.getNodeIndex(startNode), startTime, person, vehicle, (node, arrTime, cost, distance, depTime) -> false);
     }
 
     /**
@@ -66,7 +66,7 @@ public class LeastCostPathTree {
      */
     @Deprecated
     public void calculate(Node startNode, double startTime, Person person, Vehicle vehicle, StopCriterion stopCriterion) {
-        this.calculateImpl(startNode.getId().index(), startTime, person, vehicle, stopCriterion);
+        this.calculateImpl(graph.getNodeIndex(startNode), startTime, person, vehicle, stopCriterion);
     }
 
     public void calculate(Link startLink, double startTime, Person person, Vehicle vehicle) {
@@ -74,11 +74,11 @@ public class LeastCostPathTree {
     }
 
     public void calculate(Link startLink, double startTime, Person person, Vehicle vehicle, StopCriterion stopCriterion) {
-        int startNode = startLink.getToNode().getId().index();
+        int startNode = graph.getNodeIndex(startLink.getToNode());
         if(graph.getTurnRestrictions().isPresent()) {
             TurnRestrictionsContext context = graph.getTurnRestrictions().get();
             if(context.replacedLinks.containsKey(startLink.getId())) {
-                startNode = context.replacedLinks.get(startLink.getId()).toColoredNode.index();
+                startNode = graph.getInternalIndex(context.replacedLinks.get(startLink.getId()).toColoredNode.index());
             }
         }
         calculateImpl(startNode, startTime, person, vehicle, stopCriterion);
@@ -92,7 +92,7 @@ public class LeastCostPathTree {
         setData(startNode, 0, startTime, 0);
 
         this.pq.clear();
-        this.pq.insert(startNode);
+        this.pq.insert(startNode, 0);
 
         while (!this.pq.isEmpty()) {
             final int nodeIdx = this.pq.poll();
@@ -125,7 +125,7 @@ public class LeastCostPathTree {
                     }
                 } else {
                     setData(toNode, newCost, newTime, currDistance + link.getLength());
-                    this.pq.insert(toNode);
+                    this.pq.insert(toNode, newCost);
                     this.comingFrom[toNode] = nodeIdx;
                     this.fromLink[toNode] = linkIdx;
                 }
@@ -162,9 +162,9 @@ public class LeastCostPathTree {
 
         this.pq.clear();
 
-        int arrivalNode = arrivalLink.getFromNode().getId().index();
+        int arrivalNode = graph.getNodeIndex(arrivalLink.getFromNode());
         setData(arrivalNode, 0, arrivalTime, 0);
-        this.pq.insert(arrivalNode);
+        this.pq.insert(arrivalNode, 0);
 
         if(graph.getTurnRestrictions().isPresent()) {
             TurnRestrictionsContext turnRestrictionsContext = graph.getTurnRestrictions().get();
@@ -174,17 +174,17 @@ public class LeastCostPathTree {
                 TurnRestrictionsContext.ColoredLink replacedLink = turnRestrictionsContext.replacedLinks
                         .get(inLink.getId());
                 if (replacedLink != null && replacedLink.toColoredNode != null) {
-                    int coloredArrivalNode = replacedLink.toColoredNode.index();
+                    int coloredArrivalNode = graph.getInternalIndex(replacedLink.toColoredNode.index());
                     setData(coloredArrivalNode, 0, arrivalTime, 0);
-                    this.pq.insert(coloredArrivalNode);
+                    this.pq.insert(coloredArrivalNode, 0);
                 }
                 List<TurnRestrictionsContext.ColoredLink> coloredLinks = turnRestrictionsContext.coloredLinksPerLinkMap.get(inLink.getId());
                 if (coloredLinks != null) {
                     for (TurnRestrictionsContext.ColoredLink coloredLink : coloredLinks) {
                         if (coloredLink.toColoredNode != null) {
-                            int coloredArrivalNode = coloredLink.toColoredNode.index();
+                            int coloredArrivalNode = graph.getInternalIndex(coloredLink.toColoredNode.index());
                             setData(coloredArrivalNode, 0, arrivalTime, 0);
-                            this.pq.insert(coloredArrivalNode);
+                            this.pq.insert(coloredArrivalNode, 0);
                         }
                     }
                 }
@@ -222,7 +222,7 @@ public class LeastCostPathTree {
                     }
                 } else {
                     setData(fromNode, newCost, newTime, currDistance + link.getLength());
-                    this.pq.insert(fromNode);
+                    this.pq.insert(fromNode, newCost);
                     this.comingFrom[fromNode] = nodeIdx;
                     this.fromLink[fromNode] = linkIdx;
                 }
@@ -253,8 +253,8 @@ public class LeastCostPathTree {
             if (uncoloredNode != null) {
 
                 // the index points to a node with a different index -> colored copy
-                if (uncoloredNode.getId().index() != i) {
-                    int uncoloredIndex = uncoloredNode.getId().index();
+                if (graph.getNodeIndex(uncoloredNode) != i) {
+                    int uncoloredIndex = graph.getNodeIndex(uncoloredNode);
                     double uncoloredCost = getCost(uncoloredIndex);
                     double coloredCost = getCost(i);
 
@@ -282,6 +282,14 @@ public class LeastCostPathTree {
             return OptionalTime.undefined();
         }
         return OptionalTime.defined(time);
+    }
+
+    /**
+     * Returns the internal (spatially ordered) node index for the given MATSim node.
+     * Use this instead of {@code node.getId().index()} when querying tree results.
+     */
+    public int getNodeIndex(Node node) {
+        return graph.getNodeIndex(node);
     }
 
     public double getDistance(int nodeIndex) {
@@ -346,7 +354,7 @@ public class LeastCostPathTree {
         private int current;
 
         public PathIterator(Node startNode) {
-            current = startNode.getId().index();
+            current = graph.getNodeIndex(startNode);
         }
 
         @Override
@@ -372,7 +380,7 @@ public class LeastCostPathTree {
         private int current;
 
         public LinkPathIterator(Node startNode) {
-            current = fromLink[startNode.getId().index()];
+            current = fromLink[graph.getNodeIndex(startNode)];
         }
 
         @Override

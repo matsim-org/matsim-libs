@@ -72,6 +72,7 @@ public class StuckAgentTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.qsim().setEndTime(24*3600);
 
 		config.controller().setLastIteration(0);

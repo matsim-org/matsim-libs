@@ -19,6 +19,7 @@
 package org.matsim.contrib.drt.optimizer.rebalancing;
 
 import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
@@ -109,21 +110,10 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 			() -> (ConfigGroup)rebalancingStrategyParams,
 			params -> rebalancingStrategyParams = (RebalancingStrategyParams)params);
 
-		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
-				() -> zoneSystemParams,
-				params -> zoneSystemParams = (SquareGridZoneSystemParams)params);
-
-		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
-				() -> zoneSystemParams,
-				params -> zoneSystemParams = (GISFileZoneSystemParams)params);
-
-		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
-				() -> zoneSystemParams,
-				params -> zoneSystemParams = (H3GridZoneSystemParams)params);
-
-		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
-				() -> zoneSystemParams,
-				params -> zoneSystemParams = (GeometryFreeZoneSystemParams)params);
+		// rebalancing zones configuration
+		ZoneSystemUtils.registerDefaultZoneSystems(this::addDefinition,  //
+			(ZoneSystemParams params) -> zoneSystemParams = params, // 
+			() -> zoneSystemParams);
 	}
 
 	@Override

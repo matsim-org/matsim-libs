@@ -336,8 +336,8 @@ public final class LSPUtils {
 		public LSPBuilder setInitialPlan(LSPPlan plan) {
 			// yy maybe one could use the first plan by default, and then get rid of this method here?  kai, jul'25
 			this.initialPlan = plan;
-			for (LogisticChain solution : plan.getLogisticChains()) {
-				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+			for (LogisticChain logisticChain : plan.getLogisticChains()) {
+				for (LogisticChainElement element : logisticChain.getLogisticChainElements()) {
 					if (!resources.contains(element.getResource())) {
 						resources.add(element.getResource());
 					}

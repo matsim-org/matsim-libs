@@ -21,10 +21,12 @@ package org.matsim.contrib.drt.optimizer.depot;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 /**
  * @author michalm
  */
+@NodeSingleton
 public interface DepotFinder {
 	Link findDepot(DvrpVehicle vehicle);
 }

@@ -276,7 +276,8 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@StringSetter(TOUR_FILTERS)
 	public void setTourFiltersAsString(String tourFilters) {
-		this.tourFilters = Arrays.asList(tourFilters.split(",")).stream().map(String::trim).collect(Collectors.toSet());
+		this.tourFilters = Arrays.asList(tourFilters.split(",")).stream().map(String::trim).filter(s -> !s.isEmpty())
+				.collect(Collectors.toSet());
 	}
 
 	/**
@@ -306,7 +307,8 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@StringSetter(TRIP_FILTERS)
 	public void setTripFiltersAsString(String tripFilters) {
-		this.tripFilters = Arrays.asList(tripFilters.split(",")).stream().map(String::trim).collect(Collectors.toSet());
+		this.tripFilters = Arrays.asList(tripFilters.split(",")).stream().map(String::trim).filter(s -> !s.isEmpty())
+				.collect(Collectors.toSet());
 	}
 
 	/**
@@ -369,7 +371,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(TOUR_CONSTRAINTS)
 	public void setTourConstraintsAsString(String tourConstraints) {
 		this.tourConstraints = Arrays.asList(tourConstraints.split(",")).stream().map(String::trim)
-				.collect(Collectors.toSet());
+				.filter(s -> !s.isEmpty()).collect(Collectors.toSet());
 	}
 
 	/**
@@ -400,7 +402,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(TRIP_CONSTRAINTS)
 	public void setTripConstraintsAsString(String tripConstraints) {
 		this.tripConstraints = Arrays.asList(tripConstraints.split(",")).stream().map(String::trim)
-				.collect(Collectors.toSet());
+				.filter(s -> !s.isEmpty()).collect(Collectors.toSet());
 	}
 
 	/**
@@ -430,7 +432,8 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@StringSetter(CACHED_MODES)
 	public void setCachedModesAsString(String cachedModes) {
-		this.cachedModes = Arrays.asList(cachedModes.split(",")).stream().map(String::trim).collect(Collectors.toSet());
+		this.cachedModes = Arrays.asList(cachedModes.split(",")).stream().map(String::trim).filter(s -> !s.isEmpty())
+				.collect(Collectors.toSet());
 	}
 
 	/**

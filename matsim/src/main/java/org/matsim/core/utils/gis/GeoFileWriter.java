@@ -75,7 +75,12 @@ public class GeoFileWriter implements MatsimSomeWriter {
         	    FileDataStore datastore = new ShapefileDataStore(fileURL);
 				datastore.createSchema(featureType);
 				featureSource = (SimpleFeatureStore) datastore.getFeatureSource();
-        	} else if(filename.endsWith(".gpkg")){
+				DefaultFeatureCollection coll = new DefaultFeatureCollection();
+				coll.addAll(features);
+				featureSource.addFeatures(coll);
+				datastore.dispose();
+
+			} else if(filename.endsWith(".gpkg")){
 				Map<String, Object> map = new HashMap<>();
 				map.put(GeoPkgDataStoreFactory.DBTYPE.key, GeoPkgDataStoreFactory.DBTYPE.sample);
 				map.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
@@ -86,14 +91,15 @@ public class GeoFileWriter implements MatsimSomeWriter {
 					layerName = new NameImpl(featureType.getTypeName());
 				}
 				featureSource = (SimpleFeatureStore) datastore.getFeatureSource(layerName);
+				DefaultFeatureCollection coll = new DefaultFeatureCollection();
+				coll.addAll(features);
+				featureSource.addFeatures(coll);
+				datastore.dispose();
             } else {
 				throw new RuntimeException("Unsupported file type.");
 			}
 
-			DefaultFeatureCollection coll = new DefaultFeatureCollection();
-			coll.addAll(features);
 
-			featureSource.addFeatures(coll);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

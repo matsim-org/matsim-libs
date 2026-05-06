@@ -17,8 +17,8 @@ final class MovingBlockResource implements RailResourceInternal {
 
 	private final Id<RailResource> id;
 	private final List<RailLink> links;
-	private final Track[] tracks;
-	private final int capacity;
+	private Track[] tracks;
+	private int capacity;
 
 	/**
 	 * Links that are reserved by trains.
@@ -108,6 +108,20 @@ final class MovingBlockResource implements RailResourceInternal {
 	}
 
 	@Override
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+
+		// Create new arrays with new capacity if necessary
+		if (tracks.length < capacity) {
+			tracks = Arrays.copyOf(tracks, capacity);
+			for (int i = 0; i < capacity; i++) {
+				if (tracks[i] == null)
+					tracks[i] = new Track();
+			}
+		}
+	}
+
+	@Override
 	public double getReservedDist(RailLink link, TrainPosition position) {
 
 		TrainEntry entry = reservations.get(position.getDriver());
@@ -118,7 +132,7 @@ final class MovingBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public double reserve(double time, RailLink link, int track, TrainPosition position) {
+	public double reserve(double time, RailLink link, int track, TrainPosition position, boolean force) {
 
 		moving.get(link).add(position.getDriver());
 
@@ -158,7 +172,7 @@ final class MovingBlockResource implements RailResourceInternal {
 
 		assert mode < 0: "Can not give a specific track at this point";
 
-		for (int i = 0; i < tracks.length; i++) {
+		for (int i = 0; i < capacity; i++) {
 			if (tracks[i].incoming == link)
 				same = i;
 			else if (tracks[i].incoming == null) {
@@ -245,6 +259,14 @@ final class MovingBlockResource implements RailResourceInternal {
 		}
 
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "MovingBlockResource{" +
+			"id=" + id +
+			", capacity=" + capacity +
+			'}';
 	}
 
 	/**

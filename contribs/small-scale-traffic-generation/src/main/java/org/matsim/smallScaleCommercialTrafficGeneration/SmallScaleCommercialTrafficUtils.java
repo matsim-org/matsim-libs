@@ -42,23 +42,23 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.ScheduledTour;
+import org.matsim.freight.carriers.Tour;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * Utils for the SmallScaleFreightTraffic
@@ -154,8 +154,7 @@ public class SmallScaleCommercialTrafficUtils {
 						NetworkUtils.findLinkInOppositeDirection(possibleLink).getId().toString())))
 						continue searchLink;
 				}
-			double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-				(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+			double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,	possibleLink.getCoord());
 			if (distance < minDistance) {
 				newLink = possibleLink.getId();
 				minDistance = distance;
@@ -163,8 +162,7 @@ public class SmallScaleCommercialTrafficUtils {
 		}
 		if (newLink == null && numberOfPossibleLinks > 0) {
 			for (Link possibleLink : linksPerZone.get(zone).values()) {
-				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-					(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,	possibleLink.getCoord());
 				if (distance < minDistance) {
 					newLink = possibleLink.getId();
 					minDistance = distance;
@@ -178,7 +176,7 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
-	static void createPlansBasedOnCarrierPlans(Scenario scenario, String smallScaleCommercialTrafficType, Path output,
+	static void createPlansBasedOnCarrierPlans(Scenario scenario, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, Path output,
 											   String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
 
 		Population population = scenario.getPopulation();
@@ -186,64 +184,74 @@ public class SmallScaleCommercialTrafficUtils {
 
 		Map<String, AtomicLong> idCounter = new HashMap<>();
 
-		Population populationFromCarrier = (Population) scenario.getScenarioElement("allpersons");
-		Vehicles allVehicles = VehicleUtils.getOrCreateAllvehicles(scenario);
 
-		for (Person person : populationFromCarrier.getPersons().values()) {
-
-			Plan plan = popFactory.createPlan();
-			String carrierName = person.getId().toString().split("freight_")[1].split("_veh_")[0];
-			Carrier relatedCarrier = CarriersUtils.addOrGetCarriers(scenario).getCarriers()
-				.get(Id.create(carrierName, Carrier.class));
-			String subpopulation = relatedCarrier.getAttributes().getAttribute("subpopulation").toString();
-			Id<Vehicle> vehicleId = Id.createVehicleId(person.getId().toString());
-			String mode = allVehicles.getVehicles().get(vehicleId).getType().getNetworkMode();
-
-			List<PlanElement> tourElements = person.getSelectedPlan().getPlanElements();
-			for (PlanElement tourElement : tourElements) {
-
-				if (tourElement instanceof Activity activity) {
-					Activity newActivity = PopulationUtils.createActivityFromCoord(activity.getType(),
-						scenario.getNetwork().getLinks().get(activity.getLinkId()).getFromNode().getCoord());
-					if (activity.getMaximumDuration() != OptionalTime.undefined())
-						newActivity.setMaximumDuration(activity.getMaximumDuration().seconds());
-					if (activity.getType().equals("start")) {
-						newActivity.setEndTime(activity.getEndTime().seconds());
-						newActivity.setType("commercial_start");
-					}
-					if (activity.getType().equals("end"))
-						newActivity.setType("commercial_end");
-					plan.addActivity(newActivity);
-				}
-				if (tourElement instanceof Leg) {
-					PopulationUtils.createAndAddLeg(plan, mode);
-				}
+		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
+			if (carrier.getSelectedPlan() == null){
+				log.warn("Carrier {} has no selected plan. Therefore, no population plans are created for this carrier.", carrier.getId());
+				continue;
 			}
+			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 
-			String key = String.format("%s_%s_%s", subpopulation, relatedCarrier.getAttributes().getAttribute("tourStartArea"),
-				relatedCarrier.getAttributes().getAttribute("purpose"));
+				Plan plan = popFactory.createPlan();
 
-			long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
+				String subpopulation = carrier.getAttributes().getAttribute("subpopulation").toString();
+				Id<Vehicle> vehicleId = tour.getVehicle().getId();
+				String mode = tour.getVehicle().getType().getNetworkMode();
 
-			Person newPerson = popFactory.createPerson(Id.createPersonId(key + "_" + id));
+				Tour.Start start = tour.getTour().getStart();
+				Activity startActivity = PopulationUtils.createActivityFromCoord("commercial_start",
+					scenario.getNetwork().getLinks().get(start.getLocation()).getFromNode().getCoord());
+				startActivity.setLinkId(start.getLocation());
+				startActivity.setEndTime(tour.getDeparture());
 
-			newPerson.addPlan(plan);
-			PopulationUtils.putSubpopulation(newPerson, subpopulation);
-			newPerson.getAttributes().putAttribute("purpose",
-				relatedCarrier.getAttributes().getAttribute("purpose"));
-			if (relatedCarrier.getAttributes().getAsMap().containsKey("tourStartArea"))
-				newPerson.getAttributes().putAttribute("tourStartArea",
-					relatedCarrier.getAttributes().getAttribute("tourStartArea"));
+				plan.addActivity(startActivity);
+				List<Tour.TourElement> tourElements = tour.getTour().getTourElements();
+				for (Tour.TourElement tourElement : tourElements) {
+					if (tourElement instanceof Tour.Leg) {
+						PopulationUtils.createAndAddLeg(plan, mode);
+						continue;
+					}
+					if (tourElement instanceof Tour.TourActivity activity) {
+						Activity newActivity = PopulationUtils.createActivityFromCoord(activity.getActivityType(),
+							scenario.getNetwork().getLinks().get(activity.getLocation()).getFromNode().getCoord());
+						newActivity.setMaximumDuration(activity.getDuration());
+						newActivity.setLinkId(activity.getLocation());
+						plan.addActivity(newActivity);
+					}
+				}
+				Tour.End end = tour.getTour().getEnd();
+				Activity endActivity = PopulationUtils.createActivityFromCoord("commercial_end",
+					scenario.getNetwork().getLinks().get(end.getLocation()).getFromNode().getCoord());
+				endActivity.setLinkId(end.getLocation());
+				plan.addActivity(endActivity);
+				String key = String.format("%s_%s_%s", subpopulation, carrier.getAttributes().getAttribute("tourStartArea"),
+					carrier.getAttributes().getAttribute("purpose"));
 
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
-			VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, allVehicles.getVehicles().get(vehicleId).getType().getId()));
+				long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
 
-			population.addPerson(newPerson);
+				Person newPerson = popFactory.createPerson(Id.createPersonId(key + "_" + id));
+
+				newPerson.addPlan(plan);
+				PopulationUtils.putSubpopulation(newPerson, subpopulation);
+				newPerson.getAttributes().putAttribute("purpose",
+					carrier.getAttributes().getAttribute("purpose"));
+				if (carrier.getAttributes().getAsMap().containsKey("tourStartArea"))
+					newPerson.getAttributes().putAttribute("tourStartArea",
+						carrier.getAttributes().getAttribute("tourStartArea"));
+				if (carrier.getAttributes().getAsMap().containsKey("startCategory"))
+					newPerson.getAttributes().putAttribute("startCategory",
+						carrier.getAttributes().getAttribute("startCategory").toString());
+				newPerson.getAttributes().putAttribute("carrierId", carrier.getId().toString());
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
+				VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, tour.getVehicle().getType().getId()));
+
+				population.addPerson(newPerson);
+			}
 		}
 
 		String outputPopulationFile;
 		if (nameOutputPopulation == null)
-			if (smallScaleCommercialTrafficType.equals("completeSmallScaleCommercialTraffic"))
+			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.completeSmallScaleCommercialTraffic))
 				outputPopulationFile = output.toString() + "/" + modelName + "_" + "smallScaleCommercialTraffic" + "_" + sampleName + "pct_plans.xml.gz";
 			else
 				outputPopulationFile = output.toString() + "/" + modelName + "_" + smallScaleCommercialTrafficType + "_" + sampleName + "pct_plans.xml.gz";
@@ -256,9 +264,9 @@ public class SmallScaleCommercialTrafficUtils {
 			log.warn(
 				"You selected {} of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.",
 				numberOfPlanVariantsPerAgent);
-
+		ProjectionUtils.putCRS(population, scenario.getConfig().global().getCoordinateSystem());
 		PopulationUtils.writePopulation(population, outputPopulationFile);
-		scenario.getPopulation().getPersons().clear();
+		log.info("Population with {} persons created including the plans in {}.", population.getPersons().size(), outputPopulationFile);
 	}
 
 	static String getSampleNameOfOutputFolder(double sample) {
@@ -287,12 +295,12 @@ public class SmallScaleCommercialTrafficUtils {
 	 * @return 								resultingDataPerZone
 	 * @throws IOException 					if the file is not found
 	 */
-	static Map<String, Object2DoubleMap<String>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
+	static Map<String, Object2DoubleMap<StructuralAttribute>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
 		if (!Files.exists(pathToDataDistributionToZones)) {
 			log.error("Required data per zone file {} not found", pathToDataDistributionToZones);
 		}
 
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = new HashMap<>();
 		try (BufferedReader reader = IOUtils.getBufferedReader(pathToDataDistributionToZones.toString())) {
 			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
 				.setSkipHeaderRecord(true).get().parse(reader);
@@ -301,7 +309,12 @@ public class SmallScaleCommercialTrafficUtils {
 				String zoneID = record.get("zoneID");
 				resultingDataPerZone.put(zoneID, new Object2DoubleOpenHashMap<>());
 				for (int n = 2; n < parse.getHeaderMap().size(); n++) {
-					resultingDataPerZone.get(zoneID).mergeDouble(parse.getHeaderNames().get(n),
+					Optional<StructuralAttribute> category = StructuralAttribute.fromLabel(parse.getHeaderNames().get(n));
+					if (category.isEmpty()) {
+						log.warn("The category '{}' in the data distribution file is not known. Please check the input file and the defined categories.", parse.getHeaderNames().get(n));
+						continue;
+					}
+					resultingDataPerZone.get(zoneID).mergeDouble(category.get(),
 						Double.parseDouble(record.get(n)), Double::sum);
 				}
 			}
@@ -352,5 +365,28 @@ public class SmallScaleCommercialTrafficUtils {
 				return costs;
 			}
 		};
+	}
+
+	public enum StructuralAttribute {
+		INHABITANTS("Inhabitants"),
+		EMPLOYEE("Employee"),
+		EMPLOYEE_PRIMARY("Employee Primary Sector"),
+		EMPLOYEE_CONSTRUCTION("Employee Construction"),
+		EMPLOYEE_SECONDARY("Employee Secondary Sector Rest"),
+		EMPLOYEE_RETAIL("Employee Retail"),
+		EMPLOYEE_TRAFFIC("Employee Traffic/Parcels"),
+		EMPLOYEE_TERTIARY("Employee Tertiary Sector Rest");
+
+		private final String label;
+
+		StructuralAttribute(String label) { this.label = label; }
+		public String getLabel() { return label; }
+
+		private static final Map<String, StructuralAttribute> BY_LABEL =
+			Arrays.stream(values()).collect(Collectors.toMap(StructuralAttribute::getLabel, e -> e));
+
+		public static Optional<StructuralAttribute> fromLabel(String label) {
+			return Optional.ofNullable(BY_LABEL.get(label));
+		}
 	}
 }

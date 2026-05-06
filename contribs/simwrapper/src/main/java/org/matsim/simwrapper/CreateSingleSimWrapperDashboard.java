@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @CommandLine.Command(
 	name = "dashboard",
@@ -82,8 +83,7 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 			}
 
 			//skip default dashboards
-			simwrapperCfg.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
-			simwrapperCfg.setBasePath("D:/git/matsim-kelheim/output/output-kelheim-v3.1-1pct-iter_0");
+			simwrapperCfg.setDefaultDashboards( SimWrapperConfigGroup.DefaultDashboardsMode.disabled );
 
 			//add dashboard
 			switch (dashboardType) {
@@ -94,10 +94,10 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 					sw.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()));
 				}
 				case traffic -> {
-					sw.addDashboard(new TrafficDashboard());
+					sw.addDashboard(new TrafficDashboard(Set.copyOf(config.qsim().getMainModes())));
 				}
 				case overview -> {
-					sw.addDashboard(new OverviewDashboard());
+					sw.addDashboard(new OverviewDashboard(Set.copyOf(config.qsim().getMainModes())));
 				}
 				case stuckAgent -> {
 					sw.addDashboard(new StuckAgentDashboard());

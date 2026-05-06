@@ -151,7 +151,7 @@ abstract class AbstractQLink implements QLinkI {
 				log.warn(Gbl.ONLYONCE);
 			}
 		}
-		qveh.setCurrentLink(this.link);
+		qveh.setCurrentLinkId(this.link.getId());
 
 		if (isInitial) {
 			vehicleHandler.handleInitialVehicleArrival(qveh, link);
@@ -213,7 +213,7 @@ abstract class AbstractQLink implements QLinkI {
 	private final void addDepartingVehicle(MobsimVehicle mvehicle) {
 		QVehicle vehicle = (QVehicle) mvehicle;
 		this.waitingList.add(vehicle);
-		vehicle.setCurrentLink(this.getLink());
+		vehicle.setCurrentLinkId(this.getLink().getId());
 		this.activateLink();
 		vehicleHandler.handleVehicleDeparture(vehicle, link);
 	}
@@ -252,10 +252,10 @@ abstract class AbstractQLink implements QLinkI {
 				else stuckAgents.add(veh.getDriver().getId());
 
 				context.getEventsManager().processEvent(
-					new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
+					new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLinkId()));
 
 				context.getEventsManager().processEvent(
-					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLinkId(), veh.getDriver().getMode()));
 				context.getAgentCounter().incLost();
 				context.getAgentCounter().decLiving();
 			}
@@ -267,7 +267,7 @@ abstract class AbstractQLink implements QLinkI {
 				MobsimAgent mobsimAgent = (MobsimAgent) passenger;
 
 				context.getEventsManager().processEvent(
-					new PersonStuckEvent(now, mobsimAgent.getId(), veh.getCurrentLink().getId(), mobsimAgent.getMode()));
+					new PersonStuckEvent(now, mobsimAgent.getId(), veh.getCurrentLinkId(), mobsimAgent.getMode()));
 				context.getAgentCounter().incLost();
 				context.getAgentCounter().decLiving();
 			}
@@ -317,17 +317,18 @@ abstract class AbstractQLink implements QLinkI {
 				stuckAgents.add(veh.getDriver().getId());
 			}
 
-			this.context.getEventsManager().processEvent(new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
+			this.context.getEventsManager().processEvent(new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLinkId()));
 
 			this.context.getEventsManager().processEvent(
-				new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+				new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLinkId(), veh.getDriver().getMode()));
 			this.context.getAgentCounter().incLost();
 			this.context.getAgentCounter().decLiving();
 		}
 		this.waitingList.clear();
 	}
 
-	void makeVehicleAvailableToNextDriver(QVehicle veh) {
+	@Override
+	public void makeVehicleAvailableToNextDriver(QVehicle veh) {
 
 		// this would (presumably) be the place where the "nature" of a vehicle could be changed (in the sense of PAVE), e.g. to
 		// a freight vehicle, or to an autonomous vehicle that can be sent around the block or home.  However, this would
@@ -575,7 +576,7 @@ abstract class AbstractQLink implements QLinkI {
 		}
 
 		public void setCurrentLinkToVehicle(QVehicle veh) {
-			veh.setCurrentLink(AbstractQLink.this.link);
+			veh.setCurrentLinkId(AbstractQLink.this.link.getId());
 		}
 
 		public QLaneI getAcceptingQLane() {

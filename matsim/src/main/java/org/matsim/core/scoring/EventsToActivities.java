@@ -22,7 +22,9 @@
 
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -49,6 +51,7 @@ import org.matsim.core.population.PopulationUtils;
  *
  */
 public final class EventsToActivities implements ActivityStartEventHandler, ActivityEndEventHandler {
+	private static final Logger log = LogManager.getLogger( EventsToActivities.class );
 
 	public interface ActivityHandler {
 	    void handleActivity(PersonExperiencedActivity activity);

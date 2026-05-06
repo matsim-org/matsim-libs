@@ -54,7 +54,7 @@ public interface CostCalculationStrategy {
                                                              DetourTimeInfo detourTimeInfo) {
             double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
             if (detourTimeInfo.pickupDetourInfo.requestPickupTime > request.getLatestStartTime()
-                    || detourTimeInfo.dropoffDetourInfo.requestDropoffTime > request.getConstraints().latestArrivalTime()) {
+                    || detourTimeInfo.dropoffDetourInfo.requestDropoffTime > request.getLatestArrivalTime()) {
                 //no extra time is lost => do not check if the current slack time is long enough (can be even negative)
                 return InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
             }
@@ -104,7 +104,7 @@ public interface CostCalculationStrategy {
         double waitTimeViolation = Math.max(0, detourTimeInfo.pickupDetourInfo.requestPickupTime - request.getLatestStartTime());
         // (if drt vehicle picks up too late) (max wait time (often 600 sec) after submission)
 
-        double travelTimeViolation = Math.max(0, detourTimeInfo.dropoffDetourInfo.requestDropoffTime - request.getConstraints().latestArrivalTime());
+        double travelTimeViolation = Math.max(0, detourTimeInfo.dropoffDetourInfo.requestDropoffTime - request.getLatestArrivalTime());
         // (if drt vehicle drops off too late) (submission time + alpha * directTravelTime + beta)
 
         double detourViolation = Math.max(0,

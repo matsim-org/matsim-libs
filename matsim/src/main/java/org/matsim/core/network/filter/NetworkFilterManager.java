@@ -32,6 +32,7 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinksUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 /**
@@ -120,7 +121,13 @@ public final class NetworkFilterManager {
 	public Network applyFilters() {
 		log.info("applying filters to network with " + network.getNodes().size() + " nodes and "
 				+ network.getLinks().size() + " links...");
+
 		Network net = NetworkUtils.createNetwork(networkConfigGroup);
+		String crsString = ProjectionUtils.getCRS(network);
+		if (crsString != null && !crsString.isEmpty()) {
+			ProjectionUtils.putCRS(net, crsString);
+		}
+
 		if (!this.nodeFilters.isEmpty()) {
 			for (Node n : this.network.getNodes().values()) {
 				if (nodeFilters.stream().allMatch(f -> f.judgeNode(n))) {
