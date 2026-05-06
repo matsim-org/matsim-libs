@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
-import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -142,12 +141,14 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 				dispatchStuckEvents(waiting.vehicle());
 			}
 		}
+		waitingVehicles.clear();
 
 		for (var q : activeStops.values()) {
 			for (var vehAtStop : q) {
 				dispatchStuckEvents(vehAtStop.vehicle());
 			}
 		}
+		activeStops.clear();
 	}
 
 	private void dispatchStuckEvents(DistributedMobsimVehicle veh) {

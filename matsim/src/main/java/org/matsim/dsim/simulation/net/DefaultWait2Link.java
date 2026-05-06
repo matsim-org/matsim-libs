@@ -67,6 +67,8 @@ public class DefaultWait2Link implements Wait2Link {
 				}
 			}
 		}
+		// clear in case this is called from multiple places
+		waitingVehicles.clear();
 	}
 
 	private boolean moveWaiting(DistributedMobsimVehicle vehicle, SimLink link, double now) {

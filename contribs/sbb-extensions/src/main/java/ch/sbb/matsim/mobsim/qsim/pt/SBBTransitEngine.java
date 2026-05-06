@@ -100,6 +100,8 @@ public class SBBTransitEngine
 				em.processEvent(new PersonStuckEvent(now, agent.getId(), stop.getLinkId(), agent.getMode()));
 			}
 		}
+		agentTracker.getAgentsAtStop().clear();
+
 		for (var transitEvent : eventQueue) {
 			var driver = transitEvent.context().driver();
 			var vehicle = driver.getVehicle();
@@ -110,6 +112,7 @@ public class SBBTransitEngine
 				em.processEvent(new PersonStuckEvent(now, p.getId(), linkId, mode));
 			}
 		}
+		eventQueue.clear();
 	}
 
 	private void validateModeConfiguration() {
