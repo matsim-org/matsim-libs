@@ -79,6 +79,7 @@ public class TravelTimeFourWaysTest {
 		conf.qsim().setUseLanes(true);
 	    conf.qsim().setUsingFastCapacityUpdate(false);
 		conf.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		conf.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class );
