@@ -36,7 +36,7 @@ jobs:
           #          - contribs/commercialTrafficApplications
           #          - contribs/av
           #          - contribs/locationchoice
-          #          - contribs/ev
+          - contribs/ev
           #          - contribs/dvrp
           #          - contribs/emissions
           #          - contribs/decongestion
