@@ -72,6 +72,7 @@ public class Fixture {
 
 	public Scenario createAndLoadTestScenarioOneSignal(Boolean useIntergreens) {
 		Config conf = createConfigOneSignal(useIntergreens);
+		conf.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.loadScenario(conf);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(conf).loadSignalsData());
 

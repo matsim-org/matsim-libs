@@ -412,8 +412,8 @@ public class SBBTransitEngineTest {
 			.addQSimModule(new ActivityEngineModule())
 			.addQSimModule(new SBBTransitEngineQSimModule())
 			.addQSimModule(new TestQSimModule(f.config))
-			.configureQSimComponents(new SBBTransitEngineQSimModule())
 			.configureQSimComponents(configurator -> configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME))
+			.configureQSimComponents(new SBBTransitEngineQSimModule())
 			.build(f.scenario, eventsManager);
 
 		EventsCollector collector = new EventsCollector();
