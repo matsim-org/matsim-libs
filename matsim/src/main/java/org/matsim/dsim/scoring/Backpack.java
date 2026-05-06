@@ -57,9 +57,8 @@ public class Backpack {
 		if (isRelevantForScoring(e)) {
 			events.add(e);
 		} else {
-			throw new IllegalArgumentException(
-				"Agents only take events relevant for the scoring function into their back back. Currently these are: " +
-					"PersonMoneyEvent, PersonScoreEvent, PersonStuckEvent.");
+			throw new IllegalArgumentException("Agents only take events relevant for the scoring function into their back back. Currently these are: " +
+				"PersonMoneyEvent, PersonScoreEvent, PersonStuckEvent.");
 		}
 	}
 
@@ -72,12 +71,7 @@ public class Backpack {
 	}
 
 	FinishedBackpack finish() {
-		try {
-			return new FinishedBackpack(personId, startingPartition, events, backpackPlan.finishPlan());
-		} catch (Exception e) {
-			// in case something wasn't assembled correclty, it is helpful to have the person id for debugging.
-			throw new RuntimeException("Exception while finishing backpack for person: " + personId, e);
-		}
+		return new FinishedBackpack(personId, startingPartition, events, backpackPlan.finishPlan());
 	}
 
 	Msg toMessage() {

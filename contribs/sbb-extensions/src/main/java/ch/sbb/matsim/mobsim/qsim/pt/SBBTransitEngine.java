@@ -91,30 +91,6 @@ public class SBBTransitEngine
 		validateModeConfiguration();
 	}
 
-	@Override
-	public void afterMobsim() {
-		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
-		for (Map.Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
-			TransitStopFacility stop = scenario.getTransitSchedule().getFacilities().get(agentsAtStop.getKey());
-			for (PTPassengerAgent agent : agentsAtStop.getValue()) {
-				em.processEvent(new PersonStuckEvent(now, agent.getId(), stop.getLinkId(), agent.getMode()));
-			}
-		}
-		agentTracker.getAgentsAtStop().clear();
-
-		for (var transitEvent : eventQueue) {
-			var driver = transitEvent.context().driver();
-			var vehicle = driver.getVehicle();
-			var mode = driver.getMode();
-			var linkId = vehicle.getCurrentLinkId();
-			em.processEvent(new PersonStuckEvent(now, driver.getId(), linkId, mode));
-			for (var p : vehicle.getPassengers()) {
-				em.processEvent(new PersonStuckEvent(now, p.getId(), linkId, mode));
-			}
-		}
-		eventQueue.clear();
-	}
-
 	private void validateModeConfiguration() {
 		Set<String> deterministicModes = this.config.getDeterministicServiceModes();
 		Set<String> passengerModes = this.ptConfig.getTransitModes();

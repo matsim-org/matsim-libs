@@ -26,7 +26,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
@@ -79,76 +78,6 @@ public class ScoringRegressionTest {
 		var person = getSinglePerson(scenario);
 		assertEquals(-57.284102507736776, person.getSelectedPlan().getScore(), 0.1);
 
-	}
-
-	@Test
-	public void ptPassengerStuckInVehicle() {
-
-		var config = loadConfig("pt-simple-lineswitch", utils.getOutputDirectory());
-		config.dsim().setEndTime(18360); // 05:06:00 — person is inside gelb vehicle (departs 05:05:30, arrives 05:07:00)
-		config.controller().setLastIteration(0);
-
-		var scenario = ScenarioUtils.loadScenario(config);
-		var controler = new Controler(scenario);
-		controler.run();
-
-		var person = getSinglePerson(scenario);
-		assertEquals(-432.0, person.getSelectedPlan().getScore(), 0.1);
-	}
-
-	@Test
-	public void ptPassengerStuckWaitingAtStop() {
-
-		var config = loadConfig("pt-simple-lineswitch", utils.getOutputDirectory());
-		config.dsim().setEndTime(18200); // 05:03:20 — person has departed home but gelb bus has not yet reached stop 293
-		config.controller().setLastIteration(0);
-
-		var scenario = ScenarioUtils.loadScenario(config);
-		var controler = new Controler(scenario);
-		controler.run();
-
-		var person = getSinglePerson(scenario);
-		assertEquals(-432.0, person.getSelectedPlan().getScore(), 0.1);
-	}
-
-	@Test
-	public void ptVehicleStuckAtNonBlockingStop() {
-
-		// Stops in pt-simple-lineswitch have no isBlocking attribute, so they default to false (non-blocking).
-		// The gelb bus arrives at stop 293 around 05:05:30 (18330 s). Without a configured boarding time the dwell
-		// is only ~1 s, which is too short to be caught by endTime. Setting accessTime=60 s extends the dwell to
-		// ~60 s so the bus reliably stays in activeStops when the sim ends at 18360.
-		var config = loadConfig("pt-simple-lineswitch", utils.getOutputDirectory());
-		config.dsim().setEndTime(18360);
-		config.controller().setLastIteration(0);
-
-		var scenario = ScenarioUtils.loadScenario(config);
-		scenario.getTransitVehicles().getVehicleTypes().values()
-			.forEach(vt -> VehicleUtils.setAccessTime(vt, 60.0));
-
-		var controler = new Controler(scenario);
-		controler.run();
-
-		var person = getSinglePerson(scenario);
-		assertEquals(-432.0, person.getSelectedPlan().getScore(), 0.1);
-	}
-
-	@Test
-	public void carVehicleStuckInDefaultWait2Link() {
-
-		var config = loadConfig("equil", utils.getOutputDirectory(), "config_plans1.xml");
-		config.dsim().setEndTime(29410.0); // 06:00:10 — car vehicle blocked from entering network
-		config.controller().setLastIteration(0);
-
-		var scenario = loadScenarioAndResetRoutes(config);
-		scenario.getNetwork().getLinks().values()
-			.forEach(l -> l.setCapacity(-1)); // near-zero flow capacity traps vehicle in DefaultWait2Link
-
-		var controler = new Controler(scenario);
-		controler.run();
-
-		var person = getSinglePerson(scenario);
-		assertEquals(-432.0, person.getSelectedPlan().getScore(), 0.1);
 	}
 
 	@Test
@@ -215,11 +144,11 @@ public class ScoringRegressionTest {
 		var controler2 = new Controler(scenario2);
 		controler2.run();
 
-		//		var comparisonPopulation = scenario2.getPopulation();//PopulationUtils.readPopulation(utils.getInputDirectory() + "expected_experienced_plans.xml.gz");
-		//		for (var person : scenario.getPopulation().getPersons().values()) {
-		//			var ep = comparisonPopulation.getPersons().get(person.getId());
-		//			assertEquals(ep.getSelectedPlan().getScore(), person.getSelectedPlan().getScore(), 10, "Person " + person.getId() + " has different score");
-		//		}
+//		var comparisonPopulation = scenario2.getPopulation();//PopulationUtils.readPopulation(utils.getInputDirectory() + "expected_experienced_plans.xml.gz");
+//		for (var person : scenario.getPopulation().getPersons().values()) {
+//			var ep = comparisonPopulation.getPersons().get(person.getId());
+//			assertEquals(ep.getSelectedPlan().getScore(), person.getSelectedPlan().getScore(), 10, "Person " + person.getId() + " has different score");
+//		}
 	}
 
 	private static @NonNull Config loadConfig(String scenarioName, String outputDir, String... configFile) {

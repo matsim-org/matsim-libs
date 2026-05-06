@@ -29,7 +29,8 @@ class BackpackTransitRoute implements BackpackRoute {
 	private final List<Data> parts;
 
 	/**
-	 * Use this constructor when a new leg is started, and we want to start creating an experienced route.
+	 * Use this constructor when a new leg is started, and we want to
+	 * start creating an experienced route.
 	 *
 	 * @param network         must be passed, so that we can compute distances.
 	 * @param transitSchedule must be passed, so that we fetch transit relevant data such as facilities
@@ -114,7 +115,6 @@ class BackpackTransitRoute implements BackpackRoute {
 			result.setBoardingTime(part.boardingTime);
 			result.setDistance(partDistance);
 			result.setTravelTime(partTravelTime);
-
 		}
 
 		return result;
