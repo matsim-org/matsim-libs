@@ -33,9 +33,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Set;
-import java.util.SplittableRandom;
+import java.util.*;
 
 public class ScenarioComparisonDashboardTest {
 
@@ -73,24 +71,21 @@ public class ScenarioComparisonDashboardTest {
 //
 //		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		String[] scenarioComparisonPaths = new String[] {
-			"/home/brendan/cluster_data/matsim-berlin/output/berlin-v6.4-0.1pct_RidePCUSetToZero",
-			"/home/brendan/cluster_data/2026-03-13-basePolicy/output-base"
-		};
 
-		String[] comparisonScenarioPaths = new String[] {
-			"berlin_1pct",
-			"gunma_base"
-		};
+		Map<String, String> comparisonScenarios = new HashMap<>();
+
+		comparisonScenarios.put("berlin_1pct", "/home/brendan/cluster_data/matsim-berlin/output/berlin-v6.4-0.1pct_RidePCUSetToZero");
+		comparisonScenarios.put("gunma_base", "/home/brendan/cluster_data/2026-03-13-basePolicy/output-base");
+
+		// make a dict o structure? for name and path.
 
 		SimWrapper sw = SimWrapper.create(config)
 //			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()))
 //			.addDashboard(new ImpactAnalysisDashboard(Set.of("car")))
 			.addDashboard(new TripDashboard())
 			.addDashboard(new ScenarioComparisonDashboard(
-				scenarioComparisonPaths,
-				comparisonScenarioPaths,
-				true
+				comparisonScenarios
+//				true
 			));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
