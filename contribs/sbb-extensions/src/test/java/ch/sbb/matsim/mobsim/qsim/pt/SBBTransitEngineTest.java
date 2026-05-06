@@ -33,7 +33,6 @@ import ch.sbb.matsim.mobsim.qsim.SBBTransitModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -47,6 +46,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -820,5 +820,79 @@ public class SBBTransitEngineTest {
 			}
 			Assertions.assertEquals(expectedEventsCount, collector.getEvents().size(), "wrong number of events in iteration " + iteration);
 		}
+	}
+
+	/**
+	 * Passenger departs at 29500 and waits at stop B. Bus arrives at stop B at 30100. Setting endTime=30050 cuts the sim while the passenger is in
+	 * agentTracker and the driver is mid-route in eventQueue. Both must receive a PersonStuckEvent.
+	 */
+	@Test
+	void afterMobsimPassengerWaitingAtStop() {
+		TestFixture f = new TestFixture();
+		f.addSingleTransitDemand();
+		f.config.qsim().setEndTime(30050);
+
+		EventsManager eventsManager = EventsUtils.createEventsManager(f.config);
+		QSim qSim = new QSimBuilder(f.config)
+			.addQSimModule(new ActivityEngineModule())
+			.addQSimModule(new SBBTransitEngineQSimModule())
+			.addQSimModule(new TestQSimModule(f.config))
+			.addQSimModule(new PopulationModule())
+			.configureQSimComponents(new SBBTransitEngineQSimModule())
+			.configureQSimComponents(configurator -> {
+				configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME);
+				configurator.addNamedComponent(PopulationModule.COMPONENT_NAME);
+			})
+			.build(f.scenario, eventsManager);
+
+		EventsCollector collector = new EventsCollector();
+		eventsManager.addHandler(collector);
+		qSim.run();
+
+		List<PersonStuckEvent> stuckEvents = collector.getEvents().stream()
+			.filter(e -> e instanceof PersonStuckEvent)
+			.map(e -> (PersonStuckEvent) e)
+			.toList();
+
+		Assertions.assertEquals(2, stuckEvents.size(), "expected stuck events for passenger and driver");
+		Assertions.assertTrue(stuckEvents.stream().anyMatch(e -> e.getPersonId().equals(Id.createPersonId(1))),
+			"passenger should be stuck");
+	}
+
+	/**
+	 * Passenger boards at stop B (30101) and is in the vehicle until alighting at stop D (30570). Setting endTime=30400 cuts the sim while both
+	 * driver and passenger are in the vehicle (single eventQueue entry). Both must receive a PersonStuckEvent.
+	 */
+	@Test
+	void afterMobsimPassengerInVehicle() {
+		TestFixture f = new TestFixture();
+		f.addSingleTransitDemand();
+		f.config.qsim().setEndTime(30400);
+
+		EventsManager eventsManager = EventsUtils.createEventsManager(f.config);
+		QSim qSim = new QSimBuilder(f.config)
+			.addQSimModule(new ActivityEngineModule())
+			.addQSimModule(new SBBTransitEngineQSimModule())
+			.addQSimModule(new TestQSimModule(f.config))
+			.addQSimModule(new PopulationModule())
+			.configureQSimComponents(new SBBTransitEngineQSimModule())
+			.configureQSimComponents(configurator -> {
+				configurator.addNamedComponent(ActivityEngineModule.COMPONENT_NAME);
+				configurator.addNamedComponent(PopulationModule.COMPONENT_NAME);
+			})
+			.build(f.scenario, eventsManager);
+
+		EventsCollector collector = new EventsCollector();
+		eventsManager.addHandler(collector);
+		qSim.run();
+
+		List<PersonStuckEvent> stuckEvents = collector.getEvents().stream()
+			.filter(e -> e instanceof PersonStuckEvent)
+			.map(e -> (PersonStuckEvent) e)
+			.toList();
+
+		Assertions.assertEquals(2, stuckEvents.size(), "expected stuck events for driver and passenger");
+		Assertions.assertTrue(stuckEvents.stream().anyMatch(e -> e.getPersonId().equals(Id.createPersonId(1))),
+			"passenger should be stuck");
 	}
 }
