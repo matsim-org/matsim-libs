@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -660,8 +661,9 @@ public class SBBTransitEngineTest {
 		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
 		try (var pool = Executors.newFixedThreadPool(size)) {
-			var futures = comms.stream()
-				.map(comm -> pool.submit(() -> {
+			var completionService = new ExecutorCompletionService<Void>(pool);
+			for (var comm : comms) {
+				completionService.submit(() -> {
 					TestFixture f = new TestFixture();
 
 					f.config.controller().setOutputDirectory(utils.getOutputDirectory());
@@ -710,11 +712,22 @@ public class SBBTransitEngineTest {
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}
-				}))
-				.toList();
+					return null;
+				});
+			}
 
-			for (var future : futures) {
-				future.get(2, TimeUnit.MINUTES);
+			for (int i = 0; i < size; i++) {
+				var done = completionService.poll(2, TimeUnit.MINUTES);
+				if (done == null) {
+					pool.shutdownNow();
+					Assertions.fail("Simulation timed out after 2 minutes");
+				}
+				try {
+					done.get();
+				} catch (ExecutionException e) {
+					pool.shutdownNow();
+					throw e;
+				}
 			}
 
 			// Replay the output events file and verify correctness
