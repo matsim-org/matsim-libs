@@ -60,13 +60,19 @@ public class DefaultWait2Link implements Wait2Link {
 	public void afterMobsim() {
 		for (var q : waitingVehicles.values()) {
 			for (var veh : q) {
-				em.processEvent(new PersonStuckEvent(now, veh.vehicle().getDriver().getId(), veh.link().getId(), veh.vehicle().getDriver().getMode()));
+				em.processEvent(
+					new PersonStuckEvent(now, veh.vehicle().getDriver().getId(), veh.link().getId(), veh.vehicle().getDriver().getMode()));
+				for (var p : veh.vehicle().getPassengers()) {
+					em.processEvent(new PersonStuckEvent(now, p.getId(), veh.link().getId(), veh.vehicle().getDriver().getMode()));
+				}
 			}
 		}
 	}
 
 	private boolean moveWaiting(DistributedMobsimVehicle vehicle, SimLink link, double now) {
-		SimLink.LinkPosition position = vehicle.getDriver().isWantingToArriveOnCurrentLink() ? SimLink.LinkPosition.QEnd : SimLink.LinkPosition.Buffer;
+		SimLink.LinkPosition position = vehicle.getDriver().isWantingToArriveOnCurrentLink()
+			? SimLink.LinkPosition.QEnd
+			: SimLink.LinkPosition.Buffer;
 
 		if (link.isAccepting(position, now)) {
 			em.processEvent(new VehicleEntersTrafficEvent(

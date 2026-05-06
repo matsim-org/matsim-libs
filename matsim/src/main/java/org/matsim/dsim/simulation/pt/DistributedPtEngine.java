@@ -3,10 +3,12 @@ package org.matsim.dsim.simulation.pt;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
+import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -32,6 +34,8 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 	private final Map<Id<Link>, Queue<DefaultWait2Link.Waiting>> waitingVehicles = new HashMap<>();
 	private final EventsManager em;
 	private final Wait2Link vehicleWait2Link;
+
+	private double now;
 
 	@Inject
 	public DistributedPtEngine(Scenario scenario, SimNetwork simNetwork, TransitQSimEngine transitQSimEngine, EventsManager em) {
@@ -61,6 +65,7 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 
 	@Override
 	public void doSimStep(double now) {
+		this.now = now;
 
 		var it = activeStops.entrySet().iterator();
 		while (it.hasNext()) {
@@ -130,6 +135,28 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 	@Override
 	public void afterMobsim() {
 		transitQSimEngine.afterMobsim();
+		vehicleWait2Link.afterMobsim();
+
+		for (var q : waitingVehicles.values()) {
+			for (var waiting : q) {
+				dispatchStuckEvents(waiting.vehicle());
+			}
+		}
+
+		for (var q : activeStops.values()) {
+			for (var vehAtStop : q) {
+				dispatchStuckEvents(vehAtStop.vehicle());
+			}
+		}
+	}
+
+	private void dispatchStuckEvents(DistributedMobsimVehicle veh) {
+		var mode = veh.getDriver().getMode();
+		var linkId = veh.getCurrentLinkId();
+		em.processEvent(new PersonStuckEvent(now, veh.getDriver().getId(), linkId, mode));
+		for (var p : veh.getPassengers()) {
+			em.processEvent(new PersonStuckEvent(now, p.getId(), linkId, mode));
+		}
 	}
 
 	@Override
@@ -175,7 +202,6 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 	private static boolean stopOnLink(TransitStopFacility stop, SimLink link) {
 		return stop != null && stop.getLinkId().equals(link.getId());
 	}
-
 
 	private SimLink.OnLeaveQueueInstruction onLeaveQueue(DistributedMobsimVehicle vehicle, SimLink link, double now) {
 
