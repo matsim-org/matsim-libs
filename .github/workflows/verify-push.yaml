@@ -21,9 +21,10 @@ jobs:
       matrix:
         module:
           - matsim
-          # sorted from longest to shortest (to minimise the overall test stage duration)
+          # sorted from longest to shortest (to minimize the overall test stage duration)
           - contribs/vsp
           - contribs/common
+          - contribs/distributed-simulation
           - contribs/taxi
           - contribs/minibus
           - contribs/signals
@@ -59,7 +60,6 @@ jobs:
           - contribs/analysis
           - contribs/hybridsim
           - contribs/informed-mode-choice
-          - contribs/distributed-simulation
           - contribs/otfvis
           - contribs/osm
           - contribs/application
@@ -99,7 +99,8 @@ jobs:
 
       - name: Test module
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        run: mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
+        # run: mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
+        run: mvn verify --batch-mode -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
         working-directory: ${{matrix.module}}
 
       - name: Sanitize module name for artifact
