@@ -63,6 +63,9 @@ public class PretoriaTest {
 	// TODO Try to fix the deletion bug, so that we can use utils.getOutput() instead of a fixed path
 	private final static String OUTPUT_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput";
 
+	// TODO The GPS files are too large for Git. Upload them into the public-svn
+	private final static String GPS_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data";
+
 	// TODO Remove for final commit, as this was just used once for data preparation
 	public static void main(String[] args) {
 		Network cRoute = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_pems.xml");
@@ -228,9 +231,9 @@ public class PretoriaTest {
 			.build();
 
 		Path gps_path = switch (vehicle){
-			case ETIOS -> Path.of(utils.getClassInputDirectory() + "public-etios.csv");
-			case FIGO, FIGO_TECHAVG -> Path.of(utils.getClassInputDirectory() + "public-figo.csv");
-			case RRV, RRV_TECHAVG -> Path.of(utils.getClassInputDirectory() + "public-rrv.csv");
+			case ETIOS -> Path.of(GPS_PATH + "/public-etios.csv");
+			case FIGO, FIGO_TECHAVG -> Path.of(GPS_PATH + "/public-figo.csv");
+			case RRV, RRV_TECHAVG -> Path.of(GPS_PATH + "/public-rrv.csv");
 		};
 
 		String referenceDate = switch(vehicle){
