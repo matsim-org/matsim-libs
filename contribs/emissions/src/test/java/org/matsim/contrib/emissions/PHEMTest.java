@@ -60,6 +60,9 @@ public class PHEMTest {
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
 
+	// TODO Try to fix the deletion bug, so that we can use utils.getOutput() instead of a fixed path
+	private final static String OUTPUT_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput";
+
 	// ----- Helper methods -----
 
 	/**
@@ -173,7 +176,6 @@ public class PHEMTest {
 		drivingSegments.add(currentList);
 
 		// Now build the list of Cycle Link attributes
-		// #090226: HbefaRoadTypeMapping mapping = new VspHbefaRoadTypeMapping();
 		PHEMTestHbefaRoadTypeMapping mapping = new PHEMTestHbefaRoadTypeMapping();
 
 		// Variables needed for the mapping
@@ -677,7 +679,7 @@ public class PHEMTest {
 	// ----- Main-test method -----
 
 	/// Start the main-test with the given settings
-	public void startTest(Cycle cycle,
+	public void basicTest(Cycle cycle,
 						  Fuel fuel,
 						  LinkCutSetting cutSetting,
 						  EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments,
@@ -712,8 +714,57 @@ public class PHEMTest {
 
 		// Print out the results as csv TODO Change path back to test-output folder
 		// #090226: String path = "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/ExplorativeAnalysis/OldModelAVGResults/";
-		String path = "/Users/aleksander/Documents/VSP/PHEMTest/diff2/" + cycle + "/";
+		String path = OUTPUT_PATH + "/PHEMTest/";
 		String diff_name = "diff_" + cycle + "_" + fuel + "_output_" + duplicateSubsegments + "_" + emissionsComputationMethod + "_" + cutSetting + "_" + cutSetting.getAttr() + ".csv";
+		writeDiffFile(path + diff_name, comparison);
+
+		// Start the tests
+		if (!ignoreSubTests){
+			// We need to read in the reference-files with the SUMO and MATSIM results for HBEFA v4.1
+			var refComparison = readReferenceComparison(Paths.get(utils.getClassInputDirectory()).resolve("diff_" + cycle + "_" + fuel + "_ref.csv"));
+
+			// Now we have everything we need for comparing -> Compute the difference between MATSim- and SUMO-emissions
+			testHbefaV4_1(refComparison, comparison);
+			testValueDeviation(refComparison, comparison);
+			averageDeviation(refComparison, comparison);
+		}
+	}
+
+
+	/// Start the main-test with settings to match the outputs of the old EmissionModule (from late 2024)
+	public void basicTestWithOldSettings(Cycle cycle,
+										 Fuel fuel,
+										 boolean ignoreSumo,
+										 boolean ignoreSubTests) throws IOException {
+		System.out.println(fuel.toString());
+
+		// Create config
+		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate, EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction);
+
+		// Define the cycleLinkAttributes
+		Path cyclePath = Paths.get(utils.getClassInputDirectory()).resolve(cycle + ".csv");
+		List<CycleLinkAttributes> cycleLinkAttributes = configureLinks(cyclePath, LinkCutSetting.fromLinkAttributes);
+
+		// Read in the SUMO-outputs
+		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
+		List<SumoEntry> sumoSegments = null;
+		if (!ignoreSumo){
+			Path sumo_out_path = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + cycle + "_" + fuel + "_output_pl5.csv");
+			sumoSegments = readSumoEmissionsForLinks(sumo_out_path, cycleLinkAttributes);
+		}
+
+		// Define vehicle
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = configureVehicle(fuel);
+
+		// Calculate MATSim-emissions
+		List<Map<Pollutant, Double>> link_pollutant2grams = calculateMATSIMEmissions(config, vehHbefaInfo, cycleLinkAttributes);
+
+		// Prepare data for comparison (and print out a csv for debugging)
+		List<CycleLinkComparison> comparison = compare(cycleLinkAttributes, link_pollutant2grams, sumoSegments);
+
+		// Print out the results as csv
+		String path = OUTPUT_PATH + "/PHEMTest/";
+		String diff_name = "diff_" + cycle + "_" + fuel + "_output_oldEmissionModule.csv";
 		writeDiffFile(path + diff_name, comparison);
 
 		// Start the tests
@@ -731,7 +782,7 @@ public class PHEMTest {
 	// ----- Caller functions -----
 
 	@TestFactory
-	Collection<DynamicTest> basicWLTPTest() {
+	Collection<DynamicTest> startBasicWLTPTest() {
 		LinkCutSetting[] cutSettings = new LinkCutSetting[]{
 			LinkCutSetting.fromLinkAttributes,
 			LinkCutSetting.fixedIntervalLength.setAttr(60),
@@ -744,7 +795,7 @@ public class PHEMTest {
 				.flatMap(cutSetting -> Arrays.stream(EmissionsConfigGroup.EmissionsComputationMethod.values())
 					.map(computationMethod -> DynamicTest.dynamicTest(
 						"Inv.-WLTP-Test: Fuel=" + fuel + "; CutSetting=" + cutSetting + "; ComputationMethod=" + computationMethod,
-						() -> startTest(
+						() -> basicTest(
 							Cycle.WLTP,
 							fuel,
 							cutSetting,
@@ -760,7 +811,22 @@ public class PHEMTest {
 	}
 
 	@TestFactory
-	Collection<DynamicTest> invertedWLTPTest() {
+	Collection<DynamicTest> startBasicWLTPTestWithOldSettings() {
+		return Arrays.stream(Fuel.values())
+				.map(fuel -> DynamicTest.dynamicTest(
+					"Old-WLTP-Test: Fuel=" + fuel,
+					() -> basicTestWithOldSettings(
+						Cycle.WLTP,
+						fuel,
+						false,
+						true
+					)
+				))
+			.toList();
+	}
+
+	@TestFactory
+	Collection<DynamicTest> startInvertedWLTPTest() {
 		Cycle[] cycles = new Cycle[]{
 			Cycle.WLTP,
 			Cycle.WLTP_derivated_acc,
@@ -771,7 +837,7 @@ public class PHEMTest {
 			.flatMap(fuel -> Arrays.stream(cycles)
 				.map(cycle -> DynamicTest.dynamicTest(
 					"Inv.-WLTP-Test: Fuel=" + fuel + "; Cycle=" + cycle,
-					() -> startTest(
+					() -> basicTest(
 						cycle,
 						fuel,
 						LinkCutSetting.fixedIntervalLength.setAttr(60),
@@ -792,7 +858,7 @@ public class PHEMTest {
 		return Arrays.stream(Fuel.values())
 			.map(fuel -> DynamicTest.dynamicTest(
 				"PM-Test: Fuel=" + fuel,
-				() -> startTest(
+				() -> basicTest(
 					Cycle.CADC,
 					fuel,
 					LinkCutSetting.fixedIntervalLength.setAttr(60),
@@ -814,9 +880,7 @@ public class PHEMTest {
 
 	@ParameterizedTest
 	@EnumSource(Fuel.class)
-	void
-
-	sinusCyclesExpTest(Fuel fuel) throws IOException {
+	void sinusCyclesExpTest(Fuel fuel) throws IOException {
 
 		// Create config
 		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate, EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction);
@@ -843,7 +907,6 @@ public class PHEMTest {
 		String diff_name = "combined_matsim_" + fuel + "_output.csv";
 		writeDiffFile(path + diff_name, comparison);
 	}
-
 
 	@ParameterizedTest
 	@MethodSource("scaledWLTPExpProvider")

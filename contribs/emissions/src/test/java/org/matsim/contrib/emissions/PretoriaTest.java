@@ -6,6 +6,8 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -57,6 +59,9 @@ public class PretoriaTest {
 	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Concept_Aleks_V1.1.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
+
+	// TODO Try to fix the deletion bug, so that we can use utils.getOutput() instead of a fixed path
+	private final static String OUTPUT_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput";
 
 	// TODO Remove for final commit, as this was just used once for data preparation
 	public static void main(String[] args) {
@@ -223,9 +228,9 @@ public class PretoriaTest {
 			.build();
 
 		Path gps_path = switch (vehicle){
-			case ETIOS -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-etios.csv");
-			case FIGO, FIGO_TECHAVG -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-figo.csv");
-			case RRV, RRV_TECHAVG -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-rrv.csv");
+			case ETIOS -> Path.of(utils.getClassInputDirectory() + "public-etios.csv");
+			case FIGO, FIGO_TECHAVG -> Path.of(utils.getClassInputDirectory() + "public-figo.csv");
+			case RRV, RRV_TECHAVG -> Path.of(utils.getClassInputDirectory() + "public-rrv.csv");
 		};
 
 		String referenceDate = switch(vehicle){
@@ -348,16 +353,16 @@ public class PretoriaTest {
 			.flatMap(v -> methods.stream().map(m -> Arguments.of(v, m)));
 	}
 
-	@BeforeAll
-	public static void printNetworkInformation() throws IOException, RuntimeException {
+	@BeforeEach
+	public void printNetworkInformation() throws IOException, RuntimeException {
 		// Link information used for output analysis
 
 		// Read in the Pretoria network file with real emissions
-		Network pretoriaNetwork = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_etios.xml");
+		Network pretoriaNetwork = NetworkUtils.readNetwork(utils.getClassInputDirectory() + "network_routeC_etios.xml");
 
 		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/networkInformation.csv"),
+			IOUtils.getBufferedWriter(utils.getClassInputDirectory() + "networkInformation.csv"),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
 			"linkId",
@@ -394,7 +399,7 @@ public class PretoriaTest {
 		System.out.println(vehHbefaInfo);
 
 		// Read in the Pretoria network file with real emissions
-		Network pretoriaNetwork = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_etios.xml");
+		Network pretoriaNetwork = NetworkUtils.readNetwork(utils.getClassInputDirectory() + "network_routeC_etios.xml");
 
 		// Create Scenario and EventManager
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -501,7 +506,7 @@ public class PretoriaTest {
 
 		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/output_" + vehicle + "_" + method + ".csv"),
+			IOUtils.getBufferedWriter(OUTPUT_PATH + "/PretoriaTest/output_" + vehicle + "_" + method + ".csv"),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
 			"tripId",

@@ -28,8 +28,10 @@ public class EmissionMethodComparisonTest {
 
 	private final static String HBEFA_HOT_GRAD = HBEFA_4_1_PATH + "EFA_HOT_Concept_Aleks_Average_V1.1.csv";
 
+	// TODO Try to fix the deletion bug, so that we can use utils.getOutput() instead of a fixed path
+	private final static String OUTPUT_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput";
+
 	private static EmissionModulePack modulePackDetailed;
-	private static EmissionModulePack modulePackGradient;
 
 	private static EmissionsConfigGroup getEmissionsConfigGroup(EmissionsConfigGroup.EmissionsComputationMethod method, boolean gradientFile) {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
@@ -89,7 +91,6 @@ public class EmissionMethodComparisonTest {
 	@BeforeAll
 	public static void prepare(){
 		modulePackDetailed = new EmissionModulePack(false);
-		modulePackGradient = new EmissionModulePack(true);
 	}
 
 	@TestFactory
@@ -115,30 +116,9 @@ public class EmissionMethodComparisonTest {
 		)).toList();
 	}
 
-	@TestFactory
-	Collection<DynamicTest> gradientCurveFactory(){
-		List<Tuple<String, Double>> roadTypes = List.of(
-			new Tuple<>("URB/Local/60", 60.),
-			new Tuple<>("URB/Local/50", 50.),
-			new Tuple<>("RUR/MW/100", 100.),
-			new Tuple<>("RUR/MW/130", 130.),
-			new Tuple<>("RUR/MW/>130", 140.)
-		);
-
-		List<Tuple<HbefaVehicleCategory, HbefaVehicleAttributes>> vehHbefaInfo = List.of(
-			getVehicleAttributesTuple("petrol (4S)", "average"),
-			getVehicleAttributesTuple("diesel", "average")
-		);
-
-		return roadTypes.stream().flatMap(r ->
-			vehHbefaInfo.stream().map(v ->
-				DynamicTest.dynamicTest(r + "; " + v, () -> gradientCurves(r.getFirst(), r.getSecond(), v))
-			)).toList();
-	}
-
 	void speedCurves(String roadType, double freeVelocity, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo) throws IOException {
 		String filename = roadType.replace("/", "_") + "_" + vehHbefaInfo.getSecond().getHbefaEmConcept().replace(" ", "_");
-		CSVPrinter writer = new CSVPrinter(IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/InterpolationCurves/" + filename + ".csv"), CSVFormat.DEFAULT);
+		CSVPrinter writer = new CSVPrinter(IOUtils.getBufferedWriter(OUTPUT_PATH + "/EmissionMethodComputationTest/" + filename + ".csv"), CSVFormat.DEFAULT);
 
 		writer.print("vel");
 
@@ -158,43 +138,6 @@ public class EmissionMethodComparisonTest {
 					roadType,
 					freeVelocity,
 					1000,
-					vehHbefaInfo
-				);
-
-				writer.print(values.get(Pollutant.CO));
-				writer.print(values.get(Pollutant.CO2_TOTAL));
-				writer.print(values.get(Pollutant.NOx));
-			}
-			writer.println();
-		}
-
-		writer.flush();
-		writer.close();
-	}
-
-	void gradientCurves(String roadType, double freeVelocity, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo) throws IOException {
-		String filename = roadType.replace("/", "_") + "_" + vehHbefaInfo.getSecond().getHbefaEmConcept().replace(" ", "_") + "_G";
-		CSVPrinter writer = new CSVPrinter(IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/InterpolationCurves/" + filename + ".csv"), CSVFormat.DEFAULT);
-
-		writer.print("grad");
-
-		for (var method : EmissionsConfigGroup.EmissionsComputationMethod.values()) {
-			for (var component : List.of("CO", "CO2", "NOx")){
-				writer.print(component + "_" + method);
-			}
-		}
-
-		writer.println();
-
-		for(double g = -6; g <= 6+1e-6; g += 0.05){
-			writer.print(g);
-			for (var method : EmissionsConfigGroup.EmissionsComputationMethod.values()) {
-				var values = modulePackGradient.getModule(method).getWarmEmissionAnalysisModule().calculateWarmEmissions(
-					3600 / freeVelocity,
-					roadType,
-					freeVelocity,
-					1000,
-					1000 * (g/100),
 					vehHbefaInfo
 				);
 
