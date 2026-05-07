@@ -204,7 +204,7 @@ public class DrtIntegrationTest {
 		var comms = LocalCommunicator.create(size);
 		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
-		DistributedExecution.execute(comms, comm -> {
+		DistributedExecution.execute(comms, 600, comm -> {
 			Scenario scenario = createScenario();
 
 			scenario.getConfig().dsim().setThreads(2);

@@ -73,7 +73,7 @@ public class DSimIntegrationTest {
 		var size = 3;
 		var comms = LocalCommunicator.create(size);
 
-		DistributedExecution.execute(comms, comm -> {
+		DistributedExecution.execute(comms, 600, comm -> {
 			Config config = createConfig();
 			config.plans().setInputFile(plansPath.toString());
 			DistributedController c = new DistributedController(comm, config, 2);

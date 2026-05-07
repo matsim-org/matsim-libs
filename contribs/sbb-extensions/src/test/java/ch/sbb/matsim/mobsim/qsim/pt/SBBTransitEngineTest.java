@@ -657,7 +657,7 @@ public class SBBTransitEngineTest {
 		var comms = LocalCommunicator.create(size);
 		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
-		DistributedExecution.execute(comms, comm -> {
+		DistributedExecution.execute(comms, 600, comm -> {
 
 			TestFixture f = new TestFixture();
 
