@@ -132,6 +132,7 @@ public class FlowCapacityVariationTest {
 			config.qsim().setMainModes(Arrays.asList(travelMode));
 			config.qsim().setUsingFastCapacityUpdate(true);
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 			population = scenario.getPopulation();
 		}
 
