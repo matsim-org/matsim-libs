@@ -15,6 +15,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.testcases.utils.DistributedExecution;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.io.IOException;
@@ -72,25 +73,18 @@ public class DSimIntegrationTest {
 		// start three instances each containing one partition
 		var size = 3;
 		var comms = LocalCommunicator.create(size);
-		try (var pool = Executors.newFixedThreadPool(size)) {
-			var futures = comms.stream()
-				.map(comm -> pool.submit(() -> {
-					Config config = createConfig();
-					config.plans().setInputFile(plansPath.toString());
-					DistributedController c = new DistributedController(comm, config, 2);
-					c.run();
-					try {
-						comm.close();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}))
-				.toList();
 
-			for (var f : futures) {
-				f.get();
+		DistributedExecution.execute(comms, 300, comm -> {
+			Config config = createConfig();
+			config.plans().setInputFile(plansPath.toString());
+			DistributedController c = new DistributedController(comm, config, 2);
+			c.run();
+			try {
+				comm.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-		}
+		});
 
 		Path distOutput = output.resolve("kelheim-mini.output_events.xml");
 		Path localOutput = output.resolve("..").resolve("runLocal/kelheim-mini.output_events.xml").toAbsolutePath();
