@@ -133,7 +133,7 @@ public class DistributedIntegrationTest {
 		var comms = LocalCommunicator.create(size);
 		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
-		DistributedExecution.execute(comms, comm -> {
+		DistributedExecution.execute(comms, 600, comm -> {
 			Config local = createScenario();
 			local.dsim().setThreads(1);
 
