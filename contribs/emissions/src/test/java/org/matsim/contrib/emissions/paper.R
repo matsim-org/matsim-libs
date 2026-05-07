@@ -36,8 +36,9 @@
     facet_wrap(~component, scales="free") +
     ylab("emissions in g/km") +
     theme_minimal() +
-    ggtitle("Comparison across WLTP-cycle for petrol") +
-    theme(text = element_text(size=12))
+    # ggtitle("Comparison across WLTP-cycle for petrol") +
+    labs(caption = "Fig XX: Comparison of MATSim and PHEMLightV4 across WLTP-cycle for a petrol vehicle") +
+    theme(text = element_text(size=12), plot.caption = element_text(size = 12, hjust = 0.5, margin = margin(t=20)))
 
   ggsave(glue("{plots_path}/OldModelS&GResultsPetrol.png"),
          width = 16,
@@ -72,8 +73,9 @@
     facet_wrap(~component, scales="free") +
     ylab("emissions in g/km") +
     theme_minimal() +
-    ggtitle("Comparison across WLTP-cycle for diesel") +
-    theme(text = element_text(size=12))
+    # ggtitle("Comparison across WLTP-cycle for diesel") +
+    labs(caption = "Fig XX: Comparison of MATSim and PHEMLightV4 across WLTP-cycle for a diesel vehicle") +
+    theme(text = element_text(size=12), plot.caption = element_text(size = 12, hjust = 0.5, margin = margin(t=20)))
 
   ggsave(glue("{plots_path}/OldModelS&GResultsDiesel.png"),
          width = 16,
@@ -109,7 +111,8 @@
     ylab("emissions in g/km") +
     theme_minimal() +
     ggtitle("Comparison across WLTP-cycle for petrol") +
-    theme(text = element_text(size=12))
+    labs(caption = "Fig XX: Comparison of MATSim and PHEMLightV4 across WLTP-cycle for a petrol vehicle with the improved emission model") +
+    theme(text = element_text(size=12), plot.caption = element_text(size = 12, hjust = 0.5, margin = margin(t=20)))
 
   ggsave(glue("{plots_path}/ImprovedModelResultsPetrol.png"),
          width = 16,
@@ -144,8 +147,8 @@
     facet_wrap(~component, scales="free") +
     ylab("emissions in g/km") +
     theme_minimal() +
-    ggtitle("Comparison across WLTP-cycle for diesel") +
-    theme(text = element_text(size=12))
+    labs(caption = "Fig XX: Comparison of MATSim and PHEMLightV4 across WLTP-cycle for a diesel vehicle with the improved emission model") +
+    theme(text = element_text(size=12), plot.caption = element_text(size = 12, hjust = 0.5, margin = margin(t=20)))
 
   ggsave(glue("{plots_path}/ImprovedModelResultsDiesel.png"),
          width = 16,
@@ -180,11 +183,11 @@
     # geom_point(aes(x=as.numeric(Freespeed), y=EFA, color=TrafficSituation)) +
     facet_wrap(Region~RoadType, scales = "free") +
     theme_minimal() +
-    theme(text = element_text(size=12)) +
     scale_color_manual(values=colors) +
     # scale_x_continuous(breaks = seq(0, max(as.numeric(VClass)), by = 10)) +
-    geom_hline(aes(yintercept = 0.042, color=" PLV5"), linetype="dashed") +
-    labs(title=glue("Emissions for all HBEFA keys with: {tech}, {concept}, {component}")) +
+    geom_hline(aes(yintercept = 0.042, color="PLV5 (Low)"), linetype="dashed") +
+    labs(caption=glue("Fig XX: Emissions for all HBEFA keys with: {tech}, {concept}, {component}. \n PLV5 reference value is average value for the Low segment of the WLTP trajectory.")) +
+    theme(text = element_text(size=12), plot.caption = element_text(size = 12, hjust = 0.5, margin = margin(t=20))) +
     xlab("Speed (km/h)") +
     ylab("Emissions (g/km)")
 
@@ -220,14 +223,37 @@
     # geom_point(aes(x=as.numeric(Freespeed), y=EFA, color=TrafficSituation)) +
     facet_wrap(Region~RoadType, scales = "free") +
     theme_minimal() +
-    theme(text = element_text(size=12)) +
-    scale_color_manual(values=colors) +
     # scale_x_continuous(breaks = seq(0, max(as.numeric(d$Freespeed)), by = 10)) +
-    geom_hline(aes(yintercept = 0.057 , color=" PLV5 (Low)"), linetype="dashed") +
-    geom_hline(aes(yintercept = 0.049, color=" PLV5 (Medium)"), linetype="dashed") +
-    geom_hline(aes(yintercept = 0.044, color=" PLV5 (High)"), linetype="dashed") +
-    geom_hline(aes(yintercept = 0.070, color=" PLV5 (Extra High)"), linetype="dashed") +
-    labs(title=glue("Emissions for all HBEFA keys with: {tech}, {concept}, {component}")) +
+    geom_hline(aes(yintercept = 0.057, color="PLV5 (Low)"), linetype="dashed") +
+    geom_hline(aes(yintercept = 0.049, color="PLV5 (Medium)"), linetype="dashed") +
+    geom_hline(aes(yintercept = 0.044, color="PLV5 (High)"), linetype="dashed") +
+    geom_hline(aes(yintercept = 0.070, color="PLV5 (Extra High)"), linetype="dashed") +
+
+    scale_color_manual(
+      values = c(
+        "PLV5 (Low)" = colors[1],
+        "PLV5 (Medium)" = colors[2],
+        "PLV5 (High)" = colors[3],
+        "PLV5 (Extra High)" = colors[4],
+
+        "Freeflow" = colors[5],
+        "Heavy"    = colors[6],
+        "Satur."   = colors[7],
+        "St+Go"    = colors[8],
+        "St+Go2"   = colors[9]
+      ),
+
+      breaks = c(
+        # line legend first
+        "PLV5 (Low)", "PLV5 (Medium)", "PLV5 (High)", "PLV5 (Extra High)",
+
+        # hline legend second
+        "Freeflow", "Heavy", "Satur.", "St+Go", "St+Go2"
+      )
+    ) +
+
+    labs(caption=glue("Fig XX: Emissions for all HBEFA keys with: {tech}, {concept}, {component}. \n PLV5 reference values are the averages for respective segment")) +
+    theme(text = element_text(size=12), plot.caption = element_text(size = 12, hjust = 0.5, margin = margin(t=20))) +
     xlab("Speed (km/h)") +
     ylab("Emissions (g/km)")
 
@@ -241,7 +267,8 @@
 speedCurves <- function(
   trafficSit = "RUR/MW/>130",
   emConcept = "PC P Euro-4",
-  curves = c("AverageSpeed", "StopAndGoFraction", "InterpolationFraction", "BilinearInterpolationFraction")){
+  curves = c("AverageSpeed", "StopAndGoFraction", "InterpolationFraction", "BilinearInterpolationFraction"),
+  caption = ""){
   trafficSit.u <- gsub( "/", "_", trafficSit)
   emConcept.u <- gsub( " ", "_", emConcept)
 
@@ -266,20 +293,21 @@ speedCurves <- function(
     geom_point(data=hbefa_det, aes(x=V, y=EFA)) +
     facet_wrap(~component, scales = "free") +
     theme_minimal() +
-    ggtitle(glue("Comparison of emission development for different methods ({trafficSit}, {emConcept})")) +
-    theme(text = element_text(size=12)) +
+    # ggtitle(glue("Comparison of emission development for different methods ({trafficSit}, {emConcept})")) +
+    labs(caption = caption) +
+    theme(text = element_text(size=12), plot.caption = element_text(size = 12, hjust = 0.5, margin = margin(t=20))) +
     xlab("Average velocity (km/h)") +
     ylab("Emissions (g/km)")
 
   ggsave(glue("{plots_path}/{trafficSit.u}_{emConcept.u}.png"),
-         width = 30,
+         width = 12,
          height = 10,
          dpi = 300)
 }
 
 # Curve plots
 {
-  speedCurves(curves = c("AverageSpeed", "StopAndGoFraction"))
+  speedCurves(curves = c("AverageSpeed", "StopAndGoFraction"), caption="Fig XX: Development of emissions output for a petrol vehicle driving at various speeds on a motorway with speed limit of 130 km/h")
   speedCurves()
   speedCurves(trafficSit = "URB/Local/50")
 }
