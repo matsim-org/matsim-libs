@@ -3,10 +3,10 @@
   library(glue)
 
   # ==== Paths to ressources ====
-  sumo_path <- "/Users/aleksander/Documents/VSP/PHEMTest/sumo"
-  diff_path <- "/Users/aleksander/Documents/VSP/PHEMTest/diff"
+  matsim_output_path <- "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput"
+  sumo_path <- "/Users/aleksander/Documents/VSP/PHEMTest/sumo2"
   hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
-
+  plots_path <- "/Users/aleksander/Documents/VSP/PHEMTest/plots2"
 }
 
 # ==== Helper functions ====
@@ -73,7 +73,7 @@ read_sumo <- function(path, intervals, model_suffix = ""){
 # Example: plot_main(extra_notes = "Test", data.TEST)
 plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLength_60", extra_notes = "", plot = "line",
                       title = glue("Comparison across WLTP-cycle for {fuel}"),
-                      matsim_data = glue("{diff_path}/diff_{fuel}_output_{segment_method}.csv"),
+                      matsim_data = glue("{matsim_output_path}/PHEMTest/diff_{fuel}_output_{segment_method}.csv"),
                       pl_data = glue("{sumo_path}/sumo_{fuel}_output.csv"),
                       pl5_data = glue("{sumo_path}/sumo_{fuel}_output_pl5.csv")){
   # Load data from MATSim
@@ -134,10 +134,10 @@ plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLengt
 # Example: plot_main(extra_notes = "Test", data.TEST)
 plot_main2 <- function(..., fuel = "petrol", segment_method = "fromLinkAttributes_0", extra_notes = "", plot = "bar",
                       title = glue("Comparison across WLTP-cycle for {fuel}"),
-                      matsim_data_avgsp = glue("{diff2_path}/WLTP/diff_WLTP_{fuel}_output_useFirstDuplicate_AverageSpeed_{segment_method}.csv"),
-                      matsim_data_sg = glue("{diff2_path}/WLTP/diff_WLTP_{fuel}_output_useFirstDuplicate_StopAndGoFraction_{segment_method}.csv"),
-                      matsim_data_intfr = glue("{diff2_path}/WLTP/diff_WLTP_{fuel}_output_useFirstDuplicate_InterpolationFraction_{segment_method}.csv"),
-                      pl5_data = glue("{sumo_path}/sumo_{fuel}_output_pl5.csv")){
+                      matsim_data_avgsp = glue("{matsim_output_path}/PHEMTest/diff_WLTP_{fuel}_output_useFirstDuplicate_AverageSpeed_{segment_method}.csv"),
+                      matsim_data_sg = glue("{matsim_output_path}/PHEMTest/diff_WLTP_{fuel}_output_useFirstDuplicate_StopAndGoFraction_{segment_method}.csv"),
+                      matsim_data_intfr = glue("{matsim_output_path}/PHEMTest/diff_WLTP_{fuel}_output_useFirstDuplicate_InterpolationFraction_{segment_method}.csv"),
+                      pl5_data = glue("{sumo_path}/sumo_{fuel}_a_output_pl5.csv")){
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
   r <- read_matsim(matsim_data_avgsp, "AverageSpeed")
@@ -192,7 +192,7 @@ plot_main2 <- function(..., fuel = "petrol", segment_method = "fromLinkAttribute
       theme_minimal()
   }
 
-  ggsave(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/PL_Comparison_{fuel}.png"),
+  ggsave(glue("{plots_path}/PL_Comparison_{fuel}.png"),
          width = 16,
          height = 9,
          dpi = 300)

@@ -5,6 +5,12 @@
   library(glue)
 
   # ==== Paths to ressources ====
+  matsim_input_path <- "/Users/aleksander/Documents/VSP/PHEMTest/matsim-libs-phem/contribs/emissions/test/input/org/matsim/contrib/emissions"
+  matsim_output_path <- "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput"
+  sumo_path <- "/Users/aleksander/Documents/VSP/PHEMTest/sumo2"
+  hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
+  plots_path <- "/Users/aleksander/Documents/VSP/PHEMTest/plots2"
+
   pretoria_path <- "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria"
 }
 
@@ -13,7 +19,7 @@
   vehicle <- "FIGO_TECHAVG"
   method <- "InterpolationFraction"
 
-  pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}_{method}.csv")) %>%
+  pretoria_output <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_{method}.csv")) %>%
     filter(linkId != 6555) %>%
     mutate(n = row_number())
 
@@ -41,7 +47,7 @@
 {
   vehicle <- "FIGO"
 
-  gps_input <- read_csv(glue("{pretoria_path}/data/public-{vehicle}.csv")) %>%
+  gps_input <- read_csv(glue("{matsim_input_path}/PretoriaTest/public-{vehicle}.csv")) %>%
     mutate(gps_acc = lead(gps_speed) - gps_speed, veh_acc = lead(speed_vehicle) - speed_vehicle)
 
   gps_avg <- gps_input %>%
@@ -63,7 +69,7 @@
   vehicle <- "FIGO_TECHAVG"
   method <- "InterpolationFraction"
 
-  pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}_{method}.csv")) %>%
+  pretoria_output <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_{method}.csv")) %>%
     filter(linkId != 6555) %>%
     mutate(n = row_number())
 
@@ -81,7 +87,7 @@
            NOx_diff = 100*NOx_MATSim/NOx_pems-100)
 }
 
-# ==== Segment Wise Pretoria Analysis ====
+# ==== ç ====
 {
   # In the JWJ Paper, 3 segments were defined
   # A: Urban (from 28948 to 14100)
@@ -91,7 +97,7 @@
   vehicle <- "FIGO_TECHAVG"
   method <- "InterpolationFraction"
 
-  pretoria_output <- read_csv(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/output_{vehicle}_{method}.csv")) %>%
+  pretoria_output <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_{method}.csv")) %>%
     filter(linkId != 6555, segment != "none") %>%
     mutate(n = row_number())
 
@@ -113,7 +119,7 @@
 {
   vehicle <- "FIGO"
 
-  cRoute <- read_csv(glue("{pretoria_path}/data/public-{vehicle}.csv")) %>%
+  cRoute <- read_csv(glue("{matsim_input_path}/PretoriaTest/public-{vehicle}.csv")) %>%
     mutate(acc = lead(speed_vehicle) - speed_vehicle, n = row_number()) %>%
     mutate(acc = ifelse(is.na(acc), 0, acc)) %>%
     select(n, speed_vehicle, acc, trip)

@@ -3,19 +3,22 @@
   library(glue)
 
   # ==== Paths to ressources ====
-  data_path <- "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/"
+  matsim_output_path <- "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput"
+  sumo_path <- "/Users/aleksander/Documents/VSP/PHEMTest/sumo2"
+  hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
+  plots_path <- "/Users/aleksander/Documents/VSP/PHEMTest/plots2"
 }
 
 # Plots Old Model (S&G Petrol)
 {
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
-  r <- read_matsim(glue("{data_path}/ExplorativeAnalysis/OldModelS&GResults/diff_WLTP_petrol_output_useFirstDuplicate_fromLinkAttributes_0.csv"), "")
+  r <- read_matsim(glue("{matsim_output_path}/PHEMTest/diff_WLTP_petrol_output_oldEmissionModule.csv"), "")
   data.MATSIM <- r[[1]]
   intervals <- r[[2]]
 
   # Load data from SUMO with PHEMLight5 and summarize for each interval
-  data.SUMO_PHEMLight5 <- read_sumo(glue("{data_path}/ExplorativeAnalysis/sumo_petrol_a_output_pl5.csv"), intervals, "PHEMLight5") %>%
+  data.SUMO_PHEMLight5 <- read_sumo(glue("{sumo_path}/sumo_petrol_a_output_pl5.csv"), intervals, "PHEMLight5") %>%
     mutate(model = "PHEMLightV5")
 
   # recalc: gram -> gram per kilometer
@@ -36,7 +39,7 @@
     ggtitle("Comparison across WLTP-cycle for petrol") +
     theme(text = element_text(size=12))
 
-  ggsave("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/ExplorativeAnalysis/OldModelS&GResultsPetrol.png",
+  ggsave(glue("{plots_path}/OldModelS&GResultsPetrol.png"),
          width = 16,
          height = 9,
          dpi = 300)
@@ -46,12 +49,12 @@
 {
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
-  r <- read_matsim(glue("{data_path}/ExplorativeAnalysis/OldModelS&GResults/diff_WLTP_diesel_output_useFirstDuplicate_fromLinkAttributes_0.csv"), "")
+  r <- read_matsim(glue("{matsim_output_path}/PHEMTest/diff_WLTP_diesel_output_oldEmissionModule.csv"), "")
   data.MATSIM <- r[[1]]
   intervals <- r[[2]]
 
   # Load data from SUMO with PHEMLight5 and summarize for each interval
-  data.SUMO_PHEMLight5 <- read_sumo(glue("{data_path}/ExplorativeAnalysis/sumo_diesel_a_output_pl5.csv"), intervals, "") %>%
+  data.SUMO_PHEMLight5 <- read_sumo(glue("{sumo_path}/sumo_diesel_a_output_pl5.csv"), intervals, "") %>%
     mutate(model = "PHEMLightV5")
 
   # recalc: gram -> gram per kilometer
@@ -72,7 +75,7 @@
     ggtitle("Comparison across WLTP-cycle for diesel") +
     theme(text = element_text(size=12))
 
-  ggsave("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/ExplorativeAnalysis/OldModelS&GResultsDiesel.png",
+  ggsave(glue("{plots_path}/OldModelS&GResultsDiesel.png"),
          width = 16,
          height = 9,
          dpi = 300)
@@ -82,12 +85,12 @@
 {
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
-  r <- read_matsim(glue("{data_path}/ExplorativeAnalysis/ImprovedModelResults/diff_WLTP_petrol_output_useFirstDuplicate_fromLinkAttributes_0.csv"), "")
+  r <- read_matsim(glue("{matsim_output_path}/PHEMTest/diff_WLTP_petrol_output_useFirstDuplicate_InterpolationFraction_fromLinkAttributes_0.csv"), "")
   data.MATSIM <- r[[1]]
   intervals <- r[[2]]
 
   # Load data from SUMO with PHEMLight5 and summarize for each interval
-  data.SUMO_PHEMLight5 <- read_sumo(glue("{data_path}/ExplorativeAnalysis/sumo_petrol_a_output_pl5.csv"), intervals, "PHEMLight5") %>%
+  data.SUMO_PHEMLight5 <- read_sumo(glue("{sumo_path}/sumo_petrol_a_output_pl5.csv"), intervals, "PHEMLight5") %>%
     mutate(model = "PHEMLightV5")
 
   # recalc: gram -> gram per kilometer
@@ -108,7 +111,7 @@
     ggtitle("Comparison across WLTP-cycle for petrol") +
     theme(text = element_text(size=12))
 
-  ggsave("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/ExplorativeAnalysis/ImprovedModelResultsPetrol.png",
+  ggsave(glue("{plots_path}/ImprovedModelResultsPetrol.png"),
          width = 16,
          height = 9,
          dpi = 300)
@@ -118,12 +121,12 @@
 {
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
-  r <- read_matsim(glue("{data_path}/ExplorativeAnalysis/ImprovedModelResults/diff_WLTP_diesel_output_useFirstDuplicate_fromLinkAttributes_0.csv"), "")
+  r <- read_matsim(glue("{matsim_output_path}/PHEMTest/diff_WLTP_diesel_output_useFirstDuplicate_InterpolationFraction_fromLinkAttributes_0.csv"), "")
   data.MATSIM <- r[[1]]
   intervals <- r[[2]]
 
   # Load data from SUMO with PHEMLight5 and summarize for each interval
-  data.SUMO_PHEMLight5 <- read_sumo(glue("{data_path}/ExplorativeAnalysis/sumo_diesel_a_output_pl5.csv"), intervals, "") %>%
+  data.SUMO_PHEMLight5 <- read_sumo(glue("{sumo_path}/sumo_diesel_a_output_pl5.csv"), intervals, "") %>%
     mutate(model = "PHEMLightV5")
 
   # recalc: gram -> gram per kilometer
@@ -144,7 +147,7 @@
     ggtitle("Comparison across WLTP-cycle for diesel") +
     theme(text = element_text(size=12))
 
-  ggsave("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/ExplorativeAnalysis/ImprovedModelResultsDiesel.png",
+  ggsave(glue("{plots_path}/ImprovedModelResultsDiesel.png"),
          width = 16,
          height = 9,
          dpi = 300)
@@ -152,7 +155,7 @@
 
 # Plot CO emission keys and values
 {
-  hbefa_det <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv", delim = ";")
+  hbefa_det <- read_delim(glue("{hbefa_path}/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv"), delim = ";")
 
   hbefa_det_split <- hbefa_det %>%
     separate_wider_delim(TrafficSit, "/", names=c("Region", "RoadType", "VClass", "TrafficSituation"))
@@ -185,7 +188,7 @@
     xlab("Speed (km/h)") +
     ylab("Emissions (g/km)")
 
-  ggsave("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/HBEFA_Diesel_EURO4_CO.png",
+  ggsave(glue("{plots_path}/HBEFA_Diesel_EURO4_CO.png"),
          width = 11,
          height = 10,
          dpi = 300)
@@ -193,7 +196,7 @@
 
 # Plot NOx emission keys and values
 {
-  hbefa_det <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv", delim = ";")
+  hbefa_det <- read_delim(glue("{hbefa_path}/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv"), delim = ";")
 
   hbefa_det_split <- hbefa_det %>%
     separate_wider_delim(TrafficSit, "/", names=c("Region", "RoadType", "Freespeed", "TrafficSituation"))
@@ -228,7 +231,7 @@
     xlab("Speed (km/h)") +
     ylab("Emissions (g/km)")
 
-  ggsave("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/HBEFA_Petrol_EURO4_NOx.png",
+  ggsave(glue("{plots_path}/HBEFA_Petrol_EURO4_NOx.png"),
          width = 11,
          height = 10,
          dpi = 300)
@@ -242,13 +245,13 @@ speedCurves <- function(
   trafficSit.u <- gsub( "/", "_", trafficSit)
   emConcept.u <- gsub( " ", "_", emConcept)
 
-  hbefa_det <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv", delim = ";") %>%
+  hbefa_det <- read_delim(glue("{hbefa_path}/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv"), delim = ";") %>%
     filter(Component == "CO" | Component == "CO2(total)" | Component == "NOx") %>%
     filter(EmConcept == emConcept) %>%
     filter(startsWith(TrafficSit, trafficSit)) %>%
     mutate(component = ifelse(Component == "CO2(total)", "CO2", Component))
 
-  curves <- read_csv(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/InterpolationCurves/{trafficSit.u}_{emConcept.u}.csv")) %>%
+  curves <- read_csv(glue("{matsim_output_path}/EmissionMethodComputationTest/{trafficSit.u}_{emConcept.u}.csv")) %>%
     pivot_longer(cols = c(
       "CO_StopAndGoFraction", "CO2_StopAndGoFraction", "NOx_StopAndGoFraction",
       "CO_AverageSpeed", "CO2_AverageSpeed", "NOx_AverageSpeed",
@@ -268,7 +271,7 @@ speedCurves <- function(
     xlab("Average velocity (km/h)") +
     ylab("Emissions (g/km)")
 
-  ggsave(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/{trafficSit.u}_{emConcept.u}.png"),
+  ggsave(glue("{plots_path}/{trafficSit.u}_{emConcept.u}.png"),
          width = 30,
          height = 10,
          dpi = 300)
@@ -281,3 +284,8 @@ speedCurves <- function(
   speedCurves(trafficSit = "URB/Local/50")
 }
 
+# PHEM Plots with all computation methods
+{
+  plot_main2()
+  plot_main2(fuel = "diesel")
+}
