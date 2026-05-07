@@ -123,7 +123,6 @@ public class ThreeLinkIntegrationTest {
 
 	@Test
 	@Order(2)
-	@Timeout(value = 2, unit = TimeUnit.MINUTES)
 	@org.matsim.testcases.DisabledOnGitHubWindowsCI
 	void oneAgentThreeNodes() {
 
@@ -134,7 +133,7 @@ public class ThreeLinkIntegrationTest {
 		var size = 3;
 		var comms = LocalCommunicator.create(size);
 
-		DistributedExecution.execute(comms, comm -> {
+		DistributedExecution.execute(comms, 120, comm -> {
 			Config config = ConfigUtils.loadConfig(configPath);
 			config.controller().setOutputDirectory(outputDirectory);
 			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -157,7 +156,6 @@ public class ThreeLinkIntegrationTest {
 
 	@Test
 	@Order(2)
-	@Timeout(value = 2, unit = TimeUnit.MINUTES)
 	@org.matsim.testcases.DisabledOnGitHubWindowsCI
 	void oneAgentThreeNodesTwoIterations() {
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
@@ -165,7 +163,7 @@ public class ThreeLinkIntegrationTest {
 		var size = 3;
 		var comms = LocalCommunicator.create(size);
 
-		DistributedExecution.execute(comms, comm -> {
+		DistributedExecution.execute(comms, 120, comm -> {
 			Config local = ConfigUtils.loadConfig(configPath);
 			local.dsim().setThreads(1);
 			local.controller().setFirstIteration(0);
