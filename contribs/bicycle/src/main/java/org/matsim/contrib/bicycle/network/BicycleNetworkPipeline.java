@@ -17,6 +17,11 @@ import org.matsim.application.MATSimAppCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.nio.file.Path;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import java.util.*;
 import java.util.function.BiPredicate;
 
@@ -50,21 +55,29 @@ import java.util.function.BiPredicate;
  * simplification steps is {@link CreateBicycleNetworkWithElevation}.
  */
 @Command(
-	name = "BicycleNetworkPipeline",
+	name = "bicycle-network",
 	description = "Builds a MATSim bicycle network from OSM + DEM elevation data.",
+	showDefaultValues = true,
 	mixinStandardHelpOptions = true
 )
 public class BicycleNetworkPipeline implements MATSimAppCommand {
 
-	@Option(names = "--osm-file", required = true, description = "Path to OSM input file (.osm.pbf)")
-	private String inputOsmFile;
+	@Option(names = "--input", required = true, description = "Path to OSM input file (.osm.pbf)")
+	private Path input;
 
-	@Option(names = "--tiff-file", required = true, description = "Path to DEM GeoTIFF")
-	private String inputTiffFile;
+	@Option(names = "--dem", required = true, description = "Path to DEM GeoTIFF")
+	private Path dem;
 
-	@Option(names = "--output-file", required = true, description = "Path to output network (.xml.gz)")
-	private String outputFile;
+	@Option(names = "--dem-crs", required = true,
+		description = "CRS of the DEM GeoTIFF, e.g. EPSG:32632 for Sonny's German DTM")
+	private String demCRS;
 
+	@Option(names = "--output", required = true, description = "Path to output network (.xml.gz)")
+	private Path output;
+
+	// TODO maybe change to this later
+	// @Mixin
+	//private CrsOptions crs = new CrsOptions();   // gibt --target-crs / --input-crs etc.
 	@Option(names = "--crs", required = true, description = "Output CRS (e.g. EPSG:25832)")
 	private String outputCRS;
 
@@ -114,6 +127,8 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 	// ============================================================================
 
+	private static final Logger log = LogManager.getLogger(BicycleNetworkPipeline.class);
+
 	public static void main(String[] args) {
 		new BicycleNetworkPipeline().execute(args);
 	}
@@ -122,7 +137,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	public Integer call() throws Exception {
 
 
-		var elevationParser = new ElevationDataParser(inputTiffFile, outputCRS);
+		var elevationParser = new ElevationDataParser(dem.toString(), outputCRS, demCRS);
 		var transformation = TransformationFactory.getCoordinateTransformation(
 			TransformationFactory.WGS84, outputCRS);
 
@@ -139,7 +154,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 				policy.apply(link, tags, direction);
 			})
 			.build()
-			.read(inputOsmFile);
+			.read(input);
 
 //		// ---- 1b. raw OSM attributes prefixen ---------------------------------
 //		renameLinkAttributes(network, Map.of(
@@ -174,12 +189,14 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			attachLinkElevationKpis(link, elevationParser, eleSampleStepM, eleNoiseToleranceM);
 			counted++;
 		}
-		System.out.println("Attached elevation KPIs to " + counted + " links "
-			+ "(sample step = " + eleSampleStepM + " m, noise tolerance = "
-			+ eleNoiseToleranceM + " m).");
+//		System.out.println("Attached elevation KPIs to " + counted + " links "
+//			+ "(sample step = " + eleSampleStepM + " m, noise tolerance = "
+//			+ eleNoiseToleranceM + " m).");
+		log.info("Attached elevation KPIs to {} links (sample step = {} m, noise tolerance = {} m).",
+			counted, eleSampleStepM, eleNoiseToleranceM);
 
 		// ---- 7. write --------------------------------------------------------
-		new NetworkWriter(network).write(outputFile);
+		new NetworkWriter(network).write(output.toString());
 
 		return 0;
 	}

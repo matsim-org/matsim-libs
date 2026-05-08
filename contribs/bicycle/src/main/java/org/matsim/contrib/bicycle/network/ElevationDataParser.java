@@ -21,11 +21,9 @@ package org.matsim.contrib.bicycle.network;
 import java.awt.image.Raster;
 import java.io.IOException;
 
-import org.geotools.api.data.DataSourceException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.geometry.Position2D;
@@ -39,10 +37,14 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  */
 public class ElevationDataParser {
 
-	private static GridCoverage2D grid;
-	private static Raster gridData;
-	private CoordinateTransformation ct;
+	private final GridCoverage2D grid;
+	private final Raster gridData;
+	private final CoordinateTransformation ct;
 
+
+	// TODO: convert this to a JUnit test once a small test DEM (or a stable reference TIFF
+	// path via system property) is available. The Berlin sample points below have known
+	// approximate elevations from Sonny's DTM Germany 50m v3b and could serve as fixtures.
 	public static void main(String[] args) {
 		// Data sources:
 		// https://sonny.4lima.de/
@@ -57,42 +59,36 @@ public class ElevationDataParser {
 		// -> choose either
 		// DTM 20m  ~1.1 GB Germany "EPSG:32632"
 		// DTM 50m  ~0.3 GB Germany "EPSG:32632"
-		String tiffFile = "C:/Users/metz_so/Downloads/DTM Germany 50m v3b by Sonny.tif";
+		String tiffFile = "C:/Users/metz_so/Workspace/data/elevation/DTM Germany 50m v3b by Sonny.tif";
 
 
 		String scenarioCRS = "EPSG:4326"; // WGS84 as the coorinates to test below are stated like this
+		String demCRS = "EPSG:32632";     // UTM 32N - native CRS of Sonny's German DTM
 
-		ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, scenarioCRS);
+		ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, scenarioCRS, demCRS);
 
-		System.out.println("Teufelsberg: " + elevationDataParser.getElevation(13.2407, 52.4971));
-		System.out.println("Tempelhofer Feld: " + elevationDataParser.getElevation(13.3989, 52.4755));
-		System.out.println("Müggelsee: " + elevationDataParser.getElevation(13.6354, 52.4334));
-		System.out.println("Müggelberg: " + elevationDataParser.getElevation(13.64048, 52.41594));
-		System.out.println("Alexanderplatz: " + elevationDataParser.getElevation(13.40993, 52.52191));
-		System.out.println("Kreuzberg (Berg): " + elevationDataParser.getElevation(13.379491, 52.487610));
-		System.out.println("Herrmannplatz: " + elevationDataParser.getElevation(13.422301, 52.486477));
-		System.out.println("U-Bahnhof Boddinstraße: " + elevationDataParser.getElevation(13.423210, 52.480278));
+		// Reference values from Sonny DTM 50m v3b (run on 2026-05-08), in meters above sea level.
+		System.out.println("Teufelsberg:            " + elevationDataParser.getElevation(13.2407, 52.4971));    // ~112.4
+		System.out.println("Tempelhofer Feld:       " + elevationDataParser.getElevation(13.3989, 52.4755));    //  ~45.7
+		System.out.println("Müggelsee:              " + elevationDataParser.getElevation(13.6354, 52.4334));    //  ~32.3
+		System.out.println("Müggelberg:             " + elevationDataParser.getElevation(13.64048, 52.41594));   //  ~94.5
+		System.out.println("Alexanderplatz:         " + elevationDataParser.getElevation(13.40993, 52.52191));   //  ~36.6
+		System.out.println("Kreuzberg (Berg):       " + elevationDataParser.getElevation(13.379491, 52.487610));  //  ~57.8
+		System.out.println("Herrmannplatz:          " + elevationDataParser.getElevation(13.422301, 52.486477));  //  ~36.8
+		System.out.println("U-Bahnhof Boddinstraße: " + elevationDataParser.getElevation(13.423210, 52.480278));  //  ~52.3
 	}
 
 
-	public ElevationDataParser(String tiffFile, String scenarioCRS) {
-		// add here the Coordinate Reference System (CRS) of the GeoTIFF file
-		this.ct = TransformationFactory.getCoordinateTransformation(scenarioCRS, "EPSG:32632");
-
-
-		GeoTiffReader reader = null;
+	public ElevationDataParser(String tiffFile, String scenarioCRS, String demCRS) {
+		this.ct = TransformationFactory.getCoordinateTransformation(scenarioCRS, demCRS);
 		try {
-			reader = new GeoTiffReader(tiffFile);
-		} catch (DataSourceException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			grid = reader.read(null);
+			GeoTiffReader reader = new GeoTiffReader(tiffFile);
+			this.grid = reader.read(null);
+			this.gridData = grid.getRenderedImage().getData();
 		} catch (IOException e) {
-			e.printStackTrace();
+			// DataSourceException extends IOException, ein catch reicht
+			throw new RuntimeException("Failed to read DEM from " + tiffFile, e);
 		}
-		gridData = grid.getRenderedImage().getData();
 	}
 
 
@@ -102,21 +98,14 @@ public class ElevationDataParser {
 
 
 	public double getElevation(Coord coord) {
-		GridGeometry2D gg = grid.getGridGeometry();
-
-		Coord transformedCoord = ct.transform(coord);
-
-		GridCoordinates2D posGrid = null;
+		Coord transformed = ct.transform(coord);
 		try {
-			posGrid = gg.worldToGrid(new Position2D(transformedCoord.getX(), transformedCoord.getY()));
-		} catch (InvalidGridGeometryException e) {
-			e.printStackTrace();
-		} catch (TransformException e) {
-			e.printStackTrace();
+			GridCoordinates2D posGrid = grid.getGridGeometry()
+				.worldToGrid(new Position2D(transformed.getX(), transformed.getY()));
+			double[] pixel = new double[1];
+			return gridData.getPixel(posGrid.x, posGrid.y, pixel)[0];
+		} catch (TransformException | InvalidGridGeometryException e) {
+			throw new RuntimeException("Failed to read elevation at " + coord, e);
 		}
-
-		double[] pixel = new double[1];
-		double[] data = gridData.getPixel(posGrid.x, posGrid.y, pixel);
-		return data[0];
 	}
 }

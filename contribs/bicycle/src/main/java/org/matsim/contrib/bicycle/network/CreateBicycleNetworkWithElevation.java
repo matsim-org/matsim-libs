@@ -12,20 +12,20 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import java.util.Set;
 
-/**
- * Reads an OSM file, builds a bicycle network, and attaches elevation information
- * at two levels:
- * <ul>
- *   <li>Each Node gets a Z coordinate from the DEM.</li>
- *   <li>Each Link gets five elevation KPIs sampled every {@value #SAMPLE_STEP_M} m
- *       along its straight-line geometry: average elevation, mean gradient (signed,
- *       in the direction of travel), max gradient, cumulative climb and cumulative
- *       descent.</li>
- * </ul>
- * The per-link KPIs are computed <em>after</em> the network is fully built, so that
- * {@link NetworkUtils#cleanNetwork} has a chance to drop disconnected components
- * before we spend effort sampling them.
- */
+/// **
+// * Reads an OSM file, builds a bicycle network, and attaches elevation information
+// * at two levels:
+// * <ul>
+// *   <li>Each Node gets a Z coordinate from the DEM.</li>
+// *   <li>Each Link gets five elevation KPIs sampled every {@value #SAMPLE_STEP_M} m
+// *       along its straight-line geometry: average elevation, mean gradient (signed,
+// *       in the direction of travel), max gradient, cumulative climb and cumulative
+// *       descent.</li>
+// * </ul>
+// * The per-link KPIs are computed <em>after</em> the network is fully built, so that
+// * {@link NetworkUtils#cleanNetwork} has a chance to drop disconnected components
+// * before we spend effort sampling them.
+// */
 
 
 /**
@@ -75,11 +75,13 @@ public class CreateBicycleNetworkWithElevation {
 	private static final String inputOsmFile = "C://Users/metz_so/Workspace/data/neukoelln.osm.pbf";//"C://Users/metz_so/Workspace/data/berlin-260122.osm.pbf";
 	//private static final String inputTiffFile = "C:/Users/metz_so/Downloads/DTM Germany 50m v3b by Sonny.tif";
 	private static final String inputTiffFile = "C:/Users/metz_so/Downloads/DTM Germany 20m v3b by Sonny.tif";
+	private static final String demCRS = "EPSG:32632";
 	private static final String outputFile = "C://Users/metz_so/Workspace/data/networks/network_elevation20_step10_tol10.xml.gz";
+
 
 	public static void main(String[] args) {
 
-		var elevationParser = new ElevationDataParser(inputTiffFile, outputCRS);
+		var elevationParser = new ElevationDataParser(inputTiffFile, outputCRS, demCRS);
 		var transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, outputCRS);
 
 		var network = new OsmBicycleReader.Builder()
