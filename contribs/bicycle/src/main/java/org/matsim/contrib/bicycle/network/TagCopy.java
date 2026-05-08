@@ -23,6 +23,9 @@ import org.matsim.api.core.v01.network.Link;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author smetzler
+ */
 public final class TagCopy {
 	private final List<String> keys;
 	private final String prefix;

@@ -24,6 +24,9 @@ import java.util.Map;
 
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
 
+/**
+ * @author smetzler
+ */
 public final class BicycleInfraClassifier {
 
 	/**

@@ -179,6 +179,9 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 	// ============================================================================
 
+	/**
+	 * @author smetzler
+	 */
 	public static void main(String[] args) {
 		new BicycleNetworkPipeline().execute(args);
 	}

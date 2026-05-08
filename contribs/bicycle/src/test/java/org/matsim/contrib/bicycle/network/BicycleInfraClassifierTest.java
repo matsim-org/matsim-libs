@@ -38,6 +38,8 @@ import static org.matsim.contrib.bicycle.network.BicycleInfraCategory.*;
  * The {@code precedence_*} tests pin down a few critical orderings: changing
  * the rule order in {@code classify()} would break those tests, which is the
  * point.
+ *
+ * @author smetzler
  */
 public class BicycleInfraClassifierTest {
 
@@ -495,7 +497,9 @@ public class BicycleInfraClassifierTest {
 	// helpers
 	// =========================================================================
 
-	/** Build a small key/value map. Pass an even number of strings: k1, v1, k2, v2, ... */
+	/**
+	 * Build a small key/value map. Pass an even number of strings: k1, v1, k2, v2, ...
+	 */
 	private static Map<String, String> tags(String... kv) {
 		if (kv.length % 2 != 0) {
 			throw new IllegalArgumentException("tags() needs an even number of arguments");

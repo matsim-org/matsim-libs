@@ -53,6 +53,8 @@ import java.util.Set;
  * the attribute {@code "type"} carries values like {@code "highway.service"},
  * which this class matches against {@code "service"} after stripping the
  * {@code "highway."} prefix.
+ *
+ * @author smetzler
  */
 public final class ServiceLinkCleaner {
 

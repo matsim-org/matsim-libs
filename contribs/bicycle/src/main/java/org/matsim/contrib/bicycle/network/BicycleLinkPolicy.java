@@ -47,6 +47,8 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
  * "Kill" here means the link stays in the graph but has no allowed modes and
  * zero capacity — this is easier for downstream simplifiers than physically
  * removing it.
+ *
+ * @author smetzler
  */
 public final class BicycleLinkPolicy {
 

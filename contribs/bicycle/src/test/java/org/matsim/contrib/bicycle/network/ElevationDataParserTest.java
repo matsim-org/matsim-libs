@@ -57,6 +57,8 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * <p>The chosen tolerance is ±2 m, which is generous: it covers the DTM's own
  * vertical resolution (0.1 m), nearest-neighbor sampling artifacts at pixel
  * boundaries, and any small adjustments Sonny may push in a future v3c.
+ *
+ * @author smetzler
  */
 public class ElevationDataParserTest {
 

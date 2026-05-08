@@ -53,6 +53,8 @@ import java.util.Deque;
  * and last samples are pinned to those values. This keeps KPIs consistent
  * with the per-node elevation attribute and means those endpoints are never
  * removed by DP.
+ *
+ * @author smetzler
  */
 public final class LinkElevationProfile {
 

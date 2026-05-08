@@ -45,6 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *       tolerance is kept</li>
  *   <li>Reverse direction has flipped signs</li>
  * </ul>
+ *
+ * @author smetzler
  */
 public class LinkElevationProfileTest {
 
@@ -226,7 +228,9 @@ public class LinkElevationProfileTest {
 	// helpers
 	// =========================================================================
 
-	/** Forward link, length 100 m on the X axis from (x0, y0) to (x0 + length, y0). */
+	/**
+	 * Forward link, length 100 m on the X axis from (x0, y0) to (x0 + length, y0).
+	 */
 	private static Link createLink(double x0, double y0, double length) {
 		Network net = NetworkUtils.createNetwork();
 		Node from = net.getFactory().createNode(Id.createNodeId("from"), new Coord(x0, y0));
@@ -237,7 +241,9 @@ public class LinkElevationProfileTest {
 			length, 1000.0, 1000.0, 1.0);
 	}
 
-	/** Reverse direction of {@link #createLink}. */
+	/**
+	 * Reverse direction of {@link #createLink}.
+	 */
 	private static Link createReverseLink(double x0, double y0, double length) {
 		Network net = NetworkUtils.createNetwork();
 		Node from = net.getFactory().createNode(Id.createNodeId("from"), new Coord(x0 + length, y0));
