@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.contrib.bicycle.network;
 
 import org.matsim.api.core.v01.Id;
@@ -61,6 +79,11 @@ import java.util.function.BiPredicate;
 	mixinStandardHelpOptions = true
 )
 public class BicycleNetworkPipeline implements MATSimAppCommand {
+
+	@Option(names = "--mode",
+		description = "Network mode name to assign to cyclable links. Default: ${DEFAULT-VALUE}.",
+		defaultValue = "bike")
+	private String mode;
 
 	@Option(names = "--input", required = true, description = "Path to OSM input file (.osm.pbf)")
 	private Path input;
@@ -177,7 +200,6 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		removeNonConnectingService(network);
 
 		// ---- 4b. second pass: service cleanup may have created new isolated components
-		//NetworkUtils.cleanNetwork(network, Set.of(FROM_MODE));
 		simplifyWithBikeInfra(network);
 
 		// ---- 5. rename mode: bike -> bicycle ---------------------------------
@@ -189,9 +211,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			attachLinkElevationKpis(link, elevationParser, eleSampleStepM, eleNoiseToleranceM);
 			counted++;
 		}
-//		System.out.println("Attached elevation KPIs to " + counted + " links "
-//			+ "(sample step = " + eleSampleStepM + " m, noise tolerance = "
-//			+ eleNoiseToleranceM + " m).");
+
 		log.info("Attached elevation KPIs to {} links (sample step = {} m, noise tolerance = {} m).",
 			counted, eleSampleStepM, eleNoiseToleranceM);
 
@@ -201,17 +221,6 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		return 0;
 	}
 
-//	private static void renameLinkAttributes(Network network, Map<String, String> renames) {
-//		for (Link link : network.getLinks().values()) {
-//			for (var e : renames.entrySet()) {
-//				Object v = link.getAttributes().getAttribute(e.getKey());
-//				if (v != null) {
-//					link.getAttributes().putAttribute(e.getValue(), v);
-//					link.getAttributes().removeAttribute(e.getKey());
-//				}
-//			}
-//		}
-//	}
 
 	// =========================================================================
 	// Elevation

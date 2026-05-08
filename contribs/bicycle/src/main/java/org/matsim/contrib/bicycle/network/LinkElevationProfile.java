@@ -1,5 +1,20 @@
 /* *********************************************************************** *
- * project: org.matsim.*                                                   *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.network;
 
@@ -41,30 +56,36 @@ import java.util.Deque;
  */
 public final class LinkElevationProfile {
 
-	/** Five KPIs derived from the simplified elevation profile along a link. */
+	/**
+	 * Five KPIs derived from the simplified elevation profile along a link.
+	 */
 	public record Kpis(
 		double averageElevation,  // meters a.s.l., mean over the simplified profile
 		double gradient,          // signed mean gradient, e.g. +0.032 = 3.2% uphill
 		double maxGradient,       // max signed gradient over any simplified segment
 		double elevationGain,     // cumulative meters climbed (on simplified profile)
 		double elevationLoss      // cumulative meters descended (as positive number)
-	) {}
+	) {
+	}
 
-	private LinkElevationProfile() {}
+	private LinkElevationProfile() {
+	}
 
 	public static Kpis compute(Link link, double sampleStep, double noiseToleranceM,
-	                           ElevationDataParser elevation) {
+							   ElevationDataParser elevation) {
 		return compute(link, sampleStep, noiseToleranceM, elevation::getElevation);
 	}
 
-	/** Function-interface variant — mainly useful for unit tests that mock the elevation source. */
+	/**
+	 * Function-interface variant — mainly useful for unit tests that mock the elevation source.
+	 */
 	@FunctionalInterface
 	public interface ElevationSource {
 		double at(Coord coord);
 	}
 
 	public static Kpis compute(Link link, double sampleStep, double noiseToleranceM,
-	                           ElevationSource elevation) {
+							   ElevationSource elevation) {
 		Coord from = link.getFromNode().getCoord();
 		Coord to = link.getToNode().getCoord();
 
