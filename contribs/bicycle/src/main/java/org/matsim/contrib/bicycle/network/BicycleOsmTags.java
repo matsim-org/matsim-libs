@@ -150,5 +150,5 @@ public final class BicycleOsmTags {
 	public static final String BICYCLE_ROAD = "bicycle_road";
 	public static final String MTB_SCALE = "mtb:scale";
 	public static final String SURFACE = "surface";
-
+	public static final String SMOOTHNESS = "smoothness";
 }

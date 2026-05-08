@@ -143,7 +143,10 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * see the TODO in the class JavaDoc.
 	 */
 	private static final List<String> OSM_TAG_ATTR_KEYS = List.of(
-		"bicycle", "surface", "smoothness", "cycleway"
+		BicycleOsmTags.BICYCLE,
+		BicycleOsmTags.SURFACE,
+		BicycleOsmTags.SMOOTHNESS,
+		BicycleOsmTags.CYCLEWAY
 	);
 
 	/**
