@@ -27,7 +27,7 @@ public class VehicleTypeBasedScoringFunctionFactory implements ScoringFunctionFa
 		ScoringParameters parameters = params.getScoringParameters(person);
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(parameters));
+		sumScoringFunction.addScoringFunction(new ActivityScoringForCommercialActivities(parameters));
 		sumScoringFunction.addScoringFunction(new VehicleTypeBasedLegScoring(scenario.getVehicles(), parameters, scenario.getConfig().transit().getTransitModes()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(parameters));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(parameters));
