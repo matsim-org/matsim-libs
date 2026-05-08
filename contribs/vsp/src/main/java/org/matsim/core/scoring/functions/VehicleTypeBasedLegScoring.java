@@ -159,7 +159,7 @@ public class VehicleTypeBasedLegScoring implements SumScoringFunction.TripScorin
 					ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(vehicleType.getId().toString());
 					thisModeParams.setDailyMonetaryConstant((-1) * vehicleType.getCostInformation().getFixedCosts());
 					thisModeParams.setMarginalUtilityOfDistance((-1) * vehicleType.getCostInformation().getCostsPerMeter());
-					thisModeParams.setMarginalUtilityOfTraveling((-1) * vehicleType.getCostInformation().getCostsPerSecond());
+					thisModeParams.setMarginalUtilityOfTraveling((-1) * vehicleType.getCostInformation().getCostsPerSecond() * 3600); // needed because the builder expects this in per hour
 					params.modeParams.put(vehicleType.getId().toString(), new ModeUtilityParameters.Builder(thisModeParams).build());
 					return vehicleType.getId().toString();
 				}
