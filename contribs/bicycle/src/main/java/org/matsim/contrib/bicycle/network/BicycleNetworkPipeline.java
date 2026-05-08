@@ -37,16 +37,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.nio.file.Path;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 
 
@@ -209,6 +200,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			.read(input.toString());
 		log.info("After OSM read: {} nodes, {} links",
 			network.getNodes().size(), network.getLinks().size());
+		logBicycleInfraDistribution(network, "after OSM read");
 
 		// ---- 1b. move OSM-derived attributes under "osm:" prefix ------------
 		prefixOsmAttributes(network);
@@ -241,6 +233,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		}
 		log.info("Attached elevation KPIs to {} links (sample step = {} m, noise tolerance = {} m).",
 			counted, eleSampleStepM, eleNoiseToleranceM);
+		logBicycleInfraDistribution(network, "in final network");
 
 		// ---- 8. write --------------------------------------------------------
 		new NetworkWriter(network).write(output.toString());
@@ -268,6 +261,102 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 				}
 			}
 		}
+	}
+
+
+	// =========================================================================
+	// Bicycle infra distribution
+	// =========================================================================
+
+	/**
+	 * Counts links by their {@code bicycle_infra} attribute and logs a sorted
+	 * summary table including link counts, total length in km, and percentages.
+	 * Useful as a sanity check during scenario development -- if the {@code NONE}
+	 * count or {@code NEEDS_CLARIFICATION} count jumps unexpectedly between two
+	 * OSM extracts, this is the place where you'd notice.
+	 *
+	 * <p>Categories with zero count are omitted; links whose attribute value
+	 * doesn't match any known {@link BicycleInfraCategory} are tallied
+	 * separately under "(unparseable)".
+	 *
+	 * <p>Sorted by total length, descending. Ties broken by enum declaration
+	 * order.
+	 *
+	 * @param label short context tag included in the log header,
+	 *              e.g. {@code "after OSM read"} or {@code "in final network"}
+	 */
+	private static void logBicycleInfraDistribution(Network network, String label) {
+		EnumMap<BicycleInfraCategory, Integer> counts = new EnumMap<>(BicycleInfraCategory.class);
+		EnumMap<BicycleInfraCategory, Double> lengthsM = new EnumMap<>(BicycleInfraCategory.class);
+		int unparseableCount = 0;
+		double unparseableLengthM = 0;
+		int totalCount = 0;
+		double totalLengthM = 0;
+
+		for (Link link : network.getLinks().values()) {
+			Object raw = link.getAttributes().getAttribute(LINK_ATTR_BICYCLE_INFRA);
+			double len = link.getLength();
+			totalCount++;
+			totalLengthM += len;
+			if (raw == null) {
+				unparseableCount++;
+				unparseableLengthM += len;
+				continue;
+			}
+			try {
+				BicycleInfraCategory cat = BicycleInfraCategory.valueOf(raw.toString());
+				counts.merge(cat, 1, Integer::sum);
+				lengthsM.merge(cat, len, Double::sum);
+			} catch (IllegalArgumentException e) {
+				unparseableCount++;
+				unparseableLengthM += len;
+			}
+		}
+
+		if (totalCount == 0) {
+			log.info("Bicycle infra distribution ({}): no links.", label);
+			return;
+		}
+
+		// Find the longest category name for column alignment.
+		int nameWidth = 0;
+		for (BicycleInfraCategory cat : counts.keySet()) {
+			nameWidth = Math.max(nameWidth, cat.name().length());
+		}
+		if (unparseableCount > 0) {
+			nameWidth = Math.max(nameWidth, "(unparseable)".length());
+		}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("Bicycle infra distribution (").append(label).append("):\n");
+
+		// Sort by descending total length, ties broken by enum declaration order.
+		List<BicycleInfraCategory> sorted = new ArrayList<>(counts.keySet());
+		sorted.sort((a, b) -> {
+			int byLength = Double.compare(lengthsM.getOrDefault(b, 0.0), lengthsM.getOrDefault(a, 0.0));
+			return byLength != 0 ? byLength : a.compareTo(b);
+		});
+		for (BicycleInfraCategory cat : sorted) {
+			sb.append(formatRow(cat.name(), counts.get(cat), totalCount,
+				lengthsM.getOrDefault(cat, 0.0), totalLengthM, nameWidth));
+		}
+
+		if (unparseableCount > 0) {
+			sb.append(formatRow("(unparseable)", unparseableCount, totalCount,
+				unparseableLengthM, totalLengthM, nameWidth));
+		}
+		sb.append(formatRow("Total", totalCount, totalCount, totalLengthM, totalLengthM, nameWidth));
+
+		log.info(sb.toString());
+	}
+
+	private static String formatRow(String name, int count, int totalCount,
+									double lengthM, double totalLengthM, int nameWidth) {
+		double countPct = 100.0 * count / totalCount;
+		double lengthPct = totalLengthM > 0 ? 100.0 * lengthM / totalLengthM : 0.0;
+		return String.format(Locale.ROOT,
+			"  %-" + nameWidth + "s  %8d (%5.1f%%)  %9.1f km (%5.1f%%)%n",
+			name, count, countPct, lengthM / 1000.0, lengthPct);
 	}
 
 
