@@ -18,6 +18,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.testcases.utils.DistributedExecution;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.io.IOException;
@@ -26,8 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,9 +90,8 @@ public class DistributedIntegrationTest {
 	}
 
 	/**
-	 * This test is disabled. The DSim calculates travel times different from the QSim. Therefore events and scores
-	 * are not equal and there is no point in comparing it. Keep the test around though, because it is sometimes handy
-	 * for comparing with existing features.
+	 * This test is disabled. The DSim calculates travel times different from the QSim. Therefore events and scores are not equal and there is no
+	 * point in comparing it. Keep the test around though, because it is sometimes handy for comparing with existing features.
 	 */
 	@Test
 	@Order(1)
@@ -129,37 +127,28 @@ public class DistributedIntegrationTest {
 	@Test
 	@Order(3)
 	@org.matsim.testcases.DisabledOnGitHubWindowsCI
-	void runDistributed() throws ExecutionException, InterruptedException, TimeoutException, IOException {
+	void runDistributed() throws IOException {
 
 		int size = 2;
 		var comms = LocalCommunicator.create(size);
 		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
-		try (var pool = Executors.newFixedThreadPool(size)) {
-			var futures = comms.stream()
-				.map(comm -> pool.submit(() -> {
+		DistributedExecution.execute(comms, 600, comm -> {
+			Config local = createScenario();
+			local.dsim().setThreads(1);
 
-					Config local = createScenario();
-					local.dsim().setThreads(1);
+			Scenario scenario = prepareScenario(local);
 
-					Scenario scenario = prepareScenario(local);
+			Controler controler = new Controler(scenario, DistributedContext.create(comm, local));
 
-					Controler controler = new Controler(scenario, DistributedContext.create(comm, local));
+			controler.run();
 
-					controler.run();
-
-					try {
-						comm.close();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}))
-				.toList();
-
-			for (var f : futures) {
-				f.get(2, TimeUnit.MINUTES);
+			try {
+				comm.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-		}
+		});
 
 		Path outputPath = Path.of(utils.getOutputDirectory());
 

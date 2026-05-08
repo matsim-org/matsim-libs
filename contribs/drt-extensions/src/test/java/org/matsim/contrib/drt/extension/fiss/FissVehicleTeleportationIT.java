@@ -111,6 +111,151 @@ class FissVehicleTeleportationIT {
 	}
 
 	/**
+	 * Tests redirect in teleport mode: Two agents share one vehicle. Agent A departs link1 at t=100, teleporting to
+	 * link3 (arrival t=302). Agent B's activity on link3 ends at t=150, while the vehicle is still in transit. With
+	 * {@link QSimConfigGroup.VehicleBehavior#teleport}, the vehicle location is irrelevant -- FISS redirects the
+	 * in-transit vehicle to agent B's destination and agent B departs immediately at t=150 (no waiting).
+	 * <p>
+	 * Contrast with {@link #testSharedVehicleWithWait()} where the agent waits until the vehicle arrives.
+	 * </p>
+	 *
+	 * <pre>
+	 * n1 --l1--> n2 --l2--> n3 --l3--> n4
+	 * n1 <--l4-- n2 <--l5-- n3 <--l6-- n4
+	 *
+	 * Agent A trip 1: l1--[l2]-->l3 at t=100. TT=202s. Arrive t=302.
+	 * Agent B trip 1: l3--[l6, l5]-->l4 at t=150. Vehicle in transit.
+	 *     Redirect: depart immediately. TT=303s. Arrive t=453.
+	 * </pre>
+	 */
+	@Test
+	void testVehicleTeleportationRedirectInTransit() {
+		Config config = ConfigUtils.createConfig();
+		config.qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.teleport);
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
+		config.qsim().setMainModes(List.of(TransportMode.car));
+		config.qsim().setEndTime(24 * 3600);
+		config.routing().setNetworkModes(List.of(TransportMode.car));
+		config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
+		config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600));
+		config.scoring().addModeParams(new ModeParams(TransportMode.car));
+		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1));
+		config.controller().setLastIteration(0);
+		config.controller()
+				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+
+		Network network = scenario.getNetwork();
+		NetworkFactory nf = network.getFactory();
+		Node node1 = nf.createNode(Id.createNodeId("1"), new Coord(0, 0));
+		Node node2 = nf.createNode(Id.createNodeId("2"), new Coord(1000, 0));
+		Node node3 = nf.createNode(Id.createNodeId("3"), new Coord(2000, 0));
+		Node node4 = nf.createNode(Id.createNodeId("4"), new Coord(3000, 0));
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		network.addNode(node4);
+		Link l1 = nf.createLink(Id.createLinkId("1"), node1, node2);
+		Link l2 = nf.createLink(Id.createLinkId("2"), node2, node3);
+		Link l3 = nf.createLink(Id.createLinkId("3"), node3, node4);
+		Link l4 = nf.createLink(Id.createLinkId("4"), node2, node1);
+		Link l5 = nf.createLink(Id.createLinkId("5"), node3, node2);
+		Link l6 = nf.createLink(Id.createLinkId("6"), node4, node3);
+		for (Link link : List.of(l1, l2, l3, l4, l5, l6)) {
+			link.setLength(1000);
+			link.setFreespeed(10);
+			link.setCapacity(1000);
+			link.setNumberOfLanes(1);
+			link.setAllowedModes(Set.of(TransportMode.car));
+			network.addLink(link);
+		}
+
+		// One shared vehicle, initially on link1
+		Vehicles vehicles = scenario.getVehicles();
+		VehicleType carType = VehicleUtils.createVehicleType(Id.create("defaultCar", VehicleType.class));
+		carType.setNetworkMode(TransportMode.car);
+		vehicles.addVehicleType(carType);
+		Vehicle sharedVehicle = VehicleUtils.createVehicle(Id.createVehicleId("shared_v1"), carType);
+		VehicleUtils.setInitialLinkId(sharedVehicle, l1.getId());
+		vehicles.addVehicle(sharedVehicle);
+
+		PopulationFactory pf = scenario.getPopulation().getFactory();
+
+		// Agent A: depart l1 at t=100, arrive l3 at t=302
+		Person agentA = pf.createPerson(Id.createPersonId("A"));
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes(agentA,
+				java.util.Map.of(TransportMode.car, sharedVehicle.getId()));
+		Plan planA = pf.createPlan();
+		Activity homeA = pf.createActivityFromLinkId("home", l1.getId());
+		homeA.setEndTime(100);
+		planA.addActivity(homeA);
+		Leg legA = pf.createLeg(TransportMode.car);
+		TripStructureUtils.setRoutingMode(legA, TransportMode.car);
+		NetworkRoute routeA = RouteUtils.createLinkNetworkRouteImpl(l1.getId(), List.of(l2.getId()), l3.getId());
+		routeA.setVehicleId(sharedVehicle.getId());
+		legA.setRoute(routeA);
+		planA.addLeg(legA);
+		Activity workA = pf.createActivityFromLinkId("work", l3.getId());
+		planA.addActivity(workA); // no end time -- single trip
+		agentA.addPlan(planA);
+		scenario.getPopulation().addPerson(agentA);
+
+		// Agent B: depart l3 at t=150 (vehicle still in transit). Redirect.
+		Person agentB = pf.createPerson(Id.createPersonId("B"));
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes(agentB,
+				java.util.Map.of(TransportMode.car, sharedVehicle.getId()));
+		Plan planB = pf.createPlan();
+		Activity homeB = pf.createActivityFromLinkId("home", l3.getId());
+		homeB.setEndTime(150);
+		planB.addActivity(homeB);
+		Leg legB = pf.createLeg(TransportMode.car);
+		TripStructureUtils.setRoutingMode(legB, TransportMode.car);
+		NetworkRoute routeB = RouteUtils.createLinkNetworkRouteImpl(l3.getId(),
+				List.of(l6.getId(), l5.getId()), l4.getId());
+		routeB.setVehicleId(sharedVehicle.getId());
+		legB.setRoute(routeB);
+		planB.addLeg(legB);
+		Activity workB = pf.createActivityFromLinkId("work", l4.getId());
+		planB.addActivity(workB);
+		agentB.addPlan(planB);
+		scenario.getPopulation().addPerson(agentB);
+
+		FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
+		fissConfigGroup.setSampleFactor(Double.MIN_VALUE);
+		fissConfigGroup.setSampledModes(Set.of(TransportMode.car));
+		fissConfigGroup.setSwitchOffFISSLastIteration(false);
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new FISSModule());
+
+		StuckCounter stuckCounter = new StuckCounter();
+		ArrivalTracker arrivalTracker = new ArrivalTracker();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(stuckCounter);
+				addEventHandlerBinding().toInstance(arrivalTracker);
+			}
+		});
+
+		controler.run();
+
+		assertEquals(0, stuckCounter.getStuckCount(), "No agents should get stuck");
+
+		List<Double> arrivalsA = arrivalTracker.getArrivalTimes(Id.createPersonId("A"));
+		assertEquals(1, arrivalsA.size(), "Agent A should complete 1 trip");
+		assertEquals(100 + 202, arrivalsA.get(0), 0, "Agent A arrives at t=302");
+
+		List<Double> arrivalsB = arrivalTracker.getArrivalTimes(Id.createPersonId("B"));
+		assertEquals(1, arrivalsB.size(), "Agent B should complete 1 trip");
+		// Agent B departs at t=150, not waiting until t=302
+		assertEquals(150 + 303, arrivalsB.get(0), 0,
+				"Agent B should depart at t=150 (redirect), not wait until t=302");
+	}
+
+	/**
 	 * Shared implementation for the minimal teleportation tests.
 	 *
 	 * @param activityEndTime when the intermediate activity ends. If before
@@ -480,10 +625,15 @@ class FissVehicleTeleportationIT {
 		assertEquals(2, fissA.size(), "FISS: agent A should complete 2 trips");
 		assertEquals(2, fissB.size(), "FISS: agent B should complete 2 trips");
 
+		// With deferred departures, FISS teleports agents that wait for an in-transit vehicle
+		// rather than delegating to QSim physical simulation. Each vehicle
+		// handoff in QSim introduces a 1-second back-to-back departure delay
+		// that FISS does not reproduce. With 3 handoffs in this scenario, the
+		// accumulated difference can be up to 3 seconds.
 		assertEquals(baselineA.get(0), fissA.get(0), 1, "Agent A trip 1 arrival should match baseline");
-		assertEquals(baselineA.get(1), fissA.get(1), 1, "Agent A trip 2 arrival should match baseline");
+		assertEquals(baselineA.get(1), fissA.get(1), 3, "Agent A trip 2 arrival should match baseline");
 		assertEquals(baselineB.get(0), fissB.get(0), 1, "Agent B trip 1 arrival should match baseline");
-		assertEquals(baselineB.get(1), fissB.get(1), 1, "Agent B trip 2 arrival should match baseline");
+		assertEquals(baselineB.get(1), fissB.get(1), 3, "Agent B trip 2 arrival should match baseline");
 	}
 
 	private ArrivalTracker runSharedVehicleScenario(boolean enableFiss) {
