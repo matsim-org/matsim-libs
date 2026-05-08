@@ -66,8 +66,8 @@ public final class BicycleLinkPolicy {
 		tagCopy.copy(link, tags);
 
 		// 1. classify cycling infrastructure
-		String infra = classifier.classify(tags, direction);
-		link.getAttributes().putAttribute("bicycle_infra", infra);
+		BicycleInfraCategory infra = classifier.classify(tags, direction);
+		link.getAttributes().putAttribute("bicycle_infra", infra.name());
 
 		// 2. footway/pedestrian whitelist — kills the link if bike isn't explicitly allowed
 		enforceFootwayPedestrianWhitelist(link, tags);
