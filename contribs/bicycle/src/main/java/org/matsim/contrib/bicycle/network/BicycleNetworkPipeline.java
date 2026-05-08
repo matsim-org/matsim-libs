@@ -204,22 +204,28 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			})
 			.build()
 			.read(input.toString());
+		log.info("After OSM read: {} nodes, {} links",
+			network.getNodes().size(), network.getLinks().size());
 
 		// ---- 1b. move OSM-derived attributes under "osm:" prefix ------------
 		prefixOsmAttributes(network);
 
 		// ---- 2. drop isolated components -------------------------------------
 		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.bike));
+		log.info("After cleanNetwork: {} links", network.getLinks().size());
 
 		// ---- 3. bicycle-aware simplification ---------------------------------
 		simplifyWithBikeInfra(network);
+		log.info("After simplification (1st pass): {} links", network.getLinks().size());
 
 		// ---- 4. remove service dead-ends and hairline branches ---------------
 		new ServiceLinkCleaner().run(network);
+		log.info("After service-link cleanup: {} links", network.getLinks().size());
 
 		// ---- 5. second simplification pass; service cleanup may have created
 		//        new merge candidates -----------------------------------------
 		simplifyWithBikeInfra(network);
+		log.info("After simplification (2nd pass): {} links", network.getLinks().size());
 
 		// ---- 6. rename mode if requested (no-op when --mode bike) -----------
 		renameMode(network, TransportMode.bike, mode);
