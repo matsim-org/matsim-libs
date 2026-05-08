@@ -83,7 +83,7 @@ import java.util.function.BiPredicate;
  * prefix once their renames are sorted out:
  * <ul>
  *   <li>{@code "type"} → {@code "osm:highway"} (still carries the {@code "highway."}
- *       value prefix that is consumed by {@link #isService(Link)})</li>
+ *       value prefix; see {@link ServiceLinkCleaner})</li>
  *   <li>{@code "origid"} → {@code "osm:way_id"} (carries merge semantics from
  *       {@link NetworkSimplifier})</li>
  * </ul>
@@ -215,7 +215,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		simplifyWithBikeInfra(network);
 
 		// ---- 4. remove service dead-ends and hairline branches ---------------
-		removeNonConnectingService(network);
+		new ServiceLinkCleaner().run(network);
 
 		// ---- 5. second simplification pass; service cleanup may have created
 		//        new merge candidates -----------------------------------------
@@ -391,121 +391,5 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		for (String part : s.split("-")) {
 			if (!part.isBlank()) acc.add(part);
 		}
-	}
-
-
-	// =========================================================================
-	// Service link cleanup
-	// =========================================================================
-
-	private static boolean isService(Link l) {
-		// TODO: switch to "osm:highway" once the type/highway rename happens.
-		Object t = l.getAttributes().getAttribute("type");
-		if (t == null) return false;
-		String s = t.toString().replaceFirst("^highway\\.", "");
-		return "service".equals(s);
-	}
-
-	private static boolean hasNonServiceIncidentLink(Node n) {
-		for (Link l : n.getInLinks().values()) if (!isService(l)) return true;
-		for (Link l : n.getOutLinks().values()) if (!isService(l)) return true;
-		return false;
-	}
-
-	/**
-	 * Walks the connected components made of service links and decides what to
-	 * do with each: if a component touches the rest of the graph at 0-1 nodes,
-	 * it can't provide a useful shortcut and is removed entirely. Otherwise,
-	 * we trim off hair-like dead-end branches while keeping whatever actually
-	 * connects two entry points.
-	 */
-	private static void removeNonConnectingService(Network network) {
-
-		Set<Id<Link>> visited = new HashSet<>();
-		List<Id<Link>> linksToRemove = new ArrayList<>();
-
-		for (Link seed : network.getLinks().values()) {
-			if (!isService(seed) || visited.contains(seed.getId())) continue;
-
-			Deque<Link> q = new ArrayDeque<>();
-			q.add(seed);
-			visited.add(seed.getId());
-
-			List<Link> componentLinks = new ArrayList<>();
-			Set<Id<Node>> dockingNodes = new HashSet<>();
-
-			while (!q.isEmpty()) {
-				Link l = q.poll();
-				componentLinks.add(l);
-
-				Node a = l.getFromNode();
-				Node b = l.getToNode();
-				if (hasNonServiceIncidentLink(a)) dockingNodes.add(a.getId());
-				if (hasNonServiceIncidentLink(b)) dockingNodes.add(b.getId());
-
-				for (Link nl : a.getInLinks().values()) if (isService(nl) && visited.add(nl.getId())) q.add(nl);
-				for (Link nl : a.getOutLinks().values()) if (isService(nl) && visited.add(nl.getId())) q.add(nl);
-				for (Link nl : b.getInLinks().values()) if (isService(nl) && visited.add(nl.getId())) q.add(nl);
-				for (Link nl : b.getOutLinks().values()) if (isService(nl) && visited.add(nl.getId())) q.add(nl);
-			}
-
-			if (dockingNodes.size() <= 1) {
-				for (Link l : componentLinks) linksToRemove.add(l.getId());
-			} else {
-				trimServiceComponent(network, componentLinks, dockingNodes);
-			}
-		}
-
-		linksToRemove.forEach(network::removeLink);
-		NetworkUtils.removeNodesWithoutLinks(network);
-	}
-
-	/**
-	 * Iteratively peels off leaf nodes (degree <= 1, not a docking node) from
-	 * the service component. What remains is either empty or a chain/tree
-	 * connecting at least two docking nodes.
-	 */
-	private static void trimServiceComponent(Network network, List<Link> componentLinks, Set<Id<Node>> dockingNodes) {
-
-		Map<Id<Node>, Set<Id<Node>>> nbr = new HashMap<>();
-		Map<String, List<Id<Link>>> pairToLinks = new HashMap<>();
-
-		for (Link l : componentLinks) {
-			Id<Node> u = l.getFromNode().getId();
-			Id<Node> v = l.getToNode().getId();
-			nbr.computeIfAbsent(u, k -> new HashSet<>()).add(v);
-			nbr.computeIfAbsent(v, k -> new HashSet<>()).add(u);
-			pairToLinks.computeIfAbsent(edgeKey(u, v), k -> new ArrayList<>()).add(l.getId());
-		}
-
-		Deque<Id<Node>> q = new ArrayDeque<>();
-		for (var e : nbr.entrySet()) {
-			if (e.getValue().size() <= 1 && !dockingNodes.contains(e.getKey())) q.add(e.getKey());
-		}
-
-		Set<String> removedPairs = new HashSet<>();
-		while (!q.isEmpty()) {
-			Id<Node> leaf = q.poll();
-			Set<Id<Node>> neigh = nbr.get(leaf);
-			if (neigh == null || neigh.size() > 1 || dockingNodes.contains(leaf)) continue;
-			if (neigh.isEmpty()) continue;
-
-			Id<Node> other = neigh.iterator().next();
-			removedPairs.add(edgeKey(leaf, other));
-			nbr.get(leaf).remove(other);
-			nbr.get(other).remove(leaf);
-
-			if (nbr.get(other).size() <= 1 && !dockingNodes.contains(other)) q.add(other);
-		}
-
-		for (String key : removedPairs) {
-			for (Id<Link> lid : pairToLinks.getOrDefault(key, List.of())) {
-				network.removeLink(lid);
-			}
-		}
-	}
-
-	private static String edgeKey(Id<Node> a, Id<Node> b) {
-		return a.toString().compareTo(b.toString()) < 0 ? a + "_" + b : b + "_" + a;
 	}
 }
