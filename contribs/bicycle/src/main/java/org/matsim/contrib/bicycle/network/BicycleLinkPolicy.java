@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
+
 /**
  * Applies bicycle-specific link attributes and access rules on top of the
  * generic network produced by {@link org.matsim.contrib.osm.networkReader.OsmBicycleReader}.
@@ -72,7 +74,7 @@ public final class BicycleLinkPolicy {
 		if (link.getAllowedModes().isEmpty()) return;
 
 		// 3. bicycle=no -> kill
-		if ("no".equals(tags.get("bicycle"))) {
+		if (NO.equals(tags.get(BICYCLE))) {
 			kill(link);
 			return;
 		}
@@ -93,11 +95,11 @@ public final class BicycleLinkPolicy {
 	// ------------------------------------------------------------------------
 
 	private static void enforceFootwayPedestrianWhitelist(Link link, Map<String, String> tags) {
-		String h = tags.get("highway");
-		if (!("footway".equals(h) || "pedestrian".equals(h))) return;
+		String h = tags.get(HIGHWAY);
+		if (!(HW_FOOTWAY.equals(h) || HW_PEDESTRIAN.equals(h))) return;
 
-		String bicycle = tags.get("bicycle");
-		boolean ok = "yes".equals(bicycle) || "designated".equals(bicycle);
+		String bicycle = tags.get(BICYCLE);
+		boolean ok = YES.equals(bicycle) || DESIGNATED.equals(bicycle);
 		if (!ok) {
 			kill(link);
 		}
@@ -115,13 +117,13 @@ public final class BicycleLinkPolicy {
 	}
 
 	private static boolean isBicycleOnewayRelevant(Map<String, String> tags) {
-		String h = tags.get("highway");
-		boolean relevant = "path".equals(h) || "cycleway".equals(h) || "footway".equals(h);
+		String h = tags.get(HIGHWAY);
+		boolean relevant = HW_PATH.equals(h) || HW_CYCLEWAY.equals(h) || HW_FOOTWAY.equals(h);
 		if (!relevant) return false;
 
-		if ("yes".equals(tags.get("oneway:bicycle"))) return true;
-		if ("yes".equals(tags.get("oneway"))) {
-			return !"no".equals(tags.get("oneway:bicycle"));
+		if (YES.equals(tags.get(ONEWAY_BICYCLE))) return true;
+		if (YES.equals(tags.get(ONEWAY))) {
+			return !NO.equals(tags.get(ONEWAY_BICYCLE));
 		}
 		return false;
 	}

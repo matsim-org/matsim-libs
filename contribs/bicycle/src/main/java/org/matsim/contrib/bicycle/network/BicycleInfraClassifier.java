@@ -22,6 +22,8 @@ import org.matsim.contrib.osm.networkReader.SupersonicOsmNetworkReader.Direction
 
 import java.util.Map;
 
+import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
+
 public final class BicycleInfraClassifier {
 
 	/**
@@ -118,9 +120,9 @@ public final class BicycleInfraClassifier {
 	// -------------------------------------------------------------------------
 
 	private static String getBicycleRoadType(Map<String, String> t) {
-		boolean isBicycleRoad = "yes".equals(v(t, "bicycle_road"));
+		boolean isBicycleRoad = YES.equals(v(t, BICYCLE_ROAD));
 
-		String trafficSign = v(t, "traffic_sign");
+		String trafficSign = v(t, TRAFFIC_SIGN);
 		if (!isBicycleRoad && !isEmpty(trafficSign) && trafficSign.contains("DE:244")) {
 			isBicycleRoad = true;
 		}
@@ -136,9 +138,9 @@ public final class BicycleInfraClassifier {
 			return "BICYCLE_ROAD_VEHICLE_DESTINATION";
 		}
 
-		String vehicle = v(t, "vehicle");
-		String motorVehicle = v(t, "motor_vehicle");
-		if (isAnyOf(vehicle, "destination", "yes") || isAnyOf(motorVehicle, "destination", "yes")) {
+		String vehicle = v(t, VEHICLE);
+		String motorVehicle = v(t, MOTOR_VEHICLE);
+		if (isAnyOf(vehicle, "destination", YES) || isAnyOf(motorVehicle, "destination", YES)) {
 			return "BICYCLE_ROAD_VEHICLE_DESTINATION";
 		}
 
@@ -150,9 +152,9 @@ public final class BicycleInfraClassifier {
 	// -------------------------------------------------------------------------
 
 	private static boolean isPedestrianAreaBicycleYes(Map<String, String> t) {
-		if (!"pedestrian".equals(v(t, "highway"))) return false;
-		String bicycle = v(t, "bicycle");
-		return isAnyOf(bicycle, "yes", "designated");
+		if (!HW_PEDESTRIAN.equals(v(t, HIGHWAY))) return false;
+		String bicycle = v(t, BICYCLE);
+		return isAnyOf(bicycle, YES, DESIGNATED);
 	}
 
 	// -------------------------------------------------------------------------
@@ -160,23 +162,23 @@ public final class BicycleInfraClassifier {
 	// -------------------------------------------------------------------------
 
 	private static boolean isCyclewayLink(Map<String, String> t) {
-		return "cycleway".equals(v(t, "highway")) && "link".equals(v(t, "cycleway"));
+		return HW_CYCLEWAY.equals(v(t, HIGHWAY)) && "link".equals(v(t, CYCLEWAY));
 	}
 
 	private static boolean isCrossing(Map<String, String> t) {
-		String highway = v(t, "highway");
-		String bicycle = v(t, "bicycle");
+		String highway = v(t, HIGHWAY);
+		String bicycle = v(t, BICYCLE);
 
 		// highway=cycleway + cycleway=crossing
-		if ("cycleway".equals(highway) && "crossing".equals(v(t, "cycleway"))) return true;
+		if (HW_CYCLEWAY.equals(highway) && CW_CROSSING.equals(v(t, CYCLEWAY))) return true;
 
 		// highway=path + path=crossing + bicycle=yes/designated
-		if ("path".equals(highway) && "crossing".equals(v(t, "path"))
-			&& isAnyOf(bicycle, "yes", "designated")) return true;
+		if (HW_PATH.equals(highway) && CW_CROSSING.equals(v(t, "path"))
+			&& isAnyOf(bicycle, YES, DESIGNATED)) return true;
 
 		// highway=footway + footway=crossing + bicycle=yes/designated
-		if ("footway".equals(highway) && "crossing".equals(v(t, "footway"))
-			&& isAnyOf(bicycle, "yes", "designated")) return true;
+		if (HW_FOOTWAY.equals(highway) && CW_CROSSING.equals(v(t, "footway"))
+			&& isAnyOf(bicycle, YES, DESIGNATED)) return true;
 
 		return false;
 	}
@@ -188,13 +190,13 @@ public final class BicycleInfraClassifier {
 	private static String getSharedBusLaneTypeForDirection(Map<String, String> t, Direction dir) {
 		boolean forward = dir == Direction.Forward;
 
-		String highway = v(t, "highway");
-		String cycleway = v(t, "cycleway");
-		String trafficSign = v(t, "traffic_sign");
+		String highway = v(t, HIGHWAY);
+		String cycleway = v(t, CYCLEWAY);
+		String trafficSign = v(t, TRAFFIC_SIGN);
 
 		// highway=cycleway cases (keep core GH ones)
-		if ("cycleway".equals(highway)) {
-			if (isAnyOf(cycleway, "share_busway", "opposite_share_busway")) {
+		if (HW_CYCLEWAY.equals(highway)) {
+			if (isAnyOf(cycleway, CW_SHARE_BUSWAY, "opposite_share_busway")) {
 				return "SHARED_BUS_LANE_BUS_WITH_BIKE";
 			}
 			if (!isEmpty(trafficSign) && trafficSign.startsWith("DE:245")) {
@@ -202,7 +204,7 @@ public final class BicycleInfraClassifier {
 					return "SHARED_BUS_LANE_BUS_WITH_BIKE";
 				}
 			}
-			if ("share_busway".equals(v(t, "lane"))) {
+			if (CW_SHARE_BUSWAY.equals(v(t, "lane"))) {
 				return "SHARED_BUS_LANE_BIKE_WITH_BUS";
 			}
 			if (!isEmpty(trafficSign) && trafficSign.startsWith("DE:237")) {
@@ -213,20 +215,20 @@ public final class BicycleInfraClassifier {
 		}
 
 		// directional: cycleway:right/left OR busway:right/left
-		String cwSide = forward ? v(t, "cycleway:right") : v(t, "cycleway:left");
-		String bwSide = forward ? v(t, "busway:right") : v(t, "busway:left");
+		String cwSide = forward ? v(t, CYCLEWAY_RIGHT) : v(t, CYCLEWAY_LEFT);
+		String bwSide = forward ? v(t, BUSWAY_RIGHT) : v(t, BUSWAY_LEFT);
 
-		if ("share_busway".equals(cwSide) || "share_busway".equals(bwSide)) {
+		if (CW_SHARE_BUSWAY.equals(cwSide) || CW_SHARE_BUSWAY.equals(bwSide)) {
 			return "SHARED_BUS_LANE_BUS_WITH_BIKE";
 		}
 
 		// both sides
-		if ("share_busway".equals(v(t, "cycleway:both")) || "share_busway".equals(v(t, "busway:both"))) {
+		if (CW_SHARE_BUSWAY.equals(v(t, CYCLEWAY_BOTH)) || CW_SHARE_BUSWAY.equals(v(t, BUSWAY_BOTH))) {
 			return "SHARED_BUS_LANE_BUS_WITH_BIKE";
 		}
 
 		// generic
-		if (isAnyOf(cycleway, "share_busway", "opposite_share_busway")) {
+		if (isAnyOf(cycleway, CW_SHARE_BUSWAY, "opposite_share_busway")) {
 			return "SHARED_BUS_LANE_BUS_WITH_BIKE";
 		}
 
@@ -240,19 +242,19 @@ public final class BicycleInfraClassifier {
 	private static boolean isSharedMotorVehicleLaneForDirection(Map<String, String> t, Direction dir) {
 		boolean forward = dir == Direction.Forward;
 
-		String highway = v(t, "highway");
-		String cycleway = v(t, "cycleway");
+		String highway = v(t, HIGHWAY);
+		String cycleway = v(t, CYCLEWAY);
 
 		// highway=cycleway + cycleway=shared_lane
-		if ("cycleway".equals(highway) && "shared_lane".equals(cycleway)) return true;
+		if (HW_CYCLEWAY.equals(highway) && CW_SHARED_LANE.equals(cycleway)) return true;
 
 		// side tags
-		String cwSide = forward ? v(t, "cycleway:right") : v(t, "cycleway:left");
-		if ("shared_lane".equals(cwSide)) return true;
+		String cwSide = forward ? v(t, CYCLEWAY_RIGHT) : v(t, CYCLEWAY_LEFT);
+		if (CW_SHARED_LANE.equals(cwSide)) return true;
 
 		// both / generic
-		if ("shared_lane".equals(v(t, "cycleway:both"))) return true;
-		return "shared_lane".equals(cycleway);
+		if (CW_SHARED_LANE.equals(v(t, CYCLEWAY_BOTH))) return true;
+		return CW_SHARED_LANE.equals(cycleway);
 	}
 
 	// -------------------------------------------------------------------------
@@ -260,8 +262,8 @@ public final class BicycleInfraClassifier {
 	// -------------------------------------------------------------------------
 
 	private static boolean isCyclewayOnHighwayBetweenLanes(Map<String, String> t) {
-		String cyclewayLanes = v(t, "cycleway:lanes");
-		String bicycleLanes = v(t, "bicycle:lanes");
+		String cyclewayLanes = v(t, CYCLEWAY_LANES);
+		String bicycleLanes = v(t, BICYCLE_LANES);
 		return (!isEmpty(cyclewayLanes) && cyclewayLanes.contains("|lane|"))
 			|| (!isEmpty(bicycleLanes) && bicycleLanes.contains("|designated|"));
 	}
@@ -273,17 +275,17 @@ public final class BicycleInfraClassifier {
 	private static boolean isCyclewayOnHighwayAdvisoryOrExclusiveBase(Map<String, String> t) {
 
 		boolean hasLane =
-			isAnyOf(v(t, "cycleway"), "lane", "opposite_lane") ||
-				isAnyOf(v(t, "cycleway:right"), "lane", "opposite_lane") ||
-				isAnyOf(v(t, "cycleway:left"), "lane", "opposite_lane") ||
-				isAnyOf(v(t, "cycleway:both"), "lane", "opposite_lane");
+			isAnyOf(v(t, CYCLEWAY), CW_LANE, CW_OPPOSITE_LANE) ||
+				isAnyOf(v(t, CYCLEWAY_RIGHT), CW_LANE, CW_OPPOSITE_LANE) ||
+				isAnyOf(v(t, CYCLEWAY_LEFT), CW_LANE, CW_OPPOSITE_LANE) ||
+				isAnyOf(v(t, CYCLEWAY_BOTH), CW_LANE, CW_OPPOSITE_LANE);
 
 		if (!hasLane) return false;
 
 		// filter "between lanes only" edge-case like GH
 		if (isCyclewayOnHighwayBetweenLanes(t)) {
-			String cyclewayLanes = v(t, "cycleway:lanes");
-			String bicycleLanes = v(t, "bicycle:lanes");
+			String cyclewayLanes = v(t, CYCLEWAY_LANES);
+			String bicycleLanes = v(t, BICYCLE_LANES);
 			if (!isEmpty(cyclewayLanes) && cyclewayLanes.contains("|lane|") && !cyclewayLanes.endsWith("|lane")) return false;
 			if (!isEmpty(bicycleLanes) && bicycleLanes.contains("|designated|") && !bicycleLanes.endsWith("|designated")) return false;
 		}
@@ -294,48 +296,48 @@ public final class BicycleInfraClassifier {
 		if (!isCyclewayOnHighwayAdvisoryOrExclusiveBase(t)) return false;
 		boolean forward = dir == Direction.Forward;
 
-		boolean rightBidirectional = "no".equals(v(t, "cycleway:right:oneway"));
-		boolean leftBidirectional = "no".equals(v(t, "cycleway:left:oneway"));
+		boolean rightBidirectional = NO.equals(v(t, CYCLEWAY_RIGHT_ONEWAY));
+		boolean leftBidirectional = NO.equals(v(t, CYCLEWAY_LEFT_ONEWAY));
 
 		boolean checkRight = forward || rightBidirectional;
 		boolean checkLeft = !forward || leftBidirectional;
 
-		if (checkRight && "advisory".equals(v(t, "cycleway:right:lane"))) return true;
-		if (checkLeft && "advisory".equals(v(t, "cycleway:left:lane"))) return true;
+		if (checkRight && CW_LANE_ADVISORY.equals(v(t, CYCLEWAY_RIGHT_LANE))) return true;
+		if (checkLeft && CW_LANE_ADVISORY.equals(v(t, CYCLEWAY_LEFT_LANE))) return true;
 
-		return "advisory".equals(v(t, "cycleway:both:lane")) || "advisory".equals(v(t, "cycleway:lane"));
+		return CW_LANE_ADVISORY.equals(v(t, CYCLEWAY_BOTH_LANE)) || CW_LANE_ADVISORY.equals(v(t, CYCLEWAY_LANE));
 	}
 
 	private static boolean hasCyclewayOnHighwayExclusiveForDirection(Map<String, String> t, Direction dir) {
 		if (!isCyclewayOnHighwayAdvisoryOrExclusiveBase(t)) return false;
 		boolean forward = dir == Direction.Forward;
 
-		boolean rightBidirectional = "no".equals(v(t, "cycleway:right:oneway"));
-		boolean leftBidirectional = "no".equals(v(t, "cycleway:left:oneway"));
+		boolean rightBidirectional = NO.equals(v(t, CYCLEWAY_RIGHT_ONEWAY));
+		boolean leftBidirectional = NO.equals(v(t, CYCLEWAY_LEFT_ONEWAY));
 
 		boolean checkRight = forward || rightBidirectional;
 		boolean checkLeft = !forward || leftBidirectional;
 
-		if (checkRight && "exclusive".equals(v(t, "cycleway:right:lane"))) return true;
-		if (checkLeft && "exclusive".equals(v(t, "cycleway:left:lane"))) return true;
+		if (checkRight && CW_LANE_EXCLUSIVE.equals(v(t, CYCLEWAY_RIGHT_LANE))) return true;
+		if (checkLeft && CW_LANE_EXCLUSIVE.equals(v(t, CYCLEWAY_LEFT_LANE))) return true;
 
-		return "exclusive".equals(v(t, "cycleway:both:lane")) || "exclusive".equals(v(t, "cycleway:lane"));
+		return CW_LANE_EXCLUSIVE.equals(v(t, CYCLEWAY_BOTH_LANE)) || CW_LANE_EXCLUSIVE.equals(v(t, CYCLEWAY_LANE));
 	}
 
 	private static boolean hasCyclewayOnHighwayAdvisoryOrExclusiveForDirection(Map<String, String> t, Direction dir) {
 		boolean forward = dir == Direction.Forward;
 
-		boolean rightBidirectional = "no".equals(v(t, "cycleway:right:oneway"));
-		boolean leftBidirectional = "no".equals(v(t, "cycleway:left:oneway"));
+		boolean rightBidirectional = NO.equals(v(t, CYCLEWAY_RIGHT_ONEWAY));
+		boolean leftBidirectional = NO.equals(v(t, CYCLEWAY_LEFT_ONEWAY));
 
 		boolean checkRight = forward || rightBidirectional;
 		boolean checkLeft = !forward || leftBidirectional;
 
-		if (checkRight && isAnyOf(v(t, "cycleway:right"), "lane", "opposite_lane")) return true;
-		if (checkLeft && isAnyOf(v(t, "cycleway:left"), "lane", "opposite_lane")) return true;
+		if (checkRight && isAnyOf(v(t, CYCLEWAY_RIGHT), CW_LANE, CW_OPPOSITE_LANE)) return true;
+		if (checkLeft && isAnyOf(v(t, CYCLEWAY_LEFT), CW_LANE, CW_OPPOSITE_LANE)) return true;
 
-		return isAnyOf(v(t, "cycleway:both"), "lane", "opposite_lane")
-			|| isAnyOf(v(t, "cycleway"), "lane", "opposite_lane");
+		return isAnyOf(v(t, CYCLEWAY_BOTH), CW_LANE, CW_OPPOSITE_LANE)
+			|| isAnyOf(v(t, CYCLEWAY), CW_LANE, CW_OPPOSITE_LANE);
 	}
 
 	// -------------------------------------------------------------------------
@@ -345,43 +347,43 @@ public final class BicycleInfraClassifier {
 	private static String getCyclewayTypeForDirection(Map<String, String> t, Direction dir) {
 		boolean forward = dir == Direction.Forward;
 
-		String highway = v(t, "highway");
-		String cycleway = v(t, "cycleway");
-		String trafficSign = v(t, "traffic_sign");
-		String isSidepath = v(t, "is_sidepath");
+		String highway = v(t, HIGHWAY);
+		String cycleway = v(t, CYCLEWAY);
+		String trafficSign = v(t, TRAFFIC_SIGN);
+		String isSidepath = v(t, IS_SIDEPATH);
 
 		// GUARD: cycleway=lane is on-highway, not separated
-		if ("lane".equals(cycleway)) return null;
+		if (CW_LANE.equals(cycleway)) return null;
 
 		boolean isCycleway = false;
 
 		// highway=cycleway + is_sidepath (whole way)
-		if ("cycleway".equals(highway) && !isEmpty(isSidepath)) isCycleway = true;
+		if (HW_CYCLEWAY.equals(highway) && !isEmpty(isSidepath)) isCycleway = true;
 
 		// highway=cycleway + cycleway=track/opposite_track
-		if ("cycleway".equals(highway) && isAnyOf(cycleway, "track", "opposite_track")) isCycleway = true;
+		if (HW_CYCLEWAY.equals(highway) && isAnyOf(cycleway, CW_TRACK, "opposite_track")) isCycleway = true;
 
 		// directional side tags track
 		if (forward) {
-			if ("track".equals(v(t, "cycleway:right")) || "track".equals(v(t, "cycleway:both"))) isCycleway = true;
+			if (CW_TRACK.equals(v(t, CYCLEWAY_RIGHT)) || CW_TRACK.equals(v(t, CYCLEWAY_BOTH))) isCycleway = true;
 		} else {
-			if ("track".equals(v(t, "cycleway:left")) || "track".equals(v(t, "cycleway:both"))) isCycleway = true;
+			if (CW_TRACK.equals(v(t, CYCLEWAY_LEFT)) || CW_TRACK.equals(v(t, CYCLEWAY_BOTH))) isCycleway = true;
 		}
 
 		// generic cycleway=track
-		if ("track".equals(cycleway)) isCycleway = true;
+		if (CW_TRACK.equals(cycleway)) isCycleway = true;
 
 		// traffic sign DE:237 whitelist
 		if (!isEmpty(trafficSign) && trafficSign.contains("DE:237")) {
-			if (isAnyOf(highway, "living_street", "pedestrian", "service", "track", "bridleway", "path", "footway", "cycleway")) {
+			if (isAnyOf(highway, HW_LIVING_STREET, HW_PEDESTRIAN, HW_SERVICE, HW_TRACK, HW_BRIDLEWAY, HW_PATH, HW_FOOTWAY, HW_CYCLEWAY)) {
 				isCycleway = true;
 			}
 		}
 
 		if (!isCycleway) return null;
 
-		if ("yes".equals(isSidepath)) return "CYCLEWAY_ADJOINING";
-		if ("no".equals(isSidepath)) return "CYCLEWAY_ISOLATED";
+		if (YES.equals(isSidepath)) return "CYCLEWAY_ADJOINING";
+		if (NO.equals(isSidepath)) return "CYCLEWAY_ISOLATED";
 		return "CYCLEWAY_ADJOINING_OR_ISOLATED";
 	}
 
@@ -390,49 +392,49 @@ public final class BicycleInfraClassifier {
 	// -------------------------------------------------------------------------
 
 	private static String getFootAndCyclewayType(Map<String, String> t) {
-		String highway = v(t, "highway");
-		String trafficSign = v(t, "traffic_sign");
-		String segregated = v(t, "segregated");
-		String foot = v(t, "foot");
-		String bicycle = v(t, "bicycle");
-		String cycleway = v(t, "cycleway");
+		String highway = v(t, HIGHWAY);
+		String trafficSign = v(t, TRAFFIC_SIGN);
+		String segregated = v(t, SEGREGATED);
+		String foot = v(t, FOOT);
+		String bicycle = v(t, BICYCLE);
+		String cycleway = v(t, CYCLEWAY);
 
 		// Special: highway=cycleway + cycleway=track + segregated/signs
-		if ("cycleway".equals(highway) && "track".equals(cycleway)) {
-			String isSidepath = v(t, "is_sidepath");
-			if ("no".equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("240"))) {
+		if (HW_CYCLEWAY.equals(highway) && CW_TRACK.equals(cycleway)) {
+			String isSidepath = v(t, IS_SIDEPATH);
+			if (NO.equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("240"))) {
 				return sidepathCategory(isSidepath, "FOOT_AND_CYCLEWAY_SHARED");
 			}
-			if ("yes".equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("241"))) {
+			if (YES.equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("241"))) {
 				return sidepathCategory(isSidepath, "FOOT_AND_CYCLEWAY_SEGREGATED");
 			}
 		}
 
 		// only on cycleway-like highways
-		if (!isAnyOf(highway, "cycleway", "path", "footway", "service", "track")) return null;
+		if (!isAnyOf(highway, HW_CYCLEWAY, HW_PATH, HW_FOOTWAY, HW_SERVICE, HW_TRACK)) return null;
 
-		boolean footAllowed = isAnyOf(foot, "designated", "yes");
-		boolean bicycleAllowed = isAnyOf(bicycle, "designated", "yes");
+		boolean footAllowed = isAnyOf(foot, DESIGNATED, YES);
+		boolean bicycleAllowed = isAnyOf(bicycle, DESIGNATED, YES);
 		if (!footAllowed || !bicycleAllowed) return null;
 
-		String isSidepath = v(t, "is_sidepath");
+		String isSidepath = v(t, IS_SIDEPATH);
 
 		// segregated=yes or sign 241
-		if ("yes".equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("241"))) {
-			if (isAnyOf(highway, "cycleway", "path", "footway")) {
+		if (YES.equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("241"))) {
+			if (isAnyOf(highway, HW_CYCLEWAY, HW_PATH, HW_FOOTWAY)) {
 				return sidepathCategory(isSidepath, "FOOT_AND_CYCLEWAY_SEGREGATED");
 			}
 			// minimal edge case from GH: traffic_mode:right=foot (no separation)
-			if ("cycleway".equals(highway) && "foot".equals(v(t, "traffic_mode:right"))) {
-				String separationRight = v(t, "separation:right");
-				boolean separationOk = isEmpty(separationRight) || "no".equals(separationRight);
+			if (HW_CYCLEWAY.equals(highway) && FOOT.equals(v(t, TRAFFIC_MODE_RIGHT))) {
+				String separationRight = v(t, SEPARATION_RIGHT);
+				boolean separationOk = isEmpty(separationRight) || NO.equals(separationRight);
 				if (separationOk) return sidepathCategory(isSidepath, "FOOT_AND_CYCLEWAY_SEGREGATED");
 			}
 		}
 
 		// shared: segregated=no or sign 240
-		if ("no".equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("240"))) {
-			if (isAnyOf(highway, "cycleway", "path", "footway", "service", "track")) {
+		if (NO.equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("240"))) {
+			if (isAnyOf(highway, HW_CYCLEWAY, HW_PATH, HW_FOOTWAY, HW_SERVICE, HW_TRACK)) {
 				return sidepathCategory(isSidepath, "FOOT_AND_CYCLEWAY_SHARED");
 			}
 		}
@@ -446,35 +448,35 @@ public final class BicycleInfraClassifier {
 
 	private static String getFootwayBicycleYesTypeForDirection(Map<String, String> t, Direction dir) {
 		boolean forward = dir == Direction.Forward;
-		String highway = v(t, "highway");
+		String highway = v(t, HIGHWAY);
 
 		// Case 1: sidewalk:*:bicycle=yes (directional)
-		if (forward && "yes".equals(v(t, "sidewalk:right:bicycle"))) return "FOOTWAY_BICYCLE_YES_ADJOINING";
-		if (!forward && "yes".equals(v(t, "sidewalk:left:bicycle"))) return "FOOTWAY_BICYCLE_YES_ADJOINING";
-		if ("yes".equals(v(t, "sidewalk:both:bicycle"))) return "FOOTWAY_BICYCLE_YES_ADJOINING";
+		if (forward && YES.equals(v(t, SIDEWALK_RIGHT_BICYCLE))) return "FOOTWAY_BICYCLE_YES_ADJOINING";
+		if (!forward && YES.equals(v(t, SIDEWALK_LEFT_BICYCLE))) return "FOOTWAY_BICYCLE_YES_ADJOINING";
+		if (YES.equals(v(t, SIDEWALK_BOTH_BICYCLE))) return "FOOTWAY_BICYCLE_YES_ADJOINING";
 
 		// Case 2: separate geometry highway=footway/path
-		if (!isAnyOf(highway, "footway", "path")) return null;
+		if (!isAnyOf(highway, HW_FOOTWAY, HW_PATH)) return null;
 
-		String bicycle = v(t, "bicycle");
-		String trafficSign = v(t, "traffic_sign");
+		String bicycle = v(t, BICYCLE);
+		String trafficSign = v(t, TRAFFIC_SIGN);
 
-		boolean hasBicycleAccess = "yes".equals(bicycle) || (!isEmpty(trafficSign) && trafficSign.contains("1022-10"));
+		boolean hasBicycleAccess = YES.equals(bicycle) || (!isEmpty(trafficSign) && trafficSign.contains("1022-10"));
 		if (!hasBicycleAccess) return null;
 
 		// mtb:scale filter
-		String mtbScale = v(t, "mtb:scale");
+		String mtbScale = v(t, MTB_SCALE);
 		if (!isEmpty(mtbScale)) {
 			String cleaned = mtbScale.replaceAll("[\\+\\-\\s]", "");
 			try {
 				int scale = Integer.parseInt(cleaned);
 				if (scale > 1) return null;
-				if (isEmpty(trafficSign) && isEmpty(v(t, "is_sidepath"))) return null;
+				if (isEmpty(trafficSign) && isEmpty(v(t, IS_SIDEPATH))) return null;
 			} catch (NumberFormatException ignored) {
 			}
 		}
 
-		String isSidepath = v(t, "is_sidepath");
+		String isSidepath = v(t, IS_SIDEPATH);
 		return sidepathCategory(isSidepath, "FOOTWAY_BICYCLE_YES");
 	}
 
@@ -484,16 +486,16 @@ public final class BicycleInfraClassifier {
 
 	private static boolean isCyclewayOnHighwayProtected(Map<String, String> t) {
 		// Must be sidepath
-		if (!"yes".equals(v(t, "is_sidepath"))) return false;
+		if (!YES.equals(v(t, IS_SIDEPATH))) return false;
 
 		// physical separation left
-		if (isPhysicalSeparation(v(t, "separation:left"))) return true;
+		if (isPhysicalSeparation(v(t, SEPARATION_LEFT))) return true;
 
 		// parking counts as separation
-		if ("parking".equals(v(t, "traffic_mode:left"))) return true;
+		if ("parking".equals(v(t, TRAFFIC_MODE_LEFT))) return true;
 
 		// contraflow check: traffic_mode:right=motor_vehicle AND physical separation right
-		if ("motor_vehicle".equals(v(t, "traffic_mode:right")) && isPhysicalSeparation(v(t, "separation:right"))) return true;
+		if (MOTOR_VEHICLE.equals(v(t, TRAFFIC_MODE_RIGHT)) && isPhysicalSeparation(v(t, SEPARATION_RIGHT))) return true;
 
 		return false;
 	}
@@ -509,10 +511,10 @@ public final class BicycleInfraClassifier {
 	// -------------------------------------------------------------------------
 
 	private static boolean needsClarification(Map<String, String> t) {
-		String highway = v(t, "highway");
-		String bicycle = v(t, "bicycle");
-		String cycleway = v(t, "cycleway");
-		String foot = v(t, "foot");
+		String highway = v(t, HIGHWAY);
+		String bicycle = v(t, BICYCLE);
+		String cycleway = v(t, CYCLEWAY);
+		String foot = v(t, FOOT);
 
 		// already categorized: between lanes
 		if (isCyclewayOnHighwayBetweenLanes(t)) return false;
@@ -521,25 +523,25 @@ public final class BicycleInfraClassifier {
 		if ("shared".equals(cycleway)) return false;
 
 		// highway=cycleway without more details
-		if ("cycleway".equals(highway)) return true;
+		if (HW_CYCLEWAY.equals(highway)) return true;
 
 		// path + bicycle=designated without more info
-		if ("path".equals(highway) && "designated".equals(bicycle)) {
+		if (HW_PATH.equals(highway) && DESIGNATED.equals(bicycle)) {
 
 			// exclude MTB-ish
-			if (!isEmpty(v(t, "mtb:scale")) || "yes".equals(v(t, "mtb"))) return false;
+			if (!isEmpty(v(t, MTB_SCALE)) || YES.equals(v(t, "mtb"))) return false;
 
-			String surface = v(t, "surface");
+			String surface = v(t, SURFACE);
 			if (isAnyOf(surface, "ground", "dirt", "fine_gravel", "gravel", "pebblestone", "earth")) return false;
 
 			// foot=no on a path is relevant
-			if ("no".equals(foot)) return true;
+			if (NO.equals(foot)) return true;
 
 			return true;
 		}
 
 		// footway + bicycle=designated
-		if ("footway".equals(highway) && "designated".equals(bicycle)) return true;
+		if (HW_FOOTWAY.equals(highway) && DESIGNATED.equals(bicycle)) return true;
 
 		return false;
 	}
@@ -564,8 +566,8 @@ public final class BicycleInfraClassifier {
 	}
 
 	private static String sidepathCategory(String isSidepath, String prefix) {
-		if ("yes".equals(isSidepath)) return prefix + "_ADJOINING";
-		if ("no".equals(isSidepath)) return prefix + "_ISOLATED";
+		if (YES.equals(isSidepath)) return prefix + "_ADJOINING";
+		if (NO.equals(isSidepath)) return prefix + "_ISOLATED";
 		return prefix + "_ADJOINING_OR_ISOLATED";
 	}
 }
