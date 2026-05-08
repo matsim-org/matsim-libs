@@ -18,29 +18,35 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.network;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.osm.networkReader.OsmBicycleReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-
-import org.matsim.application.MATSimAppCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.nio.file.Path;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiPredicate;
 
 
@@ -54,13 +60,15 @@ import java.util.function.BiPredicate;
  *   <li>Read OSM with {@link OsmBicycleReader}. During read, each link's
  *       endpoints get a Z coordinate from the DEM, and {@link BicycleLinkPolicy}
  *       stamps the {@code bicycle_infra} attribute and enforces access rules.</li>
+ *   <li>Move OSM-derived attributes under the {@code osm:} prefix to clearly
+ *       separate them from pipeline-internal attributes.</li>
  *   <li>{@link NetworkUtils#cleanNetwork} drops isolated components.</li>
  *   <li>Bicycle-aware simplification merges consecutive links only when their
  *       infra-relevant attributes match (standard simplifier ignores those).</li>
  *   <li>Service-link cleanup removes service dead-ends and hairline branches
  *       that don't actually connect anything useful.</li>
- *   <li>Rename the mode {@link TransportMode#bike} → {@code "bicycle"} so
- *       downstream bicycle-contrib code picks it up.</li>
+ *   <li>Optionally rename the network mode {@code "bike"} to whatever the
+ *       caller requested via {@code --mode}.</li>
  *   <li>For every surviving link, sample its elevation profile and attach the
  *       five KPIs (averageElevation, gradient, maxGradient, elevationGain,
  *       elevationLoss).</li>
@@ -69,8 +77,17 @@ import java.util.function.BiPredicate;
  *
  * <p>Elevation KPIs are deliberately computed <em>after</em> the simplifier has
  * run: after merging, link lengths are longer and there are fewer of them, so
- * we sample only what survives. A simpler counterpart that skips the infra and
- * simplification steps is {@link CreateBicycleNetworkWithElevation}.
+ * we sample only what survives.
+ *
+ * <p>TODO: also move the remaining OSM-derived attributes under the {@code osm:}
+ * prefix once their renames are sorted out:
+ * <ul>
+ *   <li>{@code "type"} → {@code "osm:highway"} (still carries the {@code "highway."}
+ *       value prefix that is consumed by {@link #isService(Link)})</li>
+ *   <li>{@code "origid"} → {@code "osm:way_id"} (carries merge semantics from
+ *       {@link NetworkSimplifier})</li>
+ * </ul>
+ * Both touch additional code paths and are deferred to a separate commit.
  */
 @Command(
 	name = "bicycle-network",
@@ -80,10 +97,9 @@ import java.util.function.BiPredicate;
 )
 public class BicycleNetworkPipeline implements MATSimAppCommand {
 
-	@Option(names = "--mode",
-		description = "Network mode name to assign to cyclable links. Default: ${DEFAULT-VALUE}.",
-		defaultValue = "bike")
-	private String mode;
+	private static final Logger log = LogManager.getLogger(BicycleNetworkPipeline.class);
+
+	// ---- CLI options -----------------------------------------------------------
 
 	@Option(names = "--input", required = true, description = "Path to OSM input file (.osm.pbf)")
 	private Path input;
@@ -98,14 +114,14 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	@Option(names = "--output", required = true, description = "Path to output network (.xml.gz)")
 	private Path output;
 
-	// TODO maybe change to this later
-	// @Mixin
-	//private CrsOptions crs = new CrsOptions();   // gibt --target-crs / --input-crs etc.
+	// TODO maybe switch to CrsOptions mixin from matsim-application later.
 	@Option(names = "--crs", required = true, description = "Output CRS (e.g. EPSG:25832)")
 	private String outputCRS;
 
-
-	// ---- elevation tunables ----------------------------------------------------
+	@Option(names = "--mode",
+		description = "Network mode name to assign to cyclable links. Default: ${DEFAULT-VALUE}.",
+		defaultValue = "bike")
+	private String mode;
 
 	@Option(names = "--ele-sample-step",
 		description = "Distance between elevation samples along a link in meters (default: ${DEFAULT-VALUE})",
@@ -118,22 +134,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	private double eleNoiseToleranceM;
 
 
-	// ---- mode renaming ---------------------------------------------------------
-
-	/**
-	 * OsmBicycleReader emits this; we rename to TO_MODE before writing.
-	 */
-	private static final String FROM_MODE = TransportMode.bike; // "bike"
-	private static final String TO_MODE = "bicycle";
-
-	// ---- tags ------------------------------------------------------------------
-
-	/**
-	 * Optional raw OSM tags to copy onto links (with "osm:" prefix). Empty = none.
-	 */
-	private static final List<String> TAGS_TO_COPY = List.of();
-
-	// ---- link attribute keys ---------------------------------------------------
+	// ---- attribute keys --------------------------------------------------------
 
 	public static final String LINK_ATTR_BICYCLE_INFRA = "bicycle_infra";
 	public static final String LINK_ATTR_GRADIENT = "gradient";
@@ -141,16 +142,42 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	public static final String LINK_ATTR_ELEVATION_GAIN = "elevationGain";
 	public static final String LINK_ATTR_ELEVATION_LOSS = "elevationLoss";
 
-	// Attribute keys used by the bicycle-aware simplifier to decide if two links
-	// may merge. If they differ on any of these, keep them separate.
+	private static final String OSM_PREFIX = "osm:";
+
+	/**
+	 * OSM tag values that {@link OsmBicycleReader} writes verbatim into link
+	 * attributes; these are moved under the "osm:" prefix in step 1b.
+	 *
+	 * <p>Note: "type" and "origid" are intentionally NOT in this list yet --
+	 * see the TODO in the class JavaDoc.
+	 */
+	private static final List<String> OSM_TAG_ATTR_KEYS = List.of(
+		"bicycle", "surface", "smoothness", "cycleway"
+	);
+
+	/**
+	 * Optional raw OSM tags to copy onto links via {@link TagCopy} (with "osm:"
+	 * prefix). Empty by default; populate to forward additional OSM tags that
+	 * {@link OsmBicycleReader} doesn't write itself.
+	 */
+	private static final List<String> TAGS_TO_COPY = List.of();
+
+	/**
+	 * Attribute keys used by the bicycle-aware simplifier to decide if two
+	 * links may merge. If they differ on any of these, keep them separate.
+	 *
+	 * <p>"type" stays unprefixed for now (see TODO above).
+	 */
 	private static final String[] SIMPLIFY_MATCH_KEYS = {
-		LINK_ATTR_BICYCLE_INFRA, "type", "surface", FROM_MODE, "smoothness"
+		LINK_ATTR_BICYCLE_INFRA,
+		"type",
+		OSM_PREFIX + "surface",
+		OSM_PREFIX + "bicycle",
+		OSM_PREFIX + "smoothness"
 	};
 
 
 	// ============================================================================
-
-	private static final Logger log = LogManager.getLogger(BicycleNetworkPipeline.class);
 
 	public static void main(String[] args) {
 		new BicycleNetworkPipeline().execute(args);
@@ -159,13 +186,12 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-
 		var elevationParser = new ElevationDataParser(dem.toString(), outputCRS, demCRS);
 		var transformation = TransformationFactory.getCoordinateTransformation(
 			TransformationFactory.WGS84, outputCRS);
 
 		var classifier = new BicycleInfraClassifier();
-		var tagCopy = new TagCopy(TAGS_TO_COPY, "osm:");
+		var tagCopy = new TagCopy(TAGS_TO_COPY, OSM_PREFIX);
 		var policy = new BicycleLinkPolicy(classifier, tagCopy);
 
 		// ---- 1. OSM read: stamps node elevations + infra on each new link ----
@@ -177,48 +203,62 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 				policy.apply(link, tags, direction);
 			})
 			.build()
-			.read(input);
+			.read(input.toString());
 
-//		// ---- 1b. raw OSM attributes prefixen ---------------------------------
-//		renameLinkAttributes(network, Map.of(
-//			"type", "osm:type",
-//			"surface", "osm:surface",
-//			"smoothness", "osm:smoothness"
-//			//	"origid", "osm:way_id"        // siehe Punkt unten: Dedup
-//		));
+		// ---- 1b. move OSM-derived attributes under "osm:" prefix ------------
+		prefixOsmAttributes(network);
 
 		// ---- 2. drop isolated components -------------------------------------
-		NetworkUtils.cleanNetwork(network, Set.of(FROM_MODE));
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.bike));
 
 		// ---- 3. bicycle-aware simplification ---------------------------------
 		simplifyWithBikeInfra(network);
 
-		// ---- 3b. origid -> osm:way_id -----------------------------------------
-		//renameLinkAttributes(network, Map.of("origid", "osm:way_id"));
-
 		// ---- 4. remove service dead-ends and hairline branches ---------------
 		removeNonConnectingService(network);
 
-		// ---- 4b. second pass: service cleanup may have created new isolated components
+		// ---- 5. second simplification pass; service cleanup may have created
+		//        new merge candidates -----------------------------------------
 		simplifyWithBikeInfra(network);
 
-		// ---- 5. rename mode: bike -> bicycle ---------------------------------
-		renameMode(network, FROM_MODE, TO_MODE);
+		// ---- 6. rename mode if requested (no-op when --mode bike) -----------
+		renameMode(network, TransportMode.bike, mode);
 
-		// ---- 6. elevation KPIs on the final link set -------------------------
+		// ---- 7. elevation KPIs on the final link set -------------------------
 		int counted = 0;
 		for (Link link : network.getLinks().values()) {
 			attachLinkElevationKpis(link, elevationParser, eleSampleStepM, eleNoiseToleranceM);
 			counted++;
 		}
-
 		log.info("Attached elevation KPIs to {} links (sample step = {} m, noise tolerance = {} m).",
 			counted, eleSampleStepM, eleNoiseToleranceM);
 
-		// ---- 7. write --------------------------------------------------------
+		// ---- 8. write --------------------------------------------------------
 		new NetworkWriter(network).write(output.toString());
 
 		return 0;
+	}
+
+
+	// =========================================================================
+	// OSM attribute prefixing
+	// =========================================================================
+
+	/**
+	 * Move OSM-derived attributes (those listed in {@link #OSM_TAG_ATTR_KEYS})
+	 * under the "osm:" prefix to make their provenance explicit and to keep
+	 * them separate from pipeline-internal attributes.
+	 */
+	private static void prefixOsmAttributes(Network network) {
+		for (Link link : network.getLinks().values()) {
+			for (String key : OSM_TAG_ATTR_KEYS) {
+				Object value = link.getAttributes().getAttribute(key);
+				if (value != null) {
+					link.getAttributes().putAttribute(OSM_PREFIX + key, value);
+					link.getAttributes().removeAttribute(key);
+				}
+			}
+		}
 	}
 
 
@@ -253,30 +293,34 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		return Math.round(v * factor) / factor;
 	}
 
+
 	// =========================================================================
 	// Mode rename
 	// =========================================================================
 
 	/**
-	 * Rename a mode both in each link's allowed-modes set and in any attribute
-	 * stored under the old mode name as key (the OsmBicycleReader writes a
-	 * bicycle-restriction attribute under key "bike").
+	 * Rename a mode in each link's allowed-modes set. If {@code from} equals
+	 * {@code to}, this is a no-op.
+	 *
+	 * <p>Note: the OSM {@code bicycle=...} restriction value is no longer
+	 * stored under the mode-name key -- it now lives at "osm:bicycle" and is
+	 * unaffected by the mode rename.
 	 */
 	private static void renameMode(Network network, String from, String to) {
+		if (from.equals(to)) {
+			log.info("Network mode is already '{}', no rename needed.", to);
+			return;
+		}
+		log.info("Renaming network mode '{}' -> '{}'.", from, to);
 		for (Link link : network.getLinks().values()) {
 			Set<String> modes = new HashSet<>(link.getAllowedModes());
 			if (modes.remove(from)) {
 				modes.add(to);
 				link.setAllowedModes(modes);
 			}
-
-			Object val = link.getAttributes().getAttribute(from);
-			if (val != null) {
-				link.getAttributes().putAttribute(to, val);
-				link.getAttributes().removeAttribute(from);
-			}
 		}
 	}
+
 
 	// =========================================================================
 	// Bicycle-aware simplification
@@ -307,13 +351,14 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			Link a = inOut.getFirst();
 			Link b = inOut.getSecond();
 
-			// bicycle-relevante Attribute: sind per Predicate bereits identisch
+			// Bicycle-relevant attributes are already identical on both
+			// inputs by construction of the predicate.
 			for (String key : SIMPLIFY_MATCH_KEYS) {
 				Object v = a.getAttributes().getAttribute(key);
 				if (v != null) newLink.getAttributes().putAttribute(key, v);
 			}
 
-			// origid merge mit Dedup
+			// Merge origid values, deduplicating across the two inputs.
 			Object idA = a.getAttributes().getAttribute("origid");
 			Object idB = b.getAttributes().getAttribute("origid");
 			String merged = mergeOrigIds(idA, idB);
@@ -326,9 +371,10 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	}
 
 	/**
-	 * Merged zwei origid-Werte zu einem String, in dem jede Way-ID nur einmal
-	 * vorkommt und die Reihenfolge erhalten bleibt. Beide Inputs können selbst
-	 * schon mit '-' verkettete Mehrfach-IDs aus einem früheren Merge sein.
+	 * Merge two origid values into a single hyphen-separated string in which
+	 * each way ID appears at most once and original order is preserved. Both
+	 * inputs may themselves already be hyphen-separated multi-IDs from an
+	 * earlier merge.
 	 */
 	static String mergeOrigIds(Object idA, Object idB) {
 		Set<String> seen = new LinkedHashSet<>();
@@ -347,12 +393,14 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		}
 	}
 
+
 	// =========================================================================
 	// Service link cleanup
 	// =========================================================================
 
 	private static boolean isService(Link l) {
-		Object t = l.getAttributes().getAttribute("type");  //"osm:type"
+		// TODO: switch to "osm:highway" once the type/highway rename happens.
+		Object t = l.getAttributes().getAttribute("type");
 		if (t == null) return false;
 		String s = t.toString().replaceFirst("^highway\\.", "");
 		return "service".equals(s);
@@ -461,6 +509,3 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		return a.toString().compareTo(b.toString()) < 0 ? a + "_" + b : b + "_" + a;
 	}
 }
-
-
-
