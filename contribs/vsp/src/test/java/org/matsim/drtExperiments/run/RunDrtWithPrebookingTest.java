@@ -1,7 +1,7 @@
 package org.matsim.drtExperiments.run;
 
-import com.ibm.icu.impl.Assert;
 import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.drtExperiments.run.rollingHorizonExperiments.RunDrtWithPrebooking;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
@@ -57,7 +58,7 @@ public class RunDrtWithPrebookingTest{
 			LogManager.getLogger(this.getClass() ).fatal("there was an exception: \n" + ee ) ;
 
 			// if one catches an exception, then one needs to explicitly fail the test:
-			Assert.fail();
+			Assertions.fail();
 		}
 
 	}
