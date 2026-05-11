@@ -1,8 +1,8 @@
 package org.matsim.simwrapper.DbViewer;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.mapdb.*;
-
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -11,43 +11,35 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 
 public class DbEventListener implements IterationEndsListener, IterationStartsListener {
 
+	private final EventsManager eventsManager;
+	private final DbEventHandler dbEventHandler;
+	private final DB db;
 
 	@Inject
-	private EventsManager eventsManager;
-	private final DB db;
-	private final AgentState agentState;
-	private DbEventHandler DbEventHandler;
-
-
-	public DbEventListener(AgentState agentState) {
-
-		this.agentState = agentState;
-		this.db = DBMaker.memoryDB().make();
-
-		HTreeMap<String, Long> linkMap = this.db.hashMap("links", Serializer.STRING, Serializer.LONG)
-			.createOrOpen();
-
-		HTreeMap<String, Long> agentMap = this.db.hashMap("Agents", Serializer.STRING, Serializer.LONG)
-			.createOrOpen();
-
+	public DbEventListener(EventsManager eventsManager, DbEventHandler dbEventHandler,
+						   @DbOutputPath String outputDirectory) {
+		this.eventsManager = eventsManager;
+		this.dbEventHandler = dbEventHandler;
+		this.db = DBMaker.fileDB(outputDirectory + "/agents.db")
+			.fileMmapEnable()
+			.checksumHeaderBypass()
+			.make();
 	}
 
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (event.isLastIteration()) {
-			//  PersonMoneyEventsCollector might consume many resources, run only at last iteration
-			eventsManager.addHandler(DbEventHandler);
+			eventsManager.addHandler(dbEventHandler);
 		}
 	}
-
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-
 		if (event.isLastIteration()) {
-			DbWriter dbWriter = new DbWriter(DbEventHandler, db, agentState);
+			DbWriter dbWriter = new DbWriter(dbEventHandler, db);
+			dbWriter.write();
+			db.close();
 		}
 	}
-
 }

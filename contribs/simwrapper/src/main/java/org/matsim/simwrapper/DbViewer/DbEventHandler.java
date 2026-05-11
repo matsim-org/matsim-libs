@@ -5,30 +5,31 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
-import org.matsim.core.api.experimental.events.EventsManager;
 
+import java.util.HashMap;
+import java.util.Map;
 
 public final class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEventHandler,
-
-	PersonArrivalEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
-
+		PersonArrivalEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private final static Logger log = LogManager.getLogger(DbEventHandler.class);
-	private final EventsManager eventsManager;
+	private final Map<String, AgentState> agentStates = new HashMap<>();
 
 	@Inject
-	DbEventHandler(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
-	}
+	DbEventHandler() {}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		System.out.println("link enter event: " + event.getVehicleId().toString());
+		AgentState state = agentStates.get(event.getVehicleId().toString());
+		if (state != null) state.appendLink(event.getLinkId().toString(), event.getTime());
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		System.out.println("person departure event: " + event.getPersonId().toString());
+		AgentState state = new AgentState();
+		state.agentId = event.getPersonId().toString();
+		state.mode = event.getLegMode();
+		agentStates.put(state.agentId, state);
 	}
 
 	@Override
@@ -38,15 +39,17 @@ public final class DbEventHandler implements LinkEnterEventHandler, PersonDepart
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		System.out.println("person " + event.getPersonId().toString() + "ended activity " + event.getEventType().toString());
+		System.out.println("person " + event.getPersonId().toString() + " ended activity " + event.getEventType().toString());
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		System.out.println("person " + event.getPersonId().toString() + "start activity " + event.getEventType().toString());
-
+		System.out.println("person " + event.getPersonId().toString() + " start activity " + event.getEventType().toString());
 	}
 
+	public Map<String, AgentState> getAgentStates() {
+		return agentStates;
+	}
 
 //	@Override
 //	public void handleEvent(LinkEnterEvent event) {

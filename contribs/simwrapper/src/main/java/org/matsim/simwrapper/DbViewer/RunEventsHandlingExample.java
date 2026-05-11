@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -43,31 +44,35 @@ public class RunEventsHandlingExample {
 
 		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setLastIteration(2);
+		config.controller().setOverwriteFileSetting(
+				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists // ← add this
+		);
+		config.controller().setOutputDirectory("/home/brendan/git/matsim-libs/contribs/simwrapper/test/output/org/matsim/simwrapper/dashboard/SelectLinkAnalysis/");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
-		controler.setModules(new AbstractModule() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				install(new DbEventsModule());
+				install(new DbEventsModule(config.controller().getOutputDirectory()));
 			}
 		});
 
 		controler.run();
 
-		String inputFile = "output/example/output_events.xml.gz";
+		String inputFile = "output_events.xml.zst";
 
 		//create an event object
 		EventsManager events = EventsUtils.createEventsManager();
+		DbEventHandler dbEventHandle = new DbEventHandler();
 
-		AgentState agentState = new AgentState();
 		//create the handler and add it
-		DbEventListener handler1 = new DbEventListener(agentState);
+		DbEventListener handler1 = new DbEventListener(events, dbEventHandle, config.controller().getOutputDirectory());
 
         //create the reader and read the file
 		events.initProcessing();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(inputFile);
+		reader.readFile(config.controller().getOutputDirectory() + inputFile);
 		events.finishProcessing();
 
 //		System.out.println("average travel time: " + handler2.getTotalTravelTime());

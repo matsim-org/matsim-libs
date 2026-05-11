@@ -1,19 +1,29 @@
 package org.matsim.simwrapper.DbViewer;
 
 import org.mapdb.DB;
-import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
+
+import java.util.Map;
 
 public class DbWriter {
+	private final Map<String, AgentState> agentRecords;
+	private final DB db;
 
-	private final AgentState agentState;
-	private DbEventListener DbEventListener;
+	public DbWriter(DbEventHandler dbEventHandler, DB db) {
+		this.agentRecords = dbEventHandler.getAgentStates();
+		this.db = db;
+	}
 
-	private final IdMap<Person, Plan> agentRecords = new IdMap<>(Person.class);
-
-
-	public DbWriter(DbEventHandler dbEventHandler, DB db, AgentState agentState) {
-		this.agentState = agentState;
+	public void write() {
+		try {
+			HTreeMap<String, String> table = db.hashMap("agents",
+					Serializer.STRING, Serializer.STRING).createOrOpen();
+			for (AgentState state : agentRecords.values()) {
+				table.put(state.agentId, String.join("|", state.linkSequence));
+			}
+		} catch (Exception e) {
+			System.err.println("Failed to write to MapDB: " + e.getMessage());
+		}
 	}
 }
