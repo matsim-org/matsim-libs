@@ -48,7 +48,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.sum;
 		"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats_%s.csv",
 		"mode_share_per_purpose.csv", "mode_share_per_%s.csv",
 		"population_trip_stats.csv", "trip_purposes_by_hour.csv",
-		"mode_share_distance_distribution_%s.csv", "mode_shift_%s.csv", "mode_chains.csv",
+		"mode_share_distance_distribution_%s.csv", "mode_share_distance_distribution.csv", "mode_shift_%s.csv", "mode_chains.csv",
 		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv",
 		"mode_confusion_matrix.csv", "mode_prediction_error.csv"
 	}
@@ -108,8 +108,6 @@ public class TripAnalysis implements MATSimAppCommand {
 	private LocationFilter filter;
 	@CommandLine.Mixin
 	private ShpOptions shp;
-	@CommandLine.Option(names = "--input-comparison-data", description = "Optional path to comparison scenario data", required = false)
-	private String comparisonData;
 
 	public static void main(String[] args) {
 		new TripAnalysis().execute(args);
@@ -337,11 +335,6 @@ public class TripAnalysis implements MATSimAppCommand {
 		if (refData != null) {
 			sociodemographicGroups = new TripBySociodemographicGroupsAnalysis(refData);
 			sociodemographicGroups.groupPersons(persons);
-		}
-
-		if (comparisonData != null) {
-			groups = new TripByGroupAnalysis(comparisonData);
-			groups.groupPersons(persons);
 		}
 
 		// Use longest_distance_mode where main_mode is not present

@@ -1,10 +1,10 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.analysis.scenarioComparison.ScenarioComparisonAnalysis;
-import org.matsim.simwrapper.ComparisonDashboard;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.components.Line;
@@ -19,10 +19,17 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.IntStream;
 
-public class ScenarioComparisonDashboard implements ComparisonDashboard {
+public class ScenarioComparisonDashboard implements Dashboard {
 
 	private Map<String, String> comparisonScenarios;
-//	private boolean tripsComparison;
+	private static final Logger log = LogManager.getLogger(ScenarioComparisonDashboard.class);
+
+	private String [] argsTripAnalysis;
+	public enum AnalysisTypeArgs {
+		COMMERCIAL,
+		TRIP,
+		BOTH
+	}
 
 	/**
 	 * Default scenario comparison dashboard constructor.
@@ -34,8 +41,31 @@ public class ScenarioComparisonDashboard implements ComparisonDashboard {
 	}
 
 
+	// Below was added to accommodate changes to TripDashboard/TripAnalysis that broke the scenarioComparison.
+	/**
+	 * Reuses already registered {@link TripAnalysis} args if another dashboard configured the command first
+	 * and appends missing commercial args. Registered args stay authoritative because the TripDashboard
+	 * usually defines the more specific TripAnalysis setup. We also need to update the registered args
+	 * in the current {@link Data} context, otherwise later compute calls would still see the old,
+	 * incomplete command line and fail with conflicting args.
+	 */
+	private String[] resolveTripAnalysisArgs(Data data) {
+		String[] registeredArgs = data.getArgs(TripAnalysis.class);
+		String[] mergedArgs = DashboardUtils.mergeArgsPreferBase(
+			registeredArgs.length > 0 ? registeredArgs : argsTripAnalysis,
+			registeredArgs.length > 0 ? argsTripAnalysis : new String[0]
+		);
+		if (registeredArgs.length > 0 && !Arrays.equals(registeredArgs, mergedArgs)) {
+			data.setArgs(TripAnalysis.class, mergedArgs);
+			log.info("TripAnalysis was already registered with args {}. Appending missing CommercialTrafficDashboard args {} -> {}.",
+				Arrays.toString(registeredArgs), Arrays.toString(argsTripAnalysis), Arrays.toString(mergedArgs));
+		}
+		return mergedArgs;
+	}
+
+
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Scenario Comparison: Policy to Base Case";
 		header.description = "Shows the differences in a variety of metrics between the policy and base case.";
@@ -66,10 +96,10 @@ public class ScenarioComparisonDashboard implements ComparisonDashboard {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("sim").build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"))
-					.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM)
+					.aggregate(List.of("main_mode"), "share_total", Plotly.AggrFunc.SUM)
 					.mapping()
 					.x("main_mode")
-					.y("share")
+					.y("share_total")
 			);
 		});
 
@@ -99,10 +129,10 @@ public class ScenarioComparisonDashboard implements ComparisonDashboard {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("sim").build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv")).constant("source", "sim")
-					.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
+					.aggregate(List.of("dist_group"), "share_total", Plotly.AggrFunc.SUM)
 					.mapping()
 					.x("dist_group")
-					.y("share")
+					.y("share_total")
 			);
 		});
 
@@ -189,14 +219,15 @@ public class ScenarioComparisonDashboard implements ComparisonDashboard {
 			viz.description = "by mode.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.xAxis(Axis.builder().title("Distance [m]").build())
-				.yAxis(Axis.builder().title("Share").build())
+				.yAxis(Axis.builder().title("share_total").build())
 				.build();
 
 			viz.colorRamp = ColorScheme.Viridis;
 			viz.interactive = Plotly.Interactive.dropdown;
 
-			Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_distance_distribution.csv"))
-				.pivot(List.of("dist"), "main_mode", "share")
+//			Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_distance_distribution.csv"))
+			Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", "total", resolveTripAnalysisArgs(data)))
+				.pivot(List.of("dist"), "main_mode", "share_total")
 				.constant("source", "Sim");
 
 				for (Map.Entry<String, String> compScenario : this.comparisonScenarios.entrySet()) {
@@ -225,7 +256,7 @@ public class ScenarioComparisonDashboard implements ComparisonDashboard {
 				.showLegend(true)
 				.mode(ScatterTrace.Mode.LINE).build(), ds.mapping().name("main_mode")
 				.x("dist")
-				.y("share")
+				.y("share_total")
 			);
 		});
 	}
@@ -239,7 +270,7 @@ public class ScenarioComparisonDashboard implements ComparisonDashboard {
 			viz.description = "by mode.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.xAxis(Axis.builder().title("Distance Groups [m]").build())
-				.yAxis(Axis.builder().title("Share").build())
+				.yAxis(Axis.builder().title("share_total").build())
 				.build();
 
 			viz.colorRamp = ColorScheme.Viridis;
@@ -270,7 +301,7 @@ public class ScenarioComparisonDashboard implements ComparisonDashboard {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("sim")
 				.showLegend(true).build(),
-				ds.mapping().name("main_mode").x("dist_group").y("share")
+				ds.mapping().name("main_mode").x("dist_group").y("share_total")
 			);
 		});
 	}
