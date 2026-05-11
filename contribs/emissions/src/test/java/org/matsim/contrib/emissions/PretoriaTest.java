@@ -365,18 +365,19 @@ public class PretoriaTest {
 
 		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter(utils.getClassInputDirectory() + "networkInformation.csv"),
+			IOUtils.getBufferedWriter(OUTPUT_PATH + "/PretoriaTest/networkInformation.csv"),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
 			"linkId",
 			"freespeed",
+			"length",
 			"roadType",
 			"gradient"
 		);
 
 		for (Link l : pretoriaNetwork.getLinks().values()) {
 			double dAlt = (Double) l.getToNode().getAttributes().getAttribute("alt") - (Double) l.getFromNode().getAttributes().getAttribute("alt");
-			writer.printRecord(l.getId(), l.getFreespeed(), l.getAttributes().getAttribute("hbefa_road_type"), dAlt / l.getLength());
+			writer.printRecord(l.getId(), l.getFreespeed(), l.getLength(), l.getAttributes().getAttribute("hbefa_road_type"), dAlt / l.getLength());
 		}
 
 		writer.flush();
