@@ -213,52 +213,106 @@
   {
     vehicle <- "FIGO_TECHAVG"
 
-    pretoria_output.SG <- read_csv(glue("{pretoria_path}/output_{vehicle}_StopAndGoFraction.csv")) %>%
+    pretoria_output.SG <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_StopAndGoFraction.csv")) %>%
       filter(linkId != 6555 & linkId != "cold") %>%
       mutate(ERR_CO = CO_MATSim - CO_pems, ERR_CO2 = CO2_MATSim - CO2_pems, ERR_NOx = NOx_MATSim - NOx_pems) %>%
       pivot_longer(c("ERR_CO", "ERR_CO2", "ERR_NOx"), names_to = "component", values_to = "error") %>%
       mutate(method = "StopAndGoFraction")
 
-    pretoria_output.Int <- read_csv(glue("{pretoria_path}/output_{vehicle}_InterpolationFraction.csv")) %>%
+    pretoria_output.Int <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_InterpolationFraction.csv")) %>%
       filter(linkId != 6555 & linkId != "cold") %>%
       mutate(ERR_CO = CO_MATSim - CO_pems, ERR_CO2 = CO2_MATSim - CO2_pems, ERR_NOx = NOx_MATSim - NOx_pems) %>%
       pivot_longer(c("ERR_CO", "ERR_CO2", "ERR_NOx"), names_to = "component", values_to = "error") %>%
       mutate(method = "InterpolationFraction")
 
-    network_information <- read_csv("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/networkInformation.csv") %>%
+    network_information <- read_csv(glue("{matsim_output_path}/PretoriaTest/networkInformation.csv")) %>%
       separate(roadType, c("Region", "RoadType", "VClass"), sep="/")
 
     d <- pretoria_output.SG %>%
       rbind(pretoria_output.Int) %>%
       inner_join(network_information, by = "linkId")
 
+    colors <- c("#00a4f5", "#d21717")
+
+    xmin <- min(d$gradient)
+    xmax <- max(d$gradient)
+
     p1 <- ggplot(d) +
       stat_summary_bin(aes(x=gradient, y=error, color=method), fun = mean, binwidth=0.05, geom="line") +
+      coord_cartesian(xlim = c(xmin, xmax)) +
+      theme_minimal() +
+      scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
+      scale_color_manual(values=colors) +
       facet_wrap(~component, scales="free") +
-      ggtitle("Error and distribution of error per link by gradient")
+      theme(text = element_text(size=18)) +
+      xlab("") +
+      ylab("Average error in mass (g)")
 
     p2 <- ggplot(d) +
-      geom_histogram(aes(x=gradient), binwidth = 0.05) +
-      facet_wrap(~component, scales="free")
+      geom_histogram(aes(x=gradient, fill=segment, weight=length/(2*length(unique(d$tripId)))/1000), binwidth = 0.05) +
+      coord_cartesian(xlim = c(xmin, xmax)) +
+      theme_minimal() +
+      scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
+      scale_fill_manual(
+        values = c(
+          "A" = "#1f77b4",
+          "B" = "#ff7f0e",
+          "C" = "#2ca02c",
+          "none" = "grey70"
+        )
+      ) +
+      facet_wrap(~component, scales="free") +
+      xlab("Gradient in %") +
+      ylab("Driven distance per trip (km)") +
+      labs(caption="Fig XX: The absolute error distribution by gradient. Upper plots show the error for the distinct components. \n Bottom plots show the distance driven with respective gradient.") +
+      theme(text = element_text(size=18), plot.caption = element_text(size = 18, hjust = 0.5, margin = margin(t=20)))
 
     p1 / p2
 
+    ggsave(glue("{plots_path}/gradient_err.png"),
+           width = 30,
+           height = 20,
+           dpi = 300)
+
+    xmin <- min(d$freespeed)
+    xmax <- max(d$freespeed)
+
     p3 <- ggplot(d) +
-      stat_summary_bin(aes(x=freespeed, y=error, color=method), fun = mean, binwidth=1, geom="line") +
-      facet_wrap(~component, scales="free") +
+      stat_summary_bin(aes(x=freespeed, y=(error)*100, color=method), fun = mean, binwidth=1, geom="line") +
+      geom_hline(yintercept=0) +
+      coord_cartesian(xlim = c(xmin, xmax)) +
       theme_minimal() +
+      scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
+      scale_color_manual(values=colors) +
+      facet_wrap(~component, scales="free_y") +
       theme(text = element_text(size=18)) +
-      ggtitle("Absolute error and distribution of error per link by average speed")
+      xlab("") +
+      ylab("Average error in mass (g)")
+
 
     p4 <- ggplot(d) +
-      geom_histogram(aes(x=freespeed), binwidth = 1) +
-      facet_wrap(~component, scales="free") +
+      geom_histogram(aes(x=freespeed, fill=segment, weight=length/(2*length(unique(d$tripId)))/1000), binwidth = 1) +
+      coord_cartesian(xlim = c(xmin, xmax)) +
       theme_minimal() +
-      theme(text = element_text(size=18))
+      scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
+      scale_fill_manual(
+        values = c(
+          "A" = "#1f77b4",
+          "B" = "#ff7f0e",
+          "C" = "#2ca02c",
+          "none" = "grey70"
+        )
+      ) +
+      facet_wrap(~component, scales="free_y") +
+      theme(text = element_text(size=18)) +
+      xlab("Freespeed in (m/s)") +
+      ylab("Driven distance per trip (km)") +
+      labs(caption="Fig XX: The absolute error distribution by freespeed. Upper plots show the error for the distinct components. \n Bottom plots show the distance driven with respective freespeed.") +
+      theme(text = element_text(size=18), plot.caption = element_text(size = 18, hjust = 0.5, margin = margin(t=20)))
 
     p3 / p4
 
-    ggsave(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/freespeed_err.png"),
+    ggsave(glue("{plots_path}/freespeed_err.png"),
            width = 30,
            height = 20,
            dpi = 300)
