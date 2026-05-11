@@ -114,6 +114,14 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		defaultValue = "bike")
 	private String mode;
 
+	@Option(names = "--country",
+		description = "Country profile for traffic-sign interpretation. "
+			+ "Supported: de, at, generic. Default: ${DEFAULT-VALUE}. "
+			+ "Use 'generic' if your country isn't listed; it skips traffic-sign matching "
+			+ "and relies on tag-based classification only (cycleway=*, segregated=*, etc.).",
+		defaultValue = "de")
+	private String country;
+
 	@Option(names = "--ele-sample-step",
 		description = "Distance between elevation samples along a link in meters (default: ${DEFAULT-VALUE})",
 		defaultValue = "10.0")
@@ -187,7 +195,9 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		var transformation = TransformationFactory.getCoordinateTransformation(
 			TransformationFactory.WGS84, outputCRS);
 
-		var classifier = new BicycleInfraClassifier();
+		var profile = BicycleCountryProfiles.forCode(country);
+		log.info("Using country profile: {}", profile.getClass().getSimpleName());
+		var classifier = new BicycleInfraClassifier(profile);
 		var tagCopy = new TagCopy(TAGS_TO_COPY, OSM_PREFIX);
 		var policy = new BicycleLinkPolicy(classifier, tagCopy);
 

@@ -24,6 +24,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Copies selected OSM tag values onto link attributes, prefixed with a fixed
+ * string. Used by {@link BicycleLinkPolicy} to forward raw OSM tags that the
+ * {@link org.matsim.contrib.osm.networkReader.OsmBicycleReader} doesn't write
+ * itself but that downstream consumers want to see (typically under the
+ * {@code "osm:"} prefix).
+ *
+ * <p>Configured with a list of OSM keys and the target prefix; instances are
+ * immutable and reusable across many links. Empty or missing values are
+ * skipped, so an empty key list makes {@link #copy} a no-op.
+ *
  * @author smetzler
  */
 public final class TagCopy {

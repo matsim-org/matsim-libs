@@ -25,9 +25,42 @@ import java.util.Map;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
 
 /**
+ * Classifies OSM tag sets into {@link BicycleInfraCategory}. Precedence is
+ * first-match-wins and mirrors the FixMyCity ({@code BikelaneCategories.lua})
+ * order.
+ *
+ * <p>Country-specific knobs — currently only traffic-sign codes — are pulled
+ * out into {@link BicycleCountryProfile}. The no-arg constructor wires
+ * {@link GermanCountryProfile} so existing callers keep working unchanged.
+ *
+ * <p><b>TODO (left-hand traffic).</b> The profile carries
+ * {@link BicycleCountryProfile#isRightHandTraffic()} but this classifier
+ * still hard-codes the right-hand interpretation of {@code cycleway:right}
+ * (= in direction of travel) and {@code cycleway:left} (= against
+ * direction of travel). Sites that would need to flip for a left-hand
+ * country: the {@code cwSide}/{@code bwSide} pickers in
+ * {@code getSharedBusLaneTypeForDirection} and
+ * {@code isSharedMotorVehicleLaneForDirection}, the right/left split in
+ * the three {@code hasCyclewayOnHighway*ForDirection} methods, and the
+ * forward branch in {@code getCyclewayTypeForDirection} and
+ * {@code getFootwayBicycleYesTypeForDirection}. Postponed until a real
+ * left-hand profile lands; flipping the boolean alone would not produce
+ * correct results.
+ *
  * @author smetzler
  */
 public final class BicycleInfraClassifier {
+
+	private final BicycleCountryProfile profile;
+
+	/** Uses {@link GermanCountryProfile}. */
+	public BicycleInfraClassifier() {
+		this(new GermanCountryProfile());
+	}
+
+	public BicycleInfraClassifier(BicycleCountryProfile profile) {
+		this.profile = profile;
+	}
 
 	/**
 	 * Main entry: classify OSM tags into a bicycle infrastructure category.
@@ -122,22 +155,14 @@ public final class BicycleInfraClassifier {
 	// Bicycle road
 	// -------------------------------------------------------------------------
 
-	private static BicycleInfraCategory getBicycleRoadType(Map<String, String> t) {
-		boolean isBicycleRoad = YES.equals(v(t, BICYCLE_ROAD));
-
+	private BicycleInfraCategory getBicycleRoadType(Map<String, String> t) {
 		String trafficSign = v(t, TRAFFIC_SIGN);
-		if (!isBicycleRoad && !isEmpty(trafficSign) && trafficSign.contains("DE:244")) {
-			isBicycleRoad = true;
-		}
+
+		boolean isBicycleRoad = YES.equals(v(t, BICYCLE_ROAD)) || profile.isBicycleRoadSign(trafficSign);
 		if (!isBicycleRoad) return null;
 
 		// vehicle destination / frei
-		if (!isEmpty(trafficSign) && trafficSign.contains("1020-30")) {
-			return BicycleInfraCategory.BICYCLE_ROAD_VEHICLE_DESTINATION;
-		}
-		if (!isEmpty(trafficSign) && (trafficSign.contains("Kraftfahrzeuge-frei")
-			|| trafficSign.contains("Kfz-Verkehr frei")
-			|| trafficSign.contains("KFZ frei"))) {
+		if (profile.isBicycleRoadVehicleDestinationSign(trafficSign)) {
 			return BicycleInfraCategory.BICYCLE_ROAD_VEHICLE_DESTINATION;
 		}
 
@@ -190,7 +215,7 @@ public final class BicycleInfraClassifier {
 	// Bus lanes (directional)
 	// -------------------------------------------------------------------------
 
-	private static BicycleInfraCategory getSharedBusLaneTypeForDirection(Map<String, String> t, Direction dir) {
+	private BicycleInfraCategory getSharedBusLaneTypeForDirection(Map<String, String> t, Direction dir) {
 		boolean forward = dir == Direction.Forward;
 
 		String highway = v(t, HIGHWAY);
@@ -202,18 +227,14 @@ public final class BicycleInfraClassifier {
 			if (isAnyOf(cycleway, CW_SHARE_BUSWAY, "opposite_share_busway")) {
 				return BicycleInfraCategory.SHARED_BUS_LANE_BUS_WITH_BIKE;
 			}
-			if (!isEmpty(trafficSign) && trafficSign.startsWith("DE:245")) {
-				if (trafficSign.contains("1022-10") || trafficSign.contains("1022-14")) {
-					return BicycleInfraCategory.SHARED_BUS_LANE_BUS_WITH_BIKE;
-				}
+			if (profile.isSharedBusLaneBusWithBikeSign(trafficSign)) {
+				return BicycleInfraCategory.SHARED_BUS_LANE_BUS_WITH_BIKE;
 			}
 			if (CW_SHARE_BUSWAY.equals(v(t, "lane"))) {
 				return BicycleInfraCategory.SHARED_BUS_LANE_BIKE_WITH_BUS;
 			}
-			if (!isEmpty(trafficSign) && trafficSign.startsWith("DE:237")) {
-				if (trafficSign.contains("1024-14") || trafficSign.contains("1026-32")) {
-					return BicycleInfraCategory.SHARED_BUS_LANE_BIKE_WITH_BUS;
-				}
+			if (profile.isSharedBusLaneBikeWithBusSign(trafficSign)) {
+				return BicycleInfraCategory.SHARED_BUS_LANE_BIKE_WITH_BUS;
 			}
 		}
 
@@ -347,7 +368,7 @@ public final class BicycleInfraClassifier {
 	// Separated cycleways (directional)
 	// -------------------------------------------------------------------------
 
-	private static BicycleInfraCategory getCyclewayTypeForDirection(Map<String, String> t, Direction dir) {
+	private BicycleInfraCategory getCyclewayTypeForDirection(Map<String, String> t, Direction dir) {
 		boolean forward = dir == Direction.Forward;
 
 		String highway = v(t, HIGHWAY);
@@ -377,7 +398,7 @@ public final class BicycleInfraClassifier {
 		if (CW_TRACK.equals(cycleway)) isCycleway = true;
 
 		// traffic sign DE:237 whitelist
-		if (!isEmpty(trafficSign) && trafficSign.contains("DE:237")) {
+		if (profile.isProtectedCyclewaySign(trafficSign)) {
 			if (isAnyOf(highway, HW_LIVING_STREET, HW_PEDESTRIAN, HW_SERVICE, HW_TRACK, HW_BRIDLEWAY, HW_PATH, HW_FOOTWAY, HW_CYCLEWAY)) {
 				isCycleway = true;
 			}
@@ -392,7 +413,7 @@ public final class BicycleInfraClassifier {
 	// Foot+cycle combined (shared/segregated) - mostly non-directional like GH
 	// -------------------------------------------------------------------------
 
-	private static BicycleInfraCategory getFootAndCyclewayType(Map<String, String> t) {
+	private BicycleInfraCategory getFootAndCyclewayType(Map<String, String> t) {
 		String highway = v(t, HIGHWAY);
 		String trafficSign = v(t, TRAFFIC_SIGN);
 		String segregated = v(t, SEGREGATED);
@@ -403,10 +424,10 @@ public final class BicycleInfraClassifier {
 		// Special: highway=cycleway + cycleway=track + segregated/signs
 		if (HW_CYCLEWAY.equals(highway) && CW_TRACK.equals(cycleway)) {
 			String isSidepath = v(t, IS_SIDEPATH);
-			if (NO.equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("240"))) {
+			if (NO.equals(segregated) || profile.isSharedFootCyclewaySign(trafficSign)) {
 				return footAndCyclewaySharedSidepath(isSidepath);
 			}
-			if (YES.equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("241"))) {
+			if (YES.equals(segregated) || profile.isSegregatedFootCyclewaySign(trafficSign)) {
 				return footAndCyclewaySegregatedSidepath(isSidepath);
 			}
 		}
@@ -421,7 +442,7 @@ public final class BicycleInfraClassifier {
 		String isSidepath = v(t, IS_SIDEPATH);
 
 		// segregated=yes or sign 241
-		if (YES.equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("241"))) {
+		if (YES.equals(segregated) || profile.isSegregatedFootCyclewaySign(trafficSign)) {
 			if (isAnyOf(highway, HW_CYCLEWAY, HW_PATH, HW_FOOTWAY)) {
 				return footAndCyclewaySegregatedSidepath(isSidepath);
 			}
@@ -434,7 +455,7 @@ public final class BicycleInfraClassifier {
 		}
 
 		// shared: segregated=no or sign 240
-		if (NO.equals(segregated) || (!isEmpty(trafficSign) && trafficSign.contains("240"))) {
+		if (NO.equals(segregated) || profile.isSharedFootCyclewaySign(trafficSign)) {
 			if (isAnyOf(highway, HW_CYCLEWAY, HW_PATH, HW_FOOTWAY, HW_SERVICE, HW_TRACK)) {
 				return footAndCyclewaySharedSidepath(isSidepath);
 			}
@@ -447,7 +468,7 @@ public final class BicycleInfraClassifier {
 	// Footway bicycle yes (directional for sidewalk:* tags)
 	// -------------------------------------------------------------------------
 
-	private static BicycleInfraCategory getFootwayBicycleYesTypeForDirection(Map<String, String> t, Direction dir) {
+	private BicycleInfraCategory getFootwayBicycleYesTypeForDirection(Map<String, String> t, Direction dir) {
 		boolean forward = dir == Direction.Forward;
 		String highway = v(t, HIGHWAY);
 
@@ -462,7 +483,7 @@ public final class BicycleInfraClassifier {
 		String bicycle = v(t, BICYCLE);
 		String trafficSign = v(t, TRAFFIC_SIGN);
 
-		boolean hasBicycleAccess = YES.equals(bicycle) || (!isEmpty(trafficSign) && trafficSign.contains("1022-10"));
+		boolean hasBicycleAccess = YES.equals(bicycle) || profile.isFootwayBicycleAllowedSign(trafficSign);
 		if (!hasBicycleAccess) return null;
 
 		// mtb:scale filter
@@ -615,4 +636,3 @@ public final class BicycleInfraClassifier {
 			BicycleInfraCategory.FOOTWAY_BICYCLE_YES_ADJOINING_OR_ISOLATED);
 	}
 }
-

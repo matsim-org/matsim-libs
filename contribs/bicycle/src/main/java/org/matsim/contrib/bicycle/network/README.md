@@ -20,16 +20,17 @@ mvn -pl contribs/bicycle exec:java \
                  --output berlin-bicycle-network.xml.gz"
 ```
 
-| Option                  | Default | Meaning                                                |
-|-------------------------|---------|--------------------------------------------------------|
-| `--input` (required)    | —       | OSM input (`.osm.pbf`)                                 |
-| `--dem` (required)      | —       | DEM GeoTIFF                                            |
-| `--dem-crs` (required)  | —       | CRS of the DEM (e.g. `EPSG:32632` for Sonny Germany)   |
-| `--output` (required)   | —       | Output network (`.xml.gz`)                             |
-| `--crs` (required)      | —       | Output network CRS (e.g. `EPSG:25832`)                 |
-| `--mode`                | `bike`  | Network mode for cyclable links                        |
-| `--ele-sample-step`     | `10.0`  | Distance between elevation samples along a link, in m  |
-| `--ele-noise-tolerance` | `3.0`   | Douglas-Peucker vertical tolerance, in m               |
+| Option                  | Default | Meaning                                                                                          |
+|-------------------------|---------|--------------------------------------------------------------------------------------------------|
+| `--input` (required)    | —       | OSM input (`.osm.pbf`)                                                                           |
+| `--dem` (required)      | —       | DEM GeoTIFF                                                                                      |
+| `--dem-crs` (required)  | —       | CRS of the DEM (e.g. `EPSG:32632` for Sonny Germany)                                             |
+| `--output` (required)   | —       | Output network (`.xml.gz`)                                                                       |
+| `--crs` (required)      | —       | Output network CRS (e.g. `EPSG:25832`)                                                           |
+| `--mode`                | `bike`  | Network mode for cyclable links                                                                  |
+| `--country`             | `de`    | Country profile for traffic-sign interpretation: `de`, `at`, or `generic` (see Country profiles) |
+| `--ele-sample-step`     | `10.0`  | Distance between elevation samples along a link, in m                                            |
+| `--ele-noise-tolerance` | `3.0`   | Douglas-Peucker vertical tolerance, in m                                                         |
 
 ## What gets attached to links
 
@@ -60,6 +61,11 @@ link with a hill between equal-height endpoints — `maxGradient`, `elevationGai
 - `BicycleLinkPolicy` — per-link hook: infra classification + access rule enforcement (footway whitelist, `bicycle=no`,
   oneway handling)
 - `BicycleOsmTags` — bicycle-specific OSM tag keys + frequently-used values, used as `import static`
+- `BicycleCountryProfile` — interface for country-specific knobs (traffic-sign predicates, driving direction); see
+  Country profiles below
+- `BicycleCountryProfiles` — factory mapping a short code (`de` / `at` / `generic`) to a profile; used by the
+  `--country` CLI flag
+- `GermanCountryProfile`, `AustrianCountryProfile`, `GenericCountryProfile` — concrete profiles
 - `ElevationDataParser` — reads a GeoTIFF DEM via GeoTools, handles CRS transformation, samples nearest-neighbor
 - `LinkElevationProfile` — samples along a link, applies Douglas-Peucker smoothing, computes KPIs
 - `ServiceLinkCleaner` — removes service-link components that don't connect anything useful
@@ -141,6 +147,28 @@ rules.
 
 `BicycleLinkPolicy` additionally kills links (empty modes, zero capacity) when they're footway/pedestrian without
 explicit bike permission, or tagged `bicycle=no`, or the reverse direction of a bicycle-oneway.
+
+## Country profiles
+
+The classification rules that depend on the OSM `traffic_sign=*` tag are country-specific (DE:244 for German bicycle
+roads, AT:53.27 for Austrian ones, etc.). These are pluggable via `--country`:
+
+| Code      | Profile                    | Use for                                                                 |
+|-----------|----------------------------|-------------------------------------------------------------------------|
+| `de`      | `GermanCountryProfile`     | Germany (default). Recognises DE:244, DE:237, DE:240, DE:241, etc.      |
+| `at`      | `AustrianCountryProfile`   | Austria. Recognises AT:53.27 (Fahrradstraße), AT:52.17/a/b, AT:53.28b.  |
+| `generic` | `GenericCountryProfile`    | Everywhere else. Skips traffic-sign matching; relies on tag-only logic. |
+
+The bulk of the classification is country-independent and works from generic OSM tags (`highway=*`, `cycleway=*`,
+`bicycle=*`, `foot=*`, `segregated=*`, `is_sidepath`, `separation:*`, `cycleway:right/left`, sidewalk subtags). The
+country profile only kicks in for the handful of rules that consult `traffic_sign=*`. So `--country generic` is a
+reasonable default for any country without a dedicated profile — it doesn't break anything, it just doesn't pick up the
+extra signal from country-specific traffic signs.
+
+Adding a new country: implement `BicycleCountryProfile`, register it in `BicycleCountryProfiles.forCode`, and look at
+`GermanCountryProfile` / `AustrianCountryProfile` as templates. The right-hand-traffic assumption is currently still
+hard-coded in `BicycleInfraClassifier` regardless of the profile; left-hand-traffic countries (UK, IE, …) need a
+broader refactor.
 
 ## DEM
 
