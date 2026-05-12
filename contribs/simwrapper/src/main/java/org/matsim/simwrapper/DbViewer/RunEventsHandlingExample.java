@@ -20,6 +20,7 @@
 package org.matsim.simwrapper.DbViewer;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -29,6 +30,9 @@ import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -51,6 +55,8 @@ public class RunEventsHandlingExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
+
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -67,7 +73,7 @@ public class RunEventsHandlingExample {
 		DbEventHandler dbEventHandle = new DbEventHandler();
 
 		//create the handler and add it
-		DbEventListener handler1 = new DbEventListener(events, dbEventHandle, config.controller().getOutputDirectory());
+		DbEventListener handler1 = new DbEventListener(events, dbEventHandle, config.controller().getOutputDirectory(), scenario);
 
         //create the reader and read the file
 		events.initProcessing();
