@@ -34,7 +34,7 @@ import java.util.*;
 public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = LogManager.getLogger(ControllerConfigGroup.class);
 
-	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, SpeedyALT}
+	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, SpeedyALT, CHRouter}
 
 	public enum EventTypeToCreateScoringFunctions {IterationStarts, BeforeMobsim}
 

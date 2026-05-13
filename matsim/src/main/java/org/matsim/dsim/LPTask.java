@@ -138,8 +138,8 @@ public final class LPTask implements SimTask {
 		return consumers.keySet();
 	}
 
-	public IntSet waitForOtherRanks(double time) {
-		return lp.waitForOtherRanks(time);
+	public IntSet waitForOtherParts(double time) {
+		return lp.waitForOtherParts(time);
 	}
 
 	@Override

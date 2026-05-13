@@ -441,6 +441,10 @@ public class ApplicationUtils {
 		if (Files.exists(possibility))
 			return possibility;
 
+		possibility = dir.resolve(name + ".zst");
+		if (Files.exists(possibility))
+			return possibility;
+
 		// Match files that could be matsim output files
 		Optional<Path> path = matchSuffix("output_" + name, dir);
 		if (path.isPresent())

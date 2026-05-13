@@ -20,7 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 
@@ -34,8 +33,8 @@ public interface TransitVehicle extends MobsimVehicle {
 	public Vehicle getVehicle();
 
 	@Override
-	public MobsimDriverAgent getDriver();
-	
+	public TransitDriverAgent getDriver();
+
 	public TransitStopHandler getStopHandler();
 
 }

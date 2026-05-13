@@ -1,5 +1,7 @@
 package org.matsim.smallScaleCommercialTrafficGeneration.prepare;
 
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
+
 import java.util.*;
 
 /**
@@ -7,26 +9,34 @@ import java.util.*;
  *
  * @author Ricardo Ewert
  */
-public class LanduseDataConnectionCreatorForOSM_Data implements LanduseDataConnectionCreator{
+public class LanduseDataConnectionCreatorForOSM_Data implements LanduseDataConnectionCreator {
 
 	@Override
-	public Map<String, List<String>> createLanduseDataConnection() {
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
-		landuseCategoriesAndDataConnection.put("Inhabitants",
+	public Map<StructuralAttribute, List<String>> createLanduseDataConnection() {
+		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = new EnumMap<>(StructuralAttribute.class);
+
+		landuseCategoriesAndDataConnection.put(
+			StructuralAttribute.INHABITANTS,
 			new ArrayList<>(Arrays.asList("residential", "apartments", "dormitory", "dwelling_house", "house",
 				"retirement_home", "semidetached_house", "detached")));
-		landuseCategoriesAndDataConnection.put("Employee Primary Sector", new ArrayList<>(
-			Arrays.asList("farmyard", "farmland", "farm", "farm_auxiliary", "greenhouse", "agricultural")));
-		landuseCategoriesAndDataConnection.put("Employee Construction",
+		landuseCategoriesAndDataConnection.put(
+			StructuralAttribute.EMPLOYEE_PRIMARY,
+			new ArrayList<>(Arrays.asList("farmyard", "farmland", "farm", "farm_auxiliary", "greenhouse", "agricultural")));
+		landuseCategoriesAndDataConnection.put(
+			StructuralAttribute.EMPLOYEE_CONSTRUCTION,
 			new ArrayList<>(List.of("construction")));
-		landuseCategoriesAndDataConnection.put("Employee Secondary Sector Rest",
+		landuseCategoriesAndDataConnection.put(
+			StructuralAttribute.EMPLOYEE_SECONDARY,
 			new ArrayList<>(Arrays.asList("industrial", "factory", "manufacture", "bakehouse")));
-		landuseCategoriesAndDataConnection.put("Employee Retail",
+		landuseCategoriesAndDataConnection.put(
+			StructuralAttribute.EMPLOYEE_RETAIL,
 			new ArrayList<>(Arrays.asList("retail", "kiosk", "mall", "shop", "supermarket")));
-		landuseCategoriesAndDataConnection.put("Employee Traffic/Parcels", new ArrayList<>(
-			Arrays.asList("commercial", "post_office", "storage", "storage_tank", "warehouse")));
-		landuseCategoriesAndDataConnection.put("Employee Tertiary Sector Rest", new ArrayList<>(
-			Arrays.asList("commercial", "embassy", "foundation", "government", "office", "townhall")));
+		landuseCategoriesAndDataConnection.put(
+			StructuralAttribute.EMPLOYEE_TRAFFIC,
+			new ArrayList<>(Arrays.asList("commercial", "post_office", "storage", "storage_tank", "warehouse")));
+		landuseCategoriesAndDataConnection.put(
+			StructuralAttribute.EMPLOYEE_TERTIARY,
+			new ArrayList<>(Arrays.asList("commercial", "embassy", "foundation", "government", "office", "townhall")));
 		return landuseCategoriesAndDataConnection;
 	}
 }

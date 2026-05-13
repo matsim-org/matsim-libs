@@ -24,8 +24,8 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.OptionalInt;
 import java.util.function.IntToDoubleFunction;
+import java.util.function.ToIntFunction;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.speedy.LeastCostPathTree.StopCriterion;
 
@@ -61,10 +61,25 @@ public class LeastCostPathTreeStopCriteria {
 	}
 
 	public static StopCriterion allEndNodesReached(Collection<Node> endNodes) {
+		return allEndNodesReached(endNodes, node -> node.getId().index());
+	}
+
+	/**
+	 * Creates a stop criterion that fires when all end nodes have been reached.
+	 * Uses the provided {@code nodeIndexFunction} to translate MATSim nodes to
+	 * internal tree indices, which is necessary when the graph uses spatial
+	 * (Z-order) node reordering.
+	 *
+	 * @param endNodes           the target nodes
+	 * @param nodeIndexFunction  maps a MATSim {@link Node} to the internal index
+	 *                           used by the shortest-path tree (e.g. {@code graph::getNodeIndex})
+	 */
+	public static StopCriterion allEndNodesReached(Collection<Node> endNodes,
+			ToIntFunction<Node> nodeIndexFunction) {
 		Preconditions.checkArgument(!endNodes.isEmpty(), "At least one end node must be provided.");
 
-		final BitSet nodesToVisit = new BitSet(Id.getNumberOfIds(Node.class));
-		endNodes.forEach(node -> nodesToVisit.set(node.getId().index()));
+		final BitSet nodesToVisit = new BitSet();
+		endNodes.forEach(node -> nodesToVisit.set(nodeIndexFunction.applyAsInt(node)));
 
 		return new StopCriterion() {
 			private int counter = nodesToVisit.cardinality();
@@ -84,17 +99,28 @@ public class LeastCostPathTreeStopCriteria {
 		// zero or positive values allowed
 		private final IntToDoubleFunction additionalCostByNodeIndex;
 
-		private final BitSet nodesToVisit = new BitSet(Id.getNumberOfIds(Node.class));
+		private final BitSet nodesToVisit = new BitSet();
 		private int counter;
 
 		private int bestEndNodeIndex = -1;
 		private double bestEndNodeCost = Double.POSITIVE_INFINITY;
 
 		public LeastCostEndNodeReached(Collection<Node> endNodes, IntToDoubleFunction additionalCostByNodeIndex) {
+			this(endNodes, additionalCostByNodeIndex, node -> node.getId().index());
+		}
+
+		/**
+		 * @param endNodes                  the target nodes
+		 * @param additionalCostByNodeIndex additional cost function per node index
+		 * @param nodeIndexFunction         maps a MATSim {@link Node} to the internal
+		 *                                  index used by the shortest-path tree
+		 */
+		public LeastCostEndNodeReached(Collection<Node> endNodes, IntToDoubleFunction additionalCostByNodeIndex,
+				ToIntFunction<Node> nodeIndexFunction) {
 			Preconditions.checkArgument(!endNodes.isEmpty(), "At least one end node must be provided.");
 
 			this.additionalCostByNodeIndex = additionalCostByNodeIndex;
-			endNodes.forEach(node -> nodesToVisit.set(node.getId().index()));
+			endNodes.forEach(node -> nodesToVisit.set(nodeIndexFunction.applyAsInt(node)));
 			counter = nodesToVisit.cardinality();
 		}
 

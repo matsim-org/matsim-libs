@@ -22,10 +22,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.api.experimental.events.VehicleTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -33,12 +35,19 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Random;
 
 /**
@@ -77,22 +86,35 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 
 	private final MatsimServices matsimServices;
 	private final QSimConfigGroup qsimConfig;
-	private final Scenario scenario;
+	private final Map<Id<Vehicle>, Vehicle> vehicles;
+	private final QNetsimEngineI qNetsimEngine;
 
+	private final PriorityQueue<VehicleArrivalEntry> vehicleArrivals = new PriorityQueue<>();
+	private final Map<Id<Vehicle>, VehicleArrivalEntry> vehicleArrivalsIndex = new HashMap<>();
+	private final Map<Id<Vehicle>, Deque<DeferredDeparture>> deferredDepartures = new HashMap<>();
+
+	private InternalInterface internalInterface;
+
+	private long teleportedTrips = 0;
+	private long teleportedDeferredTrips = 0;
+	private long simulatedTrips = 0;
+	private long simulatedQsimFallbackTrips = 0;
 
 	@Inject
 	FISS(MatsimServices matsimServices, Scenario scenario, FISSConfigGroup fissConfigGroup, Network network, TeleportationEngine teleport,
 		 @Named(TransportMode.car) TravelTime travelTime,
-		 @Named("base-network-mode-departure-handler") NetworkModeDepartureHandler networkModeDepartureHandler) {
+		 @Named("base-network-mode-departure-handler") NetworkModeDepartureHandler networkModeDepartureHandler,
+		 QNetsimEngineI qNetsimEngine) {
 		this.delegate = networkModeDepartureHandler;
 		this.fissConfigGroup = fissConfigGroup;
 		this.network = network;
 		this.teleport = teleport;
 		this.travelTime = travelTime;
 		this.matsimServices = matsimServices;
-		this.scenario = scenario;
+		this.vehicles = scenario.getVehicles().getVehicles();
 		this.qsimConfig = scenario.getConfig().qsim();
 		this.random = MatsimRandom.getLocalInstance();
+		this.qNetsimEngine = qNetsimEngine;
 	}
 
 	@Override
@@ -100,57 +122,97 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 		if (!this.qsimConfig.getMainModes().contains(agent.getMode())) {
 			return false;
 		} else if (agent instanceof DynAgent) {
+			simulatedTrips++;
 			return delegate.handleDeparture(now, agent, linkId);
 		} else if (!this.fissConfigGroup.getSampledModes().contains(agent.getMode())) {
+			simulatedTrips++;
 			return delegate.handleDeparture(now, agent, linkId); // not covered by test
 			// (the earlier design would have such agents fall through, in which case they would be treated by the standard network mode
 			// dp handler)
 		} else if (random.nextDouble() < fissConfigGroup.getSampleFactor() || agent instanceof TransitDriverAgent || this.switchOffFISS()) {
+			simulatedTrips++;
 			return delegate.handleDeparture(now, agent, linkId);
 		}
 
 		// This updates the travel time.  Teleportation departure is handled further down.
+		double newTravelTime = 0.;
+		Id<Link> destinationLinkId = agent.getDestinationLinkId();
 		if (agent instanceof PlanAgent planAgent) {
 			Leg currentLeg = (Leg) planAgent.getCurrentPlanElement();
 			NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
 			Person person = planAgent.getCurrentPlan().getPerson();
-			Vehicle vehicle = this.scenario.getVehicles().getVehicles().get(networkRoute.getVehicleId());
+			Vehicle vehicle = this.vehicles.get(networkRoute.getVehicleId());
 
-			double newTravelTime = RouteUtils.calcTravelTimeExcludingStartEndLink(networkRoute, now, person, vehicle, network, travelTime);
-			// yyyy This travel time _should_ include start and end link.  Also in regular teleportation!  kai, jan'25
+			newTravelTime = calcQSimTravelTime(networkRoute, now, person, vehicle);
 			LOG.debug("New travelTime: {}, was {}", newTravelTime, networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
 
 			networkRoute.setTravelTime(newTravelTime);
 		}
 
-		// !!!! The following is not a teleportation-pull (as it is in NetworkModeDpHandler...), but a teleportation-push.  yyyy Are we sure
-		// that these are the same?  E.g. if the vehicle needs to be made available for the next driver?  kai, feb'25
+		// Remove vehicle from departure link and schedule delayed arrival at
+		// destination.
+		if (agent instanceof MobsimDriverAgent driverAgent) {
+			Id<Vehicle> vehicleId = driverAgent.getPlannedVehicleId();
+			QLinkI qLinkI = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
+			QVehicle removedVehicle = qLinkI.removeParkedVehicle(vehicleId);
+			if (removedVehicle == null) {
+				// Vehicle not on departure link -- check if it's in our arrivals queue.
+				VehicleArrivalEntry inTransit = vehicleArrivalsIndex.get(vehicleId);
+				if (inTransit != null) {
+					QSimConfigGroup.VehicleBehavior vehicleBehavior = qsimConfig.getVehicleBehavior();
+					if (vehicleBehavior == QSimConfigGroup.VehicleBehavior.teleport) {
+						// Vehicle location is irrelevant in teleport mode. Redirect
+						// the in-transit vehicle to the new destination and depart now.
+						removeVehicleArrival(inTransit);
+						addVehicleArrival(now + newTravelTime, inTransit.vehicle, destinationLinkId);
+						internalInterface.getMobsim().getEventsManager().processEvent(
+								new VehicleTeleportationDepartureEvent(now, driverAgent.getId(), vehicleId, linkId,
+										agent.getMode()));
+						teleportedTrips++;
+						boolean result = teleport.handleDeparture(now, agent, linkId);
+						Gbl.assertIf(result);
+						return result;
+					} else if (vehicleBehavior == QSimConfigGroup.VehicleBehavior.wait
+							&& inTransit.destinationLinkId.equals(linkId)) {
+						// Vehicle is heading to this link. Defer the departure
+						// until the vehicle arrives, then teleport. Only agents on
+						// the matching link are deferred -- agents on other links
+						// are delegated to QSim. This is safe because agents on
+						// different links never compete at arrival time (QSim's
+						// makeVehicleAvailableToNextDriver only wakes agents
+						// registered on the arrival link). Deferring agents on
+						// non-matching links would risk orphaning them: if a
+						// subsequent trip is physically simulated (random selection),
+						// FISS never sees the vehicle arrive and the agent is
+						// silently lost.
+						deferredDepartures.computeIfAbsent(vehicleId, k -> new ArrayDeque<>())
+								.addLast(new DeferredDeparture(now, agent, linkId));
+						teleportedTrips++;
+						teleportedDeferredTrips++;
+						return true;
+					}
+				}
+				// Vehicle not in FISS queue -- delegate to QSim.
+				LOG.debug(
+						"Vehicle {} not found on link {} for agent {} at time {}. Falling back to standard departure.",
+						vehicleId, linkId, driverAgent.getId(), now);
+				simulatedTrips++;
+				simulatedQsimFallbackTrips++;
+				return delegate.handleDeparture(now, agent, linkId);
+			}
+			addVehicleArrival(now + newTravelTime, removedVehicle, destinationLinkId);
 
-//		// remove vehicle of teleported agent from parking spot
-//		QVehicle removedVehicle = null;
-//		if (agent instanceof MobsimDriverAgent driverAgent) {
-//			Id<Vehicle> vehicleId = driverAgent.getPlannedVehicleId();
-//			QLinkI qLinkI = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
-//			removedVehicle = qLinkI.removeParkedVehicle(vehicleId);
-//			if (removedVehicle == null) {
-//				throw new RuntimeException(
-//						"Could not remove parked vehicle with id " + vehicleId + " on the link id "
-// 								+ qNetsimEngine.getVehicles().get(vehicleId).getCurrentLinkId()
-//								+ ".  Maybe it is currently used by someone else?"
-//								+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
-//								+ "Maybe was never placed onto a link?");
-//			}
-//			// yyyy need to check how this is handled elsewhere.  I think that with some config settings we wait until the vehicle becomes available--???
-//		}
+			// Signal that a vehicular trip is being teleported. This fires at departure time
+			// (same timestamp as PersonDepartureEvent) and serves as the equivalent of
+			// PersonEntersVehicleEvent for teleported trips.
+			internalInterface.getMobsim().getEventsManager().processEvent(
+					new VehicleTeleportationDepartureEvent(now, driverAgent.getId(), vehicleId, linkId,
+							agent.getMode()));
+		}
+
+		teleportedTrips++;
 		boolean result = teleport.handleDeparture(now, agent, linkId);
 		Gbl.assertIf(result); // otherwise we are now confused
-
-		// teleport vehicle right after agent
-//		if (removedVehicle != null) {
-//			Id<Link> destinationLinkId = agent.getDestinationLinkId();
-//			QLinkI qLinkDest = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(destinationLinkId);
-//			qLinkDest.addParkedVehicle(removedVehicle);
-//		}
 
 		return result;
 
@@ -158,28 +220,163 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 
 	@Override
 	public void doSimStep(double time) {
+		// Deliver vehicles that have reached their arrival time.
+		while (!vehicleArrivals.isEmpty() && vehicleArrivals.peek().arrivalTime <= time) {
+			VehicleArrivalEntry entry = vehicleArrivals.poll();
+			vehicleArrivalsIndex.remove(entry.vehicle.getId());
+
+			Deque<DeferredDeparture> queue = deferredDepartures.get(entry.vehicle.getId());
+			DeferredDeparture deferred = (queue != null) ? queue.pollFirst() : null;
+			if (queue != null && queue.isEmpty()) {
+				deferredDepartures.remove(entry.vehicle.getId());
+			}
+			if (deferred != null) {
+				// Vehicle arrived -- serve the deferred agent (FIFO).
+				MobsimAgent agent = deferred.agent;
+				Id<Link> departureLinkId = deferred.linkId;
+				Id<Link> destinationLinkId = agent.getDestinationLinkId();
+
+				double driveTravelTime = 0.;
+				if (agent instanceof PlanAgent planAgent) {
+					Leg currentLeg = (Leg) planAgent.getCurrentPlanElement();
+					NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
+					Person person = planAgent.getCurrentPlan().getPerson();
+					Vehicle vehicle = this.vehicles.get(networkRoute.getVehicleId());
+					driveTravelTime = calcQSimTravelTime(networkRoute, time, person, vehicle);
+					networkRoute.setTravelTime(driveTravelTime);
+				}
+
+				addVehicleArrival(time + driveTravelTime, entry.vehicle, destinationLinkId);
+
+				if (agent instanceof MobsimDriverAgent driverAgent) {
+					internalInterface.getMobsim().getEventsManager().processEvent(
+							new VehicleTeleportationDepartureEvent(time, driverAgent.getId(),
+									entry.vehicle.getId(), departureLinkId, agent.getMode()));
+				}
+
+				boolean result = teleport.handleDeparture(time, agent, departureLinkId);
+				Gbl.assertIf(result);
+			} else {
+				// Normal arrival -- park vehicle and wake waiting agents.
+				QLinkI qLinkDest = (QLinkI) this.qNetsimEngine.getNetsimNetwork()
+						.getNetsimLink(entry.destinationLinkId);
+				qLinkDest.addParkedVehicle(entry.vehicle);
+				qLinkDest.makeVehicleAvailableToNextDriver(entry.vehicle);
+			}
+		}
 		teleport.doSimStep(time);
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeMobsim() {
 		if (switchOffFISS()) {
 			deflateVehicleTypes(matsimServices.getScenario(), this.fissConfigGroup);
 			// (This is before the QVehicles are generated, so it wil be taken into account when generating them.)
 		}
-		teleport.onPrepareSim();
+		teleport.beforeMobsim();
 	}
 
 	private void deflateVehicleTypes(Scenario scenario, FISSConfigGroup fissConfigGroup) {
-		for (String sampledQsimModes : fissConfigGroup.getSampledModes()) {
-			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create(sampledQsimModes, VehicleType.class));
-			vehicleType.setPcuEquivalents(vehicleType.getPcuEquivalents() * fissConfigGroup.getSampleFactor());
+		for (String sampledMode : fissConfigGroup.getSampledModes()) {
+			for (VehicleType vehicleType : scenario.getVehicles().getVehicleTypes().values()) {
+				if (vehicleType.hasNetworkMode() && vehicleType.getNetworkMode().equals(sampledMode)) {
+					vehicleType.setPcuEquivalents(vehicleType.getPcuEquivalents() * fissConfigGroup.getSampleFactor());
+				}
+			}
 		}
 	}
 
+	/**
+	 * Calculates travel time to match QSim physical simulation timing:
+	 * <ul>
+	 * <li>Departure link is NOT traversed (vehicle goes from parking straight
+	 * to the link's buffer via {@code addFromWait}).</li>
+	 * <li>Each intermediate link is fully traversed.</li>
+	 * <li>Arrival link IS fully traversed (agent arrives when the vehicle
+	 * reaches the buffer at the downstream end).</li>
+	 * <li>Each link-to-link transition crosses a node, costing one QSim time
+	 * step.</li>
+	 * <li>Per-link travel time is lower-bounded by the vehicle type's max
+	 * speed (matching {@code DefaultLinkSpeedCalculator}).</li>
+	 * </ul>
+	 */
+	private double calcQSimTravelTime(NetworkRoute networkRoute, double now, Person person, Vehicle vehicle) {
+		boolean zeroLengthRoute = networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())
+				&& networkRoute.getLinkIds().isEmpty();
+		if (zeroLengthRoute) {
+			return 0;
+		}
+		double vehicleMaxSpeed = vehicle != null ? vehicle.getType().getMaximumVelocity() : Double.POSITIVE_INFINITY;
+		double timeStepSize = qsimConfig.getTimeStepSize();
+
+		double totalTT = 0;
+		// Intermediate links
+		for (Id<Link> linkId : networkRoute.getLinkIds()) {
+			Link link = network.getLinks().get(linkId);
+			double linkTT = travelTime.getLinkTravelTime(link, now + totalTT, person, vehicle);
+			totalTT += applyVehicleSpeedFloor(link, linkTT, vehicleMaxSpeed, timeStepSize);
+		}
+		// Arrival link
+		Link endLink = network.getLinks().get(networkRoute.getEndLinkId());
+		double arrivalLinkTT = travelTime.getLinkTravelTime(endLink, now + totalTT, person, vehicle);
+		totalTT += applyVehicleSpeedFloor(endLink, arrivalLinkTT, vehicleMaxSpeed, timeStepSize);
+		// Node transitions: one per link boundary crossed
+		int numNodeTransitions = networkRoute.getLinkIds().size() + 1;
+		totalTT += numNodeTransitions * timeStepSize;
+		return totalTT;
+	}
+
+	/**
+	 * Ensures a link travel time is not shorter than what the vehicle's max
+	 * speed allows, and floors the result to the QSim time step size. The
+	 * {@link TravelTime} object may return congested times (longer than
+	 * free-speed) which are kept as-is, but if the link's free-speed exceeds
+	 * the vehicle's max speed the travel time must be at least
+	 * {@code link.length / vehicleMaxSpeed}. The result is always floored to
+	 * match QSim's discrete time-step behaviour in
+	 * {@code QueueWithBuffer.addFromUpstream}.
+	 */
+	private static double applyVehicleSpeedFloor(Link link, double linkTT,
+			double vehicleMaxSpeed, double timeStepSize) {
+		double minTT = link.getLength() / vehicleMaxSpeed;
+		double effectiveTT = Math.max(linkTT, minTT);
+		return timeStepSize * Math.floor(effectiveTT / timeStepSize);
+	}
+
 	@Override
-	public void afterSim() {
-		teleport.afterSim();
+	public void afterMobsim() {
+		for (VehicleArrivalEntry entry : vehicleArrivals) {
+			LOG.warn("FISS: vehicle {} still in transit at end of mobsim. arrivalTime={}, destinationLinkId={}",
+					entry.vehicle.getId(), entry.arrivalTime, entry.destinationLinkId);
+		}
+		for (Map.Entry<Id<Vehicle>, Deque<DeferredDeparture>> mapEntry : deferredDepartures.entrySet()) {
+			for (DeferredDeparture deferred : mapEntry.getValue()) {
+				LOG.warn(
+						"FISS: agent {} still waiting for vehicle {} at end of mobsim. desiredDepartureTime={}, linkId={}",
+						deferred.agent.getId(), mapEntry.getKey(), deferred.desiredDepartureTime, deferred.linkId);
+			}
+		}
+		teleport.afterMobsim();
+
+		long total = teleportedTrips + simulatedTrips;
+		double teleportedShare = total > 0 ? (double) teleportedTrips / total : 0.0;
+		double fallbackShare = total > 0 ? (double) simulatedQsimFallbackTrips / total : 0.0;
+		LOG.info("FISS stats (sampleFactor={}):" +
+				"\n\ttotal departures: {}" +
+				"\n\t  teleported:     {} (share={})" +
+				"\n\t    of which deferred: {}" +
+				"\n\t  simulated:      {}" +
+				"\n\t    of which qsim fallback: {} (share={})",
+				fissConfigGroup.getSampleFactor(),
+				total,
+				teleportedTrips, String.format("%.4f", teleportedShare),
+				teleportedDeferredTrips,
+				simulatedTrips,
+				simulatedQsimFallbackTrips, String.format("%.4f", fallbackShare));
+		teleportedTrips = 0;
+		teleportedDeferredTrips = 0;
+		simulatedTrips = 0;
+		simulatedQsimFallbackTrips = 0;
 	}
 
 	private boolean switchOffFISS() {
@@ -191,6 +388,30 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
 		teleport.setInternalInterface(internalInterface);
 	}
+
+	private record VehicleArrivalEntry(double arrivalTime, QVehicle vehicle,
+			Id<Link> destinationLinkId) implements Comparable<VehicleArrivalEntry> {
+		@Override
+		public int compareTo(VehicleArrivalEntry o) {
+			return Double.compare(this.arrivalTime, o.arrivalTime);
+		}
+	}
+
+	private record DeferredDeparture(double desiredDepartureTime, MobsimAgent agent, Id<Link> linkId) {
+	}
+
+	private void addVehicleArrival(double arrivalTime, QVehicle vehicle, Id<Link> destinationLinkId) {
+		VehicleArrivalEntry entry = new VehicleArrivalEntry(arrivalTime, vehicle, destinationLinkId);
+		vehicleArrivals.add(entry);
+		vehicleArrivalsIndex.put(vehicle.getId(), entry);
+	}
+
+	private void removeVehicleArrival(VehicleArrivalEntry entry) {
+		vehicleArrivals.remove(entry);
+		vehicleArrivalsIndex.remove(entry.vehicle.getId());
+	}
+
 }

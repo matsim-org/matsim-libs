@@ -1,6 +1,8 @@
 package org.matsim.dsim.scoring;
 
 import com.google.inject.Inject;
+import org.apache.fory.logging.Logger;
+import org.apache.fory.logging.LoggerFactory;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -11,6 +13,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.NewScoreAssigner;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.dsim.simulation.IterationInformation;
+import org.matsim.dsim.utils.CountedWarning;
 
 /**
  * This class converts between finished backpacks and the {@link org.matsim.core.scoring.ScoringFunction} mechanism. It works on completed experienced
@@ -25,6 +28,8 @@ import org.matsim.dsim.simulation.IterationInformation;
  * After finishing the scoring function, {@link NewScoreAssigner#assignNewScore} is called.
  */
 public class EndOfDayScoring {
+
+	private static final Logger log = LoggerFactory.getLogger(EndOfDayScoring.class);
 
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final Population population;
@@ -43,8 +48,10 @@ public class EndOfDayScoring {
 
 		var person = population.getPersons().get(backPack.personId());
 
+		// ignore persons not found in the population.
 		if (person == null) {
-			throw new IllegalStateException("Person " + backPack.personId() + " not found in population");
+			CountedWarning.warn("EndOfDayScoring::score", 10, "Person {} not found in population. No scoring is done.", backPack.personId());
+			return;
 		}
 
 		var scoringFunction = scoringFunctionFactory.createNewScoringFunction(person);

@@ -25,14 +25,12 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 
 import java.util.Collection;
-
 
 public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle {
 
@@ -43,9 +41,6 @@ public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle
 		baseVehicle = new QVehicleImpl(basicVehicle);
 
 		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
-		if (capacity == null) {
-			throw new NullPointerException("No capacity set in vehicle type.");
-		}
 		// New default is that vehicle is created with capacity. Initial values are 1 seat for the driver and no standing room {@link org.matsim.vehicles.VehicleCapacity} (sep 19, KMT)
 		// PT does not count the driver, so only warn if there is indeed no real capacity (mar 21, mrieser)
 		if (capacity.getSeats() == 0 && capacity.getStandingRoom() == 0) {
@@ -73,7 +68,13 @@ public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle
 
 	@Override
 	public void setDriver(DriverAgent driver) {
-		baseVehicle.setDriver(driver);
+
+		if (driver == null || driver instanceof TransitDriverAgent) {
+			baseVehicle.setDriver(driver);
+		} else {
+			throw new IllegalArgumentException("Driver for TransitQVehicle must be of type TransitDriverAgent, but was: " + driver);
+		}
+
 	}
 
 	@Override
@@ -102,8 +103,10 @@ public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle
 	}
 
 	@Override
-	public MobsimDriverAgent getDriver() {
-		return baseVehicle.getDriver();
+	public TransitDriverAgent getDriver() {
+		// SAFETY: We guard setDriver, so we know that the driver should be a TransitDriverAgent, as long as no one sets
+		// the driver directly on the baseVehicle.
+		return (TransitDriverAgent) baseVehicle.getDriver();
 	}
 
 	@Override
@@ -153,6 +156,6 @@ public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle
 		return new Msg(baseMessage, handler);
 	}
 
-	record Msg(Message baseMessage, Message handlerMessage) implements Message {
+	public record Msg(Message baseMessage, Message handlerMessage) implements Message {
 	}
 }

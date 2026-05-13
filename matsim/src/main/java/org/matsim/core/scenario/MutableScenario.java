@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.*;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.checkers.ScenarioChecker;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.households.Households;
@@ -53,6 +56,7 @@ public final class MutableScenario implements Scenario, Lockable {
 	private boolean locked = false ;
 
 	private final Map<String, Object> elements = new HashMap<>();
+	private final List<ScenarioChecker> scenarioCheckers = new ArrayList<>();
 
 	//mandatory attributes
 	private final Config config;
@@ -170,6 +174,47 @@ public final class MutableScenario implements Scenario, Lockable {
 	public final Object getScenarioElement(final String name) {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		return elements.get( name );
+	}
+
+	@Override
+	public void addScenarioChecker(ScenarioChecker checker) {
+		boolean alreadyExists = false;
+		for (ScenarioChecker consistencyChecker : scenarioCheckers) {
+			if (consistencyChecker.getClass().equals(checker.getClass())) {
+				alreadyExists = true;
+				break;
+			}
+		}
+		if (!alreadyExists) {
+			this.scenarioCheckers.add(checker);
+		} else {
+			log.info("ScenarioChecker with runtime type={} was already added; not adding it a second time",
+				checker.getClass());
+		}
+	}
+
+	@Override
+	public void removeScenarioChecker(ScenarioChecker checker) {
+		scenarioCheckers.remove(checker);
+	}
+
+	@Override
+	public void checkConsistencyBeforeRun() {
+		for (ScenarioChecker checker : scenarioCheckers) {
+			checker.checkConsistencyBeforeRun(this);
+		}
+	}
+
+	@Override
+	public void checkConsistencyAfterRun() {
+		for (ScenarioChecker checker : scenarioCheckers) {
+			checker.checkConsistencyAfterRun(this);
+		}
+	}
+
+	@Override
+	public List<ScenarioChecker> getScenarioCheckers() {
+		return this.scenarioCheckers;
 	}
 
 	@Override

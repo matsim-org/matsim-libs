@@ -116,9 +116,9 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		this.coordinateSystem = coordinateSystem;
 		return this;
 	}
-	// ---
-	private boolean insistingOnDeprecatedConfigVersion = true ;
-	// yyyy this should be set to false eventually.  kai, aug'18
+	// For programmatically created configs, the current config version is the default.
+	// Deprecated config support is re-enabled explicitly when reading config_v1.
+	private boolean insistingOnDeprecatedConfigVersion = false ;
 	private static final String INSITING_ON_DEPRECATED_CONFIG_VERSION = "insistingOnDeprecatedConfigVersion" ;
 	@StringGetter( INSITING_ON_DEPRECATED_CONFIG_VERSION )
 	public final boolean isInsistingOnDeprecatedConfigVersion() { return this.insistingOnDeprecatedConfigVersion ; }
@@ -139,13 +139,15 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
     }
 	// ---
 	private double relativeToleranceForSampleSizeFactors = 0.;
-//	@StringSetter( "relativeScalesTolerance" )
+	@StringSetter( "relativeToleranceForSampleSizeFactors" )
 	public GlobalConfigGroup setRelativeToleranceForSampleSizeFactors( double val ) {
-		this.relativeToleranceForSampleSizeFactors = val;
+//		this.relativeToleranceForSampleSizeFactors = val + Double.MIN_VALUE; // make this very slightly larger // fails the ContribV2IO test
+		this.relativeToleranceForSampleSizeFactors = val ;
 		return this;
 	}
+	@StringGetter( "relativeToleranceForSampleSizeFactors" )
 	public double getRelativeToleranceForSampleSizeFactor() {
-		return this.relativeToleranceForSampleSizeFactors + Double.MAX_VALUE; // makd this very slightly larger than zero
+		return this.relativeToleranceForSampleSizeFactors;
 	}
 	// ===
 	@Override protected void checkConsistency( Config config ){

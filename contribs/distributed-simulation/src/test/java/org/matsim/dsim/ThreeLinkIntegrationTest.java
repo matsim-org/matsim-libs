@@ -13,16 +13,13 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.testcases.utils.DistributedExecution;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -80,8 +77,8 @@ public class ThreeLinkIntegrationTest {
 	}
 
 	/**
-	 * This tests the propagation of a vehicle through the network. It was helpful to debug the timing of message
-	 * passing, including when processes should synchronize and when simulation times should be updated.
+	 * This tests the propagation of a vehicle through the network. It was helpful to debug the timing of message passing, including when processes
+	 * should synchronize and when simulation times should be updated.
 	 */
 	@Test
 	@Order(2)
@@ -102,10 +99,9 @@ public class ThreeLinkIntegrationTest {
 	}
 
 	/**
-	 * This tests mainly tests, that storage capacities block following agents. The scenario contains two agents, one
-	 * with a slow vehicle and one with a fast vehicle. The one with the slow vehicle blocks the last link for 100s.
-	 * This test was helpful for debugging, the consuming and releasing logic of links. Also, this tests that storage
-	 * capacities are propagated between partitions
+	 * This tests mainly tests, that storage capacities block following agents. The scenario contains two agents, one with a slow vehicle and one with
+	 * a fast vehicle. The one with the slow vehicle blocks the last link for 100s. This test was helpful for debugging, the consuming and releasing
+	 * logic of links. Also, this tests that storage capacities are propagated between partitions
 	 */
 	@Test
 	@Order(2)
@@ -127,9 +123,8 @@ public class ThreeLinkIntegrationTest {
 
 	@Test
 	@Order(2)
-	@Timeout(value = 2, unit = TimeUnit.MINUTES)
-	@DisabledOnGitHubWindowsCI
-	void oneAgentThreeNodes() throws InterruptedException, ExecutionException, TimeoutException {
+	@org.matsim.testcases.DisabledOnGitHubWindowsCI
+	void oneAgentThreeNodes() {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var outputDirectory = utils.getOutputDirectory(); // this also creats the directory
@@ -137,27 +132,19 @@ public class ThreeLinkIntegrationTest {
 		// start three instances each containing one partition
 		var size = 3;
 		var comms = LocalCommunicator.create(size);
-		try (var pool = Executors.newFixedThreadPool(size)) {
-			var futures = comms.stream()
-				.map(comm -> pool.submit(() -> {
-					Config config = ConfigUtils.loadConfig(configPath);
-					config.controller().setOutputDirectory(outputDirectory);
-					config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-					DistributedController c = new DistributedController(comm, config, 1);
-					c.run();
-					try {
-						comm.close();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}))
-				.toList();
 
-			for (var f : futures) {
-				f.get(1, TimeUnit.MINUTES);
+		DistributedExecution.execute(comms, 120, comm -> {
+			Config config = ConfigUtils.loadConfig(configPath);
+			config.controller().setOutputDirectory(outputDirectory);
+			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+			DistributedController c = new DistributedController(comm, config, 1);
+			c.run();
+			try {
+				comm.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-		}
-
+		});
 
 		var outputDir = Paths.get(utils.getOutputDirectory());
 		var expectedEventsPath = outputDir.resolve("..").resolve("qsim").resolve("three-links.output_events.xml");
@@ -169,51 +156,42 @@ public class ThreeLinkIntegrationTest {
 
 	@Test
 	@Order(2)
-	@Timeout(value = 2, unit = TimeUnit.MINUTES)
-	@DisabledOnGitHubWindowsCI
-	void oneAgentThreeNodesTwoIterations() throws ExecutionException, InterruptedException, TimeoutException {
+	@org.matsim.testcases.DisabledOnGitHubWindowsCI
+	void oneAgentThreeNodesTwoIterations() {
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var outputDirectory = utils.getOutputDirectory(); // this also creats the directory
 		var size = 3;
 		var comms = LocalCommunicator.create(size);
-		try (var pool = Executors.newFixedThreadPool(size)) {
-			var futures = comms.stream()
-				.map(comm -> pool.submit(() -> {
 
-					Config local = ConfigUtils.loadConfig(configPath);
-					local.dsim().setThreads(1);
-					local.controller().setFirstIteration(0);
-					local.controller().setLastIteration(1);
-					local.controller().setOutputDirectory(outputDirectory);
-					local.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		DistributedExecution.execute(comms, 120, comm -> {
+			Config local = ConfigUtils.loadConfig(configPath);
+			local.dsim().setThreads(1);
+			local.controller().setFirstIteration(0);
+			local.controller().setLastIteration(1);
+			local.controller().setOutputDirectory(outputDirectory);
+			local.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
-					Scenario scenario = ScenarioUtils.loadScenario(local);
+			Scenario scenario = ScenarioUtils.loadScenario(local);
 
-					Controler controler = new Controler(scenario, DistributedContext.create(comm, local));
+			Controler controler = new Controler(scenario, DistributedContext.create(comm, local));
 
-					controler.run();
+			controler.run();
 
-					try {
-						comm.close();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-					return Tuple.of(comm.getRank(), scenario);
-				}))
-				.toList();
-
-			for (var f : futures) {
-				var result = f.get(1, TimeUnit.MINUTES);
-				assertEquals(1, result.getSecond().getPopulation().getPersons().size());
-				var person = result.getSecond().getPopulation().getPersons().values().iterator().next();
-				// make sure that the score is sent back to the person.
-				if (result.getFirst() == 0) {
-					assertNotNull(person.getSelectedPlan().getScore());
-				} else {
-					assertNull(person.getSelectedPlan().getScore());
-				}
+			try {
+				comm.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-		}
+
+			assertEquals(1, scenario.getPopulation().getPersons().size());
+			var person = scenario.getPopulation().getPersons().values().iterator().next();
+
+			if (comm.getRank() == 0) {
+				assertNotNull(person.getSelectedPlan().getScore());
+			} else {
+				assertNull(person.getSelectedPlan().getScore());
+			}
+		});
 	}
 
 	@Test

@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>2026.0-SNAPSHOT</version>
+		<version>2027.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -10,8 +10,8 @@
 	<name>hybridsim</name>
 
 	<properties>
-		<protobuf.version>4.33.5</protobuf.version>
-		<grpc.version>1.79.0</grpc.version>
+		<protobuf.version>4.34.1</protobuf.version>
+		<grpc.version>1.81.0</grpc.version>
 	</properties>
 
 	<dependencies>
@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>io.opentelemetry</groupId>
 			<artifactId>opentelemetry-sdk</artifactId>
-			<version>1.59.0</version>
+			<version>1.62.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>

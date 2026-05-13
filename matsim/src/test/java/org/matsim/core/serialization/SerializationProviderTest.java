@@ -8,15 +8,14 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 
-import java.io.IOException;
 import java.util.List;
 
 class SerializationProviderTest {
 
-	private final SerializationProvider provider = new SerializationProvider();
+	private final SerializationProvider provider = SerializationProvider.getInstance();
 
 	@Test
-	void serializeEvents() throws IOException {
+	void serializeEvents() {
 
 		List<Event> events = List.of(
 			new PersonArrivalEvent(10, Id.createPersonId("p1"), Id.createLinkId("link"), TransportMode.car),
@@ -28,16 +27,13 @@ class SerializationProviderTest {
 
 		for (Event event : events) {
 
-			FuryBufferParser parser = provider.getFuryParser(event.getType());
-
-			byte[] bytes = provider.getFory().serializeJavaObject(event);
+			var bytes = provider.serialize(event);
 
 			MemoryBuffer buf = MemoryBuffer.fromByteArray(bytes);
 
-			Message result = parser.parse(buf);
+			Message result = provider.deserialize(buf, event.getType());
 
 			Assertions.assertEquals(event, result);
 		}
-
 	}
 }

@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
-import java.util.LinkedList;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -27,107 +28,131 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.pt.Umlauf;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 
 /**
  * @author mrieser / SBB
  */
 public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 
-    private final EventsManager eventsManager;
-    private final SBBPassengerAccessEgress accessEgress;
-    private TransitRouteStop currentStop;
-    private TransitRouteStop nextStop;
-    private TransitRoute currentTransitRoute;
-    private LinkedList<TransitRouteStop> remainingRouteStops = null;
+	private final EventsManager eventsManager;
+	private final SBBPassengerAccessEgress accessEgress;
 
-    SBBTransitDriverAgent(Umlauf umlauf, String transportMode, TransitStopAgentTracker agentTracker, InternalInterface internalInterface) {
-        super(umlauf, transportMode, agentTracker, internalInterface);
-        this.eventsManager = internalInterface.getMobsim().getEventsManager();
-        this.accessEgress = new SBBPassengerAccessEgress(internalInterface, agentTracker, internalInterface.getMobsim().getScenario(), this.eventsManager);
-        checkCurrentRoute();
-    }
+	SBBTransitDriverAgent(Umlauf umlauf, String transportMode, TransitStopAgentTracker agentTracker, InternalInterface internalInterface) {
+		super(umlauf, transportMode, agentTracker, internalInterface);
+		this.eventsManager = internalInterface.getMobsim().getEventsManager();
+		this.accessEgress = new SBBPassengerAccessEgress(internalInterface, agentTracker, internalInterface.getMobsim().getScenario(),
+			this.eventsManager);
+	}
 
-    void arrive(TransitRouteStop stop, double now) {
-        TransitStopFacility facility = stop.getStopFacility();
-        assertExpectedStop(facility);
-        processVehicleArrival(facility, now);
-    }
+	SBBTransitDriverAgent(SBBTransitDriverMessage message, Umlauf umlauf, String transportMode, TransitStopAgentTracker thisAgentTracker,
+		InternalInterface internalInterface) {
+		super(message.delegateMessage(), umlauf, transportMode, thisAgentTracker, internalInterface);
+		eventsManager = internalInterface.getMobsim().getEventsManager();
+		accessEgress = new SBBPassengerAccessEgress(internalInterface, thisAgentTracker, internalInterface.getMobsim().getScenario(),
+			this.eventsManager);
+	}
 
-    @Override
-    public double handleTransitStop(TransitStopFacility stop, double now) {
-        assertExpectedStop(stop);
+	void arrive(TransitRouteStop stop, double now) {
+		assertExpectedStop(stop.getStopFacility());
+		processVehicleArrival(stop.getStopFacility(), now);
+	}
 
-        double stopTime = this.accessEgress.handlePassengersWithPhysicalLimits(stop, this.getVehicle(), this.getTransitLine(), this.currentTransitRoute, this.remainingRouteStops, now);
+	void arriveAtNextStop(double now) {
+		arrive(stops.get(stopIndex), now);
+	}
 
-        if (stopTime <= 0.0) {
-            // figure out if it's already time to depart or not
-            double departureOffset = this.currentStop.getDepartureOffset().or(this.currentStop.getArrivalOffset()).seconds();
-            double scheduledDepartureTime = this.getDeparture().getDepartureTime() + departureOffset;
-            if (scheduledDepartureTime > now) {
-                stopTime = 1.0; // allow agents arriving in the next time step to board
-            }
-        }
+	@Override
+	public double handleTransitStop(TransitStopFacility stop, double now) {
+		assertExpectedStop(stop);
 
-        return stopTime;
-    }
+		double stopTime = this.accessEgress.handlePassengersWithPhysicalLimits(stop, this.getVehicle(), this.getTransitLine(),
+			getTransitRoute(), stops.subList(stopIndex + 1, stops.size()), now);
+
+		if (stopTime <= 0.0) {
+			// figure out if it's already time to depart or not
+			double departureOffset = currentStop.getDepartureOffset().or(currentStop::getArrivalOffset).seconds();
+			double scheduledDepartureTime = this.getDeparture().getDepartureTime() + departureOffset;
+			if (scheduledDepartureTime > now) {
+				stopTime = 1.0; // allow agents arriving in the next time step to board
+			}
+		}
+
+		return stopTime;
+	}
 
 	@Override
 	protected void handleEndRoute(double now) {
-
-		// Delegates call to the correct access egress
 		if (getDeparture() != null)
-			accessEgress.relocatePassengers( this, getDeparture().getChainedDepartures(), now);
+			accessEgress.relocatePassengers(this, getDeparture().getChainedDepartures(), now);
+	}
 
+	void departAtStop(double now) {
+		depart(getCurrentStop().getStopFacility(), now);
 	}
 
 	void depart(TransitStopFacility stop, double now) {
-        handleDeparture(stop, now);
-    }
+		assertExpectedStop(stop);
+		processVehicleDeparture(stop, now);
+	}
 
-    private void handleDeparture(TransitStopFacility stop, double now) {
-        assertExpectedStop(stop);
-        processVehicleDeparture(stop, now);
-    }
+	TransitRouteStop getNextStop() {
+		return (stops != null && stopIndex < stops.size()) ? stops.get(stopIndex) : null;
+	}
 
-    TransitRouteStop getNextRouteStop() {
-        return this.nextStop;
-    }
+	TransitRouteStop getPreviousStop() {
+		return (stops != null && stopIndex > 0) ? stops.get(stopIndex - 1) : null;
+	}
 
-    private void assertExpectedStop(final TransitStopFacility stop) {
-        checkCurrentRoute();
-        if (this.currentStop != null && stop == this.currentStop.getStopFacility()) {
-            return;
-        }
-        if (stop != this.nextStop.getStopFacility() || this.currentStop != null) {
-            throw new RuntimeException("Expected stop " + this.nextStop.getStopFacility().getId() + ", got " + stop.getId());
-        }
-    }
+	TransitRouteStop getCurrentStop() {
+		return currentStop;
+	}
 
-    private void checkCurrentRoute() {
-        TransitRoute route = super.getTransitRoute();
-        if (route != null && route != this.currentTransitRoute) {
-            this.currentTransitRoute = route;
-            this.remainingRouteStops = new LinkedList<>(route.getStops());
-            this.nextStop = this.remainingRouteStops.getFirst();
-        }
-    }
+	private void assertExpectedStop(final TransitStopFacility stop) {
+		if (currentStop != null) {
+			return; // already dwelling at this stop, re-entry is fine
+		}
+		if (stops == null || stopIndex >= stops.size() || stop != stops.get(stopIndex).getStopFacility()) {
+			String expected = (stops != null && stopIndex < stops.size())
+				? stops.get(stopIndex).getStopFacility().getId().toString() : "none";
+			throw new RuntimeException("Expected stop " + expected + ", got " + stop.getId());
+		}
+	}
 
-    private void processVehicleArrival(final TransitStopFacility stop, final double now) {
-        if (this.currentStop == null) {
-            this.currentStop = this.nextStop;
-            this.eventsManager.processEvent(new VehicleArrivesAtFacilityEvent(now, this.getVehicle().getId(), stop.getId(), 0.0));
-            this.remainingRouteStops.removeFirst();
-            this.nextStop = this.remainingRouteStops.isEmpty() ? null : this.remainingRouteStops.getFirst();
-        }
-    }
+	private void processVehicleArrival(final TransitStopFacility stop, final double now) {
+		if (currentStop == null) {
+			currentStop = stops.get(stopIndex);
+			eventsManager.processEvent(new VehicleArrivesAtFacilityEvent(now, this.getVehicle().getId(), stop.getId(), 0.0));
+		}
+	}
 
-    private void processVehicleDeparture(final TransitStopFacility stop, final double now) {
-        if (this.currentStop != null) {
-            this.currentStop = null;
-            this.eventsManager.processEvent(new VehicleDepartsAtFacilityEvent(now, this.getVehicle().getId(), stop.getId(), 0.0));
-        }
-    }
+	private void processVehicleDeparture(final TransitStopFacility stop, final double now) {
+		if (currentStop != null) {
+			currentStop = null;
+			// directly set the index of the base class.
+			stopIndex++;
+			eventsManager.processEvent(new VehicleDepartsAtFacilityEvent(now, this.getVehicle().getId(), stop.getId(), 0.0));
+		}
+	}
+
+	@Override
+	public Message toMessage() {
+		// SAFETY: We know that we inherit from TransitDriverAgentImpl which creates this message.
+		var delegateMessage = (TransitDriverMessage) super.toMessage();
+
+		return new SBBTransitDriverMessage(
+			delegateMessage,
+			getTransitLine().getId(),
+			getTransitRoute().getId(),
+			getDeparture().getId()
+		);
+	}
+
+	public record SBBTransitDriverMessage(
+		TransitDriverMessage delegateMessage,
+		Id<TransitLine> transitLineId,
+		Id<TransitRoute> transitRouteId,
+		Id<Departure> departureId
+	) implements Message {
+	}
 }

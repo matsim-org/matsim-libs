@@ -13,8 +13,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
 import java.util.*;
 
@@ -29,6 +27,8 @@ public class SharingMetricsTracker implements DrtRequestSubmittedEventHandler, P
 	record Segment(double start, int occupancy) {
 	}
 
+	private final String mode;
+
 	private final Map<Id<DvrpVehicle>, List<Id<Request>>> occupancyByVehicle = new HashMap<>();
 
 	private final Map<Id<Request>, List<Segment>> segments = new HashMap<>();
@@ -39,16 +39,23 @@ public class SharingMetricsTracker implements DrtRequestSubmittedEventHandler, P
 	private final Map<Id<Request>, Boolean> poolingRate = new HashMap<>();
 
 
-	public SharingMetricsTracker() {
+	public SharingMetricsTracker(String mode) {
+		this.mode = mode;
 	}
 
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
+		if (!event.getMode().equals(mode)) {
+			return;
+		}
 		knownGroups.put(event.getRequestId(), new ArrayList<>(event.getPersonIds()));
 	}
 
 	@Override
 	public void handleEvent(PassengerDroppedOffEvent event) {
+		if (!event.getMode().equals(mode)) {
+			return;
+		}
 
 		List<Id<Person>> passengers = knownGroups.get(event.getRequestId());
 		Gbl.assertIf(passengers.contains(event.getPersonId()));
@@ -103,6 +110,9 @@ public class SharingMetricsTracker implements DrtRequestSubmittedEventHandler, P
 
 	@Override
 	public void handleEvent(PassengerPickedUpEvent event) {
+		if (!event.getMode().equals(mode)) {
+			return;
+		}
 		List<Id<Request>> occupancy = occupancyByVehicle.computeIfAbsent(event.getVehicleId(), vehicleId -> new ArrayList<>());
 		if (occupancy.contains(event.getRequestId())) {
 			if (knownGroups.get(event.getRequestId()).size() > 1) {

@@ -434,13 +434,14 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			double maxSpeedOnToLink = Math.min(vehicle.getType().getMaximumVelocity(),toLink.getFreespeed());
 			double travelTimeEstimateOnToLink = (toLink.getLength() / maxSpeedOnToLink) * relPosOnArrivalLink;
-			route.setTravelTime((int) (path.travelTime+travelTimeEstimateOnToLink));
+			int travelTime = (int) (path.travelTime + travelTimeEstimateOnToLink);
+			route.setTravelTime(travelTime);
 
 			route.setTravelCost(path.travelCost);
 			route.setDistance(RouteUtils.calcDistance(route, relPosOnDepartureLink, relPosOnArrivalLink, this.filteredNetwork));
 			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
-			travTime = (int) path.travelTime; // yyyy Why are we casting to int here? This causes the link traveltime to be different from the route traveltime. aleks Jan'2025
+			travTime = travelTime;
 
 		} else {
 			// create an empty route == staying on place if toLink == endLink

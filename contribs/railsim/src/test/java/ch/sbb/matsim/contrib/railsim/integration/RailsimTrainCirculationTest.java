@@ -21,6 +21,8 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 		// THe south stop is part of the route two times and has twice as many stops
 		assertThat(result)
 			.allTrainsArrived()
+			.allTrainsHaveValidLengthAtDeparture()
+			.allTrainsHaveValidLengthAtArrival()
 			.trainHasStopAt("train_1", "stop_North", 5)
 			.trainHasStopAt("train_1", "stop_East", 5)
 			.trainHasStopAt("train_1", "stop_West", 5)
@@ -35,7 +37,9 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 		// There are 3 stops per direction, and the trips is done twice
 		assertThat(result)
 			.allTrainsHaveNumberOfStops(12)
-			.allTrainsArrived();
+			.allTrainsArrived()
+			.allTrainsHaveValidLengthAtDeparture()
+			.allTrainsHaveValidLengthAtArrival();
 	}
 
 	@Test
@@ -46,7 +50,9 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 		// There are 3 stops per direction, and the trips is done twice
 		assertThat(result)
 			.allTrainsHaveNumberOfStops(14)
-			.allTrainsArrived();
+			.allTrainsArrived()
+			.allTrainsHaveValidLengthAtDeparture()
+			.allTrainsHaveValidLengthAtArrival();
 	}
 
 	@Test
@@ -62,7 +68,34 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "shuttle"), setup);
 		assertThat(result)
 			.allTrainsHaveNumberOfStops(6)
-			.allTrainsArrived();
+			.allTrainsArrived()
+			.allTrainsHaveValidLengthAtDeparture()
+			.allTrainsHaveValidLengthAtArrival();
+	}
+
+	@Test
+	void microStationReversingTrack() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microStationReversingTrack"));
+
+		assertThat(result)
+			.allTrainsArrived()
+			.allTrainsHaveValidLengthAtDeparture()
+			.allTrainsHaveValidLengthAtArrival();
+	}
+
+	@Test
+	void microStationReversingTrackUnconstrained() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microStationReversingTrack"), scenario -> {
+			scenario.getNetwork().getLinks().values().forEach(l -> RailsimUtils.setTrainCapacity(l, 99999));
+		});
+
+		assertThat(result)
+			.allTrainsArrived()
+			.allTrainsHaveValidLengthAtDeparture()
+			.allTrainsHaveValidLengthAtArrival()
+			.allDelaysAtStopsSatisfy(d -> d <= 0);
 	}
 
 	@Test

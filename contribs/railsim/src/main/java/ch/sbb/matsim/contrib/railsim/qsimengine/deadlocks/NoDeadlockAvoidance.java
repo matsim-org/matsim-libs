@@ -4,6 +4,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
@@ -14,6 +15,10 @@ import java.util.List;
  */
 public class NoDeadlockAvoidance implements DeadlockAvoidance {
 
+
+	@Inject
+	public NoDeadlockAvoidance() {
+	}
 
 	@VisibleForTesting
 	public NoDeadlockAvoidance(Network network) {

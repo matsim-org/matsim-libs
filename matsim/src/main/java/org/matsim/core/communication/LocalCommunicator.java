@@ -33,6 +33,8 @@ public class LocalCommunicator implements Communicator {
 	 */
 	private final List<ManyToOneConcurrentLinkedQueue<ByteBuffer>> queues;
 
+	private volatile boolean isClosed = false;
+
 	public LocalCommunicator(int rank, int size, List<ManyToOneConcurrentLinkedQueue<ByteBuffer>> queues) {
 		this.rank = rank;
 		this.size = size;
@@ -100,6 +102,10 @@ public class LocalCommunicator implements Communicator {
 		ManyToOneConcurrentLinkedQueue<ByteBuffer> self = queues.get(rank);
 		while (expectsNext.expectsMoreMessages()) {
 
+			if (Thread.interrupted() || isClosed) {
+				throw new RuntimeException(new InterruptedException("recv interrupted by shutdown"));
+			}
+
 			ByteBuffer poll = self.poll();
 			if (poll == null) {
 				idle.idle();
@@ -131,5 +137,10 @@ public class LocalCommunicator implements Communicator {
 			b.append("]");
 			return b.toString();
 		}
+	}
+
+	@Override
+	public void close() {
+		isClosed = true;
 	}
 }

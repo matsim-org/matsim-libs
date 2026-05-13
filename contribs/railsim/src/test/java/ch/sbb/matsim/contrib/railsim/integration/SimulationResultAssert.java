@@ -1,18 +1,24 @@
 package ch.sbb.matsim.contrib.railsim.integration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SequencedMap;
-import java.util.function.DoublePredicate;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import org.assertj.core.api.AbstractAssert;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.SequencedMap;
+import java.util.function.DoublePredicate;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Assertions for maps of stop times organized by train and station.
@@ -214,7 +220,7 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 
 				// Skip trains with less than 3 stops (no intermediate stops)
 				if (trainStops.size() < 3) {
-					return Stream.<String>empty();
+					return Stream.empty();
 				}
 
 				// Get all stops except first and last
@@ -358,7 +364,7 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 	 * Asserts that a specific train has arrived at its last stop with the expected arrival time.
 	 * This method checks if the train has any stops and if the last stop has the specified arrival time.
 	 *
-	 * @param trainId the train ID to check
+	 * @param trainId             the train ID to check
 	 * @param expectedArrivalTime the expected arrival time in seconds
 	 * @return this assert instance
 	 */
@@ -395,12 +401,59 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 	 * Asserts that a specific train has arrived at its last stop with the expected arrival time.
 	 * This method checks if the train has any stops and if the last stop has the specified arrival time.
 	 *
-	 * @param trainId the train ID to check
+	 * @param trainId             the train ID to check
 	 * @param expectedArrivalTime the expected arrival time as a string (e.g., "8:00", "08:30:15")
 	 * @return this assert instance
 	 */
 	public SimulationResultAssert trainHasLastArrival(String trainId, String expectedArrivalTime) {
 		return trainHasLastArrival(trainId, org.matsim.core.utils.misc.Time.parseTime(expectedArrivalTime));
+	}
+
+	/**
+	 * Asserts that a specific train did not arrive at its final scheduled stop.
+	 *
+	 * @param trainId the train ID to check
+	 * @return this assert instance
+	 */
+	public SimulationResultAssert trainHasNotArrived(String trainId) {
+		isNotNull();
+
+		TransitRouteStop lastScheduledStop = null;
+		for (TransitLine line : actual.getScenario().getTransitSchedule().getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+					if (departure.getVehicleId().toString().equals(trainId)) {
+						if (route.getStops().isEmpty()) {
+							failWithMessage("Expected train <%s> to have scheduled stops but found none", trainId);
+						}
+						lastScheduledStop = route.getStops().get(route.getStops().size() - 1);
+						break;
+					}
+				}
+				if (lastScheduledStop != null) {
+					break;
+				}
+			}
+			if (lastScheduledStop != null) {
+				break;
+			}
+		}
+
+		if (lastScheduledStop == null) {
+			failWithMessage("Expected train <%s> to be present in the transit schedule but it was not found", trainId);
+		}
+
+		var trainStops = actual.stopTimes.get(trainId);
+		String lastStopId = lastScheduledStop.getStopFacility().getId().toString();
+		if (trainStops != null && trainStops.containsKey(lastStopId)) {
+			StopTimeData stopData = trainStops.get(lastStopId);
+			if (stopData.hasArrived()) {
+				failWithMessage("Expected train <%s> to not arrive at its final stop <%s> but it arrived at <%s> (%s). Stop data: %s",
+					trainId, lastStopId, stopData.arrivalTime, Time.writeTime(stopData.arrivalTime), stopData);
+			}
+		}
+
+		return this;
 	}
 
 	/**
@@ -491,10 +544,32 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 	}
 
 	/**
-	 *  Asserts that all delays at the arrival at a stop satisfy the given predicate for a specific train,
+	 * Asserts that all delays at the arrival at a stop satisfy the given predicate for a specific train,
 	 */
 	public SimulationResultAssert allDelaysAtStopsSatisfy(DoublePredicate predicate) {
 		return allDelaysAtStopsSatisfy(null, predicate);
+	}
+
+	/**
+	 * Asserts that all facility arrival delays satisfy the given predicate.
+	 */
+	public SimulationResultAssert allFacilityArrivalDelaysSatisfy(DoublePredicate predicate) {
+		isNotNull();
+
+		List<String> failingDelays = actual.stopTimes.entrySet().stream()
+			.flatMap(trainEntry -> trainEntry.getValue().values().stream()
+				.filter(stop -> !Double.isNaN(stop.arrivalDelay))
+				.filter(stop -> !predicate.test(stop.arrivalDelay))
+				.map(stop -> String.format("train %s at facility %s @ %s: %s",
+					trainEntry.getKey(), stop.getFacilityId(), Time.writeTime(stop.arrivalTime), stop.arrivalDelay)))
+			.toList();
+
+		if (!failingDelays.isEmpty()) {
+			failWithMessage("Expected all facility arrival delays to satisfy the predicate but the following failed:\n\t%s",
+				String.join("\n\t", failingDelays));
+		}
+
+		return this;
 	}
 
 	/**
@@ -502,5 +577,117 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 	 */
 	public SimulationResultAssert allStopDelaysAreZero() {
 		return allDelaysAtStopsSatisfy(d -> d == 0);
+	}
+
+	/**
+	 * Asserts that the physical length of all trains strictly matches the expected length
+	 * of the vehicle type at their first recorded departure event.
+	 */
+	public SimulationResultAssert allTrainsHaveValidLengthAtDeparture() {
+		isNotNull();
+		Network network = actual.getScenario().getNetwork();
+
+		for (Map.Entry<String, List<RailsimTrainStateEvent>> entry : actual.stateEvents.entrySet()) {
+			String vehicleIdStr = entry.getKey();
+			List<RailsimTrainStateEvent> events = entry.getValue();
+			if (events.isEmpty()) {
+				continue;
+			}
+
+			Id<Vehicle> vehicleId = Id.createVehicleId(vehicleIdStr);
+			Vehicle vehicle = actual.getScenario().getTransitVehicles().getVehicles().get(vehicleId);
+			if (vehicle == null) {
+				continue;
+			}
+
+			double expectedLength = vehicle.getType().getLength();
+			RailsimTrainStateEvent initialEvent = events.getFirst();
+			try {
+				double initialLength = calculateTrainLength(initialEvent, network);
+				if (Math.abs(expectedLength - initialLength) > 0.001) {
+					failWithMessage("Expected initial length of train <%s> at departure to be <%s> but was <%s>", vehicleId, expectedLength,
+						initialLength);
+				}
+			} catch (IllegalStateException e) {
+				failWithMessage("Error calculating initial length for train <%s>: %s", vehicleId, e.getMessage());
+			}
+		}
+
+		return this;
+	}
+
+	/**
+	 * Asserts that the physical length of all trains strictly matches the expected length
+	 * of the vehicle type at their last recorded arrival event.
+	 */
+	public SimulationResultAssert allTrainsHaveValidLengthAtArrival() {
+		isNotNull();
+		Network network = actual.getScenario().getNetwork();
+
+		for (Map.Entry<String, List<RailsimTrainStateEvent>> entry : actual.stateEvents.entrySet()) {
+			String vehicleIdStr = entry.getKey();
+			List<RailsimTrainStateEvent> events = entry.getValue();
+			if (events.isEmpty()) {
+				continue;
+			}
+
+			Id<Vehicle> vehicleId = Id.createVehicleId(vehicleIdStr);
+			Vehicle vehicle = actual.getScenario().getTransitVehicles().getVehicles().get(vehicleId);
+			if (vehicle == null) {
+				continue;
+			}
+
+			double expectedLength = vehicle.getType().getLength();
+			RailsimTrainStateEvent finalEvent = events.getLast();
+			try {
+				double finalLength = calculateTrainLength(finalEvent, network);
+				if (Math.abs(expectedLength - finalLength) > 0.001) {
+					failWithMessage("Expected final length of train <%s> at arrival to be <%s> but was <%s>", vehicleId, expectedLength, finalLength);
+				}
+			} catch (IllegalStateException e) {
+				failWithMessage("Error calculating final length for train <%s>: %s", vehicleId, e.getMessage());
+			}
+		}
+
+		return this;
+	}
+
+	/**
+	 * Helper method to calculate the exact physical length of the train on the network geometry.
+	 */
+	private double calculateTrainLength(RailsimTrainStateEvent event, Network network) {
+		if (event.getHeadLink().equals(event.getTailLink())) {
+			return event.getHeadPosition() - event.getTailPosition();
+		}
+
+		Link tailLink = network.getLinks().get(event.getTailLink());
+		Link headLink = network.getLinks().get(event.getHeadLink());
+
+		java.util.Queue<LinkNode> queue = new java.util.LinkedList<>();
+		queue.add(new LinkNode(tailLink, tailLink.getLength()));
+
+		java.util.Set<Id<Link>> visited = new java.util.HashSet<>();
+		visited.add(tailLink.getId());
+
+		while (!queue.isEmpty()) {
+			LinkNode current = queue.poll();
+			if (current.link.getId().equals(headLink.getId())) {
+				double distanceBetween = current.dist - headLink.getLength();
+				return distanceBetween - event.getTailPosition() + event.getHeadPosition();
+			}
+
+			for (Link out : current.link.getToNode().getOutLinks().values()) {
+				if (!visited.contains(out.getId())) {
+					visited.add(out.getId());
+					queue.add(new LinkNode(out, current.dist + out.getLength()));
+				}
+			}
+		}
+
+		throw new IllegalStateException(
+			"Could not find path from tail " + tailLink.getId() + " to head " + headLink.getId() + ". This indicates the train's tail is completely disconnected from the head due to a bug.");
+	}
+
+	private record LinkNode(Link link, double dist) {
 	}
 }

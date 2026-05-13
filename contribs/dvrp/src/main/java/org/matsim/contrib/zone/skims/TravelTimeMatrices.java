@@ -59,7 +59,7 @@ public final class TravelTimeMatrices {
 
 		for (Zone toZone : centralNodes.keySet()) {
 			Node toNode = centralNodes.get(toZone);
-			int nodeIndex = toNode.getId().index();
+			int nodeIndex = lcpTree.getNodeIndex(toNode);
 			OptionalTime currOptionalTime = lcpTree.getTime(nodeIndex);
 			double currTime = currOptionalTime.orElseThrow(() -> new RuntimeException(
 				"Undefined Time. Reason could be that the dvrp network is not fully connected. Please check and/or clean."));
@@ -90,7 +90,7 @@ public final class TravelTimeMatrices {
 
 		List<NodeAndTime> neighborNodes = new ArrayList<>();
 		for (Node toNode : nodes) {
-			int toNodeIndex = toNode.getId().index();
+			int toNodeIndex = lcpTree.getNodeIndex(toNode);
 			OptionalTime currOptionalTime = lcpTree.getTime(toNodeIndex);
 			if (currOptionalTime.isUndefined()) {
 				continue;
@@ -98,7 +98,7 @@ public final class TravelTimeMatrices {
 			// these values may not the actual minimum, because many nodes may not get fully relaxed (due to the early termination)
 			double currTime = currOptionalTime.seconds();
 			double time = currTime - departureTime;
-			neighborNodes.add(new NodeAndTime(toNodeIndex, time));
+			neighborNodes.add(new NodeAndTime(toNode.getId().index(), time));
 		}
 
 		var sparseRow = new SparseRow(neighborNodes);

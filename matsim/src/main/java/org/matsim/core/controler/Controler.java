@@ -258,6 +258,10 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 				}
 			);
 			this.injector = Injector.createInjector(config, simCtx, AbstractModule.override(standardModules, overrides));
+			if ( scenario != null )
+				scenario.checkConsistencyBeforeRun();
+			else
+				injector.getInstance( Scenario.class ).checkConsistencyBeforeRun();
 		}
 	}
 

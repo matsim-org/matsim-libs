@@ -22,7 +22,6 @@ jobs:
         module:
           - matsim
           # sorted from longest to shortest (to minimise the overall test stage duration)
-          # (used in travis; not respected in GitHub Action workflows)
           - contribs/vsp
           - contribs/common
           - contribs/taxi
@@ -68,8 +67,10 @@ jobs:
           - contribs/sbb-extensions
           - contribs/simulatedannealing
           - contribs/small-scale-traffic-generation
+          - contribs/perceived-safety
           - contribs/atap
           - benchmark
+          - code-examples
 
     steps:
       - name: Checkout git repo
@@ -78,7 +79,7 @@ jobs:
       - name: Detect changes against main
         # we only want to build matsim (module) if changes are not limited to contribs
         id: detect-changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         if: ${{matrix.module == 'matsim'}}
         with:
           filters: |
@@ -100,7 +101,23 @@ jobs:
       - name: Test module
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
         run: mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
+        #run: mvn verify --batch-mode -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
         working-directory: ${{matrix.module}}
+
+      - name: Sanitize module name for artifact
+        if: failure()
+        id: sanitize
+        run: echo "name=$(echo '${{ matrix.module }}' | tr '/' '-')" >> $GITHUB_OUTPUT
+
+      - name: Upload test output on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-output-${{ steps.sanitize.outputs.name }}
+          path: |
+            ${{ matrix.module }}/test/output/
+            ${{ matrix.module }}/target/surefire-reports/
+          retention-days: 5
 
     env:
       MAVEN_OPTS: -Xmx2g

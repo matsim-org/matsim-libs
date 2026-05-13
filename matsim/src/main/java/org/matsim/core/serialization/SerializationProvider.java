@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.fory.Fory;
 import org.apache.fory.ThreadSafeFory;
 import org.apache.fory.config.Language;
+import org.apache.fory.memory.MemoryBuffer;
 import org.apache.fory.reflect.ReflectionUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Message;
@@ -29,12 +30,18 @@ import java.nio.ByteBuffer;
  */
 public class SerializationProvider {
 
+	private static final SerializationProvider INSTANCE = new SerializationProvider();
+
+	public static SerializationProvider getInstance() {
+		return INSTANCE;
+	}
+
 	private final Int2ObjectMap<Class<? extends Message>> type2Class = new Int2ObjectOpenHashMap<>(128);
 	private final Object2IntMap<Class<? extends Message>> class2Type = new Object2IntOpenHashMap<>();
 
 	private final ThreadSafeFory fory;
 
-	public SerializationProvider() {
+	private SerializationProvider() {
 
 		// Fory uses its own verbose logging. Disable this manually here, so users don't see the internals of how Fory compiles classes into
 		// wire formats.
@@ -49,7 +56,7 @@ public class SerializationProvider {
 			.buildThreadSafeFory();
 
 		// Manually register some allowed types
-		fory.register(Coord.class, true);
+		fory.register(Coord.class);
 
 		Class<?> idImpl;
 		try {
@@ -59,7 +66,7 @@ public class SerializationProvider {
 		}
 
 		fory.registerSerializer(idImpl, IdSerializer.class);
-		fory.register(idImpl, true);
+		//fory.register(idImpl);
 
 		fory.registerSerializer(IntArrayList.class, IntArrayListSerializer.class);
 		fory.registerSerializer(AttributesImpl.class, AttributesSerializer.class);
@@ -83,7 +90,7 @@ public class SerializationProvider {
 				int msgType = msgClass.getName().hashCode();
 
 				// Protobuf message
-				fory.register(msgClass, true);
+				fory.register(msgClass);
 
 				if (type2Class.containsKey(msgType)) {
 					throw new IllegalArgumentException("Duplicate provider for type %s. %s already registered.".formatted(msgClass,
@@ -98,17 +105,6 @@ public class SerializationProvider {
 		}
 	}
 
-	public static void main() throws ClassNotFoundException {
-		System.out.println(new SerializationProvider());
-	}
-
-	/**
-	 * Return whether the given type is an event.
-	 */
-	public boolean isEvent(int type) {
-		return type2Class.containsKey(type) && Event.class.isAssignableFrom(type2Class.get(type));
-	}
-
 	/**
 	 * Serialize message object and return byte array.
 	 */
@@ -120,26 +116,32 @@ public class SerializationProvider {
 	 * Deserialize a message that was serialized using {@link #toBytes(Message)}.
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends Message> T parse(ByteBuffer buf) {
+	public <T extends Message> T deserialize(ByteBuffer buf) {
 		return (T) fory.deserialize(buf);
 	}
 
-	public ByteMessageParser getParser(int type) {
-		if (!type2Class.containsKey(type)) {
-			throw new IllegalArgumentException("No provider for type " + type);
+	public Message deserialize(MemoryBuffer in, int type) {
+		var msgClass = type2Class.get(type);
+		if (msgClass == null) {
+			throw new IllegalArgumentException("Type " + type + " was not registered for serialization. Messages that should be serialized must be at least package private to be detected.");
 		}
 
-		Class<? extends Message> msgType = type2Class.get(type);
-		return (in) -> fory.deserializeJavaObject(in, msgType);
+		return deserialize(in, msgClass);
 	}
 
-	public FuryBufferParser getFuryParser(int type) {
-		if (!type2Class.containsKey(type)) {
-			throw new IllegalArgumentException("No provider for type " + type);
-		}
+	public <T extends Message> T deserialize(MemoryBuffer in, Class<T> clazz) {
+		return fory.deserialize(in, clazz);
+	}
 
-		Class<? extends Message> msgType = type2Class.get(type);
-		return (in) -> fory.deserializeJavaObject(in, msgType);
+	public <T extends Message> byte[] serialize(T message) {
+		if (!class2Type.containsKey(message.getClass())) {
+			throw new IllegalArgumentException("Class " + message.getClass() + " was not registered for serialization. Messages that should be serialized must be at least package private to be detected.");
+		}
+		try {
+			return fory.serialize(message);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -154,10 +156,6 @@ public class SerializationProvider {
 	 */
 	public boolean hasType(int type) {
 		return type == Event.ANY_TYPE || type2Class.containsKey(type);
-	}
-
-	public boolean hasType(Class<?> msgClass) {
-		return msgClass == Event.class || class2Type.containsKey(msgClass);
 	}
 
 	/**
@@ -190,9 +188,5 @@ public class SerializationProvider {
 
 	public Class<?> getType(int type) {
 		return type == Event.ANY_TYPE ? Event.class : type2Class.get(type);
-	}
-
-	public ThreadSafeFory getFory() {
-		return fory;
 	}
 }
