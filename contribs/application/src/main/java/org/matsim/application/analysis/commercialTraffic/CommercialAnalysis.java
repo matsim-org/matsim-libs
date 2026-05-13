@@ -431,7 +431,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 							printer.print(String.valueOf(
 								Math.round(traveledDistanceInKm / (maxDistanceWithDepotChargingInKilometers.get(vehicleType)) * 100) / 100.0));
 						} else {
-							log.warn("Vehicle type {} not found in maxDistanceWithDepotChargingInKilometers map. Set to NaN", vehicleType);
 							printer.print(Double.NaN);
 							printer.print(Double.NaN);
 						}
