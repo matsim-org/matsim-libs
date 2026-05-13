@@ -37,18 +37,18 @@ import java.util.*;
 
 public class ScenarioComparisonDashboardTest {
 
-//	private static final String HBEFA_2020_PATH = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
-//	private static final String HBEFA_FILE_COLD_DETAILED = HBEFA_2020_PATH + "82t7b02rc0rji2kmsahfwp933u2rfjlkhfpi2u9r20.enc";
-//	private static final String HBEFA_FILE_WARM_DETAILED = HBEFA_2020_PATH + "944637571c833ddcf1d0dfcccb59838509f397e6.enc";
-//	private static final String HBEFA_FILE_COLD_AVERAGE = HBEFA_2020_PATH + "r9230ru2n209r30u2fn0c9rn20n2rujkhkjhoewt84202.enc";
-//	private static final String HBEFA_FILE_WARM_AVERAGE = HBEFA_2020_PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc";
+	private static final String HBEFA_2020_PATH = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
+	private static final String HBEFA_FILE_COLD_DETAILED = HBEFA_2020_PATH + "82t7b02rc0rji2kmsahfwp933u2rfjlkhfpi2u9r20.enc";
+	private static final String HBEFA_FILE_WARM_DETAILED = HBEFA_2020_PATH + "944637571c833ddcf1d0dfcccb59838509f397e6.enc";
+	private static final String HBEFA_FILE_COLD_AVERAGE = HBEFA_2020_PATH + "r9230ru2n209r30u2fn0c9rn20n2rujkhkjhoewt84202.enc";
+	private static final String HBEFA_FILE_WARM_AVERAGE = HBEFA_2020_PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc";
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void generate() {
-//		Assumptions.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);
+		Assumptions.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);
 
 		Config config = TestScenario.loadConfig(utils);
 
@@ -60,32 +60,41 @@ public class ScenarioComparisonDashboardTest {
 		SimWrapperConfigGroup.ContextParams contextParams = simWrapperConfigGroup.defaultParams();
 		contextParams.setMapCenter("12,48.95");
 		contextParams.setMapZoomLevel(9.0);
-//
-//		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
-//
-//		emissionsConfig.setAverageColdEmissionFactorsFile(HBEFA_FILE_COLD_AVERAGE);
-//		emissionsConfig.setDetailedColdEmissionFactorsFile(HBEFA_FILE_COLD_DETAILED);
-//		emissionsConfig.setAverageWarmEmissionFactorsFile(HBEFA_FILE_WARM_AVERAGE);
-//		emissionsConfig.setDetailedWarmEmissionFactorsFile(HBEFA_FILE_WARM_DETAILED);
-//		emissionsConfig.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent);
-//
-//		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
+
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+
+		emissionsConfig.setAverageColdEmissionFactorsFile(HBEFA_FILE_COLD_AVERAGE);
+		emissionsConfig.setDetailedColdEmissionFactorsFile(HBEFA_FILE_COLD_DETAILED);
+		emissionsConfig.setAverageWarmEmissionFactorsFile(HBEFA_FILE_WARM_AVERAGE);
+		emissionsConfig.setDetailedWarmEmissionFactorsFile(HBEFA_FILE_WARM_DETAILED);
+		emissionsConfig.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent);
+
+		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
 
 		Map<String, String> comparisonScenarios = new HashMap<>();
+		ArrayList< ScenarioComparisonDashboard.ComparisonDashboards> comparisonDashboards = new ArrayList<>();
 
-		comparisonScenarios.put("berlin_1pct", "/home/brendan/cluster_data/matsim-berlin/output/berlin-v6.4-0.1pct_RidePCUSetToZero");
-		comparisonScenarios.put("gunma_base", "/home/brendan/cluster_data/2026-03-13-basePolicy/output-base");
+		comparisonScenarios.put("kelheim_test_A", "/home/brendan/git/matsim-libs/contribs/simwrapper/test/output/org/matsim/simwrapper/scenariocomp/emissionsTestA/generate");
+		comparisonScenarios.put("kelheim_test_B", "/home/brendan/git/matsim-libs/contribs/simwrapper/test/output/org/matsim/simwrapper/scenariocomp/emissionsTestB/generate");
 
-		// make a dict o structure? for name and path.
+		comparisonDashboards.add(ScenarioComparisonDashboard.ComparisonDashboards.Trips);
+		comparisonDashboards.add(ScenarioComparisonDashboard.ComparisonDashboards.ImpactAnalysis);
+
+		// need to add arguments used for other dashboards for their comparison counterpart
+		Map<ScenarioComparisonDashboard.ComparisonDashboards, Object> comparisonDashboardArgs =  new HashMap<>();
+		// ImpactAnalysis argument
+		comparisonDashboardArgs.put(ScenarioComparisonDashboard.ComparisonDashboards.ImpactAnalysis, Set.of("car"));
+
 
 		SimWrapper sw = SimWrapper.create(config)
-//			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()))
-//			.addDashboard(new ImpactAnalysisDashboard(Set.of("car")))
+			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()))
+			.addDashboard(new ImpactAnalysisDashboard(Set.of("car")))
 			.addDashboard(new TripDashboard())
 			.addDashboard(new ScenarioComparisonDashboard(
-				comparisonScenarios
-//				true
+				comparisonScenarios,
+				comparisonDashboards,
+				comparisonDashboardArgs
 			));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
@@ -96,15 +105,15 @@ public class ScenarioComparisonDashboardTest {
 			link.setFreespeed(30);
 		}
 
-//		prepareVehicleTypes(scenario);
-//		prepareHbefaNetwork(scenario);
+		prepareVehicleTypes(scenario);
+		prepareHbefaNetwork(scenario);
 
 		controler.addOverridingModule(new CountsModule());
 		controler.getConfig().global().setRelativeToleranceForSampleSizeFactors(1.0);
 		controler.run();
 
-//		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "emissions"))
-//			.isDirectoryContaining("glob:**emissions_total.csv");
+		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "emissions"))
+			.isDirectoryContaining("glob:**emissions_total.csv");
 
 
 		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "population"))
