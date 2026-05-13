@@ -203,7 +203,7 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 			}
 
 			//Write networkMode, if present
-			if (vt.getNetworkMode() != null) {
+			if (vt.hasNetworkMode()) {
 				atts.clear();
 				atts.add(this.createTuple(VehicleSchemaV2Names.NETWORKMODE, vt.getNetworkMode()));
 				this.writeStartTag(VehicleSchemaV2Names.NETWORKMODE, atts, true);
