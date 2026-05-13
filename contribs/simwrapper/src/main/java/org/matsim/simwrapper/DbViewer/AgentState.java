@@ -8,10 +8,5 @@ public class AgentState {
 	double originX, originY;
 	String mode;
 	double departureTime;
-	List<String> linkSequence = new ArrayList<>();
-
-	public void appendLink(String linkId, double time) {
-		if (linkSequence.isEmpty()) departureTime = time;
-		linkSequence.add(linkId);
-	}
+	double currentLegId;
 }

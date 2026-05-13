@@ -112,6 +112,8 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
 			Plan plan = entry.getValue();
 			plan.setScore( originalPerson.getSelectedPlan().getScore() );
 
+
+
 			person.addPlan(plan);
 			tmpPop.addPerson(person);
 		}

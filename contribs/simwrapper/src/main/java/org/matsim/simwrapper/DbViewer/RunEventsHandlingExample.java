@@ -37,25 +37,28 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
+import java.sql.SQLException;
+
 /**
  * This class contains a main method to call the
- * example event handlers MyEventHandler1-3.
+ * example event handler for Select Link Analysis.
  *
- * @author dgrether
+ * @author brendan-lawton
  */
 public class RunEventsHandlingExample {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
 
 		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setLastIteration(2);
 		config.controller().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists // ← add this
 		);
+
 		config.controller().setOutputDirectory("/home/brendan/git/matsim-libs/contribs/simwrapper/test/output/org/matsim/simwrapper/dashboard/SelectLinkAnalysis/");
+		String inputFile = "output_events.xml.zst";
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-
-
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -65,26 +68,15 @@ public class RunEventsHandlingExample {
 		});
 
 		controler.run();
-
-		String inputFile = "output_events.xml.zst";
-
-		//create an event object
-		EventsManager events = EventsUtils.createEventsManager();
-		DbEventHandler dbEventHandle = new DbEventHandler();
-
-		//create the handler and add it
-		DbEventListener handler1 = new DbEventListener(events, dbEventHandle, config.controller().getOutputDirectory(), scenario);
-
-        //create the reader and read the file
-		events.initProcessing();
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(config.controller().getOutputDirectory() + inputFile);
-		events.finishProcessing();
-
-//		System.out.println("average travel time: " + handler2.getTotalTravelTime());
-//		handler3.writeChart("output/departuresPerHour.png");
-
-		System.out.println("Events file read!");
+//
+//		//create the reader and read the file
+//		EventsManager events = EventsUtils.createEventsManager();
+//		events.initProcessing();
+//		MatsimEventsReader reader = new MatsimEventsReader(events);
+//		reader.readFile(config.controller().getOutputDirectory() + inputFile);
+//		events.finishProcessing();
+//
+//		System.out.println("Events file read!");
 	}
 
 }

@@ -1,7 +1,6 @@
 package org.matsim.simwrapper.DbViewer;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.mapdb.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -19,6 +18,8 @@ public class DbEventListener implements IterationEndsListener, IterationStartsLi
 	private final DB db;
 	private final Scenario scenario;
 	private final String outputDirectory;
+	private boolean lastIterationStarted = false;
+
 
 	@Inject
 	public DbEventListener(EventsManager eventsManager, DbEventHandler dbEventHandler,
@@ -37,6 +38,7 @@ public class DbEventListener implements IterationEndsListener, IterationStartsLi
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (event.isLastIteration()) {
+			lastIterationStarted = true;
 			eventsManager.addHandler(dbEventHandler);
 		}
 	}
@@ -44,14 +46,15 @@ public class DbEventListener implements IterationEndsListener, IterationStartsLi
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (event.isLastIteration()) {
-			DbWriter dbWriter = new DbWriter(dbEventHandler, db, scenario, outputDirectory);
-//			dbWriter.write();
 			try {
-				dbWriter.writeAgentTable();
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
+				dbEventHandler.finish();
+			}  catch (SQLException ex) {
+				throw new RuntimeException(ex);
 			}
-			db.close();
 		}
+//			DbWriter dbWriter = new DbWriter(dbEventHandler, db, scenario, outputDirectory);
+//			dbWriter.write();
+//			db.close();
+//		}
 	}
 }

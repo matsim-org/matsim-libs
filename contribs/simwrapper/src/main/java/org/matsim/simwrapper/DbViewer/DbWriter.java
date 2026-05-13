@@ -4,6 +4,7 @@ import org.mapdb.DB;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 public class DbWriter {
 	private final Map<String, AgentState> agentRecords;
+//	private final Map<String, LinkTraversal> linkTraversals;
 	private final DB db;
 	private final Scenario scenario;
 	private final String outputDirectory;
@@ -22,6 +24,7 @@ public class DbWriter {
 		this.db = db;
 		this.scenario = scenario;
 		this.outputDirectory = outputDirectory;
+//		this.linkTraversals = dbEventHandler.getLinkTraversals();
 	}
 
 	public void writeAgentTable() throws SQLException {
@@ -81,21 +84,32 @@ public class DbWriter {
 	}
 
 	public void write() {
-		try {
-			HTreeMap<String, String> table = db.hashMap("agents",
-				Serializer.STRING, Serializer.STRING).createOrOpen();
-			for (Person person : scenario.getPopulation().getPersons().values()) {
-				String agentId = person.getId().toString();
 
-				// Don't hardcode attribute keys — read whatever is there dynamically
-				Map<String, Object> attributes = new HashMap<>();
-				for (String key : person.getAttributes().getAsMap().keySet()) {
-					attributes.put(key, person.getAttributes().getAttribute(key));
-				}
+
+//			HTreeMap<String, LinkTraversal> linkTraversalsTable = db
+//				.hashMap("linkTraversals", Serializer.STRING, Serializer.JAVA)
+//				.createOrOpen(); // DBMap is good for
+
+
+
+
+
+//			for (Person person : scenario.getPopulation().getPersons().values()) {
+//				String agentId = person.getId().toString();
+//
+//				// Don't hardcode attribute keys — read whatever is there dynamically
+//				Map<String, Object> attributes = new HashMap<>();
+//				for (String key : person.getAttributes().getAsMap().keySet()) {
+//					attributes.put(key, person.getAttributes().getAttribute(key));
+//				}
+
+
+
+
 			}
-		} catch (Exception e) {
-			System.err.println("Failed to write to MapDB: " + e.getMessage());
-		}
-
-	}
+//		} catch (Exception e) {
+//			System.err.println("Failed to write to MapDB: " + e.getMessage());
+//		}
+//
+//	}
 }
