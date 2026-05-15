@@ -12,7 +12,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.testcases.MatsimTestUtils;
-()
+
 public class RunDrtWithPrebookingTest{
 	private static final Logger log = LogManager.getLogger( RunDrtWithPrebooking.class );
 
