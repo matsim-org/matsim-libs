@@ -40,12 +40,12 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- Scenario parameters only used in testing -->
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>vsp</artifactId>
-			<version>${project.parent.version}</version>
-			<scope>test</scope>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.matsim.contrib</groupId>-->
+<!--			<artifactId>vsp</artifactId>-->
+<!--			<version>${project.parent.version}</version>-->
+<!--			<scope>test</scope>-->
+<!--		</dependency>-->
 
 		<dependency>
 			<groupId>org.mockito</groupId>
