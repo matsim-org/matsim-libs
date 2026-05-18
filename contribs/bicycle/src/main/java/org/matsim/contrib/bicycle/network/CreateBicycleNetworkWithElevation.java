@@ -71,13 +71,12 @@ public class CreateBicycleNetworkWithElevation {
 	public static final String LINK_ATTR_ELEVATION_LOSS = "elevationLoss";
 
 
-	private static final String outputCRS = "EPSG:25832"; //UTM-32
-	private static final String inputOsmFile = "C://Users/metz_so/Workspace/data/neukoelln.osm.pbf";//"C://Users/metz_so/Workspace/data/berlin-260122.osm.pbf";
-	//private static final String inputTiffFile = "C:/Users/metz_so/Downloads/DTM Germany 50m v3b by Sonny.tif";
-	private static final String inputTiffFile = "C:/Users/metz_so/Downloads/DTM Germany 20m v3b by Sonny.tif";
-	private static final String demCRS = "EPSG:32632";
-	private static final String outputFile = "C://Users/metz_so/Workspace/data/networks/network_elevation20_step10_tol10.xml.gz";
-
+	private static final String inputCRS = "EPSG:4326"; // WGS84 -- Update if needed, but usually OSM is in WGS84
+    private static final String outputCRS = "EPSG:XXXXX"; // Update accordingly
+	private static final String demCRS = "EPSG:XXXXX";	// Update accordingly
+    private static final String inputOsmFile = "path/to/your/input/file.osm.pbf";
+    private static final String inputTiffFile = "path/to/your/elevation/tiff-file.tif";
+    private static final String outputFile = "path/to/your/output/network.xml.gz";
 
 	public static void main(String[] args) {
 

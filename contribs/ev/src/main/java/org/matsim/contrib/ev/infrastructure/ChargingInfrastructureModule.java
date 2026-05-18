@@ -20,20 +20,16 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
+import com.google.inject.*;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -55,7 +51,7 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 		bind(Network.class).annotatedWith(Names.named(CHARGERS)).to(networkKey).asEagerSingleton();
 
 		bind(ChargingInfrastructureSpecification.class)
-				.toProvider(XmlChargingInfrasturcutreSpecificationProvider.class).asEagerSingleton();
+			.toProvider(XmlChargingInfrasturcutreSpecificationProvider.class).asEagerSingleton();
 
 		addControllerListenerBinding().to(ChargerWriterListener.class);
 
@@ -70,14 +66,19 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 					private ChargingInfrastructureSpecification chargingInfrastructureSpecification;
 					@Inject
 					private ChargingLogic.Factory chargingLogicFactory;
+					@Inject
+					private NetworkPartition networkPartition;
 
 					@Override
 					public ChargingInfrastructure get() {
-						return ChargingInfrastructureUtils.createChargingInfrastructure(
-								chargingInfrastructureSpecification,
-								network.getLinks()::get, chargingLogicFactory);
+						// create chargers for the entire infrastructure and then filter the ones that are on our network partition.
+						var allChargers = ChargingInfrastructureUtils.createChargingInfrastructure(
+							chargingInfrastructureSpecification,
+							network.getLinks()::get, chargingLogicFactory);
+						//var filtered = ChargingInfrastructureUtils.filterChargers(allChargers, c -> networkPartition.containsLink(c.getLink().getId()));
+						return allChargers;
 					}
-				}).asEagerSingleton();
+				}).in(Singleton.class);
 			}
 		});
 	}
@@ -85,9 +86,9 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 	@Provides
 	@Singleton
 	ChargerWriterListener provideChargerWriterListener(ChargingInfrastructureSpecification infrastructure,
-			OutputDirectoryHierarchy outputDirectoryHierarchy) {
+	                                                   OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		EvConfigGroup evConfig = EvConfigGroup.get(getConfig());
 		return new ChargerWriterListener(infrastructure, outputDirectoryHierarchy, evConfig.getWriteChargersInterval(),
-				getConfig().controller().getCompressionType());
+			getConfig().controller().getCompressionType());
 	}
 }

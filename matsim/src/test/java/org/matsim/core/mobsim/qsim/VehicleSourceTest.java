@@ -96,6 +96,7 @@ public class VehicleSourceTest {
 
 		Config config = scenario.getConfig();
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.qsim().setFlowCapFactor(1.0);
 		config.qsim().setStorageCapFactor(1.0);
 		config.qsim().setMainModes(Arrays.asList(transportModes));

@@ -57,6 +57,9 @@ public class CarrierViewerDashboardTest {
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 		group.setSampleSize(0.001);
 
+		config.global().setRelativeToleranceForSampleSizeFactors( 1. );
+		// I cannot say why flowCap=1 and simwrapperSampleSize = 0.001 make sense here, but that is what I found.  kai, feb'26
+
 		// ## MATSim configuration:  ##
 		SimWrapperConfigGroup simwrapperCfg = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 		simwrapperCfg.setDefaultDashboards( SimWrapperConfigGroup.DefaultDashboardsMode.disabled );

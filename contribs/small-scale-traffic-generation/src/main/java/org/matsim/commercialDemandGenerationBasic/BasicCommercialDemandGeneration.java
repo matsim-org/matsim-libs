@@ -41,11 +41,17 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controller.CarrierModule;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
+import org.matsim.simwrapper.SimWrapper;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
+import org.matsim.simwrapper.SimWrapperModule;
+import org.matsim.simwrapper.dashboard.CarrierDashboard;
+import org.matsim.simwrapper.dashboard.OverviewDashboard;
 import picocli.CommandLine;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -471,6 +477,11 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 			public void install() {
 				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
 			}});
+		SimWrapper sw = SimWrapper.create();
+		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
+		sw.addDashboard(new OverviewDashboard(Set.copyOf(scenario.getConfig().qsim().getMainModes())));
+		sw.addDashboard(new CarrierDashboard("(*.)?output_carriers_withPlans.xml.gz"));
+		controller.addOverridingModule(new SimWrapperModule(sw));
 		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 		return controller;
 	}

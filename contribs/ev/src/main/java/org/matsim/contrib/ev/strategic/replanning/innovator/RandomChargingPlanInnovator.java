@@ -1,9 +1,5 @@
 package org.matsim.contrib.ev.strategic.replanning.innovator;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
@@ -23,6 +19,10 @@ import org.matsim.contrib.ev.withinday.ChargingSlotFinder.LegBasedCandidate;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 /**
  * This is the current default implementation of the charging plan innovator. It
  * traverses an agent's regular plan and finds all potential slots where the
@@ -33,7 +33,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
  * charger. Existing slots from the current charging plan of the agent are kept
  * with
  * a configurable retention probability.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
@@ -61,9 +61,9 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 	private final double updateChargerProbability;
 
 	public RandomChargingPlanInnovator(ChargerProvider chargerProvider, ChargingSlotFinder candidateFinder,
-			TimeInterpretation timeInterpretation, StrategicChargingConfigGroup config, Parameters parameters,
-			ChargerSelector.Factory selectorFactory, ChargerReservability chargerReservability,
-			ChargingInfrastructureSpecification infrastructure, ChargerAccess chargerAccess) {
+	                                   TimeInterpretation timeInterpretation, StrategicChargingConfigGroup config, Parameters parameters,
+	                                   ChargerSelector.Factory selectorFactory, ChargerReservability chargerReservability,
+	                                   ChargingInfrastructureSpecification infrastructure, ChargerAccess chargerAccess) {
 		this.chargerProvider = chargerProvider;
 		this.timeInterpretation = timeInterpretation;
 
@@ -89,7 +89,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 	public ChargingPlan createChargingPlan(Person person, Plan plan, ChargingPlans chargingPlans) {
 		// set up the helper
 		InnovationHelper helper = InnovationHelper.build(plan, timeInterpretation, candidateFinder,
-				chargerReservability);
+			chargerReservability);
 		ChargerSelector chargerSelector = selectorFactory.create(person, plan, random, helper);
 
 		// get existing plan if available
@@ -112,15 +112,15 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 					if (helper.isSame(candidate, activity)) {
 						if (random.nextDouble() <= retentionProbability) {
 							ChargerSpecification charger = infrastructure.getChargerSpecifications()
-									.get(activity.getChargerId());
+								.get(activity.getChargerId());
 
 							if (random.nextDouble() <= updateChargerProbability) {
 								boolean withReservation = StrategicChargingReservationEngine
-										.getReservationSlack(person) != null
-										&& random.nextDouble() < reservationProbability;
+									.getReservationSlack(person) != null
+									&& random.nextDouble() < reservationProbability;
 
 								charger = helper.selectCharger(candidate, chargerProvider, chargerSelector,
-										withReservation);
+									withReservation);
 							}
 
 							if (charger != null && chargerAccess.hasAccess(person, charger)) {
@@ -137,11 +137,11 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		for (ActivityBasedCandidate candidate : activityBased) {
 			if (random.nextDouble() <= activityInclusionProbability) {
 				boolean withReservation = StrategicChargingReservationEngine.getReservationSlack(person) != null
-						&& random.nextDouble() < reservationProbability;
+					&& random.nextDouble() < reservationProbability;
 
 				// find chargers
 				ChargerSpecification charger = helper.selectCharger(candidate, chargerProvider, chargerSelector,
-						withReservation);
+					withReservation);
 
 				// integrate into plan
 				helper.push(candidate, charger, withReservation);
@@ -165,16 +165,16 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 					if (helper.isSame(candidate, activity)) {
 						if (random.nextDouble() <= retentionProbability) {
 							ChargerSpecification charger = infrastructure.getChargerSpecifications()
-									.get(activity.getChargerId());
+								.get(activity.getChargerId());
 
 							if (random.nextDouble() <= updateChargerProbability) {
 								boolean withReservation = StrategicChargingReservationEngine
-										.getReservationSlack(person) != null
-										&& random.nextDouble() < reservationProbability;
+									.getReservationSlack(person) != null
+									&& random.nextDouble() < reservationProbability;
 
 								charger = helper.selectCharger(candidate, activity.getDuration(), chargerProvider,
-										chargerSelector,
-										withReservation);
+									chargerSelector,
+									withReservation);
 							}
 
 							if (charger != null && chargerAccess.hasAccess(person, charger)) {
@@ -195,11 +195,11 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 				duration += (maximumEnrouteChargingDuration - minimumEnrouteChargingDuration) * random.nextDouble();
 
 				boolean withReservation = StrategicChargingReservationEngine.getReservationSlack(person) != null
-						&& random.nextDouble() < reservationProbability;
+					&& random.nextDouble() < reservationProbability;
 
 				// find charger
 				ChargerSpecification charger = helper.selectCharger(candidate, duration, chargerProvider,
-						chargerSelector, withReservation);
+					chargerSelector, withReservation);
 
 				// integrate into plan
 				helper.push(candidate, duration, charger, withReservation);
