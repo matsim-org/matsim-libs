@@ -22,8 +22,8 @@ package org.matsim.contrib.bicycle.network;
  * Country-specific knobs for {@link BicycleInfraClassifier}.
  *
  * <p>Everything in this interface is hard-coded to Germany in
- * {@link GermanCountryProfile} (the default). The interface exists so that
- * other countries — France, UK, …  — can be added without forking the
+ * {@link BicycleCountryProfileGermany} (the default). The interface exists so
+ * that other countries — France, UK, …  — can be added without forking the
  * classifier. Only knobs that are actually used today are exposed; further
  * methods will be added when the first non-DE profile lands.
  *

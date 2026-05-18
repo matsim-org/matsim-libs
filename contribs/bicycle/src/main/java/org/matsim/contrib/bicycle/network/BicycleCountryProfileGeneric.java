@@ -30,7 +30,7 @@ package org.matsim.contrib.bicycle.network;
  * detailed {@code traffic_sign=*} tagging is the exception outside of
  * Germany, Austria, and parts of the Netherlands.
  *
- * <p>Compared to {@link GermanCountryProfile}, this profile loses:
+ * <p>Compared to {@link BicycleCountryProfileGermany}, this profile loses:
  * <ul>
  *   <li>Bicycle road detection that relies solely on signs (e.g. DE:244 on
  *       a road still tagged {@code highway=residential} with no
@@ -47,12 +47,12 @@ package org.matsim.contrib.bicycle.network;
  *
  * <p>If your country has well-established traffic-sign tagging in OSM,
  * consider implementing a dedicated {@link BicycleCountryProfile} (use
- * {@link GermanCountryProfile} or {@link AustrianCountryProfile} as a
- * template). This generic profile is a sensible default but not optimal.
+ * {@link BicycleCountryProfileGermany} or {@link BicycleCountryProfileAustria}
+ * as a template). This generic profile is a sensible default but not optimal.
  *
  * @author smetzler
  */
-public final class GenericCountryProfile implements BicycleCountryProfile {
+public final class BicycleCountryProfileGeneric implements BicycleCountryProfile {
 
 	@Override
 	public boolean isRightHandTraffic() {

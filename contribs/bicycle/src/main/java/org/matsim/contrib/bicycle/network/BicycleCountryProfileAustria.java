@@ -27,8 +27,8 @@ package org.matsim.contrib.bicycle.network;
  * were chosen from an Austria-wide aggregation of {@code traffic_sign=*}
  * values (~13,600 tagged ways) but there is no end-to-end test against a
  * real Austrian scenario yet. Expect edge cases. Treat this file as a
- * starting point alongside {@link GermanCountryProfile} when adding further
- * countries, not as a finished AT profile.
+ * starting point alongside {@link BicycleCountryProfileGermany} when adding
+ * further countries, not as a finished AT profile.
  *
  * <p>Codes matched, with observed OSM-AT counts:
  * <ul>
@@ -53,7 +53,7 @@ package org.matsim.contrib.bicycle.network;
  *
  * @author smetzler
  */
-public final class AustrianCountryProfile implements BicycleCountryProfile {
+public final class BicycleCountryProfileAustria implements BicycleCountryProfile {
 
 	@Override
 	public boolean isRightHandTraffic() {

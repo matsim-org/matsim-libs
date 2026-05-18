@@ -65,7 +65,7 @@ link with a hill between equal-height endpoints — `maxGradient`, `elevationGai
   Country profiles below
 - `BicycleCountryProfiles` — factory mapping a short code (`de` / `at` / `generic`) to a profile; used by the
   `--country` CLI flag
-- `GermanCountryProfile`, `AustrianCountryProfile`, `GenericCountryProfile` — concrete profiles
+- `BicycleCountryProfileGermany`, `BicycleCountryProfileAustria`, `BicycleCountryProfileGeneric` — concrete profiles
 - `ElevationDataParser` — reads a GeoTIFF DEM via GeoTools, handles CRS transformation, samples nearest-neighbor
 - `LinkElevationProfile` — samples along a link, applies Douglas-Peucker smoothing, computes KPIs
 - `ServiceLinkCleaner` — removes service-link components that don't connect anything useful
@@ -153,11 +153,11 @@ explicit bike permission, or tagged `bicycle=no`, or the reverse direction of a 
 The classification rules that depend on the OSM `traffic_sign=*` tag are country-specific (DE:244 for German bicycle
 roads, AT:53.27 for Austrian ones, etc.). These are pluggable via `--country`:
 
-| Code      | Profile                    | Use for                                                                 |
-|-----------|----------------------------|-------------------------------------------------------------------------|
-| `de`      | `GermanCountryProfile`     | Germany (default). Recognises DE:244, DE:237, DE:240, DE:241, etc.      |
-| `at`      | `AustrianCountryProfile`   | Austria. Recognises AT:53.27 (Fahrradstraße), AT:52.17/a/b, AT:53.28b.  |
-| `generic` | `GenericCountryProfile`    | Everywhere else. Skips traffic-sign matching; relies on tag-only logic. |
+| Code      | Profile                          | Use for                                                                                |
+|-----------|----------------------------------|----------------------------------------------------------------------------------------|
+| `de`      | `BicycleCountryProfileGermany`   | Germany (default). Recognises DE:244, DE:237, DE:240, DE:241, etc.                     |
+| `at`      | `BicycleCountryProfileAustria`   | Austria. Recognises AT:53.26 (Fahrradstraße), AT:52.17, AT:52.17a-a/-b, AT:53.28b.     |
+| `generic` | `BicycleCountryProfileGeneric`   | Everywhere else. Skips traffic-sign matching; relies on tag-only logic.                |
 
 The bulk of the classification is country-independent and works from generic OSM tags (`highway=*`, `cycleway=*`,
 `bicycle=*`, `foot=*`, `segregated=*`, `is_sidepath`, `separation:*`, `cycleway:right/left`, sidewalk subtags). The
@@ -166,7 +166,7 @@ reasonable default for any country without a dedicated profile — it doesn't br
 extra signal from country-specific traffic signs.
 
 Adding a new country: implement `BicycleCountryProfile`, register it in `BicycleCountryProfiles.forCode`, and look at
-`GermanCountryProfile` / `AustrianCountryProfile` as templates. The right-hand-traffic assumption is currently still
+`BicycleCountryProfileGermany` / `BicycleCountryProfileAustria` as templates. The right-hand-traffic assumption is currently still
 hard-coded in `BicycleInfraClassifier` regardless of the profile; left-hand-traffic countries (UK, IE, …) need a
 broader refactor.
 

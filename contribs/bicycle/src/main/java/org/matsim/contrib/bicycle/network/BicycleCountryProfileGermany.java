@@ -35,7 +35,7 @@ package org.matsim.contrib.bicycle.network;
  *
  * @author smetzler
  */
-public final class GermanCountryProfile implements BicycleCountryProfile {
+public final class BicycleCountryProfileGermany implements BicycleCountryProfile {
 
 	@Override
 	public boolean isRightHandTraffic() {

@@ -27,10 +27,10 @@ import java.util.Locale;
  * <p>Used to translate a CLI flag like {@code --country=de} into a profile.
  * Three codes are currently recognised:
  * <ul>
- *   <li>{@code "de"} — {@link GermanCountryProfile}</li>
- *   <li>{@code "at"} — {@link AustrianCountryProfile}</li>
- *   <li>{@code "generic"} — {@link GenericCountryProfile}; tag-only, no
- *       country-specific traffic-sign matching</li>
+ *   <li>{@code "de"} — {@link BicycleCountryProfileGermany}</li>
+ *   <li>{@code "at"} — {@link BicycleCountryProfileAustria}</li>
+ *   <li>{@code "generic"} — {@link BicycleCountryProfileGeneric}; tag-only,
+ *       no country-specific traffic-sign matching</li>
  * </ul>
  * Unknown codes throw {@link IllegalArgumentException} with a message that
  * lists the supported values and points at {@code generic} as the fallback,
@@ -60,18 +60,18 @@ public final class BicycleCountryProfiles {
 		}
 		switch (code.toLowerCase(Locale.ROOT)) {
 			case "de":
-				return new GermanCountryProfile();
+				return new BicycleCountryProfileGermany();
 			case "at":
-				return new AustrianCountryProfile();
+				return new BicycleCountryProfileAustria();
 			case "generic":
-				return new GenericCountryProfile();
+				return new BicycleCountryProfileGeneric();
 			default:
 				throw new IllegalArgumentException(
 					"Unsupported country code '" + code + "'. Supported: " + SUPPORTED_CODES
 						+ ". If your country isn't listed, use 'generic' (tag-only classification)"
 						+ " — it works reasonably well for countries without detailed traffic_sign"
 						+ " tagging in OSM. For better results, implement a new BicycleCountryProfile"
-						+ " (see GermanCountryProfile or AustrianCountryProfile as templates).");
+						+ " (see BicycleCountryProfileGermany or BicycleCountryProfileAustria as templates).");
 		}
 	}
 }

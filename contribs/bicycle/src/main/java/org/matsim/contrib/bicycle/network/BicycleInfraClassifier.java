@@ -31,7 +31,7 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
  *
  * <p>Country-specific knobs — currently only traffic-sign codes — are pulled
  * out into {@link BicycleCountryProfile}. The no-arg constructor wires
- * {@link GermanCountryProfile} so existing callers keep working unchanged.
+ * {@link BicycleCountryProfileGermany} so existing callers keep working unchanged.
  *
  * <p><b>TODO (left-hand traffic).</b> The profile carries
  * {@link BicycleCountryProfile#isRightHandTraffic()} but this classifier
@@ -53,9 +53,9 @@ public final class BicycleInfraClassifier {
 
 	private final BicycleCountryProfile profile;
 
-	/** Uses {@link GermanCountryProfile}. */
+	/** Uses {@link BicycleCountryProfileGermany}. */
 	public BicycleInfraClassifier() {
-		this(new GermanCountryProfile());
+		this(new BicycleCountryProfileGermany());
 	}
 
 	public BicycleInfraClassifier(BicycleCountryProfile profile) {
