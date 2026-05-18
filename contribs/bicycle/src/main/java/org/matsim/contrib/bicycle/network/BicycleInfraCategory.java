@@ -26,6 +26,24 @@ package org.matsim.contrib.bicycle.network;
  * the link attribute {@code bicycle_infra}, so the on-disk attribute values
  * are unchanged from the previous string-based implementation.
  *
+ * <p><b>Compatibility — enum names are an on-disk contract.</b> The string
+ * form is the {@code bicycle_infra} attribute value in MATSim network XML.
+ * That means:
+ * <ul>
+ *   <li><b>Do not rename existing constants.</b> Renaming
+ *       e.g. {@code CYCLEWAY_ADJOINING} to {@code CYCLEWAY_ADJACENT} silently
+ *       breaks every previously written network XML — the value
+ *       {@code "CYCLEWAY_ADJOINING"} will no longer parse via {@code valueOf}
+ *       and the link distribution log will tally it under
+ *       {@code "(unparseable)"}.</li>
+ *   <li><b>Adding new constants is fine</b>, including at any position in the
+ *       declaration list — enum ordering is informational (see next paragraph).
+ *       Old XMLs continue to read with their existing values.</li>
+ *   <li><b>Removing or repurposing a constant is a breaking change</b> and
+ *       needs a deprecation cycle plus a migration note in the contrib's
+ *       release notes.</li>
+ * </ul>
+ *
  * <p>The order of the values follows the precedence used by the classifier
  * (first match wins) and is informational only — runtime behaviour does not
  * depend on enum ordering. Sidepath variants are spelled out explicitly
