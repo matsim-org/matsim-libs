@@ -79,6 +79,8 @@ import java.util.function.BiPredicate;
  *       {@link NetworkSimplifier})</li>
  * </ul>
  * Both touch additional code paths and are deferred to a separate commit.
+ *
+ * @author smetzler
  */
 @Command(
 	name = "bicycle-network",
@@ -180,10 +182,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 
 	// ============================================================================
-
-	/**
-	 * @author smetzler
-	 */
+	
 	public static void main(String[] args) {
 		new BicycleNetworkPipeline().execute(args);
 	}

@@ -72,7 +72,7 @@ public class ElevationDataParser {
 			this.grid = reader.read(null);
 			this.gridData = grid.getRenderedImage().getData();
 		} catch (IOException e) {
-			// DataSourceException extends IOException, ein catch reicht
+			// DataSourceException extends IOException, one catch is enough.
 			throw new RuntimeException("Failed to read DEM from " + tiffFile, e);
 		}
 	}
