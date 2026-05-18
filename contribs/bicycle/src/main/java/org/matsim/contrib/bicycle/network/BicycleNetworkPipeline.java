@@ -44,7 +44,7 @@ import java.util.function.BiPredicate;
 /**
  * End-to-end pipeline for building a MATSim bicycle network from an OSM file,
  * enriched with cycling infrastructure classification and DEM-based elevation
- * KPIs.
+ * metrics.
  *
  * <p>Pipeline order:
  * <ol>
@@ -61,12 +61,12 @@ import java.util.function.BiPredicate;
  *   <li>Optionally rename the network mode {@code "bike"} to whatever the
  *       caller requested via {@code --mode}.</li>
  *   <li>For every surviving link, sample its elevation profile and attach the
- *       five KPIs (averageElevation, gradient, maxGradient, elevationGain,
+ *       five metrics (averageElevation, gradient, maxGradient, elevationGain,
  *       elevationLoss).</li>
  *   <li>Write the MATSim XML.</li>
  * </ol>
  *
- * <p>Elevation KPIs are deliberately computed <em>after</em> the simplifier has
+ * <p>Elevation metrics are deliberately computed <em>after</em> the simplifier has
  * run: after merging, link lengths are longer and there are fewer of them, so
  * we sample only what survives.
  *
@@ -172,17 +172,17 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 *
 	 * <p>"type" stays unprefixed for now (see TODO above).
 	 */
-	private static final String[] SIMPLIFY_MATCH_KEYS = {
+	private static final List<String> SIMPLIFY_MATCH_KEYS = List.of(
 		LINK_ATTR_BICYCLE_INFRA,
 		"type",
 		OSM_PREFIX + "surface",
 		OSM_PREFIX + "bicycle",
 		OSM_PREFIX + "smoothness"
-	};
+	);
 
 
 	// ============================================================================
-	
+
 	public static void main(String[] args) {
 		new BicycleNetworkPipeline().execute(args);
 	}
@@ -237,13 +237,13 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		// ---- 6. rename mode if requested (no-op when --mode bike) -----------
 		renameMode(network, TransportMode.bike, mode);
 
-		// ---- 7. elevation KPIs on the final link set -------------------------
+		// ---- 7. elevation metrics on the final link set ----------------------
 		int counted = 0;
 		for (Link link : network.getLinks().values()) {
-			attachLinkElevationKpis(link, elevationParser, eleSampleStepM, eleNoiseToleranceM);
+			attachElevationMetrics(link, elevationParser, eleSampleStepM, eleNoiseToleranceM);
 			counted++;
 		}
-		log.info("Attached elevation KPIs to {} links (sample step = {} m, noise tolerance = {} m).",
+		log.info("Attached elevation metrics to {} links (sample step = {} m, noise tolerance = {} m).",
 			counted, eleSampleStepM, eleNoiseToleranceM);
 		logBicycleInfraDistribution(network, "in final network");
 
@@ -383,19 +383,19 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		}
 	}
 
-	private static void attachLinkElevationKpis(Link link, ElevationDataParser parser,
+	private static void attachElevationMetrics(Link link, ElevationDataParser parser,
 												double sampleStep, double noiseTolerance) {
-		LinkElevationProfile.Kpis k = LinkElevationProfile.compute(
+		LinkElevationProfile.Metrics m = LinkElevationProfile.compute(
 			link, sampleStep, noiseTolerance, parser);
 
 		// Elevations in meters — round to 1 decimal (matches DEM resolution).
-		link.getAttributes().putAttribute(BicycleUtils.AVERAGE_ELEVATION, round(k.averageElevation(), 1));
-		link.getAttributes().putAttribute(LINK_ATTR_ELEVATION_GAIN, round(k.elevationGain(), 1));
-		link.getAttributes().putAttribute(LINK_ATTR_ELEVATION_LOSS, round(k.elevationLoss(), 1));
+		link.getAttributes().putAttribute(BicycleUtils.AVERAGE_ELEVATION, round(m.averageElevation(), 1));
+		link.getAttributes().putAttribute(LINK_ATTR_ELEVATION_GAIN, round(m.elevationGain(), 1));
+		link.getAttributes().putAttribute(LINK_ATTR_ELEVATION_LOSS, round(m.elevationLoss(), 1));
 
 		// Dimensionless ratios — 3 decimals = 0.1% resolution.
-		link.getAttributes().putAttribute(LINK_ATTR_GRADIENT, round(k.gradient(), 3));
-		link.getAttributes().putAttribute(LINK_ATTR_MAX_GRADIENT, round(k.maxGradient(), 3));
+		link.getAttributes().putAttribute(LINK_ATTR_GRADIENT, round(m.gradient(), 3));
+		link.getAttributes().putAttribute(LINK_ATTR_MAX_GRADIENT, round(m.maxGradient(), 3));
 	}
 
 	private static double round(double v, int decimals) {

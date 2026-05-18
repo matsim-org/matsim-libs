@@ -1,12 +1,12 @@
 # Bicycle network tools
 
 Tools in `org.matsim.contrib.bicycle.network` for building MATSim bicycle networks from OSM data, with
-cycling-infrastructure classification and elevation KPIs.
+cycling-infrastructure classification and elevation metrics.
 
 ## Entry point
 
 `BicycleNetworkPipeline` — full pipeline: infra classification, OSM-attribute prefixing, bicycle-aware simplification,
-service-link cleanup, and elevation KPIs. Produces a MATSim network XML with Z coordinates on nodes and elevation
+service-link cleanup, and elevation metrics. Produces a MATSim network XML with Z coordinates on nodes and elevation
 attributes on links.
 
 CLI usage:
@@ -67,7 +67,7 @@ link with a hill between equal-height endpoints — `maxGradient`, `elevationGai
   `--country` CLI flag
 - `BicycleCountryProfileGermany`, `BicycleCountryProfileAustria`, `BicycleCountryProfileGeneric` — concrete profiles
 - `ElevationDataParser` — reads a GeoTIFF DEM via GeoTools, handles CRS transformation, samples nearest-neighbor
-- `LinkElevationProfile` — samples along a link, applies Douglas-Peucker smoothing, computes KPIs
+- `LinkElevationProfile` — samples along a link, applies Douglas-Peucker smoothing, computes metrics
 - `ServiceLinkCleaner` — removes service-link components that don't connect anything useful
 - `TagCopy` — optional: copies selected raw OSM tags onto links with a prefix
 
@@ -92,10 +92,10 @@ Tests live in `contribs/bicycle/src/test/java/.../network`:
 6. Second simplification pass; service cleanup may have created new merge candidates.
 7. Optionally rename mode `bike` → whatever was passed via `--mode`. By default (`--mode bike`) this is a no-op.
 8. For each surviving link, sample elevations every `--ele-sample-step` meters along the straight line between
-   endpoints, Douglas-Peucker-filter the profile with tolerance `--ele-noise-tolerance`, compute KPIs.
+   endpoints, Douglas-Peucker-filter the profile with tolerance `--ele-noise-tolerance`, compute metrics.
 9. Write MATSim XML.
 
-Elevation KPIs are computed **after** the simplifier runs — on fewer, longer links — so we sample only what survives.
+Elevation metrics are computed **after** the simplifier runs — on fewer, longer links — so we sample only what survives.
 
 The pipeline logs a one-line summary after each step (`After OSM read: …`, `After cleanNetwork: …` etc.) so you can see
 where the link count drops.
@@ -182,7 +182,7 @@ Sonny's DTMs (https://sonny.4lima.de/) are LiDAR-based, much better than SRTM. G
 - Bridges and tunnels aren't flagged as such; DP hides most of the resulting spurious gradients but very long bridges
   can still look unrealistic.
 - After simplification, some nodes may have been removed. Nodes that survive but were never touched by the reader's
-  `setAfterLinkCreated` callback remain without a Z coordinate; the per-link KPIs are unaffected because they sample the
+  `setAfterLinkCreated` callback remain without a Z coordinate; the per-link metrics are unaffected because they sample the
   DEM directly.
 - `type` and `origid` are not yet under the `osm:` prefix (see TODO P3.1) because both carry semantics that other code
   depends on (`type=highway.service` for `ServiceLinkCleaner`; `origid` for `NetworkSimplifier` merge tracking).

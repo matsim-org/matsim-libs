@@ -27,14 +27,14 @@ import java.util.Deque;
 
 /**
  * Samples a link's elevation profile from an elevation source and derives
- * gradient KPIs.
+ * elevation metrics.
  *
  * <p>Samples are taken every {@code sampleStep} meters along the straight line
  * from the link's fromNode to its toNode (including both endpoints). The raw
  * samples are then simplified by a 1-D Douglas-Peucker filter with a vertical
  * tolerance {@code noiseToleranceM}: any intermediate point whose height
  * deviates less than the tolerance from the straight line between its kept
- * neighbours is removed. The KPIs are computed on the simplified profile.
+ * neighbours is removed. The metrics are computed on the simplified profile.
  *
  * <p>Why the filter matters — a DEM has two sources of noise: quantisation
  * (Sonny's DTM is 0.1 m vertical) and projection mismatch between terrain and
@@ -50,7 +50,7 @@ import java.util.Deque;
  * sign — which is exactly what bicycle disutility models expect.
  *
  * <p>If a link's fromNode and toNode carry Z coordinates already, the first
- * and last samples are pinned to those values. This keeps KPIs consistent
+ * and last samples are pinned to those values. This keeps metrics consistent
  * with the per-node elevation attribute and means those endpoints are never
  * removed by DP.
  *
@@ -59,9 +59,9 @@ import java.util.Deque;
 public final class LinkElevationProfile {
 
 	/**
-	 * Five KPIs derived from the simplified elevation profile along a link.
+	 * Five metrics derived from the simplified elevation profile along a link.
 	 */
-	public record Kpis(
+	public record Metrics(
 		double averageElevation,  // meters a.s.l., mean over the simplified profile
 		double gradient,          // signed mean gradient, e.g. +0.032 = 3.2% uphill
 		double maxGradient,       // max signed gradient over any simplified segment
@@ -73,7 +73,7 @@ public final class LinkElevationProfile {
 	private LinkElevationProfile() {
 	}
 
-	public static Kpis compute(Link link, double sampleStep, double noiseToleranceM,
+	public static Metrics compute(Link link, double sampleStep, double noiseToleranceM,
 							   ElevationDataParser elevation) {
 		return compute(link, sampleStep, noiseToleranceM, elevation::getElevation);
 	}
@@ -86,7 +86,7 @@ public final class LinkElevationProfile {
 		double at(Coord coord);
 	}
 
-	public static Kpis compute(Link link, double sampleStep, double noiseToleranceM,
+	public static Metrics compute(Link link, double sampleStep, double noiseToleranceM,
 							   ElevationSource elevation) {
 		Coord from = link.getFromNode().getCoord();
 		Coord to = link.getToNode().getCoord();
@@ -113,7 +113,7 @@ public final class LinkElevationProfile {
 		// Apply Douglas-Peucker on (distance, height). Endpoints are always kept.
 		boolean[] keep = douglasPeucker(distances, heights, noiseToleranceM);
 
-		return computeKpis(distances, heights, keep, length);
+		return computeMetrics(distances, heights, keep, length);
 	}
 
 	/**
@@ -175,7 +175,7 @@ public final class LinkElevationProfile {
 		return keep;
 	}
 
-	private static Kpis computeKpis(double[] distances, double[] heights, boolean[] keep, double length) {
+	private static Metrics computeMetrics(double[] distances, double[] heights, boolean[] keep, double length) {
 		int n = distances.length;
 
 		double sum = 0;
@@ -213,6 +213,6 @@ public final class LinkElevationProfile {
 			? (heights[n - 1] - heights[0]) / length
 			: 0.0;
 
-		return new Kpis(avg, meanGradient, maxGradSigned, gain, loss);
+		return new Metrics(avg, meanGradient, maxGradSigned, gain, loss);
 	}
 }
