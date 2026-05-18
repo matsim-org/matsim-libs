@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.bicycle.network.LinkElevationProfile.ElevationSource;
-import org.matsim.contrib.bicycle.network.LinkElevationProfile.Kpis;
+import org.matsim.contrib.bicycle.network.LinkElevationProfile.Metrics;
 import org.matsim.core.network.NetworkUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * <p>Coverage:
  * <ul>
- *   <li>Flat link → all KPIs zero / equal endpoints</li>
+ *   <li>Flat link → all metrics zero / equal endpoints</li>
  *   <li>Monotonically rising link → positive gradient, gain &gt; 0, loss = 0</li>
  *   <li>Hill between equal-height endpoints → gradient = 0 but maxGradient &gt; 0</li>
  *   <li>Douglas-Peucker filter: spike below tolerance is dropped, real hill above
@@ -61,17 +61,17 @@ public class LinkElevationProfileTest {
 	// =========================================================================
 
 	@Test
-	void flatLink_allKpisZero() {
+	void flatLink_allMetricsZero() {
 		Link link = createLink(0, 0, 100);
 		ElevationSource flat = c -> 50.0;
 
-		Kpis k = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, flat);
+		Metrics m = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, flat);
 
-		assertEquals(50.0, k.averageElevation(), EPS);
-		assertEquals(0.0, k.gradient(), EPS);
-		assertEquals(0.0, k.maxGradient(), EPS);
-		assertEquals(0.0, k.elevationGain(), EPS);
-		assertEquals(0.0, k.elevationLoss(), EPS);
+		assertEquals(50.0, m.averageElevation(), EPS);
+		assertEquals(0.0, m.gradient(), EPS);
+		assertEquals(0.0, m.maxGradient(), EPS);
+		assertEquals(0.0, m.elevationGain(), EPS);
+		assertEquals(0.0, m.elevationLoss(), EPS);
 	}
 
 
@@ -85,14 +85,14 @@ public class LinkElevationProfileTest {
 		Link link = createLink(0, 0, 100);
 		ElevationSource rising = c -> c.getX() * 0.1;
 
-		Kpis k = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, rising);
+		Metrics m = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, rising);
 
 		// mean gradient = (10 - 0) / 100 = 0.1 = 10 %
-		assertEquals(0.1, k.gradient(), EPS);
-		assertTrue(k.elevationGain() > 0, "gain must be positive on a rising link");
-		assertEquals(0.0, k.elevationLoss(), EPS, "no descent on a monotonically rising link");
-		assertTrue(k.maxGradient() > 0, "maxGradient must be positive on a rising link");
-		assertEquals(5.0, k.averageElevation(), 1.0, "mean elevation roughly half the climb");
+		assertEquals(0.1, m.gradient(), EPS);
+		assertTrue(m.elevationGain() > 0, "gain must be positive on a rising link");
+		assertEquals(0.0, m.elevationLoss(), EPS, "no descent on a monotonically rising link");
+		assertTrue(m.maxGradient() > 0, "maxGradient must be positive on a rising link");
+		assertEquals(5.0, m.averageElevation(), 1.0, "mean elevation roughly half the climb");
 	}
 
 
@@ -110,21 +110,21 @@ public class LinkElevationProfileTest {
 			return x <= 50.0 ? x * 0.2 : (100.0 - x) * 0.2;   // 0..10..0
 		};
 
-		Kpis k = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, hill);
+		Metrics m = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, hill);
 
 		// Endpoints same → end-to-end gradient must be exactly 0
-		assertEquals(0.0, k.gradient(), EPS, "endpoints have same elevation");
+		assertEquals(0.0, m.gradient(), EPS, "endpoints have same elevation");
 
 		// But there's a real hill in between: gain ≈ loss ≈ 10 m
-		assertTrue(k.elevationGain() > 5.0,
-			"gain should reflect the climb to the peak, was " + k.elevationGain());
-		assertTrue(k.elevationLoss() > 5.0,
-			"loss should reflect the descent from the peak, was " + k.elevationLoss());
-		assertEquals(k.elevationGain(), k.elevationLoss(), 1.0,
+		assertTrue(m.elevationGain() > 5.0,
+			"gain should reflect the climb to the peak, was " + m.elevationGain());
+		assertTrue(m.elevationLoss() > 5.0,
+			"loss should reflect the descent from the peak, was " + m.elevationLoss());
+		assertEquals(m.elevationGain(), m.elevationLoss(), 1.0,
 			"symmetric triangle → gain ≈ loss");
 
 		// maxGradient must capture the slope of one of the two halves: ±0.2 = ±20 %
-		assertTrue(Math.abs(k.maxGradient()) > 0.05,
+		assertTrue(Math.abs(m.maxGradient()) > 0.05,
 			"maxGradient should reflect the steep climb/descent on the hill");
 	}
 
@@ -143,13 +143,13 @@ public class LinkElevationProfileTest {
 			return Math.abs(x - 50.0) < 5.0 ? 50.2 : 50.0;
 		};
 
-		Kpis k = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, spike);
+		Metrics m = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, spike);
 
 		// With DP filtering at 0.5 m tolerance, the 0.2 m spike must be dropped.
 		// Endpoint elevations (50, 50) are always kept → gradient = 0.
-		assertEquals(0.0, k.gradient(), EPS);
-		assertEquals(0.0, k.elevationGain(), EPS, "spike should have been filtered");
-		assertEquals(0.0, k.elevationLoss(), EPS, "spike should have been filtered");
+		assertEquals(0.0, m.gradient(), EPS);
+		assertEquals(0.0, m.elevationGain(), EPS, "spike should have been filtered");
+		assertEquals(0.0, m.elevationLoss(), EPS, "spike should have been filtered");
 	}
 
 	@Test
@@ -162,12 +162,12 @@ public class LinkElevationProfileTest {
 			return Math.abs(x - 50.0) < 10.0 ? 55.0 : 50.0;
 		};
 
-		Kpis k = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, hill);
+		Metrics m = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, hill);
 
-		assertTrue(k.elevationGain() > 1.0,
-			"5 m hill above tolerance must be kept, gain was " + k.elevationGain());
-		assertTrue(k.elevationLoss() > 1.0,
-			"5 m hill above tolerance must produce a descent, loss was " + k.elevationLoss());
+		assertTrue(m.elevationGain() > 1.0,
+			"5 m hill above tolerance must be kept, gain was " + m.elevationGain());
+		assertTrue(m.elevationLoss() > 1.0,
+			"5 m hill above tolerance must produce a descent, loss was " + m.elevationLoss());
 	}
 
 
@@ -184,14 +184,14 @@ public class LinkElevationProfileTest {
 
 		ElevationSource rising = c -> c.getX() * 0.1;
 
-		Kpis kf = LinkElevationProfile.compute(forward, SAMPLE_STEP, TOLERANCE, rising);
-		Kpis kr = LinkElevationProfile.compute(reverse, SAMPLE_STEP, TOLERANCE, rising);
+		Metrics mf = LinkElevationProfile.compute(forward, SAMPLE_STEP, TOLERANCE, rising);
+		Metrics mr = LinkElevationProfile.compute(reverse, SAMPLE_STEP, TOLERANCE, rising);
 
-		assertEquals(kf.gradient(), -kr.gradient(), EPS,
+		assertEquals(mf.gradient(), -mr.gradient(), EPS,
 			"reverse link has opposite-sign mean gradient");
-		assertEquals(kf.elevationGain(), kr.elevationLoss(), EPS,
+		assertEquals(mf.elevationGain(), mr.elevationLoss(), EPS,
 			"forward gain becomes reverse loss");
-		assertEquals(kf.elevationLoss(), kr.elevationGain(), EPS,
+		assertEquals(mf.elevationLoss(), mr.elevationGain(), EPS,
 			"forward loss becomes reverse gain");
 	}
 
@@ -216,10 +216,10 @@ public class LinkElevationProfileTest {
 		// The profile should override the endpoints with the node Z values.
 		ElevationSource liesAtEndpoints = c -> 0.0;
 
-		Kpis k = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, liesAtEndpoints);
+		Metrics m = LinkElevationProfile.compute(link, SAMPLE_STEP, TOLERANCE, liesAtEndpoints);
 
 		// Mean gradient is computed from endpoint heights: both pinned to 100.
-		assertEquals(0.0, k.gradient(), EPS,
+		assertEquals(0.0, m.gradient(), EPS,
 			"both endpoints pinned to 100 m → end-to-end gradient is zero");
 	}
 
