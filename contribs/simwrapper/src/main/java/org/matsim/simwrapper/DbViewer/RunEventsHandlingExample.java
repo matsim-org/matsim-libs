@@ -48,14 +48,13 @@ import java.sql.SQLException;
 public class RunEventsHandlingExample {
 	public static void main(String[] args) throws SQLException {
 
-		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.controller().setLastIteration(2);
+		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
+		config.controller().setLastIteration(0);
 		config.controller().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists // ← add this
 		);
 
 		config.controller().setOutputDirectory("/home/brendan/git/matsim-libs/contribs/simwrapper/test/output/org/matsim/simwrapper/dashboard/SelectLinkAnalysis/");
-		String inputFile = "output_events.xml.zst";
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
@@ -68,15 +67,6 @@ public class RunEventsHandlingExample {
 		});
 
 		controler.run();
-//
-//		//create the reader and read the file
-//		EventsManager events = EventsUtils.createEventsManager();
-//		events.initProcessing();
-//		MatsimEventsReader reader = new MatsimEventsReader(events);
-//		reader.readFile(config.controller().getOutputDirectory() + inputFile);
-//		events.finishProcessing();
-//
-//		System.out.println("Events file read!");
 	}
 
 }
