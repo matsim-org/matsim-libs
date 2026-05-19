@@ -535,6 +535,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				CarriersUtils.setJspritIterations(carrier, jspritIterations);
 		});
 		int carrierSteps = 30;
+		int splitCarriers = 0;
 		for (int i = 0; i < allCarriers.size(); i++) {
 			int fromIndex = i * carrierSteps;
 			int toIndex = (i + 1) * carrierSteps;
@@ -559,7 +560,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					int countedServices = 0;
 					int countedVehicles = 0;
 					if (carrier.getServices().size() > maxServicesPerCarrier) {
-
+						splitCarriers++;
 						int numberOfNewCarrier = (int) Math
 							.ceil((double) carrier.getServices().size() / (double) maxServicesPerCarrier);
 						int numberOfServicesPerNewCarrier = (int) Math
@@ -642,6 +643,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					subCarriers.remove(id);
 				}
 			}
+			log.info("Splitting carriers: {}/{}, because the maximum number of services per carriers is set to {}.", splitCarriers, subCarriers.size(), maxServicesPerCarrier);
+			log.info("New number of carriers to solve: {}.", subCarriers.size());
+
 			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
 			CarriersUtils.getCarriers(originalScenario).getCarriers().putAll(subCarriers);
 
