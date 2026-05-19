@@ -1,7 +1,6 @@
-package org.matsim.contrib.vsp.scenario;
+package org.matsim.contrib.common.conventions.vsp;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 
 /**
