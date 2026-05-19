@@ -753,7 +753,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		// Reset some config values that are not needed
 		config.controller().setFirstIteration(0);
-		config.controller().setLastIteration(MATSimIterationsAfterDemandGeneration);
+		if (MATSimIterationsAfterDemandGeneration != null)
+			config.controller().setLastIteration(MATSimIterationsAfterDemandGeneration);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.plans().setInputFile(null);
 		config.transit().setTransitScheduleFile(null);
