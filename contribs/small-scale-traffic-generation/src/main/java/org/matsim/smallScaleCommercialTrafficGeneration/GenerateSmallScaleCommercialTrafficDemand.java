@@ -793,13 +793,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// use overwriteExistingFiles because before setting up the OutputDirectoryHierarchy, the OverwriteFileSetting was failIfDirectoryExists
 		// in mean time some files were already written (e.g. carriers analysis), so we need to allow overwriting here
 		controller.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-//		controller.addOverridingModule(new CarrierModule());
-//		controller.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
-//			}
-//		});
 
 		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 		return controller;
