@@ -338,13 +338,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						CarriersUtils.getCarriers(scenario));
 					if (!nonCompleteSolvedCarriers.isEmpty()) {
 						log.info(
-							"By using the option {} {} carriers are found with unhandled jobs. These carriers will be solved and the plans of the fully planed carriers will remain. ",
-							CreationOption.useExistingCarrierFileWithSolution, nonCompleteSolvedCarriers.size());
+							"By using the option {} {} carriers of all {} carriers are found with unhandled jobs. These carriers will be solved and the plans of the fully planed carriers will remain. ",
+							CreationOption.useExistingCarrierFileWithSolution, nonCompleteSolvedCarriers.size(), CarriersUtils.getCarriers(scenario).getCarriers().size());
 						nonCompleteSolvedCarriers.forEach((carrier -> carrier.getPlans().clear()));
 					}
 				}
 				// for the case @useExistingCarrierFileWithSolution the method solveSeparatedVRPs skips carriers with existing plans. But if a carrier without plans exists, it will be solved.
-				solveSeparatedVRPs(scenario);
+				solveVRP(scenario);
 			}
 			default -> {
 				if (!Files.exists(shapeFileZonePath)) {
@@ -368,7 +368,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
 				CarriersUtils.writeCarriers(scenario, "output_carriers_unsolvedVRP.xml.gz");
-				solveSeparatedVRPs(scenario);
+				solveVRP(scenario);
 			}
 		}
 		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(scenario, output.resolve("analysis").resolve("freight").toString());
@@ -520,164 +520,137 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * This is repeated until the carrier-plans are solved or the {@code maxNumberOfLoopsForVRPSolving} are reached.
 	 * @param originalScenario complete Scenario
 	 */
-	private void solveSeparatedVRPs(Scenario originalScenario) throws Exception {
+	private void solveVRP(Scenario originalScenario) throws Exception {
 
 		CarriersUtils.addRoadPricingForVRPToEnsureSolutionsBasedOnNetworkModes(originalScenario);
 
-		boolean splitCarrier = true;
-		boolean splitVRPs = false;
 
 		// comparison of results for hannover: increasing to maxServicesPerCarrier = 300 results in:
 		// computationTime *4; numberOfVehicles -2%; Jsprit score: -0,4%, drivenDistanc: -4,4%
 		// RE: result is to set this to maxServicesPerCarrier = 100;
+		boolean splitCarrier = true;
 		int maxServicesPerCarrier = 100;
-		Map<Id<Carrier>, Carrier> allCarriers = new HashMap<>(
-			CarriersUtils.getCarriers(originalScenario).getCarriers());
-		Map<Id<Carrier>, Carrier> solvedCarriers = new HashMap<>();
-		List<Id<Carrier>> keyList = new ArrayList<>(allCarriers.keySet());
+		Carriers carriers = CarriersUtils.addOrGetCarriers(originalScenario);
 		Map<Id<Carrier>, List<Id<Carrier>>> carrierId2subCarrierIds = new HashMap<>();
-		// sort out carriers which don't has to be solved
-		CarriersUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
-			if (CarriersUtils.getJspritIterations(carrier) == 0 || CarriersUtils.allJobsHandledBySelectedPlan(carrier)) {
-				allCarriers.remove(carrier.getId());
-				solvedCarriers.put(carrier.getId(), carrier);
-			}
-			else
-				CarriersUtils.setJspritIterations(carrier, jspritIterations);
-		});
-		int carrierSteps = 30;
-		for (int i = 0; i < allCarriers.size(); i++) {
-			int fromIndex = i * carrierSteps;
-			int toIndex = (i + 1) * carrierSteps;
-			if (toIndex >= allCarriers.size())
-				toIndex = allCarriers.size();
 
-			Map<Id<Carrier>, Carrier> subCarriers = new HashMap<>(allCarriers);
-			List<Id<Carrier>> subList;
-			if (splitVRPs) {
-				subList = keyList.subList(fromIndex, toIndex);
-				subCarriers.keySet().retainAll(subList);
-			} else {
-				fromIndex = 0;
-				toIndex = allCarriers.size();
-			}
+		int splitCarriers = 0;
 
-			if (splitCarrier) {
-				Map<Id<Carrier>, Carrier> subCarriersToAdd = new HashMap<>();
-				List<Id<Carrier>> keyListCarrierToRemove = new ArrayList<>();
-				for (Carrier carrier : subCarriers.values()) {
+		if (splitCarrier) {
+			Map<Id<Carrier>, Carrier> subCarriersToAdd = new HashMap<>();
+			List<Id<Carrier>> keyListCarrierToRemove = new ArrayList<>();
+			for (Carrier carrier : carriers.getCarriers().values()) {
+				if (CarriersUtils.getJspritIterations(carrier) == 0 || CarriersUtils.allJobsHandledBySelectedPlan(carrier))
+					continue;
+				int countedServices = 0;
+				int countedVehicles = 0;
+				if (carrier.getServices().size() > maxServicesPerCarrier) {
+					splitCarriers++;
+					int numberOfNewCarrier = (int) Math
+						.ceil((double) carrier.getServices().size() / (double) maxServicesPerCarrier);
+					int numberOfServicesPerNewCarrier = (int) Math
+						.floor((double) carrier.getServices().size() / numberOfNewCarrier);
 
-					int countedServices = 0;
-					int countedVehicles = 0;
-					if (carrier.getServices().size() > maxServicesPerCarrier) {
+					int totalVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().size();
+					int numberOfVehiclesPerNewCarrier = totalVehicles / numberOfNewCarrier;
+					int numberOfVehiclesRemainder = totalVehicles % numberOfNewCarrier;
 
-						int numberOfNewCarrier = (int) Math
-							.ceil((double) carrier.getServices().size() / (double) maxServicesPerCarrier);
-						int numberOfServicesPerNewCarrier = (int) Math
-							.floor((double)carrier.getServices().size() / numberOfNewCarrier);
+					List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>(
+						carrier.getCarrierCapabilities().getCarrierVehicles().keySet());
+					vehiclesForNewCarrier.sort(Comparator.comparing(Id::toString));
+					List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>(
+						carrier.getServices().keySet());
+					servicesForNewCarrier.sort(Comparator.comparing(Id::toString));
 
-						int totalVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().size();
-						int numberOfVehiclesPerNewCarrier = totalVehicles / numberOfNewCarrier;
-						int numberOfVehiclesRemainder = totalVehicles % numberOfNewCarrier;
+					for (int j = 0; j < numberOfNewCarrier; j++) {
 
-						List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>(
-							carrier.getCarrierCapabilities().getCarrierVehicles().keySet());
-						vehiclesForNewCarrier.sort(Comparator.comparing(Id::toString));
-						List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>(
-							carrier.getServices().keySet());
-						servicesForNewCarrier.sort(Comparator.comparing(Id::toString));
+						int numberOfServicesForNewCarrier = numberOfServicesPerNewCarrier;
+						if (j + 1 == numberOfNewCarrier)
+							numberOfServicesForNewCarrier = carrier.getServices().size() - countedServices;
 
-						for (int j = 0; j < numberOfNewCarrier; j++) {
+						int numberOfVehiclesForNewCarrier = numberOfVehiclesPerNewCarrier;
+						if (j < numberOfVehiclesRemainder)
+							numberOfVehiclesForNewCarrier++;
 
-							int numberOfServicesForNewCarrier = numberOfServicesPerNewCarrier;
-							if (j + 1 == numberOfNewCarrier)
-								numberOfServicesForNewCarrier = carrier.getServices().size() - countedServices;
+						Carrier newCarrier = CarriersUtils.createCarrier(
+							Id.create(carrier.getId().toString() + "_part_" + (j + 1), Carrier.class));
+						CarrierCapabilities newCarrierCapabilities = CarrierCapabilities.Builder.newInstance()
+							.setFleetSize(carrier.getCarrierCapabilities().getFleetSize()).build();
+						newCarrierCapabilities.getVehicleTypes().addAll(carrier.getCarrierCapabilities().getVehicleTypes());
+						newCarrierCapabilities.getCarrierVehicles().putAll(carrier.getCarrierCapabilities().getCarrierVehicles());
+						newCarrier.setCarrierCapabilities(newCarrierCapabilities);
+						newCarrier.getServices().putAll(carrier.getServices());
+						CarriersUtils.setJspritIterations(newCarrier, CarriersUtils.getJspritIterations(carrier));
+						carrier.getAttributes().getAsMap().keySet().forEach(attribute -> newCarrier.getAttributes()
+							.putAttribute(attribute, carrier.getAttributes().getAttribute(attribute)));
 
-							int numberOfVehiclesForNewCarrier = numberOfVehiclesPerNewCarrier;
-							if (j < numberOfVehiclesRemainder)
-								numberOfVehiclesForNewCarrier++;
+						carrierId2subCarrierIds.putIfAbsent(carrier.getId(), new LinkedList<>());
+						carrierId2subCarrierIds.get(carrier.getId()).add(newCarrier.getId());
 
-							Carrier newCarrier = CarriersUtils.createCarrier(
-								Id.create(carrier.getId().toString() + "_part_" + (j + 1), Carrier.class));
-							CarrierCapabilities newCarrierCapabilities = CarrierCapabilities.Builder.newInstance()
-								.setFleetSize(carrier.getCarrierCapabilities().getFleetSize()).build();
-							newCarrierCapabilities.getVehicleTypes().addAll(carrier.getCarrierCapabilities().getVehicleTypes());
-							newCarrierCapabilities.getCarrierVehicles().putAll(carrier.getCarrierCapabilities().getCarrierVehicles());
-							newCarrier.setCarrierCapabilities(newCarrierCapabilities);
-							newCarrier.getServices().putAll(carrier.getServices());
-							CarriersUtils.setJspritIterations(newCarrier, CarriersUtils.getJspritIterations(carrier));
-							carrier.getAttributes().getAsMap().keySet().forEach(attribute -> newCarrier.getAttributes()
-								.putAttribute(attribute, carrier.getAttributes().getAttribute(attribute)));
+						int fromIndexVehicles = Math.min(countedVehicles, vehiclesForNewCarrier.size());
+						int fromIndexServices = Math.min(countedServices, servicesForNewCarrier.size());
 
-							carrierId2subCarrierIds.putIfAbsent(carrier.getId(), new LinkedList<>());
-							carrierId2subCarrierIds.get(carrier.getId()).add(newCarrier.getId());
+						int toIndexVehicles = fromIndexVehicles + numberOfVehiclesForNewCarrier;
+						int toIndexServices = fromIndexServices + numberOfServicesForNewCarrier;
 
-							int fromIndexVehicles = Math.min(countedVehicles, vehiclesForNewCarrier.size());
-							int fromIndexServices = Math.min(countedServices, servicesForNewCarrier.size());
+						// just to be sure that the index is not out of bounds
+						toIndexVehicles = Math.min(toIndexVehicles, vehiclesForNewCarrier.size());
+						toIndexServices = Math.min(toIndexServices, servicesForNewCarrier.size());
 
-							int toIndexVehicles = fromIndexVehicles + numberOfVehiclesForNewCarrier;
-							int toIndexServices = fromIndexServices + numberOfServicesForNewCarrier;
-
-							// just to be sure that the index is not out of bounds
-							toIndexVehicles = Math.min(toIndexVehicles, vehiclesForNewCarrier.size());
-							toIndexServices = Math.min(toIndexServices, servicesForNewCarrier.size());
-
-							if (fromIndexVehicles == toIndexVehicles && fromIndexServices == toIndexServices) {
-								throw new IllegalStateException("No remaining vehicles/services but still splitting: " + carrier.getId());
-							}
-
-							List<Id<Vehicle>> subListVehicles = vehiclesForNewCarrier.subList(fromIndexVehicles, toIndexVehicles);
-							List<Id<CarrierService>> subListServices = servicesForNewCarrier.subList(fromIndexServices, toIndexServices);
-
-							newCarrier.getCarrierCapabilities().getCarrierVehicles().keySet()
-								.retainAll(subListVehicles);
-							newCarrier.getServices().keySet().retainAll(subListServices);
-
-							countedVehicles += newCarrier.getCarrierCapabilities().getCarrierVehicles().size();
-							countedServices += newCarrier.getServices().size();
-
-							subCarriersToAdd.put(newCarrier.getId(), newCarrier);
+						if (fromIndexVehicles == toIndexVehicles && fromIndexServices == toIndexServices) {
+							throw new IllegalStateException("No remaining vehicles/services but still splitting: " + carrier.getId());
 						}
-						keyListCarrierToRemove.add(carrier.getId());
-						if (countedVehicles != carrier.getCarrierCapabilities().getCarrierVehicles().size())
-							throw new Exception("Split parts of the carrier " + carrier.getId().toString()
-								+ " has a different number of vehicles than the original carrier");
-						if (countedServices != carrier.getServices().size())
-							throw new Exception("Split parts of the carrier " + carrier.getId().toString()
-								+ " has a different number of services than the original carrier");
 
+						List<Id<Vehicle>> subListVehicles = vehiclesForNewCarrier.subList(fromIndexVehicles, toIndexVehicles);
+						List<Id<CarrierService>> subListServices = servicesForNewCarrier.subList(fromIndexServices, toIndexServices);
+
+						newCarrier.getCarrierCapabilities().getCarrierVehicles().keySet()
+							.retainAll(subListVehicles);
+						newCarrier.getServices().keySet().retainAll(subListServices);
+
+						countedVehicles += newCarrier.getCarrierCapabilities().getCarrierVehicles().size();
+						countedServices += newCarrier.getServices().size();
+
+						subCarriersToAdd.put(newCarrier.getId(), newCarrier);
 					}
-				}
-				subCarriers.putAll(subCarriersToAdd);
-				for (Id<Carrier> id : keyListCarrierToRemove) {
-					subCarriers.remove(id);
-				}
-			}
-			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
-			CarriersUtils.getCarriers(originalScenario).getCarriers().putAll(subCarriers);
+					keyListCarrierToRemove.add(carrier.getId());
+					if (countedVehicles != carrier.getCarrierCapabilities().getCarrierVehicles().size())
+						throw new Exception("Split parts of the carrier " + carrier.getId().toString()
+							+ " has a different number of vehicles than the original carrier");
+					if (countedServices != carrier.getServices().size())
+						throw new Exception("Split parts of the carrier " + carrier.getId().toString()
+							+ " has a different number of services than the original carrier");
 
-//			Map the values to the new subcarriers
-			for (Id<Carrier> oldCarrierId : carrierId2subCarrierIds.keySet()) {
-				for (Id<Carrier> newCarrierId : carrierId2subCarrierIds.get(oldCarrierId)) {
-					if (carrierId2carrierAttributes.putIfAbsent(newCarrierId, carrierId2carrierAttributes.get(oldCarrierId)) != null)
-						throw new Exception("CarrierAttributes already exist for the carrier " + newCarrierId.toString());
 				}
 			}
-
-			log.info("Solving carriers {}-{} of all {} carriers. This are {} VRP to solve.", fromIndex + 1, toIndex, allCarriers.size(),
-				subCarriers.size());
-			CarriersUtils.runJsprit(originalScenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
-			List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
-			if (!nonCompleteSolvedCarriers.isEmpty() && maxNumberOfLoopsForVRPSolving > 0) {
-				CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario), originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved.xml.gz");
-				unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers);
+			log.info("Splitting carriers: {}/{}, because the maximum number of services per carriers is set to {}.", splitCarriers, carriers.getCarriers().size(),
+				maxServicesPerCarrier);
+			// add created parts of new carriers and delete the old ones
+			carriers.getCarriers().putAll(subCarriersToAdd);
+			for (Id<Carrier> id : keyListCarrierToRemove) {
+				carriers.getCarriers().remove(id);
 			}
-			solvedCarriers.putAll(CarriersUtils.getCarriers(originalScenario).getCarriers());
-			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
-			if (!splitVRPs)
-				break;
+			log.info("New number of carriers to solve: {}.", carriers.getCarriers().size());
+
 		}
-		CarriersUtils.getCarriers(originalScenario).getCarriers().putAll(solvedCarriers);
+
+		// Map the values to the new subcarriers
+		for (Id<Carrier> oldCarrierId : carrierId2subCarrierIds.keySet()) {
+			for (Id<Carrier> newCarrierId : carrierId2subCarrierIds.get(oldCarrierId)) {
+				if (carrierId2carrierAttributes.putIfAbsent(newCarrierId, carrierId2carrierAttributes.get(oldCarrierId)) != null)
+					throw new Exception("CarrierAttributes already exist for the carrier " + newCarrierId.toString());
+			}
+		}
+
+		log.info("Start solving {} carriers. Carriers with 0 Jsprit iterations will be skipped and carriers with existing plans will be skipped.",
+			carriers.getCarriers().size());
+		CarriersUtils.runJsprit(originalScenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
+		List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
+		if (!nonCompleteSolvedCarriers.isEmpty() && maxNumberOfLoopsForVRPSolving > 0) {
+			CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario),
+				originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved.xml.gz");
+			unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers);
+		}
+
 		CarriersUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
 			if (linksPerZone != null && !carrier.getAttributes().getAsMap().containsKey("tourStartArea")) {
 				List<String> startAreas = new ArrayList<>();
