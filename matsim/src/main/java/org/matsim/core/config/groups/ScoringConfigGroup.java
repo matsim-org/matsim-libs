@@ -616,14 +616,16 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		final ScoringParameterSet params = getScoringParametersPerSubpopulation().get(subpopulation);
 		return params != null ? params : getScoringParametersPerSubpopulation().get(null);
 	}
+
+	/**
+	 * @return {@code true} if there is a default scoring parameter set (i.e. with key {@code null} or {@link #DEFAULT_SUBPOPULATION}), {@code false} otherwise.
+	 */
 	public boolean hasDefaultScoringParameters() {
 		if (getScoringParameters(null) != null)
 			return true;
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return true;
-		else
-			return false;
+		else return getScoringParameters(DEFAULT_SUBPOPULATION) != null;
 	}
+
 	/**
 	 * Returns the explicitly configured scoring parameter set for the given subpopulation,
 	 * creating one if necessary.
