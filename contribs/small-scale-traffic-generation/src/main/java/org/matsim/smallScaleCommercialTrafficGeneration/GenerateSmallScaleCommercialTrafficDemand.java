@@ -342,8 +342,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						CarriersUtils.getCarriers(scenario));
 					if (!nonCompleteSolvedCarriers.isEmpty()) {
 						log.info(
-							"By using the option {} {} carriers are found with unhandled jobs. These carriers will be solved and the plans of the fully planed carriers will remain. ",
-							CreationOption.useExistingCarrierFileWithSolution, nonCompleteSolvedCarriers.size());
+							"By using the option {} {} carriers of all {} carriers are found with unhandled jobs. These carriers will be solved and the plans of the fully planed carriers will remain. ",
+							CreationOption.useExistingCarrierFileWithSolution, nonCompleteSolvedCarriers.size(), CarriersUtils.getCarriers(scenario).getCarriers().size());
 						nonCompleteSolvedCarriers.forEach((carrier -> carrier.getPlans().clear()));
 					}
 				}
@@ -653,7 +653,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				}
 			}
 
-			log.info("Solving carriers {}-{} of all {} carriers. This are {} VRP to solve.", fromIndex + 1, toIndex, allCarriers.size(),
+			log.info("Solving carriers {}-{} of all {} carriers. This are {} VRP to solve.", fromIndex + 1, toIndex, CarriersUtils.getCarriers(originalScenario).getCarriers().size(),
 				subCarriers.size());
 			CarriersUtils.runJsprit(originalScenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
 			List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
