@@ -149,6 +149,114 @@ import org.matsim.testcases.MatsimTestUtils;
         Assertions.assertEquals(originalSize + 1, c.getActivityParams().size());
 	}
 
+	@Test
+	void testExplicitSubpopulationGettersDoNotFallback() {
+		// Explicit subpopulation accessors should only return parameters defined for exactly that subpopulation.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		ScoringConfigGroup.ScoringParameterSet freightParams = scoringConfigGroup.getOrCreateScoringParameters("freight");
+		ModeParams truckModeParams = new ModeParams("truck");
+		ActivityParams freightActivityParams = new ActivityParams("freightInteraction");
+		freightActivityParams.setTypicalDuration(600.);
+		freightParams.addModeParams(truckModeParams);
+		freightParams.addActivityParams(freightActivityParams);
+
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getModeParamsForSubpopulation("missing"));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getActivityParamsForSubpopulation("missing"));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", "missing"));
+
+		Assertions.assertSame(truckModeParams,
+			scoringConfigGroup.getModeParamsForSubpopulation("freight").get("truck"));
+		Assertions.assertSame(freightActivityParams,
+			scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", "freight"));
+	}
+
+	@Test
+	void testAddParamsForSubpopulationRequiresExplicitSubpopulation() {
+		// Adding mode and activity parameters for a subpopulation should require that the subpopulation already exists.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		scoringConfigGroup.getOrCreateScoringParameters("freight");
+
+		ModeParams truckModeParams = new ModeParams("truck");
+		ActivityParams freightActivityParams = new ActivityParams("freightInteraction");
+		freightActivityParams.setTypicalDuration(600.);
+
+		scoringConfigGroup.addModeParamsForSubpopulation(truckModeParams, "freight");
+		scoringConfigGroup.addActivityParamsForSubpopulation(freightActivityParams, "freight");
+
+		Assertions.assertSame(truckModeParams,
+			scoringConfigGroup.getModeParamsForSubpopulation("freight").get("truck"));
+		Assertions.assertSame(freightActivityParams,
+			scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", "freight"));
+
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.addModeParamsForSubpopulation(new ModeParams("van"), "missing"));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.addActivityParamsForSubpopulation(new ActivityParams("missingInteraction"), "missing"));
+	}
+
+	@Test
+	void testSetScoringParametersAsDefaultSubpopulationUsesExistingParameters() {
+		// Setting an existing subpopulation as default should create an independent default parameter set.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		ScoringConfigGroup.ScoringParameterSet freightParams = scoringConfigGroup.getOrCreateScoringParameters("freight");
+		ModeParams truckModeParams = new ModeParams("truck");
+		truckModeParams.setConstant(23.);
+		ActivityParams freightActivityParams = new ActivityParams("freightInteraction");
+		freightActivityParams.setTypicalDuration(600.);
+		freightParams.addModeParams(truckModeParams);
+		freightParams.addActivityParams(freightActivityParams);
+		freightParams.setMarginalUtilityOfMoney(4.);
+
+		ScoringConfigGroup.ScoringParameterSet defaultParams =
+			scoringConfigGroup.setScoringParametersAsDefaultSubpopulation("freight");
+
+		Assertions.assertNotSame(freightParams, defaultParams);
+		Assertions.assertSame(defaultParams,
+			scoringConfigGroup.getScoringParametersPerSubpopulation().get(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertSame(freightParams,
+			scoringConfigGroup.getScoringParametersPerSubpopulation().get("freight"));
+		Assertions.assertEquals(4., scoringConfigGroup.getMarginalUtilityOfMoney(), 1e-7);
+		Assertions.assertEquals(23.,
+			scoringConfigGroup.getModeParams().get("truck").getConstant(), 1e-7);
+		Assertions.assertEquals(freightActivityParams.getTypicalDuration(),
+			scoringConfigGroup.getActivityParams("freightInteraction").getTypicalDuration());
+
+		truckModeParams.setConstant(42.);
+
+		Assertions.assertEquals(23.,
+			scoringConfigGroup.getModeParams().get("truck").getConstant(), 1e-7);
+		Assertions.assertEquals(42.,
+			scoringConfigGroup.getModeParamsForSubpopulation("freight").get("truck").getConstant(), 1e-7);
+	}
+
+	@Test
+	void testSetScoringParametersAsDefaultSubpopulationRequiresExistingSubpopulation() {
+		// Missing subpopulations should fail instead of creating an empty default by accident.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.setScoringParametersAsDefaultSubpopulation("missing"));
+	}
+
+	@Test
+	void testSetScoringParametersAsDefaultSubpopulationFailsIfDefaultAlreadyExists() {
+		// An already explicit default should not be overwritten by another subpopulation.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		scoringConfigGroup.getOrCreateScoringParameters("freight");
+		scoringConfigGroup.setScoringParametersAsDefaultSubpopulation("freight");
+		scoringConfigGroup.getOrCreateScoringParameters("person");
+
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.setScoringParametersAsDefaultSubpopulation("person"));
+	}
+
 	 @Test
 	 void testIODifferentVersions() {
 		final ScoringConfigGroup initialGroup = createTestConfigGroup();
