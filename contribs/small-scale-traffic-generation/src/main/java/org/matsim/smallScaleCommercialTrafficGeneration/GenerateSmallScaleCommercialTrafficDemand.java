@@ -61,7 +61,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
-import org.matsim.freight.carriers.controller.*;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.SimWrapperModule;
@@ -348,7 +347,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					}
 				}
 				// for the case @useExistingCarrierFileWithSolution the method solveSeparatedVRPs skips carriers with existing plans. But if a carrier without plans exists, it will be solved.
-				solveSeparatedVRPs(scenario);
+				solveVRP(scenario);
 			}
 			default -> {
 				if (!Files.exists(shapeFileZonePath)) {
@@ -372,7 +371,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
 				CarriersUtils.writeCarriers(scenario, "output_carriers_unsolvedVRP.xml.gz");
-				solveSeparatedVRPs(scenario);
+				solveVRP(scenario);
 			}
 		}
 		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(scenario, output.resolve("analysis").resolve("freight").toString());
@@ -509,7 +508,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * This is repeated until the carrier-plans are solved or the {@code maxNumberOfLoopsForVRPSolving} are reached.
 	 * @param originalScenario complete Scenario
 	 */
-	private void solveSeparatedVRPs(Scenario originalScenario) throws Exception {
+	private void solveVRP(Scenario originalScenario) throws Exception {
 
 		CarriersUtils.addRoadPricingForVRPToEnsureSolutionsBasedOnNetworkModes(originalScenario);
 
