@@ -20,6 +20,9 @@
 package org.matsim.contrib.drt.optimizer.constraints;
 
 /**
+ *
+ * Some explanation of this is in {@link DrtOptimizationConstraintsSet}.
+ *
  * @author Sebastian Hörl, IRT SystemX
  * @author nkuehnel / MOIA
  */
