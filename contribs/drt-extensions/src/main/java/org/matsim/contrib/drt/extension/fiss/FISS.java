@@ -251,7 +251,8 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 				if (agent instanceof MobsimDriverAgent driverAgent) {
 					internalInterface.getMobsim().getEventsManager().processEvent(
 							new VehicleTeleportationDepartureEvent(time, driverAgent.getId(),
-									entry.vehicle.getId(), departureLinkId, agent.getMode()));
+									entry.vehicle.getId(), departureLinkId, agent.getMode(),
+									deferred.desiredDepartureTime));
 				}
 
 				boolean result = teleport.handleDeparture(time, agent, departureLinkId);
