@@ -2,6 +2,7 @@ package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.GridMap;
 import org.matsim.simwrapper.viz.MapPlot;
@@ -62,7 +63,8 @@ public class EmissionsDashboard implements Dashboard {
 				viz.unit = "CO₂ [g]";
 				viz.description = "per day";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
-				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_day.%s", "avro");
+				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_day.%s", "avro")
+					.replace("emissions_grid_per_day", Pollutant.CO2_TOTAL + "_" + "emissions_grid_per_day");
 			});
 
 		layout.row("third")
@@ -71,7 +73,8 @@ public class EmissionsDashboard implements Dashboard {
 				viz.unit = "CO₂ [g]";
 				viz.description = "per hour";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
-				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_hour.%s", "avro");
+				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_hour.%s", "avro")
+					.replace("emissions_grid_per_hour", Pollutant.CO2_TOTAL + "_" + "emissions_grid_per_hour");
 			});
 
 
