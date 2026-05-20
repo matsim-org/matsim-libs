@@ -127,6 +127,12 @@ public final class PoolExecutor implements LPExecutor {
 			} catch (InterruptedException | ExecutionException e) {
 				log.error("Error while executing task", e);
 				executor.shutdown();
+
+				// re-throw original unchecked exceptions/errors
+				if (e.getCause() instanceof RuntimeException re) throw re;
+				if (e.getCause() instanceof Error err) throw err;
+
+				// otherwise wrap it into an unchecked exception
 				throw new RuntimeException(e.getCause());
 			}
 		}

@@ -1810,6 +1810,7 @@ public class QSimTest {
 			this.config.qsim().setNumberOfThreads(numberOfThreads);
 
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 			/* build network */
 			this.network = this.scenario.getNetwork();

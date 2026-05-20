@@ -47,7 +47,7 @@ public class RailsimChangeEventsTest extends AbstractIntegrationTest {
 		assertThat(result)
 			.allTrainsArrived()
 			.trainHasLastArrival("train1", 33422.0)
-			.trainHasLastArrival("train2", 31732.0)
+			.trainHasLastArrival("train2", 31721.0)
 			.trainHasLastArrival("train3", 34518.0)
 			.trainHasLastArrival("train4", 32319.0);
 

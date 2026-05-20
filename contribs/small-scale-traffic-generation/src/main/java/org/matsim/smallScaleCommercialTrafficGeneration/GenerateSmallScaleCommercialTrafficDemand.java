@@ -61,8 +61,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
-import org.matsim.freight.carriers.controller.*;
-import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.SimWrapperModule;
@@ -109,7 +107,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 	private final IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
 	private final CommercialTourSpecifications commercialTourSpecifications;
-	protected final VehicleSelection vehicleSelection;
+	protected final OdMatrixEntryInformationProvider odMatrixEntryInformationProvider;
 	private final UnhandledServicesSolution unhandledServicesSolution;
 
 	private enum CreationOption {
@@ -183,8 +181,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--MATSimIterationsAfterDemandGeneration", description = "If selected, the MATSim simulation will be run for the selected number of iterations after demand generation. if not selected, only demand generation is performed.")
 	private Integer MATSimIterationsAfterDemandGeneration;
 
-	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = " The factor describing how many vehicles should be created in relation to the number of created services. If maxNumberOfLoopsForVRPSolving > 0 more vehiclaes are added in the replanning process.", defaultValue = "1.2")
+	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = "The factor describing how many vehicles should be created in relation to the number of created services. If maxNumberOfLoopsForVRPSolving > 0 more vehicles are added in the replanning process.", defaultValue = "1.2")
 	private double factorForTravelBufferCalculation;
+
+	@CommandLine.Option(names = "--useRangeConstraintForTourPlanning", description = "Option to use range constraint for planning the tours. If this is selected, the range is restricted based on consumption information in the vehicle types file.")
+	private boolean useRangeConstraintForTourPlanning;
 
 	private Random rnd;
 	private RandomGenerator rng;
@@ -204,23 +205,22 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private final String[] configArgs;
 
 	public GenerateSmallScaleCommercialTrafficDemand() {
-		this(null, null, null, null, null);
+		this(null, null, null, null, null, null);
 	}
 
 	public GenerateSmallScaleCommercialTrafficDemand(String[] configArgs) {
-		this(configArgs, null, null, null, null);
+		this(configArgs, null, null, null, null, null);
 	}
 
 	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-													 CommercialTourSpecifications commercialTourSpecifications, VehicleSelection vehicleSelection,
-													 UnhandledServicesSolution unhandledServicesSolution) {
-		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, vehicleSelection,
-			unhandledServicesSolution);
+	                                                 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
+	                                                 VehicleTypeSelection vehicleTypeSelection, UnhandledServicesSolution unhandledServicesSolution) {
+		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, odMatrixEntryInformationProvider, vehicleTypeSelection, unhandledServicesSolution);
 	}
 	public GenerateSmallScaleCommercialTrafficDemand(String[] configArgs,
-													 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-													 CommercialTourSpecifications commercialTourSpecifications, VehicleSelection vehicleSelection,
-													 UnhandledServicesSolution unhandledServicesSolution) {
+	                                                 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
+	                                                 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
+	                                                 VehicleTypeSelection vehicleTypeSelection, UnhandledServicesSolution unhandledServicesSolution) {
 
 		this.configArgs = (configArgs == null) ? new String[0] : configArgs;
 
@@ -238,12 +238,18 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			this.commercialTourSpecifications = commercialTourSpecifications;
 			log.info("Using {} for tour specifications!", commercialTourSpecifications.getClass().getSimpleName());
 		}
-		if (vehicleSelection == null) {
-			this.vehicleSelection = new DefaultVehicleSelection();
-			log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
+		if (odMatrixEntryInformationProvider == null) {
+			if (vehicleTypeSelection != null) {
+				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider(vehicleTypeSelection);
+				log.info("Using default {} with provided {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName(), vehicleTypeSelection.getClass().getSimpleName());
+			}
+			else {
+				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider();
+				log.info("Using default {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName());
+			}
 		} else {
-			this.vehicleSelection = vehicleSelection;
-			log.info("Using {} for tour vehicle-selection!", vehicleSelection.getClass().getSimpleName());
+			this.odMatrixEntryInformationProvider = odMatrixEntryInformationProvider;
+			log.info("Using {} for OD matrix entry information!", odMatrixEntryInformationProvider.getClass().getSimpleName());
 		}
 		if (unhandledServicesSolution == null) {
 			this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this);
@@ -271,6 +277,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		output = Path.of(config.controller().getOutputDirectory());
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		if (useRangeConstraintForTourPlanning) {
+			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
+			log.info("Using range constraint for tour planning based on energy consumption information in the vehicle types file.");
+		}
 		if (freightCarriersConfigGroup.getCarriersVehicleTypesFile() != null)
 			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
@@ -331,13 +341,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						CarriersUtils.getCarriers(scenario));
 					if (!nonCompleteSolvedCarriers.isEmpty()) {
 						log.info(
-							"By using the option {} {} carriers are found with unhandled jobs. These carriers will be solved and the plans of the fully planed carriers will remain. ",
-							CreationOption.useExistingCarrierFileWithSolution, nonCompleteSolvedCarriers.size());
+							"By using the option {} {} carriers of all {} carriers are found with unhandled jobs. These carriers will be solved and the plans of the fully planed carriers will remain. ",
+							CreationOption.useExistingCarrierFileWithSolution, nonCompleteSolvedCarriers.size(), CarriersUtils.getCarriers(scenario).getCarriers().size());
 						nonCompleteSolvedCarriers.forEach((carrier -> carrier.getPlans().clear()));
 					}
 				}
 				// for the case @useExistingCarrierFileWithSolution the method solveSeparatedVRPs skips carriers with existing plans. But if a carrier without plans exists, it will be solved.
-				solveSeparatedVRPs(scenario);
+				solveVRP(scenario);
 			}
 			default -> {
 				if (!Files.exists(shapeFileZonePath)) {
@@ -360,14 +370,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
-				CarriersUtils.writeCarriers(scenario, "output_carriers_noPlans.xml.gz");
-				solveSeparatedVRPs(scenario);
+				CarriersUtils.writeCarriers(scenario, "output_carriers_unsolvedVRP.xml.gz");
+				solveVRP(scenario);
 			}
 		}
-		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(CarriersUtils.addOrGetCarriers(scenario), output.resolve("analysis").resolve("freight").toString());
-		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersPlans);
-
-		CarriersUtils.writeCarriers(scenario, "output_carriers_withPlans.xml.gz");
+		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(scenario, output.resolve("analysis").resolve("freight").toString());
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans);
+		CarriersUtils.writeCarrierVehicleTypes(scenario, "output_carriersVehicleTypes.xml.gz");
+		CarriersUtils.writeCarriers(scenario, "output_carriers_solvedVRP.xml.gz");
 
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(scenario,
 			usedSmallScaleCommercialTrafficType, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
@@ -498,164 +508,137 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * This is repeated until the carrier-plans are solved or the {@code maxNumberOfLoopsForVRPSolving} are reached.
 	 * @param originalScenario complete Scenario
 	 */
-	private void solveSeparatedVRPs(Scenario originalScenario) throws Exception {
+	private void solveVRP(Scenario originalScenario) throws Exception {
 
 		CarriersUtils.addRoadPricingForVRPToEnsureSolutionsBasedOnNetworkModes(originalScenario);
 
-		boolean splitCarrier = true;
-		boolean splitVRPs = false;
 
 		// comparison of results for hannover: increasing to maxServicesPerCarrier = 300 results in:
 		// computationTime *4; numberOfVehicles -2%; Jsprit score: -0,4%, drivenDistanc: -4,4%
 		// RE: result is to set this to maxServicesPerCarrier = 100;
+		boolean splitCarrier = true;
 		int maxServicesPerCarrier = 100;
-		Map<Id<Carrier>, Carrier> allCarriers = new HashMap<>(
-			CarriersUtils.getCarriers(originalScenario).getCarriers());
-		Map<Id<Carrier>, Carrier> solvedCarriers = new HashMap<>();
-		List<Id<Carrier>> keyList = new ArrayList<>(allCarriers.keySet());
+		Carriers carriers = CarriersUtils.addOrGetCarriers(originalScenario);
 		Map<Id<Carrier>, List<Id<Carrier>>> carrierId2subCarrierIds = new HashMap<>();
-		// sort out carriers which don't has to be solved
-		CarriersUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
-			if (CarriersUtils.getJspritIterations(carrier) == 0 || CarriersUtils.allJobsHandledBySelectedPlan(carrier)) {
-				allCarriers.remove(carrier.getId());
-				solvedCarriers.put(carrier.getId(), carrier);
-			}
-			else
-				CarriersUtils.setJspritIterations(carrier, jspritIterations);
-		});
-		int carrierSteps = 30;
-		for (int i = 0; i < allCarriers.size(); i++) {
-			int fromIndex = i * carrierSteps;
-			int toIndex = (i + 1) * carrierSteps;
-			if (toIndex >= allCarriers.size())
-				toIndex = allCarriers.size();
 
-			Map<Id<Carrier>, Carrier> subCarriers = new HashMap<>(allCarriers);
-			List<Id<Carrier>> subList;
-			if (splitVRPs) {
-				subList = keyList.subList(fromIndex, toIndex);
-				subCarriers.keySet().retainAll(subList);
-			} else {
-				fromIndex = 0;
-				toIndex = allCarriers.size();
-			}
+		int splitCarriers = 0;
 
-			if (splitCarrier) {
-				Map<Id<Carrier>, Carrier> subCarriersToAdd = new HashMap<>();
-				List<Id<Carrier>> keyListCarrierToRemove = new ArrayList<>();
-				for (Carrier carrier : subCarriers.values()) {
+		if (splitCarrier) {
+			Map<Id<Carrier>, Carrier> subCarriersToAdd = new HashMap<>();
+			List<Id<Carrier>> keyListCarrierToRemove = new ArrayList<>();
+			for (Carrier carrier : carriers.getCarriers().values()) {
+				if (CarriersUtils.getJspritIterations(carrier) == 0 || CarriersUtils.allJobsHandledBySelectedPlan(carrier))
+					continue;
+				int countedServices = 0;
+				int countedVehicles = 0;
+				if (carrier.getServices().size() > maxServicesPerCarrier) {
+					splitCarriers++;
+					int numberOfNewCarrier = (int) Math
+						.ceil((double) carrier.getServices().size() / (double) maxServicesPerCarrier);
+					int numberOfServicesPerNewCarrier = (int) Math
+						.floor((double) carrier.getServices().size() / numberOfNewCarrier);
 
-					int countedServices = 0;
-					int countedVehicles = 0;
-					if (carrier.getServices().size() > maxServicesPerCarrier) {
+					int totalVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().size();
+					int numberOfVehiclesPerNewCarrier = totalVehicles / numberOfNewCarrier;
+					int numberOfVehiclesRemainder = totalVehicles % numberOfNewCarrier;
 
-						int numberOfNewCarrier = (int) Math
-							.ceil((double) carrier.getServices().size() / (double) maxServicesPerCarrier);
-						int numberOfServicesPerNewCarrier = (int) Math
-							.floor((double)carrier.getServices().size() / numberOfNewCarrier);
+					List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>(
+						carrier.getCarrierCapabilities().getCarrierVehicles().keySet());
+					vehiclesForNewCarrier.sort(Comparator.comparing(Id::toString));
+					List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>(
+						carrier.getServices().keySet());
+					servicesForNewCarrier.sort(Comparator.comparing(Id::toString));
 
-						int totalVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().size();
-						int numberOfVehiclesPerNewCarrier = totalVehicles / numberOfNewCarrier;
-						int numberOfVehiclesRemainder = totalVehicles % numberOfNewCarrier;
+					for (int j = 0; j < numberOfNewCarrier; j++) {
 
-						List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>(
-							carrier.getCarrierCapabilities().getCarrierVehicles().keySet());
-						vehiclesForNewCarrier.sort(Comparator.comparing(Id::toString));
-						List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>(
-							carrier.getServices().keySet());
-						servicesForNewCarrier.sort(Comparator.comparing(Id::toString));
+						int numberOfServicesForNewCarrier = numberOfServicesPerNewCarrier;
+						if (j + 1 == numberOfNewCarrier)
+							numberOfServicesForNewCarrier = carrier.getServices().size() - countedServices;
 
-						for (int j = 0; j < numberOfNewCarrier; j++) {
+						int numberOfVehiclesForNewCarrier = numberOfVehiclesPerNewCarrier;
+						if (j < numberOfVehiclesRemainder)
+							numberOfVehiclesForNewCarrier++;
 
-							int numberOfServicesForNewCarrier = numberOfServicesPerNewCarrier;
-							if (j + 1 == numberOfNewCarrier)
-								numberOfServicesForNewCarrier = carrier.getServices().size() - countedServices;
+						Carrier newCarrier = CarriersUtils.createCarrier(
+							Id.create(carrier.getId().toString() + "_part_" + (j + 1), Carrier.class));
+						CarrierCapabilities newCarrierCapabilities = CarrierCapabilities.Builder.newInstance()
+							.setFleetSize(carrier.getCarrierCapabilities().getFleetSize()).build();
+						newCarrierCapabilities.getVehicleTypes().addAll(carrier.getCarrierCapabilities().getVehicleTypes());
+						newCarrierCapabilities.getCarrierVehicles().putAll(carrier.getCarrierCapabilities().getCarrierVehicles());
+						newCarrier.setCarrierCapabilities(newCarrierCapabilities);
+						newCarrier.getServices().putAll(carrier.getServices());
+						CarriersUtils.setJspritIterations(newCarrier, CarriersUtils.getJspritIterations(carrier));
+						carrier.getAttributes().getAsMap().keySet().forEach(attribute -> newCarrier.getAttributes()
+							.putAttribute(attribute, carrier.getAttributes().getAttribute(attribute)));
 
-							int numberOfVehiclesForNewCarrier = numberOfVehiclesPerNewCarrier;
-							if (j < numberOfVehiclesRemainder)
-								numberOfVehiclesForNewCarrier++;
+						carrierId2subCarrierIds.putIfAbsent(carrier.getId(), new LinkedList<>());
+						carrierId2subCarrierIds.get(carrier.getId()).add(newCarrier.getId());
 
-							Carrier newCarrier = CarriersUtils.createCarrier(
-								Id.create(carrier.getId().toString() + "_part_" + (j + 1), Carrier.class));
-							CarrierCapabilities newCarrierCapabilities = CarrierCapabilities.Builder.newInstance()
-								.setFleetSize(carrier.getCarrierCapabilities().getFleetSize()).build();
-							newCarrierCapabilities.getVehicleTypes().addAll(carrier.getCarrierCapabilities().getVehicleTypes());
-							newCarrierCapabilities.getCarrierVehicles().putAll(carrier.getCarrierCapabilities().getCarrierVehicles());
-							newCarrier.setCarrierCapabilities(newCarrierCapabilities);
-							newCarrier.getServices().putAll(carrier.getServices());
-							CarriersUtils.setJspritIterations(newCarrier, CarriersUtils.getJspritIterations(carrier));
-							carrier.getAttributes().getAsMap().keySet().forEach(attribute -> newCarrier.getAttributes()
-								.putAttribute(attribute, carrier.getAttributes().getAttribute(attribute)));
+						int fromIndexVehicles = Math.min(countedVehicles, vehiclesForNewCarrier.size());
+						int fromIndexServices = Math.min(countedServices, servicesForNewCarrier.size());
 
-							carrierId2subCarrierIds.putIfAbsent(carrier.getId(), new LinkedList<>());
-							carrierId2subCarrierIds.get(carrier.getId()).add(newCarrier.getId());
+						int toIndexVehicles = fromIndexVehicles + numberOfVehiclesForNewCarrier;
+						int toIndexServices = fromIndexServices + numberOfServicesForNewCarrier;
 
-							int fromIndexVehicles = Math.min(countedVehicles, vehiclesForNewCarrier.size());
-							int fromIndexServices = Math.min(countedServices, servicesForNewCarrier.size());
+						// just to be sure that the index is not out of bounds
+						toIndexVehicles = Math.min(toIndexVehicles, vehiclesForNewCarrier.size());
+						toIndexServices = Math.min(toIndexServices, servicesForNewCarrier.size());
 
-							int toIndexVehicles = fromIndexVehicles + numberOfVehiclesForNewCarrier;
-							int toIndexServices = fromIndexServices + numberOfServicesForNewCarrier;
-
-							// just to be sure that the index is not out of bounds
-							toIndexVehicles = Math.min(toIndexVehicles, vehiclesForNewCarrier.size());
-							toIndexServices = Math.min(toIndexServices, servicesForNewCarrier.size());
-
-							if (fromIndexVehicles == toIndexVehicles && fromIndexServices == toIndexServices) {
-								throw new IllegalStateException("No remaining vehicles/services but still splitting: " + carrier.getId());
-							}
-
-							List<Id<Vehicle>> subListVehicles = vehiclesForNewCarrier.subList(fromIndexVehicles, toIndexVehicles);
-							List<Id<CarrierService>> subListServices = servicesForNewCarrier.subList(fromIndexServices, toIndexServices);
-
-							newCarrier.getCarrierCapabilities().getCarrierVehicles().keySet()
-								.retainAll(subListVehicles);
-							newCarrier.getServices().keySet().retainAll(subListServices);
-
-							countedVehicles += newCarrier.getCarrierCapabilities().getCarrierVehicles().size();
-							countedServices += newCarrier.getServices().size();
-
-							subCarriersToAdd.put(newCarrier.getId(), newCarrier);
+						if (fromIndexVehicles == toIndexVehicles && fromIndexServices == toIndexServices) {
+							throw new IllegalStateException("No remaining vehicles/services but still splitting: " + carrier.getId());
 						}
-						keyListCarrierToRemove.add(carrier.getId());
-						if (countedVehicles != carrier.getCarrierCapabilities().getCarrierVehicles().size())
-							throw new Exception("Split parts of the carrier " + carrier.getId().toString()
-								+ " has a different number of vehicles than the original carrier");
-						if (countedServices != carrier.getServices().size())
-							throw new Exception("Split parts of the carrier " + carrier.getId().toString()
-								+ " has a different number of services than the original carrier");
 
+						List<Id<Vehicle>> subListVehicles = vehiclesForNewCarrier.subList(fromIndexVehicles, toIndexVehicles);
+						List<Id<CarrierService>> subListServices = servicesForNewCarrier.subList(fromIndexServices, toIndexServices);
+
+						newCarrier.getCarrierCapabilities().getCarrierVehicles().keySet()
+							.retainAll(subListVehicles);
+						newCarrier.getServices().keySet().retainAll(subListServices);
+
+						countedVehicles += newCarrier.getCarrierCapabilities().getCarrierVehicles().size();
+						countedServices += newCarrier.getServices().size();
+
+						subCarriersToAdd.put(newCarrier.getId(), newCarrier);
 					}
-				}
-				subCarriers.putAll(subCarriersToAdd);
-				for (Id<Carrier> id : keyListCarrierToRemove) {
-					subCarriers.remove(id);
-				}
-			}
-			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
-			CarriersUtils.getCarriers(originalScenario).getCarriers().putAll(subCarriers);
+					keyListCarrierToRemove.add(carrier.getId());
+					if (countedVehicles != carrier.getCarrierCapabilities().getCarrierVehicles().size())
+						throw new Exception("Split parts of the carrier " + carrier.getId().toString()
+							+ " has a different number of vehicles than the original carrier");
+					if (countedServices != carrier.getServices().size())
+						throw new Exception("Split parts of the carrier " + carrier.getId().toString()
+							+ " has a different number of services than the original carrier");
 
-//			Map the values to the new subcarriers
-			for (Id<Carrier> oldCarrierId : carrierId2subCarrierIds.keySet()) {
-				for (Id<Carrier> newCarrierId : carrierId2subCarrierIds.get(oldCarrierId)) {
-					if (carrierId2carrierAttributes.putIfAbsent(newCarrierId, carrierId2carrierAttributes.get(oldCarrierId)) != null)
-						throw new Exception("CarrierAttributes already exist for the carrier " + newCarrierId.toString());
 				}
 			}
-
-			log.info("Solving carriers {}-{} of all {} carriers. This are {} VRP to solve.", fromIndex + 1, toIndex, allCarriers.size(),
-				subCarriers.size());
-			CarriersUtils.runJsprit(originalScenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
-			List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
-			if (!nonCompleteSolvedCarriers.isEmpty() && maxNumberOfLoopsForVRPSolving > 0) {
-				CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario), originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved.xml.gz");
-				unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers);
+			log.info("Splitting carriers: {}/{}, because the maximum number of services per carriers is set to {}.", splitCarriers, carriers.getCarriers().size(),
+				maxServicesPerCarrier);
+			// add created parts of new carriers and delete the old ones
+			carriers.getCarriers().putAll(subCarriersToAdd);
+			for (Id<Carrier> id : keyListCarrierToRemove) {
+				carriers.getCarriers().remove(id);
 			}
-			solvedCarriers.putAll(CarriersUtils.getCarriers(originalScenario).getCarriers());
-			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
-			if (!splitVRPs)
-				break;
+			log.info("New number of carriers to solve: {}.", carriers.getCarriers().size());
+
 		}
-		CarriersUtils.getCarriers(originalScenario).getCarriers().putAll(solvedCarriers);
+
+		// Map the values to the new subcarriers
+		for (Id<Carrier> oldCarrierId : carrierId2subCarrierIds.keySet()) {
+			for (Id<Carrier> newCarrierId : carrierId2subCarrierIds.get(oldCarrierId)) {
+				if (carrierId2carrierAttributes.putIfAbsent(newCarrierId, carrierId2carrierAttributes.get(oldCarrierId)) != null)
+					throw new Exception("CarrierAttributes already exist for the carrier " + newCarrierId.toString());
+			}
+		}
+
+		log.info("Start solving {} carriers. Carriers with 0 Jsprit iterations will be skipped and carriers with existing plans will be skipped.",
+			carriers.getCarriers().size());
+		CarriersUtils.runJsprit(originalScenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
+		List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
+		if (!nonCompleteSolvedCarriers.isEmpty() && maxNumberOfLoopsForVRPSolving > 0) {
+			CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario),
+				originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved.xml.gz");
+			unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers);
+		}
+
 		CarriersUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
 			if (linksPerZone != null && !carrier.getAttributes().getAsMap().containsKey("tourStartArea")) {
 				List<String> startAreas = new ArrayList<>();
@@ -743,7 +726,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		// Reset some config values that are not needed
 		config.controller().setFirstIteration(0);
-		config.controller().setLastIteration(MATSimIterationsAfterDemandGeneration);
+		if (MATSimIterationsAfterDemandGeneration != null)
+			config.controller().setLastIteration(MATSimIterationsAfterDemandGeneration);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.plans().setInputFile(null);
 		config.transit().setTransitScheduleFile(null);
@@ -783,13 +767,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// use overwriteExistingFiles because before setting up the OutputDirectoryHierarchy, the OverwriteFileSetting was failIfDirectoryExists
 		// in mean time some files were already written (e.g. carriers analysis), so we need to allow overwriting here
 		controller.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-//		controller.addOverridingModule(new CarrierModule());
-//		controller.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
-//			}
-//		});
 
 		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 		return controller;
@@ -844,7 +821,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 					if (isStartingLocation) {
 						// Get the vehicle-types and start/stop-categories
-						VehicleSelection.OdMatrixEntryInformation odMatrixEntry = vehicleSelection.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
+						OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
 
 						// use only types of the possibleTypes which are in the given types file
 						List<String> vehicleTypes = new ArrayList<>();
@@ -903,7 +880,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param odMatrixEntry odMatrixEntry
 	 * @return the selected start category
 	 */
-	protected StructuralAttribute getSelectedStartCategory(String startZone, VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {
+	protected StructuralAttribute getSelectedStartCategory(String startZone, OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry) {
 		// Find a start category with existing employees in this zone
 		StructuralAttribute selectedStartCategory = odMatrixEntry.startCategoryDistribution.sample();
 		// we start with count = 1 because the first category is already selected, and if this category has employees, we can use it.
@@ -1212,7 +1189,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	/**
 	 * The attributes of a carrier, used during the generation
-	 * @param purpose purpose of this carrier denoted as an index. Can be used in {@link VehicleSelection} to get more information about this carrier.
+	 * @param purpose purpose of this carrier denoted as an index. Can be used in {@link OdMatrixEntryInformationProvider} to get more information about this carrier.
 	 * @param startZone start zone of this carrier, entry from {@link TripDistributionMatrix#getListOfZones()}
 	 * @param selectedStartCategory start category of this carrier, selected randomly from
 	 * @param modeORvehType entry from {@link TripDistributionMatrix#getListOfModesOrVehTypes()}
@@ -1222,5 +1199,5 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	public record CarrierAttributes(int purpose, String startZone, StructuralAttribute selectedStartCategory, String modeORvehType,
 									SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, ArrayList<String> vehicleDepots,
-									VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {}
+									OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry) {}
 }

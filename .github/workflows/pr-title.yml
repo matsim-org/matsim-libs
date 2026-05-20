@@ -19,5 +19,18 @@ jobs:
       pull-requests: read
     steps:
       - uses: amannn/action-semantic-pull-request@v6
+        with:
+          types: |
+            feat
+            fix
+            docs
+            chore
+            refactor
+            test
+            ci
+            perf
+            build
+            revert
+            maintenance
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

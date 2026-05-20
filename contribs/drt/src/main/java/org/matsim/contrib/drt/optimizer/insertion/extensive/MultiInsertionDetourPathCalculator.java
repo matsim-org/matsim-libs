@@ -44,6 +44,7 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.router.speedy.CHGraph;
 import org.matsim.core.router.speedy.SpeedyGraph;
 import org.matsim.core.router.speedy.SpeedyGraphBuilder;
 import org.matsim.core.router.util.TravelDisutility;
@@ -72,6 +73,26 @@ class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener 
 		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility,  allowsLazyPathCreation(drtCfg));
 		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility,  allowsLazyPathCreation(drtCfg));
 		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility,  allowsLazyPathCreation(drtCfg));
+		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
+	}
+
+	/**
+	 * Constructs a CH-accelerated path calculator using a pre-built and customized
+	 * {@link CHGraph}.  The CH graph is expected to be shared across multiple
+	 * calculator instances (it is read-only after customisation).
+	 *
+	 * @param chGraph         pre-built and TTF-customized CH overlay graph
+	 * @param travelTime      time-dependent travel time function
+	 * @param travelDisutility travel disutility for cost computation
+	 * @param drtCfg          DRT config group
+	 */
+	MultiInsertionDetourPathCalculator(CHGraph chGraph, TravelTime travelTime,
+			TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
+		boolean lazy = allowsLazyPathCreation(drtCfg);
+		toPickupPathSearch    = OneToManyPathSearch.createSearchCH(chGraph, travelTime, travelDisutility, lazy);
+		fromPickupPathSearch  = OneToManyPathSearch.createSearchCH(chGraph, travelTime, travelDisutility, lazy);
+		toDropoffPathSearch   = OneToManyPathSearch.createSearchCH(chGraph, travelTime, travelDisutility, lazy);
+		fromDropoffPathSearch = OneToManyPathSearch.createSearchCH(chGraph, travelTime, travelDisutility, lazy);
 		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
 	}
 
