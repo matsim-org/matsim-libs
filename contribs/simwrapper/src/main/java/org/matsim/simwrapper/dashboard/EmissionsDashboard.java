@@ -2,10 +2,8 @@ package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.DashboardUtils;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.GridMap;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Table;
@@ -26,7 +24,7 @@ public class EmissionsDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Air Pollution";
 		header.description = "Shows the air pollution footprint and its spatial distribution. Shown values are already upscaled from simulated sample size.";
@@ -65,7 +63,8 @@ public class EmissionsDashboard implements Dashboard {
 				viz.unit = "CO₂ [g]";
 				viz.description = "per day";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
-				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_day.%s", "avro");
+				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_day.%s", "avro")
+					.replace("emissions_grid_per_day", Pollutant.CO2_TOTAL + "_" + "emissions_grid_per_day");
 			});
 
 		layout.row("third")
@@ -74,7 +73,8 @@ public class EmissionsDashboard implements Dashboard {
 				viz.unit = "CO₂ [g]";
 				viz.description = "per hour";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
-				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_hour.%s", "avro");
+				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_hour.%s", "avro")
+					.replace("emissions_grid_per_hour", Pollutant.CO2_TOTAL + "_" + "emissions_grid_per_hour");
 			});
 
 

@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.pt.Umlauf;
@@ -31,6 +32,13 @@ public class DefaultTransitDriverAgentFactory implements TransitDriverAgentFacto
 	@Override
 	public AbstractTransitDriverAgent createTransitDriver(Umlauf umlauf, InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker) {
 		return new TransitDriverAgentImpl(umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
+	}
+	@Override
+	public AbstractTransitDriverAgent createTransitDriverFromMessage(Message message, Umlauf umlauf, InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker){
+		if (message instanceof TransitDriverAgentImpl.TransitDriverMessage tdm) {
+			return new TransitDriverAgentImpl(tdm, umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
+		}
+		throw new IllegalArgumentException("DefaultTransitDriverAgentFactory only supports TransitDriverAgentImpl.TransitDriverMessage but was called with: " + message.getClass().getName());
 	}
 
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="network">
+		<param name="inputNetworkFile" value="grid_network.xml"/>
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="multi_mode_one_shared_taxi_population.xml"/>
+	</module>
+
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="1"/>
+		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
+		<parameterset type="strategysettings" >
+			<param name="weight" value="1.0"/>
+			<param name="strategyName" value="KeepLastSelected"/>
+		</parameterset>
+	</module>
+</config>

@@ -19,41 +19,34 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.HasLinkId;
-import org.matsim.api.core.v01.events.HasVehicleId;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Because in QSim vehicles enter and leave traffic at the end of links, we skip the first link when
  * calculating the drive-related energy consumption. However, the time spent on the first link is used by the time-based
  * idle discharge process (see {@link IdleDischargingHandler}).
  */
+@DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class DriveDischargingHandler
-	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler, MobsimEngine {
+	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler, DistributedMobsimEngine {
 
 	private static class EvDrive {
 		private final Id<Vehicle> vehicleId;
@@ -73,31 +66,31 @@ public class DriveDischargingHandler
 
 	private final Network network;
 	private final EventsManager eventsManager;
-	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
+	private final ElectricFleet fleet;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
-	
+
 	private final Queue<VehicleEntersTrafficEvent> trafficEnterEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<LinkLeaveEvent> linkLeaveEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<VehicleLeavesTrafficEvent> trafficLeaveEvents = new ConcurrentLinkedQueue<>();
-	
-	private final QSim qsim;
+
+	private final Netsim netsim;
 
 	@Inject
-	DriveDischargingHandler(QSim qsim, ElectricFleet data, Network network, EventsManager eventsManager) {
-		this.qsim = qsim;
+	DriveDischargingHandler(Netsim netsim, ElectricFleet fleet, Network network, EventsManager eventsManager) {
+		this.netsim = netsim;
 		this.network = network;
 		this.eventsManager = eventsManager;
-		eVehicles = data.getElectricVehicles();
-		evDrives = new ConcurrentHashMap<>(eVehicles.size() / 10);
+		this.fleet = fleet;
+		evDrives = new ConcurrentHashMap<>();
 	}
 
-	private ElectricVehicle getElectricVehicle(Id<Vehicle> vehicleId) {
-		return eVehicles.get(vehicleId);
-	}
+//	private ElectricVehicle getElectricVehicle(Id<Vehicle> vehicleId) {
+//		return electricFleet.getVehicle(vehicleId);
+//	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			trafficEnterEvents.add(event);
 		}
@@ -105,7 +98,7 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			linkLeaveEvents.add(event);
 		}
@@ -113,20 +106,18 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			trafficLeaveEvents.add(event);
 		}
 	}
 
 	@Override
-	public void onPrepareSim() {
-	}
-
-	@Override
-	public void afterSim() {
+	public void afterMobsim() {
 		// process remaining events
-		doSimStep(this.qsim.getSimTimer().getTimeOfDay());
+		// pass time + 1, because we delay the processing of events during the mobsim. Yet, afterMobsim is called with the last time step of the mobsim
+		// when passing the last timestep no events will be processed, as the logic waits for the next timestep.
+		doSimStep(this.netsim.getSimTimer().getTimeOfDay() + 1);
 	}
 
 	@Override
@@ -142,7 +133,7 @@ public class DriveDischargingHandler
 				break; // see below
 			}
 
-			ElectricVehicle ev = getElectricVehicle(event.getVehicleId());
+			ElectricVehicle ev = fleet.getVehicle(event.getVehicleId());
 			evDrives.put(ev.getId(), new EvDrive(ev.getId(), ev));
 			trafficEnterEvents.remove();
 		}
@@ -184,7 +175,7 @@ public class DriveDischargingHandler
 			//===============================================================
 			//Added to handle cases when the negative energy discharged would surpass the battery capacity
 			//The new resulting energy should mean that the battery stays at the battery capacity when the energy is negative
-			if(ev.getBattery().getCharge() - energy > ev.getBattery().getCapacity()){
+			if (ev.getBattery().getCharge() - energy > ev.getBattery().getCapacity()) {
 				energy = ev.getBattery().getCharge() - ev.getBattery().getCapacity();
 			}
 			//===================================================================

@@ -43,6 +43,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.SingletonUmlaufBuilderImpl;
+import org.matsim.pt.Umlauf;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -285,6 +286,7 @@ public class TransitDriverTest {
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
+		queueVehicle.setDriver(driver);
 
 		PTPassengerAgent agent1 = new FakeAgent(null, stop3);
 		PTPassengerAgent agent2 = new FakeAgent(null, stop3);
@@ -379,6 +381,7 @@ public class TransitDriverTest {
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
+		queueVehicle.setDriver(driver);
 
 		PTPassengerAgent agent1 = new FakeAgent(Id.createPersonId("fake-1"), null, stop1);
 		PTPassengerAgent agent2 = new FakeAgent(Id.createPersonId("fake-2"), null, stop1);
@@ -545,6 +548,7 @@ public class TransitDriverTest {
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
+		queueVehicle.setDriver(driver);
 
 		PTPassengerAgent agent1 = new FakeAgent(stop2, stop1);
 		tracker.addAgentToStop(55, agent1, stop2.getId());
@@ -617,6 +621,119 @@ public class TransitDriverTest {
 		} catch (RuntimeException e) {
 			log.info("catched expected exception.", e);
 		}
+	}
+
+	@Test
+	void testStopIndexLifecycle() {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
+
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord(1500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord(2500, 0), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new Coord(3500, 0), false);
+		List<TransitRouteStop> stops = new ArrayList<>();
+		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
+		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
+		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
+		stops.add(builder.createTransitRouteStop(stop4, 350, 360));
+
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L1", TransitRoute.class), route, stops, "bus");
+		tRoute.addDeparture(builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0));
+		tLine.addRoute(tRoute);
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		QSim tqsim = new QSimBuilder(scenario.getConfig()).useDefaults().build(scenario, eventsManager);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
+		tqsim.addMobsimEngine(trEngine);
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker(eventsManager);
+
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(
+			new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0),
+			TransportMode.car, tracker, trEngine.getInternalInterface());
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("T", VehicleType.class));
+		vehType.getCapacity().setSeats(5);
+		TransitQVehicle vehicle = new TransitQVehicle(VehicleUtils.createVehicle(Id.create("V", Vehicle.class), vehType));
+		vehicle.setStopHandler(new SimpleTransitStopHandler());
+		driver.setVehicle(vehicle);
+
+		assertEquals(0, driver.getStopIndex());
+		assertEquals(stop1, driver.getNextTransitStop());
+
+		assertEquals(0.0, driver.handleTransitStop(stop1, 60), MatsimTestUtils.EPSILON);
+		assertEquals(1, driver.getStopIndex());
+		assertEquals(stop2, driver.getNextTransitStop());
+
+		assertEquals(0.0, driver.handleTransitStop(stop2, 160), MatsimTestUtils.EPSILON);
+		assertEquals(2, driver.getStopIndex());
+		assertEquals(stop3, driver.getNextTransitStop());
+
+		assertEquals(0.0, driver.handleTransitStop(stop3, 260), MatsimTestUtils.EPSILON);
+		assertEquals(3, driver.getStopIndex());
+		assertEquals(stop4, driver.getNextTransitStop());
+
+		assertEquals(0.0, driver.handleTransitStop(stop4, 360), MatsimTestUtils.EPSILON);
+		assertEquals(4, driver.getStopIndex());
+		assertNull(driver.getNextTransitStop());
+	}
+
+	@Test
+	void testMessageRoundTrip() {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
+
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord(1500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord(2500, 0), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new Coord(3500, 0), false);
+		List<TransitRouteStop> stops = new ArrayList<>();
+		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
+		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
+		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
+		stops.add(builder.createTransitRouteStop(stop4, 350, 360));
+
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L1", TransitRoute.class), route, stops, "bus");
+		double depTime = 9876.0;
+		tRoute.addDeparture(builder.createDeparture(Id.create("L1.1", Departure.class), depTime));
+		tLine.addRoute(tRoute);
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		QSim tqsim = new QSimBuilder(scenario.getConfig()).useDefaults().build(scenario, eventsManager);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
+		tqsim.addMobsimEngine(trEngine);
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker(eventsManager);
+		Umlauf umlauf = new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0);
+
+		TransitDriverAgentImpl driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("T", VehicleType.class));
+		vehType.getCapacity().setSeats(5);
+		TransitQVehicle vehicle = new TransitQVehicle(VehicleUtils.createVehicle(Id.create("V", Vehicle.class), vehType));
+		vehicle.setStopHandler(new SimpleTransitStopHandler());
+		driver.setVehicle(vehicle);
+
+		// advance through first 2 stops
+		driver.handleTransitStop(stop1, 60);
+		driver.handleTransitStop(stop2, 160);
+		assertEquals(2, driver.getStopIndex());
+		assertEquals(stop3, driver.getNextTransitStop());
+		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestUtils.EPSILON);
+
+		// serialize and reconstruct
+		TransitDriverAgentImpl.TransitDriverMessage message = (TransitDriverAgentImpl.TransitDriverMessage) driver.toMessage();
+		assertEquals(2, message.stopIndex());
+
+		TransitDriverAgentImpl reconstructed = new TransitDriverAgentImpl(message, umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
+		reconstructed.setVehicle(vehicle);
+
+		assertEquals(2, reconstructed.getStopIndex());
+		assertEquals(stop3, reconstructed.getNextTransitStop());
+		assertEquals(depTime, reconstructed.getActivityEndTime(), MatsimTestUtils.EPSILON);
 	}
 
 	protected static class SpyAgent implements PTPassengerAgent {

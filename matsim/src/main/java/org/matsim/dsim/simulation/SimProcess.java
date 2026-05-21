@@ -1,6 +1,8 @@
 package org.matsim.dsim.simulation;
 
 import com.google.inject.Inject;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,10 +30,8 @@ import org.matsim.core.mobsim.qsim.MobsimListenerManager;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.DistributedEventsManager;
-import org.matsim.dsim.messages.SimStepMessageProcessor;
-import org.matsim.dsim.scoring.BackpackDataCollector;
-import org.matsim.dsim.scoring.BackpackScoringModule;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -43,22 +43,31 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	private static final Logger log = LogManager.getLogger(SimProcess.class);
 
+	// simulation-related handlers
 	private final List<DistributedMobsimEngine> engines = new ArrayList<>();
 	private final List<DistributedDepartureHandler> departureHandlers = new ArrayList<>();
 	private final List<DistributedActivityHandler> activityHandlers = new ArrayList<>();
+
+	// partition-communication-related handlers.
+	private final List<NotifyAgentPartitionTransfer> notifyAgentPartitionTransfers = new ArrayList<>();
+	private final List<NotifyVehiclePartitionTransfer> notifyVehiclePartitionTransfers = new ArrayList<>();
+	private final Int2ObjectMap<List<DSimComponentsMessageProcessor.MessageHandler>> messageHandlers = new Int2ObjectOpenHashMap<>();
+
+	// lifecycle hooks
+	private final List<BeforeMobsim> beforeMobsimListeners = new ArrayList<>();
+	private final List<AfterMobsim> afterMobsimListeners = new ArrayList<>();
 	private final MobsimListenerManager listenerManager = new MobsimListenerManager(this);
-	private final SimStepMessaging messaging;
+
+	// mechanics
+	private final PartitionTransfer partitionTransfer;
 	private final Scenario scenario;
 	private final NetworkPartition partition;
 	private final AgentSourcesContainer asc;
 	private final EventsManager em;
+	private final SerializationProvider serialization;
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
 	private NetworkTrafficEngine networkTrafficEngine;
-	// this is hard-wired in the simulation, as the collector needs to know when agents enter or leave a partition. Once we have a second 'thing' which
-	// needs to know this, we can think about a more abstract way of doing this. For now, we didn't want to introduce yet another signaling mechanism
-	// for this. Janek jan' 26
-	private final BackpackDataCollector backpackDataCollector;
 	/**
 	 * Additional agents that have been registered using {@link #registerAdditionalAgentOnLink(MobsimAgent)}.
 	 * This map does not contain the full set of agents in the simulation.
@@ -66,20 +75,15 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final IdMap<Person, MobsimAgent> agents = new IdMap<>(Person.class);
 
 	@Inject
-	SimProcess(Scenario scenario, NetworkPartition partition, SimStepMessaging messaging, AgentSourcesContainer asc, DistributedEventsManager em,
-			   BackpackDataCollector bdc, BackpackScoringModule.BackpackDataCollectorRegistry registry) {
+	SimProcess(Scenario scenario, NetworkPartition partition, PartitionTransfer messaging, AgentSourcesContainer asc, DistributedEventsManager em,
+			   SerializationProvider serialization) {
 		this.scenario = scenario;
 		this.partition = partition;
-		this.messaging = messaging;
 		this.asc = asc;
 		this.em = em;
+		this.serialization = serialization;
 		this.currentTime = new MobsimTimer();
-		this.backpackDataCollector = bdc;
-
-		// register the collector, so it can be removed from the events manager eventually.
-		registry.register(bdc);
-		// Wire up the scoring data collector as single partition events handler.
-		em.addHandler(backpackDataCollector, partition.getIndex());
+		this.partitionTransfer = messaging;
 	}
 
 	/**
@@ -92,6 +96,21 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			engines.sort(Comparator.comparingDouble(DistributedMobsimEngine::getEnginePriority).reversed());
 		} else if (component instanceof MobsimEngine e) {
 			log.warn("Ignoring non-distributed mobsim engine : {}", e.getClass().getName());
+		}
+
+		if (component instanceof BeforeMobsim b) {
+			this.beforeMobsimListeners.add(b);
+		}
+
+		if (component instanceof AfterMobsim a) {
+			this.afterMobsimListeners.add(a);
+		}
+
+		if (component instanceof DSimComponentsMessageProcessor p) {
+			p.getMessageHandlers().forEach((clazz, handler) -> {
+				var type = serialization.getType(clazz);
+				messageHandlers.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler);
+			});
 		}
 
 		if (component instanceof DistributedActivityHandler d) {
@@ -107,14 +126,22 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		if (component instanceof NetworkTrafficEngine n) {
 			this.networkTrafficEngine = n;
 		}
+
+		if (component instanceof NotifyAgentPartitionTransfer n) {
+			this.notifyAgentPartitionTransfers.add(n);
+		}
+
+		if (component instanceof NotifyVehiclePartitionTransfer n) {
+			this.notifyVehiclePartitionTransfers.add(n);
+		}
 	}
 
 	@Override
 	public void onPrepareSim() {
 		currentTime.setSimStartTime(getScenario().getConfig().qsim().getStartTime().orElse(0));
 
-		for (DistributedMobsimEngine engine : engines) {
-			engine.onPrepareSim();
+		for (BeforeMobsim listener : beforeMobsimListeners) {
+			listener.beforeMobsim();
 		}
 
 		for (DistributedAgentSource source : asc.getAgentSources()) {
@@ -135,9 +162,9 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			engine.doSimStep(time);
 		}
 
-		messaging.sendMessages(time);
-
 		listenerManager.fireQueueSimulationAfterSimStepEvent(time);
+
+		partitionTransfer.send(time, partition.getNeighbors());
 	}
 
 	@Override
@@ -145,24 +172,17 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
-		for (DistributedMobsimEngine engine : engines) {
-			engine.afterSim();
+		for (AfterMobsim listener : afterMobsimListeners) {
+			listener.afterMobsim();
 		}
-
-		backpackDataCollector.finishAllPersons();
 	}
 
 	@Override
 	public void process(SimStepMessage msg) {
-
-		var now = getSimTimer().getTimeOfDay();
-
-		assert msg.simstep() <= now : "Message time (%.2f) does not match current time (%.2f)".formatted(msg.simstep(), currentTime.getTimeOfDay());
-
-		for (DistributedMobsimEngine engine : engines) {
-			engine.process(msg, now);
+		var handlers = messageHandlers.get(msg.messageType());
+		if (handlers != null) {
+			handlers.forEach(h -> h.handle(msg.messages(), msg.timeStep()));
 		}
-		backpackDataCollector.process(msg);
 	}
 
 	@Override
@@ -229,6 +249,34 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	}
 
 	@Override
+	public void notifyAgentEntersPartition(DistributedMobsimAgent agent) {
+		for (var handler : notifyAgentPartitionTransfers) {
+			handler.onAgentEntersPartition(agent);
+		}
+	}
+
+	@Override
+	public void notifyAgentLeavesPartition(DistributedMobsimAgent agent, int toPartition) {
+		for (var handler : notifyAgentPartitionTransfers) {
+			handler.onAgentLeavesPartition(agent, toPartition);
+		}
+	}
+
+	@Override
+	public void notifyVehicleEntersPartition(DistributedMobsimVehicle vehicle) {
+		for (var handler : notifyVehiclePartitionTransfers) {
+			handler.onVehicleEntersPartition(vehicle);
+		}
+	}
+
+	@Override
+	public void notifyVehicleLeavesPartition(DistributedMobsimVehicle vehicle, int toPartition) {
+		for (var handler : notifyVehiclePartitionTransfers) {
+			handler.onVehicleLeavesPartition(vehicle, toPartition);
+		}
+	}
+
+	@Override
 	public void rescheduleActivityEnd(MobsimAgent agent) {
 		for (ActivityHandler activityHandler : activityHandlers) {
 			Gbl.assertNotNull(activityHandler);
@@ -237,7 +285,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	}
 
 	@Override
-	public IntSet waitForOtherRanks(double time) {
+	public IntSet waitForOtherParts(double time) {
 		return partition.getNeighbors();
 	}
 
@@ -248,7 +296,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void insertAgentIntoMobsim(MobsimAgent agent) {
-		backpackDataCollector.registerAgent(agent);
 		arrangeNextAgentState(agent);
 	}
 

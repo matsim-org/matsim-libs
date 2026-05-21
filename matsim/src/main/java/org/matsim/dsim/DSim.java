@@ -20,6 +20,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.MobsimListenerManager;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.simulation.SimProvider;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
@@ -40,25 +41,15 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.inject.Key.get;
 
-
 public final class DSim implements Mobsim {
 
 	private static final Logger log = LogManager.getLogger(DSim.class);
 
 	private final Injector injector;
-	private final Communicator comm;
-	private final MessageBroker broker;
-	private final Set<LPProvider> lps;
-	private final MobsimTimer timer;
 
 	@Inject
 	public DSim(Injector injector) {
 		this.injector = injector;
-		this.comm = injector.getInstance(Communicator.class);
-		this.broker = injector.getInstance(MessageBroker.class);
-		this.lps = injector.getInstance(get(new TypeLiteral<>() {
-		}));
-		this.timer = new MobsimTimer();
 	}
 
 	private static double round(double v) {
@@ -71,10 +62,15 @@ public final class DSim implements Mobsim {
 	@Override
 	public void run() {
 
+		Communicator comm = injector.getInstance(Communicator.class);
+		MessageBroker broker = injector.getInstance(MessageBroker.class);
+		Set<LPProvider> lps = injector.getInstance(get(new TypeLiteral<>() {
+		}));
 		ComputeNode computeNode = injector.getInstance(ComputeNode.class);
 		Topology topology = injector.getInstance(Topology.class);
 		Config config = injector.getInstance(Config.class);
 		DSimConfigGroup dsimConfig = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
+		var timer = new MobsimTimer();
 
 		LPExecutor executor = injector.getInstance(LPExecutor.class);
 		DistributedEventsManager manager = (DistributedEventsManager) injector.getInstance(EventsManager.class);
@@ -126,8 +122,7 @@ public final class DSim implements Mobsim {
 
 		Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
 
-		log.info("Starting simulation");
-
+		log.info("#{} Simulation initialized", comm.getRank());
 		listenerManager.fireQueueSimulationInitializedEvent();
 
 		long start = System.currentTimeMillis();
@@ -138,6 +133,8 @@ public final class DSim implements Mobsim {
 		long afterListener = 0;
 
 		double time = timer.getTimeOfDay();
+		log.info("#{} Starting Simulation at: {}", comm.getRank(), Time.writeTime(time));
+
 		while (timer.getTimeOfDay() < dsimConfig.getEndTime()) {
 
 			long t = System.nanoTime();
@@ -159,7 +156,7 @@ public final class DSim implements Mobsim {
 			try {
 				executor.doSimStep(time);
 			} catch (Throwable e) {
-				log.error("Error in simulation step: %.2fs".formatted(time), e);
+				log.error(() -> "Error in simulation step: %.2fs".formatted(timer.getTimeOfDay()), e);
 				throw e;
 			}
 
@@ -236,7 +233,7 @@ public final class DSim implements Mobsim {
 	}
 
 	private void writeRuntimes(ComputeNode node, Histogram simulation, Histogram broker, Histogram sizes, LPExecutor executor,
-							   long overallRuntime, long beforeListener, long afterListener, long syncStep) {
+		long overallRuntime, long beforeListener, long afterListener, long syncStep) {
 
 		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
 

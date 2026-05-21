@@ -10,6 +10,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
@@ -17,6 +19,7 @@ import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
+import java.net.URL;
 import java.nio.file.Path;
 
 /**
@@ -30,7 +33,6 @@ public class BasicCommercialDemandGenerationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	@Disabled
 	void testMainRun() {
 		try {
 			Path output = Path.of(utils.getOutputDirectory());
@@ -39,7 +41,11 @@ public class BasicCommercialDemandGenerationTest {
 			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
-			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
+
+			URL url = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
+			URL result = IOUtils.extendUrl( url, "grid9x9.xml" );
+			String network = result.toString();
+
 			String shapeCategory = "Ortsteil";
 			new BasicCommercialDemandGeneration().execute(
 				"--output", output.toString(),
@@ -91,7 +97,29 @@ public class BasicCommercialDemandGenerationTest {
 		for (Carrier thisCarrier : carriersSolution.getCarriers().values()) {
 			Assertions.assertTrue(carriersToCompare.getCarriers().containsKey(thisCarrier.getId()));
 			Carrier inputCarrier = carriersToCompare.getCarriers().get(thisCarrier.getId());
-			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScore(), thisCarrier.getSelectedPlan().getScore());
+			inputCarrier.getShipments().values().forEach(shipment ->
+					Assertions.assertTrue(thisCarrier.getShipments().containsKey(shipment.getId()))
+			);
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getPickupLinkId(), (shipment.getPickupLinkId())));
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getDeliveryLinkId(), (shipment.getDeliveryLinkId())));
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getCapacityDemand(), (shipment.getCapacityDemand())));
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getPickupDuration(), (shipment.getPickupDuration())));
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getPickupStartingTimeWindow(), (shipment.getPickupStartingTimeWindow())));
+			inputCarrier.getShipments().values().forEach(shipment ->
+				Assertions.assertEquals(thisCarrier.getShipments().get(shipment.getId()).getDeliveryStartingTimeWindow(), (shipment.getDeliveryStartingTimeWindow())));
+			inputCarrier.getCarrierCapabilities().getCarrierVehicles().values().forEach(carrierVehicle ->
+				Assertions.assertTrue(thisCarrier.getCarrierCapabilities().getCarrierVehicles().containsKey(carrierVehicle.getId()))
+			);
+			inputCarrier.getCarrierCapabilities().getCarrierVehicles().values().forEach(carrierVehicle ->
+				Assertions.assertEquals(thisCarrier.getCarrierCapabilities().getCarrierVehicles().get(carrierVehicle.getId()).getLinkId(), (carrierVehicle.getLinkId())));
+			Assertions.assertEquals(CarriersUtils.getJspritScore(inputCarrier.getSelectedPlan()), CarriersUtils.getJspritScore(thisCarrier.getSelectedPlan()));
+
+			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScore(), thisCarrier.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScheduledTours().size(), thisCarrier.getSelectedPlan().getScheduledTours().size());
 		}
 
@@ -112,7 +140,11 @@ public class BasicCommercialDemandGenerationTest {
 			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV_parcels.csv");
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
-			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
+
+			URL url = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
+			URL result = IOUtils.extendUrl( url, "grid9x9.xml" );
+			String network = result.toString();
+
 			String shapeCategory = "Ortsteil";
 			new BasicCommercialDemandGeneration(demandGenerationSpecificationForParcelDelivery).execute(
 				"--output", output.toString(),

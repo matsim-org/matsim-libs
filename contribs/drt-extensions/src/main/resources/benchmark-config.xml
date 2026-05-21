@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<!-- DRT Scalability Benchmark Configuration -->
+	<!--
+	Usage:
+	  java -cp matsim.jar org.matsim.contrib.drt.extension.benchmark.RunScalabilityBenchmark benchmark-config.xml
+	-->
+
+	<module name="drtBenchmark">
+
+		<!-- ================================================================== -->
+		<!-- Agent & Vehicle Configuration                                      -->
+		<!-- ================================================================== -->
+
+		<!-- Comma-separated list of agent counts to test -->
+		<param name="agentCounts" value="50000"/>
+
+		<!-- Number of vehicles per 100 agents (with 50000 agents and value 1 = 500 vehicles) -->
+		<param name="vehiclesPerHundredAgents" value="1"/>
+
+		<!-- ================================================================== -->
+		<!-- Request Inserter & Insertion Search Configuration                  -->
+		<!-- ================================================================== -->
+
+		<!-- Comma-separated list of request inserter types to benchmark.
+		     Options:
+		       - Default:  Sequential processing (DefaultUnplannedRequestInserter)
+		       - Parallel: Partitioned parallel processing (ParallelUnplannedRequestInserter)
+		     Note: Partitioner/collection period settings only apply to 'Parallel'.
+		-->
+		<param name="requestInserterTypes" value="Default,Parallel"/>
+
+		<!-- Comma-separated list of insertion search strategies to benchmark.
+		     Options:
+		       - Selective:         Fast heuristic (single best insertion per request)
+		       - Extensive:         Evaluates all feasible insertions (higher quality, slower)
+		       - RepeatedSelective: Retries selective search multiple times
+		     Each search strategy is combined with each inserter type (cross-product).
+		-->
+		<param name="insertionSearchStrategies" value="RepeatedSelective, Extensive"/>
+
+		<!-- ================================================================== -->
+		<!-- Partitioner Configuration (only for Parallel inserter type)        -->
+		<!-- ================================================================== -->
+
+		<!-- Vehicle partitioners to test (comma-separated)
+		     Options:
+		       - Replicating (or Repl): Each partition gets all vehicles (best quality, highest memory)
+		       - RoundRobin (or RR): Vehicles distributed round-robin across partitions
+		       - ShiftingRoundRobin (or ShiftRR): Like RR but shifts assignment each iteration
+		-->
+		<param name="vehiclePartitioners" value="ShiftingRoundRobin"/>
+
+		<!-- Request partitioners to test (comma-separated)
+		     Options:
+		       - RoundRobin (or RR): Requests distributed round-robin
+		       - LoadAware: Distributes based on partition load (slightly slower, often better quality)
+		-->
+		<param name="requestPartitioners" value="LoadAware"/>
+
+		<!-- ================================================================== -->
+		<!-- Parallel Inserter Settings (only for Parallel inserter type)       -->
+		<!-- ================================================================== -->
+
+		<!-- Collection periods in seconds (comma-separated)
+		     How long to collect requests before processing them in batch -->
+		<param name="collectionPeriods" value="90"/>
+
+		<!-- Number of parallel partitions (typically = number of CPU cores) -->
+		<param name="maxPartitions" value="8"/>
+
+		<!-- Max iterations for parallel inserter optimization -->
+		<param name="maxIterations" value="3"/>
+
+		<!-- DVRP travel-time matrix cell size in meters (resolution of square-grid zones).
+		     Larger values => fewer zones, less memory/preprocessing; smaller values => higher spatial precision.
+		     Typical range for large real networks: 500..2000 -->
+		<param name="matrixCellSize" value="4000"/>
+
+		<!-- Log detailed performance statistics -->
+		<param name="logPerformanceStats" value="true"/>
+
+		<!-- ================================================================== -->
+		<!-- Benchmark Settings                                                 -->
+		<!-- ================================================================== -->
+
+		<!-- Number of warmup runs (results discarded, JIT warmup) -->
+		<param name="warmupRuns" value="0"/>
+
+		<!-- Number of measured runs (results averaged) -->
+		<param name="measuredRuns" value="1"/>
+
+		<!-- ================================================================== -->
+		<!-- Output Settings                                                    -->
+		<!-- ================================================================== -->
+
+		<!-- Output directory (timestamp subfolder will be created) -->
+		<param name="outputDirectory" value="output/benchmark"/>
+
+		<!-- Enable spatial request-fleet filter (reduces search space) -->
+		<param name="useSpatialFilter" value="true"/>
+
+		<!-- Comma-separated list of detour path calculator types to benchmark.
+		     Options:
+		       - SpeedyALT: Default Dijkstra-based one-to-many router (good for small/medium networks)
+		       - CH:        Contraction Hierarchies (dramatically faster on large networks, one-time build cost)
+		     Each calculator type is combined with each search strategy and inserter type (cross-product).
+		-->
+		<param name="detourPathCalculatorTypes" value="SpeedyALT,CH"/>
+
+		<!-- Optional: URL or local file path to an external MATSim network (xml or xml.gz).
+		     If empty, a synthetic 100x100 grid network is generated automatically.
+		     Example (Berlin v7.0 – ~88k nodes):
+		     value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v7.0/input/berlin-v7.0-network.xml.gz"
+		     Example (local file):
+		     value="/path/to/network.xml.gz"
+		-->
+		<param name="networkUrl" value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v7.0/input/berlin-v7.0-network.xml.gz"/>
+
+	</module>
+</config>
+

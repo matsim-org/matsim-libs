@@ -171,7 +171,7 @@ public final class TravelTimeCalculator implements AggregatingEventHandler<Trave
 			}
 		}
 
-		log.info("Send TravelTimeSyncMessage {} with {} entries", msg.getType(), msg.travelTimes.size());
+		log.trace(() -> "Send TravelTimeSyncMessage " + msg.getType() + " with " + msg.travelTimes.size() + " entries");
 		return msg;
 	}
 

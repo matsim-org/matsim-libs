@@ -42,6 +42,8 @@ public final class AccidentsModule extends AbstractModule {
 			this.addEventHandlerBinding().to(AnalysisEventHandler.class) ;
 
 			this.addControllerListenerBinding().to(AccidentControlerListener.class);
+
+			this.bind( AccidentCostComputation.class ).to( AccidentCostComputationBVWP.class );
 		}
 
 	}

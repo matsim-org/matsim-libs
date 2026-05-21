@@ -2,6 +2,7 @@ package org.matsim.dsim.simulation;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.MobsimMessageCollector;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -23,7 +24,8 @@ public class DSimComponentsModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 
-		bind(SimStepMessaging.class).in(Singleton.class);
+		bind(PartitionTransfer.class).in(Singleton.class);
+		bind(MobsimMessageCollector.class).to(PartitionTransfer.class);
 		bind(AgentSourcesContainer.class).in(Singleton.class);
 
 		bind(TeleportationEngine.class).to(DistributedTeleportationEngine.class).in(Singleton.class);
@@ -31,7 +33,7 @@ public class DSimComponentsModule extends AbstractQSimModule {
 
 		bind(PopulationAgentSource.class).asEagerSingleton();
 		addQSimComponentBinding(PopulationModule.COMPONENT_NAME).to(PopulationAgentSource.class);
-		
+
 		if (getConfig().transit().isUseTransit()) {
 			bind(Wait2Link.class).to(DistributedPtEngine.class).in(Singleton.class);
 		} else {

@@ -73,6 +73,9 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 	private static final Logger log = LogManager.getLogger(PrepareForSim.class);
 
+	private static int walkWithNetworkRouteLogCount = 0;
+	private static final int WALK_WITH_NETWORK_ROUTE_LOG_MAX = 10;
+
 	private final GlobalConfigGroup globalConfigGroup;
 	private final Scenario scenario;
 	private final Network network;
@@ -179,6 +182,10 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		adaptOutdatedPlansForRoutingMode();
 
+		// (in principle, the above could be added as PersonPrepareForSimAlgorithm,
+		// see next.  However, what comes next is more like a hook for users and not central infrastructure,
+		// and in consequence having it as a separate call is also ok an maybe even better/safer.)
+
 		// Can be null if instantiated via constructor, which should only happen in tests
 		if (prepareForSimAlgorithms != null) {
 			// This does not nake use of multi-threading because it can not be assumed that these instances are thread-safe
@@ -258,7 +265,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				modeToVehicle.put(mode, vehicleId);
 			}
 
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, modeToVehicle);
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, modeToVehicle );
 		}
 	}
 
@@ -412,11 +419,17 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 						for (Leg leg : legs) {
 							// check before replaceOutdatedAccessEgressHelperModes
 							if (leg.getMode().equals(TransportMode.walk) && leg.getRoute() instanceof NetworkRoute) {
-								log.error(
-									"Found a walk leg with a NetworkRoute. This is the only allowed use case of having "
-										+ "non_network_walk as an access/egress mode. PrepareForSimImpl replaces "
-										+ "non_network_walk with walk, because access/egress to modes other than walk should "
-										+ "use the walk Router. If this causes any problem please report to gleich or kai -nov'19");
+								walkWithNetworkRouteLogCount++;
+								if (walkWithNetworkRouteLogCount <= WALK_WITH_NETWORK_ROUTE_LOG_MAX) {
+									log.error(
+										"Found a walk leg with a NetworkRoute. This is the only allowed use case of having "
+											+ "non_network_walk as an access/egress mode. PrepareForSimImpl replaces "
+											+ "non_network_walk with walk, because access/egress to modes other than walk should "
+											+ "use the walk Router. If this causes any problem please report to gleich or kai -nov'19");
+									if (walkWithNetworkRouteLogCount == WALK_WITH_NETWORK_ROUTE_LOG_MAX) {
+										log.error("Suppressing further 'walk leg with NetworkRoute' messages.");
+									}
+								}
 							}
 						}
 
