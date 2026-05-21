@@ -97,7 +97,7 @@ public class ScenarioComparisonDashboard implements Dashboard {
 				layout.row(mode, impactAnalysisTab)
 					.el(Table.class, (viz, data) -> {
 						viz.title = "Central Traffic / Physical Effects (" + mode.substring(0, 1).toUpperCase() + mode.substring(1) + ")";
-						viz.style = "topsheet";
+//						viz.style = "topsheet";
 						viz.dataset = data.compute(ScenarioComparisonAnalysis.class, "general_impact_comparison.csv",
 							"--input-comp-paths=" + String.join(",", this.comparisonScenarios.values()),
 							"--input-comp-names=" + String.join(",", this.comparisonScenarios.keySet()),
@@ -111,7 +111,7 @@ public class ScenarioComparisonDashboard implements Dashboard {
 
 					.el(Table.class, (viz, data) -> {
 						viz.title = "Change In Exhaust Emissions (" + mode.substring(0, 1).toUpperCase() + mode.substring(1) + ")";
-						viz.style = "topsheet";
+//						viz.style = "topsheet";
 						viz.dataset = data.compute(ScenarioComparisonAnalysis.class, "emissions_comparison.csv",
 							"--input-comp-paths=" + String.join(",", this.comparisonScenarios.values()),
 							"--input-comp-names=" + String.join(",", this.comparisonScenarios.keySet()),
@@ -171,6 +171,14 @@ public class ScenarioComparisonDashboard implements Dashboard {
 			viz.title = "Mode Split";
 //				viz.width = 2d;
 
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("sim").build(),
+				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"))
+					.aggregate(List.of("main_mode"), "share_total", Plotly.AggrFunc.SUM)
+					.mapping()
+					.x("main_mode")
+					.y("share_total")
+			);
+
 			for (Map.Entry<String, String> compScenario : this.comparisonScenarios.entrySet()) {
 				Path source = Path.of(compScenario.getValue() + "/analysis/population/mode_share.csv");
 				Path alias = source.getParent().resolve("mode_share_" + "scenarioComp_" + compScenario.getKey() + ".csv");
@@ -188,19 +196,23 @@ public class ScenarioComparisonDashboard implements Dashboard {
 				);
 			}
 
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("sim").build(),
-				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"))
-					.aggregate(List.of("main_mode"), "share_total", Plotly.AggrFunc.SUM)
-					.mapping()
-					.x("main_mode")
-					.y("share_total")
-			);
 		});
 
 		first.el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Trip distance distribution";
-			viz.colorRamp = ColorScheme.Viridis;
+//			viz.colorRamp = ColorScheme.Viridis;
+
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder().barMode(tech.tablesaw.plotly.components.Layout.BarMode.GROUP).build();
+
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+				.name("sim").build(),
+				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv")).constant("source", "sim")
+					.aggregate(List.of("dist_group"), "share_total", Plotly.AggrFunc.SUM)
+					.mapping()
+					.x("dist_group")
+					.y("share_total")
+			);
 
 			for (Map.Entry<String, String> compScenario : this.comparisonScenarios.entrySet())
 			{
@@ -218,16 +230,9 @@ public class ScenarioComparisonDashboard implements Dashboard {
 						.x("dist_group")
 						.y("share_total")
 				);
-				viz.multiIndex = Map.of("dist_group", "source");
+//				viz.multiIndex = Map.of("dist_group", "source");
 			}
 
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("sim").build(),
-				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv")).constant("source", "sim")
-					.aggregate(List.of("dist_group"), "share_total", Plotly.AggrFunc.SUM)
-					.mapping()
-					.x("dist_group")
-					.y("share_total")
-			);
 		});
 
 
@@ -235,6 +240,7 @@ public class ScenarioComparisonDashboard implements Dashboard {
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics";
 				viz.description = "by main mode, over whole trip (including access & egress)";
+				viz.enableFilter = true;
 				viz.dataset = data.compute(ScenarioComparisonAnalysis.class, "trip_stats_comparison.csv",
 					"--input-comp-paths=" + String.join(",", this.comparisonScenarios.values()),
 					"--input-comp-names=" + String.join(",", this.comparisonScenarios.keySet()),
@@ -245,6 +251,7 @@ public class ScenarioComparisonDashboard implements Dashboard {
 					.mapToObj(i -> i == 0 ? "left" : "right")
 					.toArray(String[]::new);
 				viz.showAllRows = true;
+//				viz.style = "topsheet";
 			});
 
 		createModeDistanceBarPlot(layout, tab);
@@ -272,6 +279,12 @@ public class ScenarioComparisonDashboard implements Dashboard {
 
 				Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_users.csv"));
 
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("sim").build(), ds.mapping()
+					.x("main_mode")
+					.y("user")
+
+				);
+
 				for   (Map.Entry<String, String> compScenario : this.comparisonScenarios.entrySet())
 				{
 
@@ -290,11 +303,6 @@ public class ScenarioComparisonDashboard implements Dashboard {
 					);
 				}
 
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("sim").build(), ds.mapping()
-					.x("main_mode")
-					.y("user")
-
-				);
 			});
 
 		createDistancePlot(layout, tab);
@@ -326,6 +334,13 @@ public class ScenarioComparisonDashboard implements Dashboard {
 				.pivot(List.of("dist"), "main_mode", "share_total")
 				.constant("source", "Sim");
 
+			viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).name("sim")
+				.showLegend(true)
+				.mode(ScatterTrace.Mode.LINE).build(), ds.mapping().name("main_mode")
+				.x("dist")
+				.y("share_total")
+			);
+
 				for (Map.Entry<String, String> compScenario : this.comparisonScenarios.entrySet()) {
 
 					Path source = Path.of(compScenario.getValue() + "/analysis/population/mode_share_distance_distribution_total.csv");
@@ -347,13 +362,6 @@ public class ScenarioComparisonDashboard implements Dashboard {
 						ref.mapping().name("main_mode").x("dist").y("share_total")
 					);
 				}
-
-			viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).name("sim")
-				.showLegend(true)
-				.mode(ScatterTrace.Mode.LINE).build(), ds.mapping().name("main_mode")
-				.x("dist")
-				.y("share_total")
-			);
 		});
 	}
 
@@ -376,6 +384,11 @@ public class ScenarioComparisonDashboard implements Dashboard {
 //				.pivot(List.of("dist_group"), "main_mode", "share")
 				.constant("source", "Sim");
 
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("sim")
+					.showLegend(true).build(),
+				ds.mapping().name("main_mode").x("dist_group").y("share_total")
+			);
+
 			for (Map.Entry<String, String> compScenario : this.comparisonScenarios.entrySet()) {
 
 				Path source = Path.of(compScenario.getValue() + "/analysis/population/mode_share_per_dist.csv");
@@ -394,11 +407,6 @@ public class ScenarioComparisonDashboard implements Dashboard {
 					ref.mapping().name("main_mode").x("dist_group").y("share_total")
 				);
 			}
-
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("sim")
-				.showLegend(true).build(),
-				ds.mapping().name("main_mode").x("dist_group").y("share_total")
-			);
 		});
 	}
 }

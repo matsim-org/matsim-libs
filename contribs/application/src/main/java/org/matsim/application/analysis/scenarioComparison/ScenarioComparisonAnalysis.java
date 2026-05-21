@@ -57,58 +57,78 @@ public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 		new ScenarioComparisonAnalysis().execute(args);
 	}
 
-	private static void JoinAndWriteCsv(Table simTable, List<Table> compTables, String[] constructorCompNames, String outputFileName, String[] columnJoiner, boolean allowDuplicateCols) {
-		Table result = null;
+	private static void JoinAndWriteCsv(Table simTable, List<Table> compTables, String[] compNames, String outputFileName, String[] columnJoiners, boolean allowDuplicateCols, boolean addModeColumn) {
 
-			int i = 0;
-			for (Table t : compTables) {
-				for (String mode : new HashSet<>(t.columnNames())) {
-						if (!Arrays.asList(columnJoiner).contains(mode)) {
-							t.column(mode).setName(mode + "_" + constructorCompNames[i]);
-					}
+		int i = 0;
+		for (Table t : compTables) {
+			for (String col : new HashSet<>(t.columnNames())) {
+				if (!Arrays.asList(columnJoiners).contains(col)) {
+					t.column(col).setName(col + "_" + compNames[i]);
 				}
-				i++;
 			}
+			i++;
+		}
 
-			result = compTables.stream()
-				.reduce(simTable, (left, right) ->
-					new DataFrameJoiner(left, columnJoiner)
-						.type(JoinType.LEFT_OUTER)
-						.with(right)
-						.allowDuplicateColumnNames(allowDuplicateCols)
-						.join()
-				);
+		Table wide = compTables.stream()
+			.reduce(simTable, (left, right) ->
+				new DataFrameJoiner(left, columnJoiners)
+					.type(JoinType.LEFT_OUTER)
+					.with(right)
+					.allowDuplicateColumnNames(allowDuplicateCols)
+					.join()
+			);
 
-			List<String> sortedColumns = result.columnNames().stream()
-				.sorted()
-				.collect(Collectors.toList());
+		List<String> modeCols = simTable.columnNames().stream()
+			.filter(c -> !Arrays.asList(columnJoiners).contains(c))
+			.collect(Collectors.toList());
 
-			result = result.reorderColumns(sortedColumns.toArray(new String[0]));
+		Map<String, StringColumn> columnJoinersOut = new LinkedHashMap<>();
+		for (String jc : columnJoiners) {
+			columnJoinersOut.put(jc, StringColumn.create(jc));
+		}
+		StringColumn modeColOut = StringColumn.create("mode");
+		StringColumn simColOut = StringColumn.create("sim");
+		Map<String, StringColumn> compColsOut = new LinkedHashMap<>();
+		for (String name : compNames) {
+			compColsOut.put(name, StringColumn.create(name));
+		}
 
-		for (Column<?> col : new ArrayList<>(result.columns())) {
-			if (col instanceof DoubleColumn || col instanceof FloatColumn) {
-				StringColumn formatted = StringColumn.create(col.name());
-				for (int j = 0; j < col.size(); j++) {
-					if (col.isMissing(j)) {
-						formatted.append("");
-					} else {
-						// hacky way to make all numbers have same amount if digits for alignment in table
-						double val = ((NumericColumn<?>) col).getDouble(j);
-						formatted.append("\u2060" + String.format("%.2f", val));
-					}
-					log.info("j={}, col.size()={}, formatted.size()={}", j, col.size(), formatted.size());
+		for (String mode : modeCols) {
+			for (int row = 0; row < wide.rowCount(); row++) {
+				for (String jc : columnJoiners) {
+					columnJoinersOut.get(jc).append(wide.stringColumn(jc).get(row));
 				}
-				log.info("Final: col.size()={}, formatted.size()={}", col.size(), formatted.size());
-				result.replaceColumn(col.name(), formatted);
+				modeColOut.append(mode);
+
+				double simVal = ((NumericColumn<?>) wide.column(mode)).getDouble(row);
+				simColOut.append(String.format("%.2f", simVal));
+
+				for (String name : compNames) {
+					String compColName = mode + "_" + name;
+					if (wide.columnNames().contains(compColName) && !wide.column(compColName).isMissing(row)) {
+						double compVal = ((NumericColumn<?>) wide.column(compColName)).getDouble(row);
+						double pct = simVal == 0 ? 0 : ((compVal - simVal) / simVal) * 100;
+						String sign = pct >= 0 ? "+" : "";
+						compColsOut.get(name).append(String.format("%.2f (%s%.1f %%)", compVal, sign, pct));
+					} else {
+						compColsOut.get(name).append("");
+					}
+				}
 			}
 		}
 
-		result = result.reorderColumns(sortedColumns.toArray(new String[0]));
+		Table result = Table.create();
+		columnJoinersOut.values().forEach(result::addColumns);
+		if (addModeColumn)
+		{
+			result.addColumns(modeColOut, simColOut);
+		} else {
+			result.addColumns(simColOut);
+		}
 
+		compColsOut.values().forEach(result::addColumns);
 		result.write().csv(output.getPath(outputFileName).toString());
-
 	}
-
 	@Override
 	public Integer call() throws Exception {
 
@@ -208,7 +228,7 @@ public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 				}
 			}
 
-			JoinAndWriteCsv(simDataTable, compDataTables, compNames, "trip_stats_comparison.csv", new String[]{"Info"},true);
+			JoinAndWriteCsv(simDataTable, compDataTables, compNames, "trip_stats_comparison.csv", new String[]{"Info"},true, true);
 		}
 
 		if (compPopTripFiles.isEmpty() || !simPopTripsFile.exists()) {
@@ -236,7 +256,7 @@ public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 				}
 			}
 
-			JoinAndWriteCsv(simDataTable, compDataTables, compNames,"population_trip_stats_comparison.csv", new String[]{"Group"},true);
+			JoinAndWriteCsv(simDataTable, compDataTables, compNames,"population_trip_stats_comparison.csv", new String[]{"Group"},true, false);
 		}
 
 		if (compEmissionsFiles.isEmpty() || !simEmissionsFile.exists()) {
@@ -264,7 +284,7 @@ public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 				}
 			}
 
-			JoinAndWriteCsv(simDataTable, compDataTables, compNames,"emissions_comparison.csv", new String[]{"Description", "Unit"},true);
+			JoinAndWriteCsv(simDataTable, compDataTables, compNames,"emissions_comparison.csv", new String[]{"Description", "Unit"},true, false);
 		}
 
 		if (compGenImpactFiles.isEmpty() || !simGenImpactFile.exists()) {
@@ -292,7 +312,7 @@ public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 				}
 			}
 
-			JoinAndWriteCsv(simDataTable, compDataTables, compNames,"general_impact_comparison.csv", new String[]{"Description","Unit"},true);
+			JoinAndWriteCsv(simDataTable, compDataTables, compNames,"general_impact_comparison.csv", new String[]{"Description","Unit"},true, false);
 		}
 
 		return 0;
