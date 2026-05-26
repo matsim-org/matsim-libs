@@ -156,6 +156,7 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 
+
 		Id<Person> personId = vehicleToPersonMap.get(event.getVehicleId());
 		if (personId == null) {
 			log.warn("personId null for vehicle {}", event.getVehicleId());

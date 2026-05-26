@@ -20,6 +20,7 @@
 package org.matsim.simwrapper.DbViewer;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -38,6 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 import java.sql.SQLException;
+import java.util.*;
 
 /**
  * This class contains a main method to call the
@@ -46,12 +48,16 @@ import java.sql.SQLException;
  * @author brendan-lawton
  */
 public class RunEventsHandlingExample {
+
+
+
 	public static void main(String[] args) throws SQLException {
+
 
 		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
 		config.controller().setLastIteration(0);
 		config.controller().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists // ← add this
+			OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists // ← add this
 		);
 
 		config.controller().setOutputDirectory("/home/brendan/git/matsim-libs/contribs/simwrapper/test/output/org/matsim/simwrapper/dashboard/SelectLinkAnalysis/");
@@ -66,7 +72,41 @@ public class RunEventsHandlingExample {
 			}
 		});
 
-		controler.run();
+		Map<String, Object> attributes = scenario.getPopulation()
+			.getPersons().values().iterator().next()
+			.getAttributes().getAsMap();
+
+		String ddl = generateSchema("persons", attributes);
+		System.out.println(ddl);
+
+
+			controler.run();
+		}
+
+	private static String toSqlType(Object value) {
+		if (value instanceof Integer)        return "INT";
+		if (value instanceof Long)           return "BIGINT";
+		if (value instanceof Double
+			|| value instanceof Float)          return "DOUBLE";
+		if (value instanceof Boolean)        return "BOOLEAN";
+		return "VARCHAR(255)"; // fallback for String and unknowns
+	}
+
+	public static String generateSchema(String tableName, Map<String, Object> attributes) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("CREATE TABLE ").append(tableName).append(" (\n");
+		sql.append("   agent_id   TEXT,\n"); // optional surrogate key
+
+		List<String> columns = new ArrayList<>();
+		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+			String colName = entry.getKey().toLowerCase().replace(" ", "_");
+			String sqlType = toSqlType(entry.getValue());
+			columns.add("    " + colName + " " + sqlType);
+		}
+
+		sql.append(String.join(",\n", columns));
+		sql.append("\n);");
+		return sql.toString();
 	}
 
 }
