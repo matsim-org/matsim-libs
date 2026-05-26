@@ -425,18 +425,20 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				scoringParameters.addModeParams(new ScoringConfigGroup.ModeParams("walk"));
 			});
 			config.scoring().setExplainScores(true);
-			ScoringConfigGroup.ScoringParameterSet scoringParameters = config.scoring().getOrCreateScoringParameters(ScoringConfigGroup.DEFAULT_SUBPOPULATION);
-			scoringParameters.setPerforming_utils_hr(32.);
-			scoringParameters.setMarginalUtlOfWaitingPt_utils_hr(0.);
-						modes.forEach(mode -> {
-				ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
-				scoringParameters.addModeParams(thisModeParams);
-			});
+			config.scoring().setScoringParametersAsDefaultSubpopulation(subpopulations.stream().findFirst().orElseThrow());
+
 			Set<String> qsimModes = new HashSet<>(config.qsim().getMainModes());
 			config.qsim().setMainModes(Sets.union(qsimModes, modes));
-
+			qsimModes.forEach(mode -> {
+				if (!config.scoring().getDefaultModeParams().containsKey(mode))
+					config.scoring().getDefaultModeParams().put(mode, new ScoringConfigGroup.ModeParams(mode));
+			});
 			Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
 			config.routing().setNetworkModes(Sets.union(networkModes, modes));
+			networkModes.forEach(mode -> {
+				if (!config.scoring().getDefaultModeParams().containsKey(mode))
+					config.scoring().getDefaultModeParams().put(mode, new ScoringConfigGroup.ModeParams(mode));
+			});
 
 			SimWrapper sw = SimWrapper.create(config);
 			sw.getConfigGroup().defaultParams().setShp(null);
