@@ -15,6 +15,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.testcases.utils.DistributedExecution;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.io.IOException;
@@ -24,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -62,8 +62,8 @@ public class DSimIntegrationTest {
 
 	@Test
 	@Order(2)
-	@DisabledOnGitHubWindowsCI
-	void runDistributed() throws IOException, InterruptedException, ExecutionException {
+	@org.matsim.testcases.DisabledOnGitHubWindowsCI
+	void runDistributed() throws IOException {
 
 		Path output = Path.of(utils.getOutputDirectory());
 		Path plansPath = output.resolve("..").resolve("runLocal/prerun").resolve("kelheim-mini.output_plans.xml").toAbsolutePath();
@@ -72,25 +72,18 @@ public class DSimIntegrationTest {
 		// start three instances each containing one partition
 		var size = 3;
 		var comms = LocalCommunicator.create(size);
-		try (var pool = Executors.newFixedThreadPool(size)) {
-			var futures = comms.stream()
-				.map(comm -> pool.submit(() -> {
-					Config config = createConfig();
-					config.plans().setInputFile(plansPath.toString());
-					DistributedController c = new DistributedController(comm, config, 2);
-					c.run();
-					try {
-						comm.close();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}))
-				.toList();
 
-			for (var f : futures) {
-				f.get();
+		DistributedExecution.execute(comms, 600, comm -> {
+			Config config = createConfig();
+			config.plans().setInputFile(plansPath.toString());
+			DistributedController c = new DistributedController(comm, config, 2);
+			c.run();
+			try {
+				comm.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-		}
+		});
 
 		Path distOutput = output.resolve("kelheim-mini.output_events.xml");
 		Path localOutput = output.resolve("..").resolve("runLocal/kelheim-mini.output_events.xml").toAbsolutePath();

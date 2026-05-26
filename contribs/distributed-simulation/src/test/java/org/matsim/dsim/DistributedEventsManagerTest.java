@@ -269,7 +269,7 @@ class DistributedEventsManagerTest {
 		assertEquals(2, testEventHandler.counter.get());
 		assertEquals(3, basicEventHandler.counter.get());
 	}
-	
+
 	@Test
 	public void globalHandlerReceivesRemoteEvent() throws Exception {
 		var communicators = LocalCommunicator.create(2);

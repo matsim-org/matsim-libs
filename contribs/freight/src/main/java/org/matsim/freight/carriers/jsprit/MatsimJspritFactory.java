@@ -686,18 +686,53 @@ public final class MatsimJspritFactory {
 		} else {
 			log.info("Use a VehicleRoutingAlgorithm out of the box.");
 			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
-				case noDistanceConstraint -> algorithm = Jsprit.Builder.newInstance(problem).buildAlgorithm();
+				//by default of Jsprit the fixed costs are not considered in the algorithm. Adding this property takes this into account.
+				case noDistanceConstraint -> algorithm = Jsprit.Builder.newInstance(problem).setProperty(Jsprit.Parameter.FIXED_COST_PARAM, "0.5").buildAlgorithm();
 				case basedOnEnergyConsumption -> {
 					log.info("Use the distanceConstraint based on energy consumption.");
 					StateManager stateManager = new StateManager(problem);
 					stateManager.addStateUpdater(new DistanceUpdater(stateManager.createStateId("distance"), stateManager, netBasedCosts));
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts), ConstraintManager.Priority.CRITICAL);
-					algorithm = Jsprit.Builder.newInstance(problem).setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
+					//by default of Jsprit the fixed costs are not considered in the algorithm. Adding this property takes this into account.
+					algorithm = Jsprit.Builder.newInstance(problem).setProperty(Jsprit.Parameter.FIXED_COST_PARAM, "0.5").setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
 				}
 				default -> throw new IllegalStateException("Unexpected value: " + freightConfig.getUseDistanceConstraintForTourPlanning());
 			}
 		}
 		return algorithm;
 	}
+// ### This class could be an option to get both absolute and relative fixed costs into the algorithm. However, it is currently not used since it is not clear how to set the weight parameter and what the influence of this parameter is. Ricardo April'26
+//	private static VehicleRoutingAlgorithm createFixedCostAwareAlgorithm(VehicleRoutingProblem problem, StateManager stateManager, ConstraintManager constraintManager) {
+//		// Weight parameter - determines importance of fixed costs vs variable costs
+//		// 0.0 = fixed costs ignored, 1.0 = good starting point
+//		double weightOfFixedCosts = 0.5;
+//
+//		// Create your own StateManager and ConstraintManager
+//		if (stateManager == null)
+//			stateManager = new StateManager(problem);
+//		if (constraintManager == null)
+//			constraintManager = new ConstraintManager(problem, stateManager);
+//
+//		// Create both fixed cost constraints
+//		IncreasingAbsoluteFixedCosts absoluteFixedCosts = new IncreasingAbsoluteFixedCosts(problem.getJobs().size());
+//		absoluteFixedCosts.setWeightOfFixCost(weightOfFixedCosts);
+//
+//		DecreasingRelativeFixedCosts relativeFixedCosts = new DecreasingRelativeFixedCosts(stateManager, problem.getJobs().size());
+//		relativeFixedCosts.setWeightOfFixCost(weightOfFixedCosts);
+//
+//		// Add both as soft route constraints
+//		constraintManager.addConstraint(absoluteFixedCosts);
+//		constraintManager.addConstraint(relativeFixedCosts);
+//
+//		// Build algorithm with your managers
+//		VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem).setStateAndConstraintManager(stateManager,
+//			constraintManager).buildAlgorithm();
+//
+//		// Register both as listeners (required for solution completeness ratio updates)
+//		algorithm.addListener(absoluteFixedCosts);
+//		algorithm.addListener(relativeFixedCosts);
+//
+//		return algorithm;
+//	}
 }

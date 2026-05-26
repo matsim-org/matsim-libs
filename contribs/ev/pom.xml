@@ -9,6 +9,25 @@
 	<artifactId>ev</artifactId>
 	<name>ev</name>
 
+	<properties>
+		<!-- Required by Aeron (via MessageBroker) when running DSim integration tests. -->
+		<test.jvm.aeron>
+			--add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+		</test.jvm.aeron>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>${test.jvm.aeron} ${argLine}</argLine>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -83,6 +102,23 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- DSim integration tests need Fory serialization at runtime (used by
+		     DistributedContext / SerializationProvider in the core matsim jar). -->
+		<dependency>
+			<groupId>org.apache.fory</groupId>
+			<artifactId>fory-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.fory</groupId>
+			<artifactId>fory-format</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

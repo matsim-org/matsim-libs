@@ -10,6 +10,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,14 +18,17 @@ import java.util.Optional;
  * This class calculates the fare for a public transport trip based on the fare zone the origin and destination are in.
  */
 public class FareZoneBasedPtFareCalculator implements PtFareCalculator {
-	private final ShpOptions shp;
+	private final List<SimpleFeature> features;
 	private final String transactionPartner;
 	private final Map<Coord, Optional<SimpleFeature>> zoneByCoordCache = new HashMap<>();
+	private final String shapefile;
 
 	public static final String FARE = "fare";
 
 	public FareZoneBasedPtFareCalculator(FareZoneBasedPtFareParams params, URL context) {
-		this.shp = new ShpOptions(IOUtils.extendUrl(context, params.getFareZoneShp()).toString(), null, null);
+		ShpOptions shpOptions = new ShpOptions(IOUtils.extendUrl(context, params.getFareZoneShp()).toString(), null, null);
+		this.features = shpOptions.readFeatures();
+		this.shapefile = shpOptions.getShapeFile();
 		transactionPartner = params.getTransactionPartner();
 	}
 
@@ -43,12 +47,12 @@ public class FareZoneBasedPtFareCalculator implements PtFareCalculator {
 		}
 
 		Double fare = (Double) departureZone.get().getAttribute(FARE);
-		Verify.verifyNotNull(fare, "Fare zone without attribute " + FARE + " in " + shp.getShapeFile() +
+		Verify.verifyNotNull(fare, "Fare zone without attribute " + FARE + " in " + this.shapefile +
 			" found. Terminating.");
 		return Optional.of(new FareResult(fare, transactionPartner));
 	}
 
 	Optional<SimpleFeature> determineFareZone(Coord coord) {
-		return shp.readFeatures().stream().filter(f -> MGC.coord2Point(coord).within((Geometry) f.getDefaultGeometry())).findFirst();
+		return features.stream().filter(f -> MGC.coord2Point(coord).within((Geometry) f.getDefaultGeometry())).findFirst();
 	}
 }

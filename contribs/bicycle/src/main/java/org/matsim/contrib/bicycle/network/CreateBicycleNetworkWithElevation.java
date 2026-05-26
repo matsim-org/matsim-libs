@@ -12,15 +12,17 @@ import java.util.Set;
 
 public class CreateBicycleNetworkWithElevation {
 
-    private static final String outputCRS = "EPSG:25832"; //UTM-32
+	private static final String inputCRS = "EPSG:4326"; // WGS84 -- Update if needed, but usually OSM is in WGS84
+    private static final String outputCRS = "EPSG:XXXXX"; // Update accordingly
+	private static final String tiffFileCRS = "EPSG:XXXXX";	// Update accordingly
     private static final String inputOsmFile = "path/to/your/input/file.osm.pbf";
     private static final String inputTiffFile = "path/to/your/elevation/tiff-file.tif";
     private static final String outputFile = "path/to/your/output/network.xml.gz";
 
     public static void main(String[] args) {
 
-        var elevationParser = new ElevationDataParser(inputTiffFile, outputCRS);
-        var transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, outputCRS);
+        var elevationParser = new ElevationDataParser(inputTiffFile, outputCRS, tiffFileCRS);
+        var transformation = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
 
         var network = new OsmBicycleReader.Builder()
                 .setCoordinateTransformation(transformation)

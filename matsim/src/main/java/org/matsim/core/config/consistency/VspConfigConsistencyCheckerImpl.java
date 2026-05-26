@@ -41,6 +41,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import static org.matsim.api.core.v01.TransportMode.*;
+
 /**
  * @author nagel
  *
@@ -188,11 +190,17 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			problem = true;
 		}
 		// added feb'26
-		if ( config.timeAllocationMutator().getLatestActivityEndTime() < 27. * 3600 ) {
-			System.out.flush();
-			log.log( lvl, "The latest activity end time of the timeAllocationMutator is too early.  It should be infinity, but since that setting is not possible, it should " +
-							  "minimally be the last time step of the qsim.");
+		if ( config.timeAllocationMutator().getLatestActivityEndTime() < Double.POSITIVE_INFINITY ) {
+			if ( config.qsim().getEndTime().isDefined() ) {
+				if ( config.timeAllocationMutator().getLatestActivityEndTime() < config.qsim().getEndTime().seconds() ) {
+					System.out.flush();
+					log.log( lvl, "The latest activity end time of the timeAllocationMutator is too early.  It should either be left at its (new) default of infinity, or " +
+									  "minimally be the last time step of the qsim.");
+					problem = true;
+				}
+			}
 		}
+
 		return problem;
 	}
 
@@ -283,7 +291,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if (config.qsim().getVehiclesSource() == VehiclesSource.defaultVehicle) {
 			log.log(lvl, "found qsim.vehiclesSource=defaultVehicle; vsp should use one of the other settings or talk to kai");
 		}
-		if (config.qsim().getLinkDynamics() != QSimConfigGroup.LinkDynamics.PassingQ && config.qsim().getMainModes().contains(TransportMode.bike)) {
+		if (config.qsim().getLinkDynamics() != QSimConfigGroup.LinkDynamics.PassingQ && config.qsim().getMainModes().contains( bike )) {
 			log.log(lvl, "found qsim.linkDynamics=" + config.qsim().getLinkDynamics() + "; vsp should use PassingQ or talk to kai");
 		}
 
@@ -401,7 +409,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				case relative:
 					break;
 				case uniform:
-				problem = true ;
+					problem = true ;
 					log.log(lvl, "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should use `relative'. ");
 					break;
 				default:
@@ -420,10 +428,10 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 
-		if (config.scoring().getModes().get(TransportMode.car) != null && config.scoring().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0) {
+		if (config.scoring().getModes().get( car ) != null && config.scoring().getModes().get( car ).getMonetaryDistanceRate() > 0) {
 			problem = true;
 		}
-		final ModeParams modeParamsPt = config.scoring().getModes().get(TransportMode.pt);
+		final ModeParams modeParamsPt = config.scoring().getModes().get( pt );
 		if (modeParamsPt != null && modeParamsPt.getMonetaryDistanceRate() > 0) {
 			problem = true;
 			System.out.flush();
@@ -455,17 +463,32 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added may'23
-		for (ModeParams params : config.scoring().getModes().values()) {
-			if (config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng() == CheckingOfMarginalUtilityOfTravellng.allZero) {
-				if (params.getMarginalUtilityOfTraveling() != 0. && !params.getMode().equals(TransportMode.ride) && !params.getMode().equals(TransportMode.bike)) {
-					log.log(lvl, "You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
-						+ ". VSP standard is to set this to zero.  Please document carefully why you are using a value different from zero, e.g. by showing distance distributions.");
+		for( ScoringConfigGroup.ScoringParameterSet scoringParams : config.scoring().getScoringParametersPerSubpopulation().values() ){
+			for( ModeParams params : scoringParams.getModes().values() ){
+				switch( config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng() ){
+					case allZeroExceptBikeAndRide -> {
+
+						if( params.getMode().equals( bike ) || params.getMode().equals( ride ) ){
+							// do nothing
+						} else{
+							if( params.getMarginalUtilityOfTraveling() != 0. ){
+								log.log( lvl,
+									"You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
+										+ ". Please document carefully why you are using a value different from zero, e.g. by showing distance distributions. " +
+										"Then use vspConfig#setCheckingOfMarginalUtilityOfTravellng=" + CheckingOfMarginalUtilityOfTravellng.allZeroExceptBikeAndRide.name()
+										+ " if possible, and " + CheckingOfMarginalUtilityOfTravellng.none.name() + " only if really necessary." );
+							}
+						}
+
+					}
+					case null, default -> {
+					}
 				}
-			}
-			if (params.getMode().equals(TransportMode.walk) && params.getConstant() != 0.) {
-				problem = true;
-				log.log(lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
-					+ ".  Values different from zero cause problems here because the ASC is also used for access/egress modes");
+				if( params.getMode().equals( walk ) && params.getConstant() != 0. ){
+					problem = true;
+					log.log( lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
+									  + ".  Values different from zero cause problems here because the ASC is also used for access/egress modes" );
+				}
 			}
 		}
 		// added jun'25:

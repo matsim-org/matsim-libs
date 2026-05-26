@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!-- This is a fairly minimal config file; see console or logfile output for more options. -->
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="plans100.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="./output/example" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+		<param name="eventsFileFormat" value="xml" />
+		<param name="snapshotFormat" value="otfvis" />
+<!-- 		Produces visualiser output in the following formats: -->
+<!-- 		"otfvis": matsim native visualizer format.  Two ways to use it: -->
+<!-- 		          () without hardware acceleration.  Simpler, but slower -->
+<!--                      () with hardware acceleration.  A bit more complicated to set up, but indispensable for larger matsim  -->
+<!--                         scenarios -->
+<!-- 		The visualiser output files are in <outputDirectory>/ITERS/it.0/... -->
+		
+	</module>
+
+
+	<module name="qsim">
+
+		<param name="snapshotperiod" value="00:01:00" />
+
+	</module>
+
+	<module name="planCalcScore" >
+
+		<parameterset type="scoringParameters">
+
+			<parameterset type="modeParams">
+				<param name="mode" value="car"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="pt"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="walk"/>
+			</parameterset>
+
+			<parameterset type="activityParams">
+				<param name="activityType"    value="h" /> <!-- home -->
+				<param name="typicalDuration" value="12:00:00" />
+			</parameterset>
+			<parameterset type="activityParams">
+				<param name="activityType"            value="w" /> <!-- work -->
+				<param name="typicalDuration" value="08:00:00" />
+			</parameterset>
+		</parameterset>
+	</module>
+
+
+</config>

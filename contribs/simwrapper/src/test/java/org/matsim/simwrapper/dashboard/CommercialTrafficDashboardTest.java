@@ -255,7 +255,10 @@ public class CommercialTrafficDashboardTest {
 		String center = coord.getX() + "," + coord.getY();
 		SimWrapper sw = SimWrapper.create(scenario.getConfig());
 		sw.getConfigGroup().defaultParams().setShp("shp/testRegions.shp");
-		sw.getConfigGroup().setSampleSize(0.1);
+
+//		sw.getConfigGroup().setSampleSize(0.1); // why?  flowCapFactor is 1.0
+		sw.getConfigGroup().setSampleSize( config.qsim().getFlowCapFactor() );
+
 		sw.getConfigGroup().defaultParams().setMapCenter(center);
 		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
 		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
