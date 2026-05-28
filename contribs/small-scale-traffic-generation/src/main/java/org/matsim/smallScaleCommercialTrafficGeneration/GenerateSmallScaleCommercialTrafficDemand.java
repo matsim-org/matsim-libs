@@ -446,8 +446,18 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			sw.getConfigGroup().setSampleSize(sample);
 			sw.addDashboard(new OverviewDashboard(Set.copyOf(config.qsim().getMainModes())));
 			sw.addDashboard(new CarrierDashboard("(*.)?output_carriers_solvedVRP.xml.gz"));
-			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
- 			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			String subpopSetterForDashboards;
+			if (usedSmallScaleCommercialTrafficType == SmallScaleCommercialTrafficType.completeSmallScaleCommercialTraffic)
+				subpopSetterForDashboards = "commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic";
+			else if (usedSmallScaleCommercialTrafficType == SmallScaleCommercialTrafficType.commercialPersonTraffic)
+				subpopSetterForDashboards = "commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service";
+			else if (usedSmallScaleCommercialTrafficType == SmallScaleCommercialTrafficType.goodsTraffic)
+				subpopSetterForDashboards = "smallScaleGoodsTraffic=goodsTraffic";
+			else
+				throw new RuntimeException("No traffic type selected.");
+
+			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis(subpopSetterForDashboards).setAnalysisArgs("--shp-filter", "none"));
+ 			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(subpopSetterForDashboards));
 			Controller controller = prepareController(scenario);
 
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
