@@ -26,15 +26,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 import picocli.CommandLine;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @CommandLine.Command(name = "extract-freight-trips", description = "Extract subset of freight trips from whole population", showDefaultValues = true)
 public class ExtractRelevantFreightTrips implements MATSimAppCommand {
@@ -128,7 +128,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
 		log.info("Filtering the links within the relevant area...");
 		// Identify links on the boundary
-		List<Id<Link>> linksOnTheBoundary = new ArrayList<>();
+		Set<Id<Link>> linksOnTheBoundary = new HashSet<>();
 		for (Link link : network.getLinks().values()) {
 			Coord fromCoord = sct.transform(link.getFromNode().getCoord());
 			Coord toCoord = sct.transform(link.getToNode().getCoord());
@@ -154,7 +154,6 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			}
 
 			Plan plan = person.getSelectedPlan();
-			Attributes attributes = person.getAttributes();
 			// By default, the plan of each freight person consist of only 3 elements:
 			// startAct, leg, endAct
 			Activity startActivity = (Activity) plan.getPlanElements().get(0);
@@ -171,39 +170,45 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			Activity act0 = populationFactory.createActivityFromCoord("freight_start", null);
 			Leg leg = populationFactory.createLeg(legMode);
 			Activity act1 = populationFactory.createActivityFromCoord("freight_end", null);
+			String geographicalTripTypeAttribute;
 
 			switch (geographicalTripType) {
 				case ALL -> {
-					createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, act1, endCoord, attributes);
-					createActivitiesForOutgoingTrip(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
-						startLink, endLink,
-						linksOnTheBoundary, act1, endCoord, attributes);
-					createActivitiesForIncomingTrips(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
-						startLink, endLink, linksOnTheBoundary, act1, endCoord, attributes);
-					createActivitiesForTransitTrip(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
-						startLink, endLink, linksOnTheBoundary, act1, endCoord, attributes);
+					geographicalTripTypeAttribute = createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, act1, endCoord);
+					if (geographicalTripTypeAttribute == null) {
+						geographicalTripTypeAttribute = createActivitiesForOutgoingTrip(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
+							startLink, endLink, linksOnTheBoundary, act1, endCoord);
+					}
+					if (geographicalTripTypeAttribute == null) {
+						geographicalTripTypeAttribute = createActivitiesForIncomingTrips(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
+							startLink, endLink, linksOnTheBoundary, act1, endCoord);
+					}
+					if (geographicalTripTypeAttribute == null) {
+						geographicalTripTypeAttribute = createActivitiesForTransitTrip(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
+							startLink, endLink, linksOnTheBoundary, act1, endCoord);
+					}
 				}
 				case INTERNAL ->
-					createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, act1, endCoord,
-						attributes);
+					geographicalTripTypeAttribute = createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, act1, endCoord);
 				case OUTGOING ->
-					createActivitiesForOutgoingTrip(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
-						startLink, endLink,	linksOnTheBoundary, act1, endCoord, attributes);
+					geographicalTripTypeAttribute = createActivitiesForOutgoingTrip(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
+						startLink, endLink,	linksOnTheBoundary, act1, endCoord);
 				case INCOMING ->
-					createActivitiesForIncomingTrips(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
-						startLink, endLink,	linksOnTheBoundary, act1, endCoord, attributes);
+					geographicalTripTypeAttribute = createActivitiesForIncomingTrips(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
+						startLink, endLink,	linksOnTheBoundary, act1, endCoord);
 				case TRANSIT ->
-					createActivitiesForTransitTrip(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
-						startLink, endLink,	linksOnTheBoundary, act1, endCoord, attributes);
+					geographicalTripTypeAttribute = createActivitiesForTransitTrip(originIsInside, destinationIsInside, act0, ct, startCoord, router, network,
+						startLink, endLink,	linksOnTheBoundary, act1, endCoord);
 				default -> throw new IllegalStateException("Unexpected value: " + geographicalTripType);
 			}
 
 			// Add new freight person to the output plans if trips is relevant
-			if (act0.getCoord() != null && act1.getCoord() != null && departureTime < 86400) {
+			if (geographicalTripTypeAttribute != null && act0.getCoord() != null && act1.getCoord() != null && departureTime < 86400) {
 				// The output start activity is newly created, so copy the original trip's start time.
 				act0.setEndTime(departureTime);
 				Person freightPerson = populationFactory.createPerson(Id.create("freight_" + generated, Person.class));
-				attributes.getAsMap().forEach(freightPerson.getAttributes()::putAttribute);
+				person.getAttributes().getAsMap().forEach(freightPerson.getAttributes()::putAttribute);
+				freightPerson.getAttributes().putAttribute(GEOGRAPHICAL_TRIP_TYPE, geographicalTripTypeAttribute);
 				freightPerson.getAttributes().putAttribute("subpopulation", subpopulation);
 				Plan freightPersonPlan = populationFactory.createPlan();
 				freightPersonPlan.addActivity(act0);
@@ -254,16 +259,16 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	/**
 	 * Create activities if the trip is a transit trips
 	 */
-	private void createActivitiesForTransitTrip(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
+	private String createActivitiesForTransitTrip(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
 												LeastCostPathCalculator router, Network network, Id<Link> startLink, Id<Link> endLink,
-												List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord, Attributes attributes) {
+												Set<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord) {
 		if (!originIsInside && !destinationIsInside) {
 			boolean vehicleIsInside = false;
 			LeastCostPathCalculator.Path route = router.calcLeastCostPath(
 					network.getLinks().get(startLink), network.getLinks().get(endLink), 0,
 					null, null);
 			if (route.links.isEmpty()) {
-				return;
+				return null;
 			}
 			if (cutOnBoundary) {
 				double travelTimeFromStartToBoundary = 0;
@@ -295,16 +300,17 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 					}
 				}
 			}
-			attributes.putAttribute(GEOGRAPHICAL_TRIP_TYPE, "transit");
+			return "transit";
 		}
+		return null;
 	}
 
 	/**
 	 * Create activities if the trip is an incoming trip
 	 */
-	private void createActivitiesForIncomingTrips(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
+	private String createActivitiesForIncomingTrips(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
 												  LeastCostPathCalculator router, Network network, Id<Link> startLink, Id<Link> endLink,
-												  List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord, Attributes attributes) {
+												  Set<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord) {
 		if (!originIsInside && destinationIsInside) {
 			if (cutOnBoundary) {
 				boolean isCoordSet = false;
@@ -312,7 +318,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 						network.getLinks().get(startLink), network.getLinks().get(endLink),
 						0, null, null);
 				if (route.links.isEmpty()) {
-					return;
+					return null;
 				}
 				double travelTimeFromStartToBoundary = 0;
 				double distanceFromStartToBoundary = 0;
@@ -334,16 +340,17 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				act0.setCoord(ct.transform(startCoord));
 			}
 			act1.setCoord(ct.transform(endCoord));
-			attributes.putAttribute(GEOGRAPHICAL_TRIP_TYPE, "incoming");
+			return "incoming";
 		}
+		return null;
 	}
 
 	/**
 	 * Create activities if the trip is an outgoing trip
 	 */
-	private void createActivitiesForOutgoingTrip(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
+	private String createActivitiesForOutgoingTrip(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
 												 LeastCostPathCalculator router, Network network, Id<Link> startLink, Id<Link> endLink,
-												 List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord, Attributes attributes) {
+												 Set<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord) {
 		if (originIsInside && !destinationIsInside) {
 			act0.setCoord(ct.transform(startCoord));
 			if (cutOnBoundary) {
@@ -352,7 +359,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 					network.getLinks().get(startLink), network.getLinks().get(endLink),
 					0, null, null);
 				if (route.links.isEmpty()) {
-					return;
+					return null;
 				}
 				RouteMetrics routeMetrics = getRouteMetrics(route.links);
 				double travelTimeFromStartToBoundary = 0;
@@ -377,20 +384,22 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			} else {
 				act1.setCoord(ct.transform(endCoord));
 			}
-			attributes.putAttribute(GEOGRAPHICAL_TRIP_TYPE, "outgoing");
+			return "outgoing";
 		}
+		return null;
 	}
 
 	/**
 	 * Create activities if the trip is an internal trip
 	 */
-	private static void createActivitiesForInternalTrips(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
-														 Activity act1, Coord endCoord, Attributes attributes) {
+	private static String createActivitiesForInternalTrips(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
+														 Activity act1, Coord endCoord) {
 		if (originIsInside && destinationIsInside) {
 			act0.setCoord(ct.transform(startCoord));
 			act1.setCoord(ct.transform(endCoord));
-			attributes.putAttribute(GEOGRAPHICAL_TRIP_TYPE, "internal");
+			return "internal";
 		}
+		return null;
 	}
 
 	private static void addBoundaryAttributesToStartActivity(Activity activity, double routedDistanceToBoundary, double routedTravelTimeToBoundary) {
