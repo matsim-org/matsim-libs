@@ -225,8 +225,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
 		// Write population
 		log.info("Writing population file...");
-		if (!Files.exists(outputPath.getParent())) {
-			Files.createDirectory(outputPath.getParent());
+		Path outputDirectory = outputPath.getParent();
+		if (outputDirectory != null) {
+			Files.createDirectories(outputDirectory);
 		}
 
 		PopulationWriter pw = new PopulationWriter(outputPlans);
