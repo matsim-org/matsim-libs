@@ -428,17 +428,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			config.scoring().setScoringParametersAsDefaultSubpopulation(subpopulations.stream().findFirst().orElseThrow());
 
 			Set<String> qsimModes = new HashSet<>(config.qsim().getMainModes());
-			config.qsim().setMainModes(Sets.union(qsimModes, modes));
-			qsimModes.forEach(mode -> {
-				if (!config.scoring().getDefaultModeParams().containsKey(mode))
-					config.scoring().getDefaultModeParams().put(mode, new ScoringConfigGroup.ModeParams(mode));
-			});
+			Set<String> allQsimModes = Sets.union(qsimModes, modes);
+			config.qsim().setMainModes(allQsimModes);
+			ensureDefaultModeParams(config, allQsimModes);
 			Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
-			config.routing().setNetworkModes(Sets.union(networkModes, modes));
-			networkModes.forEach(mode -> {
-				if (!config.scoring().getDefaultModeParams().containsKey(mode))
-					config.scoring().getDefaultModeParams().put(mode, new ScoringConfigGroup.ModeParams(mode));
-			});
+			Set<String> allNetworkModes = Sets.union(networkModes, modes);
+			config.routing().setNetworkModes(allNetworkModes);
+			ensureDefaultModeParams(config, allNetworkModes);
 
 			SimWrapper sw = SimWrapper.create(config);
 			sw.getConfigGroup().defaultParams().setShp(null);
@@ -721,16 +717,21 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Set<String> modes = scenario.getVehicles().getVehicleTypes().values().stream()
 			.map(VehicleType::getNetworkMode).collect(Collectors.toSet());
 
-		modes.forEach(mode -> {
-			ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
-			scenario.getConfig().scoring().addModeParams(thisModeParams);
-		});
+		ensureDefaultModeParams(scenario.getConfig(), modes);
 
 		Set<String> qsimModes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
 		scenario.getConfig().qsim().setMainModes(Sets.union(qsimModes, modes));
 
 		Set<String> networkModes = new HashSet<>(scenario.getConfig().routing().getNetworkModes());
 		scenario.getConfig().routing().setNetworkModes(Sets.union(networkModes, modes));
+	}
+
+	private static void ensureDefaultModeParams(Config config, Set<String> modes) {
+		modes.forEach(mode -> {
+			if (!config.scoring().getDefaultModeParams().containsKey(mode)) {
+				config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(mode));
+			}
+		});
 	}
 
 	/**
