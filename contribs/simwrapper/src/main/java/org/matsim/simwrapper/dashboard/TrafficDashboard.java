@@ -35,9 +35,10 @@ public class TrafficDashboard implements Dashboard {
 			header.title = "Network Traffic";
 		header.description = "Traffic related analyses for the modes " + modes + ". Volumes for PT are not shown in this dashboard.";
 
-		layout.row("index_by_hour").el(Plotly.class, (viz, data) -> {
+		layout.row("index_by_hour")
+			.el(Plotly.class, (viz, data) -> {
 
-				viz.title = "Network congestion index";
+				viz.title = "Network excess travel time index";
 				viz.description = "by hour";
 
 				Plotly.DataSet ds = viz.addDataset(data.compute(TrafficAnalysis.class, "traffic_stats_by_road_type_and_hour.csv", args));
@@ -50,10 +51,29 @@ public class TrafficDashboard implements Dashboard {
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
 					.x("hour")
-					.y("congestion_index")
+					.y("excess_travel_time_index")
 					.name("road_type", ColorScheme.Spectral)
 				);
 			})
+//			.el(Plotly.class, (viz, data) -> {
+//
+//				viz.title = "Network congestion index (deprecated)";
+//				viz.description = "by hour";
+//
+//				Plotly.DataSet ds = viz.addDataset(data.compute(TrafficAnalysis.class, "traffic_stats_by_road_type_and_hour.csv", args));
+//
+//				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+//					.yAxis(Axis.builder().title("Index").build())
+//					.xAxis(Axis.builder().title("Hour").build())
+//					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
+//					.build();
+//
+//				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
+//					.x("hour")
+//					.y("congestion_index")
+//					.name("road_type", ColorScheme.Spectral)
+//				);
+//			})
 			.el(Table.class, ((viz, data) -> {
 
 				viz.title = "Traffic stats per road type";
@@ -65,7 +85,7 @@ public class TrafficDashboard implements Dashboard {
 				viz.enableFilter = false;
 			}));
 
-		// TODO: Could be done per mode, by using the tab feature
+//		// TODO: Could be done per mode, by using the tab feature
 
 		layout.row("map").el(MapPlot.class, (viz, data) -> {
 
@@ -96,12 +116,16 @@ public class TrafficDashboard implements Dashboard {
 			viz.backgroundColor = "transparent";
 			viz.content = """
 				### Notes
-				- The congestion index is the ratio of time a road is in an uncongested state. 0.5 means that a road is congested half of the time. A road with 1.0 is always uncongested.
-				- Cf. A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index by Feifei He, Xuedong Yan, Yang Liu, Lu Ma.
-				""";
-//			- The speed performance index is the ratio of average travel speed and the maximum permissible road speed.
-//			A performance index of 0.5, means that the average speed is half of the maximum permissible speed. A road with a performance index below 0.5 is considered to be in a congested state.
+				- The excess travel time index of a link is the ratio of the expected extra travel time on a link during the given period of time. This value is normalized to the free speed travel time of the link.\s
+				When it comes to the network index, the absolute excess travel time for each link are first summed up, and then normalized to the summed free speed travel time. The traffic volume is considered when summing up. \s
+				The idea is based on the TomTom travel time index. For example, an excess travel time index of 0.2 means 20% of extra travel time is expected, compared to the free flow condition.\s
+			\t
+				- Note: The "congestion index" used in previous versions is not recommended by VSP, it is therefore replaced by the "excess travel time index" described above.
+			\t""";
 		});
 
+		// reference for the "congestion index" used in previous versions: Feifei He, Xuedong Yan, Yang Liu, Lu Ma, 2016,
+		// A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index,
+		//Procedia Engineering, Volume 137, Pages 425-433, ISSN 1877-7058, https://doi.org/10.1016/j.proeng.2016.01.277.
 	}
 }
