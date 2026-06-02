@@ -1,4 +1,4 @@
-package org.matsim.contrib.parking.parkingparameterization;
+package org.matsim.contrib.parking.parkingsearchparameterization;
 
 import com.google.inject.Inject;
 import org.apache.commons.csv.CSVFormat;

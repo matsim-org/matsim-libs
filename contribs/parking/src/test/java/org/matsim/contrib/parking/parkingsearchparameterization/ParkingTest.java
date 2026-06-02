@@ -1,4 +1,4 @@
-package org.matsim.contrib.parking.parkingparameterization;
+package org.matsim.contrib.parking.parkingsearchparameterization;
 
 import com.google.inject.Singleton;
 import org.junit.jupiter.api.Assertions;
@@ -37,8 +37,8 @@ import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.util.List;
 
-import static org.matsim.contrib.parking.parkingparameterization.ParkingUtils.LINK_OFF_STREET_SPOTS;
-import static org.matsim.contrib.parking.parkingparameterization.ParkingUtils.LINK_ON_STREET_SPOTS;
+import static org.matsim.contrib.parking.parkingsearchparameterization.ParkingUtils.LINK_OFF_STREET_SPOTS;
+import static org.matsim.contrib.parking.parkingsearchparameterization.ParkingUtils.LINK_ON_STREET_SPOTS;
 
 public class ParkingTest {
 	@RegisterExtension

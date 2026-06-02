@@ -1,4 +1,4 @@
-package org.matsim.contrib.parking.parkingparameterization;
+package org.matsim.contrib.parking.parkingsearchparameterization;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
