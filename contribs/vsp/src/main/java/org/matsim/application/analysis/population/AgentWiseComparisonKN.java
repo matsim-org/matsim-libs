@@ -63,6 +63,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	private static final boolean doRoh = false;
 	static final boolean doSwitchers = true;
 	static final boolean isDebugging = true;
+//	static final String fromMode = bike;
+//	static final String fromMode = car;
+//	static final String fromMode = ride;
+//	static final String fromMode = pt;
+	static final String fromMode = walk;
 
 	@CommandLine.Parameters(description = "Path to run output directory for which analysis should be performed.")
 	private Path policyCasePath;
@@ -149,12 +154,12 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-policy";
 
 		// lausitz ditrimo drt
-//		final String baseDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
+		final String baseDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-1-ruhland-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-2-ruhland-bhf-spremberg-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-3-ruhland-bhf-spremberg-bhf-cottbus-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-4-ruhland-bhf-spremberg-bhf-schwarze-pumpe_full_plans/";
-//		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-5-regional-drt_full_plans/";
+		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-5-regional-drt_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-1-ruhland-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-2-ruhland-bhf-spremberg-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-3-ruhland-bhf-spremberg-bhf-cottbus-bhf_full_plans/";
@@ -162,8 +167,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-5-regional-drt_full_plans/";
 
 		// lausitz ditrimo pt line
-		final String baseDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
-		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/01_pt-case-study/";
+//		final String baseDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
+//		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/01_pt-case-study/";
 
 
 		// ===
@@ -500,6 +505,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			MUTTS_AV = popSumMuse_h / popCntMuse_h;
 			log.warn( "MUTTS_AV={}; popSumMuse_h={}; popCntMuse_h={}", MUTTS_AV, popSumMuse_h, popCntMuse_h );
 		}
+		System.out.println("###########################################################################################################################################");
+		System.out.println("Analysis only for switchers from mode: " + fromMode.toUpperCase() );
+		System.out.println("###########################################################################################################################################");
+		System.out.println();
 		printTable( table, "print person table:" );
 		return table;
 	}
@@ -517,13 +526,13 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
 
 //		filter for pt line users for lausitz pt line case
-		Table ptLineUsers = Table.read()
-			.csv(CsvReadOptions.builder(IOUtils.getBufferedReader("D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/01_pt-case-study/analysis/analysis/pt_persons.csv"))
-			.columnTypesPartial(Map.of("person", ColumnType.STRING, "time", ColumnType.DOUBLE))
-			.sample(false)
-			.separator(','));
-
-		joinedTable = joinedTable.dropWhere(joinedTable.stringColumn(personId).isNotIn(ptLineUsers.stringColumn("person")));
+//		Table ptLineUsers = Table.read()
+//			.csv(CsvReadOptions.builder(IOUtils.getBufferedReader("D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/01_pt-case-study/analysis/analysis/pt_persons.csv"))
+//			.columnTypesPartial(Map.of("person", ColumnType.STRING, "time", ColumnType.DOUBLE))
+//			.sample(false)
+//			.separator(','));
+//
+//		joinedTable = joinedTable.dropWhere(joinedTable.stringColumn(personId).isNotIn(ptLineUsers.stringColumn("person")));
 
 
 		log.info( "" );
@@ -545,8 +554,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
 //			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
-//			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
-			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
+			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
+//			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 //			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
 
 			Table deltaTable = createDeltaTable( joinedTable );
@@ -605,8 +614,13 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //				joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
 //			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
-//			joinedTable = joinedTable.where( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
+			joinedTable = joinedTable.where( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
 //			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
+			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString(fromMode) ) ;
+			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( MODE_SEQ ).containsString(car) ) ;
+			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( MODE_SEQ ).containsString(bike) ) ;
+			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( MODE_SEQ ).containsString(ride) ) ;
+			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( MODE_SEQ ).containsString(pt) ) ;
 
 			Table deltaTable = createDeltaTable( joinedTable );
 
