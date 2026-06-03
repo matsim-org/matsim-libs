@@ -51,6 +51,7 @@ import org.matsim.core.controler.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripStructureUtils;
