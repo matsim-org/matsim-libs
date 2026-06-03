@@ -58,6 +58,7 @@ import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
@@ -1100,6 +1101,20 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	/**
+	 * Reads the scenario network once more as a static network for the OD resistance precomputation.
+	 * <p>
+	 * The main scenario network may be time-dependent. The OD resistance values are static, so this method loads only
+	 * the base network file with the default non-time-variant link factory and deliberately does not read network change
+	 * events.
+	 */
+	private static Network readStaticNetworkForResistancePrecompute(Scenario scenario) {
+		Network staticNetwork = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(ProjectionUtils.getCRS(scenario.getNetwork()), scenario.getConfig().global().getCoordinateSystem(), staticNetwork)
+			.readURL(scenario.getConfig().network().getInputFileURL(scenario.getConfig().getContext()));
+		return staticNetwork;
+	}
+
+	/**
 	 * Creates the number of trips between the zones for each mode and purpose.
 	 */
 	private TripDistributionMatrix createTripDistribution(
@@ -1115,21 +1130,20 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		});
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
 			.newInstance(indexZones, shapeFileZoneNameColumn, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType, listOfZones).build();
-		Network network = scenario.getNetwork();
-		int count = 0;
+		Network staticNetworkForODGeneration = readStaticNetworkForResistancePrecompute(scenario);
 		log.info("Create trip distribution for traffic type {} with resistance factor {}.", smallScaleCommercialTrafficType, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType).toString());
+		// Route all zone-pair resistance values on a static network before the OD loop so later matrix work only reads cached values.
+		odMatrix.precomputeResistanceFunctionValues(staticNetworkForODGeneration, linksPerZone, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
+		Counter ODcounter = new Counter("OD pair # ", " of " + trafficVolume_start.size() + " OD pairs processed.");
 		for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : trafficVolume_start.keySet()) {
-			count++;
-			if (count % 50 == 0 || count == 1)
-				log.info("Create OD pair {} of {}", count, trafficVolume_start.size());
-
+			ODcounter.incCounter();
 			String startZone = trafficVolumeKey.zone();
 			String modeORvehType = trafficVolumeKey.modeORvehType();
 			for (Integer purpose : trafficVolume_start.get(trafficVolumeKey).keySet()) {
 				Collections.shuffle(listOfZones, rnd);
 				for (String stopZone : listOfZones) {
 					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType,
-						network, linksPerZone, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
+						staticNetworkForODGeneration, linksPerZone, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
 				}
 			}
 		}
