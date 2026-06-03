@@ -383,9 +383,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					linksPerZone = filterLinksForZones(scenario, this.indexZones, facilitiesPerZoneWithProbabilities, shapeFileZoneNameColumn);
 				}
 				if (Objects.requireNonNull(usedCreationOption) == CreationOption.useExistingCarrierFileWithoutSolution) {
-					CarriersUtils.getCarriers(scenario).getCarriers().values().forEach(carrier -> {
-						carrier.getPlans().clear();
-					});
+					CarriersUtils.getCarriers(scenario).getCarriers().values().forEach(CarriersUtils::clearCarrierPlans);
 				} else {
 					// if we use an existing carrier with a solution, we delete only the plans of carriers which have unhandled jobs.
 					List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(
@@ -394,7 +392,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						log.info(
 							"By using the option {} {} carriers of all {} carriers are found with unhandled jobs. These carriers will be solved and the plans of the fully planed carriers will remain. ",
 							CreationOption.useExistingCarrierFileWithSolution, nonCompleteSolvedCarriers.size(), CarriersUtils.getCarriers(scenario).getCarriers().size());
-						nonCompleteSolvedCarriers.forEach((carrier -> carrier.getPlans().clear()));
+						nonCompleteSolvedCarriers.forEach((CarriersUtils::clearCarrierPlans));
 					}
 				}
 				filterCarriersForSelectedPart(scenario);
