@@ -81,7 +81,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				} else if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("goodsTraffic")) {
 					smallScaleCommercialTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
 					String[] split = carrierId.split("vehTyp")[1].split("_"); //TODO make this via attributes
-					modeORvehType = split[0];
+					modeORvehType = "vehTyp" + split[0];
 				} else {
 					log.warn("Carrier {} has no valid subpopulation. Skipping.", carrier.getId());
 					continue;
@@ -90,7 +90,11 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					modeORvehType, smallScaleCommercialTrafficType);
 				String startZone = carrier.getAttributes().getAttribute("tourStartArea") == null ? "" : carrier.getAttributes().getAttribute(
 					"tourStartArea").toString();
-				SmallScaleCommercialTrafficUtils.StructuralAttribute selectedStartCategory = generator.getSelectedStartCategory(startZone, odMatrixEntry);
+				Object startCategoryAttribute = carrier.getAttributes().getAttribute("startCategory");
+				SmallScaleCommercialTrafficUtils.StructuralAttribute selectedStartCategory = startCategoryAttribute == null
+					? generator.getSelectedStartCategory(startZone, odMatrixEntry)
+					: SmallScaleCommercialTrafficUtils.StructuralAttribute.fromLabel(startCategoryAttribute.toString())
+					.orElseGet(() -> SmallScaleCommercialTrafficUtils.StructuralAttribute.valueOf(startCategoryAttribute.toString()));
 				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = new GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes(
 					purpose, startZone, selectedStartCategory, modeORvehType,
 					smallScaleCommercialTrafficType, null, odMatrixEntry);
