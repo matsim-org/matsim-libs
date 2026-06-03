@@ -61,6 +61,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers;
 import org.matsim.freight.carriers.jsprit.*;
+import org.matsim.freight.carriers.splitter.CarrierSplitter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -96,6 +97,21 @@ public class CarriersUtils {
 
 	public static Carrier createCarrier(Id<Carrier> id) {
 		return new CarrierImpl(id);
+	}
+
+	/**
+	 * Splits each carrier in the scenario into smaller carriers by clustering its shipments or services.
+	 * <p>
+	 * This is a convenience entry point; the actual split implementation lives in {@link CarrierSplitter}.
+	 *
+	 * @param scenario MATSim scenario containing the network and carriers to split.
+	 * @param clusterStrategy clustering strategy used to build the smaller carrier groups.
+	 * @param shipmentClusterLocation location representation for shipment clustering; required for carriers with shipments.
+	 * @param maxJobsPerCarrier target upper bound for jobs assigned to each new carrier.
+	 */
+	public static void splitCarriers(Scenario scenario, CarrierSplitter.ClusteringStrategy clusterStrategy,
+			CarrierSplitter.ShipmentClusteringLocation shipmentClusterLocation, int maxJobsPerCarrier) {
+		CarrierSplitter.splitCarriers(scenario, clusterStrategy, shipmentClusterLocation, maxJobsPerCarrier);
 	}
 
 	/**
