@@ -123,7 +123,7 @@ public class EmissionMethodComparisonTest {
 		writer.print("vel");
 
 		for (var method : EmissionsConfigGroup.EmissionsComputationMethod.values()) {
-			for (var component : List.of("CO", "CO2", "NOx")){
+			for (var component : List.of("CO", "CO2", "HC", "NOx", "PMx")){
 				writer.print(component + "_" + method);
 			}
 		}
@@ -143,7 +143,9 @@ public class EmissionMethodComparisonTest {
 
 				writer.print(values.get(Pollutant.CO));
 				writer.print(values.get(Pollutant.CO2_TOTAL));
+				writer.print(values.get(Pollutant.HC));
 				writer.print(values.get(Pollutant.NOx));
+				writer.print(values.get(Pollutant.PM_TOTAL));
 			}
 			writer.println();
 		}

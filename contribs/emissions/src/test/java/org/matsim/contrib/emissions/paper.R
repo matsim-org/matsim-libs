@@ -356,48 +356,69 @@ speedCurves <- function(
   trafficSit = "RUR/MW/>130",
   emConcept = "PC P Euro-4",
   curves = c("AverageSpeed", "StopAndGoFraction", "InterpolationFraction", "BilinearInterpolationFraction"),
+  components = c("CO", "CO2", "HC", "NOx"),
   caption = ""){
   trafficSit.u <- gsub( "/", "_", trafficSit)
   emConcept.u <- gsub( " ", "_", emConcept)
+  components.u <- paste(components, collapse="-")
 
   hbefa_det <- read_delim(glue("{hbefa_path}/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv"), delim = ";") %>%
-    filter(Component == "CO" | Component == "CO2(total)" | Component == "NOx") %>%
+    filter(Component == "CO" | Component == "CO2(total)" | Component == "HC" | Component == "NOx") %>%
     filter(EmConcept == emConcept) %>%
     filter(startsWith(TrafficSit, trafficSit)) %>%
-    mutate(component = ifelse(Component == "CO2(total)", "CO2", Component))
+    mutate(component = ifelse(Component == "CO2(total)", "CO2", Component)) %>%
+    filter(component %in% components)
 
   curves <- read_csv(glue("{matsim_output_path}/EmissionMethodComputationTest/{trafficSit.u}_{emConcept.u}.csv")) %>%
     pivot_longer(cols = c(
-      "CO_StopAndGoFraction", "CO2_StopAndGoFraction", "NOx_StopAndGoFraction",
-      "CO_AverageSpeed", "CO2_AverageSpeed", "NOx_AverageSpeed",
-      "CO_InterpolationFraction", "CO2_InterpolationFraction", "NOx_InterpolationFraction",
-      "CO_BilinearInterpolationFraction", "CO2_BilinearInterpolationFraction", "NOx_BilinearInterpolationFraction"),
+      "CO_StopAndGoFraction", "CO2_StopAndGoFraction", "HC_StopAndGoFraction", "NOx_StopAndGoFraction", "PMx_StopAndGoFraction",
+      "CO_AverageSpeed", "CO2_AverageSpeed",  "HC_AverageSpeed", "NOx_AverageSpeed", "PMx_AverageSpeed",
+      "CO_InterpolationFraction", "CO2_InterpolationFraction", "HC_InterpolationFraction", "NOx_InterpolationFraction", "PMx_InterpolationFraction",
+      "CO_BilinearInterpolationFraction", "CO2_BilinearInterpolationFraction", "HC_BilinearInterpolationFraction", "NOx_BilinearInterpolationFraction", "PMx_BilinearInterpolationFraction"),
            names_to = "method", values_to = "value") %>%
     separate("method", c("component", "method"), "_") %>%
-    filter(method %in% curves)
+    filter(method %in% curves) %>%
+    filter(component %in% components)
 
-  ggplot() +
+  colors <- c(
+    "AverageSpeed"="#F54927",
+    "StopAndGoFraction"="#27C2F5",
+    "InterpolationFraction"="#F227F5",
+    "BilinearInterpolationFraction"="#169C07"
+  )
+
+  p <- ggplot() +
     geom_line(data=curves, aes(x=vel, y=value, color=method)) +
     geom_point(data=hbefa_det, aes(x=V, y=EFA)) +
     facet_wrap(~component, scales = "free") +
+    expand_limits(y = 0)+
     theme_minimal() +
+    scale_color_manual(values=colors) +
     # ggtitle(glue("Comparison of emission development for different methods ({trafficSit}, {emConcept})")) +
     labs(caption = caption) +
     theme(text = element_text(size=12), plot.caption = element_text(size = 12, hjust = 0.5, margin = margin(t=20))) +
     xlab("Average velocity (km/h)") +
     ylab("Emissions (g/km)")
 
-  ggsave(glue("{plots_path}/{trafficSit.u}_{emConcept.u}.png"),
-         width = 12,
-         height = 10,
+  layout <- ggplot_build(p)$layout$layout
+
+  nrow <- layout$ROW
+  ncol <- layout$COL
+
+  ggsave(glue("{plots_path}/{trafficSit.u}_{emConcept.u}_{components.u}.png"),
+         p,
+         width = max(ncol)*10,
+         height = max(nrow)*10,
          dpi = 300)
 }
 
 # Curve plots
 {
   speedCurves(curves = c("AverageSpeed", "StopAndGoFraction"), caption="Fig XX: Development of emissions output for a petrol vehicle driving at various speeds on a motorway with speed limit of 130 km/h")
-  speedCurves()
-  speedCurves(trafficSit = "URB/Local/50")
+  speedCurves(curves = c("AverageSpeed", "StopAndGoFraction"), components="NOx")
+  speedCurves(curves = c("AverageSpeed", "StopAndGoFraction"), components=c("CO", "CO2", "HC"))
+  speedCurves(components=c("CO", "CO2", "HC"))
+  speedCurves(trafficSit = "URB/Local/50", components=c("CO", "CO2"))
 }
 
 # PHEM Plots with all computation methods
