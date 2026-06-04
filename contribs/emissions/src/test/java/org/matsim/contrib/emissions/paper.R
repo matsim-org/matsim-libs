@@ -1,6 +1,7 @@
 {
   library(tidyverse)
   library(glue)
+  library(kableExtra)
 
   # ==== Paths to ressources ====
   matsim_output_path <- "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput"
@@ -44,6 +45,50 @@
          width = 16,
          height = 9,
          dpi = 300)
+
+  # Export values to latex table
+  # (Tables here are not final, but the served as basis for the journal tables)
+  export <- data %>%
+    select(segment, component, model, gPkm) %>%
+    arrange(segment, component, model) %>%
+    group_by(component) %>%
+    mutate(
+      exponent = floor(log10(max(abs(gPkm), na.rm = TRUE))),
+      mantissa = round(gPkm / 10^exponent, digits = 3)
+    ) %>%
+  ungroup()
+
+  tab <- export %>%
+    select(segment, model, component, mantissa) %>%
+    pivot_wider(names_from = component,
+                values_from = mantissa) %>%
+    ungroup()
+
+  exp_row <- export %>%
+    distinct(component, exponent) %>%
+    arrange(component)
+
+  tab %>%
+    kbl(
+      format = "latex",
+      escape = FALSE,
+      booktabs = TRUE
+    ) %>%
+    add_header_above(
+      c(" " = 2, "Emissions [g/km]" = ncol(tab) - 2)
+    ) %>%
+    add_header_above(
+      c(
+        " " = 2,
+        setNames(
+          rep(1, nrow(exp_row)),
+          paste0("$10^{", exp_row$exponent, "}$")
+        )
+      ),
+      escape = FALSE
+    ) %>%
+    kable_styling()
+
 }
 
 # Plots Old Model (S&G Diesel)
@@ -81,6 +126,49 @@
          width = 16,
          height = 9,
          dpi = 300)
+
+  # Export values to latex table
+  # (Tables here are not final, but the served as basis for the journal tables)
+  export <- data %>%
+    select(segment, component, model, gPkm) %>%
+    arrange(segment, component, model) %>%
+    group_by(component) %>%
+    mutate(
+      exponent = floor(log10(max(abs(gPkm), na.rm = TRUE))),
+      mantissa = round(gPkm / 10^exponent, digits = 3)
+    ) %>%
+    ungroup()
+
+  tab <- export %>%
+    select(segment, model, component, mantissa) %>%
+    pivot_wider(names_from = component,
+                values_from = mantissa) %>%
+    ungroup()
+
+  exp_row <- export %>%
+    distinct(component, exponent) %>%
+    arrange(component)
+
+  tab %>%
+    kbl(
+      format = "latex",
+      escape = FALSE,
+      booktabs = TRUE
+    ) %>%
+    add_header_above(
+      c(" " = 2, "Emissions [g/km]" = ncol(tab) - 2)
+    ) %>%
+    add_header_above(
+      c(
+        " " = 2,
+        setNames(
+          rep(1, nrow(exp_row)),
+          paste0("$10^{", exp_row$exponent, "}$")
+        )
+      ),
+      escape = FALSE
+    ) %>%
+    kable_styling()
 }
 
 # Plots New Model (Int. Petrol)
