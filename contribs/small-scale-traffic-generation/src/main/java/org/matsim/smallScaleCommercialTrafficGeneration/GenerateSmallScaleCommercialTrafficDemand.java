@@ -355,8 +355,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
 					FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 
-				if (freightCarriersConfigGroup.getCarriersFile() == null)
-					freightCarriersConfigGroup.setCarriersFile(carrierFilePath.toAbsolutePath().toString());
+					if (freightCarriersConfigGroup.getCarriersFile() == null)
+						freightCarriersConfigGroup.setCarriersFile(carrierFilePath.toAbsolutePath().toString());
 					Path carrierVehicleTypesFile = SmallScaleCommercialTrafficUtils.resolveCarrierVehicleTypesFile(config, carrierFilePath, CARRIER_VEHICLE_TYPES_FILE);
 					if (carrierVehicleTypesFile != null)
 						freightCarriersConfigGroup.setCarriersVehicleTypesFile(carrierVehicleTypesFile.toAbsolutePath().toString());
