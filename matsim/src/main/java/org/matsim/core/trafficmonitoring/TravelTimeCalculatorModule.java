@@ -64,7 +64,9 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 			//			for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
 			for (final String mode : getConfig().routing().getNetworkModes()) {
 
-				if (analyzedModes.contains(mode)) {
+				if ( !getConfig().travelTimeCalculator().isFilterModes() || analyzedModes.contains(mode)) {
+					// (means that only if isFilterModes=false, we look at the analyzedModes)
+
 					// generate and bind the observer:
 					bind(TravelTimeCalculator.class).annotatedWith(Names.named(mode)).toProvider(new SingleModeTravelTimeCalculatorProvider(mode)).in(Singleton.class);
 
