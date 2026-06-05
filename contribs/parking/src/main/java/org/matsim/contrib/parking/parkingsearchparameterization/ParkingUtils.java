@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
+package org.matsim.contrib.parking.parkingsearchparameterization;
 
 public class ParkingUtils {
 	public static final String LINK_ON_STREET_SPOTS = "onstreet_spots";

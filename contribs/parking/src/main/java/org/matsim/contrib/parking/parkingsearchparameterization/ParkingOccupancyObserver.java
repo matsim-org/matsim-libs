@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
+package org.matsim.contrib.parking.parkingsearchparameterization;
 
 import com.google.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
@@ -25,6 +25,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Tracks link-level parking occupancy during the mobsim and exposes capacity/occupancy
+ * snapshots for parking search time calculation.
+ */
 public class ParkingOccupancyObserver implements MobsimScopeEventHandler, VehicleEntersTrafficEventHandler, VehicleEndsParkingSearchEventHandler, BeforeMobsimListener, MobsimBeforeSimStepListener {
 	private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ParkingOccupancyObserver.class);
 
@@ -41,7 +45,7 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 	double lastTimeStep = -1;
 
 	@Inject
-	public ParkingOccupancyObserver(Network network, ParkingCapacityInitializer parkingCapacityInitializer, Config config, OutputDirectoryHierarchy outputDirectoryHierarchy) {
+	ParkingOccupancyObserver(Network network, ParkingCapacityInitializer parkingCapacityInitializer, Config config, OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		this.parkingCapacityInitializer = parkingCapacityInitializer;
 		this.network = network;
 		this.config = config;
@@ -133,6 +137,8 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 			Id<Link> linkId = entry.getKey();
 			double weight = entry.getValue();
 			int index = indexByLinkId.get(linkId);
+			// Use the last completed timestep so vehicles processed earlier in the
+			// current timestep do not immediately affect later vehicles.
 			int occupancy = parkingOccupancyOfLastTimeStep[index];
 			result.put(linkId, new ParkingCount(occupancy, capacity[index], weight));
 		}

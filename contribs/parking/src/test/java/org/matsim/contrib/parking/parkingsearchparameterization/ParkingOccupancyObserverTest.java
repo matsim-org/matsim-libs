@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
+package org.matsim.contrib.parking.parkingsearchparameterization;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
