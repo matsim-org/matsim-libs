@@ -88,9 +88,10 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 					// (This used to be without "Singleton".  I think that with Singleton it makes more sense, but don't know ramifications. kai, nov'19)
 				} else {
 
-					// For modes that are not analyzed, no travel time calculator is bound
-					// however, travel time is still provided
+					// For modes that are not analyzed, a free speed travel time is returned:
 					addTravelTimeBinding(mode).to(FreeSpeedTravelTime.class).in(Singleton.class);
+					// (yy I am a bit sceptical if this is a good fallback, or if it should rather fail.  It certainly led to using
+					// non-congested routing for non-car modes from approx 2019 to 2026.  kai, jun'26)
 
 				}
 
