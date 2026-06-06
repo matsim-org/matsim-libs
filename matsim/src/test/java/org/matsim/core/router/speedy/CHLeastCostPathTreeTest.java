@@ -1381,4 +1381,148 @@ public class CHLeastCostPathTreeTest {
                 Arrays.asList(Id.createLinkId("34"), Id.createLinkId("4T")));
         return network;
     }
+
+    // =========================================================================
+    // Distance accumulation tests
+    //
+    // CHLeastCostPathTree.getDistance(idx) must return the same network distance
+    // (sum of link lengths along the resolved shortest path) as plain
+    // LeastCostPathTree.  Distance is precomputed once per CH global edge
+    // (including shortcuts) at build time and accumulated during relaxation.
+    // =========================================================================
+
+    @Test
+    void testForwardDistanceMatchesDijkstra_grid() {
+        Network network = buildGridNetwork(10);
+        assertForwardDistanceMatchesDijkstra(network, 5);
+    }
+
+    @Test
+    void testBackwardDistanceMatchesDijkstra_grid() {
+        Network network = buildGridNetwork(10);
+        assertBackwardDistanceMatchesDijkstra(network, 5);
+    }
+
+    @Test
+    void testForwardDistanceMatchesDijkstra_equil() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+        assertForwardDistanceMatchesDijkstra(scenario.getNetwork(), 10);
+    }
+
+    @Test
+    void testBackwardDistanceMatchesDijkstra_equil() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+        assertBackwardDistanceMatchesDijkstra(scenario.getNetwork(), 10);
+    }
+
+    /**
+     * Forward distance with turn restrictions: the start link itself is not
+     * traversed (the tree is rooted at {@code startLink.getToNode()}); the
+     * legal path from node 1 is {@code 1->2->3->4->5->T} (5 links of length 1),
+     * not the forbidden {@code 1->T} (1 link).
+     */
+    @Test
+    void testForwardDistanceMatchesDijkstra_turnRestrictions() {
+        Network network = buildTurnRestrictionsTestNetwork();
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+        InertialFlowCutter.NDOrderResult order = new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc).buildWithOrderParallel(order);
+        new CHTTFCustomizer().customize(chGraph, tc, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        Link startLink = network.getLinks().get(Id.createLinkId("S1"));
+        double depTime = 8.0 * 3600;
+        chTree.calculate(startLink, depTime, null, null);
+        dijTree.calculate(startLink, depTime, null, null);
+
+        int tIdx = network.getNodes().get(Id.createNodeId("T")).getId().index();
+        Assertions.assertEquals(5.0, dijTree.getDistance(tIdx), COST_TOLERANCE,
+                "test fixture broken: Dijkstra distance at T should be 5 (legal detour from node 1)");
+        Assertions.assertEquals(dijTree.getDistance(tIdx), chTree.getDistance(tIdx), COST_TOLERANCE,
+                "CH distance at T must match Dijkstra (legal 5-link detour from node 1)");
+    }
+
+    private static void assertForwardDistanceMatchesDijkstra(Network network, int numSources) {
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+        InertialFlowCutter.NDOrderResult order = new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc).buildWithOrderParallel(order);
+        new CHTTFCustomizer().customize(chGraph, tc, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        List<Link> links = new ArrayList<>(network.getLinks().values());
+        Random rng = new Random(13);
+        int mismatches = 0;
+        int comparisons = 0;
+        double depTime = 8.0 * 3600;
+        for (int s = 0; s < numSources; s++) {
+            Link srcLink = links.get(rng.nextInt(links.size()));
+            chTree.calculate(srcLink, depTime, null, null);
+            dijTree.calculate(srcLink, depTime, null, null);
+
+            for (Node n : network.getNodes().values()) {
+                int idx = n.getId().index();
+                if (dijTree.getTime(idx).isUndefined()) continue;
+                comparisons++;
+                double chD = chTree.getDistance(idx);
+                double djD = dijTree.getDistance(idx);
+                if (Math.abs(chD - djD) > COST_TOLERANCE) {
+                    mismatches++;
+                    if (mismatches < 10) {
+                        System.err.printf("FWD-DIST MISMATCH src=%s node=%s: CH=%.6f Dijkstra=%.6f%n",
+                                srcLink.getId(), n.getId(), chD, djD);
+                    }
+                }
+            }
+        }
+        Assertions.assertEquals(0, mismatches,
+                mismatches + " forward-distance mismatches out of " + comparisons + " comparisons");
+    }
+
+    private static void assertBackwardDistanceMatchesDijkstra(Network network, int numArrivals) {
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+        InertialFlowCutter.NDOrderResult order = new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc).buildWithOrderParallel(order);
+        new CHTTFCustomizer().customize(chGraph, tc, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        List<Link> links = new ArrayList<>(network.getLinks().values());
+        Random rng = new Random(17);
+        int mismatches = 0;
+        int comparisons = 0;
+        double arrTime = 8.0 * 3600;
+        for (int s = 0; s < numArrivals; s++) {
+            Link arrLink = links.get(rng.nextInt(links.size()));
+            chTree.calculateBackwards(arrLink, arrTime, null, null);
+            dijTree.calculateBackwards(arrLink, arrTime, null, null);
+
+            for (Node n : network.getNodes().values()) {
+                int idx = n.getId().index();
+                if (dijTree.getTime(idx).isUndefined()) continue;
+                comparisons++;
+                double chD = chTree.getDistance(idx);
+                double djD = dijTree.getDistance(idx);
+                if (Math.abs(chD - djD) > COST_TOLERANCE) {
+                    mismatches++;
+                    if (mismatches < 10) {
+                        System.err.printf("BWD-DIST MISMATCH arr=%s node=%s: CH=%.6f Dijkstra=%.6f%n",
+                                arrLink.getId(), n.getId(), chD, djD);
+                    }
+                }
+            }
+        }
+        Assertions.assertEquals(0, mismatches,
+                mismatches + " backward-distance mismatches out of " + comparisons + " comparisons");
+    }
 }

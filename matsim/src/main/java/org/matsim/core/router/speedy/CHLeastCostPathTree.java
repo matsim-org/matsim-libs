@@ -97,6 +97,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
     private final double[] dnWeights;
     private final int[] sweepOrder;
     private final double[] ttf;
+    private final double[] edgeDistance;
     private final int totalEdgeCount;
 
     // Reverse CSR arrays for push-based Phase 2 sweep
@@ -129,6 +130,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
         this.dnWeights = chGraph.dnWeights;
         this.sweepOrder = chGraph.sweepOrder;
         this.ttf = chGraph.ttf;
+        this.edgeDistance = chGraph.edgeDistance;
         this.totalEdgeCount = chGraph.totalEdgeCount;
 
         // Reverse CSR for push-based Phase 2
@@ -208,6 +210,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
             // Iterate upward out-edges
             int uOff = upOff[v];
             int uEnd = uOff + upLen[v];
+            double vDist = getDistance(v);
             for (int slot = uOff; slot < uEnd; slot++) {
                 int eBase = slot * S;
                 int w = upEdges[eBase];
@@ -216,14 +219,15 @@ public class CHLeastCostPathTree implements ShortestPathTree {
                 double tTime = ttf[binOff + gIdx];
                 double newCost = cost + tTime;
                 double newArr = arr + tTime;
+                double newDist = vDist + edgeDistance[gIdx];
 
                 if (iterIds[w] == currentIteration) {
                     if (newCost < getCost(w)) {
-                        setNode(w, newCost, newArr, 0.0, v, gIdx);
+                        setNode(w, newCost, newArr, newDist, v, gIdx);
                         pq.decreaseKey(w, newCost);
                     }
                 } else {
-                    setNode(w, newCost, newArr, 0.0, v, gIdx);
+                    setNode(w, newCost, newArr, newDist, v, gIdx);
                     pq.insert(w, newCost);
                 }
             }
@@ -286,6 +290,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
             if (uCost >= maxCost) continue;
 
             double uArr = data[u * 3 + 1];      // getTimeRaw(u) inlined
+            double uDist = data[u * 3 + 2];     // getDistance(u) inlined
 
             // Push costs along u's outgoing downward edges (u→w, rank(w) < rank(u))
             int dOff = dnOutOff[u];
@@ -306,12 +311,13 @@ public class CHLeastCostPathTree implements ShortestPathTree {
                         ? data[wBase] : Double.POSITIVE_INFINITY;
 
                 if (newCost < wCost) {
+                    int gIdx = dnOutEdges[eBase + CHGraph.E_GIDX];
                     // setNode inlined for hot-path performance
                     data[wBase] = newCost;
                     data[wBase + 1] = uArr + tTime;
-                    data[wBase + 2] = 0.0;
+                    data[wBase + 2] = uDist + edgeDistance[gIdx];
                     comingFrom[w] = u;
-                    fromEdgeGIdx[w] = dnOutEdges[eBase + CHGraph.E_GIDX];
+                    fromEdgeGIdx[w] = gIdx;
                     iterIds[w] = iter;
                 }
             }
@@ -386,6 +392,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
 
             int dOff = dnOff[w];
             int dEnd = dOff + dnLen[w];
+            double wDist = getDistance(w);
             for (int slot = dOff; slot < dEnd; slot++) {
                 int eBase = slot * S;
                 int u = dnEdges[eBase];
@@ -393,16 +400,17 @@ public class CHLeastCostPathTree implements ShortestPathTree {
 
                 double edgeCost = chGraph.minTTF[gIdx];
                 double newCost = cost + edgeCost;
+                double newDist = wDist + edgeDistance[gIdx];
 
                 if (iterIds[u] == currentIteration) {
                     if (newCost < getCost(u)) {
                         double newTime = getTimeRaw(w) - edgeCost;
-                        setNode(u, newCost, newTime, 0.0, w, gIdx);
+                        setNode(u, newCost, newTime, newDist, w, gIdx);
                         pq.decreaseKey(u, newCost);
                     }
                 } else {
                     double newTime = getTimeRaw(w) - edgeCost;
-                    setNode(u, newCost, newTime, 0.0, w, gIdx);
+                    setNode(u, newCost, newTime, newDist, w, gIdx);
                     pq.insert(u, newCost);
                 }
             }
@@ -439,6 +447,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
             if (uCost >= maxCost) continue;      // cost-bounded pruning
 
             double uTime = data[u * 3 + 1];     // getTimeRaw(u) inlined
+            double uDist = data[u * 3 + 2];     // getDistance(u) inlined
 
             // Push cost from u back to lower-ranked w via incoming up-edges (w→u)
             int iOff = upInOff[u];
@@ -457,12 +466,13 @@ public class CHLeastCostPathTree implements ShortestPathTree {
                         ? data[wBase] : Double.POSITIVE_INFINITY;
 
                 if (newCost < wCost) {
+                    int gIdx = upInEdges[eBase + CHGraph.E_GIDX];
                     // setNode inlined
                     data[wBase] = newCost;
                     data[wBase + 1] = uTime - edgeCost;
-                    data[wBase + 2] = 0.0;
+                    data[wBase + 2] = uDist + edgeDistance[gIdx];
                     comingFrom[w] = u;
-                    fromEdgeGIdx[w] = upInEdges[eBase + CHGraph.E_GIDX];
+                    fromEdgeGIdx[w] = gIdx;
                     iterIds[w] = iter;
                 }
             }

@@ -2747,11 +2747,27 @@ public class CHBuilder {
             }
         }
 
+        // 7. Precompute per-edge accumulated network distance.
+        // For original edges: distance = link length.
+        // For shortcuts: distance = sum of the two lower edges' distances.
+        // customizeOrder visits lower edges before their parent shortcuts,
+        // so a single pass suffices.
+        double[] edgeDistance = new double[totalEdgeCount];
+        for (int i = 0; i < totalEdgeCount; i++) {
+            int e = customizeOrder[i];
+            int origLink = edgeOrigLink[e];
+            if (origLink >= 0) {
+                edgeDistance[e] = graph.getLink(origLink).getLength();
+            } else {
+                edgeDistance[e] = edgeDistance[edgeLower1[e]] + edgeDistance[edgeLower2[e]];
+            }
+        }
+
         return new CHGraph(graph, nodeCount,
                 totalUp, upOff, upCount, upEdges, upWeights,
                 totalDn, dnOff, dnCount, dnEdges, dnWeights,
                 totalEdgeCount, edgeOrigLink, edgeLower1, edgeLower2,
-                customizeOrder, nodeLevel);
+                edgeDistance, customizeOrder, nodeLevel);
     }
 
     // -------------------------------------------------------------------------
