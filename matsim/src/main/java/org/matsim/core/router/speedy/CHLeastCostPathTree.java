@@ -22,6 +22,7 @@ package org.matsim.core.router.speedy;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -29,6 +30,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -154,6 +156,16 @@ public class CHLeastCostPathTree implements ShortestPathTree {
                           LeastCostPathTree.StopCriterion stopCriterion) {
         lastForwardSearch = true;
         int startNode = baseGraph.getNodeIndex(startLink.getToNode());
+        // If the base graph contains turn restrictions, the start link may have been
+        // replaced by a colored copy.  Use that colored to-node so the CH search
+        // starts from the topologically correct (restriction-aware) entry node.
+        if (baseGraph.getTurnRestrictions().isPresent()) {
+            TurnRestrictionsContext context = baseGraph.getTurnRestrictions().get();
+            TurnRestrictionsContext.ColoredLink replaced = context.replacedLinks.get(startLink.getId());
+            if (replaced != null && replaced.toColoredNode != null) {
+                startNode = baseGraph.getInternalIndex(replaced.toColoredNode.index());
+            }
+        }
         calculateForward(startNode, startTime, stopCriterion);
     }
 
@@ -225,6 +237,15 @@ public class CHLeastCostPathTree implements ShortestPathTree {
         //   - Cost-bounded pruning skips nodes/edges beyond earlyTermCost
         //   - Sequential memory access on sweepOrder (cache-friendly)
         forwardSweepLinear(S, earlyTermCost);
+
+        // When turn restrictions are present, the base graph contains colored copies
+        // of real nodes; only the colored copy may have been reached.  Mirror each
+        // best colored label onto the corresponding real-node slot so that callers
+        // querying getCost/getTime/getDistance on the real node observe the correct
+        // result.  Mirrors org.matsim.core.router.speedy.LeastCostPathTree.
+        if (baseGraph.getTurnRestrictions().isPresent()) {
+            consolidateColoredNodes();
+        }
     }
 
     /**
@@ -310,11 +331,12 @@ public class CHLeastCostPathTree implements ShortestPathTree {
                                    LeastCostPathTree.StopCriterion stopCriterion) {
         lastForwardSearch = false;
         int arrivalNode = baseGraph.getNodeIndex(arrivalLink.getFromNode());
-        calculateBackwardImpl(arrivalNode, arrivalTime, stopCriterion);
+        calculateBackwardImpl(arrivalNode, arrivalTime, stopCriterion, arrivalLink);
     }
 
     private void calculateBackwardImpl(int targetNode, double arrivalTime,
-                                        LeastCostPathTree.StopCriterion stopCriterion) {
+                                        LeastCostPathTree.StopCriterion stopCriterion,
+                                        Link arrivalLink) {
         advanceIteration();
 
         final int S = CHGraph.E_STRIDE;
@@ -323,6 +345,31 @@ public class CHLeastCostPathTree implements ShortestPathTree {
         setNode(targetNode, 0.0, arrivalTime, 0.0, -1, -1);
         pq.clear();
         pq.insert(targetNode, 0.0);
+
+        // When turn restrictions are present, the real arrival node may be unreachable;
+        // only colored copies sitting "in front of" the arrival link may be reachable.
+        // Seed every such colored arrival node, mirroring LeastCostPathTree.
+        if (arrivalLink != null && baseGraph.getTurnRestrictions().isPresent()) {
+            TurnRestrictionsContext ctx = baseGraph.getTurnRestrictions().get();
+            for (Link inLink : arrivalLink.getFromNode().getInLinks().values()) {
+                TurnRestrictionsContext.ColoredLink replaced = ctx.replacedLinks.get(inLink.getId());
+                if (replaced != null && replaced.toColoredNode != null) {
+                    int coloredArrival = baseGraph.getInternalIndex(replaced.toColoredNode.index());
+                    setNode(coloredArrival, 0.0, arrivalTime, 0.0, -1, -1);
+                    pq.insert(coloredArrival, 0.0);
+                }
+                List<TurnRestrictionsContext.ColoredLink> coloredLinks = ctx.coloredLinksPerLinkMap.get(inLink.getId());
+                if (coloredLinks != null) {
+                    for (TurnRestrictionsContext.ColoredLink coloredLink : coloredLinks) {
+                        if (coloredLink.toColoredNode != null) {
+                            int coloredArrival = baseGraph.getInternalIndex(coloredLink.toColoredNode.index());
+                            setNode(coloredArrival, 0.0, arrivalTime, 0.0, -1, -1);
+                            pq.insert(coloredArrival, 0.0);
+                        }
+                    }
+                }
+            }
+        }
 
         // Track the cost at which Phase 1 terminates (for sweep pruning).
         double earlyTermCost = Double.POSITIVE_INFINITY;
@@ -363,6 +410,11 @@ public class CHLeastCostPathTree implements ShortestPathTree {
 
         // Phase 2: Cost-bounded linear push sweep.
         backwardSweepLinear(S, earlyTermCost);
+
+        // Consolidate colored copies onto real nodes (see calculateForward).
+        if (baseGraph.getTurnRestrictions().isPresent()) {
+            consolidateColoredNodes();
+        }
     }
 
     /**
@@ -483,6 +535,47 @@ public class CHLeastCostPathTree implements ShortestPathTree {
         comingFrom[nodeIndex] = from;
         fromEdgeGIdx[nodeIndex] = edgeGIdx;
         iterIds[nodeIndex] = currentIteration;
+    }
+
+    /**
+     * When the base graph carries turn restrictions, real nodes may have been
+     * replaced by one or more colored copies during graph construction.  The CH
+     * search settles labels on those colored copies; this method propagates the
+     * best label of each colored copy onto its corresponding real-node slot, so
+     * that {@link #getCost(int)}, {@link #getTime(int)} and {@link #getDistance(int)}
+     * return meaningful results when queried by real-node index.
+     *
+     * <p>Mirrors {@link LeastCostPathTree#consolidateColoredNodes()}.
+     */
+    private void consolidateColoredNodes() {
+        for (int i = 0; i < nodeCount; i++) {
+            Node uncoloredNode = baseGraph.getNode(i);
+            if (uncoloredNode == null) continue;
+
+            // If the node at internal index i resolves to a different internal
+            // index, then i is a colored copy of a real node.
+            int uncoloredIndex = baseGraph.getNodeIndex(uncoloredNode);
+            if (uncoloredIndex == i) continue;
+
+            // Skip colored copies that were not visited in this iteration.
+            if (iterIds[i] != currentIteration) continue;
+
+            double coloredCost = data[i * 3];
+            double uncoloredCost = (iterIds[uncoloredIndex] == currentIteration)
+                    ? data[uncoloredIndex * 3]
+                    : Double.POSITIVE_INFINITY;
+
+            if (coloredCost < uncoloredCost) {
+                int uBase = uncoloredIndex * 3;
+                int cBase = i * 3;
+                data[uBase]     = data[cBase];
+                data[uBase + 1] = data[cBase + 1];
+                data[uBase + 2] = data[cBase + 2];
+                comingFrom[uncoloredIndex]   = comingFrom[i];
+                fromEdgeGIdx[uncoloredIndex] = fromEdgeGIdx[i];
+                iterIds[uncoloredIndex]      = currentIteration;
+            }
+        }
     }
 
     // -------------------------------------------------------------------------
