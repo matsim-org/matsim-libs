@@ -92,6 +92,7 @@ public class CHGraph {
     final int[]    edgeOrigLink;    // originalLinkIndex per global edge
     final int[]    edgeLower1;      // lowerEdge1 per global edge
     final int[]    edgeLower2;      // lowerEdge2 per global edge
+    final double[] edgeDistance;    // accumulated network distance per global edge (sum of original link lengths underneath)
 
     // Time-dependent TTF – bin-major flat contiguous array.
     // ttf[bin * totalEdgeCount + globalIdx] = travel time (seconds).
@@ -158,7 +159,7 @@ public class CHGraph {
                   int upEdgeCount, int[] upOff, int[] upLen, int[] upEdges, double[] upWeights,
                   int dnEdgeCount, int[] dnOff, int[] dnLen, int[] dnEdges, double[] dnWeights,
                   int totalEdgeCount, int[] edgeOrigLink, int[] edgeLower1, int[] edgeLower2,
-                  int[] customizeOrder, int[] nodeLevel) {
+                  double[] edgeDistance, int[] customizeOrder, int[] nodeLevel) {
         this.baseGraph      = baseGraph;
         this.nodeCount      = nodeCount;
         this.upEdgeCount    = upEdgeCount;
@@ -175,6 +176,7 @@ public class CHGraph {
         this.edgeOrigLink   = edgeOrigLink;
         this.edgeLower1     = edgeLower1;
         this.edgeLower2     = edgeLower2;
+        this.edgeDistance   = edgeDistance;
         this.customizeOrder = customizeOrder;
         this.nodeLevel      = nodeLevel;
         this.edgeWeights    = new double[totalEdgeCount];
