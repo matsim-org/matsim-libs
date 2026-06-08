@@ -30,6 +30,7 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RTransfer;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.Facility;
@@ -596,7 +597,7 @@ public class SwissRailRaptorCore {
 				}
 
         // collect information for each stop
-        Map<Id<TransitStopFacility>, TravelInfo> result = new HashMap<>();
+        Map<Id<TransitStopFacility>, TravelInfo> result = new IdMap<>(TransitStopFacility.class, this.data.countStops);
         for (int index = 0; index < this.data.countStops; index++) {
             PathElement destination = this.arrivalPathPerStop[index];
             if (destination != null) {
