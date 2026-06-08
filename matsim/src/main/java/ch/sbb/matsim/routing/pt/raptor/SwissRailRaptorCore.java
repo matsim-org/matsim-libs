@@ -597,11 +597,10 @@ public class SwissRailRaptorCore {
 
         // collect information for each stop
         Map<Id<TransitStopFacility>, TravelInfo> result = new HashMap<>();
-        for (Map.Entry<TransitStopFacility, Integer> e : this.data.stopFacilityIndices.entrySet()) {
-            TransitStopFacility stop = e.getKey();
-            int index = e.getValue();
+        for (int index = 0; index < this.data.countStops; index++) {
             PathElement destination = this.arrivalPathPerStop[index];
             if (destination != null) {
+                TransitStopFacility stop = this.data.stopFacilities[index];
                 TravelInfo ti = getTravelInfo(destination, parameters);
                 result.put(stop.getId(), ti);
             }
