@@ -170,6 +170,49 @@ public class CornerCases {
 		);
 	}
 
+	/**
+	 * Reduce the capacities of car links in the specified area,
+	 * excluding motorways and trunks.
+	 */
+	public static void reduceCarCapacities(
+		Scenario scenario,
+		List<PreparedGeometry> areaFilter,
+		double reductionFactor
+	) {
+
+		if (areaFilter == null || areaFilter.isEmpty()) {
+			throw new IllegalArgumentException("areaFilter must be provided and not empty.");
+		}
+
+		scenario.getNetwork().getLinks().values().stream()
+
+			.filter(link -> link.getAllowedModes().contains(TransportMode.car))
+			.filter(link -> isInShape(link, areaFilter))
+
+			.filter(link -> {
+				String typeObj = (String) link.getAttributes().getAttribute("type");
+				return typeObj != null
+					&& !typeObj.contains("motorway")
+					&& !typeObj.contains("trunk");
+			})
+
+			.forEach(link -> {
+
+				if (link.getCapacity() > 0) {
+					link.setCapacity(link.getCapacity() * reductionFactor);
+				}
+
+				if (link.getNumberOfLanes() > 2.0) {
+					link.setNumberOfLanes(link.getNumberOfLanes() * reductionFactor);
+				}
+			});
+
+		log.info(
+			"Reduced car capacities by factor {} in selected area",
+			reductionFactor
+		);
+	}
+
 	// Returns true if either endpoint of the link is in any of the given geometries.
 	private static boolean isInShape(Link link, List<PreparedGeometry> geometries) {
 	    return ShpGeometryUtils.isCoordInPreparedGeometries(
