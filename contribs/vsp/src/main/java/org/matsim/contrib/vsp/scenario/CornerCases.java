@@ -15,6 +15,7 @@ import playground.vsp.simpleParkingCostHandler.ParkingCostConfigGroup;
 import playground.vsp.simpleParkingCostHandler.ParkingCostModule;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.api.core.v01.network.Link;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -25,19 +26,51 @@ public class CornerCases {
 	private static final Logger log = LogManager.getLogger(CornerCases.class);
 
 	/**
-	 * Doubles or increases bike speed.
+	 * Modifies bike speed depending on whether bikes are
+	 * teleported or network routed.
 	 */
-	public static void increaseBikeSpeed(Scenario scenario, double factor) {
+	public static void modifyBikeSpeed(Scenario scenario, double factor) {
 
+		Config config = scenario.getConfig();
+
+		// teleported routing
+		var teleportedParams = config.routing()
+			.getModeRoutingParams()
+			.get(TransportMode.bike);
+
+		if (teleportedParams != null
+			&& teleportedParams.getTeleportedModeSpeed() != null) {
+
+			double oldSpeed = teleportedParams.getTeleportedModeSpeed();
+
+			teleportedParams.setTeleportedModeSpeed(
+				oldSpeed * factor
+			);
+
+			log.info(
+				"Modified teleported bike speed by factor {}",
+				factor
+			);
+
+			return;
+		}
+
+		// network routing
 		VehicleType bike = scenario.getVehicles()
 			.getVehicleTypes()
-			.get(Id.create("bike", VehicleType.class));
+			.get(Id.create(TransportMode.bike, VehicleType.class));
 
-		bike.setMaximumVelocity(
-			bike.getMaximumVelocity() * factor
-		);
+		if (bike != null) {
 
-		log.info("Bike speed increased by factor {}", factor);
+			bike.setMaximumVelocity(
+				bike.getMaximumVelocity() * factor
+			);
+
+			log.info(
+				"Modified network bike speed by factor {}",
+				factor
+			);
+		}
 	}
 
 	/**
@@ -56,7 +89,7 @@ public class CornerCases {
 
 		scenario.getNetwork().getLinks().values().stream()
 			.filter(link -> link.getAllowedModes().contains(TransportMode.car))
-			.filter(link -> ShpGeometryUtils.isCoordInPreparedGeometries(link.getCoord(), geometries))
+			.filter(link -> isInShape(link, geometries))
 			.filter(link -> !((String) link.getAttributes().getAttribute("type")).contains("motorway"))
 			.forEach(link ->
 				link.setFreespeed(link.getFreespeed() * factor)
@@ -73,12 +106,16 @@ public class CornerCases {
 		Config config,
 		Controler controler,
 		Path shp,
-		double firstHourCost
+		double firstHourCost,
+		double extraHourCost,
+		double residentialParkingFee
 	) {
 
 		ParkingCostConfigGroup group =
-
-			ConfigUtils.addOrGetModule(config, ParkingCostConfigGroup.class);
+			ConfigUtils.addOrGetModule(
+				config,
+				ParkingCostConfigGroup.class
+			);
 
 		group.setFirstHourParkingCostLinkAttributeName(
 			"firstHourParkingCost"
@@ -93,7 +130,9 @@ public class CornerCases {
 		);
 
 		controler.addOverridingModule(new ParkingCostModule());
-		controler.addOverridingModule(new PersonMoneyEventsAnalysisModule());
+		controler.addOverridingModule(
+			new PersonMoneyEventsAnalysisModule()
+		);
 
 		List<PreparedGeometry> geometries =
 			ShpGeometryUtils.loadPreparedGeometries(
@@ -101,21 +140,46 @@ public class CornerCases {
 			);
 
 		scenario.getNetwork().getLinks().values().stream()
-			.filter(link -> link.getAllowedModes().contains(TransportMode.car))
-			.filter(link -> ShpGeometryUtils.isCoordInPreparedGeometries(link.getCoord(), geometries))
+			.filter(link ->
+				link.getAllowedModes().contains(TransportMode.car)
+			)
+			.filter(link -> isInShape(link, geometries))
 			.forEach(link -> {
+
 				link.getAttributes().putAttribute(
 					"firstHourParkingCost",
 					firstHourCost
 				);
+
 				link.getAttributes().putAttribute(
 					"extraHourParkingCost",
-					firstHourCost / 2
+					extraHourCost
+				);
+
+				link.getAttributes().putAttribute(
+					"residentialParkingFee",
+					residentialParkingFee
 				);
 			});
 
-		log.info("Applied parking costs.");
+		log.info(
+			"Applied parking costs: firstHour={}, extraHour={}, residential={}",
+			firstHourCost,
+			extraHourCost,
+			residentialParkingFee
+		);
 	}
 
+	// Returns true if either endpoint of the link is in any of the given geometries.
+	private static boolean isInShape(Link link, List<PreparedGeometry> geometries) {
+	    return ShpGeometryUtils.isCoordInPreparedGeometries(
+	        link.getFromNode().getCoord(),
+	        geometries
+	    ) ||
+	    ShpGeometryUtils.isCoordInPreparedGeometries(
+	        link.getToNode().getCoord(),
+	        geometries
+	    );
+	}
 
 }
