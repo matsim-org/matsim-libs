@@ -64,7 +64,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>vsp</artifactId>
+			<artifactId>common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>

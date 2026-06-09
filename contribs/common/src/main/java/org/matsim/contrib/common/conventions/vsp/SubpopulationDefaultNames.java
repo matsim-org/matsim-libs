@@ -1,4 +1,4 @@
-package org.matsim.contrib.vsp.scenario;
+package org.matsim.contrib.common.conventions.vsp;
 
 public class SubpopulationDefaultNames{
 	/**
