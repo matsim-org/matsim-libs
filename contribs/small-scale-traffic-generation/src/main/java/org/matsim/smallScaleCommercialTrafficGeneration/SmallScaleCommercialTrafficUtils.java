@@ -201,7 +201,6 @@ public class SmallScaleCommercialTrafficUtils {
 				Plan plan = popFactory.createPlan();
 
 				String subpopulation = carrier.getAttributes().getAttribute("subpopulation").toString();
-				Id<Vehicle> vehicleId = tour.getVehicle().getId();
 				String mode = tour.getVehicle().getType().getNetworkMode();
 
 				Tour.Start start = tour.getTour().getStart();
@@ -248,7 +247,8 @@ public class SmallScaleCommercialTrafficUtils {
 					newPerson.getAttributes().putAttribute("startCategory",
 						carrier.getAttributes().getAttribute("startCategory").toString());
 				newPerson.getAttributes().putAttribute("carrierId", carrier.getId().toString());
-				VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
+				newPerson.getAttributes().putAttribute("tourId", tour.getTour().getId().toString());
+
 				VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, tour.getVehicle().getType().getId()));
 
 				population.addPerson(newPerson);
