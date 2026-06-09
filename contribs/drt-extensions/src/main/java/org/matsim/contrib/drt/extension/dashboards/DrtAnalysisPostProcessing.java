@@ -183,7 +183,10 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		if (stopsFile != null) {
 			List<TransitStopFacility> stops = readTransitStops(stopsFile);
 			writeStopsShp(stops, output.getPath("stops.shp"));
-			Map<String, TransitStopFacility> byLink = stops.stream().collect(Collectors.toMap(s -> s.getLinkId().toString(), Function.identity()));
+
+			Map<String, TransitStopFacility> byLink = stops.stream().collect(Collectors.toMap(s -> s.getLinkId().toString(), Function.identity(),
+				//when several stops have the same link id, only one is kept. the resulting map will be used for link-based analysis only, anyways.
+				(s, a) -> s));
 
 			//needs to be a DoubleColumn because transposing later forces us to have the same column type for all (new) value columns
 			tableSupplyKPI.addColumns(DoubleColumn.create("Number of stops", new Integer[]{stops.size()}));
