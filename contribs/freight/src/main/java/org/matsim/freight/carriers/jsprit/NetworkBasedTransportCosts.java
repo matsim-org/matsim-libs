@@ -45,7 +45,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.freight.carriers.CarrierVehicle;
-import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.VehicleType;
@@ -826,6 +825,13 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	private int getTimeSlice(double time) {
 		return (int) (time / timeSliceWidth);
+	}
+
+	/**
+	 * @return true if routing distinguishes between different departure-time slices
+	 */
+	public boolean usesTimeDependentRouting() {
+		return timeSliceWidth != Integer.MAX_VALUE;
 	}
 
 	/**

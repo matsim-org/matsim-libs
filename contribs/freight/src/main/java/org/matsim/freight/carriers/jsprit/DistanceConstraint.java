@@ -51,7 +51,9 @@ import org.matsim.vehicles.VehicleUtils;
  */
 /* package-private */ class DistanceConstraint implements HardActivityConstraint {
 
-	@SuppressWarnings("unused")
+	// Recalculating every candidate route is expensive, so only do it close to the usable range limit.
+	private static final double FULL_ROUTE_RECALCULATION_THRESHOLD = 0.9;
+
 	private static final Logger log = LogManager.getLogger(DistanceConstraint.class);
 
 	private final CarrierVehicleTypes vehicleTypes;
@@ -146,7 +148,20 @@ import org.matsim.vehicles.VehicleUtils;
 			additionalConsumptionOfPickup = additionalDistanceOfPickup * (consumptionPerMeter);
 		}
 
-		if (currentRouteConsumption + additionalConsumption + additionalConsumptionOfPickup > energyCapacityInKWhOrLiters)
+		double estimatedConsumption = currentRouteConsumption + additionalConsumption + additionalConsumptionOfPickup;
+		if (estimatedConsumption < energyCapacityInKWhOrLiters * FULL_ROUTE_RECALCULATION_THRESHOLD)
+			return ConstraintsStatus.FULFILLED;
+
+		// Static routing cannot change the distance of subsequent legs. During pickup evaluation, jsprit has also not
+		// selected the delivery position yet; the complete shipment is recalculated with its delivery candidate.
+		// recalculation is only done if the network is time-dependent
+		if (!netBasedCosts.usesTimeDependentRouting() || newAct instanceof PickupShipment)
+			return estimatedConsumption > energyCapacityInKWhOrLiters
+				? ConstraintsStatus.NOT_FULFILLED
+				: ConstraintsStatus.FULFILLED;
+
+		double recalculatedConsumption = calculateRouteDistanceWithInsertion(context, newAct, newVehicle) * consumptionPerMeter;
+		if (recalculatedConsumption > energyCapacityInKWhOrLiters)
 			return ConstraintsStatus.NOT_FULFILLED;
 
 		return ConstraintsStatus.FULFILLED;
@@ -174,6 +189,64 @@ import org.matsim.vehicles.VehicleUtils;
 		realRouteDistance = realRouteDistance + getDistance(
 				context.getRoute().getTourActivities().getActivities().get(n), context.getRoute().getEnd(), newVehicle, from.getEndTime());
 		return realRouteDistance;
+	}
+
+	/**
+	 * Recalculates the complete candidate route while propagating its departure times. Thus, an insertion can also
+	 * change the time-dependent distance of all subsequent legs.
+	 */
+	private double calculateRouteDistanceWithInsertion(JobInsertionContext context, TourActivity newAct, Vehicle vehicle) {
+		List<TourActivity> activities = createActivitySequenceWithInsertion(context, newAct);
+		Location previousLocation = vehicle.getStartLocation();
+		double departureTime = context.getNewDepTime();
+		double distance = 0.;
+
+		for (TourActivity activity : activities) {
+			distance += getDistance(previousLocation, activity.getLocation(), vehicle, departureTime);
+			double arrivalTime = departureTime + netBasedCosts.getTransportTime(
+				previousLocation, activity.getLocation(), departureTime, context.getNewDriver(), vehicle);
+			double operationStartTime = Math.max(arrivalTime, activity.getTheoreticalEarliestOperationStartTime());
+			departureTime = operationStartTime + activity.getOperationTime(); // + activityCosts.getActivityDuration(activity, arrivalTime, context.getNewDriver(), vehicle);
+			previousLocation = activity.getLocation();
+		}
+
+		if (vehicle.isReturnToDepot()) {
+			distance += getDistance(previousLocation, vehicle.getEndLocation(), vehicle, departureTime);
+		}
+		return distance;
+	}
+
+	/**
+	 * Creates the complete activity sequence represented by the current insertion context. Shipment pickup and
+	 * delivery indices both refer to positions in the original route.
+	 */
+	private List<TourActivity> createActivitySequenceWithInsertion(JobInsertionContext context, TourActivity newAct) {
+		List<TourActivity> currentActivities = context.getRoute().getActivities();
+		List<TourActivity> activitiesWithInsertion = new ArrayList<>(currentActivities.size() + 2);
+		int insertionIndex = context.getActivityContext().getInsertionIndex();
+
+		if (newAct instanceof DeliverShipment) {
+			int pickupInsertionIndex = context.getRelatedActivityContext().getInsertionIndex();
+			TourActivity pickup = context.getAssociatedActivities().getFirst();
+			for (int index = 0; index <= currentActivities.size(); index++) {
+				if (index == pickupInsertionIndex) activitiesWithInsertion.add(pickup);
+				if (index == insertionIndex) activitiesWithInsertion.add(newAct);
+				if (index < currentActivities.size()) activitiesWithInsertion.add(currentActivities.get(index));
+			}
+		} else {
+			activitiesWithInsertion.addAll(currentActivities.subList(0, insertionIndex));
+			activitiesWithInsertion.add(newAct);
+			activitiesWithInsertion.addAll(currentActivities.subList(insertionIndex, currentActivities.size()));
+		}
+		return activitiesWithInsertion;
+	}
+
+	private double calculateDepartureTimeAtNewActivity(JobInsertionContext context, TourActivity prevAct,
+			TourActivity newAct, Vehicle vehicle, double prevActDepTime) {
+			double arrivalTime = prevActDepTime + netBasedCosts.getTransportTime(
+			prevAct.getLocation(), newAct.getLocation(), prevActDepTime, context.getNewDriver(), vehicle);
+		double operationStartTime = Math.max(arrivalTime, newAct.getTheoreticalEarliestOperationStartTime());
+		return operationStartTime + newAct.getOperationTime(); //.activityCosts.getActivityDuration(newAct, arrivalTime, context.getNewDriver(), vehicle);
 	}
 
 	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle, double departureTime) {
