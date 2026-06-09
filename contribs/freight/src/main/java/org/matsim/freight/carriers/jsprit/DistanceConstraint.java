@@ -21,6 +21,7 @@
 
 package org.matsim.freight.carriers.jsprit;
 
+import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.constraint.HardActivityConstraint;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.*;
@@ -108,10 +109,12 @@ import org.matsim.vehicles.VehicleUtils;
 
 		double currentDistance = calculateRouteDistance(context, newVehicle);
 		double currentRouteConsumption = currentDistance * (consumptionPerMeter);
-		if (currentRouteConsumption > energyCapacityInKWhOrLiters) return ConstraintsStatus.NOT_FULFILLED_BREAK;
+		if (currentRouteConsumption > energyCapacityInKWhOrLiters && newAct instanceof PickupShipment)
+			return ConstraintsStatus.NOT_FULFILLED_BREAK;
 
 		double distancePrevAct2NewAct = getDistance(prevAct, newAct, newVehicle, prevActDepTime);
-		double distanceNewAct2nextAct = getDistance(newAct, nextAct, newVehicle, prevActDepTime);
+		double newActDepTime = calculateDepartureTimeAtNewActivity(context, prevAct, newAct, newVehicle, prevActDepTime);
+		double distanceNewAct2nextAct = getDistance(newAct, nextAct, newVehicle, newActDepTime);
 		double distancePrevAct2NextAct = getDistance(prevAct, nextAct, newVehicle, prevActDepTime);
 		if (prevAct instanceof Start && nextAct instanceof End) distancePrevAct2NextAct = 0;
 		if (nextAct instanceof End && !context.getNewVehicle().isReturnToDepot()) {
@@ -120,25 +123,30 @@ import org.matsim.vehicles.VehicleUtils;
 		}
 		double additionalDistance = distancePrevAct2NewAct + distanceNewAct2nextAct - distancePrevAct2NextAct;
 		double additionalConsumption = additionalDistance * (consumptionPerMeter);
-		if (currentRouteConsumption + additionalConsumption > energyCapacityInKWhOrLiters) return ConstraintsStatus.NOT_FULFILLED;
-
 
 		double additionalDistanceOfPickup;
 		double additionalConsumptionOfPickup = 0;
 		if (newAct instanceof DeliverShipment) {
 			int iIndexOfPickup = context.getRelatedActivityContext().getInsertionIndex();
 			TourActivity pickup = context.getAssociatedActivities().getFirst();
-			TourActivity actBeforePickup;
-			if (iIndexOfPickup > 0) actBeforePickup = context.getRoute().getActivities().get(iIndexOfPickup - 1);
-			else actBeforePickup = new Start(context.getNewVehicle().getStartLocation(), 0, Double.MAX_VALUE);
+			Location beforePickupLocation;
+			double beforePickupDepTime;
+			if (iIndexOfPickup > 0) {
+				TourActivity actBeforePickup = context.getRoute().getActivities().get(iIndexOfPickup - 1);
+				beforePickupLocation = actBeforePickup.getLocation();
+				beforePickupDepTime = actBeforePickup.getEndTime();
+			} else {
+				beforePickupLocation = context.getNewVehicle().getStartLocation();
+				beforePickupDepTime = context.getNewDepTime();
+			}
 			TourActivity actAfterPickup;
 			if (iIndexOfPickup < context.getRoute().getActivities().size())
 				actAfterPickup = context.getRoute().getActivities().get(iIndexOfPickup);
 			else
 				actAfterPickup = nextAct;
-			double distanceActBeforePickup2Pickup = getDistance(actBeforePickup, pickup, newVehicle, actBeforePickup.getEndTime());
+			double distanceActBeforePickup2Pickup = getDistance(beforePickupLocation, pickup.getLocation(), newVehicle, beforePickupDepTime);
 			double distancePickup2ActAfterPickup = getDistance(pickup, actAfterPickup, newVehicle, context.getRelatedActivityContext().getEndTime());
-			double distanceBeforePickup2AfterPickup = getDistance(actBeforePickup, actAfterPickup,newVehicle, actBeforePickup.getEndTime());
+			double distanceBeforePickup2AfterPickup = getDistance(beforePickupLocation, actAfterPickup.getLocation(), newVehicle, beforePickupDepTime);
 			if (context.getRoute().isEmpty()) distanceBeforePickup2AfterPickup = 0;
 			if (actAfterPickup instanceof End && !context.getNewVehicle().isReturnToDepot()) {
 				distancePickup2ActAfterPickup = 0;
@@ -169,7 +177,8 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	/**
-	 * Calculates the distance based on the route-based distances between every tour activity.
+	 * Calculates the distance of the current route using its stored activity end times. This is the cheap baseline
+	 * for the local insertion estimate.
 	 */
 	private double calculateRouteDistance(JobInsertionContext context, Vehicle newVehicle) {
 		double realRouteDistance = 0;
@@ -250,8 +259,11 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle, double departureTime) {
-		double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), departureTime,
-				vehicle);
+		return getDistance(from.getLocation(), to.getLocation(), vehicle, departureTime);
+	}
+
+	private double getDistance(Location from, Location to, Vehicle vehicle, double departureTime) {
+		double distance = netBasedCosts.getDistance(from, to, departureTime, vehicle);
 		if (!(distance >= 0.))
 			throw new AssertionError("Distance must not be negative! From, to" + from + ", " + to
 					+ " distance " + distance);
