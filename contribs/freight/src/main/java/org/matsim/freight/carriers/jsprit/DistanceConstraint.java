@@ -82,11 +82,9 @@ import org.matsim.vehicles.VehicleUtils;
 	 * If a delivery is added, it also accounts for the necessary consumption if the pickup is added at the given position of the tour. This is also important for the fulfilled decision of this
 	 * function. In the end, the conditions check if the consumption of the tour including the additional shipment is possible with the possible energyCapacity.
 	 */
-	//TODO add the time dependencies of the distance calculation because the route choice can be different for different times
 	@Override
 	public ConstraintsStatus fulfilled(JobInsertionContext context, TourActivity prevAct, TourActivity newAct,
 			TourActivity nextAct, double prevActDepTime) {
-//		double additionalDistance;
 
 		Vehicle newVehicle = context.getNewVehicle();
 		Id<VehicleType> vehicleTypeId = Id.create(newVehicle.getType().getTypeId(), VehicleType.class);
