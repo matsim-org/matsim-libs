@@ -25,6 +25,10 @@ import com.graphhopper.jsprit.core.problem.constraint.HardActivityConstraint;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.*;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -54,10 +58,20 @@ import org.matsim.vehicles.VehicleUtils;
 
 	private final NetworkBasedTransportCosts netBasedCosts;
 
-	public DistanceConstraint(CarrierVehicleTypes vehicleTypes,
-							  NetworkBasedTransportCosts netBasedCosts) {
+	private final double usableEnergyCapacityFactor;
+
+	private final Set<Id<VehicleType>> loggedVehicleTypes = ConcurrentHashMap.newKeySet();
+
+	public DistanceConstraint(CarrierVehicleTypes vehicleTypes, NetworkBasedTransportCosts netBasedCosts,
+			double usableRangeInPercent) {
+		if (!Double.isFinite(usableRangeInPercent) || usableRangeInPercent <= 0. || usableRangeInPercent > 100.) {
+			throw new IllegalArgumentException("Distance constraint usable range must be in the range (0, 100].");
+		}
 		this.vehicleTypes = vehicleTypes;
 		this.netBasedCosts = netBasedCosts;
+		this.usableEnergyCapacityFactor = usableRangeInPercent / 100.;
+		log.info("Distance constraint initialized with a usable range of {} percent of the vehicle range during tour planning.",
+				usableRangeInPercent);
 	}
 
 	/**
@@ -72,12 +86,17 @@ import org.matsim.vehicles.VehicleUtils;
 //		double additionalDistance;
 
 		Vehicle newVehicle = context.getNewVehicle();
+		Id<VehicleType> vehicleTypeId = Id.create(newVehicle.getType().getTypeId(), VehicleType.class);
 		VehicleType vehicleTypeOfNewVehicle = vehicleTypes.getVehicleTypes()
-				.get(Id.create(newVehicle.getType().getTypeId(), VehicleType.class));
-		if (VehicleUtils.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation()) == null)  return ConstraintsStatus.FULFILLED;
+				.get(vehicleTypeId);
+		Double vehicleEnergyCapacity = VehicleUtils.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation());
+		if (vehicleEnergyCapacity == null)  return ConstraintsStatus.FULFILLED;
 
-		Double energyCapacityInKWhOrLiters = VehicleUtils
-			.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation());
+		double energyCapacityInKWhOrLiters = vehicleEnergyCapacity * usableEnergyCapacityFactor;
+		if (loggedVehicleTypes.add(vehicleTypeId)) {
+			log.info("Distance constraint checks vehicle type {} with energy capacity {} and usable energy capacity {} ({} percent usable range).",
+				vehicleTypeId, vehicleEnergyCapacity, energyCapacityInKWhOrLiters, (usableEnergyCapacityFactor * 100.));
+		}
 		Double consumptionPerMeter;
 		if (VehicleUtils.getHbefaTechnology(vehicleTypeOfNewVehicle.getEngineInformation()).equals("electricity"))
 			consumptionPerMeter = VehicleUtils
