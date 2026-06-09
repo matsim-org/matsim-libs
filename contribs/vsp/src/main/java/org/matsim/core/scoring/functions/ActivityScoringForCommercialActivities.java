@@ -23,8 +23,6 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 
 	private final ScoringParameters params;
 	private final OpeningIntervalCalculator openingIntervalCalculator;
-	private Id<VehicleType> vehicleType;
-	private Vehicles vehicles;
 	private Activity firstActivity;
 
 	private static final Logger log = LogManager.getLogger(ActivityScoringForCommercialActivities.class);
