@@ -126,7 +126,7 @@ public class CommercialTrafficIT {
 		for (Person person : population.getPersons().values()) {
 			Assertions.assertNotNull(person.getSelectedPlan());
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("tourStartArea"));
-			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("vehicles"));
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("tourId"));
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("subpopulation"));
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("purpose"));
 
