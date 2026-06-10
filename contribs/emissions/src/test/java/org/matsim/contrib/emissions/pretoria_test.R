@@ -274,6 +274,8 @@
            height = 20,
            dpi = 300)
 
+    d <- d %>% mutate(freespeed = freespeed*3.6)
+
     xmin <- min(d$freespeed)
     xmax <- max(d$freespeed)
 
@@ -305,7 +307,7 @@
       ) +
       facet_wrap(~component, scales="free_y") +
       theme(text = element_text(size=18)) +
-      xlab("Freespeed in (m/s)") +
+      xlab("Freespeed in (km/h)") +
       ylab("Driven distance per trip (km)") +
       labs(caption="Fig XX: The absolute error distribution by freespeed. Upper plots show the error for the distinct components. \n Bottom plots show the distance driven with respective freespeed.") +
       theme(text = element_text(size=18), plot.caption = element_text(size = 18, hjust = 0.5, margin = margin(t=20)))
