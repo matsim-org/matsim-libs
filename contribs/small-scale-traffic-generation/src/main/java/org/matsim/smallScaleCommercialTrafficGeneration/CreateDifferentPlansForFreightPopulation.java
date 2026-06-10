@@ -8,8 +8,11 @@ import picocli.CommandLine;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.StringJoiner;
 
 @CommandLine.Command(name = "generate-plan-variants-for-freight", description = "Generates variants of plans for a population of freight agents", showDefaultValues = true)
 
@@ -21,7 +24,7 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 	private Path populationPath;
 	@CommandLine.Option(names = "--outputPopulationPath", description = "Path to the outputPopulation", required = true)
 	private Path outputPopulationPath;
-	@CommandLine.Option(names = "--numberOfPlanVariants", description = "Set the number of plan variants", required = true, defaultValue = "5")
+	@CommandLine.Option(names = "--numberOfPlanVariants", description = "Set the maximum number of plan variants", required = true, defaultValue = "5")
 	private static int numberOfPlanVariants;
 	@CommandLine.Option(names = "--earliestTourStartTime", description = "Set earliest tour startTime in seconds", defaultValue = "21600")
 	private static int earliestTourStartTime;
@@ -69,7 +72,8 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 	}
 
 	/**
-	 * Creates alternative plans (n = selectedNumberOfPlanVariants) by changing the order of the activities.
+	 * Creates up to selectedNumberOfPlanVariants plan variants by changing the order of the activities.
+	 * Fewer plans are created if fewer unique activity orders exist.
 	 *
 	 * @param population
 	 * @param selectedNumberOfPlanVariants
@@ -108,19 +112,32 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 						}
 						count++;
 					}
-					for (int i = person.getPlans().size(); i < numberOfPlanVariants; i++) {
-						if (activityIndexList.size() < 2)
-							continue;
+					if (activityIndexList.size() < 2)
+						continue;
+
+					Plan selectedPlan = person.getSelectedPlan();
+					Set<String> usedActivityOrders = new HashSet<>();
+					for (Plan plan : person.getPlans()) {
+						usedActivityOrders.add(createActivityOrderSignature(plan, activityIndexList));
+					}
+
+					int maxUniqueActivityOrders = maxActivityOrderVariants(activityIndexList.size());
+					int tries = 0;
+					int maxTries = Math.max(maxUniqueActivityOrders * 20, numberOfPlanVariants * 20);
+					while (person.getPlans().size() < numberOfPlanVariants && usedActivityOrders.size() < maxUniqueActivityOrders && tries++ < maxTries) {
 						List<Integer> activityNewIndexList = new ArrayList<>(activityIndexList);
 						Collections.shuffle(activityNewIndexList, rnd);
-						List<Integer> alreadySwapedActivity = new ArrayList<>();
+						String activityOrderSignature = createActivityOrderSignature(selectedPlan, activityNewIndexList);
+						if (!usedActivityOrders.add(activityOrderSignature))
+							continue;
+
+						List<PlanElement> newActivityOrder = activityNewIndexList.stream()
+							.map(index -> selectedPlan.getPlanElements().get(index))
+							.toList();
 						Plan newPLan = person.createCopyOfSelectedPlanAndMakeSelected();
-						person.setSelectedPlan(person.getPlans().getFirst());
+						person.setSelectedPlan(selectedPlan);
 						for (int j = 0; j < activityIndexList.size(); j++) {
-							if (alreadySwapedActivity.contains(activityIndexList.get(j)))
-								continue;
-							Collections.swap(newPLan.getPlanElements(), activityIndexList.get(j), activityNewIndexList.get(j));
-							alreadySwapedActivity.add(activityNewIndexList.get(j));
+							newPLan.getPlanElements().set(activityIndexList.get(j), newActivityOrder.get(j));
 						}
 					}
 
@@ -128,6 +145,44 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 				default -> throw new RuntimeException("No possible PlanVariantStrategy selected");
 			}
 		}
+	}
+
+	/**
+	 * Builds a signature for the service activity order in an existing plan.
+	 */
+	private static String createActivityOrderSignature(Plan plan, List<Integer> activityIndexList) {
+		StringJoiner activityOrderSignature = new StringJoiner("||");
+		for (int index : activityIndexList) {
+			activityOrderSignature.add(createActivitySignature((Activity) plan.getPlanElements().get(index)));
+		}
+		return activityOrderSignature.toString();
+	}
+
+	/**
+	 * Describes an activity by the fields relevant for distinguishing activity-order variants.
+	 */
+	private static String createActivitySignature(Activity activity) {
+		String coord = activity.getCoord() == null ? "null" : activity.getCoord().getX() + "," + activity.getCoord().getY();
+		return String.join("|",
+			activity.getType(),
+			String.valueOf(activity.getLinkId()),
+			String.valueOf(activity.getFacilityId()),
+			coord,
+			String.valueOf(activity.getStartTime()),
+			String.valueOf(activity.getEndTime()),
+			String.valueOf(activity.getMaximumDuration()));
+	}
+
+	private static int maxActivityOrderVariants(int numberOfActivities) {
+		int result = 1;
+		for (int i = 2; i <= numberOfActivities; i++) {
+			if (result > numberOfPlanVariants / i)
+				return numberOfPlanVariants;
+			result *= i;
+			if (result >= numberOfPlanVariants)
+				return numberOfPlanVariants;
+		}
+		return result;
 	}
 
 	private static double createStartTimeVariante(List<Double> timeVariants) {
