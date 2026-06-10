@@ -108,6 +108,14 @@ public class CHLeastCostPathTree implements ShortestPathTree {
     private final int nodeCount;
 
     public CHLeastCostPathTree(CHGraph chGraph, TravelTime tt, TravelDisutility td) {
+		if (!chGraph.isTimeDependent()) {
+			// Refuse to wrap a static graph rather than NPE in the hot loop on the null
+			// ttf/minTTF arrays.
+			throw new IllegalStateException(
+					"CHLeastCostPathTree currently requires a time-dependent "
+							+ "CHGraph; the supplied graph was built with "
+							+ "timeDependent=false.");
+		}
         this.chGraph = chGraph;
         this.baseGraph = chGraph.getBaseGraph();
         this.tt = tt;

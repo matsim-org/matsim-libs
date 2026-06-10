@@ -98,12 +98,35 @@ public class CHGraph {
     // ttf[bin * totalEdgeCount + globalIdx] = travel time (seconds).
     // Bin-major layout gives sequential access when iterating a node's edges
     // (constant bin, contiguous globalIdx values).
+    // Null when {@link #timeDependent} is {@code false} (graph built for the
+    // static {@link CHRouter} path only, e.g. by
+    // {@code StaticCHRouterFactory} — saves NUM_BINS x totalEdgeCount doubles
+    // of heap and skips the full-graph CHTTFCustomizer pass).
     double[] ttf;
     double[] minTTF;
 
     // Change detection for incremental TTF customization.
     // ttfHash[globalIdx] = sum of TTF bins; NaN until first customization.
+    // Null when {@link #timeDependent} is {@code false}.
     double[] ttfHash;
+
+    /**
+     * Whether this CH overlay was built with time-of-day TTF storage.
+     *
+     * <p>When {@code false}, the {@code ttf}, {@code minTTF} and {@code ttfHash}
+     * arrays are not allocated and the graph can only be used with the static
+     * {@link CHRouter} (which reads {@code edgeWeights[]} only). Consumers that
+     * require per-bin travel times — namely {@link CHTTFCustomizer},
+     * {@link CHRouterTimeDep} and {@link CHLeastCostPathTree} — must reject
+     * a static graph by throwing {@link IllegalStateException} in their
+     * constructor / entry point.
+     */
+    private final boolean timeDependent;
+
+    /** Whether this CH overlay carries per-bin time-of-day TTF storage. */
+    public boolean isTimeDependent() {
+        return timeDependent;
+    }
 
     // Topological processing order for customization.
     // Ensures lower (component) edges are processed before their parent shortcuts.
@@ -159,7 +182,8 @@ public class CHGraph {
                   int upEdgeCount, int[] upOff, int[] upLen, int[] upEdges, double[] upWeights,
                   int dnEdgeCount, int[] dnOff, int[] dnLen, int[] dnEdges, double[] dnWeights,
                   int totalEdgeCount, int[] edgeOrigLink, int[] edgeLower1, int[] edgeLower2,
-                  double[] edgeDistance, int[] customizeOrder, int[] nodeLevel) {
+                  double[] edgeDistance, int[] customizeOrder, int[] nodeLevel,
+                  boolean timeDependent) {
         this.baseGraph      = baseGraph;
         this.nodeCount      = nodeCount;
         this.upEdgeCount    = upEdgeCount;
@@ -179,6 +203,7 @@ public class CHGraph {
         this.edgeDistance   = edgeDistance;
         this.customizeOrder = customizeOrder;
         this.nodeLevel      = nodeLevel;
+        this.timeDependent  = timeDependent;
         this.edgeWeights    = new double[totalEdgeCount];
 
         // Precompute sweep order: nodes sorted by decreasing level
@@ -194,11 +219,34 @@ public class CHGraph {
             sweepOrder[i] = invLevel[nodeCount - 1 - i];
         }
 
-        // Pre-allocate bin-major flat TTF arrays.
-        this.ttf    = new double[CHTTFCustomizer.NUM_BINS * totalEdgeCount];
-        this.minTTF = new double[totalEdgeCount];
-        this.ttfHash = new double[totalEdgeCount];
-        java.util.Arrays.fill(this.ttfHash, Double.NaN);
+        // Pre-allocate bin-major flat TTF arrays (only when this graph will be
+        // used with a time-dependent router/tree). Static-only graphs skip the
+        // NUM_BINS x totalEdgeCount allocation entirely — it can run into many
+        // tens of GB and also overflows int sizing on large networks.
+        if (timeDependent) {
+            // Guard against int overflow before the JVM throws an opaque
+            // NegativeArraySizeException. Math.multiplyExact would do, but we want
+            // the message to name the dimensions so callers can act on it.
+            long ttfSize = (long) CHTTFCustomizer.NUM_BINS * (long) totalEdgeCount;
+            if (ttfSize > Integer.MAX_VALUE - 8L) {
+                throw new IllegalStateException(
+                        "CH time-dependent TTF array size exceeds Integer.MAX_VALUE: "
+                        + "NUM_BINS=" + CHTTFCustomizer.NUM_BINS
+                        + ", totalEdgeCount=" + totalEdgeCount
+                        + " (would need " + ttfSize + " doubles, ~"
+                        + (ttfSize * 8L / (1024L * 1024L * 1024L)) + " GB). "
+                        + "Either build the CH graph in static mode "
+                        + "(timeDependent=false) or split the network.");
+            }
+            this.ttf    = new double[(int) ttfSize];
+            this.minTTF = new double[totalEdgeCount];
+            this.ttfHash = new double[totalEdgeCount];
+            java.util.Arrays.fill(this.ttfHash, Double.NaN);
+        } else {
+            this.ttf     = null;
+            this.minTTF  = null;
+            this.ttfHash = null;
+        }
 
         // Build reverse CSR: dnOutEdges (reverse of dnEdges).
         // dnEdges[w] stores incoming edges u→w.  dnOutEdges[u] stores outgoing edges u→w.
