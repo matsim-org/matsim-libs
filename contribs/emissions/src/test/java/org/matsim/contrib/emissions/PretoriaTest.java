@@ -5,9 +5,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -361,7 +359,7 @@ public class PretoriaTest {
 		// Link information used for output analysis
 
 		// Read in the Pretoria network file with real emissions
-		Network pretoriaNetwork = NetworkUtils.readNetwork(utils.getClassInputDirectory() + "network_routeC_etios.xml");
+		Network pretoriaNetwork = NetworkUtils.readNetwork(utils.getClassInputDirectory() + "network_routeC_final.xml");
 
 		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
@@ -403,7 +401,7 @@ public class PretoriaTest {
 		System.out.println(vehHbefaInfo);
 
 		// Read in the Pretoria network file with real emissions
-		Network pretoriaNetwork = NetworkUtils.readNetwork(utils.getClassInputDirectory() + "network_routeC_etios.xml");
+		Network pretoriaNetwork = NetworkUtils.readNetwork(utils.getClassInputDirectory() + "network_routeC_final.xml");
 
 		// Create Scenario and EventManager
 		Scenario scenario = ScenarioUtils.loadScenario(config);
