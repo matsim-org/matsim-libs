@@ -1,6 +1,7 @@
 package org.matsim.simwrapper.DbViewer;
 
 import com.google.inject.Inject;
+import org.agrona.concurrent.Agent;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -17,6 +18,8 @@ import org.apache.parquet.schema.MessageTypeParser;
 import org.apache.parquet.schema.PrimitiveType;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.PopulationUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -27,24 +30,25 @@ import java.util.Map;
 public class AgentTable {
 
 	ParquetWriter<Group> writerAgents;
-	SimpleGroupFactory factoryAgents;
 	private Integer agentCount = 0;
+	private final Population population;
 	private final static Logger log = LogManager.getLogger(AgentTable.class);
+	private String outputDirectory;
 
-	@Inject
-	public AgentTable(@DbScenario Scenario scenario, @DbOutputPath String outputDirectory) throws IOException, SQLException {
-		Map<String, Object> attributes = scenario.getPopulation()
-			.getPersons().values().iterator().next()
-			.getAttributes().getAsMap();
+	public AgentTable(Population population, String outputDirectory)  {
+		this.population = population;
+		this.outputDirectory = outputDirectory;
+	}
+	public void run() throws IOException, SQLException {
 
+		Map<String, Object> attributes = this.population.getPersons().values().iterator().next().getAttributes().getAsMap();
 		String parquetSchemaString = generateParquetSchema("persons", attributes);
 
 		MessageType schemaAgents = MessageTypeParser.parseMessageType(parquetSchemaString);
-
-		this.factoryAgents= new SimpleGroupFactory(schemaAgents);
+		SimpleGroupFactory factoryAgents = new SimpleGroupFactory(schemaAgents);
 
 		Configuration conf = new Configuration();
-		Path pathAgents = new Path(outputDirectory + "/agents.parquet");
+		Path pathAgents = new Path(this.outputDirectory + "/agents.parquet");
 		FileSystem fs = FileSystem.get(new Configuration());
 
 		if (fs.exists(pathAgents)) {
@@ -63,10 +67,10 @@ public class AgentTable {
 			log.error("Failed to open parquet file", e);
 		}
 
-		for (Person person : scenario.getPopulation().getPersons().values()) {
+		for (Person person : this.population.getPersons().values()) {
 			try {
 
-					Group group = this.factoryAgents.newGroup();
+				Group group = factoryAgents.newGroup();
 				group.append("agent_id", person.getId().toString()); // ← add this
 
 
@@ -91,7 +95,7 @@ public class AgentTable {
 					}
 				}
 
-					this.writerAgents.write(group);
+				this.writerAgents.write(group);
 				this.agentCount++;
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -141,7 +145,6 @@ public class AgentTable {
 		sql.append("\n}");
 		return sql.toString();
 	}
-
 
 	public void finish() throws SQLException {
 		log.info("finish() called — agentCount={}", this.agentCount);

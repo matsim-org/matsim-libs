@@ -18,7 +18,7 @@ public class DbEventsModule extends AbstractModule {
 		bind(String.class).annotatedWith(DbOutputPath.class).toInstance(outputDirectory);
 		bind(Scenario.class).annotatedWith(DbScenario.class).toInstance(scenario);
 		bind(DbEventHandler.class).in(Singleton.class);
-		bind(AgentTable.class).asEagerSingleton();
+		// bind(AgentTable.class).asEagerSingleton();
 		addControllerListenerBinding().to(DbEventListener.class);
 	}
 }

@@ -9,6 +9,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class DbEventListener implements IterationEndsListener, IterationStartsListener {
@@ -50,6 +51,8 @@ public class DbEventListener implements IterationEndsListener, IterationStartsLi
 				dbEventHandler.finish();
 			}  catch (SQLException ex) {
 				throw new RuntimeException(ex);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 		}
 //			DbWriter dbWriter = new DbWriter(dbEventHandler, db, scenario, outputDirectory);
