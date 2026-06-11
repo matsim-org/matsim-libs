@@ -426,7 +426,7 @@ errorDiagrams <- function(
   name = "freespeed",
   vehicle = "FIGO_TECHAVG",
   binwidth = 5,
-  xlab = "Freespeed in (km/h)",
+  xlab = "Freespeed (km/h)",
   ylab = "Average error (g/m)",
   caption = "Fig XX: The absolute error distribution by freespeed. Upper plots show the error for the distinct components.
            Bounding boxes represent the range between the 25th and 75th error percentile for the respective method.
@@ -498,7 +498,7 @@ errorDiagrams <- function(
     facet_wrap(~component, scales="free_y") +
     theme(text = element_text(size=18)) +
     xlab("") +
-    ylab("Average error (g/m)")
+    ylab(ylab)
 
   p2 <- ggplot(d_error %>% mutate(x_value = x(d_error))) +
     geom_histogram(aes(x=x_value, fill=segment, weight=length/(2*length(unique(d_error$tripId)))/1000), binwidth = binwidth) +
@@ -515,7 +515,7 @@ errorDiagrams <- function(
     ) +
     facet_wrap(~component, scales="free_y") +
     theme(text = element_text(size=18)) +
-    xlab("Freespeed in (km/h)") +
+    xlab(xlab) +
     ylab("Driven distance per trip (km)") +
     labs(caption=
            "Fig XX: The absolute error distribution by freespeed. Upper plots show the error for the distinct components.
@@ -532,11 +532,11 @@ errorDiagrams <- function(
 }
 
 errorDiagrams()
-errorDiagrams(name="gradient", binwidth = 0.05, x = function(error) error$gradient)
-errorDiagrams(name="freespeed_normalized", y = function(error) {
+errorDiagrams(name="gradient", binwidth = 0.05, xlab="Gradient (%)", x = function(error) error$gradient)
+errorDiagrams(name="freespeed_normalized", ylab="Normalized average error (g/m)", y = function(error) {
   error$error_gPkm / error$mean_value
 })
-errorDiagrams(name="gradient_normalized", binwidth = 0.05, x = function(error) error$gradient, y = function(error) {
+errorDiagrams(name="gradient_normalized", binwidth = 0.05, xlab="Gradient (%)", ylab="Normalized average error (g/m)", x = function(error) error$gradient, y = function(error) {
   error$error_gPkm / error$mean_value
 })
 
