@@ -16,7 +16,7 @@
 
 # ==== General Pretoria Analysis ====
 {
-  vehicle <- "FIGO_TECHAVG"
+  vehicle <- "RRV"
   method <- "InterpolationFraction"
 
   pretoria_output <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_{method}.csv")) %>%
@@ -87,7 +87,7 @@
            NOx_diff = 100*NOx_MATSim/NOx_pems-100)
 }
 
-# ==== ç ====
+# ==== Segment Wise Pretoria Analysis ====
 {
   # In the JWJ Paper, 3 segments were defined
   # A: Urban (from 28948 to 14100)
@@ -230,7 +230,8 @@
 
     d <- pretoria_output.SG %>%
       rbind(pretoria_output.Int) %>%
-      inner_join(network_information, by = "linkId")
+      inner_join(network_information, by = "linkId") %>%
+      mutate(freespeed = freespeed*3.6, error_gPkm = error/length)
 
     colors <- c("#00a4f5", "#d21717")
 
@@ -238,7 +239,7 @@
     xmax <- max(d$gradient)
 
     p1 <- ggplot(d) +
-      stat_summary_bin(aes(x=gradient, y=error, color=method), fun = mean, binwidth=0.05, geom="line") +
+      stat_summary_bin(aes(x=gradient, y=error_gPkm, color=method), fun = mean, binwidth=0.05, geom="line") +
       coord_cartesian(xlim = c(xmin, xmax)) +
       theme_minimal() +
       scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
@@ -246,13 +247,13 @@
       facet_wrap(~component, scales="free") +
       theme(text = element_text(size=18)) +
       xlab("") +
-      ylab("Average error in mass (g)")
+      ylab("Average error (g/m)")
 
     p2 <- ggplot(d) +
       geom_histogram(aes(x=gradient, fill=segment, weight=length/(2*length(unique(d$tripId)))/1000), binwidth = 0.05) +
       coord_cartesian(xlim = c(xmin, xmax)) +
       theme_minimal() +
-      scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
+      # scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
       scale_fill_manual(
         values = c(
           "A" = "#1f77b4",
@@ -274,22 +275,20 @@
            height = 20,
            dpi = 300)
 
-    d <- d %>% mutate(freespeed = freespeed*3.6)
-
     xmin <- min(d$freespeed)
     xmax <- max(d$freespeed)
 
     p3 <- ggplot(d) +
-      stat_summary_bin(aes(x=freespeed, y=(error)*100, color=method), fun = mean, binwidth=1, geom="line") +
+      stat_summary_bin(aes(x=freespeed, y=error_gPkm, color=method), fun = mean, binwidth=1, geom="line") +
       geom_hline(yintercept=0) +
       coord_cartesian(xlim = c(xmin, xmax)) +
       theme_minimal() +
-      scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
+      # scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
       scale_color_manual(values=colors) +
       facet_wrap(~component, scales="free_y") +
       theme(text = element_text(size=18)) +
       xlab("") +
-      ylab("Average error in mass (g)")
+      ylab("Average error (g/m)")
 
 
     p4 <- ggplot(d) +
