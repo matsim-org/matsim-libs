@@ -421,6 +421,125 @@ speedCurves <- function(
   speedCurves(trafficSit = "URB/Local/50", components=c("CO", "CO2"))
 }
 
+# Binned Error Diagrams
+errorDiagrams <- function(
+  name = "freespeed",
+  vehicle = "FIGO_TECHAVG",
+  binwidth = 5,
+  xlab = "Freespeed in (km/h)",
+  ylab = "Average error (g/m)",
+  caption = "Fig XX: The absolute error distribution by freespeed. Upper plots show the error for the distinct components.
+           Bounding boxes represent the range between the 25th and 75th error percentile for the respective method.
+           Bottom plots show the distance driven with respective freespeed.",
+  x = function(error) error$freespeed,
+  y = function(error) error$error_gPkm
+) {
+
+  pretoria_output.SG <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_StopAndGoFraction.csv")) %>%
+    filter(linkId != 6555 & linkId != "cold") %>%
+    mutate(method = "StopAndGoFraction")
+
+  pretoria_output.Int <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_InterpolationFraction.csv")) %>%
+    filter(linkId != 6555 & linkId != "cold") %>%
+    mutate(method = "InterpolationFraction")
+
+  network_information <- read_csv(glue("{matsim_output_path}/PretoriaTest/networkInformation.csv")) %>%
+    separate(roadType, c("Region", "RoadType", "VClass"), sep="/")
+
+  pretoria_output <- pretoria_output.SG %>%
+    rbind(pretoria_output.Int) %>%
+    inner_join(network_information, by = "linkId") %>%
+    mutate(freespeed = freespeed*3.6, averageVelocity = averageVelocity*3.6)
+
+  value_avg <- pretoria_output %>%
+    pivot_longer(cols = c("CO_MATSim", "CO_pems", "CO2_MATSim", "CO2_pems", "NOx_MATSim", "NOx_pems"), names_to="component", values_to="value") %>%
+    separate(component, sep = "_", into = c("component", "model")) %>%
+    group_by(component, method, model) %>%
+    summarize(mean_value = mean(value, na.rm=TRUE))
+
+  d_error <- pretoria_output %>%
+    mutate(CO = CO_MATSim - CO_pems, CO2 = CO2_MATSim - CO2_pems, NOx = NOx_MATSim - NOx_pems) %>%
+    select(-CO_MATSim, -CO_pems, -CO2_MATSim, -CO2_pems, -NOx_MATSim, -NOx_pems) %>%
+    pivot_longer(c("CO", "CO2", "NOx"), names_to = "component", values_to = "error") %>%
+    mutate(error_gPkm = error/length) %>%
+    left_join(value_avg %>% filter(model == "MATSim"), by =c("component", "method")) %>%
+    select(-model)
+
+  colors <- c("#00a4f5", "#d21717")
+
+  d <- d_error %>%
+    mutate(bin = ceiling(x(d_error) / binwidth) * binwidth ) %>%
+    group_by(component, method, bin) %>%
+    summarize(
+      mean_error = mean(y(cur_data()), na.rm = TRUE),
+      q05 = quantile(y(pick(everything())), 0.05, na.rm = TRUE),
+      q25 = quantile(y(pick(everything())), 0.25, na.rm = TRUE),
+      q75 = quantile(y(pick(everything())), 0.75, na.rm = TRUE),
+      q95 = quantile(y(pick(everything())), 0.95, na.rm = TRUE),
+      n = n(),
+      .groups = "drop"
+    )
+
+  xmin <- min(d$bin)
+  xmax <- max(d$bin)
+
+  p1 <- ggplot(d) +
+    geom_ribbon(
+      aes(x=bin, ymin = q25, ymax = q75, fill = method),
+      alpha = 0.2,
+    ) +
+    geom_line(aes(x=bin, y = mean_error, color=method)) +
+    geom_hline(yintercept=0) +
+    coord_cartesian(xlim = c(xmin, xmax)) +
+    theme_minimal() +
+    # scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
+    scale_color_manual(values=colors) +
+    scale_fill_manual(values=colors) +
+    facet_wrap(~component, scales="free_y") +
+    theme(text = element_text(size=18)) +
+    xlab("") +
+    ylab("Average error (g/m)")
+
+  p2 <- ggplot(d_error %>% mutate(x_value = x(d_error))) +
+    geom_histogram(aes(x=x_value, fill=segment, weight=length/(2*length(unique(d_error$tripId)))/1000), binwidth = binwidth) +
+    coord_cartesian(xlim = c(xmin, xmax)) +
+    theme_minimal() +
+    scale_y_continuous(labels = \(x) str_pad(round(x, 2), width = 6)) +
+    scale_fill_manual(
+      values = c(
+        "A" = "#1f77b4",
+        "B" = "#ff7f0e",
+        "C" = "#2ca02c",
+        "none" = "grey70"
+      )
+    ) +
+    facet_wrap(~component, scales="free_y") +
+    theme(text = element_text(size=18)) +
+    xlab("Freespeed in (km/h)") +
+    ylab("Driven distance per trip (km)") +
+    labs(caption=
+           "Fig XX: The absolute error distribution by freespeed. Upper plots show the error for the distinct components.
+           Bounding boxes represent the range between the 25th and 75th error percentile for the respective method.
+           Bottom plots show the distance driven with respective freespeed.") +
+    theme(text = element_text(size=18), plot.caption = element_text(size = 18, hjust = 0.5, margin = margin(t=20)))
+
+  p1 / p2
+
+  ggsave(glue("{plots_path}/{name}_err.png"),
+         width = 30,
+         height = 20,
+         dpi = 300)
+}
+
+errorDiagrams()
+errorDiagrams(name="gradient", binwidth = 0.05, x = function(error) error$gradient)
+errorDiagrams(name="freespeed_normalized", y = function(error) {
+  error$error_gPkm / error$mean_value
+})
+errorDiagrams(name="gradient_normalized", binwidth = 0.05, x = function(error) error$gradient, y = function(error) {
+  error$error_gPkm / error$mean_value
+})
+
 # PHEM Plots with all computation methods
 {
   plot_main2()
