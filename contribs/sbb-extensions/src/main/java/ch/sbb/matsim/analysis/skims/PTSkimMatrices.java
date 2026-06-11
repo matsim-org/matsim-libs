@@ -316,7 +316,7 @@ public class PTSkimMatrices {
                     Id<TransitStopFacility> egressStopId = egressEntry.getKey();
                     Double egressTime = egressEntry.getValue();
                     TravelInfo info = tree.get(egressStopId);
-                    if (info != null && !info.isWalkOnly()) {
+                    if (info != null && !info.isWalkOnly) {
                         Double accessTime = accessTimes.get(info.departureStop);
                         ODConnection connection = new ODConnection(info.ptDepartureTime, info.ptTravelTime, accessTime, egressTime, info.transferCount, info);
                         connections.add(connection);
