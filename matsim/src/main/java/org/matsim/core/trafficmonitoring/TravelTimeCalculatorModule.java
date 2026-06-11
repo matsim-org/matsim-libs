@@ -89,9 +89,12 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 				} else {
 
 					// For modes that are not analyzed, a free speed travel time is returned:
-					addTravelTimeBinding(mode).to(FreeSpeedTravelTime.class).in(Singleton.class);
+//					addTravelTimeBinding(mode).to(FreeSpeedTravelTime.class).in(Singleton.class);
 					// (yy I am a bit sceptical if this is a good fallback, or if it should rather fail.  It certainly led to using
 					// non-congested routing for non-car modes from approx 2019 to 2026.  kai, jun'26)
+
+					// --> I am removing the binding now and will see what happens.  We do NOT want to thrown an exception since people maybe bind this
+					// in user code.  kai, jun'26
 
 				}
 
