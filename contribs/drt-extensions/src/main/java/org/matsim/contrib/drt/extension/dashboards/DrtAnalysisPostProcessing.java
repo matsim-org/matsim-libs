@@ -296,7 +296,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
 
-			csv.printRecord("from_stop", "to_stop", "trips");
+			csv.printRecord("from_linkId", "to_linkId", "trips");
 
 			for (Object2IntMap.Entry<OD> e : entries) {
 				OD od = e.getKey();
