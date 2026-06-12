@@ -28,6 +28,8 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -47,6 +49,7 @@ import java.util.Set;
  * @author michaz
  */
 public class TravelTimeCalculatorModule extends AbstractModule {
+	private static final Logger log = LogManager.getLogger( TravelTimeCalculatorModule.class );
 
 	@Override
 	public void install() {
@@ -89,9 +92,21 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 				} else {
 
 					// For modes that are not analyzed, a free speed travel time is returned:
-					addTravelTimeBinding(mode).to(FreeSpeedTravelTime.class).in(Singleton.class);
+//					addTravelTimeBinding(mode).to(FreeSpeedTravelTime.class).in(Singleton.class);
 					// (yy I am a bit sceptical if this is a good fallback, or if it should rather fail.  It certainly led to using
 					// non-congested routing for non-car modes from approx 2019 to 2026.  kai, jun'26)
+
+					// --> I am removing the binding now and will see what happens.  We do NOT want to thrown an exception since people maybe bind this
+					// in user code.  kai, jun'26
+
+					// All regression tests run through removing this binding does not seem to be a major problem.  However, there may be issues in user
+					// code.  To given them some guidance, I am adding a warning as follows.
+					log.warn( "There used to be a `addTravelTimeBinding(mode).to(FreeSpeedTravelTime.class)' here.  This caused problems, " +
+								  "see https://github.com/matsim-org/matsim-libs/pull/4981 and https://github.com/matsim-org/matsim-libs/pull/5007.  " +
+								  "I am therefore removing that binding now.  If a necessary travel time binding is set somewhere else, you will just get " +
+								  "this warning.  If it fails later, then maybe adding the above line in Java is the right solution.  If you are not running from " +
+								  "Java, then check if you have configured travelTimeCalculator correctly, in particular with filterMode=false." );
+
 
 				}
 
