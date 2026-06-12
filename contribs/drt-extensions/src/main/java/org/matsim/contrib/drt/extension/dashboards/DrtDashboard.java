@@ -146,7 +146,7 @@ public class DrtDashboard implements Dashboard {
 		;
 
 //		This plot is not absolutely necesarry given the hex plots
-//		if (drtConfigGroup.operationalScheme == DrtConfigGroup.OperationalScheme.stopbased)
+//		if (drtConfigGroup.getOperationalScheme() == DrtConfigGroup.OperationalScheme.stopbased)
 //			layout.row("od").el(AggregateOD.class, (viz, data) -> {
 //
 //				viz.shpFile = postProcess(data, "stops.shp");
