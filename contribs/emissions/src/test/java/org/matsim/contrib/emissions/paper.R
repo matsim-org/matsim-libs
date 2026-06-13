@@ -454,8 +454,9 @@ errorDiagrams <- function(
   value_avg <- pretoria_output %>%
     pivot_longer(cols = c("CO_MATSim", "CO_pems", "CO2_MATSim", "CO2_pems", "NOx_MATSim", "NOx_pems"), names_to="component", values_to="value") %>%
     separate(component, sep = "_", into = c("component", "model")) %>%
+    mutate(value_gPkm = value/length) %>%
     group_by(component, method, model) %>%
-    summarize(mean_value = mean(value, na.rm=TRUE))
+    summarize(mean_value = mean(value, na.rm=TRUE), mean_value_gPkm = mean(value_gPkm, na.rm=TRUE))
 
   d_error <- pretoria_output %>%
     mutate(CO = CO_MATSim - CO_pems, CO2 = CO2_MATSim - CO2_pems, NOx = NOx_MATSim - NOx_pems) %>%
@@ -471,7 +472,7 @@ errorDiagrams <- function(
     mutate(bin = ceiling(x(d_error) / binwidth) * binwidth ) %>%
     group_by(component, method, bin) %>%
     summarize(
-      mean_error = mean(y(cur_data()), na.rm = TRUE),
+      mean_error = mean(y(pick(everything())), na.rm = TRUE),
       q05 = quantile(y(pick(everything())), 0.05, na.rm = TRUE),
       q25 = quantile(y(pick(everything())), 0.25, na.rm = TRUE),
       q75 = quantile(y(pick(everything())), 0.75, na.rm = TRUE),
@@ -533,11 +534,17 @@ errorDiagrams <- function(
 
 errorDiagrams()
 errorDiagrams(name="gradient", binwidth = 0.05, xlab="Gradient (%)", x = function(error) error$gradient)
-errorDiagrams(name="freespeed_normalized", ylab="Normalized average error (g/m)", y = function(error) {
-  error$error_gPkm / error$mean_value
+errorDiagrams(name="freespeed_normalized", ylab="Normalized average error", y = function(error) {
+  error$error_gPkm / error$mean_value_gPkm
 })
-errorDiagrams(name="gradient_normalized", binwidth = 0.05, xlab="Gradient (%)", ylab="Normalized average error (g/m)", x = function(error) error$gradient, y = function(error) {
-  error$error_gPkm / error$mean_value
+errorDiagrams(name="gradient_normalized", binwidth = 0.05, xlab="Gradient (%)", ylab="Normalized average error", x = function(error) error$gradient, y = function(error) {
+  error$error_gPkm / error$mean_value_gPkm
+})
+errorDiagrams(name="averagespeed_normalized", xlab="Average speed (km/h)", ylab="Normalized average error", x = function(error) error$averageVelocity, y = function(error) {
+  error$error_gPkm / error$mean_value_gPkm
+})
+errorDiagrams(name="differencespeed_normalized", xlab="Difference speed factor: Average Speed - Freespeed (km/h)", ylab="Normalized average error", x = function(error) (error$averageVelocity - error$freespeed), y = function(error) {
+  error$error_gPkm / error$mean_value_gPkm
 })
 
 # PHEM Plots with all computation methods
