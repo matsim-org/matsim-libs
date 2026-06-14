@@ -116,6 +116,13 @@ public class CHBuilder {
     private final TravelDisutility td;
     private final int nodeCount;
 
+    /**
+     * Whether the produced {@link CHGraph} should carry time-of-day TTF storage.
+     * Set via {@link #withTimeDependence(boolean)} before calling {@code build*}.
+     * Defaults to {@code true} for backward compatibility.
+     */
+    private boolean timeDependent = true;
+
     // Build-time edge storage (grows dynamically)
     private final AtomicInteger buildEdgeCounter = new AtomicInteger(0);
     private volatile int[] buildEdgeData;
@@ -408,6 +415,29 @@ public class CHBuilder {
 
         // Guard against duplicate neighbor processing in reestimateCellNeighborsParallel
         this.nbrRemovedGen = new int[nodeCount];
+    }
+
+    /**
+     * Configures whether the produced {@link CHGraph} should allocate
+     * time-of-day TTF storage ({@code ttf}, {@code minTTF}, {@code ttfHash}).
+     *
+     * <p>Pass {@code false} when the resulting CH will only be used with the
+     * static {@link CHRouter} (which reads {@code edgeWeights[]} alone). This
+     * skips a {@code NUM_BINS x totalEdgeCount} double[] allocation \u2014 several
+     * tens of GB on large multi-mode networks \u2014 and avoids running
+     * {@link CHTTFCustomizer} entirely.
+     *
+     * <p>When {@code false}, consumers requiring per-bin travel times \u2014
+     * {@link CHTTFCustomizer}, {@link CHRouterTimeDep},
+     * {@link CHLeastCostPathTree} \u2014 will throw {@link IllegalStateException}.
+     *
+     * <p>Defaults to {@code true} (backward compatible).
+     *
+     * @return this builder, for fluent chaining
+     */
+    public CHBuilder withTimeDependence(boolean timeDependent) {
+        this.timeDependent = timeDependent;
+        return this;
     }
 
     /** Runs the full CH build pipeline and returns the ready-to-customize graph. */
@@ -2767,7 +2797,8 @@ public class CHBuilder {
                 totalUp, upOff, upCount, upEdges, upWeights,
                 totalDn, dnOff, dnCount, dnEdges, dnWeights,
                 totalEdgeCount, edgeOrigLink, edgeLower1, edgeLower2,
-                edgeDistance, customizeOrder, nodeLevel);
+                edgeDistance, customizeOrder, nodeLevel,
+                this.timeDependent);
     }
 
     // -------------------------------------------------------------------------
