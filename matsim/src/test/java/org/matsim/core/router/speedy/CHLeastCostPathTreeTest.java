@@ -1525,4 +1525,168 @@ public class CHLeastCostPathTreeTest {
         Assertions.assertEquals(0, mismatches,
                 mismatches + " backward-distance mismatches out of " + comparisons + " comparisons");
     }
+
+    // ---- static (time-independent) CHLeastCostPathTree correctness ----
+    //
+    // Mirrors runForward/Backward CorrectnessTest but builds the CH with
+    // withTimeDependence(false) and customizes with CHCustomizer instead of
+    // CHTTFCustomizer.  Exercises the static branches added in
+    // CHLeastCostPathTree (forwardPhase1Static + edgeWeights[] in backward
+    // phase 1).  Since FreespeedTravelTimeAndDisutility is time-independent,
+    // the static tree must match the time-dependent reference Dijkstra exactly.
+
+    @Test
+    void testForwardSearchSmallGridStatic() {
+        runForwardStaticCorrectnessTest(buildGridNetwork(5));
+    }
+
+    @Test
+    void testForwardSearchEquilNetworkStatic() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+        runForwardStaticCorrectnessTest(scenario.getNetwork());
+    }
+
+    @Test
+    void testBackwardSearchSmallGridStatic() {
+        runBackwardStaticCorrectnessTest(buildGridNetwork(5));
+    }
+
+    @Test
+    void testBackwardSearchEquilNetworkStatic() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+        runBackwardStaticCorrectnessTest(scenario.getNetwork());
+    }
+
+    private void runForwardStaticCorrectnessTest(Network network) {
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(
+                new ScoringConfigGroup());
+
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+
+        InertialFlowCutter.NDOrderResult orderResult =
+                new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc)
+                .withTimeDependence(false)
+                .buildWithOrderParallel(orderResult);
+        new CHCustomizer().customize(chGraph, tc);
+        Assertions.assertFalse(chGraph.isTimeDependent(),
+                "CHGraph must be marked time-independent in static mode.");
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijkstraTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        List<Link> linkList = new ArrayList<>(network.getLinks().values());
+        int n = linkList.size();
+        if (n < 2) return;
+
+        Random rng = new Random(42);
+        int mismatches = 0;
+        int comparisons = 0;
+
+        for (int s = 0; s < NUM_SOURCE_NODES; s++) {
+            Link srcLink = linkList.get(rng.nextInt(n));
+            double startTime = 8.0 * 3600;
+
+            chTree.calculate(srcLink, startTime, null, null);
+            dijkstraTree.calculate(srcLink, startTime, null, null);
+
+            for (int t = 0; t < NUM_TARGET_NODES; t++) {
+                Link tgtLink = linkList.get(rng.nextInt(n));
+                int tgtNodeIdx = tgtLink.getFromNode().getId().index();
+
+                // Compare cost (= sum of edge disutilities). In static mode
+                // the "time" field is not meaningful because edgeWeights[]
+                // holds disutility, not travel time.
+                double chCost = chTree.getCost(tgtNodeIdx);
+                double dijCost = dijkstraTree.getCost(tgtNodeIdx);
+
+                boolean chUnreach = Double.isInfinite(chCost) || Double.isNaN(chCost);
+                boolean dijUnreach = Double.isInfinite(dijCost) || Double.isNaN(dijCost);
+                if (chUnreach && dijUnreach) {
+                    comparisons++;
+                    continue;
+                }
+                if (chUnreach || dijUnreach) {
+                    if (!dijUnreach && chUnreach) mismatches++;
+                    comparisons++;
+                    continue;
+                }
+
+                comparisons++;
+                if (Math.abs(chCost - dijCost) > COST_TOLERANCE) {
+                    mismatches++;
+                    System.err.printf("STATIC FORWARD MISMATCH src=%s tgt=%s: CH=%.6f  Dijkstra=%.6f%n",
+                            srcLink.getId(), tgtLink.getId(), chCost, dijCost);
+                }
+            }
+        }
+
+        Assertions.assertEquals(0, mismatches,
+                mismatches + " static-forward cost mismatches out of " + comparisons + " comparisons.");
+    }
+
+    private void runBackwardStaticCorrectnessTest(Network network) {
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(
+                new ScoringConfigGroup());
+
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+
+        InertialFlowCutter.NDOrderResult orderResult =
+                new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc)
+                .withTimeDependence(false)
+                .buildWithOrderParallel(orderResult);
+        new CHCustomizer().customize(chGraph, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijkstraTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        List<Link> linkList = new ArrayList<>(network.getLinks().values());
+        int n = linkList.size();
+        if (n < 2) return;
+
+        Random rng = new Random(42);
+        int mismatches = 0;
+        int comparisons = 0;
+
+        for (int s = 0; s < NUM_SOURCE_NODES; s++) {
+            Link arrLink = linkList.get(rng.nextInt(n));
+            double arrivalTime = 8.0 * 3600;
+
+            chTree.calculateBackwards(arrLink, arrivalTime, null, null);
+            dijkstraTree.calculateBackwards(arrLink, arrivalTime, null, null);
+
+            for (int t = 0; t < NUM_TARGET_NODES; t++) {
+                Link srcLink = linkList.get(rng.nextInt(n));
+                int srcNodeIdx = srcLink.getToNode().getId().index();
+
+                double chCost = chTree.getCost(srcNodeIdx);
+                double dijCost = dijkstraTree.getCost(srcNodeIdx);
+
+                boolean chUnreach = Double.isInfinite(chCost) || Double.isNaN(chCost);
+                boolean dijUnreach = Double.isInfinite(dijCost) || Double.isNaN(dijCost);
+                if (chUnreach && dijUnreach) {
+                    comparisons++;
+                    continue;
+                }
+                if (chUnreach || dijUnreach) {
+                    if (!dijUnreach && chUnreach) mismatches++;
+                    comparisons++;
+                    continue;
+                }
+
+                comparisons++;
+                if (Math.abs(chCost - dijCost) > COST_TOLERANCE) {
+                    mismatches++;
+                    System.err.printf("STATIC BACKWARD MISMATCH src=%s arr=%s: CH=%.6f  Dijkstra=%.6f%n",
+                            srcLink.getId(), arrLink.getId(), chCost, dijCost);
+                }
+            }
+        }
+
+        Assertions.assertEquals(0, mismatches,
+                mismatches + " static-backward cost mismatches out of " + comparisons + " comparisons.");
+    }
 }
