@@ -1,7 +1,6 @@
 package org.matsim.contrib.drt.extension.insertion.spatialFilter;
 
 import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -15,7 +14,6 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.core.utils.geometry.GeometryUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -62,23 +60,27 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
 		return filterEntries(vehicleEntries, drtRequest);
 	}
 
-	private synchronized void maybeUpdateTree(double now) {
+	private void maybeUpdateTree(double now) {
 		if (now >= lastTreeUpdate + updateInterval) {
-			STRtree newTree = buildTree();
-			treeRef.set(newTree);
-			lastTreeUpdate = now;
+			synchronized (this) {
+				if (now >= lastTreeUpdate + updateInterval) {
+					STRtree newTree = buildTree();
+					treeRef.set(newTree);
+					lastTreeUpdate = now;
+				}
+			}
 		}
 	}
 
 	private Collection<VehicleEntry> filterEntries(Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries, DrtRequest drtRequest) {
 		Collection<VehicleEntry> result = Collections.emptyList();
-		Point point = GeometryUtils.createGeotoolsPoint(drtRequest.getFromLink().getToNode().getCoord());
+		Coord coord = drtRequest.getFromLink().getToNode().getCoord();
 		STRtree tree = treeRef.get();
 
 		for (double expansion = minExpansion; expansion <= maxExpansion && result.size() < minCandidates; expansion *= expansionIncrementFactor) {
-			Envelope envelopeInternal = point.getEnvelopeInternal();
-			envelopeInternal.expandBy(expansion);
-			List<?> ids = tree.query(envelopeInternal);
+			Envelope envelope = new Envelope(coord.getX(), coord.getX(), coord.getY(), coord.getY());
+			envelope.expandBy(expansion);
+			List<?> ids = tree.query(envelope);
 			result = extract(vehicleEntries, ids);
 		}
 
@@ -125,6 +127,6 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
 	}
 
 	private static void insertVehicleInTree(STRtree tree, DvrpVehicle vehicle, Coord coord) {
-		tree.insert(GeometryUtils.createGeotoolsPoint(coord).getEnvelopeInternal(), vehicle.getId());
+		tree.insert(new Envelope(coord.getX(), coord.getX(), coord.getY(), coord.getY()), vehicle.getId());
 	}
 }
