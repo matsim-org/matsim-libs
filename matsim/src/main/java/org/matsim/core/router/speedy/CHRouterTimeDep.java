@@ -105,6 +105,12 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
     public long getChQueryCount()    { return chQueryCount; }
 
     public CHRouterTimeDep(CHGraph chGraph, TravelTime tt, TravelDisutility td) {
+        if (!chGraph.isTimeDependent()) {
+            throw new IllegalStateException(
+                    "CHRouterTimeDep requires a time-dependent CHGraph; "
+                    + "the supplied graph was built with timeDependent=false. "
+                    + "Use the static CHRouter instead.");
+        }
         this.chGraph   = chGraph;
         this.baseGraph = chGraph.getBaseGraph();
         this.tt        = tt;
