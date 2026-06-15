@@ -25,6 +25,7 @@ public class CornerCases {
 
 	private static final Logger log = LogManager.getLogger(CornerCases.class);
 
+	//teleported non teleported
 	/**
 	 * Modifies bike speed depending on whether bikes are
 	 * teleported or network routed.
@@ -98,17 +99,8 @@ public class CornerCases {
 		log.info("Reduced speeds by factor {}", factor);
 	}
 
-	/**
-	 * Adds parking costs inside shape area.
-	 */
-	public static void addParkingCosts(
-		Scenario scenario,
-		Config config,
-		Controler controler,
-		Path shp,
-		double firstHourCost,
-		double extraHourCost,
-		double residentialParkingFee
+	public static void prepareConfigForParkingCost(
+		Config config
 	) {
 
 		ParkingCostConfigGroup group =
@@ -128,11 +120,25 @@ public class CornerCases {
 		group.setResidentialParkingFeeAttributeName(
 			"residentialParkingFee"
 		);
+	}
+
+	public static void prepareControllerForParkingCost(
+		Controler controler
+	) {
 
 		controler.addOverridingModule(new ParkingCostModule());
 		controler.addOverridingModule(
 			new PersonMoneyEventsAnalysisModule()
 		);
+	}
+
+	public static void prepareScenarioForParkingCost(
+		Scenario scenario,
+		Path shp,
+		double firstHourCost,
+		double extraHourCost,
+		double residentialParkingFee
+	) {
 
 		List<PreparedGeometry> geometries =
 			ShpGeometryUtils.loadPreparedGeometries(
