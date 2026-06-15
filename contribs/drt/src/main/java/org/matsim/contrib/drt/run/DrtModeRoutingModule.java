@@ -111,6 +111,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 		if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.stopbased) {
 			bindModal(DumpDrtStopsAtEnd.class).toProvider(modalProvider(
 					getter -> new DumpDrtStopsAtEnd(
+							this.getMode(),
 							getter.getModal(DrtStopNetwork.class),
 							getter.get(OutputDirectoryHierarchy.class)
 					))
