@@ -65,7 +65,7 @@ class FastBufferedWriterTest {
 
 	@FunctionalInterface
 	private interface WriterScript {
-		void run(java.io.BufferedWriter writer) throws IOException;
+		void run(Writer writer) throws IOException;
 	}
 
 	@Test
@@ -127,18 +127,6 @@ class FastBufferedWriterTest {
 				w.append((CharSequence) null);        // must yield "null"
 				w.append((CharSequence) null, 1, 3);  // must yield "ul"
 				w.append(new StringBuilder("from-builder"));
-			});
-		}
-	}
-
-	@Test
-	void newLineMatchesPlatform() throws IOException {
-		for (int bufferSize : new int[] { 1, 2, 16 }) {
-			assertEquivalent(bufferSize, w -> {
-				w.write("line1");
-				w.newLine();
-				w.write("line2");
-				w.newLine();
 			});
 		}
 	}

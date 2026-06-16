@@ -20,7 +20,6 @@
 
 package org.matsim.core.utils.io;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -31,15 +30,13 @@ import java.io.Writer;
  * monitor, which dominates the serialization cost for large scenarios (populations, households, ...). This class makes
  * each small write a plain unsynchronized array copy and only touches the underlying writer once per full buffer.
  *
- * <p>The produced bytes are identical to those of {@link java.io.BufferedWriter}. It extends {@link BufferedWriter}
- * only so it can be used wherever a {@code BufferedWriter} is expected; the inherited buffer is left unused (size 1)
- * because every write path is overridden to go through this class' own buffer.</p>
- *
- * <p>Not thread-safe. MATSim file writing is single-threaded, so this is fine.</p>
+ * <p>The produced bytes are identical to those of {@link java.io.BufferedWriter}. Unlike {@code BufferedWriter} it is
+ * not synchronized, so it must only be used by a single thread &ndash; which is always the case for MATSim file
+ * writing.</p>
  *
  * @author Hannes Rewald
  */
-final class FastBufferedWriter extends BufferedWriter {
+final class FastBufferedWriter extends Writer {
 
 	private static final int DEFAULT_BUFFER_SIZE = 1 << 16; // 64k chars
 
@@ -52,8 +49,6 @@ final class FastBufferedWriter extends BufferedWriter {
 	}
 
 	FastBufferedWriter(final Writer out, final int bufferSize) {
-		// The BufferedWriter buffer (size 1) is never used; all writes are routed through our own buffer below.
-		super(out, 1);
 		this.out = out;
 		this.buffer = new char[bufferSize];
 	}
@@ -99,11 +94,6 @@ final class FastBufferedWriter extends BufferedWriter {
 		}
 		s.getChars(off, off + len, this.buffer, this.count);
 		this.count += len;
-	}
-
-	@Override
-	public void newLine() throws IOException {
-		write(System.lineSeparator());
 	}
 
 	@Override
