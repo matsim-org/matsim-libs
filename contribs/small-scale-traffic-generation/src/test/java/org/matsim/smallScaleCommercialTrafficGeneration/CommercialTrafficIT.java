@@ -50,11 +50,16 @@ import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * @author Ricardo Ewert
@@ -121,7 +126,7 @@ public class CommercialTrafficIT {
 		for (Person person : population.getPersons().values()) {
 			Assertions.assertNotNull(person.getSelectedPlan());
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("tourStartArea"));
-			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("vehicles"));
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("tourId"));
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("subpopulation"));
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("purpose"));
 
@@ -159,6 +164,115 @@ public class CommercialTrafficIT {
 		String actual = utils.getOutputDirectory() + "test.output_events.xml.gz" ;
 		ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
 		Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
+	}
+
+	@Test
+	void testMainRunAndResultsWithCarrierParts() throws IOException {
+		String pathToConfig = utils.getPackageInputDirectory() + "config_demand.xml";
+		Path pathToDataDistributionToZones = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
+		String pathToCommercialFacilities = "commercialFacilities.xml.gz";
+		Path output = Path.of(utils.getOutputDirectory()).resolve("carrierPartsRun");
+		Files.createDirectories(output);
+		String network = String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml"));
+		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
+
+		List<String> commonArgs = new ArrayList<>(List.of(
+			pathToConfig,
+			"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
+			"--pathToCommercialFacilities", pathToCommercialFacilities,
+			"--network", network,
+			"--sample", "0.1",
+			"--jspritIterations", "2",
+			"--creationOption", "createNewCarrierFile",
+			"--smallScaleCommercialTrafficType", "completeSmallScaleCommercialTraffic",
+			"--additionalTravelBufferPerIterationInMinutes", "10",
+			"--includeExistingModels",
+			"--zoneShapeFileName", zoneShapeFileName,
+			"--zoneShapeFileNameColumn", "name",
+			"--shapeCRS", "Atlantis",
+			"--nameOutputPopulation", "testPopulation.xml.gz",
+			"--resistanceFactor_commercialPersonTraffic", "0.3",
+			"--resistanceFactor_goodsTraffic", "0.2",
+			"--MATSimIterationsAfterDemandGeneration", "0",
+			"--factorForTravelBufferCalculation", "1.2",
+			"--maxNumberOfLoopsForVRPSolving", "2"
+		));
+
+		// Step 1: Create the shared unsolved carrier file without running jsprit.
+		List<String> initArgs = new ArrayList<>(commonArgs);
+		initArgs.addAll(List.of("--pathOutput", output.toString(), "--createSmallScaleCommercialCarrierFileOnly"));
+		new GenerateSmallScaleCommercialTrafficDemand().execute(initArgs.toArray(new String[0]));
+
+		// Step 2: Count all jobs from the shared carrier file as the reference for the part runs.
+		Path sharedCarrierFile = output.resolve("test.output_carriers_unsolvedVRP.xml.gz");
+		Path carrierVehicleTypesFile = output.resolve("test.output_carriersVehicleTypes.xml.gz");
+		Assertions.assertTrue(Files.exists(sharedCarrierFile));
+		Assertions.assertTrue(Files.exists(carrierVehicleTypesFile));
+		int initialJobs = countCarrierJobs(sharedCarrierFile);
+		Path referenceCarrierFile = output.getParent().resolve("testMainRunAndResults").resolve("test.output_carriers_unsolvedVRP.xml.gz");
+		if (Files.exists(referenceCarrierFile)) {
+			Assertions.assertEquals(countCarrierJobs(referenceCarrierFile), initialJobs);
+		}
+
+		// Step 3: Solve each carrier part independently based on the shared unsolved carrier file.
+		int jobsInParts = 0;
+		for (int partIndex = 0; partIndex < 2; partIndex++) {
+			List<String> partArgs = new ArrayList<>(commonArgs);
+			partArgs.remove("--includeExistingModels");
+			int creationOptionIndex = partArgs.indexOf("--creationOption") + 1;
+			partArgs.set(creationOptionIndex, "useExistingCarrierFileWithoutSolution");
+			partArgs.addAll(List.of(
+				"--pathOutput", output.toString(),
+				"--carrierFilePath", sharedCarrierFile.toAbsolutePath().toString(),
+				"--smallScaleCommercialCarrierPartCount", "2",
+				"--smallScaleCommercialCarrierPartIndex", String.valueOf(partIndex)
+			));
+			new GenerateSmallScaleCommercialTrafficDemand().execute(partArgs.toArray(new String[0]));
+
+			Path partCarrierFile = output.resolve("carrierParts")
+				.resolve("part-" + String.format("%03d", partIndex + 1) + "-of-002")
+				.resolve("test.output_carriers_unsolvedVRP.xml.gz");
+			Assertions.assertTrue(Files.exists(partCarrierFile));
+			jobsInParts += countCarrierJobs(partCarrierFile);
+		}
+
+		// Step 4: Verify that splitting did not add or drop jobs across all part files.
+		Assertions.assertEquals(initialJobs, jobsInParts);
+
+		// Step 5: Merge the independently solved carrier parts and create the resulting population.
+		List<String> mergeArgs = new ArrayList<>(commonArgs);
+		mergeArgs.remove("--includeExistingModels");
+		mergeArgs.addAll(List.of(
+			"--pathOutput", output.toString(),
+			"--mergeSmallScaleCommercialCarrierParts",
+			"--smallScaleCommercialCarrierPartCount", "2"
+		));
+		new GenerateSmallScaleCommercialTrafficDemand().execute(mergeArgs.toArray(new String[0]));
+
+		// Step 6: Verify that init's unsolved file remains the reference and the merged solved file contains all jobs.
+		Path mergedSolvedCarrierFile = output.resolve("test.output_carriers_solvedVRP.xml.gz");
+		Assertions.assertTrue(Files.exists(sharedCarrierFile));
+		Assertions.assertTrue(Files.exists(mergedSolvedCarrierFile));
+		Assertions.assertTrue(Files.exists(output.resolve("calculatedData")));
+		Assertions.assertEquals(initialJobs, countCarrierJobs(sharedCarrierFile));
+		Assertions.assertEquals(initialJobs, countCarrierJobs(mergedSolvedCarrierFile));
+	}
+
+	private static int countCarrierJobs(Path carrierFile) {
+		try (var inputStream = IOUtils.getInputStream(IOUtils.resolveFileOrResource(carrierFile.toString()))) {
+			var reader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream);
+			int jobs = 0;
+			while (reader.hasNext()) {
+				if (reader.next() == XMLStreamConstants.START_ELEMENT
+					&& (reader.getLocalName().equals("service") || reader.getLocalName().equals("shipment"))) {
+					jobs++;
+				}
+			}
+			reader.close();
+			return jobs;
+		} catch (IOException | XMLStreamException e) {
+			throw new RuntimeException("Could not count carrier jobs in " + carrierFile, e);
+		}
 	}
 
 	/**

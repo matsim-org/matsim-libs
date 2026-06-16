@@ -98,6 +98,11 @@ public class SpeedyALT implements LeastCostPathCalculator {
 	}
 
 	public Path calcLeastCostPath(Link fromLink, Link toLink, double starttime, final Person person, final Vehicle vehicle) {
+		return calcLeastCostPath(fromLink, toLink, starttime, person, vehicle, Double.POSITIVE_INFINITY);
+	}
+
+	@Override
+	public Path calcLeastCostPath(Link fromLink, Link toLink, double starttime, final Person person, final Vehicle vehicle, double maxCost) {
 
 		int startNodeIndex = this.graph.getNodeIndex(fromLink.getToNode());
 		int endNodeIndex = this.graph.getNodeIndex(toLink.getFromNode());
@@ -109,8 +114,9 @@ public class SpeedyALT implements LeastCostPathCalculator {
 			}
 		}
 
-		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, starttime, person, vehicle);
-		if(path == null) {
+		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, starttime, person, vehicle, maxCost);
+		// Do not warn on cutoff-driven aborts: a bounded null is an intentional caller hint, not a config issue.
+		if(path == null && Double.isInfinite(maxCost)) {
 			LOG.warn("No route was found from link " + fromLink.getId() + " to link " + toLink.getId() + ". Some possible reasons:");
 		  LOG.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(Network network, Set<String> modes).") ;
 			LOG.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
@@ -122,7 +128,7 @@ public class SpeedyALT implements LeastCostPathCalculator {
 
 	@Override
 	public Path calcLeastCostPath(Node startNode, Node endNode, double startTime, Person person, Vehicle vehicle) {
-		Path path = calcLeastCostPathImpl(this.graph.getNodeIndex(startNode), this.graph.getNodeIndex(endNode), startTime, person, vehicle);
+		Path path = calcLeastCostPathImpl(this.graph.getNodeIndex(startNode), this.graph.getNodeIndex(endNode), startTime, person, vehicle, Double.POSITIVE_INFINITY);
 		if(path == null) {
       LOG.warn("No route was found from node " + startNode.getId() + " to node " + endNode.getId() + ". Some possible reasons:");
 		  LOG.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(Network network, Set<String> modes).") ;
@@ -133,7 +139,7 @@ public class SpeedyALT implements LeastCostPathCalculator {
 		return path;
 	}
 
-	private Path calcLeastCostPathImpl(int startNodeIndex, int endNodeIndex, double startTime, Person person, Vehicle vehicle) {
+	private Path calcLeastCostPathImpl(int startNodeIndex, int endNodeIndex, double startTime, Person person, Vehicle vehicle, double maxCost) {
 		this.currentIteration++;
 		if (this.currentIteration == Integer.MAX_VALUE) {
 			// reset iteration as we overflow
@@ -154,6 +160,32 @@ public class SpeedyALT implements LeastCostPathCalculator {
 		boolean foundEndNode = false;
 
 		while (!this.pq.isEmpty()) {
+			// Bounded-search early termination.
+			//
+			// The heap key is f = g + h, where h is the landmark lower bound
+			//     h(n) = max_L max(d(n,L) - d(t,L), d(L,t) - d(L,n)).
+			// Standard ALT admissibility: by the triangle inequality each individual landmark
+			// estimate is a lower bound on d(n, t), so h(n) <= d(n, t).
+			//
+			// The +infinity case is admissible too and is actually load-bearing for the
+			// disconnected-subgraph use case:
+			//   - If d(n, L) = +inf and d(t, L) finite, the triangle inequality
+			//     d(n, t) + d(t, L) >= d(n, L) forces d(n, t) = +inf (n cannot reach t).
+			//   - Symmetric for d(L, t) = +inf with d(L, n) finite.
+			// So a node only gets h = +inf when it genuinely cannot reach t, and returning null
+			// from such a search is correct.
+			//
+			// The NaN case (both d(n, L) and d(t, L) are +inf, similarly for the other pair)
+			// represents a landmark isolated from both endpoints. Math.max propagates NaN, the
+			// heap key becomes NaN, and `peek > maxCost` evaluates to false, so the cutoff is
+			// silently skipped (a missed optimisation, not a correctness issue).
+			//
+			// Nodes that cannot reach t but are pushed during exploration get key = g + (+inf)
+			// = +inf and sink to the bottom of the heap; they do not affect peek, which always
+			// reflects the best finite-keyed reachable candidate.
+			if (this.pq.peekCost() > maxCost) {
+				return null;
+			}
 			final int nodeIdx = this.pq.poll();
 			if (!hasTurnRestrictions && nodeIdx == endNodeIndex) {
 				foundEndNode = true;
@@ -209,6 +241,14 @@ public class SpeedyALT implements LeastCostPathCalculator {
 					double oldCost = getCost(toNode);
 					if (newCost < oldCost) {
 						estimation = estimateMinTravelcostToDestination(toNode, endNodeIndex);
+						// Bounded-search edge-level pruning: skip if the admissible f-value
+						// exceeds maxCost. Since h(toNode) <= true remaining cost to target,
+						// f = g + h <= true cost through toNode, so f > maxCost implies the
+						// path through toNode cannot satisfy the cutoff. Mirrors the
+						// cost-bounded pruning in CHLeastCostPathTree.
+						if (newCost + estimation > maxCost) {
+							continue;
+						}
 						this.pq.decreaseKey(toNode, newCost + estimation);
 						setData(toNode, newCost, newTime, currDistance + link.getLength());
 						this.comingFrom[toNode] = nodeIdx;
@@ -216,6 +256,10 @@ public class SpeedyALT implements LeastCostPathCalculator {
 					}
 				} else {
 					estimation = estimateMinTravelcostToDestination(toNode, endNodeIndex);
+					// Bounded-search edge-level pruning (see comment above).
+					if (newCost + estimation > maxCost) {
+						continue;
+					}
 					setData(toNode, newCost, newTime, currDistance + link.getLength());
 					this.pq.insert(toNode, newCost + estimation);
 					this.comingFrom[toNode] = nodeIdx;

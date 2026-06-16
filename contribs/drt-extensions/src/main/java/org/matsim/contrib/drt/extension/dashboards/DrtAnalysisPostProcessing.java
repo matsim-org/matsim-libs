@@ -183,7 +183,10 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		if (stopsFile != null) {
 			List<TransitStopFacility> stops = readTransitStops(stopsFile);
 			writeStopsShp(stops, output.getPath("stops.shp"));
-			Map<String, TransitStopFacility> byLink = stops.stream().collect(Collectors.toMap(s -> s.getLinkId().toString(), Function.identity()));
+
+			Map<String, TransitStopFacility> byLink = stops.stream().collect(Collectors.toMap(s -> s.getLinkId().toString(), Function.identity(),
+				//when several stops have the same link id, only one is kept. the resulting map will be used for link-based analysis only, anyways.
+				(s, a) -> s));
 
 			//needs to be a DoubleColumn because transposing later forces us to have the same column type for all (new) value columns
 			tableSupplyKPI.addColumns(DoubleColumn.create("Number of stops", new Integer[]{stops.size()}));
@@ -293,7 +296,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
 
-			csv.printRecord("from_stop", "to_stop", "trips");
+			csv.printRecord("from_linkId", "to_linkId", "trips");
 
 			for (Object2IntMap.Entry<OD> e : entries) {
 				OD od = e.getKey();

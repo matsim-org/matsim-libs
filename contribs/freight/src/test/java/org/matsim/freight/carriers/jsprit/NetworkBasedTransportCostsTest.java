@@ -60,6 +60,17 @@ public class NetworkBasedTransportCostsTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
+	void usesTimeDependentRoutingOnlyWithFiniteTimeSlices() {
+		Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
+
+		Assertions.assertFalse(NetworkBasedTransportCosts.Builder.newInstance(network).build().usesTimeDependentRouting());
+		Assertions.assertTrue(NetworkBasedTransportCosts.Builder.newInstance(network)
+			.setTimeSliceWidth(1800)
+			.build()
+			.usesTimeDependentRouting());
+	}
+
+	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem(){
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
