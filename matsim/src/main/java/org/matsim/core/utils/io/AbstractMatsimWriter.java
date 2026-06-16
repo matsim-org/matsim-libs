@@ -70,11 +70,9 @@ public abstract class AbstractMatsimWriter {
 	 */
 	protected final void openFile(final String filename) throws UncheckedIOException {
 		assertNotAlreadyOpen();
-		if (this.useCompression == null) {
-			this.writer = new FastBufferedWriter(IOUtils.getBufferedWriter(filename));
-		} else {
-			this.writer = new FastBufferedWriter(IOUtils.getBufferedWriter(filename + ".gz"));
-		}
+		final String target = (this.useCompression == null) ? filename : filename + ".gz";
+		final OutputStream outputStream = IOUtils.getOutputStream(IOUtils.getFileUrl(target), false);
+		this.writer = new FastBufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
 	}
 
 	/**
