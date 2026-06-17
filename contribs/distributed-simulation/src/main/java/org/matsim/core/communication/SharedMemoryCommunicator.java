@@ -15,6 +15,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 
 /**
@@ -47,11 +48,12 @@ public class SharedMemoryCommunicator implements Communicator {
 
 		try {
 			Files.createDirectories(tmpDir);
+			Files.deleteIfExists(tmpDir.resolve("q-" + rank + ".init"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
-		this.subscription = new IPC(qFilePath, size, true);
+		this.subscription = new IPC(qFilePath, true);
 		this.others = new IPC[size];
 	}
 
@@ -77,7 +79,7 @@ public class SharedMemoryCommunicator implements Communicator {
 				while (!Files.exists(name))
 					idle.idle();
 
-				others[i] = new IPC(name, size, false);
+				others[i] = new IPC(name, false);
 			}
 		}
 	}
@@ -178,33 +180,39 @@ public class SharedMemoryCommunicator implements Communicator {
 			return 1L << (64 - Long.numberOfLeadingZeros(value - 1));
 		}
 
-		public IPC(Path path, long total, boolean clear) {
+		public IPC(Path path, boolean owner) {
 
 			this.path = path;
+
+			String bufferSizeEnv = System.getenv("MSG_BUFFER_SIZE");
+			long capacity = bufferSizeEnv != null
+				? nextPowerOfTwo(Long.parseLong(bufferSizeEnv))
+				: 1L << 30; // 1 GB
+			while (capacity + RingBufferDescriptor.TRAILER_LENGTH > Integer.MAX_VALUE)
+				capacity >>= 1;
+			long size = capacity + RingBufferDescriptor.TRAILER_LENGTH;
+
+			// Owner: write to a temp path and rename atomically after zeroing, so connect()
+			// in other processes only sees the file once it is fully initialized.
+			Path openPath = owner ? path.resolveSibling(path.getFileName() + ".init") : path;
 			try {
-				channel = FileChannel.open(path, StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+				channel = owner
+					? FileChannel.open(openPath, StandardOpenOption.CREATE_NEW, StandardOpenOption.READ, StandardOpenOption.WRITE)
+					: FileChannel.open(path, StandardOpenOption.READ, StandardOpenOption.WRITE);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 
-			String bufferSize = System.getenv("MSG_BUFFER_SIZE");
-			int s = bufferSize != null ? Integer.parseInt(bufferSize) : 32 * 1024 * 1024;
-			long n = nextPowerOfTwo(total * s + RingBufferDescriptor.TRAILER_LENGTH);
-			long size = n * s + RingBufferDescriptor.TRAILER_LENGTH;
-			while (size > Integer.MAX_VALUE) {
-				n = n >> 1;
-				size = n * s + RingBufferDescriptor.TRAILER_LENGTH;
-			}
-
-			// Create a memory-mapped file
 			MappedByteBuffer buffer = mapBuffer(size);
-
-			// Zero the buffer before using it
-			if (clear) {
-				while (buffer.hasRemaining()) {
+			if (owner) {
+				while (buffer.hasRemaining())
 					buffer.put((byte) 0);
-				}
 				buffer.clear();
+				try {
+					Files.move(openPath, path, StandardCopyOption.ATOMIC_MOVE);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			}
 
 			UnsafeBuffer ub = new UnsafeBuffer(buffer);
