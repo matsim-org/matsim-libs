@@ -139,6 +139,18 @@ public class SplitActivityTypesDurationTest {
 				.expect(out("work_41400").end("18:00:00"))
 				.expect(out("leisure_600")),
 
+			// Same as above, but with a testee configured for a longer day: maxTypicalDuration = 27h (97200s).
+			// Now the last activity's start (25:00 = 90000) is *inside* the period, so measuring to the boundary
+			// gives a positive duration (97200-90000 = 7200) instead of a negative one that needs clamping.
+			new Case("midnight-starts-after-midnight-no-merge-mtd-27h")
+				.maxTypicalDuration(Time.parseTime("27:00:00"))
+				.in(act("home").end("06:00:00"))                   // 21600
+				.in(act("work").start("06:30:00").end("18:00:00")) // 41400
+				.in(act("leisure").start("25:00:00"))              // 97200-90000 = 7200
+				.expect(out("home_21600").end("06:00:00"))
+				.expect(out("work_41400").end("18:00:00"))
+				.expect(out("leisure_7200")),
+
 			// Same, but the last activity is "home" and so merges with the morning home. This exposes a bug.
 			// Periodic-correct: the overnight home runs from 25:00 to the next day's 06:00, i.e.
 			// 86400 + 21600 - 90000 = 18000 (5h). But run() first rounds/clamps the (negative) evening portion to
@@ -205,7 +217,7 @@ public class SplitActivityTypesDurationTest {
 
 		Person person = c.toPerson();
 
-		SplitActivityTypesDuration algorithm = new SplitActivityTypesDuration(BIN_SIZE, MAX_TYPICAL_DURATION, END_TIME_TO_DURATION);
+		SplitActivityTypesDuration algorithm = new SplitActivityTypesDuration(BIN_SIZE, c.maxTypicalDuration, END_TIME_TO_DURATION);
 		algorithm.setExclude(new HashSet<>(c.exclude));
 
 		algorithm.run(person);
@@ -327,9 +339,15 @@ public class SplitActivityTypesDurationTest {
 		private final Set<String> exclude = new HashSet<>();
 		private final List<ActIn> in = new ArrayList<>();
 		private final List<ActOut> expected = new ArrayList<>();
+		private int maxTypicalDuration = MAX_TYPICAL_DURATION;
 
 		private Case(String name) {
 			this.name = name;
+		}
+
+		Case maxTypicalDuration(double seconds) {
+			this.maxTypicalDuration = (int) seconds;
+			return this;
 		}
 
 		Case exclude(String... types) {
