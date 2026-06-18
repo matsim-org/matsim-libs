@@ -192,6 +192,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--useRangeConstraintForTourPlanning", description = "Option to use range constraint for planning the tours. If this is selected, the range is restricted based on consumption information in the vehicle types file.")
 	private boolean useRangeConstraintForTourPlanning;
 
+	@CommandLine.Option(names = "--distanceConstraintUsableRange", description = "Usable range in percent of the energy capacity applied to the vehicle range during tour planning. For example, a value of 80 limits the usable range to 80 percent. This option is only applied if --useRangeConstraintForTourPlanning is selected.", defaultValue = "100")
+	private double distanceConstraintUsableRange;
+
 	@CommandLine.Option(names = "--createSmallScaleCommercialCarrierFileOnly", description = "Create the unsolved small scale commercial carrier file and stop before tour planning.")
 	private boolean createSmallScaleCommercialCarrierFileOnly;
 
@@ -932,6 +935,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (useRangeConstraintForTourPlanning) {
 			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
 			log.info("Using range constraint for tour planning based on energy consumption information in the vehicle types file.");
+			freightCarriersConfigGroup.setDistanceConstraintUsableRange(distanceConstraintUsableRange);
+			log.info("Distance constraint safety margin is set to {} for vehicles with energy capacity information.", distanceConstraintUsableRange);
 		}
 		if (freightCarriersConfigGroup.getCarriersVehicleTypesFile() != null)
 			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
