@@ -67,10 +67,7 @@ import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.SimWrapperModule;
-import org.matsim.simwrapper.dashboard.CarrierDashboard;
-import org.matsim.simwrapper.dashboard.CommercialTrafficDashboard;
-import org.matsim.simwrapper.dashboard.OverviewDashboard;
-import org.matsim.simwrapper.dashboard.TripDashboard;
+import org.matsim.simwrapper.dashboard.*;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.CommercialTourSpecifications;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.DefaultTourSpecificationsByUsingKID2002;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
@@ -144,8 +141,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--jspritIterations", description = "Set number of jsprit iterations", required = true)
 	private int jspritIterations;
 
-	@CommandLine.Option(names = "--additionalTravelBufferPerIterationInMinutes", description = "This buffer/driving time is used for service-route-planning. If set too low, carriers may not serve all their services.", defaultValue = "30")
-	private int additionalTravelBufferPerIterationInMinutes;
+	@CommandLine.Option(names = {"--additionalTravelBufferPerIterationInMinutes", "--additionalTravelBufferPerTourAndIterationInMinutes"}, description = "Additional travel buffer in minutes per scheduled tour and carrier-replanning iteration. Used while resolving carriers with unhandled services; if set too low, carriers may not serve all services.", defaultValue = "30")
+	private int additionalTravelBufferPerTourAndIterationInMinutes;
 
 	@CommandLine.Option(names = "--maxNumberOfLoopsForVRPSolving", description = "Limit of carrier replanning iterations, where carriers with unhandled services get new plans. If your carrier-plans are still not fully served, increase this limit.", defaultValue = "100")
 	private int maxNumberOfLoopsForVRPSolving;
@@ -189,11 +186,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--MATSimIterationsAfterDemandGeneration", description = "If selected, the MATSim simulation will be run for the selected number of iterations after demand generation. if not selected, only demand generation is performed.")
 	private Integer MATSimIterationsAfterDemandGeneration;
 
-	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = "The factor describing how many vehicles should be created in relation to the number of created services. If maxNumberOfLoopsForVRPSolving > 0 more vehicles are added in the replanning process.", defaultValue = "1.2")
+	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = "Factor applied to the total service duration when estimating the required total tour duration for initial vehicle creation. Values above 1.0 reserve additional time for travel between services", defaultValue = "1.2")
 	private double factorForTravelBufferCalculation;
 
 	@CommandLine.Option(names = "--useRangeConstraintForTourPlanning", description = "Option to use range constraint for planning the tours. If this is selected, the range is restricted based on consumption information in the vehicle types file.")
 	private boolean useRangeConstraintForTourPlanning;
+
+	@CommandLine.Option(names = "--distanceConstraintUsableRange", description = "Usable range in percent of the energy capacity applied to the vehicle range during tour planning. For example, a value of 80 limits the usable range to 80 percent. This option is only applied if --useRangeConstraintForTourPlanning is selected.", defaultValue = "100")
+	private double distanceConstraintUsableRange;
 
 	@CommandLine.Option(names = "--createSmallScaleCommercialCarrierFileOnly", description = "Create the unsolved small scale commercial carrier file and stop before tour planning.")
 	private boolean createSmallScaleCommercialCarrierFileOnly;
@@ -440,18 +440,19 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 		CarriersUtils.writeCarrierVehicleTypes(scenario, CARRIER_VEHICLE_TYPES_FILE);
 		CarriersUtils.writeCarriers(scenario, SOLVED_CARRIER_FILE);
+
+		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(scenario, output.resolve("analysis").resolve("freight").toString());
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans);
+
 		if (isSolvingOnlyCarrierPart()) {
 			log.info("Solved small scale commercial carrier part {}/{}. Population and carrier analysis will be created by the merge step.",
 				smallScaleCommercialCarrierPartIndex + 1, smallScaleCommercialCarrierPartCount);
 			return 0;
 		}
-		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(scenario, output.resolve("analysis").resolve("freight").toString());
-		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans);
-
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(scenario,
 			usedSmallScaleCommercialTrafficType, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
 
-		if (MATSimIterationsAfterDemandGeneration!= null && MATSimIterationsAfterDemandGeneration >= 0) {
+		if (MATSimIterationsAfterDemandGeneration != null && MATSimIterationsAfterDemandGeneration >= 0) {
 			log.info("Running MATSim for {} iterations after demand generation.", MATSimIterationsAfterDemandGeneration);
 			Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 			carriers.getCarriers().clear();
@@ -506,10 +507,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			sw.getConfigGroup().defaultParams().setShp(null);
 			sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
 			sw.getConfigGroup().setSampleSize(sample);
-			sw.addDashboard(new OverviewDashboard(Set.copyOf(config.qsim().getMainModes())));
+			sw.addDashboard(new OverviewDashboard(modes));
 			sw.addDashboard(new CarrierDashboard("(*.)?output_carriers_withPlans.xml.gz"));
 			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
- 			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			sw.addDashboard(new TrafficDashboard(modes));
 			Controller controller = prepareController(scenario);
 
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
@@ -934,6 +936,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (useRangeConstraintForTourPlanning) {
 			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
 			log.info("Using range constraint for tour planning based on energy consumption information in the vehicle types file.");
+			freightCarriersConfigGroup.setDistanceConstraintUsableRange(distanceConstraintUsableRange);
+			log.info("Distance constraint safety margin is set to {} for vehicles with energy capacity information.", distanceConstraintUsableRange);
 		}
 		if (freightCarriersConfigGroup.getCarriersVehicleTypesFile() != null)
 			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
@@ -1140,7 +1144,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				StructuralAttribute selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
 				while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
 					selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
-				// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
+				// additionalTravelBufferPerTourAndIterationInMinutes is only used while resolving carriers with unhandled services.
 				int serviceTimePerStop = getServiceTimePerStop(carrierAttributes);
 				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window so that late tours can handle it
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow, countedServices);
@@ -1353,16 +1357,30 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		log.info("Create trip distribution for traffic type {} with resistance factor {}.", smallScaleCommercialTrafficType, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType).toString());
 		// Route all zone-pair resistance values on a static network before the OD loop so later matrix work only reads cached values.
 		odMatrix.precomputeResistanceFunctionValues(staticNetworkForODGeneration, linksPerZone, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
-		Counter ODcounter = new Counter("OD pair # ", " of " + trafficVolume_start.size() + " OD pairs processed.");
-		for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : trafficVolume_start.keySet()) {
-			ODcounter.incCounter();
-			String startZone = trafficVolumeKey.zone();
-			String modeORvehType = trafficVolumeKey.modeORvehType();
-			for (Integer purpose : trafficVolume_start.get(trafficVolumeKey).keySet()) {
-				Collections.shuffle(listOfZones, rnd);
-				for (String stopZone : listOfZones) {
-					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType,
-						staticNetworkForODGeneration, linksPerZone, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
+		List<TrafficVolumeGeneration.TrafficVolumeKey> trafficVolumeKeys = new ArrayList<>(trafficVolume_start.keySet());
+		List<String> usedModesORvehTypes = trafficVolumeKeys.stream()
+			.map(TrafficVolumeGeneration.TrafficVolumeKey::modeORvehType).distinct().sorted().toList();
+		List<Integer> usedPurposes = trafficVolume_start.values().stream().flatMap(
+			purposeVolumes -> purposeVolumes.keySet().stream()).distinct().sorted().toList();
+
+		Counter ODcounter = new Counter("OD destination slice # ",
+			" of " + usedModesORvehTypes.size() * usedPurposes.size() * listOfZones.size() + " processed.");
+		for (String modeORvehType : usedModesORvehTypes) {
+			List<TrafficVolumeGeneration.TrafficVolumeKey> startKeysForMode = trafficVolumeKeys.stream()
+				.filter(trafficVolumeKey -> trafficVolumeKey.modeORvehType().equals(modeORvehType))
+				.toList();
+			for (Integer purpose : usedPurposes) {
+				List<String> shuffledStopZones = new ArrayList<>(listOfZones);
+				Collections.shuffle(shuffledStopZones, rnd);
+				for (String stopZone : shuffledStopZones) {
+					List<TrafficVolumeGeneration.TrafficVolumeKey> shuffledStartKeys = new ArrayList<>(startKeysForMode);
+					Collections.shuffle(shuffledStartKeys, rnd);
+					for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : shuffledStartKeys) {
+						odMatrix.setTripDistributionValue(trafficVolumeKey.zone(), stopZone, modeORvehType, purpose,
+							smallScaleCommercialTrafficType, staticNetworkForODGeneration, linksPerZone,
+							resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
+					}
+					ODcounter.incCounter();
 				}
 			}
 		}
@@ -1387,8 +1405,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		return maxNumberOfLoopsForVRPSolving;
 	}
 
-	public int getAdditionalTravelBufferPerIterationInMinutes(){
-		return additionalTravelBufferPerIterationInMinutes;
+	public int getAdditionalTravelBufferPerTourAndIterationInMinutes(){
+		return additionalTravelBufferPerTourAndIterationInMinutes;
 	}
 	public double getFactorForTravelBufferCalculation(){
 		return factorForTravelBufferCalculation;

@@ -212,8 +212,8 @@ public class SmallScaleCommercialTrafficUtils {
 				plan.addActivity(startActivity);
 				List<Tour.TourElement> tourElements = tour.getTour().getTourElements();
 				for (Tour.TourElement tourElement : tourElements) {
-					if (tourElement instanceof Tour.Leg) {
-						PopulationUtils.createAndAddLeg(plan, mode);
+					if (tourElement instanceof Tour.Leg tourLeg) {
+						createAndAddLegBasedOnCarrierLeg(plan, mode, tourLeg);
 						continue;
 					}
 					if (tourElement instanceof Tour.TourActivity activity) {
@@ -273,6 +273,19 @@ public class SmallScaleCommercialTrafficUtils {
 		ProjectionUtils.putCRS(population, scenario.getConfig().global().getCoordinateSystem());
 		PopulationUtils.writePopulation(population, outputPopulationFile);
 		log.info("Population with {} persons created including the plans in {}.", population.getPersons().size(), outputPopulationFile);
+	}
+
+	private static void createAndAddLegBasedOnCarrierLeg(Plan plan, String mode, Tour.Leg carrierLeg) {
+		Leg leg = PopulationUtils.createAndAddLeg(plan, mode);
+		leg.setDepartureTime(carrierLeg.getExpectedDepartureTime());
+		leg.setTravelTime(carrierLeg.getExpectedTransportTime());
+
+		Route route = carrierLeg.getRoute();
+		if (route != null) {
+			Route routeCopy = route.clone();
+			routeCopy.setTravelTime(carrierLeg.getExpectedTransportTime());
+			leg.setRoute(routeCopy);
+		}
 	}
 
 	static String getSampleNameOfOutputFolder(double sample) {
