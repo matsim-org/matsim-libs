@@ -1357,16 +1357,30 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		log.info("Create trip distribution for traffic type {} with resistance factor {}.", smallScaleCommercialTrafficType, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType).toString());
 		// Route all zone-pair resistance values on a static network before the OD loop so later matrix work only reads cached values.
 		odMatrix.precomputeResistanceFunctionValues(staticNetworkForODGeneration, linksPerZone, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
-		Counter ODcounter = new Counter("OD pair # ", " of " + trafficVolume_start.size() + " OD pairs processed.");
-		for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : trafficVolume_start.keySet()) {
-			ODcounter.incCounter();
-			String startZone = trafficVolumeKey.zone();
-			String modeORvehType = trafficVolumeKey.modeORvehType();
-			for (Integer purpose : trafficVolume_start.get(trafficVolumeKey).keySet()) {
-				Collections.shuffle(listOfZones, rnd);
-				for (String stopZone : listOfZones) {
-					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType,
-						staticNetworkForODGeneration, linksPerZone, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
+		List<TrafficVolumeGeneration.TrafficVolumeKey> trafficVolumeKeys = new ArrayList<>(trafficVolume_start.keySet());
+		List<String> usedModesORvehTypes = trafficVolumeKeys.stream()
+			.map(TrafficVolumeGeneration.TrafficVolumeKey::modeORvehType).distinct().sorted().toList();
+		List<Integer> usedPurposes = trafficVolume_start.values().stream().flatMap(
+			purposeVolumes -> purposeVolumes.keySet().stream()).distinct().sorted().toList();
+
+		Counter ODcounter = new Counter("OD destination slice # ",
+			" of " + usedModesORvehTypes.size() * usedPurposes.size() * listOfZones.size() + " processed.");
+		for (String modeORvehType : usedModesORvehTypes) {
+			List<TrafficVolumeGeneration.TrafficVolumeKey> startKeysForMode = trafficVolumeKeys.stream()
+				.filter(trafficVolumeKey -> trafficVolumeKey.modeORvehType().equals(modeORvehType))
+				.toList();
+			for (Integer purpose : usedPurposes) {
+				List<String> shuffledStopZones = new ArrayList<>(listOfZones);
+				Collections.shuffle(shuffledStopZones, rnd);
+				for (String stopZone : shuffledStopZones) {
+					List<TrafficVolumeGeneration.TrafficVolumeKey> shuffledStartKeys = new ArrayList<>(startKeysForMode);
+					Collections.shuffle(shuffledStartKeys, rnd);
+					for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : shuffledStartKeys) {
+						odMatrix.setTripDistributionValue(trafficVolumeKey.zone(), stopZone, modeORvehType, purpose,
+							smallScaleCommercialTrafficType, staticNetworkForODGeneration, linksPerZone,
+							resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
+					}
+					ODcounter.incCounter();
 				}
 			}
 		}
