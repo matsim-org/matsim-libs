@@ -45,11 +45,11 @@ public class EmissionsDashboard implements Dashboard {
 				viz.height = 12.;
 				viz.addDataset("emissions_per_link_per_m", data.compute(AirPollutionAnalysis.class, "emissions_per_link_per_m.csv"));
 				viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "linkId");
-				viz.display.lineColor.columnName = "CO2_TOTAL [g/m]";
+				viz.display.lineColor.columnName = "NOx [g/m]";
 				viz.display.lineColor.dataset = "emissions_per_link_per_m";
 				viz.display.lineColor.setColorRamp("greenRed", 10, false);
 				viz.display.lineColor.join = "linkId";
-				viz.display.lineWidth.columnName = "CO2_TOTAL [g/m]";
+				viz.display.lineWidth.columnName = "NOx [g/m]";
 				viz.display.lineWidth.scaleFactor = 2000.0;
 				viz.display.lineWidth.dataset = "emissions_per_link_per_m";
 				viz.display.lineWidth.join = "linkId";
@@ -59,22 +59,22 @@ public class EmissionsDashboard implements Dashboard {
 
 		layout.row("second")
 			.el(GridMap.class, (viz, data) -> {
-				viz.title = "CO₂ Emissions";
-				viz.unit = "CO₂ [g]";
+				viz.title = "NOx Emissions";
+				viz.unit = "NOx [g/m]";
 				viz.description = "per day";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_day.%s", "avro")
-					.replace("emissions_grid_per_day", Pollutant.CO2_TOTAL + "_" + "emissions_grid_per_day");
+					.replace("emissions_grid_per_day", Pollutant.NOx + "_" + "emissions_grid_per_day");
 			});
 
 		layout.row("third")
 			.el(GridMap.class, (viz, data) -> {
-				viz.title = "CO₂ Emissions";
-				viz.unit = "CO₂ [g]";
+				viz.title = "NOx  Emissions";
+				viz.unit = "NOx [g/m]";
 				viz.description = "per hour";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_hour.%s", "avro")
-					.replace("emissions_grid_per_hour", Pollutant.CO2_TOTAL + "_" + "emissions_grid_per_hour");
+					.replace("emissions_grid_per_hour", Pollutant.NOx + "_" + "emissions_grid_per_hour");
 			});
 
 
