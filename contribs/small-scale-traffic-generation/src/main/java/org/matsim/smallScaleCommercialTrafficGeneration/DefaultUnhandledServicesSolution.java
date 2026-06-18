@@ -108,7 +108,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 			// Write header only if the file is newly created
 			if (Files.size(outputPath) == 0) {
 				String[] header = {"iteration", "carriersWithUnhandledJobsBeforeLoopIteration", "carriersSolvedInIteration",
-					"carriersNotSolvedInIteration", "addedVehicles", "changedServiceDurations", "additionalTravelBufferInMinutes", "calculationTimeInHH:MM:SS"};
+					"carriersNotSolvedInIteration", "addedVehicles", "changedServiceDurations", "additionalTravelBufferPerScheduledTourInMinutes", "calculationTimeInHH:MM:SS"};
 				JOIN.appendTo(writer, header);
 				writer.newLine();
 			}
@@ -120,7 +120,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				int numberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
 				int addedVehicles = 0;
 				int changedServiceDurations = 0;
-				int additionalTravelBufferInThisIterationInMinutes = (i) * generator.getAdditionalTravelBufferPerIterationInMinutes();
+				int additionalTravelBufferPerTourInThisIterationInMinutes = i * generator.getAdditionalTravelBufferPerTourAndIterationInMinutes();
 				for (Carrier nonCompleteSolvedCarrier : nonCompleteSolvedCarriers) {
 					GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes =
 						generator.getCarrierId2carrierAttributes().get(nonCompleteSolvedCarrier.getId());
@@ -206,16 +206,16 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					String.valueOf(numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size()),
 					String.valueOf(nonCompleteSolvedCarriers.size()),
 					String.valueOf(addedVehicles), String.valueOf(changedServiceDurations),
-					String.valueOf((i) * generator.getAdditionalTravelBufferPerIterationInMinutes()),
+					String.valueOf(additionalTravelBufferPerTourInThisIterationInMinutes),
 					timeForThisLoop});
 				writer.newLine();
 				writer.flush();  // Ensure it's written immediately
 
 				log.info(
-					"End of carrier-replanning loop iteration: {}. From the {} carriers with unhandled jobs ({} already solved), {} were solved in this iteration with an additionalBuffer of {} minutes.",
+					"End of carrier-replanning loop iteration: {}. From the {} carriers with unhandled jobs ({} already solved), {} were solved in this iteration with an additionalBuffer of {} minutes per scheduled tour.",
 					i, startNumberOfCarriersWithUnhandledJobs, startNumberOfCarriersWithUnhandledJobs - numberOfCarriersWithUnhandledJobs,
 					numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size(),
-					(i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes());
+					additionalTravelBufferPerTourInThisIterationInMinutes);
 
 				if (i != 1) {
 					try {

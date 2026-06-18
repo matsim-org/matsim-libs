@@ -144,8 +144,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--jspritIterations", description = "Set number of jsprit iterations", required = true)
 	private int jspritIterations;
 
-	@CommandLine.Option(names = "--additionalTravelBufferPerIterationInMinutes", description = "This buffer/driving time is used for service-route-planning. If set too low, carriers may not serve all their services.", defaultValue = "30")
-	private int additionalTravelBufferPerIterationInMinutes;
+	@CommandLine.Option(names = {"--additionalTravelBufferPerIterationInMinutes", "--additionalTravelBufferPerTourAndIterationInMinutes"}, description = "Additional travel buffer in minutes per scheduled tour and carrier-replanning iteration. Used while resolving carriers with unhandled services; if set too low, carriers may not serve all services.", defaultValue = "30")
+	private int additionalTravelBufferPerTourAndIterationInMinutes;
 
 	@CommandLine.Option(names = "--maxNumberOfLoopsForVRPSolving", description = "Limit of carrier replanning iterations, where carriers with unhandled services get new plans. If your carrier-plans are still not fully served, increase this limit.", defaultValue = "100")
 	private int maxNumberOfLoopsForVRPSolving;
@@ -1140,7 +1140,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				StructuralAttribute selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
 				while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
 					selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
-				// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
+				// additionalTravelBufferPerTourAndIterationInMinutes is only used while resolving carriers with unhandled services.
 				int serviceTimePerStop = getServiceTimePerStop(carrierAttributes);
 				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window so that late tours can handle it
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow, countedServices);
@@ -1387,8 +1387,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		return maxNumberOfLoopsForVRPSolving;
 	}
 
-	public int getAdditionalTravelBufferPerIterationInMinutes(){
-		return additionalTravelBufferPerIterationInMinutes;
+	public int getAdditionalTravelBufferPerTourAndIterationInMinutes(){
+		return additionalTravelBufferPerTourAndIterationInMinutes;
 	}
 	public double getFactorForTravelBufferCalculation(){
 		return factorForTravelBufferCalculation;
