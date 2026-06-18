@@ -67,10 +67,7 @@ import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.SimWrapperModule;
-import org.matsim.simwrapper.dashboard.CarrierDashboard;
-import org.matsim.simwrapper.dashboard.CommercialTrafficDashboard;
-import org.matsim.simwrapper.dashboard.OverviewDashboard;
-import org.matsim.simwrapper.dashboard.TripDashboard;
+import org.matsim.simwrapper.dashboard.*;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.CommercialTourSpecifications;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.DefaultTourSpecificationsByUsingKID2002;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
@@ -509,7 +506,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			sw.addDashboard(new OverviewDashboard(Set.copyOf(config.qsim().getMainModes())));
 			sw.addDashboard(new CarrierDashboard("(*.)?output_carriers_withPlans.xml.gz"));
 			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
- 			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			sw.addDashboard(new TrafficDashboard(modes));
 			Controller controller = prepareController(scenario);
 
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
