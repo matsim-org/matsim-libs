@@ -175,9 +175,9 @@ public class DriveDischargingHandlerTest {
 	/**
 	 * Tests that DriveDischargingHandler processes events from the last simulation timestep.
 	 * <p>
-	 * The afterMobsim hook calls doSimStep(lastTime + 1). Without the +1, the event-processing
-	 * logic would skip events whose time equals the current sim time, leaving VehicleLeavesTrafficEvent
-	 * at the final timestep unprocessed — and no energy would be discharged for the last link.
+	 * The afterMobsim hook has to process events whose time equals the last simulated step without
+	 * generating drive-consumption events after the mobsim cleanup time. Otherwise later cleanup events
+	 * at the final mobsim time may arrive after a drive-consumption event from the future.
 	 */
 	@Test
 	public void testLastTimestepEventsProcessedInAfterMobsim() {
@@ -242,9 +242,9 @@ public class DriveDischargingHandlerTest {
 
 		// The vehicle traverses l1 (1000 m, 1 J/m = 1000 J). l0 is the departure (first) link
 		// and is skipped by DriveDischargingHandler. The VehicleLeavesTrafficEvent for l1 fires
-		// at t=3600 (the last sim step) and is only processed by afterMobsim via doSimStep(3601).
-		// Without the +1 fix in afterMobsim, energy would be 0.
+		// at t=3600 (the last sim step) and is processed by afterMobsim.
 		assertEquals(EvUnits.J_to_kWh(1000.0), energy.energy_kWh, 1e-9);
+		assertEquals(3601.0, energy.lastEventTime, 1e-9);
 	}
 
 	private static Config createBaseConfig(String outputDir, double endTime) {
@@ -311,10 +311,12 @@ public class DriveDischargingHandlerTest {
 
 	static public class SummedEnergy implements DrivingEnergyConsumptionEventHandler {
 		public double energy_kWh = 0.0;
+		public double lastEventTime = Double.NaN;
 
 		@Override
 		public void handleEvent(DrivingEnergyConsumptionEvent event) {
 			energy_kWh += EvUnits.J_to_kWh(event.getEnergy());
+			lastEventTime = event.getTime();
 		}
 
 		public void install(Controler controller) {
