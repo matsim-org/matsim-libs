@@ -114,7 +114,7 @@ public class DriveDischargingHandler
 
 	@Override
 	public void afterMobsim() {
-		// Process remaining events without generating events after the mobsim cleanup time.
+		// Process all remaining queued events. No cutoff is needed once mobsim has finished producing events.
 		drainQueuedEvents(Double.POSITIVE_INFINITY, this.netsim.getSimTimer().getTimeOfDay());
 	}
 
