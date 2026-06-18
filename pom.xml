@@ -31,7 +31,7 @@
 		<argLine/>
 
 		<log4j.version>2.26.0</log4j.version>
-		<geotools.version>34.4</geotools.version>
+		<geotools.version>35.0</geotools.version>
 		<osmosis.version>0.49.2</osmosis.version>
 		<jts.version>1.20.0</jts.version>
 		<guice.version>7.0.0</guice.version>
@@ -41,7 +41,7 @@
 		<junit.version>6.1.0</junit.version>
 		<fastutil.version>8.5.18</fastutil.version>
 		<!-- We have transitive dependencies to this dependency. Therefore, move it here, so we have one version across the project -->
-		<protobuf-javalite.version>4.35.0</protobuf-javalite.version>
+		<protobuf-javalite.version>4.35.1</protobuf-javalite.version>
 	</properties>
 
 	<scm>
@@ -234,7 +234,7 @@
 			<dependency>
 				<groupId>com.google.errorprone</groupId>
 				<artifactId>error_prone_annotations</artifactId>
-				<version>2.49.0</version>
+				<version>2.50.0</version>
 			</dependency>
 
 			<dependency>
@@ -246,7 +246,7 @@
 			<dependency>
 				<groupId>com.fasterxml.woodstox</groupId>
 				<artifactId>woodstox-core</artifactId>
-				<version>7.2.0</version>
+				<version>7.2.1</version>
 			</dependency>
 
 			<dependency>
@@ -579,7 +579,7 @@
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.14</version>
+						<version>0.8.15</version>
 						<executions>
 							<execution>
 								<id>default-prepare-agent</id>

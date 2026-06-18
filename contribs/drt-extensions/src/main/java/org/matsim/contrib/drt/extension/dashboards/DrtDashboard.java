@@ -51,7 +51,7 @@ public class DrtDashboard implements Dashboard {
 		switch (drtConfigGroup.getOperationalScheme()) {
 			case stopbased ->
 //				drtConfigGroup.transitStopFile can not be null, otherwise simulation crashed, earlier
-				args.addAll(List.of("--stops-file", ConfigGroup.getInputFileURL(matsimConfigContext, drtConfigGroup.getTransitStopFile()).toString()));
+				args.addAll(List.of("--with-stops"));
 			case door2door -> {
 				//TODO potentially show the entire drt network (all drt links have stops)
 			}
@@ -146,7 +146,7 @@ public class DrtDashboard implements Dashboard {
 		;
 
 //		This plot is not absolutely necesarry given the hex plots
-//		if (drtConfigGroup.operationalScheme == DrtConfigGroup.OperationalScheme.stopbased)
+//		if (drtConfigGroup.getOperationalScheme() == DrtConfigGroup.OperationalScheme.stopbased)
 //			layout.row("od").el(AggregateOD.class, (viz, data) -> {
 //
 //				viz.shpFile = postProcess(data, "stops.shp");

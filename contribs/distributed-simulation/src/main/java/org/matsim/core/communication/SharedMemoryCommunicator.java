@@ -1,6 +1,5 @@
 package org.matsim.core.communication;
 
-import io.aeron.CommonContext;
 import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.agrona.concurrent.YieldingIdleStrategy;
@@ -16,6 +15,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 
 /**
  * Communicates using shared memory.
@@ -26,39 +27,47 @@ public class SharedMemoryCommunicator implements Communicator {
 
 	private final int rank;
 	private final int size;
+	private final Path tmpDir;
 
 	private final IdleStrategy idle = new YieldingIdleStrategy();
 
 	private final IPC subscription;
 	private final IPC[] others;
 
-	public SharedMemoryCommunicator(int rank, int size) {
+	public SharedMemoryCommunicator(int rank, int size, Path tmpDir) {
 		this.rank = rank;
 		this.size = size;
+		this.tmpDir = tmpDir;
 
-		File name = getName(rank);
-		log.info("Serving on {}", name);
+		var qFilePath = getQFilePath(rank);
+		if (Files.exists(qFilePath)) {
+			throw new RuntimeException("Shared memory file already exists: " + qFilePath + ". This indicates that a previous run was not properly" +
+				" finished. Clean up the directory before starting a simulation to ensure proper message exchange!");
+		}
+		log.info("Serving on {}", qFilePath);
 
 		try {
-			Files.createDirectories(Path.of(CommonContext.getAeronDirectoryName()));
+			Files.createDirectories(tmpDir);
+			Files.deleteIfExists(tmpDir.resolve("q-" + rank + ".init"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
-		this.subscription = new IPC(name, size, true);
+		this.subscription = new IPC(qFilePath, true);
 		this.others = new IPC[size];
 	}
 
 	static void main() {
-		try (SharedMemoryCommunicator comm = new SharedMemoryCommunicator(0, 1)) {
+		var globalTmpDir = System.getProperty("java.io.tmpdir");
+		try (SharedMemoryCommunicator comm = new SharedMemoryCommunicator(0, 1, Path.of(globalTmpDir, "dsim-shared-mem-comm"))) {
 			comm.connect();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private File getName(int rank) {
-		return new File(CommonContext.getAeronDirectoryName() + "/q-" + rank);
+	private Path getQFilePath(int rank) {
+		return tmpDir.resolve("q-" + rank);
 	}
 
 	public void connect() {
@@ -66,11 +75,11 @@ public class SharedMemoryCommunicator implements Communicator {
 		for (int i = 0; i < size; i++) {
 			if (i != rank) {
 
-				File name = getName(i);
-				while (!name.exists())
+				var name = getQFilePath(i);
+				while (!Files.exists(name))
 					idle.idle();
 
-				others[i] = new IPC(name, size, false);
+				others[i] = new IPC(name, false);
 			}
 		}
 	}
@@ -136,7 +145,7 @@ public class SharedMemoryCommunicator implements Communicator {
 	@Override
 	public void recv(MessageReceiver expectsNext, MessageConsumer handleReceive) {
 		while (expectsNext.expectsMoreMessages()) {
-			int read = subscription.rb.read((msgTypeId, buffer, index, length) -> {
+			int read = subscription.rb.read((_, buffer, index, length) -> {
 				ByteBuffer bb = buffer.byteBuffer();
 				if (bb == null)
 					bb = ByteBuffer.wrap(buffer.byteArray(), index, length);
@@ -148,7 +157,7 @@ public class SharedMemoryCommunicator implements Communicator {
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
-			});
+			}, 1);
 
 			if (read == 0) {
 				idle.idle();
@@ -161,49 +170,52 @@ public class SharedMemoryCommunicator implements Communicator {
 	private static final class IPC {
 
 		final ManyToOneRingBuffer rb;
-		private final File path;
-		private final RandomAccessFile file;
 		private final FileChannel channel;
-		private final MappedByteBuffer buffer;
-		private final UnsafeBuffer ub;
+		private final Path path;
 
 		/**
-		 * Compute next power of two for the given value.
-		 *
-		 * @param value
-		 * @return
+		 * Compute the next power of two for the given value.
 		 */
 		private long nextPowerOfTwo(long value) {
 			return 1L << (64 - Long.numberOfLeadingZeros(value - 1));
 		}
 
-		public IPC(File path, long total, boolean clear) {
+		public IPC(Path path, boolean owner) {
 
 			this.path = path;
-			file = getRandomAccessFile(path);
-			channel = file.getChannel();
 
-			String bufferSize = System.getenv("MSG_BUFFER_SIZE");
-			int s = bufferSize != null ? Integer.parseInt(bufferSize) : 32 * 1024 * 1024;
-			long n = nextPowerOfTwo(total * s + RingBufferDescriptor.TRAILER_LENGTH);
-			long size = n * s + RingBufferDescriptor.TRAILER_LENGTH;
-			while (size > Integer.MAX_VALUE) {
-				n = n >> 1;
-				size = n * s + RingBufferDescriptor.TRAILER_LENGTH;
+			String bufferSizeEnv = System.getenv("MSG_BUFFER_SIZE");
+			long capacity = bufferSizeEnv != null
+				? nextPowerOfTwo(Long.parseLong(bufferSizeEnv))
+				: 1L << 30; // 1 GB
+			while (capacity + RingBufferDescriptor.TRAILER_LENGTH > Integer.MAX_VALUE)
+				capacity >>= 1;
+			long size = capacity + RingBufferDescriptor.TRAILER_LENGTH;
+
+			// Owner: write to a temp path and rename atomically after zeroing, so connect()
+			// in other processes only sees the file once it is fully initialized.
+			Path openPath = owner ? path.resolveSibling(path.getFileName() + ".init") : path;
+			try {
+				channel = owner
+					? FileChannel.open(openPath, StandardOpenOption.CREATE_NEW, StandardOpenOption.READ, StandardOpenOption.WRITE)
+					: FileChannel.open(path, StandardOpenOption.READ, StandardOpenOption.WRITE);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 
-			// Create a memory-mapped file
-			buffer = mapBuffer(size);
-
-			// Zero the buffer before using it
-			if (clear) {
-				while (buffer.hasRemaining()) {
+			MappedByteBuffer buffer = mapBuffer(size);
+			if (owner) {
+				while (buffer.hasRemaining())
 					buffer.put((byte) 0);
-				}
 				buffer.clear();
+				try {
+					Files.move(openPath, path, StandardCopyOption.ATOMIC_MOVE);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			}
 
-			ub = new UnsafeBuffer(buffer);
+			UnsafeBuffer ub = new UnsafeBuffer(buffer);
 			rb = new ManyToOneRingBuffer(ub);
 		}
 
@@ -215,19 +227,10 @@ public class SharedMemoryCommunicator implements Communicator {
 			}
 		}
 
-		private RandomAccessFile getRandomAccessFile(File path) {
-			try {
-				return new RandomAccessFile(path, "rw");
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
 		public void close(boolean delete) {
 
 			try {
 				channel.close();
-				file.close();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -237,8 +240,9 @@ public class SharedMemoryCommunicator implements Communicator {
 		}
 
 		private void delete() {
-			boolean deleted = path.delete();
-			if (!deleted) {
+			try {
+				Files.delete(path);
+			} catch (IOException e) {
 				log.warn("Could not delete file {}", path);
 			}
 		}
