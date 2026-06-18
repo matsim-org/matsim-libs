@@ -440,18 +440,19 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 		CarriersUtils.writeCarrierVehicleTypes(scenario, CARRIER_VEHICLE_TYPES_FILE);
 		CarriersUtils.writeCarriers(scenario, SOLVED_CARRIER_FILE);
+
+		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(scenario, output.resolve("analysis").resolve("freight").toString());
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans);
+
 		if (isSolvingOnlyCarrierPart()) {
 			log.info("Solved small scale commercial carrier part {}/{}. Population and carrier analysis will be created by the merge step.",
 				smallScaleCommercialCarrierPartIndex + 1, smallScaleCommercialCarrierPartCount);
 			return 0;
 		}
-		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(scenario, output.resolve("analysis").resolve("freight").toString());
-		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnCarrierPlans);
-
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(scenario,
 			usedSmallScaleCommercialTrafficType, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
 
-		if (MATSimIterationsAfterDemandGeneration!= null && MATSimIterationsAfterDemandGeneration >= 0) {
+		if (MATSimIterationsAfterDemandGeneration != null && MATSimIterationsAfterDemandGeneration >= 0) {
 			log.info("Running MATSim for {} iterations after demand generation.", MATSimIterationsAfterDemandGeneration);
 			Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 			carriers.getCarriers().clear();
