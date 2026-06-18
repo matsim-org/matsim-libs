@@ -144,9 +144,9 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 						nonCompleteSolvedCarrier.getId(), unhandledServices.size(), handledServices.size(), unusedVehicles.size(),
 						usedVehicleIds.size());
 					// Calculate time deficit (including additional buffer) of the unhandled services compared to the available vehicle tour durations
+					int scheduledTourCount = Math.max(1, nonCompleteSolvedCarrier.getSelectedPlan().getScheduledTours().size());
 					double sumServiceDurationsWithBuffer = nonCompleteSolvedCarrier.getServices().values().stream().mapToDouble(
-						CarrierService::getServiceDuration).sum() + Math.max(1,
-						nonCompleteSolvedCarrier.getSelectedPlan().getScheduledTours().size()) * additionalTravelBufferInThisIterationInMinutes * 60;
+						CarrierService::getServiceDuration).sum() + scheduledTourCount * additionalTravelBufferPerTourInThisIterationInMinutes * 60;
 					double sumMaxTourDurationsVehicles = nonCompleteSolvedCarrier.getCarrierCapabilities().getCarrierVehicles().values().stream().mapToDouble(
 						vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime()).sum();
 					double timeDeficit = sumServiceDurationsWithBuffer - sumMaxTourDurationsVehicles;
@@ -176,9 +176,10 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 						new UnHandledInformation(unhandledServices.size(), unusedVehicles.size()));
 
 					log.info(
-						"Carrier '{}': timeDeficit={} min (service+buffer={} / vehicles={}), anySingleJobInfeasible={}, checkAddVehicles={}, checkRedrawServiceDur={}",
+						"Carrier '{}': timeDeficit={} min (service+buffer={} / vehicles={}), scheduledTours={}, additionalBufferPerTour={} min, anySingleJobInfeasible={}, checkAddVehicles={}, checkRedrawServiceDur={}",
 						nonCompleteSolvedCarrier.getId(),
 						timeDeficit / 60.0, sumServiceDurationsWithBuffer / 60.0, sumMaxTourDurationsVehicles / 60.0,
+						scheduledTourCount, additionalTravelBufferPerTourInThisIterationInMinutes,
 						anySingleJobInfeasible, checkAdditionalVehicles, checkServiceDurationChange
 					);
 					// Add additional vehicles
