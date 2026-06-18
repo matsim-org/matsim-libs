@@ -186,7 +186,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--MATSimIterationsAfterDemandGeneration", description = "If selected, the MATSim simulation will be run for the selected number of iterations after demand generation. if not selected, only demand generation is performed.")
 	private Integer MATSimIterationsAfterDemandGeneration;
 
-	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = "The factor describing how many vehicles should be created in relation to the number of created services. If maxNumberOfLoopsForVRPSolving > 0 more vehicles are added in the replanning process.", defaultValue = "1.2")
+	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = "Factor applied to the total service duration when estimating the required total tour duration for initial vehicle creation. Values above 1.0 reserve additional time for travel between services", defaultValue = "1.2")
 	private double factorForTravelBufferCalculation;
 
 	@CommandLine.Option(names = "--useRangeConstraintForTourPlanning", description = "Option to use range constraint for planning the tours. If this is selected, the range is restricted based on consumption information in the vehicle types file.")
