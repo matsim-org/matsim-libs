@@ -51,7 +51,7 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 
 	@Override
 	public Integer call() throws Exception {
-		// yyyy the output_config has the input files as as files. :-(
+		// yyyy the output_config has the _input_ file paths. :-(
 
 		Path configPath = ApplicationUtils.globFile( path, "*output_" + Controler.DefaultFiles.configReduced.getFilename() );
 
@@ -68,6 +68,7 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 
 		Path eventsPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.events.getFilename() + ".gz");
 		Path experiencedPlansPath = eventsPath.getParent().resolve(runPrefix + "output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
+		// yyyy tendency to replace in the above "output_" by "postproc_". kai, jun'26
 
 		Scenario scenario = new ScenarioUtils.ScenarioBuilder(config)
 			.setNetwork(NetworkUtils.readNetwork(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.network.getFilename() + ".gz").toString()))

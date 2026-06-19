@@ -151,11 +151,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		// ===
 
-//		generateExperiencedPlans( baseDir );
+		generateExperiencedPlans( baseDir );
 //		generateExperiencedPlans( policyDir );
-//		generateFilteredEventsFile( baseDir );
+		generateFilteredEventsFile( baseDir );
 //		generateFilteredEventsFile( policyDir );
-		agentWiseComparison( baseDir, policyDir, shpFile );
+//		agentWiseComparison( baseDir, policyDir, shpFile );
 	}
 
 	// ---
