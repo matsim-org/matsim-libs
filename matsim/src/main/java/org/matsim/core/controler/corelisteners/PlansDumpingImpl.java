@@ -23,9 +23,8 @@ package org.matsim.core.controler.corelisteners;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -54,7 +53,6 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 	static final private Logger log = LogManager.getLogger(PlansDumpingImpl.class);
 
 	@Inject private Config config;
-	@Inject private Network network;
 	@Inject private Population population;
 	@Inject private IterationStopWatch stopwatch;
 	@Inject private OutputDirectoryHierarchy controlerIO;
@@ -79,8 +77,9 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 			final String inputCRS = config.plans().getInputCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
+			final String filename = controlerIO.getIterationFilename(event.getIteration(), Controler.DefaultFiles.population);
 			if ( inputCRS == null ) {
-				new PopulationWriter(population, network).write(controlerIO.getIterationFilename(event.getIteration(), Controler.DefaultFiles.population));
+				PopulationUtils.writePopulation(population, filename);
 			}
 			else {
 				log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
@@ -90,7 +89,8 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 								internalCRS,
 								inputCRS );
 
-				new PopulationWriter(transformation, population, network).write(controlerIO.getIterationFilename(event.getIteration(), Controler.DefaultFiles.population));
+				PopulationUtils.writePopulation(population, filename,
+						java.util.Collections.emptyMap(), transformation);
 			}
 			log.info("finished plans dump.");
 			stopwatch.endOperation("dump all plans");

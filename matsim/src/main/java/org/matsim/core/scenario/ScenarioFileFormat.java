@@ -1,6 +1,7 @@
 package org.matsim.core.scenario;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 import java.net.URL;
@@ -34,6 +35,11 @@ public interface ScenarioFileFormat {
 	default void readPopulation(URL url, Scenario scenario, String inputCRS, String targetCRS,
 								Map<Class<?>, AttributeConverter<?>> attributeConverters) {
 		throw new UnsupportedOperationException("Population reading not supported by " + getClass().getName());
+	}
+
+	default void writePopulation(Population population, String filename,
+								 Map<Class<?>, AttributeConverter<?>> attributeConverters) {
+		throw new UnsupportedOperationException("Population writing not supported by " + getClass().getName());
 	}
 
 	default void readNetwork(URL url, Scenario scenario, String inputCRS, String targetCRS,

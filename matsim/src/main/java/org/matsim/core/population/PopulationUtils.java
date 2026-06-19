@@ -45,12 +45,16 @@ import org.matsim.core.population.routes.mediumcompressed.MediumCompressedNetwor
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioFileFormat;
+import org.matsim.core.scenario.ScenarioFileFormatRegistry;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.vehicles.Vehicle;
@@ -1183,7 +1187,27 @@ public final class PopulationUtils {
 	}
 
 	public static void writePopulation(Population population, String filename) {
-		new PopulationWriter(population).write(filename);
+		writePopulation(population, filename, Collections.emptyMap());
+	}
+
+	public static void writePopulation(Population population, String filename,
+									   Map<Class<?>, AttributeConverter<?>> attributeConverters) {
+		writePopulation(population, filename, attributeConverters, null);
+	}
+
+	public static void writePopulation(Population population, String filename,
+									   Map<Class<?>, AttributeConverter<?>> attributeConverters,
+									   CoordinateTransformation coordinateTransformation) {
+		Optional<ScenarioFileFormat> provider = ScenarioFileFormatRegistry.getProvider(filename);
+		if (provider.isPresent()) {
+			provider.get().writePopulation(population, filename, attributeConverters);
+		} else {
+			PopulationWriter writer = coordinateTransformation != null
+					? new PopulationWriter(coordinateTransformation, population)
+					: new PopulationWriter(population);
+			writer.putAttributeConverters(attributeConverters);
+			writer.write(filename);
+		}
 	}
 
 	public static Id<Link> decideOnLinkIdForActivity(Activity act, Scenario sc) {
@@ -1273,10 +1297,12 @@ public final class PopulationUtils {
 	public static void readPopulation(Population population, String filename) {
 		MutableScenario scenario = ScenarioUtils.createMutableScenario(ConfigUtils.createConfig());
 		scenario.setPopulation(population);
-		new PopulationReader(scenario).readFile(filename);
-		// (yyyy population reader uses network to retrofit some missing geo information such as route lenth.
-		// In my opinion, that should be done in prepareForSim, not in the parser.  It is commented as such
-		// in the PopulationReader class.  kai, nov'18)
+		Optional<ScenarioFileFormat> provider = ScenarioFileFormatRegistry.getProvider(filename);
+		if (provider.isPresent()) {
+			provider.get().readPopulation(IOUtils.getFileUrl(filename), scenario, null, null, Collections.emptyMap());
+		} else {
+			new PopulationReader(scenario).readFile(filename);
+		}
 	}
 
 	public static Population readPopulation(String filename) {
