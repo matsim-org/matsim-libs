@@ -151,11 +151,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		// ===
 
-		generateExperiencedPlans( baseDir );
+//		generateExperiencedPlans( baseDir );
 //		generateExperiencedPlans( policyDir );
-		generateFilteredEventsFile( baseDir );
+//		generateFilteredEventsFile( baseDir );
 //		generateFilteredEventsFile( policyDir );
-//		agentWiseComparison( baseDir, policyDir, shpFile );
+		agentWiseComparison( baseDir, policyDir, shpFile );
 	}
 
 	// ---
@@ -245,7 +245,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		baseTablePersons.addColumns( baseTablePersons.doubleColumn( MATSIM_SCORE ).subtract( baseTablePersons.doubleColumn( SCORE ) ).setName( "error" ) );
 
-		printTable( baseTablePersons.sortOn( "error" ), "sorted by score differences bw mw and self-computed" );
+		printTable( baseTablePersons.sortOn( "error" ), "sorted by score differences between ms output and self-computed" );
 		writeMuseHtml( baseTablePersons, policyCasePath );
 		writeVseHtml( baseTablePersons, policyCasePath );
 
@@ -452,7 +452,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				if( basePerson != null ){
 					marginalUtilityOfMoney = getMarginalUtilityOfMoney( basePerson );
 				}
-				// yyyy We have persons in the policy case which are no longer in the base case.
+				// yyyy We have persons in the policy case which are no longer in the base case. // yyyyyy ????
 				moneyScore = (sumMoney + dailyMoney) * marginalUtilityOfMoney;
 
 				table.doubleColumn( HeadersKN.MONEY_SCORE ).append( moneyScore );
@@ -508,7 +508,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
 //			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 		// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
-			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
+		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
 //		joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
 
 		Table copyOfJoinedTable = Table.create( joinedTable.columns() );
@@ -554,9 +554,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			// ===
 
-			writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
-		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
-		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+			writeMatsimScoresSummaryTables( "all", outputPath, baseConfig, deltaTable );
+			writeMatsimScoresSummaryTables( "0th decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
+			writeMatsimScoresSummaryTables( "last decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
 
 			if( doRoh ){
 				writeRuleOfHalfSummaryTable( policyCasePath, baseConfig, rohDeltaTable );
@@ -599,9 +599,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			// ===
 
-			writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
-		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
-		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+			writeMatsimScoresSummaryTables( "all", outputPath, baseConfig, deltaTable );
+			writeMatsimScoresSummaryTables( "0th decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
+			writeMatsimScoresSummaryTables( "last decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
 
 			if( doRoh ){
 				writeRuleOfHalfSummaryTable( policyCasePath, baseConfig, rohDeltaTable );
