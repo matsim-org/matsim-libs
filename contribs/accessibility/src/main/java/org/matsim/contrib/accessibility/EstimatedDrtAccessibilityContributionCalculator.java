@@ -13,6 +13,7 @@ import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -143,8 +144,8 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		double expSum = 0.;
 
 		// find the closest stop to measuring point.
-		Assert.isTrue(stopFinder instanceof ClosestAccessEgressFacilityFinder, "So far, findClosestStop() is only implemented in ClosestAccessEgressFacilityFinder");
-		Facility nearestStopAccess = ((ClosestAccessEgressFacilityFinder) stopFinder).findClosestStop(origin);
+//		Assert.isTrue(stopFinder instanceof ClosestAccessEgressFacilityFinder || stopFinder instanceof DecideOnLinkAccessEgressFacilityFinder, "So far, findClosestStop() is only implemented in ClosestAccessEgressFacilityFinder");
+		Facility nearestStopAccess = stopFinder.findClosestStop(origin);
 
 
 		// UTILITY OF ACCESS WALK LEG
@@ -163,7 +164,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 			// find closest DRT stop to opportunity
 			Facility opportunity = (Facility) destination.getNearestBasicLocation();
-			Facility nearestStopEgress = ((ClosestAccessEgressFacilityFinder) stopFinder).findClosestStop(opportunity);
+			Facility nearestStopEgress = stopFinder.findClosestStop(opportunity);
 
 			// UTILITY OF DRT LEG
 			// first, we route a car trip from pickup DRT stop to dropoff DRT stop, and extract the travel distance and travel time.
@@ -174,7 +175,8 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 
 			// DRT Estimator needs a "drt route"
-			DrtRoute drtRoute = new DrtRoute(Id.createLinkId("dummyFrom"), Id.createLinkId("dummyTo"));
+			nearestStopEgress.getLinkId();
+			DrtRoute drtRoute = new DrtRoute(nearestStopAccess.getLinkId(), nearestStopEgress.getLinkId());
 			drtRoute.setDistance(directRideDistance_m); // todo: since this is based on the distance and not the time of the direct car trips, congestion effects are not yet included.
 			drtRoute.setDirectRideTime(directRideTime_sec);
 

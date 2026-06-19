@@ -22,6 +22,8 @@ public final class MapPlot extends VizMap<MapPlot> {
 	public Display display = new Display();
 	public Double minValue;
 	public Double maxValue;
+	public String projection;
+
 	@JsonProperty(required = true)
 	private Object shapes;
 
@@ -76,8 +78,10 @@ public final class MapPlot extends VizMap<MapPlot> {
 	 */
 	public static final class DisplaySettings {
 
-		@JsonProperty(required = true)
+		@JsonProperty(required = false)
 		public String dataset;
+
+		public String diff;
 
 		@JsonProperty(required = true)
 		public String columnName;
@@ -91,6 +95,7 @@ public final class MapPlot extends VizMap<MapPlot> {
 		public Double scaleFactor;
 		@JsonProperty()
 		public String[] fixedColors;
+
 
 		private Map<String, Object> colorRamp;
 

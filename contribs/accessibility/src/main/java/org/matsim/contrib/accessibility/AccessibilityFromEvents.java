@@ -45,7 +45,7 @@ public final class AccessibilityFromEvents{
 		private Scenario scenario;
 		// events file is required to calculate congestion levels on network, which would affect the accessibility of modes like car & drt, which are routed on the network
 		private String eventsFile;
-		private final List<FacilityDataExchangeInterface> dataListeners = new ArrayList<>() ;
+		private final List<DataExchangeInterface> dataListeners = new ArrayList<>() ;
 
 		public Builder( Scenario scenario, String eventsFile) {
 			this(scenario, eventsFile, null);
@@ -63,7 +63,7 @@ public final class AccessibilityFromEvents{
 
 
 
-		public void addDataListener( FacilityDataExchangeInterface dataListener ) {
+		public void addDataListener(DataExchangeInterface dataListener ) {
 			dataListeners.add( dataListener ) ;
 		}
 		public AccessibilityFromEvents build() {
@@ -73,9 +73,9 @@ public final class AccessibilityFromEvents{
 
 	private final Scenario scenario;
 	private final String eventsFile;
-	private final List<FacilityDataExchangeInterface> dataListeners ;
+	private final List<DataExchangeInterface> dataListeners ;
 
-	private AccessibilityFromEvents(Scenario scenario, String eventsFile, List<FacilityDataExchangeInterface> dataListeners, List<String> actType, DrtEstimator drtEstimator) {
+	private AccessibilityFromEvents(Scenario scenario, String eventsFile, List<DataExchangeInterface> dataListeners, List<String> actType, DrtEstimator drtEstimator) {
 		this.scenario = scenario;
 		this.eventsFile = eventsFile;
 		this.dataListeners = dataListeners;
@@ -179,7 +179,7 @@ public final class AccessibilityFromEvents{
 				// install the accessiblity module:
 				if (actTypes == null || actTypes.isEmpty()) {
 					final AccessibilityModule module = new AccessibilityModule();
-					for( FacilityDataExchangeInterface dataListener : dataListeners ){
+					for( DataExchangeInterface dataListener : dataListeners ){
 						module.addFacilityDataExchangeListener( dataListener );
 					}
 					install( module );
@@ -189,7 +189,7 @@ public final class AccessibilityFromEvents{
 						if (actType != null) {
 							module.setConsideredActivityType(actType);
 						}
-						for( FacilityDataExchangeInterface dataListener : dataListeners ){
+						for( DataExchangeInterface dataListener : dataListeners ){
 							module.addFacilityDataExchangeListener( dataListener );
 						}
 						install( module);

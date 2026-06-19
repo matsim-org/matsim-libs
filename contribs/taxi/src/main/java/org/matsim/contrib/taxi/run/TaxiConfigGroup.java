@@ -138,7 +138,7 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	public int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	@NotNull
-	private AbstractTaxiOptimizerParams taxiOptimizerParams;
+	public AbstractTaxiOptimizerParams taxiOptimizerParams;
 
 	@Nullable
 	private TaxiFareParams taxiFareParams;

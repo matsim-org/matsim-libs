@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.core.config.Config;
@@ -50,13 +52,14 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 	private static final Logger LOG = LogManager.getLogger(AccessibilityComputationShutdownListener.class);
 
     private final ActivityFacilities measuringPoints;
+	private final Scenario scenario;
 	private ActivityFacilities opportunities;
 
 	private String outputDirectory;
 
 	private final Map<String, AccessibilityContributionCalculator> calculators = new LinkedHashMap<>();
-	private AccessibilityAggregator accessibilityAggregator;
-	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
+	private DataExchangeInterface accessibilityAggregator;
+	private final ArrayList<DataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
 	private Config config;
 	private AccessibilityConfigGroup acg;
@@ -69,6 +72,8 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 	    this.opportunities = opportunities;
 
 		this.outputDirectory = outputDirectory;
+
+		this.scenario = scenario;
 
 		this.config = scenario.getConfig();
 
@@ -99,7 +104,13 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		}
 
 		LOG.info("Initializing accessibility computation...");
-		accessibilityAggregator = new AccessibilityAggregator();
+
+		if(acg.isPersonBased()){
+			accessibilityAggregator = new AccessibilityAggregatorPersonBased();
+		}else {
+			accessibilityAggregator = new AccessibilityAggregator();
+
+		}
 		addFacilityDataExchangeListener(accessibilityAggregator);
 
 		if (outputDirectory != null) {
@@ -111,10 +122,35 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		computeAccessibilities(acg.getTimeOfDay(), opportunities);
 		LOG.info("Finished computing accessibilities.");
 
-		writeCSVFile(outputDirectory);
+		if(acg.isPersonBased()){
+			writeCSVFilePersonBased(outputDirectory);
+		}else {
+			writeCSVFile(outputDirectory);
+		}
 		writePoiFile(outputDirectory);
 		writeConfigUsedForAccessibilityComputation(outputDirectory, config);
 
+	}
+
+	private void writePoiFile(String outputDirectory) {
+		LOG.info("Start writing POI output to " + outputDirectory + ".");
+
+		final CSVWriter writer = new CSVWriter(outputDirectory + "/" + CSVWriter.POI_FILE_NAME ) ;
+
+		// Write header
+//		writer.writeField(Labels.ID);
+		writer.writeField(Labels.X_COORDINATE);
+		writer.writeField(Labels.Y_COORDINATE);
+		writer.writeNewLine();
+
+		opportunities.getFacilities().values().forEach(facility -> {
+			writer.writeField(facility.getCoord().getX());
+			writer.writeField(facility.getCoord().getY());
+			writer.writeNewLine();
+		});
+
+		writer.close() ;
+		LOG.info("Finished writing POI output to " + outputDirectory + ".");
 	}
 
 
@@ -176,7 +212,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 				}
 
 			}
-			for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
+			for (DataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 				zoneDataExchangeInterface.finish();
 			}
 		}
@@ -218,32 +254,15 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
                     throw new IllegalArgumentException("No valid accessibility measure type chosen.");
                 }
 
-				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, mode, accessibility);
+				for (DataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
+					if(acg.isPersonBased()){
+						((PersonDataExchangeInterface) zoneDataExchangeInterface).setPersonAccessibilities((Person) origin.getAttributes().getAttribute("person"), departureTime, mode, accessibility);
+					} else {
+						((FacilityDataExchangeInterface) zoneDataExchangeInterface).setFacilityAccessibilities(origin, departureTime, mode, accessibility);
+					}
 				}
 			}
 		}
-	}
-
-	private void writePoiFile(String outputDirectory) {
-		LOG.info("Start writing POI output to " + outputDirectory + ".");
-
-		final CSVWriter writer = new CSVWriter(outputDirectory + "/" + CSVWriter.POI_FILE_NAME ) ;
-
-		// Write header
-//		writer.writeField(Labels.ID);
-		writer.writeField(Labels.X_COORDINATE);
-		writer.writeField(Labels.Y_COORDINATE);
-		writer.writeNewLine();
-
-		opportunities.getFacilities().values().forEach(facility -> {
-			writer.writeField(facility.getCoord().getX());
-			writer.writeField(facility.getCoord().getY());
-			writer.writeNewLine();
-		});
-
-		writer.close() ;
-		LOG.info("Finished writing POI output to " + outputDirectory + ".");
 	}
 
 	private void writeConfigUsedForAccessibilityComputation(String adaptedOutputDirectory, Config config) {
@@ -257,7 +276,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 	private void writeCSVFile(String adaptedOutputDirectory) {
 		LOG.info("Start writing accessibility output to " + adaptedOutputDirectory + ".");
 
-		Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = accessibilityAggregator.getAccessibilitiesMap();
+		Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = ((AccessibilityAggregator) accessibilityAggregator).getAccessibilitiesMap();
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
 
 		// Write header
@@ -298,6 +317,54 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		LOG.info("Finished writing accessibility output to " + adaptedOutputDirectory + ".");
 	}
 
+	private void writeCSVFilePersonBased(String adaptedOutputDirectory) {
+		LOG.info("Start writing accessibility output to " + adaptedOutputDirectory + ".");
+
+		Map<Tuple<Person, Double>, Map<String,Double>> accessibilitiesMap = ((AccessibilityAggregatorPersonBased) accessibilityAggregator).getAccessibilitiesMap();
+		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
+
+		// Write header
+		writer.writeField(Labels.ID);
+//		writer.writeField(Labels.X_COORDINATE);
+//		writer.writeField(Labels.Y_COORDINATE);
+		writer.writeField(Labels.TIME);
+		for (String mode : getModes() ) {
+			writer.writeField(mode + "_accessibility");
+		}
+		for (ActivityFacilities additionalDataFacilities : this.additionalFacilityData) { // Iterate over all additional data collections
+			String additionalDataName = additionalDataFacilities.getName();
+			writer.writeField(additionalDataName);
+		}
+		writer.writeNewLine();
+
+		// Write data
+		for (Tuple<Person, Double> tuple : accessibilitiesMap.keySet()) {
+			Person person = tuple.getFirst();
+			writer.writeField(person.getId().toString());
+//			writer.writeField(facility.getCoord().getX());
+//			writer.writeField(facility.getCoord().getY());
+			writer.writeField(tuple.getSecond());
+
+			for (String mode : getModes() ) {
+				// Defaulting to NaN allows accessibility calculations to be skipped for certain time slices for certain modes
+				final double value = accessibilitiesMap.get(tuple).getOrDefault(mode, Double.NaN);
+				if (!Double.isNaN(value)) {
+					writer.writeField(value);
+				} else {
+					writer.writeField(Double.NaN);
+				}
+			}
+//			for (ActivityFacilities additionalDataFacilities : this.additionalFacilityData) { // Again: Iterate over all additional data collections
+//				String additionalDataName = additionalDataFacilities.getName();
+//				int value = (int) facility.getAttributes().getAttribute(additionalDataName);
+//				writer.writeField(value);
+//			}
+			writer.writeNewLine();
+		}
+		writer.close() ;
+		LOG.info("Finished writing accessibility output to " + adaptedOutputDirectory + ".");
+	}
+
 
 	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calculator) {
 		LOG.info("Adding accessibility contribution calculator for " + mode + ".");
@@ -311,7 +378,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 	}
 
 
-	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface listener){
+	public void addFacilityDataExchangeListener(DataExchangeInterface listener){
 		this.zoneDataExchangeListeners.add(listener);
 	}
 
