@@ -674,7 +674,8 @@ public final class MatsimJspritFactory {
 					StateManager stateManager = new StateManager(problem);
 					stateManager.addStateUpdater(new DistanceUpdater(stateManager.createStateId("distance"), stateManager, netBasedCosts));
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts), ConstraintManager.Priority.CRITICAL);
+					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts,
+						freightConfig.getDistanceConstraintUsableRange()), ConstraintManager.Priority.CRITICAL);
 					AlgorithmConfig algorithmConfig = new AlgorithmConfig();
 					AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
 					xmlReader.read(vraURL);
@@ -693,7 +694,8 @@ public final class MatsimJspritFactory {
 					StateManager stateManager = new StateManager(problem);
 					stateManager.addStateUpdater(new DistanceUpdater(stateManager.createStateId("distance"), stateManager, netBasedCosts));
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts), ConstraintManager.Priority.CRITICAL);
+					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts,
+						freightConfig.getDistanceConstraintUsableRange()), ConstraintManager.Priority.CRITICAL);
 					//by default of Jsprit the fixed costs are not considered in the algorithm. Adding this property takes this into account.
 					algorithm = Jsprit.Builder.newInstance(problem).setProperty(Jsprit.Parameter.FIXED_COST_PARAM, "0.5").setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
 				}

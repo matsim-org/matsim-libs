@@ -22,6 +22,7 @@ package org.matsim.core.router.speedy;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -29,6 +30,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -95,6 +97,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
     private final double[] dnWeights;
     private final int[] sweepOrder;
     private final double[] ttf;
+    private final double[] edgeDistance;
     private final int totalEdgeCount;
 
     // Reverse CSR arrays for push-based Phase 2 sweep
@@ -127,6 +130,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
         this.dnWeights = chGraph.dnWeights;
         this.sweepOrder = chGraph.sweepOrder;
         this.ttf = chGraph.ttf;
+        this.edgeDistance = chGraph.edgeDistance;
         this.totalEdgeCount = chGraph.totalEdgeCount;
 
         // Reverse CSR for push-based Phase 2
@@ -154,6 +158,16 @@ public class CHLeastCostPathTree implements ShortestPathTree {
                           LeastCostPathTree.StopCriterion stopCriterion) {
         lastForwardSearch = true;
         int startNode = baseGraph.getNodeIndex(startLink.getToNode());
+        // If the base graph contains turn restrictions, the start link may have been
+        // replaced by a colored copy.  Use that colored to-node so the CH search
+        // starts from the topologically correct (restriction-aware) entry node.
+        if (baseGraph.getTurnRestrictions().isPresent()) {
+            TurnRestrictionsContext context = baseGraph.getTurnRestrictions().get();
+            TurnRestrictionsContext.ColoredLink replaced = context.replacedLinks.get(startLink.getId());
+            if (replaced != null && replaced.toColoredNode != null) {
+                startNode = baseGraph.getInternalIndex(replaced.toColoredNode.index());
+            }
+        }
         calculateForward(startNode, startTime, stopCriterion);
     }
 
@@ -196,6 +210,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
             // Iterate upward out-edges
             int uOff = upOff[v];
             int uEnd = uOff + upLen[v];
+            double vDist = getDistance(v);
             for (int slot = uOff; slot < uEnd; slot++) {
                 int eBase = slot * S;
                 int w = upEdges[eBase];
@@ -204,14 +219,15 @@ public class CHLeastCostPathTree implements ShortestPathTree {
                 double tTime = ttf[binOff + gIdx];
                 double newCost = cost + tTime;
                 double newArr = arr + tTime;
+                double newDist = vDist + edgeDistance[gIdx];
 
                 if (iterIds[w] == currentIteration) {
                     if (newCost < getCost(w)) {
-                        setNode(w, newCost, newArr, 0.0, v, gIdx);
+                        setNode(w, newCost, newArr, newDist, v, gIdx);
                         pq.decreaseKey(w, newCost);
                     }
                 } else {
-                    setNode(w, newCost, newArr, 0.0, v, gIdx);
+                    setNode(w, newCost, newArr, newDist, v, gIdx);
                     pq.insert(w, newCost);
                 }
             }
@@ -225,6 +241,15 @@ public class CHLeastCostPathTree implements ShortestPathTree {
         //   - Cost-bounded pruning skips nodes/edges beyond earlyTermCost
         //   - Sequential memory access on sweepOrder (cache-friendly)
         forwardSweepLinear(S, earlyTermCost);
+
+        // When turn restrictions are present, the base graph contains colored copies
+        // of real nodes; only the colored copy may have been reached.  Mirror each
+        // best colored label onto the corresponding real-node slot so that callers
+        // querying getCost/getTime/getDistance on the real node observe the correct
+        // result.  Mirrors org.matsim.core.router.speedy.LeastCostPathTree.
+        if (baseGraph.getTurnRestrictions().isPresent()) {
+            consolidateColoredNodes();
+        }
     }
 
     /**
@@ -265,6 +290,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
             if (uCost >= maxCost) continue;
 
             double uArr = data[u * 3 + 1];      // getTimeRaw(u) inlined
+            double uDist = data[u * 3 + 2];     // getDistance(u) inlined
 
             // Push costs along u's outgoing downward edges (u→w, rank(w) < rank(u))
             int dOff = dnOutOff[u];
@@ -285,12 +311,13 @@ public class CHLeastCostPathTree implements ShortestPathTree {
                         ? data[wBase] : Double.POSITIVE_INFINITY;
 
                 if (newCost < wCost) {
+                    int gIdx = dnOutEdges[eBase + CHGraph.E_GIDX];
                     // setNode inlined for hot-path performance
                     data[wBase] = newCost;
                     data[wBase + 1] = uArr + tTime;
-                    data[wBase + 2] = 0.0;
+                    data[wBase + 2] = uDist + edgeDistance[gIdx];
                     comingFrom[w] = u;
-                    fromEdgeGIdx[w] = dnOutEdges[eBase + CHGraph.E_GIDX];
+                    fromEdgeGIdx[w] = gIdx;
                     iterIds[w] = iter;
                 }
             }
@@ -310,11 +337,12 @@ public class CHLeastCostPathTree implements ShortestPathTree {
                                    LeastCostPathTree.StopCriterion stopCriterion) {
         lastForwardSearch = false;
         int arrivalNode = baseGraph.getNodeIndex(arrivalLink.getFromNode());
-        calculateBackwardImpl(arrivalNode, arrivalTime, stopCriterion);
+        calculateBackwardImpl(arrivalNode, arrivalTime, stopCriterion, arrivalLink);
     }
 
     private void calculateBackwardImpl(int targetNode, double arrivalTime,
-                                        LeastCostPathTree.StopCriterion stopCriterion) {
+                                        LeastCostPathTree.StopCriterion stopCriterion,
+                                        Link arrivalLink) {
         advanceIteration();
 
         final int S = CHGraph.E_STRIDE;
@@ -323,6 +351,31 @@ public class CHLeastCostPathTree implements ShortestPathTree {
         setNode(targetNode, 0.0, arrivalTime, 0.0, -1, -1);
         pq.clear();
         pq.insert(targetNode, 0.0);
+
+        // When turn restrictions are present, the real arrival node may be unreachable;
+        // only colored copies sitting "in front of" the arrival link may be reachable.
+        // Seed every such colored arrival node, mirroring LeastCostPathTree.
+        if (arrivalLink != null && baseGraph.getTurnRestrictions().isPresent()) {
+            TurnRestrictionsContext ctx = baseGraph.getTurnRestrictions().get();
+            for (Link inLink : arrivalLink.getFromNode().getInLinks().values()) {
+                TurnRestrictionsContext.ColoredLink replaced = ctx.replacedLinks.get(inLink.getId());
+                if (replaced != null && replaced.toColoredNode != null) {
+                    int coloredArrival = baseGraph.getInternalIndex(replaced.toColoredNode.index());
+                    setNode(coloredArrival, 0.0, arrivalTime, 0.0, -1, -1);
+                    pq.insert(coloredArrival, 0.0);
+                }
+                List<TurnRestrictionsContext.ColoredLink> coloredLinks = ctx.coloredLinksPerLinkMap.get(inLink.getId());
+                if (coloredLinks != null) {
+                    for (TurnRestrictionsContext.ColoredLink coloredLink : coloredLinks) {
+                        if (coloredLink.toColoredNode != null) {
+                            int coloredArrival = baseGraph.getInternalIndex(coloredLink.toColoredNode.index());
+                            setNode(coloredArrival, 0.0, arrivalTime, 0.0, -1, -1);
+                            pq.insert(coloredArrival, 0.0);
+                        }
+                    }
+                }
+            }
+        }
 
         // Track the cost at which Phase 1 terminates (for sweep pruning).
         double earlyTermCost = Double.POSITIVE_INFINITY;
@@ -339,6 +392,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
 
             int dOff = dnOff[w];
             int dEnd = dOff + dnLen[w];
+            double wDist = getDistance(w);
             for (int slot = dOff; slot < dEnd; slot++) {
                 int eBase = slot * S;
                 int u = dnEdges[eBase];
@@ -346,16 +400,17 @@ public class CHLeastCostPathTree implements ShortestPathTree {
 
                 double edgeCost = chGraph.minTTF[gIdx];
                 double newCost = cost + edgeCost;
+                double newDist = wDist + edgeDistance[gIdx];
 
                 if (iterIds[u] == currentIteration) {
                     if (newCost < getCost(u)) {
                         double newTime = getTimeRaw(w) - edgeCost;
-                        setNode(u, newCost, newTime, 0.0, w, gIdx);
+                        setNode(u, newCost, newTime, newDist, w, gIdx);
                         pq.decreaseKey(u, newCost);
                     }
                 } else {
                     double newTime = getTimeRaw(w) - edgeCost;
-                    setNode(u, newCost, newTime, 0.0, w, gIdx);
+                    setNode(u, newCost, newTime, newDist, w, gIdx);
                     pq.insert(u, newCost);
                 }
             }
@@ -363,6 +418,11 @@ public class CHLeastCostPathTree implements ShortestPathTree {
 
         // Phase 2: Cost-bounded linear push sweep.
         backwardSweepLinear(S, earlyTermCost);
+
+        // Consolidate colored copies onto real nodes (see calculateForward).
+        if (baseGraph.getTurnRestrictions().isPresent()) {
+            consolidateColoredNodes();
+        }
     }
 
     /**
@@ -387,6 +447,7 @@ public class CHLeastCostPathTree implements ShortestPathTree {
             if (uCost >= maxCost) continue;      // cost-bounded pruning
 
             double uTime = data[u * 3 + 1];     // getTimeRaw(u) inlined
+            double uDist = data[u * 3 + 2];     // getDistance(u) inlined
 
             // Push cost from u back to lower-ranked w via incoming up-edges (w→u)
             int iOff = upInOff[u];
@@ -405,12 +466,13 @@ public class CHLeastCostPathTree implements ShortestPathTree {
                         ? data[wBase] : Double.POSITIVE_INFINITY;
 
                 if (newCost < wCost) {
+                    int gIdx = upInEdges[eBase + CHGraph.E_GIDX];
                     // setNode inlined
                     data[wBase] = newCost;
                     data[wBase + 1] = uTime - edgeCost;
-                    data[wBase + 2] = 0.0;
+                    data[wBase + 2] = uDist + edgeDistance[gIdx];
                     comingFrom[w] = u;
-                    fromEdgeGIdx[w] = upInEdges[eBase + CHGraph.E_GIDX];
+                    fromEdgeGIdx[w] = gIdx;
                     iterIds[w] = iter;
                 }
             }
@@ -483,6 +545,47 @@ public class CHLeastCostPathTree implements ShortestPathTree {
         comingFrom[nodeIndex] = from;
         fromEdgeGIdx[nodeIndex] = edgeGIdx;
         iterIds[nodeIndex] = currentIteration;
+    }
+
+    /**
+     * When the base graph carries turn restrictions, real nodes may have been
+     * replaced by one or more colored copies during graph construction.  The CH
+     * search settles labels on those colored copies; this method propagates the
+     * best label of each colored copy onto its corresponding real-node slot, so
+     * that {@link #getCost(int)}, {@link #getTime(int)} and {@link #getDistance(int)}
+     * return meaningful results when queried by real-node index.
+     *
+     * <p>Mirrors {@link LeastCostPathTree#consolidateColoredNodes()}.
+     */
+    private void consolidateColoredNodes() {
+        for (int i = 0; i < nodeCount; i++) {
+            Node uncoloredNode = baseGraph.getNode(i);
+            if (uncoloredNode == null) continue;
+
+            // If the node at internal index i resolves to a different internal
+            // index, then i is a colored copy of a real node.
+            int uncoloredIndex = baseGraph.getNodeIndex(uncoloredNode);
+            if (uncoloredIndex == i) continue;
+
+            // Skip colored copies that were not visited in this iteration.
+            if (iterIds[i] != currentIteration) continue;
+
+            double coloredCost = data[i * 3];
+            double uncoloredCost = (iterIds[uncoloredIndex] == currentIteration)
+                    ? data[uncoloredIndex * 3]
+                    : Double.POSITIVE_INFINITY;
+
+            if (coloredCost < uncoloredCost) {
+                int uBase = uncoloredIndex * 3;
+                int cBase = i * 3;
+                data[uBase]     = data[cBase];
+                data[uBase + 1] = data[cBase + 1];
+                data[uBase + 2] = data[cBase + 2];
+                comingFrom[uncoloredIndex]   = comingFrom[i];
+                fromEdgeGIdx[uncoloredIndex] = fromEdgeGIdx[i];
+                iterIds[uncoloredIndex]      = currentIteration;
+            }
+        }
     }
 
     // -------------------------------------------------------------------------

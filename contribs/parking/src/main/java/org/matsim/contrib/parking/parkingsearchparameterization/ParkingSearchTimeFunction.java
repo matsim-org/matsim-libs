@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
+package org.matsim.contrib.parking.parkingsearchparameterization;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;

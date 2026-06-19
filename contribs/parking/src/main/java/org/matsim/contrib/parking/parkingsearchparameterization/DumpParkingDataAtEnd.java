@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
+package org.matsim.contrib.parking.parkingsearchparameterization;
 
 import com.google.inject.Inject;
 import org.matsim.core.controler.OutputDirectoryHierarchy;

@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
+package org.matsim.contrib.parking.parkingsearchparameterization;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,8 +17,8 @@ import org.matsim.examples.ExamplesUtils;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingUtils.LINK_OFF_STREET_SPOTS;
-import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingUtils.LINK_ON_STREET_SPOTS;
+import static org.matsim.contrib.parking.parkingsearchparameterization.ParkingUtils.LINK_OFF_STREET_SPOTS;
+import static org.matsim.contrib.parking.parkingsearchparameterization.ParkingUtils.LINK_ON_STREET_SPOTS;
 
 class PlanBasedParkingCapacityInitializerTest {
 	@Test
