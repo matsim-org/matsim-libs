@@ -98,6 +98,7 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 						double variantEndTime = variantStartTime + typicalTourDuration;
 						PopulationUtils.getFirstActivity(newPLan).setEndTime(variantStartTime);
 						PopulationUtils.getLastActivity(newPLan).setStartTime(variantEndTime);
+						PopulationUtils.resetRoutes(newPLan);
 					}
 				}
 				case activityOrderVariation -> {
@@ -139,6 +140,7 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 						for (int j = 0; j < activityIndexList.size(); j++) {
 							newPLan.getPlanElements().set(activityIndexList.get(j), newActivityOrder.get(j));
 						}
+						PopulationUtils.resetRoutes(newPLan);
 					}
 
 				}
