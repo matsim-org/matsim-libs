@@ -37,14 +37,13 @@ public final class ScenarioFileFormatRegistry {
 	 * Handles double extensions like "population.pb.zst" by stripping compression suffixes first.
 	 */
 	public static Optional<ScenarioFileFormat> getProvider(String filename) {
-		String ext = getEffectiveExtension(filename);
-		return Optional.ofNullable(providers.get(ext));
+		return getEffectiveExtension(filename).map(providers::get);
 	}
 
-	static String getEffectiveExtension(String filename) {
+	static Optional<String> getEffectiveExtension(String filename) {
 		int lastDot = filename.lastIndexOf('.');
 		if (lastDot < 0) {
-			return "";
+			return Optional.empty();
 		}
 		String ext = filename.substring(lastDot + 1);
 		if (ext.equals("zst") || ext.equals("gz") || ext.equals("bz2")) {
@@ -54,6 +53,6 @@ public final class ScenarioFileFormatRegistry {
 				ext = inner.substring(innerDot + 1);
 			}
 		}
-		return ext;
+		return Optional.of(ext);
 	}
 }

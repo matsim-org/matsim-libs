@@ -35,12 +35,12 @@ public class ScenarioFileFormatSpiTest {
 
 	@Test
 	void testEffectiveExtensionParsing() {
-		Assertions.assertEquals("pb", ScenarioFileFormatRegistry.getEffectiveExtension("population.pb.zst"));
-		Assertions.assertEquals("parquet", ScenarioFileFormatRegistry.getEffectiveExtension("network.parquet"));
-		Assertions.assertEquals("xml", ScenarioFileFormatRegistry.getEffectiveExtension("plans.xml.gz"));
-		Assertions.assertEquals("xml", ScenarioFileFormatRegistry.getEffectiveExtension("plans.xml.bz2"));
-		Assertions.assertEquals("gz", ScenarioFileFormatRegistry.getEffectiveExtension("noprefix.gz"));
-		Assertions.assertEquals("", ScenarioFileFormatRegistry.getEffectiveExtension("nodotfile"));
+		Assertions.assertEquals(Optional.of("pb"), ScenarioFileFormatRegistry.getEffectiveExtension("population.pb.zst"));
+		Assertions.assertEquals(Optional.of("parquet"), ScenarioFileFormatRegistry.getEffectiveExtension("network.parquet"));
+		Assertions.assertEquals(Optional.of("xml"), ScenarioFileFormatRegistry.getEffectiveExtension("plans.xml.gz"));
+		Assertions.assertEquals(Optional.of("xml"), ScenarioFileFormatRegistry.getEffectiveExtension("plans.xml.bz2"));
+		Assertions.assertEquals(Optional.of("gz"), ScenarioFileFormatRegistry.getEffectiveExtension("noprefix.gz"));
+		Assertions.assertEquals(Optional.empty(), ScenarioFileFormatRegistry.getEffectiveExtension("nodotfile"));
 	}
 
 	@Test
