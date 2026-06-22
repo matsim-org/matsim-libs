@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -61,7 +62,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	private static int scoreWrnCnt = 0;
 
 	private static final boolean doRoh = false;
-	static final boolean doSwitchers = true;
+	static final boolean doSwitchers = false;
 	static final boolean isDebugging = true;
 //	static final String fromMode = bike;
 //	static final String fromMode = car;
@@ -154,12 +155,12 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-policy";
 
 		// lausitz ditrimo drt
-		final String baseDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
+//		final String baseDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-1-ruhland-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-2-ruhland-bhf-spremberg-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-3-ruhland-bhf-spremberg-bhf-cottbus-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-4-ruhland-bhf-spremberg-bhf-schwarze-pumpe_full_plans/";
-		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-5-regional-drt_full_plans/";
+//		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-5-regional-drt_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-1-ruhland-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-2-ruhland-bhf-spremberg-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-3-ruhland-bhf-spremberg-bhf-cottbus-bhf_full_plans/";
@@ -170,7 +171,14 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String baseDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/01_pt-case-study/";
 
-
+//		berlin 6.4 bike network study
+		final String baseDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-base-case-ctd";
+//		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.0";
+//		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.01";
+//		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.1";
+//		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.2";
+//		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.3";
+		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-teleported";
 		// ===
 
 //		generateExperiencedPlans( baseDir );
@@ -554,9 +562,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
 //			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
-			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
+//			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
 //			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 //			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
+//			bike remainers
+			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString(bike).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( bike ) ) );
 
 			Table deltaTable = createDeltaTable( joinedTable );
 
