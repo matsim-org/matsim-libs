@@ -36,7 +36,7 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.HashMap;
@@ -52,7 +52,7 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 	private final Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
 
 	private static class DummyMatsimWriter extends AbstractMatsimWriter {
-		BufferedWriter getWriter() {
+		Writer getWriter() {
 			return writer;
 		}
 		void openHere(String filename ) {
