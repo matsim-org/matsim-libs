@@ -25,6 +25,7 @@ class VspScenarioCheckerImplTest {
 	void doesNotComplainWhenNoFacilitiesPresent() {
 		Scenario scenario = createScenarioWithAbortLevel();
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p1"));
+		PopulationUtils.putSubpopulation(person, "person");
 		Plan plan = PopulationUtils.createPlan();
 		Activity act = PopulationUtils.createActivityFromCoord("home", new Coord(0, 0));
 		plan.addActivity(act);
@@ -48,6 +49,7 @@ class VspScenarioCheckerImplTest {
 		scenario.getActivityFacilities().addActivityFacility(facility);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p1"));
+		PopulationUtils.putSubpopulation(person, "person");
 		Plan plan = PopulationUtils.createPlan();
 		Activity act = PopulationUtils.createActivityFromCoord("home", coord);
 		act.setLinkId(linkId);
@@ -74,6 +76,7 @@ class VspScenarioCheckerImplTest {
 		scenario.getActivityFacilities().addActivityFacility(facility);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p1"));
+		PopulationUtils.putSubpopulation(person, "person");
 		Plan plan = PopulationUtils.createPlan();
 		Activity act = PopulationUtils.createActivityFromCoord("home", coord);
 		act.setLinkId(activityLinkId);
@@ -100,6 +103,7 @@ class VspScenarioCheckerImplTest {
 		scenario.getActivityFacilities().addActivityFacility(facility);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p1"));
+		PopulationUtils.putSubpopulation(person, "person");
 		Plan plan = PopulationUtils.createPlan();
 		Activity act = PopulationUtils.createActivityFromCoord("home", activityCoord);
 		act.setLinkId(linkId);
@@ -121,6 +125,7 @@ class VspScenarioCheckerImplTest {
 			factory.createActivityFacility(Id.create("fac1", ActivityFacility.class), new Coord(0, 0), Id.createLinkId("l")));
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p1"));
+		PopulationUtils.putSubpopulation(person, "person");
 		Plan plan = PopulationUtils.createPlan();
 		Activity act = PopulationUtils.createActivityFromCoord("home", new Coord(0, 0));
 		// no facilityId set
@@ -144,6 +149,7 @@ class VspScenarioCheckerImplTest {
 			factory.createActivityFacility(facilityId, coord, Id.createLinkId("link1")));
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p1"));
+		PopulationUtils.putSubpopulation(person, "person");
 		Plan plan = PopulationUtils.createPlan();
 		Activity act = PopulationUtils.createActivityFromCoord("home", coord);
 		act.setFacilityId(facilityId);
@@ -169,6 +175,7 @@ class VspScenarioCheckerImplTest {
 			factory.createActivityFacility(facilityId, coord));
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p1"));
+		PopulationUtils.putSubpopulation(person, "person");
 		Plan plan = PopulationUtils.createPlan();
 		Activity act = PopulationUtils.createActivityFromCoord("home", coord);
 		act.setLinkId(Id.createLinkId("link1"));
@@ -193,6 +200,7 @@ class VspScenarioCheckerImplTest {
 			factory.createActivityFacility(Id.create("other", ActivityFacility.class), new Coord(0, 0), Id.createLinkId("l")));
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p1"));
+		PopulationUtils.putSubpopulation(person, "person");
 		Plan plan = PopulationUtils.createPlan();
 		Activity act = PopulationUtils.createActivityFromCoord("home", new Coord(0, 0));
 		act.setFacilityId(facilityId);
@@ -208,6 +216,7 @@ class VspScenarioCheckerImplTest {
 	private static Scenario createScenarioWithAbortLevel() {
 		Config config = ConfigUtils.createConfig();
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
+		config.scoring().getOrCreateScoringParameters("person").getOrCreateActivityParams("home");
 		return ScenarioUtils.createScenario(config);
 	}
 }
