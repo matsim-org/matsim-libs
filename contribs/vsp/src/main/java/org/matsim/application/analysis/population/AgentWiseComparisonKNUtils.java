@@ -52,7 +52,7 @@ import static org.matsim.application.analysis.population.HeadersKN.*;
 import static org.matsim.core.population.PersonUtils.getMarginalUtilityOfMoney;
 
 class AgentWiseComparisonKNUtils{
-	private static Logger log = LogManager.getLogger( AgentWiseComparisonKNUtils.class );
+	private static final Logger log = LogManager.getLogger( AgentWiseComparisonKNUtils.class );
 	private static int wrnCnt = 0;
 
 	static double MUTTS_AV = 9.16;
@@ -70,11 +70,11 @@ class AgentWiseComparisonKNUtils{
 				// can happen e.g. if population file is reduced
 				return;
 			}
-			Double moneyAttrib = (Double) person.getAttributes().getAttribute( AgentWiseComparisonKN.KN_MONEY );
+			Double moneyAttrib = (Double) person.getAttributes().getAttribute( AgentWiseComparisonKN.KN_MONEY_FROM_EVENTS );
 			if ( moneyAttrib == null ) {
-				person.getAttributes().putAttribute( AgentWiseComparisonKN.KN_MONEY, event.getAmount() );
+				person.getAttributes().putAttribute( AgentWiseComparisonKN.KN_MONEY_FROM_EVENTS, event.getAmount() );
 			} else {
-				person.getAttributes().putAttribute( AgentWiseComparisonKN.KN_MONEY, moneyAttrib + event.getAmount() );
+				person.getAttributes().putAttribute( AgentWiseComparisonKN.KN_MONEY_FROM_EVENTS, moneyAttrib + event.getAmount() );
 			}
 		}
 	}

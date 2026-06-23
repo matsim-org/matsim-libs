@@ -57,7 +57,7 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 			// yyyyyy much/all of the following needs to be differentiated by subpopulation !!! yyyyyy
 
 			double sumMoney = 0.;
-			Double moneyFromEvents = (Double) person.getAttributes().getAttribute( KN_MONEY );
+			Double moneyFromEvents = (Double) person.getAttributes().getAttribute( KN_MONEY_FROM_EVENTS );
 			if ( moneyFromEvents!=null ) {
 				sumMoney += moneyFromEvents ;
 			};

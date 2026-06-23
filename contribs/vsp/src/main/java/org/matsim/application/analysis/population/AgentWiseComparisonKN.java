@@ -52,7 +52,7 @@ import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.Ex
 public class AgentWiseComparisonKN implements MATSimAppCommand{
 	private static final Logger log = LogManager.getLogger( AgentWiseComparisonKN.class );
 
-	public static final String KN_MONEY = "knMoney";
+	public static final String KN_MONEY_FROM_EVENTS = "knMoneyFromEvents";
 
 	private static int scoreWrnCnt = 0;
 
@@ -328,7 +328,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			double sumMoney = 0.;
 			{
 				// money from events.  money from normal scoring comes later
-				Double moneyFromEvents = (Double) person.getAttributes().getAttribute( KN_MONEY );
+				Double moneyFromEvents = (Double) person.getAttributes().getAttribute( KN_MONEY_FROM_EVENTS );
 				if( moneyFromEvents != null ){
 					sumMoney += moneyFromEvents;
 				}
@@ -346,7 +346,6 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			List<String> actSeq = new ArrayList<>();
 			boolean firstTrip = true;
 			for( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( person.getSelectedPlan() ) ){
-				final String mainMode = TripStructureUtils.identifyMainMode( trip.getTripElements() );
 
 				// per trip:
 				double tripTTime = 0.;
