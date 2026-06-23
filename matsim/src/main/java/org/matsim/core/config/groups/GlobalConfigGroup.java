@@ -161,7 +161,8 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 										   + ". (The old approach of setting the stor cap fact larger than the flow cap fact is no longer needed since the qsim became a lot more deterministic.)  Relative tolerance can be set in the global config group." );
 		}
 		if ( config.counts().getCountsFileName()!=null && !config.counts().getCountsFileName().isEmpty() ){
-			if( !Precision.equalsWithRelativeTolerance( flowCapFactor, config.counts().getCountsScaleFactor(), relativeTolerance ) ){
+			// CountsComparisonAlgorithm multiplies the count-value from sim with the countsScaleFactor, i.e. we need the inverse of the flowCapFactor here
+			if( !Precision.equalsWithRelativeTolerance( flowCapFactor, 1. / config.counts().getCountsScaleFactor(), relativeTolerance ) ){
 				throw new RuntimeException(
 					"your countsScaleFactor=" + config.counts().getCountsScaleFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
 				+ ". Relative tolerance can be set in the global config group.");
