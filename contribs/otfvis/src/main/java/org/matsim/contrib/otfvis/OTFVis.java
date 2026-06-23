@@ -277,7 +277,7 @@ public class OTFVis {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.equiDist );
+		scenario.getConfig().qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.queue );
 		OTFVisConfigGroup otfConfig = ConfigUtils.addOrGetModule( scenario.getConfig(), OTFVisConfigGroup.class );
 		otfConfig.setLinkWidth( 10 );
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);

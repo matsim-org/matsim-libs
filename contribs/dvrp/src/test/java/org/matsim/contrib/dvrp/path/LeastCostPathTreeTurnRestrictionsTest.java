@@ -57,12 +57,12 @@ class LeastCostPathTreeTurnRestrictionsTest {
 		tree.calculateBackwards(network.getLinks().get(Id.createLinkId("10")), 0, null, null);
 
 		for (Node node : network.getNodes().values()) {
-			System.out.println(tree.getCost(node.getId().index()));
+			System.out.println(tree.getCost(tree.getNodeIndex(node)));
 		}
 
-		Assertions.assertEquals(1., tree.getCost(Id.createNodeId("0").index()));
-		Assertions.assertEquals(0., tree.getCost(Id.createNodeId("1").index()));
-		Assertions.assertEquals(1., tree.getCost(Id.createNodeId("2").index()));
+		Assertions.assertEquals(1., tree.getCost(tree.getNodeIndex(network.getNodes().get(Id.createNodeId("0")))));
+		Assertions.assertEquals(0., tree.getCost(tree.getNodeIndex(network.getNodes().get(Id.createNodeId("1")))));
+		Assertions.assertEquals(1., tree.getCost(tree.getNodeIndex(network.getNodes().get(Id.createNodeId("2")))));
 	}
 
 	@Test
@@ -83,8 +83,8 @@ class LeastCostPathTreeTurnRestrictionsTest {
 
 		tree.calculateBackwards(network.getLinks().get(Id.createLinkId("10")), 0, null, null);
 
-		Assertions.assertEquals(1., tree.getCost(Id.createNodeId("0").index()));
-		Assertions.assertEquals(0., tree.getCost(Id.createNodeId("1").index()));
-		Assertions.assertEquals(1., tree.getCost(Id.createNodeId("2").index()));
+		Assertions.assertEquals(1., tree.getCost(tree.getNodeIndex(network.getNodes().get(Id.createNodeId("0")))));
+		Assertions.assertEquals(0., tree.getCost(tree.getNodeIndex(network.getNodes().get(Id.createNodeId("1")))));
+		Assertions.assertEquals(1., tree.getCost(tree.getNodeIndex(network.getNodes().get(Id.createNodeId("2")))));
 	}
 }

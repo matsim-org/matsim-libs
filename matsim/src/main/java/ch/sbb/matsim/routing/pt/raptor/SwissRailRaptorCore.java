@@ -1141,6 +1141,8 @@ public class SwissRailRaptorCore {
         /** the costs an agent accumulates due to waiting at the first stop until the first pt vehicle departs. */
         public final double waitingCost;
 
+        public final boolean isWalkOnly;
+
         private final PathElement destinationPath;
 
         TravelInfo(Id<TransitStopFacility> departureStop, double departureTime, double arrivalTime, double travelCost, double accessTime, double accessCost, int transferCount, double waitingTime, double waitingCost, PathElement destinationPath) {
@@ -1155,6 +1157,7 @@ public class SwissRailRaptorCore {
             this.waitingTime = waitingTime;
             this.waitingCost = waitingCost;
             this.destinationPath = destinationPath;
+            this.isWalkOnly = computeWalkOnly(destinationPath);
         }
 
         public RaptorRoute getRaptorRoute() {
@@ -1168,11 +1171,11 @@ public class SwissRailRaptorCore {
             return createRaptorRoute(fromFacility, toFacility, this.destinationPath, firstPath.arrivalTime);
         }
 
-        public boolean isWalkOnly() {
-            if (this.destinationPath.comingFrom == null) {
+        private static boolean computeWalkOnly(PathElement destinationPath) {
+            if (destinationPath.comingFrom == null) {
                 return true;
             }
-            PathElement pe = this.destinationPath;
+            PathElement pe = destinationPath;
             while (pe != null) {
                 if (!pe.isTransfer) {
                     return false;

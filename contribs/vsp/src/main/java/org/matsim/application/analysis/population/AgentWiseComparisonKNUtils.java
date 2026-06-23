@@ -15,10 +15,6 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -29,6 +25,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.gbl.ConsoleFonts;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -349,88 +346,113 @@ class AgentWiseComparisonKNUtils{
 	static void alignLeft( StringBuilder weighted_ttime_cmt, int maxLen ){
 		weighted_ttime_cmt.append( " ".repeat( maxLen - weighted_ttime_cmt.length() ) );
 	}
+
+	private enum IsMonetized { FALSE, TRUE }
 	static void writeMatsimScoresSummaryTables( String msg, Path inputPath, Config config, Table deltaTable ){
 		final double factor = 1./ config.qsim().getFlowCapFactor();
-		final double matsim_score_sum = deltaTable.doubleColumn( deltaOf( MATSIM_SCORE) ).sum() * factor;
-		final double score_sum = deltaTable.doubleColumn( deltaOf( SCORE ) ).sum() * factor;
-		final double money_score = deltaTable.doubleColumn( deltaOf(MONEY_SCORE ) ).sum() * factor;
-		final double ascs_sum = deltaTable.doubleColumn( deltaOf( ASCS ) ).sum() * factor;
-		final double u_trav_score = deltaTable.doubleColumn( deltaOf( U_TRAV_DIRECT ) ).sum() * factor;
-		final double line_switch_score = deltaTable.doubleColumn( deltaOf( U_LINESWITCHES ) ).sum() * factor;
-		final double acts_score = deltaTable.doubleColumn( deltaOf( ACTS_SCORE ) ).sum() * factor;
-		final double non_monetary = ascs_sum + u_trav_score + line_switch_score + acts_score;
-		final double u_trav_direct_all = ascs_sum + u_trav_score + line_switch_score;
 
-		// Wenn ich an u_trav_direct drehe, dann wird das durch eine entgegengesetzte Änderung an den ASCs aufgefangen.  Somit kann man die ASCs in erster Näherung zu den "direct disutilities of travelling" rechnen.
+		for( IsMonetized isMonetized : IsMonetized.values() ){
 
-		final StringBuilder score_cmt = new StringBuilder( "is the overall benefit (potentially negative) in score space. This has the following contributions:" );
-		final StringBuilder weighted_ttime_cmt = new StringBuilder( "... ... is the travel time benefit." );
-		final StringBuilder weighted_money_cmt = new StringBuilder( "... is the monetary benefit (re-weighted by indiv. mUoM)." );
-		final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC (= unobserved (travel) benefits)." );
-		final StringBuilder u_trav_direct_cmt = new StringBuilder( "... ... is the direct travel score benefits (=less bike, less ride)." );
-		final StringBuilder u_lineswitches_cmt = new StringBuilder("... ... is the line switching benefit.");
-		final StringBuilder sum_cmt = new StringBuilder( "is the sum of these contributions." );
-		final StringBuilder acts_score_cmt = new StringBuilder( "... is the activities score (= pure time) benefit." );
-		final StringBuilder alt_sum_cmt = new StringBuilder("is the sum of these contributions.") ;
-		final StringBuilder matsim_score_cmt = new StringBuilder("is the matsim score diff from the output population");
+			double matsim_score_sum = deltaTable.doubleColumn( deltaOf( MATSIM_SCORE ) ).sum() * factor;
+			double score_sum = deltaTable.doubleColumn( deltaOf( SCORE ) ).sum() * factor;
+			double money_score = deltaTable.doubleColumn( deltaOf( MONEY_SCORE ) ).sum() * factor;
+			double ascs_sum = deltaTable.doubleColumn( deltaOf( ASCS ) ).sum() * factor;
+			double u_trav_score = deltaTable.doubleColumn( deltaOf( U_TRAV_DIRECT ) ).sum() * factor;
+			double line_switch_score = deltaTable.doubleColumn( deltaOf( U_LINESWITCHES ) ).sum() * factor;
+			double acts_score = deltaTable.doubleColumn( deltaOf( ACTS_SCORE ) ).sum() * factor;
+			double non_monetary = ascs_sum + u_trav_score + line_switch_score + acts_score;
+			double u_trav_direct_all = ascs_sum + u_trav_score + line_switch_score;
+			if( isMonetized == IsMonetized.TRUE ){
+				matsim_score_sum = deltaTable.doubleColumn( deltaOf( MATSIM_SCORE ) ).divide(
+					deltaTable.doubleColumn( UTL_OF_MONEY ) ).sum() * factor;
+				score_sum = deltaTable.doubleColumn( deltaOf( SCORE ) ).divide( deltaTable.doubleColumn( UTL_OF_MONEY ) ).sum() * factor;
+				money_score = deltaTable.doubleColumn( deltaOf( MONEY_SCORE ) ).divide( deltaTable.doubleColumn( UTL_OF_MONEY ) ).sum() * factor;
+				ascs_sum = deltaTable.doubleColumn( deltaOf( ASCS ) ).divide( deltaTable.doubleColumn( UTL_OF_MONEY ) ).sum() * factor;
+				u_trav_score = deltaTable.doubleColumn( deltaOf( U_TRAV_DIRECT ) ).divide( deltaTable.doubleColumn( UTL_OF_MONEY ) ).sum() * factor;
+				line_switch_score = deltaTable.doubleColumn( deltaOf( U_LINESWITCHES ) ).divide(
+					deltaTable.doubleColumn( UTL_OF_MONEY ) ).sum() * factor;
+				acts_score = deltaTable.doubleColumn( deltaOf( ACTS_SCORE ) ).divide( deltaTable.doubleColumn( UTL_OF_MONEY ) ).sum() * factor;
+				non_monetary = ascs_sum + u_trav_score + line_switch_score + acts_score;
+				u_trav_direct_all = ascs_sum + u_trav_score + line_switch_score;
+			}
+
+			// Wenn ich an u_trav_direct drehe, dann wird das durch eine entgegengesetzte Änderung an den ASCs aufgefangen.  Somit kann man die ASCs in erster Näherung zu den "direct disutilities of travelling" rechnen.
+
+			final StringBuilder score_cmt = new StringBuilder( "is the overall benefit (potentially negative). This has the following contributions:" );
+			final StringBuilder weighted_ttime_cmt = new StringBuilder( "... ... is the travel time benefit." );
+			final StringBuilder weighted_money_cmt = new StringBuilder( "... is the monetary benefit (if in score space, then re-weighted by indiv. mUoM)." );
+			final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC (= unobserved (travel)) benefits." + ConsoleFonts.RESET );
+			final StringBuilder u_trav_direct_cmt = new StringBuilder( "... ... is the direct travel score benefits (=less bike, less ride)." );
+			final StringBuilder u_lineswitches_cmt = new StringBuilder( "... ... is the line switching benefit." );
+			final StringBuilder sum_cmt = new StringBuilder( "is the sum of these contributions." );
+			final StringBuilder acts_score_cmt = new StringBuilder( "... is the activities score (= pure time) benefit." );
+			final StringBuilder alt_sum_cmt = new StringBuilder( "is the sum of these contributions." + ConsoleFonts.YELLOW);
+			final StringBuilder matsim_score_cmt = new StringBuilder( "is the matsim score diff from the output population" + ConsoleFonts.RESET );
 //		final StringBuilder non_monetary_cmt = new StringBuilder("... are the non-monetary benefits.  This has the following contributions:");
-		final StringBuilder u_trav_direct_all_cmt = new StringBuilder("... are the direct travel benefits.  This has the following contributions:");
+			final StringBuilder u_trav_direct_all_cmt = new StringBuilder( "... are the direct travel benefits.  This has the following contributions:" + ConsoleFonts.YELLOW );
 
-		final int maxLen = score_cmt.length();
-		alignLeft( weighted_ttime_cmt, maxLen );
-		alignLeft( weighted_money_cmt, maxLen );
-		alignLeft( asc_cmt, maxLen );
-		alignLeft( u_trav_direct_cmt, maxLen );
-		alignLeft( u_lineswitches_cmt, maxLen );
-		alignLeft( sum_cmt, maxLen );
-		alignLeft( acts_score_cmt, maxLen );
-		alignLeft( alt_sum_cmt, maxLen );
-		alignLeft( matsim_score_cmt, maxLen );
+			// "\033[1m" prints in bold, "\033[0m" sets back to normal .  I had colors in the unotrans code.
+
+			final int maxLen = score_cmt.length();
+			alignLeft( weighted_ttime_cmt, maxLen );
+			alignLeft( weighted_money_cmt, maxLen );
+			alignLeft( asc_cmt, maxLen );
+			alignLeft( u_trav_direct_cmt, maxLen );
+			alignLeft( u_lineswitches_cmt, maxLen );
+			alignLeft( sum_cmt, maxLen );
+			alignLeft( acts_score_cmt, maxLen );
+			alignLeft( alt_sum_cmt, maxLen );
+			alignLeft( matsim_score_cmt, maxLen );
 //		alignLeft( non_monetary_cmt, maxLen );
-		alignLeft( u_trav_direct_all_cmt, maxLen );
+			alignLeft( u_trav_direct_all_cmt, maxLen );
 
-		// ---
+			// ---
 
-		Table summaryTable = Table.create( DoubleColumn.create( "value" ), StringColumn.create( "comment" ) );
+			Table summaryTable = Table.create( DoubleColumn.create( "value" ), StringColumn.create( "comment" ) );
 
-		summaryTable.doubleColumn( "value" ).append( score_sum );
-		summaryTable.stringColumn( "comment" ).append( score_cmt.toString() );
+			summaryTable.doubleColumn( "value" ).append( score_sum );
+			summaryTable.stringColumn( "comment" ).append( score_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( money_score );
-		summaryTable.stringColumn( "comment" ).append( weighted_money_cmt.toString() );
+			summaryTable.doubleColumn( "value" ).append( money_score );
+			summaryTable.stringColumn( "comment" ).append( weighted_money_cmt.toString() );
 
 //		summaryTable.doubleColumn( "value" ).append( non_monetary );
 //		summaryTable.stringColumn( "comment" ).append( non_monetary_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( acts_score );
-		summaryTable.stringColumn( "comment" ).append( acts_score_cmt.toString() );
+			summaryTable.doubleColumn( "value" ).append( acts_score );
+			summaryTable.stringColumn( "comment" ).append( acts_score_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( u_trav_direct_all );
-		summaryTable.stringColumn( "comment" ).append( u_trav_direct_all_cmt.toString() );
+			summaryTable.doubleColumn( "value" ).append( u_trav_direct_all );
+			summaryTable.stringColumn( "comment" ).append( u_trav_direct_all_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( u_trav_score );
-		summaryTable.stringColumn( "comment" ).append( u_trav_direct_cmt.toString() );
+			summaryTable.doubleColumn( "value" ).append( u_trav_score );
+			summaryTable.stringColumn( "comment" ).append( u_trav_direct_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( line_switch_score );
-		summaryTable.stringColumn( "comment" ).append( u_lineswitches_cmt.toString() );
+			summaryTable.doubleColumn( "value" ).append( line_switch_score );
+			summaryTable.stringColumn( "comment" ).append( u_lineswitches_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( ascs_sum );
-		summaryTable.stringColumn( "comment" ).append( asc_cmt.toString() );
+			summaryTable.doubleColumn( "value" ).append( ascs_sum );
+			summaryTable.stringColumn( "comment" ).append( asc_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( acts_score + u_trav_score + ascs_sum + line_switch_score + money_score );
-		summaryTable.stringColumn( "comment" ).append( alt_sum_cmt.toString() );
+			summaryTable.doubleColumn( "value" ).append( acts_score + u_trav_score + ascs_sum + line_switch_score + money_score );
+			summaryTable.stringColumn( "comment" ).append( alt_sum_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( matsim_score_sum );
-		summaryTable.stringColumn( "comment" ).append( matsim_score_cmt.toString() );
+			summaryTable.doubleColumn( "value" ).append( matsim_score_sum );
+			summaryTable.stringColumn( "comment" ).append( matsim_score_cmt.toString() );
 
-		formatTable( summaryTable, 0 );
+			formatTable( summaryTable, 0 );
 
-		System.out.println();
-		log.info( msg );
-		log.info( inputPath );
-		log.info( "Popsize={} rescaled to 100% by multiplying with {}.", deltaTable.rowCount(), factor );
-		System.out.println( summaryTable + System.lineSeparator() );
-		System.out.println();
+			System.out.println();
+			if ( isMonetized==IsMonetized.TRUE ){
+				log.info( ConsoleFonts.BOLD + msg + "; in money space:" + ConsoleFonts.RESET );
+			} else {
+				log.info( ConsoleFonts.BOLD + msg + "; in score space:" + ConsoleFonts.RESET );
+			}
+			log.info( inputPath );
+			log.info( "Popsize={} rescaled to 100% by multiplying with {}; isMonetized={}", deltaTable.rowCount(), factor, isMonetized );
+			System.out.println( summaryTable + System.lineSeparator() );
+			System.out.println();
+		}
 	}
 	static void writeAscTable( Config config ){
 		Table summaryTable = Table.create( DoubleColumn.create( "ASC" ), StringColumn.create( "mode" ));
@@ -486,11 +508,7 @@ class AgentWiseComparisonKNUtils{
 	}
 	static void computeAndSetIncomeDeciles( Population basePopulation ){
 		List<? extends Person> persons = new ArrayList<>( basePopulation.getPersons().values() );
-		persons.sort( new Comparator<Person>(){
-			@Override public int compare( Person o1, Person o2 ){
-				return (int) (PersonUtils.getIncome( o1 ) - PersonUtils.getIncome( o2 ) );
-			}
-		} );
+		persons.sort( (Comparator<Person>) ( o1, o2 ) -> (int) (PersonUtils.getIncome( o1 ) - PersonUtils.getIncome( o2 ) ) );
 		for( int decile = 0 ; decile < 10 ; decile++ ){
 			int from = decile * persons.size() / 10;
 			int to = (decile + 1) * persons.size() / 10;

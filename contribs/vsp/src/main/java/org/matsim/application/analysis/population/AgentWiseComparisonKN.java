@@ -275,7 +275,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		baseTablePersons.addColumns( baseTablePersons.doubleColumn( MATSIM_SCORE ).subtract( baseTablePersons.doubleColumn( SCORE ) ).setName( "error" ) );
 
-		printTable( baseTablePersons.sortOn( "error" ), "sorted by score differences bw mw and self-computed" );
+		printTable( baseTablePersons.sortOn( "error" ), "sorted by score differences between ms output and self-computed" );
 		writeMuseHtml( baseTablePersons, policyCasePath );
 		writeVseHtml( baseTablePersons, policyCasePath );
 
@@ -482,7 +482,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				if( basePerson != null ){
 					marginalUtilityOfMoney = getMarginalUtilityOfMoney( basePerson );
 				}
-				// yyyy We have persons in the policy case which are no longer in the base case.
+				// yyyy We have persons in the policy case which are no longer in the base case. // yyyyyy ????
 				moneyScore = (sumMoney + dailyMoney) * marginalUtilityOfMoney;
 
 				table.doubleColumn( HeadersKN.MONEY_SCORE ).append( moneyScore );
@@ -549,24 +549,27 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		joinedTable.addColumns( deltaColumn( joinedTable, TTIME ), deltaColumn( joinedTable, MONEY ) );
 
-		Table copyOfJoinedTable = Table.create( joinedTable.columns() );
-
-		// yy it might be possible to first create the deltaTalbe and then do the filtering
-		// yy The filtering should be done before we split into switchers and remainers.
-		{
-			System.out.println("");
-			System.out.println("## REMAINERS: ===");
-			System.out.println("");
-
 //		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
-			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
 //			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
+		// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
+		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
+//		joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
 			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
 //			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
 //			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 //			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
 //			bike remainers
 			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString(bike).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( bike ) ) );
+
+		Table copyOfJoinedTable = Table.create( joinedTable.columns() );
+
+		{
+			System.out.println("");
+			System.out.println("## REMAINERS: ===");
+			System.out.println("");
+
+			// only keep the remainers:
+			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
 
 			Table deltaTable = createDeltaTable( joinedTable );
 
@@ -601,9 +604,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			// ===
 
-			writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
-//		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
-//		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+			writeMatsimScoresSummaryTables( "all", outputPath, baseConfig, deltaTable );
+			writeMatsimScoresSummaryTables( "0th decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
+			writeMatsimScoresSummaryTables( "last decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
 
 			if( doRoh ){
 				writeRuleOfHalfSummaryTable( policyCasePath, baseConfig, rohDeltaTable );
@@ -618,19 +621,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			System.out.println("## SWITCHERS: ===");
 			System.out.println();
 
-//		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
+			// only keep the switchers:
 			joinedTable = copyOfJoinedTable.where( copyOfJoinedTable.stringColumn( MODE_SEQ ).isNotEqualTo( copyOfJoinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
-//			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or(
-//				joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
-			// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
-//			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
-			joinedTable = joinedTable.where( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
-//			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
-			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString(fromMode) ) ;
-			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( MODE_SEQ ).containsString(car) ) ;
-			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( MODE_SEQ ).containsString(bike) ) ;
-			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( MODE_SEQ ).containsString(ride) ) ;
-			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( MODE_SEQ ).containsString(pt) ) ;
 
 			Table deltaTable = createDeltaTable( joinedTable );
 
@@ -657,15 +649,15 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			// ===
 
-			writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
-//		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
-//		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+			writeMatsimScoresSummaryTables( "all", outputPath, baseConfig, deltaTable );
+			writeMatsimScoresSummaryTables( "0th decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
+			writeMatsimScoresSummaryTables( "last decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
 
 			if( doRoh ){
 				writeRuleOfHalfSummaryTable( policyCasePath, baseConfig, rohDeltaTable );
 			}
 		}
-		writeAscTable( baseConfig );
+		writeAscTable( policyScenario.getConfig() );
 
 	}
 

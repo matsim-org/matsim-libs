@@ -20,48 +20,42 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import java.util.Collection;
-import java.util.Objects;
-
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.vehicles.*;
+
+import java.util.Collection;
+import java.util.Objects;
 
 public final class ElectricFleetUtils {
 	public static final String EV_ENGINE_HBEFA_TECHNOLOGY = "electricity";
 	public static final String INITIAL_SOC = "initialSoc";// in [0, 1]
 	public static final String CHARGER_TYPES = "chargerTypes";
 	private static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
-	private ElectricFleetUtils(){} // do not instantiate
+
+	private ElectricFleetUtils() {} // do not instantiate
 
 	/**
-	 * Sets the the state of charge at the beginning of the simulation for the vehicle.
+	 * Sets the state of charge at the beginning of the simulation for the vehicle.
 	 * The value must be provided in the range [0, 1].
-	 * @param vehicle
-	 * @param initialSoc
 	 */
 	public static void setInitialSoc(Vehicle vehicle, double initialSoc) {
 		Preconditions.checkArgument(initialSoc >= 0 && initialSoc <= 1,
-				"Trying to set invalid initialSoc value for vehicle: %s. Please provide a value in [0, 1] or batteryCapacity of ", vehicle.getId());
-		vehicle.getAttributes().putAttribute( INITIAL_SOC, initialSoc );
+			"Trying to set invalid initialSoc value for vehicle: %s. Please provide a value in [0, 1] or batteryCapacity of ", vehicle.getId());
+		vehicle.getAttributes().putAttribute(INITIAL_SOC, initialSoc);
 	}
 
 	/**
 	 * Sets the charger types the vehicle type is compatible with.
-	 * @param vehicleType
-	 * @param chargerTypes
 	 */
 	public static void setChargerTypes(VehicleType vehicleType, Collection<String> chargerTypes) {
-		vehicleType.getEngineInformation().getAttributes().putAttribute( CHARGER_TYPES, chargerTypes );
+		vehicleType.getEngineInformation().getAttributes().putAttribute(CHARGER_TYPES, chargerTypes);
 	}
 
 	/**
 	 * Changes the attribute of the vehicle type's engine information such that the vehicle type is considered to be electric (by the EV contrib).
-	 * @param vehicleType
 	 */
 	public static void setElectricVehicleType(VehicleType vehicleType) {
 		VehicleUtils.setHbefaTechnology(vehicleType.getEngineInformation(), EV_ENGINE_HBEFA_TECHNOLOGY);
@@ -74,7 +68,7 @@ public final class ElectricFleetUtils {
 
 		for (var v : vehicles.getVehicles().values()) {
 			double battery_kWh = VehicleUtils.getEnergyCapacity(v.getType().getEngineInformation());
-			double initial_kWh = (double)v.getAttributes().getAttribute(INITIAL_ENERGY_kWh);
+			double initial_kWh = (double) v.getAttributes().getAttribute(INITIAL_ENERGY_kWh);
 			double initial_soc = initial_kWh / battery_kWh;
 			v.getAttributes().removeAttribute(INITIAL_ENERGY_kWh);
 			v.getAttributes().putAttribute(INITIAL_SOC, initial_soc);
@@ -83,32 +77,31 @@ public final class ElectricFleetUtils {
 		var writer = new MatsimVehicleWriter(vehicles);
 		writer.writeFile(file);
 	}
-	public static ElectricVehicle create( ElectricVehicleSpecification vehicleSpecification,
-					      DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory,
-					      ChargingPower.Factory chargingFactory ) {
+
+	public static ElectricVehicle create(ElectricVehicleSpecification vehicleSpecification,
+	                                     DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory,
+	                                     ChargingPower.Factory chargingFactory) {
 		ElectricVehicleDefaultImpl ev = new ElectricVehicleDefaultImpl(vehicleSpecification);
-		ev.driveEnergyConsumption = Objects.requireNonNull(driveFactory.create(ev ) );
+		ev.driveEnergyConsumption = Objects.requireNonNull(driveFactory.create(ev));
 		ev.auxEnergyConsumption = Objects.requireNonNull(auxFactory.create(ev));
 		ev.chargingPower = Objects.requireNonNull(chargingFactory.create(ev));
 		return ev;
 	}
+
 	public static void createAndAddVehicleSpecificationsFromMatsimVehicles(ElectricFleetSpecification fleetSpecification, Collection<Vehicle> vehicles) {
 		vehicles.stream()
-				.filter(vehicle -> EV_ENGINE_HBEFA_TECHNOLOGY.equals(VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())))
-				.map( ElectricVehicleSpecificationDefaultImpl::new )
-				.forEach(fleetSpecification::addVehicleSpecification);
+			.filter(vehicle -> isElectricVehicleType(vehicle.getType()))
+			.map(ElectricVehicleSpecificationDefaultImpl::new)
+			.forEach(fleetSpecification::addVehicleSpecification);
 	}
-	public static ElectricVehicleSpecification createElectricVehicleSpecificationDefaultImpl( Vehicle matsimVehicle ){
-		return new ElectricVehicleSpecificationDefaultImpl( matsimVehicle );
+
+	public static ElectricVehicleSpecification createElectricVehicleSpecificationDefaultImpl(Vehicle matsimVehicle) {
+		return new ElectricVehicleSpecificationDefaultImpl(matsimVehicle);
 	}
-	public static ElectricFleet createDefaultFleet(ElectricFleetSpecification fleetSpecification,
-			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
-			ChargingPower.Factory chargingFactory) {
-		ImmutableMap<Id<Vehicle>, ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
-											.values()
-											.stream()
-											.map(s -> create(s, driveConsumptionFactory, auxConsumptionFactory, chargingFactory ))
-											.collect(ImmutableMap.toImmutableMap(ElectricVehicle::getId, v -> v));
-		return () -> vehicles;
+
+	public static boolean isElectricVehicleType(VehicleType vehicleType) {
+		var engineInformation = vehicleType.getEngineInformation();
+		var hbefaTechnology = VehicleUtils.getHbefaTechnology(engineInformation);
+		return EV_ENGINE_HBEFA_TECHNOLOGY.equals(hbefaTechnology);
 	}
 }

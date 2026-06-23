@@ -25,6 +25,7 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -332,7 +333,7 @@ import org.xml.sax.Attributes;
 			String legMode = this.currleg.getMode();
 			if ("pt".equals(legMode)) {
 				routeType = "experimentalPt1";
-			} else if ("car".equals(legMode)) {
+			} else if ( TransportMode.car.equals(legMode )) {
 				routeType = "links";
 			} else {
 				routeType = "generic";

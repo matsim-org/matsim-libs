@@ -20,6 +20,9 @@
 package org.matsim.contrib.drt.optimizer.constraints;
 
 /**
+ *
+ * Some explanation of this is in {@link DrtOptimizationConstraintsSet}.
+ *
  * @author Sebastian Hörl, IRT SystemX
  * @author nkuehnel / MOIA
  */
@@ -31,6 +34,11 @@ public record DrtRouteConstraints(
 		double lateDiversionThreshold,
 		boolean allowRejection
 ) {
+
+	// TODO could you please document that meanings of these variables?  In particular,
+	// * what is the difference between maxWaitDuration and maxPickupDelay; and
+	// * what is lateDiversionThreshold?
+	// Thanks.  kai, may'26
 
 	public final static DrtRouteConstraints UNDEFINED =
 			new DrtRouteConstraints(

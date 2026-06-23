@@ -1025,6 +1025,7 @@ public class ControlerIT {
 
 		protected Fixture(final Config config) {
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = this.scenario.getNetwork();
 

@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -80,16 +81,20 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				} else if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("goodsTraffic")) {
 					smallScaleCommercialTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
 					String[] split = carrierId.split("vehTyp")[1].split("_"); //TODO make this via attributes
-					modeORvehType = split[0];
+					modeORvehType = "vehTyp" + split[0];
 				} else {
 					log.warn("Carrier {} has no valid subpopulation. Skipping.", carrier.getId());
 					continue;
 				}
-				VehicleSelection.OdMatrixEntryInformation odMatrixEntry = generator.vehicleSelection.getOdMatrixEntryInformation(purpose,
+		OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = generator.odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose,
 					modeORvehType, smallScaleCommercialTrafficType);
 				String startZone = carrier.getAttributes().getAttribute("tourStartArea") == null ? "" : carrier.getAttributes().getAttribute(
 					"tourStartArea").toString();
-				SmallScaleCommercialTrafficUtils.StructuralAttribute selectedStartCategory = generator.getSelectedStartCategory(startZone, odMatrixEntry);
+				Object startCategoryAttribute = carrier.getAttributes().getAttribute("startCategory");
+				SmallScaleCommercialTrafficUtils.StructuralAttribute selectedStartCategory = startCategoryAttribute == null
+					? generator.getSelectedStartCategory(startZone, odMatrixEntry)
+					: SmallScaleCommercialTrafficUtils.StructuralAttribute.fromLabel(startCategoryAttribute.toString())
+					.orElseGet(() -> SmallScaleCommercialTrafficUtils.StructuralAttribute.valueOf(startCategoryAttribute.toString()));
 				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = new GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes(
 					purpose, startZone, selectedStartCategory, modeORvehType,
 					smallScaleCommercialTrafficType, null, odMatrixEntry);
@@ -103,13 +108,14 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 			// Write header only if the file is newly created
 			if (Files.size(outputPath) == 0) {
 				String[] header = {"iteration", "carriersWithUnhandledJobsBeforeLoopIteration", "carriersSolvedInIteration",
-					"carriersNotSolvedInIteration", "addedVehicles", "changedServiceDurations", "additionalTravelBufferInMinutes"};
+					"carriersNotSolvedInIteration", "addedVehicles", "changedServiceDurations", "additionalTravelBufferInMinutes", "calculationTimeInHH:MM:SS"};
 				JOIN.appendTo(writer, header);
 				writer.newLine();
 			}
 
 			HashMap <Id<Carrier>, UnHandledInformation> unhandledInformationPerCarrier = new HashMap<>();
 			for (int i = 1; i <= generator.getMaxNumberOfLoopsForVRPSolving(); i++) {
+				double start = System.currentTimeMillis();
 				log.info("carrier-replanning loop iteration {}. Solving {} carriers (of {} carriers) with unhandled jobs", i, nonCompleteSolvedCarriers.size(), CarriersUtils.getCarriers(scenario).getCarriers().size());
 				int numberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
 				int addedVehicles = 0;
@@ -193,13 +199,15 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				}
 
 				nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(scenario));
+				String timeForThisLoop = Time.writeTime((System.currentTimeMillis() - start) / 1000, Time.TIMEFORMAT_HHMMSS);
 
 				// Write iteration results to file
 				JOIN.appendTo(writer, new String[]{String.valueOf(i), String.valueOf(numberOfCarriersWithUnhandledJobs),
 					String.valueOf(numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size()),
 					String.valueOf(nonCompleteSolvedCarriers.size()),
 					String.valueOf(addedVehicles), String.valueOf(changedServiceDurations),
-					String.valueOf((i) * generator.getAdditionalTravelBufferPerIterationInMinutes())});
+					String.valueOf((i) * generator.getAdditionalTravelBufferPerIterationInMinutes()),
+					timeForThisLoop});
 				writer.newLine();
 				writer.flush();  // Ensure it's written immediately
 

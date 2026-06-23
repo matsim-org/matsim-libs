@@ -32,6 +32,12 @@ public class DashboardTests {
 		Config config = TestScenario.loadConfig(utils);
 		config.controller().setLastIteration(1);
 
+		config.global().setRelativeToleranceForSampleSizeFactors( 1. );
+		// This test, as it was explained to me, uses Kelheim 0.1pct.  But it sets capacity values to 1pct
+		// to avoid "excessive" congestion. In consequence, simwrapper sample size (and maybe some other
+		// things such as counts scale factor) need to be set to 0.001, but flowCap will be set to 0.01.  In this case, a
+		// relative error of 1 (or actually a bit less) is sufficient, since 0.1pct is less than 100% different from the flow cap value of 1pct.
+
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 		group.setSampleSize(0.001);
 

@@ -42,22 +42,30 @@ import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.List;
-import java.util.ListIterator;
 
 public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
 
 	private static final Logger log = LogManager.getLogger(AbstractTransitDriverAgent.class);
 
-	private EventsManager eventsManager;
+	private final EventsManager eventsManager;
 
 	private TransitVehicle vehicle = null;
-
 	private int nextLinkIndex = 0;
 	private Person dummyPerson;
-	private TransitRouteStop currentStop = null;
 	private Double currentArrivalTime = null;
-	protected TransitRouteStop nextStop;
-	protected ListIterator<TransitRouteStop> stopIterator;
+
+	/**
+	 * Index of the next stop to arrive at. Increments on departure (not arrival). Convention: 0 = before first stop; stops.size() = after last stop.
+	 * This is protected so that subclasses can use this index while maintaining their own arrival/departure logic.
+	 */
+	protected int stopIndex = 0;
+
+	/** Immutable list of stops for the current transit route leg. Null during non-transit ("Wenden") legs. */
+	protected List<TransitRouteStop> stops = null;
+
+	/** Non-null while the vehicle is dwelling at a stop; null while travelling between stops. */
+	protected TransitRouteStop currentStop = null;
+
 	private final InternalInterface internalInterface;
 	protected final PassengerAccessEgress accessEgress;
 
@@ -92,30 +100,18 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	final void init() {
-		if (getTransitRoute() != null) {
-			this.stopIterator = getTransitRoute().getStops().listIterator();
-			this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
-		} else {
-			this.nextStop = null;
-		}
+		TransitRoute route = getTransitRoute();
+		this.stops = (route != null) ? route.getStops() : null;
+		this.stopIndex = 0;
 		this.nextLinkIndex = 0;
 	}
 
 	final void init(int stopIndex, int nextLinkIndex, boolean atEnd) {
-
-		if (getTransitRoute() != null) {
-			if (atEnd) {
-				this.stopIterator = getTransitRoute().getStops().listIterator(stopIndex);
-				this.nextStop = null;
-			} else {
-				this.stopIterator = getTransitRoute().getStops().listIterator(stopIndex - 1);
-				this.currentStop = null;
-				this.nextStop = stopIterator.next();
-			}
-		} else {
-			this.nextStop = null;
-		}
+		TransitRoute route = getTransitRoute();
+		this.stops = (route != null) ? route.getStops() : null;
+		this.stopIndex = atEnd ? (stops != null ? stops.size() : 0) : stopIndex;
 		this.nextLinkIndex = nextLinkIndex;
+		this.currentStop = null;
 	}
 
 	final void setDriver(Person personImpl) {
@@ -140,7 +136,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 			return linkIds.get(this.nextLinkIndex);
 		}
 		if (this.nextLinkIndex == linkIds.size()) {
-			if (linkIds.size() == 0 && netR.getStartLinkId().equals(netR.getEndLinkId())) {
+			if (linkIds.isEmpty() && netR.getStartLinkId().equals(netR.getEndLinkId())) {
 				// unfortunate exception for the unlikely but legal and test-covered case where a whole transit line
 				// takes place on a single link.
 				// would not need to be here if a route were simply a list of linkIds to traverse, with 1 being an allowed length.
@@ -177,7 +173,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	protected final int getStopIndex() {
-		return stopIterator.previousIndex() + 1;
+		return stopIndex;
 	}
 
 	protected final int getNextLinkIndex() {
@@ -193,10 +189,10 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	@Override
 	public final TransitStopFacility getNextTransitStop() {
-		if (this.nextStop == null) {
+		if (stops == null || stopIndex >= stops.size()) {
 			return null;
 		}
-		return this.nextStop.getStopFacility();
+		return stops.get(stopIndex).getStopFacility();
 	}
 
 	@Override
@@ -211,13 +207,13 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 			processEventVehicleArrives(stop, now);
 		}
 
-		TransitRoute route = this.getTransitRoute();
-		List<TransitRouteStop> stopsToCome = route.getStops().subList(stopIterator.nextIndex(), route.getStops().size());
+		List<TransitRouteStop> stopsToCome = stops.subList(stopIndex + 1, stops.size());
 		/*
 		 * If there are passengers leaving or entering, the stop time must be not greater than 1.0 in order to let them (de-)board every second.
 		 * If a stopTime greater than 1.0 is used, this method is not necessarily triggered by the qsim, so (de-)boarding will not happen. Dg, 10-2012
 		 */
-		double stopTime = ((PassengerAccessEgressImpl) this.accessEgress).calculateStopTimeAndTriggerBoarding(getTransitRoute(), getTransitLine(), this.vehicle, stop, stopsToCome, now);
+		double stopTime = ((PassengerAccessEgressImpl) this.accessEgress).calculateStopTimeAndTriggerBoarding(getTransitRoute(), getTransitLine(),
+			this.vehicle, stop, stopsToCome, now);
 
 		if (currentStop != null && currentStop.getMinimumStopDuration() > 0) {
 			// TODO: event sequence can be incorrect
@@ -241,7 +237,8 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 			// check if "Wenden"
 			if (getTransitLine() == null) {
 				eventsManager.processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
-					this.vehicle.getId(), Id.create("Wenden", TransitLine.class), Id.create("Wenden", TransitRoute.class), Id.create("Wenden", Departure.class)));
+					this.vehicle.getId(), Id.create("Wenden", TransitLine.class), Id.create("Wenden", TransitRoute.class),
+					Id.create("Wenden", Departure.class)));
 			} else {
 				eventsManager.processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 					this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
@@ -276,10 +273,9 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		this.vehicle = (TransitVehicle) vehicle;
 	}
 
-	private void processEventVehicleArrives(final TransitStopFacility stop,
-											final double now) {
+	private void processEventVehicleArrives(final TransitStopFacility stop, final double now) {
 		if (this.currentStop == null) {
-			this.currentStop = this.nextStop;
+			this.currentStop = stops.get(stopIndex);
 			double delay = now - this.getDeparture().getDepartureTime();
 			delay -= this.currentStop.getArrivalOffset()
 				.or(this.currentStop::getDepartureOffset)
@@ -294,15 +290,14 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	private void assertExpectedStop(final TransitStopFacility stop) {
-		if (stop != this.nextStop.getStopFacility()) {
+		if (stops == null || stopIndex >= stops.size() || stop != stops.get(stopIndex).getStopFacility()) {
 			throw new RuntimeException("Expected different stop.");
 		}
 	}
 
-	protected double longerStopTimeIfWeAreAheadOfSchedule(final double now,
-														  final double stopTime) {
-		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset().isDefined())) {
-			double earliestDepTime = getActivityEndTime() + this.nextStop.getDepartureOffset().seconds();
+	protected double longerStopTimeIfWeAreAheadOfSchedule(final double now, final double stopTime) {
+		if ((this.currentStop.isAwaitDepartureTime()) && (this.currentStop.getDepartureOffset().isDefined())) {
+			double earliestDepTime = getActivityEndTime() + this.currentStop.getDepartureOffset().seconds();
 			if (now + stopTime < earliestDepTime) {
 				return earliestDepTime - now;
 			}
@@ -323,35 +318,35 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 			this.currentStop.getStopFacility().getId(),
 			delay));
 		this.currentArrivalTime = null;
-		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
-		if (this.nextStop == null) {
+		this.currentStop = null;
+		this.stopIndex++;
+		if (this.stopIndex >= stops.size()) {
 			assertVehicleIsEmpty();
 		}
-		this.currentStop = null;
 	}
 
 	private void assertAllStopsServed() {
-		if (this.nextStop != null) {
+		if (stops != null && stopIndex < stops.size()) {
 			RuntimeException e = new RuntimeException("Transit vehicle is not yet at last stop! vehicle-id = "
-				+ this.vehicle.getVehicle().getId() + "; next-stop = " + this.nextStop.getStopFacility().getId());
+				+ this.vehicle.getVehicle().getId() + "; next-stop = " + stops.get(stopIndex).getStopFacility().getId());
 			log.error(e);
 			throw e;
 		}
 	}
 
 	private void assertVehicleIsEmpty() {
-		if (this.vehicle.getPassengers().size() > 0) {
-			RuntimeException e = new RuntimeException("Transit vehicle is at last stop but still contains passengers that did not leave the vehicle!");
-			log.error("Transit vehicle must be empty after last stop! vehicle-id = " + this.vehicle.getVehicle().getId(), e);
+		if (!this.vehicle.getPassengers().isEmpty()) {
+			RuntimeException e = new RuntimeException(
+				"Transit vehicle is at last stop but still contains passengers that did not leave the vehicle!");
+			log.error("Transit vehicle must be empty after last stop! vehicle-id = {}", this.vehicle.getVehicle().getId(), e);
 			for (PassengerAgent agent : this.vehicle.getPassengers()) {
 				if (agent instanceof PersonDriverAgentImpl) {
-					log.error("Agent is still in transit vehicle: agent-id = " + ((PersonDriverAgentImpl) agent).getPerson().getId());
+					log.error("Agent is still in transit vehicle: agent-id = {}", ((PersonDriverAgentImpl) agent).getPerson().getId());
 				}
 			}
 			throw e;
 		}
 	}
-
 
 	final NetworkRouteWrapper getWrappedCarRoute(NetworkRoute carRoute) {
 		return new NetworkRouteWrapper(carRoute);
@@ -368,10 +363,9 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	abstract /*package*/ Leg getCurrentLeg();
 
 	/**
-	 * A simple wrapper that delegates all get-Methods to another instance, blocks set-methods
-	 * so this will be read-only, and returns in getVehicleId() a vehicle-Id specific to this driver,
-	 * and not to the NetworkRoute. This allows to share one NetworkRoute from a TransitRoute with
-	 * multiple transit drivers, thus saving memory.
+	 * A simple wrapper that delegates all get-Methods to another instance, blocks set-methods so this will be read-only, and returns in
+	 * getVehicleId() a vehicle-Id specific to this driver, and not to the NetworkRoute. This allows to share one NetworkRoute from a TransitRoute
+	 * with multiple transit drivers, thus saving memory.
 	 *
 	 * @author mrieser
 	 */
@@ -490,6 +484,5 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		}
 
 	}
-
 
 }

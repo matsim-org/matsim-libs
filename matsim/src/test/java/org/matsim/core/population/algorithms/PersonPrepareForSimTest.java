@@ -489,6 +489,7 @@ public class PersonPrepareForSimTest {
 		// set config, such that inconsistency is ignored
 		Config config = ConfigUtils.createConfig();
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
 

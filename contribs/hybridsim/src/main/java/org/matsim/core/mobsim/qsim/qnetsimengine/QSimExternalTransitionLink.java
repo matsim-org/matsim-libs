@@ -19,10 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +28,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
@@ -51,8 +46,8 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	private final QNodeI toQNode ;
 
 	QSimExternalTransitionLink(Link link, ExternalEngine e, NetsimEngineContext context, NetsimInternalInterface netsimEngine,
-							   QNodeI toQNode, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler, ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
-		super(link, toQNode, context, netsimEngine, linkSpeedCalculator, vehicleHandler, parkingSearchTimeCalculator);
+	                           QNodeI toQNode, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler, ArrivalTimeCalculator arrivalTimeCalculator) {
+		super(link, toQNode, context, netsimEngine, linkSpeedCalculator, vehicleHandler, arrivalTimeCalculator);
 		this.e = e;
 		this.em = e.getEventsManager();
 		this.context = context ;
@@ -107,28 +102,28 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		list.add( fakeLane ) ;
 		return list ;
 
-		// Gregor, the popFirstVehicle/getFirstVehicle etc. is now delegated down to QLane.  This probably makes it slightly more 
+		// Gregor, the popFirstVehicle/getFirstVehicle etc. is now delegated down to QLane.  This probably makes it slightly more
 		// complicated from the perspective here, but makes the QNetsimEngine simpler (no exception for the "multiple lanes" any more).
 		// Please ask if you need this and have problems. kai, feb'16
 	}
-	
+
 	@Override
 	public QLaneI getAcceptingQLane() {
 		return this.fakeLane ;
 	}
-	
+
 	private final class FakeLane implements QLaneI {
 		@Override
 		public void addFromUpstream(QVehicle veh) {
 			double now = context.getSimTimer().getTimeOfDay() ;
-			
+
 			Id<Link> nextL = veh.getDriver().chooseNextLinkId();
 			Id<Node> leaveId = toQNode.getNode().getId() ;
 //			e.addFromUpstream( getLink().getFromNode().getId(), leaveId, veh);
 			e.addFromUpstream( veh);
 			em.processEvent(new LinkEnterEvent(now, veh.getId(), getLink().getId()));
 		}
-		
+
 		@Override
 		public double getLoadIndicator() {
 			return 0. ;
@@ -147,12 +142,12 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		public void addTransitSlightlyUpstreamOfStop(QVehicle arg0) {
 			throw new RuntimeException("not implemented") ;
 		}
-		
+
 		@Override
 		public void changeUnscaledFlowCapacityPerSecond(double val) {
 			throw new RuntimeException("not implemented");
 		}
-		
+
 		@Override
 		public void changeEffectiveNumberOfLanes(double val) {
 			throw new RuntimeException("not implemented");
@@ -187,7 +182,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		public QVehicle getFirstVehicle() {
 			// something like
 //			QSimExternalTransitionLink.this.e.getFirstFehicle() ;
-			
+
 			throw new RuntimeException("not implemented") ;
 		}
 
@@ -200,12 +195,12 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		public double getSimulatedFlowCapacityPerTimeStep() {
 			throw new RuntimeException("not implemented") ;
 		}
-		
+
 		@Override
 		public void recalcTimeVariantAttributes() {
 			throw new RuntimeException("not implemented");
 		}
-		
+
 		@Override
 		public double getStorageCapacity() {
 			throw new RuntimeException("not implemented") ;
@@ -250,12 +245,12 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		public Id<Lane> getId() {
 			throw new RuntimeException("not implemented") ;
 		}
-		
+
 		@Override
 		public void initBeforeSimStep() {
 		}
 	}
 
 
-	
+
 }
