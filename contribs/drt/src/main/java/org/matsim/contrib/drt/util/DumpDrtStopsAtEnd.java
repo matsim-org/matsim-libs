@@ -19,8 +19,10 @@ public final class DumpDrtStopsAtEnd implements ShutdownListener {
 	private final DrtStopNetwork drtStopNetwork;
 
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
+	private final String mode;
 
-	public DumpDrtStopsAtEnd(DrtStopNetwork drtStopNetwork, OutputDirectoryHierarchy outputDirectoryHierarchy) {
+	public DumpDrtStopsAtEnd(String mode, DrtStopNetwork drtStopNetwork, OutputDirectoryHierarchy outputDirectoryHierarchy) {
+		this.mode = mode;
 		this.drtStopNetwork = drtStopNetwork;
 		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 	}
@@ -37,7 +39,8 @@ public final class DumpDrtStopsAtEnd implements ShutdownListener {
 		try {
 			if (this.drtStopNetwork != null) {
 				TransitSchedule transitSchedule = DrtStopNetwork.toTransitSchedule(this.drtStopNetwork);
-				new TransitScheduleWriter(transitSchedule).writeFile(this.outputDirectoryHierarchy.getOutputFilename("output_drt_Stops.xml.gz"));
+				new TransitScheduleWriter(transitSchedule).writeFile(this.outputDirectoryHierarchy
+					.getOutputFilename("output_drt_stops_" + this.mode + ".xml.gz"));
 			}
 		} catch (Exception ee) {
 			log.error("Exception writing drt stops.", ee);

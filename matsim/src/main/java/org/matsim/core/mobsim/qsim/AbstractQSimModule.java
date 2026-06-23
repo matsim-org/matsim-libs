@@ -30,7 +30,7 @@ import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.framework.AbstractMobsimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ArrivalTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 
 import java.lang.annotation.Annotation;
@@ -108,7 +108,7 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 		return Multibinder.newSetBinder(this.binder(), VehicleHandler.class).addBinding();
 	}
 
-	protected LinkedBindingBuilder<ParkingSearchTimeCalculator> addParkingSearchTimeCalculatorBinding() {
-		return Multibinder.newSetBinder(this.binder(), ParkingSearchTimeCalculator.class).addBinding();
+	protected LinkedBindingBuilder<ArrivalTimeCalculator> addParkingSearchTimeCalculatorBinding() {
+		return Multibinder.newSetBinder(this.binder(), ArrivalTimeCalculator.class).addBinding();
 	}
 }

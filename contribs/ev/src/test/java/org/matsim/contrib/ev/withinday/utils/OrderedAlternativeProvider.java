@@ -1,11 +1,8 @@
 package org.matsim.contrib.ev.withinday.utils;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import jakarta.annotation.Nullable;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -15,47 +12,44 @@ import org.matsim.contrib.ev.withinday.ChargingAlternative;
 import org.matsim.contrib.ev.withinday.ChargingAlternativeProvider;
 import org.matsim.contrib.ev.withinday.ChargingSlot;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.LinkedList;
+import java.util.List;
 
 @Singleton
 public class OrderedAlternativeProvider implements ChargingAlternativeProvider {
-    @Inject
-    ChargingInfrastructure infrastructure;
+	@Inject
+	ChargingInfrastructure infrastructure;
 
-    @Override
-    public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
-            ElectricVehicle vehicle,
-            @Nullable ChargingSlot initialSlot) {
-        return null;
-    }
+	@Override
+	public ChargingAlternative findEnrouteAlternative(double now, Person person, Plan plan,
+	                                                  ElectricVehicle vehicle,
+	                                                  @Nullable ChargingSlot initialSlot) {
+		return null;
+	}
 
-    @SuppressWarnings("null")
-    @Override
-    @Nullable
-    public ChargingAlternative findAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
-            @Nullable ChargingSlot slot, List<ChargingAlternative> trace) {
-        List<Charger> chargers = new LinkedList<>();
-        chargers.addAll(infrastructure.getChargers().values());
+	@SuppressWarnings("null")
+	@Override
+	@Nullable
+	public ChargingAlternative findAlternative(double now, Person person, Plan plan, ElectricVehicle vehicle,
+	                                           @Nullable ChargingSlot slot, List<ChargingAlternative> trace) {
 
-        chargers.remove(slot.charger());
-        for (ChargingAlternative s : trace) {
-            chargers.remove(s.charger());
-        }
+		List<Charger> chargers = new LinkedList<>(infrastructure.getChargers().values());
+		chargers.removeIf(c -> c.getId().equals(slot.charger().getId()));
+		for (ChargingAlternative s : trace) {
+			chargers.removeIf(c -> c.getId().equals(s.charger()));
+		}
 
-        Collections.sort(chargers, (a, b) -> {
-            return String.CASE_INSENSITIVE_ORDER.compare(a.getId().toString(), b.getId().toString());
-        });
+		chargers.sort((a, b) -> String.CASE_INSENSITIVE_ORDER.compare(a.getId().toString(), b.getId().toString()));
 
-        if (chargers.size() > 0) {
-            if (!slot.isLegBased()) {
-                return new ChargingAlternative(chargers.get(0));
-            } else {
-                return new ChargingAlternative(chargers.get(0), slot.duration());
-            }
-        }
+		if (!chargers.isEmpty()) {
+			if (!slot.isLegBased()) {
+				return new ChargingAlternative(chargers.getFirst().getId());
+			} else {
+				return new ChargingAlternative(chargers.getFirst().getId(), slot.duration());
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
 }

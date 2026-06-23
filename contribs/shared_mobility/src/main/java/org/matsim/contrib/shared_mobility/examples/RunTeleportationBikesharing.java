@@ -15,6 +15,7 @@ import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.CommandLine.ConfigurationException;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.RoutingConfigGroup;
@@ -36,16 +37,10 @@ public class RunTeleportationBikesharing {
 		Config config = ConfigUtils.loadConfig(cmd.getOptionStrict("config-path"));
 
 		// We define bike to be routed based on Euclidean distance.
-		RoutingConfigGroup.TeleportedModeParams bikeRoutingParams = new RoutingConfigGroup.TeleportedModeParams("bike");
-		bikeRoutingParams.setTeleportedModeSpeed(5.0);
-		bikeRoutingParams.setBeelineDistanceFactor(1.3);
-		config.routing().addTeleportedModeParams(bikeRoutingParams);
+		config.routing().addTeleportedModeParams( new TeleportedModeParams("bike").setTeleportedModeSpeed(5.0 ).setBeelineDistanceFactor(1.3 ) );
 
 		// Walk is deleted by adding bike here, we need to re-add it ...
-		RoutingConfigGroup.TeleportedModeParams walkRoutingParams = new RoutingConfigGroup.TeleportedModeParams("walk");
-		walkRoutingParams.setTeleportedModeSpeed(2.0);
-		walkRoutingParams.setBeelineDistanceFactor(1.3);
-		config.routing().addTeleportedModeParams(walkRoutingParams);
+		config.routing().addTeleportedModeParams( new TeleportedModeParams("walk").setTeleportedModeSpeed(2.0 ).setBeelineDistanceFactor(1.3 ) );
 
 		// By default, "bike" will be simulated using teleportation.
 
@@ -65,9 +60,8 @@ public class RunTeleportationBikesharing {
 		serviceConfig.setServiceScheme(ServiceScheme.StationBased);
 		serviceConfig.setServiceAreaShapeFile(null);
 
-		// ... with a number of available vehicles and their initial locations
-		// the following file is an example and it works with the siouxfalls-2014
-		// scenario
+		// ... with a number of available vehicles and their initial locations the following file is an example and it works with
+		// the siouxfalls-2014 scenario
 		serviceConfig.setServiceInputFile("shared_taxi_vehicles_stations.xml");
 
 		// ... and, we need to define the underlying mode, here "bike".
@@ -80,21 +74,12 @@ public class RunTeleportationBikesharing {
 		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
 
 		// We need to add interaction activity types to scoring
-		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
-		pickupParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(pickupParams);
-
-		ActivityParams dropoffParams = new ActivityParams(SharingUtils.DROPOFF_ACTIVITY);
-		dropoffParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(dropoffParams);
-
-		ActivityParams bookingParams = new ActivityParams(SharingUtils.BOOKING_ACTIVITY);
-		bookingParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(bookingParams);
+		config.scoring().addActivityParams( new ActivityParams(SharingUtils.PICKUP_ACTIVITY).setScoringThisActivityAtAll(false ) );
+		config.scoring().addActivityParams( new ActivityParams(SharingUtils.DROPOFF_ACTIVITY).setScoringThisActivityAtAll(false ) );
+		config.scoring().addActivityParams( new ActivityParams(SharingUtils.BOOKING_ACTIVITY).setScoringThisActivityAtAll(false ) );
 
 		// We need to score bike
-		ModeParams bikeScoringParams = new ModeParams("bike");
-		config.scoring().addModeParams(bikeScoringParams);
+		config.scoring().addModeParams( new ModeParams("bike") );
 
 		// Write out all events (DEBUG)
 		config.controller().setWriteEventsInterval(1);

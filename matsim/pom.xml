@@ -117,7 +117,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.5.5</version>
+				<version>3.5.6</version>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -224,12 +224,12 @@
 		<dependency>
 			<groupId>org.lz4</groupId>
 			<artifactId>lz4-java</artifactId>
-			<version>1.8.0</version>
+			<version>1.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.7-7</version>
+			<version>1.5.7-11</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -327,12 +327,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-sampling</artifactId>
-			<version>1.6</version>
+			<version>1.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-client-api</artifactId>
-			<version>1.6</version>
+			<version>1.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -349,7 +349,7 @@
 		<dependency>
 			<groupId>com.google.errorprone</groupId>
 			<artifactId>error_prone_annotations</artifactId>
-			<version>2.49.0</version>
+			<version>2.50.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -364,7 +364,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-core</artifactId>
-			<version>1.6</version>
+			<version>1.7</version>
 		</dependency>
 
 		<!-- Scan classpath to find providers -->
@@ -388,7 +388,7 @@
 		<dependency>
 			<groupId>org.agrona</groupId>
 			<artifactId>agrona</artifactId>
-			<version>2.4.0</version>
+			<version>2.4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hdrhistogram</groupId>

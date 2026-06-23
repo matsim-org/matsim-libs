@@ -30,7 +30,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +60,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startNetwork(final Network network, final BufferedWriter out) throws IOException {
+	public void startNetwork(final Network network, final Writer out) throws IOException {
 		out.write("<network");
 		if (network.getName() != null) {
 			out.write(" name=\"" + encodeAttributeValue(network.getName()) + "\"");
@@ -71,7 +71,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	}
 
 	@Override
-	public void endNetwork(final BufferedWriter out) throws IOException {
+	public void endNetwork(final Writer out) throws IOException {
 		out.write("</network>\n");
 	}
 
@@ -80,12 +80,12 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startNodes(final Network network, final BufferedWriter out) throws IOException {
+	public void startNodes(final Network network, final Writer out) throws IOException {
 		out.write("\t<nodes>\n");
 	}
 
 	@Override
-	public void endNodes(final BufferedWriter out) throws IOException {
+	public void endNodes(final Writer out) throws IOException {
 		out.write("\t</nodes>\n\n");
 	}
 
@@ -94,7 +94,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startLinks(final Network network, final BufferedWriter out) throws IOException {
+	public void startLinks(final Network network, final Writer out) throws IOException {
 		out.write("\t<links");
 		if (network.getCapacityPeriod() != Integer.MIN_VALUE) {
 			out.write(" capperiod=\"" + Time.writeTime(network.getCapacityPeriod()) + "\"");
@@ -107,7 +107,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	}
 
 	@Override
-	public void endLinks(final BufferedWriter out) throws IOException {
+	public void endLinks(final Writer out) throws IOException {
 		out.write("\t</links>\n\n");
 	}
 
@@ -116,7 +116,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startNode(final Node node, final BufferedWriter out) throws IOException {
+	public void startNode(final Node node, final Writer out) throws IOException {
 		out.write("\t\t<node");
 		out.write(" id=\"" + encodeAttributeValue(node.getId().toString()) + "\"");
 		final Coord coord = transformation.transform( node.getCoord() );
@@ -135,7 +135,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	}
 
 	@Override
-	public void endNode(final BufferedWriter out) throws IOException {
+	public void endNode(final Writer out) throws IOException {
 		out.write("\t\t</node>\n");
 	}
 
@@ -147,7 +147,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	private String lastModes = null;
 
 	@Override
-	public void startLink(final Link link, final BufferedWriter out) throws IOException {
+	public void startLink(final Link link, final Writer out) throws IOException {
 		out.write("\t\t<link");
 		out.write(" id=\"" + encodeAttributeValue(link.getId().toString()) + "\"");
 		out.write(" from=\"" + encodeAttributeValue(link.getFromNode().getId().toString()) + "\"");
@@ -192,7 +192,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	}
 
 	@Override
-	public void endLink(final BufferedWriter out) throws IOException {
+	public void endLink(final Writer out) throws IOException {
 		out.write("\t\t</link>\n");
 	}
 
@@ -201,7 +201,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void writeSeparator(final BufferedWriter out) throws IOException {
+	public void writeSeparator(final Writer out) throws IOException {
 		out.write("<!-- =================================================" +
 				"===================== -->\n\n");
 	}

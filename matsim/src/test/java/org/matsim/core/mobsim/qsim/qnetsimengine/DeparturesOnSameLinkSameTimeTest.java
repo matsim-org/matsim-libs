@@ -149,6 +149,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 			this.scenario = ScenarioUtils.loadScenario(config);
 			config.qsim().setMainModes(Arrays.asList(travelMode));
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 			//following is necessary for mixed traffic, providing a route was obstructing
 			// the requirement of these which might be all right in some cases. Amit Jan'18

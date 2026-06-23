@@ -172,6 +172,7 @@ public class SeepageTest {
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
 			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ);
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 			config.qsim().setSeepModes(Arrays.asList(TransportMode.walk) );
 			config.qsim().setSeepModeStorageFree(false);

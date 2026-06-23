@@ -105,6 +105,12 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
     public long getChQueryCount()    { return chQueryCount; }
 
     public CHRouterTimeDep(CHGraph chGraph, TravelTime tt, TravelDisutility td) {
+        if (!chGraph.isTimeDependent()) {
+            throw new IllegalStateException(
+                    "CHRouterTimeDep requires a time-dependent CHGraph; "
+                    + "the supplied graph was built with timeDependent=false. "
+                    + "Use the static CHRouter instead.");
+        }
         this.chGraph   = chGraph;
         this.baseGraph = chGraph.getBaseGraph();
         this.tt        = tt;
@@ -148,7 +154,7 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
                                   double startTime, Person person, Vehicle vehicle) {
         int startIdx = baseGraph.getNodeIndex(startNode);
         int endIdx   = baseGraph.getNodeIndex(endNode);
-        Path path    = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle);
+        Path path    = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle, Double.POSITIVE_INFINITY);
         if (path == null) logNoRoute("node " + startNode.getId(), "node " + endNode.getId());
         return path;
     }
@@ -156,6 +162,12 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
     @Override
     public Path calcLeastCostPath(Link fromLink, Link toLink,
                                   double startTime, Person person, Vehicle vehicle) {
+        return calcLeastCostPath(fromLink, toLink, startTime, person, vehicle, Double.POSITIVE_INFINITY);
+    }
+
+    @Override
+    public Path calcLeastCostPath(Link fromLink, Link toLink,
+                                  double startTime, Person person, Vehicle vehicle, double maxCost) {
         int startIdx = baseGraph.getNodeIndex(fromLink.getToNode());
         int endIdx   = baseGraph.getNodeIndex(toLink.getFromNode());
 
@@ -166,7 +178,7 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
             }
         }
 
-        Path path = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle);
+        Path path = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle, maxCost);
         if (path == null) logNoRoute("link " + fromLink.getId(), "link " + toLink.getId());
         return path;
     }
@@ -176,7 +188,7 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
     // -------------------------------------------------------------------------
 
     private Path calcLeastCostPathImpl(int startIdx, int endIdx,
-                                       double startTime, Person person, Vehicle vehicle) {
+                                       double startTime, Person person, Vehicle vehicle, double maxCost) {
         advanceIteration();
 
         if (startIdx == endIdx) {
@@ -234,6 +246,17 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
             double fMin = fwdPQ.isEmpty() ? Double.POSITIVE_INFINITY : fwdCost[fwdPQ.peek()];
             double bMin = bwdPQ.isEmpty() ? Double.POSITIVE_INFINITY : bwdLB[bwdPQ.peek()];
             if (fMin >= bestBound && bMin >= bestBound) break;
+            // NOTE: no loop-level early termination on maxCost is applied here.
+            // CHRouterTimeDep's internal search optimises *travel time* (required for the
+            // CATCHUp/TCH time-dependent CH invariant), while {@code maxCost} is expressed
+            // in the same units as {@link Path#travelCost} — i.e. travel *disutility* as
+            // reconstructed in {@link #constructPath}. Comparing the time-valued queue
+            // minima against a disutility-valued maxCost would be unsound. The bounded
+            // contract is enforced via a final guard on the reconstructed path cost
+            // below, which is correct but provides no in-loop speedup. A proper fast-path
+            // would require either pushing the disutility into the search metric or
+            // bounding via a time-unit cap derived from maxCost, both of which require
+            // changes beyond this method.
 
             boolean expandForward = !fwdPQ.isEmpty()
                     && (bwdPQ.isEmpty() || fMin <= bMin);
@@ -376,7 +399,13 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
         chQueryCount++;
 
         if (meetingNode < 0) return null;
-        return constructPath(startIdx, meetingNode, startTime, person, vehicle);
+        // Bounded-search final guard. bestBound is a lower bound on the actual cost,
+        // so a meeting found before the early-termination check fired may still
+        // reconstruct to a path with actualCost > maxCost. We must reconstruct first
+        // and then drop the result if its actual cost exceeds the bound.
+        Path path = constructPath(startIdx, meetingNode, startTime, person, vehicle);
+        if (path != null && path.travelCost > maxCost) return null;
+        return path;
     }
 
     // -------------------------------------------------------------------------
