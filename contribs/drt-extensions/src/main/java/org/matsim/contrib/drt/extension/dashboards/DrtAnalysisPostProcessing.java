@@ -34,6 +34,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.gis.GeoFileWriter;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import picocli.CommandLine;
@@ -76,8 +77,9 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 	@CommandLine.Option(names = "--drt-mode", required = true, description = "Name of the drt mode to analyze.")
 	private String drtMode;
 
-	@CommandLine.Option(names = "--stops-file", description = "URL to drt stops file")
-	private URL stopsFile;
+	@CommandLine.Option(names = "--with-stops", defaultValue = "false",
+		description = "read stops file from matsim output directory")
+	private boolean readStops;
 
 	@CommandLine.Option(names = "--area-file", description = "URL to drt service area file")
 	private URL areaFile;
@@ -180,8 +182,8 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 			.separator(';').build());
 
 		Table tableSupplyKPI = Table.create("supplyKPI");
-		if (stopsFile != null) {
-			List<TransitStopFacility> stops = readTransitStops(stopsFile);
+		if (readStops) {
+			List<TransitStopFacility> stops = readTransitStops();
 			writeStopsShp(stops, output.getPath("stops.shp"));
 
 			Map<String, TransitStopFacility> byLink = stops.stream().collect(Collectors.toMap(s -> s.getLinkId().toString(), Function.identity(),
@@ -307,11 +309,11 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		}
 	}
 
-	private List<TransitStopFacility> readTransitStops(URL stopFile) {
-
+	private List<TransitStopFacility> readTransitStops() {
+		URL stopFile = IOUtils.resolveFileOrResource(ApplicationUtils.matchInput("output_drt_stops_" + drtMode + ".xml",
+			input.getRunDirectory()).toAbsolutePath().toString());
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readURL(stopFile);
-
 
 		return new ArrayList<>(scenario.getTransitSchedule().getFacilities().values());
 	}

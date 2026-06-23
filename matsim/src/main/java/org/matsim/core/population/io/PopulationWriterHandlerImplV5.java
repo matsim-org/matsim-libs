@@ -22,7 +22,7 @@ package org.matsim.core.population.io;
 
 import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
@@ -58,13 +58,13 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	@Override
-	public void writeHeaderAndStartElement(final BufferedWriter out) throws IOException {
+	public void writeHeaderAndStartElement(final Writer out) throws IOException {
 		out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 		out.write("<!DOCTYPE population SYSTEM \"" + MatsimXmlWriter.DEFAULT_DTD_LOCATION + "population_v5.dtd\">\n\n");
 	}
 
 	@Override
-	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
+	public void startPlans(final Population plans, final Writer out) throws IOException {
 		out.write("<population");
 		if (plans.getName() != null) {
 			out.write(" desc=\"" + encodeAttributeValue(plans.getName()) + "\"");
@@ -73,7 +73,7 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	@Override
-	public void writePerson(final Person person, final BufferedWriter out) throws IOException {
+	public void writePerson(final Person person, final Writer out) throws IOException {
 		PopulationWriterHandlerImplV5.startPerson(person, out);
 		for (Plan plan : person.getPlans()) {
 			PopulationWriterHandlerImplV5.startPlan(plan, out);
@@ -102,12 +102,12 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	@Override
-	public void endPlans(final BufferedWriter out) throws IOException {
+	public void endPlans(final Writer out) throws IOException {
 		out.write("</population>\n");
 		out.flush();
 	}
 
-	private static void startPerson(final Person person, final BufferedWriter out) throws IOException {
+	private static void startPerson(final Person person, final Writer out) throws IOException {
 		out.write("\t<person id=\"");
 		out.write(encodeAttributeValue(person.getId().toString()));
 		out.write("\"");
@@ -139,11 +139,11 @@ import org.matsim.core.utils.misc.Time;
 		out.write(">\n");
 	}
 
-	private static void endPerson(final BufferedWriter out) throws IOException {
+	private static void endPerson(final Writer out) throws IOException {
 		out.write("\t</person>\n\n");
 	}
 
-	private static void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
+	private static void startPlan(final Plan plan, final Writer out) throws IOException {
 		out.write("\t\t<plan");
 		if (plan.getScore() != null) {
 			out.write(" score=\"");
@@ -162,11 +162,11 @@ import org.matsim.core.utils.misc.Time;
 		out.write(">\n");
 	}
 
-	private static void endPlan(final BufferedWriter out) throws IOException {
+	private static void endPlan(final Writer out) throws IOException {
 		out.write("\t\t</plan>\n\n");
 	}
 
-	private void writeAct(final Activity act, final BufferedWriter out) throws IOException {
+	private void writeAct(final Activity act, final Writer out) throws IOException {
 		out.write("\t\t\t<act type=\"");
 		out.write(encodeAttributeValue(act.getType()));
 		out.write("\"");
@@ -206,7 +206,7 @@ import org.matsim.core.utils.misc.Time;
 		out.write(" />\n");
 	}
 
-	private static void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
+	private static void startLeg(final Leg leg, final Writer out) throws IOException {
 		out.write("\t\t\t<leg mode=\"");
 		out.write(encodeAttributeValue(leg.getMode()));
 		out.write("\"");
@@ -233,11 +233,11 @@ import org.matsim.core.utils.misc.Time;
 		out.write(">\n");
 	}
 
-	private static void endLeg(final BufferedWriter out) throws IOException {
+	private static void endLeg(final Writer out) throws IOException {
 		out.write("\t\t\t</leg>\n");
 	}
 
-	private static void startRoute(final Route route, final BufferedWriter out) throws IOException {
+	private static void startRoute(final Route route, final Writer out) throws IOException {
 		out.write("\t\t\t\t<route ");
 		out.write("type=\"");
 		out.write(encodeAttributeValue(route.getRouteType()));
@@ -269,12 +269,12 @@ import org.matsim.core.utils.misc.Time;
 		}
 	}
 
-	private static void endRoute(final BufferedWriter out) throws IOException {
+	private static void endRoute(final Writer out) throws IOException {
 		out.write("</route>\n");
 	}
 
 	@Override
-	public void writeSeparator(final BufferedWriter out) throws IOException {
+	public void writeSeparator(final Writer out) throws IOException {
 		out.write("<!-- ====================================================================== -->\n\n");
 	}
 

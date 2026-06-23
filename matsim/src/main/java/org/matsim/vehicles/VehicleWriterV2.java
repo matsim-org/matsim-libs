@@ -92,7 +92,7 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 				this.writeStartTag(VehicleSchemaV2Names.VEHICLE, atts, true);
 			} else {
 				this.writeStartTag(VehicleSchemaV2Names.VEHICLE, atts, false);
-				this.writer.newLine();
+				this.writer.write(NL);
 				attributesWriter.writeAttributes("\t\t", this.writer, v.getAttributes(), false);
 				this.writeEndTag(VehicleSchemaV2Names.VEHICLE);
 			}

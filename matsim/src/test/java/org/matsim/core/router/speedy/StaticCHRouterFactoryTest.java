@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConfigWriterHandler.java
+ * StaticCHRouterFactoryTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2026 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.router.speedy;
 
-package org.matsim.core.config;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.router.AbstractCHLeastCostPathCalculatorTest;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 
-import java.io.Writer;
-
-/*package*/ abstract class ConfigWriterHandler {
-
-	abstract void startConfig(final Config config, final Writer out);
-	
-	abstract void endConfig(final Writer out);
-	
-	abstract void writeModule(final ConfigGroup module, final Writer out);
-	
-	abstract void writeSeparator(final Writer out);
-	
-	/**
-	 * Sets the string to be used as newline separator.
-	 * The idea behind this is that by default, "\n" should be used,
-	 * so that files generated on different OSes can be compared by checksum.
-	 * Using the System property (see <code>System.getProperty("line.separator");</code>) 
-	 * may however be necessary for proper display
-	 * of the config dump in the console...
-	 *
-	 * @param newline the newline separator
-	 * @return the former newline separator
-	 */
-	abstract String setNewline(final String newline);
+/**
+ * Standard test suite for {@link StaticCHRouterFactory}. Inherits the full
+ * {@link AbstractCHLeastCostPathCalculatorTest} suite (basic routing + turn
+ * restrictions) and exercises the factory exactly the way external callers
+ * would: a single {@code createPathCalculator} call per scenario, using
+ * {@link FreespeedTravelTimeAndDisutility} for static travel costs.
+ */
+public class StaticCHRouterFactoryTest extends AbstractCHLeastCostPathCalculatorTest {
+	@Override
+	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
+		FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+		return new StaticCHRouterFactory().createPathCalculator(network, tc, tc);
+	}
 }
