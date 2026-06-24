@@ -104,10 +104,7 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 			problem = true;
 		}
 
-		Set<String> subpopulations = scenario.getPopulation().getPersons().values().stream()
-			.map(PopulationUtils::getSubpopulation)
-			.filter(Objects::nonNull)
-			.collect(Collectors.toSet());
+		Set<String> subpopulations = PopulationUtils.getSubpopulationsOfPopulation(scenario.getPopulation());
 
 		// check if there are corresponding scoring params for all subpopulations.
 		for (String subpopulation : subpopulations) {
