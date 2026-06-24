@@ -114,10 +114,8 @@ public class DriveDischargingHandler
 
 	@Override
 	public void afterMobsim() {
-		// process remaining events
-		// pass time + 1, because we delay the processing of events during the mobsim. Yet, afterMobsim is called with the last time step of the mobsim
-		// when passing the last timestep no events will be processed, as the logic waits for the next timestep.
-		doSimStep(this.netsim.getSimTimer().getTimeOfDay() + 1);
+		// Process all remaining queued events. No cutoff is needed once mobsim has finished producing events.
+		drainQueuedEvents(Double.POSITIVE_INFINITY, this.netsim.getSimTimer().getTimeOfDay());
 	}
 
 	@Override
@@ -126,10 +124,14 @@ public class DriveDischargingHandler
 
 	@Override
 	public void doSimStep(double time) {
+		drainQueuedEvents(time, time);
+	}
+
+	private void drainQueuedEvents(double cutoffExclusive, double outputTime) {
 		while (!trafficEnterEvents.isEmpty()) {
 			var event = trafficEnterEvents.peek();
 
-			if (event.getTime() == time) {
+			if (event.getTime() >= cutoffExclusive) {
 				break; // see below
 			}
 
@@ -138,22 +140,22 @@ public class DriveDischargingHandler
 			trafficEnterEvents.remove();
 		}
 
-		handleQueuedEvents(linkLeaveEvents, time, false);
-		handleQueuedEvents(trafficLeaveEvents, time, true);
+		handleQueuedEvents(linkLeaveEvents, cutoffExclusive, outputTime, false);
+		handleQueuedEvents(trafficLeaveEvents, cutoffExclusive, outputTime, true);
 	}
 
-	private <E extends Event & HasVehicleId & HasLinkId> void handleQueuedEvents(Queue<E> queue, double time, boolean leftTraffic) {
+	private <E extends Event & HasVehicleId & HasLinkId> void handleQueuedEvents(Queue<E> queue, double cutoffExclusive, double outputTime, boolean leftTraffic) {
 		// We want to process events in the main thread (instead of the event handling threads).
 		// This is to eliminate race conditions, where the battery is read/modified by many threads without proper synchronisation
 		while (!queue.isEmpty()) {
 			var event = queue.peek();
-			if (event.getTime() == time) {
+			if (event.getTime() >= cutoffExclusive) {
 				// There is a potential race condition wrt processing events between doSimStep() and handleEvent().
 				// To ensure a deterministic behaviour, we only process events from the previous time step.
 				break;
 			}
 
-			var evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
+			var evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), outputTime);
 			if (leftTraffic) {
 				evDrives.remove(evDrive.vehicleId);
 			} else {

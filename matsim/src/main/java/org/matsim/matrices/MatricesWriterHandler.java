@@ -20,7 +20,7 @@
 
 package org.matsim.matrices;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 
 interface MatricesWriterHandler {
@@ -29,25 +29,25 @@ interface MatricesWriterHandler {
 	// <matrices ... > ... </matrices>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startMatrices(final Matrices matrices, final BufferedWriter out) throws IOException;
+	public void startMatrices(final Matrices matrices, final Writer out) throws IOException;
 
-	public void endMatrices(final BufferedWriter out) throws IOException;
+	public void endMatrices(final Writer out) throws IOException;
 
 	//////////////////////////////////////////////////////////////////////
 	// <matrix ... > ... </matrix>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startMatrix(final Matrix matrix, final BufferedWriter out) throws IOException;
+	public void startMatrix(final Matrix matrix, final Writer out) throws IOException;
 
-	public void endMatrix(final BufferedWriter out) throws IOException;
+	public void endMatrix(final Writer out) throws IOException;
 
 	//////////////////////////////////////////////////////////////////////
 	// <entry ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startEntry(final Entry entry, final BufferedWriter out) throws IOException;
+	public void startEntry(final Entry entry, final Writer out) throws IOException;
 
-	public void endEntry(final BufferedWriter out) throws IOException;
+	public void endEntry(final Writer out) throws IOException;
 	
-	public void writeSeparator(final BufferedWriter out) throws IOException;
+	public void writeSeparator(final Writer out) throws IOException;
 }
