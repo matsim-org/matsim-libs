@@ -2,8 +2,14 @@ package org.matsim.simwrapper.DbViewer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.simwrapper.SimWrapper;
+import org.matsim.simwrapper.dashboard.SelectLinkAnalysisDashboard;
 import picocli.CommandLine;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CsvOptions;
@@ -38,19 +44,21 @@ public class SelectLinkAnalysis  implements MATSimAppCommand {
 
 		DbEventHandler DbEventHandler = new DbEventHandler(outputPath.toString());
 
-		// 1. Initialize a config instance
-//		Config config = ConfigUtils.createConfig();
+//		1. Initialize a config instance
+		Config config = ConfigUtils.createConfig();
+		config.controller().setOutputDirectory(outputPath.toString());
 
-		// 2. Create an empty population container
-//		Population population = PopulationUtils.createPopulation(config);
-//
-//		// 3. Populate the container by reading the file
-//		PopulationUtils.readPopulation(population, populationPath.toString());
+//		2. Create an empty population container
+		Population population = PopulationUtils.createPopulation(config);
+
+//		 3. Populate the container by reading the file
+		PopulationUtils.readPopulation(population, populationPath.toString());
+
 //
 ////		Population population = PopulationUtils.readPopulation();
 //
-//		AgentTable agentTable = new AgentTable(population, outputPath.toString());
-//		agentTable.run();
+		AgentTable agentTable = new AgentTable(population, outputPath.toString());
+		agentTable.run();
 
 		eventsManager.addHandler(DbEventHandler);
 
@@ -63,6 +71,11 @@ public class SelectLinkAnalysis  implements MATSimAppCommand {
 		eventsManager.finishProcessing();
 
 		DbEventHandler.finish();
+
+		SimWrapper sw = SimWrapper.create();
+		sw.addDashboard(new SelectLinkAnalysisDashboard());
+		sw.generate(outputPath, true);
+
 		return null;
 	}
 

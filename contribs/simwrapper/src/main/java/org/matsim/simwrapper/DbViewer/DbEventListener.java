@@ -47,13 +47,17 @@ public class DbEventListener implements IterationEndsListener, IterationStartsLi
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (event.isLastIteration()) {
+//			try {
 			try {
 				dbEventHandler.finish();
-			}  catch (SQLException ex) {
-				throw new RuntimeException(ex);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+//			}  catch (SQLException ex) {
+//				throw new RuntimeException(ex);
+//			} catch (IOException e) {
+//				throw new RuntimeException(e);
+//			}
 		}
 //			DbWriter dbWriter = new DbWriter(dbEventHandler, db, scenario, outputDirectory);
 //			dbWriter.write();
