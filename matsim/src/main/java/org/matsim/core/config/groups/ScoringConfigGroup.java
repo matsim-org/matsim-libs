@@ -439,7 +439,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			return getScoringParameters(null).getActivityParamsPerType().keySet();
 		else {
 			Set<String> activities = new HashSet<>();
-			getScoringParametersPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
+			getAllScoringParameterSetsPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
 			return activities;
 		}
 	}
@@ -454,7 +454,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 		} else {
 			Set<String> modes = new HashSet<>();
-			getScoringParametersPerSubpopulation().values().forEach(item -> modes.addAll(item.getModeParams().keySet()));
+			getAllScoringParameterSetsPerSubpopulation().values().forEach(item -> modes.addAll(item.getModeParams().keySet()));
 			return modes;
 		}
 
@@ -503,13 +503,14 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * In contrast to {@link #getScoringParameters(String)}, this method does not apply any fallback.
 	 */
 	public Map<String, ModeParams> getModeParamsForSubpopulation(String subpopulation) {
-		if (getScoringParametersPerSubpopulation().get(subpopulation) != null)
-			return getScoringParametersPerSubpopulation().get(subpopulation).getModeParams();
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet != null)
+			return scoringParameterSet.getModeParams();
 		else
 			throw new RuntimeException("Mode parameters for subpopulation " + subpopulation + " are not defined");
 	}
 
-	public Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
+	public Map<String, ScoringParameterSet> getAllScoringParameterSetsPerSubpopulation() {
 		@SuppressWarnings("unchecked") final Collection<ScoringParameterSet> parameters = (Collection<ScoringParameterSet>) getParameterSets(
 			ScoringParameterSet.SET_TYPE);
 		final Map<String, ScoringParameterSet> map = new LinkedHashMap<>();
@@ -522,6 +523,26 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 		return map;
+	}
+
+	public Map<String, ScoringParameterSet> getExplicitScoringParameterSetsPerSubpopulation() {
+		final Map<String, ScoringParameterSet> map = new LinkedHashMap<>();
+
+		for (Map.Entry<String, ScoringParameterSet> entry : getAllScoringParameterSetsPerSubpopulation().entrySet()) {
+			if (entry.getKey() != null && !DEFAULT_SUBPOPULATION.equals(entry.getKey())) {
+				map.put(entry.getKey(), entry.getValue());
+			}
+		}
+		return map;
+	}
+
+	/**
+	 * @deprecated Use {@link #getAllScoringParameterSetsPerSubpopulation()} when default parameter sets should be included,
+	 * or {@link #getExplicitScoringParameterSetsPerSubpopulation()} when only real subpopulation parameter sets should be returned.
+	 */
+	@Deprecated(since = "2026-06")
+	public Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
+		return getAllScoringParameterSetsPerSubpopulation();
 	}
 
 	/* direct access */
@@ -552,8 +573,9 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * In contrast to {@link #getScoringParameters(String)}, this method does not apply any fallback.
 	 */
 	public Collection<ActivityParams> getActivityParamsForSubpopulation(String subpopulation) {
-		if (getScoringParametersPerSubpopulation().get(subpopulation) != null)
-			return getScoringParametersPerSubpopulation().get(subpopulation).getActivityParams();
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet != null)
+			return scoringParameterSet.getActivityParams();
 		else
 			throw new RuntimeException("Activity parameters for subpopulation " + subpopulation + " are not defined");
 	}
@@ -601,8 +623,9 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * scoring parameter set of the given subpopulation key.
 	 */
 	public ActivityParams getActivityParamsForSubpopulation(final String actType, String subpopulation) {
-		if (getScoringParametersPerSubpopulation().get(subpopulation) != null)
-			return getScoringParametersPerSubpopulation().get(subpopulation).getActivityParams(actType);
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet != null)
+			return scoringParameterSet.getActivityParams(actType);
 		else
 			throw new RuntimeException("Activity parameters for subpopulation " + subpopulation + " are not defined");
 	}
@@ -614,8 +637,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * management code relies on stable "exact-or-root" semantics.
 	 */
 	public ScoringParameterSet getScoringParameters(String subpopulation) {
-		final ScoringParameterSet params = getScoringParametersPerSubpopulation().get(subpopulation);
-		return params != null ? params : getScoringParametersPerSubpopulation().get(null);
+		final ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
+		return params != null ? params : getAllScoringParameterSetsPerSubpopulation().get(null);
 	}
 
 	/**
@@ -632,7 +655,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * creating one if necessary.
 	 */
 	public ScoringParameterSet getOrCreateScoringParameters(String subpopulation) {
-		ScoringParameterSet params = getScoringParametersPerSubpopulation().get(subpopulation);
+		ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
 
 		if (params == null) {
 			params = new ScoringParameterSet(subpopulation);
@@ -651,7 +674,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * @throws RuntimeException if scoring parameters for {@link #DEFAULT_SUBPOPULATION} already exist
 	 */
 	public ScoringParameterSet setScoringParametersAsDefaultSubpopulation(String subpopulation) {
-		final ScoringParameterSet params = getScoringParametersPerSubpopulation().get(subpopulation);
+		final ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
 		if (params == null) {
 			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
 		}
@@ -670,7 +693,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		if (DEFAULT_SUBPOPULATION.equals(params.getSubpopulation())) {
 			return params;
 		}
-		if (getScoringParametersPerSubpopulation().containsKey(DEFAULT_SUBPOPULATION)) {
+		if (getAllScoringParameterSetsPerSubpopulation().containsKey(DEFAULT_SUBPOPULATION)) {
 			throw new RuntimeException("ScoringParams for default subpopulation are already defined");
 		}
 
@@ -737,7 +760,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	public void addModeParamsForSubpopulation(final ModeParams params, String subpopulation) {
-		final ScoringParameterSet scoringParameterSet = getScoringParametersPerSubpopulation().get(subpopulation);
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
 		if (scoringParameterSet == null) {
 			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
 		}
@@ -749,7 +772,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	public void addActivityParamsForSubpopulation(final ActivityParams params, String subpopulation) {
-		final ScoringParameterSet scoringParameterSet = getScoringParametersPerSubpopulation().get(subpopulation);
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
 		if (scoringParameterSet == null) {
 			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
 		}
@@ -796,8 +819,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			throw new RuntimeException(msg);
 		}
 
-		if (getScoringParametersPerSubpopulation().size() > 1) {
-			if (!getScoringParametersPerSubpopulation().containsKey(ScoringConfigGroup.DEFAULT_SUBPOPULATION)) {
+		if (getAllScoringParameterSetsPerSubpopulation().size() > 1) {
+			if (!getAllScoringParameterSetsPerSubpopulation().containsKey(ScoringConfigGroup.DEFAULT_SUBPOPULATION)) {
 				throw new RuntimeException("Using several subpopulations in " + ScoringConfigGroup.GROUP_NAME + " requires defining a \"" + ScoringConfigGroup.DEFAULT_SUBPOPULATION + " \" subpopulation."
 					+ " Otherwise, crashes can be expected.");
 			}
@@ -813,7 +836,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		// adding the interaction activities that result from access/egress routing. this is strictly speaking not a consistency
 		// check, but I don't know a better place where to add this. kai, jan'18
 
-		for (ScoringParameterSet scoringParameterSet : this.getScoringParametersPerSubpopulation().values()) {
+		for (ScoringParameterSet scoringParameterSet : this.getAllScoringParameterSetsPerSubpopulation().values()) {
 
 			for (String mode : config.routing().getNetworkModes()) {
 				createAndAddInteractionActivity(scoringParameterSet, mode);
@@ -836,15 +859,16 @@ public final class ScoringConfigGroup extends ConfigGroup {
 				}
 			}
 		}
-		this.getScoringParametersPerSubpopulation().keySet().forEach(subpop -> {
-			for (ActivityParams params : getActivityParamsForSubpopulation(subpop)) {
-				if (params.isScoringThisActivityAtAll() && params.getTypicalDuration().isUndefined()) {
-					throw new RuntimeException("In activity type=" + params.getActivityType()
-						+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
-						+ "so rather aborting here.");
+		this.getAllScoringParameterSetsPerSubpopulation().values()
+			.forEach(scoringParameterSet -> {
+				for (ActivityParams params : scoringParameterSet.getActivityParams()) {
+					if (params.isScoringThisActivityAtAll() && params.getTypicalDuration().isUndefined()) {
+						throw new RuntimeException("In activity type=" + params.getActivityType()
+							+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
+							+ "so rather aborting here.");
+					}
 				}
-			}
-		});
+			});
 	}
 
 	private static void createAndAddInteractionActivity(ScoringParameterSet scoringParameterSet, String mode) {
@@ -1004,9 +1028,11 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			throw new RuntimeException("Default subpopulation is not defined");
 
 	}
+
 	public double getMarginalUtlOfWaiting_utils_hr(String subpopulation) {
 		if (getScoringParameters(subpopulation) != null)
 			return getScoringParameters(subpopulation).getMarginalUtlOfWaiting_utils_hr();
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
 		else
 			throw new RuntimeException("MarginalUtlOfWaiting_utils_hr for subpopulation " + subpopulation + " is not defined");
 	}

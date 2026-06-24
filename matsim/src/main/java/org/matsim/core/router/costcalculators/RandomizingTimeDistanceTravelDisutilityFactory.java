@@ -103,7 +103,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 			}
 
 			final Set<String> monoSubpopKeyset = Collections.singleton( null );
-			if ( !cnScoringGroup.getScoringParametersPerSubpopulation().keySet().equals( monoSubpopKeyset ) ) {
+			if ( !cnScoringGroup.getAllScoringParameterSetsPerSubpopulation().keySet().equals( monoSubpopKeyset ) ) {
 				log.warn( "Scoring parameters are defined for different subpopulations." +
 						" The routing disutility will only consider the ones of the default subpopulation.");
 				log.warn( "This warning can safely be ignored if disutility of traveling only depends on travel time.");

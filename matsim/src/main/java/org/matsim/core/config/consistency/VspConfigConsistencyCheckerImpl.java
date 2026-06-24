@@ -391,13 +391,13 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log(lvl, "</module>");
 		}
 
-		// added aug'13:
-		Set<String> subPopulationsWithScoringParameters = config.scoring().getScoringParametersPerSubpopulation().keySet();
+		Collection<ScoringConfigGroup.ScoringParameterSet> scoringParameterSets = config.scoring().getAllScoringParameterSetsPerSubpopulation().values();
 
-		for (String subpop : subPopulationsWithScoringParameters) {
-			problem = checkScoringParameterSet(lvl, problem, subpop, config.scoring().getActivityParamsForSubpopulation(subpop),
-				config.scoring().getModeParamsForSubpopulation(subpop).values(), config.scoring().getMarginalUtlOfWaiting_utils_hr(subpop),
-				config.scoring().getMarginalUtilityOfMoney(subpop));
+		// added aug'13:
+		for (ScoringConfigGroup.ScoringParameterSet scoringParameterSet : scoringParameterSets) {
+			problem = checkScoringParameterSet(lvl, problem, getContextLabel(scoringParameterSet),
+				scoringParameterSet.getActivityParams(), scoringParameterSet.getModeParams().values(),
+				scoringParameterSet.getMarginalUtlOfWaiting_utils_hr(), scoringParameterSet.getMarginalUtilityOfMoney());
 		}
 		// added oct'17:
 		if (config.scoring().getFractionOfIterationsToStartScoreMSA() == null || config.scoring().getFractionOfIterationsToStartScoreMSA() >= 1.) {

@@ -28,6 +28,7 @@ import org.matsim.core.config.groups.ControllerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ScoringParameterSet;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -68,28 +69,16 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	}
 
 	/*package because of test */ static void checkScoring(final Config c) {
-		if (c.scoring().hasDefaultScoringParameters())
-			checkScoringForDefaultParameters(c);
-
-		c.scoring().getScoringParametersPerSubpopulation().keySet().forEach(subpopulation -> {
-			checkScoringForSubpopulation(c, subpopulation);
-		});
+		c.scoring().getAllScoringParameterSetsPerSubpopulation().values()
+			.forEach(scoringParameterSet -> checkScoringParameterSet(c, scoringParameterSet));
 	}
 
-	private static void checkScoringForDefaultParameters(final Config c) {
-		checkTravelingUtility(c.scoring().getDefaultModeParams().get(TransportMode.pt), ScoringConfigGroup.GROUP_NAME + ".travelingPt");
-		checkTravelingUtility(c.scoring().getDefaultModeParams().get(TransportMode.car), ScoringConfigGroup.GROUP_NAME + ".traveling");
-		checkTravelingUtility(c.scoring().getDefaultModeParams().get(TransportMode.bike), ScoringConfigGroup.GROUP_NAME + ".travelingBike");
-		checkTravelingUtility(c.scoring().getDefaultModeParams().get(TransportMode.walk), ScoringConfigGroup.GROUP_NAME + ".travelingWalk");
-		checkPtInteractionScoring(c, c.scoring().getDefaultActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE));
-	}
-
-	private static void checkScoringForSubpopulation(final Config c, final String subpopulation) {
-		checkTravelingUtility(c.scoring().getModeParamsForSubpopulation(subpopulation).get(TransportMode.pt), ScoringConfigGroup.GROUP_NAME + ".travelingPt");
-		checkTravelingUtility(c.scoring().getModeParamsForSubpopulation(subpopulation).get(TransportMode.car), ScoringConfigGroup.GROUP_NAME + ".traveling");
-		checkTravelingUtility(c.scoring().getModeParamsForSubpopulation(subpopulation).get(TransportMode.bike), ScoringConfigGroup.GROUP_NAME + ".travelingBike");
-		checkTravelingUtility(c.scoring().getModeParamsForSubpopulation(subpopulation).get(TransportMode.walk), ScoringConfigGroup.GROUP_NAME + ".travelingWalk");
-		checkPtInteractionScoring(c, c.scoring().getActivityParamsForSubpopulation(PtConstants.TRANSIT_ACTIVITY_TYPE, subpopulation));
+	private static void checkScoringParameterSet(final Config c, ScoringParameterSet scoringParameterSet) {
+		checkTravelingUtility(scoringParameterSet.getModeParams().get(TransportMode.pt), ScoringConfigGroup.GROUP_NAME + ".travelingPt");
+		checkTravelingUtility(scoringParameterSet.getModeParams().get(TransportMode.car), ScoringConfigGroup.GROUP_NAME + ".traveling");
+		checkTravelingUtility(scoringParameterSet.getModeParams().get(TransportMode.bike), ScoringConfigGroup.GROUP_NAME + ".travelingBike");
+		checkTravelingUtility(scoringParameterSet.getModeParams().get(TransportMode.walk), ScoringConfigGroup.GROUP_NAME + ".travelingWalk");
+		checkPtInteractionScoring(c, scoringParameterSet.getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE));
 	}
 
 	private static void checkTravelingUtility(ModeParams modeParams, String parameterName) {

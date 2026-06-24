@@ -167,11 +167,22 @@ import org.matsim.testcases.MatsimTestUtils;
 			() -> scoringConfigGroup.getActivityParamsForSubpopulation("missing"));
 		Assertions.assertThrows(RuntimeException.class,
 			() -> scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", "missing"));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getMarginalUtilityOfMoney("missing"));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr("missing"));
 
 		Assertions.assertSame(truckModeParams,
 			scoringConfigGroup.getModeParamsForSubpopulation("freight").get("truck"));
 		Assertions.assertSame(freightActivityParams,
 			scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", "freight"));
+		Assertions.assertEquals(freightParams.getMarginalUtilityOfMoney(),
+			scoringConfigGroup.getMarginalUtilityOfMoney("freight"), 1e-7);
+		Assertions.assertEquals(freightParams.getMarginalUtlOfWaiting_utils_hr(),
+			scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr("freight"), 1e-7);
+		Assertions.assertTrue(scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().containsKey("freight"));
+		Assertions.assertTrue(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey("freight"));
+		Assertions.assertFalse(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey(null));
 	}
 
 	@Test
@@ -218,14 +229,35 @@ import org.matsim.testcases.MatsimTestUtils;
 
 		Assertions.assertNotSame(freightParams, defaultParams);
 		Assertions.assertSame(defaultParams,
-			scoringConfigGroup.getScoringParametersPerSubpopulation().get(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
 		Assertions.assertSame(freightParams,
-			scoringConfigGroup.getScoringParametersPerSubpopulation().get("freight"));
+			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get("freight"));
+		Assertions.assertFalse(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
 		Assertions.assertEquals(4., scoringConfigGroup.getMarginalUtilityOfMoney(), 1e-7);
 		Assertions.assertEquals(23.,
 			scoringConfigGroup.getModeParams().get("truck").getConstant(), 1e-7);
 		Assertions.assertEquals(freightActivityParams.getTypicalDuration(),
 			scoringConfigGroup.getActivityParams("freightInteraction").getTypicalDuration());
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getModeParamsForSubpopulation(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getActivityParamsForSubpopulation(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getMarginalUtilityOfMoney(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+
+		scoringConfigGroup.setDefaultMarginalUtilityOfMoney(5.);
+		scoringConfigGroup.setDefaultMarginalUtlOfWaiting_utils_hr(-2.);
+		scoringConfigGroup.setDefaultMarginalUtlOfWaitingPt_utils_hr(-3.);
+
+		Assertions.assertEquals(5., scoringConfigGroup.getMarginalUtilityOfMoney(), 1e-7);
+		Assertions.assertEquals(4., scoringConfigGroup.getMarginalUtilityOfMoney("freight"), 1e-7);
+		Assertions.assertEquals(-2., scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr(), 1e-7);
+		Assertions.assertEquals(0., scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr("freight"), 1e-7);
+		Assertions.assertEquals(-3., scoringConfigGroup.getDefaultMarginalUtlOfWaitingPt_utils_hr(), 1e-7);
 
 		truckModeParams.setConstant(42.);
 
