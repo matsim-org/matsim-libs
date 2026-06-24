@@ -415,22 +415,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log(lvl, "</module>");
 		}
 
-		for (String subpop : subPopulationsWithScoringParameters) {
-			for (ModeParams params : config.scoring().getModeParamsForSubpopulation(subpop).values()) {
-				if (config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng() == CheckingOfMarginalUtilityOfTravellng.allZero) {
-					if (params.getMarginalUtilityOfTraveling() != 0. && !params.getMode().equals(TransportMode.ride) && !params.getMode().equals(
-						TransportMode.bike)) {
-						log.log(lvl,
-							"You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
-								+ ". VSP standard is to set this to zero.  Please document carefully why you are using a value different from zero, e.g. by showing distance distributions.");
-					}
-				}
-				if (params.getMode().equals(TransportMode.walk) && params.getConstant() != 0.) {
-					problem = true;
-					log.log(lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
-						+ ".  Values different from zero cause problems here because the ASC is also used for access/egress modes");
-				}
-			}
+		for (ScoringConfigGroup.ScoringParameterSet scoringParameterSet : scoringParameterSets) {
+			problem = checkModeParameterSet(config, lvl, problem, scoringParameterSet.getModeParams().values());
 		}
 		// added jun'25:
 		if (!config.scoring().isWriteExperiencedPlans()) {
@@ -484,73 +470,42 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 
-		if (config.scoring().getModes().get( car ) != null && config.scoring().getModes().get( car ).getMonetaryDistanceRate() > 0) {
-			problem = true;
-		}
-		final ModeParams modeParamsPt = config.scoring().getModes().get( pt );
-		if (modeParamsPt != null && modeParamsPt.getMonetaryDistanceRate() > 0) {
-			problem = true;
-			System.out.flush();
-			log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here.");
-		}
-		if (config.scoring().getMarginalUtilityOfMoney() < 0.) {
-			problem = true;
-			System.out.flush();
-			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. ");
-			if (params.getMode().equals(TransportMode.pt) && params.getMonetaryDistanceRate() > 0) {
-				problem = true;
-				System.out.flush();
-				log.error("found monetary distance rate pt > 0 in {} scoring parameters. You probably want a value < 0 here.", contextLabel);
-			}
-		}
-
 		if (marginalUtilityOfMoney < 0.) {
 			problem = true;
 			System.out.flush();
 			log.error("found marginal utility of money < 0 in {} scoring parameters. You almost certainly want a value > 0 here.", contextLabel);
 		}
 
-		// added apr'21:
-		for (Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> entry : config.scoring().getScoringParametersPerSubpopulation().entrySet()) {
-			for (ActivityParams activityParam : entry.getValue().getActivityParams()) {
-				if (activityParam.getMinimalDuration().isDefined()) {
-					log.log(lvl, "Vsp default is to not define minimal duration.  Activity type=" + activityParam.getActivityType() + "; subpopulation=" + entry.getKey());
+		return problem;
+	}
+
+	private static String getContextLabel(ScoringConfigGroup.ScoringParameterSet scoringParameterSet) {
+		return scoringParameterSet.getSubpopulation() == null ? "null/default" : scoringParameterSet.getSubpopulation();
+	}
+
+	private static boolean checkModeParameterSet(Config config, Level lvl, boolean problem, Collection<ModeParams> modeParams) {
+		for (ModeParams params : modeParams) {
+			CheckingOfMarginalUtilityOfTravellng checking = config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng();
+			if (checking == CheckingOfMarginalUtilityOfTravellng.allZero) {
+				if (params.getMarginalUtilityOfTraveling() != 0. && !params.getMode().equals(ride) && !params.getMode().equals(bike)) {
+					log.log(lvl,
+						"You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
+							+ ". VSP standard is to set this to zero.  Please document carefully why you are using a value different from zero, e.g. by showing distance distributions.");
+				}
+			} else if (checking == CheckingOfMarginalUtilityOfTravellng.allZeroExceptBikeAndRide) {
+				if (!params.getMode().equals(bike) && !params.getMode().equals(ride) && params.getMarginalUtilityOfTraveling() != 0.) {
+					log.log(lvl,
+						"You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
+							+ ". Please document carefully why you are using a value different from zero, e.g. by showing distance distributions. " +
+							"Then use vspConfig#setCheckingOfMarginalUtilityOfTravellng=" + CheckingOfMarginalUtilityOfTravellng.allZeroExceptBikeAndRide.name()
+							+ " if possible, and " + CheckingOfMarginalUtilityOfTravellng.none.name() + " only if really necessary.");
 				}
 			}
-		}
-
-		// added may'23
-		for( ScoringConfigGroup.ScoringParameterSet scoringParams : config.scoring().getScoringParametersPerSubpopulation().values() ){
-			for( ModeParams params : scoringParams.getModes().values() ){
-				switch( config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng() ){
-					case allZeroExceptBikeAndRide -> {
-
-						if( params.getMode().equals( bike ) || params.getMode().equals( ride ) ){
-							// do nothing
-						} else{
-							if( params.getMarginalUtilityOfTraveling() != 0. ){
-								log.log( lvl,
-									"You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
-										+ ". Please document carefully why you are using a value different from zero, e.g. by showing distance distributions. " +
-										"Then use vspConfig#setCheckingOfMarginalUtilityOfTravellng=" + CheckingOfMarginalUtilityOfTravellng.allZeroExceptBikeAndRide.name()
-										+ " if possible, and " + CheckingOfMarginalUtilityOfTravellng.none.name() + " only if really necessary." );
-							}
-						}
-
-					}
-					case null, default -> {
-					}
-				}
-				if( params.getMode().equals( walk ) && params.getConstant() != 0. ){
-					problem = true;
-					log.log( lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
-									  + ".  Values different from zero cause problems here because the ASC is also used for access/egress modes" );
-				}
+			if( params.getMode().equals( walk ) && params.getConstant() != 0. ){
+				problem = true;
+				log.log( lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
+					+ ".  Values different from zero cause problems here because the ASC is also used for access/egress modes" );
 			}
-		}
-		// added jun'25:
-		if (!config.scoring().isWriteExperiencedPlans()) {
-			log.log(lvl, "You are not writing experienced plans.  Vsp default is to do so.");
 		}
 		return problem;
 	}
