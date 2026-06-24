@@ -584,7 +584,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * Sets the PT waiting utility on the default scoring parameters.
 	 */
 	public void setDefaultMarginalUtlOfWaitingPt_utils_hr(double val) {
-		getScoringParameters(null).setMarginalUtlOfWaitingPt_utils_hr(val);
+		getDefaultScoringParameterSet().setMarginalUtlOfWaitingPt_utils_hr(val);
 	}
 
 	/**
@@ -966,6 +966,10 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public double getMarginalUtilityOfMoney() {
+		return getDefaultMarginalUtilityOfMoney();
+	}
+
+	public double getDefaultMarginalUtilityOfMoney() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getMarginalUtilityOfMoney();
 		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
@@ -976,14 +980,23 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	public double getMarginalUtilityOfMoney(String subpopulation) {
-		if (getScoringParameters(subpopulation) != null)
-			return getScoringParameters(subpopulation).getMarginalUtilityOfMoney();
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet != null)
+			return scoringParameterSet.getMarginalUtilityOfMoney();
 		else
 			throw new RuntimeException("MarginalUtilityOfMoney for subpopulation " + subpopulation + " is not defined or the scoringParams for subpopulation is not defined");
 	}
 
+	public void setDefaultMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+		getDefaultScoringParameterSet().setMarginalUtilityOfMoney(marginalUtilityOfMoney);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultMarginalUtilityOfMoney(double)} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
-		getScoringParameters(null).setMarginalUtilityOfMoney(marginalUtilityOfMoney);
+		setDefaultMarginalUtilityOfMoney(marginalUtilityOfMoney);
 	}
 
 	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
@@ -1020,6 +1033,10 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
 	public double getMarginalUtlOfWaiting_utils_hr() {
+		return getDefaultMarginalUtlOfWaiting_utils_hr();
+	}
+
+	public double getDefaultMarginalUtlOfWaiting_utils_hr() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getMarginalUtlOfWaiting_utils_hr();
 		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
@@ -1030,15 +1047,32 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	public double getMarginalUtlOfWaiting_utils_hr(String subpopulation) {
-		if (getScoringParameters(subpopulation) != null)
-			return getScoringParameters(subpopulation).getMarginalUtlOfWaiting_utils_hr();
 		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet != null)
+			return scoringParameterSet.getMarginalUtlOfWaiting_utils_hr();
 		else
 			throw new RuntimeException("MarginalUtlOfWaiting_utils_hr for subpopulation " + subpopulation + " is not defined");
 	}
 
+	public void setDefaultMarginalUtlOfWaiting_utils_hr(double waiting) {
+		getDefaultScoringParameterSet().setMarginalUtlOfWaiting_utils_hr(waiting);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultMarginalUtlOfWaiting_utils_hr(double)} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setMarginalUtlOfWaiting_utils_hr(double waiting) {
-		getScoringParameters(null).setMarginalUtlOfWaiting_utils_hr(waiting);
+		setDefaultMarginalUtlOfWaiting_utils_hr(waiting);
+	}
+
+	private ScoringParameterSet getDefaultScoringParameterSet() {
+		if (getScoringParameters(null) != null)
+			return getScoringParameters(null);
+		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
+			return getScoringParameters(DEFAULT_SUBPOPULATION);
+		else
+			throw new RuntimeException("Default subpopulation is not defined");
 	}
 
 	public void setFractionOfIterationsToStartScoreMSA(Double val) {
