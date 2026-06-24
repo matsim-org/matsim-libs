@@ -25,7 +25,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.gbl.ConsoleFonts;
+//import org.matsim.core.gbl.ConsoleFonts;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -381,15 +381,19 @@ class AgentWiseComparisonKNUtils{
 			final StringBuilder score_cmt = new StringBuilder( "is the overall benefit (potentially negative). This has the following contributions:" );
 			final StringBuilder weighted_ttime_cmt = new StringBuilder( "... ... is the travel time benefit." );
 			final StringBuilder weighted_money_cmt = new StringBuilder( "... is the monetary benefit (if in score space, then re-weighted by indiv. mUoM)." );
-			final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC (= unobserved (travel)) benefits." + ConsoleFonts.RESET );
+//			final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC (= unobserved (travel)) benefits." + ConsoleFonts.RESET );
+			final StringBuilder asc_cmt = new StringBuilder( "... ... are the ASC (= unobserved (travel)) benefits." );
 			final StringBuilder u_trav_direct_cmt = new StringBuilder( "... ... is the direct travel score benefits (=less bike, less ride)." );
 			final StringBuilder u_lineswitches_cmt = new StringBuilder( "... ... is the line switching benefit." );
 			final StringBuilder sum_cmt = new StringBuilder( "is the sum of these contributions." );
 			final StringBuilder acts_score_cmt = new StringBuilder( "... is the activities score (= pure time) benefit." );
-			final StringBuilder alt_sum_cmt = new StringBuilder( "is the sum of these contributions." + ConsoleFonts.YELLOW);
-			final StringBuilder matsim_score_cmt = new StringBuilder( "is the matsim score diff from the output population" + ConsoleFonts.RESET );
+//			final StringBuilder alt_sum_cmt = new StringBuilder( "is the sum of these contributions." + ConsoleFonts.YELLOW);
+			final StringBuilder alt_sum_cmt = new StringBuilder( "is the sum of these contributions.");
+//			final StringBuilder matsim_score_cmt = new StringBuilder( "is the matsim score diff from the output population" + ConsoleFonts.RESET );
+			final StringBuilder matsim_score_cmt = new StringBuilder( "is the matsim score diff from the output population" );
 //		final StringBuilder non_monetary_cmt = new StringBuilder("... are the non-monetary benefits.  This has the following contributions:");
-			final StringBuilder u_trav_direct_all_cmt = new StringBuilder( "... are the direct travel benefits.  This has the following contributions:" + ConsoleFonts.YELLOW );
+//			final StringBuilder u_trav_direct_all_cmt = new StringBuilder( "... are the direct travel benefits.  This has the following contributions:" + ConsoleFonts.YELLOW );
+			final StringBuilder u_trav_direct_all_cmt = new StringBuilder( "... are the direct travel benefits.  This has the following contributions:" );
 
 			// "\033[1m" prints in bold, "\033[0m" sets back to normal .  I had colors in the unotrans code.
 
@@ -444,9 +448,11 @@ class AgentWiseComparisonKNUtils{
 
 			System.out.println();
 			if ( isMonetized==IsMonetized.TRUE ){
-				log.info( ConsoleFonts.BOLD + msg + "; in money space:" + ConsoleFonts.RESET );
+//				log.info( ConsoleFonts.BOLD + msg + "; in money space:" + ConsoleFonts.RESET );
+				log.info( msg + "; in money space:" );
 			} else {
-				log.info( ConsoleFonts.BOLD + msg + "; in score space:" + ConsoleFonts.RESET );
+//				log.info( ConsoleFonts.BOLD + msg + "; in score space:" + ConsoleFonts.RESET );
+				log.info( msg + "; in score space:" );
 			}
 			log.info( inputPath );
 			log.info( "Popsize={} rescaled to 100% by multiplying with {}; isMonetized={}", deltaTable.rowCount(), factor, isMonetized );
