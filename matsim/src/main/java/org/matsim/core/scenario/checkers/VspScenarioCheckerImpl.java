@@ -37,9 +37,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.facilities.ActivityFacility;
 
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
