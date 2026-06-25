@@ -27,6 +27,10 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	private Set<String> packages = new HashSet<>();
 
 	@Parameter
+	@Comment("base path to generate difference plots/dashboards.")
+	private String path;
+
+	@Parameter
 	@Comment("Set of simple class names or fully qualified class names of dashboards to exclude")
 	private Set<String> exclude = new HashSet<>();
 
@@ -145,6 +149,15 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
 	public void setSampleSize(Double sampleSize) {
 		this.sampleSize = sampleSize;
+	}
+
+	// add getter and setter for base path, which triggers creation of difference dashboards
+	public String getBasePath() {
+		return path;
+	}
+
+	public void setBasePath(String path) {
+		this.path = path;
 	}
 
 	/**
