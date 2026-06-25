@@ -199,7 +199,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			throw new RuntimeException("Please use monetaryDistanceRate (without `cost').  Even better, use config v2, "
 				+ "mode-parameters (see output of any recent run), and mode-specific monetary " + "distance rate.");
 		} else if (WAITING_PT.equals(key)) {
-			setMarginalUtlOfWaitingPt_utils_hr(Double.parseDouble(value));
+			setDefaultMarginalUtlOfWaitingPt_utils_hr(Double.parseDouble(value));
 		}
 
 		// backward compatibility: underscored
@@ -463,12 +463,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * Returns all activity parameter sets of the default scoring parameters.
 	 */
 	public Collection<ActivityParams> getDefaultActivityParams() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getActivityParams();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getActivityParams();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
+		return getDefaultScoringParameterSet().getActivityParams();
 	}
 
 	/**
@@ -482,12 +477,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * Returns all mode parameters of the default/root scoring parameters.
 	 */
 	public Map<String, ModeParams> getDefaultModeParams() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getModeParams();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getModeParams();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
+		return getDefaultScoringParameterSet().getModeParams();
 	}
 
 	/**
@@ -551,13 +541,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * Returns the PT waiting utility of the default/root scoring parameters.
 	 */
 	public double getDefaultMarginalUtlOfWaitingPt_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getMarginalUtlOfWaitingPt_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getMarginalUtlOfWaitingPt_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultScoringParameterSet().getMarginalUtlOfWaitingPt_utils_hr();
 	}
 
 	/**
@@ -602,12 +586,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * the full collection of configured activity parameter sets.
 	 */
 	public ActivityParams getDefaultActivityParams(final String actType) {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getActivityParams(actType);
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getActivityParams(actType);
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
+		return getDefaultScoringParameterSet().getActivityParams(actType);
 	}
 
 	/**
@@ -920,63 +899,104 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		delegate.setPathSizeLogitBeta(beta);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * Returns the late arrival utility of the default/root scoring parameters.
+	 */
+	public double getDefaultLateArrival_utils_hr() {
+		return getDefaultScoringParameterSet().getLateArrival_utils_hr();
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultLateArrival_utils_hr()} for default scoring parameters or
+	 * {@link ScoringParameterSet#getLateArrival_utils_hr()} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getLateArrival_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getLateArrival_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getLateArrival_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
+		return getDefaultLateArrival_utils_hr();
 	}
 
+	public void setDefaultLateArrival_utils_hr(double lateArrival) {
+		getDefaultScoringParameterSet().setLateArrival_utils_hr(lateArrival);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultLateArrival_utils_hr(double)} for default scoring parameters or
+	 * {@link ScoringParameterSet#setLateArrival_utils_hr(double)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setLateArrival_utils_hr(double lateArrival) {
-		getScoringParameters(null).setLateArrival_utils_hr(lateArrival);
+		setDefaultLateArrival_utils_hr(lateArrival);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * Returns the early departure utility of the default/root scoring parameters.
+	 */
+	public double getDefaultEarlyDeparture_utils_hr() {
+		return getDefaultScoringParameterSet().getEarlyDeparture_utils_hr();
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultEarlyDeparture_utils_hr()} for default scoring parameters or
+	 * {@link ScoringParameterSet#getEarlyDeparture_utils_hr()} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getEarlyDeparture_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getEarlyDeparture_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getEarlyDeparture_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultEarlyDeparture_utils_hr();
 	}
 
+	public void setDefaultEarlyDeparture_utils_hr(double earlyDeparture) {
+		getDefaultScoringParameterSet().setEarlyDeparture_utils_hr(earlyDeparture);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultEarlyDeparture_utils_hr(double)} for default scoring parameters or
+	 * {@link ScoringParameterSet#setEarlyDeparture_utils_hr(double)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setEarlyDeparture_utils_hr(double earlyDeparture) {
-		getScoringParameters(null).setEarlyDeparture_utils_hr(earlyDeparture);
+		setDefaultEarlyDeparture_utils_hr(earlyDeparture);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * Returns the performing utility of the default/root scoring parameters.
+	 */
+	public double getDefaultPerforming_utils_hr() {
+		return getDefaultScoringParameterSet().getPerforming_utils_hr();
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultPerforming_utils_hr()} for default scoring parameters or
+	 * {@link ScoringParameterSet#getPerforming_utils_hr()} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getPerforming_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getPerforming_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getPerforming_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultPerforming_utils_hr();
 	}
 
+	public void setDefaultPerforming_utils_hr(double performing) {
+		getDefaultScoringParameterSet().setPerforming_utils_hr(performing);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultPerforming_utils_hr(double)} for default scoring parameters or
+	 * {@link ScoringParameterSet#setPerforming_utils_hr(double)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setPerforming_utils_hr(double performing) {
-		getScoringParameters(null).setPerforming_utils_hr(performing);
+		setDefaultPerforming_utils_hr(performing);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * @deprecated Use {@link #getDefaultMarginalUtilityOfMoney()} for default scoring parameters or
+	 * {@link #getMarginalUtilityOfMoney(String)} for explicit subpopulation scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getMarginalUtilityOfMoney() {
 		return getDefaultMarginalUtilityOfMoney();
 	}
 
 	public double getDefaultMarginalUtilityOfMoney() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getMarginalUtilityOfMoney();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getMarginalUtilityOfMoney();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultScoringParameterSet().getMarginalUtilityOfMoney();
 	}
 
 	public double getMarginalUtilityOfMoney(String subpopulation) {
@@ -999,25 +1019,42 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		setDefaultMarginalUtilityOfMoney(marginalUtilityOfMoney);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
-	public double getUtilityOfLineSwitch() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getUtilityOfLineSwitch();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getUtilityOfLineSwitch();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+	/**
+	 * Returns the line switch utility of the default/root scoring parameters.
+	 */
+	public double getDefaultUtilityOfLineSwitch() {
+		return getDefaultScoringParameterSet().getUtilityOfLineSwitch();
 	}
 
+	/**
+	 * @deprecated Use {@link #getDefaultUtilityOfLineSwitch()} for default scoring parameters or
+	 * {@link ScoringParameterSet#getUtilityOfLineSwitch()} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-02")
+	public double getUtilityOfLineSwitch() {
+		return getDefaultUtilityOfLineSwitch();
+	}
+
+	public void setDefaultUtilityOfLineSwitch(double utilityOfLineSwitch) {
+		getDefaultScoringParameterSet().setUtilityOfLineSwitch(utilityOfLineSwitch);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultUtilityOfLineSwitch(double)} for default scoring parameters or
+	 * {@link ScoringParameterSet#setUtilityOfLineSwitch(double)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
-		getScoringParameters(null).setUtilityOfLineSwitch(utilityOfLineSwitch);
+		setDefaultUtilityOfLineSwitch(utilityOfLineSwitch);
 	}
 
 	public boolean isUsingOldScoringBelowZeroUtilityDuration() {
 		return delegate.isUsingOldScoringBelowZeroUtilityDuration();
 	}
 
+	/**
+	 * @deprecated This switch exists only for backwards compatibility with old below-zero utility duration behavior.
+	 */
 	@Deprecated
 	public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
 		delegate.setUsingOldScoringBelowZeroUtilityDuration(usingOldScoringBelowZeroUtilityDuration);
@@ -1031,19 +1068,17 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		delegate.setWriteExperiencedPlans(writeExperiencedPlans);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * @deprecated Use {@link #getDefaultMarginalUtlOfWaiting_utils_hr()} for default scoring parameters or
+	 * {@link #getMarginalUtlOfWaiting_utils_hr(String)} for explicit subpopulation scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getMarginalUtlOfWaiting_utils_hr() {
 		return getDefaultMarginalUtlOfWaiting_utils_hr();
 	}
 
 	public double getDefaultMarginalUtlOfWaiting_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getMarginalUtlOfWaiting_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getMarginalUtlOfWaiting_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultScoringParameterSet().getMarginalUtlOfWaiting_utils_hr();
 	}
 
 	public double getMarginalUtlOfWaiting_utils_hr(String subpopulation) {

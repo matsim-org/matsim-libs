@@ -233,7 +233,7 @@ import org.matsim.testcases.MatsimTestUtils;
 		Assertions.assertSame(freightParams,
 			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get("freight"));
 		Assertions.assertFalse(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
-		Assertions.assertEquals(4., scoringConfigGroup.getMarginalUtilityOfMoney(), 1e-7);
+		Assertions.assertEquals(4., scoringConfigGroup.getDefaultMarginalUtilityOfMoney(), 1e-7);
 		Assertions.assertEquals(23.,
 			scoringConfigGroup.getModeParams().get("truck").getConstant(), 1e-7);
 		Assertions.assertEquals(freightActivityParams.getTypicalDuration(),
@@ -252,12 +252,24 @@ import org.matsim.testcases.MatsimTestUtils;
 		scoringConfigGroup.setDefaultMarginalUtilityOfMoney(5.);
 		scoringConfigGroup.setDefaultMarginalUtlOfWaiting_utils_hr(-2.);
 		scoringConfigGroup.setDefaultMarginalUtlOfWaitingPt_utils_hr(-3.);
+		scoringConfigGroup.setDefaultLateArrival_utils_hr(-4.);
+		scoringConfigGroup.setDefaultEarlyDeparture_utils_hr(-5.);
+		scoringConfigGroup.setDefaultPerforming_utils_hr(6.);
+		scoringConfigGroup.setDefaultUtilityOfLineSwitch(-7.);
 
-		Assertions.assertEquals(5., scoringConfigGroup.getMarginalUtilityOfMoney(), 1e-7);
+		Assertions.assertEquals(5., scoringConfigGroup.getDefaultMarginalUtilityOfMoney(), 1e-7);
 		Assertions.assertEquals(4., scoringConfigGroup.getMarginalUtilityOfMoney("freight"), 1e-7);
-		Assertions.assertEquals(-2., scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr(), 1e-7);
+		Assertions.assertEquals(-2., scoringConfigGroup.getDefaultMarginalUtlOfWaiting_utils_hr(), 1e-7);
 		Assertions.assertEquals(0., scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr("freight"), 1e-7);
 		Assertions.assertEquals(-3., scoringConfigGroup.getDefaultMarginalUtlOfWaitingPt_utils_hr(), 1e-7);
+		Assertions.assertEquals(-4., scoringConfigGroup.getDefaultLateArrival_utils_hr(), 1e-7);
+		Assertions.assertEquals(-18., freightParams.getLateArrival_utils_hr(), 1e-7);
+		Assertions.assertEquals(-5., scoringConfigGroup.getDefaultEarlyDeparture_utils_hr(), 1e-7);
+		Assertions.assertEquals(-0., freightParams.getEarlyDeparture_utils_hr(), 1e-7);
+		Assertions.assertEquals(6., scoringConfigGroup.getDefaultPerforming_utils_hr(), 1e-7);
+		Assertions.assertEquals(6., freightParams.getPerforming_utils_hr(), 1e-7);
+		Assertions.assertEquals(-7., scoringConfigGroup.getDefaultUtilityOfLineSwitch(), 1e-7);
+		Assertions.assertEquals(-1., freightParams.getUtilityOfLineSwitch(), 1e-7);
 
 		truckModeParams.setConstant(42.);
 
@@ -349,13 +361,13 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong constantWalk "+msg);
 		Assertions.assertEquals(
-				initialGroup.getLateArrival_utils_hr(),
-				inputConfigGroup.getLateArrival_utils_hr(),
+				initialGroup.getDefaultLateArrival_utils_hr(),
+				inputConfigGroup.getDefaultLateArrival_utils_hr(),
 				1e-7,
 				"wrong lateArrival_utils_hr "+msg );
 		Assertions.assertEquals(
-				initialGroup.getEarlyDeparture_utils_hr(),
-				inputConfigGroup.getEarlyDeparture_utils_hr(),
+				initialGroup.getDefaultEarlyDeparture_utils_hr(),
+				inputConfigGroup.getDefaultEarlyDeparture_utils_hr(),
 				1e-7,
 				"wrong earlyDeparture_utils_hr "+msg );
 		Assertions.assertEquals(
@@ -364,8 +376,8 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong learningRate "+msg );
 		Assertions.assertEquals(
-				initialGroup.getMarginalUtilityOfMoney(),
-				inputConfigGroup.getMarginalUtilityOfMoney() ,
+				initialGroup.getDefaultMarginalUtilityOfMoney(),
+				inputConfigGroup.getDefaultMarginalUtilityOfMoney() ,
 				1e-7,
 				"wrong marginalUtilityOfMoney "+msg);
 		Assertions.assertEquals(
@@ -379,13 +391,13 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong marginalUtlOfDistanceWalk "+msg);
 		Assertions.assertEquals(
-				initialGroup.getMarginalUtlOfWaiting_utils_hr(),
-				inputConfigGroup.getMarginalUtlOfWaiting_utils_hr(),
+				initialGroup.getDefaultMarginalUtlOfWaiting_utils_hr(),
+				inputConfigGroup.getDefaultMarginalUtlOfWaiting_utils_hr(),
 				1e-7,
 				"wrong marginalUtlOfWaiting_utils_hr "+msg );
 		Assertions.assertEquals(
-				initialGroup.getMarginalUtlOfWaitingPt_utils_hr(),
-				inputConfigGroup.getMarginalUtlOfWaitingPt_utils_hr(),
+				initialGroup.getDefaultMarginalUtlOfWaitingPt_utils_hr(),
+				inputConfigGroup.getDefaultMarginalUtlOfWaitingPt_utils_hr(),
 				1e-7,
 				"wrong marginalUtlOfWaitingPt_utils_hr "+msg );
 		Assertions.assertEquals(
@@ -404,8 +416,8 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong pathSizeLogitBeta "+msg );
 		Assertions.assertEquals(
-				initialGroup.getPerforming_utils_hr(),
-				inputConfigGroup.getPerforming_utils_hr(),
+				initialGroup.getDefaultPerforming_utils_hr(),
+				inputConfigGroup.getDefaultPerforming_utils_hr(),
 				1e-7,
 				"wrong performing_utils_hr "+msg );
 		Assertions.assertEquals(
@@ -434,8 +446,8 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong travelingWalk_utils_hr "+msg);
 		Assertions.assertEquals(
-				initialGroup.getUtilityOfLineSwitch(),
-				inputConfigGroup.getUtilityOfLineSwitch(),
+				initialGroup.getDefaultUtilityOfLineSwitch(),
+				inputConfigGroup.getDefaultUtilityOfLineSwitch(),
 				1e-7,
 				"wrong utilityOfLineSwitch "+msg );
 
@@ -557,24 +569,24 @@ import org.matsim.testcases.MatsimTestUtils;
 		group.getModeParams().get(TransportMode.other).setConstant((double) 345);
 		group.getModeParams().get(TransportMode.pt).setConstant((double) 983);
 		group.getModeParams().get(TransportMode.walk).setConstant((double) 89);
-		group.setLateArrival_utils_hr( 345 );
-		group.setEarlyDeparture_utils_hr( 5 );
+		group.setDefaultLateArrival_utils_hr( 345 );
+		group.setDefaultEarlyDeparture_utils_hr( 5 );
 		group.setLearningRate( 98 );
-		group.setMarginalUtilityOfMoney( 9 );
+		group.setDefaultMarginalUtilityOfMoney( 9 );
 		group.getModeParams().get(TransportMode.other).setMarginalUtilityOfDistance((double) 23);
 		group.getModeParams().get(TransportMode.walk).setMarginalUtilityOfDistance((double) 8675);
-		group.setMarginalUtlOfWaiting_utils_hr( 65798 );
-		group.setMarginalUtlOfWaitingPt_utils_hr( 9867 );
+		group.setDefaultMarginalUtlOfWaiting_utils_hr( 65798 );
+		group.setDefaultMarginalUtlOfWaitingPt_utils_hr( 9867 );
 		group.getModeParams().get(TransportMode.car).setMonetaryDistanceRate((double) 240358);
 		group.getModeParams().get(TransportMode.pt).setMonetaryDistanceRate((double) 9835);
 		group.setPathSizeLogitBeta( 8 );
-		group.setPerforming_utils_hr( 678 );
+		group.setDefaultPerforming_utils_hr( 678 );
 		group.getModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 246);
 		group.getModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling((double) 968);
 		group.getModeParams().get(TransportMode.other).setMarginalUtilityOfTraveling((double) 206);
 		group.getModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 957);
 		group.getModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 983455);
-		group.setUtilityOfLineSwitch( 396 );
+		group.setDefaultUtilityOfLineSwitch( 396 );
 
 		final Random random = new Random( 925 );
 		for ( int i=0; i < 10; i++ ) {
