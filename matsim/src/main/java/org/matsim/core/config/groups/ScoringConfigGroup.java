@@ -189,7 +189,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		"modern hierarchical format; your output_config.xml " +
 		"will be in the correct version; the old version will fail eventually, since we want to reduce the " +
 		"workload on this backwards compatibility (look into " +
-		"PlanCalcScoreConfigGroup or PlanCalcRouteConfigGroup if you want to know what we mean).";
+		"ScoringConfigGroup or RoutingConfigGroup if you want to know what we mean).";
 
 	@Override
 	public void addParam(final String key, final String value) {
@@ -831,10 +831,9 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		this.delegate.setLocked();
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// CLASSES
-
-	/// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {
 		// in normal pgm execution, code will presumably lock instance of PlanCalcScoreConfigGroup, but not instance of
 		// ActivityParams. I will try to pass the locked setting through the getters. kai, jun'15
