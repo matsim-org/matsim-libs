@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -90,7 +91,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	public ScoringConfigGroup() {
 		super(GROUP_NAME);
 
-		this.addScoringParameters(new ScoringParameterSet());
+		this.addScoringParameterSet(new ScoringParameterSet());
 
 		// what follows now has weird consequences:
 		// * the material is added to the ScoringParameterSet of the default subpopulation
@@ -198,7 +199,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			throw new RuntimeException("Please use monetaryDistanceRate (without `cost').  Even better, use config v2, "
 				+ "mode-parameters (see output of any recent run), and mode-specific monetary " + "distance rate.");
 		} else if (WAITING_PT.equals(key)) {
-			setMarginalUtlOfWaitingPt_utils_hr(Double.parseDouble(value));
+			setDefaultMarginalUtlOfWaitingPt_utils_hr(Double.parseDouble(value));
 		}
 
 		// backward compatibility: underscored
@@ -287,65 +288,65 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		else if ("traveling".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingPt".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingWalk".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingOther".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.other).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.other).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingBike".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		}
 
 		// backward compatibility: "typed" util of distance
 		else if ("marginalUtlOfDistanceCar".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.car).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.car).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistancePt".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.pt).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistanceWalk".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.walk).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.walk).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistanceOther".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModes().get(TransportMode.other).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getModeParams().get(TransportMode.other).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		}
 
 		// backward compatibility: "typed" constants
 		else if ("constantCar".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModes().get(TransportMode.car).setConstant(Double.parseDouble(value));
+			getModeParams().get(TransportMode.car).setConstant(Double.parseDouble(value));
 		} else if ("constantWalk".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModes().get(TransportMode.walk).setConstant(Double.parseDouble(value));
+			getModeParams().get(TransportMode.walk).setConstant(Double.parseDouble(value));
 		} else if ("constantOther".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModes().get(TransportMode.other).setConstant(Double.parseDouble(value));
+			getModeParams().get(TransportMode.other).setConstant(Double.parseDouble(value));
 		} else if ("constantPt".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModes().get(TransportMode.pt).setConstant(Double.parseDouble(value));
+			getModeParams().get(TransportMode.pt).setConstant(Double.parseDouble(value));
 		} else if ("constantBike".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModes().get(TransportMode.bike).setConstant(Double.parseDouble(value));
+			getModeParams().get(TransportMode.bike).setConstant(Double.parseDouble(value));
 		}
 
 		// old-fashioned scoring parameters: default subpopulation
@@ -438,7 +439,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			return getScoringParameters(null).getActivityParamsPerType().keySet();
 		else {
 			Set<String> activities = new HashSet<>();
-			getScoringParametersPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
+			getAllScoringParameterSetsPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
 			return activities;
 		}
 	}
@@ -449,37 +450,57 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 */
 	public Collection<String> getAllModes() {
 		if (getScoringParameters(null) != null) {
-			return getScoringParameters(null).getModes().keySet();
+			return getScoringParameters(null).getModeParams().keySet();
 
 		} else {
 			Set<String> modes = new HashSet<>();
-			getScoringParametersPerSubpopulation().values().forEach(item -> modes.addAll(item.getModes().keySet()));
+			getAllScoringParameterSetsPerSubpopulation().values().forEach(item -> modes.addAll(item.getModeParams().keySet()));
 			return modes;
 		}
 
 	}
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * Returns all activity parameter sets of the default scoring parameters.
+	 */
+	public Collection<ActivityParams> getDefaultActivityParams() {
+		return getDefaultScoringParameterSet().getActivityParams();
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultActivityParams()} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
 	public Collection<ActivityParams> getActivityParams() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getActivityParams();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getActivityParams();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
+		return getDefaultActivityParams();
+	}
+	/**
+	 * Returns all mode parameters of the default/root scoring parameters.
+	 */
+	public Map<String, ModeParams> getDefaultModeParams() {
+		return getDefaultScoringParameterSet().getModeParams();
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
-	public Map<String, ModeParams> getModes() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getModes();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getModes();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
+	/**
+	 * @deprecated Use {@link #getDefaultModeParams()} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
+	public Map<String, ModeParams> getModeParams() {
+		return getDefaultModeParams();
 	}
 
+	/**
+	 * Returns the mode parameters explicitly configured for the given subpopulation key.
+	 * In contrast to {@link #getScoringParameters(String)}, this method does not apply any fallback.
+	 */
+	public Map<String, ModeParams> getModeParamsForSubpopulation(String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet != null)
+			return scoringParameterSet.getModeParams();
+		else
+			throw new RuntimeException("Mode parameters for subpopulation " + subpopulation + " are not defined");
+	}
 
-	public Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
+	public Map<String, ScoringParameterSet> getAllScoringParameterSetsPerSubpopulation() {
 		@SuppressWarnings("unchecked") final Collection<ScoringParameterSet> parameters = (Collection<ScoringParameterSet>) getParameterSets(
 			ScoringParameterSet.SET_TYPE);
 		final Map<String, ScoringParameterSet> map = new LinkedHashMap<>();
@@ -494,51 +515,192 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		return map;
 	}
 
+	public Map<String, ScoringParameterSet> getExplicitScoringParameterSetsPerSubpopulation() {
+		final Map<String, ScoringParameterSet> map = new LinkedHashMap<>();
+
+		for (Map.Entry<String, ScoringParameterSet> entry : getAllScoringParameterSetsPerSubpopulation().entrySet()) {
+			if (entry.getKey() != null && !DEFAULT_SUBPOPULATION.equals(entry.getKey())) {
+				map.put(entry.getKey(), entry.getValue());
+			}
+		}
+		return map;
+	}
+
+	/**
+	 * @deprecated Use {@link #getAllScoringParameterSetsPerSubpopulation()} when default parameter sets should be included,
+	 * or {@link #getExplicitScoringParameterSetsPerSubpopulation()} when only real subpopulation parameter sets should be returned.
+	 */
+	@Deprecated(since = "2026-06")
+	public Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
+		return getAllScoringParameterSetsPerSubpopulation();
+	}
+
 	/* direct access */
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * Returns the PT waiting utility of the default/root scoring parameters.
+	 */
+	public double getDefaultMarginalUtlOfWaitingPt_utils_hr() {
+		return getDefaultScoringParameterSet().getMarginalUtlOfWaitingPt_utils_hr();
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultMarginalUtlOfWaitingPt_utils_hr()} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getMarginalUtlOfWaitingPt_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getMarginalUtlOfWaitingPt_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getMarginalUtlOfWaitingPt_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultMarginalUtlOfWaitingPt_utils_hr();
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * Returns the activity parameters explicitly configured for the given subpopulation key.
+	 * In contrast to {@link #getScoringParameters(String)}, this method does not apply any fallback.
+	 */
+	public Collection<ActivityParams> getActivityParamsForSubpopulation(String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet != null)
+			return scoringParameterSet.getActivityParams();
+		else
+			throw new RuntimeException("Activity parameters for subpopulation " + subpopulation + " are not defined");
+	}
+
+	/**
+	 * Sets the PT waiting utility on the default scoring parameters.
+	 */
+	public void setDefaultMarginalUtlOfWaitingPt_utils_hr(double val) {
+		getDefaultScoringParameterSet().setMarginalUtlOfWaitingPt_utils_hr(val);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultMarginalUtlOfWaitingPt_utils_hr(double)} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
 	public void setMarginalUtlOfWaitingPt_utils_hr(double val) {
-		getScoringParameters(null).setMarginalUtlOfWaitingPt_utils_hr(val);
+		setDefaultMarginalUtlOfWaitingPt_utils_hr(val);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+
+	/**
+	 * Returns the activity parameters for one activity type from the default scoring parameters.
+	 * This is the type-specific accessor and differs from {@link #getDefaultActivityParams()}, which returns
+	 * the full collection of configured activity parameter sets.
+	 */
+	public ActivityParams getDefaultActivityParams(final String actType) {
+		return getDefaultScoringParameterSet().getActivityParams(actType);
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultActivityParams(String)} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
 	public ActivityParams getActivityParams(final String actType) {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getActivityParams(actType);
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getActivityParams(actType);
+		return getDefaultActivityParams(actType);
+	}
+
+	/**
+	 * Returns the activity parameters for one activity type for the explicitly configured
+	 * scoring parameter set of the given subpopulation key.
+	 */
+	public ActivityParams getActivityParamsForSubpopulation(final String actType, String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet != null)
+			return scoringParameterSet.getActivityParams(actType);
 		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+			throw new RuntimeException("Activity parameters for subpopulation " + subpopulation + " are not defined");
 	}
 
+	/**
+	 * Looks up the scoring parameter set for the given subpopulation and falls back to the
+	 * default entry identified by {@code null}. This method is intentionally not using
+	 * {@link #DEFAULT_SUBPOPULATION} as an additional implicit fallback because config
+	 * management code relies on stable "exact-or-root" semantics.
+	 */
 	public ScoringParameterSet getScoringParameters(String subpopulation) {
-		final ScoringParameterSet params = getScoringParametersPerSubpopulation().get(subpopulation);
-		// If no config parameters defined for a specific subpopulation,
-		// use the ones of the "default" subpopulation
-		return params != null ? params : getScoringParametersPerSubpopulation().get(null);
+		final ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
+		return params != null ? params : getAllScoringParameterSetsPerSubpopulation().get(null);
 	}
 
+	/**
+	 * @return {@code true} if there is a default scoring parameter set (i.e. with key {@code null} or {@link #DEFAULT_SUBPOPULATION}), {@code false} otherwise.
+	 */
+	public boolean hasDefaultScoringParameters() {
+		if (getScoringParameters(null) != null)
+			return true;
+		else return getScoringParameters(DEFAULT_SUBPOPULATION) != null;
+	}
+
+	/**
+	 * Returns the explicitly configured scoring parameter set for the given subpopulation,
+	 * creating one if necessary.
+	 */
 	public ScoringParameterSet getOrCreateScoringParameters(String subpopulation) {
-		ScoringParameterSet params = getScoringParametersPerSubpopulation().get(subpopulation);
+		ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
 
 		if (params == null) {
 			params = new ScoringParameterSet(subpopulation);
-			this.addScoringParameters(params);
+			this.addScoringParameterSet(params);
 		}
 
 		return params;
+	}
+
+	/**
+	 * Sets the scoring parameters of an existing subpopulation as the default subpopulation.
+	 *
+	 * @param subpopulation the subpopulation whose scoring parameters should be used as default
+	 * @return the scoring parameters registered for {@link #DEFAULT_SUBPOPULATION}
+	 * @throws RuntimeException if no scoring parameters exist for the given subpopulation
+	 * @throws RuntimeException if scoring parameters for {@link #DEFAULT_SUBPOPULATION} already exist
+	 */
+	public ScoringParameterSet setScoringParametersAsDefaultSubpopulation(String subpopulation) {
+		final ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (params == null) {
+			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
+		}
+		return setScoringParametersAsDefaultSubpopulation(params);
+	}
+
+	/**
+	 * Sets the given scoring parameters as the default subpopulation.
+	 *
+	 * @param params the scoring parameters to use as default
+	 * @return the scoring parameters registered for {@link #DEFAULT_SUBPOPULATION}
+	 * @throws RuntimeException if scoring parameters for {@link #DEFAULT_SUBPOPULATION} already exist and {@code params} is not that default set
+	 */
+	public ScoringParameterSet setScoringParametersAsDefaultSubpopulation(ScoringParameterSet params) {
+		testForLocked();
+		if (DEFAULT_SUBPOPULATION.equals(params.getSubpopulation())) {
+			return params;
+		}
+		if (getAllScoringParameterSetsPerSubpopulation().containsKey(DEFAULT_SUBPOPULATION)) {
+			throw new RuntimeException("ScoringParams for default subpopulation are already defined");
+		}
+
+		final ScoringParameterSet defaultParams = copyScoringParameterSet(params, DEFAULT_SUBPOPULATION);
+		addScoringParameterSet(defaultParams);
+		return defaultParams;
+	}
+
+	private static ScoringParameterSet copyScoringParameterSet(ScoringParameterSet source, String subpopulation) {
+		final ScoringParameterSet copy = new ScoringParameterSet(subpopulation);
+
+		copy.lateArrival = source.lateArrival;
+		copy.earlyDeparture = source.earlyDeparture;
+		copy.performing = source.performing;
+		copy.waiting = source.waiting;
+		copy.marginalUtilityOfMoney = source.marginalUtilityOfMoney;
+		copy.utilityOfLineSwitch = source.utilityOfLineSwitch;
+		copy.waitingPt = source.waitingPt;
+
+		for (Collection<? extends ConfigGroup> sourceSets : source.getParameterSets().values()) {
+			for (ConfigGroup sourceSet : sourceSets) {
+				final ConfigGroup copySet = copy.createParameterSet(sourceSet.getName());
+				ConfigUtils.copyFromTo(sourceSet, copySet);
+				copy.addParameterSet(copySet);
+			}
+		}
+
+		return copy;
 	}
 
 	@Override
@@ -551,14 +713,14 @@ public final class ScoringConfigGroup extends ConfigGroup {
 				addModeParams((ModeParams) set);
 				break;
 			case ScoringParameterSet.SET_TYPE:
-				addScoringParameters((ScoringParameterSet) set);
+				addScoringParameterSet((ScoringParameterSet) set);
 				break;
 			default:
 				throw new IllegalArgumentException(set.getName());
 		}
 	}
 
-	private void addScoringParameters(final ScoringParameterSet params) {
+	private void addScoringParameterSet(final ScoringParameterSet params) {
 		final ScoringParameterSet previous = this.getScoringParameters(params.getSubpopulation());
 
 		if (previous != null) {
@@ -576,8 +738,24 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		getScoringParameters(null).addModeParams(params);
 	}
 
+	public void addModeParamsForSubpopulation(final ModeParams params, String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet == null) {
+			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
+		}
+		scoringParameterSet.addModeParams(params);
+	}
+
 	public void addActivityParams(final ActivityParams params) {
 		getScoringParameters(null).addActivityParams(params);
+	}
+
+	public void addActivityParamsForSubpopulation(final ActivityParams params, String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet == null) {
+			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
+		}
+		scoringParameterSet.addActivityParams(params);
 	}
 
 	public enum TypicalDurationScoreComputation {
@@ -620,8 +798,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			throw new RuntimeException(msg);
 		}
 
-		if (getScoringParametersPerSubpopulation().size() > 1) {
-			if (!getScoringParametersPerSubpopulation().containsKey(ScoringConfigGroup.DEFAULT_SUBPOPULATION)) {
+		if (getAllScoringParameterSetsPerSubpopulation().size() > 1) {
+			if (!getAllScoringParameterSetsPerSubpopulation().containsKey(ScoringConfigGroup.DEFAULT_SUBPOPULATION)) {
 				throw new RuntimeException("Using several subpopulations in " + ScoringConfigGroup.GROUP_NAME + " requires defining a \"" + ScoringConfigGroup.DEFAULT_SUBPOPULATION + " \" subpopulation."
 					+ " Otherwise, crashes can be expected.");
 			}
@@ -637,7 +815,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		// adding the interaction activities that result from access/egress routing. this is strictly speaking not a consistency
 		// check, but I don't know a better place where to add this. kai, jan'18
 
-		for (ScoringParameterSet scoringParameterSet : this.getScoringParametersPerSubpopulation().values()) {
+		for (ScoringParameterSet scoringParameterSet : this.getAllScoringParameterSetsPerSubpopulation().values()) {
 
 			for (String mode : config.routing().getNetworkModes()) {
 				createAndAddInteractionActivity(scoringParameterSet, mode);
@@ -646,20 +824,30 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			// There is, however, a test that checks if all network modes from planCalcRoute have
 			// interaction activities.  So we rather satisfy it than changing the test.  kai, jan'21
 
-			for (String mode : scoringParameterSet.getModes().keySet()) {
+			for (String mode : scoringParameterSet.getModeParams().keySet()) {
 				createAndAddInteractionActivity(scoringParameterSet, mode);
 			}
 		}
 //		}
-
-		for (ActivityParams params : this.getActivityParams()) {
-			if (params.isScoringThisActivityAtAll() && params.getTypicalDuration().isUndefined()) {
-				throw new RuntimeException("In activity type=" + params.getActivityType()
-					+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
-					+ "so rather aborting here.");
+		if (hasDefaultScoringParameters()) {
+			for (ActivityParams params : getDefaultActivityParams()) {
+				if (params.isScoringThisActivityAtAll() && params.getTypicalDuration().isUndefined()) {
+					throw new RuntimeException("In activity type=" + params.getActivityType()
+						+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
+						+ "so rather aborting here.");
+				}
 			}
 		}
-
+		this.getAllScoringParameterSetsPerSubpopulation().values()
+			.forEach(scoringParameterSet -> {
+				for (ActivityParams params : scoringParameterSet.getActivityParams()) {
+					if (params.isScoringThisActivityAtAll() && params.getTypicalDuration().isUndefined()) {
+						throw new RuntimeException("In activity type=" + params.getActivityType()
+							+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
+							+ "so rather aborting here.");
+					}
+				}
+			});
 	}
 
 	private static void createAndAddInteractionActivity(ScoringParameterSet scoringParameterSet, String mode) {
@@ -711,84 +899,162 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		delegate.setPathSizeLogitBeta(beta);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * Returns the late arrival utility of the default/root scoring parameters.
+	 */
+	public double getDefaultLateArrival_utils_hr() {
+		return getDefaultScoringParameterSet().getLateArrival_utils_hr();
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultLateArrival_utils_hr()} for default scoring parameters or
+	 * {@link ScoringParameterSet#getLateArrival_utils_hr()} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getLateArrival_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getLateArrival_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getLateArrival_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
+		return getDefaultLateArrival_utils_hr();
 	}
 
+	public void setDefaultLateArrival_utils_hr(double lateArrival) {
+		getDefaultScoringParameterSet().setLateArrival_utils_hr(lateArrival);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultLateArrival_utils_hr(double)} for default scoring parameters or
+	 * {@link ScoringParameterSet#setLateArrival_utils_hr(double)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setLateArrival_utils_hr(double lateArrival) {
-		getScoringParameters(null).setLateArrival_utils_hr(lateArrival);
+		setDefaultLateArrival_utils_hr(lateArrival);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * Returns the early departure utility of the default/root scoring parameters.
+	 */
+	public double getDefaultEarlyDeparture_utils_hr() {
+		return getDefaultScoringParameterSet().getEarlyDeparture_utils_hr();
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultEarlyDeparture_utils_hr()} for default scoring parameters or
+	 * {@link ScoringParameterSet#getEarlyDeparture_utils_hr()} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getEarlyDeparture_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getEarlyDeparture_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getEarlyDeparture_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultEarlyDeparture_utils_hr();
 	}
 
+	public void setDefaultEarlyDeparture_utils_hr(double earlyDeparture) {
+		getDefaultScoringParameterSet().setEarlyDeparture_utils_hr(earlyDeparture);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultEarlyDeparture_utils_hr(double)} for default scoring parameters or
+	 * {@link ScoringParameterSet#setEarlyDeparture_utils_hr(double)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setEarlyDeparture_utils_hr(double earlyDeparture) {
-		getScoringParameters(null).setEarlyDeparture_utils_hr(earlyDeparture);
+		setDefaultEarlyDeparture_utils_hr(earlyDeparture);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * Returns the performing utility of the default/root scoring parameters.
+	 */
+	public double getDefaultPerforming_utils_hr() {
+		return getDefaultScoringParameterSet().getPerforming_utils_hr();
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultPerforming_utils_hr()} for default scoring parameters or
+	 * {@link ScoringParameterSet#getPerforming_utils_hr()} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getPerforming_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getPerforming_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getPerforming_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultPerforming_utils_hr();
 	}
 
+	public void setDefaultPerforming_utils_hr(double performing) {
+		getDefaultScoringParameterSet().setPerforming_utils_hr(performing);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultPerforming_utils_hr(double)} for default scoring parameters or
+	 * {@link ScoringParameterSet#setPerforming_utils_hr(double)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setPerforming_utils_hr(double performing) {
-		getScoringParameters(null).setPerforming_utils_hr(performing);
+		setDefaultPerforming_utils_hr(performing);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * @deprecated Use {@link #getDefaultMarginalUtilityOfMoney()} for default scoring parameters or
+	 * {@link #getMarginalUtilityOfMoney(String)} for explicit subpopulation scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getMarginalUtilityOfMoney() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getMarginalUtilityOfMoney();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getMarginalUtilityOfMoney();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultMarginalUtilityOfMoney();
 	}
 
+	public double getDefaultMarginalUtilityOfMoney() {
+		return getDefaultScoringParameterSet().getMarginalUtilityOfMoney();
+	}
+
+	public double getMarginalUtilityOfMoney(String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet != null)
+			return scoringParameterSet.getMarginalUtilityOfMoney();
+		else
+			throw new RuntimeException("MarginalUtilityOfMoney for subpopulation " + subpopulation + " is not defined or the scoringParams for subpopulation is not defined");
+	}
+
+	public void setDefaultMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+		getDefaultScoringParameterSet().setMarginalUtilityOfMoney(marginalUtilityOfMoney);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultMarginalUtilityOfMoney(double)} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
-		getScoringParameters(null).setMarginalUtilityOfMoney(marginalUtilityOfMoney);
+		setDefaultMarginalUtilityOfMoney(marginalUtilityOfMoney);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * Returns the line switch utility of the default/root scoring parameters.
+	 */
+	public double getDefaultUtilityOfLineSwitch() {
+		return getDefaultScoringParameterSet().getUtilityOfLineSwitch();
+	}
+
+	/**
+	 * @deprecated Use {@link #getDefaultUtilityOfLineSwitch()} for default scoring parameters or
+	 * {@link ScoringParameterSet#getUtilityOfLineSwitch()} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getUtilityOfLineSwitch() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getUtilityOfLineSwitch();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getUtilityOfLineSwitch();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultUtilityOfLineSwitch();
 	}
 
+	public void setDefaultUtilityOfLineSwitch(double utilityOfLineSwitch) {
+		getDefaultScoringParameterSet().setUtilityOfLineSwitch(utilityOfLineSwitch);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultUtilityOfLineSwitch(double)} for default scoring parameters or
+	 * {@link ScoringParameterSet#setUtilityOfLineSwitch(double)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
-		getScoringParameters(null).setUtilityOfLineSwitch(utilityOfLineSwitch);
+		setDefaultUtilityOfLineSwitch(utilityOfLineSwitch);
 	}
 
 	public boolean isUsingOldScoringBelowZeroUtilityDuration() {
 		return delegate.isUsingOldScoringBelowZeroUtilityDuration();
 	}
 
+	/**
+	 * @deprecated This switch exists only for backwards compatibility with old below-zero utility duration behavior.
+	 */
 	@Deprecated
 	public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
 		delegate.setUsingOldScoringBelowZeroUtilityDuration(usingOldScoringBelowZeroUtilityDuration);
@@ -802,19 +1068,46 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		delegate.setWriteExperiencedPlans(writeExperiencedPlans);
 	}
 
-	@Deprecated // should move everywhere to subpopulation-based params. This is minimally necessary to correctly differentiate between private and commercial traffic. kai, feb'26
+	/**
+	 * @deprecated Use {@link #getDefaultMarginalUtlOfWaiting_utils_hr()} for default scoring parameters or
+	 * {@link #getMarginalUtlOfWaiting_utils_hr(String)} for explicit subpopulation scoring parameters.
+	 */
+	@Deprecated(since = "2026-02")
 	public double getMarginalUtlOfWaiting_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getMarginalUtlOfWaiting_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getMarginalUtlOfWaiting_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
+		return getDefaultMarginalUtlOfWaiting_utils_hr();
 	}
 
+	public double getDefaultMarginalUtlOfWaiting_utils_hr() {
+		return getDefaultScoringParameterSet().getMarginalUtlOfWaiting_utils_hr();
+	}
+
+	public double getMarginalUtlOfWaiting_utils_hr(String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet != null)
+			return scoringParameterSet.getMarginalUtlOfWaiting_utils_hr();
+		else
+			throw new RuntimeException("MarginalUtlOfWaiting_utils_hr for subpopulation " + subpopulation + " is not defined");
+	}
+
+	public void setDefaultMarginalUtlOfWaiting_utils_hr(double waiting) {
+		getDefaultScoringParameterSet().setMarginalUtlOfWaiting_utils_hr(waiting);
+	}
+
+	/**
+	 * @deprecated Use {@link #setDefaultMarginalUtlOfWaiting_utils_hr(double)} for default scoring parameters.
+	 */
+	@Deprecated(since = "2026-06")
 	public void setMarginalUtlOfWaiting_utils_hr(double waiting) {
-		getScoringParameters(null).setMarginalUtlOfWaiting_utils_hr(waiting);
+		setDefaultMarginalUtlOfWaiting_utils_hr(waiting);
+	}
+
+	private ScoringParameterSet getDefaultScoringParameterSet() {
+		if (getScoringParameters(null) != null)
+			return getScoringParameters(null);
+		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
+			return getScoringParameters(DEFAULT_SUBPOPULATION);
+		else
+			throw new RuntimeException("Default subpopulation is not defined");
 	}
 
 	public void setFractionOfIterationsToStartScoreMSA(Double val) {
@@ -1406,10 +1699,10 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		@StringGetter(WAITING_PT)
 		public double getMarginalUtlOfWaitingPt_utils_hr() {
 			if( waitingPt != null ) return waitingPt;
-			final ModeParams modeParams = this.getModes().get( TransportMode.pt );
+			final ModeParams modeParams = this.getModeParams().get( TransportMode.pt );
 
 			if ( modeParams==null ) {
-				log.fatal( "this.getModes().get( TransportMode.pt ) returns null; cannot continue; possibly some confusion with setting mode params for subpopulations. subpop={}", this.getSubpopulation() ) ;
+				log.fatal( "this.getModeParams().get( TransportMode.pt ) returns null; cannot continue; possibly some confusion with setting mode params for subpopulations. subpop={}", this.getSubpopulation() ) ;
 				throw new RuntimeException("see log statement" );
 			}
 
@@ -1449,7 +1742,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 						throw new RuntimeException("wrong class for " + module);
 					}
 					final String m = ((ModeParams) module).getMode();
-					if (getModes().get(m) != null) {
+					if (getModeParams().get(m) != null) {
 						throw new IllegalStateException("already a parameter set for mode " + m);
 					}
 					break;
@@ -1507,7 +1800,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			return params;
 		}
 
-		public Map<String, ModeParams> getModes() {
+		public Map<String, ModeParams> getModeParams() {
 			@SuppressWarnings("unchecked") final Collection<ModeParams> modes = (Collection<ModeParams>) getParameterSets(ModeParams.SET_TYPE);
 			final Map<String, ModeParams> map = new LinkedHashMap<>();
 
@@ -1525,7 +1818,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 		public ModeParams getOrCreateModeParams(String modeName) {
-			ModeParams modeParams = getModes().get(modeName);
+			ModeParams modeParams = getModeParams().get(modeName);
 			if (modeParams == null) {
 				modeParams = new ModeParams(modeName);
 				addParameterSet(modeParams);
@@ -1534,7 +1827,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 		public void addModeParams(final ModeParams params) {
-			final ModeParams previous = this.getModes().get(params.getMode());
+			final ModeParams previous = this.getModeParams().get(params.getMode());
 
 			if (previous != null) {
 				final boolean removed = removeParameterSet(previous);

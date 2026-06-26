@@ -289,7 +289,7 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("theMode", "mode", "scoring", "scoringParameters", "modeParams");
 		r2.readStream(bais);
 
-		Assertions.assertEquals(-5.6, config.scoring().getModes().get("car").getMarginalUtilityOfTraveling(), 1e-7);
-		Assertions.assertEquals(-8.7, config.scoring().getModes().get("unicycle").getMarginalUtilityOfTraveling(), 1e-7);
+		Assertions.assertEquals(-5.6, config.scoring().getModeParams().get("car").getMarginalUtilityOfTraveling(), 1e-7);
+		Assertions.assertEquals(-8.7, config.scoring().getModeParams().get("unicycle").getMarginalUtilityOfTraveling(), 1e-7);
 	}
 }

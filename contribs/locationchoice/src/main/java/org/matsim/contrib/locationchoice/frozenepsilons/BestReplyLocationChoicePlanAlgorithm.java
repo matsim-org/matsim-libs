@@ -227,7 +227,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
 		 */
 		double travelSpeedCrowFly = this.dccg.getTravelSpeed_car();
-		double betaTime = this.scenario.getConfig().scoring().getModes().get(TransportMode.car ).getMarginalUtilityOfTraveling();
+		double betaTime = this.scenario.getConfig().scoring().getModeParams().get(TransportMode.car ).getMarginalUtilityOfTraveling();
 //		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
 		if ( this.scenario.getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
 			betaTime -= this.scenario.getConfig().scoring().getPerforming_utils_hr() ;

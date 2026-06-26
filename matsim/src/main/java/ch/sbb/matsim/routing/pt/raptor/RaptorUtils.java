@@ -116,7 +116,7 @@ public final class RaptorUtils {
 
         ScoringConfigGroup pcsConfig = config.scoring();
         double marginalUtilityPerforming = pcsConfig.getPerforming_utils_hr() / 3600.0;
-        for (Map.Entry<String, ScoringConfigGroup.ModeParams> e : pcsConfig.getModes().entrySet()) {
+        for (Map.Entry<String, ScoringConfigGroup.ModeParams> e : pcsConfig.getModeParams().entrySet()) {
             String mode = e.getKey();
             ScoringConfigGroup.ModeParams modeParams = e.getValue();
             double marginalUtility_utl_s = modeParams.getMarginalUtilityOfTraveling()/3600.0 - marginalUtilityPerforming;

@@ -361,7 +361,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				boolean haveAddedFirstPtAscOfTrip = false;
 				for( Leg leg : trip.getLegsOnly() ){
 					final ScoringParameterSet subpopScoringParams = config.scoring().getScoringParameters( PopulationUtils.getSubpopulation( person ) );
-					final ModeParams modeParams = subpopScoringParams.getModes().get( leg.getMode() );
+					final ModeParams modeParams = subpopScoringParams.getModeParams().get( leg.getMode() );
 
 					// ttime:
 					sumTtimes += leg.getTravelTime().seconds();

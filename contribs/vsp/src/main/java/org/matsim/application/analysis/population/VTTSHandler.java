@@ -118,7 +118,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		this.currentIteration = Integer.MIN_VALUE;
 		this.defaultVTTS_moneyPerHour =
 				(this.scenario.getConfig().scoring().getPerforming_utils_hr()
-						 + this.scenario.getConfig().scoring().getModes().get( TransportMode.car ).getMarginalUtilityOfTraveling() * (-1.0)
+						 + this.scenario.getConfig().scoring().getModeParams().get( TransportMode.car ).getMarginalUtilityOfTraveling() * (-1.0)
 				) / this.scenario.getConfig().scoring().getMarginalUtilityOfMoney();
 	}
 
@@ -347,8 +347,8 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		// (Could be done similarly to the activity delay disutility. As long as it is computed linearly, the following should be okay.)
 		String mode = simData.trips.getLast().mode;
 		double directMarginalUtilityOfTraveling = 0.;
-		if( scoringConfigGroup.getModes().get( mode ) != null ){
-			directMarginalUtilityOfTraveling = scoringConfigGroup.getModes().get( mode ).getMarginalUtilityOfTraveling();
+		if( scoringConfigGroup.getModeParams().get( mode ) != null ){
+			directMarginalUtilityOfTraveling = scoringConfigGroup.getModeParams().get( mode ).getMarginalUtilityOfTraveling();
 		} else{
 			log.warn( "Could not identify the marginal utility of traveling for mode={}. Setting this value to zero. (Probably using subpopulations...)", mode );
 		}

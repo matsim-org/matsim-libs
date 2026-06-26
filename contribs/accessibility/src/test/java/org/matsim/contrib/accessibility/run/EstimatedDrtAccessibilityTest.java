@@ -245,7 +245,7 @@ public class EstimatedDrtAccessibilityTest {
 
 		Config config = createTestConfig(network);
 
-		config.scoring().getModes().get(TransportMode.drt).setMarginalUtilityOfDistance(-0.001);
+		config.scoring().getModeParams().get(TransportMode.drt).setMarginalUtilityOfDistance(-0.001);
 
 
 		// Create  Scenario
@@ -312,7 +312,7 @@ public class EstimatedDrtAccessibilityTest {
 
 		Config config = createTestConfig(network);
 
-		config.scoring().getModes().get(TransportMode.drt).setConstant(10);
+		config.scoring().getModeParams().get(TransportMode.drt).setConstant(10);
 
 
 		// Create  Scenario

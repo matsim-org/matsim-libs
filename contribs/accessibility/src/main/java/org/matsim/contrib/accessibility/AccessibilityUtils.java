@@ -77,7 +77,7 @@ public class AccessibilityUtils {
 			double distance_m = NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
 
 			// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-			double walkBetaTT_utils_h = config.scoring().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
+			double walkBetaTT_utils_h = config.scoring().getModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling()
 					- config.scoring().getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
 			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / walkSpeed_m_h);
 
@@ -146,9 +146,9 @@ public class AccessibilityUtils {
 	public static double getModeSpecificConstantForAccessibilities(String mode, ScoringConfigGroup scoringConfigGroup) {
 		double modeSpecificConstant;
 		if (mode.equals(Modes4Accessibility.freespeed.name())) {
-			modeSpecificConstant = scoringConfigGroup.getModes().get(TransportMode.car).getConstant();
+			modeSpecificConstant = scoringConfigGroup.getModeParams().get(TransportMode.car).getConstant();
 		} else {
-			modeSpecificConstant = scoringConfigGroup.getModes().get(mode).getConstant();
+			modeSpecificConstant = scoringConfigGroup.getModeParams().get(mode).getConstant();
 		}
 		return modeSpecificConstant;
 	}

@@ -307,7 +307,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		Assertions.assertEquals(2.0, delay, MatsimTestUtils.EPSILON, "Wrong delay.");
 
 		double amountFromEvent = moneyEvents.get(0).getAmount();
-		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
+		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 		// with delay --> 70.570685898554200
 		// without delay --> 70.573360291244900
 		double activityDelayDisutility = 70.573360291244900 - 70.570685898554200;
@@ -387,7 +387,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		Assertions.assertEquals(2.0, delay, MatsimTestUtils.EPSILON, "Wrong delay.");
 
 		double amountFromEvent = moneyEvents.get(0).getAmount();
-		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
+		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 
 		// home duration morning: 28800.
 		// home duration evening with delay: (24 * 3600.) - 57705.
