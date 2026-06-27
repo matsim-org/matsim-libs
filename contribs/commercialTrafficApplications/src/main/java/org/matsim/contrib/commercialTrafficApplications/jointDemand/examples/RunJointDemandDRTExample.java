@@ -145,7 +145,7 @@ class RunJointDemandDRTExample {
         DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                 drtCfg.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
-        defaultConstraintsSet.setMaxWaitTime(2 * 3600);
+		defaultConstraintsSet.setMaxWaitTime(15 * 60);
 		defaultConstraintsSet.setMaxTravelTimeAlpha(5);
 		defaultConstraintsSet.setMaxTravelTimeBeta(15 * 60);
         drtCfg.setStopDuration(60);

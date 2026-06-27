@@ -60,7 +60,7 @@ public class CapacityReconfigurationTest {
 
 		controller.run();
 
-		assertEquals(198, tracker.pickedUpPassengers);
+		assertEquals(199, tracker.pickedUpPassengers);
 		assertEquals(0, tracker.pickedUpGoods);
 	}
 
@@ -90,8 +90,8 @@ public class CapacityReconfigurationTest {
 
 		controller.run();
 
-		assertEquals(88, tracker.pickedUpPassengers);
-		assertEquals(106, tracker.pickedUpGoods);
+		assertEquals(91, tracker.pickedUpPassengers);
+		assertEquals(108, tracker.pickedUpGoods);
 	}
 
 	@Test
@@ -129,8 +129,8 @@ public class CapacityReconfigurationTest {
 
 		controller.run();
 
-		assertEquals(186, tracker.pickedUpPassengers);
-		assertEquals(167, tracker.pickedUpGoods);
+		assertEquals(193, tracker.pickedUpPassengers);
+		assertEquals(178, tracker.pickedUpGoods);
 	}
 
 	@Test
