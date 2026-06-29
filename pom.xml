@@ -28,7 +28,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.release>25</maven.compiler.release>
-		<argLine/>
+		<!-- add-opens=java.base/java.lang.invoke=ALL-UNNAMED is required for SerializationProviderTest when upgrading org.apache.fory:fory-* to 1.3.0 -->
+		<argLine>--add-opens=java.base/java.lang.invoke=ALL-UNNAMED</argLine>
 
 		<log4j.version>2.26.0</log4j.version>
 		<geotools.version>35.0</geotools.version>
