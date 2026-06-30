@@ -39,6 +39,8 @@ import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -64,11 +66,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	private static final boolean doRoh = false;
 	static final boolean doSwitchers = true;
 	static final boolean isDebugging = true;
-//	static final String fromMode = bike;
-//	static final String fromMode = car;
-//	static final String fromMode = ride;
-//	static final String fromMode = pt;
-	static final String fromMode = walk;
+
+	private static List<String> outputList = new ArrayList<>();
 
 	@CommandLine.Parameters(description = "Path to run output directory for which analysis should be performed.")
 	private Path policyCasePath;
@@ -181,11 +180,47 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-teleported";
 		// ===
 
+		final boolean fromModeOnly = false;
+//		static final String fromMode = bike;
+//		static final String fromMode = car;
+//		static final String fromMode = ride;
+//		static final String fromMode = pt;
+		final String fromMode = walk;
+//		TODO: use fromModeOnly boolean when filtering fpr fromMode
+
+		String outputFile;
+
+		if (!fromModeOnly) {
+			outputFile = Path.of(policyDir, "KN-econometrics-output.txt").toString();
+		} else {
+			outputFile = Path.of(policyDir, "KN-econometrics-output-from-" + fromMode + "-only.txt").toString();
+			outputList.add("");
+			outputList.add("###########################################################################################################################################");
+			outputList.add("Analysis only for switchers from mode: " + fromMode.toUpperCase() );
+			outputList.add("###########################################################################################################################################");
+			outputList.add("");
+		}
+
+		outputList.add("############################################################################################");
+		outputList.add("");
+		outputList.add("########################################### " + policyDir + " #################################################");
+		outputList.add("");
+
 //		generateExperiencedPlans( baseDir );
 //		generateExperiencedPlans( policyDir );
 //		generateFilteredEventsFile( baseDir );
 //		generateFilteredEventsFile( policyDir );
 		agentWiseComparison( baseDir, policyDir, shpFile );
+
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputFile)) {
+			for (String s : outputList) {
+				System.out.println(s);
+				writer.write(s);
+				writer.newLine();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	// ---
@@ -275,7 +310,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		baseTablePersons.addColumns( baseTablePersons.doubleColumn( MATSIM_SCORE ).subtract( baseTablePersons.doubleColumn( SCORE ) ).setName( "error" ) );
 
-		printTable( baseTablePersons.sortOn( "error" ), "sorted by score differences between ms output and self-computed" );
+		outputList = printTable( baseTablePersons.sortOn( "error" ), "sorted by score differences between ms output and self-computed", outputList );
 		writeMuseHtml( baseTablePersons, policyCasePath );
 		writeVseHtml( baseTablePersons, policyCasePath );
 
@@ -492,11 +527,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			if ( scoreWrnCnt < 10 ){
 				if( !Gbl.equal( person.getSelectedPlan().getScore(), computedPersonScore, 1 ) ){
-					log.warn( "personId={}; scoreFromMS={}; computedPersonScore={}; possible reason: score averaging in ms", person.getId(),
-						person.getSelectedPlan().getScore(), computedPersonScore );
+					outputList.add( "personId=" + person.getId() + "; scoreFromMS=" + person.getSelectedPlan().getScore() + "; computedPersonScore=" + computedPersonScore + "; possible reason: score averaging in ms");
 					scoreWrnCnt++;
 					if ( scoreWrnCnt==10 ) {
-						log.warn( Gbl.FUTURE_SUPPRESSED );
+						outputList.add( Gbl.FUTURE_SUPPRESSED );
 					}
 				}
 			}
@@ -511,13 +545,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		}
 		if( isBaseTable ){
 			MUTTS_AV = popSumMuse_h / popCntMuse_h;
-			log.warn( "MUTTS_AV={}; popSumMuse_h={}; popCntMuse_h={}", MUTTS_AV, popSumMuse_h, popCntMuse_h );
+			outputList.add("");
+			outputList.add( "MUTTS_AV=" + MUTTS_AV + "; popSumMuse_h=" + popSumMuse_h + "; popCntMuse_h=" + popCntMuse_h );
 		}
-		System.out.println("###########################################################################################################################################");
-		System.out.println("Analysis only for switchers from mode: " + fromMode.toUpperCase() );
-		System.out.println("###########################################################################################################################################");
-		System.out.println();
-		printTable( table, "print person table:" );
+
+		printTable( table, "print person table:", outputList );
 		return table;
 	}
 
@@ -529,7 +561,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		if( doRoh ){
 			new AgentWiseRuleOfHalfComputation( baseCaseInjector, this.policyInjector ).somehowComputeRuleOfHalf();
-			addRohValuesToTable( policyScenario.getPopulation(), personsTablePolicy );
+			outputList = addRohValuesToTable( policyScenario.getPopulation(), personsTablePolicy, outputList );
 		}
 		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
 
@@ -542,10 +574,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //
 //		joinedTable = joinedTable.dropWhere(joinedTable.stringColumn(personId).isNotIn(ptLineUsers.stringColumn("person")));
 
-
-		log.info( "" );
-		log.info( "print joined table:" );
-		System.out.println( joinedTable );
+		outputList.add( "" );
+		outputList.add( "print joined table:" );
+		outputList.add( joinedTable.toString() );
+		outputList.add("");
 
 		joinedTable.addColumns( deltaColumn( joinedTable, TTIME ), deltaColumn( joinedTable, MONEY ) );
 
@@ -564,9 +596,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		Table copyOfJoinedTable = Table.create( joinedTable.columns() );
 
 		{
-			System.out.println("");
-			System.out.println("## REMAINERS: ===");
-			System.out.println("");
+			outputList.add("");
+			outputList.add("## REMAINERS: ===");
+			outputList.add("");
 
 			// only keep the remainers:
 			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
@@ -575,10 +607,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			formatTable( deltaTable, 1 );
 
-			log.info( "" );
-			log.info( "print sorted table:" );
-//			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
-			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
+			outputList.add( "" );
+			outputList.add( "print sorted table:" );
+//			outputList.add( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+			outputList.add( deltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
 
 			// ===
 
@@ -588,28 +620,28 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 				formatTable( rohDeltaTable, 1 );
 
-				log.info( "" );
-				log.info( "print sorted roh table:" );
-//				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
-				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
+				outputList.add( "" );
+				outputList.add( "print sorted roh table:" );
+//				outputList.add( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+				outputList.add( rohDeltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
 
-				log.info("");
-				log.info("print debugging table:");
+				outputList.add("");
+				outputList.add("print debugging table:");
 				rohDeltaTable.addColumns(  rohDeltaTable.doubleColumn( deltaOf(ACTS_SCORE) ).subtract( rohDeltaTable.doubleColumn(
 					U_TTIME_DIFF_REM_HET_PT ) ).setName( "ms - roh" ) );
 				formatTable( rohDeltaTable, 2 );
-				System.out.println( rohDeltaTable.sortOn( "ms - roh" ).print(20) );
-				log.info("");
+				outputList.add( rohDeltaTable.sortOn( "ms - roh" ).print(20) );
+				outputList.add("");
 			}
 
 			// ===
 
-			writeMatsimScoresSummaryTables( "all", outputPath, baseConfig, deltaTable );
-			writeMatsimScoresSummaryTables( "0th decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
-			writeMatsimScoresSummaryTables( "last decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+			outputList = writeMatsimScoresSummaryTables( "all", outputPath, baseConfig, deltaTable, outputList );
+			outputList = writeMatsimScoresSummaryTables( "0th decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ), outputList );
+			outputList = writeMatsimScoresSummaryTables( "last decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ), outputList );
 
 			if( doRoh ){
-				writeRuleOfHalfSummaryTable( policyCasePath, baseConfig, rohDeltaTable );
+				outputList = writeRuleOfHalfSummaryTable( policyCasePath, baseConfig, rohDeltaTable, outputList );
 			}
 		}
 		if ( !doSwitchers ) {
@@ -617,9 +649,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			System.exit(-1);
 		}
 		{
-			System.out.println();
-			System.out.println("## SWITCHERS: ===");
-			System.out.println();
+			outputList.add("");
+			outputList.add("## SWITCHERS: ===");
+			outputList.add("");
 
 			// only keep the switchers:
 			joinedTable = copyOfJoinedTable.where( copyOfJoinedTable.stringColumn( MODE_SEQ ).isNotEqualTo( copyOfJoinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
@@ -628,10 +660,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			formatTable( deltaTable, 1 );
 
-			log.info( "" );
-			log.info( "print sorted table:" );
-//			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
-			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
+			outputList.add( "" );
+			outputList.add( "print sorted table:" );
+//			outputList.add( deltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+			outputList.add( deltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
 
 			// ===
 
@@ -641,23 +673,23 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 				formatTable( rohDeltaTable, 1 );
 
-				log.info( "" );
-				log.info( "print sorted roh table:" );
-//				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
-				System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
+				outputList.add( "" );
+				outputList.add( "print sorted roh table:" );
+//				outputList.add( rohDeltaTable.sortOn( deltaOf( SCORE ) ).sortOn( INCOME_DECILE ).print( 20 ) );
+				outputList.add( rohDeltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
 			}
 
 			// ===
 
-			writeMatsimScoresSummaryTables( "all", outputPath, baseConfig, deltaTable );
-			writeMatsimScoresSummaryTables( "0th decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
-			writeMatsimScoresSummaryTables( "last decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+			outputList = writeMatsimScoresSummaryTables( "all", outputPath, baseConfig, deltaTable, outputList );
+			outputList = writeMatsimScoresSummaryTables( "0th decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ), outputList );
+			outputList = writeMatsimScoresSummaryTables( "last decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ), outputList );
 
 			if( doRoh ){
-				writeRuleOfHalfSummaryTable( policyCasePath, baseConfig, rohDeltaTable );
+				outputList = writeRuleOfHalfSummaryTable( policyCasePath, baseConfig, rohDeltaTable, outputList );
 			}
 		}
-		writeAscTable( policyScenario.getConfig() );
+		outputList = writeAscTable( policyScenario.getConfig(), outputList );
 
 	}
 

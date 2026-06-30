@@ -256,13 +256,15 @@ class AgentWiseComparisonKNUtils{
 		}
 		PopulationUtils.writePopulation( policyPopulation, inputPath + "/output_plans_with_drt.xml.gz" );
 	}
-	static void printSpecificPerson( Table table, String personId ){
+	static List<String> printSpecificPerson( Table table, String personId, List<String> outputList ){
 		final Table filteredTable = table.where( table.stringColumn( PERSON_ID ).isEqualTo( personId ) );
 		formatTable( filteredTable, 2 );
-		log.info( "print table for specific person:" );
-		System.out.println( filteredTable );
+		outputList.add( "print table for specific person:" );
+		outputList.add( filteredTable.toString() );
+
+		return outputList;
 	}
-	static void writeRuleOfHalfSummaryTable( Path inputPath, Config config, Table deltaTable ){
+	static List<String> writeRuleOfHalfSummaryTable( Path inputPath, Config config, Table deltaTable, List<String> outputList ){
 		final double factor = 1./ config.qsim().getFlowCapFactor();
 
 //		double homTtimeBenefitRemainers = deltaTable.doubleColumn( U_TTIME_DIFF_REM_UNI ).sum() * factor ;
@@ -337,18 +339,20 @@ class AgentWiseComparisonKNUtils{
 
 		formatTable( summaryTable, 0 );
 
-		System.out.println();
-		log.info( inputPath );
-		log.info( "Popsize={} rescaled to 100% by multiplying with {}.", deltaTable.rowCount(), factor );
-		System.out.println( summaryTable + System.lineSeparator() );
-		System.out.println();
+		outputList.add("");
+		outputList.add( inputPath.toString() );
+		outputList.add( "Popsize=" + deltaTable.rowCount() + " rescaled to 100% by multiplying with " + factor + "." );
+		outputList.add( summaryTable + System.lineSeparator() );
+		outputList.add("");
+
+		return outputList;
 	}
 	static void alignLeft( StringBuilder weighted_ttime_cmt, int maxLen ){
 		weighted_ttime_cmt.append( " ".repeat( maxLen - weighted_ttime_cmt.length() ) );
 	}
 
 	private enum IsMonetized { FALSE, TRUE }
-	static void writeMatsimScoresSummaryTables( String msg, Path inputPath, Config config, Table deltaTable ){
+	static List<String> writeMatsimScoresSummaryTables(String msg, Path inputPath, Config config, Table deltaTable, List<String> outputList ){
 		final double factor = 1./ config.qsim().getFlowCapFactor();
 
 		for( IsMonetized isMonetized : IsMonetized.values() ){
@@ -446,21 +450,22 @@ class AgentWiseComparisonKNUtils{
 
 			formatTable( summaryTable, 0 );
 
-			System.out.println();
+			outputList.add("");
 			if ( isMonetized==IsMonetized.TRUE ){
-//				log.info( ConsoleFonts.BOLD + msg + "; in money space:" + ConsoleFonts.RESET );
-				log.info( msg + "; in money space:" );
+//				outputList.add( ConsoleFonts.BOLD + msg + "; in money space:" + ConsoleFonts.RESET );
+				outputList.add( msg + "; in money space:" );
 			} else {
-//				log.info( ConsoleFonts.BOLD + msg + "; in score space:" + ConsoleFonts.RESET );
-				log.info( msg + "; in score space:" );
+//				outputList.add( ConsoleFonts.BOLD + msg + "; in score space:" + ConsoleFonts.RESET );
+				outputList.add( msg + "; in score space:" );
 			}
-			log.info( inputPath );
-			log.info( "Popsize={} rescaled to 100% by multiplying with {}; isMonetized={}", deltaTable.rowCount(), factor, isMonetized );
-			System.out.println( summaryTable + System.lineSeparator() );
-			System.out.println();
+			outputList.add( inputPath.toString() );
+			outputList.add( "Popsize=" + deltaTable.rowCount() + " rescaled to 100% by multiplying with " + factor + "; isMonetized= " + isMonetized );
+			outputList.add( summaryTable + System.lineSeparator() );
+			outputList.add("");
 		}
+		return outputList;
 	}
-	static void writeAscTable( Config config ){
+	static List<String> writeAscTable( Config config, List<String> outputList ) {
 		Table summaryTable = Table.create( DoubleColumn.create( "ASC" ), StringColumn.create( "mode" ));
 
 		for( ScoringConfigGroup.ModeParams modeParams : config.scoring().getModes().values() ){
@@ -470,7 +475,9 @@ class AgentWiseComparisonKNUtils{
 
 		formatTable(  summaryTable, 2 );
 
-		System.out.println( System.lineSeparator() + summaryTable + System.lineSeparator() );
+		outputList.add( System.lineSeparator() + summaryTable + System.lineSeparator() );
+
+		return outputList;
 	}
 	static void cleanPopulation( Path path, List<String> eventsFilePatterns, Population basePopulation ){
 		removeNonPersons( basePopulation );
@@ -524,17 +531,19 @@ class AgentWiseComparisonKNUtils{
 			}
 		}
 	}
-	private static void printIncomeTable( Collection<? extends Person> persons, String message ){
+	private static List<String> printIncomeTable( Collection<? extends Person> persons, String message, List<String> outputList ){
 		StringColumn idColumn = StringColumn.create( "id" );
 		DoubleColumn incomeColumn = DoubleColumn.create( "income" );
 		for( Person person : persons ){
 			idColumn.append( person.getId().toString() );
 			incomeColumn.append( PersonUtils.getIncome( person ) );
 		}
-		log.info( "" );
-		log.info( message );
-		System.out.println( Table.create( idColumn, incomeColumn ) );
-		log.info( "average income={}", incomeColumn.mean() );
+		outputList.add( "" );
+		outputList.add( message );
+		outputList.add( Table.create( idColumn, incomeColumn ).toString() );
+		outputList.add( "average income= " + incomeColumn.mean() );
+
+		return outputList;
 	}
 	static @NotNull Table createDeltaTable( Table joinedTable ){
 		return Table.create( joinedTable.column( PERSON_ID )
@@ -624,13 +633,15 @@ class AgentWiseComparisonKNUtils{
 			, StringColumn.create( ANALYSIS_POPULATION )
 						   );
 	}
-	static void printTable( Table table, String msg ){
-		log.info("" );
-		log.info( msg );
-		System.out.println( table );
-		log.info("" );
+	static List<String> printTable( Table table, String msg, List<String> outputList ){
+		outputList.add("" );
+		outputList.add( msg );
+		outputList.add( table.toString() );
+		outputList.add("" );
+
+		return outputList;
 	}
-	static void addRohValuesToTable( Population policyPopulation, Table personsTablePolicy ) {
+	static List<String> addRohValuesToTable( Population policyPopulation, Table personsTablePolicy, List<String> outputList ) {
 		// yyyy note that this does not check that the person IDs are consistent.
 
 		DoubleColumn tTimeRemPt = DoubleColumn.create( TTIME_DIFF_REM_PT );
@@ -674,8 +685,10 @@ class AgentWiseComparisonKNUtils{
 
 //		personsTablePolicy.addColumns( tTimeRem, uTtimeRemHom, uTtimeRemHet, ixRem, uTttimeSwiHom, uTtimeSwiHet, ixSwi );
 		personsTablePolicy.addColumns( tTimeRemPt, tTimeRemOther, uTtimeRemHetPt, uTtimeRemHetOther, ixRem, uTtimeSwiHet, ixSwi );
-		log.info( "persons table policy after adding RoH entries:" );
-		System.out.println( personsTablePolicy );
+		outputList.add( "persons table policy after adding RoH entries:" );
+		outputList.add( personsTablePolicy.toString() );
+
+		return outputList;
 
 	}
 	static @NotNull Config prepareConfig( Path path ){
