@@ -246,7 +246,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			}
 
 			// Calculate the agent's trip delay disutility (could be done similar to the activity delay disutility).
-			double tripDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
+			double tripDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().scoring().getModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 
 			// Translate the disutility into monetary units.
 			double totalDelayCost = (activityDelayDisutility + tripDelayDisutility) / this.scenario.getConfig().scoring().getMarginalUtilityOfMoney();

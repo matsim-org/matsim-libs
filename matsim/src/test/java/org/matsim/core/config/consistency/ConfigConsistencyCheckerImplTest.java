@@ -38,14 +38,14 @@ import java.util.Set;
 public class ConfigConsistencyCheckerImplTest {
 
 	@Test
-	void testCheckPlanCalcScore_DefaultsOk() {
+	void testCheckScoring_DefaultsOk() {
 		Config config = new Config();
 		config.addCoreModules();
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
 			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(0, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
@@ -54,16 +54,16 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	void testCheckPlanCalcScore_Traveling() {
+	void testCheckScoring_Traveling() {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
 			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
@@ -72,16 +72,16 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	void testCheckPlanCalcScore_TravelingPt() {
+	void testCheckScoring_TravelingPt() {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
 			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
@@ -90,16 +90,16 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	void testCheckPlanCalcScore_TravelingBike() {
+	void testCheckScoring_TravelingBike() {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
 			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
@@ -108,16 +108,16 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	void testCheckPlanCalcScore_TravelingWalk() {
+	void testCheckScoring_TravelingWalk() {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
 			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
@@ -126,7 +126,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	void testCheckPlanCalcScore_PtInteractionActivity() {
+	void testCheckScoring_PtInteractionActivity() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -135,7 +135,7 @@ public class ConfigConsistencyCheckerImplTest {
 		config.scoring().addActivityParams(transitActivityParams);
 
 		try {
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(0,1) ; // should never get here
 		} catch ( Exception ee ){
 
@@ -145,7 +145,7 @@ public class ConfigConsistencyCheckerImplTest {
 		config.vspExperimental().setAbleToOverwritePtInteractionParams(true) ;
 
 		try {
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config );
+			ConfigConsistencyCheckerImpl.checkScoring(config );
 		} catch ( Exception ee ){
 			Assertions.assertEquals(0,1) ; // should never get here
 		}

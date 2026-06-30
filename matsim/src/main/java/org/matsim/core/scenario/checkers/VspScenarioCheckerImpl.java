@@ -37,9 +37,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.facilities.ActivityFacility;
 
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
@@ -106,14 +104,11 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 			problem = true;
 		}
 
-		Set<String> subpopulations = scenario.getPopulation().getPersons().values().stream()
-			.map(PopulationUtils::getSubpopulation)
-			.filter(Objects::nonNull)
-			.collect(Collectors.toSet());
+		Set<String> subpopulations = PopulationUtils.getSubpopulationsOfPopulation(scenario.getPopulation());
 
 		// check if there are corresponding scoring params for all subpopulations.
 		for (String subpopulation : subpopulations) {
-			if (!scenario.getConfig().scoring().getScoringParametersPerSubpopulation().containsKey(subpopulation)) {
+			if (!scenario.getConfig().scoring().getAllScoringParameterSetsPerSubpopulation().containsKey(subpopulation)) {
 				log.log(lvl,
 					"Found subpopulation '{}' but no corresponding scoring parameters. Please add scoring parameters for this subpopulation.",
 					subpopulation);

@@ -498,7 +498,7 @@ public class SwissRailRaptorIntermodalTest {
 
         // we need to set special values for walk and bike as the defaults are the same for walk, bike and waiting
         // which would result in all options having the same cost in the end.
-        f.config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
+        f.config.scoring().getModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(-7);
@@ -593,7 +593,7 @@ public class SwissRailRaptorIntermodalTest {
 
         // we need to set special values for walk and bike as the defaults are the same for walk, bike and waiting
         // which would result in all options having the same cost in the end.
-        f.config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
+        f.config.scoring().getModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(-7);
@@ -1484,7 +1484,7 @@ public class SwissRailRaptorIntermodalTest {
 
             // we need to set special values for walk and bike as the defaults are the same for walk, bike and waiting
             // which would result in all options having the same cost in the end.
-            this.config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
+            this.config.scoring().getModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
 
             this.config.transitRouter().setMaxBeelineWalkConnectionDistance(150);
 

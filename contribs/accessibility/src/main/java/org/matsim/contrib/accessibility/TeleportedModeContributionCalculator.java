@@ -2,7 +2,6 @@ package org.matsim.contrib.accessibility;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
@@ -38,9 +37,9 @@ public class TeleportedModeContributionCalculator implements AccessibilityContri
 		this.mode = mode;
 		this.scoringConfigGroup = scoringConfigGroup;
 
-		this.betaTT_h = scoringConfigGroup.getModes().get(mode).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		this.betaDist_m = scoringConfigGroup.getModes().get(mode).getMarginalUtilityOfDistance();
-		this.asc = scoringConfigGroup.getModes().get(mode).getConstant();
+		this.betaTT_h = scoringConfigGroup.getModeParams().get(mode).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		this.betaDist_m = scoringConfigGroup.getModeParams().get(mode).getMarginalUtilityOfDistance();
+		this.asc = scoringConfigGroup.getModeParams().get(mode).getConstant();
 
 	}
 
