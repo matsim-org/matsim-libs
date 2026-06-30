@@ -74,6 +74,7 @@ public final class EmissionModule {
 
 //		this implicitly sets the hbefa version to 4.1
 		scenario.addScenarioChecker(new Hbefa41ScenarioChecker());
+		scenario.checkConsistencyBeforeRun();
 
 		createLookupTables();
 		createEmissionHandlers();
