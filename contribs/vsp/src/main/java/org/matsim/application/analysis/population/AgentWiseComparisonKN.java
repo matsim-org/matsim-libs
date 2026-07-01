@@ -93,6 +93,13 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 	private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
 
+	static final boolean fromModeOnly = true;
+//	static final String fromMode = bike;
+//	static final String fromMode = car;
+//	static final String fromMode = ride;
+//	static final String fromMode = pt;
+	static final String fromMode = walk;
+
 	public static void main( String[] args ){
 		Gbl.assertIf( args==null || args.length==0 );
 
@@ -155,11 +162,12 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		// lausitz ditrimo drt
 		final String baseDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
-		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-1-ruhland-bhf_full_plans/";
+//		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-1-ruhland-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-2-ruhland-bhf-spremberg-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-3-ruhland-bhf-spremberg-bhf-cottbus-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-4-ruhland-bhf-spremberg-bhf-schwarze-pumpe_full_plans/";
-//		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-5-regional-drt_full_plans/";
+		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-5-regional-drt_full_plans/";
+
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-1-ruhland-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-2-ruhland-bhf-spremberg-bhf_full_plans/";
 //		final String policyDir="D:/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-3-ruhland-bhf-spremberg-bhf-cottbus-bhf_full_plans/";
@@ -180,18 +188,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-teleported";
 		// ===
 
-		final boolean fromModeOnly = false;
-//		static final String fromMode = bike;
-//		static final String fromMode = car;
-//		static final String fromMode = ride;
-//		static final String fromMode = pt;
-		final String fromMode = walk;
-//		TODO: use fromModeOnly boolean when filtering fpr fromMode
-
 		String outputFile;
 
 		if (!fromModeOnly) {
-			outputFile = Path.of(policyDir, "KN-econometrics-output.txt").toString();
+			outputFile = Path.of(policyDir, "KN-econometrics-output-general.txt").toString();
 		} else {
 			outputFile = Path.of(policyDir, "KN-econometrics-output-from-" + fromMode + "-only.txt").toString();
 			outputList.add("");
@@ -226,7 +226,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	// ---
 
 	// the following methods stay here despite being static since they essentially belong to "main".
-	private static void agentWiseComparison( String baseDir, String policyDir, String shpFile ){
+	private static void agentWiseComparison( String baseDir, String policyDir, String shpFile ) {
 		String[] args;
 		if ( shpFile != null ){
 			args = new String[]{"--prefix=" + onlyMoneyAndStuck, "--base-path=" + baseDir, "--shp=" + baseDir + "/" + shpFile, policyDir };
@@ -655,6 +655,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			// only keep the switchers:
 			joinedTable = copyOfJoinedTable.where( copyOfJoinedTable.stringColumn( MODE_SEQ ).isNotEqualTo( copyOfJoinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
+
+			if (fromModeOnly) {
+				joinedTable = joinedTable.where(joinedTable.stringColumn(MODE_SEQ).containsString(fromMode));
+			}
 
 			Table deltaTable = createDeltaTable( joinedTable );
 
