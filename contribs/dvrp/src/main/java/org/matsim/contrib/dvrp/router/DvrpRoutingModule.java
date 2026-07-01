@@ -50,6 +50,9 @@ public class DvrpRoutingModule implements RoutingModule {
 	public interface AccessEgressFacilityFinder {
 		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility,
 				Attributes tripAttributes);
+
+		Facility findClosestStop(Facility facility);
+
 	}
 
 	private final AccessEgressFacilityFinder stopFinder;
