@@ -34,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
@@ -49,9 +48,6 @@ import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
-import org.matsim.contrib.drt.routing.DrtStopFacility;
-import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
-import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -84,7 +80,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.base.MoreObjects;
 
 /**
@@ -140,12 +135,9 @@ public class RunDrtExampleIT {
 	void testRunDrtExampleWithParallelInserter_ServiceQualityProbe() {
 		Id.resetCaches();
 
-		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
-		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
-
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+			"mielec_stop_based_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 			new OTFVisConfigGroup());
 
 		var drtCfg = MultiModeDrtConfigGroup.get(config).getModalElements().iterator().next();
@@ -162,20 +154,6 @@ public class RunDrtExampleIT {
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		Controler controller = DrtControlerCreator.createControler(config, false);
-//		controller.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
-//			@Override
-//			public void install() {
-//				bindModal(DrtStopNetwork.class).toProvider(modalProvider(getter -> {
-//					Map<Id<DrtStopFacility>, DrtStopFacility> stops = new LinkedHashMap<>();
-//					for (String linkId : List.of("149", "211", "193")) {
-//						Link link = getter.getModal(Network.class).getLinks().get(Id.createLinkId(linkId));
-//						DrtStopFacility stop = DrtStopFacilityImpl.createFromLink(link);
-//						stops.put(stop.getId(), stop);
-//					}
-//					return () -> ImmutableMap.copyOf(stops);
-//				})).asEagerSingleton();
-//			}
-//		});
 		controller.addOverridingQSimModule(new ParallelRequestInserterModule(drtCfg));
 		controller.run();
 
@@ -188,7 +166,16 @@ public class RunDrtExampleIT {
 			throw new RuntimeException(e);
 		}
 		assertThat(rows.get(0)).isEqualTo("time;originStop;destinationStop;waitTime;directRideTime;rideTimeWithDetour;detourFactor");
-		assertThat(rows).hasSize(7);
+		long stopCount;
+		try {
+			stopCount = Files.lines(Paths.get(ExamplesUtils.getTestScenarioURL("mielec").toURI())
+					.resolve("drtstops_wLinkIds_lessStops.xml"))
+				.filter(line -> line.contains("<stopFacility "))
+				.count();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		assertThat(rows).hasSize((int) (stopCount * (stopCount - 1) + 1));
 		assertThat(rows.stream().skip(1).noneMatch(row -> {
 			String[] columns = row.split(";");
 			return columns[1].equals(columns[2]);
@@ -203,9 +190,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 			.rejectionRate(0.0)
 			.rejections(0)
-			.waitAverage(301.37)
-			.inVehicleTravelTimeMean(381.11)
-			.totalTravelTimeMean(682.48)
+			.waitAverage(286.51)
+			.inVehicleTravelTimeMean(376.49)
+			.totalTravelTimeMean(663.01)
 			.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
