@@ -76,47 +76,6 @@ public class RequestInsertWorker {
 			InsertionWithDetourData insertion = best.get();
 			requestData.setSolution(new RequestData.InsertionRecord(best));
 			this.solutions.computeIfAbsent(insertion.insertion.vehicleEntry.vehicle.getId(), _ -> createTreeSet()).add(requestData);
-
-
-			double pickupTime = insertion.detourTimeInfo.pickupDetourInfo.requestPickupTime;
-			double dropoffTime = insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime;
-
-			double waitTime = pickupTime - requestData.getDrtRequest().getEarliestStartTime();
-			double travelTime = dropoffTime - pickupTime;
-			System.out.println();
-			System.out.println("Request Time: " + requestData.getDrtRequest().getSubmissionTime());
-			System.out.println("Wait Time:"  + waitTime);
-			double unsharedRideTime = req.getUnsharedRideTime();
-			System.out.println("Unshared Travel Time" + unsharedRideTime);
-			System.out.println("Estimated Shared Travel Time: " + travelTime);
-			System.out.println("Detour Factor: "+ travelTime/unsharedRideTime);
-
-
-		}
-	}
-
-
-	private void findInsertion2(RequestData requestData, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries, double now) {
-		DrtRequest req = requestData.getDrtRequest();
-		Collection<VehicleEntry> filteredFleet = requestFleetFilter.filter(req, vehicleEntries, now);
-		Optional<InsertionWithDetourData> best = insertionSearch.findBestInsertion(req, filteredFleet);
-
-		if (best.isEmpty()) {
-			this.noSolutions.add(requestData.getDrtRequest());
-		} else {
-			InsertionWithDetourData insertion = best.get();
-
-
-			double pickupTime = insertion.detourTimeInfo.pickupDetourInfo.requestPickupTime;
-			double dropoffTime = insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime;
-
-			double waitTime = pickupTime - requestData.getDrtRequest().getEarliestStartTime();
-			double travelTime = dropoffTime - pickupTime;
-			System.out.println(waitTime);
-			System.out.println(travelTime);
-
-//			requestData.setSolution(new RequestData.InsertionRecord(best));
-//			this.solutions.computeIfAbsent(insertion.insertion.vehicleEntry.vehicle.getId(), _ -> createTreeSet()).add(requestData);
 		}
 	}
 

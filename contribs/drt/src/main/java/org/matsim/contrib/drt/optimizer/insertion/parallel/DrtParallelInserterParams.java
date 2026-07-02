@@ -81,6 +81,45 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 	@Comment("Enable/Disable detailed performance statistics including worker utilization, conflict resolution timing, and load balancing metrics. Disabled by default.")
 	private boolean logPerformanceStats = false;
 
+	@Comment("Enable/Disable service quality probing. If enabled, the parallel inserter estimates DRT service quality for all stop-to-stop pairs at the configured probe times in the last iteration only. Disabled by default.")
+	private boolean writeServiceQualityProbes = false;
+
+	@Comment("Comma-separated list of simulation times in seconds for service quality probing, e.g. '28800,32400,36000'.")
+	private String serviceQualityProbeTimes = "";
+
+	@Comment("Output file name for service quality probes. The file is written to the last iteration output directory.")
+	private String serviceQualityProbeOutputFile = "drt_service_quality_probes.csv.gz";
+
+	@StringGetter("writeServiceQualityProbes")
+	public boolean isWriteServiceQualityProbes() {
+		return writeServiceQualityProbes;
+	}
+
+	@StringSetter("writeServiceQualityProbes")
+	public void setWriteServiceQualityProbes(boolean writeServiceQualityProbes) {
+		this.writeServiceQualityProbes = writeServiceQualityProbes;
+	}
+
+	@StringGetter("serviceQualityProbeTimes")
+	public String getServiceQualityProbeTimes() {
+		return serviceQualityProbeTimes;
+	}
+
+	@StringSetter("serviceQualityProbeTimes")
+	public void setServiceQualityProbeTimes(String serviceQualityProbeTimes) {
+		this.serviceQualityProbeTimes = serviceQualityProbeTimes;
+	}
+
+	@StringGetter("serviceQualityProbeOutputFile")
+	public String getServiceQualityProbeOutputFile() {
+		return serviceQualityProbeOutputFile;
+	}
+
+	@StringSetter("serviceQualityProbeOutputFile")
+	public void setServiceQualityProbeOutputFile(String serviceQualityProbeOutputFile) {
+		this.serviceQualityProbeOutputFile = serviceQualityProbeOutputFile;
+	}
+
 	@StringGetter("vehiclesPartitioner")
 	public VehiclesPartitioner getVehiclesPartitioner() {
 		return vehiclesPartitioner;

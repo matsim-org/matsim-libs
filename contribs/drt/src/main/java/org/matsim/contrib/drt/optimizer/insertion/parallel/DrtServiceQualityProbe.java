@@ -1,0 +1,237 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2026 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.contrib.drt.optimizer.insertion.parallel;
+
+import com.google.inject.Provider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
+import org.matsim.contrib.drt.optimizer.insertion.RequestFleetFilter;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
+import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.routing.DrtRouteConstraintsCalculator;
+import org.matsim.contrib.drt.routing.DrtStopFacility;
+import org.matsim.contrib.drt.routing.DrtStopNetwork;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPaths;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * Estimates stop-to-stop DRT service quality from the current optimizer state without scheduling the requests.
+ */
+class DrtServiceQualityProbe {
+	private static final Logger LOG = LogManager.getLogger(DrtServiceQualityProbe.class);
+	private static final List<Id<Person>> PASSENGER_IDS = List.of(Id.createPersonId("drt-service-quality-probe"));
+
+	private final MatsimServices matsimServices;
+	private final String mode;
+	private final List<DrtStopFacility> stops;
+	private final Network network;
+	private final TravelTime travelTime;
+	private final LeastCostPathCalculator router;
+	private final DrtRouteConstraintsCalculator constraintsCalculator;
+	private final DvrpLoad load;
+	private final RequestFleetFilter requestFleetFilter;
+	private final Provider<DrtInsertionSearch> insertionSearchProvider;
+	private final List<Double> probeTimes;
+	private final String outputFile;
+	private final String delimiter;
+	private final Person dummyPerson = PopulationUtils.getFactory().createPerson(Id.createPersonId("drt-service-quality-probe"));
+	private final Attributes tripAttributes = new AttributesImpl();
+	private int nextProbeTimeIndex = 0;
+	private final List<ServiceQualityRecord> records = new ArrayList<>();
+
+	record ServiceQualityRecord(double time, Id<DrtStopFacility> originStop, Id<DrtStopFacility> destinationStop,
+								double waitTime, double directRideTime, double rideTimeWithDetour, double detourFactor) {
+	}
+
+	DrtServiceQualityProbe(MatsimServices matsimServices, String mode, DrtStopNetwork stopNetwork, Network network,
+						   TravelTime travelTime, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
+						   TravelDisutilityFactory travelDisutilityFactory,
+						   DrtRouteConstraintsCalculator constraintsCalculator, DvrpLoadFromTrip loadFromTrip,
+						   RequestFleetFilter requestFleetFilter, Provider<DrtInsertionSearch> insertionSearchProvider,
+						   DrtParallelInserterParams params) {
+		this.matsimServices = matsimServices;
+		this.mode = mode;
+		this.stops = stopNetwork.getDrtStops().values().stream()
+			.sorted(Comparator.comparing(stop -> stop.getId().toString()))
+			.collect(Collectors.toList());
+		this.network = network;
+		this.travelTime = travelTime;
+		this.router = leastCostPathCalculatorFactory.createPathCalculator(network,
+			travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
+		this.constraintsCalculator = constraintsCalculator;
+		this.load = loadFromTrip.getLoad(dummyPerson, tripAttributes);
+		this.requestFleetFilter = requestFleetFilter;
+		this.insertionSearchProvider = insertionSearchProvider;
+		this.probeTimes = parseProbeTimes(params.getServiceQualityProbeTimes());
+		this.outputFile = params.getServiceQualityProbeOutputFile();
+		this.delimiter = matsimServices.getConfig().global().getDefaultDelimiter();
+	}
+
+	boolean isEnabled() {
+		return !probeTimes.isEmpty();
+	}
+
+	boolean isDue(double now) {
+		return matsimServices.getIterationNumber() == matsimServices.getConfig().controller().getLastIteration()
+			&& nextProbeTimeIndex < probeTimes.size()
+			&& now >= probeTimes.get(nextProbeTimeIndex);
+	}
+
+	void probeIfDue(double now, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
+		if (matsimServices.getIterationNumber() != matsimServices.getConfig().controller().getLastIteration()) {
+			return;
+		}
+		while (nextProbeTimeIndex < probeTimes.size() && now >= probeTimes.get(nextProbeTimeIndex)) {
+			double probeTime = probeTimes.get(nextProbeTimeIndex++);
+			probe(probeTime, vehicleEntries);
+		}
+	}
+
+	void writeOutput() {
+		if (records.isEmpty()) {
+			return;
+		}
+		String filename = matsimServices.getControllerIO()
+			.getIterationFilename(matsimServices.getIterationNumber(), outputFile);
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(filename)) {
+			writer.write(String.join(delimiter, "time", "originStop", "destinationStop", "waitTime", "directRideTime",
+				"rideTimeWithDetour", "detourFactor"));
+			writer.newLine();
+			for (ServiceQualityRecord record : records) {
+				writer.write(String.join(delimiter,
+					Double.toString(record.time),
+					record.originStop.toString(),
+					record.destinationStop.toString(),
+					Double.toString(record.waitTime),
+					Double.toString(record.directRideTime),
+					Double.toString(record.rideTimeWithDetour),
+					Double.toString(record.detourFactor)));
+				writer.newLine();
+			}
+		} catch (IOException e) {
+			LOG.error("Failed to write DRT service quality probe output", e);
+		}
+	}
+
+	private void probe(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
+		if (stops.isEmpty()) {
+			throw new IllegalStateException("DRT service quality probes require a non-empty DrtStopNetwork for mode " + mode);
+		}
+
+		LOG.info("Estimating DRT service quality for {} stop-to-stop pairs at time {}", stops.size() * (stops.size() - 1), time);
+		DrtInsertionSearch insertionSearch = insertionSearchProvider.get();
+		for (DrtStopFacility origin : stops) {
+			for (DrtStopFacility destination : stops) {
+				if (origin.getId().equals(destination.getId())) {
+					continue;
+				}
+				records.add(estimate(time, origin, destination, vehicleEntries, insertionSearch));
+			}
+		}
+	}
+
+	private ServiceQualityRecord estimate(double time, DrtStopFacility origin, DrtStopFacility destination,
+										  Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries,
+										  DrtInsertionSearch insertionSearch) {
+		DrtRequest request = createRequest(time, origin, destination);
+		Collection<VehicleEntry> filteredFleet = requestFleetFilter.filter(request, vehicleEntries, time);
+		Optional<InsertionWithDetourData> insertion = insertionSearch.findBestInsertion(request, filteredFleet);
+		if (insertion.isEmpty()) {
+			return new ServiceQualityRecord(time, origin.getId(), destination.getId(), Double.NaN,
+				request.getUnsharedRideTime(), Double.NaN, Double.NaN);
+		}
+
+		double pickupTime = insertion.get().detourTimeInfo.pickupDetourInfo.requestPickupTime;
+		double dropoffTime = insertion.get().detourTimeInfo.dropoffDetourInfo.requestDropoffTime;
+		double waitTime = pickupTime - request.getEarliestStartTime();
+		double rideTimeWithDetour = dropoffTime - pickupTime;
+		double detourFactor = rideTimeWithDetour / request.getUnsharedRideTime();
+		return new ServiceQualityRecord(time, origin.getId(), destination.getId(), waitTime,
+			request.getUnsharedRideTime(), rideTimeWithDetour, detourFactor);
+	}
+
+	private DrtRequest createRequest(double time, DrtStopFacility origin, DrtStopFacility destination) {
+		Link fromLink = getLink(origin);
+		Link toLink = getLink(destination);
+		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(fromLink, toLink, time, router, travelTime);
+		double directRideTime = unsharedPath.getTravelTime();
+		double directRideDistance = VrpPaths.calcDistance(unsharedPath);
+		DrtRouteConstraints constraints = constraintsCalculator.calculateRouteConstraints(time, fromLink, toLink,
+			dummyPerson, tripAttributes, directRideTime, directRideDistance);
+
+		return DrtRequest.newBuilder()
+			.id(Id.create("service-quality-probe-" + time + "-" + origin.getId() + "-" + destination.getId(), Request.class))
+			.passengerIds(PASSENGER_IDS)
+			.mode(mode)
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.earliestDepartureTime(time)
+			.constraints(constraints)
+			.submissionTime(time)
+			.load(load)
+			.unsharedRideTime(directRideTime)
+			.build();
+	}
+
+	private Link getLink(DrtStopFacility stop) {
+		Link link = network.getLinks().get(stop.getLinkId());
+		if (link == null) {
+			throw new IllegalStateException("Cannot find network link " + stop.getLinkId() + " for DRT stop " + stop.getId());
+		}
+		return link;
+	}
+
+	private static List<Double> parseProbeTimes(String probeTimes) {
+		if (probeTimes == null || probeTimes.isBlank()) {
+			return List.of();
+		}
+		return Arrays.stream(probeTimes.split(","))
+			.map(String::trim)
+			.filter(token -> !token.isEmpty())
+			.map(Double::parseDouble)
+			.sorted()
+			.toList();
+	}
+}

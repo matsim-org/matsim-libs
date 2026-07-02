@@ -174,7 +174,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 
 			// DRT Estimator needs a "drt route"
-			DrtRoute drtRoute = new DrtRoute(Id.createLinkId("dummyFrom"), Id.createLinkId("dummyTo"));
+			DrtRoute drtRoute = new DrtRoute(nearestStopAccess.getLinkId(), nearestStopEgress.getLinkId());
 			drtRoute.setDistance(directRideDistance_m); // todo: since this is based on the distance and not the time of the direct car trips, congestion effects are not yet included.
 			drtRoute.setDirectRideTime(directRideTime_sec);
 
