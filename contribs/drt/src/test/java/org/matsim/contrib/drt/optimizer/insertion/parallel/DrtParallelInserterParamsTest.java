@@ -32,6 +32,8 @@ class DrtParallelInserterParamsTest {
         originalParams.setLogThreadActivity(true);
         originalParams.setVehiclesPartitioner(DrtParallelInserterParams.VehiclesPartitioner.RoundRobinVehicleEntryPartitioner);
         originalParams.setRequestsPartitioner(DrtParallelInserterParams.RequestsPartitioner.RoundRobinRequestsPartitioner);
+		originalParams.setServiceQualityProbeSpatialResolution(DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE);
+		originalParams.setServiceQualityProbeZoneCellSize(5000.);
 
 		drtConfigGroup.addParameterSet(originalParams);
 
@@ -54,5 +56,7 @@ class DrtParallelInserterParamsTest {
         assertTrue(loadedParams.isLogThreadActivity());
         assertEquals(DrtParallelInserterParams.VehiclesPartitioner.RoundRobinVehicleEntryPartitioner, loadedParams.getVehiclesPartitioner());
         assertEquals(DrtParallelInserterParams.RequestsPartitioner.RoundRobinRequestsPartitioner, loadedParams.getRequestsPartitioner());
+		assertEquals(DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE, loadedParams.getServiceQualityProbeSpatialResolution());
+		assertEquals(5000., loadedParams.getServiceQualityProbeZoneCellSize());
     }
 }

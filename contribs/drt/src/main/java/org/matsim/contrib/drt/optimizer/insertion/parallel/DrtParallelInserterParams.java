@@ -38,6 +38,8 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 
 	public enum RequestsPartitioner {RoundRobinRequestsPartitioner, LoadAwareRoundRobinRequestsPartitioner}
 
+	public enum ServiceQualityProbeSpatialResolution {STOP_TO_STOP, ZONE_TO_ZONE}
+
 	public static final String SET_NAME = "parallelInserter";
 
 	@Comment("Time window (in seconds) for collecting incoming requests before processing begins.")
@@ -90,6 +92,12 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 	@Comment("Output file name for service quality probes. The file is written to the last iteration output directory.")
 	private String serviceQualityProbeOutputFile = "drt_service_quality_probes.csv.gz";
 
+	@Comment("Spatial resolution for service quality probing. STOP_TO_STOP estimates all DRT stop pairs. ZONE_TO_ZONE estimates one representative link-to-link request for each travel-time-matrix zone pair.")
+	private ServiceQualityProbeSpatialResolution serviceQualityProbeSpatialResolution = ServiceQualityProbeSpatialResolution.STOP_TO_STOP;
+
+	@Comment("Optional square-grid cell size for ZONE_TO_ZONE service quality probing. If unset, the DVRP travel-time-matrix zone system is used.")
+	private double serviceQualityProbeZoneCellSize = Double.NaN;
+
 	@StringGetter("writeServiceQualityProbes")
 	public boolean isWriteServiceQualityProbes() {
 		return writeServiceQualityProbes;
@@ -118,6 +126,26 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 	@StringSetter("serviceQualityProbeOutputFile")
 	public void setServiceQualityProbeOutputFile(String serviceQualityProbeOutputFile) {
 		this.serviceQualityProbeOutputFile = serviceQualityProbeOutputFile;
+	}
+
+	@StringGetter("serviceQualityProbeSpatialResolution")
+	public ServiceQualityProbeSpatialResolution getServiceQualityProbeSpatialResolution() {
+		return serviceQualityProbeSpatialResolution;
+	}
+
+	@StringSetter("serviceQualityProbeSpatialResolution")
+	public void setServiceQualityProbeSpatialResolution(ServiceQualityProbeSpatialResolution serviceQualityProbeSpatialResolution) {
+		this.serviceQualityProbeSpatialResolution = serviceQualityProbeSpatialResolution;
+	}
+
+	@StringGetter("serviceQualityProbeZoneCellSize")
+	public double getServiceQualityProbeZoneCellSize() {
+		return serviceQualityProbeZoneCellSize;
+	}
+
+	@StringSetter("serviceQualityProbeZoneCellSize")
+	public void setServiceQualityProbeZoneCellSize(double serviceQualityProbeZoneCellSize) {
+		this.serviceQualityProbeZoneCellSize = serviceQualityProbeZoneCellSize;
 	}
 
 	@StringGetter("vehiclesPartitioner")
