@@ -145,9 +145,16 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="/Users/kainagel/runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-policy";
 
 		// lausitz ditrimo
-		final String baseDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
-		final String policyDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-1-ruhland-bhf_full_plans/";
+//		final String baseDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/00_base-case-ctd/";
+//		final String policyDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-pt-fare/output-1-ruhland-bhf_full_plans/";
 //		final String policyDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-1-ruhland-bhf_full_plans/";
+
+		// muehlnickel
+		final String baseDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/muehlnickel/u5_ubahn_smq_continued_4711/";
+		final String policyDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/muehlnickel/20251220_222258-U5plus-continued-10pct-4711/";
+
+		// ca. 10k wechsler car --> pt
+		// verbl. 0.2 min schneller
 
 		// ===
 
@@ -507,15 +514,15 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
 //			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 		// (!!!! for the RoH, the reverse switchers need to be symmetrically included !!!!)
-		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
+//		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "drt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) );
 //		joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
 
 		Table copyOfJoinedTable = Table.create( joinedTable.columns() );
 
 		{
-			System.out.println("");
+			System.out.println();
 			System.out.println("## REMAINERS: ===");
-			System.out.println("");
+			System.out.println();
 
 			// only keep the remainers:
 			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
@@ -552,6 +559,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			}
 
 			// ===
+			System.out.println();
+			System.out.println("## REMAINERS: ===");
+			System.out.println();
+
 
 			writeMatsimScoresSummaryTables( "all", outputPath, baseConfig, deltaTable );
 			writeMatsimScoresSummaryTables( "0th decile", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
@@ -583,6 +594,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ).print( 20 ) );
 
 			// ===
+
+			System.out.println();
+			System.out.println("## SWITCHERS: ===");
+			System.out.println();
 
 			Table rohDeltaTable = null;
 			if( doRoh ){

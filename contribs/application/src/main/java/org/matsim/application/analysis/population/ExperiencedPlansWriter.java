@@ -67,8 +67,9 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 		String runPrefix = Objects.nonNull(runId) ? runId + "." : "";
 
 		Path eventsPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.events.getFilename() + ".gz");
-		Path experiencedPlansPath = eventsPath.getParent().resolve(runPrefix + "output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
+		Path experiencedPlansPath = eventsPath.getParent().resolve(runPrefix + "postproc_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
 		// yyyy tendency to replace in the above "output_" by "postproc_". kai, jun'26
+		// --> done in jul'26
 
 		Scenario scenario = new ScenarioUtils.ScenarioBuilder(config)
 			.setNetwork(NetworkUtils.readNetwork(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.network.getFilename() + ".gz").toString()))
