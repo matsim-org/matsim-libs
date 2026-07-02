@@ -658,6 +658,22 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			if (fromModeOnly) {
 				joinedTable = joinedTable.where(joinedTable.stringColumn(MODE_SEQ).containsString(fromMode));
+
+				if (fromMode.equals(walk)) {
+					Table rideWalkUsers = joinedTable.where(joinedTable.stringColumn(MODE_SEQ).containsString(ride));
+					Table carWalkUsers = joinedTable.where(joinedTable.stringColumn(MODE_SEQ).containsString(car));
+					Table bikeWalkUsers = joinedTable.where(joinedTable.stringColumn(MODE_SEQ).containsString(bike));
+					Table ptWalkUsers = joinedTable.where(joinedTable.stringColumn(MODE_SEQ).containsString(pt));
+					Table walkOnlyUsers = joinedTable.where(
+						joinedTable.stringColumn(MODE_SEQ)
+							.eval(s -> s.matches("walk(--walk)*")));
+					outputList.add("number of walk users: " + joinedTable.rowCount());
+					outputList.add("number of ride and walk users: " + rideWalkUsers.rowCount());
+					outputList.add("number of car and walk users: " + carWalkUsers.rowCount());
+					outputList.add("number of bike and walk users: " + bikeWalkUsers.rowCount());
+					outputList.add("number of pt and walk users: " + ptWalkUsers.rowCount());
+					outputList.add("number of walk only users: " + walkOnlyUsers.rowCount());
+				}
 			}
 
 			Table deltaTable = createDeltaTable( joinedTable );
