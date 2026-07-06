@@ -80,11 +80,15 @@ public class TrafficVolumeGenerationTest {
 		double sample = 1.;
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				List.of("total"));
-		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+//		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
+		// is now done in the TrafficVolumeGeneration constructor below
+
+		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( usedTrafficType );
+
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
@@ -137,9 +141,9 @@ public class TrafficVolumeGenerationTest {
 
 		//test with different sample
 		sample = 0.25;
-		trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+		trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
@@ -210,11 +214,14 @@ public class TrafficVolumeGenerationTest {
 		double sample = 1.;
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
-		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+//		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
+		// is now done in TrafficVolumeGeneration constructor below
+
+		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( usedTrafficType );
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
 		Assertions.assertEquals(15, trafficVolumePerTypeAndZone_start.size());
@@ -524,7 +531,10 @@ public class TrafficVolumeGenerationTest {
 		config.network().setInputCRS("EPSG:4326");
 		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
+
+//		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
+		// is now done in TrafficVolumeGeneration constructor below
+
 		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 
 		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
@@ -533,9 +543,10 @@ public class TrafficVolumeGenerationTest {
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( usedTrafficType );
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
 		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, SCTUtils.getZoneIndex(inputDataDirectory));
@@ -681,7 +692,9 @@ public class TrafficVolumeGenerationTest {
 		config.network().setInputCRS("EPSG:4326");
 		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
+
+//		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
+		// is now done in TrafficVolumeGeneration constructor below
 
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
 		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
@@ -694,9 +707,10 @@ public class TrafficVolumeGenerationTest {
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
                         SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( usedTrafficType );
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
 		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, SCTUtils.getZoneIndex(inputDataDirectory));

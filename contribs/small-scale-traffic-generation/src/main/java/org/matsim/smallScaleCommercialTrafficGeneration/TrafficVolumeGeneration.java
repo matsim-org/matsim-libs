@@ -35,24 +35,40 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 
+import static org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.*;
+
 /**
  * @author Ricardo Ewert
  *
  */
-public class TrafficVolumeGeneration {
+class TrafficVolumeGeneration {
 
 	private static final Logger log = LogManager.getLogger(TrafficVolumeGeneration.class);
 	private static final Joiner JOIN = Joiner.on("\t");
 
-	private static Map<Integer, Map<StructuralAttribute, Double>> generationRatesStart = new HashMap<>();
-	private static Map<Integer, Map<StructuralAttribute, Double>> generationRatesStop = new HashMap<>();
-	private static Map<String, Map<StructuralAttribute, Double>> commitmentRatesStart = new HashMap<>();
-	private static Map<String, Map<StructuralAttribute, Double>> commitmentRatesStop = new HashMap<>();
+	private Map<Integer, Map<StructuralAttribute, Double>> generationRatesStart = new HashMap<>();
+	private Map<Integer, Map<StructuralAttribute, Double>> generationRatesStop = new HashMap<>();
+	private Map<String, Map<StructuralAttribute, Double>> commitmentRatesStart = new HashMap<>();
+	private Map<String, Map<StructuralAttribute, Double>> commitmentRatesStop = new HashMap<>();
 
-	public record TrafficVolumeKey(String zone, String modeORvehType) {}
+	record TrafficVolumeKey(String zone, String modeORvehType) {}
 
 	static TrafficVolumeKey makeTrafficVolumeKey(String zone, String modeORvehType) {
 		return new TrafficVolumeKey(zone, modeORvehType);
+	}
+
+	TrafficVolumeGeneration( SmallScaleCommercialTrafficType smallScaleCommercialTrafficType ) {
+		// Set generation rates for start potentials
+		generationRatesStart = GetGenerationRates.setGenerationRates(smallScaleCommercialTrafficType, "start");
+
+		// Set generation rates for stop potentials
+		generationRatesStop = GetGenerationRates.setGenerationRates(smallScaleCommercialTrafficType, "stop");
+
+		// Set commitment rates for start potentials
+		commitmentRatesStart = GetGenerationRates.setCommitmentRates(smallScaleCommercialTrafficType, "start");
+
+		// Set commitment rates for stop potentials
+		commitmentRatesStop = GetGenerationRates.setCommitmentRates(smallScaleCommercialTrafficType, "stop");
 	}
 
 	/**
@@ -65,9 +81,9 @@ public class TrafficVolumeGeneration {
 	 * @param modesORvehTypes selected mode or vehicleType
 	 * @return trafficVolume_start
 	 */
-	static Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_start(
+	Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_start(
 		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone, Path output, double sample,
-		List<String> modesORvehTypes, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType trafficType) throws MalformedURLException {
+		List<String> modesORvehTypes, SmallScaleCommercialTrafficType trafficType ) throws MalformedURLException {
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_start, resultingDataPerZone, "start", sample, modesORvehTypes);
@@ -89,9 +105,9 @@ public class TrafficVolumeGeneration {
 	 * @param modesORvehTypes selected mode or vehicleType
 	 * @return trafficVolume_stop
 	 */
-	static Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_stop(
+	Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_stop(
 		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone, Path output, double sample,
-		List<String> modesORvehTypes, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType trafficType) throws MalformedURLException {
+		List<String> modesORvehTypes, SmallScaleCommercialTrafficType trafficType ) throws MalformedURLException {
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_stop, resultingDataPerZone, "stop", sample, modesORvehTypes);
@@ -112,7 +128,7 @@ public class TrafficVolumeGeneration {
 	 * @param modesORvehTypes selected mode or vehicleType
 	 * @param sample sample size
 	 */
-	private static void calculateTrafficVolumePerZone(
+	private void calculateTrafficVolumePerZone(
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
 		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone, String volumeType, double sample,
 		List<String> modesORvehTypes) {
@@ -206,26 +222,6 @@ public class TrafficVolumeGeneration {
 		} catch (IOException e) {
 			log.error("Problem writing traffic volume file.", e);
 		}
-	}
-
-	/**
-	 * Loads the input data based on the selected smallScaleCommercialTrafficType.
-	 *
-	 * @param smallScaleCommercialTrafficType used smallScaleCommercialTrafficType (freight or business traffic)
-	 */
-	static void setInputParameters(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType) {
-
-		// Set generation rates for start potentials
-		generationRatesStart = GetGenerationRates.setGenerationRates(smallScaleCommercialTrafficType, "start");
-
-		// Set generation rates for stop potentials
-		generationRatesStop = GetGenerationRates.setGenerationRates(smallScaleCommercialTrafficType, "stop");
-
-		// Set commitment rates for start potentials
-		commitmentRatesStart = GetGenerationRates.setCommitmentRates(smallScaleCommercialTrafficType, "start");
-
-		// Set commitment rates for stop potentials
-		commitmentRatesStop = GetGenerationRates.setCommitmentRates(smallScaleCommercialTrafficType, "stop");
 	}
 
 }

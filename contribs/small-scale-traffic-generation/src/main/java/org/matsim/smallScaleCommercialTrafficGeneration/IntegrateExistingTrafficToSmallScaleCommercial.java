@@ -6,7 +6,7 @@ import org.matsim.application.options.ShpOptions;
 
 import java.util.Map;
 
-public interface IntegrateExistingTrafficToSmallScaleCommercial {
+interface IntegrateExistingTrafficToSmallScaleCommercial {
 
 	void readExistingCarriersFromFolder(Scenario scenario, double sampleScenario,
 										ShpOptions.Index indexZones) throws Exception;

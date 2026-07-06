@@ -51,6 +51,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.makeTrafficVolumeKey;
+
 /**
  * Builds and stores OD matrices for small scale commercial traffic.
  * <p>
@@ -61,7 +63,7 @@ import java.util.stream.Collectors;
  *
  * @author Ricardo Ewert
  */
-public class TripDistributionMatrix {
+class TripDistributionMatrix {
 
 	private static final Logger log = LogManager.getLogger(TripDistributionMatrix.class);
 	private static final Joiner JOIN = Joiner.on("\t");
@@ -90,7 +92,7 @@ public class TripDistributionMatrix {
 		private final ArrayList<String> listOfZones;
 		private final Map<String, SimpleFeature> zoneFeatureMap;
 
-		public static Builder newInstance(Index indexZones,
+		static Builder newInstance(Index indexZones,
 										  String shapeFileZoneNameColumn, Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 										  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
 										  GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, ArrayList<String> listOfZones) {
@@ -113,7 +115,7 @@ public class TripDistributionMatrix {
 			this.listOfZones = new ArrayList<>(listOfZones);
 		}
 
-		public TripDistributionMatrix build() {
+		TripDistributionMatrix build() {
 			return new TripDistributionMatrix(this);
 		}
 	}
@@ -191,8 +193,8 @@ public class TripDistributionMatrix {
 	 */
 	void setTripDistributionValue(String startZone, String stopZone, String modeORvehType, Integer purpose, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, Network network,
 								  Map<String, Map<Id<Link>, Link>> linksPerZone, double resistanceFactor) {
-		double volumeStart = trafficVolume_start.get(TrafficVolumeGeneration.makeTrafficVolumeKey(startZone, modeORvehType)).getDouble(purpose);
-		double volumeStop = trafficVolume_stop.get(TrafficVolumeGeneration.makeTrafficVolumeKey(stopZone, modeORvehType)).getDouble(purpose);
+		double volumeStart = trafficVolume_start.get( makeTrafficVolumeKey(startZone, modeORvehType ) ).getDouble(purpose );
+		double volumeStop = trafficVolume_stop.get( makeTrafficVolumeKey(stopZone, modeORvehType ) ).getDouble(purpose );
 		int roundedVolume;
 		if (volumeStart != 0 && volumeStop != 0) {
 
@@ -368,8 +370,8 @@ public class TripDistributionMatrix {
 			for (String modeORvehType : getListOfModesOrVehTypes()) {
 				loopForEachPurpose:
 				for (Integer purpose : getListOfPurposes()) {
-					double trafficVolume = trafficVolume_stop.get(TrafficVolumeGeneration.makeTrafficVolumeKey(stopZone, modeORvehType)).getDouble(
-						purpose);
+					double trafficVolume = trafficVolume_stop.get( makeTrafficVolumeKey(stopZone, modeORvehType ) ).getDouble(
+						purpose );
 					int generatedTrafficVolume = getSumOfServicesForStopZone(stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
 					if (trafficVolume > generatedTrafficVolume) {
 						ArrayList<String> shuffledZones = new ArrayList<>(getListOfZones());

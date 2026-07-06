@@ -78,11 +78,14 @@ public class TripDistributionMatrixTest {
 		double resistanceFactor = 0.005;
 
 		List<String> modesORvehTypes = new ArrayList<>(List.of("total"));
-		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+//		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
+		// is now done in the TrafficVolumeGeneration constructor below
+
+		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( usedTrafficType );
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 		ArrayList<String> listOfZones = new ArrayList<>( List.of("area1", "area2", "area3"));
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
@@ -175,11 +178,13 @@ public class TripDistributionMatrixTest {
 			Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
 		ArrayList<String> listOfZones = new ArrayList<>( List.of("area1", "area2", "area3"));
 
-		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
+//		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
+		// is now done in the TrafficVolumeGeneration constructor below
 
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
+		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( usedTrafficType );
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
 				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
 				.newInstance(getZoneIndex(inputDataDirectory), shapeFileZoneNameColumn, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType,
