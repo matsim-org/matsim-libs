@@ -515,6 +515,9 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	public enum StructuralAttribute {
+		// yyyyyy Strukturdaten ist deutsch, aber im engl. ist das m.E. kaum verständlich ... gehört da eher zu so etwas wie
+		// Tragwerksplanung.  M.E. am ehesten ZoneAttributes.  Mal die KI fragen ...
+
 		INHABITANTS("Inhabitants"),
 		EMPLOYEE("Employee"),
 		EMPLOYEE_PRIMARY("Employee Primary Sector"),

@@ -133,6 +133,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--pathToDataDistributionToZones", description = "Path to the data distribution to zones")
 	private Path pathToDataDistributionToZones;
 	// yyyy ??
+	// Dies zeigt auf die Datei, welche die Strukturdaten pro Zone enthält, welche dann mit den IVV magic numbers multipliziert
+	// werden.  Strukturdaten \ne structure data im engl., eher so etwas wie "zone attributes".
 
 	@CommandLine.Option(names = "--pathToCommercialFacilities", description = "Path to the commercial facilities.")
 	private Path pathToCommercialFacilities;
@@ -150,14 +152,21 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private int nJspritIterations;
 	// ok
 
-	@CommandLine.Option(names = {"--additionalTravelBufferPerIterationInMinutes", "--additionalTravelBufferPerTourAndIterationInMinutes"}, description = "Additional travel buffer in minutes per scheduled tour and carrier-replanning iteration. Used while resolving carriers with unhandled services; if set too low, carriers may not serve all services.", defaultValue = "30")
+	@CommandLine.Option(names = {"--additionalTravelBufferPerIterationInMinutes", "--additionalTravelBufferPerTourAndIterationInMinutes"}, defaultValue = "30",
+		description = "Additional travel buffer in minutes per scheduled tour and carrier-replanning iteration. Used while resolving carriers with unhandled services; if set too low, carriers may not serve all services.")
 	private int additionalTravelBufferPerTourAndIterationInMinutes;
+	// This has to do with the issue that the vehicle fleets are given a priori, since they need to match some externally given
+	// data.  With that, it may happen that not all services fit in.  In order to counter that, the tours (= driver workhours)
+	// are made longer and longer until it fits.
 
-	@CommandLine.Option(names = "--maxNumberOfLoopsForVRPSolving", description = "Limit of carrier replanning iterations, where carriers with unhandled services get new plans. If your carrier-plans are still not fully served, increase this limit.", defaultValue = "100")
+	@CommandLine.Option(names = "--maxNumberOfLoopsForVRPSolving", defaultValue = "100",
+		description = "Limit of carrier replanning iterations, where carriers with unhandled services get new plans. If your carrier-plans are still not fully served, increase this limit.")
 	private int maxNumberOfLoopsForVRPSolving;
+	/// see {@link #additionalTravelBufferPerTourAndIterationInMinutes}
 
 	@CommandLine.Option(names = "--creationOption", description = "Set option of mode differentiation:  useExistingCarrierFileWithSolution, createNewCarrierFile, useExistingCarrierFileWithoutSolution")
 	private CreationOption carriersFileCreationOption;
+	/// see comments at {@link CreationOption}
 
 	@CommandLine.Option(names = "--smallScaleCommercialTrafficType", description = "Select traffic type. Options: commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic (contains both types)")
 	private SmallScaleCommercialTrafficType usedSmallScaleCommercialTrafficType;
@@ -173,6 +182,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	@CommandLine.Option(names = "--zoneShapeFileNameColumn", description = "Name of the unique column of the name/Id of each zone in the zones shape file.")
 	private String shapeFileZoneNameColumn;
+	// ok
 
 	@CommandLine.Option(names = "--shapeCRS", description = "CRS of the three input shape files (zones, landuse, buildings")
 	private String shapeCRS;
@@ -197,39 +207,36 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--network", description = "Overwrite network file in config")
 	private String network;
 	// ok
-	// yyyy since one reads a config, this here is not needed: can be set via --config:.... syntax
+	// yy since one reads a config, this here is not needed: can be set via --config:.... syntax
 
 	@CommandLine.Option(names = "--pathOutput", description = "Path for the output")
 	private Path output;
 	// ok
-	// yyyy since one reads a config, this here is not needed: can be set via --config:.... syntax
-
-	@CommandLine.Option(names = "--MATSimIterationsAfterDemandGeneration",
-		description = "If selected, the MATSim simulation will be run for the selected number of iterations after demand generation. if not selected, only demand generation is performed.")
-	private Integer MATSimIterationsAfterDemandGeneration;
-	// ok.  The matsim-related code should go to a different file/class.
-	// yyyy since one reads a config, this here is not needed: can be set via --config:.... syntax
+	// yy since one reads a config, this here is not needed: can be set via --config:.... syntax
 
 	@CommandLine.Option(names = "--factorForTravelBufferCalculation", defaultValue = "1.2",
 		description = "Factor applied to the total service duration when estimating the required total tour duration for initial vehicle creation. Values above 1.0 reserve additional time for travel between services")
 	private double factorForTravelBufferCalculation;
 
+
+	@CommandLine.Option(names = "--createSmallScaleCommercialCarrierFileOnly", description = "Create the unsolved small scale commercial carrier file and stop before tour planning.")
+	private boolean createSmallScaleCommercialCarrierFileOnly;
+	// ok (means, I think: "stopBeforeJsprit").  The jsprit-related code now is in a different file/class.
+	// yyyy as far as I can tell, this option is not honoured when using one of the two "useExistingCarrier..." options.
+
+	// ### only matsim- and jsprit-related params below
+
 	@CommandLine.Option(names = "--useRangeConstraintForTourPlanning",
 		description = "Option to use range constraint for planning the tours. If this is selected, the range is restricted based on consumption information in the vehicle types file.")
 	private boolean useRangeConstraintForTourPlanning;
 	// I think that this is a jsprit option.
-	// yyyy since one reads a config, this here is not needed
+	// yy since one reads a config, this here is not needed
 
 	@CommandLine.Option(names = "--distanceConstraintUsableRange",
 		description = "Usable range in percent of the energy capacity applied to the vehicle range during tour planning. For example, a value of 80 limits the usable range to 80 percent. This option is only applied if --useRangeConstraintForTourPlanning is selected.", defaultValue = "100")
 	private double distanceConstraintUsableRange;
 	// I think that this is a jsprit option
-	// yyyy since one reads a config, this here is not needed: can be set via --config:freight.... syntax
-
-	@CommandLine.Option(names = "--createSmallScaleCommercialCarrierFileOnly", description = "Create the unsolved small scale commercial carrier file and stop before tour planning.")
-	private boolean createSmallScaleCommercialCarrierFileOnly;
-	// ok (means, I think: "stopBeforeJsprit").  The jsprit-related code now is in a different file/class.
-	// yyyy as far as I can tell, this option does not work together with the two "useExistingCarrier..." options.
+	// yy since one reads a config, this here is not needed: can be set via --config:freight.... syntax
 
 	@CommandLine.Option(names = "--smallScaleCommercialCarrierPartCount", defaultValue = "1",
 		description = "Number of independent carrier parts for small scale commercial tour planning. Use with --smallScaleCommercialCarrierPartIndex.")
@@ -247,6 +254,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--smallScaleCommercialCarrierPartsFolder", description = "Folder containing the solved small scale commercial carrier part folders. Defaults to <pathOutput>/carrierParts.")
 	private Path smallScaleCommercialCarrierPartsFolder;
 	// if one replaces "parts" by "chunks" it becomes clear
+
+	// ### only matsim-related params below
+
+	@CommandLine.Option(names = "--MATSimIterationsAfterDemandGeneration",
+		description = "If selected, the MATSim simulation will be run for the selected number of iterations after demand generation. if not selected, only demand generation is performed.")
+	private Integer MATSimIterationsAfterDemandGeneration;
+	// ok.  The matsim-related code should go to a different file/class.
+	// yyyy since one reads a config, this here is not needed: can be set via --config:.... syntax
 
 	private Random rnd;
 	private RandomGenerator rng;

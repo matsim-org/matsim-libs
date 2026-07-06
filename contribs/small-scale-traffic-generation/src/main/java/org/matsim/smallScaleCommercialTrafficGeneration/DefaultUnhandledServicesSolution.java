@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
+class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 	private static final Logger log = LogManager.getLogger(DefaultUnhandledServicesSolution.class);
 	private static final Joiner JOIN = Joiner.on("\t");
 
