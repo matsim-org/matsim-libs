@@ -33,20 +33,22 @@ public class VehicleTypeBasedLegScoring implements SumScoringFunction.TripScorin
 	private final Set<String> modesAlreadyConsideredForDailyConstants;
 	private final DoubleList legScores;
 	private final Vehicles vehicles;
+	private final ScoringConfigGroup.ScoringParameterSet scoringParameterSet;
 
 	private double score;
 
 	public VehicleTypeBasedLegScoring(Vehicles vehicles, ScoringParameters params, Set<String> ptModes) {
+		this(vehicles, params, null, ptModes);
+	}
+
+	public VehicleTypeBasedLegScoring(Vehicles vehicles, ScoringParameters params, ScoringConfigGroup.ScoringParameterSet scoringParameterSet, Set<String> ptModes) {
 		this.vehicles = vehicles;
 		this.params = params;
+		this.scoringParameterSet = scoringParameterSet;
 		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
 		this.ptModes = ptModes;
 		this.modesAlreadyConsideredForDailyConstants = new HashSet<>();
 		this.legScores = new DoubleArrayList();
-	}
-
-	public VehicleTypeBasedLegScoring(ScoringParameters params, Vehicles vehicles) {
-		this(vehicles, params, new HashSet<>(Collections.singletonList("pt")));
 	}
 
 	@Override
@@ -156,10 +158,9 @@ public class VehicleTypeBasedLegScoring implements SumScoringFunction.TripScorin
 					return vehicleType.getId().toString();
 				}
 				else {
-					ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(vehicleType.getId().toString());
-					thisModeParams.setDailyMonetaryConstant((-1) * vehicleType.getCostInformation().getFixedCosts());
-					thisModeParams.setMarginalUtilityOfDistance((-1) * vehicleType.getCostInformation().getCostsPerMeter());
-					thisModeParams.setMarginalUtilityOfTraveling((-1) * vehicleType.getCostInformation().getCostsPerSecond() * 3600); // needed because the builder expects this in per hour
+					var thisModeParams = scoringParameterSet != null
+						? VehicleTypeBasedScoringUtils.getOrCreateModeParams(scoringParameterSet, vehicleType)
+						: VehicleTypeBasedScoringUtils.createModeParams(vehicleType);
 					params.modeParams.put(vehicleType.getId().toString(), new ModeUtilityParameters.Builder(thisModeParams).build());
 					return vehicleType.getId().toString();
 				}
