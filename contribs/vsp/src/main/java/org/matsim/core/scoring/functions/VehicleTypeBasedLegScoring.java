@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PassengerRoute;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.ScoringFunction;
@@ -156,10 +155,7 @@ public class VehicleTypeBasedLegScoring implements SumScoringFunction.TripScorin
 					return vehicleType.getId().toString();
 				}
 				else {
-					ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(vehicleType.getId().toString());
-					thisModeParams.setDailyMonetaryConstant((-1) * vehicleType.getCostInformation().getFixedCosts());
-					thisModeParams.setMarginalUtilityOfDistance((-1) * vehicleType.getCostInformation().getCostsPerMeter());
-					thisModeParams.setMarginalUtilityOfTraveling((-1) * vehicleType.getCostInformation().getCostsPerSecond() * 3600); // needed because the builder expects this in per hour
+					var thisModeParams = VehicleTypeBasedScoringUtils.createModeParams(vehicleType);
 					params.modeParams.put(vehicleType.getId().toString(), new ModeUtilityParameters.Builder(thisModeParams).build());
 					return vehicleType.getId().toString();
 				}

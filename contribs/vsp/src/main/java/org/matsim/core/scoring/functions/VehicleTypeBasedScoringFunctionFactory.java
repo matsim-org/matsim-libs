@@ -19,6 +19,7 @@ public class VehicleTypeBasedScoringFunctionFactory implements ScoringFunctionFa
 	@Inject
 	VehicleTypeBasedScoringFunctionFactory(Scenario scenario) {
 		this.scenario = scenario;
+		VehicleTypeBasedScoringUtils.addVehicleTypeModeParamsToScoringConfig(scenario.getConfig().scoring(), scenario.getVehicles());
 		this.params = new SubpopulationScoringParameters(scenario);
 	}
 

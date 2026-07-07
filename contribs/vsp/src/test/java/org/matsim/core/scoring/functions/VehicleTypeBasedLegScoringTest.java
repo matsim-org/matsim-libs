@@ -1,14 +1,19 @@
 package org.matsim.core.scoring.functions;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -21,9 +26,13 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VehicleTypeBasedLegScoringTest {
+
+	@RegisterExtension
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void usesVehicleTypeScoringParametersWhenAvailable() {
@@ -79,6 +88,59 @@ class VehicleTypeBasedLegScoringTest {
 		assertTrue(params.modeParams.containsKey("truck"));
 	}
 
+	@Test
+	void addsVehicleTypeScoringParametersToScoringConfigGroup() {
+		var config = ConfigUtils.createConfig();
+		var scenario = ScenarioUtils.createScenario(config);
+		var truckType = addVehicleType(scenario.getVehicles(), "truck");
+		truckType.getCostInformation()
+			.setFixedCost(5.0)
+			.setCostsPerMeter(0.3)
+			.setCostsPerSecond(0.2);
+		addVehicle(scenario.getVehicles(), "truck-1", truckType);
+
+		new VehicleTypeBasedScoringFunctionFactory(scenario);
+
+		var truckParams = config.scoring().getScoringParameters(null).getModes().get("truck");
+		assertVehicleTypeParams(truckParams);
+
+		var outFile = utils.getOutputDirectory() + "/vehicle-type-based-scoring-config.xml";
+		new ConfigWriter(config).write(outFile);
+
+		var readConfig = ConfigUtils.createConfig();
+		new ConfigReader(readConfig).readFile(outFile);
+
+		var readTruckParams = readConfig.scoring().getScoringParameters(null).getModes().get("truck");
+		assertVehicleTypeParams(readTruckParams);
+	}
+
+	@Test
+	void keepsConfiguredVehicleTypeScoringParametersInScoringConfigGroup() {
+		var config = ConfigUtils.createConfig();
+		var scenario = ScenarioUtils.createScenario(config);
+		var truckType = addVehicleType(scenario.getVehicles(), "truck");
+		truckType.getCostInformation()
+			.setFixedCost(5.0)
+			.setCostsPerMeter(0.3)
+			.setCostsPerSecond(0.2);
+		addVehicle(scenario.getVehicles(), "truck-1", truckType);
+
+		config.scoring().getOrCreateModeParams("truck")
+			.setConstant(-99.0)
+			.setMarginalUtilityOfTraveling(-88.0)
+			.setMarginalUtilityOfDistance(-77.0)
+			.setDailyMonetaryConstant(-66.0);
+
+		new VehicleTypeBasedScoringFunctionFactory(scenario);
+
+		var truckParams = config.scoring().getScoringParameters(null).getModes().get("truck");
+		assertNotNull(truckParams);
+		assertEquals(-99.0, truckParams.getConstant(), MatsimTestUtils.EPSILON);
+		assertEquals(-88.0, truckParams.getMarginalUtilityOfTraveling(), MatsimTestUtils.EPSILON);
+		assertEquals(-77.0, truckParams.getMarginalUtilityOfDistance(), MatsimTestUtils.EPSILON);
+		assertEquals(-66.0, truckParams.getDailyMonetaryConstant(), MatsimTestUtils.EPSILON);
+	}
+
 	private static ScoringConfigGroup createScoringConfig() {
 		var scoringConfig = new ScoringConfigGroup();
 		scoringConfig.setMarginalUtilityOfMoney(1.0);
@@ -115,5 +177,12 @@ class VehicleTypeBasedLegScoringTest {
 		leg.setRoute(route);
 		leg.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, vehicleId);
 		return leg;
+	}
+
+	private static void assertVehicleTypeParams(ScoringConfigGroup.ModeParams truckParams) {
+		assertNotNull(truckParams);
+		assertEquals(-5.0, truckParams.getDailyMonetaryConstant(), MatsimTestUtils.EPSILON);
+		assertEquals(-0.3, truckParams.getMarginalUtilityOfDistance(), MatsimTestUtils.EPSILON);
+		assertEquals(-0.2 * 3600, truckParams.getMarginalUtilityOfTraveling(), MatsimTestUtils.EPSILON);
 	}
 }
