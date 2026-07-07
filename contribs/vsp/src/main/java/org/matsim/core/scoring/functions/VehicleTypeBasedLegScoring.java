@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PassengerRoute;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.ScoringFunction;
@@ -32,20 +33,22 @@ public class VehicleTypeBasedLegScoring implements SumScoringFunction.TripScorin
 	private final Set<String> modesAlreadyConsideredForDailyConstants;
 	private final DoubleList legScores;
 	private final Vehicles vehicles;
+	private final ScoringConfigGroup.ScoringParameterSet scoringParameterSet;
 
 	private double score;
 
 	public VehicleTypeBasedLegScoring(Vehicles vehicles, ScoringParameters params, Set<String> ptModes) {
+		this(vehicles, params, null, ptModes);
+	}
+
+	public VehicleTypeBasedLegScoring(Vehicles vehicles, ScoringParameters params, ScoringConfigGroup.ScoringParameterSet scoringParameterSet, Set<String> ptModes) {
 		this.vehicles = vehicles;
 		this.params = params;
+		this.scoringParameterSet = scoringParameterSet;
 		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
 		this.ptModes = ptModes;
 		this.modesAlreadyConsideredForDailyConstants = new HashSet<>();
 		this.legScores = new DoubleArrayList();
-	}
-
-	public VehicleTypeBasedLegScoring(ScoringParameters params, Vehicles vehicles) {
-		this(vehicles, params, new HashSet<>(Collections.singletonList("pt")));
 	}
 
 	@Override
@@ -155,7 +158,9 @@ public class VehicleTypeBasedLegScoring implements SumScoringFunction.TripScorin
 					return vehicleType.getId().toString();
 				}
 				else {
-					var thisModeParams = VehicleTypeBasedScoringUtils.createModeParams(vehicleType);
+					var thisModeParams = scoringParameterSet != null
+						? VehicleTypeBasedScoringUtils.getOrCreateModeParams(scoringParameterSet, vehicleType)
+						: VehicleTypeBasedScoringUtils.createModeParams(vehicleType);
 					params.modeParams.put(vehicleType.getId().toString(), new ModeUtilityParameters.Builder(thisModeParams).build());
 					return vehicleType.getId().toString();
 				}

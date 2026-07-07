@@ -13,7 +13,6 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -27,6 +26,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VehicleTypeBasedLegScoringTest {
@@ -89,20 +89,47 @@ class VehicleTypeBasedLegScoringTest {
 	}
 
 	@Test
-	void addsVehicleTypeScoringParametersToScoringConfigGroup() {
+	void addsOnlyUsedVehicleTypeScoringParametersToRelevantSubpopulation() {
 		var config = ConfigUtils.createConfig();
-		var scenario = ScenarioUtils.createScenario(config);
-		var truckType = addVehicleType(scenario.getVehicles(), "newTruckType");
-		truckType.getCostInformation()
+		var vehicles = VehicleUtils.createVehiclesContainer();
+		var privateTruckType = addVehicleType(vehicles, "privateTruck");
+		privateTruckType.getCostInformation()
 			.setFixedCost(5.0)
 			.setCostsPerMeter(0.3)
 			.setCostsPerSecond(0.2);
-		addVehicle(scenario.getVehicles(), "truck-1", truckType);
+		var freightTruckType = addVehicleType(vehicles, "freightTruck");
+		freightTruckType.getCostInformation()
+			.setFixedCost(5.0)
+			.setCostsPerMeter(0.3)
+			.setCostsPerSecond(0.2);
+		var privateTruckId = addVehicle(vehicles, "private-truck-1", privateTruckType);
+		var freightTruckId = addVehicle(vehicles, "freight-truck-1", freightTruckType);
 
-		new VehicleTypeBasedScoringFunctionFactory(scenario);
+		var privateScoringParameterSet = config.scoring().getOrCreateScoringParameters("private");
+		var freightScoringParameterSet = config.scoring().getOrCreateScoringParameters("freight");
+		privateScoringParameterSet.setMarginalUtlOfWaitingPt_utils_hr(0.0);
+		freightScoringParameterSet.setMarginalUtlOfWaitingPt_utils_hr(0.0);
 
-		var truckParams = config.scoring().getScoringParameters(null).getModes().get("newTruckType");
-		assertVehicleTypeParams(truckParams);
+		var privateScoring = new VehicleTypeBasedLegScoring(
+			vehicles,
+			createScoringParameters(config.scoring(), privateScoringParameterSet),
+			privateScoringParameterSet,
+			Set.of()
+		);
+		privateScoring.handleTrip(TripStructureUtils.getTrips2(List.of(createLeg(TransportMode.car, 20, 30, privateTruckId))).getFirst());
+
+		var freightScoring = new VehicleTypeBasedLegScoring(
+			vehicles,
+			createScoringParameters(config.scoring(), freightScoringParameterSet),
+			freightScoringParameterSet,
+			Set.of()
+		);
+		freightScoring.handleTrip(TripStructureUtils.getTrips2(List.of(createLeg(TransportMode.car, 20, 30, freightTruckId))).getFirst());
+
+		assertVehicleTypeParams(privateScoringParameterSet.getModes().get("privateTruck"));
+		assertNull(privateScoringParameterSet.getModes().get("freightTruck"));
+		assertVehicleTypeParams(freightScoringParameterSet.getModes().get("freightTruck"));
+		assertNull(freightScoringParameterSet.getModes().get("privateTruck"));
 
 		var outFile = utils.getOutputDirectory() + "/vehicle-type-based-scoring-config.xml";
 		new ConfigWriter(config).write(outFile);
@@ -110,30 +137,37 @@ class VehicleTypeBasedLegScoringTest {
 		var readConfig = ConfigUtils.createConfig();
 		new ConfigReader(readConfig).readFile(outFile);
 
-		var readTruckParams = readConfig.scoring().getScoringParameters(null).getModes().get("newTruckType");
-		assertVehicleTypeParams(readTruckParams);
+		var readPrivateParams = readConfig.scoring().getScoringParameters("private");
+		var readFreightParams = readConfig.scoring().getScoringParameters("freight");
+		assertVehicleTypeParams(readPrivateParams.getModes().get("privateTruck"));
+		assertNull(readPrivateParams.getModes().get("freightTruck"));
+		assertVehicleTypeParams(readFreightParams.getModes().get("freightTruck"));
+		assertNull(readFreightParams.getModes().get("privateTruck"));
 	}
 
 	@Test
 	void keepsConfiguredVehicleTypeScoringParametersInScoringConfigGroup() {
-		var config = ConfigUtils.createConfig();
-		var scenario = ScenarioUtils.createScenario(config);
-		var truckType = addVehicleType(scenario.getVehicles(), "truck");
+		var vehicles = VehicleUtils.createVehiclesContainer();
+		var truckType = addVehicleType(vehicles, "truck");
 		truckType.getCostInformation()
 			.setFixedCost(5.0)
 			.setCostsPerMeter(0.3)
 			.setCostsPerSecond(0.2);
-		addVehicle(scenario.getVehicles(), "truck-1", truckType);
+		var truckId = addVehicle(vehicles, "truck-1", truckType);
 
-		config.scoring().getOrCreateModeParams("truck")
+		var scoringConfig = createScoringConfig();
+		var scoringParameterSet = scoringConfig.getScoringParameters(null);
+		scoringConfig.getOrCreateModeParams("truck")
 			.setConstant(-99.0)
 			.setMarginalUtilityOfTraveling(-88.0)
 			.setMarginalUtilityOfDistance(-77.0)
 			.setDailyMonetaryConstant(-66.0);
 
-		new VehicleTypeBasedScoringFunctionFactory(scenario);
+		var params = createScoringParameters(scoringConfig, scoringParameterSet);
+		var scoring = new VehicleTypeBasedLegScoring(vehicles, params, scoringParameterSet, Set.of());
+		scoring.handleTrip(TripStructureUtils.getTrips2(List.of(createLeg(TransportMode.car, 20, 30, truckId))).getFirst());
 
-		var truckParams = config.scoring().getScoringParameters(null).getModes().get("truck");
+		var truckParams = scoringConfig.getScoringParameters(null).getModes().get("truck");
 		assertNotNull(truckParams);
 		assertEquals(-99.0, truckParams.getConstant(), MatsimTestUtils.EPSILON);
 		assertEquals(-88.0, truckParams.getMarginalUtilityOfTraveling(), MatsimTestUtils.EPSILON);
@@ -148,9 +182,13 @@ class VehicleTypeBasedLegScoringTest {
 	}
 
 	private static ScoringParameters createScoringParameters(ScoringConfigGroup scoringConfig) {
+		return createScoringParameters(scoringConfig, scoringConfig.getScoringParameters(null));
+	}
+
+	private static ScoringParameters createScoringParameters(ScoringConfigGroup scoringConfig, ScoringConfigGroup.ScoringParameterSet scoringParameterSet) {
 		return new ScoringParameters.Builder(
 			scoringConfig,
-			scoringConfig.getScoringParameters(null),
+			scoringParameterSet,
 			Map.of(),
 			new ScenarioConfigGroup()
 		).build();

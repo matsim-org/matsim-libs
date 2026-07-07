@@ -3,6 +3,7 @@ package org.matsim.core.scoring.functions;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -19,17 +20,17 @@ public class VehicleTypeBasedScoringFunctionFactory implements ScoringFunctionFa
 	@Inject
 	VehicleTypeBasedScoringFunctionFactory(Scenario scenario) {
 		this.scenario = scenario;
-		VehicleTypeBasedScoringUtils.addVehicleTypeModeParamsToScoringConfig(scenario.getConfig().scoring(), scenario.getVehicles());
 		this.params = new SubpopulationScoringParameters(scenario);
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 		ScoringParameters parameters = params.getScoringParameters(person);
+		var scoringParameterSet = scenario.getConfig().scoring().getScoringParameters(PopulationUtils.getSubpopulation(person));
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		sumScoringFunction.addScoringFunction(new ActivityScoringForCommercialActivities(parameters));
-		sumScoringFunction.addScoringFunction(new VehicleTypeBasedLegScoring(scenario.getVehicles(), parameters, scenario.getConfig().transit().getTransitModes()));
+		sumScoringFunction.addScoringFunction(new VehicleTypeBasedLegScoring(scenario.getVehicles(), parameters, scoringParameterSet, scenario.getConfig().transit().getTransitModes()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(parameters));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(parameters));
 		sumScoringFunction.addScoringFunction(new ScoreEventScoring());
