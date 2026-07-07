@@ -3,6 +3,18 @@
 Tools in `org.matsim.contrib.bicycle.network` for building MATSim bicycle networks from OSM data, with
 cycling-infrastructure classification and elevation metrics.
 
+This is a **new approach** to building bicycle networks. Rather than producing a plain network and inferring
+cycling infrastructure downstream, it classifies each link's cycling-infrastructure category up front, *during*
+the OSM read itself: the classifier is hooked into the reader via a per-link callback, so every link already
+carries its `bicycle_infra` category by the time the network is written. DEM-based elevation metrics are attached
+on top.
+
+The classic approach remains available and unchanged: run
+[`OsmBicycleReader`](/contribs/osm/src/main/java/org/matsim/contrib/osm/networkReader/OsmBicycleReader.java)
+directly to get a bicycle network without the up-front infrastructure classification. The new pipeline builds on
+that same reader — it just wires the classification (and elevation) into it — and is intended to eventually
+replace the classic approach entirely.
+
 ## Entry point
 
 `BicycleNetworkPipeline` — full pipeline: infra classification, OSM-attribute prefixing, bicycle-aware simplification,
@@ -52,10 +64,19 @@ mvn -pl contribs/bicycle exec:java \
 Gradients are signed in the direction of travel, so reverse links get the opposite sign. `gradient` alone reads 0 % on a
 link with a hill between equal-height endpoints — `maxGradient`, `elevationGain` and `elevationLoss` fill that gap.
 
+Not all of these are needed by the simulation `averageElevation` and `osm:cycleway`. Handy for sanity-checking an
+extract, not read
+by anything downstream.
+
+For ad-hoc debugging you can forward **arbitrary** OSM tags onto links: add their keys to `TAGS_TO_COPY` in
+`BicycleNetworkPipeline` and `TagCopy` copies them on verbatim under the `osm:` prefix (empty by default, so a no-op
+until you populate it).
+
 ## Files
 
 - `BicycleNetworkPipeline` — full pipeline, entry point
-- `BicycleInfraClassifier` — classifies OSM tags into a `BicycleInfraCategory` (GraphHopper-style precedence)
+- `BicycleInfraClassifier` — classifies OSM tags into a `BicycleInfraCategory` ([radinfra.de](https://radinfra.de/)
+  -style precedence)
 - `BicycleInfraCategory` — enum of the 27 infrastructure categories the classifier can produce; `name()` is what gets
   written to the link attribute
 - `BicycleLinkPolicy` — per-link hook: infra classification + access rule enforcement (footway whitelist, `bicycle=no`,
@@ -81,7 +102,8 @@ Tests live in `contribs/bicycle/src/test/java/.../network`:
 ## Pipeline
 
 1. Read OSM with `OsmBicycleReader`. During read, each link's endpoints get a Z stamped from the DEM, and
-   `BicycleLinkPolicy` classifies the link and enforces access rules.
+   `BicycleLinkPolicy` classifies the link's cycling infrastructure via `BicycleInfraClassifier` — written to the
+   `bicycle_infra` attribute as a `BicycleInfraCategory` name — and enforces access rules.
 2. Move OSM-derived attributes (`bicycle`, `surface`, `smoothness`, `cycleway`) under the `osm:` prefix to separate
    them from pipeline-internal attributes.
 3. `NetworkUtils.cleanNetwork` drops isolated components.
@@ -136,7 +158,8 @@ Berlin streets without filtering.
 9. `CYCLEWAY_ON_HIGHWAY_ADVISORY`, `_EXCLUSIVE`, `_ADVISORY_OR_EXCLUSIVE` — on-highway lanes
 10. `CYCLEWAY_ADJOINING`, `_ISOLATED`, `_ADJOINING_OR_ISOLATED` — separated cycleways
 11. `FOOT_AND_CYCLEWAY_SHARED_ADJOINING`, `_ISOLATED`, `_ADJOINING_OR_ISOLATED` — combined foot+bike paths (shared)
-12. `FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING`, `_ISOLATED`, `_ADJOINING_OR_ISOLATED` — combined foot+bike paths (segregated)
+12. `FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING`, `_ISOLATED`, `_ADJOINING_OR_ISOLATED` — combined foot+bike paths (
+    segregated)
 13. `FOOTWAY_BICYCLE_YES_ADJOINING`, `_ISOLATED`, `_ADJOINING_OR_ISOLATED` — footway with bicycle allowed
 14. `NEEDS_CLARIFICATION` — matched the precedence but OSM tags were ambiguous
 15. `NONE` — no cycling infrastructure
@@ -151,38 +174,50 @@ explicit bike permission, or tagged `bicycle=no`, or the reverse direction of a 
 ## Country profiles
 
 The classification rules that depend on the OSM `traffic_sign=*` tag are country-specific (DE:244 for German bicycle
-roads, AT:53.27 for Austrian ones, etc.). These are pluggable via `--country`:
+roads, AT:53.26 for Austrian ones, etc.). These are pluggable via `--country`:
 
-| Code      | Profile                          | Use for                                                                                |
-|-----------|----------------------------------|----------------------------------------------------------------------------------------|
-| `de`      | `BicycleCountryProfileGermany`   | Germany (default). Recognises DE:244, DE:237, DE:240, DE:241, etc.                     |
-| `at`      | `BicycleCountryProfileAustria`   | Austria. Recognises AT:53.26 (Fahrradstraße), AT:52.17, AT:52.17a-a/-b, AT:53.28b.     |
-| `generic` | `BicycleCountryProfileGeneric`   | Everywhere else. Skips traffic-sign matching; relies on tag-only logic.                |
+| Code      | Profile                        | Use for                                                                            |
+|-----------|--------------------------------|------------------------------------------------------------------------------------|
+| `de`      | `BicycleCountryProfileGermany` | Germany (default). Recognises DE:244, DE:237, DE:240, DE:241, etc.                 |
+| `at`      | `BicycleCountryProfileAustria` | Austria. Recognises AT:53.26 (Fahrradstraße), AT:52.17, AT:52.17a-a/-b, AT:53.28b. |
+| `generic` | `BicycleCountryProfileGeneric` | Everywhere else. Skips traffic-sign matching; relies on tag-only logic.            |
 
 The bulk of the classification is country-independent and works from generic OSM tags (`highway=*`, `cycleway=*`,
-`bicycle=*`, `foot=*`, `segregated=*`, `is_sidepath`, `separation:*`, `cycleway:right/left`, sidewalk subtags). The
+`bicycle=*`, `foot=*`, `segregated=*`, `bicycle_road=*`, `is_sidepath`, `separation:*`, `cycleway:right/left`, sidewalk
+subtags). The
 country profile only kicks in for the handful of rules that consult `traffic_sign=*`. So `--country generic` is a
 reasonable default for any country without a dedicated profile — it doesn't break anything, it just doesn't pick up the
 extra signal from country-specific traffic signs.
 
 Adding a new country: implement `BicycleCountryProfile`, register it in `BicycleCountryProfiles.forCode`, and look at
-`BicycleCountryProfileGermany` / `BicycleCountryProfileAustria` as templates. The right-hand-traffic assumption is currently still
+`BicycleCountryProfileGermany` / `BicycleCountryProfileAustria` as templates. The right-hand-traffic assumption is
+currently still
 hard-coded in `BicycleInfraClassifier` regardless of the profile; left-hand-traffic countries (UK, IE, …) need a
 broader refactor.
 
 ## DEM
 
-Sonny's DTMs (https://sonny.4lima.de/) are LiDAR-based, much better than SRTM. Germany is available as 20 m (~1.1 GB) or
+Sonny's DTMs (https://sonny.4lima.de/) are LiDAR-based, much better than SRTM. Germany is available as 20 m (~1.4 GB) or
 50 m (~300 MB), both in `EPSG:32632`. License: CC BY 4.0.
 
 ## Limitations
 
-- Elevation sampling walks the **straight line** between link endpoints, not the OSM way's curve geometry.
+- Elevation sampling walks the straight line between link endpoints, not the OSM way's curve geometry.
 - Nearest-neighbor DEM sampling (the DP filter compensates for most artifacts).
 - Bridges and tunnels aren't flagged as such; DP hides most of the resulting spurious gradients but very long bridges
   can still look unrealistic.
 - After simplification, some nodes may have been removed. Nodes that survive but were never touched by the reader's
-  `setAfterLinkCreated` callback remain without a Z coordinate; the per-link metrics are unaffected because they sample the
-  DEM directly.
-- `type` and `origid` are not yet under the `osm:` prefix (see TODO P3.1) because both carry semantics that other code
+  `setAfterLinkCreated` callback remain without a Z coordinate; the per-link metrics are unaffected because they sample
+  the DEM directly.
+- `type` and `origid` are not yet under the `osm:` prefix because both carry semantics that other code
   depends on (`type=highway.service` for `ServiceLinkCleaner`; `origid` for `NetworkSimplifier` merge tracking).
+- Elevation default sample step: The current default of `10` m oversamples the 20 m Sonny DTM — sampling finer than
+  the DEM resolution adds no real information. `20` m is likely the better default and would roughly halve the DEM
+  look-ups, but it hasn't been benchmarked against the 10 m default on a real scenario yet. Revisit once tested.
+- Some link attributes are written for inspection/debugging only and aren't consumed by the simulation:
+  `averageElevation` and `osm:cycleway`.
+- Today the simulation derives each link's gradient from the node Z coordinates (used in both the speed model and
+  scoring/routing). The intended direction is to stop relying on Z and
+  instead consume the pre-computed `gradient` attribute directly, plus the richer `maxGradient` / `elevationGain` /
+  `elevationLoss` metrics. How exactly those additional metrics should feed into speed, scoring and routing is still an
+  open design question. Until that's settled, both the Z coordinates and the gradient attributes are written.

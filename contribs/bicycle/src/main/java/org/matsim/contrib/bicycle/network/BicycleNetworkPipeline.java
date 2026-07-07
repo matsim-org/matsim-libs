@@ -176,7 +176,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		LINK_ATTR_BICYCLE_INFRA,
 		"type",
 		OSM_PREFIX + "surface",
-		OSM_PREFIX + "bicycle",
+		OSM_PREFIX + "bicycle", // this could be removed in the future as "bicycle_infra" should be enough
 		OSM_PREFIX + "smoothness"
 	);
 
@@ -384,7 +384,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	}
 
 	private static void attachElevationMetrics(Link link, ElevationDataParser parser,
-												double sampleStep, double noiseTolerance) {
+											   double sampleStep, double noiseTolerance) {
 		LinkElevationProfile.Metrics m = LinkElevationProfile.compute(
 			link, sampleStep, noiseTolerance, parser);
 
