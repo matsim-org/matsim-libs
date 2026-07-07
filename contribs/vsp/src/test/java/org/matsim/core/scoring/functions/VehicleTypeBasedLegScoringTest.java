@@ -92,7 +92,7 @@ class VehicleTypeBasedLegScoringTest {
 	void addsVehicleTypeScoringParametersToScoringConfigGroup() {
 		var config = ConfigUtils.createConfig();
 		var scenario = ScenarioUtils.createScenario(config);
-		var truckType = addVehicleType(scenario.getVehicles(), "truck");
+		var truckType = addVehicleType(scenario.getVehicles(), "newTruckType");
 		truckType.getCostInformation()
 			.setFixedCost(5.0)
 			.setCostsPerMeter(0.3)
@@ -101,7 +101,7 @@ class VehicleTypeBasedLegScoringTest {
 
 		new VehicleTypeBasedScoringFunctionFactory(scenario);
 
-		var truckParams = config.scoring().getScoringParameters(null).getModes().get("truck");
+		var truckParams = config.scoring().getScoringParameters(null).getModes().get("newTruckType");
 		assertVehicleTypeParams(truckParams);
 
 		var outFile = utils.getOutputDirectory() + "/vehicle-type-based-scoring-config.xml";
@@ -110,7 +110,7 @@ class VehicleTypeBasedLegScoringTest {
 		var readConfig = ConfigUtils.createConfig();
 		new ConfigReader(readConfig).readFile(outFile);
 
-		var readTruckParams = readConfig.scoring().getScoringParameters(null).getModes().get("truck");
+		var readTruckParams = readConfig.scoring().getScoringParameters(null).getModes().get("newTruckType");
 		assertVehicleTypeParams(readTruckParams);
 	}
 
