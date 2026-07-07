@@ -1524,6 +1524,10 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			}
 		}
 
+		public Map<String, ModeParams> getModeParams() {
+			return getModes();
+		}
+
 		public ModeParams getOrCreateModeParams(String modeName) {
 			ModeParams modeParams = getModes().get(modeName);
 			if (modeParams == null) {
