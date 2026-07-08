@@ -240,7 +240,7 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>9.1.1.Final</version>
+			<version>9.1.2.Final</version>
 			<exclusions>
 				<exclusion>
 					<groupId>jakarta.validation</groupId>
@@ -252,7 +252,7 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator-annotation-processor</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>9.1.1.Final</version>
+			<version>9.1.2.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
@@ -388,7 +388,7 @@
 		<dependency>
 			<groupId>org.agrona</groupId>
 			<artifactId>agrona</artifactId>
-			<version>2.4.1</version>
+			<version>2.5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hdrhistogram</groupId>
