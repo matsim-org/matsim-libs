@@ -74,7 +74,6 @@ public final class MatsimJspritFactory {
 
 	@SuppressWarnings("unused")
 	private static final  Logger log = LogManager.getLogger(MatsimJspritFactory.class);
-	private static final double OUT_OF_THE_BOX_MAX_TRANSPORT_COSTS = 1000.;
 	private static int addVehicleUsageCnt;
 	private static final int maxVehicleUsageCnt = 1;
 
@@ -689,7 +688,7 @@ public final class MatsimJspritFactory {
 			log.info("Use a VehicleRoutingAlgorithm out of the box.");
 			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
 				//by default of Jsprit the fixed costs are not considered in the algorithm. Adding this property takes this into account.
-				case noDistanceConstraint -> algorithm = createOutOfTheBoxJspritBuilder(problem).buildAlgorithm();
+				case noDistanceConstraint -> algorithm = Jsprit.Builder.newInstance(problem).setProperty(Jsprit.Parameter.FIXED_COST_PARAM, "0.5").buildAlgorithm();
 				case basedOnEnergyConsumption -> {
 					log.info("Use the distanceConstraint based on energy consumption.");
 					StateManager stateManager = new StateManager(problem);
@@ -698,23 +697,12 @@ public final class MatsimJspritFactory {
 					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts,
 						freightConfig.getDistanceConstraintUsableRange()), ConstraintManager.Priority.CRITICAL);
 					//by default of Jsprit the fixed costs are not considered in the algorithm. Adding this property takes this into account.
-					algorithm = createOutOfTheBoxJspritBuilder(problem)
-						.setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
+					algorithm = Jsprit.Builder.newInstance(problem).setProperty(Jsprit.Parameter.FIXED_COST_PARAM, "0.5").setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
 				}
 				default -> throw new IllegalStateException("Unexpected value: " + freightConfig.getUseDistanceConstraintForTourPlanning());
 			}
 		}
 		return algorithm;
-	}
-
-	private static Jsprit.Builder createOutOfTheBoxJspritBuilder(VehicleRoutingProblem problem) {
-		// jsprit scales the unassigned-job penalty with max_transport_costs. The default is carrier-specific and can be
-		// too low for high fixed-cost vehicles, so the out-of-the-box MATSim freight setup uses a stable penalty scale.
-		log.info("Use jsprit max_transport_costs {} in the out-of-the-box algorithm. With default service priority 2, the unassigned-service penalty is {}.",
-			OUT_OF_THE_BOX_MAX_TRANSPORT_COSTS, OUT_OF_THE_BOX_MAX_TRANSPORT_COSTS * 18.);
-		return Jsprit.Builder.newInstance(problem)
-			.setProperty(Jsprit.Parameter.FIXED_COST_PARAM, "0.5")
-			.setProperty(Jsprit.Parameter.MAX_TRANSPORT_COSTS, String.valueOf(OUT_OF_THE_BOX_MAX_TRANSPORT_COSTS));
 	}
 // ### This class could be an option to get both absolute and relative fixed costs into the algorithm. However, it is currently not used since it is not clear how to set the weight parameter and what the influence of this parameter is. Ricardo April'26
 //	private static VehicleRoutingAlgorithm createFixedCostAwareAlgorithm(VehicleRoutingProblem problem, StateManager stateManager, ConstraintManager constraintManager) {

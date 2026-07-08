@@ -108,8 +108,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	// Option 3: Leerkamp (nur in RVR Modell).
 
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
-	public static final String UNSOLVED_CARRIER_FILE = "output_carriers_unsolvedVRP.xml.gz";
-	public static final String SOLVED_CARRIER_FILE = "output_carriers_solvedVRP.xml.gz";
+	private static final String UNSOLVED_CARRIER_FILE = "output_carriers_unsolvedVRP.xml.gz";
+	private static final String SOLVED_CARRIER_FILE = "output_carriers_solvedVRP.xml.gz";
 	private static final String CARRIER_VEHICLE_TYPES_FILE = "output_carriersVehicleTypes.xml.gz";
 	private static final String CARRIER_PARTS_FOLDER = "carrierParts";
 	private final IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
@@ -941,19 +941,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	private static void ensureDefaultModeParams(Config config, Set<String> modes) {
-		ScoringConfigGroup.ScoringParameterSet scoringParams = getOrCreateDefaultScoringParameters(config);
-		modes.forEach(scoringParams::getOrCreateModeParams);
-	}
-
-	private static ScoringConfigGroup.ScoringParameterSet getOrCreateDefaultScoringParameters(Config config) { //TODO das sollte anders gelöst werden
-		ScoringConfigGroup.ScoringParameterSet scoringParams = config.scoring().getScoringParameters(null);
-		if (scoringParams == null) {
-			scoringParams = config.scoring().getScoringParameters(ScoringConfigGroup.DEFAULT_SUBPOPULATION);
-		}
-		if (scoringParams == null) {
-			scoringParams = config.scoring().getOrCreateScoringParameters(null);
-		}
-		return scoringParams;
+		modes.forEach(mode -> {
+			if (!config.scoring().getDefaultModeParams().containsKey(mode)) {
+				config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(mode));
+			}
+		});
 	}
 
 	/**
