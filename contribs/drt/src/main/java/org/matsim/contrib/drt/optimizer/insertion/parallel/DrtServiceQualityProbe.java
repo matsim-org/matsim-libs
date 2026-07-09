@@ -157,8 +157,7 @@ class DrtServiceQualityProbe {
 		if (stopRecords.isEmpty() && zoneRecords.isEmpty()) {
 			return;
 		}
-		String filename = matsimServices.getControllerIO()
-			.getIterationFilename(matsimServices.getIterationNumber(), outputFile);
+		String filename = matsimServices.getControllerIO().getOutputFilename(outputFile);
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(filename)) {
 			if (spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE) {
 				writeZoneRecords(writer);
