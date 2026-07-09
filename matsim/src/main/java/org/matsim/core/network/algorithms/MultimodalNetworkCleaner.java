@@ -21,7 +21,6 @@ package org.matsim.core.network.algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -179,7 +178,13 @@ public final class MultimodalNetworkCleaner {
 	 */
 	private Map<Id<Link>, Link> findCluster(final Link startLink, final Set<Id<Link>> modeLinkIds) {
 
-		final Map<Id<Link>, DoubleFlagRole> linkRoles = new HashMap<>(this.network.getLinks().size());
+		// Per-link forward/backward reachability flags, indexed by Id#index() instead of a
+		// HashMap<Id<Link>, ...>. This turns the per-edge-visit lookup in the BFS below into a plain array access
+		// (the HashMap get/put previously dominated the runtime on large networks) and avoids allocating a role
+		// object per visited link.
+		final int linkIdCount = Id.getNumberOfIds(Link.class);
+		final boolean[] forwardFlags = new boolean[linkIdCount];
+		final boolean[] backwardFlags = new boolean[linkIdCount];
 
 		ArrayList<Node> pendingForward = new ArrayList<>();
 		ArrayList<Node> pendingBackward = new ArrayList<>();
@@ -195,9 +200,9 @@ public final class MultimodalNetworkCleaner {
 			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getOutLinks().values()) {
 				if (modeLinkIds.contains(link.getId())) {
-					DoubleFlagRole r = getDoubleFlag(link, linkRoles);
-					if (!r.forwardFlag) {
-						r.forwardFlag = true;
+					int linkIndex = link.getId().index();
+					if (!forwardFlags[linkIndex]) {
+						forwardFlags[linkIndex] = true;
 						pendingForward.add(link.getToNode());
 					}
 				}
@@ -210,11 +215,11 @@ public final class MultimodalNetworkCleaner {
 			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getInLinks().values()) {
 				if (modeLinkIds.contains(link.getId())) {
-					DoubleFlagRole r = getDoubleFlag(link, linkRoles);
-					if (!r.backwardFlag) {
-						r.backwardFlag = true;
+					int linkIndex = link.getId().index();
+					if (!backwardFlags[linkIndex]) {
+						backwardFlags[linkIndex] = true;
 						pendingBackward.add(link.getFromNode());
-						if (r.forwardFlag) {
+						if (forwardFlags[linkIndex]) {
 							// the node can be reached forward and backward, add it to the cluster
 							clusterLinks.put(link.getId(), link);
 						}
@@ -259,20 +264,6 @@ public final class MultimodalNetworkCleaner {
 			}
 		}
 		return false;
-	}
-
-	private static DoubleFlagRole getDoubleFlag(final Link l, final Map<Id<Link>, DoubleFlagRole> linkRoles) {
-		DoubleFlagRole r = linkRoles.get(l.getId());
-		if (null == r) {
-			r = new DoubleFlagRole();
-			linkRoles.put(l.getId(), r);
-		}
-		return r;
-	}
-
-	static class DoubleFlagRole {
-		boolean forwardFlag = false;
-		boolean backwardFlag = false;
 	}
 
 }
