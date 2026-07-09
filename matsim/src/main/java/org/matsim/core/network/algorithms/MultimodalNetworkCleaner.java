@@ -107,16 +107,29 @@ public final class MultimodalNetworkCleaner {
 		// search the biggest cluster of nodes in the network
 		log.info("  checking " + this.network.getNodes().size() + " nodes and " +
 				this.network.getLinks().size() + " links for dead-ends...");
+
+		// Pre-compute the set of link IDs whose allowedModes intersect combinedModes. This way the
+		// BFS hot loop in findCluster only has to do a single HashSet#contains lookup per edge visit
+		// instead of allocating a fresh HashSet/HashMap iterator inside intersectingSets each time.
+		// (For large networks this set-intersection check dominated the runtime; see profile.)
+		final Set<Id<Link>> modeLinkIds = new HashSet<>();
+		for (Link link : this.network.getLinks().values()) {
+			if (intersectingSets(combinedModes, link.getAllowedModes())) {
+				modeLinkIds.add(link.getId());
+			}
+		}
+
 		boolean stillSearching = true;
 		Iterator<? extends Link> iter = this.network.getLinks().values().iterator();
 		while (iter.hasNext() && stillSearching) {
 			Link startLink = iter.next();
-			if ((!visitedLinks.containsKey(startLink.getId())) && (intersectingSets(combinedModes, startLink.getAllowedModes()))) {
-				Map<Id<Link>, Link> cluster = this.findCluster(startLink, combinedModes);
+			if ((!visitedLinks.containsKey(startLink.getId())) && modeLinkIds.contains(startLink.getId())) {
+				Map<Id<Link>, Link> cluster = this.findCluster(startLink, modeLinkIds);
 				visitedLinks.putAll(cluster);
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
-					if (biggestCluster.size() >= (this.network.getLinks().size() - visitedLinks.size())) {
+					// upper bound: only mode-matching, not-yet-visited links can ever join a cluster
+					if (biggestCluster.size() >= (modeLinkIds.size() - visitedLinks.size())) {
 						// stop searching here, because we cannot find a bigger cluster in the lasting nodes
 						stillSearching = false;
 					}
@@ -159,10 +172,12 @@ public final class MultimodalNetworkCleaner {
 	 * and from where it is also possible to return again to <code>startLink</code>.
 	 *
 	 * @param startLink the link to start building the cluster
-	 * @param modes the set of modes that are allowed to
+	 * @param modeLinkIds the set of link IDs whose allowed modes intersect the modes being cleaned
+	 *        (pre-computed by {@link #run(Set, Set)} so the BFS does not have to repeat the
+	 *        set-intersection check per edge visit)
 	 * @return cluster of links <pre>startLink</pre> is part of
 	 */
-	private Map<Id<Link>, Link> findCluster(final Link startLink, final Set<String> modes) {
+	private Map<Id<Link>, Link> findCluster(final Link startLink, final Set<Id<Link>> modeLinkIds) {
 
 		final Map<Id<Link>, DoubleFlagRole> linkRoles = new HashMap<>(this.network.getLinks().size());
 
@@ -179,7 +194,7 @@ public final class MultimodalNetworkCleaner {
 			int idx = pendingForward.size() - 1;
 			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getOutLinks().values()) {
-				if (intersectingSets(modes, link.getAllowedModes())) {
+				if (modeLinkIds.contains(link.getId())) {
 					DoubleFlagRole r = getDoubleFlag(link, linkRoles);
 					if (!r.forwardFlag) {
 						r.forwardFlag = true;
@@ -194,7 +209,7 @@ public final class MultimodalNetworkCleaner {
 			int idx = pendingBackward.size()-1;
 			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getInLinks().values()) {
-				if (intersectingSets(modes, link.getAllowedModes())) {
+				if (modeLinkIds.contains(link.getId())) {
 					DoubleFlagRole r = getDoubleFlag(link, linkRoles);
 					if (!r.backwardFlag) {
 						r.backwardFlag = true;
