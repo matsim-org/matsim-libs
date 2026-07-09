@@ -28,7 +28,7 @@ import org.matsim.vehicles.Vehicle;
  * tracking, energy consumption), since {@link org.matsim.api.core.v01.events.PersonEntersVehicleEvent} is not fired for
  * teleported trips.
  */
-public final class VehicleTeleportationDepartureEvent extends Event implements HasPersonId, HasVehicleId, HasLinkId {
+public final class VehicleTeleportationDepartureEvent extends Event implements HasVehicleId, HasLinkId {
 
 	public static final String EVENT_TYPE = "vehicle teleport departure";
 
@@ -70,7 +70,6 @@ public final class VehicleTeleportationDepartureEvent extends Event implements H
 		this(time, personId, vehicleId, linkId, mode, time);
 	}
 
-	@Override
 	public Id<Person> getPersonId() {
 		return personId;
 	}
@@ -105,6 +104,7 @@ public final class VehicleTeleportationDepartureEvent extends Event implements H
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attributes = super.getAttributes();
+		attributes.put(HasPersonId.ATTRIBUTE_PERSON, personId.toString());
 		attributes.put(ATTRIBUTE_MODE, mode);
 		if (desiredDepartureTime != getTime()) {
 			attributes.put(ATTRIBUTE_DESIRED_DEPARTURE_TIME, Double.toString(desiredDepartureTime));
