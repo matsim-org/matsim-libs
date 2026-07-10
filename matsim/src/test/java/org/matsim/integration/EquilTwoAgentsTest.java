@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
@@ -92,6 +93,8 @@ public class EquilTwoAgentsTest {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		ConfigUtils.loadConfig(config, IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
 		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans2.xml").toString());
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		config.scoring().setWriteExperiencedPlans( true );
 

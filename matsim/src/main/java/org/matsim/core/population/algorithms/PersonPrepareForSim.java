@@ -136,7 +136,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 			// There is router without access/egress routing any more. Trips with one leg only are outdated.
 			for (Trip trip : TripStructureUtils.getTrips(plan)) {
-				if (TripStructureUtils.getLegs(plan).size() > 1) {
+				if (trip.getLegsOnly().size() > 1) {
 					// we are ok here, since trip consists of more than one leg. We assume that it has access/egress than.
 					continue;
 				}

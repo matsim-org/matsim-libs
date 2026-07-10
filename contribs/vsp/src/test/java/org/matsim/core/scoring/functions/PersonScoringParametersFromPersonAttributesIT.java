@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -53,6 +54,8 @@ public class PersonScoringParametersFromPersonAttributesIT {
         config.scoring().setPerforming_utils_hr(0.0d);
         config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0d);
         config.plans().setInputFile("plans2.xml");
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 

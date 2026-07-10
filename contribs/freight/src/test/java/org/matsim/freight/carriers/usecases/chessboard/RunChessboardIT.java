@@ -50,7 +50,9 @@ public class RunChessboardIT {
 		String [] args = { IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ).toString()
 				, "--config:controler.outputDirectory", utils.getOutputDirectory()
 				, "--config:controler.lastIteration", "1",
-				"--config:controler.runId", "itTest"
+				"--config:controler.runId", "itTest",
+			//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+			"--config:routing.accessEgressConsistencyCheck=disable"
 		};
 
 		try{

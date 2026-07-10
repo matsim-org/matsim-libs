@@ -9,6 +9,9 @@ import java.util.*;
 
 /**
  * Config group for the {@link SimWrapperModule}.
+ *
+ * Maybe, we should rename this config group to "AnalysisConfigGroup", because the main purpose of Simwrapper is the creation and display of aggregated analysis files.
+ * This is motivated by the discussion, where to put a path to the base case. matsim hackathon, jun'26.
  */
 public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 

@@ -52,6 +52,8 @@ public class ReRoutingIT {
 
 	private Scenario loadScenario() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() +"config.xml");
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		// (this is a local config!  It then recruits some files from the test scenarios.)
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
 		config.plans().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "plans_hwh_1pct.xml.gz").toString());

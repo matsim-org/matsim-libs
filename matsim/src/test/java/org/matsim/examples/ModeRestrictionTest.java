@@ -253,6 +253,8 @@ public class ModeRestrictionTest {
 	private Config prepareConfig(String plansFile, RoutingConfigGroup.NetworkRouteConsistencyCheck consistencyCheck) {
 		final Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml", MatsimTestUtils.TestMethodType.Parameterized);
 		config.routing().setNetworkRouteConsistencyCheck(consistencyCheck);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.plans().setInputFile(plansFile);
 
 		ScoringConfigGroup.ModeParams params = new ScoringConfigGroup.ModeParams("bike") ;

@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -75,6 +76,8 @@ public class WithinDayTravelTimeTest {
 	private void testGetLinkTravelTime(boolean isUsingFastCapacityUpdate) {
 
         Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.controller().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+isUsingFastCapacityUpdate);
 
 		QSimConfigGroup qSimConfig = config.qsim();

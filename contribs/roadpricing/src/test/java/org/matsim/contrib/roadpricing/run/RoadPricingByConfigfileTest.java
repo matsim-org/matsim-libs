@@ -55,7 +55,9 @@ public class RoadPricingByConfigfileTest {
 					IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil-extended" ), "config-with-roadpricing.xml" ).toString()
 					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
 					, "--config:controler.lastIteration=5"
-					, "--config:routing.accessEgressType=none"
+					, "--config:routing.accessEgressType=none",
+				//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+				"--config:routing.accessEgressConsistencyCheck=disable"
 			} );
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
