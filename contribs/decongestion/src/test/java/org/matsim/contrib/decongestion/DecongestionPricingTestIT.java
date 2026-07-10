@@ -228,6 +228,8 @@ public class DecongestionPricingTestIT {
 		URL configUrl = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
 
 		Config config = ConfigUtils.loadConfig( configUrl );
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.controller().setOutputDirectory( testUtils.getOutputDirectory()  );
 
 		config.plans().setInputFile( "plans2000.xml.gz" );
