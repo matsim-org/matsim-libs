@@ -31,6 +31,7 @@ import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -55,6 +56,8 @@ public class EquilTest  {
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 		config.facilities().setFacilitiesSource( FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile );
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		String netFileName = "test/scenarios/equil/network.xml";
 		String popFileName = "test/scenarios/equil/plans100.xml";
