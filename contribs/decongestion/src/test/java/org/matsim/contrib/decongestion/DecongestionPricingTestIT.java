@@ -44,6 +44,7 @@ import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingBangBang;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingPID;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -78,6 +79,8 @@ public class DecongestionPricingTestIT {
 		final String configFile = testUtils.getPackageInputDirectory() + "/config0.xml";
 
 		Config config = ConfigUtils.loadConfig(configFile);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
 		config.controller().setOutputDirectory(outputDirectory);
