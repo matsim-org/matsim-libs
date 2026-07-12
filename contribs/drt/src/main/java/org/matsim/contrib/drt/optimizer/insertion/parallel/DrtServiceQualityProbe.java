@@ -35,7 +35,6 @@ import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.RequestFleetFilter;
@@ -48,9 +47,13 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -283,24 +286,37 @@ class DrtServiceQualityProbe {
 
 	private double calculateRideDistanceWithDetour(InsertionWithDetourData insertionWithDetourData, double departureTime) {
 		var insertion = insertionWithDetourData.insertion;
-		List<Waypoint> itinerary = new ArrayList<>();
-		itinerary.add(insertion.pickup.newWaypoint);
+		var detourData = insertionWithDetourData.detourData;
 		if (insertion.pickup.index == insertion.dropoff.index) {
-			itinerary.add(insertion.dropoff.newWaypoint);
-		} else {
-			for (int index = insertion.pickup.index + 1; index <= insertion.dropoff.index; index++) {
-				itinerary.add(insertion.vehicleEntry.getWaypoint(index));
-			}
-			itinerary.add(insertion.dropoff.newWaypoint);
+			return calculatePathDistance(insertion.pickup.newWaypoint.getLink(), insertion.dropoff.newWaypoint.getLink(),
+				departureTime, detourData.detourFromPickup);
 		}
 
+		double distance = calculatePathDistance(insertion.pickup.newWaypoint.getLink(), insertion.pickup.nextWaypoint.getLink(),
+			departureTime, detourData.detourFromPickup);
+
+		Schedule schedule = insertion.vehicleEntry.vehicle.getSchedule();
+		for (int stopIndex = insertion.pickup.index; stopIndex < insertion.dropoff.index - 1; stopIndex++) {
+			distance += calculateScheduledDriveDistance(schedule, insertion.vehicleEntry.stops.get(stopIndex).getTask(),
+				insertion.vehicleEntry.stops.get(stopIndex + 1).getTask());
+		}
+
+		return distance + calculatePathDistance(insertion.dropoff.previousWaypoint.getLink(), insertion.dropoff.newWaypoint.getLink(),
+			insertion.dropoff.previousWaypoint.getDepartureTime(), detourData.detourToDropoff);
+	}
+
+	private double calculatePathDistance(Link fromLink, Link toLink, double departureTime,
+			PathData pathData) {
+		return VrpPaths.calcDistance(VrpPaths.createPath(fromLink, toLink, departureTime, pathData, travelTime));
+	}
+
+	private static double calculateScheduledDriveDistance(Schedule schedule, Task fromStopTask, Task toStopTask) {
 		double distance = 0;
-		double time = departureTime;
-		for (int index = 0; index < itinerary.size() - 1; index++) {
-			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(itinerary.get(index).getLink(), itinerary.get(index + 1).getLink(),
-				time, router, travelTime);
-			distance += VrpPaths.calcDistance(path);
-			time += path.getTravelTime();
+		for (int taskIndex = fromStopTask.getTaskIdx() + 1; taskIndex < toStopTask.getTaskIdx(); taskIndex++) {
+			Task task = schedule.getTasks().get(taskIndex);
+			if (task instanceof DriveTask driveTask) {
+				distance += VrpPaths.calcDistance(driveTask.getPath());
+			}
 		}
 		return distance;
 	}

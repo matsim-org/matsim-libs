@@ -175,7 +175,10 @@ public class RunDrtExampleIT {
 			String[] columns = row.split(";");
 			return Double.isFinite(Double.parseDouble(columns[3]))
 				&& Double.isFinite(Double.parseDouble(columns[5]))
-				&& Double.isFinite(Double.parseDouble(columns[6]));
+				&& Double.isFinite(Double.parseDouble(columns[6]))
+				&& Double.isFinite(Double.parseDouble(columns[7]))
+				&& Double.isFinite(Double.parseDouble(columns[8]))
+				&& Double.isFinite(Double.parseDouble(columns[9]));
 		})).isTrue();
 
 		var expectedStats = Stats.newBuilder()
