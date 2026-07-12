@@ -20,6 +20,9 @@
 package org.matsim.contrib.drt.optimizer.insertion.parallel;
 
 import com.google.inject.Provider;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,6 +35,7 @@ import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.RequestFleetFilter;
@@ -72,6 +76,7 @@ class DrtServiceQualityProbe {
 	private final MatsimServices matsimServices;
 	private final String mode;
 	private final List<DrtStopFacility> stops;
+	private final List<StopPair> stopPairs;
 	private final List<ProbeLocation> zoneLocations;
 	private final Network network;
 	private final TravelTime travelTime;
@@ -88,14 +93,20 @@ class DrtServiceQualityProbe {
 	private final Person dummyPerson = PopulationUtils.getFactory().createPerson(Id.createPersonId("drt-service-quality-probe"));
 	private final Attributes tripAttributes = new AttributesImpl();
 	private int nextProbeTimeIndex = 0;
-	private final List<StopServiceQualityRecord> stopRecords = new ArrayList<>();
-	private final List<ZoneServiceQualityRecord> zoneRecords = new ArrayList<>();
+	private BufferedWriter outputWriter;
 
 	private record ProbeLocation(String id, Link link, Coord coord) {
 	}
 
 	record StopServiceQualityRecord(double time, Id<DrtStopFacility> originStop, Id<DrtStopFacility> destinationStop,
-								double waitTime, double directRideTime, double rideTimeWithDetour, double detourFactor) {
+								double waitTime, double directRideTime, double rideTimeWithDetour, double detourFactor,
+								double directRideDistance, double rideDistanceWithDetour, double distanceDetourFactor) {
+	}
+
+	private record StopPair(DrtStopFacility origin, DrtStopFacility destination) {
+	}
+
+	private record ProbeRequest(DrtRequest request, double directRideDistance) {
 	}
 
 	record ZoneServiceQualityRecord(double time, Id<Zone> originZone, double originX, double originY,
@@ -116,7 +127,14 @@ class DrtServiceQualityProbe {
 			.sorted(Comparator.comparing(stop -> stop.getId().toString()))
 			.collect(Collectors.toList());
 		this.network = network;
+		this.delimiter = matsimServices.getConfig().global().getDefaultDelimiter();
 		this.spatialResolution = params.getServiceQualityProbeSpatialResolution();
+		this.stopPairs = spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.STOP_TO_STOP
+			? createStopPairs(params.getServiceQualityProbeStopPairInputFiles()) : List.of();
+		if (spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE
+			&& !params.getServiceQualityProbeStopPairInputFiles().isBlank()) {
+			throw new IllegalArgumentException("serviceQualityProbeStopPairInputFiles can only be used with STOP_TO_STOP probing");
+		}
 		this.zoneCellSize = params.getServiceQualityProbeZoneCellSize();
 		this.zoneLocations = spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE
 			? createZoneLocations()
@@ -130,7 +148,6 @@ class DrtServiceQualityProbe {
 		this.insertionSearchProvider = insertionSearchProvider;
 		this.probeTimes = parseProbeTimes(params.getServiceQualityProbeTimes());
 		this.outputFile = params.getServiceQualityProbeOutputFile();
-		this.delimiter = matsimServices.getConfig().global().getDefaultDelimiter();
 	}
 
 	boolean isEnabled() {
@@ -154,49 +171,48 @@ class DrtServiceQualityProbe {
 	}
 
 	void writeOutput() {
-		if (stopRecords.isEmpty() && zoneRecords.isEmpty()) {
+		if (outputWriter == null) {
 			return;
 		}
-		String filename = matsimServices.getControllerIO().getOutputFilename(outputFile);
-		try (BufferedWriter writer = IOUtils.getBufferedWriter(filename)) {
-			if (spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE) {
-				writeZoneRecords(writer);
-			} else {
-				writeStopRecords(writer);
-			}
+		try {
+			outputWriter.close();
 		} catch (IOException e) {
 			LOG.error("Failed to write DRT service quality probe output", e);
+		} finally {
+			outputWriter = null;
 		}
 	}
 
 	private void probe(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
-		if (spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE) {
-			probeZones(time, vehicleEntries);
-		} else {
-			probeStops(time, vehicleEntries);
+		try {
+			ensureOutputWriter();
+			if (spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE) {
+				probeZones(time, vehicleEntries);
+			} else {
+				probeStops(time, vehicleEntries);
+			}
+			outputWriter.flush();
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to stream DRT service quality probe output", e);
 		}
 	}
 
-	private void probeStops(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
+	private void probeStops(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) throws IOException {
 		if (stops.isEmpty()) {
 			throw new IllegalStateException("DRT stop-to-stop service quality probes require a non-empty DrtStopNetwork for mode " + mode);
 		}
-		LOG.info("Estimating DRT service quality for {} stop-to-stop pairs at time {}", stops.size() * (stops.size() - 1), time);
+		LOG.info("Estimating DRT service quality for {} stop-to-stop pairs at time {}", stopPairs.size(), time);
 		DrtInsertionSearch insertionSearch = insertionSearchProvider.get();
-		for (DrtStopFacility origin : stops) {
-			for (DrtStopFacility destination : stops) {
-				if (origin.getId().equals(destination.getId())) {
-					continue;
-				}
-				Estimate estimate = estimate(time, origin.getId().toString(), getLink(origin),
-					destination.getId().toString(), getLink(destination), vehicleEntries, insertionSearch);
-				stopRecords.add(new StopServiceQualityRecord(time, origin.getId(), destination.getId(),
-					estimate.waitTime, estimate.directRideTime, estimate.rideTimeWithDetour, estimate.detourFactor));
-			}
+		for (StopPair pair : stopPairs) {
+			Estimate estimate = estimate(time, pair.origin.getId().toString(), getLink(pair.origin),
+				pair.destination.getId().toString(), getLink(pair.destination), vehicleEntries, insertionSearch);
+			writeStopRecord(new StopServiceQualityRecord(time, pair.origin.getId(), pair.destination.getId(),
+				estimate.waitTime, estimate.directRideTime, estimate.rideTimeWithDetour, estimate.detourFactor,
+				estimate.directRideDistance, estimate.rideDistanceWithDetour, estimate.distanceDetourFactor));
 		}
 	}
 
-	private void probeZones(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
+	private void probeZones(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) throws IOException {
 		if (zoneLocations.isEmpty()) {
 			throw new IllegalStateException("DRT zone-to-zone service quality probes require a non-empty travel-time-matrix zone system for mode " + mode);
 		}
@@ -209,7 +225,7 @@ class DrtServiceQualityProbe {
 				}
 				Estimate estimate = estimate(time, origin.id, origin.link, destination.id, destination.link,
 					vehicleEntries, insertionSearch);
-				zoneRecords.add(new ZoneServiceQualityRecord(time, Id.create(origin.id, Zone.class),
+				writeZoneRecord(new ZoneServiceQualityRecord(time, Id.create(origin.id, Zone.class),
 					origin.coord.getX(), origin.coord.getY(), Id.create(destination.id, Zone.class),
 					destination.coord.getX(), destination.coord.getY(), estimate.waitTime,
 					estimate.directRideTime, estimate.rideTimeWithDetour, estimate.detourFactor));
@@ -220,11 +236,13 @@ class DrtServiceQualityProbe {
 	private Estimate estimate(double time, String originId, Link fromLink, String destinationId, Link toLink,
 							  Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries,
 							  DrtInsertionSearch insertionSearch) {
-		DrtRequest request = createRequest(time, originId, fromLink, destinationId, toLink);
+		ProbeRequest probeRequest = createRequest(time, originId, fromLink, destinationId, toLink);
+		DrtRequest request = probeRequest.request;
 		Collection<VehicleEntry> filteredFleet = requestFleetFilter.filter(request, vehicleEntries, time);
 		Optional<InsertionWithDetourData> insertion = insertionSearch.findBestInsertion(request, filteredFleet);
 		if (insertion.isEmpty()) {
-			return new Estimate(Double.NaN, request.getUnsharedRideTime(), Double.NaN, Double.NaN);
+			return new Estimate(Double.NaN, request.getUnsharedRideTime(), Double.NaN, Double.NaN,
+				probeRequest.directRideDistance, Double.NaN, Double.NaN);
 		}
 
 		double pickupTime = insertion.get().detourTimeInfo.pickupDetourInfo.requestPickupTime;
@@ -232,20 +250,23 @@ class DrtServiceQualityProbe {
 		double waitTime = pickupTime - request.getEarliestStartTime();
 		double rideTimeWithDetour = dropoffTime - pickupTime;
 		double detourFactor = rideTimeWithDetour / request.getUnsharedRideTime();
-		return new Estimate(waitTime, request.getUnsharedRideTime(), rideTimeWithDetour, detourFactor);
+		double rideDistanceWithDetour = calculateRideDistanceWithDetour(insertion.get(), pickupTime);
+		return new Estimate(waitTime, request.getUnsharedRideTime(), rideTimeWithDetour, detourFactor,
+			probeRequest.directRideDistance, rideDistanceWithDetour, rideDistanceWithDetour / probeRequest.directRideDistance);
 	}
 
-	private record Estimate(double waitTime, double directRideTime, double rideTimeWithDetour, double detourFactor) {
+	private record Estimate(double waitTime, double directRideTime, double rideTimeWithDetour, double detourFactor,
+			double directRideDistance, double rideDistanceWithDetour, double distanceDetourFactor) {
 	}
 
-	private DrtRequest createRequest(double time, String originId, Link fromLink, String destinationId, Link toLink) {
+	private ProbeRequest createRequest(double time, String originId, Link fromLink, String destinationId, Link toLink) {
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(fromLink, toLink, time, router, travelTime);
 		double directRideTime = unsharedPath.getTravelTime();
 		double directRideDistance = VrpPaths.calcDistance(unsharedPath);
 		DrtRouteConstraints constraints = constraintsCalculator.calculateRouteConstraints(time, fromLink, toLink,
 			dummyPerson, tripAttributes, directRideTime, directRideDistance);
 
-		return DrtRequest.newBuilder()
+		DrtRequest request = DrtRequest.newBuilder()
 			.id(Id.create("service-quality-probe-" + time + "-" + originId + "-" + destinationId, Request.class))
 			.passengerIds(PASSENGER_IDS)
 			.mode(mode)
@@ -257,6 +278,31 @@ class DrtServiceQualityProbe {
 			.load(load)
 			.unsharedRideTime(directRideTime)
 			.build();
+		return new ProbeRequest(request, directRideDistance);
+	}
+
+	private double calculateRideDistanceWithDetour(InsertionWithDetourData insertionWithDetourData, double departureTime) {
+		var insertion = insertionWithDetourData.insertion;
+		List<Waypoint> itinerary = new ArrayList<>();
+		itinerary.add(insertion.pickup.newWaypoint);
+		if (insertion.pickup.index == insertion.dropoff.index) {
+			itinerary.add(insertion.dropoff.newWaypoint);
+		} else {
+			for (int index = insertion.pickup.index + 1; index <= insertion.dropoff.index; index++) {
+				itinerary.add(insertion.vehicleEntry.getWaypoint(index));
+			}
+			itinerary.add(insertion.dropoff.newWaypoint);
+		}
+
+		double distance = 0;
+		double time = departureTime;
+		for (int index = 0; index < itinerary.size() - 1; index++) {
+			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(itinerary.get(index).getLink(), itinerary.get(index + 1).getLink(),
+				time, router, travelTime);
+			distance += VrpPaths.calcDistance(path);
+			time += path.getTravelTime();
+		}
+		return distance;
 	}
 
 	private Link getLink(DrtStopFacility stop) {
@@ -279,6 +325,53 @@ class DrtServiceQualityProbe {
 			.map(zone -> createZoneLocation(zoneSystem, zone))
 			.flatMap(Optional::stream)
 			.toList();
+	}
+
+	private List<StopPair> createStopPairs(String inputFiles) {
+		if (inputFiles == null || inputFiles.isBlank()) {
+			return stops.stream().flatMap(origin -> stops.stream()
+				.filter(destination -> !origin.getId().equals(destination.getId()))
+				.map(destination -> new StopPair(origin, destination))).toList();
+		}
+		Map<String, DrtStopFacility> stopsById = stops.stream()
+			.collect(Collectors.toMap(stop -> stop.getId().toString(), stop -> stop));
+		Map<String, StopPair> uniquePairs = new TreeMap<>();
+		for (String inputFile : inputFiles.split(",")) {
+			if (!inputFile.trim().isEmpty()) {
+				readStopPairs(inputFile.trim(), stopsById, uniquePairs);
+			}
+		}
+		if (uniquePairs.isEmpty()) {
+			throw new IllegalArgumentException("No non-identical stop pairs found in serviceQualityProbeStopPairInputFiles");
+		}
+		return List.copyOf(uniquePairs.values());
+	}
+
+	private void readStopPairs(String inputFile, Map<String, DrtStopFacility> stopsById, Map<String, StopPair> uniquePairs) {
+		CSVFormat format = CSVFormat.DEFAULT.builder().setDelimiter(delimiter).setHeader().setSkipHeaderRecord(true).build();
+		try (CSVParser parser = new CSVParser(IOUtils.getBufferedReader(inputFile), format)) {
+			for (CSVRecord record : parser) {
+				DrtStopFacility origin = getValidatedStop(record, "accessStopId", "accessLinkId", stopsById, inputFile);
+				DrtStopFacility destination = getValidatedStop(record, "egressStopId", "egressLinkId", stopsById, inputFile);
+				if (!origin.getId().equals(destination.getId())) {
+					uniquePairs.put(origin.getId() + "\u0000" + destination.getId(), new StopPair(origin, destination));
+				}
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to read service-quality stop pairs from " + inputFile, e);
+		}
+	}
+
+	private DrtStopFacility getValidatedStop(CSVRecord record, String stopColumn, String linkColumn,
+			Map<String, DrtStopFacility> stopsById, String inputFile) {
+		DrtStopFacility stop = stopsById.get(record.get(stopColumn));
+		if (stop == null) {
+			throw new IllegalArgumentException("Unknown DRT stop '" + record.get(stopColumn) + "' in " + inputFile);
+		}
+		if (!stop.getLinkId().toString().equals(record.get(linkColumn))) {
+			throw new IllegalArgumentException("Link '" + record.get(linkColumn) + "' does not match DRT stop '" + stop.getId() + "' in " + inputFile);
+		}
+		return stop;
 	}
 
 	private ZoneSystem createProbeZoneSystem() {
@@ -336,29 +429,39 @@ class DrtServiceQualityProbe {
 			.toList();
 	}
 
-	private void writeStopRecords(BufferedWriter writer) throws IOException {
-		writer.write(String.join(delimiter, "time", "originStop", "destinationStop", "waitTime", "directRideTime",
-			"rideTimeWithDetour", "detourFactor"));
-		writer.newLine();
-		for (StopServiceQualityRecord record : stopRecords) {
-			writer.write(String.join(delimiter,
+	private void ensureOutputWriter() throws IOException {
+		if (outputWriter != null) {
+			return;
+		}
+		String filename = matsimServices.getControllerIO().getOutputFilename(outputFile);
+		outputWriter = IOUtils.getBufferedWriter(filename);
+		if (spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE) {
+			outputWriter.write(String.join(delimiter, "time", "originZone", "originX", "originY", "destinationZone",
+				"destinationX", "destinationY", "waitTime", "directRideTime", "rideTimeWithDetour", "detourFactor"));
+		} else {
+			outputWriter.write(String.join(delimiter, "time", "originStop", "destinationStop", "waitTime", "directRideTime",
+			"rideTimeWithDetour", "detourFactor", "directRideDistance", "rideDistanceWithDetour", "distanceDetourFactor"));
+		}
+		outputWriter.newLine();
+	}
+
+	private void writeStopRecord(StopServiceQualityRecord record) throws IOException {
+		outputWriter.write(String.join(delimiter,
 				Double.toString(record.time),
 				record.originStop.toString(),
 				record.destinationStop.toString(),
 				Double.toString(record.waitTime),
 				Double.toString(record.directRideTime),
 				Double.toString(record.rideTimeWithDetour),
-				Double.toString(record.detourFactor)));
-			writer.newLine();
-		}
+				Double.toString(record.detourFactor),
+				Double.toString(record.directRideDistance),
+				Double.toString(record.rideDistanceWithDetour),
+				Double.toString(record.distanceDetourFactor)));
+		outputWriter.newLine();
 	}
 
-	private void writeZoneRecords(BufferedWriter writer) throws IOException {
-		writer.write(String.join(delimiter, "time", "originZone", "originX", "originY", "destinationZone",
-			"destinationX", "destinationY", "waitTime", "directRideTime", "rideTimeWithDetour", "detourFactor"));
-		writer.newLine();
-		for (ZoneServiceQualityRecord record : zoneRecords) {
-			writer.write(String.join(delimiter,
+	private void writeZoneRecord(ZoneServiceQualityRecord record) throws IOException {
+		outputWriter.write(String.join(delimiter,
 				Double.toString(record.time),
 				record.originZone.toString(),
 				Double.toString(record.originX),
@@ -370,8 +473,7 @@ class DrtServiceQualityProbe {
 				Double.toString(record.directRideTime),
 				Double.toString(record.rideTimeWithDetour),
 				Double.toString(record.detourFactor)));
-			writer.newLine();
-		}
+		outputWriter.newLine();
 	}
 
 	private static double squaredDistance(Coord first, Coord second) {

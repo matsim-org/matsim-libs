@@ -176,6 +176,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 				}
 
 			}
+a			calculators.get(mode).finish();
 			for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 				zoneDataExchangeInterface.finish();
 			}

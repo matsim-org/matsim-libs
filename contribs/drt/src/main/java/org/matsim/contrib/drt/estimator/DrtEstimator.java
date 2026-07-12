@@ -20,6 +20,11 @@ public interface DrtEstimator extends ControllerListener {
 	 */
 	Estimate estimate(DrtRoute route, OptionalTime departureTime);
 
+	/** Whether callers must populate direct ride time and distance before estimating. */
+	default boolean requiresDirectTripRouting() {
+		return true;
+	}
+
 
 	/**
 	 * Estimate for various attributes for a drt trip.

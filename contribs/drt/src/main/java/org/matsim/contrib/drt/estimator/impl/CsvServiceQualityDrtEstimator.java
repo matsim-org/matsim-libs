@@ -43,13 +43,13 @@ import java.util.TreeMap;
 public class CsvServiceQualityDrtEstimator implements DrtEstimator {
 	private static final char DEFAULT_DELIMITER = ';';
 
-	private final Map<StopPair, NavigableMap<Double, ServiceQuality>> estimates = new HashMap<>();
-	private final Map<Id<Link>, Id<DrtStopFacility>> stopByLinkId = new HashMap<>();
+	private final Map<LinkPair, NavigableMap<Double, ServiceQuality>> estimates = new HashMap<>();
+	private final Map<Id<DrtStopFacility>, Id<Link>> linkByStopId = new HashMap<>();
 
-	record StopPair(Id<DrtStopFacility> originStop, Id<DrtStopFacility> destinationStop) {
+	record LinkPair(Id<Link> originLink, Id<Link> destinationLink) {
 	}
 
-	record ServiceQuality(double waitTime, double directRideTime, double rideTimeWithDetour) {
+	record ServiceQuality(double waitTime, double directRideTime, double rideTimeWithDetour, double rideDistanceWithDetour) {
 	}
 
 	public CsvServiceQualityDrtEstimator(String csvFile, DrtStopNetwork stopNetwork) {
@@ -58,34 +58,33 @@ public class CsvServiceQualityDrtEstimator implements DrtEstimator {
 
 	public CsvServiceQualityDrtEstimator(String csvFile, DrtStopNetwork stopNetwork, char delimiter) {
 		for (DrtStopFacility stop : stopNetwork.getDrtStops().values()) {
-			stopByLinkId.putIfAbsent(stop.getLinkId(), stop.getId());
+			linkByStopId.put(stop.getId(), stop.getLinkId());
 		}
 		read(csvFile, delimiter);
 	}
 
 	@Override
-	public Estimate estimate(DrtRoute route, OptionalTime departureTime) {
-		Id<DrtStopFacility> originStop = stopByLinkId.get(route.getStartLinkId());
-		Id<DrtStopFacility> destinationStop = stopByLinkId.get(route.getEndLinkId());
-		if (originStop == null || destinationStop == null) {
-			throw new IllegalArgumentException("Cannot map DRT route links to stop ids: fromLink=" + route.getStartLinkId()
-				+ ", toLink=" + route.getEndLinkId());
-		}
+	public boolean requiresDirectTripRouting() {
+		return false;
+	}
 
-		StopPair stopPair = new StopPair(originStop, destinationStop);
-		NavigableMap<Double, ServiceQuality> byTime = estimates.get(stopPair);
+	@Override
+	public Estimate estimate(DrtRoute route, OptionalTime departureTime) {
+		LinkPair linkPair = new LinkPair(route.getStartLinkId(), route.getEndLinkId());
+		NavigableMap<Double, ServiceQuality> byTime = estimates.get(linkPair);
 		if (byTime == null || byTime.isEmpty()) {
-			throw new IllegalArgumentException("No DRT service quality estimate for stop pair " + originStop + " -> " + destinationStop);
+			throw new IllegalArgumentException("No DRT service quality estimate for link pair "
+				+ route.getStartLinkId() + " -> " + route.getEndLinkId());
 		}
 
 		double time = departureTime.isDefined() ? departureTime.seconds() : byTime.firstKey();
 		ServiceQuality serviceQuality = nearest(byTime, time);
 		if (!Double.isFinite(serviceQuality.waitTime) || !Double.isFinite(serviceQuality.rideTimeWithDetour)) {
-			throw new IllegalStateException("DRT service quality estimate is not finite for stop pair " + originStop
-				+ " -> " + destinationStop + " around time " + time);
+			throw new IllegalStateException("DRT service quality estimate is not finite for link pair "
+				+ route.getStartLinkId() + " -> " + route.getEndLinkId() + " around time " + time);
 		}
 
-		return new Estimate(route.getDistance(), serviceQuality.rideTimeWithDetour, serviceQuality.waitTime, 0);
+		return new Estimate(serviceQuality.rideDistanceWithDetour, serviceQuality.rideTimeWithDetour, serviceQuality.waitTime, 0);
 	}
 
 	private void read(String csvFile, char delimiter) {
@@ -99,11 +98,18 @@ public class CsvServiceQualityDrtEstimator implements DrtEstimator {
 				double time = Double.parseDouble(record.get("time"));
 				Id<DrtStopFacility> originStop = Id.create(record.get("originStop"), DrtStopFacility.class);
 				Id<DrtStopFacility> destinationStop = Id.create(record.get("destinationStop"), DrtStopFacility.class);
+				Id<Link> originLink = linkByStopId.get(originStop);
+				Id<Link> destinationLink = linkByStopId.get(destinationStop);
+				if (originLink == null || destinationLink == null) {
+					throw new IllegalArgumentException("Cannot map probe stop ids to DRT stop links: originStop=" + originStop
+						+ ", destinationStop=" + destinationStop);
+				}
 				ServiceQuality serviceQuality = new ServiceQuality(
 					Double.parseDouble(record.get("waitTime")),
 					Double.parseDouble(record.get("directRideTime")),
-					Double.parseDouble(record.get("rideTimeWithDetour")));
-				estimates.computeIfAbsent(new StopPair(originStop, destinationStop), _ -> new TreeMap<>())
+					Double.parseDouble(record.get("rideTimeWithDetour")),
+					Double.parseDouble(record.get("rideDistanceWithDetour")));
+				estimates.computeIfAbsent(new LinkPair(originLink, destinationLink), _ -> new TreeMap<>())
 					.put(time, serviceQuality);
 			}
 		} catch (IOException e) {

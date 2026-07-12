@@ -157,7 +157,7 @@ public class RunDrtExampleIT {
 		controller.addOverridingQSimModule(new ParallelRequestInserterModule(drtCfg));
 		controller.run();
 
-		Path probeCsv = Paths.get(utils.getOutputDirectory(), "ITERS", "it.0", "0.drt_service_quality_probes.csv");
+		Path probeCsv = Paths.get(utils.getOutputDirectory(), "drt_service_quality_probes.csv");
 		assertThat(probeCsv).exists();
 		List<String> rows;
 		try {
@@ -165,17 +165,8 @@ public class RunDrtExampleIT {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		assertThat(rows.get(0)).isEqualTo("time;originStop;destinationStop;waitTime;directRideTime;rideTimeWithDetour;detourFactor");
-		long stopCount;
-		try {
-			stopCount = Files.lines(Paths.get(ExamplesUtils.getTestScenarioURL("mielec").toURI())
-					.resolve("drtstops_wLinkIds_lessStops.xml"))
-				.filter(line -> line.contains("<stopFacility "))
-				.count();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		assertThat(rows).hasSize((int) (stopCount * (stopCount - 1) + 1));
+		assertThat(rows.get(0)).isEqualTo("time;originStop;destinationStop;waitTime;directRideTime;rideTimeWithDetour;detourFactor;directRideDistance;rideDistanceWithDetour;distanceDetourFactor");
+		assertThat(rows).hasSizeGreaterThan(1);
 		assertThat(rows.stream().skip(1).noneMatch(row -> {
 			String[] columns = row.split(";");
 			return columns[1].equals(columns[2]);

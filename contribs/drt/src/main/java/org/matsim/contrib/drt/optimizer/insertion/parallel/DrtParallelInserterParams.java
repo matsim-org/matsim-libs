@@ -92,6 +92,9 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 	@Comment("Output file name for service quality probes. The file is written to the last iteration output directory.")
 	private String serviceQualityProbeOutputFile = "drt_service_quality_probes.csv.gz";
 
+	@Comment("Optional comma-separated stop-pair CSV/CSV.GZ files produced by accessibility. In STOP_TO_STOP mode, only their unique directed pairs are probed. If unset, all stop pairs are probed.")
+	private String serviceQualityProbeStopPairInputFiles = "";
+
 	@Comment("Spatial resolution for service quality probing. STOP_TO_STOP estimates all DRT stop pairs. ZONE_TO_ZONE estimates one representative link-to-link request for each travel-time-matrix zone pair.")
 	private ServiceQualityProbeSpatialResolution serviceQualityProbeSpatialResolution = ServiceQualityProbeSpatialResolution.STOP_TO_STOP;
 
@@ -126,6 +129,16 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 	@StringSetter("serviceQualityProbeOutputFile")
 	public void setServiceQualityProbeOutputFile(String serviceQualityProbeOutputFile) {
 		this.serviceQualityProbeOutputFile = serviceQualityProbeOutputFile;
+	}
+
+	@StringGetter("serviceQualityProbeStopPairInputFiles")
+	public String getServiceQualityProbeStopPairInputFiles() {
+		return serviceQualityProbeStopPairInputFiles;
+	}
+
+	@StringSetter("serviceQualityProbeStopPairInputFiles")
+	public void setServiceQualityProbeStopPairInputFiles(String serviceQualityProbeStopPairInputFiles) {
+		this.serviceQualityProbeStopPairInputFiles = serviceQualityProbeStopPairInputFiles;
 	}
 
 	@StringGetter("serviceQualityProbeSpatialResolution")

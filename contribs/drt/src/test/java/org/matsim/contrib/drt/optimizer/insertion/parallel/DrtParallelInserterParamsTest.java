@@ -34,6 +34,7 @@ class DrtParallelInserterParamsTest {
         originalParams.setRequestsPartitioner(DrtParallelInserterParams.RequestsPartitioner.RoundRobinRequestsPartitioner);
 		originalParams.setServiceQualityProbeSpatialResolution(DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE);
 		originalParams.setServiceQualityProbeZoneCellSize(5000.);
+		originalParams.setServiceQualityProbeStopPairInputFiles("first.csv.gz,second.csv");
 
 		drtConfigGroup.addParameterSet(originalParams);
 
@@ -58,5 +59,6 @@ class DrtParallelInserterParamsTest {
         assertEquals(DrtParallelInserterParams.RequestsPartitioner.RoundRobinRequestsPartitioner, loadedParams.getRequestsPartitioner());
 		assertEquals(DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE, loadedParams.getServiceQualityProbeSpatialResolution());
 		assertEquals(5000., loadedParams.getServiceQualityProbeZoneCellSize());
+		assertEquals("first.csv.gz,second.csv", loadedParams.getServiceQualityProbeStopPairInputFiles());
     }
 }

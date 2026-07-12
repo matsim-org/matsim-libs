@@ -62,6 +62,8 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 
 	private static final String USE_PARALLELIZATION = "useParallelization";
 	private boolean useParallelization = true;
+	private static final String WRITE_DRT_STOP_PAIRS = "writeDrtStopPairs";
+	private boolean writeDrtStopPairs = false;
 
 //	private static final String ACCESSIBILITY_DESTINATION_SAMPLING_RATE = "accessibilityDestinationSamplingRate";
 //	private Double accessibilityDestinationSamplingRate;
@@ -275,6 +277,17 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	@StringSetter(USE_PARALLELIZATION)
 	public AccessibilityConfigGroup setUseParallelization(Boolean useParallelization) {
 		this.useParallelization = useParallelization;
+		return this;
+	}
+
+	@StringGetter(WRITE_DRT_STOP_PAIRS)
+	public boolean isWriteDrtStopPairs() {
+		return writeDrtStopPairs;
+	}
+
+	@StringSetter(WRITE_DRT_STOP_PAIRS)
+	public AccessibilityConfigGroup setWriteDrtStopPairs(boolean writeDrtStopPairs) {
+		this.writeDrtStopPairs = writeDrtStopPairs;
 		return this;
 	}
     @StringGetter(WEIGHT_EXPONENT)
