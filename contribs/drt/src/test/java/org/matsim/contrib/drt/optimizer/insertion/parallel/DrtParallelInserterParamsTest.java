@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DrtParallelInserterParamsTest {
 
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils() ;
+	private final MatsimTestUtils utils = new MatsimTestUtils() ;
 
     @Test
     void DrtParallelInserterParamsIOTest() {

@@ -52,7 +52,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	public static final String GROUP_NAME = "accessibility";
 
 	private static final String ACCESSIBILITY_MEASURE_TYPE = "accessibilityMeasureType";
-	public static enum AccessibilityMeasureType{logSum, rawSum, gravity}
+	public enum AccessibilityMeasureType{logSum, rawSum, gravity}
 	private AccessibilityMeasureType accessibilityMeasureType = AccessibilityMeasureType.logSum;
 
 	private static final String USE_OPPORTUNITY_WEIGHTS = "useOpportunityWeights";
@@ -69,7 +69,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 //	private Double accessibilityDestinationSamplingRate;
 
 	private static final String MEASURE_POINT_GEOMETRY_PROVISION = "measurePointGeometryProvision";
-	public static enum MeasurePointGeometryProvision{autoCreate, fromShapeFile}
+	public enum MeasurePointGeometryProvision{autoCreate, fromShapeFile}
 	private MeasurePointGeometryProvision measurePointGeometryProvision = MeasurePointGeometryProvision.autoCreate;
 
 	private double boundingBoxTop;
@@ -81,7 +81,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private String shapeFileCellBasedAccessibility;
 
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation";
-	public static enum AreaOfAccesssibilityComputation{fromNetwork, fromBoundingBox, fromBoundingBoxHexagons, fromShapeFile, fromFacilitiesFile, fromFacilitiesObject}
+	public enum AreaOfAccesssibilityComputation{fromNetwork, fromBoundingBox, fromBoundingBoxHexagons, fromShapeFile, fromFacilitiesFile, fromFacilitiesObject}
 	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork;
 	private Set<Modes4Accessibility> isComputingMode = EnumSet.noneOf(Modes4Accessibility.class);
 
@@ -99,11 +99,11 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	}
 
 	@StringGetter(OUTPUT_CRS)
-	public final String getOutputCrs() {
+	public String getOutputCrs() {
 		return this.outputCrs;
 	}
 	@StringSetter(OUTPUT_CRS)
-	public final void setOutputCrs(String outputCrs) {
+	public void setOutputCrs(String outputCrs) {
 		this.outputCrs = outputCrs;
 	}
 
