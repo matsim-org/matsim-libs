@@ -26,10 +26,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.MeasurePointGeometryProvision;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
@@ -46,10 +48,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.facilities.*;
 
 import com.google.inject.Provider;
 import java.util.*;
@@ -62,7 +61,7 @@ public final class AccessibilityModule extends AbstractModule {
 
 	private static final Logger LOG = LogManager.getLogger(AccessibilityModule.class);
 
-	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ;
+	private final List<DataExchangeInterface> dataListeners = new ArrayList<>() ;
 	private ActivityFacilities measuringPoints;
 	private Map<String, ActivityFacilities> additionalFacs = new TreeMap<>() ;
 	private String activityType;
@@ -86,8 +85,8 @@ public final class AccessibilityModule extends AbstractModule {
 		this.createQGisOutput = createQGisOutput;
 	}
 
-	public final void addFacilityDataExchangeListener(FacilityDataExchangeInterface listener) {
-		this.facilityDataListeners.add(listener) ;
+	public final void addFacilityDataExchangeListener(DataExchangeInterface listener) {
+		this.dataListeners.add(listener) ;
 	}
 
 	/**
@@ -174,6 +173,23 @@ public final class AccessibilityModule extends AbstractModule {
 				}
 				LOG.info("Using measuring points from facilities object.");
 
+			} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromPopulation) {
+				boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
+				measuringPoints = FacilitiesUtils.createActivityFacilities();
+
+				for (Person person : scenario.getPopulation().getPersons().values()) {
+					double homeX = (Double) person.getAttributes().getAttribute("home_x");
+					double homeY = (Double) person.getAttributes().getAttribute("home_y");
+					ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(
+						Id.create(person.getId().toString(), ActivityFacility.class),
+						new Coord(homeX, homeY),
+						null
+					);
+
+					facility.getAttributes().putAttribute("person", person);
+
+					measuringPoints.addActivityFacility(facility);
+				}
 			} else { // This covers also the "fromNetwork" case
 				LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 				LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
@@ -262,7 +278,7 @@ public final class AccessibilityModule extends AbstractModule {
 				accessibilityShutdownListener.addAdditionalFacilityData(fac);
 			}
 
-			for (FacilityDataExchangeInterface listener : facilityDataListeners) {
+			for (DataExchangeInterface listener : dataListeners) {
 				accessibilityShutdownListener.addFacilityDataExchangeListener(listener);
 			}
 

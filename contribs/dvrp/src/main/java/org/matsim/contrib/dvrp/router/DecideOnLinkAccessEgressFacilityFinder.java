@@ -22,11 +22,14 @@ package org.matsim.contrib.dvrp.router;
 
 import java.util.Optional;
 
+import com.google.common.base.Verify;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.router.LinkWrapperFacility;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -47,5 +50,11 @@ public class DecideOnLinkAccessEgressFacilityFinder implements AccessEgressFacil
 				FacilitiesUtils.decideOnLink(fromFacility, network));
 		LinkWrapperFacility egressFacility = new LinkWrapperFacility(FacilitiesUtils.decideOnLink(toFacility, network));
 		return Optional.of(ImmutablePair.of(accessFacility, egressFacility));
+	}
+
+	@Override
+	public Facility findClosestStop(Facility facility) {
+		return new LinkWrapperFacility(
+			FacilitiesUtils.decideOnLink(facility, network));
 	}
 }

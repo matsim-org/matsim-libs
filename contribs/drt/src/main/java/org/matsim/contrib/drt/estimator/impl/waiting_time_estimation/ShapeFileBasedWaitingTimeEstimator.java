@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.OptionalTime;
 
@@ -34,6 +35,7 @@ public class ShapeFileBasedWaitingTimeEstimator implements WaitingTimeEstimator 
 	public ShapeFileBasedWaitingTimeEstimator(Network network, List<SimpleFeature> features, double baseTypicalWaitingTime) {
 		this.baseTypicalWaitingTime = baseTypicalWaitingTime;
 		initializeWaitingTimeMap(network, features);
+
 	}
 
 	private void initializeWaitingTimeMap(Network network, List<SimpleFeature> features) {
@@ -42,18 +44,22 @@ public class ShapeFileBasedWaitingTimeEstimator implements WaitingTimeEstimator 
 				continue;
 			}
 			double minTypicalWaitingTime = baseTypicalWaitingTime;
+
 			for (SimpleFeature feature : features) {
 				Geometry geometry = (Geometry) feature.getDefaultGeometry();
 				if (geometry.contains(MGC.coord2Point(link.getToNode().getCoord()))) {
 					// The link is located within the zone -> reduce typical waiting time if necessary
-					double typicalWaitingTimeForCurrentZone = (long) feature.getAttribute(TYPICAL_WAITING_TIME_NAME);
+					double typicalWaitingTimeForCurrentZone = (int) feature.getAttribute(TYPICAL_WAITING_TIME_NAME);
 					if (typicalWaitingTimeForCurrentZone < minTypicalWaitingTime) {
 						minTypicalWaitingTime = typicalWaitingTimeForCurrentZone;
 					}
+					break;
 				}
 			}
 			typicalWaitingTimeForEachLink.put(link.getId(), minTypicalWaitingTime);
 		}
+
+
 	}
 
 	@Override
