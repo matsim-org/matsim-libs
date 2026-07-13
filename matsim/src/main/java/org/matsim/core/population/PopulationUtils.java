@@ -68,10 +68,7 @@ public final class PopulationUtils {
 	private static final PopulationFactory populationFactory = createPopulation(
 			new PlansConfigGroup(), null, null).getFactory();
 
-//	/**
-//	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
-//	 */
-//	@Deprecated
+
 	private static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
 
 
@@ -918,6 +915,7 @@ public final class PopulationUtils {
 		for( Plan inPlan : in.getPlans() ){
 			Plan outPlan = getFactory().createPlan();
 			copyFromTo( inPlan, outPlan );
+			out.addPlan(outPlan);
 		}
 	}
 
