@@ -26,7 +26,8 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
 
 /**
  * Classifies OSM tag sets into {@link BicycleInfraCategory}. Precedence is
- * first-match-wins and mirrors the FixMyCity ({@code BikelaneCategories.lua})
+ * first-match-wins and mirrors the FixMyCity / radinfra.de
+ * <a href="https://github.com/FixMyBerlin/tilda-geo/blob/main/processing/topics/roads_bikelanes/bikelanes/BikelaneCategories.lua">{@code BikelaneCategories.lua}</a>,
  * order.
  *
  * <p>Country-specific knobs — currently only traffic-sign codes — are pulled
@@ -53,7 +54,9 @@ public final class BicycleInfraClassifier {
 
 	private final BicycleCountryProfile profile;
 
-	/** Uses {@link BicycleCountryProfileGermany}. */
+	/**
+	 * Uses {@link BicycleCountryProfileGermany}.
+	 */
 	public BicycleInfraClassifier() {
 		this(new BicycleCountryProfileGermany());
 	}
@@ -222,7 +225,7 @@ public final class BicycleInfraClassifier {
 		String cycleway = v(t, CYCLEWAY);
 		String trafficSign = v(t, TRAFFIC_SIGN);
 
-		// highway=cycleway cases (keep core GH ones)
+		// highway=cycleway cases (keep core FMC ones)
 		if (HW_CYCLEWAY.equals(highway)) {
 			if (isAnyOf(cycleway, CW_SHARE_BUSWAY, "opposite_share_busway")) {
 				return BicycleInfraCategory.SHARED_BUS_LANE_BUS_WITH_BIKE;
@@ -306,7 +309,7 @@ public final class BicycleInfraClassifier {
 
 		if (!hasLane) return false;
 
-		// filter "between lanes only" edge-case like GH
+		// filter "between lanes only" edge-case like FMC
 		if (isCyclewayOnHighwayBetweenLanes(t)) {
 			String cyclewayLanes = v(t, CYCLEWAY_LANES);
 			String bicycleLanes = v(t, BICYCLE_LANES);
@@ -410,7 +413,7 @@ public final class BicycleInfraClassifier {
 	}
 
 	// -------------------------------------------------------------------------
-	// Foot+cycle combined (shared/segregated) - mostly non-directional like GH
+	// Foot+cycle combined (shared/segregated) - mostly non-directional
 	// -------------------------------------------------------------------------
 
 	private BicycleInfraCategory getFootAndCyclewayType(Map<String, String> t) {
@@ -446,7 +449,7 @@ public final class BicycleInfraClassifier {
 			if (isAnyOf(highway, HW_CYCLEWAY, HW_PATH, HW_FOOTWAY)) {
 				return footAndCyclewaySegregatedSidepath(isSidepath);
 			}
-			// minimal edge case from GH: traffic_mode:right=foot (no separation)
+			// minimal edge case: traffic_mode:right=foot (no separation)
 			if (HW_CYCLEWAY.equals(highway) && FOOT.equals(v(t, TRAFFIC_MODE_RIGHT))) {
 				String separationRight = v(t, SEPARATION_RIGHT);
 				boolean separationOk = isEmpty(separationRight) || NO.equals(separationRight);
