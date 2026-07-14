@@ -55,11 +55,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.TimeDependentNetwork;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers;
 import org.matsim.freight.carriers.jsprit.*;
+import org.matsim.freight.carriers.splitter.CarrierSplitter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -78,7 +80,7 @@ public class CarriersUtils {
 
 	private static final String ATTR_SKILLS = "skills";
 	private static final String ATTR_JSPRIT_SCORE = "jspritScore";
-	private static final String ATTR_JSPRIT_Time = "jspritComputationTime";
+	private static final String ATTR_JSPRIT_Time = "jspritComputationTimeInSeconds";
 	private static final String delimiter = "\t";
 
 	private static final Object CSV_LOCK_FOR_WRITING_OUTPUT_PER_CARRIER = new Object();
@@ -95,6 +97,21 @@ public class CarriersUtils {
 
 	public static Carrier createCarrier(Id<Carrier> id) {
 		return new CarrierImpl(id);
+	}
+
+	/**
+	 * Splits each carrier in the scenario into smaller carriers by clustering its shipments or services.
+	 * <p>
+	 * This is a convenience entry point; the actual split implementation lives in {@link CarrierSplitter}.
+	 *
+	 * @param scenario MATSim scenario containing the network and carriers to split.
+	 * @param clusterStrategy clustering strategy used to build the smaller carrier groups.
+	 * @param shipmentClusterLocation location representation for shipment clustering; required for carriers with shipments.
+	 * @param maxJobsPerCarrier target upper bound for jobs assigned to each new carrier.
+	 */
+	public static void splitCarriers(Scenario scenario, CarrierSplitter.ClusteringStrategy clusterStrategy,
+			CarrierSplitter.ShipmentClusteringLocation shipmentClusterLocation, int maxJobsPerCarrier) {
+		CarrierSplitter.splitCarriers(scenario, clusterStrategy, shipmentClusterLocation, maxJobsPerCarrier);
 	}
 
 	/**
@@ -276,7 +293,7 @@ public class CarriersUtils {
 		else
 			log.warn("Jsprit analysis per carrier CSV file already exists at {}. Will append results to this file. If you want to start with a new file, please delete or move the existing file.", jspritAnalysisPerCarrierCSVPath);
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
-		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
+		FreightCarriersConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
 		// Create the NetBasedCosts based on the network and the vehicle types
 		//Consider tolls if a RoadPricingScheme is available in the scenario.
@@ -287,9 +304,14 @@ public class CarriersUtils {
 			log.debug("Was not able to get a RoadPricingScheme from scenario. Tolls cannot be considered.", e);
 		}
 
-		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values())
-			.setRoadPricingScheme(roadPricingScheme)
-			.build();
+		NetworkBasedTransportCosts.Builder netBasedCostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values())
+			.setRoadPricingScheme(roadPricingScheme);
+
+		if (scenario.getNetwork() instanceof TimeDependentNetwork timeDependentNetwork && !timeDependentNetwork.getNetworkChangeEvents().isEmpty()) {
+			netBasedCostsBuilder.setTimeSliceWidth(freightConfigGroup.getTravelTimeSliceWidth());
+		}
+
+		final NetworkBasedTransportCosts netBasedCosts = netBasedCostsBuilder.build();
 
 		//Check if the inputs of the carrier(s) are consistent before starting the planning
 		CarrierConsistencyCheckers.checkBeforePlanning(carriers, Level.ERROR);
@@ -927,17 +949,29 @@ public class CarriersUtils {
 		return (Double) plan.getAttributes().getAttribute(ATTR_JSPRIT_SCORE);
 	}
 
+	/**
+	 * Gets the jsprit computation time from the carrier's attributes in seconds.
+	 *
+	 * @return computation time for solving and routing of the VRP in seconds
+	 */
 	public static double getJspritComputationTime(Carrier carrier) {
 		try {
 			return (double) carrier.getAttributes().getAttribute(ATTR_JSPRIT_Time);
 		} catch (Exception e) {
-			log.error("Requested attribute jspritComputationTime does not exists for carrier {}. Will return {}.", carrier.getId(), Integer.MIN_VALUE);
+			log.error("Requested attribute jspritComputationTime does not exists for carrier {}. Will return {}.", carrier.getId(),
+				Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		}
 	}
 
-	public static void setJspritComputationTime(Carrier carrier, double time) {
-		carrier.getAttributes().putAttribute(ATTR_JSPRIT_Time, time);
+	/**
+	 * Sets the jsprit computation time as an attribute of the carrier in seconds.
+	 *
+	 * @param carrier       this carrier
+	 * @param timeInSeconds timeInSeconds in seconds
+	 */
+	public static void setJspritComputationTime(Carrier carrier, double timeInSeconds) {
+		carrier.getAttributes().putAttribute(ATTR_JSPRIT_Time, timeInSeconds);
 	}
 
 	/**

@@ -21,7 +21,6 @@ package org.matsim.core.network.algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -107,16 +106,31 @@ public final class MultimodalNetworkCleaner {
 		// search the biggest cluster of nodes in the network
 		log.info("  checking " + this.network.getNodes().size() + " nodes and " +
 				this.network.getLinks().size() + " links for dead-ends...");
+
+		// Pre-compute which links have an allowed mode intersecting combinedModes, stored in a boolean[] keyed by
+		// Id#index(). This way the BFS hot loop in findCluster only does a plain array read per edge visit instead of
+		// a HashSet#contains (which in turn replaced an even more expensive per-edge set-intersection).
+		// (For large networks this check dominated the runtime; see profile.)
+		final boolean[] isModeLink = new boolean[Id.getNumberOfIds(Link.class)];
+		int modeLinkCount = 0;
+		for (Link link : this.network.getLinks().values()) {
+			if (intersectingSets(combinedModes, link.getAllowedModes())) {
+				isModeLink[link.getId().index()] = true;
+				modeLinkCount++;
+			}
+		}
+
 		boolean stillSearching = true;
 		Iterator<? extends Link> iter = this.network.getLinks().values().iterator();
 		while (iter.hasNext() && stillSearching) {
 			Link startLink = iter.next();
-			if ((!visitedLinks.containsKey(startLink.getId())) && (intersectingSets(combinedModes, startLink.getAllowedModes()))) {
-				Map<Id<Link>, Link> cluster = this.findCluster(startLink, combinedModes);
+			if ((!visitedLinks.containsKey(startLink.getId())) && isModeLink[startLink.getId().index()]) {
+				Map<Id<Link>, Link> cluster = this.findCluster(startLink, isModeLink);
 				visitedLinks.putAll(cluster);
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
-					if (biggestCluster.size() >= (this.network.getLinks().size() - visitedLinks.size())) {
+					// upper bound: only mode-matching, not-yet-visited links can ever join a cluster
+					if (biggestCluster.size() >= (modeLinkCount - visitedLinks.size())) {
 						// stop searching here, because we cannot find a bigger cluster in the lasting nodes
 						stillSearching = false;
 					}
@@ -159,12 +173,20 @@ public final class MultimodalNetworkCleaner {
 	 * and from where it is also possible to return again to <code>startLink</code>.
 	 *
 	 * @param startLink the link to start building the cluster
-	 * @param modes the set of modes that are allowed to
+	 * @param isModeLink flags, indexed by {@link Id#index()}, marking links whose allowed modes intersect the modes
+	 *        being cleaned (pre-computed by {@link #run(Set, Set)} so the BFS does not have to repeat the
+	 *        set-intersection check per edge visit)
 	 * @return cluster of links <pre>startLink</pre> is part of
 	 */
-	private Map<Id<Link>, Link> findCluster(final Link startLink, final Set<String> modes) {
+	private Map<Id<Link>, Link> findCluster(final Link startLink, final boolean[] isModeLink) {
 
-		final Map<Id<Link>, DoubleFlagRole> linkRoles = new HashMap<>(this.network.getLinks().size());
+		// Per-link forward/backward reachability flags, indexed by Id#index() instead of a
+		// HashMap<Id<Link>, ...>. This turns the per-edge-visit lookup in the BFS below into a plain array access
+		// (the HashMap get/put previously dominated the runtime on large networks) and avoids allocating a role
+		// object per visited link.
+		final int linkIdCount = Id.getNumberOfIds(Link.class);
+		final boolean[] forwardFlags = new boolean[linkIdCount];
+		final boolean[] backwardFlags = new boolean[linkIdCount];
 
 		ArrayList<Node> pendingForward = new ArrayList<>();
 		ArrayList<Node> pendingBackward = new ArrayList<>();
@@ -179,12 +201,10 @@ public final class MultimodalNetworkCleaner {
 			int idx = pendingForward.size() - 1;
 			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getOutLinks().values()) {
-				if (intersectingSets(modes, link.getAllowedModes())) {
-					DoubleFlagRole r = getDoubleFlag(link, linkRoles);
-					if (!r.forwardFlag) {
-						r.forwardFlag = true;
-						pendingForward.add(link.getToNode());
-					}
+				int linkIndex = link.getId().index();
+				if (isModeLink[linkIndex] && !forwardFlags[linkIndex]) {
+					forwardFlags[linkIndex] = true;
+					pendingForward.add(link.getToNode());
 				}
 			}
 		}
@@ -194,15 +214,13 @@ public final class MultimodalNetworkCleaner {
 			int idx = pendingBackward.size()-1;
 			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getInLinks().values()) {
-				if (intersectingSets(modes, link.getAllowedModes())) {
-					DoubleFlagRole r = getDoubleFlag(link, linkRoles);
-					if (!r.backwardFlag) {
-						r.backwardFlag = true;
-						pendingBackward.add(link.getFromNode());
-						if (r.forwardFlag) {
-							// the node can be reached forward and backward, add it to the cluster
-							clusterLinks.put(link.getId(), link);
-						}
+				int linkIndex = link.getId().index();
+				if (isModeLink[linkIndex] && !backwardFlags[linkIndex]) {
+					backwardFlags[linkIndex] = true;
+					pendingBackward.add(link.getFromNode());
+					if (forwardFlags[linkIndex]) {
+						// the node can be reached forward and backward, add it to the cluster
+						clusterLinks.put(link.getId(), link);
 					}
 				}
 			}
@@ -244,20 +262,6 @@ public final class MultimodalNetworkCleaner {
 			}
 		}
 		return false;
-	}
-
-	private static DoubleFlagRole getDoubleFlag(final Link l, final Map<Id<Link>, DoubleFlagRole> linkRoles) {
-		DoubleFlagRole r = linkRoles.get(l.getId());
-		if (null == r) {
-			r = new DoubleFlagRole();
-			linkRoles.put(l.getId(), r);
-		}
-		return r;
-	}
-
-	static class DoubleFlagRole {
-		boolean forwardFlag = false;
-		boolean backwardFlag = false;
 	}
 
 }

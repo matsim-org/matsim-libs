@@ -9,10 +9,12 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEvent;
 import org.matsim.contrib.ev.discharging.DrivingEnergyConsumptionEventHandler;
 import org.matsim.core.communication.LocalCommunicator;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -39,8 +41,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * <ul>
  *   <li>Total energy consumed equals the expected value (l2: 1000 J + l3: 100 J = 1100 J).</li>
  *   <li>Each {@link DrivingEnergyConsumptionEvent} fires at the correct time relative to
- *       its triggering event: one step later in QSim (deferred processing), same step in
- *       DSim (synchronous processing in {@code DistributedDriveDischargingHandler}).</li>
+ *       its triggering event: one step later in QSim while events are drained by the next
+ *       {@code doSimStep}, same step for the final QSim drain in {@code afterMobsim}, and
+ *       same step in DSim (synchronous processing in {@code DistributedDriveDischargingHandler}).</li>
  * </ul>
  *
  * @see EvDSimTestFixture
@@ -58,8 +61,11 @@ public class EvDriveDischargingIntegrationTest {
 		var controller = new Controler(scenario);
 		EvDSimTestFixture.installEvModules(controller);
 
-		// QSim defers discharge by one step: DrivingEnergyConsumptionEvent.time = triggeringEvent.time + 1
-		var verifier = new DriveDischargeVerifier(1);
+		// QSim defers discharge by one step during regular sim steps, but the final event is
+		// drained by afterMobsim without a cutoff and uses the current mobsim cleanup time.
+		var verifier = new DriveDischargeVerifier(Map.of(
+			Id.createLinkId("l2"), 1.0,
+			Id.createLinkId("l3"), 0.0));
 		verifier.install(controller);
 
 		controller.run();
@@ -74,13 +80,18 @@ public class EvDriveDischargingIntegrationTest {
 	void threePartitions() {
 		var config = EvDSimTestFixture.createConfig(utils.getOutputDirectory());
 		EvDSimTestFixture.configureDSim(config, 3);
+		var evConfig = ConfigUtils.addOrGetModule(config, EvConfigGroup.class);
+		evConfig.setWriteChargersInterval(1);
+		evConfig.setWriteChargingActivitiesInterval(1);
 		var scenario = EvDSimTestFixture.createScenario(config, 3);
 
 		var controller = new Controler(scenario);
 		EvDSimTestFixture.installEvModules(controller);
 
 		// DSim discharges synchronously: DrivingEnergyConsumptionEvent.time = triggeringEvent.time
-		var verifier = new DriveDischargeVerifier(0);
+		var verifier = new DriveDischargeVerifier(Map.of(
+			Id.createLinkId("l2"), 0.0,
+			Id.createLinkId("l3"), 0.0));
 		verifier.install(controller);
 
 		controller.run();
@@ -144,19 +155,18 @@ public class EvDriveDischargingIntegrationTest {
 	 * and {@link DrivingEnergyConsumptionEvent}s, then asserts:
 	 * <ol>
 	 *   <li>Total energy == 1100 J (l2: 1000 J + l3: 100 J; l1 is the first link and is skipped).</li>
-	 *   <li>For each discharge event: {@code dischargeEvent.time == triggeringEvent.time + timeDelta}
-	 *       (timeDelta = 1 for QSim, 0 for DSim).</li>
+	 *   <li>For each discharge event: {@code dischargeEvent.time == triggeringEvent.time + expectedTimeDelta}.</li>
 	 * </ol>
 	 */
 	static class DriveDischargeVerifier
 		implements DrivingEnergyConsumptionEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler {
 
-		private final int timeDelta;
+		private final Map<Id<Link>, Double> timeDeltas;
 		private final Map<Id<Link>, Double> triggerTimes = new HashMap<>();
 		private final Map<Id<Link>, DrivingEnergyConsumptionEvent> dischargeEvents = new HashMap<>();
 
-		DriveDischargeVerifier(int timeDelta) {
-			this.timeDelta = timeDelta;
+		DriveDischargeVerifier(Map<Id<Link>, Double> timeDeltas) {
+			this.timeDeltas = timeDeltas;
 		}
 
 		@Override
@@ -185,6 +195,8 @@ public class EvDriveDischargingIntegrationTest {
 		}
 
 		void assertExpected() {
+			assertEquals(timeDeltas.keySet(), dischargeEvents.keySet(), "Discharged links mismatch");
+
 			double totalEnergy_J = dischargeEvents.values().stream()
 				.mapToDouble(DrivingEnergyConsumptionEvent::getEnergy)
 				.sum();
@@ -196,6 +208,8 @@ public class EvDriveDischargingIntegrationTest {
 				var discharge = entry.getValue();
 				Double triggerTime = triggerTimes.get(linkId);
 				assertNotNull(triggerTime, "No triggering event recorded for link " + linkId);
+				Double timeDelta = timeDeltas.get(linkId);
+				assertNotNull(timeDelta, "No expected time delta configured for link " + linkId);
 				assertEquals(triggerTime + timeDelta, discharge.getTime(), 1e-6,
 					"Discharge event time mismatch for link " + linkId);
 			}

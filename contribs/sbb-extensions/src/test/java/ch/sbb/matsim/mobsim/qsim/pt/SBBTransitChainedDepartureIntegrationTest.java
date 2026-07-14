@@ -57,6 +57,8 @@ public class SBBTransitChainedDepartureIntegrationTest {
 		config.controller().setLastIteration(0);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
 		config.controller().setWritePlansInterval(1);
+		config.controller().setMobsim("qsim");
+		config.dsim().setThreads(2);
 		config.scoring().setWriteExperiencedPlans(true);
 		config.qsim().setEndTime(Time.parseTime("36:00:00"));
 
@@ -65,6 +67,7 @@ public class SBBTransitChainedDepartureIntegrationTest {
 
 		SBBTransitConfigGroup sbb = ConfigUtils.addOrGetModule(config, SBBTransitConfigGroup.class);
 		sbb.setDeterministicServiceModes(Set.of("rail"));
+		sbb.setCreateLinkEventsInterval(0);
 
 		return ScenarioUtils.loadScenario(config);
 	}
@@ -80,9 +83,7 @@ public class SBBTransitChainedDepartureIntegrationTest {
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new SBBTransitModule());
-		controler.configureQSimComponents(components -> {
-			new SBBTransitEngineQSimModule().configure(components);
-		});
+		controler.configureQSimComponents(components -> new SBBTransitEngineQSimModule().configure(components));
 
 		controler.run();
 
@@ -137,7 +138,7 @@ public class SBBTransitChainedDepartureIntegrationTest {
 	@Test
 	void withChainedDepartures() throws Exception {
 
-		List<Event> events = runScenario(scenario -> {
+		List<Event> events = runScenario(_ -> {
 		});
 
 		PersonContinuesInVehicleEvent c1 = new PersonContinuesInVehicleEvent(

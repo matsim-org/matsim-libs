@@ -128,7 +128,7 @@ public class CHRouter implements LeastCostPathCalculator {
                                   double startTime, Person person, Vehicle vehicle) {
         int startIdx = baseGraph.getNodeIndex(startNode);
         int endIdx   = baseGraph.getNodeIndex(endNode);
-        Path path    = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle);
+        Path path    = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle, Double.POSITIVE_INFINITY);
         if (path == null) LeastCostPathUtils.handleNotFound(noPathBehavior, LOG, startNode, endNode, person, vehicle);
         return path;
     }
@@ -136,6 +136,12 @@ public class CHRouter implements LeastCostPathCalculator {
     @Override
     public Path calcLeastCostPath(Link fromLink, Link toLink,
                                   double startTime, Person person, Vehicle vehicle) {
+        return calcLeastCostPath(fromLink, toLink, startTime, person, vehicle, Double.POSITIVE_INFINITY);
+    }
+
+    @Override
+    public Path calcLeastCostPath(Link fromLink, Link toLink,
+                                  double startTime, Person person, Vehicle vehicle, double maxCost) {
         int startIdx = baseGraph.getNodeIndex(fromLink.getToNode());
         int endIdx   = baseGraph.getNodeIndex(toLink.getFromNode());
 
@@ -146,13 +152,14 @@ public class CHRouter implements LeastCostPathCalculator {
             }
         }
 
-        Path path = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle);
+
+        Path path = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle, maxCost);
         if (path == null) LeastCostPathUtils.handleNotFound(noPathBehavior, LOG, fromLink, toLink, person, vehicle);
         return path;
     }
 
     private Path calcLeastCostPathImpl(int startIdx, int endIdx,
-                                       double startTime, Person person, Vehicle vehicle) {
+                                       double startTime, Person person, Vehicle vehicle, double maxCost) {
         advanceIteration();
 
         if (startIdx == endIdx) {
@@ -200,6 +207,12 @@ public class CHRouter implements LeastCostPathCalculator {
             double fMin = fwdPQ.isEmpty() ? Double.POSITIVE_INFINITY : fwdCost[fwdPQ.peek()];
             double bMin = bwdPQ.isEmpty() ? Double.POSITIVE_INFINITY : bwdCost[bwdPQ.peek()];
             if (fMin >= bestCost && bMin >= bestCost) break;
+            // Bounded-search early termination: once both queue minima exceed maxCost,
+            // no further meeting node can yield a complete path with cost <= maxCost,
+            // because fwdCost and bwdCost are both monotone-nondecreasing in the order
+            // their respective searches settle nodes, and any meeting cost is
+            // fwdCost[m] + bwdCost[m] >= max(fMin, bMin) > maxCost.
+            if (fMin > maxCost && bMin > maxCost) break;
 
             boolean expandForward = !fwdPQ.isEmpty()
                     && (bwdPQ.isEmpty() || fMin <= bMin);
@@ -323,6 +336,10 @@ public class CHRouter implements LeastCostPathCalculator {
         }
 
         if (meetingNode < 0) return null;
+        // Bounded-search guard: a meeting node found before the early-termination check
+        // fired may still have total cost above maxCost (the early-termination is
+        // monotone but not a per-iteration check on bestCost itself).
+        if (bestCost > maxCost) return null;
         return constructPath(startIdx, meetingNode, startTime, person, vehicle);
     }
 

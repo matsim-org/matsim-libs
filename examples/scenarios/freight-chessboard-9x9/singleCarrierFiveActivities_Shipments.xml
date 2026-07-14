@@ -3,7 +3,7 @@
 <carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
 	<carrier id="carrier1">
 		<attributes>
-			<attribute name="jspritComputationTime" class="java.lang.Double">0.12</attribute>
+			<attribute name="jspritComputationTimeInSeconds" class="java.lang.Double">0.12</attribute>
 			<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
 		</attributes>
 		<capabilities fleetSize="INFINITE">

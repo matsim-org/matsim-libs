@@ -32,6 +32,11 @@ public record DrtRouteConstraints(
 		boolean allowRejection
 ) {
 
+	// TODO could you please document that meanings of these variables?  In particular,
+	// * what is the difference between maxWaitDuration and maxPickupDelay; and
+	// * what is lateDiversionThreshold?
+	// Thanks.  kai, may'26
+
 	public final static DrtRouteConstraints UNDEFINED =
 			new DrtRouteConstraints(
 					Double.POSITIVE_INFINITY,

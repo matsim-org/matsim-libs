@@ -30,10 +30,12 @@ import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
@@ -73,6 +75,9 @@ public class SignalSystemsIT {
 
 		config.controller().setLastIteration(10);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
+
+		// stick with "old" non-access/egress-containing plans
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		// ---
 
@@ -128,13 +133,13 @@ public class SignalSystemsIT {
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
 
-			boolean works = PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation());
+			PopulationComparison.Result works = PopulationComparison.compare(expectedPopulation.getPopulation(), actualPopulation.getPopulation());
 
-			if (!works){
+			if (works != PopulationComparison.Result.equal){
 				new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it10.xml.gz");
 				new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it10.xml.gz");
 			}
-			Assertions.assertTrue(works, "different population files after iteration 10 ");
+			Assertions.assertEquals(PopulationComparison.Result.equal, works, "different population files after iteration 10 ");
 		}
 		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControllerIO());
 		File file = new File(writer.getSignalSystemsOutputFilename());
@@ -172,6 +177,9 @@ public class SignalSystemsIT {
 		config.controller().setLastIteration(10);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
+		// stick with "old" non-access/egress-containing plans
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
@@ -198,13 +206,13 @@ public class SignalSystemsIT {
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
 
-			boolean works = PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation());
+			PopulationComparison.Result works = PopulationComparison.compare(expectedPopulation.getPopulation(), actualPopulation.getPopulation());
 
-			if (!works){
+			if (works != PopulationComparison.Result.equal){
 				new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it0.xml.gz");
 				new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it0.xml.gz");
 			}
-			Assertions.assertTrue(works, "different population files after iteration 0 ");
+			Assertions.assertEquals(PopulationComparison.Result.equal, works, "different population files after iteration 10 ");
 		}
 		{
 			//iteration 10
@@ -223,13 +231,13 @@ public class SignalSystemsIT {
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
 
-			boolean works = PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation());
+			PopulationComparison.Result works = PopulationComparison.compare(expectedPopulation.getPopulation(), actualPopulation.getPopulation());
 
-			if (!works){
+			if (works != PopulationComparison.Result.equal){
 				new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it10.xml.gz");
 				new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it10.xml.gz");
 			}
-			Assertions.assertTrue(works, "different population files after iteration 10 ");
+			Assertions.assertEquals(works, PopulationComparison.Result.equal, "different population files after iteration 10 ");
 		}
 		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControllerIO());
 		File file = new File(writer.getSignalSystemsOutputFilename());

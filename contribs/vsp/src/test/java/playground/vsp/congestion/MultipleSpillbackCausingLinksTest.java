@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
@@ -177,6 +178,8 @@ public class MultipleSpillbackCausingLinksTest {
 
 		public createPseudoInputs(){
 			config=ConfigUtils.createConfig();
+			//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 			this.scenario = ScenarioUtils.loadScenario(config);
 			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
