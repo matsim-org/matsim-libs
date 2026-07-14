@@ -101,7 +101,7 @@ public final class BicycleLinkPolicy {
 		if (!(HW_FOOTWAY.equals(h) || HW_PEDESTRIAN.equals(h))) return;
 
 		String bicycle = tags.get(BICYCLE);
-		boolean ok = YES.equals(bicycle) || DESIGNATED.equals(bicycle);
+		boolean ok = YES.equals(bicycle) || DESIGNATED.equals(bicycle); // this is fine for now, but we might want to keep bicycle=permissive =dismount as well
 		if (!ok) {
 			kill(link);
 		}
