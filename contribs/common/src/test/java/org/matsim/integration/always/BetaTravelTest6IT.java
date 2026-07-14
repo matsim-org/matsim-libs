@@ -53,6 +53,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -136,6 +137,10 @@ public class BetaTravelTest6IT {
 		ConfigUtils.loadConfig(config, utils.getInputDirectory() + "config.xml"); // specific setting for this test
 		config.controller().setWritePlansInterval(0);
 		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
+		config.global().setRelativeToleranceForSampleSizeFactors( 5.1 );
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
+
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
 		 * to store the persons in the population, we have to sort the population manually.

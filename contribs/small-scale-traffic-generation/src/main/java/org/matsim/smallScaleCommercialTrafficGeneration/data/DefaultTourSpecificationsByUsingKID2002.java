@@ -4,6 +4,7 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
 import org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand;
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		Map<GenerateSmallScaleCommercialTrafficDemand.ServiceDurationPerCategoryKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> stopDurationProbabilityDistribution = new HashMap<>();
 
 		List<Pair<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds, Double>> thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 30), 0.098));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 30), 0.098));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 60), 0.17));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(60, 90), 0.127));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(90, 120), 0.11));
@@ -34,12 +35,12 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 600), 0.034));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(600, 720), 0.012));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(720, 840), 0.002));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Primary Sector", null,
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_PRIMARY, null,
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 30), 0.054));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 30), 0.054));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 60), 0.164));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(60, 90), 0.153));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(90, 120), 0.087));
@@ -53,12 +54,12 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 600), 0.058));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(600, 720), 0.016));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(720, 840), 0.002));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Construction", null,
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_CONSTRUCTION, null,
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 30), 0.13));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 30), 0.13));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 60), 0.324));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(60, 90), 0.178));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(90, 120), 0.108));
@@ -72,12 +73,12 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 600), 0.008));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(600, 720), 0.006));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(720, 840), 0.001));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Secondary Sector Rest", null,
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_SECONDARY, null,
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 30), 0.178));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 30), 0.178));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 60), 0.301));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(60, 90), 0.192));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(90, 120), 0.104));
@@ -91,12 +92,12 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 600), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(600, 720), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(720, 840), 0.001));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Retail", null,
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_RETAIL, null,
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 30), 0.144));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 30), 0.144));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 60), 0.372));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(60, 90), 0.203));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(90, 120), 0.069));
@@ -109,12 +110,12 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(480, 540), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 600), 0.005));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(600, 720), 0.005));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Traffic/Parcels", null,
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TRAFFIC, null,
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 30), 0.196));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 30), 0.196));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 60), 0.292));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(60, 90), 0.19));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(90, 120), 0.101));
@@ -128,12 +129,12 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 600), 0.006));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(600, 720), 0.004));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(720, 840), 0.001));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Tertiary Sector Rest", null,
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TERTIARY, null,
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.038));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.038));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.049));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.052));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.094));
@@ -149,12 +150,12 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.016));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.026));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.002));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Primary Sector", "vehTyp1",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_PRIMARY, "vehTyp1",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.025));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.025));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.025));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.05));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.043));
@@ -167,12 +168,12 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(180, 240), 0.068));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.025));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.019));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Primary Sector", "vehTyp2",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_PRIMARY, "vehTyp2",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.036));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.036));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.098));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.036));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.016));
@@ -189,18 +190,18 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.062));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.016));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(660, 780), 0.003));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Primary Sector", "vehTyp3",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_PRIMARY, "vehTyp3",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.071));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.071));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.143));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.429));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(60, 75), 0.179));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(90, 120), 0.107));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.071));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Primary Sector", "vehTyp4",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_PRIMARY, "vehTyp4",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
@@ -214,13 +215,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(120, 150), 0.079));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(150, 180), 0.026));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.053));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Primary Sector", "vehTyp5",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_PRIMARY, "vehTyp5",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.014));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.014));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.033));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.064));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.109));
@@ -236,13 +237,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.01));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.051));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.015));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Construction", "vehTyp1",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_CONSTRUCTION, "vehTyp1",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.02));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.02));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.027));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.061));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.045));
@@ -258,13 +259,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.065));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.023));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Construction", "vehTyp2",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_CONSTRUCTION, "vehTyp2",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.009));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.009));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.04));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.074));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.09));
@@ -280,13 +281,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.021));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.075));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.022));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Construction", "vehTyp3",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_CONSTRUCTION, "vehTyp3",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.036));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.036));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.055));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.018));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.236));
@@ -300,13 +301,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.055));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.055));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.018));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Construction", "vehTyp4",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_CONSTRUCTION, "vehTyp4",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.014));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.014));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.163));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.21));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.165));
@@ -322,13 +323,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.004));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.008));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.004));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Construction", "vehTyp5",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_CONSTRUCTION, "vehTyp5",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.072));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.072));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.093));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.123));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.113));
@@ -344,13 +345,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.009));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.014));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 780), 0.002));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Secondary Sector Rest", "vehTyp1",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_SECONDARY, "vehTyp1",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.062));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.062));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.14));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.093));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.115));
@@ -365,13 +366,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.009));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.024));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.011));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Secondary Sector Rest", "vehTyp2",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_SECONDARY, "vehTyp2",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.051));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.051));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.214));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.146));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.129));
@@ -387,7 +388,7 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.011));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 900), 0.003));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Secondary Sector Rest", "vehTyp3",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_SECONDARY, "vehTyp3",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
@@ -402,13 +403,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(75, 90), 0.122));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.01));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.01));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Secondary Sector Rest", "vehTyp4",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_SECONDARY, "vehTyp4",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.003));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.003));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.195));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.225));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.16));
@@ -421,13 +422,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(180, 240), 0.003));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 660), 0.009));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Secondary Sector Rest", "vehTyp5",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_SECONDARY, "vehTyp5",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.057));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.057));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.108));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.093));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.133));
@@ -443,13 +444,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.005));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.006));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.003));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Retail", "vehTyp1",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_RETAIL, "vehTyp1",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.084));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.084));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.119));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.183));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.076));
@@ -466,13 +467,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.004));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(780, 900), 0.002));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Retail", "vehTyp2",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_RETAIL, "vehTyp2",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.103));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.103));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.23));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.193));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.08));
@@ -488,13 +489,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.01));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.003));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.003));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Retail", "vehTyp3",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_RETAIL, "vehTyp3",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.094));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.094));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.179));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.094));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(40, 50), 0.245));
@@ -506,13 +507,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(180, 240), 0.009));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.009));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.019));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Retail", "vehTyp4",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_RETAIL, "vehTyp4",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.066));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.066));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.063));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.142));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.165));
@@ -525,13 +526,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(150, 180), 0.023));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(180, 240), 0.017));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.003));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Retail", "vehTyp5",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_RETAIL, "vehTyp5",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.159));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.159));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.173));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.173));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.088));
@@ -546,13 +547,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.017));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.007));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Traffic/Parcels", "vehTyp1",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TRAFFIC, "vehTyp1",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.292));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.292));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.135));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.062));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.197));
@@ -564,13 +565,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(120, 150), 0.034));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(180, 240), 0.006));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.022));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Traffic/Parcels", "vehTyp2",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TRAFFIC, "vehTyp2",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.092));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.092));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.111));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.224));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.173));
@@ -585,13 +586,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.006));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.006));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Traffic/Parcels", "vehTyp3",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TRAFFIC, "vehTyp3",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.146));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.146));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.098));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.146));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.195));
@@ -603,13 +604,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(120, 150), 0.037));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(180, 240), 0.012));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.012));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Traffic/Parcels", "vehTyp4",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TRAFFIC, "vehTyp4",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.026));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.026));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.042));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.062));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.121));
@@ -624,13 +625,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.005));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 900), 0.008));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Traffic/Parcels", "vehTyp5",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TRAFFIC, "vehTyp5",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.061));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.061));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.093));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.101));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.125));
@@ -645,13 +646,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.011));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.004));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.005));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Tertiary Sector Rest", "vehTyp1",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TERTIARY, "vehTyp1",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.081));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.081));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.101));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.101));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.109));
@@ -666,13 +667,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.003));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.008));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Tertiary Sector Rest", "vehTyp2",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TERTIARY, "vehTyp2",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.052));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.052));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.114));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.155));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.111));
@@ -688,7 +689,7 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.009));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(660, 780), 0.003));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Tertiary Sector Rest", "vehTyp3",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TERTIARY, "vehTyp3",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
@@ -702,13 +703,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(90, 120), 0.163));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(120, 150), 0.102));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(180, 240), 0.02));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Tertiary Sector Rest", "vehTyp4",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TERTIARY, "vehTyp4",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.02));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.02));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.02));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.151));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.296));
@@ -722,14 +723,14 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(240, 300), 0.01));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.005));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.005));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Employee Tertiary Sector Rest", "vehTyp5",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.EMPLOYEE_TERTIARY, "vehTyp5",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		// because no data für private persons; use average numbers of all employee categories
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.056));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.056));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.084));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.095));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.118));
@@ -745,13 +746,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.018));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.004));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Inhabitants", "vehTyp1",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.INHABITANTS, "vehTyp1",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.077));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.077));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.093));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.103));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.092));
@@ -767,13 +768,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.011));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.021));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.007));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Inhabitants", "vehTyp2",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.INHABITANTS, "vehTyp2",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.06));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.06));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.141));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.152));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.107));
@@ -790,13 +791,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.024));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.006));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(660, 780), 0.001));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Inhabitants", "vehTyp3",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.INHABITANTS, "vehTyp3",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.062));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.062));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.11));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.12));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.144));
@@ -812,13 +813,13 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.014));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 540), 0.014));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(540, 660), 0.002));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Inhabitants", "vehTyp4",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.INHABITANTS, "vehTyp4",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();
 
 		thisStopDurationProbabilityDistribution = new ArrayList<>();
-		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(0, 10), 0.024));
+		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(1, 10), 0.024));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(10, 20), 0.099));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(20, 30), 0.147));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(30, 40), 0.17));
@@ -834,7 +835,7 @@ public class DefaultTourSpecificationsByUsingKID2002 implements CommercialTourSp
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(300, 420), 0.004));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(420, 660), 0.007));
 		thisStopDurationProbabilityDistribution.add(Pair.create(new GenerateSmallScaleCommercialTrafficDemand.DurationsBounds(660, 900), 0.002));
-		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey("Inhabitants", "vehTyp5",
+		stopDurationProbabilityDistribution.put(makeServiceDurationPerCategoryKey(StructuralAttribute.INHABITANTS, "vehTyp5",
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic),
 			new EnumeratedDistribution<>(rng, thisStopDurationProbabilityDistribution));
 		thisStopDurationProbabilityDistribution.clear();

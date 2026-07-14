@@ -103,8 +103,19 @@ public final class TrainRouter {
 		if (nextStop != null) {
 			currentStopLinks = stopLinks.getOrDefault(nextStop.getId(), Collections.emptySet());
 		}
-
 		List<Link> path = dijkstra(fromLink, toLink, position, currentStopLinks);
+		return path.stream().map(l -> resources.getLink(l.getId())).toList();
+	}
+
+	/**
+	 * Calculate shortest path, independent of train position.
+	 */
+	public List<RailLink> calcRoute(RailLink from, RailLink to) {
+
+		Link fromLink = network.getLinks().get(from.getLinkId());
+		Link toLink = network.getLinks().get(to.getLinkId());
+
+		List<Link> path = dijkstra(fromLink, toLink, null, Set.of());
 		return path.stream().map(l -> resources.getLink(l.getId())).toList();
 	}
 
@@ -155,6 +166,11 @@ public final class TrainRouter {
 
 				// Don't traverse links that are opposite of links already used in the path
 				if (isOppositeLinkInPath(outgoingLink, currentPathNode)) {
+					continue;
+				}
+
+				// Use either path data or the very first link to check for disallowed sequence
+				if (isDisallowedNextLink(outgoingLink, currentPathNode.link != null ? currentPathNode.link.getId() : fromLink.getId())) {
 					continue;
 				}
 
@@ -211,12 +227,29 @@ public final class TrainRouter {
 	}
 
 	/**
+	 * Check if the next link is disallowed for the given incoming link.
+	 */
+	private boolean isDisallowedNextLink(Link nextLink, Id<Link> incomingLinkId) {
+		if (incomingLinkId != null) {
+			RailLink l = resources.getLink(incomingLinkId);
+			return l.isDisallowedNextLink(nextLink.getId());
+		}
+		return false;
+	}
+
+	/**
 	 * Calculate the cost of traversing a link.
 	 */
 	private double calculateLinkCost(Link link, TrainPosition position, boolean isStopLink) {
+
 		// Stop loop links should always be traversed once, so give them negative cost
 		if (isStopLink) {
 			return -0.5;
+		}
+
+		// When the method is called without position, just try with constant cost
+		if (position == null) {
+			return 1;
 		}
 
 		// Links without capacity have higher cost

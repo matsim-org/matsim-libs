@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
@@ -49,11 +50,16 @@ public final class ScenarioByInstanceModule extends AbstractModule {
 	public void install() {
 		// if no network provided, assume it comes from somewhere else, and this module just provides
 		// the scenario "elements"
+		// I think that the above comment means "scenario" and not "network".  And "comes from somewhere else" means "bound
+		// somewhere else". kai, nov;25
 		if ( scenario != null ) bind(Scenario.class).toInstance(scenario);
 		if (getConfig().transit().isUseTransit()) {
 			bind(TransitSchedule.class).toProvider(TransitScheduleProvider.class);
 			bind(Vehicles.class).annotatedWith(Transit.class).toProvider(TransitVehiclesProvider.class);
 		}
+
+		if (!getSimulationContext().isDistributed())
+			bind(PopulationPartition.class).toInstance(PopulationPartition.SINGLE_INSTANCE);
 	}
 
 	@Provides Network provideNetwork(Scenario scenario) {

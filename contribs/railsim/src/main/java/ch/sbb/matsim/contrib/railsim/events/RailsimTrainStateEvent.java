@@ -43,6 +43,7 @@ public final class RailsimTrainStateEvent extends Event implements HasVehicleId 
 	public static final String ATTRIBUTE_SPEED = "speed";
 	public static final String ATTRIBUTE_ACCELERATION = "acceleration";
 	public static final String ATTRIBUTE_TARGET_SPEED = "targetSpeed";
+	public static final String ATTRIBUTE_DELAY = "delay";
 
 	/**
 	 * Exact time with resolution of 0.001s.
@@ -57,10 +58,15 @@ public final class RailsimTrainStateEvent extends Event implements HasVehicleId 
 	private final double acceleration;
 	private final double targetSpeed;
 
+	/**
+	 * Approximate delay in seconds.
+	 */
+	private final double delay;
+
 	public RailsimTrainStateEvent(double time, double exactTime, Id<Vehicle> vehicleId,
 								  Id<Link> headLink, double headPosition,
 								  Id<Link> tailLink, double tailPosition,
-								  double speed, double acceleration, double targetSpeed) {
+								  double speed, double acceleration, double targetSpeed, double delay) {
 		super(time);
 		this.exactTime = RailsimUtils.round(exactTime);
 		this.vehicleId = vehicleId;
@@ -71,6 +77,7 @@ public final class RailsimTrainStateEvent extends Event implements HasVehicleId 
 		this.speed = speed;
 		this.acceleration = acceleration;
 		this.targetSpeed = targetSpeed;
+		this.delay = delay;
 	}
 
 	@Override
@@ -107,6 +114,10 @@ public final class RailsimTrainStateEvent extends Event implements HasVehicleId 
 		return this.acceleration;
 	}
 
+	public double getDelay() {
+		return this.delay;
+	}
+
 	public Id<Link> getHeadLink() {
 		return this.headLink;
 	}
@@ -127,6 +138,10 @@ public final class RailsimTrainStateEvent extends Event implements HasVehicleId 
 		attr.put(ATTRIBUTE_SPEED, Double.toString(speed));
 		attr.put(ATTRIBUTE_ACCELERATION, Double.toString(acceleration));
 		attr.put(ATTRIBUTE_TARGET_SPEED, Double.toString(targetSpeed));
+
+		if (!Double.isNaN(delay))
+			attr.put(ATTRIBUTE_DELAY, Double.toString(delay));
+
 		return attr;
 	}
 }

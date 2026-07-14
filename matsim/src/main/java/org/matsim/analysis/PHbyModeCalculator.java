@@ -20,6 +20,19 @@
 
 package org.matsim.analysis;
 
+import com.google.inject.Inject;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.router.StageActivityTypeIdentifier;
+import org.matsim.core.scoring.EventsToLegs;
+import org.matsim.core.utils.charts.StackedBarChart;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,26 +42,15 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import com.google.inject.Inject;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.logging.log4j.LogManager;
-import org.jfree.chart.axis.CategoryLabelPositions;
-import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.StageActivityTypeIdentifier;
-import org.matsim.core.scoring.EventsToLegs;
-import org.matsim.core.utils.charts.StackedBarChart;
 
 /**
  * analyses passenger hours traveled based on experienced plans.
+ *
  * @author vsp-gleich
  */
 public class PHbyModeCalculator {
 
-	private final Map<Integer,Map<String,TravelTimeAndWaitTime>> phtPerIteration = new TreeMap<>();
+	private final Map<Integer, Map<String, TravelTimeAndWaitTime>> phtPerIteration = new TreeMap<>();
 	private final OutputDirectoryHierarchy controllerIO;
 	private final String delimiter;
 	private final static String FILENAME = "ph_modestats";
@@ -63,20 +65,20 @@ public class PHbyModeCalculator {
 		this.delimiter = globalConfig.getDefaultDelimiter();
 	}
 
-	void addIteration(int iteration, IdMap<Person, Plan> map) {
-		Map<String,TravelTimeAndWaitTime> phtbyMode = map.values()
-				.parallelStream()
-				.flatMap(plan -> plan.getPlanElements().stream())
-				.map(PHbyModeCalculator::mapPlanElementToEntry)
-				.collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue, TravelTimeAndWaitTime::sum));
-		phtPerIteration.put(iteration,phtbyMode);
+	void addIteration(int iteration, Map<Id<Person>, Plan> map) {
+		Map<String, TravelTimeAndWaitTime> phtbyMode = map.values()
+			.parallelStream()
+			.flatMap(plan -> plan.getPlanElements().stream())
+			.map(PHbyModeCalculator::mapPlanElementToEntry)
+			.collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue, TravelTimeAndWaitTime::sum));
+		phtPerIteration.put(iteration, phtbyMode);
 	}
 
 	private static AbstractMap.SimpleEntry<String, TravelTimeAndWaitTime> mapPlanElementToEntry(PlanElement pe) {
 		if (pe instanceof Leg leg) {
 			double travelTime = 0.0;
 			double waitTime = 0.0;
-			if (leg.getRoute()!=null) {
+			if (leg.getRoute() != null) {
 				travelTime = leg.getRoute().getTravelTime().seconds();
 				double enterVehicleTime = Double.NaN;
 				Object attr = leg.getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME);
@@ -84,15 +86,19 @@ public class PHbyModeCalculator {
 					enterVehicleTime = (Double) attr;
 				}
 				waitTime = enterVehicleTime - leg.getDepartureTime().seconds();
-				if (!Double.isFinite(waitTime)) {waitTime = 0.0;}
+				if (!Double.isFinite(waitTime)) {
+					waitTime = 0.0;
+				}
 				if (waitTime >= 0.0) {
 					travelTime -= waitTime;
 				} else {
 					throw new RuntimeException("negative wait time" + enterVehicleTime + " " + leg.getDepartureTime()
-							.seconds());
+						.seconds());
 				}
 			}
-			if (Double.isNaN(travelTime)) {travelTime = 0.0; }
+			if (Double.isNaN(travelTime)) {
+				travelTime = 0.0;
+			}
 			return new AbstractMap.SimpleEntry<>(leg.getMode(), new TravelTimeAndWaitTime(travelTime, waitTime));
 		}
 
@@ -108,7 +114,7 @@ public class PHbyModeCalculator {
 
 	void writeOutput(boolean writePng) {
 		writeCsv();
-		if(writePng){
+		if (writePng) {
 			new Thread(this::writePng).start();
 		}
 	}
@@ -127,9 +133,9 @@ public class PHbyModeCalculator {
 	}
 
 	private void writeValues(CSVPrinter csvPrinter, TreeSet<String> allModes) throws IOException {
-		for (Map.Entry<Integer,Map<String,TravelTimeAndWaitTime>> e : phtPerIteration.entrySet()){
+		for (Map.Entry<Integer, Map<String, TravelTimeAndWaitTime>> e : phtPerIteration.entrySet()) {
 			csvPrinter.print(e.getKey());
-			for (String mode : allModes){
+			for (String mode : allModes) {
 				TravelTimeAndWaitTime travelTimeAndWaitTime = e.getValue().getOrDefault(mode, new TravelTimeAndWaitTime(0.0, 0.0));
 				csvPrinter.print((int) Math.round(travelTimeAndWaitTime.travelTime / 3600.0));
 				csvPrinter.print((int) Math.round(travelTimeAndWaitTime.waitTime / 3600.0));
@@ -140,47 +146,47 @@ public class PHbyModeCalculator {
 
 	private static void writeHeader(CSVPrinter csvPrinter, TreeSet<String> allModes) throws IOException {
 		csvPrinter.print("Iteration");
-		for (String mode: allModes) {
+		for (String mode : allModes) {
 			csvPrinter.print(mode + TRAVEL_TIME_SUFFIX);
 			csvPrinter.print(mode + WAIT_TIME_SUFFIX);
 		}
 		csvPrinter.println();
 	}
 
-	private void writePng(){
+	private void writePng() {
 		TreeSet<String> allModes = getAllModes();
 		String[] categories = new String[phtPerIteration.size()];
 		int i = 0;
-		for (Integer it : phtPerIteration.keySet()){
+		for (Integer it : phtPerIteration.keySet()) {
 			categories[i++] = it.toString();
 		}
 
-		StackedBarChart chart = new StackedBarChart("Passenger hours traveled per Mode","Iteration","person hours",categories);
+		StackedBarChart chart = new StackedBarChart("Passenger hours traveled per Mode", "Iteration", "person hours", categories);
 		//rotate x-axis by 90degrees
 		chart.getChart().getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
 
-		for (String mode : allModes){
-			double[] valueTravelTime =  phtPerIteration.values().stream()
-													   .mapToDouble(k->k.getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0)).travelTime/3600.0)
-													   .toArray();
+		for (String mode : allModes) {
+			double[] valueTravelTime = phtPerIteration.values().stream()
+				.mapToDouble(k -> k.getOrDefault(mode, new TravelTimeAndWaitTime(0.0, 0.0)).travelTime / 3600.0)
+				.toArray();
 			chart.addSeries(mode + TRAVEL_TIME_SUFFIX, valueTravelTime);
-			double[] valueWaitTime =  phtPerIteration.values().stream()
-													 .mapToDouble(k->k.getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0)).waitTime/3600.0)
-													 .toArray();
+			double[] valueWaitTime = phtPerIteration.values().stream()
+				.mapToDouble(k -> k.getOrDefault(mode, new TravelTimeAndWaitTime(0.0, 0.0)).waitTime / 3600.0)
+				.toArray();
 			chart.addSeries(mode + WAIT_TIME_SUFFIX, valueWaitTime);
 		}
 		chart.addMatsimLogo();
-		chart.saveAsPng(controllerIO.getOutputFilename(FILENAME+ ".png"), 1024, 768);
+		chart.saveAsPng(controllerIO.getOutputFilename(FILENAME + ".png"), 1024, 768);
 	}
 
 	private TreeSet<String> getAllModes() {
 		return this.phtPerIteration.values()
-								   .stream()
-								   .flatMap(i -> i.keySet().stream())
-								   .collect(Collectors.toCollection(TreeSet::new));
+			.stream()
+			.flatMap(i -> i.keySet().stream())
+			.collect(Collectors.toCollection(TreeSet::new));
 	}
 
-	private record TravelTimeAndWaitTime(double travelTime, double waitTime){
+	private record TravelTimeAndWaitTime(double travelTime, double waitTime) {
 		private static TravelTimeAndWaitTime sum(TravelTimeAndWaitTime object1, TravelTimeAndWaitTime object2) {
 			return new TravelTimeAndWaitTime(object1.travelTime + object2.travelTime, object1.waitTime + object2.waitTime);
 		}

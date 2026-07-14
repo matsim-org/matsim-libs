@@ -62,21 +62,12 @@ public class RunCarsharing {
 		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
 
 		// We need to add interaction activity types to scoring
-		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
-		pickupParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(pickupParams);
-
-		ActivityParams dropoffParams = new ActivityParams(SharingUtils.DROPOFF_ACTIVITY);
-		dropoffParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(dropoffParams);
-
-		ActivityParams bookingParams = new ActivityParams(SharingUtils.BOOKING_ACTIVITY);
-		bookingParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(bookingParams);
+		config.scoring().addActivityParams( new ActivityParams(SharingUtils.PICKUP_ACTIVITY).setScoringThisActivityAtAll(false ) );
+		config.scoring().addActivityParams( new ActivityParams(SharingUtils.DROPOFF_ACTIVITY).setScoringThisActivityAtAll(false ) );
+		config.scoring().addActivityParams( new ActivityParams(SharingUtils.BOOKING_ACTIVITY).setScoringThisActivityAtAll(false ) );
 
 		// We need to score car
-		ModeParams carScoringParams = new ModeParams("car");
-		config.scoring().addModeParams(carScoringParams);
+		config.scoring().addModeParams( new ModeParams("car") );
 
 		// Write out all events (DEBUG)
 		config.controller().setWriteEventsInterval(1);

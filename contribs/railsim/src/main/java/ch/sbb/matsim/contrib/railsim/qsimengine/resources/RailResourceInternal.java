@@ -5,7 +5,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 /**
  * Internal rail resource interface, which allows modifying the state.
- * Disposition should only interact with resources via {@link RailResourceManager}.
+ * Disposition should only interact with resources via {@link RailResourceManagerImpl}.
  */
 interface RailResourceInternal extends RailResource {
 

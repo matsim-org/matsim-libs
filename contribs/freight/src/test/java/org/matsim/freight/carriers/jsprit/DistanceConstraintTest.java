@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -64,8 +62,6 @@ public class DistanceConstraintTest {
 
 	@RegisterExtension
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
-
-	static final Logger log = LogManager.getLogger(DistanceConstraintTest.class);
 
 	final static URL SCENARIO_URL = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
@@ -152,6 +148,72 @@ public class DistanceConstraintTest {
 			"The scheduled tour has a non expected distance");
 	}
 
+	/**
+	 * Checks that the configurable distance-constraint usable range reduces the vehicle range during tour planning.
+	 * With a 75 percent usable range, the combined tour with 24 km is no longer feasible for vehicles with a nominal range of
+	 * 30 km, so the carrier needs two separate tours.
+	 */
+	@Test
+	final void distanceConstraintUsableRangeAffectsTourPlanning() throws ExecutionException, InterruptedException {
+		Config config = ConfigUtils.createConfig();
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+		prepareConfig(config);
+		ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class).setDistanceConstraintUsableRange(75.);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		Carriers carriers = new Carriers();
+		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
+		FleetSize fleetSize = FleetSize.INFINITE;
+
+		Carrier carrier = CarriersUtils.createCarrier(Id.create("Carrier_UsableRange", Carrier.class));
+		VehicleType vehicleTypeLarge = VehicleUtils.createVehicleType(Id.create("LargeBattery_UsableRange", VehicleType.class));
+		vehicleTypeLarge.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
+		VehicleUtils.setHbefaTechnology(vehicleTypeLarge.getEngineInformation(), "electricity");
+		VehicleUtils.setEnergyCapacity(vehicleTypeLarge.getEngineInformation(), 450.);
+		VehicleUtils.setEnergyConsumptionKWhPerMeter(vehicleTypeLarge.getEngineInformation(), 0.015);
+		vehicleTypeLarge.setDescription("Carrier_UsableRange");
+		vehicleTypeLarge.getCapacity().setOther(80.);
+
+		VehicleType vehicleTypeSmall = VehicleUtils.createVehicleType(Id.create("SmallBattery_UsableRange", VehicleType.class));
+		vehicleTypeSmall.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(70.);
+		VehicleUtils.setHbefaTechnology(vehicleTypeSmall.getEngineInformation(), "electricity");
+		VehicleUtils.setEnergyCapacity(vehicleTypeSmall.getEngineInformation(), 300.);
+		VehicleUtils.setEnergyConsumptionKWhPerMeter(vehicleTypeSmall.getEngineInformation(), 0.01);
+		vehicleTypeSmall.setDescription("Carrier_UsableRange");
+		vehicleTypeSmall.getCapacity().setOther(80.);
+
+		vehicleTypes.getVehicleTypes().put(vehicleTypeLarge.getId(), vehicleTypeLarge);
+		vehicleTypes.getVehicleTypes().put(vehicleTypeSmall.getId(), vehicleTypeSmall);
+
+		carriers.addCarrier(addTwoServicesToCarrier(carrier));
+		createCarrier(fleetSize, carrier, vehicleTypes);
+
+		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
+		scenario.addScenarioElement("carriers", carriers);
+		CarriersUtils.setJspritIterations(carrier, 25);
+
+		CarriersUtils.runJsprit(scenario);
+
+		Assertions.assertEquals(2, carrier.getSelectedPlan().getScheduledTours().size(),
+			"The usable range should make the combined 24 km tour infeasible.");
+
+		List<Double> distancesOfTours = new ArrayList<>();
+		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+			Assertions.assertEquals(vehicleTypeSmall.getId(), scheduledTour.getVehicle().getType().getId());
+			double distanceTour = 0.0;
+			for (Tour.TourElement element : scheduledTour.getTour().getTourElements()) {
+				if (element instanceof Tour.Leg legElement && legElement.getRoute().getDistance() != 0) {
+					distanceTour += RouteUtils.calcDistance((NetworkRoute) legElement.getRoute(), 0, 0,
+						scenario.getNetwork());
+				}
+			}
+			distancesOfTours.add(distanceTour);
+		}
+
+		Assertions.assertTrue(distancesOfTours.contains(12000.0), "The scheduled tour has a non expected distance");
+		Assertions.assertTrue(distancesOfTours.contains(20000.0), "The scheduled tour has a non expected distance");
+	}
 	/**
 	 * Option 2: Tour is not possible with the vehicle with the small battery.
 	 * That's why one vehicle with a large battery is used.

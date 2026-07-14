@@ -37,7 +37,7 @@ public class ZonalEnergyDemandListener
         implements IterationStartsListener, IterationEndsListener, EnergyChargedEventHandler, ShutdownListener {
     static public final String OUTPUT_FILE = "ev_zonal_energy_demand.csv";
 
-    private final String fileEnding;
+    private final CompressionType compressionType;
     private final EventsManager eventsManager;
     private final OutputDirectoryHierarchy outputHierarchy;
 
@@ -57,7 +57,7 @@ public class ZonalEnergyDemandListener
     public ZonalEnergyDemandListener(EventsManager eventsManager, OutputDirectoryHierarchy outputHierarchy,
             ZoneSystem zoneSystem, ChargingInfrastructureSpecification infrastructure, int interval,
             CompressionType compressionType) {
-        this.fileEnding = compressionType.fileEnding;
+        this.compressionType = compressionType;
         this.eventsManager = eventsManager;
         this.zoneSystem = zoneSystem;
         this.infrastructure = infrastructure;
@@ -86,8 +86,9 @@ public class ZonalEnergyDemandListener
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {
-        File iterationPath = new File(outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE + this.fileEnding));
-        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE + this.fileEnding));
+        File iterationPath = new File(
+                outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE, compressionType));
+        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE, compressionType));
 
         try {
             Files.copy(iterationPath, outputPath);
@@ -97,7 +98,7 @@ public class ZonalEnergyDemandListener
 
     private void writeData(int iteration) {
         try {
-            String outputPath = outputHierarchy.getIterationFilename(iteration, OUTPUT_FILE + this.fileEnding);
+            String outputPath = outputHierarchy.getIterationFilename(iteration, OUTPUT_FILE, compressionType);
             BufferedWriter writer = IOUtils.getBufferedWriter(outputPath);
 
             writer.write(String.join(";", new String[] {

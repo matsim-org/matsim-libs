@@ -14,7 +14,7 @@ import com.google.common.base.Verify;
  * This RequestUnscheduler searches for a request in a vehicle's schedule and
  * removes the request from the relevant stop tasks. No other changes (wrt to
  * rerouting the vehicle) are applied to the schedule.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class SimpleRequestUnscheduler implements RequestUnscheduler {
@@ -28,11 +28,20 @@ public class SimpleRequestUnscheduler implements RequestUnscheduler {
 	public void unscheduleRequest(double now, Id<DvrpVehicle> vehicleId, Id<Request> requestId) {
 		DvrpVehicle vehicle = vehicleLookup.lookupVehicle(vehicleId);
 		Schedule schedule = vehicle.getSchedule();
+		Verify.verify(
+				schedule.getStatus() != Schedule.ScheduleStatus.UNPLANNED
+						&& schedule.getStatus() != Schedule.ScheduleStatus.COMPLETED,
+				"Unexpected DVRP schedule status when unscheduling prebooked request: %s (vehicle %s)",
+				schedule.getStatus(), vehicle.getId());
 
 		DrtStopTask pickupTask = null;
 		DrtStopTask dropoffTask = null;
 
-		int currentIndex = schedule.getCurrentTask().getTaskIdx();
+		// Start searching from first task if schedule is planned but not yet started
+		int currentIndex = 0;
+		if (schedule.getStatus() == Schedule.ScheduleStatus.STARTED) {
+			currentIndex = schedule.getCurrentTask().getTaskIdx();
+		}
 		for (; currentIndex < schedule.getTaskCount() && dropoffTask == null; currentIndex++) {
 			Task currentTask = schedule.getTasks().get(currentIndex);
 

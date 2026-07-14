@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+
+    <attributes>
+        <attribute name="coordinateReferenceSystem" class="java.lang.String">ATLANTIS</attribute>
+    </attributes>
+    <!-- ====================================================================== -->
+
+    <nodes>
+        <node id="n1" x="0" y="0">
+            <attributes>
+                <attribute name="partition" class="java.lang.Integer">0</attribute>
+            </attributes>
+        </node>
+        <node id="n2" x="0" y="100">
+            <attributes>
+                <attribute name="partition" class="java.lang.Integer">0</attribute>
+            </attributes>
+        </node>
+        <node id="n3" x="0" y="1100">
+            <attributes>
+                <attribute name="partition" class="java.lang.Integer">1</attribute>
+            </attributes>
+        </node>
+        <node id="n4" x="0" y="1200">
+            <attributes>
+                <attribute name="partition" class="java.lang.Integer">2</attribute>
+            </attributes>
+        </node>
+    </nodes>
+    <links effectivecellsize="100">
+        <link id="l1" from="n1" to="n2" length="100" freespeed="10." capacity="3600" permlanes="1.0">
+            <attributes>
+                <attribute name="partition" class="java.lang.Integer">0</attribute>
+            </attributes>
+        </link>
+        <link id="l2" from="n2" to="n3" length="1000" freespeed="10." capacity="3600" permlanes="1.0">
+            <attributes>
+                <attribute name="partition" class="java.lang.Integer">1</attribute>
+            </attributes>
+        </link>
+        <link id="l3" from="n3" to="n4" length="100" freespeed="10." capacity="1" permlanes="1.0">
+            <attributes>
+                <attribute name="partition" class="java.lang.Integer">2</attribute>
+            </attributes>
+        </link>
+    </links>
+</network>

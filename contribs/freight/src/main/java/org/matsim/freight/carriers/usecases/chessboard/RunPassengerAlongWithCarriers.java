@@ -59,7 +59,10 @@ final class RunPassengerAlongWithCarriers {
 	}
 
 	public void run() {
-		Config config = prepareConfig();
+		run(prepareConfig());
+	}
+
+	public void run(Config config) {
 
 		Scenario scenario = prepareScenario(config);
 

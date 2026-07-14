@@ -146,7 +146,7 @@ public class HermesRoundaboutTest {
 					vehicle = VehicleUtils.createVehicle(Id.createVehicleId(p.getId()), car);
 				}
 				scenario.getVehicles().addVehicle(vehicle);
-				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(TransportMode.car, vehicle.getId()));
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes( p, Map.of(TransportMode.car, vehicle.getId() ) );
 			}
 			a++;
 		}

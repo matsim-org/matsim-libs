@@ -197,6 +197,20 @@ final class ScheduleImpl implements Schedule {
 	}
 
 	@Override
+	public void update(Schedule schedule) {
+
+		if (!(schedule instanceof ScheduleImpl s)) {
+			throw new IllegalArgumentException("Schedule must be of type ScheduleImpl");
+		}
+
+		tasks.clear();
+		tasks.addAll(s.tasks);
+
+		status = s.status;
+		currentTask = s.currentTask;
+	}
+
+	@Override
 	public String toString() {
 		return "Schedule_" + vehicleSpecification.getId();
 	}

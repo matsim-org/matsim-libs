@@ -8,8 +8,10 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.SimpleDeadlockAvoidanc
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.MaxSpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManagerImpl;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
+import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -20,10 +22,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import jakarta.annotation.Nullable;
 import java.io.File;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
+import static ch.sbb.matsim.contrib.railsim.qsimengine.RailsimTestUtils.createTrainTimeDistanceHandler;
 
 public class RailsimDeadlockTest {
 
@@ -42,7 +46,7 @@ public class RailsimDeadlockTest {
 		eventsManager.initProcessing();
 	}
 
-	private RailsimTestUtils.Holder getTestEngine(String network, DeadlockAvoidance dla, @Nullable Consumer<Link> f) {
+	private RailsimTestUtils.Holder getTestEngine(String network, Function<Network, DeadlockAvoidance> deadlockAvoidance, @Nullable Consumer<Link> f) {
 		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), network).toString());
 		RailsimConfigGroup config = new RailsimConfigGroup();
 
@@ -55,17 +59,18 @@ public class RailsimDeadlockTest {
 		}
 
 		TrainManager trains = new TrainManager();
-		RailResourceManager res = new RailResourceManager(eventsManager, config, net, dla, trains);
+		RailResourceManager res = new RailResourceManagerImpl(eventsManager, config, net, deadlockAvoidance.apply(net), trains);
 		MaxSpeedProfile speed = new MaxSpeedProfile();
 		TrainRouter router = new TrainRouter(net, res);
+		TrainTimeDistanceHandler ttd = createTrainTimeDistanceHandler();
 
-		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, trains, new SimpleDisposition(res, speed, router)), net);
+		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, trains, new SimpleDisposition(res, speed, router), ttd), net);
 	}
 
 	@Test
 	public void deadlock() {
 
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new NoDeadlockAvoidance(), null);
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", NoDeadlockAvoidance::new, null);
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "AB", "EF");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "DC");
 
@@ -86,7 +91,7 @@ public class RailsimDeadlockTest {
 		// This avoidance point is too small for these trains and will lead to a deadlock
 		// this test is also an example where the simple deadlock avoidance fails currently
 
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new SimpleDeadlockAvoidance(), l -> {
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", SimpleDeadlockAvoidance::new, l -> {
 			String id = l.getId().toString();
 			if (increased.contains(id)) {
 				RailsimUtils.setTrainCapacity(l, 2);
@@ -110,7 +115,7 @@ public class RailsimDeadlockTest {
 		// There is an avoidance point which is also large enough for the train
 		Set<String> increased = Set.of("y1y", "yy1");
 
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new SimpleDeadlockAvoidance(), l -> {
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", SimpleDeadlockAvoidance::new, l -> {
 			String id = l.getId().toString();
 			if (increased.contains(id)) {
 				RailsimUtils.setTrainCapacity(l, 2);
@@ -135,7 +140,7 @@ public class RailsimDeadlockTest {
 		Set<String> increased = Set.of("xB", "Bx", "yx", "xy", "AB", "BA");
 
 		// Increase some capacity, but one of the segment is too small for multiple trains
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new SimpleDeadlockAvoidance(), l -> {
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", SimpleDeadlockAvoidance::new, l -> {
 			String id = l.getId().toString();
 			if (increased.contains(id))
 				RailsimUtils.setTrainCapacity(l, 2);
@@ -164,7 +169,7 @@ public class RailsimDeadlockTest {
 	@Test
 	public void oneWay() {
 
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new SimpleDeadlockAvoidance(), null);
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", SimpleDeadlockAvoidance::new, null);
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "AB", "EF");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "CD");
 
@@ -180,7 +185,7 @@ public class RailsimDeadlockTest {
 	@Test
 	public void twoWay() {
 
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new SimpleDeadlockAvoidance(), l -> RailsimUtils.setTrainCapacity(l, 2));
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", SimpleDeadlockAvoidance::new, l -> RailsimUtils.setTrainCapacity(l, 2));
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1a", 0, "AB", "EF");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1b", 0, "AB", "EF");
 
@@ -204,7 +209,7 @@ public class RailsimDeadlockTest {
 		// Keep start and end as fixed block
 		Set<String> fixed = Set.of("AB", "BA", "CD", "DC", "EF", "FE", "HG", "GH");
 
-		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", new SimpleDeadlockAvoidance(), l -> {
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocks.xml", SimpleDeadlockAvoidance::new, l -> {
 			String id = l.getId().toString();
 			if (!fixed.contains(id)) {
 				RailsimUtils.setResourceType(l, ResourceType.movingBlock);

@@ -52,6 +52,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -135,6 +136,9 @@ public class BetaTravelTest66IT {
 		Config config = utils.loadConfig("../../examples/scenarios/equil/config.xml");
 		ConfigUtils.loadConfig(config, utils.getInputDirectory() + "config.xml");
 		config.controller().setWritePlansInterval(0);
+		config.global().setRelativeToleranceForSampleSizeFactors( 5.1 );
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		/*

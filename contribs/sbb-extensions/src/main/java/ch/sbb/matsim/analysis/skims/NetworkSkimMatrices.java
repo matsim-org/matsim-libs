@@ -152,7 +152,7 @@ public final class NetworkSkimMatrices {
                             Link[] toLinks = this.linksPerZone.get(toZoneId);
                             if (toLinks != null) {
                                 for (Link toLink : toLinks) {
-                                    int nodeIndex = toLink.getFromNode().getId().index();
+                                    int nodeIndex = lcpTree.getNodeIndex(toLink.getFromNode());
                                     OptionalTime currOptionalTime = lcpTree.getTime(nodeIndex);
                                     double currTime = currOptionalTime.orElseThrow(() -> new RuntimeException("Undefined Time"));
                                     double tt = currTime - this.departureTime;

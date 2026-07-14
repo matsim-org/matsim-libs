@@ -24,6 +24,7 @@ import org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.RequestDa
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A {@link RequestsPartitioner} implementation that distributes incoming DRT requests
@@ -42,9 +43,9 @@ import java.util.*;
  */
 
 public class RoundRobinRequestsPartitioner implements RequestsPartitioner {
-	private long counter = 0;
+	private final AtomicLong counter = new AtomicLong(0);
 
-    @Override
+	@Override
     public List<Collection<RequestData>> partition(Collection<DrtRequest> unplannedRequests, int n, double collectionPeriod) {
         List<Collection<RequestData>> partitions = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
@@ -54,10 +55,9 @@ public class RoundRobinRequestsPartitioner implements RequestsPartitioner {
         Iterator<DrtRequest> it = unplannedRequests.iterator();
         while (it.hasNext()) {
             DrtRequest request = it.next();
-            int partitionIndex = (int) counter % n;
+			int partitionIndex = (int) (counter.getAndIncrement() % n);
             partitions.get(partitionIndex).add(new RequestData(request));
             it.remove();
-            counter++;
         }
 
         return partitions;

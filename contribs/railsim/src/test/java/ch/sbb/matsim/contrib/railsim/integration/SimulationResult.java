@@ -1,15 +1,18 @@
 package ch.sbb.matsim.contrib.railsim.integration;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SequencedMap;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.testcases.utils.EventsCollector;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SequencedMap;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 
 /**
  * Data class holding the results of a simulation run and the scenario.
@@ -19,7 +22,15 @@ final class SimulationResult {
 	private final Scenario scenario;
 	private final EventsCollector collector;
 
+	/**
+	 * Maps train and facility to stop time data.
+	 */
 	final Map<String, SequencedMap<String, StopTimeData>> stopTimes;
+
+	/**
+	 * Maps train to their corresponding state events.
+	 */
+	final Map<String, List<RailsimTrainStateEvent>> stateEvents = new LinkedHashMap<>();
 
 	public SimulationResult(Scenario scenario, EventsCollector collector) {
 		this.scenario = scenario;
@@ -47,6 +58,7 @@ final class SimulationResult {
 				StopTimeData stop = stops.computeIfAbsent(facilityId, k -> new StopTimeData(facilityId, stops.lastEntry()));
 
 				stop.arrivalTime = arrivalEvent.getTime();
+				stop.arrivalDelay = arrivalEvent.getDelay();
 				stop.stopCount++;
 
 			} else if (event instanceof VehicleDepartsAtFacilityEvent departureEvent) {
@@ -58,6 +70,10 @@ final class SimulationResult {
 
 				stops.computeIfAbsent(facilityId, k -> new StopTimeData(facilityId, stops.lastEntry()))
 					.departureTime = departureEvent.getTime();
+				stops.get(facilityId).departureDelay = departureEvent.getDelay();
+			} else if (event instanceof RailsimTrainStateEvent trainStateEvent) {
+				String trainId = trainStateEvent.getVehicleId().toString();
+				stateEvents.computeIfAbsent(trainId, (k) -> new ArrayList<>()).add(trainStateEvent);
 			}
 		}
 

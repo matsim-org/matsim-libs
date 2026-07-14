@@ -114,6 +114,8 @@ public class RunCarsharingIT {
 			config.routing().addModeRoutingParams(params);
 		}
 
+		config.global().setRelativeToleranceForSampleSizeFactors( 10.1 );
+
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);

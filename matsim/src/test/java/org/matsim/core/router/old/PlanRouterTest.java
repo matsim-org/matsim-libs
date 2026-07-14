@@ -72,6 +72,8 @@ public class PlanRouterTest {
 	void passesVehicleFromOldPlan(RoutingConfigGroup.AccessEgressType type) {
 		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.routing().setAccessEgressType(type);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		config.plans().setInputFile("plans1.xml");
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -162,7 +164,7 @@ public class PlanRouterTest {
 					).calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, departureTime, person));
 					((NetworkRoute) TripStructureUtils.getLegs(trip).get(1).getRoute()).setVehicleId(newVehicleId);
 				} else {
-					trip = DefaultRoutingModules.createPureNetworkRouter("car", scenario.getPopulation().getFactory(),
+					trip = DefaultRoutingModules.createPureNetworkRouter("car", scenario.getPopulation().getFactory(), scenario,
 							scenario.getNetwork(),
 							leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime), travelTime))
 						.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, departureTime, person));

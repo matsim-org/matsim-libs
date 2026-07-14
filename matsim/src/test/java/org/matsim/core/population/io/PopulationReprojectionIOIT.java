@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
@@ -180,6 +181,7 @@ public class PopulationReprojectionIOIT {
 
 		config.network().setInputFile( NET_FILE );
 		config.plans().setInputFile( BASE_FILE );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -289,6 +291,7 @@ public class PopulationReprojectionIOIT {
 
 		config.network().setInputFile( NET_FILE );
 		config.plans().setInputFile( BASE_FILE );
+		 config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );

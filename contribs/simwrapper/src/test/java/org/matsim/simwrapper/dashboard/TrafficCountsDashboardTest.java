@@ -72,7 +72,7 @@ public class TrafficCountsDashboardTest {
 		}
 	}
 
-	public void generateDummyCounts(Config config) {
+	private void generateDummyCounts(Config config) {
 
 		SplittableRandom random = new SplittableRandom(1234);
 
@@ -106,6 +106,8 @@ public class TrafficCountsDashboardTest {
 			String absolutPath = Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath() + "/dummy_counts.xml";
 
 			config.counts().setInputFile(absolutPath);
+			// due to implementation in CountsComparisonAlgorithm this needs to be the inverse of flowCapFactor
+			config.counts().setCountsScaleFactor( 1. / config.qsim().getFlowCapFactor());
 			new CountsWriter(counts).write(absolutPath);
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -17,6 +17,9 @@ public class OsmTags {
 	public static final String LIVING_STREET = "living_street";
 	public static final String TRACK = "track";
 	public static final String CYCLEWAY = "cycleway";
+    public static final String CYCLEWAY_BOTH = "cycleway:both";
+    public static final String CYCLEWAY_RIGHT = "cycleway:right";
+    public static final String CYCLEWAY_LEFT = "cycleway:left";
 	public static final String SERVICE = "service";
 	public static final String FOOTWAY = "footway";
 	public static final String PEDESTRIAN = "pedestrian";
@@ -57,7 +60,10 @@ public class OsmTags {
 	public static final String ELECTRIFIED = "electrified";
 	public static final String VOLTAGE = "voltage";
 	public static final String ETCS = "etcs";
+	public static final String RAILWAY_TRACK_CLASS = "railway:track_class"; // apparently track_class is only used for railways
+	public static final String RAILWAY_TRAFFIC_MODE = "railway:traffic_mode"; // apparently traffic_mode is only used for railways
 	public static final String OPERATOR = "operator";
 
+	public static final String PROPOSED = "proposed:"; // used as a prefix, e.g. proposed:voltage
 
 }

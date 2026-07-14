@@ -22,14 +22,14 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 /**
  * @author michalm
  */
 public class MobsimTimerProvider implements Provider<MobsimTimer> {
 	@Inject
-	private QSim qsim;
+	private Netsim qsim;
 
 	public MobsimTimer get() {
 		return qsim.getSimTimer();

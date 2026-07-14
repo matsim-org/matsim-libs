@@ -54,6 +54,11 @@ public interface TrainPosition {
 	double getTailPosition();
 
 	/**
+	 * The approximate delay of the train in seconds. Can be negative if ahead of schedule.
+	 */
+	double getDelay();
+
+	/**
 	 * Current route index.
 	 */
 	int getRouteIndex();

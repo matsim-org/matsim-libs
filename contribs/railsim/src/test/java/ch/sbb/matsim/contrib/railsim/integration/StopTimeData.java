@@ -11,6 +11,8 @@ final class StopTimeData {
 
 	double arrivalTime = -1.0;
 	double departureTime = -1.0;
+	double arrivalDelay = Double.NaN;
+	double departureDelay = Double.NaN;
 	int stopCount = 0;
 
 	/**

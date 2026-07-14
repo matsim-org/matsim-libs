@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
@@ -65,16 +66,17 @@ public class StrategyManager implements MatsimManager {
 	private final GenericStrategyManagerImpl<Plan, Person> delegate;
 
 	@Inject
-	StrategyManager(ReplanningConfigGroup replanningConfigGroup,
-									ControllerConfigGroup controllerConfigGroup, StrategyChooser<Plan, Person> strategyChooser,
-									Map<ReplanningConfigGroup.StrategySettings, PlanStrategy> planStrategies ) {
+	StrategyManager(ReplanningConfigGroup replanningConfigGroup, PopulationPartition partition,
+					ControllerConfigGroup controllerConfigGroup, StrategyChooser<Plan, Person> strategyChooser,
+					Map<ReplanningConfigGroup.StrategySettings, PlanStrategy> planStrategies ) {
 
-		this(strategyChooser);
+		this.delegate = new GenericStrategyManagerImpl<>(strategyChooser, partition);
+
 		setMaxPlansPerAgent(replanningConfigGroup.getMaxAgentPlanMemorySize());
 
 		int globalInnovationDisableAfter = (int) ((controllerConfigGroup.getLastIteration() - controllerConfigGroup.getFirstIteration())
 				* replanningConfigGroup.getFractionOfIterationsToDisableInnovation() + controllerConfigGroup.getFirstIteration());
-		log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
+		log.info("global innovation switch off after iteration: {}", globalInnovationDisableAfter);
 
 		for (Map.Entry<ReplanningConfigGroup.StrategySettings, PlanStrategy> entry : planStrategies.entrySet()) {
 			PlanStrategy strategy = entry.getValue();
@@ -103,10 +105,6 @@ public class StrategyManager implements MatsimManager {
 
 	public StrategyManager() {
 		this.delegate = new GenericStrategyManagerImpl<>();
-	}
-
-	StrategyManager(StrategyChooser<Plan, Person> strategyChooser) {
-		this.delegate = new GenericStrategyManagerImpl<>(strategyChooser);
 	}
 
 	/**
