@@ -28,11 +28,11 @@ import org.matsim.api.core.v01.network.Link;
  */
 public final class BicycleUtils {
 	public static final String AVERAGE_ELEVATION = "averageElevation";
-	public static final String SURFACE = "surface";
-	public static final String SMOOTHNESS = "smoothness";
+	public static final String SURFACE = "osm:surface"; // TODO: handle "surface" for backwards compatibility
+	public static final String SMOOTHNESS = "osm:smoothness";  // TODO: handle "smoothness" for backwards compatibility
 	//public static final String BICYCLE_INFRA = "bicycle_infra";
 	//public static final String CYCLEWAY = "cycleway";
-	static final String WAY_TYPE = "type";
+	static final String WAY_TYPE = "type";  // may later be called "osm:highway"
 	/*package*/ static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 
 	public enum BicycleInfraAttribute {
