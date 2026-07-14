@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -40,7 +41,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author jbischoff
  *this is a very simple Dijkstra developed in the Matsim class @ TUB
- * 	
+ *
 //
  */
 public final class MatsimClassDijkstra implements LeastCostPathCalculator {
@@ -86,12 +87,17 @@ public final class MatsimClassDijkstra implements LeastCostPathCalculator {
 		return null;
 	}
 
+	@Override
+	public void setNoPathBehavior(LeastCostPathUtils.NoPathBehavior behavior) {
+
+	}
+
 	private Path createPath(Id<Node> toNodeId, Id<Node> fromNodeId) {
 		List<Node> nodes = new ArrayList<Node>();
 		List<Link> links = new ArrayList<Link>();
 		Node lastNode = network.getNodes().get(toNodeId);
 		while (!lastNode.getId().equals(fromNodeId)){
-			if (!lastNode.getId().equals(toNodeId)) 
+			if (!lastNode.getId().equals(toNodeId))
 				nodes.add(0, lastNode);
 			Node newLastNode = network.getNodes().get(this.previousNodes.get(lastNode.getId()));
 			Link l = NetworkUtils.getConnectingLink(newLastNode,lastNode);
