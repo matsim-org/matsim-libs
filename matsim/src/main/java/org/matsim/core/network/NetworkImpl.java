@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -79,11 +80,13 @@ import java.util.*;
 
 	private String name = null;
 
-	private int counter=0;
+//	private int counter=0;
+	private final Counter counter = new Counter( "adding link # ");
 
 	private int nextMsg=1;
 
-	private int counter2=0;
+//	private int counter2=0;
+	private final Counter counter2 = new Counter( "adding node # " );
 
 	private int nextMsg2=1;
 
@@ -145,23 +148,18 @@ import java.util.*;
 		}
 
 
-		// show counter
-		this.counter++;
-		if (this.counter % this.nextMsg == 0) {
-			this.nextMsg *= 4;
-			printLinksCount();
-		}
+//		// show counter
+//		this.counter++;
+//		if (this.counter % this.nextMsg == 0) {
+//			this.nextMsg *= 4;
+//			log.info(" link # " + this.counter );
+//		}
+
+		counter.incCounter();
+
 		if ( this.locked && link instanceof Lockable ) {
 			((Lockable)link).setLocked() ;
 		}
-	}
-
-	private void printLinksCount() {
-		log.info(" link # " + this.counter);
-	}
-
-	private void printNodesCount() {
-		log.info(" node # " + this.counter2);
 	}
 
 	@Override
@@ -193,17 +191,20 @@ import java.util.*;
 			}
 		}
 
-		// show counter
-		this.counter2++;
-		if (this.counter2 % this.nextMsg2 == 0) {
-			this.nextMsg2 *= 4;
-			printNodesCount();
-		}
+//		// show counter
+//		this.counter2++;
+//		if (this.counter2 % this.nextMsg2 == 0) {
+//			this.nextMsg2 *= 4;
+//			log.info(" node # " + this.counter2 );
+//		}
+
+		counter2.incCounter();
 
 		if ( this.locked && nn instanceof Lockable ) {
 			((Lockable)nn).setLocked() ;
 		}
 	}
+
 	// ////////////////////////////////////////////////////////////////////
 	// remove methods
 	// ////////////////////////////////////////////////////////////////////

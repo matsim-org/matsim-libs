@@ -21,6 +21,7 @@ package org.matsim.core.controler.corelisteners;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scoring.PlansScoringModule;
+import org.matsim.dsim.scoring.BackpackScoringModule;
 
 /**
  * Defines the default core listeners.
@@ -34,11 +35,17 @@ public class ControlerDefaultCoreListenersModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		install(new PlansScoringModule());
-		bind( PlansReplanning.class ).to( PlansReplanningImpl.class );
-		bind( PlansDumping.class ).to( PlansDumpingImpl.class );
-		bind( EventsHandling.class ).to( EventsHandlingImpl.class );
-		bind( DumpDataAtEnd.class ).to( DumpDataAtEndImpl.class );
+
+		// Dsim uses its own scoring machinery
+		if (getConfig().controller().getMobsim().equals("dsim")) {
+			install(new BackpackScoringModule());
+		} else {
+			install(new PlansScoringModule());
+		}
+		bind(PlansReplanning.class).to(PlansReplanningImpl.class);
+		bind(PlansDumping.class).to(PlansDumpingImpl.class);
+		bind(EventsHandling.class).to(EventsHandlingImpl.class);
+		bind(DumpDataAtEnd.class).to(DumpDataAtEndImpl.class);
 	}
 }
 

@@ -13,6 +13,18 @@ approaches as to how parking can be handled in MATSim, depending on the use case
   additional time needed for parking is estimated
 - Parking Costs, developed by Marcel Rieser and Joschka Bischoff at SBB. This modules allows the integration of parking
   costs based on link attribute data.
+- Parking Search Parameterization: Parameterizes the parking search time on links. Is based on the occupancy within a certain area. (VSP: Paul & Gregor)
+
+Parking Choice ... much of that code contains functionality that is now provided by the MATSim core. 
+
+Parking Search ... DynAgent ... computationally quite expensive.
+
+Parking Proxy ... modifies plans before the mobsim and sets them back aftwards ... this is something that we (@ VSP) do not want.  (Could be avoided by modifying the plan of the MobsimAgent after the first mobsim timestep, rather than the plan in the agent database before the mobsim starts.)
+
+Parking Costs ... fixed attributes that do not take into account the interaction between demand and supply.
+
+Parking Search Parameterization ... when VehicleLeavesTraffic, then parking search time is estimated, and vehicle does not parking until this time is up.  (Is symmetrical to link departure queue.) {@link ParkingTest}.
+
 
 ## Implementations
 

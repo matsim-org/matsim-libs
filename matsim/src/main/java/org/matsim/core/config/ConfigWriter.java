@@ -29,7 +29,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public final class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 
-	public static enum Verbosity {all, minimal }
+	public static enum Verbosity {all, minimal, minimalAndWOActivities }
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

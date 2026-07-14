@@ -26,7 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
@@ -37,42 +36,30 @@ import org.matsim.core.population.PopulationUtils;
 
 import java.util.Map;
 
-class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
+final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler, IterationStartsListener {
 
 	private final static Logger log = LogManager.getLogger(ExperiencedPlansServiceImpl.class);
 
-	@Inject
-	Network network;
+	@Inject private Network network;
 	@Inject private Config config;
 	@Inject private Population population;
 	@Inject(optional = true) private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 
 	private final IdMap<Person, Plan> agentRecords = new IdMap<>(Person.class);
+	private boolean hasFinished = false;
 
 	@Inject
-    ExperiencedPlansServiceImpl(ControllerListenerManager controllerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
-        controllerListenerManager.addControllerListener(new IterationStartsListener() {
-            @Override
-            public void notifyIterationStarts(IterationStartsEvent event) {
-                for (Person person : population.getPersons().values()) {
-                    agentRecords.put(person.getId(), PopulationUtils.createPlan());
-                }
-            }
-        });
-        eventsToActivities.addActivityHandler(this);
-        eventsToLegs.addLegHandler(this);
-    }
+	ExperiencedPlansServiceImpl(ControllerListenerManager controllerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
+		controllerListenerManager.addControllerListener( this );
+		eventsToActivities.addActivityHandler(this);
+		eventsToLegs.addLegHandler(this);
+	}
 
-    ExperiencedPlansServiceImpl(EventsToActivities eventsToActivities, EventsToLegs eventsToLegs, Scenario scenario) {
-        this.population = scenario.getPopulation();
-
-        for (Person person : population.getPersons().values()) {
-            agentRecords.put(person.getId(), PopulationUtils.createPlan());
-        }
-        eventsToActivities.addActivityHandler(this);
-        eventsToLegs.addLegHandler(this);
-        this.config = scenario.getConfig();
-    }
+	@Override public void notifyIterationStarts(IterationStartsEvent event) {
+		for (Person person : population.getPersons().values()) {
+			agentRecords.put(person.getId(), PopulationUtils.createPlan());
+		}
+	}
 
 	@Override
 	synchronized public void handleLeg(PersonExperiencedLeg o) {
@@ -100,46 +87,55 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 
 	@Override
 	public void writeExperiencedPlans(String iterationFilename) {
-//		finishIteration(); // already called somewhere else in pgm flow.
+		final Population tmpPop = getPopulationWithExperiencedPlans();
+		new PopulationWriter(tmpPop, null).write(iterationFilename);
+	}
+
+	@Override
+	public Population getPopulationWithExperiencedPlans(){
+		if ( !hasFinished ){
+			finishIteration();
+		}
 		Population tmpPop = PopulationUtils.createPopulation(config,network);
+		log.warn( "agentsRecords.size={}", agentRecords.size());
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Person person = PopulationUtils.getFactory().createPerson(entry.getKey());
 
-			// the following is new as of oct-25 ...
+			// copy the attributes from the original person to the experienced plans person:
 			Person originalPerson = population.getPersons().get( entry.getKey() );
 			for( Map.Entry<String, Object> entry2 : originalPerson.getAttributes().getAsMap().entrySet() ){
 				person.getAttributes().putAttribute( entry2.getKey(),entry2.getValue() );
-				// note that this is not a completely deep copy.  Should not be a problem since we only write to file, but in the end we never know.  kai, oct'25
+				// note that this is not a completely deep copy.  Should not be a problem since we only write to file, but in the
+				// end we never know.  kai, oct'25
 			}
-			entry.getValue().setScore( originalPerson.getSelectedPlan().getScore() );
-			// yyyy this is somewhat dangerous ... since there is no guarantee that this is indeed the correct plan.
-			// ... up to here.
-			// There is EquilTwoAgentsTest, where I switched on the experienced plans writing in the scoring config.
-			// W/o the code lines above, the person attributes are not written.  W/ the code lines, they are written.
-			// This is, evidently, not a true regression test, but at least I had a look if the functionality works at all. kai, oct'25
 
 			Plan plan = entry.getValue();
+			plan.setScore( originalPerson.getSelectedPlan().getScore() );
+
 			person.addPlan(plan);
 			tmpPop.addPerson(person);
 		}
-		new PopulationWriter(tmpPop, null).write(iterationFilename);
-		// I removed the "V5" here in the assumption that it is better to move along with future format changes.  If this is
-		// undesired, please change back but could you then please also add a comment why you prefer this.  Thanks.
-		// kai, jan'16
+		return tmpPop;
 	}
+
 	@Override
 	public final void finishIteration() {
 		// I separated this from "writeExperiencedPlans" so that it can be called separately even when nothing is written.  Can't say
 		// if the design might be better served by an iteration ends listener.  kai, feb'17
-		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
-			Plan plan = entry.getValue();
-			if (scoringFunctionsForPopulation != null) {
-				plan.setScore(scoringFunctionsForPopulation.getScoringFunctionForAgent(entry.getKey()).getScore());
-				if (plan.getScore().isNaN()) {
-					log.warn("score is NaN; plan:" + plan.toString());
-				}
-			}
-		}
+//		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
+//			Plan plan = entry.getValue();
+//			if (scoringFunctionsForPopulation != null) {
+//				final ScoringFunction scoringFunctionForAgent = scoringFunctionsForPopulation.getScoringFunctionForAgent( entry.getKey() );
+//				// yyyy not sure why this can happen. kai, jan'26
+//				if ( scoringFunctionForAgent != null ){
+//					plan.setScore( scoringFunctionForAgent.getScore() );
+//					if( plan.getScore().isNaN() ){
+//						log.warn( "score is NaN; plan:" + plan.toString() );
+//					}
+//				}
+//			}
+//		}
+		hasFinished = true;
 	}
 
 	@Override

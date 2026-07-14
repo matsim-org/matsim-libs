@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -64,6 +65,8 @@ public final class RunChessboard {
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class );
 		freightCarriersConfigGroup.setCarriersFile("carrierPlans.xml");
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
+		
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );

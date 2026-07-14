@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.accidents.AccidentsConfigGroup.AccidentsComputationMethod;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,6 +39,8 @@ public class RunTest {
 
 		config.controller().setOutputDirectory(outputDirectory);
 		config.controller().setRunId(runId);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);
 		accidentsSettings.setEnableAccidentsModule(true);
@@ -46,7 +49,7 @@ public class RunTest {
 
 		// pre-process network
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			link.getAttributes().putAttribute(accidentsSettings.getAccidentsComputationMethodAttributeName(), AccidentsComputationMethod.BVWP.toString());
+			link.getAttributes().putAttribute( "accidentsComputationMethod", AccidentsComputationMethod.BVWP.toString() );
 
 			int numberOfLanesBVWP;
 			if (link.getNumberOfLanes() > 4){
@@ -56,9 +59,9 @@ public class RunTest {
 			}
 
 			if (link.getFreespeed() > 16.) {
-				link.getAttributes().putAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME, "1,0," + numberOfLanesBVWP);
+				link.getAttributes().putAttribute( AccidentUtils.BVWP_ROAD_TYPE_ARRAY_ATTRIBUTE_NAME, "1,0," + numberOfLanesBVWP );
 			} else {
-				link.getAttributes().putAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME, "1,2," + numberOfLanesBVWP);
+				link.getAttributes().putAttribute( AccidentUtils.BVWP_ROAD_TYPE_ARRAY_ATTRIBUTE_NAME, "1,2," + numberOfLanesBVWP );
 			}
 		}
 

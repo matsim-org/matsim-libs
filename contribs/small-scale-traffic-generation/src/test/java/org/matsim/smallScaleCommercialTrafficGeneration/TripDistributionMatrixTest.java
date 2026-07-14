@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
 import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreatorForOSM_Data;
@@ -53,8 +54,8 @@ public class TripDistributionMatrixTest {
 	@Test
 	void testTripDistributionCommercialPersonTrafficTraffic() throws IOException {
 
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new LanduseDataConnectionCreatorForOSM_Data().createLanduseDataConnection();
-		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = new LanduseDataConnectionCreatorForOSM_Data().createLanduseDataConnection();
+		Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
@@ -66,11 +67,11 @@ public class TripDistributionMatrixTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory),
-					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
+					getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
 		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic;
 		double sample = 1.;
@@ -134,7 +135,7 @@ public class TripDistributionMatrixTest {
 							usedTrafficType);
 					sumStopServices += generatedVolume;
 					sumStartServices += odMatrix.getSumOfServicesForStartZone(zone, modeORvehType, purpose,
-							usedTrafficType);
+							usedTrafficType, 1);
 					double planedVolume = trafficVolumePerTypeAndZone_stop.get(key).getDouble(purpose);
 					Assertions.assertEquals(planedVolume, generatedVolume, MatsimTestUtils.EPSILON);
 				}
@@ -147,8 +148,8 @@ public class TripDistributionMatrixTest {
 	@Test
 	void testTripDistributionGoodsTraffic() throws IOException {
 
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new LanduseDataConnectionCreatorForOSM_Data().createLanduseDataConnection();
-		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = new LanduseDataConnectionCreatorForOSM_Data().createLanduseDataConnection();
+		Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
@@ -160,11 +161,11 @@ public class TripDistributionMatrixTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory),
-					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
+					getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
 		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
 		double sample = 1.;
@@ -231,7 +232,7 @@ public class TripDistributionMatrixTest {
 							usedTrafficType);
 					sumStopServices += generatedVolume;
 					sumStartServices += odMatrix.getSumOfServicesForStartZone(zone, modeORvehType, purpose,
-							usedTrafficType);
+							usedTrafficType, 1);
 					double planedVolume = trafficVolumePerTypeAndZone_stop.get(key).getDouble(purpose);
 					Assertions.assertEquals(planedVolume, generatedVolume, MatsimTestUtils.EPSILON);
 				}

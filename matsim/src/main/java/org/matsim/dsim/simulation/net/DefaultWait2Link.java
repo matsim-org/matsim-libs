@@ -2,6 +2,7 @@ package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -16,6 +17,8 @@ public class DefaultWait2Link implements Wait2Link {
 
 	private final Map<Id<Link>, Queue<Waiting>> waitingVehicles = new HashMap<>();
 	private final EventsManager em;
+
+	private double now;
 
 	@Inject
 	public DefaultWait2Link(EventsManager em) {
@@ -32,6 +35,7 @@ public class DefaultWait2Link implements Wait2Link {
 
 	@Override
 	public void moveWaiting(double now) {
+		this.now = now;
 		var it = waitingVehicles.values().iterator();
 		while (it.hasNext()) {
 			var q = it.next();
@@ -52,8 +56,25 @@ public class DefaultWait2Link implements Wait2Link {
 		}
 	}
 
+	@Override
+	public void afterMobsim() {
+		for (var q : waitingVehicles.values()) {
+			for (var veh : q) {
+				em.processEvent(
+					new PersonStuckEvent(now, veh.vehicle().getDriver().getId(), veh.link().getId(), veh.vehicle().getDriver().getMode()));
+				for (var p : veh.vehicle().getPassengers()) {
+					em.processEvent(new PersonStuckEvent(now, p.getId(), veh.link().getId(), veh.vehicle().getDriver().getMode()));
+				}
+			}
+		}
+		// clear in case this is called from multiple places
+		waitingVehicles.clear();
+	}
+
 	private boolean moveWaiting(DistributedMobsimVehicle vehicle, SimLink link, double now) {
-		SimLink.LinkPosition position = vehicle.getDriver().isWantingToArriveOnCurrentLink() ? SimLink.LinkPosition.QEnd : SimLink.LinkPosition.Buffer;
+		SimLink.LinkPosition position = vehicle.getDriver().isWantingToArriveOnCurrentLink()
+			? SimLink.LinkPosition.QEnd
+			: SimLink.LinkPosition.Buffer;
 
 		if (link.isAccepting(position, now)) {
 			em.processEvent(new VehicleEntersTrafficEvent(

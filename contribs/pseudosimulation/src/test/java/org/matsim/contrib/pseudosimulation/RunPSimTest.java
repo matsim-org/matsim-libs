@@ -14,7 +14,9 @@ import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEm
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -46,6 +48,7 @@ public class RunPSimTest {
 	@Test
 	void testA() {
 		config.controller().setCreateGraphs(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);
@@ -79,6 +82,8 @@ public class RunPSimTest {
 		final String outDir = utils.getOutputDirectory();
 		config.controller().setOutputDirectory( outDir );
 		config.controller().setLastIteration(20);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 //		config.controler().setDumpDataAtEnd(false);
 //		config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 ); // crashes
 
@@ -120,7 +125,9 @@ public class RunPSimTest {
 		config.controller().setLastIteration(2);
 		config.controller().setCreateGraphs(false);
 		config.controller().setDumpDataAtEnd(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.routing().setRoutingRandomness(0.);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		Controler controler = new Controler(config);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
 		controler.addControllerListener(execScoreTracker);

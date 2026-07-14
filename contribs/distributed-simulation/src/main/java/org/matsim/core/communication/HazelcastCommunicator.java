@@ -1,13 +1,15 @@
 package org.matsim.core.communication;
 
+import com.hazelcast.collection.ISet;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MulticastConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.TcpIpConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.cp.ICountDownLatch;
 import com.hazelcast.topic.ITopic;
+
+import org.agrona.concurrent.BackoffIdleStrategy;
 import org.agrona.concurrent.BusySpinIdleStrategy;
 import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
@@ -86,13 +88,21 @@ public class HazelcastCommunicator implements Communicator {
 
 	@Override
 	public void connect() throws Exception {
-		ICountDownLatch startup = hz.getCPSubsystem().getCountDownLatch("startup");
-		startup.trySetCount(size);
+		ISet<Integer> startupSet = hz.getSet("startup");
 
 		topics.get(rank).addMessageListener(this::onMessage);
 
-		startup.countDown();
-		startup.await(10, TimeUnit.MINUTES);
+		startupSet.add(rank);
+
+		// Wait for all nodes to register
+		IdleStrategy idleStrategy = new BackoffIdleStrategy();
+		long deadline = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(10);
+		while (startupSet.size() < size) {
+			if (System.currentTimeMillis() > deadline) {
+				throw new RuntimeException("Timeout waiting for all nodes to connect");
+			}
+			idleStrategy.idle();
+		}
 	}
 
 	@Override

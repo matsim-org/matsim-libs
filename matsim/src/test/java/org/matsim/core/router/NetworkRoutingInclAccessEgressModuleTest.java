@@ -393,6 +393,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
         config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.global().setNumberOfThreads( 1 );
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
@@ -410,6 +411,47 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.equals(15.0,legs.get(0).getTravelTime().seconds());
         //the agent is lucky: work location is at the to-node
         Assert.equals(0.0,legs.get(2).getTravelTime().seconds());
+    }
+
+	@Test
+	void calcRoute_sameLinkDifferentCoords_createsAccessEgressAndZeroNetworkLeg() {
+
+        Config config = createConfig();
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+        config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.global().setNumberOfThreads( 1 );
+        Scenario scenario = createScenario(config);
+
+        Person person = createPerson("same-link-person", TransportMode.car, scenario.getPopulation().getFactory());
+        Activity home = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+        home.setCoord(new Coord(10, 10));
+        home.setLinkId(Id.createLinkId(START_LINK));
+        Activity work = (Activity) person.getSelectedPlan().getPlanElements().get(2);
+        work.setCoord(new Coord(40, 10));
+        work.setLinkId(Id.createLinkId(START_LINK));
+        scenario.getPopulation().addPerson(person);
+
+        Controler controler = createControler(scenario);
+        controler.run();
+
+        var legs = TripStructureUtils.getLegs(person.getSelectedPlan());
+        assertEquals(3, legs.size());
+
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
+        assertTrue(legs.get(0).getTravelTime().seconds() > 0);
+        assertEquals(15.0, legs.get(0).getTravelTime().seconds());
+
+        assertEquals(TransportMode.car, legs.get(1).getMode());
+        NetworkRoute carRoute = (NetworkRoute) legs.get(1).getRoute();
+        assertEquals(Id.createLinkId(START_LINK), carRoute.getStartLinkId());
+        assertEquals(Id.createLinkId(START_LINK), carRoute.getEndLinkId());
+        assertEquals(0.0, legs.get(1).getTravelTime().seconds());
+        assertEquals(0.0, carRoute.getDistance());
+
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
+        assertTrue(legs.get(2).getTravelTime().seconds() > 0);
+        assertEquals(15.0, legs.get(2).getTravelTime().seconds());
     }
 
 	@Test

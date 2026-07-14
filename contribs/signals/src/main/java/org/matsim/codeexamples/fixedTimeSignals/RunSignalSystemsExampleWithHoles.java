@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -66,6 +67,7 @@ public class RunSignalSystemsExampleWithHoles {
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 		config.qsim().setNodeOffset(5.);
         config.qsim().setUsingFastCapacityUpdate(false);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		// add the signal config group to the config file
 		SignalSystemsConfigGroup signalConfig =

@@ -72,7 +72,12 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	void testCalculate() {
-		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, ImmutableList.<StopWaypoint>builder().build(), null);
+
+		StopWaypoint[] stops = new StopWaypoint[1];
+		DrtStopTask existingStopTask = new DefaultDrtStopTask(0, 60, link("a"));
+		stops[0] = new StopWaypointImpl(existingStopTask, loadType.fromInt(1), loadType, false);
+
+		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, ImmutableList.copyOf(stops), null);
 		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution
@@ -108,7 +113,7 @@ public class InsertionCostCalculatorTest {
 		DrtStopTask existingDropoffTask = new DefaultDrtStopTask(120, 150, link("boardedDO"));
 		DrtRequest boardedRequest = DrtRequest.newBuilder().fromLink(link("boardedFrom")).toLink(link("boardedTo")).build();
 
-		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest);
+		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest, 60);
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
 		StopWaypoint[] stops = new StopWaypoint[1];
@@ -182,12 +187,12 @@ public class InsertionCostCalculatorTest {
 
 		DrtStopTask existingPickupTask = new DefaultDrtStopTask(120, 150, link("scheduledPU"));
 		DrtRequest scheduledRequest = DrtRequest.newBuilder().fromLink(link("scheduledFrom")).toLink(link("scheduledTo")).build();
-		AcceptedDrtRequest acceptedScheduledRequest = AcceptedDrtRequest.createFromOriginalRequest(scheduledRequest);
+		AcceptedDrtRequest acceptedScheduledRequest = AcceptedDrtRequest.createFromOriginalRequest(scheduledRequest, 60);
 		existingPickupTask.addPickupRequest(acceptedScheduledRequest);
 
 		DrtStopTask existingDropoffTask = new DefaultDrtStopTask(200, 230, link("boardedDO"));
 		DrtRequest boardedRequest = DrtRequest.newBuilder().fromLink(link("boardedFrom")).toLink(link("boardedTo")).build();
-		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest);
+		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest, 60);
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
 		StopWaypoint[] stops = new StopWaypoint[2];

@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Utility class to work with the metis library.
  */
-@SuppressWarnings("preview")
 public final class Metis {
 
 	private static boolean AVAILABLE;
@@ -81,10 +80,12 @@ public final class Metis {
 	private static int[] partitionInternal(Graph g, int parts, MetisOptions options, boolean recursive) {
 		try (Arena arena = Arena.ofConfined()) {
 
-			MemorySegment nvtxs = arena.allocate(metis_h.idx_t.withName("nvtxs"), g.getNumVertices());
+			// constant input values
+			MemorySegment nvtxs = arena.allocateFrom(metis_h.idx_t.withName("nvtxs"), g.getNumVertices());
+			MemorySegment ncon = arena.allocateFrom(metis_h.idx_t.withName("ncon"), 1);
+			MemorySegment nparts = arena.allocateFrom(metis_h.idx_t.withName("nparts"), parts);
 
-			MemorySegment ncon = arena.allocate(metis_h.idx_t.withName("ncon"), 1);
-
+			// adjacency matrices
 			MemorySegment xadj = arena.allocate(metis_h.idx_t.withName("xadj"), g.getNumVertices() + 1);
 			MemorySegment adjncy = arena.allocate(metis_h.idx_t.withName("adjncy"), g.getNumEdges());
 
@@ -133,10 +134,8 @@ public final class Metis {
 //            System.out.println("vwgt: " + Arrays.toString(vwgt.toArray(metis_h.idx_t)));
 //            System.out.println("adjwgt: " + Arrays.toString(adjwgt.toArray(metis_h.idx_t)));
 
-			MemorySegment nparts = arena.allocate(metis_h.idx_t.withName("nparts"), parts);
-
 			// Return values
-			MemorySegment objval = arena.allocate(metis_h.idx_t.withName("objval"), 0);
+			MemorySegment objval = arena.allocateFrom(metis_h.idx_t.withName("objval"), 0);
 			MemorySegment part = arena.allocate(metis_h.idx_t.withName("part"), g.getNumVertices());
 
 			MemorySegment opt = arena.allocate(metis_h.idx_t.withName("options"), metis_h.METIS_NOPTIONS());

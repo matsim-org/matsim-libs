@@ -40,11 +40,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.ProjectionUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.vehicles.Vehicle;
@@ -55,10 +61,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Utils for the SmallScaleFreightTraffic
@@ -154,8 +160,7 @@ public class SmallScaleCommercialTrafficUtils {
 						NetworkUtils.findLinkInOppositeDirection(possibleLink).getId().toString())))
 						continue searchLink;
 				}
-			double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-				(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+			double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,	possibleLink.getCoord());
 			if (distance < minDistance) {
 				newLink = possibleLink.getId();
 				minDistance = distance;
@@ -163,8 +168,7 @@ public class SmallScaleCommercialTrafficUtils {
 		}
 		if (newLink == null && numberOfPossibleLinks > 0) {
 			for (Link possibleLink : linksPerZone.get(zone).values()) {
-				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-					(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,	possibleLink.getCoord());
 				if (distance < minDistance) {
 					newLink = possibleLink.getId();
 					minDistance = distance;
@@ -188,36 +192,42 @@ public class SmallScaleCommercialTrafficUtils {
 
 
 		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
+			if (carrier.getSelectedPlan() == null){
+				log.warn("Carrier {} has no selected plan. Therefore, no population plans are created for this carrier.", carrier.getId());
+				continue;
+			}
 			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 
 				Plan plan = popFactory.createPlan();
 
 				String subpopulation = carrier.getAttributes().getAttribute("subpopulation").toString();
-				Id<Vehicle> vehicleId = tour.getVehicle().getId();
 				String mode = tour.getVehicle().getType().getNetworkMode();
 
 				Tour.Start start = tour.getTour().getStart();
 				Activity startActivity = PopulationUtils.createActivityFromCoord("commercial_start",
 					scenario.getNetwork().getLinks().get(start.getLocation()).getFromNode().getCoord());
+				startActivity.setLinkId(start.getLocation());
 				startActivity.setEndTime(tour.getDeparture());
 
 				plan.addActivity(startActivity);
 				List<Tour.TourElement> tourElements = tour.getTour().getTourElements();
 				for (Tour.TourElement tourElement : tourElements) {
-					if (tourElement instanceof Tour.Leg) {
-						PopulationUtils.createAndAddLeg(plan, mode);
+					if (tourElement instanceof Tour.Leg tourLeg) {
+						createAndAddLegBasedOnCarrierLeg(plan, mode, tourLeg);
 						continue;
 					}
 					if (tourElement instanceof Tour.TourActivity activity) {
 						Activity newActivity = PopulationUtils.createActivityFromCoord(activity.getActivityType(),
 							scenario.getNetwork().getLinks().get(activity.getLocation()).getFromNode().getCoord());
 						newActivity.setMaximumDuration(activity.getDuration());
+						newActivity.setLinkId(activity.getLocation());
 						plan.addActivity(newActivity);
 					}
 				}
 				Tour.End end = tour.getTour().getEnd();
 				Activity endActivity = PopulationUtils.createActivityFromCoord("commercial_end",
 					scenario.getNetwork().getLinks().get(end.getLocation()).getFromNode().getCoord());
+				endActivity.setLinkId(end.getLocation());
 				plan.addActivity(endActivity);
 				String key = String.format("%s_%s_%s", subpopulation, carrier.getAttributes().getAttribute("tourStartArea"),
 					carrier.getAttributes().getAttribute("purpose"));
@@ -233,8 +243,12 @@ public class SmallScaleCommercialTrafficUtils {
 				if (carrier.getAttributes().getAsMap().containsKey("tourStartArea"))
 					newPerson.getAttributes().putAttribute("tourStartArea",
 						carrier.getAttributes().getAttribute("tourStartArea"));
+				if (carrier.getAttributes().getAsMap().containsKey("startCategory"))
+					newPerson.getAttributes().putAttribute("startCategory",
+						carrier.getAttributes().getAttribute("startCategory").toString());
 				newPerson.getAttributes().putAttribute("carrierId", carrier.getId().toString());
-				VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
+				newPerson.getAttributes().putAttribute("tourId", tour.getTour().getId().toString());
+
 				VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, tour.getVehicle().getType().getId()));
 
 				population.addPerson(newPerson);
@@ -256,9 +270,22 @@ public class SmallScaleCommercialTrafficUtils {
 			log.warn(
 				"You selected {} of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.",
 				numberOfPlanVariantsPerAgent);
-
+		ProjectionUtils.putCRS(population, scenario.getConfig().global().getCoordinateSystem());
 		PopulationUtils.writePopulation(population, outputPopulationFile);
 		log.info("Population with {} persons created including the plans in {}.", population.getPersons().size(), outputPopulationFile);
+	}
+
+	private static void createAndAddLegBasedOnCarrierLeg(Plan plan, String mode, Tour.Leg carrierLeg) {
+		Leg leg = PopulationUtils.createAndAddLeg(plan, mode);
+		leg.setDepartureTime(carrierLeg.getExpectedDepartureTime());
+		leg.setTravelTime(carrierLeg.getExpectedTransportTime());
+
+		Route route = carrierLeg.getRoute();
+		if (route != null) {
+			Route routeCopy = route.clone();
+			routeCopy.setTravelTime(carrierLeg.getExpectedTransportTime());
+			leg.setRoute(routeCopy);
+		}
 	}
 
 	static String getSampleNameOfOutputFolder(double sample) {
@@ -268,6 +295,134 @@ public class SmallScaleCommercialTrafficUtils {
 		else
 			sampleName = String.valueOf((sample * 100));
 		return sampleName;
+	}
+
+	/**
+	 * Creates the stable folder suffix used for carrier part outputs.
+	 *
+	 * @param partIndex zero-based part index
+	 * @param partCount total number of parts
+	 * @return suffix in the form {@code part-001-of-015}
+	 */
+	static String getCarrierPartSuffix(int partIndex, int partCount) {
+		return "part-" + String.format("%03d", partIndex + 1) + "-of-" + String.format("%03d", partCount);
+	}
+
+	/**
+	 * Adds the controller run id prefix to output file names when a run id is configured.
+	 *
+	 * @param config config that may contain a controller run id
+	 * @param fileName base file name without run id prefix
+	 * @return {@code <runId>.<fileName>} or {@code fileName} if no run id is configured
+	 */
+	static String getRunIdPrefixedFileName(Config config, String fileName) {
+		String runId = config.controller().getRunId();
+		if (runId == null || runId.isBlank()) {
+			return fileName;
+		}
+		return runId + "." + fileName;
+	}
+
+	/**
+	 * Keeps only the deterministic subset of carriers assigned to one carrier part.
+	 * <p>
+	 * Carrier ids are sorted lexicographically and then distributed by {@code sortedIndex % partCount}. This keeps the
+	 * split reproducible across runs and makes the merge lossless because every carrier id is assigned to exactly one
+	 * part.
+	 *
+	 * @param scenario scenario whose carrier collection should be reduced
+	 * @param partIndex zero-based part index to keep
+	 * @param partCount total number of parts
+	 */
+	static void filterCarriersForPart(Scenario scenario, int partIndex, int partCount) {
+		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
+		List<Id<Carrier>> sortedCarrierIds = carriers.getCarriers().keySet().stream()
+			.sorted(Comparator.comparing(Id::toString))
+			.toList();
+		Set<Id<Carrier>> selectedCarrierIds = IntStream.range(0, sortedCarrierIds.size())
+			.filter(carrierIndex -> carrierIndex % partCount == partIndex)
+			.mapToObj(sortedCarrierIds::get)
+			.collect(Collectors.toSet());
+		carriers.getCarriers().keySet().removeIf(carrierId -> !selectedCarrierIds.contains(carrierId));
+		log.info("Selected small scale commercial carrier part {}/{} with {} carriers.", partIndex + 1, partCount, carriers.getCarriers().size());
+	}
+
+	/**
+	 * Loads a scenario with one specific carrier file and its matching carrier vehicle type file.
+	 * <p>
+	 * The freight config is updated with absolute paths before loading. This avoids path resolution surprises when
+	 * carrier part folders or merge folders are outside the config file directory.
+	 *
+	 * @param baseConfig config that should be used as loading context
+	 * @param carrierFile carrier file to load
+	 * @param carrierVehicleTypesFileName base name of the carrier vehicle type file located next to the carrier file
+	 * @return scenario with carriers loaded according to the freight config
+	 */
+	static Scenario loadScenarioWithCarrierFile(Config baseConfig, Path carrierFile, String carrierVehicleTypesFileName) {
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(baseConfig, FreightCarriersConfigGroup.class);
+		freightCarriersConfigGroup.setCarriersFile(carrierFile.toAbsolutePath().toString());
+		Path carrierVehicleTypesFile = resolveCarrierVehicleTypesFile(baseConfig, carrierFile, carrierVehicleTypesFileName);
+		if (carrierVehicleTypesFile != null) {
+			freightCarriersConfigGroup.setCarriersVehicleTypesFile(carrierVehicleTypesFile.toAbsolutePath().toString());
+		} else if (baseConfig.vehicles() != null && freightCarriersConfigGroup.getCarriersVehicleTypesFile() == null) {
+			freightCarriersConfigGroup.setCarriersVehicleTypesFile(baseConfig.vehicles().getVehiclesFile());
+		}
+		Scenario scenario = ScenarioUtils.loadScenario(baseConfig);
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
+		return scenario;
+	}
+
+	/**
+	 * Loads only carriers and carrier vehicle types into a minimal scenario.
+	 * <p>
+	 * This avoids loading the network when callers only need to read carrier files, for example when merging carrier
+	 * part outputs.
+	 *
+	 * @param baseConfig config that should be used as path resolution context
+	 * @param carrierFile carrier file to load
+	 * @param carrierVehicleTypesFileName base name of the carrier vehicle type file located next to the carrier file
+	 * @return scenario with carriers loaded according to the freight config, but without loading other scenario inputs
+	 */
+	static Scenario loadScenarioWithCarrierFileOnly(Config baseConfig, Path carrierFile, String carrierVehicleTypesFileName) {
+		Config carrierConfig = ConfigUtils.createConfig();
+		carrierConfig.setContext(baseConfig.getContext());
+		FreightCarriersConfigGroup carrierFreightConfigGroup = ConfigUtils.addOrGetModule(carrierConfig, FreightCarriersConfigGroup.class);
+		carrierFreightConfigGroup.setCarriersFile(carrierFile.toAbsolutePath().toString());
+
+		Path carrierVehicleTypesFile = resolveCarrierVehicleTypesFile(baseConfig, carrierFile, carrierVehicleTypesFileName);
+		if (carrierVehicleTypesFile != null) {
+			carrierFreightConfigGroup.setCarriersVehicleTypesFile(carrierVehicleTypesFile.toAbsolutePath().toString());
+		} else {
+			FreightCarriersConfigGroup baseFreightConfigGroup = ConfigUtils.addOrGetModule(baseConfig, FreightCarriersConfigGroup.class);
+			if (baseFreightConfigGroup.getCarriersVehicleTypesFile() != null) {
+				carrierFreightConfigGroup.setCarriersVehicleTypesFile(baseFreightConfigGroup.getCarriersVehicleTypesFile());
+			} else if (baseConfig.vehicles() != null && baseConfig.vehicles().getVehiclesFile() != null) {
+				carrierFreightConfigGroup.setCarriersVehicleTypesFile(baseConfig.vehicles().getVehiclesFile());
+			}
+		}
+
+		Scenario scenario = ScenarioUtils.createScenario(carrierConfig);
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
+		return scenario;
+	}
+
+	/**
+	 * Resolves the run-id-prefixed carrier vehicle type file located next to a carrier file.
+	 *
+	 * @param config config whose run id is used for the expected file name
+	 * @param carrierFile carrier file whose parent folder should contain the vehicle type file
+	 * @param carrierVehicleTypesFileName base name of the carrier vehicle type file
+	 * @return sibling vehicle type file if it exists, otherwise {@code null}
+	 */
+	static Path resolveCarrierVehicleTypesFile(Config config, Path carrierFile, String carrierVehicleTypesFileName) {
+		if (carrierFile == null || carrierFile.getParent() == null) {
+			return null;
+		}
+		Path siblingCarrierVehicleTypesFile = carrierFile.getParent().resolve(getRunIdPrefixedFileName(config, carrierVehicleTypesFileName));
+		if (Files.exists(siblingCarrierVehicleTypesFile)) {
+			return siblingCarrierVehicleTypesFile;
+		}
+		return null;
 	}
 
 	/**
@@ -287,12 +442,12 @@ public class SmallScaleCommercialTrafficUtils {
 	 * @return 								resultingDataPerZone
 	 * @throws IOException 					if the file is not found
 	 */
-	static Map<String, Object2DoubleMap<String>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
+	static Map<String, Object2DoubleMap<StructuralAttribute>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
 		if (!Files.exists(pathToDataDistributionToZones)) {
 			log.error("Required data per zone file {} not found", pathToDataDistributionToZones);
 		}
 
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = new HashMap<>();
 		try (BufferedReader reader = IOUtils.getBufferedReader(pathToDataDistributionToZones.toString())) {
 			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
 				.setSkipHeaderRecord(true).get().parse(reader);
@@ -301,7 +456,12 @@ public class SmallScaleCommercialTrafficUtils {
 				String zoneID = record.get("zoneID");
 				resultingDataPerZone.put(zoneID, new Object2DoubleOpenHashMap<>());
 				for (int n = 2; n < parse.getHeaderMap().size(); n++) {
-					resultingDataPerZone.get(zoneID).mergeDouble(parse.getHeaderNames().get(n),
+					Optional<StructuralAttribute> category = StructuralAttribute.fromLabel(parse.getHeaderNames().get(n));
+					if (category.isEmpty()) {
+						log.warn("The category '{}' in the data distribution file is not known. Please check the input file and the defined categories.", parse.getHeaderNames().get(n));
+						continue;
+					}
+					resultingDataPerZone.get(zoneID).mergeDouble(category.get(),
 						Double.parseDouble(record.get(n)), Double::sum);
 				}
 			}
@@ -352,5 +512,28 @@ public class SmallScaleCommercialTrafficUtils {
 				return costs;
 			}
 		};
+	}
+
+	public enum StructuralAttribute {
+		INHABITANTS("Inhabitants"),
+		EMPLOYEE("Employee"),
+		EMPLOYEE_PRIMARY("Employee Primary Sector"),
+		EMPLOYEE_CONSTRUCTION("Employee Construction"),
+		EMPLOYEE_SECONDARY("Employee Secondary Sector Rest"),
+		EMPLOYEE_RETAIL("Employee Retail"),
+		EMPLOYEE_TRAFFIC("Employee Traffic/Parcels"),
+		EMPLOYEE_TERTIARY("Employee Tertiary Sector Rest");
+
+		private final String label;
+
+		StructuralAttribute(String label) { this.label = label; }
+		public String getLabel() { return label; }
+
+		private static final Map<String, StructuralAttribute> BY_LABEL =
+			Arrays.stream(values()).collect(Collectors.toMap(StructuralAttribute::getLabel, e -> e));
+
+		public static Optional<StructuralAttribute> fromLabel(String label) {
+			return Optional.ofNullable(BY_LABEL.get(label));
+		}
 	}
 }

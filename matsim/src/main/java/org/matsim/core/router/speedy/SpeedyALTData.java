@@ -22,7 +22,7 @@ import java.util.concurrent.Future;
  *
  * @author mrieser / Simunto, sponsored by SBB Swiss Federal Railways
  */
-class SpeedyALTData {
+public class SpeedyALTData {
 
 	private final static Logger LOG = LogManager.getLogger(SpeedyALTData.class);
 
@@ -34,7 +34,7 @@ class SpeedyALTData {
 	private final int[] deadendData;
 	private final double minTravelCostPerLength;
 
-	public SpeedyALTData(SpeedyGraph graph, int landmarksCount, TravelDisutility travelCosts) {
+	public SpeedyALTData(SpeedyGraph graph, int landmarksCount, TravelDisutility travelCosts, int threads) {
 		this.graph = graph;
 		this.landmarksCount = landmarksCount;
 		this.travelCosts = travelCosts;
@@ -43,7 +43,7 @@ class SpeedyALTData {
 		this.deadendData = new int[graph.nodeCount];
 
 		this.findDeadEnds();
-		this.calcLandmarks();
+		this.calcLandmarks(threads);
 		this.minTravelCostPerLength = this.calcMinTravelCostPerLength();
 	}
 
@@ -128,7 +128,7 @@ class SpeedyALTData {
 		return otherNodeIndex;
 	}
 
-	private void calcLandmarks() {
+	private void calcLandmarks(int threads) {
 		LOG.info("calculate landmarks...");
 		Node firstNode = null;
 		for (int i = 0; i < this.graph.nodeCount; i++) {
@@ -143,9 +143,9 @@ class SpeedyALTData {
 		}
 
 		Future<double[]>[] trees = new Future[this.landmarksCount * 2];
-		ExecutorService executor = Executors.newFixedThreadPool(4);
+		ExecutorService executor = Executors.newFixedThreadPool(threads);
 
-		int firstLandmarkIndex = firstNode.getId().index();
+		int firstLandmarkIndex = graph.getNodeIndex(firstNode);
 		this.landmarksNodeIndices[0] = firstLandmarkIndex;
 		trees[0] = executor.submit(() -> calculateTreeForward(firstLandmarkIndex));
 		trees[1] = executor.submit(() -> calculateTreeBackward(firstLandmarkIndex));
@@ -317,16 +317,16 @@ class SpeedyALTData {
 
 				// the index points to a node with a different index -> colored copy
 				if (uncoloredNode.getId().index() != i) {
-					int uncoloredIndex = uncoloredNode.getId().index();
-					double uncoloredCost = data[uncoloredIndex];
+					int uncoloredInternalIndex = graph.getInternalIndex(uncoloredNode.getId().index());
+					double uncoloredCost = data[uncoloredInternalIndex];
 					double coloredCost = data[i];
 
 					if (Double.isFinite(uncoloredCost)) {
 						if (coloredCost < uncoloredCost) {
-							data[uncoloredIndex] = coloredCost;
+							data[uncoloredInternalIndex] = coloredCost;
 						}
 					} else {
-						data[uncoloredIndex] = coloredCost;
+						data[uncoloredInternalIndex] = coloredCost;
 					}
 				}
 			}

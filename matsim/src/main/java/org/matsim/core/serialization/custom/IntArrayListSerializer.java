@@ -1,31 +1,33 @@
 package org.matsim.core.serialization.custom;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.apache.fury.Fury;
-import org.apache.fury.memory.MemoryBuffer;
-import org.apache.fury.serializer.Serializer;
+import org.apache.fory.context.ReadContext;
+import org.apache.fory.context.WriteContext;
+import org.apache.fory.serializer.collection.CollectionSerializer;
 
-public class IntArrayListSerializer extends Serializer<IntArrayList> {
+public class IntArrayListSerializer extends CollectionSerializer<IntArrayList> {
 
-    public IntArrayListSerializer(Fury fury, Class<IntArrayList> type) {
-        super(fury, type, false, false);
-    }
+	public IntArrayListSerializer(org.apache.fory.resolver.TypeResolver resolver, Class<IntArrayList> type) {
+		super(resolver, type);
+	}
 
 
-    @Override
-    public void write(MemoryBuffer buffer, IntArrayList value) {
-        buffer.writeInt32(value.size());
-        buffer.writePrimitiveArray(value.elements(), 0, value.size() * Integer.BYTES);
-    }
+	@Override
+	public void write(WriteContext context, IntArrayList value) {
+		var buffer = context.getBuffer();
+		buffer.writeInt32(value.size());
+		buffer.writeInts(value.elements(), 0, value.size());
+	}
 
-    @Override
-    public IntArrayList read(MemoryBuffer buffer) {
+	@Override
+	public IntArrayList read(ReadContext readContext) {
 
-        int size = buffer.readInt32();
-        int[] data = new int[size];
+		var buffer = readContext.getBuffer();
+		int size = buffer.readInt32();
+		int[] data = new int[size];
 
-        buffer.readToUnsafe(data, 0, size * Integer.BYTES);
+		buffer.readInts(data, 0, size);
 
-        return IntArrayList.wrap(data);
-    }
+		return IntArrayList.wrap(data);
+	}
 }

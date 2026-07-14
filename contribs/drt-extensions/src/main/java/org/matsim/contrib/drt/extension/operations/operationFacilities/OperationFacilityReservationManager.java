@@ -10,6 +10,10 @@ import org.matsim.core.controler.listener.IterationStartsListener;
  */
 public class OperationFacilityReservationManager extends AbstractReservationManager<OperationFacility, DvrpVehicle> implements IterationStartsListener {
 
+    public OperationFacilityReservationManager(double bufferTime) {
+        super(bufferTime);
+    }
+
     @Override
     protected int getCapacity(OperationFacility resource) {
         return resource.getCapacity();
