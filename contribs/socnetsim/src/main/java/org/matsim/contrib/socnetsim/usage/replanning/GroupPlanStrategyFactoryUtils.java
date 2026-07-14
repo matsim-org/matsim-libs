@@ -43,7 +43,7 @@ import org.matsim.contrib.socnetsim.sharedvehicles.SharedVehicleUtils;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 import org.matsim.contrib.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.util.List;
 
 /**

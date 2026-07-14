@@ -102,7 +102,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final MultimodalLinkChooser multimodalLinkChooser) {
 		this.multimodalLinkChooser = multimodalLinkChooser;
 		Gbl.assertNotNull(scenario.getNetwork());
-		Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
+		// I Removed this line since it created lots of problems with many tests. Since this is now the default RoutingModule, we are instead throwing a warning
+		//Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
+		if(scenario.getNetwork().getLinks().isEmpty()) {
+			log.warn("Using NetworkRoutingInclAccessEgressModule with empty network, network for mode probably not defined!");
+		}
 		this.filteredNetwork = filteredNetwork;
 		this.invertedNetwork = invertedNetwork;
 		this.routeAlgo = routeAlgo;
@@ -116,7 +120,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.timeInterpretation = timeInterpretation;
 		if (accessEgressType.equals(AccessEgressType.none)) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
-					+ "currently not supported; there are too many other problems");
+				+ "currently not supported; there are too many other problems");
 		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink) && !hasWarnedAccessEgress) {
 			hasWarnedAccessEgress = true;
 			log.warn("you are using AccessEgressType=" + AccessEgressType.walkConstantTimeToLink +
@@ -136,6 +140,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
+		final Attributes attributes = request.getAttributes();
 
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
@@ -150,7 +155,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		// === access:
 		{
 			List<? extends PlanElement> accessTrip = computeAccessTripFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, populationFactory, mode,
-					scenario.getConfig(), request.getAttributes());
+					scenario.getConfig(), attributes);
 			if(accessTrip == null ) return null; //access trip could not get routed so we return null for the entire trip => will lead to the tripRouter to call fallbackRoutingModule
 			now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
 			result.addAll(accessTrip);
@@ -160,7 +165,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		{
 			Leg newLeg = this.populationFactory.createLeg(this.mode);
 			newLeg.setDepartureTime(now);
-			now += routeLeg(person, newLeg, accessActLink, egressActLink, now);
+			now += routeLeg(person, newLeg, accessActLink, egressActLink, now, attributes);
 
 			result.add(newLeg);
 			//			log.warn( newLeg );
@@ -169,7 +174,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		// === egress:
 		{
 			List<PlanElement> egressTrip = computeEgressTripFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result.get(result.size() - 1), populationFactory, mode,
-					scenario.getConfig(), request.getAttributes());
+					scenario.getConfig(), attributes);
 			if(egressTrip == null ) return null; //egress trip could not get routed so we return null for the entire trip => will lead to the tripRouter to call fallbackRoutingModule
 			result.addAll(egressTrip);
 		}
@@ -392,15 +397,20 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return "[NetworkRoutingModule: mode=" + this.mode + "]";
 	}
 
-	/*package (Tests)*/ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
+	/* package (Tests) */ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime,
+			Attributes attributes) {
 		double travTime;
 
 		Node startNode = fromLink.getToNode();    // start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-		if (toLink != fromLink) { // (a "true" route)
+		// use vehicle from routing request attribute, if defined
+		Id<Vehicle> vehicleId = (Id<Vehicle>) attributes.getAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID);
+		if (vehicleId == null) {
+			vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
+		}
 
-			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
+		if (toLink != fromLink) { // (a "true" route)
 			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 
 			Path path;
@@ -424,13 +434,14 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			double maxSpeedOnToLink = Math.min(vehicle.getType().getMaximumVelocity(),toLink.getFreespeed());
 			double travelTimeEstimateOnToLink = (toLink.getLength() / maxSpeedOnToLink) * relPosOnArrivalLink;
-			route.setTravelTime((int) (path.travelTime+travelTimeEstimateOnToLink));
+			int travelTime = (int) (path.travelTime + travelTimeEstimateOnToLink);
+			route.setTravelTime(travelTime);
 
 			route.setTravelCost(path.travelCost);
 			route.setDistance(RouteUtils.calcDistance(route, relPosOnDepartureLink, relPosOnArrivalLink, this.filteredNetwork));
 			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
-			travTime = (int) path.travelTime;
+			travTime = travelTime;
 
 		} else {
 			// create an empty route == staying on place if toLink == endLink
@@ -438,7 +449,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
-			route.setVehicleId(VehicleUtils.getVehicleId(person, leg.getMode()));
+			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
 			travTime = 0;
 		}

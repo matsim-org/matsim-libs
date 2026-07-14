@@ -15,13 +15,9 @@
 package org.matsim.contrib.ev.routing;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
@@ -36,15 +32,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.DefaultRoutingRequest;
-import org.matsim.core.router.LinkWrapperFacility;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.RoutingRequest;
+import org.matsim.core.router.*;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Calculates the route for EV agents, potentially inserting charging stops based on battery constraints
@@ -62,7 +56,7 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
     private static final double MIN_SOC_THRESHOLD = 0.15;            // Lower bound SOC threshold to trigger charging
     private static final double MAX_SOC_THRESHOLD = 0.4;             // Upper bound SOC threshold to trigger charging
 
-
+	private final String mode;
     private final Network network;
     private final RoutingModule delegate;
     private final ElectricFleetSpecification electricFleet;
@@ -87,6 +81,7 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
         this.auxConsumptionFactory = auxConsumptionFactory;
         this.stageActivityModePrefix = mode + " charging";
         this.evConfigGroup = evConfigGroup;
+		this.mode = mode;
         this.vehicleSuffix = "_" + mode;
 
     }
@@ -96,13 +91,15 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
         // Get basic route (no EV logic)
         List<? extends PlanElement> basicRoute = delegate.calcRoute(request);
         Id<Vehicle> evId = Id.create(request.getPerson().getId() + vehicleSuffix, Vehicle.class);
-		Leg basicLeg = (Leg)basicRoute.get(0);
 		// Skip if the main leg is not truck mode (e.g. access/egress walk)
-		if (TransportMode.walk.equals(basicLeg.getMode())) {
-			return basicRoute;
-		}
+		List<Leg> nonWalkLegs = TripStructureUtils.getLegs(basicRoute).stream()
+			.filter(leg -> !"walk".equals(leg.getMode()))
+			.toList();
+
+		Leg basicLeg = (Leg) nonWalkLegs.get(nonWalkLegs.size() - 1);
+
         // If person has no EV, return default route
-        if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
+		if (!this.mode.equals(basicLeg.getMode()) || !electricFleet.getVehicleSpecifications().containsKey(evId)) {
             return basicRoute;
         }
 
@@ -111,7 +108,7 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
         double capacity = evSpec.getBatteryCapacity();
 
         // Estimate energy and time use for original leg
-        Map<Link, Double> consumptionMap = estimateConsumption(evSpec, (Leg) basicRoute.get(0));
+        Map<Link, Double> consumptionMap = estimateConsumption(evSpec, basicLeg);
 
         // If trip is easily doable, skip EV-specific logic
         if ((0.8 * initialSOC) > consumptionMap.values().stream().mapToDouble(Double::doubleValue).sum()) {
@@ -182,8 +179,13 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
             List<? extends PlanElement> routeSegment = delegate.calcRoute(
                     DefaultRoutingRequest.of(lastFacility, toFacility, departureTime, person, request.getAttributes()));
 
-            Map<Link, Double> consumptionMap = estimateConsumption(evSpec, (Leg) routeSegment.get(0));
-            Map<Link, Double> timeMap = estimateTime((Leg) routeSegment.get(0));
+			List<Leg> nonWalkLegs = TripStructureUtils.getLegs(routeSegment).stream()
+				.filter(leg -> !"walk".equals(leg.getMode()))
+				.toList();
+
+			Leg nonWalkLeg = (Leg) nonWalkLegs.get(nonWalkLegs.size() - 1);
+            Map<Link, Double> consumptionMap = estimateConsumption(evSpec, (Leg) nonWalkLeg);
+            Map<Link, Double> timeMap = estimateTime((Leg) nonWalkLeg);
 
             double socThreshold = random.nextDouble(MIN_SOC_THRESHOLD, MAX_SOC_THRESHOLD);
             boolean chargeNeeded = false;
@@ -311,7 +313,9 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
     private Map<Link, Double> estimateConsumption(ElectricVehicleSpecification evSpec, Leg leg) {
         Map<Link, Double> consumptionMap = new LinkedHashMap<>();
         NetworkRoute route = (NetworkRoute) leg.getRoute();
-        List<Link> links = NetworkUtils.getLinks(this.network, route.getLinkIds());
+
+		    List<Link> links = NetworkUtils.getLinks(this.network, route.getLinkIds());
+
         double departureTime = leg.getDepartureTime().seconds();
 
         // Create a temporary electric vehicle instance to use its energy models

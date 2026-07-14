@@ -21,7 +21,7 @@
 
  package org.matsim.withinday.trafficmonitoring;
 
-import jakarta.inject.Singleton;
+import com.google.inject.Singleton;
 
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;

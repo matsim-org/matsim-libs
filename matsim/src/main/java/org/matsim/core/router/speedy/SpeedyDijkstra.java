@@ -69,9 +69,9 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 
 	@Override
 	public Path calcLeastCostPath(Node startNode, Node endNode, double startTime, Person person, Vehicle vehicle) {
-		int startNodeIndex = startNode.getId().index();
-		int endNodeIndex = endNode.getId().index();
-		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, startTime, person, vehicle);
+		int startNodeIndex = this.graph.getNodeIndex(startNode);
+		int endNodeIndex = this.graph.getNodeIndex(endNode);
+		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, startTime, person, vehicle, Double.POSITIVE_INFINITY);
 
 		if(path == null) {
 			LOG.warn("No route was found from node " + startNode.getId() + " to node " + endNode.getId() + ". Some possible reasons:");
@@ -85,19 +85,25 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 
 
 	public Path calcLeastCostPath(Link fromLink, Link toLink, double starttime, final Person person, final Vehicle vehicle) {
+		return calcLeastCostPath(fromLink, toLink, starttime, person, vehicle, Double.POSITIVE_INFINITY);
+	}
 
-		int startNodeIndex = fromLink.getToNode().getId().index();
-		int endNodeIndex = toLink.getFromNode().getId().index();
+	@Override
+	public Path calcLeastCostPath(Link fromLink, Link toLink, double starttime, final Person person, final Vehicle vehicle, double maxCost) {
+
+		int startNodeIndex = this.graph.getNodeIndex(fromLink.getToNode());
+		int endNodeIndex = this.graph.getNodeIndex(toLink.getFromNode());
 
 		if(graph.getTurnRestrictions().isPresent()) {
 			Map<Id<Link>, TurnRestrictionsContext.ColoredLink> replacedLinks = graph.getTurnRestrictions().get().replacedLinks;
 			if(replacedLinks.containsKey(fromLink.getId())) {
-				startNodeIndex = replacedLinks.get(fromLink.getId()).toColoredNode.index();
+				startNodeIndex = graph.getInternalIndex(replacedLinks.get(fromLink.getId()).toColoredNode.index());
 			}
 		}
 
-		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, starttime, person, vehicle);
-		if(path == null) {
+		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, starttime, person, vehicle, maxCost);
+		// Do not warn on cutoff-driven aborts: a bounded null is an intentional caller hint, not a config issue.
+		if(path == null && Double.isInfinite(maxCost)) {
 			LOG.warn("No route was found from link " + fromLink.getId() + " to link " + toLink.getId() + ". Some possible reasons:");
 			LOG.warn("  * Network is not connected.  Run NetworkCleaner().");
 			LOG.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
@@ -107,7 +113,7 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 		return path;
 	}
 
-	private Path calcLeastCostPathImpl(int startNodeIndex, int endNodeIndex, double startTime, Person person, Vehicle vehicle) {
+	private Path calcLeastCostPathImpl(int startNodeIndex, int endNodeIndex, double startTime, Person person, Vehicle vehicle, double maxCost) {
 		this.currentIteration++;
 		if (this.currentIteration == Integer.MAX_VALUE) {
 			// reset iteration as we overflow
@@ -124,13 +130,19 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 		boolean foundEndNode = false;
 
 		while (!this.pq.isEmpty()) {
+			// Bounded-search early termination: once the smallest priority key in the heap
+			// exceeds maxCost, no remaining path through any queued node can be <= maxCost,
+			// because Dijkstra's heap key is the proven shortest cost from the start.
+			if (this.pq.peekCost() > maxCost) {
+				return null;
+			}
 			final int nodeIdx = this.pq.poll();
 			if (nodeIdx == endNodeIndex) {
 				foundEndNode = true;
 				break;
 			}
 			// if turn restrictions are used, we might be on a colored node, so check for the original node
-			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == endNodeIndex) {
+			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == this.graph.getNode(endNodeIndex).getId().index()) {
 				foundEndNode = true;
 				endNodeIndex = nodeIdx;
 				break;
@@ -152,6 +164,14 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 				double travelTime = this.tt.getLinkTravelTime(link, currTime, person, vehicle);
 				double newTime = currTime + travelTime;
 				double newCost = currCost + this.td.getLinkTravelDisutility(link, currTime, person, vehicle);
+
+				// Bounded-search edge-level pruning: skip the successor entirely if its proven
+				// cost already exceeds maxCost. This mirrors the cost-bounded pruning in
+				// CHLeastCostPathTree and reduces heap pressure (fewer inserts and
+				// decreaseKey calls) near the cutoff boundary.
+				if (newCost > maxCost) {
+					continue;
+				}
 
 				if (this.iterationIds[toNode] == this.currentIteration) {
 					// this node was already visited in this route-query

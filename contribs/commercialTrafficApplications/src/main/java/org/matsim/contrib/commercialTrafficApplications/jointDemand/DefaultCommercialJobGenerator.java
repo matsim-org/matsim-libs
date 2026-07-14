@@ -21,7 +21,7 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -117,7 +117,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
 			scenario.getVehicles().addVehicleType(carrierVehicle.getType());
 		Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
-		VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarriersUtils.getCarrierMode(carrier), vid));
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes( driverPerson, Map.of(CarriersUtils.getCarrierMode(carrier ), vid ) );
 		scenario.getVehicles()
 				.addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
 		freightVehicles.add(vid);

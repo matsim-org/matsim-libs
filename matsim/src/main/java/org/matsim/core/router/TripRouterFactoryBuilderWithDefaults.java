@@ -20,6 +20,7 @@
 package org.matsim.core.router;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsManagerModule;
@@ -34,7 +35,7 @@ import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterModule;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.util.Arrays;
 
 public class TripRouterFactoryBuilderWithDefaults {
@@ -83,15 +84,15 @@ public class TripRouterFactoryBuilderWithDefaults {
                                     bind(TransitRouter.class).toProvider(transitRouterFactory);
                                 }
                                 if (carTravelDisutility != null) {
-                                    addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
+                                    addTravelDisutilityFactoryBinding( TransportMode.car ).toInstance( new TravelDisutilityFactory() {
                                         @Override
                                         public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
                                             return carTravelDisutility;
                                         }
-                                    });
+                                    } );
                                 }
                                 if (carTravelTime != null) {
-                                    addTravelTimeBinding("car").toInstance(carTravelTime);
+                                    addTravelTimeBinding(TransportMode.car ).toInstance(carTravelTime);
                                 }
                             }
                         })).getProvider(TripRouter.class);

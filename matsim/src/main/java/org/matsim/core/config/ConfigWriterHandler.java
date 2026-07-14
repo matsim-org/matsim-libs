@@ -20,17 +20,17 @@
 
 package org.matsim.core.config;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 
 /*package*/ abstract class ConfigWriterHandler {
 
-	abstract void startConfig(final Config config, final BufferedWriter out);
+	abstract void startConfig(final Config config, final Writer out);
 	
-	abstract void endConfig(final BufferedWriter out);
+	abstract void endConfig(final Writer out);
 	
-	abstract void writeModule(final ConfigGroup module, final BufferedWriter out);
+	abstract void writeModule(final ConfigGroup module, final Writer out);
 	
-	abstract void writeSeparator(final BufferedWriter out);
+	abstract void writeSeparator(final Writer out);
 	
 	/**
 	 * Sets the string to be used as newline separator.

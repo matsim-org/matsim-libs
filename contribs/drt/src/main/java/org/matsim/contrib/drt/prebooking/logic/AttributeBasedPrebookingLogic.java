@@ -36,15 +36,15 @@ import com.google.common.base.Preconditions;
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class AttributeBasedPrebookingLogic implements PrebookingLogic, MobsimInitializedListener {
-	static private final String SUBMISSION_TIME_ATTRIBUTE_PREFIX = "prebooking:submissionTime:";
-	static private final String PLANNED_DEPARTURE_ATTRIBUTE_PREFIX = "prebooking:plannedDepartureTime:";
+	static private final String DEFAULT_SUBMISSION_TIME_ATTRIBUTE_PREFIX = "prebooking:submissionTime";
+	static private final String DEFAULT_PLANNED_DEPARTURE_ATTRIBUTE_PREFIX = "prebooking:plannedDepartureTime";
 
 	static public String getSubmissionTimeAttribute(String mode) {
-		return SUBMISSION_TIME_ATTRIBUTE_PREFIX + mode;
+		return DEFAULT_SUBMISSION_TIME_ATTRIBUTE_PREFIX + ":" + mode;
 	}
 
 	static public String getPlannedDepartureTimeAttribute(String mode) {
-		return PLANNED_DEPARTURE_ATTRIBUTE_PREFIX + mode;
+		return DEFAULT_PLANNED_DEPARTURE_ATTRIBUTE_PREFIX + ":" + mode;
 	}
 
 	static public Optional<Double> getSubmissionTime(String mode, Trip trip) {
@@ -77,14 +77,24 @@ public class AttributeBasedPrebookingLogic implements PrebookingLogic, MobsimIni
 	private final TimeInterpretation timeInterpretation;
 
 	private final String mode;
+	private final String submissionTimeAttribute;
+	private final String plannedDepartureTimeAttribute;
 
 	private AttributeBasedPrebookingLogic(String mode, PrebookingQueue prebookingQueue,
 			PopulationIteratorFactory populationIteratorFactory, TimeInterpretation timeInterpretation) {
+		this(mode, prebookingQueue, populationIteratorFactory, timeInterpretation,
+				DEFAULT_SUBMISSION_TIME_ATTRIBUTE_PREFIX, DEFAULT_PLANNED_DEPARTURE_ATTRIBUTE_PREFIX);
+	}
+
+	private AttributeBasedPrebookingLogic(String mode, PrebookingQueue prebookingQueue,
+			PopulationIteratorFactory populationIteratorFactory, TimeInterpretation timeInterpretation,
+			String submissionTimeAttributePrefix, String plannedDepartureTimeAttributePrefix) {
 		this.prebookingQueue = prebookingQueue;
 		this.populationIteratorFactory = populationIteratorFactory;
 		this.mode = mode;
 		this.timeInterpretation = timeInterpretation;
-
+		this.submissionTimeAttribute = submissionTimeAttributePrefix + ":" + mode;
+		this.plannedDepartureTimeAttribute = plannedDepartureTimeAttributePrefix + ":" + mode;
 	}
 
 	@Override
@@ -109,8 +119,10 @@ public class AttributeBasedPrebookingLogic implements PrebookingLogic, MobsimIni
 									"Attribute-based prebooking logic only works with one DRT leg per trip");
 							foundLeg = true;
 
-							Optional<Double> submissionTime = getSubmissionTime(mode, trip);
-							Optional<Double> plannedDepartureTime = getPlannedDepartureTime(mode, trip);
+							Optional<Double> submissionTime = Optional.ofNullable(
+									(Double) trip.getTripAttributes().getAttribute(submissionTimeAttribute));
+							Optional<Double> plannedDepartureTime = Optional.ofNullable(
+									(Double) trip.getTripAttributes().getAttribute(plannedDepartureTimeAttribute));
 
 							if (submissionTime.isPresent()) {
 								if (plannedDepartureTime.isPresent()) {
@@ -143,6 +155,25 @@ public class AttributeBasedPrebookingLogic implements PrebookingLogic, MobsimIni
 					return new AttributeBasedPrebookingLogic(drtConfig.getMode(),
 							getter.getModal(PrebookingQueue.class), getter.getModal(PopulationIteratorFactory.class),
 							getter.get(TimeInterpretation.class));
+				}));
+				addModalQSimComponentBinding().to(modalKey(AttributeBasedPrebookingLogic.class));
+			}
+		};
+	}
+
+	static public AbstractDvrpModeQSimModule createModule(DrtConfigGroup drtConfig,
+			AttributeBasedPrebookingLogicParams logicParams) {
+		return new AbstractDvrpModeQSimModule(drtConfig.getMode()) {
+			@Override
+			protected void configureQSim() {
+				bindModal(AttributeBasedPrebookingLogic.class).toProvider(modalProvider(getter -> {
+					Preconditions.checkState(drtConfig.getPrebookingParams().isPresent());
+
+					return new AttributeBasedPrebookingLogic(drtConfig.getMode(),
+							getter.getModal(PrebookingQueue.class), getter.getModal(PopulationIteratorFactory.class),
+							getter.get(TimeInterpretation.class),
+							logicParams.getSubmissionTimeAttributePrefix(),
+							logicParams.getPlannedDepartureTimeAttributePrefix());
 				}));
 				addModalQSimComponentBinding().to(modalKey(AttributeBasedPrebookingLogic.class));
 			}

@@ -70,6 +70,7 @@ public class TransitControlerIntegrationTest {
 	void testTransitRouteCopy() {
 		Config config = utils.loadConfig((String)null);
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.transit().setUseTransit(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 

@@ -4,8 +4,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -19,6 +22,7 @@ import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;
+import org.matsim.core.router.MultimodalLinkChooser;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.SingleModeNetworksCache;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -28,6 +32,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 	private static final Logger log = LogManager.getLogger(EvNetworkRoutingProvider.class);
@@ -68,6 +73,19 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 
 	@Inject
 	private AuxEnergyConsumption.Factory auxConsumptionFactory;
+
+	@Inject
+	private Scenario scenario;
+
+	@Inject
+	private TimeInterpretation timeInterpretation;
+
+	@Inject
+	private MultimodalLinkChooser multimodalLinkChooser;
+
+	@Inject
+	@Named(TransportMode.walk)
+	private RoutingModule walkRouter;
 
 	/**
 	 * This is the older (and still more standard) constructor, where the routingMode and the resulting mode were the
@@ -129,13 +147,14 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if (!routingConfigGroup.getAccessEgressType().equals(AccessEgressType.none)) {
+		if (!routingConfigGroup.getAccessEgressType().equals(AccessEgressType.accessEgressModeToLink)) {
 			throw new IllegalArgumentException("Bushwacking is not currently supported by the EV routing module");
 		} else {
 			return new EvNetworkRoutingModule(mode, filteredNetwork,
-					DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo),
-					electricFleetSpecification, chargingInfrastructureSpecification, travelTime,
-					driveConsumptionFactory, auxConsumptionFactory, EvConfigGroup.get(config));
+				DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork,
+					walkRouter, timeInterpretation, multimodalLinkChooser),
+				electricFleetSpecification, chargingInfrastructureSpecification, travelTime,
+				driveConsumptionFactory, auxConsumptionFactory, EvConfigGroup.get(config));
 		}
 	}
 }

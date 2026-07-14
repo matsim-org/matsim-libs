@@ -50,7 +50,7 @@ public class PreemptiveRejectionModule extends AbstractModule {
                                 }
                             })).in(Singleton.class);
 
-                            addControlerListenerBinding().to(modalKey(PreemptiveRejectionHandler.class));
+                            addControllerListenerBinding().to(modalKey(PreemptiveRejectionHandler.class));
                             addEventHandlerBinding().to(modalKey(PreemptiveRejectionHandler.class));
                         }
                     });

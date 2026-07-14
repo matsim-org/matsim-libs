@@ -72,6 +72,14 @@ class TravelTimeDataArray extends TravelTimeData {
 		return val;
 	}
 
+	long[] getData() {
+		return data;
+	}
+
+	void setData(long[] data) {
+		System.arraycopy(data, 0, this.data, 0, data.length);
+	}
+
 	static int count(long encoded) {
 		return (int) (encoded >>> 32);
 	}

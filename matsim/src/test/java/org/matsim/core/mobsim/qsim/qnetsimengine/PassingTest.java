@@ -19,7 +19,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.*;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -40,10 +40,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
@@ -125,29 +121,6 @@ public class PassingTest {
 
 	}
 
-	private static class TravelTimeControlerListener implements StartupListener, IterationEndsListener {
-
-		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
-		VehicleLinkTravelTimeEventHandler hand;
-		@Inject EventsManager eventsManager;
-
-		@Override
-		public void notifyStartup(StartupEvent event) {
-
-			hand = new VehicleLinkTravelTimeEventHandler();
-			eventsManager.addHandler(hand);
-		}
-
-		public Map<Id<Vehicle>, Map<Id<Link>, Double>> getVehicleId2Time(){
-			return this.vehicleLinkTravelTimes;
-		}
-
-		@Override
-		public void notifyIterationEnds(IterationEndsEvent event) {
-			this.vehicleLinkTravelTimes = this.hand.getVehicleId2LinkTravelTime();
-		}
-	}
-
 	private void storeVehicleTypeInfo(SimpleNetwork net) {
 		net.scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
@@ -184,6 +157,7 @@ public class PassingTest {
 			config.qsim().setMainModes(Arrays.asList("car","bike"));
 			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 			network = (Network) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));

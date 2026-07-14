@@ -223,6 +223,9 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 				attributes.add(createTuple(Constants.ALLOW_ALIGHTING, String.valueOf(stop.isAllowAlighting())));
 			}
 			attributes.add(createTuple(Constants.AWAIT_DEPARTURE, String.valueOf(stop.isAwaitDepartureTime())));
+			if (stop.getMinimumStopDuration() > 0.0) {
+				attributes.add(createTimeTuple(Constants.MINIMUM_STOP_DURATION, stop.getMinimumStopDuration()));
+			}
 			this.writeStartTag(Constants.STOP, attributes, true);
 		}
 

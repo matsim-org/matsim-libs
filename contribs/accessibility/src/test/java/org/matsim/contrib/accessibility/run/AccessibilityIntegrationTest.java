@@ -64,6 +64,9 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestUtils;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.IntColumn;
+import tech.tablesaw.api.Table;
 
 /**
  * I can't say how similar or different to {@link AccessibilityIntegrationTest} this one here is.  kai, feb'17
@@ -76,7 +79,6 @@ public class AccessibilityIntegrationTest {
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Disabled
 	@Test
 	void testRunAccessibilityExample() {
 		Config config = ConfigUtils.loadConfig("./examples/RunAccessibilityExample/config.xml");
@@ -87,34 +89,32 @@ public class AccessibilityIntegrationTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(scenario);
 
-		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
-		tabFileParserConfig.setFileName("./output/work/accessibilities.csv");
-		tabFileParserConfig.setDelimiterRegex(",");
-        new TabularFileParser().parse(tabFileParserConfig, new TabularFileHandler() {
-        	double x, y, value;
+		Table table = Table.read().csv("./output/analysis/accessibility/work/accessibilities.csv");
 
-            public void startRow(String[] row) {
-            	if (row.length == 3) {
-	            	x = Double.parseDouble(row[0]);
-	            	x = Double.parseDouble(row[1]);
-	            	value = Double.parseDouble(row[2]);
+		IntColumn xCol = table.intColumn("xcoord"); // or "x" if headers exist
+		IntColumn yCol = table.intColumn("ycoord"); // or "y"
+		DoubleColumn valueCol = table.doubleColumn("freespeed_accessibility"); // or "value"
 
-	            	if (x == 50) {
-	            		if (y == 50) {
-	            			Assertions.assertEquals(2.1486094237531126, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
-	            		} else if (y == 150){
-	            			Assertions.assertEquals(2.1766435716006005, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
-	            		}
-	            	} else if (x == 150) {
-	            		if (y == 50) {
-	            			Assertions.assertEquals(2.1486094237531126, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
-	            		} else if (y == 150){
-	            			Assertions.assertEquals(2.2055702759681273, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
-	            		}
-	            	}
-            	}
-            }
-        });
+		for (int i = 0; i < table.rowCount(); i++) {
+			double x = xCol.get(i);
+			double y = yCol.get(i);
+			double value = valueCol.get(i);
+			if (x == 50) {
+				if (y == 50) {
+					Assertions.assertEquals(2.14486658890362, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
+				} else if (y == 150){
+					Assertions.assertEquals(2.207441799716032, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
+				}
+			} else if (x == 150) {
+				if (y == 50) {
+					Assertions.assertEquals(2.14486658890362, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
+				} else if (y == 150){
+					Assertions.assertEquals(2.235503385314382, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
+				}
+			}
+        }
+
+
 	}
 
 

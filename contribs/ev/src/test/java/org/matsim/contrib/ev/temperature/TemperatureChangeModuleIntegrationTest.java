@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.ev.temperature;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -47,10 +48,12 @@ public class TemperatureChangeModuleIntegrationTest {
 	void testTemperatureChangeModule() {
 
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "/config.xml",
-				new TemperatureChangeConfigGroup());
+			new TemperatureChangeConfigGroup());
 		config.controller()
-				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+			.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
+		//ev contrib doesn't work with access/egress routing
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TemperatureChangeModule());

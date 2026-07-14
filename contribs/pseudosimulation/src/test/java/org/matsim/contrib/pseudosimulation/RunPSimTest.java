@@ -14,7 +14,9 @@ import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEm
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -46,6 +48,7 @@ public class RunPSimTest {
 	@Test
 	void testA() {
 		config.controller().setCreateGraphs(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);
@@ -79,13 +82,15 @@ public class RunPSimTest {
 		final String outDir = utils.getOutputDirectory();
 		config.controller().setOutputDirectory( outDir );
 		config.controller().setLastIteration(20);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 //		config.controler().setDumpDataAtEnd(false);
 //		config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 ); // crashes
 
 
 		RunPSim runPSim = new RunPSim(config, pSimConfigGroup);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(runPSim.getMatsimControler());
-		runPSim.getMatsimControler().addControlerListener(execScoreTracker);
+		runPSim.getMatsimControler().addControllerListener(execScoreTracker);
 
 		((Controler) runPSim.getMatsimControler()).addOverridingModule(new AbstractModule() {
 			@Override
@@ -103,7 +108,7 @@ public class RunPSimTest {
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
 		PopulationComparison.compare( popExpected, popActual ) ;
-		Assertions.assertEquals(138.86084460860525, psimScore, MatsimTestUtils.EPSILON, "RunPsim score changed.");
+		Assertions.assertEquals(135.84418218045528, psimScore, MatsimTestUtils.EPSILON, "RunPsim score changed.");
 
 	}
 
@@ -120,16 +125,18 @@ public class RunPSimTest {
 		config.controller().setLastIteration(2);
 		config.controller().setCreateGraphs(false);
 		config.controller().setDumpDataAtEnd(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.routing().setRoutingRandomness(0.);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		Controler controler = new Controler(config);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
-		controler.addControlerListener(execScoreTracker);
+		controler.addControllerListener(execScoreTracker);
 		controler.run();
 
 		double qsimScore = execScoreTracker.executedScore;
 		logger.info("Default controler score was " + qsimScore );
 //		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(131.8303325803256, qsimScore, MatsimTestUtils.EPSILON, "Default controler score changed.");
+		Assertions.assertEquals(131.0688453797536, qsimScore, MatsimTestUtils.EPSILON, "Default controler score changed.");
 	}
 
 	class ExecScoreTracker implements ShutdownListener {

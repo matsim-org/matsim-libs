@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
+import org.matsim.contrib.drt.optimizer.StopWaypointImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
@@ -120,11 +122,11 @@ public class KNearestInsertionsAtEndFilterTest {
 		return new Waypoint.Start(null, null, endTime, loadType.fromInt(0));
 	}
 
-	private Waypoint.Stop stop(double endTime) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(endTime - 10, endTime, null), loadType.fromInt(0), loadType);
+	private StopWaypoint stop(double endTime) {
+		return new StopWaypointImpl(new DefaultDrtStopTask(endTime - 10, endTime, null), loadType.fromInt(0), loadType, false);
 	}
 
-	private VehicleEntry vehicleEntry(String id, Waypoint.Start start, Waypoint.Stop... stops) {
+	private VehicleEntry vehicleEntry(String id, Waypoint.Start start, StopWaypoint... stops) {
 		var vehicle = mock(DvrpVehicle.class);
 		when(vehicle.getId()).thenReturn(Id.create(id, DvrpVehicle.class));
 		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null, null, 0);

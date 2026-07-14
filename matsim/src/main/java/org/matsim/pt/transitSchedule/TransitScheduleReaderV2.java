@@ -19,7 +19,12 @@
 
 package org.matsim.pt.transitSchedule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -176,6 +181,10 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 			stopBuilder.allowBoarding(Boolean.parseBoolean(atts.getValue(Constants.ALLOW_BOARDING)));
 			stopBuilder.allowAlighting(Boolean.parseBoolean(atts.getValue(Constants.ALLOW_ALIGHTING)));
 			stopBuilder.awaitDepartureTime(Boolean.parseBoolean(atts.getValue(Constants.AWAIT_DEPARTURE)));
+			String minimumStopDuration = atts.getValue(Constants.MINIMUM_STOP_DURATION);
+			if (minimumStopDuration != null) {
+				stopBuilder.minimumStopDuration(Time.parseTime(minimumStopDuration));
+			}
 			this.currentTransitRoute.stopBuilders.add(stopBuilder);
 		} else if (Constants.RELATION.equals(name)) {
 			Id<TransitStopFacility> fromStop = Id.create(atts.getValue(Constants.FROM_STOP), TransitStopFacility.class);

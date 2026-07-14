@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
+import org.matsim.contrib.common.conventions.vsp.SubpopulationDefaultNames;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -44,7 +45,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     private double sampleSize;
 
 	@Deprecated
-    @CommandLine.Option(names = "--samples", description = "Desired down-sampled sizes in (0, 1]. Deprecated: Use the separate down-sampling instead.", arity = "1..*")
+    @CommandLine.Option(names = "--samples", description = "Target sample sizes relative to a 100% population (range: (0,1]). These values are absolute shares, NOT relative to --sample-size. Example: with --sample-size=0.25 and --samples=0.1 0.05, the tool will create a 10% and 5% sample of the full population. Deprecated: Use the separate down-sampling instead.", arity = "1..*")
     private List<Double> samples;
 
     @CommandLine.Option(names = "--population", description = "Input original population file", required = true)
@@ -60,7 +61,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     private int activityBinSize = 600;
 
     @CommandLine.Option(names = {"--max-typical-duration", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds. Default is 86400s (24h). if set to 0, activities are not split.")
-    private int maxTypicalDuration = 86400;
+    private Integer maxTypicalDuration = null;
 
     @CommandLine.Option(names = "--output", description = "Output folder", defaultValue = "scenarios/input")
     private Path output;
@@ -93,13 +94,12 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         // Clear wrong coordinate system
         scenario.getPopulation().getAttributes().clear();
 
-        scenario.getPopulation().getPersons().forEach((k, v) -> {
+		scenario.getPopulation().getPersons().forEach((k, v) -> {
 
-            if (!v.getAttributes().getAsMap().containsKey("subpopulation"))
-                v.getAttributes().putAttribute("subpopulation", "person");
-
-        });
-        // (if a <person/> does not yet have a subpopulation attribute, tag it as a "person".  kai, feb'2024)
+			if (PopulationUtils.getSubpopulation(v) == null)
+				PopulationUtils.putSubpopulation(v, SubpopulationDefaultNames.SUBPOP_PERSON);
+		});
+		// (if a <person/> does not yet have a subpopulation attribute, tag it as a "person".  kai, feb'2024)
 
         if (crs.getTargetCRS() != null) {
             ProjectionUtils.putCRS(scenario.getPopulation(), crs.getTargetCRS());
@@ -113,6 +113,15 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         }
         // (if set by command line, this will overwrite the above targetCRS.  How is this to be interpreted?  kai, feb'2024)
 
+        // Persist the population scale so follow-up down-sampling updates it consistently.
+        ScenarioUtils.putScale(scenario.getPopulation(), sampleSize);
+
+        if ( maxTypicalDuration==null ){
+            throw new RuntimeException( "maxTypicalDuration needs to be set explicitly.  The old default was 86400, which would run splitActivityTypesBasedOnDuration, " +
+                                                "which, however, is deprecated.  Normally, it should be set to 0, which means that splitActivityTypesBasedOnDuration is skipped.  Then, " +
+                                                "use separate class SplitActivityTypesDuration.  kai (with input from Simon M.), nov'25" );
+        }
+
         if (maxTypicalDuration > 0) {
             splitActivityTypesBasedOnDuration(scenario.getPopulation());
         }
@@ -124,6 +133,16 @@ public class TrajectoryToPlans implements MATSimAppCommand {
             log.info("No sub samples requested. Done.");
             return 0;
         }
+
+		if (sampleSize <= 0 || sampleSize > 1)
+			throw new IllegalArgumentException("--sample-size must be in (0,1]");
+
+		for (double s : samples) {
+			if (s <= 0 || s > 1)
+				throw new IllegalArgumentException("All --samples must be in (0,1]");
+			if (s > sampleSize)
+				throw new IllegalArgumentException("Target sample " + s + " is larger than input sample size " + sampleSize);
+		}
 
         samples.sort(Comparator.comparingDouble(Double::doubleValue).reversed());
 
@@ -141,11 +160,11 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         return 0;
     }
 
-	@Deprecated
     /**
-     * Deprecated, use {@link org.matsim.application.prepare.population.SplitActivityTypesDuration} instead. <br>
+     * @deprecated  use {@link org.matsim.application.prepare.population.SplitActivityTypesDuration} instead. <br>
      * Split activities into typical durations to improve value of travel time savings calculation.
      */
+    @Deprecated
     private void splitActivityTypesBasedOnDuration(Population population) {
 
 

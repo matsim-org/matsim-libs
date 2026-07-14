@@ -6,6 +6,7 @@ import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForMobsim;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.modechoice.*;
@@ -44,6 +45,7 @@ public class SelectSubtourModeStrategyTest extends ScenarioTest {
 
 	@Test
 	void constraint() {
+		controler.getConfig().routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
@@ -59,10 +61,10 @@ public class SelectSubtourModeStrategyTest extends ScenarioTest {
 		List<PlanCandidate> result = generator.generatePredefined(model, modes);
 
 		assertThat(result.get(0).getUtility())
-				.isEqualTo(-7.8, Offset.offset(0.1));
+			.isEqualTo(-7.5, Offset.offset(0.1));
 
 		assertThat(result.get(1).getUtility())
-				.isEqualTo(Double.NEGATIVE_INFINITY);
+			.isEqualTo(Double.NEGATIVE_INFINITY);
 
 	}
 
@@ -86,10 +88,10 @@ public class SelectSubtourModeStrategyTest extends ScenarioTest {
 		List<PlanCandidate> result = generator.generatePredefined(model, modes);
 
 		assertThat(result.get(0).getUtility())
-				.isEqualTo(-27.8, Offset.offset(0.1));
+			.isEqualTo(-27.8, Offset.offset(0.1));
 
 		assertThat(result.get(1).getUtility())
-				.isEqualTo(Double.NEGATIVE_INFINITY);
+			.isEqualTo(Double.NEGATIVE_INFINITY);
 
 	}
 

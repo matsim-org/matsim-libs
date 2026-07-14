@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.extension.edrt.optimizer;
 import java.util.List;
 
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -54,9 +55,9 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 	private final double minimumRelativeSoc;
 	private final VehicleDataEntryFactoryImpl entryFactory;
 
-	public EDrtVehicleDataEntryFactory(double minimumRelativeSoc, DvrpLoadType loadType) {
+	public EDrtVehicleDataEntryFactory(double minimumRelativeSoc, DvrpLoadType loadType, StopWaypointFactory stopWaypointFactory) {
 		this.minimumRelativeSoc = minimumRelativeSoc;
-		entryFactory = new VehicleDataEntryFactoryImpl(loadType);
+		entryFactory = new VehicleDataEntryFactoryImpl(loadType, stopWaypointFactory);
 	}
 
 	@Override
@@ -115,7 +116,8 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 
 		@Override
 		public EDrtVehicleDataEntryFactory get() {
-			return new EDrtVehicleDataEntryFactory(minimumRelativeSoc, getModalInstance(DvrpLoadType.class));
+			return new EDrtVehicleDataEntryFactory(minimumRelativeSoc, getModalInstance(DvrpLoadType.class),
+					getModalInstance(StopWaypointFactory.class));
 		}
 	}
 }

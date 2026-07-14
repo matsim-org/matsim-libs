@@ -51,7 +51,7 @@ public class SpatialFilterInsertionSearchQSimModule extends AbstractDvrpModeQSim
     @Override
     protected void configureQSim() {
         bindModal(RequestFleetFilter.class).toProvider(modalProvider(getter ->
-                new SpatialRequestFleetFilter(getter.getModal(Fleet.class), getter.get(MobsimTimer.class), drtSpatialRequestFleetFilterParams)
+                new SpatialRequestFleetFilter(getter.getModal(Fleet.class), drtSpatialRequestFleetFilterParams)
         ));
     }
 }

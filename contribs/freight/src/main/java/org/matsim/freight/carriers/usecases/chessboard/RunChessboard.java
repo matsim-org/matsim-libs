@@ -22,13 +22,14 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Provider;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -64,6 +65,8 @@ public final class RunChessboard {
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class );
 		freightCarriersConfigGroup.setCarriersFile("carrierPlans.xml");
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
+		
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
@@ -88,8 +91,8 @@ public final class RunChessboard {
 				final LegHistogram withoutFreight = new LegHistogram(900);
 				addEventHandlerBinding().toInstance(withoutFreight);
 
-				addControlerListenerBinding().toInstance( new CarrierScoreStats(carriers, config.controller().getOutputDirectory() +"/carrier_scores", true) );
-				addControlerListenerBinding().toInstance( new IterationEndsListener() {
+				addControllerListenerBinding().toInstance( new CarrierScoreStats(carriers, config.controller().getOutputDirectory() +"/carrier_scores", true) );
+				addControllerListenerBinding().toInstance(new IterationEndsListener() {
 
 					@Inject private OutputDirectoryHierarchy controlerIO;
 

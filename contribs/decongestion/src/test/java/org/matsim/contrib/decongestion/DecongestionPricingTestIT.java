@@ -44,6 +44,7 @@ import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingBangBang;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingPID;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -78,6 +79,8 @@ public class DecongestionPricingTestIT {
 		final String configFile = testUtils.getPackageInputDirectory() + "/config0.xml";
 
 		Config config = ConfigUtils.loadConfig(configFile);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
 		config.controller().setOutputDirectory(outputDirectory);
@@ -116,7 +119,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 
 			}
 		});
@@ -142,7 +145,7 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
-		Assertions.assertEquals(-33.940316666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
+		Assertions.assertEquals(-33.94198333333334, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
@@ -212,7 +215,7 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
-		Assertions.assertEquals(-33.940316666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
+		Assertions.assertEquals(-33.94198333333334, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 	}
 
 	/**
@@ -225,6 +228,8 @@ public class DecongestionPricingTestIT {
 		URL configUrl = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
 
 		Config config = ConfigUtils.loadConfig( configUrl );
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.controller().setOutputDirectory( testUtils.getOutputDirectory()  );
 
 		config.plans().setInputFile( "plans2000.xml.gz" );
@@ -248,7 +253,7 @@ public class DecongestionPricingTestIT {
 		// ===
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+
 		Network network = scenario.getNetwork();
 
 		// make middle link faster
@@ -317,7 +322,7 @@ public class DecongestionPricingTestIT {
 		System.err.println( tt1 );
 
 		Assertions.assertEquals(179.985, tt0a, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
-		Assertions.assertEquals(344.04, tt0b, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(353.717, tt0b, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 		Assertions.assertEquals(179.985, tt0c, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 		Assertions.assertEquals(180.0, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 
@@ -373,7 +378,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 
 			}
 		});
@@ -404,7 +409,7 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
-		Assertions.assertEquals(-134.31916666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
+		Assertions.assertEquals(-134.32083333333333, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
@@ -470,7 +475,7 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
-		Assertions.assertEquals(-134.31916666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
+		Assertions.assertEquals(-134.32083333333333, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 	}
 
 	/**
@@ -515,7 +520,7 @@ public class DecongestionPricingTestIT {
 				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 
 			}
 		});
@@ -544,7 +549,7 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
-		Assertions.assertEquals(-33.31916666666666, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
+		Assertions.assertEquals(-33.32083333333334, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The tolls seem to have changed.");
 
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
@@ -599,7 +604,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 			}
 		});
 
@@ -608,10 +613,10 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index) ;
-		Assertions.assertEquals(-12036.177448472225, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The run output seems to have changed.");
+		Assertions.assertEquals(-12062.205868703717, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The run output seems to have changed.");
 
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
-		Assertions.assertEquals(9.197000000000003, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON, "Wrong toll in time bin 61.");
+		Assertions.assertEquals(9.200000000000017, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON, "Wrong toll in time bin 61.");
 		Assertions.assertEquals(12.963999999999984, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(73), MatsimTestUtils.EPSILON, "Wrong toll in time bin 73.");
 	}
 
@@ -657,7 +662,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 
 			}
 		});
@@ -668,7 +673,7 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get( index ) ;
-		Assertions.assertEquals(-55.215645833333184, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The run output seems to have changed.");
+		Assertions.assertEquals(-55.219344907407525, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The run output seems to have changed.");
 
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
 		Assertions.assertEquals(13., info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON, "Wrong toll in time bin 61.");

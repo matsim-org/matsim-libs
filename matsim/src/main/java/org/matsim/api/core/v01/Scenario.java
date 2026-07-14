@@ -25,11 +25,14 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.checkers.ScenarioChecker;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.List;
 
 
 /**
@@ -122,4 +125,13 @@ public interface Scenario {
 
 	Lanes getLanes();
 
+	void addScenarioChecker(ScenarioChecker checker);
+
+	void removeScenarioChecker(ScenarioChecker checker);
+
+	List<ScenarioChecker> getScenarioCheckers();
+
+	void checkConsistencyBeforeRun();
+
+	void checkConsistencyAfterRun();
 }

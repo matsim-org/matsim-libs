@@ -30,8 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -47,7 +45,8 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 
     private static final String PARAM_USE_RANGE_QUERY = "useRangeQuery";
     private static final String PARAM_USE_INTERMODAL_ACCESS_EGRESS = "useIntermodalAccessEgress";
-    private static final String PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION = "intermodalAccessEgressModeSelection";
+	private static final String PARAM_USE_INTERMODAL_ACCESS_EGRESS_DESC = "Select intermodal access/egress modes from IntermodalAccessEgressParameterSets (true) or restrict access/egress modes to walk (false), i.e. disable intermodal routing.";
+	private static final String PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION = "intermodalAccessEgressModeSelection";
     private static final String PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC = "Sets whether intermodal access and egress modes are selected by " +
             "least cost (default) or randomly chosen out of the available access / egress modes.";
     private static final String PARAM_USE_MODE_MAPPING = "useModeMappingForPassengers";
@@ -63,7 +62,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private static final String PARAM_TRANSFER_WALK_MARGIN = "transferWalkMargin";
     private static final String PARAM_TRANSFER_WALK_MARGIN_DESC = "time deducted from transfer walk leg during transfers between pt legs in order to avoid missing a vehicle by a few seconds due to delays.";
     private static final String PARAM_INTERMODAL_LEG_ONLYHANDLING = "intermodalLegOnlyHandling";
-    private static final String PARAM_INTERMODAL_LEG_ONLYHANDLING_DESC = "Define how routes containing only intermodal legs are handled: Useful options: alllow, avoid, forbid";
+    private static final String PARAM_INTERMODAL_LEG_ONLYHANDLING_DESC = "Define how routes containing only intermodal legs are handled: Useful options: allow, avoid, forbid";
     private static final String PARAM_TRANSFER_CALCULATION = "transferCalculation";
     private static final String PARAM_TRANFER_CALCULATION_DESC = "Defines whether all potential transfers are precomputed at the beginning of the simulation (Initial) or whether they are constructed on-demand when needed (Adaptive). The former incurs potentially long up-front caclulations, but quicker routing. The latter avoids any initial computation, but may require longer routing time. Additionally, you may use Online, which will not cache adaptively calculated transfers. This will lead to largely reduced memory use, but drastically increased routing times.";
 
@@ -134,11 +133,11 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 	public String getIntermodalLegOnlyHandlingString() {
 		return intermodalLegOnlyHandling.toString();
 	}
-	
+
 	public IntermodalLegOnlyHandling getIntermodalLegOnlyHandling() {
 		return intermodalLegOnlyHandling;
-	}	
-	
+	}
+
 	@StringSetter(PARAM_TRANSFER_CALCULATION)
 	public void setTransferCalculation(RaptorTransferCalculation transferCalculation) {
 		this.transferCalculation = transferCalculation;
@@ -508,9 +507,14 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         private static final String PARAM_SHARE_TRIP_SEARCH_RADIUS = "shareTripSearchRadius";
 
         private String mode;
-        private double maxRadius;
+        private double maxRadius = Double.POSITIVE_INFINITY;
+		/*
+		 * Deliberately setting a default initialSearchRadius that will trigger the consistency checker. There is no default value that fits all
+		 * possible use cases and a too small initialSearchRadius prevents reasonable solutions from being found. Force the user to overwrite with
+		 * a value suitable for their use case.
+		 */
         private double initialSearchRadius = Double.NEGATIVE_INFINITY;
-        private double searchExtensionRadius = 200;
+        private double searchExtensionRadius = 500;
         private String linkIdAttribute;
         private String personFilterAttribute;
         private String personFilterValue;
@@ -641,8 +645,8 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
             map.put(PARAM_PERSON_FILTER_ATTRIBUTE, "Name of the person attribute used to figure out if this access/egress mode is available to the person.");
             map.put(PARAM_PERSON_FILTER_VALUE, "Only persons where the filter attribute has the value specified here can use this mode for access or egress. The attribute should be of type String.");
             map.put(PARAM_MAX_RADIUS, "Radius from the origin / destination coord in which transit stops are accessible by this mode.");
-            map.put(PARAM_INITIAL_SEARCH_RADIUS, "Radius from the origin / destination coord in which transit stops are searched. Only if less than 2 transit stops are found the search radius is increased step-wise until the maximum search radius set in param radius is reached.");
-            map.put(PARAM_SEARCH_EXTENSION_RADIUS, "If less than 2 stops were found in initialSearchRadius take the distance of the closest transit stop and add this extension radius to search again.The search radius will not exceed the maximum search radius set in param radius. Default is 200 meters.");
+            map.put(PARAM_INITIAL_SEARCH_RADIUS, "Radius from the origin / destination coord in which transit stops are searched. Only if less than 2 transit stops are found the search radius is increased step-wise until the maximum search radius set in param max radius is reached. The bigger the initial search radius, the better the routes and the higher the computation time. For walk 1000 meters is usually a good value. For other modes such as car, a much larger value is advisable.");
+            map.put(PARAM_SEARCH_EXTENSION_RADIUS, "If less than 2 stops were found in initialSearchRadius take the distance of the closest transit stop and add this extension radius to search again. The search radius will not exceed the maximum search radius set in param radius. Default is 500 meters.");
             map.put(PARAM_SHARE_TRIP_SEARCH_RADIUS, "The share of the trip crowfly distance within which the stops for access and egress will be searched for. This is a harder constraint than initial search radius. Default is positive infinity.");
 
             return map;
@@ -719,10 +723,10 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 	@Override
     public Map<String, String> getComments() {
         Map<String, String> comments = super.getComments();
+		comments.put(PARAM_USE_INTERMODAL_ACCESS_EGRESS, PARAM_USE_INTERMODAL_ACCESS_EGRESS_DESC);
         comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION, PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
         comments.put(PARAM_USE_CAPACITY_CONSTRAINTS, PARAM_USE_CAPACITY_CONSTRAINTS_DESC);
         comments.put(PARAM_TRANSFER_WALK_MARGIN, PARAM_TRANSFER_WALK_MARGIN_DESC);
-		comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION,PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
 		comments.put(PARAM_TRANSFER_CALCULATION, PARAM_TRANFER_CALCULATION_DESC);
         return comments;
     }

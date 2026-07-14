@@ -163,7 +163,7 @@ public class RunOnTheFlyShiftDrtScenarioIT {
                 this.bindModal(OnTheFlyScheduler.class).toProvider(modalProvider(getter ->
                         new OnTheFlyScheduler())).asEagerSingleton();
                 this.bindModal(ShiftScheduler.class).toProvider(modalProvider( getter -> getter.getModal(OnTheFlyScheduler.class)));
-                this.addControlerListenerBinding().toProvider(modalProvider( getter -> getter.getModal(OnTheFlyScheduler.class)));
+                this.addControllerListenerBinding().toProvider(modalProvider(getter -> getter.getModal(OnTheFlyScheduler.class)));
             }
         });
 

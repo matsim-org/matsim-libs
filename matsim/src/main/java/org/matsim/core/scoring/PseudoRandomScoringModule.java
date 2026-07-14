@@ -1,7 +1,7 @@
 package org.matsim.core.scoring;
 
 import com.google.inject.name.Names;
-import jakarta.inject.Singleton;
+import com.google.inject.Singleton;
 import org.matsim.core.config.groups.TasteVariationsConfigParameterSet;
 import org.matsim.core.controler.AbstractModule;
 

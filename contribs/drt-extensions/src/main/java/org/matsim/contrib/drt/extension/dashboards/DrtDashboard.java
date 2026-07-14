@@ -3,10 +3,7 @@ package org.matsim.contrib.drt.extension.dashboards;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.Data;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
@@ -54,7 +51,7 @@ public class DrtDashboard implements Dashboard {
 		switch (drtConfigGroup.getOperationalScheme()) {
 			case stopbased ->
 //				drtConfigGroup.transitStopFile can not be null, otherwise simulation crashed, earlier
-				args.addAll(List.of("--stops-file", ConfigGroup.getInputFileURL(matsimConfigContext, drtConfigGroup.getTransitStopFile()).toString()));
+				args.addAll(List.of("--with-stops"));
 			case door2door -> {
 				//TODO potentially show the entire drt network (all drt links have stops)
 			}
@@ -68,7 +65,7 @@ public class DrtDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = getTitle();
 		header.description = "Overview for the demand-responsive mode '" + drtConfigGroup.getMode() + "'";
@@ -103,6 +100,10 @@ public class DrtDashboard implements Dashboard {
 						viz.display.radius.join = "stop_id";
 						viz.display.radius.scaleFactor = 10d;
 
+						viz.display.fill.dataset = "trips";
+						viz.display.fill.columnName = "departures";
+						viz.display.fill.join = "stop_id";
+
 					}
 					case door2door -> {
 						//TODO add drtNetwork !?
@@ -128,6 +129,7 @@ public class DrtDashboard implements Dashboard {
 
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().getMapZoomLevel();
+				viz.radius = 100d;
 				viz.height = 7d;
 			})
 			.el(Hexagons.class, (viz, data) -> {
@@ -139,11 +141,12 @@ public class DrtDashboard implements Dashboard {
 
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().getMapZoomLevel();
+				viz.radius = 100d;
 			})
 		;
 
 //		This plot is not absolutely necesarry given the hex plots
-//		if (drtConfigGroup.operationalScheme == DrtConfigGroup.OperationalScheme.stopbased)
+//		if (drtConfigGroup.getOperationalScheme() == DrtConfigGroup.OperationalScheme.stopbased)
 //			layout.row("od").el(AggregateOD.class, (viz, data) -> {
 //
 //				viz.shpFile = postProcess(data, "stops.shp");
@@ -222,7 +225,7 @@ public class DrtDashboard implements Dashboard {
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Vehicle occupancy"; //actually, without title the area plot won't work
 				viz.description = "Number of passengers on board at a time";
-				viz.dataset = data.output("/*occupancy_time_profiles_" + drtConfigGroup.getMode() + ".txt");
+				viz.dataset = data.output("*occupancy_time_profiles_" + drtConfigGroup.getMode() + ".txt");
 				viz.x = "time";
 				viz.xAxisName = "Time";
 				viz.yAxisName = "Vehicles [1]";

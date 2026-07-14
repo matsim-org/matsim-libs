@@ -22,7 +22,6 @@ package org.matsim.freight.carriers.jsprit;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
@@ -55,6 +54,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.TimeWindow;
@@ -74,7 +74,8 @@ public final class MatsimJspritFactory {
 
 	@SuppressWarnings("unused")
 	private static final  Logger log = LogManager.getLogger(MatsimJspritFactory.class);
-
+	private static int addVehicleUsageCnt;
+	private static final int maxVehicleUsageCnt = 1;
 
 	/**
 	 * Creates (MATSim) {@link CarrierShipment} from a (jsprit) {@link Shipment}
@@ -85,15 +86,15 @@ public final class MatsimJspritFactory {
 	 */
 	static CarrierShipment createCarrierShipment(Shipment jspritShipment) {
 		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(Id.create(jspritShipment.getId(), CarrierShipment.class),
-						Id.createLinkId(jspritShipment.getPickupLocation().getId()),
-						Id.createLinkId(jspritShipment.getDeliveryLocation().getId()), jspritShipment.getSize().get(0))
-				.setDeliveryDuration(jspritShipment.getDeliveryServiceTime())
-				.setDeliveryStartingTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getDeliveryTimeWindow().getStart(),
-						jspritShipment.getDeliveryTimeWindow().getEnd()))
-				.setPickupDuration(jspritShipment.getPickupServiceTime())
-				.setPickupStartingTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getPickupTimeWindow().getStart(),
-						jspritShipment.getPickupTimeWindow().getEnd()))
-				.build();
+				Id.createLinkId(jspritShipment.getPickupLocation().getId()),
+				Id.createLinkId(jspritShipment.getDeliveryLocation().getId()), jspritShipment.getSize().get(0))
+			.setDeliveryDuration(jspritShipment.getDeliveryServiceTime())
+			.setDeliveryStartingTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getDeliveryTimeWindow().getStart(),
+				jspritShipment.getDeliveryTimeWindow().getEnd()))
+			.setPickupDuration(jspritShipment.getPickupServiceTime())
+			.setPickupStartingTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getPickupTimeWindow().getStart(),
+				jspritShipment.getPickupTimeWindow().getEnd()))
+			.build();
 		CarriersUtils.setSkills(carrierShipment, jspritShipment.getRequiredSkills().values());
 		return carrierShipment;
 	}
@@ -107,17 +108,17 @@ public final class MatsimJspritFactory {
 	 */
 	static Shipment createJspritShipment(CarrierShipment carrierShipment) {
 		Shipment.Builder shipmentBuilder = Shipment.Builder.newInstance(carrierShipment.getId().toString())
-				.setDeliveryLocation(Location.newInstance(carrierShipment.getDeliveryLinkId().toString()))
-				.setDeliveryServiceTime(carrierShipment.getDeliveryDuration())
-				.setDeliveryTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow
-						.newInstance(carrierShipment.getDeliveryStartingTimeWindow().getStart(),
-								carrierShipment.getDeliveryStartingTimeWindow().getEnd()))
-				.setPickupServiceTime(carrierShipment.getPickupDuration())
-				.setPickupLocation(Location.newInstance(carrierShipment.getPickupLinkId().toString()))
-				.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
-						carrierShipment.getPickupStartingTimeWindow().getStart(),
-						carrierShipment.getPickupStartingTimeWindow().getEnd()))
-				.addSizeDimension(0, carrierShipment.getCapacityDemand());
+			.setDeliveryLocation(Location.newInstance(carrierShipment.getDeliveryLinkId().toString()))
+			.setDeliveryServiceTime(carrierShipment.getDeliveryDuration())
+			.setDeliveryTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow
+				.newInstance(carrierShipment.getDeliveryStartingTimeWindow().getStart(),
+					carrierShipment.getDeliveryStartingTimeWindow().getEnd()))
+			.setPickupServiceTime(carrierShipment.getPickupDuration())
+			.setPickupLocation(Location.newInstance(carrierShipment.getPickupLinkId().toString()))
+			.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
+				carrierShipment.getPickupStartingTimeWindow().getStart(),
+				carrierShipment.getPickupStartingTimeWindow().getEnd()))
+			.addSizeDimension(0, carrierShipment.getCapacityDemand());
 		for (String skill : CarriersUtils.getSkills(carrierShipment)) {
 			shipmentBuilder.addRequiredSkill(skill);
 		}
@@ -140,15 +141,15 @@ public final class MatsimJspritFactory {
 		Location toLocation = toLocationBuilder.build();
 
 		Shipment.Builder shipmentBuilder = Shipment.Builder.newInstance(carrierShipment.getId().toString())
-				.setDeliveryLocation(toLocation).setDeliveryServiceTime(carrierShipment.getDeliveryDuration())
-				.setDeliveryTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow
-						.newInstance(carrierShipment.getDeliveryStartingTimeWindow().getStart(),
-								carrierShipment.getDeliveryStartingTimeWindow().getEnd()))
-				.setPickupServiceTime(carrierShipment.getPickupDuration()).setPickupLocation(fromLocation)
-				.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
-						carrierShipment.getPickupStartingTimeWindow().getStart(),
-						carrierShipment.getPickupStartingTimeWindow().getEnd()))
-				.addSizeDimension(0, carrierShipment.getCapacityDemand());
+			.setDeliveryLocation(toLocation).setDeliveryServiceTime(carrierShipment.getDeliveryDuration())
+			.setDeliveryTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow
+				.newInstance(carrierShipment.getDeliveryStartingTimeWindow().getStart(),
+					carrierShipment.getDeliveryStartingTimeWindow().getEnd()))
+			.setPickupServiceTime(carrierShipment.getPickupDuration()).setPickupLocation(fromLocation)
+			.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
+				carrierShipment.getPickupStartingTimeWindow().getStart(),
+				carrierShipment.getPickupStartingTimeWindow().getEnd()))
+			.addSizeDimension(0, carrierShipment.getCapacityDemand());
 		for (String skill : CarriersUtils.getSkills(carrierShipment)) {
 			shipmentBuilder.addRequiredSkill(skill);
 		}
@@ -166,9 +167,9 @@ public final class MatsimJspritFactory {
 		@SuppressWarnings("rawtypes") Builder serviceBuilder = Builder.newInstance(carrierService.getId().toString());
 		serviceBuilder.addSizeDimension(0, carrierService.getCapacityDemand());
 		serviceBuilder.setLocation(location).setServiceTime(carrierService.getServiceDuration())
-				.setTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
-						carrierService.getServiceStaringTimeWindow().getStart(),
-						carrierService.getServiceStaringTimeWindow().getEnd()));
+			.setTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
+				carrierService.getServiceStaringTimeWindow().getStart(),
+				carrierService.getServiceStaringTimeWindow().getEnd()));
 		for (String skill : CarriersUtils.getSkills(carrierService)) {
 			serviceBuilder.addRequiredSkill(skill);
 		}
@@ -205,11 +206,11 @@ public final class MatsimJspritFactory {
 		}
 		Location vehicleLocation = vehicleLocationBuilder.build();
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType vehicleType = createJspritVehicleType(
-				carrierVehicle.getType());
+			carrierVehicle.getType());
 		VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance(carrierVehicle.getId().toString());
 		vehicleBuilder.setEarliestStart(carrierVehicle.getEarliestStartTime())
-				.setLatestArrival(carrierVehicle.getLatestEndTime()).setStartLocation(vehicleLocation)
-				.setType(vehicleType);
+			.setLatestArrival(carrierVehicle.getLatestEndTime()).setStartLocation(vehicleLocation)
+			.setType(vehicleType);
 		for (String skill : CarriersUtils.getSkills(carrierVehicle.getType())) {
 			vehicleBuilder.addSkill(skill);
 		}
@@ -235,8 +236,15 @@ public final class MatsimJspritFactory {
 	static CarrierVehicle createCarrierVehicle(com.graphhopper.jsprit.core.problem.vehicle.Vehicle jspritVehicle) {
 		VehicleType matsimVehicleType;
 		if (jspritVehicle.getType().getUserData() != null){
-			log.info("Use the (MATSim) vehicleType that was stored inside the (jsprit) vehicleType during the jsprit run but never interacted with jsprit. ");
+			if ( addVehicleUsageCnt < maxVehicleUsageCnt ) {
+				log.info("Use the (MATSim) vehicleType that was stored inside the (jsprit) vehicleType during the jsprit run but never interacted with jsprit. ");
+				addVehicleUsageCnt++;
+				if (addVehicleUsageCnt == maxVehicleUsageCnt) {
+					log.warn(Gbl.FUTURE_SUPPRESSED);
+				}
+			}
 			matsimVehicleType = (VehicleType) jspritVehicle.getType().getUserData(); //Read in store MATSimVehicleType... Attention: This will not take care for any changes during the jsprit run
+
 		} else {
 			log.info("There was no (MATSim) vehicleType stored inside the (jsprit) vehicleType. -> create one from the available data of the (jsprit) vehicle type");
 			matsimVehicleType = createMatsimVehicleType(jspritVehicle.getType());
@@ -245,9 +253,9 @@ public final class MatsimJspritFactory {
 
 		String vehicleId = jspritVehicle.getId();
 		CarrierVehicle.Builder carrierVehicleBuilder = CarrierVehicle.Builder.newInstance(
-				Id.create(vehicleId, org.matsim.vehicles.Vehicle.class),
-				Id.create(jspritVehicle.getStartLocation().getId(), Link.class),
-				matsimVehicleType );
+			Id.create(vehicleId, org.matsim.vehicles.Vehicle.class),
+			Id.create(jspritVehicle.getStartLocation().getId(), Link.class),
+			matsimVehicleType );
 
 //		carrierVehicleBuilder.setType(matsimVehicleType); //Not needed any more, because is now part of the constructor. KMT jan22
 		carrierVehicleBuilder.setEarliestStart(jspritVehicle.getEarliestDeparture());
@@ -300,16 +308,16 @@ public final class MatsimJspritFactory {
 		if (matsimVehicleType == null)
 			throw new IllegalStateException("carrierVehicleType is null");
 		VehicleTypeImpl.Builder jspritVehTypeBuilder = VehicleTypeImpl.Builder
-				.newInstance(matsimVehicleType.getId().toString());
+			.newInstance(matsimVehicleType.getId().toString());
 		if (matsimVehicleType.getCapacity().getVolumeInCubicMeters() < Double.MAX_VALUE) {
 			throw new RuntimeException(
-					"restrictions can currently only be set for \"other\".  not a big problem, but needs to be implemented.  "
-							+ "kai/kai, sep'19");
+				"restrictions can currently only be set for \"other\".  not a big problem, but needs to be implemented.  "
+					+ "kai/kai, sep'19");
 		}
 		if (matsimVehicleType.getCapacity().getWeightInTons() < Double.MAX_VALUE) {
 			throw new RuntimeException(
-					"restrictions can currently only be set for \"other\".  not a big problem, but needs to be implemented.  "
-							+ "kai/kai, sep'19");
+				"restrictions can currently only be set for \"other\".  not a big problem, but needs to be implemented.  "
+					+ "kai/kai, sep'19");
 		}
 		final double vehicleCapacity = matsimVehicleType.getCapacity().getOther();
 		final int vehicleCapacityInt = (int) vehicleCapacity;
@@ -429,7 +437,7 @@ public final class MatsimJspritFactory {
 			if (e instanceof Tour.TourActivity) {
 				if (e instanceof Tour.ServiceActivity) {
 					CarrierService carrierService = ((Tour.ServiceActivity) e)
-							.getService();
+						.getService();
 					Service service = (Service) vehicleRoutingProblem.getJobs().get(carrierService.getId().toString());
 					if (service == null)
 						throw new IllegalStateException("service to id=" + carrierService.getId() + " is missing");
@@ -580,7 +588,7 @@ public final class MatsimJspritFactory {
 	 * To retrieve coordinates the {@link Network} is required. </br>
 	 */
 	public static VehicleRoutingProblemSolution createSolution(CarrierPlan plan,
-			VehicleRoutingProblem vehicleRoutingProblem) {
+															   VehicleRoutingProblem vehicleRoutingProblem) {
 		List<VehicleRoute> routes = new ArrayList<>();
 		for (ScheduledTour tour : plan.getScheduledTours()) {
 			VehicleRoute route = createRoute(tour, vehicleRoutingProblem);
@@ -666,7 +674,8 @@ public final class MatsimJspritFactory {
 					StateManager stateManager = new StateManager(problem);
 					stateManager.addStateUpdater(new DistanceUpdater(stateManager.createStateId("distance"), stateManager, netBasedCosts));
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts), ConstraintManager.Priority.CRITICAL);
+					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts,
+						freightConfig.getDistanceConstraintUsableRange()), ConstraintManager.Priority.CRITICAL);
 					AlgorithmConfig algorithmConfig = new AlgorithmConfig();
 					AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
 					xmlReader.read(vraURL);
@@ -678,18 +687,54 @@ public final class MatsimJspritFactory {
 		} else {
 			log.info("Use a VehicleRoutingAlgorithm out of the box.");
 			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
-				case noDistanceConstraint -> algorithm = new SchrimpfFactory().createAlgorithm(problem);
+				//by default of Jsprit the fixed costs are not considered in the algorithm. Adding this property takes this into account.
+				case noDistanceConstraint -> algorithm = Jsprit.Builder.newInstance(problem).setProperty(Jsprit.Parameter.FIXED_COST_PARAM, "0.5").buildAlgorithm();
 				case basedOnEnergyConsumption -> {
 					log.info("Use the distanceConstraint based on energy consumption.");
 					StateManager stateManager = new StateManager(problem);
 					stateManager.addStateUpdater(new DistanceUpdater(stateManager.createStateId("distance"), stateManager, netBasedCosts));
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts), ConstraintManager.Priority.CRITICAL);
-					algorithm = Jsprit.Builder.newInstance(problem).setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
+					constraintManager.addConstraint(new DistanceConstraint(CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts,
+						freightConfig.getDistanceConstraintUsableRange()), ConstraintManager.Priority.CRITICAL);
+					//by default of Jsprit the fixed costs are not considered in the algorithm. Adding this property takes this into account.
+					algorithm = Jsprit.Builder.newInstance(problem).setProperty(Jsprit.Parameter.FIXED_COST_PARAM, "0.5").setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
 				}
 				default -> throw new IllegalStateException("Unexpected value: " + freightConfig.getUseDistanceConstraintForTourPlanning());
 			}
 		}
 		return algorithm;
 	}
+// ### This class could be an option to get both absolute and relative fixed costs into the algorithm. However, it is currently not used since it is not clear how to set the weight parameter and what the influence of this parameter is. Ricardo April'26
+//	private static VehicleRoutingAlgorithm createFixedCostAwareAlgorithm(VehicleRoutingProblem problem, StateManager stateManager, ConstraintManager constraintManager) {
+//		// Weight parameter - determines importance of fixed costs vs variable costs
+//		// 0.0 = fixed costs ignored, 1.0 = good starting point
+//		double weightOfFixedCosts = 0.5;
+//
+//		// Create your own StateManager and ConstraintManager
+//		if (stateManager == null)
+//			stateManager = new StateManager(problem);
+//		if (constraintManager == null)
+//			constraintManager = new ConstraintManager(problem, stateManager);
+//
+//		// Create both fixed cost constraints
+//		IncreasingAbsoluteFixedCosts absoluteFixedCosts = new IncreasingAbsoluteFixedCosts(problem.getJobs().size());
+//		absoluteFixedCosts.setWeightOfFixCost(weightOfFixedCosts);
+//
+//		DecreasingRelativeFixedCosts relativeFixedCosts = new DecreasingRelativeFixedCosts(stateManager, problem.getJobs().size());
+//		relativeFixedCosts.setWeightOfFixCost(weightOfFixedCosts);
+//
+//		// Add both as soft route constraints
+//		constraintManager.addConstraint(absoluteFixedCosts);
+//		constraintManager.addConstraint(relativeFixedCosts);
+//
+//		// Build algorithm with your managers
+//		VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem).setStateAndConstraintManager(stateManager,
+//			constraintManager).buildAlgorithm();
+//
+//		// Register both as listeners (required for solution completeness ratio updates)
+//		algorithm.addListener(absoluteFixedCosts);
+//		algorithm.addListener(relativeFixedCosts);
+//
+//		return algorithm;
+//	}
 }

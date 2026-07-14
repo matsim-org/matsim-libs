@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.matsim.api.core.v01.Message;
 import org.matsim.vehicles.Vehicle;
 
 public class ComplexTransitStopHandlerFactory implements TransitStopHandlerFactory {
@@ -26,6 +27,11 @@ public class ComplexTransitStopHandlerFactory implements TransitStopHandlerFacto
 	@Override
 	public TransitStopHandler createTransitStopHandler(Vehicle vehicle) {
 		return new ComplexTransitStopHandler(vehicle);
+	}
+
+	@Override
+	public TransitStopHandler createTransitStopHandler(Message message) {
+		return new ComplexTransitStopHandler((ComplexTransitStopHandler.Msg) message);
 	}
 
 }

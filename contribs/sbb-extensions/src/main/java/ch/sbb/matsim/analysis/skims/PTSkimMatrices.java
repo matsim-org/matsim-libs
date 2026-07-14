@@ -110,6 +110,7 @@ public class PTSkimMatrices {
                     pti.accessTimeMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
                     pti.egressTimeMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
                     pti.transferCountMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
+                    pti.transferWaitTimeMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
                     pti.trainDistanceShareMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
                     pti.trainTravelTimeShareMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
                 } else {
@@ -122,6 +123,7 @@ public class PTSkimMatrices {
                     pti.trainDistanceShareMatrix.multiply(fromZoneId, toZoneId, avgFactor);
                     pti.trainTravelTimeShareMatrix.multiply(fromZoneId, toZoneId, avgFactor);
                     pti.transferCountMatrix.multiply(fromZoneId, toZoneId, avgFactor);
+                    pti.transferWaitTimeMatrix.multiply(fromZoneId, toZoneId, avgFactor);
                     float frequency = (float) ((maxDepartureTime - minDepartureTime) / adaptionTime / 4.0);
                     pti.frequencyMatrix.set(fromZoneId, toZoneId, frequency);
                 }
@@ -249,6 +251,7 @@ public class PTSkimMatrices {
             float egressTime = 0;
             float transferCount = 0;
             float travelTime = 0;
+            float transferWaitTime = 0;
 
             double totalDistance = 0;
             double trainDistance = 0;
@@ -290,6 +293,8 @@ public class PTSkimMatrices {
                 totalDistance += share * connTotalDistance;
                 trainDistance += share * connTrainDistance;
                 totalInVehTime += share * connTotalInVehTime;
+                double connTransferWaitTime = connection.travelInfo.ptTravelTime - connTotalInVehTime;
+                transferWaitTime += share * connTransferWaitTime;
                 trainInVehTime += share * connTrainInVehTime;
             }
 
@@ -303,6 +308,7 @@ public class PTSkimMatrices {
             this.pti.distanceMatrix.add(fromZoneId, toZoneId, (float) totalDistance*fromCoordWeight);
             this.pti.trainDistanceShareMatrix.add(fromZoneId, toZoneId, trainShareByDistance*fromCoordWeight);
             this.pti.trainTravelTimeShareMatrix.add(fromZoneId, toZoneId, trainShareByTravelTime*fromCoordWeight);
+            this.pti.transferWaitTimeMatrix.add(fromZoneId, toZoneId, transferWaitTime*fromCoordWeight);
 
             this.pti.dataCountMatrix.add(fromZoneId, toZoneId, fromCoordWeight);
         }
@@ -316,7 +322,7 @@ public class PTSkimMatrices {
                     Id<TransitStopFacility> egressStopId = egressEntry.getKey();
                     Double egressTime = egressEntry.getValue();
                     TravelInfo info = tree.get(egressStopId);
-                    if (info != null && !info.isWalkOnly()) {
+                    if (info != null && !info.isWalkOnly) {
                         Double accessTime = accessTimes.get(info.departureStop);
                         ODConnection connection = new ODConnection(info.ptDepartureTime, info.ptTravelTime, accessTime, egressTime, info.transferCount, info);
                         connections.add(connection);
@@ -332,7 +338,6 @@ public class PTSkimMatrices {
 
         public final FloatMatrix<T> adaptionTimeMatrix;
         public final FloatMatrix<T> frequencyMatrix;
-
         public final FloatMatrix<T> distanceMatrix;
         public final FloatMatrix<T> travelTimeMatrix;
         public final FloatMatrix<T> accessTimeMatrix;
@@ -340,22 +345,39 @@ public class PTSkimMatrices {
         public final FloatMatrix<T> transferCountMatrix;
         public final FloatMatrix<T> trainTravelTimeShareMatrix;
         public final FloatMatrix<T> trainDistanceShareMatrix;
-
+        public final FloatMatrix<T> transferWaitTimeMatrix;
         public final FloatMatrix<T> dataCountMatrix; // how many values/routes were taken into account to calculate the averages
 
         PtIndicators(Set<T> zones) {
-            this.adaptionTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.frequencyMatrix = new FloatMatrix<>(zones, 0);
-
-            this.distanceMatrix = new FloatMatrix<>(zones, 0);
-            this.travelTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.accessTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.egressTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.transferCountMatrix = new FloatMatrix<>(zones, 0);
-            this.dataCountMatrix = new FloatMatrix<>(zones, 0);
-            this.trainTravelTimeShareMatrix = new FloatMatrix<>(zones, 0);
-            this.trainDistanceShareMatrix = new FloatMatrix<>(zones, 0);
+            this.adaptionTimeMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.frequencyMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.distanceMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.travelTimeMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.accessTimeMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.egressTimeMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.transferCountMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.dataCountMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.trainTravelTimeShareMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.trainDistanceShareMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.transferWaitTimeMatrix = FloatMatrix.createFloatMatrix(zones, 0);
         }
+
+        public Map<String, FloatMatrix<T>> getMatrices() {
+            Map<String, FloatMatrix<T>> map = new LinkedHashMap<>();
+            map.put("adaptionTimeMatrix", adaptionTimeMatrix);
+            map.put("frequencyMatrix", frequencyMatrix);
+            map.put("distanceMatrix", distanceMatrix);
+            map.put("travelTimeMatrix", travelTimeMatrix);
+            map.put("accessTimeMatrix", accessTimeMatrix);
+            map.put("egressTimeMatrix", egressTimeMatrix);
+            map.put("transferCountMatrix", transferCountMatrix);
+            map.put("trainTravelTimeShareMatrix", trainTravelTimeShareMatrix);
+            map.put("trainDistanceShareMatrix", trainDistanceShareMatrix);
+            map.put("transferWaitTimeMatrix", transferWaitTimeMatrix);
+            map.put("dataCountMatrix", dataCountMatrix);
+            return map;
+        }
+
     }
 
 	public interface CoordAggregator{

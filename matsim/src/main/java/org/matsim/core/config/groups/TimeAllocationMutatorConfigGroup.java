@@ -52,7 +52,8 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 	private static final String MUTATION_RANGE_STEP = "mutationRangeStep";
 	private static final String MUTATION_RANGE = "mutationRange";
 	private double mutationRange = 1800.0;
-	private double latestActivityEndTime = 24*3600.0;
+//	private double latestActivityEndTime = 24*3600.0;
+	private double latestActivityEndTime = Double.POSITIVE_INFINITY;
 	private boolean mutateAroundInitialEndTimeOnly = false;
 	private double mutationRangeStep = 1.0;
 
@@ -61,16 +62,18 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 		return mutationRangeStep;
 	}
 	@StringSetter(MUTATION_RANGE_STEP)
-	public void setMutationRangeStep(double mutationRangeStep) {
+	public TimeAllocationMutatorConfigGroup setMutationRangeStep(double mutationRangeStep) {
 		this.mutationRangeStep = mutationRangeStep;
+		return this;
 	}
 	@StringGetter(LATEST_ACTIVITY_END_TIME)
 	public double getLatestActivityEndTime() {
 		return latestActivityEndTime;
 	}
 	@StringSetter(LATEST_ACTIVITY_END_TIME)
-	public void setLatestActivityEndTime(String latestActivityEndTime) {
+	public TimeAllocationMutatorConfigGroup setLatestActivityEndTime(String latestActivityEndTime) {
 		this.latestActivityEndTime = Time.parseTime(latestActivityEndTime);
+		return this;
 	}
 
 	@StringGetter(MUTATE_AROUND_INITIAL_END_TIME_ONLY)
@@ -78,8 +81,9 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 		return mutateAroundInitialEndTimeOnly;
 	}
 	@StringSetter(MUTATE_AROUND_INITIAL_END_TIME_ONLY)
-	public void setMutateAroundInitialEndTimeOnly(boolean mutateAroundInitialEndTimeOnly) {
+	public TimeAllocationMutatorConfigGroup setMutateAroundInitialEndTimeOnly(boolean mutateAroundInitialEndTimeOnly) {
 		this.mutateAroundInitialEndTimeOnly = mutateAroundInitialEndTimeOnly;
+		return this;
 	}
 
 	@StringGetter(MUTATION_RANGE)
@@ -87,8 +91,9 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 		return this.mutationRange;
 	}
 	@StringSetter(MUTATION_RANGE)
-	public void setMutationRange(final double val) {
+	public TimeAllocationMutatorConfigGroup setMutationRange(final double val) {
 		this.mutationRange = val;
+		return this;
 	}
 
 	// ---
@@ -100,8 +105,9 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 		return this.affectingDuration;
 	}
 	@StringSetter(MUTATION_AFFECTS_DURATION)
-	public void setAffectingDuration(boolean affectingDuration) {
+	public TimeAllocationMutatorConfigGroup setAffectingDuration(boolean affectingDuration) {
 		this.affectingDuration = affectingDuration;
+		return this;
 	}
 
 	// ---

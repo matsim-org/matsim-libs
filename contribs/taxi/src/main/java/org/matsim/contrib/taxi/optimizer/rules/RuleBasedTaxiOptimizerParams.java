@@ -20,6 +20,7 @@
 package org.matsim.contrib.taxi.optimizer.rules;
 
 import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
@@ -69,19 +70,10 @@ public final class RuleBasedTaxiOptimizerParams extends AbstractTaxiOptimizerPar
 	private ZoneSystemParams zoneSystemParams = new SquareGridZoneSystemParams();
 
 	private void initSingletonParameterSets() {
-
-		//insertion search params (one of: extensive, selective, repeated selective)
-		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
-			() -> zoneSystemParams,
-			params -> zoneSystemParams = (SquareGridZoneSystemParams)params);
-
-		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
-			() -> zoneSystemParams,
-			params -> zoneSystemParams = (GISFileZoneSystemParams)params);
-
-		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
-			() -> zoneSystemParams,
-			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
+		// zone parameters
+		ZoneSystemUtils.registerDefaultZoneSystems(this::addDefinition,  //
+			(ZoneSystemParams params) -> zoneSystemParams = params, // 
+			() -> zoneSystemParams);
 	}
 
 	/**

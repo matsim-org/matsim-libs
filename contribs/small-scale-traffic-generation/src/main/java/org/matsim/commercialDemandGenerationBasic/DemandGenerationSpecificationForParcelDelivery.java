@@ -27,7 +27,7 @@ import static org.matsim.commercialDemandGenerationBasic.DemandReaderFromCSV.get
  * @see BasicCommercialDemandGeneration
  * @Author Ricardo Ewert (based on the work of the master thesis of Ana Ueberhorst)
  */
-class DemandGenerationSpecificationForParcelDelivery extends DefaultDemandGenerationSpecification {
+public class DemandGenerationSpecificationForParcelDelivery extends DefaultDemandGenerationSpecification {
 	//	private static double PACKAGES_PER_PERSON = 0.0686; //default value
 	private static double PACKAGES_PER_PERSON = 0.14; //default value
 

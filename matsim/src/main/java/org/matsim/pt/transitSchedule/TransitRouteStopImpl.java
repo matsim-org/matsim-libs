@@ -39,6 +39,7 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 	private boolean awaitDepartureTime = false;
 	private boolean allowBoarding = true;
 	private boolean allowAlighting = true;
+	private double minimumStopDuration = 0.0;
 
 	private TransitRouteStopImpl(Builder builder) {
 		this.stop = builder.stop;
@@ -46,6 +47,7 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 		this.arrivalOffset = builder.arrivalOffset;
 		this.allowBoarding = builder.allowBoarding;
 		this.allowAlighting = builder.allowAlighting;
+		this.minimumStopDuration = builder.minimumStopDuration;
 		setAwaitDepartureTime(builder.awaitDepartureTime);
 	}
 
@@ -99,6 +101,16 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 		this.awaitDepartureTime = awaitDepartureTime;
 	}
 
+	@Override
+	public double getMinimumStopDuration() {
+		return this.minimumStopDuration;
+	}
+
+	@Override
+	public void setMinimumStopDuration(double minimumStopDuration) {
+		this.minimumStopDuration = minimumStopDuration;
+	}
+
 	/**
 	 * TransitRouteStops are typical Value Objects, so we consider two stops equal if they are equal field-wise.
 	 *
@@ -132,6 +144,9 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 		if (this.awaitDepartureTime != other.isAwaitDepartureTime()) {
 			return false;
 		}
+		if (this.minimumStopDuration != other.getMinimumStopDuration()) {
+			return false;
+		}
 		return true;
 	}
 
@@ -152,6 +167,7 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 		private boolean allowBoarding = true;
 		private boolean allowAlighting = true;
 		private boolean awaitDepartureTime;
+		private double minimumStopDuration = 0.0;
 
 		public Builder() {
 		}
@@ -161,6 +177,7 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 			this.departureOffset = copy.getDepartureOffset();
 			this.arrivalOffset = copy.getArrivalOffset();
 			this.awaitDepartureTime = copy.isAwaitDepartureTime();
+			this.minimumStopDuration = copy.getMinimumStopDuration();
 		}
 
 		public Builder stop(TransitStopFacility val) {
@@ -200,6 +217,11 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 
 		public Builder awaitDepartureTime(boolean val) {
 			awaitDepartureTime = val;
+			return this;
+		}
+
+		public Builder minimumStopDuration(double val) {
+			this.minimumStopDuration = val;
 			return this;
 		}
 
