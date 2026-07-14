@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathUtils;
+import org.matsim.core.router.util.LeastCostPathUtils.NoPathBehavior;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -155,7 +157,7 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
         int startIdx = baseGraph.getNodeIndex(startNode);
         int endIdx   = baseGraph.getNodeIndex(endNode);
         Path path    = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle, Double.POSITIVE_INFINITY);
-        if (path == null) logNoRoute("node " + startNode.getId(), "node " + endNode.getId());
+        if (path == null) LeastCostPathUtils.handleNotFound(noPathBehavior, LOG, startNode, endNode, person, vehicle);
         return path;
     }
 
@@ -178,8 +180,10 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
             }
         }
 
+
         Path path = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle, maxCost);
-        if (path == null) logNoRoute("link " + fromLink.getId(), "link " + toLink.getId());
+        if (path == null) LeastCostPathUtils.handleNotFound(noPathBehavior, LOG, fromLink, toLink, person, vehicle);
+
         return path;
     }
 
@@ -504,11 +508,9 @@ public class CHRouterTimeDep implements LeastCostPathCalculator {
         bwdIterIds[node]    = currentIteration;
     }
 
-    private static void logNoRoute(String from, String to) {
-        LOG.warn("No route was found from {} to {}. Some possible reasons:", from, to);
-        LOG.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(...).");
-        LOG.warn("  * Network for considered mode does not even exist.");
-        LOG.warn("  * Network for considered mode is not connected to start/end point.");
-        LOG.warn("This will now return null, but it may fail later with a NullPointerException.");
-    }
+	private NoPathBehavior noPathBehavior = NoPathBehavior.warning;
+
+	public void setNoPathBehavior(NoPathBehavior value) {
+		this.noPathBehavior = value;
+	}
 }
