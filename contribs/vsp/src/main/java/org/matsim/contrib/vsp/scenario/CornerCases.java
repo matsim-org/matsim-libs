@@ -20,7 +20,23 @@ import org.matsim.api.core.v01.network.Link;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
 
+ * Collection of reusable scenario modifications for MATSim sensitivity analyses.
+
+ * <p>
+ * This utility class contains methods that apply common "what-if" interventions
+ * to a scenario without requiring changes to the underlying scenario generation.
+ * Typical applications include:
+ * <ul>
+ *   <li>changing bicycle travel speeds,</li>
+ *   <li>reducing car speeds or capacities within a geographic area, and</li>
+ *   <li>configuring and applying parking costs.</li>
+ * </ul>
+ * <p>
+ * The methods are intended as building blocks when defining
+ * policy scenarios or robustness tests.
+ */
 public class CornerCases {
 
 	private static final Logger log = LogManager.getLogger(CornerCases.class);
