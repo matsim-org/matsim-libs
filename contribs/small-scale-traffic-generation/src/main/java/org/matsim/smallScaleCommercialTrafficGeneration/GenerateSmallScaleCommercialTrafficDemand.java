@@ -58,7 +58,7 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.CommercialTourSpecifications;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.DefaultTourSpecificationsByUsingKID2002;
-import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
 
 import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.Vehicle;
@@ -75,9 +75,9 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.*;
-import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readDataDistribution;
-import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.*;
+import static org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.*;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readZoneAttributes;
+import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.*;
 
 /**
  * Tool to generate small scale commercial traffic for a selected area. The needed input data are: employee information for the area and three shapes files (zones, buildings, landuse). These data should be available with OSM.
@@ -122,19 +122,30 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// read this as "use existing carrier file and use the existing solutions in it" and as "use existing carrier file but not the solutions in it"
 	}
 
-	public enum SmallScaleCommercialTrafficType {
+	public enum SmallScaleCommercialTrafficSegment{
 		commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic
 	}
+
+	// === cmd line params after here
 
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the config for small scale commercial generation")
 	private Path configPath;
 	// ok
 
-	@CommandLine.Option(names = "--pathToDataDistributionToZones", description = "Path to the data distribution to zones")
-	private Path pathToDataDistributionToZones;
-	// yyyy ??
+	private Path pathToZoneAttributes;
+	// command line string replaced 2026-07
+	@CommandLine.Option(names = "--pathToZoneAttributes", description = "Path to the zone attributes")
+	void setPathToZoneAttributes( String value ) {
+		this.pathToZoneAttributes = Path.of( value );
+	}
+	@CommandLine.Option(names = "--pathToDataDistributionToZones", description = "Path to the data distribution to zones", hidden=true )
+	void setOldPathToZoneAttributes( String value ) {
+		log.error( "--pathToDataDistributionToZones is deprecated since 2026-07; use --pathToZoneAttributes instead.");
+		this.pathToZoneAttributes = Path.of( value );
+	}
 	// Dies zeigt auf die Datei, welche die Strukturdaten pro Zone enthält, welche dann mit den IVV magic numbers multipliziert
 	// werden.  Strukturdaten \ne structure data im engl., eher so etwas wie "zone attributes".
+	// now ok
 
 	@CommandLine.Option(names = "--pathToCommercialFacilities", description = "Path to the commercial facilities.")
 	private Path pathToCommercialFacilities;
@@ -169,7 +180,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/// see comments at {@link CreationOption}
 
 	@CommandLine.Option(names = "--smallScaleCommercialTrafficType", description = "Select traffic type. Options: commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic (contains both types)")
-	private SmallScaleCommercialTrafficType usedSmallScaleCommercialTrafficType;
+	private SmallScaleCommercialTrafficSegment usedSmallScaleCommercialTrafficSegment;
 	// generate only one segment or the other, or both.
 
 	@CommandLine.Option(names = "--includeExistingModels", description = "If models for some segments exist they can be included.")
@@ -267,15 +278,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private RandomGenerator rng;
 	// ??
 
-	private final Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
+	private final Map<String, Map<ZoneAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
-	private final Map<SmallScaleCommercialTrafficType, Double> resistanceFactorsPerModelType = new HashMap<>();
+	private final Map<SmallScaleCommercialTrafficSegment, Double> resistanceFactorsPerModelType = new HashMap<>();
 
-	private Map<SmallScaleCommercialTrafficType, EnumeratedDistribution<TourStartAndDuration>> tourDistribution = null;
+	private Map<SmallScaleCommercialTrafficSegment, EnumeratedDistribution<TourStartAndDuration>> tourDistribution = null;
 	private Map<ServiceDurationPerCategoryKey, EnumeratedDistribution<DurationsBounds>> serviceDurationTimeSelector = null;
 
 	private TripDistributionMatrix odMatrix;
-	private Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone;
+	private Map<String, Object2DoubleMap<ZoneAttribute>> attributesByZone;
 	private Map<String, Map<Id<Link>, Link>> linksPerZone;
 
 	private Index indexZones;
@@ -354,7 +365,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 
 		/*
-		 * A carrier part run needs two different output concepts:
+		 * A carrier part ("chunk") run needs two different output concepts:
 		 * - finalOutput points to the shared traffic output folder created by the init step. The shared unsolved carrier
 		 *   file is read from there, and the merge step later writes the complete result there.
 		 * - configOutput points to the isolated part folder. It must be set before readAndCheckConfig initializes the
@@ -391,14 +402,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 			scenario = ScenarioUtils.loadScenario(config);
 
-			resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
+			attributesByZone = readZoneAttributes( pathToZoneAttributes );
 			serviceDurationTimeSelector = commercialTourSpecifications.createStopDurationDistributionPerCategory(rng);
 			tourDistribution = commercialTourSpecifications.createTourDistribution(rng);
 
-			if ((usedSmallScaleCommercialTrafficType == commercialPersonTraffic || usedSmallScaleCommercialTrafficType == completeSmallScaleCommercialTraffic) && resistanceFactor_commercialPersonTraffic == 0.){
+			if ((usedSmallScaleCommercialTrafficSegment == commercialPersonTraffic || usedSmallScaleCommercialTrafficSegment == completeSmallScaleCommercialTraffic) && resistanceFactor_commercialPersonTraffic == 0.){
 				throw new Exception( "You selected commercialPersonTraffic but did not set a resistanceFactor_commercialPersonTraffic. Please set it." );
 			}
-			if ((usedSmallScaleCommercialTrafficType == goodsTraffic || usedSmallScaleCommercialTrafficType == completeSmallScaleCommercialTraffic) && resistanceFactor_goodsTraffic == 0.){
+			if ((usedSmallScaleCommercialTrafficSegment == goodsTraffic || usedSmallScaleCommercialTrafficSegment == completeSmallScaleCommercialTraffic) && resistanceFactor_goodsTraffic == 0.){
 				throw new Exception( "You selected goodsTraffic but did not set a resistanceFactor_goodsTraffic > 0. Please set it." );
 			}
 
@@ -411,6 +422,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			switch ( carriersFileCreationOption ) {
 				case useExistingCarrierFileWithSolution, useExistingCarrierFileWithoutSolution -> {
 					// as stated elsewhere, this should be read as "use...Solution" and "use...ButNotTheSolution"
+
+					// (I _think_ that "existingCarrierFile" means that carriers plus demand are already there, and the KWM does not have to be run.  So the following only starts jsprit.)
 
 					log.info("Existing carriers (including carrier vehicle types) should be set in the freight config group");
 					if (includeExistingModels){
@@ -449,7 +462,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						filterFacilitiesForZones(scenario);
 						linksPerZone = filterLinksForZones(scenario, this.indexZones, facilitiesPerZoneWithProbabilities, shapeFileZoneNameColumn);
 					}
-					if (Objects.requireNonNull( carriersFileCreationOption ) == CreationOption.useExistingCarrierFileWithoutSolution) {
+					if ( carriersFileCreationOption == CreationOption.useExistingCarrierFileWithoutSolution) {
 						// --> the way in which this needs to be read is "use existing carrier file but do not use the solution"
 						CarriersUtils.getCarriers(scenario).getCarriers().values().forEach(CarriersUtils::clearCarrierPlans);
 					} else {
@@ -477,10 +490,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					filterFacilitiesForZones(scenario);
 					prepareConfigForResultingModes(scenario);
 
-					// !!! here cometh the core command ("createCarriersAndDemand")
-					switch (usedSmallScaleCommercialTrafficType) {
+					// ############################################
+					// ############################################
+					// here cometh the core command ("createCarriersAndDemand")
+					switch ( usedSmallScaleCommercialTrafficSegment ) {
 						case commercialPersonTraffic, goodsTraffic -> {
-							createCarriersAndDemand(output, scenario, usedSmallScaleCommercialTrafficType, includeExistingModels, indexZones);
+							createCarriersAndDemand(output, scenario, usedSmallScaleCommercialTrafficSegment, includeExistingModels, indexZones );
 						}
 						case completeSmallScaleCommercialTraffic -> {
 							createCarriersAndDemand(output, scenario, commercialPersonTraffic, includeExistingModels, indexZones);
@@ -488,6 +503,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						}
 						default -> throw new RuntimeException("No traffic type selected.");
 					}
+					// ############################################
+					// ############################################
 					CarriersUtils.writeCarriers(scenario, UNSOLVED_CARRIER_FILE);
 					if (createSmallScaleCommercialCarrierFileOnly) {
 						CarriersUtils.writeCarrierVehicleTypes(scenario, CARRIER_VEHICLE_TYPES_FILE);
@@ -516,7 +533,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			return 0;
 		}
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(scenario,
-			usedSmallScaleCommercialTrafficType, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
+			usedSmallScaleCommercialTrafficSegment, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent );
 
 		if (MATSimIterationsAfterDemandGeneration != null && MATSimIterationsAfterDemandGeneration >= 0) {
 			matsimIterations = new MATSimIterations( MATSimIterationsAfterDemandGeneration, this.sample );
@@ -531,7 +548,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param scenario complete Scenario
 	 */
 	private void filterFacilitiesForZones(Scenario scenario) {
-		Map<String, Map<StructuralAttribute, List<Pair<ActivityFacility, Double>>>> pairsPerZone = new HashMap<>();
+		Map<String, Map<ZoneAttribute, List<Pair<ActivityFacility, Double>>>> pairsPerZone = new HashMap<>();
 
 		scenario.getActivityFacilities().getFacilities().values().forEach(facility -> {
 			Object zoneObj = facility.getAttributes().getAttribute("zone");
@@ -549,16 +566,16 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			facility.getActivityOptions().values().forEach(activityOption -> {
 				String activityType = activityOption.getType();
 				// if the structural attribute is an employee, add the facility to employee and the detailed element
-				if (activityType.contains(StructuralAttribute.EMPLOYEE.getLabel())){
-					pairsPerZone.computeIfAbsent( zone, z -> new HashMap<>() ).computeIfAbsent( StructuralAttribute.EMPLOYEE,
+				if (activityType.contains( ZoneAttribute.EMPLOYEE.getLabel() )){
+					pairsPerZone.computeIfAbsent( zone, z -> new HashMap<>() ).computeIfAbsent( ZoneAttribute.EMPLOYEE,
 						t -> new ArrayList<>() ).add( Pair.create( facility, weight ) );
 				}
-				pairsPerZone.computeIfAbsent(zone, z -> new HashMap<>()).computeIfAbsent(StructuralAttribute.fromLabel(activityType).get(), t -> new ArrayList<>()).add(
-					Pair.create(facility, weight));
+				pairsPerZone.computeIfAbsent(zone, z -> new HashMap<>()).computeIfAbsent( ZoneAttribute.fromLabel(activityType ).get(), t -> new ArrayList<>() ).add(
+					Pair.create(facility, weight) );
 			});
 		});
 		pairsPerZone.forEach((zone, byType) -> {
-			Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>> distByType = facilitiesPerZoneWithProbabilities.computeIfAbsent(zone, z -> new HashMap<>());
+			Map<ZoneAttribute, EnumeratedDistribution<ActivityFacility>> distByType = facilitiesPerZoneWithProbabilities.computeIfAbsent(zone, z -> new HashMap<>() );
 
 			byType.forEach((activityType, pairs) -> {
 				if (!pairs.isEmpty()) {
@@ -705,13 +722,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		log.info("Merged {} small scale commercial carrier parts into {}.", smallScaleCommercialCarrierPartCount, outputCarrierFile);
 	}
 
-	private void createCarriersAndDemand(Path output, Scenario scenario,
-										 SmallScaleCommercialTrafficType smallScaleCommercialTrafficType,
+	private void createCarriersAndDemand(Path outputPath, Scenario scenario,
+										 SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment,
 										 boolean includeExistingModels, Index indexZones) throws Exception {
 		ArrayList<String> modesORvehTypes;
-		if (smallScaleCommercialTrafficType.equals( goodsTraffic )){
+		if ( smallScaleCommercialTrafficSegment.equals( goodsTraffic )){
 			modesORvehTypes = new ArrayList<>( Arrays.asList( "vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5" ) );
-		} else if (smallScaleCommercialTrafficType.equals( commercialPersonTraffic )){
+		} else if ( smallScaleCommercialTrafficSegment.equals( commercialPersonTraffic )){
 			modesORvehTypes = new ArrayList<>( List.of( "total" ) );
 		} else{
 			throw new Exception( "Invalid traffic type selected!" );
@@ -719,14 +736,21 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 //		setInputParameters(smallScaleCommercialTrafficType);
 		// is now done in the TrafficVolumeGeneration constructor below
 
-		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( smallScaleCommercialTrafficType );
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType );
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType );
+		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( smallScaleCommercialTrafficSegment );
+
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
+			attributesByZone, outputPath, sample, modesORvehTypes, smallScaleCommercialTrafficSegment, "start"
+		                                                                                                                                 );
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
+			attributesByZone, outputPath, sample, modesORvehTypes, smallScaleCommercialTrafficSegment, "stop"
+		                                                                                                                                );
+		// at this point we have, per zone, the inbound and outbound volumes
 
 		if (includeExistingModels) {
 			// "models" are functions. Presumably, this means "include existing model results".
 			integrateExistingTrafficToSmallScaleCommercial.readExistingCarriersFromFolder(scenario, sample, indexZones);
-			integrateExistingTrafficToSmallScaleCommercial.reduceDemandBasedOnExistingCarriers(scenario, indexZones, smallScaleCommercialTrafficType,
+			integrateExistingTrafficToSmallScaleCommercial.reduceDemandBasedOnExistingCarriers(scenario, indexZones,
+				smallScaleCommercialTrafficSegment,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 		}
 
@@ -734,8 +758,16 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (linksPerZone == null){
 			linksPerZone = filterLinksForZones( scenario, this.indexZones, facilitiesPerZoneWithProbabilities, shapeFileZoneNameColumn );
 		}
-		odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficType, scenario, output);
-		createCarriers(scenario, smallScaleCommercialTrafficType);
+
+		odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficSegment, scenario, outputPath );
+
+		// at this point, we have OD flows
+
+		createCarriers(scenario, smallScaleCommercialTrafficSegment );
+		// (This does, I think, go through all zones, and generate one carrier per zone to serve all of the outbound OD flows.)
+		// (yy I seem to remember that either the OD flows or the zonal freight volumes were rounded to integers; at this
+		// point, one wonders why that was needed; it would be sensible to have material for multiple destinations in one
+		// truck.)
 	}
 
 	/**
@@ -768,7 +800,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Config config = ConfigUtils.loadConfig(IOUtils.getFileUrl(configPath.toString()), configArgs);
 		if (output == null || output.toString().isEmpty())
 			config.controller().setOutputDirectory(Path.of(config.controller().getOutputDirectory()).resolve(modelName)
-				.resolve(usedSmallScaleCommercialTrafficType.toString() + "_" + sampleName + "pct" + "_"
+				.resolve( usedSmallScaleCommercialTrafficSegment.toString() + "_" + sampleName + "pct" + "_"
 					+ LocalDate.now() + "_" + LocalTime.now().toSecondOfDay() + "_" + resistanceFactorsPerModelType)
 				.toString());
 		else
@@ -827,19 +859,19 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Creates the carriers and the related demand, based on the generated
 	 * TripDistributionMatrix.
 	 * @param scenario Scenario (loaded from your config), where the carriers will be put into
-	 * @param smallScaleCommercialTrafficType Selected traffic types. Options: commercialPersonTraffic, goodsTraffic
+	 * @param smallScaleCommercialTrafficSegment Selected traffic types. Options: commercialPersonTraffic, goodsTraffic
 	 */
-	private void createCarriers(Scenario scenario,
-							   SmallScaleCommercialTrafficType smallScaleCommercialTrafficType) {
+	private void createCarriers(Scenario scenario, SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment ) {
 
-		int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
-			* odMatrix.getListOfModesOrVehTypes().size();
-		int createdCarrier = 0;
+		int maxNumberOfCarriers = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size() * odMatrix.getListOfModesOrVehTypes().size();
+		int nCreatedCarriers = 0;
 		int fixedNumberOfVehiclePerTypeAndLocation = 1; //TODO possible improvement, perhaps check KiD
 
-		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getOrAddCarrierVehicleTypes(scenario);
-		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
+		// carrier vehicle types:
 
+		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getOrAddCarrierVehicleTypes(scenario);
+
+		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
 		// Only a vehicle with cost information will work properly
 		additionalCarrierVehicleTypes.values().stream()
 			.filter(vehicleType -> vehicleType.getCostInformation().getCostsPerSecond() != null)
@@ -849,7 +881,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			CostInformation costInformation = vehicleType.getCostInformation();
 			VehicleUtils.setCostsPerSecondInService(costInformation, costInformation.getCostsPerSecond());
 			VehicleUtils.setCostsPerSecondWaiting(costInformation, costInformation.getCostsPerSecond());
+			// (what is this???)
 		}
+
+		// carriers:
+
 		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 
 		for (Integer purpose : odMatrix.getListOfPurposes()) {
@@ -858,12 +894,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 					// Check if this purpose, startZone, modeORvehType combination is a possiblr starting location (by looking if it has a trip-distribution-entry)
 					boolean isStartingLocation = false;
+
+					// careful, the following is a labeled break!!!
+					// (but is it really needed?  "break" ignores intermediate "if" and so either a simple "break" or a simple "continue" should do what we need.)
 					checkIfIsStartingPosition:
 					{
 						for (String possibleStopZone : odMatrix.getListOfZones()) {
 							if (!modeORvehType.equals("pt") && !modeORvehType.equals("op"))
 								if (odMatrix.getTripDistributionValue(startZone, possibleStopZone, modeORvehType,
-									purpose, smallScaleCommercialTrafficType) != 0) {
+									purpose, smallScaleCommercialTrafficSegment ) != 0) {
 									isStartingLocation = true;
 									break checkIfIsStartingPosition;
 								}
@@ -872,7 +911,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 					if (isStartingLocation) {
 						// Get the vehicle-types and start/stop-categories
-						OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
+						OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose, modeORvehType,
+							smallScaleCommercialTrafficSegment );
 
 						// use only types of the possibleTypes which are in the given types file
 						List<String> vehicleTypes = new ArrayList<>();
@@ -885,24 +925,24 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						}
 						if (vehicleTypes.isEmpty())
 							throw new RuntimeException("The possible vehicle types found for purpose " + purpose + ", modeORvehType "
-								+ modeORvehType + ", smallScaleCommercialTrafficType " + smallScaleCommercialTrafficType +" do not exist in the given vehicle types file. PLease check your input file.");
-						StructuralAttribute selectedStartCategory = getSelectedStartCategory(startZone, odMatrixEntry);
+								+ modeORvehType + ", smallScaleCommercialTrafficType " + smallScaleCommercialTrafficSegment +" do not exist in the given vehicle types file. PLease check your input file.");
+						ZoneAttribute selectedStartCategory = getSelectedStartCategory(startZone, odMatrixEntry );
 
 						// Generate carrierName
 						String carrierName = null;
-						if (smallScaleCommercialTrafficType.equals( goodsTraffic )) {
+						if ( smallScaleCommercialTrafficSegment.equals( goodsTraffic )) {
 							carrierName = "Carrier_Goods_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
-						} else if (smallScaleCommercialTrafficType.equals( commercialPersonTraffic ))
+						} else if ( smallScaleCommercialTrafficSegment.equals( commercialPersonTraffic ))
 							carrierName = "Carrier_Business_" + startZone + "_purpose_" + purpose;
 
 						// Create the Carrier
 						CarrierCapabilities.FleetSize fleetSize = CarrierCapabilities.FleetSize.FINITE;
 						ArrayList<String> vehicleDepots = new ArrayList<>();
-						createdCarrier++;
-						log.info("Create carrier number {} of a maximum Number of {} carriers.", createdCarrier, maxNumberOfCarrier);
+						nCreatedCarriers++;
+						log.info("Create carrier number {} of a maximum Number of {} carriers.", nCreatedCarriers, maxNumberOfCarriers);
 
 						CarrierAttributes carrierAttributes = new CarrierAttributes(purpose, startZone, selectedStartCategory, modeORvehType,
-							smallScaleCommercialTrafficType, vehicleDepots, odMatrixEntry);
+							smallScaleCommercialTrafficSegment, vehicleDepots, odMatrixEntry);
 						if(carrierId2carrierAttributes.putIfAbsent(Id.create(carrierName, Carrier.class), carrierAttributes) != null)
 							throw new RuntimeException("CarrierAttributes already exist for the carrier " + carrierName);
 
@@ -921,7 +961,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			}
 		}
 		log.warn("The jspritIterations are now set to {} in this simulation!", nJspritIterations );
-		log.info("Finished creating {} carriers including related services.", createdCarrier);
+		log.info("Finished creating {} carriers including related services.", nCreatedCarriers);
 	}
 
 	/**
@@ -931,12 +971,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param odMatrixEntry odMatrixEntry
 	 * @return the selected start category
 	 */
-	protected StructuralAttribute getSelectedStartCategory(String startZone, OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry) {
+	protected ZoneAttribute getSelectedStartCategory( String startZone, OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry ) {
 		// Find a start category with existing employees in this zone
-		StructuralAttribute selectedStartCategory = odMatrixEntry.startCategoryDistribution.sample();
+		ZoneAttribute selectedStartCategory = odMatrixEntry.startCategoryDistribution.sample();
 		// we start with count = 1 because the first category is already selected, and if this category has employees, we can use it.
 		// Otherwise, we have to find another category.
-		for (int count = 1; resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) == 0; count++) {
+		for ( int count = 1 ; attributesByZone.get(startZone ).getDouble(selectedStartCategory ) == 0; count++) {
 			if (count < 4)
 				selectedStartCategory = odMatrixEntry.startCategoryDistribution.sample();
 			else {
@@ -945,9 +985,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				// so that it is possible that we have traffic, although we have no employees in the given start category.
 				// That's why we exclude Inhabitants as a possible start category.
 				selectedStartCategory = odMatrixEntry.stopCategoryDistribution.sample();
-				if (selectedStartCategory.equals(StructuralAttribute.INHABITANTS))
+				if (selectedStartCategory.equals( ZoneAttribute.INHABITANTS ))
 					selectedStartCategory = odMatrixEntry.stopCategoryDistribution.sample();
-				if (resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) > 0)
+				if ( attributesByZone.get(startZone ).getDouble(selectedStartCategory ) > 0)
 					log.warn(
 						"No possible start category with employees found for zone {}. Take a random category of the stop categories: {}. The possible start categories are: {}",
 						startZone, selectedStartCategory, odMatrixEntry.startCategoryDistribution.getPmf().toString());
@@ -964,14 +1004,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		int countedServices = 0;
 		for (String stopZone : odMatrix.getListOfZones()) {
 			int trafficVolumeForOD = Math.round((float)odMatrix.getTripDistributionValue(carrierAttributes.startZone,
-				stopZone, carrierAttributes.modeORvehType, carrierAttributes.purpose, carrierAttributes.smallScaleCommercialTrafficType));
+				stopZone, carrierAttributes.modeORvehType, carrierAttributes.purpose, carrierAttributes.smallScaleCommercialTrafficSegment ) );
 			int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / carrierAttributes.odMatrixEntry.occupancyRate);
 			if (numberOfJobs == 0)
 				continue;
 			for (int i = 0; i < numberOfJobs; i++) {
 				// find a category for the tour stop with existing employees in this zone
-				StructuralAttribute selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
-				while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
+				ZoneAttribute selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
+				while ( attributesByZone.get(stopZone ).getDouble(selectedStopCategory ) == 0)
 					selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
 				// additionalTravelBufferPerTourAndIterationInMinutes is only used while resolving carriers with unhandled services.
 				int serviceTimePerStop = getServiceTimePerStop(carrierAttributes);
@@ -991,19 +1031,19 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	Integer getServiceTimePerStop(CarrierAttributes carrierAttributes) {
 		ServiceDurationPerCategoryKey key;
 		// we use the start category for the service time selection because the start category represents the employees
-		if (carrierAttributes.smallScaleCommercialTrafficType().equals( commercialPersonTraffic )) {
+		if (carrierAttributes.smallScaleCommercialTrafficSegment().equals( commercialPersonTraffic )) {
 			if (carrierAttributes.odMatrixEntry().startCategoryDistribution.getPmf().stream()
 				.noneMatch(p -> p.getKey().equals(carrierAttributes.selectedStartCategory())))
-				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.odMatrixEntry.startCategoryDistribution.sample(), null, carrierAttributes.smallScaleCommercialTrafficType());
+				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.odMatrixEntry.startCategoryDistribution.sample(), null, carrierAttributes.smallScaleCommercialTrafficSegment() );
 			else
 				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory, null,
-					carrierAttributes.smallScaleCommercialTrafficType());
+					carrierAttributes.smallScaleCommercialTrafficSegment() );
 		}
-		else if (carrierAttributes.smallScaleCommercialTrafficType().equals( goodsTraffic )) {
+		else if (carrierAttributes.smallScaleCommercialTrafficSegment().equals( goodsTraffic )) {
 			key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory(),
-				carrierAttributes.modeORvehType(), carrierAttributes.smallScaleCommercialTrafficType());
+				carrierAttributes.modeORvehType(), carrierAttributes.smallScaleCommercialTrafficSegment() );
 		} else {
-			throw new RuntimeException("Unknown traffic type: " + carrierAttributes.smallScaleCommercialTrafficType());
+			throw new RuntimeException("Unknown traffic type: " + carrierAttributes.smallScaleCommercialTrafficSegment());
 		}
 			DurationsBounds serviceDurationBounds = serviceDurationTimeSelector.get(key).sample();
 			int serviceDurationLowerBound = serviceDurationBounds.minDuration();
@@ -1014,8 +1054,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Adds a service with the given attributes to the carrier.
 	 */
-	private void createService(Carrier newCarrier, ArrayList<String> noPossibleLinks, StructuralAttribute selectedStopCategory, String stopZone,
-							   Integer serviceTimePerStop, TimeWindow serviceTimeWindow, int i) {
+	private void createService( Carrier newCarrier, ArrayList<String> noPossibleLinks, ZoneAttribute selectedStopCategory, String stopZone,
+	                            Integer serviceTimePerStop, TimeWindow serviceTimeWindow, int i) {
 		Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks);
 		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + (i + 1),
 			CarrierService.class);
@@ -1034,9 +1074,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 													List<String> vehicleTypes, CarrierCapabilities.FleetSize fleetSize,
 													int fixedNumberOfVehiclePerTypeAndLocation) {
 
-		if (carrierAttributes.smallScaleCommercialTrafficType.equals( commercialPersonTraffic ) && carrierAttributes.purpose == 3)
+		if (carrierAttributes.smallScaleCommercialTrafficSegment.equals( commercialPersonTraffic ) && carrierAttributes.purpose == 3)
 			thisCarrier.getAttributes().putAttribute("subpopulation", SubpopulationDefaultNames.SUBPOP_COM_PERSON_SERVICE);
-		else if (carrierAttributes.smallScaleCommercialTrafficType.equals( goodsTraffic ) )
+		else if (carrierAttributes.smallScaleCommercialTrafficSegment.equals( goodsTraffic ) )
 			thisCarrier.getAttributes().putAttribute("subpopulation", SubpopulationDefaultNames.SUBPOP_GOODS);
 		else
 			thisCarrier.getAttributes().putAttribute("subpopulation", SubpopulationDefaultNames.SUBPOP_COM_PERSON);
@@ -1053,8 +1093,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		double sumMaxTourDurationsOfVehicles = 0;
 
 		while (sumMaxTourDurationsOfVehicles <= sumServiceDurationsJobs) {
-			TourStartAndDuration t = tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficType).sample();
-			tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficType).sample(2);
+			TourStartAndDuration t = tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficSegment ).sample();
+			tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficSegment ).sample(2 );
 			int vehicleStartTime = t.getVehicleStartTime(this.rnd);
 			int tourDuration = t.getVehicleTourDuration(this.rnd);
 			int vehicleEndTime = vehicleStartTime + tourDuration;
@@ -1080,7 +1120,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Finds a possible link for a service or the vehicle location.
 	 */
-	Id<Link> findPossibleLink(String zone, StructuralAttribute selectedCategory, List<String> noPossibleLinks) {
+	Id<Link> findPossibleLink( String zone, ZoneAttribute selectedCategory, List<String> noPossibleLinks ) {
 		Id<Link> newLink = null;
 		for (int a = 0; newLink == null && a < facilitiesPerZoneWithProbabilities.get(zone).get(selectedCategory).getPmf().size() * 2; a++) {
 
@@ -1104,7 +1144,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Filters links by used modes and creates Map with all links in each zone
 	 */
 	static Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
-																Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
+																Map<String, Map<ZoneAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
 																String shapeFileZoneNameColumn) {
 		Map<String, Map<Id<Link>, Link>> linksPerZone = new HashMap<>();
 		log.info("Filtering and assign links to zones. This take some time...");
@@ -1134,7 +1174,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> linksPerZone,
 															Index shpZones,
-															Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
+															Map<String, Map<ZoneAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
 															String shapeFileZoneNameColumn) {
 		for (SimpleFeature singleArea : shpZones.getAllFeatures()) {
 			String zoneID = (String) singleArea.getAttribute(shapeFileZoneNameColumn);
@@ -1172,28 +1212,30 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private TripDistributionMatrix createTripDistribution(
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
-		SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, Scenario scenario, Path output)
-		throws Exception {
-
+		SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment, Scenario scenario, Path output )
+		throws Exception
+	{
 		ArrayList<String> listOfZones = new ArrayList<>();
 		trafficVolume_start.forEach((k, v) -> {
 			if (!listOfZones.contains(k.zone()))
 				listOfZones.add(k.zone());
 		});
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-			.newInstance(indexZones, shapeFileZoneNameColumn, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType, listOfZones).build();
+								.newInstance(indexZones, shapeFileZoneNameColumn, trafficVolume_start, trafficVolume_stop,
+				                                        smallScaleCommercialTrafficSegment, listOfZones ).build();
 		Network staticNetworkForODGeneration = readStaticNetworkForResistancePrecompute(scenario);
-		log.info("Create trip distribution for traffic type {} with resistance factor {}.", smallScaleCommercialTrafficType, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType).toString());
-		// Route all zone-pair resistance values on a static network before the OD loop so later matrix work only reads cached values.
-		odMatrix.precomputeResistanceFunctionValues(staticNetworkForODGeneration, linksPerZone, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
-		List<TrafficVolumeKey> trafficVolumeKeys = new ArrayList<>(trafficVolume_start.keySet());
-		List<String> usedModesORvehTypes = trafficVolumeKeys.stream()
-		                                                    .map( TrafficVolumeKey::modeORvehType ).distinct().sorted().toList();
-		List<Integer> usedPurposes = trafficVolume_start.values().stream().flatMap(
-			purposeVolumes -> purposeVolumes.keySet().stream()).distinct().sorted().toList();
+		log.info("Create trip distribution for traffic type {} with resistance factor {}.", smallScaleCommercialTrafficSegment, resistanceFactorsPerModelType.get(
+			smallScaleCommercialTrafficSegment ).toString() );
 
-		Counter ODcounter = new Counter("OD destination slice # ",
-			" of " + usedModesORvehTypes.size() * usedPurposes.size() * listOfZones.size() + " processed.");
+		// Route all zone-pair resistance values on a static network before the OD loop so later matrix work only reads cached values:
+		odMatrix.precomputeResistanceFunctionValues(staticNetworkForODGeneration, linksPerZone, resistanceFactorsPerModelType.get( smallScaleCommercialTrafficSegment ) );
+
+		List<TrafficVolumeKey> trafficVolumeKeys = new ArrayList<>(trafficVolume_start.keySet());
+		List<String> usedModesORvehTypes = trafficVolumeKeys.stream().map( TrafficVolumeKey::modeORvehType ).distinct().sorted().toList();
+		List<Integer> usedPurposes = trafficVolume_start.values().stream().flatMap(purposeVolumes -> purposeVolumes.keySet().stream()).distinct().sorted().toList();
+
+		Counter ODcounter = new Counter("OD destination slice # ", " of " + usedModesORvehTypes.size() * usedPurposes.size() * listOfZones.size() + " processed.");
+
 		for (String modeORvehType : usedModesORvehTypes) {
 			List<TrafficVolumeKey> startKeysForMode = trafficVolumeKeys.stream()
 			                                                           .filter(trafficVolumeKey -> trafficVolumeKey.modeORvehType().equals(modeORvehType))
@@ -1205,20 +1247,20 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					List<TrafficVolumeKey> shuffledStartKeys = new ArrayList<>(startKeysForMode);
 					Collections.shuffle(shuffledStartKeys, rnd);
 					for ( TrafficVolumeKey trafficVolumeKey : shuffledStartKeys) {
-						odMatrix.setTripDistributionValue(trafficVolumeKey.zone(), stopZone, modeORvehType, purpose,
-							smallScaleCommercialTrafficType, staticNetworkForODGeneration, linksPerZone,
-							resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
+						odMatrix.calculateAndSetODFlow(trafficVolumeKey.zone(), stopZone, modeORvehType, purpose,
+							smallScaleCommercialTrafficSegment, staticNetworkForODGeneration, linksPerZone,
+							resistanceFactorsPerModelType.get( smallScaleCommercialTrafficSegment ) );
 					}
 					ODcounter.incCounter();
 				}
 			}
 		}
 		odMatrix.clearRoundingError(rnd);
-		odMatrix.writeODMatrices(output, smallScaleCommercialTrafficType);
+		odMatrix.writeODMatrices(output, smallScaleCommercialTrafficSegment );
 		return odMatrix;
 	}
 
-	public Map<SmallScaleCommercialTrafficType, EnumeratedDistribution<TourStartAndDuration>> getTourDistribution() {
+	public Map<SmallScaleCommercialTrafficSegment, EnumeratedDistribution<TourStartAndDuration>> getTourDistribution() {
 		return tourDistribution;
 	}
 
@@ -1240,10 +1282,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	public double getFactorForTravelBufferCalculation(){
 		return factorForTravelBufferCalculation;
 	}
-	public record ServiceDurationPerCategoryKey(StructuralAttribute employeeCategory, String vehicleType, SmallScaleCommercialTrafficType smallScaleCommercialTrafficType) {}
+	public record ServiceDurationPerCategoryKey(ZoneAttribute employeeCategory, String vehicleType, SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment) {}
 
-	public static ServiceDurationPerCategoryKey makeServiceDurationPerCategoryKey(StructuralAttribute employeeCategory, String vehicleType, SmallScaleCommercialTrafficType smallScaleCommercialTrafficType) {
-		return new ServiceDurationPerCategoryKey(employeeCategory, vehicleType, smallScaleCommercialTrafficType);
+	public static ServiceDurationPerCategoryKey makeServiceDurationPerCategoryKey( ZoneAttribute employeeCategory, String vehicleType, SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment ) {
+		return new ServiceDurationPerCategoryKey(employeeCategory, vehicleType, smallScaleCommercialTrafficSegment );
 	}
 
 	public record TourStartAndDuration(int hourLower, int hourUpper, double minDuration, double maxDuration) {
@@ -1273,11 +1315,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param startZone start zone of this carrier, entry from {@link TripDistributionMatrix#getListOfZones()}
 	 * @param selectedStartCategory start category of this carrier, selected randomly from
 	 * @param modeORvehType entry from {@link TripDistributionMatrix#getListOfModesOrVehTypes()}
-	 * @param smallScaleCommercialTrafficType Entry from {@link SmallScaleCommercialTrafficType} for this carrier
-	 *                                        <i>(NOTE: This value only differs between carriers if {@link SmallScaleCommercialTrafficType#completeSmallScaleCommercialTraffic is selected)</i>
+	 * @param smallScaleCommercialTrafficSegment Entry from {@link SmallScaleCommercialTrafficSegment} for this carrier
+	 *                                        <i>(NOTE: This value only differs between carriers if {@link SmallScaleCommercialTrafficSegment#completeSmallScaleCommercialTraffic is selected)</i>
 	 * @param vehicleDepots Containing the depots of this carrier with linkIds as strings
 	 */
-	public record CarrierAttributes(int purpose, String startZone, StructuralAttribute selectedStartCategory, String modeORvehType,
-									SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, ArrayList<String> vehicleDepots,
-									OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry) {}
+	public record CarrierAttributes(int purpose, String startZone, ZoneAttribute selectedStartCategory, String modeORvehType,
+	                                SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment, ArrayList<String> vehicleDepots,
+	                                OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry) {}
 }

@@ -33,8 +33,8 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.CarriersUtils;
-import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
-import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.TrafficVolumeKey;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreator;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreatorForOSM_Data;
@@ -49,7 +49,7 @@ import java.util.*;
  * @author Ricardo Ewert
  *
  */
-public class TrafficVolumeGenerationTest {
+public class TrafficVolumesGeneratorTest{
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
@@ -57,7 +57,7 @@ public class TrafficVolumeGenerationTest {
 	@Test
 	void testTrafficVolumeGenerationCommercialPersonTraffic() throws IOException {
 
-		Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, Map<ZoneAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
@@ -67,16 +67,16 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
+		Map<ZoneAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
-		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<ZoneAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
 
-		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic;
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.commercialPersonTraffic;
 		double sample = 1.;
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				List.of("total"));
@@ -84,22 +84,24 @@ public class TrafficVolumeGenerationTest {
 //		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 		// is now done in the TrafficVolumeGeneration constructor below
 
-		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( usedTrafficType );
+		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( usedTrafficType );
 
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+		                                                                                                                                 );
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+		                                                                                                                                );
 
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.size());
 
 		for (String zone : resultingDataPerZone.keySet()) {
-			TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey(zone, modesORvehTypes.getFirst());
+			TrafficVolumeKey trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey(zone, modesORvehTypes.getFirst() );
 			Assertions.assertTrue(trafficVolumePerTypeAndZone_start.containsKey(trafficVolumeKey));
 			Assertions.assertTrue(trafficVolumePerTypeAndZone_stop.containsKey(trafficVolumeKey));
 		}
-		TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area1", modesORvehTypes.getFirst());
+		TrafficVolumeKey trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area1", modesORvehTypes.getFirst() );
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(12, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(28, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
@@ -112,7 +114,7 @@ public class TrafficVolumeGenerationTest {
 		Assertions.assertEquals(12, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area2", modesORvehTypes.getFirst());
+		trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area2", modesORvehTypes.getFirst() );
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(21, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(51, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
@@ -125,7 +127,7 @@ public class TrafficVolumeGenerationTest {
 		Assertions.assertEquals(25, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area3", modesORvehTypes.getFirst());
+		trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area3", modesORvehTypes.getFirst() );
 		Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(8, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
@@ -141,15 +143,18 @@ public class TrafficVolumeGenerationTest {
 
 		//test with different sample
 		sample = 0.25;
-		trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
+
+		trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes( resultingDataPerZone,
+			outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+		                                                                                );
+		trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes( resultingDataPerZone,
+			outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+		                                                                               );
 
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.size());
 
-		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area1", modesORvehTypes.getFirst());
+		trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area1", modesORvehTypes.getFirst() );
 		Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(7, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
@@ -162,7 +167,7 @@ public class TrafficVolumeGenerationTest {
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(2, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area2", modesORvehTypes.getFirst());
+		trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area2", modesORvehTypes.getFirst() );
 		Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(5, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(13, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
@@ -175,7 +180,7 @@ public class TrafficVolumeGenerationTest {
 		Assertions.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area3", modesORvehTypes.getFirst());
+		trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area3", modesORvehTypes.getFirst() );
 		Assertions.assertEquals(0, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(2, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
@@ -192,7 +197,7 @@ public class TrafficVolumeGenerationTest {
 	@Test
 	void testTrafficVolumeGenerationGoodsTraffic() throws IOException {
 
-		Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, Map<ZoneAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
@@ -202,15 +207,15 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
+		Map<ZoneAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
-		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<ZoneAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
-		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.goodsTraffic;
 		double sample = 1.;
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
@@ -218,18 +223,21 @@ public class TrafficVolumeGenerationTest {
 //		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 		// is now done in TrafficVolumeGeneration constructor below
 
-		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( usedTrafficType );
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
+		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( usedTrafficType );
+
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+		                                                                                                                                 );
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+		                                                                                                                                );
 
 		Assertions.assertEquals(15, trafficVolumePerTypeAndZone_start.size());
 		Assertions.assertEquals(15, trafficVolumePerTypeAndZone_stop.size());
 
 		for (String zone : resultingDataPerZone.keySet()) {
 			for (String modesORvehType : modesORvehTypes) {
-				TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey(zone, modesORvehType);
+				TrafficVolumeKey trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey(zone, modesORvehType );
 				Assertions.assertTrue(trafficVolumePerTypeAndZone_start.containsKey(trafficVolumeKey));
 				Assertions.assertTrue(trafficVolumePerTypeAndZone_stop.containsKey(trafficVolumeKey));
 			}
@@ -255,7 +263,7 @@ public class TrafficVolumeGenerationTest {
 			double sumStart = 0;
 			double sumStop = 0;
 			for (String modeORvehType : modesORvehTypes) {
-				TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area1", modeORvehType);
+				TrafficVolumeKey trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area1", modeORvehType );
 				sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 				sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 				if (modeORvehType.equals("vehTyp1")) {
@@ -358,7 +366,7 @@ public class TrafficVolumeGenerationTest {
 			double sumStart = 0;
 			double sumStop = 0;
 			for (String modeORvehType : modesORvehTypes) {
-				TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area2", modeORvehType);
+				TrafficVolumeKey trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area2", modeORvehType );
 				sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 				sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 			}
@@ -386,7 +394,7 @@ public class TrafficVolumeGenerationTest {
 			double sumStart = 0;
 			double sumStop = 0;
 			for (String modeORvehType : modesORvehTypes) {
-				TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area3", modeORvehType);
+				TrafficVolumeKey trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area3", modeORvehType );
 				sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 				sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 			}
@@ -505,21 +513,21 @@ public class TrafficVolumeGenerationTest {
 
 	@Test
 	void testReducingDemandAfterAddingExistingScenarios_goods() throws Exception {
-		Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, Map<ZoneAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useOSMBuildingsAndLanduse";
 		String networkPath = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.goodsTraffic;
 		double sample = 1.;
 		String shapeFileZoneNameColumn = "name";
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
+		Map<ZoneAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 
@@ -537,17 +545,20 @@ public class TrafficVolumeGenerationTest {
 
 		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 
-		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<ZoneAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
-		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( usedTrafficType );
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
+		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( usedTrafficType );
+
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+		                                                                                                                                 );
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+		                                                                                                                                );
 
 		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, SCTUtils.getZoneIndex(inputDataDirectory));
 
@@ -574,7 +585,7 @@ public class TrafficVolumeGenerationTest {
 					double sumStart = 0;
 					double sumStop = 0;
 					for (String modeORvehType : modesORvehTypes) {
-						TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area1", modeORvehType);
+						TrafficVolumeKey trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area1", modeORvehType );
 						sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 						sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 						if (modeORvehType.equals("vehTyp3")) {
@@ -617,7 +628,7 @@ public class TrafficVolumeGenerationTest {
 					double sumStart = 0;
 					double sumStop = 0;
 					for (String modeORvehType : modesORvehTypes) {
-						TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area2", modeORvehType);
+						TrafficVolumeKey trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area2", modeORvehType );
 						sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 						sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 					}
@@ -645,7 +656,7 @@ public class TrafficVolumeGenerationTest {
 					double sumStart = 0;
 					double sumStop = 0;
 					for (String modeORvehType : modesORvehTypes) {
-						TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area3", modeORvehType);
+						TrafficVolumeKey trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area3", modeORvehType );
 						sumStart += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(i);
 						sumStop += trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(i);
 						if (modeORvehType.equals("vehTyp3")) {
@@ -671,14 +682,14 @@ public class TrafficVolumeGenerationTest {
 
 	@Test
 	void testReducingDemandAfterAddingExistingScenarios_commercialPersonTraffic() throws Exception {
-		Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, Map<ZoneAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useOSMBuildingsAndLanduse";
 		String networkPath = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic;
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.commercialPersonTraffic;
 		double sample = 1.;
 		String shapeFileZoneNameColumn = "name";
 		String shapeFileBuildingTypeColumn = "type";
@@ -697,21 +708,24 @@ public class TrafficVolumeGenerationTest {
 		// is now done in TrafficVolumeGeneration constructor below
 
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
+		Map<ZoneAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 
-		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<ZoneAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
                         SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
-		final TrafficVolumeGeneration trafficVolumeGeneration = new TrafficVolumeGeneration( usedTrafficType );
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
-		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
+		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( usedTrafficType );
+
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+		                                                                                                                                 );
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+		                                                                                                                                );
 
 		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, SCTUtils.getZoneIndex(inputDataDirectory));
 
@@ -721,7 +735,7 @@ public class TrafficVolumeGenerationTest {
 		//because the reduction of the start volume in zone3 (purpose 2) is higher than the value, a start reduction will be distributed over other zones
 		double sumOfStartOtherAreas = 0;
 
-		TrafficVolumeKey trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area1", modesORvehTypes.getFirst());
+		TrafficVolumeKey trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area1", modesORvehTypes.getFirst() );
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		sumOfStartOtherAreas += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2);
 		Assertions.assertEquals(28, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
@@ -734,7 +748,7 @@ public class TrafficVolumeGenerationTest {
 		Assertions.assertEquals(12, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(6, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area2", modesORvehTypes.getFirst());
+		trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area2", modesORvehTypes.getFirst() );
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		sumOfStartOtherAreas += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2);
 		Assertions.assertEquals(51, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(3), MatsimTestUtils.EPSILON);
@@ -747,7 +761,7 @@ public class TrafficVolumeGenerationTest {
 		Assertions.assertEquals(25, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(4), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(10, trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey).getDouble(5), MatsimTestUtils.EPSILON);
 
-		trafficVolumeKey = TrafficVolumeGeneration.makeTrafficVolumeKey("area3", modesORvehTypes.getFirst());
+		trafficVolumeKey = TrafficVolumesGenerator.makeTrafficVolumeKey("area3", modesORvehTypes.getFirst() );
 		Assertions.assertEquals(1, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(1), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(0, trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2), MatsimTestUtils.EPSILON);
 		sumOfStartOtherAreas += trafficVolumePerTypeAndZone_start.get(trafficVolumeKey).getDouble(2);
@@ -770,7 +784,7 @@ public class TrafficVolumeGenerationTest {
 		String zone = "zone1";
 		String mode = "modeA";
 
-		TrafficVolumeKey newKey = TrafficVolumeGeneration.makeTrafficVolumeKey(zone, mode);
+		TrafficVolumeKey newKey = TrafficVolumesGenerator.makeTrafficVolumeKey(zone, mode );
 
 		Assertions.assertEquals(zone, newKey.zone());
 		Assertions.assertEquals(mode, newKey.modeORvehType());

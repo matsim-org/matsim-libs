@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.getObjectiveFunction;
-import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.makeTrafficVolumeKey;
+import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.makeTrafficVolumeKey;
 
 public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implements IntegrateExistingTrafficToSmallScaleCommercial {
 	private static final Logger log = LogManager.getLogger(DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class);
@@ -40,15 +40,15 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 	 * @param stopZone                          end zone
 	 */
 	protected static void reduceVolumeForThisExistingJobElement(
-		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
-		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop, String modeORvehType,
+		Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
+		Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop, String modeORvehType,
 		Integer purpose, String startZone, String stopZone) {
 
 		if (startZone == null && stopZone == null)
 			throw new IllegalArgumentException();
 
-		TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey_start = makeTrafficVolumeKey(startZone, modeORvehType);
-		TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey_stop = makeTrafficVolumeKey(stopZone, modeORvehType);
+		TrafficVolumesGenerator.TrafficVolumeKey trafficVolumeKey_start = makeTrafficVolumeKey(startZone, modeORvehType );
+		TrafficVolumesGenerator.TrafficVolumeKey trafficVolumeKey_stop = makeTrafficVolumeKey(stopZone, modeORvehType );
 		Object2DoubleMap<Integer> startVolume = trafficVolumePerTypeAndZone_start.get(trafficVolumeKey_start);
 		Object2DoubleMap<Integer> stopVolume = trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey_stop);
 
@@ -76,12 +76,12 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 	 * @param originalZone                zone with volume of 0, although a volume of an existing model exists
 	 */
 	private static void reduceVolumeForOtherArea(
-		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone, String modeORvehType,
+		Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone, String modeORvehType,
 		Integer purpose, String volumeType, String originalZone) {
-		ArrayList<TrafficVolumeGeneration.TrafficVolumeKey> shuffledKeys = new ArrayList<>(
+		ArrayList<TrafficVolumesGenerator.TrafficVolumeKey> shuffledKeys = new ArrayList<>(
 			trafficVolumePerTypeAndZone.keySet());
 		Collections.shuffle(shuffledKeys, MatsimRandom.getRandom());
-		for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : shuffledKeys) {
+		for ( TrafficVolumesGenerator.TrafficVolumeKey trafficVolumeKey : shuffledKeys) {
 			if (trafficVolumeKey.modeORvehType().equals(modeORvehType)
 				&& trafficVolumePerTypeAndZone.get(trafficVolumeKey).getDouble(purpose) > 0) {
 				trafficVolumePerTypeAndZone.get(trafficVolumeKey).mergeDouble(purpose, -1, Double::sum);
@@ -336,15 +336,15 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 
 	@Override
 	public void reduceDemandBasedOnExistingCarriers(Scenario scenario, ShpOptions.Index indexZones,
-													GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType,
-													Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
-													Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
+													GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment,
+													Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
+													Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop ) {
 		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
 			if (!carrier.getAttributes().getAsMap().containsKey("subpopulation")
-				|| !carrier.getAttributes().getAttribute("subpopulation").equals(smallScaleCommercialTrafficType.toString()))
+				|| !carrier.getAttributes().getAttribute("subpopulation").equals( smallScaleCommercialTrafficSegment.toString() ))
 				continue;
 			String modeORvehType;
-			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic))
+			if ( smallScaleCommercialTrafficSegment.equals( GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.goodsTraffic ))
 				modeORvehType = (String) carrier.getAttributes().getAttribute("vehicleType");
 			else
 				modeORvehType = "total";
