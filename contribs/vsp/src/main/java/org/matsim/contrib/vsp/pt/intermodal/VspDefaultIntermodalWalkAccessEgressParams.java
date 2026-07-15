@@ -20,6 +20,7 @@ public class VspDefaultIntermodalWalkAccessEgressParams {
 		deleteExistingWalkIntermodalAccessEgressParams(srrConfig, paramsToDelete);
 
 //		add walk as access egress mode to pt
+//		the following values are used in the matsim-lausitz scenario. GL and SM discussed and set them.
 		SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet accessEgressWalkParam = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
 		accessEgressWalkParam.setMode(TransportMode.walk);
 //			initial radius for pt stop search
