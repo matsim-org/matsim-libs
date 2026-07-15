@@ -22,6 +22,10 @@ package ch.sbb.matsim.config;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -79,4 +83,41 @@ public class SBBTransitConfigGroup extends ReflectiveConfigGroup {
                 "\t\t\t\t\"useful for visualization or analysis purposes. Defaults to 0. `0' disables the creation of events completely.");
         return comments;
     }
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		Set<String> deterministicModes = ConfigUtils.addOrGetModule(config, SBBTransitConfigGroup.class).getDeterministicServiceModes();
+			if (deterministicModes == null || deterministicModes.isEmpty()) {
+				return;
+			}
+			if (!"hermes".equals(config.controller().getMobsim())) {
+				Set<String> passengerModes = config.transit().getTransitModes();
+				Set<String> commonModes = new HashSet<>(deterministicModes);
+				commonModes.retainAll(passengerModes);
+				if (!commonModes.isEmpty()) {
+					throw new RuntimeException(
+						"There are modes configured to be pt passenger modes as well as deterministic service modes. This will not work! common modes = "
+							+ CollectionUtils.setToString(commonModes));
+				}
+				Set<String> mainModes = switch (config.controller().getMobsim()) {
+					case "qsim" -> new HashSet<>(config.qsim().getMainModes());
+					case "dsim" -> new HashSet<>(config.dsim().getNetworkModes());
+					case "hermes" -> new HashSet<>();
+					default -> throw new RuntimeException("Unknown mobsim: " + config.controller().getMobsim());
+				};
+				mainModes.retainAll(deterministicModes);
+				if (!mainModes.isEmpty()) {
+					throw new RuntimeException(
+						"There are modes configured to be deterministic service modes as well as qsim main modes. This will not work! common modes = "
+							+ CollectionUtils.setToString(mainModes));
+				}
+			}
+			else  {
+				LogManager.getLogger(SBBTransitConfigGroup.class).warn("Deterministic PT for Hermes needs to be set in the hermes config group." +
+					" Enabling it via the SBB Transit Config Group does not have an effect.");
+			}
+
+	}
 }
