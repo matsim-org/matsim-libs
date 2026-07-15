@@ -183,9 +183,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.0";
 //		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.01";
 //		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.1";
-		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.2";
+//		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.2";
 //		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-in-qsim-pce-0.3";
-//		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-teleported";
+		final String policyDir="D:/runs-svn/matsim-berlin/v6.4_bike_network_study/output-berlin-v6.4-3pct-bike-teleported";
 		// ===
 
 		String outputFile;
@@ -591,11 +591,12 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //			joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
 //			joinedTable = joinedTable.dropWhere( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "drt" ) ) ;
 //			bike users base
-		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString(bike));
+//		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString(bike));
+		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString(car));
 
 		Table copyOfJoinedTable = Table.create( joinedTable.columns() );
 
-//		bike remainers
+//		bike/car remainers
 		joinedTable = joinedTable.where(joinedTable.stringColumn(MODE_SEQ).isEqualTo(joinedTable.stringColumn(keyTwoOf(MODE_SEQ))));
 
 		{
