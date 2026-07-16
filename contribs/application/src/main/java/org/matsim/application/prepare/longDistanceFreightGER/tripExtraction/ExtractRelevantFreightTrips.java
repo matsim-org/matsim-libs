@@ -14,10 +14,11 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.contrib.common.conventions.vsp.SubpopulationDefaultNames;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -40,6 +41,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Extracts relevant freight trips from an input population.
+ * <p>
+ * Boundary cutting is intentionally implemented only for selected plans with exactly one trip. Plans with more than one
+ * trip are copied unchanged, because splitting them would create independent agents and can therefore distort
+ * vehicle-cost scoring. This keeps the original single-trip extraction logic small while making the unsupported
+ * multi-trip case explicit.
+ */
 @CommandLine.Command(name = "extract-freight-trips", description = "Extract subset of freight trips from whole population", showDefaultValues = true)
 public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	// This script will extract the relevant freight trips within the given shape
@@ -101,7 +110,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	@CommandLine.Option(names = "--legMode", description = "Set leg mode for long distance freight legs.", defaultValue = "car")
 	private String legMode;
 
-	@CommandLine.Option(names = "--subpopulation", description = "Set subpopulation for the extracted freight trips", defaultValue = SubpopulationDefaultNames.SUBPOP_LONG_DISTANCE_FREIGHT)
+	@CommandLine.Option(names = "--subpopulation", description = "Set subpopulation for the extracted freight trips. If not set, the input plans' subpopulation is kept if present.")
 	private String subpopulation;
 
 	public static void main(String[] args) {
@@ -166,6 +175,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 		// Create modified population
 		int generated = 0;
 		int processed = 0;
+		int multiTripPlansCopiedWithoutCut = 0;
 		log.info("Start creating the modified plans: there are in total {} persons to be processed",
 				originalPlans.getPersons().size());
 
@@ -176,9 +186,20 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				log.info("Processing: {} persons of {} persons have been processed", processed, originalPlans.getPersons().size());
 			}
 
+			List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(person.getSelectedPlan());
+			if (trips.size() > 1) {
+				copyMultiTripPlanWithoutBoundaryCut(person, outputPlans, populationFactory);
+				generated += 1;
+				multiTripPlansCopiedWithoutCut += 1;
+				continue;
+			}
+			if (trips.isEmpty()) {
+				continue;
+			}
+
 			Plan plan = person.getSelectedPlan();
-			// By default, the plan of each freight person consist of only 3 elements:
-			// startAct, leg, endAct
+			// By default, the plan of each freight person consists of only 3 elements:
+			// startAct, leg, endAct. Multi-trip plans are handled above and are not cut.
 			Activity startActivity = (Activity) plan.getPlanElements().get(0);
 			Activity endActivity = (Activity) plan.getPlanElements().get(2);
 			ResolvedActivityLocation startLocation = resolveActivityLocation(startActivity, longDistanceNetwork, scenarioNetwork, legMode);
@@ -228,14 +249,15 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				default -> throw new IllegalStateException("Unexpected value: " + geographicalTripType);
 			}
 
-			// Add new freight person to the output plans if trips is relevant
+			// Add new freight person to the output plans if trip is relevant.
 			if (geographicalTripTypeAttribute != null && act0.getCoord() != null && act1.getCoord() != null && departureTime < 86400) {
 				// The output start activity is newly created, so copy the original trip's start time.
 				act0.setEndTime(departureTime);
-				Person freightPerson = populationFactory.createPerson(Id.create("freight_" + generated, Person.class));
+				Person freightPerson = populationFactory.createPerson(createOutputPersonId(person, outputPlans));
 				person.getAttributes().getAsMap().forEach(freightPerson.getAttributes()::putAttribute);
 				freightPerson.getAttributes().putAttribute(GEOGRAPHICAL_TRIP_TYPE, geographicalTripTypeAttribute);
-				freightPerson.getAttributes().putAttribute("subpopulation", subpopulation);
+				if (subpopulation != null)
+					PopulationUtils.putSubpopulation(freightPerson, subpopulation);
 				Plan freightPersonPlan = populationFactory.createPlan();
 				freightPersonPlan.addActivity(act0);
 				freightPersonPlan.addLeg(leg);
@@ -244,6 +266,11 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				outputPlans.addPerson(freightPerson);
 				generated += 1;
 			}
+		}
+
+		if (multiTripPlansCopiedWithoutCut > 0) {
+			log.warn("Copied {} multi-trip freight plans unchanged because tour-preserving boundary cutting is not implemented yet.",
+				multiTripPlansCopiedWithoutCut);
 		}
 
 		if (crs.getTargetCRS() != null)
@@ -266,6 +293,38 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 		return 0;
 	}
 
+	/**
+	 * Copies a multi-trip plan as a complete selected tour without changing plan or person attributes. This keeps one
+	 * original vehicle tour as one scoring agent until tour-preserving boundary cutting is implemented.
+	 */
+	private void copyMultiTripPlanWithoutBoundaryCut(Person inputPerson, Population outputPlans,
+													 PopulationFactory populationFactory) {
+		Person freightPerson = populationFactory.createPerson(createOutputPersonId(inputPerson, outputPlans));
+		inputPerson.getAttributes().getAsMap().forEach(freightPerson.getAttributes()::putAttribute);
+
+		Plan copiedPlan = populationFactory.createPlan();
+		PopulationUtils.copyFromTo(inputPerson.getSelectedPlan(), copiedPlan);
+		freightPerson.addPlan(copiedPlan);
+		outputPlans.addPerson(freightPerson);
+	}
+
+	/**
+	 * Creates a stable output person id derived from the input person id. The original id is kept unless it already
+	 * exists in the output population.
+	 */
+	private static Id<Person> createOutputPersonId(Person inputPerson, Population outputPlans) {
+		String inputPersonId = inputPerson.getId().toString();
+		if (!outputPlans.getPersons().containsKey(Id.createPersonId(inputPersonId))) {
+			return Id.createPersonId(inputPersonId);
+		}
+
+		int duplicateIndex = 1;
+		while (outputPlans.getPersons().containsKey(Id.createPersonId(inputPersonId + "_" + duplicateIndex))) {
+			duplicateIndex++;
+		}
+		return Id.createPersonId(inputPersonId + "_" + duplicateIndex);
+	}
+
 	private static void createOutput_tripOD_relations(String freightTripTsvPath, Population outputPopulation) throws IOException{
 		// this was now copied from GenerateFreightPlans which was moved to matsim-germany.  Could be organized in a better way if desired; as
 		// a quick fix e.g. use the static method from here inside matsim-germany.
@@ -273,12 +332,14 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 		CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(freightTripTsvPath), CSVFormat.TDF);
 		tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
 		for (Person person : outputPopulation.getPersons().values()) {
-			List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-			Activity act0 = (Activity) planElements.get(0);
-			Activity act1 = (Activity) planElements.get(2);
-			Coord fromCoord = act0.getCoord();
-			Coord toCoord = act1.getCoord();
-			tsvWriter.printRecord(person.getId().toString(), fromCoord.getX(), fromCoord.getY(), toCoord.getX(), toCoord.getY());
+			List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(person.getSelectedPlan());
+			for (int i = 0; i < trips.size(); i++) {
+				TripStructureUtils.Trip trip = trips.get(i);
+				Coord fromCoord = trip.getOriginActivity().getCoord();
+				Coord toCoord = trip.getDestinationActivity().getCoord();
+				String tripId = trips.size() == 1 ? person.getId().toString() : person.getId() + "_trip" + (i + 1);
+				tsvWriter.printRecord(tripId, fromCoord.getX(), fromCoord.getY(), toCoord.getX(), toCoord.getY());
+			}
 		}
 		tsvWriter.close();
 	}
