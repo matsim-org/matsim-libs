@@ -81,4 +81,5 @@ public class EmissionsDashboard implements Dashboard {
 		// TODO: emissions by vehicle type
 
 	}
+
 }
