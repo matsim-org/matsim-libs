@@ -54,7 +54,7 @@ import java.util.Set;
  * which this class matches against {@code "service"} after stripping the
  * {@code "highway."} prefix.
  *
- * @author smetzler
+ * @author smetzler, esarikaya
  */
 public final class ServiceLinkCleaner {
 
@@ -113,10 +113,10 @@ public final class ServiceLinkCleaner {
 
 	// ----------------------------------------------------------------------
 
-	private boolean isService(Link l) {
-		Object t = l.getAttributes().getAttribute(typeAttribute);
-		if (t == null) return false;
-		String s = t.toString().replaceFirst("^highway\\.", "");
+	private boolean isService(Link link) {
+		Object type = link.getAttributes().getAttribute(typeAttribute);
+		if (type == null) return false;
+		String s = type.toString().replaceFirst("^highway\\.", "");
 		return serviceValue.equals(s);
 	}
 

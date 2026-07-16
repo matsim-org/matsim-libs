@@ -50,9 +50,9 @@ package org.matsim.contrib.bicycle.network;
  * {@link BicycleCountryProfileGermany} or {@link BicycleCountryProfileAustria}
  * as a template). This generic profile is a sensible default but not optimal.
  *
- * @author smetzler
+ * @author smetzler, esarikaya
  */
-public final class BicycleCountryProfileGeneric implements BicycleCountryProfile {
+public final class BicycleCountryProfileGeneric extends BicycleCountryProfile {
 
 	@Override
 	public boolean isRightHandTraffic() {

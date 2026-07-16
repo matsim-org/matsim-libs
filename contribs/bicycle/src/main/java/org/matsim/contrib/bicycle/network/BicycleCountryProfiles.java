@@ -37,15 +37,12 @@ import java.util.Locale;
  * so users running on countries without a dedicated profile have a clear
  * path forward instead of a silent surprise.
  *
- * @author smetzler
+ * @author smetzler, esarikaya
  */
 public final class BicycleCountryProfiles {
 
 	/** All supported codes, in the order shown to users in error messages. */
 	public static final List<String> SUPPORTED_CODES = List.of("de", "at", "generic");
-
-	private BicycleCountryProfiles() {
-	}
 
 	/**
 	 * @param code one of {@link #SUPPORTED_CODES}; case-insensitive

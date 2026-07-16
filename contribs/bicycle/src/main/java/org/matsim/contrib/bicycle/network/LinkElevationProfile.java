@@ -54,7 +54,7 @@ import java.util.Deque;
  * with the per-node elevation attribute and means those endpoints are never
  * removed by DP.
  *
- * @author smetzler
+ * @author smetzler, esarikaya
  */
 public final class LinkElevationProfile {
 
@@ -111,7 +111,7 @@ public final class LinkElevationProfile {
 		if (to.hasZ()) heights[numSamples - 1] = to.getZ();
 
 		// Apply Douglas-Peucker on (distance, height). Endpoints are always kept.
-		boolean[] keep = douglasPeucker(distances, heights, noiseToleranceM);
+		boolean[] keep = computeDouglasPeucker(distances, heights, noiseToleranceM);
 
 		return computeMetrics(distances, heights, keep, length);
 	}
@@ -123,7 +123,7 @@ public final class LinkElevationProfile {
 	 * Iterative rather than recursive to avoid stack overflow on very long links
 	 * with many samples.
 	 */
-	static boolean[] douglasPeucker(double[] distances, double[] heights, double tolerance) {
+	static boolean[] computeDouglasPeucker(double[] distances, double[] heights, double tolerance) {
 		int n = distances.length;
 		boolean[] keep = new boolean[n];
 		if (n <= 2) {

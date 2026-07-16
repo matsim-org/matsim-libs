@@ -48,7 +48,7 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
  * zero capacity — this is easier for downstream simplifiers than physically
  * removing it.
  *
- * @author smetzler
+ * @author smetzler, esarikaya
  */
 public final class BicycleLinkPolicy {
 
@@ -97,8 +97,8 @@ public final class BicycleLinkPolicy {
 	// ------------------------------------------------------------------------
 
 	private static void enforceFootwayPedestrianWhitelist(Link link, Map<String, String> tags) {
-		String h = tags.get(HIGHWAY);
-		if (!(HW_FOOTWAY.equals(h) || HW_PEDESTRIAN.equals(h))) return;
+		String highway = tags.get(HIGHWAY);
+		if (!(HW_FOOTWAY.equals(highway) || HW_PEDESTRIAN.equals(highway))) return;
 
 		String bicycle = tags.get(BICYCLE);
 		boolean ok = YES.equals(bicycle) || DESIGNATED.equals(bicycle); // this is fine for now, but we might want to keep bicycle=permissive =dismount as well
@@ -119,12 +119,12 @@ public final class BicycleLinkPolicy {
 	}
 
 	private static boolean isBicycleOnewayRelevant(Map<String, String> tags) {
-		String h = tags.get(HIGHWAY);
-		boolean relevant = HW_PATH.equals(h) || HW_CYCLEWAY.equals(h) || HW_FOOTWAY.equals(h);
+		String highway = tags.get(HIGHWAY);
+		boolean relevant = HW_PATH.equals(highway) || HW_CYCLEWAY.equals(highway) || HW_FOOTWAY.equals(highway);
 		if (!relevant) return false;
 
-		if (YES.equals(tags.get(ONEWAY_BICYCLE))) return true;
-		if (YES.equals(tags.get(ONEWAY))) {
+		if (tags.get(ONEWAY_BICYCLE).equals(YES)) return true;
+		if (tags.get(ONEWAY).equals(YES)) {
 			return !NO.equals(tags.get(ONEWAY_BICYCLE));
 		}
 		return false;

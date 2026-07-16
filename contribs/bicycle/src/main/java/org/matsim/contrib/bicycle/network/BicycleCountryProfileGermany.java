@@ -33,9 +33,9 @@ package org.matsim.contrib.bicycle.network;
  * {@code "DE:1244"} would match a {@code "DE:244"} probe, but no such
  * sign exists in the catalogue).
  *
- * @author smetzler
+ * @author smetzler, esarikaya
  */
-public final class BicycleCountryProfileGermany implements BicycleCountryProfile {
+public final class BicycleCountryProfileGermany extends BicycleCountryProfile {
 
 	@Override
 	public boolean isRightHandTraffic() {

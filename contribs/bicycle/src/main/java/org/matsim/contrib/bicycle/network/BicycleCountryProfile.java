@@ -49,9 +49,9 @@ package org.matsim.contrib.bicycle.network;
  * {@code "DE:244,1020-30"}, {@code "DE:245,1022-10"}). Implementations
  * should match accordingly with {@code contains} / {@code startsWith}.
  *
- * @author smetzler
+ * @author smetzler, esarikaya
  */
-public interface BicycleCountryProfile {
+public abstract class BicycleCountryProfile {
 
 	// ------------------------------------------------------------------------
 	// Driving direction
@@ -63,21 +63,21 @@ public interface BicycleCountryProfile {
 	 * {@code cycleway:left} = "against direction of travel"; left-hand traffic
 	 * (UK, IE, …) flips that.
 	 */
-	boolean isRightHandTraffic();
+	abstract boolean isRightHandTraffic();
 
 	// ------------------------------------------------------------------------
 	// Bicycle road
 	// ------------------------------------------------------------------------
 
 	/** Sign declaring a bicycle road (DE: Fahrradstraße — DE:244). */
-	boolean isBicycleRoadSign(String trafficSign);
+	abstract boolean isBicycleRoadSign(String trafficSign);
 
 	/**
 	 * Additional sign upgrading a bicycle road to "vehicle traffic allowed as
 	 * destination only" (DE: "Kfz frei" / "Anlieger frei" — subsign 1020-30
 	 * plus textual variants).
 	 */
-	boolean isBicycleRoadVehicleDestinationSign(String trafficSign);
+	abstract boolean isBicycleRoadVehicleDestinationSign(String trafficSign);
 
 	// ------------------------------------------------------------------------
 	// Cycleway / shared paths
@@ -88,16 +88,16 @@ public interface BicycleCountryProfile {
 	 * the separated-cycleway rule to upgrade ambiguous highway types when
 	 * the sign is present.
 	 */
-	boolean isProtectedCyclewaySign(String trafficSign);
+	abstract boolean isProtectedCyclewaySign(String trafficSign);
 
 	/** Sign declaring a shared foot+bike path (DE: "Gemeinsamer Geh-/Radweg" — DE:240). */
-	boolean isSharedFootCyclewaySign(String trafficSign);
+	abstract boolean isSharedFootCyclewaySign(String trafficSign);
 
 	/** Sign declaring a segregated foot+bike path (DE: "Getrennter Geh-/Radweg" — DE:241). */
-	boolean isSegregatedFootCyclewaySign(String trafficSign);
+	abstract boolean isSegregatedFootCyclewaySign(String trafficSign);
 
 	/** Subsign declaring "bicycles allowed on this footway" (DE: 1022-10 — "Fahrrad frei"). */
-	boolean isFootwayBicycleAllowedSign(String trafficSign);
+	abstract boolean isFootwayBicycleAllowedSign(String trafficSign);
 
 	// ------------------------------------------------------------------------
 	// Shared bus lanes
@@ -107,11 +107,11 @@ public interface BicycleCountryProfile {
 	 * Sign declaring a bus lane that explicitly permits bicycles
 	 * (DE: Bussonderfahrstreifen + Fahrrad-frei subsign — DE:245 + 1022-10/14).
 	 */
-	boolean isSharedBusLaneBusWithBikeSign(String trafficSign);
+	abstract boolean isSharedBusLaneBusWithBikeSign(String trafficSign);
 
 	/**
 	 * Sign declaring a cycleway that explicitly permits buses
 	 * (DE: Radweg + Bus-frei / Linienverkehr-frei subsign — DE:237 + 1024-14/1026-32).
 	 */
-	boolean isSharedBusLaneBikeWithBusSign(String trafficSign);
+	abstract boolean isSharedBusLaneBikeWithBusSign(String trafficSign);
 }

@@ -48,7 +48,7 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
  * left-hand profile lands; flipping the boolean alone would not produce
  * correct results.
  *
- * @author smetzler
+ * @author smetzler, esarikaya
  */
 public final class BicycleInfraClassifier {
 

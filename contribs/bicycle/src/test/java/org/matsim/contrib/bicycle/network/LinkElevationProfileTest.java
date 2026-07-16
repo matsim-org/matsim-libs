@@ -134,7 +134,7 @@ public class LinkElevationProfileTest {
 	// =========================================================================
 
 	@Test
-	void douglasPeucker_dropsSubToleranceSpike() {
+	void computeDouglasPeucker_dropsSubToleranceSpike() {
 		// 100 m link, otherwise flat at z = 50, but a tiny spike at the middle
 		// well below tolerance (TOLERANCE = 0.5 m, spike = 0.2 m)
 		Link link = createLink(0, 0, 100);
@@ -153,7 +153,7 @@ public class LinkElevationProfileTest {
 	}
 
 	@Test
-	void douglasPeucker_keepsAboveToleranceHill() {
+	void computeDouglasPeucker_keepsAboveToleranceHill() {
 		// Same link, but the hill in the middle is 5 m -- well above the 0.5 m
 		// DP tolerance, so it must be kept.
 		Link link = createLink(0, 0, 100);
