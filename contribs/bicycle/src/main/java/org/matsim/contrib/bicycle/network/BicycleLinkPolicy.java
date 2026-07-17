@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.matsim.contrib.bicycle.network.BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
 
 /**
@@ -38,7 +39,8 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
  * <ol>
  *   <li>optionally copies selected raw OSM tags onto the link (via {@link TagCopy}),</li>
  *   <li>classifies the link's cycling infrastructure with {@link BicycleInfraClassifier}
- *       and writes it to the link attribute {@code bicycle_infra},</li>
+ *       and writes it to the link attribute
+ *       {@link BicycleNetworkPipeline#LINK_ATTR_BICYCLE_INFRA},</li>
  *   <li>enforces footway/pedestrian whitelist: bike is only allowed when the OSM
  *       tags explicitly permit it,</li>
  *   <li>kills links tagged {@code bicycle=no},</li>
@@ -69,7 +71,7 @@ public final class BicycleLinkPolicy {
 
 		// 1. classify cycling infrastructure
 		BicycleInfraCategory infra = classifier.classify(tags, direction);
-		link.getAttributes().putAttribute("bicycle_infra", infra.name());
+		link.getAttributes().putAttribute(LINK_ATTR_BICYCLE_INFRA, infra.name());
 
 		// 2. footway/pedestrian whitelist — kills the link if bike isn't explicitly allowed
 		enforceFootwayPedestrianWhitelist(link, tags);
