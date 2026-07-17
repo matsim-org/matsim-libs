@@ -49,6 +49,9 @@ public class MultiModalControlerListener implements StartupListener {
             throw new RuntimeException("Filtering analyzed modes is NOT enabled in the TravelTimeCalculatorConfigGroup. " +
                     "It must be enabled since otherwise also link travel times of multi-modal legs would be " +
                     "taken into account!");
+			// (yy I think this is tested since otherwise the "multimodal" uncongested modes might be included into the averaging.
+			// However, am not sure if this is still testing for the right thing; presumably, one should first test if separateModes
+			// is false. kai, jun'26)
         }
 	}
 

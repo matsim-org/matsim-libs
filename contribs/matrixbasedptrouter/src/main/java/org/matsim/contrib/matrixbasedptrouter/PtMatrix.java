@@ -39,6 +39,7 @@ import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -317,6 +318,11 @@ public final class PtMatrix {
 						getTotalTravelTime_seconds(fromNode.getCoord(), toNode.getCoord()),
 						constPt + (ptTotalWalkTime_h * betaWalkTT) + (ptTravelTime_h * betaPtTT) + (ptTotalWalkDistance_meter * betaWalkTD) + (ptTravelDistance_meter * betaPtTD)
 				);
+			}
+
+			@Override
+			public void setNoPathBehavior(LeastCostPathUtils.NoPathBehavior behavior) {
+
 			}
 		};
 	}

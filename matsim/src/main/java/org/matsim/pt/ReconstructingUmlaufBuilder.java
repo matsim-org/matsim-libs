@@ -20,8 +20,6 @@
 package org.matsim.pt;
 
 import com.google.inject.Inject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.Gbl;
@@ -46,7 +44,6 @@ import java.util.Map;
  * @author (of documentation) kai
  */
 public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
-	private static final Logger log = LogManager.getLogger(ReconstructingUmlaufBuilder.class);
 
 	private static final Comparator<UmlaufStueck> departureTimeComparator = Comparator.comparingDouble(o -> o.getDeparture().getDepartureTime());
 
@@ -77,7 +74,7 @@ public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	}
 
 	/**
-	 * (connect multiple umlautStuecke to one umlauf.  will do anything interesting only if same vehicle is shared across multiple departures.  vehicle
+	 * (connect multiple umlautStuecke to one umlauf.  will do anything interesting only if same vehicle is shared across multiple departures. vehicle
 	 * id can be set for departures in transit schedule.  but usually isn't)
 	 */
 	private void createUmlaeufe() {
@@ -120,7 +117,6 @@ public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	 */
 	private void createUmlaufStuecke() {
 		this.umlaufStuecke = new ArrayList<>();
-		log.info("Generating rotation segments");
 		for (TransitLine line : transitLines) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				Gbl.assertNotNull(route.getRoute()); // will fail much later if this is null.  kai, may'17
@@ -130,7 +126,6 @@ public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 				}
 			}
 		}
-		log.info("Finished generating rotation segments");
 		this.umlaufStuecke.sort(departureTimeComparator);
 	}
 }

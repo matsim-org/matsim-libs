@@ -35,20 +35,20 @@ public class OsmBicycleReaderTest {
 		final String restrictions = "restrictions-value";
 
 		List<OsmTag> tags = Arrays.asList(
-			new Tag(OsmTags.SURFACE, surface),
-			new Tag(OsmTags.SMOOTHNESS, smoothness),
-			new Tag(OsmTags.CYCLEWAY, cycleway),
-			new Tag(OsmTags.BICYCLE, restrictions),
-			new Tag(OsmTags.HIGHWAY, OsmTags.RESIDENTIAL));
+				new Tag(OsmTags.SURFACE, surface),
+				new Tag(OsmTags.SMOOTHNESS, smoothness),
+				new Tag(OsmTags.CYCLEWAY, cycleway),
+				new Tag(OsmTags.BICYCLE, restrictions),
+				new Tag(OsmTags.HIGHWAY, OsmTags.RESIDENTIAL));
 		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		Network network = new OsmBicycleReader.Builder()
-			.setCoordinateTransformation(Utils.transformation)
-			.build()
-			.read(file);
+				.setCoordinateTransformation(Utils.transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -65,16 +65,16 @@ public class OsmBicycleReaderTest {
 	void test_singleLinkPrimaryWithSurfaceAsphalt() {
 
 		List<OsmTag> tags = Collections.singletonList(
-			new Tag(OsmTags.HIGHWAY, OsmTags.PRIMARY));
+				new Tag(OsmTags.HIGHWAY, OsmTags.PRIMARY));
 		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		Network network = new OsmBicycleReader.Builder()
-			.setCoordinateTransformation(Utils.transformation)
-			.build()
-			.read(file);
+				.setCoordinateTransformation(Utils.transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -88,16 +88,16 @@ public class OsmBicycleReaderTest {
 	void test_singleLinkWithBicycleNotAllowed() {
 
 		List<OsmTag> tags = Collections.singletonList(
-			new Tag(OsmTags.HIGHWAY, OsmTags.MOTORWAY));
+				new Tag(OsmTags.HIGHWAY, OsmTags.MOTORWAY));
 		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		Network network = new OsmBicycleReader.Builder()
-			.setCoordinateTransformation(Utils.transformation)
-			.build()
-			.read(file);
+				.setCoordinateTransformation(Utils.transformation)
+				.build()
+				.read(file);
 
 		assertEquals(1, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -111,18 +111,17 @@ public class OsmBicycleReaderTest {
 	@Test
 	void test_singleLinkWithOnlyBicycleAllowed() {
 
-		List<OsmTag> tags = Arrays.asList(
-			new Tag(OsmTags.HIGHWAY, OsmTags.PEDESTRIAN),
-			new Tag(OsmTags.BICYCLE, "yes"));
+		List<OsmTag> tags = Collections.singletonList(
+				new Tag(OsmTags.HIGHWAY, OsmTags.PEDESTRIAN));
 		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		Network network = new OsmBicycleReader.Builder()
-			.setCoordinateTransformation(Utils.transformation)
-			.build()
-			.read(file);
+				.setCoordinateTransformation(Utils.transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -139,19 +138,19 @@ public class OsmBicycleReaderTest {
 		final String surface = "surface-value";
 
 		List<OsmTag> tags = Arrays.asList(
-			new Tag(OsmTags.HIGHWAY, OsmTags.SECONDARY),
-			new Tag(OsmTags.ONEWAYBICYCLE, "no"),
-			new Tag(OsmTags.SURFACE, surface),
-			new Tag(OsmTags.ONEWAY, "yes"));
+				new Tag(OsmTags.HIGHWAY, OsmTags.SECONDARY),
+				new Tag(OsmTags.ONEWAYBICYCLE, "no"),
+				new Tag(OsmTags.SURFACE, surface),
+				new Tag(OsmTags.ONEWAY, "yes"));
 		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		Network network = new OsmBicycleReader.Builder()
-			.setCoordinateTransformation(Utils.transformation)
-			.build()
-			.read(file);
+				.setCoordinateTransformation(Utils.transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -172,19 +171,19 @@ public class OsmBicycleReaderTest {
 		final String surface = "surface-value";
 
 		List<OsmTag> tags = Arrays.asList(
-			new Tag(OsmTags.HIGHWAY, OsmTags.SECONDARY),
-			new Tag(OsmTags.ONEWAY, "yes"),
-			new Tag(OsmTags.SURFACE, surface),
-			new Tag(OsmTags.CYCLEWAY, "opposite"));
+				new Tag(OsmTags.HIGHWAY, OsmTags.SECONDARY),
+				new Tag(OsmTags.ONEWAY, "yes"),
+				new Tag(OsmTags.SURFACE, surface),
+				new Tag(OsmTags.CYCLEWAY, "opposite"));
 		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		Network network = new OsmBicycleReader.Builder()
-			.setCoordinateTransformation(Utils.transformation)
-			.build()
-			.read(file);
+				.setCoordinateTransformation(Utils.transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -205,19 +204,19 @@ public class OsmBicycleReaderTest {
 		final String surface = "surface-value";
 
 		List<OsmTag> tags = Arrays.asList(
-			new Tag(OsmTags.HIGHWAY, OsmTags.SECONDARY),
-			new Tag(OsmTags.ONEWAY, "reverse"),
-			new Tag(OsmTags.SURFACE, surface),
-			new Tag(OsmTags.CYCLEWAY, "opposite"));
+				new Tag(OsmTags.HIGHWAY, OsmTags.SECONDARY),
+				new Tag(OsmTags.ONEWAY, "reverse"),
+				new Tag(OsmTags.SURFACE, surface),
+				new Tag(OsmTags.CYCLEWAY, "opposite"));
 		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		Network network = new OsmBicycleReader.Builder()
-			.setCoordinateTransformation(Utils.transformation)
-			.build()
-			.read(file);
+				.setCoordinateTransformation(Utils.transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -243,17 +242,17 @@ public class OsmBicycleReaderTest {
 		Utils.writeOsmData(osmData, osmFile);
 
 		var network = new OsmBicycleReader.Builder()
-			// we only want the motorway
-			.setLinkProperties(new ConcurrentHashMap<>(Map.of(OsmTags.MOTORWAY, LinkProperties.createMotorway())))
-			.setCoordinateTransformation(Utils.transformation)
-			.build()
-			.read(osmFile);
+				// we only want the motorway
+				.setLinkProperties(new ConcurrentHashMap<>(Map.of(OsmTags.MOTORWAY, LinkProperties.createMotorway())))
+				.setCoordinateTransformation(Utils.transformation)
+				.build()
+				.read(osmFile);
 
 		// we expect one linke and it should be only the motorway link
 		assertEquals(1, network.getLinks().size());
 
 		for (Link link : network.getLinks().values()) {
-			assertPresentAndEqual(link, NetworkUtils.TYPE, OsmTags.MOTORWAY);
+			assertPresentAndEqual(link, NetworkUtils.TYPE ,OsmTags.MOTORWAY);
 		}
 	}
 

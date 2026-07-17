@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathUtils;
+import org.matsim.core.router.util.LeastCostPathUtils.NoPathBehavior;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -126,14 +128,20 @@ public class CHRouter implements LeastCostPathCalculator {
                                   double startTime, Person person, Vehicle vehicle) {
         int startIdx = baseGraph.getNodeIndex(startNode);
         int endIdx   = baseGraph.getNodeIndex(endNode);
-        Path path    = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle);
-        if (path == null) logNoRoute("node " + startNode.getId(), "node " + endNode.getId());
+        Path path    = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle, Double.POSITIVE_INFINITY);
+        if (path == null) LeastCostPathUtils.handleNotFound(noPathBehavior, LOG, startNode, endNode, person, vehicle);
         return path;
     }
 
     @Override
     public Path calcLeastCostPath(Link fromLink, Link toLink,
                                   double startTime, Person person, Vehicle vehicle) {
+        return calcLeastCostPath(fromLink, toLink, startTime, person, vehicle, Double.POSITIVE_INFINITY);
+    }
+
+    @Override
+    public Path calcLeastCostPath(Link fromLink, Link toLink,
+                                  double startTime, Person person, Vehicle vehicle, double maxCost) {
         int startIdx = baseGraph.getNodeIndex(fromLink.getToNode());
         int endIdx   = baseGraph.getNodeIndex(toLink.getFromNode());
 
@@ -144,13 +152,14 @@ public class CHRouter implements LeastCostPathCalculator {
             }
         }
 
-        Path path = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle);
-        if (path == null) logNoRoute("link " + fromLink.getId(), "link " + toLink.getId());
+
+        Path path = calcLeastCostPathImpl(startIdx, endIdx, startTime, person, vehicle, maxCost);
+        if (path == null) LeastCostPathUtils.handleNotFound(noPathBehavior, LOG, fromLink, toLink, person, vehicle);
         return path;
     }
 
     private Path calcLeastCostPathImpl(int startIdx, int endIdx,
-                                       double startTime, Person person, Vehicle vehicle) {
+                                       double startTime, Person person, Vehicle vehicle, double maxCost) {
         advanceIteration();
 
         if (startIdx == endIdx) {
@@ -198,6 +207,12 @@ public class CHRouter implements LeastCostPathCalculator {
             double fMin = fwdPQ.isEmpty() ? Double.POSITIVE_INFINITY : fwdCost[fwdPQ.peek()];
             double bMin = bwdPQ.isEmpty() ? Double.POSITIVE_INFINITY : bwdCost[bwdPQ.peek()];
             if (fMin >= bestCost && bMin >= bestCost) break;
+            // Bounded-search early termination: once both queue minima exceed maxCost,
+            // no further meeting node can yield a complete path with cost <= maxCost,
+            // because fwdCost and bwdCost are both monotone-nondecreasing in the order
+            // their respective searches settle nodes, and any meeting cost is
+            // fwdCost[m] + bwdCost[m] >= max(fMin, bMin) > maxCost.
+            if (fMin > maxCost && bMin > maxCost) break;
 
             boolean expandForward = !fwdPQ.isEmpty()
                     && (bwdPQ.isEmpty() || fMin <= bMin);
@@ -321,6 +336,10 @@ public class CHRouter implements LeastCostPathCalculator {
         }
 
         if (meetingNode < 0) return null;
+        // Bounded-search guard: a meeting node found before the early-termination check
+        // fired may still have total cost above maxCost (the early-termination is
+        // monotone but not a per-iteration check on bestCost itself).
+        if (bestCost > maxCost) return null;
         return constructPath(startIdx, meetingNode, startTime, person, vehicle);
     }
 
@@ -416,11 +435,9 @@ public class CHRouter implements LeastCostPathCalculator {
         bwdIterIds[node]    = currentIteration;
     }
 
-    private static void logNoRoute(String from, String to) {
-        LOG.warn("No route was found from {} to {}. Some possible reasons:", from, to);
-        LOG.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(...).");
-        LOG.warn("  * Network for considered mode does not even exist.");
-        LOG.warn("  * Network for considered mode is not connected to start/end point.");
-        LOG.warn("This will now return null, but it may fail later with a NullPointerException.");
-    }
+	private NoPathBehavior noPathBehavior = NoPathBehavior.warning;
+
+	public void setNoPathBehavior(NoPathBehavior value) {
+		this.noPathBehavior = value;
+	}
 }

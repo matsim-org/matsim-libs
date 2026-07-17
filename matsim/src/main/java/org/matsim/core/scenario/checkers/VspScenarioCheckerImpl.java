@@ -22,7 +22,10 @@ package org.matsim.core.scenario.checkers;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -32,6 +35,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
+import org.matsim.facilities.ActivityFacility;
 
 import java.util.Objects;
 import java.util.Set;
@@ -63,6 +67,7 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 
 		problem = checkSubpopulations(scenario, lvl, problem);
 		problem = checkActivitiesOpeningTime(scenario, lvl, problem);
+		problem = checkActivityFacilityConsistency(scenario, lvl, problem);
 
 		if (problem && scenario.getConfig().vspExperimental().getVspDefaultsCheckingLevel() == VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort) {
 			String str = "found a situation that leads to vsp-abort.  aborting ...";
@@ -114,6 +119,58 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 					subpopulation);
 				problem = true;
 			}
+		}
+		return problem;
+	}
+
+	private boolean checkActivityFacilityConsistency(Scenario scenario, Level lvl, boolean problem) {
+		if (scenario.getActivityFacilities().getFacilities().isEmpty()) {
+			return problem;
+		}
+		log.info("start checking if activity locations and links are consistent with mapped facilities ...");
+		long linkMismatches = 0;
+		long coordMismatches = 0;
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			for (Activity activity : TripStructureUtils.getActivities(person.getSelectedPlan(), ExcludeStageActivities)) {
+				Id<ActivityFacility> facilityId = activity.getFacilityId();
+				if (facilityId == null) {
+					log.log(lvl, "activity of type={} has no facilityId, but facilities are loaded.", activity.getType());
+					problem = true;
+					continue;
+				}
+				ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(facilityId);
+				if (facility == null) {
+					log.log(lvl, "activity references facilityId={} which does not exist in the facilities container.", facilityId);
+					problem = true;
+					continue;
+				}
+				Id<Link> actLinkId = activity.getLinkId();
+				Id<Link> facLinkId = facility.getLinkId();
+				if (actLinkId == null) {
+					log.log(lvl, "activity with facilityId={} has no linkId.", facilityId);
+					problem = true;
+				} else if (facLinkId == null) {
+					log.log(lvl, "facility with id={} has no linkId.", facilityId);
+					problem = true;
+				} else if (!actLinkId.equals(facLinkId)) {
+					log.log(lvl, "activity linkId={} does not match facility linkId={} for facilityId={}", actLinkId, facLinkId, facilityId);
+					linkMismatches++;
+				}
+				Coord actCoord = activity.getCoord();
+				Coord facCoord = facility.getCoord();
+				if (actCoord != null && facCoord != null && !actCoord.equals(facCoord)) {
+					log.log(lvl, "activity coord={} does not match facility coord={} for facilityId={}", actCoord, facCoord, facilityId);
+					coordMismatches++;
+				}
+			}
+		}
+		if (linkMismatches > 0) {
+			log.log(lvl, "Found {} activities whose linkId differs from their mapped facility's linkId.", linkMismatches);
+			problem = true;
+		}
+		if (coordMismatches > 0) {
+			log.log(lvl, "Found {} activities whose coord differs from their mapped facility's coord.", coordMismatches);
+			problem = true;
 		}
 		return problem;
 	}

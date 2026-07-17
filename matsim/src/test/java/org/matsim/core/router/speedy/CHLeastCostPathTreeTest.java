@@ -25,18 +25,21 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -1066,5 +1069,624 @@ public class CHLeastCostPathTreeTest {
 
         Assertions.assertEquals(0, disconnectedPaths,
                 disconnectedPaths + " disconnected backward paths out of " + totalPaths);
+    }
+
+    // =========================================================================
+    // Turn-restriction tests
+    //
+    // These cover the case where the base graph carries DisallowedNextLinks.
+    // SpeedyGraphBuilder responds by inserting "colored" copies of nodes and
+    // links so the shortest path respects forbidden manoeuvres.  The CH built
+    // on top inherits those colored copies, but only some are reached during
+    // the search.  The test verifies that:
+    //   (a) forward and backward searches still settle every node that plain
+    //       Dijkstra (LeastCostPathTree) settles,
+    //   (b) the cost on the real (uncolored) node index matches plain
+    //       Dijkstra, i.e. consolidateColoredNodes() has run, and
+    //   (c) for a hand-crafted network with a forbidden direct path, the CH
+    //       result is the expected long detour rather than the forbidden short
+    //       direct route.
+    // =========================================================================
+
+    /**
+     * Hand-crafted network from {@link org.matsim.core.router.AbstractLeastCostPathCalculatorTestWithTurnRestrictions}:
+     * {@code S -> 1 -> T} is the direct two-link path but is forbidden by a
+     * turn restriction on link {@code S1}.  The only legal way is the
+     * six-link detour {@code S -> 1 -> 2 -> 3 -> 4 -> 5 -> T}.
+     */
+    @Test
+    void testForwardSearchTurnRestrictions_handcrafted() {
+        Network network = buildTurnRestrictionsTestNetwork();
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+        InertialFlowCutter.NDOrderResult order = new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc).buildWithOrderParallel(order);
+        new CHTTFCustomizer().customize(chGraph, tc, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        Link startLink = network.getLinks().get(Id.createLinkId("S1"));
+        double depTime = 8.0 * 3600;
+        chTree.calculate(startLink, depTime, null, null);
+        dijTree.calculate(startLink, depTime, null, null);
+
+        Node nodeT = network.getNodes().get(Id.createNodeId("T"));
+        int tIdx = nodeT.getId().index();
+
+        OptionalTime chT = chTree.getTime(tIdx);
+        OptionalTime dijT = dijTree.getTime(tIdx);
+        Assertions.assertTrue(dijT.isDefined(),
+                "test fixture broken: Dijkstra should reach T via the legal detour");
+        Assertions.assertTrue(chT.isDefined(),
+                "CH must reach T via the legal detour (forbidden direct turn must be respected)");
+        Assertions.assertEquals(dijT.seconds(), chT.seconds(), COST_TOLERANCE,
+                "CH arrival time at T must match Dijkstra (legal 6-link detour)");
+
+        // Cross-check every reachable node: CH must agree with Dijkstra wherever
+        // Dijkstra has a defined time.  This catches the case where CH leaves a
+        // colored copy populated but the real node slot empty.
+        int mismatches = 0;
+        for (Node n : network.getNodes().values()) {
+            int idx = n.getId().index();
+            OptionalTime cht = chTree.getTime(idx);
+            OptionalTime djt = dijTree.getTime(idx);
+            if (djt.isDefined()) {
+                if (cht.isUndefined()) {
+                    mismatches++;
+                    System.err.printf("FORWARD-TR MISMATCH node=%s: CH=unreachable Dijkstra=%.3f%n",
+                            n.getId(), djt.seconds());
+                } else if (Math.abs(cht.seconds() - djt.seconds()) > COST_TOLERANCE) {
+                    mismatches++;
+                    System.err.printf("FORWARD-TR MISMATCH node=%s: CH=%.6f Dijkstra=%.6f%n",
+                            n.getId(), cht.seconds(), djt.seconds());
+                }
+            }
+        }
+        Assertions.assertEquals(0, mismatches, mismatches + " forward TR mismatches");
+    }
+
+    /**
+     * Same hand-crafted network as
+     * {@link #testForwardSearchTurnRestrictions_handcrafted()} but with a
+     * backward search from {@code T}.  Every node reachable by plain Dijkstra
+     * must also be reachable by CH with the same cost.
+     */
+    @Test
+    void testBackwardSearchTurnRestrictions_handcrafted() {
+        Network network = buildTurnRestrictionsTestNetwork();
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+        InertialFlowCutter.NDOrderResult order = new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc).buildWithOrderParallel(order);
+        new CHTTFCustomizer().customize(chGraph, tc, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        Link arrivalLink = network.getLinks().get(Id.createLinkId("5T"));
+        double arrTime = 8.0 * 3600;
+        chTree.calculateBackwards(arrivalLink, arrTime, null, null);
+        dijTree.calculateBackwards(arrivalLink, arrTime, null, null);
+
+        Node nodeS = network.getNodes().get(Id.createNodeId("S"));
+        int sIdx = nodeS.getId().index();
+        OptionalTime chS = chTree.getTime(sIdx);
+        OptionalTime djS = dijTree.getTime(sIdx);
+        Assertions.assertTrue(djS.isDefined(),
+                "test fixture broken: Dijkstra backwards should reach S");
+        Assertions.assertTrue(chS.isDefined(),
+                "CH backwards must reach S via the legal detour");
+        Assertions.assertEquals(djS.seconds(), chS.seconds(), COST_TOLERANCE,
+                "CH backwards departure time at S must match Dijkstra");
+
+        int mismatches = 0;
+        for (Node n : network.getNodes().values()) {
+            int idx = n.getId().index();
+            OptionalTime cht = chTree.getTime(idx);
+            OptionalTime djt = dijTree.getTime(idx);
+            if (djt.isDefined()) {
+                if (cht.isUndefined()) {
+                    mismatches++;
+                    System.err.printf("BACKWARD-TR MISMATCH node=%s: CH=unreachable Dijkstra=%.3f%n",
+                            n.getId(), djt.seconds());
+                } else if (Math.abs(cht.seconds() - djt.seconds()) > COST_TOLERANCE) {
+                    mismatches++;
+                    System.err.printf("BACKWARD-TR MISMATCH node=%s: CH=%.6f Dijkstra=%.6f%n",
+                            n.getId(), cht.seconds(), djt.seconds());
+                }
+            }
+        }
+        Assertions.assertEquals(0, mismatches, mismatches + " backward TR mismatches");
+    }
+
+    /**
+     * Realistic-scale coverage check: load the equil scenario, mark a handful
+     * of disallowed turns, and confirm that for many random sources the CH
+     * tree reaches the same set of nodes as plain Dijkstra with the same
+     * costs.  This is the regression test for the production failure where
+     * CH workers threw {@code "Undefined Time"} for destinations that plain
+     * Dijkstra reached because colored copies were never consolidated.
+     */
+    @Test
+    void testForwardSearchTurnRestrictions_equilCoverage() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+        Network network = scenario.getNetwork();
+
+        // Add a few disallowed turns spread across the network so multiple
+        // colored copies are inserted.  We pick links by iteration order so
+        // the test is reproducible without depending on exact equil link IDs.
+        List<Link> links = new ArrayList<>(network.getLinks().values());
+        int restrictionsAdded = 0;
+        for (int i = 0; i < links.size() && restrictionsAdded < 3; i++) {
+            Link from = links.get(i);
+            // Find an outgoing link of from.getToNode() to forbid.
+            for (Link out : from.getToNode().getOutLinks().values()) {
+                if (out.getToNode() != from.getFromNode()) { // skip U-turn (often already disallowed)
+                    NetworkUtils.addDisallowedNextLinks(from, TransportMode.car,
+                            Arrays.asList(out.getId()));
+                    restrictionsAdded++;
+                    break;
+                }
+            }
+        }
+        Assertions.assertTrue(restrictionsAdded >= 1,
+                "expected to add at least one disallowed-turn restriction");
+
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+        InertialFlowCutter.NDOrderResult order = new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc).buildWithOrderParallel(order);
+        new CHTTFCustomizer().customize(chGraph, tc, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        Random rng = new Random(7);
+        int mismatches = 0;
+        int comparisons = 0;
+        double depTime = 8.0 * 3600;
+        for (int s = 0; s < 10; s++) {
+            Link startLink = links.get(rng.nextInt(links.size()));
+            chTree.calculate(startLink, depTime, null, null);
+            dijTree.calculate(startLink, depTime, null, null);
+
+            for (Node n : network.getNodes().values()) {
+                int idx = n.getId().index();
+                OptionalTime cht = chTree.getTime(idx);
+                OptionalTime djt = dijTree.getTime(idx);
+                if (djt.isUndefined()) continue;
+                comparisons++;
+                if (cht.isUndefined()) {
+                    mismatches++;
+                    if (mismatches < 10) {
+                        System.err.printf("EQUIL-TR MISMATCH src=%s node=%s: CH=unreachable Dijkstra=%.3f%n",
+                                startLink.getId(), n.getId(), djt.seconds());
+                    }
+                } else if (Math.abs(cht.seconds() - djt.seconds()) > COST_TOLERANCE) {
+                    mismatches++;
+                    if (mismatches < 10) {
+                        System.err.printf("EQUIL-TR MISMATCH src=%s node=%s: CH=%.6f Dijkstra=%.6f%n",
+                                startLink.getId(), n.getId(), cht.seconds(), djt.seconds());
+                    }
+                }
+            }
+        }
+        Assertions.assertEquals(0, mismatches,
+                mismatches + " TR coverage mismatches out of " + comparisons + " comparisons");
+    }
+
+    /**
+     * Backward equivalent of {@link #testForwardSearchTurnRestrictions_equilCoverage()}.
+     * Loads the equil scenario with the same disallowed turns and confirms
+     * backward CH matches backward Dijkstra everywhere the latter is defined.
+     * This exercises the colored-arrival seeding in {@code calculateBackwardImpl}.
+     */
+    @Test
+    void testBackwardSearchTurnRestrictions_equilCoverage() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+        Network network = scenario.getNetwork();
+
+        List<Link> links = new ArrayList<>(network.getLinks().values());
+        int restrictionsAdded = 0;
+        for (int i = 0; i < links.size() && restrictionsAdded < 3; i++) {
+            Link from = links.get(i);
+            for (Link out : from.getToNode().getOutLinks().values()) {
+                if (out.getToNode() != from.getFromNode()) {
+                    NetworkUtils.addDisallowedNextLinks(from, TransportMode.car,
+                            Arrays.asList(out.getId()));
+                    restrictionsAdded++;
+                    break;
+                }
+            }
+        }
+        Assertions.assertTrue(restrictionsAdded >= 1,
+                "expected to add at least one disallowed-turn restriction");
+
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+        InertialFlowCutter.NDOrderResult order = new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc).buildWithOrderParallel(order);
+        new CHTTFCustomizer().customize(chGraph, tc, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        Random rng = new Random(11);
+        int mismatches = 0;
+        int comparisons = 0;
+        double arrTime = 8.0 * 3600;
+        for (int s = 0; s < 10; s++) {
+            Link arrivalLink = links.get(rng.nextInt(links.size()));
+            chTree.calculateBackwards(arrivalLink, arrTime, null, null);
+            dijTree.calculateBackwards(arrivalLink, arrTime, null, null);
+
+            for (Node n : network.getNodes().values()) {
+                int idx = n.getId().index();
+                OptionalTime cht = chTree.getTime(idx);
+                OptionalTime djt = dijTree.getTime(idx);
+                if (djt.isUndefined()) continue;
+                comparisons++;
+                if (cht.isUndefined()) {
+                    mismatches++;
+                    if (mismatches < 10) {
+                        System.err.printf("EQUIL-TR-BWD MISMATCH arr=%s node=%s: CH=unreachable Dijkstra=%.3f%n",
+                                arrivalLink.getId(), n.getId(), djt.seconds());
+                    }
+                } else if (Math.abs(cht.seconds() - djt.seconds()) > COST_TOLERANCE) {
+                    mismatches++;
+                    if (mismatches < 10) {
+                        System.err.printf("EQUIL-TR-BWD MISMATCH arr=%s node=%s: CH=%.6f Dijkstra=%.6f%n",
+                                arrivalLink.getId(), n.getId(), cht.seconds(), djt.seconds());
+                    }
+                }
+            }
+        }
+        Assertions.assertEquals(0, mismatches,
+                mismatches + " backward TR coverage mismatches out of " + comparisons + " comparisons");
+    }
+
+    /**
+     * {@link org.matsim.core.router.AbstractLeastCostPathCalculatorTestWithTurnRestrictions}
+     * with forbidden turns {@code S1->1T} and {@code 23->34}, {@code 23->4T}.
+     */
+    private static Network buildTurnRestrictionsTestNetwork() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Network network = scenario.getNetwork();
+        Node nodeS = NetworkUtils.createAndAddNode(network, Id.createNodeId("S"), new Coord(1, 2));
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord(1, 1));
+        Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord(0, 1));
+        Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord(0, 0));
+        Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord(1, 0));
+        Node node5 = NetworkUtils.createAndAddNode(network, Id.createNodeId("5"), new Coord(2, 0));
+        Node nodeT = NetworkUtils.createAndAddNode(network, Id.createNodeId("T"), new Coord(2, 0));
+
+        Link linkS1 = NetworkUtils.createAndAddLink(network, Id.createLinkId("S1"), nodeS, node1, 1, 1, 1, 1);
+        NetworkUtils.createAndAddLink(network, Id.createLinkId("12"), node1, node2, 1, 1, 1, 1);
+        NetworkUtils.createAndAddLink(network, Id.createLinkId("1T"), node1, nodeT, 1, 1, 1, 1);
+        Link link23 = NetworkUtils.createAndAddLink(network, Id.createLinkId("23"), node2, node3, 1, 1, 1, 1);
+        NetworkUtils.createAndAddLink(network, Id.createLinkId("34"), node3, node4, 1, 1, 1, 1);
+        NetworkUtils.createAndAddLink(network, Id.createLinkId("4T"), node4, nodeT, 1, 1, 1, 1);
+        NetworkUtils.createAndAddLink(network, Id.createLinkId("45"), node4, node5, 1, 1, 1, 1);
+        NetworkUtils.createAndAddLink(network, Id.createLinkId("5T"), node5, nodeT, 1, 1, 1, 1);
+
+        NetworkUtils.addDisallowedNextLinks(linkS1, TransportMode.car, Arrays.asList(Id.createLinkId("1T")));
+        NetworkUtils.addDisallowedNextLinks(link23, TransportMode.car,
+                Arrays.asList(Id.createLinkId("34"), Id.createLinkId("4T")));
+        return network;
+    }
+
+    // =========================================================================
+    // Distance accumulation tests
+    //
+    // CHLeastCostPathTree.getDistance(idx) must return the same network distance
+    // (sum of link lengths along the resolved shortest path) as plain
+    // LeastCostPathTree.  Distance is precomputed once per CH global edge
+    // (including shortcuts) at build time and accumulated during relaxation.
+    // =========================================================================
+
+    @Test
+    void testForwardDistanceMatchesDijkstra_grid() {
+        Network network = buildGridNetwork(10);
+        assertForwardDistanceMatchesDijkstra(network, 5);
+    }
+
+    @Test
+    void testBackwardDistanceMatchesDijkstra_grid() {
+        Network network = buildGridNetwork(10);
+        assertBackwardDistanceMatchesDijkstra(network, 5);
+    }
+
+    @Test
+    void testForwardDistanceMatchesDijkstra_equil() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+        assertForwardDistanceMatchesDijkstra(scenario.getNetwork(), 10);
+    }
+
+    @Test
+    void testBackwardDistanceMatchesDijkstra_equil() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+        assertBackwardDistanceMatchesDijkstra(scenario.getNetwork(), 10);
+    }
+
+    /**
+     * Forward distance with turn restrictions: the start link itself is not
+     * traversed (the tree is rooted at {@code startLink.getToNode()}); the
+     * legal path from node 1 is {@code 1->2->3->4->5->T} (5 links of length 1),
+     * not the forbidden {@code 1->T} (1 link).
+     */
+    @Test
+    void testForwardDistanceMatchesDijkstra_turnRestrictions() {
+        Network network = buildTurnRestrictionsTestNetwork();
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+        InertialFlowCutter.NDOrderResult order = new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc).buildWithOrderParallel(order);
+        new CHTTFCustomizer().customize(chGraph, tc, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        Link startLink = network.getLinks().get(Id.createLinkId("S1"));
+        double depTime = 8.0 * 3600;
+        chTree.calculate(startLink, depTime, null, null);
+        dijTree.calculate(startLink, depTime, null, null);
+
+        int tIdx = network.getNodes().get(Id.createNodeId("T")).getId().index();
+        Assertions.assertEquals(5.0, dijTree.getDistance(tIdx), COST_TOLERANCE,
+                "test fixture broken: Dijkstra distance at T should be 5 (legal detour from node 1)");
+        Assertions.assertEquals(dijTree.getDistance(tIdx), chTree.getDistance(tIdx), COST_TOLERANCE,
+                "CH distance at T must match Dijkstra (legal 5-link detour from node 1)");
+    }
+
+    private static void assertForwardDistanceMatchesDijkstra(Network network, int numSources) {
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+        InertialFlowCutter.NDOrderResult order = new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc).buildWithOrderParallel(order);
+        new CHTTFCustomizer().customize(chGraph, tc, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        List<Link> links = new ArrayList<>(network.getLinks().values());
+        Random rng = new Random(13);
+        int mismatches = 0;
+        int comparisons = 0;
+        double depTime = 8.0 * 3600;
+        for (int s = 0; s < numSources; s++) {
+            Link srcLink = links.get(rng.nextInt(links.size()));
+            chTree.calculate(srcLink, depTime, null, null);
+            dijTree.calculate(srcLink, depTime, null, null);
+
+            for (Node n : network.getNodes().values()) {
+                int idx = n.getId().index();
+                if (dijTree.getTime(idx).isUndefined()) continue;
+                comparisons++;
+                double chD = chTree.getDistance(idx);
+                double djD = dijTree.getDistance(idx);
+                if (Math.abs(chD - djD) > COST_TOLERANCE) {
+                    mismatches++;
+                    if (mismatches < 10) {
+                        System.err.printf("FWD-DIST MISMATCH src=%s node=%s: CH=%.6f Dijkstra=%.6f%n",
+                                srcLink.getId(), n.getId(), chD, djD);
+                    }
+                }
+            }
+        }
+        Assertions.assertEquals(0, mismatches,
+                mismatches + " forward-distance mismatches out of " + comparisons + " comparisons");
+    }
+
+    private static void assertBackwardDistanceMatchesDijkstra(Network network, int numArrivals) {
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+        InertialFlowCutter.NDOrderResult order = new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc).buildWithOrderParallel(order);
+        new CHTTFCustomizer().customize(chGraph, tc, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        List<Link> links = new ArrayList<>(network.getLinks().values());
+        Random rng = new Random(17);
+        int mismatches = 0;
+        int comparisons = 0;
+        double arrTime = 8.0 * 3600;
+        for (int s = 0; s < numArrivals; s++) {
+            Link arrLink = links.get(rng.nextInt(links.size()));
+            chTree.calculateBackwards(arrLink, arrTime, null, null);
+            dijTree.calculateBackwards(arrLink, arrTime, null, null);
+
+            for (Node n : network.getNodes().values()) {
+                int idx = n.getId().index();
+                if (dijTree.getTime(idx).isUndefined()) continue;
+                comparisons++;
+                double chD = chTree.getDistance(idx);
+                double djD = dijTree.getDistance(idx);
+                if (Math.abs(chD - djD) > COST_TOLERANCE) {
+                    mismatches++;
+                    if (mismatches < 10) {
+                        System.err.printf("BWD-DIST MISMATCH arr=%s node=%s: CH=%.6f Dijkstra=%.6f%n",
+                                arrLink.getId(), n.getId(), chD, djD);
+                    }
+                }
+            }
+        }
+        Assertions.assertEquals(0, mismatches,
+                mismatches + " backward-distance mismatches out of " + comparisons + " comparisons");
+    }
+
+    // ---- static (time-independent) CHLeastCostPathTree correctness ----
+    //
+    // Mirrors runForward/Backward CorrectnessTest but builds the CH with
+    // withTimeDependence(false) and customizes with CHCustomizer instead of
+    // CHTTFCustomizer.  Exercises the static branches added in
+    // CHLeastCostPathTree (forwardPhase1Static + edgeWeights[] in backward
+    // phase 1).  Since FreespeedTravelTimeAndDisutility is time-independent,
+    // the static tree must match the time-dependent reference Dijkstra exactly.
+
+    @Test
+    void testForwardSearchSmallGridStatic() {
+        runForwardStaticCorrectnessTest(buildGridNetwork(5));
+    }
+
+    @Test
+    void testForwardSearchEquilNetworkStatic() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+        runForwardStaticCorrectnessTest(scenario.getNetwork());
+    }
+
+    @Test
+    void testBackwardSearchSmallGridStatic() {
+        runBackwardStaticCorrectnessTest(buildGridNetwork(5));
+    }
+
+    @Test
+    void testBackwardSearchEquilNetworkStatic() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+        runBackwardStaticCorrectnessTest(scenario.getNetwork());
+    }
+
+    private void runForwardStaticCorrectnessTest(Network network) {
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(
+                new ScoringConfigGroup());
+
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+
+        InertialFlowCutter.NDOrderResult orderResult =
+                new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc)
+                .withTimeDependence(false)
+                .buildWithOrderParallel(orderResult);
+        new CHCustomizer().customize(chGraph, tc);
+        Assertions.assertFalse(chGraph.isTimeDependent(),
+                "CHGraph must be marked time-independent in static mode.");
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijkstraTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        List<Link> linkList = new ArrayList<>(network.getLinks().values());
+        int n = linkList.size();
+        if (n < 2) return;
+
+        Random rng = new Random(42);
+        int mismatches = 0;
+        int comparisons = 0;
+
+        for (int s = 0; s < NUM_SOURCE_NODES; s++) {
+            Link srcLink = linkList.get(rng.nextInt(n));
+            double startTime = 8.0 * 3600;
+
+            chTree.calculate(srcLink, startTime, null, null);
+            dijkstraTree.calculate(srcLink, startTime, null, null);
+
+            for (int t = 0; t < NUM_TARGET_NODES; t++) {
+                Link tgtLink = linkList.get(rng.nextInt(n));
+                int tgtNodeIdx = tgtLink.getFromNode().getId().index();
+
+                // Compare cost (= sum of edge disutilities). In static mode
+                // the "time" field is not meaningful because edgeWeights[]
+                // holds disutility, not travel time.
+                double chCost = chTree.getCost(tgtNodeIdx);
+                double dijCost = dijkstraTree.getCost(tgtNodeIdx);
+
+                boolean chUnreach = Double.isInfinite(chCost) || Double.isNaN(chCost);
+                boolean dijUnreach = Double.isInfinite(dijCost) || Double.isNaN(dijCost);
+                if (chUnreach && dijUnreach) {
+                    comparisons++;
+                    continue;
+                }
+                if (chUnreach || dijUnreach) {
+                    if (!dijUnreach && chUnreach) mismatches++;
+                    comparisons++;
+                    continue;
+                }
+
+                comparisons++;
+                if (Math.abs(chCost - dijCost) > COST_TOLERANCE) {
+                    mismatches++;
+                    System.err.printf("STATIC FORWARD MISMATCH src=%s tgt=%s: CH=%.6f  Dijkstra=%.6f%n",
+                            srcLink.getId(), tgtLink.getId(), chCost, dijCost);
+                }
+            }
+        }
+
+        Assertions.assertEquals(0, mismatches,
+                mismatches + " static-forward cost mismatches out of " + comparisons + " comparisons.");
+    }
+
+    private void runBackwardStaticCorrectnessTest(Network network) {
+        FreespeedTravelTimeAndDisutility tc = new FreespeedTravelTimeAndDisutility(
+                new ScoringConfigGroup());
+
+        SpeedyGraph baseGraph = SpeedyGraphBuilder.build(network);
+
+        InertialFlowCutter.NDOrderResult orderResult =
+                new InertialFlowCutter(baseGraph).computeOrderWithBatches();
+        CHGraph chGraph = new CHBuilder(baseGraph, tc)
+                .withTimeDependence(false)
+                .buildWithOrderParallel(orderResult);
+        new CHCustomizer().customize(chGraph, tc);
+
+        CHLeastCostPathTree chTree = new CHLeastCostPathTree(chGraph, tc, tc);
+        LeastCostPathTree dijkstraTree = new LeastCostPathTree(baseGraph, tc, tc);
+
+        List<Link> linkList = new ArrayList<>(network.getLinks().values());
+        int n = linkList.size();
+        if (n < 2) return;
+
+        Random rng = new Random(42);
+        int mismatches = 0;
+        int comparisons = 0;
+
+        for (int s = 0; s < NUM_SOURCE_NODES; s++) {
+            Link arrLink = linkList.get(rng.nextInt(n));
+            double arrivalTime = 8.0 * 3600;
+
+            chTree.calculateBackwards(arrLink, arrivalTime, null, null);
+            dijkstraTree.calculateBackwards(arrLink, arrivalTime, null, null);
+
+            for (int t = 0; t < NUM_TARGET_NODES; t++) {
+                Link srcLink = linkList.get(rng.nextInt(n));
+                int srcNodeIdx = srcLink.getToNode().getId().index();
+
+                double chCost = chTree.getCost(srcNodeIdx);
+                double dijCost = dijkstraTree.getCost(srcNodeIdx);
+
+                boolean chUnreach = Double.isInfinite(chCost) || Double.isNaN(chCost);
+                boolean dijUnreach = Double.isInfinite(dijCost) || Double.isNaN(dijCost);
+                if (chUnreach && dijUnreach) {
+                    comparisons++;
+                    continue;
+                }
+                if (chUnreach || dijUnreach) {
+                    if (!dijUnreach && chUnreach) mismatches++;
+                    comparisons++;
+                    continue;
+                }
+
+                comparisons++;
+                if (Math.abs(chCost - dijCost) > COST_TOLERANCE) {
+                    mismatches++;
+                    System.err.printf("STATIC BACKWARD MISMATCH src=%s arr=%s: CH=%.6f  Dijkstra=%.6f%n",
+                            srcLink.getId(), arrLink.getId(), chCost, dijCost);
+                }
+            }
+        }
+
+        Assertions.assertEquals(0, mismatches,
+                mismatches + " static-backward cost mismatches out of " + comparisons + " comparisons.");
     }
 }
