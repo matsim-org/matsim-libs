@@ -63,7 +63,8 @@ class CreateUrbanEVTestScenario {
 		//set VehicleSource
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 		config.qsim().setEndTime(20*3600);
-
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		//load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

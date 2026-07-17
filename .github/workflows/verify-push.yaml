@@ -74,7 +74,7 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Detect changes against main
         # we only want to build matsim (module) if changes are not limited to contribs
@@ -96,11 +96,11 @@ jobs:
 
       - name: Build module (with dependencies)
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        run: mvn install --batch-mode --also-make --projects ${{matrix.module}} -DskipTests -Dsource.skip
+        run: mvn install --batch-mode ${{env.MAVEN_HTTP_RETRY}} --also-make --projects ${{matrix.module}} -DskipTests -Dsource.skip
 
       - name: Test module
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        run: mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
+        run: mvn verify --batch-mode ${{env.MAVEN_HTTP_RETRY}} -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
         #run: mvn verify --batch-mode -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
         working-directory: ${{matrix.module}}
 
@@ -121,6 +121,8 @@ jobs:
 
     env:
       MAVEN_OPTS: -Xmx2g
+      # retry transient HTTP failures when fetching from Maven Central (e.g. sporadic 403/timeout on cache miss)
+      MAVEN_HTTP_RETRY: -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true
 
   verify-all-jobs-successful:
     # always() - to ensure this job is executed (regardless of the status of the previous job)

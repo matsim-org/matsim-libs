@@ -643,15 +643,15 @@ class AgentWiseComparisonKNUtils{
 
 		String basePopulationFilename;
 		try {
-			basePopulationFilename = globFile( path, "*reduced_plans.xml" ).toString();
+			basePopulationFilename = globFile( path, "*reduced_plans.xml*" ).toString();
 		} catch ( IllegalStateException e0 ) {
 			try {
-				basePopulationFilename = globFile( path, "*vtts_experienced_plans.xml.gz" ).toString();
+				basePopulationFilename = globFile( path, "*vtts_experienced_plans.xml*" ).toString();
 			} catch ( IllegalStateException ee ){
 				try{
-					basePopulationFilename = globFile( path, "*postproc_experienced_plans.xml.gz" ).toString();
+					basePopulationFilename = globFile( path, "*postproc_experienced_plans.xml*" ).toString();
 				} catch( IllegalStateException e2 ){
-					basePopulationFilename = globFile( path, "*experienced_plans.xml.gz" ).toString();
+					basePopulationFilename = globFile( path, "*experienced_plans.xml*" ).toString();
 				}
 			}
 		}

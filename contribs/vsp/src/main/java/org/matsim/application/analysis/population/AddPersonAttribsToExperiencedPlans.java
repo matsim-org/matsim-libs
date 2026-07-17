@@ -13,7 +13,6 @@ import picocli.CommandLine;
 
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Objects;
 
 import static org.matsim.application.ApplicationUtils.globFile;
 
@@ -41,14 +40,14 @@ public class AddPersonAttribsToExperiencedPlans implements MATSimAppCommand {
 	public Integer call() throws Exception {
 
 //		Path outputPopPath = path.resolve( runPrefix + "output_" + Controler.DefaultFiles.population.getFilename() + ".gz");
-		Path outputPopPath = globFile( path, "*output_" + Controler.DefaultFiles.population.getFilename() + ".gz" );
+		Path outputPopPath = globFile( path, "*output_" + Controler.DefaultFiles.population.getFilename() + "*" );
+		// (trailing "*" instead of ".gz" so any compression (gz/lz4/zst) or none is matched; default output is now zst)
 
-		// extracting the runPrefix from the outputPopPath:
-		String tmp = outputPopPath.toString().replace( ".output_" + Controler.DefaultFiles.population.getFilename() + ".gz", "" );
-		String runPrefix = Objects.nonNull(tmp ) ? tmp + "." : "";
+		// extract the runId prefix (everything up to and including "output_"'s leading part) from the matched file name:
+		String popFileName = outputPopPath.getFileName().toString();
+		String runPrefix = popFileName.substring( 0, popFileName.indexOf( "output_" ) );  // "" if no runId, else "<runId>."
 
-		Path expPlansPath =  path.resolve( runPrefix + "output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
-//		Path expPlansPath = globFile( path, Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
+		Path expPlansPath = globFile( path, "*output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + "*" );
 
 		Path postprocExpPlansPath = path.resolve( runPrefix + "postproc_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
 

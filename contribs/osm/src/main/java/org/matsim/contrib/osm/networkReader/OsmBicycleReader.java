@@ -100,7 +100,7 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 
 	private static void setRestrictions(Link link, Map<String, String> tags) {
 		if (tags.containsKey(OsmTags.BICYCLE))
-			link.getAttributes().putAttribute(TransportMode.bike, tags.get(OsmTags.BICYCLE));
+			link.getAttributes().putAttribute(OsmTags.BICYCLE, tags.get(OsmTags.BICYCLE));
 	}
 
 	@Override

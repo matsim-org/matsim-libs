@@ -44,10 +44,7 @@ import org.matsim.contrib.common.conventions.vsp.SubpopulationDefaultNames;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
-import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
-import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkTransform;
@@ -311,6 +308,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			? getCarrierPartOutputPath(requestedOutput)
 			: requestedOutput;
 		Config config = readAndCheckConfig(configArgs, configPath, modelName, sampleName, configOutput);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. Not really sure if this is even need for commerical traffic. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		output = Path.of(config.controller().getOutputDirectory());
 		Path finalOutput = isSolvingOnlyCarrierPart() && requestedOutput != null ? requestedOutput : output;
