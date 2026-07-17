@@ -58,15 +58,14 @@ mvn -pl contribs/bicycle exec:java \
 | `osm:surface`      | string | Raw OSM `surface=…` value, if present                                                  |
 | `osm:smoothness`   | string | Raw OSM `smoothness=…` value, if present                                               |
 | `osm:cycleway`     | string | Raw OSM `cycleway=…` value, if present                                                 |
-| `type`             | string | `OsmBicycleReader` highway category (e.g. `highway.service`) — not yet `osm:`-prefixed |
+| `type`             | string | Raw OSM `highway=…` value (e.g. `service`) — not yet `osm:`-prefixed                   |
 | `origid`           | string | Original OSM way ID(s); hyphen-separated when multiple links were merged               |
 
 Gradients are signed in the direction of travel, so reverse links get the opposite sign. `gradient` alone reads 0 % on a
 link with a hill between equal-height endpoints — `maxGradient`, `elevationGain` and `elevationLoss` fill that gap.
 
-Not all of these are needed by the simulation `averageElevation` and `osm:cycleway`. Handy for sanity-checking an
-extract, not read
-by anything downstream.
+Not all of these are consumed by the simulation: `averageElevation` and `osm:cycleway` are written for inspection only —
+handy for sanity-checking an extract, but not read by anything downstream.
 
 For ad-hoc debugging you can forward **arbitrary** OSM tags onto links: add their keys to `TAGS_TO_COPY` in
 `BicycleNetworkPipeline` and `TagCopy` copies them on verbatim under the `osm:` prefix (empty by default, so a no-op
@@ -94,10 +93,11 @@ until you populate it).
 
 Tests live in `contribs/bicycle/src/test/java/.../network`:
 
-- `BicycleInfraClassifierTest` — 37 table-driven cases covering every category and the precedence ordering
+- `BicycleInfraClassifierTest` — 37 table-driven cases covering 22 of the 27 categories and the precedence ordering
 - `LinkElevationProfileTest` — 7 cases using a synthetic `ElevationSource` (no DEM required, fast)
 - `ElevationDataParserTest` — 8 reference points in Berlin against Sonny's DTM 50 m. Uses a small cutout shipped in
-  `contribs/bicycle/test/input/...` (see the README there); skipped via `assumeTrue` when the DTM file is missing.
+  `contribs/bicycle/test/input/org/matsim/contrib/bicycle/network/` (see the README there for source and license); a
+  different DTM can be passed via `-Ddem.path=…`. Skipped via `assumeTrue` when the DTM file is missing.
 
 ## Pipeline
 
@@ -210,7 +210,7 @@ Sonny's DTMs (https://sonny.4lima.de/) are LiDAR-based, much better than SRTM. G
   `setAfterLinkCreated` callback remain without a Z coordinate; the per-link metrics are unaffected because they sample
   the DEM directly.
 - `type` and `origid` are not yet under the `osm:` prefix because both carry semantics that other code
-  depends on (`type=highway.service` for `ServiceLinkCleaner`; `origid` for `NetworkSimplifier` merge tracking).
+  depends on (`type=service` for `ServiceLinkCleaner`; `origid` for `NetworkSimplifier` merge tracking).
 - Elevation default sample step: The current default of `10` m oversamples the 20 m Sonny DTM — sampling finer than
   the DEM resolution adds no real information. `20` m is likely the better default and would roughly halve the DEM
   look-ups, but it hasn't been benchmarked against the 10 m default on a real scenario yet. Revisit once tested.

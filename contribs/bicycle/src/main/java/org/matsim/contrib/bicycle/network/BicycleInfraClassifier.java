@@ -67,7 +67,8 @@ public final class BicycleInfraClassifier {
 
 	/**
 	 * Main entry: classify OSM tags into a bicycle infrastructure category.
-	 * Precedence: first match wins (mirrors your GraphHopper parser order).
+	 * Precedence: first match wins, in the order of {@code BikelaneCategories.lua}
+	 * (see the class JavaDoc for the source).
 	 */
 	public BicycleInfraCategory classify(Map<String, String> tags, Direction direction) {
 
