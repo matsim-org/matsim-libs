@@ -54,7 +54,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 //	private final static String TAG_HIGHWAY = "highway";
 	private final static String TAG_BICYCLE = "bicycle";
 	private final static String TAG_ONEWAYBICYCLE = "oneway:bicycle";
-
+	
 	private int countSmoothness = 0;
 	private int countSurfaceDirect = 0;
 	private int countSurfaceInferred = 0;
@@ -68,11 +68,11 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	private static final int BICYCLE_TRACK_HIERARCHY = 9;
 	private static final int FOOTPATH_TRACK_HIERARCHY = 10;
 	private static final int STEPS_TRACK_HIERARCHY = 11;
-
+	
 	public static void main(String[] args) throws Exception {
 		String inputCRS = "EPSG:4326"; // WGS84
 		String outputCRS = "EPSG:31468"; // DHDN Gauss-Krüger Zone 4
-		String demCRS = "EPSG:32632";
+		String tiffFileCRS = "EPSG:4326"; // WGS84
 //		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/osm/2017-08-29_mitte.osm";
 		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/osm/berlin-latest.osm";
 		String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/input/eu-dem/BerlinEUDEM.tif"; // Berlin EU-DEM
@@ -85,15 +85,15 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
-
-		ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, outputCRS, demCRS);
+		
+		ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, outputCRS, tiffFileCRS);
 
 		BicycleOsmNetworkReaderV2 bicycleNetworkReader = new BicycleOsmNetworkReaderV2(network, ct, elevationDataParser);
 		bicycleNetworkReader.setKeepPaths(true);
 //		bicycleNetworkReader.addWayTags(bicycleWayTags);
-
+		
 		bicycleNetworkReader.parse(inputOSM);
-
+		
 		bicycleNetworkReader.stats(network);
 
 		NetworkUtils.cleanNetwork(network, Set.of("bicycle", TransportMode.bike, TransportMode.car));
@@ -121,26 +121,26 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		super(network, transformation, useHighwayDefaults, useVspAdjustments);
 			List<String> bicycleWayTags = Arrays.asList( BicycleUtils.CYCLEWAY, BicycleUtils.SURFACE, BicycleUtils.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE );
 			super.addWayTags( bicycleWayTags );
-
+		
 //		double bicyclePCU = 0.2; // Use the same in your run
 			this.bicycleAsTransportModeName = bicycleAsTransportModeName;
-
+		
 		if (useHighwayDefaults) {
 			LOG.info("Also falling back to bicycle-specific default values.");
 			// All highway types whose defaults are no set via the super class, see above.
 			// Cf. http://wiki.openstreetmap.org/wiki/Key:highway
 			// hierarchy , highwayType, lanesPerDirection, freespeed, freespeedFactor, laneCapacity_vehPerHour
-
+			
 			// Capacity of a track for bicycles analogous to that of a primary road for cars, dz, aug'18
 			// this.setHighwayDefaults(7, "track",	1, 10.0/3.6, 1.0, 50); // Simon's values
 			this.setHighwayDefaults(BICYCLE_TRACK_HIERARCHY, "track", 1, 30.0/3.6, 1.0, 1500 * bicyclePCU);
-
+			
 			//this.setHighwayDefaults(7, "cycleway", 1, 10.0/3.6, 1.0, 50); // Simon's values
 			this.setHighwayDefaults(BICYCLE_TRACK_HIERARCHY, "cycleway", 1, 30.0/3.6, 1.0, 1500 * bicyclePCU);
-
+			
 			// this.setHighwayDefaults(8, "service", 1, 10.0/3.6, 1.0, 50); // Simon's values
 			this.setHighwayDefaults(BICYCLE_TRACK_HIERARCHY, "service", 1, 10.0/3.6, 1.0, 1000 * bicyclePCU);
-
+			
 			// Capacity of a footway/pedestrian/path zone for bicycles analogous to that of a residential road for cars, dz, aug'18
 			// this.setHighwayDefaults(8, "footway", 1, 10.0/3.6, 1.0, 50); // Simon's values
 			this.setHighwayDefaults(FOOTPATH_TRACK_HIERARCHY, "footway", 1, 10.0/3.6, 1.0, 600 * bicyclePCU); // Simon's values
@@ -148,9 +148,9 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 			this.setHighwayDefaults(FOOTPATH_TRACK_HIERARCHY, "pedestrian", 1, 10.0/3.6, 1.0, 600 * bicyclePCU); // Simon's values
 			// this.setHighwayDefaults(8, "path", 1, 10.0/3.6, 1.0, 50); // Simon's values
 			this.setHighwayDefaults(FOOTPATH_TRACK_HIERARCHY, "path", 1, 20.0/3.6, 1.0, 600 * bicyclePCU);
-
+			
 			// "bridleway" is exclusively for equestrians; if others are allowed to use it, it should not be classified as bridleway
-
+			
 			// this.setHighwayDefaults(10, "steps", 1, 2.0/3.6, 1.0, 50); // Simon's values
 			this.setHighwayDefaults(STEPS_TRACK_HIERARCHY, "steps", 1, 1.0/3.6, 1.0, 50);
 		} else {
@@ -164,7 +164,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 			this.elevationDataParser = elevationDataParser;
 		}
 	}
-
+	
 	private void stats(Network network) {
 		LOG.info("Smoothness created: " + countSmoothness + " which is " + ((float) countSmoothness / network.getLinks().size()) * 100 + "%.");
 		LOG.info("Surface (direct) created: " + countSurfaceDirect  + " which is " + ((float) countSurfaceDirect / network.getLinks().size()) * 100 + "%.");
@@ -173,7 +173,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		LOG.info("Cycleway type created: " + countCyclewayType + " which is " + ((float) countCyclewayType / network.getLinks().size()) * 100 + "%.");
 		LOG.info("Bicyle created: " + countBicycle + " which is " + ((float) countBicycle / network.getLinks().size()) * 100 + "%.");
 	}
-
+	
 	@Override
 	protected void setOrModifyNodeAttributes(Node n, OsmNode node) {
 		if (this.elevationDataParser==null) return;
@@ -182,14 +182,14 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		Coord elevationCoord = CoordUtils.createCoord(coord.getX(), coord.getY(), elevation);
 		n.setCoord(elevationCoord);
 	}
-
+	
 	@Override
 	protected void setOrModifyLinkAttributes(Link l, OsmWay way, boolean forwardDirection) {
 		Set<String> modes = new HashSet<String>();
-
+		
 		String highwayType = way.tags.get(TAG_HIGHWAY);
 		OsmHighwayDefaults defaults = this.highwayDefaults.get(way.tags.get(TAG_HIGHWAY));
-
+		
 		// Allow bicycles on all infrastructures except motorways (hierarchy 1) and trunk roads (hierarchy 2)
 //		if (defaults.hierarchy == 3 || defaults.hierarchy == 4 || defaults.hierarchy == 5 || defaults.hierarchy == 6
 //			|| defaults.hierarchy == 7 || defaults.hierarchy == 8 || defaults.hierarchy == 9) {
@@ -276,7 +276,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	protected boolean reverseDirectionExists(OsmWay way) {
 		return !isOneway(way) || oppositeDirectionAllowedForBicycles(way);
 	}
-
+	
 	@Override
 	protected boolean forwardDirectionExists(OsmWay way) {
 		return !isOnewayReverse(way) || oppositeDirectionAllowedForBicycles(way);
@@ -288,7 +288,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		if (onewayTagBicycle != null) {
 			if ("no".equals(onewayTagBicycle)) { // This means cyclists are allowed to travel in the opposite direction
 				reverseDirectionAllowedForBicycles = true;
-			}
+			} 
 		}
 		String cyclewayType = way.tags.get(BicycleUtils.CYCLEWAY);
 		if (cyclewayType != null) {
