@@ -122,6 +122,9 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 
 					sw.addDashboard(new ImpactAnalysisDashboard(modes));
 				}
+				case bvwp -> {
+					sw.addDashboard(new BvwpDashboard(Set.of("car"), Set.of("freight", "truck")));
+				}
 				default -> throw new IllegalArgumentException("unkown dashboard type: " + dashboardType);
 			}
 
@@ -148,7 +151,8 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 		ODTrip,
 		trip,
 		publicTransit,
-		impactAnalysis
+		impactAnalysis,
+		bvwp
 	}
 
 }
