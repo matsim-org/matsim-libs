@@ -125,8 +125,10 @@ public final class BicycleLinkPolicy {
 		boolean relevant = HW_PATH.equals(highway) || HW_CYCLEWAY.equals(highway) || HW_FOOTWAY.equals(highway);
 		if (!relevant) return false;
 
-		if (tags.get(ONEWAY_BICYCLE).equals(YES)) return true;
-		if (tags.get(ONEWAY).equals(YES)) {
+		// Null-safe: the tag map is the raw OSM tag set, so oneway / oneway:bicycle
+		// are usually absent. Keep the constant on the left to avoid an NPE.
+		if (YES.equals(tags.get(ONEWAY_BICYCLE))) return true;
+		if (YES.equals(tags.get(ONEWAY))) {
 			return !NO.equals(tags.get(ONEWAY_BICYCLE));
 		}
 		return false;
