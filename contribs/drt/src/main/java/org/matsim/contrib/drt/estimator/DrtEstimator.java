@@ -20,7 +20,11 @@ public interface DrtEstimator extends ControllerListener {
 	 */
 	Estimate estimate(DrtRoute route, OptionalTime departureTime);
 
-	/** Whether callers must populate direct ride time and distance before estimating. */
+	/**
+	 *  Whether callers must populate direct ride time and distance before estimating.
+	 *  As of July2026, only CsvServiceQualityDrtEstimator provides detoured ride time and distance
+	 *  for each origin-destination combination; thus, car routing is not required. 
+	 *  */
 	default boolean requiresDirectTripRouting() {
 		return true;
 	}

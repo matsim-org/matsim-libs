@@ -89,7 +89,7 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 	@Comment("Comma-separated list of simulation times in seconds for service quality probing, e.g. '28800,32400,36000'.")
 	private String serviceQualityProbeTimes = "";
 
-	@Comment("Output file name for service quality probes. The file is written to the last iteration output directory.")
+	@Comment("Output file name for service quality probes. The file is written to the output directory.")
 	private String serviceQualityProbeOutputFile = "drt_service_quality_probes.csv.gz";
 
 	@Comment("Optional comma-separated stop-pair CSV/CSV.GZ files produced by accessibility. In STOP_TO_STOP mode, only their unique directed pairs are probed. If unset, all stop pairs are probed.")

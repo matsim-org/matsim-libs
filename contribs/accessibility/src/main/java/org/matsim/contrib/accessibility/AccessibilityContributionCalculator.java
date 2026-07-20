@@ -59,11 +59,11 @@ interface AccessibilityContributionCalculator {
 
 	/*
 	Needed for perallelization
+	Kai is not so happy about duplication on this level. Prone to errors since the deep copy needs to be programmed manually.
 	 */
 	AccessibilityContributionCalculator duplicate();
 
 	/** Called once after all departure times for an opportunity type have been processed. */
 	default void finish() {
 	}
-	// Kai is not so happy about duplication on this level. Prone to errors since the deep copy needs to be programmed manually.
 }
