@@ -70,7 +70,10 @@ class RunMatsimTest {
 		assertThatThrownBy(controler::run)
 			.rootCause()
 			.isInstanceOf(IllegalStateException.class)
-			.hasMessageContaining(E_BIKE);
+			.hasMessageContaining("No scoring parameters are defined")
+			.hasMessageContaining("'" + E_BIKE + "'")
+			.hasMessageContaining("modeParams parameter set")
+			.hasMessageContaining("scoring configuration");
 	}
 
 	@Test
@@ -109,10 +112,11 @@ class RunMatsimTest {
 
 		Controler controler = new Controler(scenario);
 		assertThatThrownBy(controler::run)
-			.isInstanceOf(RuntimeException.class)
-			.hasMessageContaining("Unable to provision")
-			.hasMessageContaining("[Guice/ErrorInCustomProvider]")
-			.hasMessageContaining(E_BIKE)
-			.hasMessageContaining("ScoringConfigGroup$ModeParams");
+			.rootCause()
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("No scoring parameters are defined")
+			.hasMessageContaining("'" + E_BIKE + "'")
+			.hasMessageContaining("modeParams parameter set")
+			.hasMessageContaining("scoring configuration");
 	}
 }
