@@ -40,9 +40,9 @@ public class TransitRouterConfigTest {
 		VspExperimentalConfigGroup vspConfig = new VspExperimentalConfigGroup() ;
 
 		final double travelingPt = -9.0;
-		planScoring.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+		planScoring.getModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
 		final double travelingWalk = -11.0;
-		planScoring.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
+		planScoring.getModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
 
 //		planScoring.setMarginalUtlOfWaiting_utils_hr(-13.0);
 		planScoring.setMarginalUtlOfWaitingPt_utils_hr(-13.0);

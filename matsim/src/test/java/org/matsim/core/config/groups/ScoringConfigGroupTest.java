@@ -53,12 +53,12 @@ import org.matsim.testcases.MatsimTestUtils;
 
 		if ( ! fullyHierarchical ){
 			// mode params are there for default modes:
-			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.car ) );
-			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.walk ) );
-			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.bike ) );
-			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.ride ) );
-			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.pt ) );
-			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.other ) );
+			Assertions.assertNotNull( scoringConfig.getModeParams().get( TransportMode.car ) );
+			Assertions.assertNotNull( scoringConfig.getModeParams().get( TransportMode.walk ) );
+			Assertions.assertNotNull( scoringConfig.getModeParams().get( TransportMode.bike ) );
+			Assertions.assertNotNull( scoringConfig.getModeParams().get( TransportMode.ride ) );
+			Assertions.assertNotNull( scoringConfig.getModeParams().get( TransportMode.pt ) );
+			Assertions.assertNotNull( scoringConfig.getModeParams().get( TransportMode.other ) );
 
 			// default stage/interaction params are there for pt and drt (as a service):
 			Assertions.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.pt ) ) );
@@ -84,7 +84,7 @@ import org.matsim.testcases.MatsimTestUtils;
 		ScoringConfigGroup scoringConfig = config.scoring() ;
 		testResultsBeforeCheckConsistency( config, true ) ;
 		log.warn( "" );
-		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+		for( ModeParams modeParams : scoringConfig.getModeParams().values() ){
 			log.warn(  modeParams );
 		}
 		log.warn( "" );
@@ -97,7 +97,7 @@ import org.matsim.testcases.MatsimTestUtils;
 		scoringConfig.checkConsistency( config );
 		testResultsAfterCheckConsistency( config );
 		log.warn( "" );
-		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+		for( ModeParams modeParams : scoringConfig.getModeParams().values() ){
 			log.warn(  modeParams );
 		}
 		log.warn( "" );
@@ -113,7 +113,7 @@ import org.matsim.testcases.MatsimTestUtils;
 		ScoringConfigGroup scoringConfig = config.scoring() ;
 		testResultsBeforeCheckConsistency( config, false ) ;
 		log.warn( "" );
-		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+		for( ModeParams modeParams : scoringConfig.getModeParams().values() ){
 			log.warn(  modeParams );
 		}
 		log.warn( "" );
@@ -126,7 +126,7 @@ import org.matsim.testcases.MatsimTestUtils;
 		scoringConfig.checkConsistency( config );
 		testResultsAfterCheckConsistency( config );
 		log.warn( "" );
-		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+		for( ModeParams modeParams : scoringConfig.getModeParams().values() ){
 			log.warn(  modeParams );
 		}
 		log.warn( "" );
@@ -147,6 +147,158 @@ import org.matsim.testcases.MatsimTestUtils;
 		c.addActivityParams(ap);
 		Assertions.assertEquals(ap, c.getActivityParams("type1"));
         Assertions.assertEquals(originalSize + 1, c.getActivityParams().size());
+	}
+
+	@Test
+	void testExplicitSubpopulationGettersDoNotFallback() {
+		// Explicit subpopulation accessors should only return parameters defined for exactly that subpopulation.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		ScoringConfigGroup.ScoringParameterSet freightParams = scoringConfigGroup.getOrCreateScoringParameters("freight");
+		ModeParams truckModeParams = new ModeParams("truck");
+		ActivityParams freightActivityParams = new ActivityParams("freightInteraction");
+		freightActivityParams.setTypicalDuration(600.);
+		freightParams.addModeParams(truckModeParams);
+		freightParams.addActivityParams(freightActivityParams);
+
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getModeParamsForSubpopulation("missing"));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getActivityParamsForSubpopulation("missing"));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", "missing"));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getMarginalUtilityOfMoney("missing"));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr("missing"));
+
+		Assertions.assertSame(truckModeParams,
+			scoringConfigGroup.getModeParamsForSubpopulation("freight").get("truck"));
+		Assertions.assertSame(freightActivityParams,
+			scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", "freight"));
+		Assertions.assertEquals(freightParams.getMarginalUtilityOfMoney(),
+			scoringConfigGroup.getMarginalUtilityOfMoney("freight"), 1e-7);
+		Assertions.assertEquals(freightParams.getMarginalUtlOfWaiting_utils_hr(),
+			scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr("freight"), 1e-7);
+		Assertions.assertTrue(scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().containsKey("freight"));
+		Assertions.assertTrue(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey("freight"));
+		Assertions.assertFalse(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey(null));
+	}
+
+	@Test
+	void testAddParamsForSubpopulationRequiresExplicitSubpopulation() {
+		// Adding mode and activity parameters for a subpopulation should require that the subpopulation already exists.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		scoringConfigGroup.getOrCreateScoringParameters("freight");
+
+		ModeParams truckModeParams = new ModeParams("truck");
+		ActivityParams freightActivityParams = new ActivityParams("freightInteraction");
+		freightActivityParams.setTypicalDuration(600.);
+
+		scoringConfigGroup.addModeParamsForSubpopulation(truckModeParams, "freight");
+		scoringConfigGroup.addActivityParamsForSubpopulation(freightActivityParams, "freight");
+
+		Assertions.assertSame(truckModeParams,
+			scoringConfigGroup.getModeParamsForSubpopulation("freight").get("truck"));
+		Assertions.assertSame(freightActivityParams,
+			scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", "freight"));
+
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.addModeParamsForSubpopulation(new ModeParams("van"), "missing"));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.addActivityParamsForSubpopulation(new ActivityParams("missingInteraction"), "missing"));
+	}
+
+	@Test
+	void testSetScoringParametersAsDefaultSubpopulationUsesExistingParameters() {
+		// Setting an existing subpopulation as default should create an independent default parameter set.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		ScoringConfigGroup.ScoringParameterSet freightParams = scoringConfigGroup.getOrCreateScoringParameters("freight");
+		ModeParams truckModeParams = new ModeParams("truck");
+		truckModeParams.setConstant(23.);
+		ActivityParams freightActivityParams = new ActivityParams("freightInteraction");
+		freightActivityParams.setTypicalDuration(600.);
+		freightParams.addModeParams(truckModeParams);
+		freightParams.addActivityParams(freightActivityParams);
+		freightParams.setMarginalUtilityOfMoney(4.);
+
+		ScoringConfigGroup.ScoringParameterSet defaultParams =
+			scoringConfigGroup.setScoringParametersAsDefaultSubpopulation("freight");
+
+		Assertions.assertNotSame(freightParams, defaultParams);
+		Assertions.assertSame(defaultParams,
+			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertSame(freightParams,
+			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get("freight"));
+		Assertions.assertFalse(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertEquals(4., scoringConfigGroup.getDefaultMarginalUtilityOfMoney(), 1e-7);
+		Assertions.assertEquals(23.,
+			scoringConfigGroup.getModeParams().get("truck").getConstant(), 1e-7);
+		Assertions.assertEquals(freightActivityParams.getTypicalDuration(),
+			scoringConfigGroup.getActivityParams("freightInteraction").getTypicalDuration());
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getModeParamsForSubpopulation(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getActivityParamsForSubpopulation(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getMarginalUtilityOfMoney(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+
+		scoringConfigGroup.setDefaultMarginalUtilityOfMoney(5.);
+		scoringConfigGroup.setDefaultMarginalUtlOfWaiting_utils_hr(-2.);
+		scoringConfigGroup.setDefaultMarginalUtlOfWaitingPt_utils_hr(-3.);
+		scoringConfigGroup.setDefaultLateArrival_utils_hr(-4.);
+		scoringConfigGroup.setDefaultEarlyDeparture_utils_hr(-5.);
+		scoringConfigGroup.setDefaultPerforming_utils_hr(6.);
+		scoringConfigGroup.setDefaultUtilityOfLineSwitch(-7.);
+
+		Assertions.assertEquals(5., scoringConfigGroup.getDefaultMarginalUtilityOfMoney(), 1e-7);
+		Assertions.assertEquals(4., scoringConfigGroup.getMarginalUtilityOfMoney("freight"), 1e-7);
+		Assertions.assertEquals(-2., scoringConfigGroup.getDefaultMarginalUtlOfWaiting_utils_hr(), 1e-7);
+		Assertions.assertEquals(0., scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr("freight"), 1e-7);
+		Assertions.assertEquals(-3., scoringConfigGroup.getDefaultMarginalUtlOfWaitingPt_utils_hr(), 1e-7);
+		Assertions.assertEquals(-4., scoringConfigGroup.getDefaultLateArrival_utils_hr(), 1e-7);
+		Assertions.assertEquals(-18., freightParams.getLateArrival_utils_hr(), 1e-7);
+		Assertions.assertEquals(-5., scoringConfigGroup.getDefaultEarlyDeparture_utils_hr(), 1e-7);
+		Assertions.assertEquals(-0., freightParams.getEarlyDeparture_utils_hr(), 1e-7);
+		Assertions.assertEquals(6., scoringConfigGroup.getDefaultPerforming_utils_hr(), 1e-7);
+		Assertions.assertEquals(6., freightParams.getPerforming_utils_hr(), 1e-7);
+		Assertions.assertEquals(-7., scoringConfigGroup.getDefaultUtilityOfLineSwitch(), 1e-7);
+		Assertions.assertEquals(-1., freightParams.getUtilityOfLineSwitch(), 1e-7);
+
+		truckModeParams.setConstant(42.);
+
+		Assertions.assertEquals(23.,
+			scoringConfigGroup.getModeParams().get("truck").getConstant(), 1e-7);
+		Assertions.assertEquals(42.,
+			scoringConfigGroup.getModeParamsForSubpopulation("freight").get("truck").getConstant(), 1e-7);
+	}
+
+	@Test
+	void testSetScoringParametersAsDefaultSubpopulationRequiresExistingSubpopulation() {
+		// Missing subpopulations should fail instead of creating an empty default by accident.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.setScoringParametersAsDefaultSubpopulation("missing"));
+	}
+
+	@Test
+	void testSetScoringParametersAsDefaultSubpopulationFailsIfDefaultAlreadyExists() {
+		// An already explicit default should not be overwritten by another subpopulation.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		scoringConfigGroup.getOrCreateScoringParameters("freight");
+		scoringConfigGroup.setScoringParametersAsDefaultSubpopulation("freight");
+		scoringConfigGroup.getOrCreateScoringParameters("person");
+
+		Assertions.assertThrows(RuntimeException.class,
+			() -> scoringConfigGroup.setScoringParametersAsDefaultSubpopulation("person"));
 	}
 
 	 @Test
@@ -184,38 +336,38 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong brainExpBeta "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.bike).getConstant(),
-				inputConfigGroup.getModes().get(TransportMode.bike).getConstant(),
+				initialGroup.getModeParams().get(TransportMode.bike).getConstant(),
+				inputConfigGroup.getModeParams().get(TransportMode.bike).getConstant(),
 				1e-7,
 				"wrong constantBike "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.car).getConstant(),
-				inputConfigGroup.getModes().get(TransportMode.car).getConstant(),
+				initialGroup.getModeParams().get(TransportMode.car).getConstant(),
+				inputConfigGroup.getModeParams().get(TransportMode.car).getConstant(),
 				1e-7,
 				"wrong constantCar "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.other).getConstant(),
-				inputConfigGroup.getModes().get(TransportMode.other).getConstant(),
+				initialGroup.getModeParams().get(TransportMode.other).getConstant(),
+				inputConfigGroup.getModeParams().get(TransportMode.other).getConstant(),
 				1e-7,
 				"wrong constantOther "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.pt).getConstant(),
-				inputConfigGroup.getModes().get(TransportMode.pt).getConstant(),
+				initialGroup.getModeParams().get(TransportMode.pt).getConstant(),
+				inputConfigGroup.getModeParams().get(TransportMode.pt).getConstant(),
 				1e-7,
 				"wrong constantPt "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.walk).getConstant(),
-				inputConfigGroup.getModes().get(TransportMode.walk).getConstant(),
+				initialGroup.getModeParams().get(TransportMode.walk).getConstant(),
+				inputConfigGroup.getModeParams().get(TransportMode.walk).getConstant(),
 				1e-7,
 				"wrong constantWalk "+msg);
 		Assertions.assertEquals(
-				initialGroup.getLateArrival_utils_hr(),
-				inputConfigGroup.getLateArrival_utils_hr(),
+				initialGroup.getDefaultLateArrival_utils_hr(),
+				inputConfigGroup.getDefaultLateArrival_utils_hr(),
 				1e-7,
 				"wrong lateArrival_utils_hr "+msg );
 		Assertions.assertEquals(
-				initialGroup.getEarlyDeparture_utils_hr(),
-				inputConfigGroup.getEarlyDeparture_utils_hr(),
+				initialGroup.getDefaultEarlyDeparture_utils_hr(),
+				inputConfigGroup.getDefaultEarlyDeparture_utils_hr(),
 				1e-7,
 				"wrong earlyDeparture_utils_hr "+msg );
 		Assertions.assertEquals(
@@ -224,38 +376,38 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong learningRate "+msg );
 		Assertions.assertEquals(
-				initialGroup.getMarginalUtilityOfMoney(),
-				inputConfigGroup.getMarginalUtilityOfMoney() ,
+				initialGroup.getDefaultMarginalUtilityOfMoney(),
+				inputConfigGroup.getDefaultMarginalUtilityOfMoney() ,
 				1e-7,
 				"wrong marginalUtilityOfMoney "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.other).getMarginalUtilityOfDistance(),
-				inputConfigGroup.getModes().get(TransportMode.other).getMarginalUtilityOfDistance(),
+				initialGroup.getModeParams().get(TransportMode.other).getMarginalUtilityOfDistance(),
+				inputConfigGroup.getModeParams().get(TransportMode.other).getMarginalUtilityOfDistance(),
 				1e-7,
 				"wrong marginalUtlOfDistanceOther "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(),
-				inputConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(),
+				initialGroup.getModeParams().get(TransportMode.walk).getMarginalUtilityOfDistance(),
+				inputConfigGroup.getModeParams().get(TransportMode.walk).getMarginalUtilityOfDistance(),
 				1e-7,
 				"wrong marginalUtlOfDistanceWalk "+msg);
 		Assertions.assertEquals(
-				initialGroup.getMarginalUtlOfWaiting_utils_hr(),
-				inputConfigGroup.getMarginalUtlOfWaiting_utils_hr(),
+				initialGroup.getDefaultMarginalUtlOfWaiting_utils_hr(),
+				inputConfigGroup.getDefaultMarginalUtlOfWaiting_utils_hr(),
 				1e-7,
 				"wrong marginalUtlOfWaiting_utils_hr "+msg );
 		Assertions.assertEquals(
-				initialGroup.getMarginalUtlOfWaitingPt_utils_hr(),
-				inputConfigGroup.getMarginalUtlOfWaitingPt_utils_hr(),
+				initialGroup.getDefaultMarginalUtlOfWaitingPt_utils_hr(),
+				inputConfigGroup.getDefaultMarginalUtlOfWaitingPt_utils_hr(),
 				1e-7,
 				"wrong marginalUtlOfWaitingPt_utils_hr "+msg );
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate(),
-				inputConfigGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate(),
+				initialGroup.getModeParams().get(TransportMode.car).getMonetaryDistanceRate(),
+				inputConfigGroup.getModeParams().get(TransportMode.car).getMonetaryDistanceRate(),
 				1e-7,
 				"wrong monetaryDistanceCostRateCar "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate(),
-				inputConfigGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate(),
+				initialGroup.getModeParams().get(TransportMode.pt).getMonetaryDistanceRate(),
+				inputConfigGroup.getModeParams().get(TransportMode.pt).getMonetaryDistanceRate(),
 				1e-7,
 				"wrong monetaryDistanceCostRatePt "+msg);
 		Assertions.assertEquals(
@@ -264,38 +416,38 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong pathSizeLogitBeta "+msg );
 		Assertions.assertEquals(
-				initialGroup.getPerforming_utils_hr(),
-				inputConfigGroup.getPerforming_utils_hr(),
+				initialGroup.getDefaultPerforming_utils_hr(),
+				inputConfigGroup.getDefaultPerforming_utils_hr(),
 				1e-7,
 				"wrong performing_utils_hr "+msg );
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling(),
-				inputConfigGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling(),
+				initialGroup.getModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling(),
+				inputConfigGroup.getModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling(),
 				1e-7,
 				"wrong traveling_utils_hr "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling(),
-				inputConfigGroup.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling(),
+				initialGroup.getModeParams().get(TransportMode.bike).getMarginalUtilityOfTraveling(),
+				inputConfigGroup.getModeParams().get(TransportMode.bike).getMarginalUtilityOfTraveling(),
 				1e-7,
 				"wrong travelingBike_utils_hr "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.other).getMarginalUtilityOfTraveling(),
-				inputConfigGroup.getModes().get(TransportMode.other).getMarginalUtilityOfTraveling(),
+				initialGroup.getModeParams().get(TransportMode.other).getMarginalUtilityOfTraveling(),
+				inputConfigGroup.getModeParams().get(TransportMode.other).getMarginalUtilityOfTraveling(),
 				1e-7,
 				"wrong travelingOther_utils_hr "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling(),
-				inputConfigGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling(),
+				initialGroup.getModeParams().get(TransportMode.pt).getMarginalUtilityOfTraveling(),
+				inputConfigGroup.getModeParams().get(TransportMode.pt).getMarginalUtilityOfTraveling(),
 				1e-7,
 				"wrong travelingPt_utils_hr "+msg);
 		Assertions.assertEquals(
-				initialGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling(),
-				inputConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling(),
+				initialGroup.getModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling(),
+				inputConfigGroup.getModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling(),
 				1e-7,
 				"wrong travelingWalk_utils_hr "+msg);
 		Assertions.assertEquals(
-				initialGroup.getUtilityOfLineSwitch(),
-				inputConfigGroup.getUtilityOfLineSwitch(),
+				initialGroup.getDefaultUtilityOfLineSwitch(),
+				inputConfigGroup.getDefaultUtilityOfLineSwitch(),
 				1e-7,
 				"wrong utilityOfLineSwitch "+msg );
 
@@ -338,9 +490,9 @@ import org.matsim.testcases.MatsimTestUtils;
 					"wrong typicalDuration "+msg);
 		}
 
-		for ( ModeParams initialSettings : initialGroup.getModes().values() ) {
+		for ( ModeParams initialSettings : initialGroup.getModeParams().values() ) {
 			final String mode = initialSettings.getMode();
-			final ModeParams inputSettings = inputConfigGroup.getModes().get( mode );
+			final ModeParams inputSettings = inputConfigGroup.getModeParams().get( mode );
 			Assertions.assertEquals(
 					initialSettings.getConstant(),
 					inputSettings.getConstant(),
@@ -392,7 +544,7 @@ import org.matsim.testcases.MatsimTestUtils;
 			settings.getTypicalDuration().ifDefined(t -> module.addParam("activityTypicalDuration_" + suffix, "" + t));
 		}
 
-		for ( ModeParams settings : initialGroup.getModes().values() ) {
+		for ( ModeParams settings : initialGroup.getModeParams().values() ) {
 			final String mode = settings.getMode();
 			module.addParam( "constant_"+mode , ""+settings.getConstant() );
 			module.addParam( "marginalUtlOfDistance_"+mode , ""+settings.getMarginalUtilityOfDistance() );
@@ -412,29 +564,29 @@ import org.matsim.testcases.MatsimTestUtils;
 		final ScoringConfigGroup group = new ScoringConfigGroup();
 
 		group.setBrainExpBeta( 124);
-		group.getModes().get(TransportMode.bike).setConstant((double) 98);
-		group.getModes().get(TransportMode.car).setConstant((double) 345);
-		group.getModes().get(TransportMode.other).setConstant((double) 345);
-		group.getModes().get(TransportMode.pt).setConstant((double) 983);
-		group.getModes().get(TransportMode.walk).setConstant((double) 89);
-		group.setLateArrival_utils_hr( 345 );
-		group.setEarlyDeparture_utils_hr( 5 );
+		group.getModeParams().get(TransportMode.bike).setConstant((double) 98);
+		group.getModeParams().get(TransportMode.car).setConstant((double) 345);
+		group.getModeParams().get(TransportMode.other).setConstant((double) 345);
+		group.getModeParams().get(TransportMode.pt).setConstant((double) 983);
+		group.getModeParams().get(TransportMode.walk).setConstant((double) 89);
+		group.setDefaultLateArrival_utils_hr( 345 );
+		group.setDefaultEarlyDeparture_utils_hr( 5 );
 		group.setLearningRate( 98 );
-		group.setMarginalUtilityOfMoney( 9 );
-		group.getModes().get(TransportMode.other).setMarginalUtilityOfDistance((double) 23);
-		group.getModes().get(TransportMode.walk).setMarginalUtilityOfDistance((double) 8675);
-		group.setMarginalUtlOfWaiting_utils_hr( 65798 );
-		group.setMarginalUtlOfWaitingPt_utils_hr( 9867 );
-		group.getModes().get(TransportMode.car).setMonetaryDistanceRate((double) 240358);
-		group.getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 9835);
+		group.setDefaultMarginalUtilityOfMoney( 9 );
+		group.getModeParams().get(TransportMode.other).setMarginalUtilityOfDistance((double) 23);
+		group.getModeParams().get(TransportMode.walk).setMarginalUtilityOfDistance((double) 8675);
+		group.setDefaultMarginalUtlOfWaiting_utils_hr( 65798 );
+		group.setDefaultMarginalUtlOfWaitingPt_utils_hr( 9867 );
+		group.getModeParams().get(TransportMode.car).setMonetaryDistanceRate((double) 240358);
+		group.getModeParams().get(TransportMode.pt).setMonetaryDistanceRate((double) 9835);
 		group.setPathSizeLogitBeta( 8 );
-		group.setPerforming_utils_hr( 678 );
-		group.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 246);
-		group.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling((double) 968);
-		group.getModes().get(TransportMode.other).setMarginalUtilityOfTraveling((double) 206);
-		group.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 957);
-		group.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 983455);
-		group.setUtilityOfLineSwitch( 396 );
+		group.setDefaultPerforming_utils_hr( 678 );
+		group.getModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 246);
+		group.getModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling((double) 968);
+		group.getModeParams().get(TransportMode.other).setMarginalUtilityOfTraveling((double) 206);
+		group.getModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 957);
+		group.getModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 983455);
+		group.setDefaultUtilityOfLineSwitch( 396 );
 
 		final Random random = new Random( 925 );
 		for ( int i=0; i < 10; i++ ) {

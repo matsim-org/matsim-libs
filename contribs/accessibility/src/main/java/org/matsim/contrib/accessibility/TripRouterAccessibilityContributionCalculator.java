@@ -88,7 +88,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 		this.networkConfigGroup = scenario.getConfig().network();
 		this.scenario = scenario;
 
-		betaWalkTT = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		betaWalkTT = scoringConfigGroup.getModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 
 		this.walkSpeed_m_s = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk);
 
@@ -152,12 +152,12 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 
 				// Note: The following computation where the end link length is added is only correct once the end link is removed from the route
 				// in the NetworkRoutingModule (route.setDistance(RouteUtils.calcDistance(route, 1.0, 0.0, this.network));)
-				if (this.scoringConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance() != 0.) {
+				if (this.scoringConfigGroup.getModeParams().get(leg.getMode()).getMarginalUtilityOfDistance() != 0.) {
 					LOG.warn("A computation including a marginal utility of distance will only be correct if the route time/distance" +
 							"inconsistency in the NetworkRoutingModule is solved.");
 				}
-				utility += (leg.getRoute().getDistance() + endLinkLength) * this.scoringConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance();
-				utility += (leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.scoringConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
+				utility += (leg.getRoute().getDistance() + endLinkLength) * this.scoringConfigGroup.getModeParams().get(leg.getMode()).getMarginalUtilityOfDistance();
+				utility += (leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.scoringConfigGroup.getModeParams().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
 				utility += -(leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.scoringConfigGroup.getPerforming_utils_hr() / 3600.;
 			}
 

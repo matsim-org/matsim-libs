@@ -68,7 +68,7 @@ public class TollHandler implements CongestionEventHandler, LinkEnterEventHandle
 	private double congestionTollFactor;
 
 	public TollHandler(Scenario scenario, double congestionTollFactor) {
-		this.vtts_car = (scenario.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - scenario.getConfig().scoring().getPerforming_utils_hr()) / scenario.getConfig().scoring().getMarginalUtilityOfMoney();
+		this.vtts_car = (scenario.getConfig().scoring().getModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() - scenario.getConfig().scoring().getPerforming_utils_hr()) / scenario.getConfig().scoring().getMarginalUtilityOfMoney();
 		this.congestionTollFactor = congestionTollFactor;
 		log.info("VTTS_car: " + vtts_car);
 		log.info("Congestion toll factor: " + congestionTollFactor);

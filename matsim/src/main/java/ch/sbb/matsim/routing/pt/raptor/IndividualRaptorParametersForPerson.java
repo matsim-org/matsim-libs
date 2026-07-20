@@ -62,7 +62,7 @@ public class IndividualRaptorParametersForPerson implements RaptorParametersForP
 
 		ScoringConfigGroup pcsConfig = config.scoring();
 
-		for (Map.Entry<String, ScoringConfigGroup.ModeParams> e : pcsConfig.getModes().entrySet()) {
+		for (Map.Entry<String, ScoringConfigGroup.ModeParams> e : pcsConfig.getModeParams().entrySet()) {
 			String mode = e.getKey();
 			ModeUtilityParameters modeParams = scoringParameters.modeParams.get(mode);
 

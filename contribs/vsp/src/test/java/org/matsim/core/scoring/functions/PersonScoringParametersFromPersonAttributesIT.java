@@ -52,7 +52,7 @@ public class PersonScoringParametersFromPersonAttributesIT {
         config.controller().setOutputDirectory(testUtils.getOutputDirectory());
         config.controller().setLastIteration(0);
         config.scoring().setPerforming_utils_hr(0.0d);
-        config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0d);
+        config.scoring().getModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0d);
         config.plans().setInputFile("plans2.xml");
 		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
 		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);

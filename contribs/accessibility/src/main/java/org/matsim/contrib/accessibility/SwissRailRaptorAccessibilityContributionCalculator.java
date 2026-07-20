@@ -79,8 +79,8 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 		this.scenario = scenario;
 		this.tripRouter = tripRouter;
 
-		this.betaWalkTT_h = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		this.betaWalkDist_m = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
+		this.betaWalkTT_h = scoringConfigGroup.getModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		this.betaWalkDist_m = scoringConfigGroup.getModeParams().get(TransportMode.walk).getMarginalUtilityOfDistance();
 	}
 
 

@@ -419,7 +419,7 @@ class AgentWiseComparisonKNUtils{
 	static void writeAscTable( Config config ){
 		Table summaryTable = Table.create( DoubleColumn.create( "ASC" ), StringColumn.create( "mode" ));
 
-		for( ScoringConfigGroup.ModeParams modeParams : config.scoring().getModes().values() ){
+		for( ScoringConfigGroup.ModeParams modeParams : config.scoring().getModeParams().values() ){
 			summaryTable.doubleColumn( "ASC" ).append( modeParams.getConstant() );
 			summaryTable.stringColumn( "mode" ).append( modeParams.getMode() ) ;
 		}

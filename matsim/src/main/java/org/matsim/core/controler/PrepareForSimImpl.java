@@ -42,6 +42,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -181,6 +182,20 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		createAndAddVehiclesForEveryNetworkMode();
 
 		adaptOutdatedPlansForRoutingMode();
+		// (in principle, the above could be added as PersonPrepareForSimAlgorithm,
+		// see next.  However, what comes next is more like a hook for users and not central infrastructure,
+		// and in consequence having it as a separate call is also ok an maybe even better/safer.)
+
+		Set<String> subpopulations = new LinkedHashSet<>();
+		for( Person person : population.getPersons().values() ){
+			var subpop = PopulationUtils.getSubpopulation( person );
+			subpopulations.add( subpop );
+		}
+		if ( subpopulations.size() > 1 ){
+			for( String subpopulation : subpopulations ){
+				// check if there are corresponding scoring params, otherwise throw runtime exception
+			}
+		}
 
 		// (in principle, the above could be added as PersonPrepareForSimAlgorithm,
 		// see next.  However, what comes next is more like a hook for users and not central infrastructure,
@@ -196,6 +211,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				}
 			}
 		}
+		// (in principle, the above could be used.  in practice, there are no
+		// implementations of the interface in matsim core.  might be used in user code)
 
 		// make sure all routes are calculated.
 		// the above creation of vehicles per agent has to be run before executing the initial routing here. janek, aug'19

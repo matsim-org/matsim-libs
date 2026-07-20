@@ -2,7 +2,6 @@ package org.matsim.contrib.vsp.pt.fare;
 
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
@@ -15,8 +14,8 @@ public class PtFareModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		getConfig().scoring().getModes().get(TransportMode.pt).setDailyMonetaryConstant(0);
-		getConfig().scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
+		getConfig().scoring().getModeParams().get(TransportMode.pt).setDailyMonetaryConstant(0);
+		getConfig().scoring().getModeParams().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
 		Multibinder<PtFareCalculator> ptFareCalculator = Multibinder.newSetBinder(binder(), PtFareCalculator.class);
 
 		PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(this.getConfig(), PtFareConfigGroup.class);

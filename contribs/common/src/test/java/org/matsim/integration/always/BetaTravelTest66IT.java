@@ -322,7 +322,7 @@ public class BetaTravelTest66IT {
 		@Override
 		public void notifyStartup(final StartupEvent event) {
             // do some test to ensure the scenario is correct
-			double beta_travel = event.getServices().getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
+			double beta_travel = event.getServices().getConfig().scoring().getModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling();
             if ((beta_travel != -6.0) && (beta_travel != -66.0)) {
                 throw new IllegalArgumentException("Unexpected value for beta_travel. Expected -6.0 or -66.0, actual value is " + beta_travel);
             }
@@ -365,7 +365,7 @@ public class BetaTravelTest66IT {
 				event.getServices().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {
-				double beta_travel = event.getServices().getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
+				double beta_travel = event.getServices().getConfig().scoring().getModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling();
 				/* ***************************************************************
 				 * AUTOMATIC VERIFICATION OF THE TESTS:
 				 *

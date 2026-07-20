@@ -294,11 +294,11 @@ public final class PtMatrix {
 	}
 
 	public LeastCostPathCalculator asPathCalculator(ScoringConfigGroup scoringConfigGroup) {
-		final double betaWalkTT	= scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		final double betaWalkTD	= scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-		final double betaPtTT = scoringConfigGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		final double betaPtTD = scoringConfigGroup.getMarginalUtilityOfMoney() * scoringConfigGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate();
-		final double constPt = scoringConfigGroup.getModes().get(TransportMode.pt).getConstant();
+		final double betaWalkTT	= scoringConfigGroup.getModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		final double betaWalkTD	= scoringConfigGroup.getModeParams().get(TransportMode.walk).getMarginalUtilityOfDistance();
+		final double betaPtTT = scoringConfigGroup.getModeParams().get(TransportMode.pt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		final double betaPtTD = scoringConfigGroup.getMarginalUtilityOfMoney() * scoringConfigGroup.getModeParams().get(TransportMode.pt).getMonetaryDistanceRate();
+		final double constPt = scoringConfigGroup.getModeParams().get(TransportMode.pt).getConstant();
 
 		return new LeastCostPathCalculator() {
 			@Override

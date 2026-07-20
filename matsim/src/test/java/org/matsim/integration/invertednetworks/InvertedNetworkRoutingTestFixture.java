@@ -94,7 +94,7 @@ public class InvertedNetworkRoutingTestFixture {
 		stratSets.setWeight(1.0);
 		config.replanning().addStrategySettings(stratSets);
 		final double traveling = -1200.0;
-		config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
+		config.scoring().getModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		ActivityParams params = new ActivityParams("home");
 		params.setTypicalDuration(24.0 * 3600.0);
 		config.scoring().addActivityParams(params);

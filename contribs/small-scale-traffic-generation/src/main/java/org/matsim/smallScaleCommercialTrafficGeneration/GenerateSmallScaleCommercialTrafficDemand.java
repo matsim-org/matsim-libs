@@ -55,6 +55,8 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.VehicleTypeBasedScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -462,20 +464,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (!scenario.getVehicles().getVehicleTypes().containsKey(vehicleType.getId()))
 					scenario.getVehicles().addVehicleType(vehicleType);
 			});
-			Set<String> activityTypes = new HashSet<>(
-				scenario.getPopulation().getPersons().values().stream()
-					.flatMap(person -> PopulationUtils.getActivities(person.getSelectedPlan(),
-						TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream())
-					.map(Activity::getType)
-					.toList()
-			);
-			for (String activityType : activityTypes) {
-				config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams(activityType).setTypicalDuration(30 * 60));
-			}
-			List<String> subpopulations = scenario.getPopulation().getPersons().values().stream()
-				.map(PopulationUtils::getSubpopulation)
-				.filter(Objects::nonNull)
-				.toList();
+
+			Set<String> modes = NetworkUtils.getModes(scenario.getNetwork());
+			Set<String> subpopulations = PopulationUtils.getSubpopulationsOfPopulation(scenario.getPopulation());
 
 			subpopulations.forEach(subpopulation -> {
 				config.replanning().addStrategySettings(
@@ -485,37 +476,71 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				config.replanning().addStrategySettings(
 					new ReplanningConfigGroup.StrategySettings().setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute).setWeight(
 						0.1).setSubpopulation(subpopulation));
-			});
 
-			Set<String> modes = scenario.getVehicles().getVehicleTypes().values().stream()
-				.map(vehicleType -> vehicleType.getId().toString())
-				.distinct().collect(Collectors.toSet());
+				Set<String> activityTypesPerSubpopulation = new HashSet<>(
+					scenario.getPopulation().getPersons().values().stream()
+						.filter(person ->PopulationUtils.getSubpopulation(person).equals(subpopulation))
+						.flatMap(person -> PopulationUtils.getActivities(person.getSelectedPlan(),
+							TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream())
+						.map(Activity::getType)
+						.toList()
+				);
 
-			modes.forEach(mode -> {
-				ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
-				config.scoring().addModeParams(thisModeParams);
+				ScoringConfigGroup.ScoringParameterSet scoringParameters = config.scoring().getOrCreateScoringParameters(subpopulation);
+				scoringParameters.setPerforming_utils_hr(32.);
+				scoringParameters.setMarginalUtlOfWaitingPt_utils_hr(0.);
+				activityTypesPerSubpopulation.forEach(activityType -> {
+					ScoringConfigGroup.ActivityParams actParams = new ScoringConfigGroup.ActivityParams(activityType).setTypicalDuration(30 * 60);
+					scoringParameters.addActivityParams(actParams);
+				});
+				modes.forEach(mode -> {
+					ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
+					scoringParameters.addModeParams(thisModeParams);
+				});
+				scoringParameters.addModeParams(new ScoringConfigGroup.ModeParams("walk"));
 			});
+			config.scoring().setExplainScores(true);
+			config.scoring().setScoringParametersAsDefaultSubpopulation(subpopulations.stream().findFirst().orElseThrow());
 
 			Set<String> qsimModes = new HashSet<>(config.qsim().getMainModes());
-			config.qsim().setMainModes(Sets.union(qsimModes, modes));
-
+			Set<String> allQsimModes = Sets.union(qsimModes, modes);
+			config.qsim().setMainModes(allQsimModes);
+			ensureDefaultModeParams(config, allQsimModes);
 			Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
-			config.routing().setNetworkModes(Sets.union(networkModes, modes));
+			Set<String> allNetworkModes = Sets.union(networkModes, modes);
+			config.routing().setNetworkModes(allNetworkModes);
+			ensureDefaultModeParams(config, allNetworkModes);
 
-			SimWrapper sw = SimWrapper.create();
+			SimWrapper sw = SimWrapper.create(config);
 			sw.getConfigGroup().defaultParams().setShp(null);
 			sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
 			sw.getConfigGroup().setSampleSize(sample);
 			sw.addDashboard(new OverviewDashboard(modes));
-			sw.addDashboard(new CarrierDashboard("(*.)?output_carriers_withPlans.xml.gz"));
-			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
-			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			sw.addDashboard(new CarrierDashboard("(*.)?output_carriers_solvedVRP.xml.gz"));
+			String subpopSetterForDashboards;
+			if (usedSmallScaleCommercialTrafficType == SmallScaleCommercialTrafficType.completeSmallScaleCommercialTraffic)
+				subpopSetterForDashboards = "commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic";
+			else if (usedSmallScaleCommercialTrafficType == SmallScaleCommercialTrafficType.commercialPersonTraffic)
+				subpopSetterForDashboards = "commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service";
+			else if (usedSmallScaleCommercialTrafficType == SmallScaleCommercialTrafficType.goodsTraffic)
+				subpopSetterForDashboards = "smallScaleGoodsTraffic=goodsTraffic";
+			else
+				throw new RuntimeException("No traffic type selected.");
+
+			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis(subpopSetterForDashboards).setAnalysisArgs("--shp-filter", "none"));
+			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(subpopSetterForDashboards));
 			sw.addDashboard(new TrafficDashboard(modes));
 			Controller controller = prepareController(scenario);
 
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
 				controller.addOverridingModule(new RoadPricingModule(RoadPricingUtils.addOrGetRoadPricingScheme(scenario)));
 			}
+			controller.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(ScoringFunctionFactory.class).to(VehicleTypeBasedScoringFunctionFactory.class);
+				}
+			});
 			controller.addOverridingModule(new SimWrapperModule(sw));
 
 			// Creating inject always adds check for unmaterialized config groups.
@@ -905,16 +930,21 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Set<String> modes = scenario.getVehicles().getVehicleTypes().values().stream()
 			.map(VehicleType::getNetworkMode).collect(Collectors.toSet());
 
-		modes.forEach(mode -> {
-			ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
-			scenario.getConfig().scoring().addModeParams(thisModeParams);
-		});
+		ensureDefaultModeParams(scenario.getConfig(), modes);
 
 		Set<String> qsimModes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
 		scenario.getConfig().qsim().setMainModes(Sets.union(qsimModes, modes));
 
 		Set<String> networkModes = new HashSet<>(scenario.getConfig().routing().getNetworkModes());
 		scenario.getConfig().routing().setNetworkModes(Sets.union(networkModes, modes));
+	}
+
+	private static void ensureDefaultModeParams(Config config, Set<String> modes) {
+		modes.forEach(mode -> {
+			if (!config.scoring().getDefaultModeParams().containsKey(mode)) {
+				config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(mode));
+			}
+		});
 	}
 
 	/**

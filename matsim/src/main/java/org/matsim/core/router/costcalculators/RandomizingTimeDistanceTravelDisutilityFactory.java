@@ -69,9 +69,9 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 		// a warning.  However, we know by now that few people think about such warnings. kai, mar'20
 		logWarningsIfNecessary( cnScoringGroup );
 
-		final ScoringConfigGroup.ModeParams params = cnScoringGroup.getModes().get( mode ) ;
+		final ScoringConfigGroup.ModeParams params = cnScoringGroup.getDefaultModeParams().get( mode ) ;
 		if ( params == null ) {
-			throw new NullPointerException( mode+" is not part of the valid mode parameters "+cnScoringGroup.getModes().keySet() );
+			throw new NullPointerException( mode+" is not part of the valid mode parameters "+cnScoringGroup.getDefaultModeParams().keySet() );
 		}
 
 		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
@@ -97,19 +97,19 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 
 	private void logWarningsIfNecessary(final ScoringConfigGroup cnScoringGroup) {
 		if ( wrnCnt.getAndIncrement() < 1 ) {
-			if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() > 0. ) {
+			if ( cnScoringGroup.getDefaultModeParams().get( mode ).getMonetaryDistanceRate() > 0. ) {
 				log.warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
 						"behavior; just found positive.  Continuing anyway.") ;
 			}
 
 			final Set<String> monoSubpopKeyset = Collections.singleton( null );
-			if ( !cnScoringGroup.getScoringParametersPerSubpopulation().keySet().equals( monoSubpopKeyset ) ) {
+			if ( !cnScoringGroup.getAllScoringParameterSetsPerSubpopulation().keySet().equals( monoSubpopKeyset ) ) {
 				log.warn( "Scoring parameters are defined for different subpopulations." +
 						" The routing disutility will only consider the ones of the default subpopulation.");
 				log.warn( "This warning can safely be ignored if disutility of traveling only depends on travel time.");
 			}
 
-			if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() == 0. && this.sigma != 0. ) {
+			if ( cnScoringGroup.getDefaultModeParams().get( mode ).getMonetaryDistanceRate() == 0. && this.sigma != 0. ) {
 				log.warn("There will be no routing randomness for mode={}. The randomization of the travel disutility requires the monetary distance rate "
 						+ "to be different than zero. Continuing anyway.", mode) ;
 				log.warn( "You can also set the width of the routing randomness to zero:");
@@ -120,7 +120,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 				log.warn("in the xml config");
 			}
 
-			if ( (cnScoringGroup.getModes().get( mode ).getMarginalUtilityOfTraveling() + cnScoringGroup.getPerforming_utils_hr())  == 0. && this.sigma != 0. ) {
+			if ( (cnScoringGroup.getDefaultModeParams().get( mode ).getMarginalUtilityOfTraveling() + cnScoringGroup.getPerforming_utils_hr())  == 0. && this.sigma != 0. ) {
 				log.warn("There will be no routing randomness for mode={}. The randomization of the travel disutility requires the travel time cost rate "
 						+ "to be different than zero. Continuing anyway.", mode) ;
 			}

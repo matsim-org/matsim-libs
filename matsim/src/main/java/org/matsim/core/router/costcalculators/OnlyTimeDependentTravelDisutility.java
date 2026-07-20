@@ -47,11 +47,19 @@ public class OnlyTimeDependentTravelDisutility implements TravelDisutility {
 		} else this.travelTime = travelTime;
 	}
 
+	/**
+	 * This implementation intentionally ignores scoring parameters and uses travel time
+	 * itself as the routing disutility.
+	 */
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		return this.travelTime.getLinkTravelTime(link, time, person, vehicle);
 	}
 
+	/**
+	 * The freespeed travel time is the smallest possible disutility because this class
+	 * considers time only.
+	 */
 	@Override
 	public double getLinkMinimumTravelDisutility(final Link link) {
 		return link.getLength() / link.getFreespeed();

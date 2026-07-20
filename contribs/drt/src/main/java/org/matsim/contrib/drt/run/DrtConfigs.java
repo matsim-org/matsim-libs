@@ -51,7 +51,7 @@ public class DrtConfigs {
 		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams(stageActivityType);
 		params.setTypicalDuration(1);
 		params.setScoringThisActivityAtAll(false);
-		planCalcScoreCfg.getScoringParametersPerSubpopulation().values().forEach(k -> k.addActivityParams(params));
+		planCalcScoreCfg.getAllScoringParameterSetsPerSubpopulation().values().forEach(k -> k.addActivityParams(params));
 		if (planCalcScoreCfg.getScoringParameters(null) != null)
 			planCalcScoreCfg.addActivityParams(params);
 		LOGGER.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");

@@ -56,7 +56,7 @@ public class DecongestionTollingP_MCP implements DecongestionTollSetting, LinkLe
 	public void updateTolls() {
 
 		final double vtts = ( this.congestionInfo.getScenario().getConfig().scoring().getPerforming_utils_hr()
-				- this.congestionInfo.getScenario().getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() )
+				- this.congestionInfo.getScenario().getConfig().scoring().getModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() )
 				/ this.congestionInfo.getScenario().getConfig().scoring().getMarginalUtilityOfMoney();
 
 

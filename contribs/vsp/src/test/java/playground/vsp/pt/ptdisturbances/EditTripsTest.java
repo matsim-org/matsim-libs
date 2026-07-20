@@ -309,8 +309,8 @@ public class EditTripsTest {
 		String outputDirectory = utils.getOutputDirectory();
 		config.controller()
 			.setOutputDirectory(outputDirectory);
-		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(
-			config.scoring().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - 3);
+		config.scoring().getModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling(
+			config.scoring().getModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - 3);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;

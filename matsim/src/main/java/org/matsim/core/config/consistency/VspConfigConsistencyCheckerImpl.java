@@ -23,7 +23,6 @@ package org.matsim.core.config.consistency;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.*;
@@ -38,7 +37,6 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.pt.PtConstants;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import static org.matsim.api.core.v01.TransportMode.*;
@@ -376,9 +374,15 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 	private static boolean checkScoringConfigGroup(Config config, Level lvl, boolean problem) {
 		// added jan'26
-		if ( config.scoring().getScoringParameters( null ) != null || config.scoring().getScoringParameters( ScoringConfigGroup.DEFAULT_SUBPOPULATION ) != null ) {
+		if (config.scoring().getScoringParameters( null ) != null) {
+			problem = true;
 			System.out.flush();
-			log.log( lvl, "you have values set for the default scoring fct; we should only set values for explicit subpopulations");
+			log.log( lvl, "Problem: you only have the null scoring parameters. At VSP we should have one scoring parameter per subpopulation.");
+		}
+		if (config.scoring().getExplicitScoringParameterSetsPerSubpopulation().isEmpty()) {
+			problem = true;
+			System.out.flush();
+			log.log( lvl, "Problem: you only have one scoring parameter set. At VSP we should have one scoring parameter per subpopulation and a required default scoring parameter set.");
 		}
 
 		// use beta_brain=1 // added as of nov'12
@@ -392,55 +396,13 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log(lvl, "</module>");
 		}
 
+		Collection<ScoringConfigGroup.ScoringParameterSet> scoringParameterSets = config.scoring().getAllScoringParameterSetsPerSubpopulation().values();
+
 		// added aug'13:
-		if (config.scoring().getMarginalUtlOfWaiting_utils_hr() != 0.) {
-			problem = true;
-			System.out.flush();
-			log.log(lvl, "found marginal utility of waiting != 0.  vsp default is setting this to 0. ");
-		}
-
-		// added apr'15:
-		for (ActivityParams params : config.scoring().getActivityParams()) {
-			if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(params.getActivityType())) {
-				// they have typicalDurationScoreComputation==relative, but are not scored anyways. benjamin/kai, nov'15
-				continue;
-			}
-			switch (params.getTypicalDurationScoreComputation()) {
-				case relative:
-					break;
-				case uniform:
-					problem = true ;
-					log.log(lvl, "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should use `relative'. ");
-					break;
-				default:
-					throw new RuntimeException("unexpected setting; aborting ... ");
-			}
-		}
-		for (ModeParams params : config.scoring().getModes().values()) {
-			if (params.getMonetaryDistanceRate() > 0.) {
-				problem = true;
-				System.out.flush();
-				log.error("found monetary distance rate for mode " + params.getMode() + " > 0.  You probably want a value < 0 here.\n");
-			}
-			if (params.getMonetaryDistanceRate() < -0.01) {
-				System.out.flush();
-				log.error("found monetary distance rate for mode " + params.getMode() + " < -0.01.  -0.01 per meter means -10 per km.  You probably want to divide your value by 1000.");
-			}
-		}
-
-		if (config.scoring().getModes().get( car ) != null && config.scoring().getModes().get( car ).getMonetaryDistanceRate() > 0) {
-			problem = true;
-		}
-		final ModeParams modeParamsPt = config.scoring().getModes().get( pt );
-		if (modeParamsPt != null && modeParamsPt.getMonetaryDistanceRate() > 0) {
-			problem = true;
-			System.out.flush();
-			log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here.");
-		}
-		if (config.scoring().getMarginalUtilityOfMoney() < 0.) {
-			problem = true;
-			System.out.flush();
-			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. ");
+		for (ScoringConfigGroup.ScoringParameterSet scoringParameterSet : scoringParameterSets) {
+			problem = checkScoringParameterSet(lvl, problem, getContextLabel(scoringParameterSet),
+				scoringParameterSet.getActivityParams(), scoringParameterSet.getModeParams().values(),
+				scoringParameterSet.getMarginalUtlOfWaiting_utils_hr(), scoringParameterSet.getMarginalUtilityOfMoney());
 		}
 		// added oct'17:
 		if (config.scoring().getFractionOfIterationsToStartScoreMSA() == null || config.scoring().getFractionOfIterationsToStartScoreMSA() >= 1.) {
@@ -453,47 +415,97 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log(lvl, "</module>");
 		}
 
-		// added apr'21:
-		for (Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> entry : config.scoring().getScoringParametersPerSubpopulation().entrySet()) {
-			for (ActivityParams activityParam : entry.getValue().getActivityParams()) {
-				if (activityParam.getMinimalDuration().isDefined()) {
-					log.log(lvl, "Vsp default is to not define minimal duration.  Activity type=" + activityParam.getActivityType() + "; subpopulation=" + entry.getKey());
-				}
-			}
-		}
-
-		// added may'23
-		for( ScoringConfigGroup.ScoringParameterSet scoringParams : config.scoring().getScoringParametersPerSubpopulation().values() ){
-			for( ModeParams params : scoringParams.getModes().values() ){
-				switch( config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng() ){
-					case allZeroExceptBikeAndRide -> {
-
-						if( params.getMode().equals( bike ) || params.getMode().equals( ride ) ){
-							// do nothing
-						} else{
-							if( params.getMarginalUtilityOfTraveling() != 0. ){
-								log.log( lvl,
-									"You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
-										+ ". Please document carefully why you are using a value different from zero, e.g. by showing distance distributions. " +
-										"Then use vspConfig#setCheckingOfMarginalUtilityOfTravellng=" + CheckingOfMarginalUtilityOfTravellng.allZeroExceptBikeAndRide.name()
-										+ " if possible, and " + CheckingOfMarginalUtilityOfTravellng.none.name() + " only if really necessary." );
-							}
-						}
-
-					}
-					case null, default -> {
-					}
-				}
-				if( params.getMode().equals( walk ) && params.getConstant() != 0. ){
-					problem = true;
-					log.log( lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
-									  + ".  Values different from zero cause problems here because the ASC is also used for access/egress modes" );
-				}
-			}
+		for (ScoringConfigGroup.ScoringParameterSet scoringParameterSet : scoringParameterSets) {
+			problem = checkModeParameterSet(config, lvl, problem, scoringParameterSet.getModeParams().values());
 		}
 		// added jun'25:
 		if (!config.scoring().isWriteExperiencedPlans()) {
 			log.log(lvl, "You are not writing experienced plans.  Vsp default is to do so.");
+		}
+		return problem;
+	}
+
+	private static boolean checkScoringParameterSet(Level lvl, boolean problem, String contextLabel,
+	                                                Collection<ActivityParams> activityParams, Collection<ModeParams> modeParams,
+	                                                double marginalUtilityOfWaiting, double marginalUtilityOfMoney) {
+		if (marginalUtilityOfWaiting != 0.0) {
+			problem = true;
+			System.out.flush();
+			log.log(lvl, "found marginal utility of waiting != 0 for {} scoring parameters. vsp default is setting this to 0.", contextLabel);
+		}
+
+		for (ActivityParams params : activityParams) {
+			if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(params.getActivityType())) {
+				continue;
+			}
+			switch (params.getTypicalDurationScoreComputation()) {
+				case relative:
+					break;
+				case uniform:
+					problem = true;
+					log.log(lvl,
+						"found `typicalDurationScoreComputation == uniform' for activity type {} for {} ; vsp should use `relative'. ",
+						params.getActivityType(), contextLabel);
+					break;
+				default:
+					throw new RuntimeException("unexpected setting; aborting ... ");
+			}
+
+			if (params.getMinimalDuration().isDefined()) {
+				log.log(lvl, "Vsp default is to not define minimal duration.  Activity type={}; scoringParameters={}", params.getActivityType(), contextLabel);
+			}
+		}
+
+		for (ModeParams params : modeParams) {
+			if (params.getMonetaryDistanceRate() > 0.) {
+				problem = true;
+				System.out.flush();
+				log.error("found monetary distance rate for mode {} > 0 in {} scoring parameters. You probably want a value < 0 here.", params.getMode(), contextLabel);
+			}
+			if (params.getMonetaryDistanceRate() < -0.01) {
+				System.out.flush();
+				log.error(
+					"found monetary distance rate for mode {} < -0.01 in {} scoring parameters. -0.01 per meter means -10 per km. You probably want to divide your value by 1000.",
+					params.getMode(), contextLabel);
+			}
+		}
+
+		if (marginalUtilityOfMoney < 0.) {
+			problem = true;
+			System.out.flush();
+			log.error("found marginal utility of money < 0 in {} scoring parameters. You almost certainly want a value > 0 here.", contextLabel);
+		}
+
+		return problem;
+	}
+
+	private static String getContextLabel(ScoringConfigGroup.ScoringParameterSet scoringParameterSet) {
+		return scoringParameterSet.getSubpopulation() == null ? "null/default" : scoringParameterSet.getSubpopulation();
+	}
+
+	private static boolean checkModeParameterSet(Config config, Level lvl, boolean problem, Collection<ModeParams> modeParams) {
+		for (ModeParams params : modeParams) {
+			CheckingOfMarginalUtilityOfTravellng checking = config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng();
+			if (checking == CheckingOfMarginalUtilityOfTravellng.allZero) {
+				if (params.getMarginalUtilityOfTraveling() != 0. && !params.getMode().equals(ride) && !params.getMode().equals(bike)) {
+					log.log(lvl,
+						"You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
+							+ ". VSP standard is to set this to zero.  Please document carefully why you are using a value different from zero, e.g. by showing distance distributions.");
+				}
+			} else if (checking == CheckingOfMarginalUtilityOfTravellng.allZeroExceptBikeAndRide) {
+				if (!params.getMode().equals(bike) && !params.getMode().equals(ride) && params.getMarginalUtilityOfTraveling() != 0.) {
+					log.log(lvl,
+						"You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
+							+ ". Please document carefully why you are using a value different from zero, e.g. by showing distance distributions. " +
+							"Then use vspConfig#setCheckingOfMarginalUtilityOfTravellng=" + CheckingOfMarginalUtilityOfTravellng.allZeroExceptBikeAndRide.name()
+							+ " if possible, and " + CheckingOfMarginalUtilityOfTravellng.none.name() + " only if really necessary.");
+				}
+			}
+			if( params.getMode().equals( walk ) && params.getConstant() != 0. ){
+				problem = true;
+				log.log( lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
+					+ ".  Values different from zero cause problems here because the ASC is also used for access/egress modes" );
+			}
 		}
 		return problem;
 	}
