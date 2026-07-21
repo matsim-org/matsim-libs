@@ -196,6 +196,7 @@ public class CharyparNagelLegScoring implements SumScoringFunction.TripScoring {
 			return params.modeParams.get(TransportMode.walk);
 		}
 
-		throw new IllegalStateException("No scoring parameters definded for mode; " + mode);
+		throw new IllegalStateException("No scoring parameters are defined for mode '" + mode
+			+ "'. Please add a modeParams parameter set for mode '" + mode + "' to the scoring configuration.");
 	}
 }

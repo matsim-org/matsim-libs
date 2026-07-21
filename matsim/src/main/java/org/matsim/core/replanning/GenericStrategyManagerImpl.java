@@ -247,7 +247,8 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 			strategy.run(person);
 		}
 
-		// finally make sure all strategies have finished there work
+		// for multithreaded strategies, that first starts their work. Before, plans have just been added to their task list. `finish()` starts threads and waits for
+		// their completion. paul, jul'26
 		for (GenericPlanStrategy<PL, AG> strategy : distinctStrategies()) {
 			strategy.finish();
 		}
