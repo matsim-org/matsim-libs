@@ -40,14 +40,12 @@ class RunMatsimTest {
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "network.xml").toString());
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
-		config.controller().setCreateGraphs(false);
-		config.controller().setWriteEventsInterval(0);
-		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		config.routing().clearTeleportedModeParams();
-		config.routing().addTeleportedModeParams(
-			new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(3. / 3.6));
-		config.routing().addTeleportedModeParams(
-			new RoutingConfigGroup.TeleportedModeParams(E_BIKE).setTeleportedModeSpeed(25. / 3.6));
+
+		// explicitly set walk and ebike params
+		config.routing().addTeleportedModeParams(new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(3. / 3.6));
+		config.routing().addTeleportedModeParams(new RoutingConfigGroup.TeleportedModeParams(E_BIKE).setTeleportedModeSpeed(25. / 3.6));
+
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(12 * 3600));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
@@ -82,15 +80,14 @@ class RunMatsimTest {
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "network.xml").toString());
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
-		config.controller().setCreateGraphs(false);
-		config.controller().setWriteEventsInterval(0);
-		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		config.routing().setNetworkModes(Set.of(E_BIKE));
 		config.qsim().setMainModes(Set.of(E_BIKE));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(12 * 3600));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// explicitly set ebike as network mode
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			Set<String> allowedModes = new HashSet<>(link.getAllowedModes());
 			allowedModes.add(E_BIKE);
