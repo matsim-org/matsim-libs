@@ -812,11 +812,10 @@ public class CommercialTrafficDashboard implements Dashboard {
 		}
 		layout.row("General_second", "General").el(Links.class, (viz, data) -> {
 			viz.title = "Link volumes of the commercial traffic";
-			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("The volumes are scaled to 100% sample size.", data, true);
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("The volumes can be filtered according to different types of traffic and vehicle types. Volume shows all vehicles of the set commercial subpopulations", data, true);
 			viz.datasets.csvFile = data.compute(CommercialAnalysis.class, "commercialTraffic_link_volume.csv", argsCommercialAnalysis);
 			viz.network = data.compute(CreateAvroNetwork.class, "network.avro",
 				"--with-properties"); //, "--match-id", "linkId", "--mode-filter", "none"
-			viz.description = "The volumes can be filtered according to different types of traffic and vehicle types.";
 			viz.height = 12.;
 		});
 	}
