@@ -21,6 +21,10 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.PURPOSE;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.SUBPOPULATION;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
+
 class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 	private static final Logger log = LogManager.getLogger(DefaultUnhandledServicesSolution.class);
 	private static final Joiner JOIN = Joiner.on("\t");
@@ -70,15 +74,15 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 		for (Carrier carrier : nonCompleteSolvedCarriers) {
 			// get the necessary attributes from a carrier which are not already saved in carrierAttributes (perhaps an existing carrier file was read)
 			if (generator.getCarrierId2carrierAttributes().get(carrier.getId()) == null) {
-				int purpose = carrier.getAttributes().getAttribute("purpose") == null ? 0 : Integer.parseInt(
-					carrier.getAttributes().getAttribute("purpose").toString());
+				int purpose = carrier.getAttributes().getAttribute( PURPOSE ) == null ? 0 : Integer.parseInt(
+					carrier.getAttributes().getAttribute( PURPOSE ).toString());
 				String carrierId = carrier.getId().toString();
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment;
 				String modeORvehType;
-				if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("commercialPersonTraffic")) {
+				if (carrier.getAttributes().getAttribute( SUBPOPULATION ).toString().contains("commercialPersonTraffic")) {
 					smallScaleCommercialTrafficSegment = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.commercialPersonTraffic;
 					modeORvehType = "total";
-				} else if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("goodsTraffic")) {
+				} else if (carrier.getAttributes().getAttribute( SUBPOPULATION ).toString().contains("goodsTraffic")) {
 					smallScaleCommercialTrafficSegment = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.goodsTraffic;
 					String[] split = carrierId.split("vehTyp")[1].split("_"); //TODO make this via attributes
 					modeORvehType = "vehTyp" + split[0];
@@ -88,8 +92,9 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 				}
 		OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = generator.odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose,
 					modeORvehType, smallScaleCommercialTrafficSegment );
-				String startZone = carrier.getAttributes().getAttribute("tourStartArea") == null ? "" : carrier.getAttributes().getAttribute(
-					"tourStartArea").toString();
+				String startZone = carrier.getAttributes().getAttribute(
+					TOUR_START_AREA ) == null ? "" : carrier.getAttributes().getAttribute(
+					TOUR_START_AREA ).toString();
 				Object startCategoryAttribute = carrier.getAttributes().getAttribute("startCategory");
 				SmallScaleCommercialTrafficUtils.ZoneAttribute selectedStartCategory = startCategoryAttribute == null
 					? generator.getSelectedStartCategory(startZone, odMatrixEntry)

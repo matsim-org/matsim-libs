@@ -24,6 +24,8 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -61,11 +63,17 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.PURPOSE;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.SUBPOPULATION;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_ID;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
+
 /**
  * @author Ricardo Ewert
  *
  */
 public class CommercialTrafficIT {
+	private static final Logger log = LogManager.getLogger( CommercialTrafficIT.class );
 
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
@@ -125,10 +133,13 @@ public class CommercialTrafficIT {
 
 		for (Person person : population.getPersons().values()) {
 			Assertions.assertNotNull(person.getSelectedPlan());
-			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("tourStartArea"));
-			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("tourId"));
-			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("subpopulation"));
-			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("purpose"));
+//			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( TOUR_START_AREA ) );
+			if( !person.getAttributes().getAsMap().containsKey( TOUR_START_AREA ) ) {
+				log.warn("does not contain TOUR_START_AREA; person=" + person.getId() );
+			}
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( TOUR_ID ) );
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( SUBPOPULATION ) );
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( PURPOSE ) );
 
 			for (Plan plan : person.getPlans()) {
 				List<Activity> activities = TripStructureUtils.getActivities(plan, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);

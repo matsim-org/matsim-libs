@@ -10,7 +10,9 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
 
+import static java.lang.String.join;
 import static org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.*;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
 
 class JspritOptimization{
 	private static final Logger log = LogManager.getLogger( JspritOptimization.class );
@@ -170,7 +172,7 @@ class JspritOptimization{
 		}
 
 		CarriersUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
-			if ( this.linksPerZone != null && !carrier.getAttributes().getAsMap().containsKey("tourStartArea" )) {
+			if ( this.linksPerZone != null && !carrier.getAttributes().getAsMap().containsKey( TOUR_START_AREA )) {
 				List<String> startAreas = new ArrayList<>();
 				for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 					String tourStartZone = SmallScaleCommercialTrafficUtils
@@ -178,8 +180,8 @@ class JspritOptimization{
 					if (!startAreas.contains(tourStartZone))
 						startAreas.add(tourStartZone);
 				}
-				carrier.getAttributes().putAttribute("tourStartArea",
-					String.join(";", startAreas));
+				carrier.getAttributes().putAttribute( TOUR_START_AREA,
+						join( ";", startAreas ) );
 			}
 		});
 	}

@@ -23,6 +23,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import static java.lang.String.join;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.PURPOSE;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.SUBPOPULATION;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.getObjectiveFunction;
 import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.makeTrafficVolumeKey;
 
@@ -290,9 +294,9 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 			carriers.getCarriers().values().forEach(carrier -> {
 				Carrier newCarrier = CarriersUtils
 					.createCarrier(Id.create(modelName + "_" + carrier.getId().toString(), Carrier.class));
-				newCarrier.getAttributes().putAttribute("subpopulation", modelTrafficType);
+				newCarrier.getAttributes().putAttribute( SUBPOPULATION, modelTrafficType);
 				if (modelPurpose != null)
-					newCarrier.getAttributes().putAttribute("purpose", modelPurpose);
+					newCarrier.getAttributes().putAttribute( PURPOSE, modelPurpose);
 				newCarrier.getAttributes().putAttribute("existingModel", modelName);
 				newCarrier.getAttributes().putAttribute("networkMode", modelMode);
 				if (vehicleType != null)
@@ -313,8 +317,8 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 						if (!startAreas.contains(tourStartZone))
 							startAreas.add(tourStartZone);
 					}
-					newCarrier.getAttributes().putAttribute("tourStartArea",
-						String.join(";", startAreas));
+					newCarrier.getAttributes().putAttribute( TOUR_START_AREA,
+						join( ";", startAreas ) );
 
 					CarriersUtils.setJspritIterations(newCarrier, 0);
 					// recalculate score for selectedPlan
@@ -340,15 +344,15 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 													Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
 													Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop ) {
 		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
-			if (!carrier.getAttributes().getAsMap().containsKey("subpopulation")
-				|| !carrier.getAttributes().getAttribute("subpopulation").equals( smallScaleCommercialTrafficSegment.toString() ))
+			if (!carrier.getAttributes().getAsMap().containsKey( SUBPOPULATION )
+				|| !carrier.getAttributes().getAttribute( SUBPOPULATION ).equals( smallScaleCommercialTrafficSegment.toString() ))
 				continue;
 			String modeORvehType;
 			if ( smallScaleCommercialTrafficSegment.equals( GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.goodsTraffic ))
 				modeORvehType = (String) carrier.getAttributes().getAttribute("vehicleType");
 			else
 				modeORvehType = "total";
-			Integer purpose = (Integer) carrier.getAttributes().getAttribute("purpose");
+			Integer purpose = (Integer) carrier.getAttributes().getAttribute( PURPOSE );
 			if (carrier.getSelectedPlan() != null) {
 				for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 					String startZone = findZoneOfLink(scenario, indexZones, tour.getTour().getStartLinkId());

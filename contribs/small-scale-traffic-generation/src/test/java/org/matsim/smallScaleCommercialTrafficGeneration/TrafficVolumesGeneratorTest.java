@@ -45,6 +45,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.PURPOSE;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.SUBPOPULATION;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
+
 /**
  * @author Ricardo Ewert
  *
@@ -433,12 +437,12 @@ public class TrafficVolumesGeneratorTest{
 		Assertions.assertEquals(3, addedCarrier1.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(30, addedCarrier1.getServices().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(6, addedCarrier1.getAttributes().size(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals("commercialPersonTraffic", addedCarrier1.getAttributes().getAttribute("subpopulation"));
-		Assertions.assertEquals(2, (int) addedCarrier1.getAttributes().getAttribute("purpose"));
+		Assertions.assertEquals("commercialPersonTraffic", addedCarrier1.getAttributes().getAttribute( SUBPOPULATION ));
+		Assertions.assertEquals(2, (int) addedCarrier1.getAttributes().getAttribute( PURPOSE ));
 		Assertions.assertEquals("exampleServiceCarrier", addedCarrier1.getAttributes().getAttribute("existingModel"));
 		Assertions.assertEquals("car", addedCarrier1.getAttributes().getAttribute("networkMode"));
 		Assertions.assertNull(addedCarrier1.getAttributes().getAttribute("vehicleType"));
-		Assertions.assertEquals("area3", addedCarrier1.getAttributes().getAttribute("tourStartArea"));
+		Assertions.assertEquals("area3", addedCarrier1.getAttributes().getAttribute( TOUR_START_AREA ) );
 
 		Carrier addedCarrier2 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleServiceCarrier_carrier2", Carrier.class));
 		Assertions.assertNotNull(addedCarrier2.getSelectedPlan());
@@ -447,12 +451,12 @@ public class TrafficVolumesGeneratorTest{
 		Assertions.assertEquals(1, addedCarrier2.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(2, addedCarrier2.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(20, addedCarrier2.getServices().size(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals("commercialPersonTraffic", addedCarrier2.getAttributes().getAttribute("subpopulation"));
-		Assertions.assertEquals(2, (int) addedCarrier2.getAttributes().getAttribute("purpose"));
+		Assertions.assertEquals("commercialPersonTraffic", addedCarrier2.getAttributes().getAttribute( SUBPOPULATION ));
+		Assertions.assertEquals(2, (int) addedCarrier2.getAttributes().getAttribute( PURPOSE ));
 		Assertions.assertEquals("exampleServiceCarrier", addedCarrier2.getAttributes().getAttribute("existingModel"));
 		Assertions.assertEquals("car", addedCarrier2.getAttributes().getAttribute("networkMode"));
 		Assertions.assertNull(addedCarrier2.getAttributes().getAttribute("vehicleType"));
-		Assertions.assertEquals("area3", addedCarrier2.getAttributes().getAttribute("tourStartArea"));
+		Assertions.assertEquals("area3", addedCarrier2.getAttributes().getAttribute( TOUR_START_AREA ) );
 
 		Carrier addedCarrier3 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleShipmentCarrier_carrier1", Carrier.class));
 		Assertions.assertNull(addedCarrier3.getSelectedPlan());
@@ -494,12 +498,12 @@ public class TrafficVolumesGeneratorTest{
 		Assertions.assertEquals(1, addedCarrier1.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(10, addedCarrier1.getServices().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(6, addedCarrier1.getAttributes().size(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals("commercialPersonTraffic", addedCarrier1.getAttributes().getAttribute("subpopulation"));
-		Assertions.assertEquals(2, (int) addedCarrier1.getAttributes().getAttribute("purpose"));
+		Assertions.assertEquals("commercialPersonTraffic", addedCarrier1.getAttributes().getAttribute( SUBPOPULATION ));
+		Assertions.assertEquals(2, (int) addedCarrier1.getAttributes().getAttribute( PURPOSE ));
 		Assertions.assertEquals("exampleServiceCarrier", addedCarrier1.getAttributes().getAttribute("existingModel"));
 		Assertions.assertEquals("car", addedCarrier1.getAttributes().getAttribute("networkMode"));
 		Assertions.assertNull(addedCarrier1.getAttributes().getAttribute("vehicleType"));
-		Assertions.assertEquals("area3", addedCarrier1.getAttributes().getAttribute("tourStartArea"));
+		Assertions.assertEquals("area3", addedCarrier1.getAttributes().getAttribute( TOUR_START_AREA ) );
 
 		Carrier addedCarrier3 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleShipmentCarrier_carrier1", Carrier.class));
 		Assertions.assertNull(addedCarrier3.getSelectedPlan());

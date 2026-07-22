@@ -72,7 +72,12 @@ import java.util.stream.IntStream;
  */
 public class SmallScaleCommercialTrafficUtils {
 
-	private static final Logger log = LogManager.getLogger(SmallScaleCommercialTrafficUtils.class);
+	private static final Logger log = LogManager.getLogger(SmallScaleCommercialTrafficUtils.class );
+
+	public static final String TOUR_START_AREA = "tourStartArea";
+	public static final String TOUR_ID = "tourId";
+	public static final String SUBPOPULATION = "subpopulation";
+	public static final String PURPOSE = "purpose";
 
 	/**
 	 * Creates and return the Index of the zone shape.
@@ -199,7 +204,7 @@ public class SmallScaleCommercialTrafficUtils {
 
 				Plan plan = popFactory.createPlan();
 
-				String subpopulation = carrier.getAttributes().getAttribute("subpopulation").toString();
+				String subpopulation = carrier.getAttributes().getAttribute( SUBPOPULATION ).toString();
 				String mode = tour.getVehicle().getType().getNetworkMode();
 
 				Tour.Start start = tour.getTour().getStart();
@@ -228,8 +233,8 @@ public class SmallScaleCommercialTrafficUtils {
 					scenario.getNetwork().getLinks().get(end.getLocation()).getFromNode().getCoord());
 				endActivity.setLinkId(end.getLocation());
 				plan.addActivity(endActivity);
-				String key = String.format("%s_%s_%s", subpopulation, carrier.getAttributes().getAttribute("tourStartArea"),
-					carrier.getAttributes().getAttribute("purpose"));
+				String key = String.format("%s_%s_%s", subpopulation, carrier.getAttributes().getAttribute( TOUR_START_AREA ),
+					carrier.getAttributes().getAttribute( PURPOSE ));
 
 				long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
 
@@ -237,16 +242,16 @@ public class SmallScaleCommercialTrafficUtils {
 
 				newPerson.addPlan(plan);
 				PopulationUtils.putSubpopulation(newPerson, subpopulation);
-				newPerson.getAttributes().putAttribute("purpose",
-					carrier.getAttributes().getAttribute("purpose"));
-				if (carrier.getAttributes().getAsMap().containsKey("tourStartArea"))
-					newPerson.getAttributes().putAttribute("tourStartArea",
-						carrier.getAttributes().getAttribute("tourStartArea"));
+				newPerson.getAttributes().putAttribute( PURPOSE,
+					carrier.getAttributes().getAttribute( PURPOSE ));
+				if (carrier.getAttributes().getAsMap().containsKey( TOUR_START_AREA ))
+					newPerson.getAttributes().putAttribute( TOUR_START_AREA,
+						carrier.getAttributes().getAttribute( TOUR_START_AREA ) );
 				if (carrier.getAttributes().getAsMap().containsKey("startCategory"))
 					newPerson.getAttributes().putAttribute("startCategory",
 						carrier.getAttributes().getAttribute("startCategory").toString());
 				newPerson.getAttributes().putAttribute("carrierId", carrier.getId().toString());
-				newPerson.getAttributes().putAttribute("tourId", tour.getTour().getId().toString());
+				newPerson.getAttributes().putAttribute( TOUR_ID, tour.getTour().getId().toString());
 
 				VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, tour.getVehicle().getType().getId()));
 

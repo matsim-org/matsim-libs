@@ -76,6 +76,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.*;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.PURPOSE;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.SUBPOPULATION;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readZoneAttributes;
 import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.*;
 
@@ -1077,14 +1080,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 													int fixedNumberOfVehiclePerTypeAndLocation) {
 
 		if (carrierAttributes.smallScaleCommercialTrafficSegment.equals( commercialPersonTraffic ) && carrierAttributes.purpose == 3)
-			thisCarrier.getAttributes().putAttribute("subpopulation", SubpopulationDefaultNames.SUBPOP_COM_PERSON_SERVICE);
+			thisCarrier.getAttributes().putAttribute( SUBPOPULATION, SubpopulationDefaultNames.SUBPOP_COM_PERSON_SERVICE);
 		else if (carrierAttributes.smallScaleCommercialTrafficSegment.equals( goodsTraffic ) )
-			thisCarrier.getAttributes().putAttribute("subpopulation", SubpopulationDefaultNames.SUBPOP_GOODS);
+			thisCarrier.getAttributes().putAttribute( SUBPOPULATION, SubpopulationDefaultNames.SUBPOP_GOODS);
 		else
-			thisCarrier.getAttributes().putAttribute("subpopulation", SubpopulationDefaultNames.SUBPOP_COM_PERSON);
+			thisCarrier.getAttributes().putAttribute( SUBPOPULATION, SubpopulationDefaultNames.SUBPOP_COM_PERSON);
 
-		thisCarrier.getAttributes().putAttribute("purpose", carrierAttributes.purpose);
-		thisCarrier.getAttributes().putAttribute("tourStartArea", carrierAttributes.startZone);
+		thisCarrier.getAttributes().putAttribute( PURPOSE, carrierAttributes.purpose);
+		thisCarrier.getAttributes().putAttribute( TOUR_START_AREA, carrierAttributes.startZone );
 		thisCarrier.getAttributes().putAttribute("startCategory", carrierAttributes.selectedStartCategory);
 		if ( nJspritIterations > 0)
 			CarriersUtils.setJspritIterations(thisCarrier, nJspritIterations );
