@@ -109,11 +109,6 @@
 	<module name="facilities" >
 		<param name="inputFacilitiesFile" value="&inputDir;/Siouxfalls_facilities.xml" />
 	</module>
-	
-	<module name="scenario">
-	  	<param name="useTransit" value="true" />
- 		<param name="useVehicles" value="true" />
-	</module>
 
 	<module name="controler">
 		<param name="writeEventsInterval" value="1000" />
@@ -175,10 +170,10 @@
 		<param name="marginalUtlOfDistanceWalk" value="0.0" />
 
 		<!-- [unit_of_money/m] conversion of car distance into money -->
-		<param name="monetaryDistanceCostRateCar" value="-0.0004" />
+		<param name="monetaryDistanceRateCar" value="-0.0004" />
 
 		<!-- [unit_of_money/m] conversion of pt distance into money -->
-		<param name="monetaryDistanceCostRatePt" value="0.0" />
+		<param name="monetaryDistanceRatePt" value="0.0" />
 
 		<!-- [utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing. -->
 		<param name="performing" value="0.96" />
@@ -258,6 +253,7 @@
 	</module>
    
   	<module name="transit">
+  		<param name="useTransit" value="true" />
   		<param name="transitScheduleFile" value="&inputDir;/Siouxfalls_transitSchedule.xml" />
  		<param name="vehiclesFile" value="&inputDir;/Siouxfalls_vehicles.xml" />
   	 	<param name="transitModes" value="pt,bus" />
