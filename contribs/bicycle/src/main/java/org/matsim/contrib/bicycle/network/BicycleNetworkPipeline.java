@@ -215,6 +215,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		logBicycleInfraDistribution(network, "after OSM read");
 
 		// ---- 1b. move OSM-derived attributes under "osm:" prefix ------------
+		normalizeOrigIdType(network);
 		prefixOsmAttributes(network);
 
 		// ---- 2. drop isolated components -------------------------------------
@@ -478,6 +479,23 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		});
 
 		simplifier.run(network);
+	}
+
+	/**
+	 * The OSM reader stores {@code origid} as {@link Long}, but
+	 * {@link NetworkUtils#getOrigId} -- called by {@link NetworkSimplifier}
+	 * whenever it merges two links -- casts the attribute to {@link String} and
+	 * would throw a {@link ClassCastException} on the first merge. Convert once
+	 * up front; this also gives the attribute a single consistent type in the
+	 * output (previously unmerged links carried Long, merged links String).
+	 */
+	private static void normalizeOrigIdType(Network network) {
+		for (Link link : network.getLinks().values()) {
+			Object origid = link.getAttributes().getAttribute("origid");
+			if (origid != null && !(origid instanceof String)) {
+				link.getAttributes().putAttribute("origid", origid.toString());
+			}
+		}
 	}
 
 	/**
