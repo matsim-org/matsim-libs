@@ -422,8 +422,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			resistanceFactorsPerModelType.put( goodsTraffic, resistanceFactor_goodsTraffic );
 			log.info("Set resistance factor for commercialPersonTraffic to {} and for goodsTraffic to {}.", resistanceFactor_commercialPersonTraffic, resistanceFactor_goodsTraffic);
 
-			jspritOptimization = new JspritOptimization( nJspritIterations, this.carrierId2carrierAttributes, this.maxNumberOfLoopsForVRPSolving, this.linksPerZone, unhandledServicesSolution );
-
 			switch ( carriersFileCreationOption ) {
 				case useExistingCarrierFileWithSolution, useExistingCarrierFileWithoutSolution -> {
 					// as stated elsewhere, this should be read as "use...Solution" and "use...ButNotTheSolution"
@@ -484,6 +482,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					ensureJspritIterationsForCarriersToSolve(scenario);
 					// for the case @useExistingCarrierFileWithSolution the method solveSeparatedVRPs skips carriers with existing plans. But if a carrier without plans exists, it will be solved.
 					CarriersUtils.writeCarriers(scenario, UNSOLVED_CARRIER_FILE);
+					jspritOptimization = new JspritOptimization( nJspritIterations, this.carrierId2carrierAttributes, this.maxNumberOfLoopsForVRPSolving, this.linksPerZone, unhandledServicesSolution );
 					jspritOptimization.solveVRP(scenario );
 				}
 				default -> {
@@ -522,6 +521,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						CarriersUtils.writeCarriers(scenario, UNSOLVED_CARRIER_FILE);
 					}
 					ensureJspritIterationsForCarriersToSolve(scenario);
+					jspritOptimization = new JspritOptimization( nJspritIterations, this.carrierId2carrierAttributes, this.maxNumberOfLoopsForVRPSolving, this.linksPerZone, unhandledServicesSolution );
 					jspritOptimization.solveVRP(scenario );
 				}
 			}

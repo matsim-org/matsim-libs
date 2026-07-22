@@ -133,10 +133,7 @@ public class CommercialTrafficIT {
 
 		for (Person person : population.getPersons().values()) {
 			Assertions.assertNotNull(person.getSelectedPlan());
-//			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( TOUR_START_AREA ) );
-			if( !person.getAttributes().getAsMap().containsKey( TOUR_START_AREA ) ) {
-				log.warn("does not contain TOUR_START_AREA; person=" + person.getId() );
-			}
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( TOUR_START_AREA ) );
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( TOUR_ID ) );
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( SUBPOPULATION ) );
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( PURPOSE ) );
