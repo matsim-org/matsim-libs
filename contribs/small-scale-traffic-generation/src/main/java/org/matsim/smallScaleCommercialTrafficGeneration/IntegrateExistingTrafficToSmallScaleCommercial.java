@@ -6,13 +6,13 @@ import org.matsim.application.options.ShpOptions;
 
 import java.util.Map;
 
-public interface IntegrateExistingTrafficToSmallScaleCommercial {
+interface IntegrateExistingTrafficToSmallScaleCommercial {
 
 	void readExistingCarriersFromFolder(Scenario scenario, double sampleScenario,
 										ShpOptions.Index indexZones) throws Exception;
 
 	void reduceDemandBasedOnExistingCarriers(Scenario scenario,
-											 ShpOptions.Index linksPerZone, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType,
-											 Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
-											 Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop);
+											 ShpOptions.Index linksPerZone, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment,
+											 Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
+											 Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop );
 }

@@ -53,7 +53,6 @@ import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.freight.carriers.Tour;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
 import java.io.BufferedReader;
@@ -73,7 +72,12 @@ import java.util.stream.IntStream;
  */
 public class SmallScaleCommercialTrafficUtils {
 
-	private static final Logger log = LogManager.getLogger(SmallScaleCommercialTrafficUtils.class);
+	private static final Logger log = LogManager.getLogger(SmallScaleCommercialTrafficUtils.class );
+
+	public static final String TOUR_START_AREA = "tourStartArea";
+	public static final String TOUR_ID = "tourId";
+	public static final String SUBPOPULATION = "subpopulation";
+	public static final String PURPOSE = "purpose";
 
 	/**
 	 * Creates and return the Index of the zone shape.
@@ -182,8 +186,8 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
-	static void createPlansBasedOnCarrierPlans(Scenario scenario, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, Path output,
-											   String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
+	static void createPlansBasedOnCarrierPlans( Scenario scenario, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment, Path output,
+	                                            String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
 
 		Population population = scenario.getPopulation();
 		PopulationFactory popFactory = population.getFactory();
@@ -200,7 +204,7 @@ public class SmallScaleCommercialTrafficUtils {
 
 				Plan plan = popFactory.createPlan();
 
-				String subpopulation = carrier.getAttributes().getAttribute("subpopulation").toString();
+				String subpopulation = carrier.getAttributes().getAttribute( SUBPOPULATION ).toString();
 				String mode = tour.getVehicle().getType().getNetworkMode();
 
 				Tour.Start start = tour.getTour().getStart();
@@ -229,8 +233,8 @@ public class SmallScaleCommercialTrafficUtils {
 					scenario.getNetwork().getLinks().get(end.getLocation()).getFromNode().getCoord());
 				endActivity.setLinkId(end.getLocation());
 				plan.addActivity(endActivity);
-				String key = String.format("%s_%s_%s", subpopulation, carrier.getAttributes().getAttribute("tourStartArea"),
-					carrier.getAttributes().getAttribute("purpose"));
+				String key = String.format("%s_%s_%s", subpopulation, carrier.getAttributes().getAttribute( TOUR_START_AREA ),
+					carrier.getAttributes().getAttribute( PURPOSE ));
 
 				long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
 
@@ -238,16 +242,16 @@ public class SmallScaleCommercialTrafficUtils {
 
 				newPerson.addPlan(plan);
 				PopulationUtils.putSubpopulation(newPerson, subpopulation);
-				newPerson.getAttributes().putAttribute("purpose",
-					carrier.getAttributes().getAttribute("purpose"));
-				if (carrier.getAttributes().getAsMap().containsKey("tourStartArea"))
-					newPerson.getAttributes().putAttribute("tourStartArea",
-						carrier.getAttributes().getAttribute("tourStartArea"));
+				newPerson.getAttributes().putAttribute( PURPOSE,
+					carrier.getAttributes().getAttribute( PURPOSE ));
+				if (carrier.getAttributes().getAsMap().containsKey( TOUR_START_AREA ))
+					newPerson.getAttributes().putAttribute( TOUR_START_AREA,
+						carrier.getAttributes().getAttribute( TOUR_START_AREA ) );
 				if (carrier.getAttributes().getAsMap().containsKey("startCategory"))
 					newPerson.getAttributes().putAttribute("startCategory",
 						carrier.getAttributes().getAttribute("startCategory").toString());
 				newPerson.getAttributes().putAttribute("carrierId", carrier.getId().toString());
-				newPerson.getAttributes().putAttribute("tourId", tour.getTour().getId().toString());
+				newPerson.getAttributes().putAttribute( TOUR_ID, tour.getTour().getId().toString());
 
 				VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, tour.getVehicle().getType().getId()));
 
@@ -257,10 +261,11 @@ public class SmallScaleCommercialTrafficUtils {
 
 		String outputPopulationFile;
 		if (nameOutputPopulation == null)
-			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.completeSmallScaleCommercialTraffic))
+			if ( smallScaleCommercialTrafficSegment.equals(
+				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.completeSmallScaleCommercialTraffic ))
 				outputPopulationFile = output.toString() + "/" + modelName + "_" + "smallScaleCommercialTraffic" + "_" + sampleName + "pct_plans.xml.gz";
 			else
-				outputPopulationFile = output.toString() + "/" + modelName + "_" + smallScaleCommercialTrafficType + "_" + sampleName + "pct_plans.xml.gz";
+				outputPopulationFile = output.toString() + "/" + modelName + "_" + smallScaleCommercialTrafficSegment + "_" + sampleName + "pct_plans.xml.gz";
 		else
 			outputPopulationFile = output.toString() + "/" + nameOutputPopulation;
 		if (numberOfPlanVariantsPerAgent > 1)
@@ -438,36 +443,45 @@ public class SmallScaleCommercialTrafficUtils {
 
 
 	/** Reads the data distribution of the zones.
-	 * @param pathToDataDistributionToZones Path to the data distribution of the zones
+	 * @param pathToZoneAttributes Path to the data distribution of the zones
 	 * @return 								resultingDataPerZone
 	 * @throws IOException 					if the file is not found
 	 */
-	static Map<String, Object2DoubleMap<StructuralAttribute>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
-		if (!Files.exists(pathToDataDistributionToZones)) {
-			log.error("Required data per zone file {} not found", pathToDataDistributionToZones);
+	static Map<String, Object2DoubleMap<ZoneAttribute>> readZoneAttributes( Path pathToZoneAttributes ) throws IOException {
+		if (!Files.exists(pathToZoneAttributes)) {
+			log.error("Required data per zone file {} not found", pathToZoneAttributes);
 		}
 
-		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = new HashMap<>();
-		try (BufferedReader reader = IOUtils.getBufferedReader(pathToDataDistributionToZones.toString())) {
-			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
-				.setSkipHeaderRecord(true).get().parse(reader);
+		Map<String, Object2DoubleMap<ZoneAttribute>> attributesByZone = new HashMap<>();
+		try (BufferedReader reader = IOUtils.getBufferedReader(pathToZoneAttributes.toString())) {
+			// The following reads the attributes (e.g. #(inhabitants), #(employes)) per zone.  These are then
+			// multiplied with the IVV magic numbers to obtain the source and sink potentials.
 
-			for (CSVRecord record : parse) {
+			CSVParser parser = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader().setSkipHeaderRecord(true).get().parse(reader);
+
+			for (CSVRecord record : parser) {
 				String zoneID = record.get("zoneID");
-				resultingDataPerZone.put(zoneID, new Object2DoubleOpenHashMap<>());
-				for (int n = 2; n < parse.getHeaderMap().size(); n++) {
-					Optional<StructuralAttribute> category = StructuralAttribute.fromLabel(parse.getHeaderNames().get(n));
+				attributesByZone.put(zoneID, new Object2DoubleOpenHashMap<>());
+				for (int n = 2; n < parser.getHeaderMap().size(); n++) {
+					Optional<ZoneAttribute> category = ZoneAttribute.fromLabel(parser.getHeaderNames().get(n ) );
+					// (yyyy why is this "Optional"?  Only so that we can get the following error message?  Or
+					// so that we can continue despite the error?  But if we want to continue, could we not just
+					// skip the attribute?)
+
 					if (category.isEmpty()) {
-						log.warn("The category '{}' in the data distribution file is not known. Please check the input file and the defined categories.", parse.getHeaderNames().get(n));
+						log.warn("The category '{}' in the data distribution file is not known. Please check the input file and the defined categories.", parser.getHeaderNames().get(n));
 						continue;
 					}
-					resultingDataPerZone.get(zoneID).mergeDouble(category.get(),
-						Double.parseDouble(record.get(n)), Double::sum);
+
+					final Object2DoubleMap<ZoneAttribute> attribs = attributesByZone.get( zoneID );
+
+					attribs.mergeDouble(category.get(), Double.parseDouble( record.get(n) ), Double::sum );
+					// (yyyy this means that we might see the same category twice, and then we sum up the numbers.  Why should that be possible?)
 				}
 			}
 		}
-		log.info("Data distribution for {} zones was read from {}", resultingDataPerZone.size(), pathToDataDistributionToZones);
-		return resultingDataPerZone;
+		log.info("Zone attributes for {} zones was read from {}", attributesByZone.size(), pathToZoneAttributes);
+		return attributesByZone;
 
 	}
 
@@ -514,7 +528,10 @@ public class SmallScaleCommercialTrafficUtils {
 		};
 	}
 
-	public enum StructuralAttribute {
+	public enum ZoneAttribute{
+		// yyyyyy Strukturdaten ist deutsch, aber im engl. ist das m.E. kaum verständlich ... gehört da eher zu so etwas wie
+		// Tragwerksplanung.  M.E. am ehesten ZoneAttributes.  Mal die KI fragen ...
+
 		INHABITANTS("Inhabitants"),
 		EMPLOYEE("Employee"),
 		EMPLOYEE_PRIMARY("Employee Primary Sector"),
@@ -526,13 +543,16 @@ public class SmallScaleCommercialTrafficUtils {
 
 		private final String label;
 
-		StructuralAttribute(String label) { this.label = label; }
+		ZoneAttribute( String label ) { this.label = label; }
+
 		public String getLabel() { return label; }
 
-		private static final Map<String, StructuralAttribute> BY_LABEL =
-			Arrays.stream(values()).collect(Collectors.toMap(StructuralAttribute::getLabel, e -> e));
+		private static final Map<String, ZoneAttribute> BY_LABEL =
+			Arrays.stream(values()).collect(Collectors.toMap( ZoneAttribute::getLabel, e -> e ) );
+		// (the data structure, private, so that one can look up the enum by label)
 
-		public static Optional<StructuralAttribute> fromLabel(String label) {
+		public static Optional<ZoneAttribute> fromLabel( String label ) {
+			// (using the above private data structure so that one can look up the enum by label)
 			return Optional.ofNullable(BY_LABEL.get(label));
 		}
 	}

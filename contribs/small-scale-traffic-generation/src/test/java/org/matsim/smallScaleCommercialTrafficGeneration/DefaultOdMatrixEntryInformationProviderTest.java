@@ -1,7 +1,7 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import org.junit.jupiter.api.Test;
-import org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType;
+import org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +17,7 @@ class DefaultOdMatrixEntryInformationProviderTest {
 		DefaultOdMatrixEntryInformationProvider provider = new DefaultOdMatrixEntryInformationProvider(vehicleTypeSelection);
 
 		OdMatrixEntryInformationProvider.OdMatrixEntryInformation information = provider.getOdMatrixEntryInformation(
-			1, "total", SmallScaleCommercialTrafficType.commercialPersonTraffic);
+			1, "total", SmallScaleCommercialTrafficSegment.commercialPersonTraffic );
 
 		assertArrayEquals(new String[]{"customVehicle"}, information.possibleVehicleTypes);
 		assertEquals(2.5, information.occupancyRate);

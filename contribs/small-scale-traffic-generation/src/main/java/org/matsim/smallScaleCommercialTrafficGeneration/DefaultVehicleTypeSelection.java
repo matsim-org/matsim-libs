@@ -1,6 +1,6 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
-import org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType;
+import org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment;
 
 /**
  * Default vehicle type and occupancy selection for small-scale commercial traffic.
@@ -11,9 +11,9 @@ public class DefaultVehicleTypeSelection implements VehicleTypeSelection {
 	public VehicleTypeInformation getVehicleTypeInformation(
 		int purpose,
 		String modeOrVehType,
-		SmallScaleCommercialTrafficType smallScaleCommercialTrafficType
+		SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment
 	) {
-		if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
+		if ( smallScaleCommercialTrafficSegment.equals( SmallScaleCommercialTrafficSegment.commercialPersonTraffic )) {
 			if (purpose == 1) {
 				return new VehicleTypeInformation(new String[]{"vwCaddy", "e_SpaceTourer"}, 1.5);
 			} else if (purpose == 2) {
@@ -25,7 +25,7 @@ public class DefaultVehicleTypeSelection implements VehicleTypeSelection {
 			} else if (purpose == 5) {
 				return new VehicleTypeInformation(new String[]{"mercedes313", "e_SpaceTourer"}, 1.7);
 			}
-		} else if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.goodsTraffic)) {
+		} else if ( smallScaleCommercialTrafficSegment.equals( SmallScaleCommercialTrafficSegment.goodsTraffic )) {
 			return switch (modeOrVehType) {
 				case "vehTyp1" -> new VehicleTypeInformation(
 					new String[]{"vwCaddy", "e_SpaceTourer"}, 1.); // possible to add more types, see source

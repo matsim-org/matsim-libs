@@ -22,7 +22,7 @@ public interface CommercialTourSpecifications {
 	 *
 	 * @return the distribution of the tour start and the related duration
 	 */
-	Map<GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration>> createTourDistribution(RandomGenerator rng);
+	Map<GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration>> createTourDistribution( RandomGenerator rng );
 
 	/**
 	 * Creates the probability distribution for the tour start times for the day.
@@ -33,7 +33,7 @@ public interface CommercialTourSpecifications {
 
 	@Deprecated //use createTourDistribution(String smallScaleCommercialTrafficType) instead
 	EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds> createTourStartTimeDistribution(
-		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, RandomGenerator rng);
+			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment, RandomGenerator rng );
 
 	/**
 	 * Creates the probability distribution for the tour duration for the day.
@@ -42,5 +42,6 @@ public interface CommercialTourSpecifications {
 	 * @return the probability distribution for the tour duration
 	 */
 	@Deprecated //use createTourDistribution(String smallScaleCommercialTrafficType) instead
-	EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds> createTourDurationTimeDistribution(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, RandomGenerator rng);
+	EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds> createTourDurationTimeDistribution(
+			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment, RandomGenerator rng );
 }

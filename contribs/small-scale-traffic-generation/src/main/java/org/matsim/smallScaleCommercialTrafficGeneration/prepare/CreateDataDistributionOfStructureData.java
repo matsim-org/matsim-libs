@@ -11,7 +11,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.facilities.*;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils;
-import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -73,8 +73,8 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	@CommandLine.Option(names = "--pathToInvestigationAreaData", description = "Path to the investigation area data", defaultValue = "contribs/small-scale-traffic-generation/test/input/org/matsim/smallScaleCommercialTrafficGeneration/investigationAreaData.csv")
 	private Path pathToInvestigationAreaData;
 
-	private Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection;
-	private final Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+	private Map<ZoneAttribute, List<String>> landuseCategoriesAndDataConnection;
+	private final Map<String, Map<ZoneAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 	public CreateDataDistributionOfStructureData(LanduseDataConnectionCreator landuseDataConnectionCreator) {
 		this.landuseDataConnectionCreator = landuseDataConnectionCreator;
@@ -148,18 +148,18 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	 */
 	private void calculateAreaSharesOfTheFacilities(ActivityFacilities facilities, ActivityFacilitiesFactory facilitiesFactory) {
 		for (String zone : buildingsPerZone.keySet()) {
-			for (StructuralAttribute assignedDataType : buildingsPerZone.get(zone).keySet()) {
+			for ( ZoneAttribute assignedDataType : buildingsPerZone.get(zone ).keySet()) {
 				buildingsPerZone.get(zone).get(assignedDataType).forEach(singleBuilding -> {
 					ActivityFacility facility;
 					Id<ActivityFacility> id = Id.create(singleBuilding.getID(), ActivityFacility.class);
 					if (facilities.getFacilities().containsKey(id)) {
 						facility = facilities.getFacilities().get(id);
-						if (!assignedDataType.equals(StructuralAttribute.EMPLOYEE))
+						if (!assignedDataType.equals( ZoneAttribute.EMPLOYEE ))
 							facility.addActivityOption(facilitiesFactory.createActivityOption(assignedDataType.getLabel()));
 					} else {
 						Coord coord = MGC.point2Coord(((Geometry) singleBuilding.getDefaultGeometry()).getCentroid());
 						facility = facilitiesFactory.createActivityFacility(id, coord);
-						if (!assignedDataType.equals(StructuralAttribute.EMPLOYEE))
+						if (!assignedDataType.equals( ZoneAttribute.EMPLOYEE ))
 							facility.addActivityOption(facilitiesFactory.createActivityOption(assignedDataType.getLabel()));
 						addAttributes(zone, singleBuilding, facility);
 						facilities.addActivityFacility(facility);
