@@ -8,6 +8,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -27,6 +28,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import picocli.CommandLine;
@@ -140,6 +142,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("activities.csv")), CSVFormat.DEFAULT)) {
 			HashMap<String, List<ActivityInformation>> activityToPersonMap = new HashMap<>();
 			List<String> activityDurationLabels = AnalysisUtils.createGroupLabels(activityDurationGroups);
+			Geometry geometryInvestigationArea = shp.isDefined() ? shp.getGeometry() : null;
 
 			printer.print("personId");
 			printer.print("groupOfSubpopulation");
@@ -167,6 +170,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				if (groupOfPerson != null) {
 					List<Activity> activities = TripStructureUtils.getActivities(person.getSelectedPlan(),
 						TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+					if (!startsInInvestigationArea(activities, geometryInvestigationArea))
+						continue;
 					// skip first and last activity
 					for (int i = 1; i <= activities.size() - 2; i++) {
 						Activity activity = activities.get(i);
@@ -204,9 +209,19 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		}
 	}
 
+	private boolean startsInInvestigationArea(List<Activity> activities, Geometry geometryInvestigationArea) {
+		if (geometryInvestigationArea == null)
+			return true;
+
+		if (activities.isEmpty() || activities.getFirst().getCoord() == null)
+			return false;
+
+		return geometryInvestigationArea.contains(MGC.coord2Point(activities.getFirst().getCoord()));
+	}
+
 	private void createGeneralTravelDataAnalysis(CommercialTrafficAnalysisEventHandler linkDemandEventHandler, Scenario scenario) {
 
-		HashMap<Id<Vehicle>, String> groupOfVehicles = linkDemandEventHandler.getGroupOfRelevantVehicles();
+		HashMap<Id<Vehicle>, String> groupOfVehicles = linkDemandEventHandler.getGroupOfAnalyzedVehicles();
 		Map<String, List<Id<Vehicle>>> vehiclesPerGroup = groupOfVehicles.entrySet().stream()
 			.collect(Collectors.groupingBy(
 				Map.Entry::getValue,
@@ -372,7 +387,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 	private void createAnalysisPerVehicle(CommercialTrafficAnalysisEventHandler linkDemandEventHandler, Scenario scenario) {
 		HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle = linkDemandEventHandler.getTravelDistancesPerVehicle();
-		HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation = linkDemandEventHandler.getGroupOfRelevantVehicles();
+		HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation = linkDemandEventHandler.getGroupOfAnalyzedVehicles();
 		HashMap<Id<Vehicle>, Double> tourDurations = linkDemandEventHandler.getTourDurationPerVehicle();
 		HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId = linkDemandEventHandler.getVehicleIdToPersonId();
 		Object2IntOpenHashMap<Id<Person>> jobsPerPerson = linkDemandEventHandler.getNumberOfJobsPerPerson();
