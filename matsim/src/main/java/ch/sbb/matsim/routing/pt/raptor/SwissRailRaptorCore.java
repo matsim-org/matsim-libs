@@ -137,6 +137,7 @@ public class SwissRailRaptorCore {
         }
 
         // same as (*) for access stops:
+		// As a result of the following for-loop, initialStops should contain the lowest cost access mode per TransitStopFacility. gleich july'26
         Map<TransitStopFacility, InitialStop> initialStops = new LinkedHashMap<>();
         for (InitialStop accessStop : accessStops) {
             InitialStop alternative = initialStops.get(accessStop.stop);
@@ -145,6 +146,14 @@ public class SwissRailRaptorCore {
             }
         }
 
+		/*
+		 * The following for-loop explores all TransitRoutes (technically TransitRouteStops) from all initialStops, but does not explore transfers to
+		 * other TransitRoutes, yet. If walking to stop A and taking a bus to stop B is cheaper than directly walking to stop B, than this for-loop
+		 * should find that.
+		 * As a result arrivalPathPerStop should contain the lowest cost path per TransitStopFacility for all TransitStopFacilities that coincide
+		 * with a InitialStop or are reachable from a InitialStop without transfer.
+		 * gleich july'26
+		 */
         boolean hasIntermodalAccess = false;
         // go through initial stops ...
         for (InitialStop stop : initialStops.values()) {
@@ -244,6 +253,17 @@ public class SwissRailRaptorCore {
             this.improvedRouteStopIndices.or(initialRouteStopIndices);
         }
 
+		/*
+		 * The following for-loop explores transfers to other TransitRoutes and checks whether destinationStops have been reached.
+		 *
+		 * findLeastCostArrival iterates over all destination stops and checks whether those were already reached, i.e. arrivalPathPerStop!=null.
+		 * It first clears improvedStops. Then exploreRoute() checks whether a cheaper path could be found to a TransitStopFacility and sets
+		 * improvedStops.
+		 * If no destinationStop has been reached it returns null as leastCostPath.
+		 *
+		 * handleTransfers goes through all improvesStops and explores transfers at those TransitStopFacilities.
+		 * gleich july'26
+		 */
         int allowedTransfersLeft = maxTransfersAfterFirstArrival;
         // the main loop
         for (int k = 0; k <= maxTransfers; k++) {

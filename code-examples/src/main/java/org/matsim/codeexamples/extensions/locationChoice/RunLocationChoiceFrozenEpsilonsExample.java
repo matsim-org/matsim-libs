@@ -23,48 +23,60 @@
 package org.matsim.codeexamples.extensions.locationChoice;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastes;
 import org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 class RunLocationChoiceFrozenEpsilonsExample{
 
 	/**
 	 * Since 2025.0 this doesn't work anymore. See https://github.com/matsim-org/matsim-libs/pull/3851
+	 *
+	 * Resurrected jul'26.
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		Config config = ConfigUtils.loadConfig( args );
-//
-//		config.replanning().addStrategySettings( new ReplanningConfigGroup.StrategySettings().setStrategyName( FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY )
-//												 .setWeight( 0.1 ) );
-//
-//		final FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
-//		dccg.setEpsilonScaleFactors("10.0" ); // larger value means locations are farther away
-////		dccg.setAlgorithm( bestResponse ); // is default
-//		dccg.setFlexibleTypes( "shopping" );
-////		dccg.setTravelTimeApproximationLevel( FrozenTastesConfigGroup.ApproximationLevel.localRouting ); // is default
-////		dccg.setRandomSeed( 221177 ); // is default
-//		dccg.setDestinationSamplePercent( 5. );
-//
-//		// ---
-//
-//		final Scenario scenario = ScenarioUtils.loadScenario(config);
-//
-//		// ---
-//
-//		Controler controler = new Controler(scenario);
-//
-//		// ---
-//
-//		FrozenTastes.configure( controler );
-//
-//		// ---
-//
-//		controler.run();
+		Config config = ConfigUtils.loadConfig( args );
+
+		config.replanning().addStrategySettings( new ReplanningConfigGroup.StrategySettings()
+								 .setStrategyName( FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY )
+								 .setWeight( 0.1 ) );
+
+		final FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
+		dccg.setEpsilonScaleFactors("10.0" ); // larger value means locations are farther away
+//		dccg.setAlgorithm( bestResponse ); // is default
+		dccg.setFlexibleTypes( "shopping" );
+//		dccg.setTravelTimeApproximationLevel( FrozenTastesConfigGroup.ApproximationLevel.localRouting ); // is default
+//		dccg.setRandomSeed( 221177 ); // is default
+		dccg.setDestinationSamplePercent( 5. );
+
+		config.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll( false ) );
+		// (yyyy not clear why this is needed--??)
+
+		// ---
+
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// ---
+
+		Controler controler = new Controler(scenario);
+
+		// ---
+
+		FrozenTastes.configure( controler );
+
+		// ---
+
+		controler.run();
 	}
 
 }
