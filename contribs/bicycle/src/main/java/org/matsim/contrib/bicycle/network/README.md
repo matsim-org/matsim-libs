@@ -94,10 +94,12 @@ until you populate it).
 Tests live in `contribs/bicycle/src/test/java/.../network`:
 
 - `BicycleInfraClassifierTest` — 37 table-driven cases covering 22 of the 27 categories and the precedence ordering
+- `BicycleLinkPolicyTest` — 7 cases for the footway/pedestrian whitelist, `bicycle=no`, and bicycle-oneway handling
 - `LinkElevationProfileTest` — 7 cases using a synthetic `ElevationSource` (no DEM required, fast)
 - `ElevationDataParserTest` — 8 reference points in Berlin against Sonny's DTM 50 m. Uses a small cutout shipped in
   `contribs/bicycle/test/input/org/matsim/contrib/bicycle/network/` (see the README there for source and license); a
   different DTM can be passed via `-Ddem.path=…`. Skipped via `assumeTrue` when the DTM file is missing.
+- `TagCopyTest` — 2 cases for the optional raw-OSM-tag copying (`TagCopy`)
 
 ## Pipeline
 

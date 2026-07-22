@@ -96,19 +96,19 @@ public enum BicycleInfraCategory {
 	FOOT_AND_CYCLEWAY_SHARED_ISOLATED,
 	FOOT_AND_CYCLEWAY_SHARED_ADJOINING_OR_ISOLATED,
 
-	// 11. Combined foot+bike paths (segregated)
+	// 12. Combined foot+bike paths (segregated)
 	FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING,
 	FOOT_AND_CYCLEWAY_SEGREGATED_ISOLATED,
 	FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING_OR_ISOLATED,
 
-	// 12. Footway with bicycle allowed
+	// 13. Footway with bicycle allowed
 	FOOTWAY_BICYCLE_YES_ADJOINING,
 	FOOTWAY_BICYCLE_YES_ISOLATED,
 	FOOTWAY_BICYCLE_YES_ADJOINING_OR_ISOLATED,
 
-	// 13. Matched the precedence but OSM tags were ambiguous
+	// 14. Matched the precedence but OSM tags were ambiguous
 	NEEDS_CLARIFICATION,
 
-	// 14. No cycling infrastructure
+	// 15. No cycling infrastructure
 	NONE
 }

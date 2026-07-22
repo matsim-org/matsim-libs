@@ -100,7 +100,7 @@ public final class LinkElevationProfile {
 		double[] heights = new double[numSamples];
 
 		for (int i = 0; i < numSamples; i++) {
-			double t = (numSamples == 1) ? 0.0 : (double) i / (numSamples - 1);
+			double t = (double) i / (numSamples - 1);
 			distances[i] = t * length;
 			double x = from.getX() + t * dx;
 			double y = from.getY() + t * dy;

@@ -21,11 +21,9 @@ package org.matsim.contrib.bicycle.network;
 import java.awt.image.Raster;
 import java.io.IOException;
 
-import org.geotools.api.data.DataSourceException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.geometry.Position2D;

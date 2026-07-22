@@ -20,7 +20,6 @@ package org.matsim.contrib.bicycle.network;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -239,13 +238,11 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		renameMode(network, TransportMode.bike, mode);
 
 		// ---- 7. elevation metrics on the final link set ----------------------
-		int counted = 0;
 		for (Link link : network.getLinks().values()) {
 			attachElevationMetrics(link, elevationParser, eleSampleStepM, eleNoiseToleranceM);
-			counted++;
 		}
 		log.info("Attached elevation metrics to {} links (sample step = {} m, noise tolerance = {} m).",
-			counted, eleSampleStepM, eleNoiseToleranceM);
+			network.getLinks().size(), eleSampleStepM, eleNoiseToleranceM);
 		logBicycleInfraDistribution(network, "in final network");
 
 		// ---- 8. write --------------------------------------------------------

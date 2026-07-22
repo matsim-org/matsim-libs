@@ -54,7 +54,7 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
  */
 public final class BicycleLinkPolicy {
 
-	public static final String BICYCLE_MODE = TransportMode.bike;
+	private static final String BICYCLE_MODE = TransportMode.bike;
 
 	private final BicycleInfraClassifier classifier;
 	private final TagCopy tagCopy;
