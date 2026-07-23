@@ -228,6 +228,12 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		normalizeOrigIdType(network);
 		prefixOsmAttributes(network);
 
+		// ---- 1c. repair reversed geometry on synthetic bike-reverse links -----
+		if (storeOriginalGeometry) {
+			int repaired = repairReversedGeometry(network);
+			log.info("Repaired reversed link geometry on {} links.", repaired);
+		}
+
 		// ---- 2. drop isolated components -------------------------------------
 		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.bike));
 		log.info("After cleanNetwork: {} links", network.getLinks().size());
@@ -485,6 +491,74 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 				modes.add(to);
 				link.setAllowedModes(modes);
 			}
+		}
+	}
+
+
+    // =========================================================================
+	// Reversed geometry repair
+	// =========================================================================
+
+	/**
+	 * Mirrors stored geometry that runs against its own link direction.
+	 *
+	 * <p>{@link OsmBicycleReader} copies every attribute onto its synthetic
+	 * {@code *_bike-reverse} links, geometry included, but those links run the other
+	 * way: their support points end up listed backwards and the link renders as a
+	 * zig-zag. Detection is geometric rather than by link id, so it does not depend
+	 * on the reader's naming and is a no-op once the geometry is correct.
+	 *
+	 * <p>Must run before the first simplification pass. Once two such links are
+	 * merged, the reversal is no longer detectable.
+	 *
+	 * <p>TODO belongs in {@link OsmBicycleReader #createReverseBicycleLink}, where the
+	 * correct order is known rather than inferred.
+	 *
+	 * @return the number of links whose geometry was mirrored
+	 */
+	private static int repairReversedGeometry(Network network) {
+		int repaired = 0;
+		for (Link link : network.getLinks().values()) {
+			Object value = link.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM);
+			if (value == null) continue;
+
+			String[] points = value.toString().trim().split("\\s+");
+			// a single support point carries no order to get wrong
+			if (points.length < 2) continue;
+
+			Coord first = parseSupportPoint(points[0]);
+			Coord last = parseSupportPoint(points[points.length - 1]);
+			if (first == null || last == null) continue;
+
+			// projected: the end nodes carry a z from the DEM, the parsed support
+			// points do not. The 3D variant would fall back to 2D anyway, but log a
+			// warning for every link it sees.
+			Coord from = link.getFromNode().getCoord();
+			Coord to = link.getToNode().getCoord();
+			double asIs = CoordUtils.calcProjectedEuclideanDistance(first, from)
+				+ CoordUtils.calcProjectedEuclideanDistance(last, to);
+			double mirrored = CoordUtils.calcProjectedEuclideanDistance(first, to)
+				+ CoordUtils.calcProjectedEuclideanDistance(last, from);
+			if (mirrored >= asIs) continue;
+
+			StringBuilder reversed = new StringBuilder();
+			for (int i = points.length - 1; i >= 0; i--) {
+				reversed.append(points[i]).append(' ');
+			}
+			link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, reversed.toString());
+			repaired++;
+		}
+		return repaired;
+	}
+
+	/** One {@code nodeId,x,y} triple from an origgeom value, or null if malformed. */
+	private static Coord parseSupportPoint(String token) {
+		String[] parts = token.split(",");
+		if (parts.length != 3) return null;
+		try {
+			return new Coord(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+		} catch (NumberFormatException e) {
+			return null;
 		}
 	}
 
