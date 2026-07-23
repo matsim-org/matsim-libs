@@ -21,6 +21,7 @@ package org.matsim.contrib.bicycle.network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -134,6 +135,13 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		defaultValue = "3.0")
 	private double eleNoiseToleranceM;
 
+	@Option(names = "--store-original-geometry", negatable = true,
+		description = "Store the true OSM road course in the 'origgeom' link attribute so "
+			+ "links keep their real shape through simplification. Use "
+			+ "--no-store-original-geometry to switch it off. Default: ${DEFAULT-VALUE}.",
+		defaultValue = "false")
+	private boolean storeOriginalGeometry;
+
 
 	// ---- attribute keys --------------------------------------------------------
 
@@ -204,7 +212,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		// ---- 1. OSM read: stamps node elevations + infra on each new link ----
 		Network network = new OsmBicycleReader.Builder()
 			.setCoordinateTransformation(transformation)
-			.setStoreOriginalGeometry(true)
+			.setStoreOriginalGeometry(storeOriginalGeometry)
 			.setAfterLinkCreated((link, tags, direction) -> {
 				addNodeElevation(link.getFromNode(), elevationParser);
 				addNodeElevation(link.getToNode(), elevationParser);
@@ -225,7 +233,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		log.info("After cleanNetwork: {} links", network.getLinks().size());
 
 		// ---- 3. bicycle-aware simplification ---------------------------------
-		simplifyWithBikeInfra(network);
+		simplifyWithBikeInfra(network, storeOriginalGeometry);
 		log.info("After simplification (1st pass): {} links", network.getLinks().size());
 
 		// ---- 4. remove service dead-ends and hairline branches ---------------
@@ -234,8 +242,13 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 		// ---- 5. second simplification pass; service cleanup may have created
 		//        new merge candidates -----------------------------------------
-		simplifyWithBikeInfra(network);
+		simplifyWithBikeInfra(network, storeOriginalGeometry);
 		log.info("After simplification (2nd pass): {} links", network.getLinks().size());
+
+		// ---- 5b. geometry sanity check --------------------------------------
+		if (storeOriginalGeometry) {
+			logGeometryConsistency(network);
+		}
 
 		// ---- 6. rename mode if requested (no-op when --mode bike) -----------
 		renameMode(network, TransportMode.bike, mode);
@@ -374,6 +387,49 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 
 	// =========================================================================
+	// Geometry consistency
+	// =========================================================================
+
+	/**
+	 * Every link's stored geometry has to add up to its own length. A forgotten
+	 * shared node, a reversed part or a dropped segment all break this, and
+	 * nothing else in the pipeline would notice.
+	 *
+	 * <p>Warns rather than throws: the reader currently produces reversed
+	 * geometry on {@code *_bike-reverse} links, so a hard failure here would
+	 * block every build until that is fixed separately.
+	 */
+	private static void logGeometryConsistency(Network network) {
+		int withGeometry = 0;
+		List<Id<Link>> offenders = new ArrayList<>();
+
+		for (Link link : network.getLinks().values()) {
+			List<Node> geometry = NetworkUtils.getOriginalGeometry(link);
+			// size 2 means no stored geometry -- a straight link, nothing to check
+			if (geometry.size() < 3 || link.getLength() <= 0) continue;
+			withGeometry++;
+
+			double drawn = 0;
+			for (int i = 1; i < geometry.size(); i++) {
+				// projected: the end nodes carry a Z from the DEM, the points parsed
+				// from origgeom do not. A 3D distance would compare different things.
+				drawn += CoordUtils.calcProjectedEuclideanDistance(
+					geometry.get(i - 1).getCoord(), geometry.get(i).getCoord());
+			}
+			if (Math.abs(drawn - link.getLength()) / link.getLength() > 0.02) {
+				offenders.add(link.getId());
+			}
+		}
+
+		log.info("Links with stored geometry: {} of {}", withGeometry, network.getLinks().size());
+		if (!offenders.isEmpty()) {
+			log.warn("{} links whose stored geometry does not match their length, e.g. {}",
+				offenders.size(), offenders.subList(0, Math.min(5, offenders.size())));
+		}
+	}
+
+
+	// =========================================================================
 	// Elevation
 	// =========================================================================
 
@@ -442,7 +498,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * agree on the bicycle-relevant attributes. The default simplifier would
 	 * happily merge across infra changes, losing that information.
 	 */
-	private static void simplifyWithBikeInfra(Network network) {
+	private static void simplifyWithBikeInfra(Network network, boolean storeOriginalGeometry) {
 
 		BiPredicate<Link, Link> attrsMustMatch = (a, b) -> {
 			for (String key : SIMPLIFY_MATCH_KEYS) {
@@ -475,7 +531,9 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 				b.getAttributes().getAttribute("origid"));
 			if (merged != null) newLink.getAttributes().putAttribute("origid", merged);
 
-			mergeOrigGeom(a, b, newLink);
+			if (storeOriginalGeometry) {
+				mergeOrigGeom(a, b, newLink);
+			}
 		});
 
 		simplifier.run(network);
@@ -499,11 +557,15 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	}
 
 	/**
-	 * Haengt die gespeicherten Geometrien beider Teillinks aneinander. Der Knoten,
-	 * an dem sie sich trafen, verschwindet hier aus dem Netz und muss deshalb
-	 * Stuetzpunkt werden -- sonst schneidet der gemergte Link genau dort die Kurve ab.
-	 * Links ohne gespeicherte Geometrie steuern nur den gemeinsamen Knoten bei,
-	 * was korrekt ist: sie waren gerade.
+	 * Concatenates the stored geometries of both merged links. The node where they
+	 * used to meet disappears from the network here, so it has to become a support
+	 * point -- otherwise the merged link cuts the corner at exactly that spot.
+	 * Links without stored geometry contribute nothing but the shared node, which
+	 * is correct: they were straight.
+	 *
+	 * <p>Only the x/y components of the shared node are written. The end nodes
+	 * carry a Z from the DEM, but {@link NetworkUtils#getOriginalGeometry} expects
+	 * exactly three fields per point and throws on a fourth.
 	 */
 	private static void mergeOrigGeom(Link in, Link out, Link merged) {
 		Node shared = in.getToNode();
