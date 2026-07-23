@@ -20,6 +20,7 @@ package org.matsim.contrib.bicycle.network;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -175,8 +176,9 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		LINK_ATTR_BICYCLE_INFRA,
 		"type",
 		OSM_PREFIX + "surface",
-		OSM_PREFIX + "bicycle", // this could be removed in the future as "bicycle_infra" should be enough
-		OSM_PREFIX + "smoothness"
+		//OSM_PREFIX + "bicycle", // this could be removed in the future as "bicycle_infra" should be enough
+		OSM_PREFIX + "smoothness",
+		NetworkUtils.ALLOWED_SPEED
 	);
 
 
@@ -202,6 +204,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		// ---- 1. OSM read: stamps node elevations + infra on each new link ----
 		Network network = new OsmBicycleReader.Builder()
 			.setCoordinateTransformation(transformation)
+			.setStoreOriginalGeometry(true)
 			.setAfterLinkCreated((link, tags, direction) -> {
 				addNodeElevation(link.getFromNode(), elevationParser);
 				addNodeElevation(link.getToNode(), elevationParser);
@@ -459,20 +462,20 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			Link a = inOut.getFirst();
 			Link b = inOut.getSecond();
 
-			// Bicycle-relevant attributes are already identical on both
-			// inputs by construction of the predicate.
 			for (String key : SIMPLIFY_MATCH_KEYS) {
 				Object v = a.getAttributes().getAttribute(key);
 				if (v != null) newLink.getAttributes().putAttribute(key, v);
 			}
 
-			// Merge origid values, deduplicating across the two inputs.
-			Object idA = a.getAttributes().getAttribute("origid");
-			Object idB = b.getAttributes().getAttribute("origid");
-			String merged = mergeOrigIds(idA, idB);
-			if (merged != null) {
-				newLink.getAttributes().putAttribute("origid", merged);
-			}
+			// allowed_speed ist bei gleichem freespeed identisch, wird aber bisher verworfen
+			Object speed = a.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED);
+			if (speed != null) newLink.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, speed);
+
+			String merged = mergeOrigIds(a.getAttributes().getAttribute("origid"),
+				b.getAttributes().getAttribute("origid"));
+			if (merged != null) newLink.getAttributes().putAttribute("origid", merged);
+
+			mergeOrigGeom(a, b, newLink);
 		});
 
 		simplifier.run(network);
@@ -493,6 +496,30 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 				link.getAttributes().putAttribute("origid", origid.toString());
 			}
 		}
+	}
+
+	/**
+	 * Haengt die gespeicherten Geometrien beider Teillinks aneinander. Der Knoten,
+	 * an dem sie sich trafen, verschwindet hier aus dem Netz und muss deshalb
+	 * Stuetzpunkt werden -- sonst schneidet der gemergte Link genau dort die Kurve ab.
+	 * Links ohne gespeicherte Geometrie steuern nur den gemeinsamen Knoten bei,
+	 * was korrekt ist: sie waren gerade.
+	 */
+	private static void mergeOrigGeom(Link in, Link out, Link merged) {
+		Node shared = in.getToNode();
+		StringBuilder sb = new StringBuilder();
+		appendGeom(sb, in);
+		Coord c = shared.getCoord();
+		sb.append(shared.getId()).append(',').append(c.getX()).append(',').append(c.getY()).append(' ');
+		appendGeom(sb, out);
+		merged.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, sb.toString());
+	}
+
+	private static void appendGeom(StringBuilder sb, Link link) {
+		Object v = link.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM);
+		if (v == null) return;
+		String s = v.toString().trim();
+		if (!s.isEmpty()) sb.append(s).append(' ');
 	}
 
 	/**
