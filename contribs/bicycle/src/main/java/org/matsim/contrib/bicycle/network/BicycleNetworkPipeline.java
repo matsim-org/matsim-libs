@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.contrib.bicycle.BicycleUtils;
+import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.osm.networkReader.OsmBicycleReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
@@ -239,7 +240,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		log.info("After cleanNetwork: {} links", network.getLinks().size());
 
 		// ---- 3. bicycle-aware simplification ---------------------------------
-		simplifyWithBikeInfra(network, storeOriginalGeometry);
+		simplifyUntilStable(network, storeOriginalGeometry);
 		log.info("After simplification (1st pass): {} links", network.getLinks().size());
 
 		// ---- 4. remove service dead-ends and hairline branches ---------------
@@ -248,7 +249,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 		// ---- 5. second simplification pass; service cleanup may have created
 		//        new merge candidates -----------------------------------------
-		simplifyWithBikeInfra(network, storeOriginalGeometry);
+		simplifyUntilStable(network, storeOriginalGeometry);
 		log.info("After simplification (2nd pass): {} links", network.getLinks().size());
 
 		// ---- 5b. geometry sanity check --------------------------------------
@@ -568,6 +569,22 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	// =========================================================================
 
 	/**
+	 * NetworkSimplifier sweeps the node collection once per run and never revisits a
+	 * node, so a link that only becomes mergeable through a neighbouring merge is
+	 * left behind -- which of them survive depends on the map order of the nodes,
+	 * not on the data. Repeat until the link count stops falling.
+	 */
+	private static void simplifyUntilStable(Network network, boolean storeOriginalGeometry) {
+		for (int pass = 1; ; pass++) {
+			int before = network.getLinks().size();
+			simplifyWithBikeInfra(network, storeOriginalGeometry);
+			int after = network.getLinks().size();
+			log.info("Simplification pass {}: {} -> {} links", pass, before, after);
+			if (after == before) return;
+		}
+	}
+
+	/**
 	 * Merges consecutive links via {@link NetworkSimplifier} only when they
 	 * agree on the bicycle-relevant attributes. The default simplifier would
 	 * happily merge across infra changes, losing that information.
@@ -583,14 +600,34 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		};
 
 		var simplifier = NetworkSimplifier.createNetworkSimplifier(network);
-		simplifier.setMergeLinkStats(false);
-		simplifier.registerIsMergeablePredicate(attrsMustMatch);
+		// Merge despite differing link stats, then re-impose everything except the
+		// length-derived capacity boost below. NetworkSimplifier recomputes the stats
+		// when merging: length summed, freespeed as the travel-time preserving mean,
+		// capacity as the minimum, lanes length-weighted. With freespeed and lanes
+		// equal by the predicate, those come out exact.
+		simplifier.setMergeLinkStats(true);
+		simplifier.registerIsMergeablePredicate((a, b) -> attrsMustMatch.test(a, b)
+			&& a.getAllowedModes().equals(b.getAllowedModes())
+			&& a.getNumberOfLanes() == b.getNumberOfLanes()
+			&& sameFreespeed(a, b)
+			&& baseCapacity(a) == baseCapacity(b));
 
 		// When two links merge, carry over the attributes from the first one
 		// (they're identical to the second by construction of the predicate).
 		simplifier.registerTransferAttributesConsumer((inOut, newLink) -> {
 			Link a = inOut.getFirst();
 			Link b = inOut.getSecond();
+
+			// NetworkSimplifier only sets the allowed modes in its mergeLinkStats=false
+			// branch; the branch we use leaves them at LinkImpl's default, which is
+			// {car}. Restore them -- equal on both by the predicate.
+			newLink.setAllowedModes(a.getAllowedModes());
+
+			// NetworkSimplifier takes min(capacity) instead of re-deriving it from the
+			// merged length, so a pair of short links would keep the < 50 m crossing
+			// boost. Re-apply the rule; baseCapacity is equal on both by the predicate.
+			newLink.setCapacity(baseCapacity(a) * (newLink.getLength()
+				< LinkProperties.DEFAULT_ADJUST_CAPACITY_LENGTH ? 2 : 1));
 
 			for (String key : SIMPLIFY_MATCH_KEYS) {
 				Object v = a.getAttributes().getAttribute(key);
@@ -679,5 +716,33 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		for (String part : s.split("-")) {
 			if (!part.isBlank()) acc.add(part);
 		}
+	}
+
+	/**
+	 * Lane capacity without the "might be a crossing" boost that
+	 * {@link LinkProperties#getLaneCapacity} applies below 50 m.
+	 *
+	 * <p>That boost is what blocks most merges: where a crossing way forces an extra
+	 * node, the road is cut into a short stub and a long remainder, and the two end
+	 * up with different capacities although they are the same road. Comparing the
+	 * unboosted value drops the artefact and keeps every real difference.
+	 */
+	private static double baseCapacity(Link link) {
+		return link.getLength() < LinkProperties.DEFAULT_ADJUST_CAPACITY_LENGTH
+			? link.getCapacity() / 2
+			: link.getCapacity();
+	}
+
+	/**
+	 * NetworkSimplifier recomputes the freespeed of a merged link as
+	 * {@code (l1 + l2) / (t1 + t2)}, which does not reproduce the input value
+	 * bit-for-bit. After a few merges the parts of one and the same road differ in
+	 * the last decimal, and an exact comparison stops the chain -- the more that has
+	 * been merged, the less merges further. Compare relatively instead; a real speed
+	 * difference is a whole km/h, not an ulp.
+	 */
+	private static boolean sameFreespeed(Link a, Link b) {
+		double x = a.getFreespeed(), y = b.getFreespeed();
+		return Math.abs(x - y) <= 1e-9 * Math.max(Math.abs(x), Math.abs(y));
 	}
 }
