@@ -21,11 +21,9 @@ package org.matsim.contrib.bicycle.network;
 import java.awt.image.Raster;
 import java.io.IOException;
 
-import org.geotools.api.data.DataSourceException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.geometry.Position2D;
@@ -35,84 +33,63 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
+ * Reads a DEM GeoTIFF via GeoTools and samples elevation at arbitrary world
+ * coordinates, transforming them from the scenario CRS into the DEM CRS as
+ * needed. Sampling is nearest-neighbor.
+ *
+ * <p>DEM sources we know about:
+ * <ul>
+ *   <li>Sonny's DTMs — https://sonny.4lima.de/ (CC BY 4.0). LiDAR-based,
+ *       much better quality than SRTM. Germany available as 20 m (~1.1 GB) or
+ *       50 m (~300 MB), both in {@code EPSG:32632}.</li>
+ *   <li>For future reference, see also GraphHopper PR #3287
+ *       (https://github.com/graphhopper/graphhopper/pull/3287) which switched
+ *       to Sonny.</li>
+ * </ul>
+ *
+ * <p>Deprecated alternatives that we have used historically:
+ * <ul>
+ *   <li>SRTM1 — http://earthexplorer.usgs.gov/ (login required)</li>
+ *   <li>SRTM3 — http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp</li>
+ *   <li>EU-DEM — http://data.eox.at/eudem</li>
+ * </ul>
+ *
  * @author smetzler, dziemke
  */
 public class ElevationDataParser {
 
-    private static GridCoverage2D grid;
-    private static Raster gridData;
-    private CoordinateTransformation ct;
-
-    public static void main(String[] args) {
-        // Data sources:
-        // SRTM1:  http://earthexplorer.usgs.gov/ (login in required)
-        // SRTM3:  http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
-        // EU-DEM: http://data.eox.at/eudem
-
-        String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/BerlinEUDEM.tif"; // Berlin EU-DEM
-        // String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/srtm3/srtm_39_02.tif"; // Berlin SRTM3
-        // String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_stuttgart/stuttgartEUDEM.tif"; // Stuttgart EU-DEM
-        // String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_stuttgart/srtm_38_03.tif"; // Stuttgart SRTM3
-        // String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_brasilia/srtm_27_16.tif"; // Brasilia SRTM3
-
-        String scenarioCRS = "EPSG:4326"; // WGS84 as the coorinates to test below are stated like this
-        String tiffCRS = "EPSG:4326";   // Not sure what Berlin TIFF used, so using 4326 as an example
-
-        ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, scenarioCRS, tiffCRS);
-
-        System.out.println("Teufelsberg: " + elevationDataParser.getElevation(13.2407, 52.4971));
-        System.out.println("Tempelhofer Feld: " + elevationDataParser.getElevation(13.3989, 52.4755));
-        System.out.println("Müggelsee: " + elevationDataParser.getElevation(13.6354, 52.4334));
-        System.out.println("Müggelberg: " + elevationDataParser.getElevation(13.64048, 52.41594));
-        System.out.println("Alexanderplatz: " + elevationDataParser.getElevation(13.40993, 52.52191));
-        System.out.println("Kreuzberg (Berg): " + elevationDataParser.getElevation(13.379491, 52.487610));
-        System.out.println("Herrmannplatz: " + elevationDataParser.getElevation(13.422301,52.486477));
-        System.out.println("U-Bahnhof Boddinstraße: " + elevationDataParser.getElevation(13.423210,52.480278));
-    }
+	private final GridCoverage2D grid;
+	private final Raster gridData;
+	private final CoordinateTransformation ct;
 
 
-    public ElevationDataParser(String tiffFile, String scenarioCRS, String tiffCRS) {
-        // Transforms node coordinates from the scenarioCRS (= outputCRS in CreateBicycleNetworkWithElevation)
-        // to the tiffCRS, so that we can look up the correct elevation pixel in the GeoTIFF.
-        this.ct = TransformationFactory.getCoordinateTransformation(scenarioCRS, tiffCRS);
-
-        GeoTiffReader reader = null;
-        try {
-            reader = new GeoTiffReader(tiffFile);
-        } catch (DataSourceException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            grid = reader.read(null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        gridData = grid.getRenderedImage().getData();
-    }
+	public ElevationDataParser(String tiffFile, String scenarioCRS, String demCRS) {
+		this.ct = TransformationFactory.getCoordinateTransformation(scenarioCRS, demCRS);
+		try {
+			GeoTiffReader reader = new GeoTiffReader(tiffFile);
+			this.grid = reader.read(null);
+			this.gridData = grid.getRenderedImage().getData();
+		} catch (IOException e) {
+			// DataSourceException extends IOException, one catch is enough.
+			throw new RuntimeException("Failed to read DEM from " + tiffFile, e);
+		}
+	}
 
 
-    public double getElevation(double x, double y) {
-        return getElevation(CoordUtils.createCoord(x, y));
-    }
+	public double getElevation(double x, double y) {
+		return getElevation(CoordUtils.createCoord(x, y));
+	}
 
 
-    public double getElevation(Coord coord) {
-        GridGeometry2D gg = grid.getGridGeometry();
-
-        Coord transformedCoord = ct.transform(coord);
-
-        GridCoordinates2D posGrid = null;
-        try {
-            posGrid = gg.worldToGrid(new Position2D(transformedCoord.getX(), transformedCoord.getY()));
-        } catch (InvalidGridGeometryException e) {
-            e.printStackTrace();
-        } catch (TransformException e) {
-            e.printStackTrace();
-        }
-
-        double[] pixel = new double[1];
-        double[] data = gridData.getPixel(posGrid.x, posGrid.y, pixel);
-        return data[0];
-    }
+	public double getElevation(Coord coord) {
+		Coord transformed = ct.transform(coord);
+		try {
+			GridCoordinates2D posGrid = grid.getGridGeometry()
+				.worldToGrid(new Position2D(transformed.getX(), transformed.getY()));
+			double[] pixel = new double[1];
+			return gridData.getPixel(posGrid.x, posGrid.y, pixel)[0];
+		} catch (TransformException | InvalidGridGeometryException e) {
+			throw new RuntimeException("Failed to read elevation at " + coord, e);
+		}
+	}
 }
