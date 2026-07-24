@@ -37,7 +37,7 @@ mvn -pl contribs/bicycle exec:java \
 | `--input` (required)    | —       | OSM input (`.osm.pbf`)                                                                           |
 | `--dem` (required)      | —       | DEM GeoTIFF                                                                                      |
 | `--dem-crs` (required)  | —       | CRS of the DEM (e.g. `EPSG:32632` for Sonny Germany)                                             |
-| `--output` (required)   | —       | Output network (`.xml.gz`)                                                                       |
+| `--output` (required)   | —       | Output network; compression is picked from the extension: `.xml.gz` (gzip), `.xml.zst` (Zstandard), `.xml` (none) |
 | `--crs` (required)      | —       | Output network CRS (e.g. `EPSG:25832`)                                                           |
 | `--mode`                | `bike`  | Network mode for cyclable links                                                                  |
 | `--country`             | `de`    | Country profile for traffic-sign interpretation: `de`, `at`, or `generic` (see Country profiles) |

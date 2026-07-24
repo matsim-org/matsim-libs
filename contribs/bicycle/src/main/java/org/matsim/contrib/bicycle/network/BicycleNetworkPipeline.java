@@ -124,7 +124,9 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		description = "CRS of the DEM GeoTIFF, e.g. EPSG:32632 for Sonny's German DTM")
 	private String demCRS;
 
-	@Option(names = "--output", required = true, description = "Path to output network (.xml.gz)")
+	@Option(names = "--output", required = true,
+		description = "Path to output network. The compression is chosen from the file extension: "
+			+ ".xml.gz for gzip, .xml.zst for Zstandard (MATSim's newer default), .xml for uncompressed.")
 	private Path output;
 
 	// TODO maybe switch to CrsOptions mixin from matsim-application later.
