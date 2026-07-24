@@ -38,6 +38,8 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 
 	public enum RequestsPartitioner {RoundRobinRequestsPartitioner, LoadAwareRoundRobinRequestsPartitioner}
 
+	public enum ServiceQualityProbeSpatialResolution {STOP_TO_STOP, ZONE_TO_ZONE}
+
 	public static final String SET_NAME = "parallelInserter";
 
 	@Comment("Time window (in seconds) for collecting incoming requests before processing begins.")
@@ -80,6 +82,84 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 
 	@Comment("Enable/Disable detailed performance statistics including worker utilization, conflict resolution timing, and load balancing metrics. Disabled by default.")
 	private boolean logPerformanceStats = false;
+
+	@Comment("Enable/Disable service quality probing. If enabled, the parallel inserter estimates DRT service quality for all stop-to-stop pairs at the configured probe times in the last iteration only. Disabled by default.")
+	private boolean writeServiceQualityProbes = false;
+
+	@Comment("Comma-separated list of simulation times in seconds for service quality probing, e.g. '28800,32400,36000'.")
+	private String serviceQualityProbeTimes = "";
+
+	@Comment("Output file name for service quality probes. The file is written to the last iteration output directory.")
+	private String serviceQualityProbeOutputFile = "drt_service_quality_probes.csv.gz";
+
+	@Comment("Optional comma-separated stop-pair CSV/CSV.GZ files produced by accessibility. In STOP_TO_STOP mode, only their unique directed pairs are probed. If unset, all stop pairs are probed.")
+	private String serviceQualityProbeStopPairInputFiles = "";
+
+	@Comment("Spatial resolution for service quality probing. STOP_TO_STOP estimates all DRT stop pairs. ZONE_TO_ZONE estimates one representative link-to-link request for each travel-time-matrix zone pair.")
+	private ServiceQualityProbeSpatialResolution serviceQualityProbeSpatialResolution = ServiceQualityProbeSpatialResolution.STOP_TO_STOP;
+
+	@Comment("Optional square-grid cell size for ZONE_TO_ZONE service quality probing. If unset, the DVRP travel-time-matrix zone system is used.")
+	private double serviceQualityProbeZoneCellSize = Double.NaN;
+
+	@StringGetter("writeServiceQualityProbes")
+	public boolean isWriteServiceQualityProbes() {
+		return writeServiceQualityProbes;
+	}
+
+	@StringSetter("writeServiceQualityProbes")
+	public void setWriteServiceQualityProbes(boolean writeServiceQualityProbes) {
+		this.writeServiceQualityProbes = writeServiceQualityProbes;
+	}
+
+	@StringGetter("serviceQualityProbeTimes")
+	public String getServiceQualityProbeTimes() {
+		return serviceQualityProbeTimes;
+	}
+
+	@StringSetter("serviceQualityProbeTimes")
+	public void setServiceQualityProbeTimes(String serviceQualityProbeTimes) {
+		this.serviceQualityProbeTimes = serviceQualityProbeTimes;
+	}
+
+	@StringGetter("serviceQualityProbeOutputFile")
+	public String getServiceQualityProbeOutputFile() {
+		return serviceQualityProbeOutputFile;
+	}
+
+	@StringSetter("serviceQualityProbeOutputFile")
+	public void setServiceQualityProbeOutputFile(String serviceQualityProbeOutputFile) {
+		this.serviceQualityProbeOutputFile = serviceQualityProbeOutputFile;
+	}
+
+	@StringGetter("serviceQualityProbeStopPairInputFiles")
+	public String getServiceQualityProbeStopPairInputFiles() {
+		return serviceQualityProbeStopPairInputFiles;
+	}
+
+	@StringSetter("serviceQualityProbeStopPairInputFiles")
+	public void setServiceQualityProbeStopPairInputFiles(String serviceQualityProbeStopPairInputFiles) {
+		this.serviceQualityProbeStopPairInputFiles = serviceQualityProbeStopPairInputFiles;
+	}
+
+	@StringGetter("serviceQualityProbeSpatialResolution")
+	public ServiceQualityProbeSpatialResolution getServiceQualityProbeSpatialResolution() {
+		return serviceQualityProbeSpatialResolution;
+	}
+
+	@StringSetter("serviceQualityProbeSpatialResolution")
+	public void setServiceQualityProbeSpatialResolution(ServiceQualityProbeSpatialResolution serviceQualityProbeSpatialResolution) {
+		this.serviceQualityProbeSpatialResolution = serviceQualityProbeSpatialResolution;
+	}
+
+	@StringGetter("serviceQualityProbeZoneCellSize")
+	public double getServiceQualityProbeZoneCellSize() {
+		return serviceQualityProbeZoneCellSize;
+	}
+
+	@StringSetter("serviceQualityProbeZoneCellSize")
+	public void setServiceQualityProbeZoneCellSize(double serviceQualityProbeZoneCellSize) {
+		this.serviceQualityProbeZoneCellSize = serviceQualityProbeZoneCellSize;
+	}
 
 	@StringGetter("vehiclesPartitioner")
 	public VehiclesPartitioner getVehiclesPartitioner() {

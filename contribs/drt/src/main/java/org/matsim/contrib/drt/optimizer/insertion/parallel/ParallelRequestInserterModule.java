@@ -34,13 +34,20 @@ import org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.vehicles.
 import org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.vehicles.ShiftingRoundRobinVehicleEntryPartitioner;
 import org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.vehicles.VehicleEntryPartitioner;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
+import org.matsim.contrib.drt.routing.DrtRouteConstraintsCalculator;
+import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.api.core.v01.network.Network;
 
 import java.util.Optional;
 
@@ -96,7 +103,23 @@ public class ParallelRequestInserterModule extends AbstractDvrpModeQSimModule {
 
 
 		bindModal(UnplannedRequestInserter.class).toProvider(modalProvider(
-			getter -> new ParallelUnplannedRequestInserter(
+			getter -> {
+				Optional<DrtServiceQualityProbe> serviceQualityProbe = drtParallelInserterParams.get().isWriteServiceQualityProbes()
+					? Optional.of(new DrtServiceQualityProbe(
+					getter.get(MatsimServices.class),
+					drtConfigGroup.getMode(),
+					getter.getModal(DrtStopNetwork.class),
+					getter.getModal(Network.class),
+					getter.getModal(TravelTime.class),
+					getter.get(LeastCostPathCalculatorFactory.class),
+					getter.getModal(TravelDisutilityFactory.class),
+					getter.getModal(DrtRouteConstraintsCalculator.class),
+					getter.getModal(DvrpLoadFromTrip.class),
+					getter.getModal(RequestFleetFilter.class),
+					() -> getter.getModal(DrtInsertionSearch.class),
+					drtParallelInserterParams.get()))
+					: Optional.empty();
+				return new ParallelUnplannedRequestInserter(
 				getter.get(MatsimServices.class),
 				getter.getModal(RequestsPartitioner.class),
 				getter.getModal(VehicleEntryPartitioner.class),
@@ -110,8 +133,10 @@ public class ParallelRequestInserterModule extends AbstractDvrpModeQSimModule {
 				getter.getModal(DrtOfferAcceptor.class),
 				getter.getModal(PassengerStopDurationProvider.class),
 				getter.getModal(RequestFleetFilter.class),
-				getter.getModal(DrtRequestInsertionRetryQueue.class)
-			))).asEagerSingleton();
+				getter.getModal(DrtRequestInsertionRetryQueue.class),
+				serviceQualityProbe
+			);
+			})).asEagerSingleton();
 		addModalQSimComponentBinding().to(modalKey(UnplannedRequestInserter.class));
 
 		addModalComponent(QsimScopeForkJoinPool.class,

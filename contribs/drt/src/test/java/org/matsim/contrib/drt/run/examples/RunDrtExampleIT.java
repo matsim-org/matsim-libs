@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -125,6 +126,67 @@ public class RunDrtExampleIT {
 			.waitAverage(301.37)
 			.inVehicleTravelTimeMean(381.11)
 			.totalTravelTimeMean(682.48)
+			.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+	@Test
+	void testRunDrtExampleWithParallelInserter_ServiceQualityProbe() {
+		Id.resetCaches();
+
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+			"mielec_stop_based_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+			new OTFVisConfigGroup());
+
+		var drtCfg = MultiModeDrtConfigGroup.get(config).getModalElements().iterator().next();
+
+		drtCfg.addOrGetDrtOptimizationConstraintsParams()
+			.addOrGetDefaultDrtOptimizationConstraintsSet()
+			.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		DrtParallelInserterParams params = new DrtParallelInserterParams();
+		params.setWriteServiceQualityProbes(true);
+		params.setServiceQualityProbeTimes("28800");
+		params.setServiceQualityProbeOutputFile("drt_service_quality_probes.csv");
+		drtCfg.addParameterSet(params);
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		Controler controller = DrtControlerCreator.createControler(config, false);
+		controller.addOverridingQSimModule(new ParallelRequestInserterModule(drtCfg));
+		controller.run();
+
+		Path probeCsv = Paths.get(utils.getOutputDirectory(), "drt_service_quality_probes.csv");
+		assertThat(probeCsv).exists();
+		List<String> rows;
+		try {
+			rows = Files.lines(probeCsv).collect(Collectors.toList());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		assertThat(rows.get(0)).isEqualTo("time;originStop;destinationStop;waitTime;directRideTime;rideTimeWithDetour;detourFactor;directRideDistance;rideDistanceWithDetour;distanceDetourFactor");
+		assertThat(rows).hasSizeGreaterThan(1);
+		assertThat(rows.stream().skip(1).noneMatch(row -> {
+			String[] columns = row.split(";");
+			return columns[1].equals(columns[2]);
+		})).isTrue();
+		assertThat(rows.stream().skip(1).anyMatch(row -> {
+			String[] columns = row.split(";");
+			return Double.isFinite(Double.parseDouble(columns[3]))
+				&& Double.isFinite(Double.parseDouble(columns[5]))
+				&& Double.isFinite(Double.parseDouble(columns[6]))
+				&& Double.isFinite(Double.parseDouble(columns[7]))
+				&& Double.isFinite(Double.parseDouble(columns[8]))
+				&& Double.isFinite(Double.parseDouble(columns[9]));
+		})).isTrue();
+
+		var expectedStats = Stats.newBuilder()
+			.rejectionRate(0.0)
+			.rejections(0)
+			.waitAverage(286.51)
+			.inVehicleTravelTimeMean(376.49)
+			.totalTravelTimeMean(663.01)
 			.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
