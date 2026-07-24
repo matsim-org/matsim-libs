@@ -179,6 +179,83 @@ public class BicycleNetworkPipelineTest {
 
 
 	// =========================================================================
+	// Tier 1 — the individual step methods in isolation
+	// =========================================================================
+
+	@Test
+	void prefixOsmAttributes_movesOsmTagsAndLeavesOthers() {
+		Network net = NetworkUtils.createNetwork();
+		Link l = link(net, node(net, "a", 0, 0), node(net, "b", 100, 0),
+			"highway.cycleway", "CYCLEWAY_LINK", "asphalt", 42L);
+		l.getAttributes().putAttribute(BicycleOsmTags.BICYCLE, "yes");
+
+		int moved = BicycleNetworkPipeline.prefixOsmAttributes(net);
+
+		assertEquals(2, moved, "surface and bicycle are the two OSM tags present");
+		assertEquals("asphalt", l.getAttributes().getAttribute("osm:surface"));
+		assertEquals("yes", l.getAttributes().getAttribute("osm:bicycle"));
+		assertNull(l.getAttributes().getAttribute("surface"));
+		assertNull(l.getAttributes().getAttribute("bicycle"));
+		// pipeline-internal attributes stay put
+		assertEquals("highway.cycleway", l.getAttributes().getAttribute("type"));
+		assertEquals(42L, l.getAttributes().getAttribute("origid"));
+	}
+
+	@Test
+	void normalizeOrigIdType_convertsLongButLeavesStrings() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node c = node(net, "c", 200, 0);
+		Link longId = link(net, a, b, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 100L);
+		Link stringId = link(net, b, c, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 200L);
+		stringId.getAttributes().putAttribute("origid", "already-a-string");
+
+		int converted = BicycleNetworkPipeline.normalizeOrigIdType(net);
+
+		assertEquals(1, converted, "only the Long origid is converted");
+		assertInstanceOf(String.class, longId.getAttributes().getAttribute("origid"));
+		assertEquals("100", longId.getAttributes().getAttribute("origid"));
+		assertEquals("already-a-string", stringId.getAttributes().getAttribute("origid"));
+	}
+
+	@Test
+	void renameMode_renamesOnlyMatchingLinksAndCounts() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Link bike = link(net, a, b, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 1L);
+		Link car = link(net, b, a, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 2L);
+		car.setAllowedModes(Set.of("car"));
+
+		int renamed = BicycleNetworkPipeline.renameMode(net, TransportMode.bike, "bicycle");
+
+		assertEquals(1, renamed);
+		assertEquals(Set.of("bicycle"), bike.getAllowedModes());
+		assertEquals(Set.of("car"), car.getAllowedModes(), "non-bike links untouched");
+	}
+
+	@Test
+	void renameMode_isNoOpWhenFromEqualsTo() {
+		Network net = NetworkUtils.createNetwork();
+		link(net, node(net, "a", 0, 0), node(net, "b", 100, 0),
+			"highway.cycleway", "CYCLEWAY_LINK", "asphalt", 1L);
+
+		assertEquals(0, BicycleNetworkPipeline.renameMode(net, TransportMode.bike, TransportMode.bike));
+	}
+
+	@Test
+	void mergeOrigIds_dedupesAndPreservesOrder() {
+		assertEquals("1-2", BicycleNetworkPipeline.mergeOrigIds("1", "2"));
+		assertEquals("1-2-3", BicycleNetworkPipeline.mergeOrigIds("1-2", "2-3"), "shared id 2 kept once");
+		assertEquals("1", BicycleNetworkPipeline.mergeOrigIds("1", "1"));
+		assertEquals("1", BicycleNetworkPipeline.mergeOrigIds("1", null));
+		assertEquals("2", BicycleNetworkPipeline.mergeOrigIds(null, "2"));
+		assertNull(BicycleNetworkPipeline.mergeOrigIds(null, null));
+	}
+
+
+	// =========================================================================
 	// helpers
 	// =========================================================================
 

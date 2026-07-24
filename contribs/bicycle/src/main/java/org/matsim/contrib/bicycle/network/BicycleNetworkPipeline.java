@@ -260,8 +260,10 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 							   Params params) {
 
 		// ---- 1b. move OSM-derived attributes under "osm:" prefix ------------
-		normalizeOrigIdType(network);
-		prefixOsmAttributes(network);
+		int normalized = normalizeOrigIdType(network);
+		int prefixed = prefixOsmAttributes(network);
+		log.info("Normalized {} origid values to String; moved {} OSM attributes under '{}'.",
+			normalized, prefixed, OSM_PREFIX);
 
 		// ---- 1c. repair reversed geometry on synthetic bike-reverse links -----
 		if (params.storeOriginalGeometry()) {
@@ -330,17 +332,22 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * Move OSM-derived attributes (those listed in {@link #OSM_TAG_ATTR_KEYS})
 	 * under the "osm:" prefix to make their provenance explicit and to keep
 	 * them separate from pipeline-internal attributes.
+	 *
+	 * @return the number of attributes moved
 	 */
-	private static void prefixOsmAttributes(Network network) {
+	public static int prefixOsmAttributes(Network network) {
+		int moved = 0;
 		for (Link link : network.getLinks().values()) {
 			for (String key : OSM_TAG_ATTR_KEYS) {
 				Object value = link.getAttributes().getAttribute(key);
 				if (value != null) {
 					link.getAttributes().putAttribute(OSM_PREFIX + key, value);
 					link.getAttributes().removeAttribute(key);
+					moved++;
 				}
 			}
 		}
+		return moved;
 	}
 
 
@@ -526,20 +533,25 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * <p>Note: the OSM {@code bicycle=...} restriction value is no longer
 	 * stored under the mode-name key -- it now lives at "osm:bicycle" and is
 	 * unaffected by the mode rename.
+	 *
+	 * @return the number of links whose mode set was changed
 	 */
-	private static void renameMode(Network network, String from, String to) {
+	public static int renameMode(Network network, String from, String to) {
 		if (from.equals(to)) {
 			log.info("Network mode is already '{}', no rename needed.", to);
-			return;
+			return 0;
 		}
-		log.info("Renaming network mode '{}' -> '{}'.", from, to);
+		int renamed = 0;
 		for (Link link : network.getLinks().values()) {
 			Set<String> modes = new HashSet<>(link.getAllowedModes());
 			if (modes.remove(from)) {
 				modes.add(to);
 				link.setAllowedModes(modes);
+				renamed++;
 			}
 		}
+		log.info("Renamed network mode '{}' -> '{}' on {} links.", from, to, renamed);
+		return renamed;
 	}
 
 
@@ -700,14 +712,19 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * would throw a {@link ClassCastException} on the first merge. Convert once
 	 * up front; this also gives the attribute a single consistent type in the
 	 * output (previously unmerged links carried Long, merged links String).
+	 *
+	 * @return the number of links whose origid was converted to String
 	 */
-	private static void normalizeOrigIdType(Network network) {
+	public static int normalizeOrigIdType(Network network) {
+		int converted = 0;
 		for (Link link : network.getLinks().values()) {
 			Object origid = link.getAttributes().getAttribute("origid");
 			if (origid != null && !(origid instanceof String)) {
 				link.getAttributes().putAttribute("origid", origid.toString());
+				converted++;
 			}
 		}
+		return converted;
 	}
 
 	/**
