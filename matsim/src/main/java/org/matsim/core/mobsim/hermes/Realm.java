@@ -37,6 +37,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 class Realm {
 	private final ScenarioImporter si;
@@ -61,6 +62,7 @@ class Realm {
     private final EventsManager eventsManager;
     // Current timestamp
     private int secs;
+	private final static int[] eventCountsPerHour = new int[31]; // Covers SIM_STEPS (typically 30 hours)
     Logger log = LogManager.getLogger(Realm.class);
 
     public Realm(ScenarioImporter scenario, EventsManager eventsManager) {
@@ -220,32 +222,32 @@ class Realm {
         int routeNo = Agent.getRoutePlanEntry(planentry);
         int stopid = Agent.getStopPlanEntry(planentry);
         int lineid = line_of_route[routeNo];
-        ArrayDeque<Agent> waiting_agents = agent_stops.get(stopid).get(lineid);
+        ArrayDeque<Agent> waitingAgents = agent_stops.get(stopid).get(lineid);
 
         // take agents
-        if (waiting_agents != null) {
-            ArrayList<Agent> removed = new ArrayList<>();
-            for (Agent in : waiting_agents) {
-                try {
-                    int egressStop = in.getNextStopPlanEntry();
-                    if (agent.willServeStop(egressStop)) {
-                        if (agent.access(egressStop, in)) {
-                            removed.add(in);
-                            // consume wait in stop, activate access
-                            advanceAgentandSetEventTime(in);
-                            // set driver in agent's event
-                            setEventVehicle(in, Agent.getPlanEvent(in.currPlan()), agent.id);
-                        } else {
-                            // agent could not enter, likely the vehicle is full
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            waiting_agents.removeAll(removed);
-        }
+		if (waitingAgents != null) {
+			Iterator<Agent> it = waitingAgents.iterator();
+			while (it.hasNext()) {
+				Agent in = it.next();
+				try {
+					int egressStop = in.getNextStopPlanEntry();
+					if (agent.willServeStop(egressStop)) {
+						if (agent.access(egressStop, in)) {
+							it.remove(); // Remove directly from waitingAgents in-place!
+							// consume wait in stop, activate access
+							advanceAgentandSetEventTime(in);
+							// set driver in agent's event
+							setEventVehicle(in, Agent.getPlanEvent(in.currPlan()), agent.id);
+						} else {
+							// agent could not enter, likely the vehicle is full
+							break;
+						}
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
         advanceAgentandSetEventTime(agent);
         // False is returned to force this agent to be processed in the next tick.
         // This will mean that the vehicle will be processed in the next tick.
@@ -256,21 +258,19 @@ class Realm {
         // Peek the next plan element and try to execute it.
         long planentry = agent.plan.get(agent.planIndex + 1);
         int type = Agent.getPlanHeader(planentry);
-        switch (type) {
-            case Agent.LinkType:        return processAgentLink(agent, planentry, currLinkId);
-            case Agent.SleepForType:    return processAgentSleepFor(agent, planentry);
-            case Agent.SleepUntilType:  return processAgentSleepUntil(agent, planentry);
-            case Agent.StopArriveType:  return processAgentStopArrive(agent, planentry);
-            case Agent.StopDelayType:   return processAgentStopDelay(agent, planentry);
-            case Agent.StopDepartType:  return processAgentStopDepart(agent, planentry);
-            case Agent.WaitType:        return processAgentWait(agent, planentry);
-            case Agent.AccessType:      // The access event is consumed in the stop.
-            case Agent.EgressType:      // The egress event is consumed in the stop.
-            default:
-                throw new RuntimeException(String.format(
-                        "unknown plan element type %d, agent %d plan index %d",
-                        type, agent.id, agent.planIndex + 1));
-        }
+		return switch (type) {
+			case Agent.LinkType -> processAgentLink(agent, planentry, currLinkId);
+			case Agent.SleepForType -> processAgentSleepFor(agent, planentry);
+			case Agent.SleepUntilType -> processAgentSleepUntil(agent, planentry);
+			case Agent.StopArriveType -> processAgentStopArrive(agent, planentry);
+			case Agent.StopDelayType -> processAgentStopDelay(agent, planentry);
+			case Agent.StopDepartType -> processAgentStopDepart(agent, planentry);
+			case Agent.WaitType -> processAgentWait(agent, planentry);      // The access event is consumed in the stop.
+			// The egress event is consumed in the stop.
+			default -> throw new RuntimeException(String.format(
+				"unknown plan element type %d, agent %d plan index %d",
+				type, agent.id, agent.planIndex + 1));
+		};
     }
 
     protected int processAgentActivities(Agent agent) {
@@ -350,9 +350,17 @@ class Realm {
                 log(secs, String.format("Processed %d agents", routed));
             }
             if (HermesConfigGroup.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0 && sortedEvents.size() > 0) {
-                eventsManager.processEvents(sortedEvents);
-                sortedEvents = new EventArray();
-            }
+				int hourIndex = secs / 3600;
+				eventCountsPerHour[hourIndex] = sortedEvents.size();
+
+				eventsManager.processEvents(sortedEvents);
+
+				// Pre-size the next hour based on the previous iteration's event count!
+				int nextHourIndex = hourIndex + 1;
+				int estimatedSize = nextHourIndex < eventCountsPerHour.length ? eventCountsPerHour[nextHourIndex] : 10000;
+
+				sortedEvents = new EventArray(Math.max(1000, (int)(estimatedSize * 1.05)));
+			}
 
             routed = 0;
             secs += 1;
