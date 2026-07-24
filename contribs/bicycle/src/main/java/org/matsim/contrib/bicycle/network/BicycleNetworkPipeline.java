@@ -185,7 +185,6 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		LINK_ATTR_BICYCLE_INFRA,
 		"type",
 		OSM_PREFIX + "surface",
-		//OSM_PREFIX + "bicycle", // this could be removed in the future as "bicycle_infra" should be enough
 		OSM_PREFIX + "smoothness",
 		NetworkUtils.ALLOWED_SPEED
 	);
@@ -225,12 +224,40 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			network.getNodes().size(), network.getLinks().size());
 		logBicycleInfraDistribution(network, "after OSM read");
 
+		// ---- 2-7. pure network transformations (no file I/O) -----------------
+		process(network, elevationParser::getElevation,
+			new Params(mode, eleSampleStepM, eleNoiseToleranceM, storeOriginalGeometry));
+
+		// ---- 8. write --------------------------------------------------------
+		new NetworkWriter(network).write(output.toString());
+
+		return 0;
+	}
+
+	/**
+	 * Everything between reading the OSM file and writing the network: attribute
+	 * prefixing, isolated-component cleanup, bicycle-aware simplification,
+	 * service-link cleanup, optional mode rename and per-link elevation metrics.
+	 *
+	 * <p>Performs no file access and reads no CLI state, so it can be exercised on
+	 * a hand-built network with a synthetic
+	 * {@link LinkElevationProfile.ElevationSource} -- e.g. {@code c -> c.getX() * 0.02}
+	 * for a constant 2 % slope. The network is mutated in place.
+	 *
+	 * @param network   the freshly read (or hand-built) network
+	 * @param elevation elevation source sampled for the per-link metrics (step 7)
+	 * @param params    the non-I/O parameters, decoupled from the picocli fields
+	 */
+	public static void process(Network network,
+							   LinkElevationProfile.ElevationSource elevation,
+							   Params params) {
+
 		// ---- 1b. move OSM-derived attributes under "osm:" prefix ------------
 		normalizeOrigIdType(network);
 		prefixOsmAttributes(network);
 
 		// ---- 1c. repair reversed geometry on synthetic bike-reverse links -----
-		if (storeOriginalGeometry) {
+		if (params.storeOriginalGeometry()) {
 			int repaired = repairReversedGeometry(network);
 			log.info("Repaired reversed link geometry on {} links.", repaired);
 		}
@@ -240,7 +267,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		log.info("After cleanNetwork: {} links", network.getLinks().size());
 
 		// ---- 3. bicycle-aware simplification ---------------------------------
-		simplifyUntilStable(network, storeOriginalGeometry);
+		simplifyUntilStable(network, params.storeOriginalGeometry());
 		log.info("After simplification (1st pass): {} links", network.getLinks().size());
 
 		// ---- 4. remove service dead-ends and hairline branches ---------------
@@ -249,29 +276,39 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 		// ---- 5. second simplification pass; service cleanup may have created
 		//        new merge candidates -----------------------------------------
-		simplifyUntilStable(network, storeOriginalGeometry);
+		simplifyUntilStable(network, params.storeOriginalGeometry());
 		log.info("After simplification (2nd pass): {} links", network.getLinks().size());
 
 		// ---- 5b. geometry sanity check --------------------------------------
-		if (storeOriginalGeometry) {
+		if (params.storeOriginalGeometry()) {
 			logGeometryConsistency(network);
 		}
 
 		// ---- 6. rename mode if requested (no-op when --mode bike) -----------
-		renameMode(network, TransportMode.bike, mode);
+		renameMode(network, TransportMode.bike, params.mode());
 
 		// ---- 7. elevation metrics on the final link set ----------------------
 		for (Link link : network.getLinks().values()) {
-			attachElevationMetrics(link, elevationParser, eleSampleStepM, eleNoiseToleranceM);
+			attachElevationMetrics(link, elevation, params.eleSampleStep(), params.eleNoiseTolerance());
 		}
 		log.info("Attached elevation metrics to {} links (sample step = {} m, noise tolerance = {} m).",
-			network.getLinks().size(), eleSampleStepM, eleNoiseToleranceM);
+			network.getLinks().size(), params.eleSampleStep(), params.eleNoiseTolerance());
 		logBicycleInfraDistribution(network, "in final network");
+	}
 
-		// ---- 8. write --------------------------------------------------------
-		new NetworkWriter(network).write(output.toString());
+	/**
+	 * Non-I/O parameters that {@link #process} needs, decoupled from the picocli
+	 * fields so a test can build them directly.
+	 */
+	public record Params(String mode,
+						 double eleSampleStep,
+						 double eleNoiseTolerance,
+						 boolean storeOriginalGeometry) {
 
-		return 0;
+		/** The pipeline defaults, matching the CLI option defaults. */
+		public static Params defaults() {
+			return new Params(TransportMode.bike, 10.0, 3.0, false);
+		}
 	}
 
 
@@ -447,10 +484,10 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		}
 	}
 
-	private static void attachElevationMetrics(Link link, ElevationDataParser parser,
+	private static void attachElevationMetrics(Link link, LinkElevationProfile.ElevationSource elevation,
 											   double sampleStep, double noiseTolerance) {
 		LinkElevationProfile.Metrics m = LinkElevationProfile.compute(
-			link, sampleStep, noiseTolerance, parser);
+			link, sampleStep, noiseTolerance, elevation);
 
 		// Elevations in meters — round to 1 decimal (matches DEM resolution).
 		link.getAttributes().putAttribute(BicycleUtils.AVERAGE_ELEVATION, round(m.averageElevation(), 1));
@@ -633,10 +670,6 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 				Object v = a.getAttributes().getAttribute(key);
 				if (v != null) newLink.getAttributes().putAttribute(key, v);
 			}
-
-			// allowed_speed ist bei gleichem freespeed identisch, wird aber bisher verworfen
-			Object speed = a.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED);
-			if (speed != null) newLink.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, speed);
 
 			String merged = mergeOrigIds(a.getAttributes().getAttribute("origid"),
 				b.getAttributes().getAttribute("origid"));
