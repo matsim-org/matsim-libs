@@ -256,6 +256,136 @@ public class BicycleNetworkPipelineTest {
 
 
 	// =========================================================================
+	// Tier 1 — bicycle-aware simplification (where the recent bugfixes lived)
+	// =========================================================================
+
+	@Test
+	void sameFreespeed_toleratesUlpButNotRealDifferences() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node c = node(net, "c", 200, 0);
+		Link l1 = simpLink(net, a, b, "CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+		Link ulp = simpLink(net, b, c, "CYCLEWAY_LINK", 8.0 + 1e-12, 1000.0, 1.0);
+		Link real = simpLink(net, a, c, "CYCLEWAY_LINK", 8.0 + 1.0, 1000.0, 1.0);
+
+		assertTrue(BicycleNetworkPipeline.sameFreespeed(l1, ulp), "a 1e-12 difference counts as the same speed");
+		assertFalse(BicycleNetworkPipeline.sameFreespeed(l1, real), "a whole m/s is a real difference");
+	}
+
+	@Test
+	void baseCapacity_removesTheSub50mBoost() {
+		Network net = NetworkUtils.createNetwork();
+		Link shortLink = simpLink(net, node(net, "a", 0, 0), node(net, "b", 30, 0),
+			"CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+		Link longLink = simpLink(net, node(net, "c", 0, 100), node(net, "d", 100, 100),
+			"CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+
+		assertEquals(500.0, BicycleNetworkPipeline.baseCapacity(shortLink), 1e-9, "<50 m halves the boosted capacity");
+		assertEquals(1000.0, BicycleNetworkPipeline.baseCapacity(longLink), 1e-9, ">=50 m keeps the capacity");
+	}
+
+	@Test
+	void simplify_mergesTwoCollinearLinksWithIdenticalAttributes() {
+		Network net = chain("CYCLEWAY_LINK", "CYCLEWAY_LINK");
+
+		int removed = BicycleNetworkPipeline.simplifyUntilStable(net, false);
+
+		assertEquals(1, removed);
+		assertEquals(1, net.getLinks().size());
+		Link merged = net.getLinks().values().iterator().next();
+		assertEquals(200.0, merged.getLength(), 1e-9, "lengths are summed");
+		assertEquals(Set.of(TransportMode.bike), merged.getAllowedModes(),
+			"merged link keeps {bike}, not LinkImpl's default {car}");
+	}
+
+	@Test
+	void simplify_doesNotMergeWhenBicycleInfraDiffers() {
+		Network net = chain("CYCLEWAY_LINK", "SHARED_MOTOR_VEHICLE_LANE");
+
+		assertEquals(0, BicycleNetworkPipeline.simplifyUntilStable(net, false));
+		assertEquals(2, net.getLinks().size());
+	}
+
+	@Test
+	void simplify_doesNotMergeWhenAllowedModesDiffer() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node c = node(net, "c", 200, 0);
+		simpLink(net, a, b, "CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+		simpLink(net, b, c, "CYCLEWAY_LINK", 8.0, 1000.0, 1.0)
+			.setAllowedModes(Set.of(TransportMode.bike, "car"));
+
+		assertEquals(0, BicycleNetworkPipeline.simplifyUntilStable(net, false));
+		assertEquals(2, net.getLinks().size());
+	}
+
+	@Test
+	void simplify_doesNotMergeWhenLaneCountDiffers() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node c = node(net, "c", 200, 0);
+		simpLink(net, a, b, "CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+		simpLink(net, b, c, "CYCLEWAY_LINK", 8.0, 1000.0, 2.0);
+
+		assertEquals(0, BicycleNetworkPipeline.simplifyUntilStable(net, false));
+		assertEquals(2, net.getLinks().size());
+	}
+
+	@Test
+	void simplify_mergesDespiteUlpFreespeedDifference() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node c = node(net, "c", 200, 0);
+		simpLink(net, a, b, "CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+		simpLink(net, b, c, "CYCLEWAY_LINK", 8.0 + 1e-12, 1000.0, 1.0);
+
+		assertEquals(1, BicycleNetworkPipeline.simplifyUntilStable(net, false),
+			"a 1e-12 freespeed difference must not block the merge");
+		assertEquals(1, net.getLinks().size());
+	}
+
+	@Test
+	void simplify_mergedLinkGetsUnboostedCapacity() {
+		// two short (<50 m) links whose stored capacity carries the crossing boost;
+		// the merged (>50 m) link must get the unboosted base capacity, not min(cap).
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 30, 0);
+		Node c = node(net, "c", 60, 0);
+		simpLink(net, a, b, "CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+		simpLink(net, b, c, "CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+
+		assertEquals(1, BicycleNetworkPipeline.simplifyUntilStable(net, false));
+		Link merged = net.getLinks().values().iterator().next();
+		assertEquals(60.0, merged.getLength(), 1e-9);
+		assertEquals(500.0, merged.getCapacity(), 1e-9,
+			"merged >50 m link keeps base capacity, not the sub-50 m boost");
+	}
+
+	@Test
+	void simplify_collapsesAChainToASingleLink() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node c = node(net, "c", 200, 0);
+		Node d = node(net, "d", 300, 0);
+		simpLink(net, a, b, "CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+		simpLink(net, b, c, "CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+		simpLink(net, c, d, "CYCLEWAY_LINK", 8.0, 1000.0, 1.0);
+
+		int removed = BicycleNetworkPipeline.simplifyUntilStable(net, false);
+
+		assertEquals(2, removed);
+		assertEquals(1, net.getLinks().size());
+		assertEquals(300.0, net.getLinks().values().iterator().next().getLength(), 1e-9);
+	}
+
+
+	// =========================================================================
 	// helpers
 	// =========================================================================
 
@@ -279,6 +409,30 @@ public class BicycleNetworkPipelineTest {
 		l.getAttributes().putAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA, infra);
 		l.getAttributes().putAttribute("origid", origid);   // Long, exactly as the reader writes it
 		return l;
+	}
+
+	/** A one-way bike link with controllable link stats; length = |dx| on the x-axis. */
+	private static Link simpLink(Network net, Node from, Node to, String infra,
+								 double freespeed, double capacity, double lanes) {
+		double length = Math.abs(to.getCoord().getX() - from.getCoord().getX());
+		Link l = NetworkUtils.createAndAddLink(net,
+			Id.createLinkId(from.getId() + "->" + to.getId()),
+			from, to, length, freespeed, capacity, lanes);
+		l.setAllowedModes(Set.of(TransportMode.bike));
+		l.getAttributes().putAttribute("type", "highway.cycleway");
+		l.getAttributes().putAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA, infra);
+		return l;
+	}
+
+	/** A one-way two-link chain a->b->c (100 m segments) with the given infra values. */
+	private static Network chain(String infraAB, String infraBC) {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node c = node(net, "c", 200, 0);
+		simpLink(net, a, b, infraAB, 8.0, 1000.0, 1.0);
+		simpLink(net, b, c, infraBC, 8.0, 1000.0, 1.0);
+		return net;
 	}
 
 	/** The (single, after collapse) link that starts at the given node id. */

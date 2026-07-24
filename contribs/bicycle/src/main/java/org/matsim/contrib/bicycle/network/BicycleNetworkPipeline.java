@@ -335,7 +335,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 *
 	 * @return the number of attributes moved
 	 */
-	public static int prefixOsmAttributes(Network network) {
+	static int prefixOsmAttributes(Network network) {
 		int moved = 0;
 		for (Link link : network.getLinks().values()) {
 			for (String key : OSM_TAG_ATTR_KEYS) {
@@ -536,7 +536,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 *
 	 * @return the number of links whose mode set was changed
 	 */
-	public static int renameMode(Network network, String from, String to) {
+	static int renameMode(Network network, String from, String to) {
 		if (from.equals(to)) {
 			log.info("Network mode is already '{}', no rename needed.", to);
 			return 0;
@@ -632,14 +632,18 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * node, so a link that only becomes mergeable through a neighbouring merge is
 	 * left behind -- which of them survive depends on the map order of the nodes,
 	 * not on the data. Repeat until the link count stops falling.
+	 *
+	 * @return the total number of links removed across all passes
 	 */
-	private static void simplifyUntilStable(Network network, boolean storeOriginalGeometry) {
+	static int simplifyUntilStable(Network network, boolean storeOriginalGeometry) {
+		int totalRemoved = 0;
 		for (int pass = 1; ; pass++) {
 			int before = network.getLinks().size();
 			simplifyWithBikeInfra(network, storeOriginalGeometry);
 			int after = network.getLinks().size();
 			log.info("Simplification pass {}: {} -> {} links", pass, before, after);
-			if (after == before) return;
+			totalRemoved += before - after;
+			if (after == before) return totalRemoved;
 		}
 	}
 
@@ -715,7 +719,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 *
 	 * @return the number of links whose origid was converted to String
 	 */
-	public static int normalizeOrigIdType(Network network) {
+	static int normalizeOrigIdType(Network network) {
 		int converted = 0;
 		for (Link link : network.getLinks().values()) {
 			Object origid = link.getAttributes().getAttribute("origid");
@@ -787,7 +791,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * up with different capacities although they are the same road. Comparing the
 	 * unboosted value drops the artefact and keeps every real difference.
 	 */
-	private static double baseCapacity(Link link) {
+	static double baseCapacity(Link link) {
 		return link.getLength() < LinkProperties.DEFAULT_ADJUST_CAPACITY_LENGTH
 			? link.getCapacity() / 2
 			: link.getCapacity();
@@ -801,7 +805,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * been merged, the less merges further. Compare relatively instead; a real speed
 	 * difference is a whole km/h, not an ulp.
 	 */
-	private static boolean sameFreespeed(Link a, Link b) {
+	static boolean sameFreespeed(Link a, Link b) {
 		double x = a.getFreespeed(), y = b.getFreespeed();
 		return Math.abs(x - y) <= 1e-9 * Math.max(Math.abs(x), Math.abs(y));
 	}
