@@ -94,9 +94,15 @@ until you populate it).
 
 Tests live in `contribs/bicycle/src/test/java/.../network`:
 
+- `BicycleNetworkPipelineTest` — 20 cases for `process`, the pure transformation seam (no file I/O, synthetic
+  `ElevationSource`): two end-to-end runs on a reader-like network (orchestration, gradient signs, `osm:` prefixing,
+  `origid` normalization, mode rename) plus tier-1 cases for the individual step methods — simplification merge guards,
+  capacity de-boost, `origid` merging, and reversed-geometry repair
 - `BicycleInfraClassifierTest` — 37 table-driven cases covering 22 of the 27 categories and the precedence ordering
 - `BicycleLinkPolicyTest` — 13 cases for the footway/pedestrian whitelist, `bicycle=no`, `access=no/private/customer`
   (incl. the `bicycle=yes/designated` override), and bicycle-oneway handling
+- `ServiceLinkCleanerTest` — 4 cases: removing a service dead-end, keeping a service link that connects two roads,
+  a no-op when there are no service links, and trimming a hairline twig while keeping the connecting spine
 - `LinkElevationProfileTest` — 7 cases using a synthetic `ElevationSource` (no DEM required, fast)
 - `ElevationDataParserTest` — 8 reference points in Berlin against Sonny's DTM 50 m. Uses a small cutout shipped in
   `contribs/bicycle/test/input/org/matsim/contrib/bicycle/network/` (see the README there for source and license); a
