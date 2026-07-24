@@ -70,10 +70,17 @@ public final class ServiceLinkCleaner {
 		this.serviceValue = serviceValue;
 	}
 
-	public void run(Network network) {
+	/**
+	 * Removes non-connecting service-link components and trims service dead-end
+	 * branches; orphaned nodes are cleaned up afterwards.
+	 *
+	 * @return the number of links removed
+	 */
+	public int run(Network network) {
 
 		Set<Id<Link>> visited = new HashSet<>();
 		List<Id<Link>> linksToRemove = new ArrayList<>();
+		int trimmed = 0;
 
 		for (Link seed : network.getLinks().values()) {
 			if (!isService(seed) || visited.contains(seed.getId())) continue;
@@ -103,12 +110,13 @@ public final class ServiceLinkCleaner {
 			if (dockingNodes.size() <= 1) {
 				for (Link l : componentLinks) linksToRemove.add(l.getId());
 			} else {
-				trimComponent(network, componentLinks, dockingNodes);
+				trimmed += trimComponent(network, componentLinks, dockingNodes);
 			}
 		}
 
 		linksToRemove.forEach(network::removeLink);
 		NetworkUtils.removeNodesWithoutLinks(network);
+		return linksToRemove.size() + trimmed;
 	}
 
 	// ----------------------------------------------------------------------
@@ -131,7 +139,7 @@ public final class ServiceLinkCleaner {
 	 * the component. What remains is either empty or a chain/tree connecting
 	 * at least two docking nodes.
 	 */
-	private void trimComponent(Network network, List<Link> componentLinks, Set<Id<Node>> dockingNodes) {
+	private int trimComponent(Network network, List<Link> componentLinks, Set<Id<Node>> dockingNodes) {
 
 		Map<Id<Node>, Set<Id<Node>>> nbr = new HashMap<>();
 		Map<String, List<Id<Link>>> pairToLinks = new HashMap<>();
@@ -164,11 +172,14 @@ public final class ServiceLinkCleaner {
 			if (nbr.get(other).size() <= 1 && !dockingNodes.contains(other)) q.add(other);
 		}
 
+		int removed = 0;
 		for (String key : removedPairs) {
 			for (Id<Link> lid : pairToLinks.getOrDefault(key, List.of())) {
 				network.removeLink(lid);
+				removed++;
 			}
 		}
+		return removed;
 	}
 
 	private static String edgeKey(Id<Node> a, Id<Node> b) {

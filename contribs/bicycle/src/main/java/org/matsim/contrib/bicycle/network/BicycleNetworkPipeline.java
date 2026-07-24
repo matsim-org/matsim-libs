@@ -280,8 +280,9 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		log.info("After simplification (1st pass): {} links", network.getLinks().size());
 
 		// ---- 4. remove service dead-ends and hairline branches ---------------
-		new ServiceLinkCleaner().run(network);
-		log.info("After service-link cleanup: {} links", network.getLinks().size());
+		int serviceLinksRemoved = new ServiceLinkCleaner().run(network);
+		log.info("After service-link cleanup: {} links ({} removed).",
+			network.getLinks().size(), serviceLinksRemoved);
 
 		// ---- 5. second simplification pass; service cleanup may have created
 		//        new merge candidates -----------------------------------------
