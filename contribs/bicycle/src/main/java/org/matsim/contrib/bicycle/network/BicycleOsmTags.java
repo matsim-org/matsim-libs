@@ -54,6 +54,7 @@ public final class BicycleOsmTags {
 	public static final String FOOT = "foot";
 	public static final String VEHICLE = "vehicle";
 	public static final String MOTOR_VEHICLE = "motor_vehicle";
+	public static final String ACCESS = "access";
 	public static final String ONEWAY = "oneway";
 	public static final String ONEWAY_BICYCLE = "oneway:bicycle";
 
@@ -112,6 +113,8 @@ public final class BicycleOsmTags {
 	public static final String YES = "yes";
 	public static final String NO = "no";
 	public static final String DESIGNATED = "designated";
+	public static final String PRIVATE = "private";
+	public static final String CUSTOMER = "customer";
 
 	// ------------------------------------------------------------------------
 	// Busway directional family

@@ -80,7 +80,7 @@ until you populate it).
 - `BicycleInfraCategory` — enum of the 27 infrastructure categories the classifier can produce; `name()` is what gets
   written to the link attribute
 - `BicycleLinkPolicy` — per-link hook: infra classification + access rule enforcement (footway whitelist, `bicycle=no`,
-  oneway handling)
+  `access=no/private/customer`, oneway handling)
 - `BicycleOsmTags` — bicycle-specific OSM tag keys + frequently-used values, used as `import static`
 - `BicycleCountryProfile` — interface for country-specific knobs (traffic-sign predicates, driving direction); see
   Country profiles below
@@ -95,7 +95,8 @@ until you populate it).
 Tests live in `contribs/bicycle/src/test/java/.../network`:
 
 - `BicycleInfraClassifierTest` — 37 table-driven cases covering 22 of the 27 categories and the precedence ordering
-- `BicycleLinkPolicyTest` — 7 cases for the footway/pedestrian whitelist, `bicycle=no`, and bicycle-oneway handling
+- `BicycleLinkPolicyTest` — 13 cases for the footway/pedestrian whitelist, `bicycle=no`, `access=no/private/customer`
+  (incl. the `bicycle=yes/designated` override), and bicycle-oneway handling
 - `LinkElevationProfileTest` — 7 cases using a synthetic `ElevationSource` (no DEM required, fast)
 - `ElevationDataParserTest` — 8 reference points in Berlin against Sonny's DTM 50 m. Uses a small cutout shipped in
   `contribs/bicycle/test/input/org/matsim/contrib/bicycle/network/` (see the README there for source and license); a
@@ -176,7 +177,8 @@ unset distinction. See `BicycleInfraCategory` for the full list and `BicycleInfr
 rules.
 
 `BicycleLinkPolicy` additionally kills links (empty modes, zero capacity) when they're footway/pedestrian without
-explicit bike permission, or tagged `bicycle=no`, or the reverse direction of a bicycle-oneway.
+explicit bike permission, tagged `bicycle=no`, have a restricted general `access` (`no` / `private` / `customer`) without
+a `bicycle=yes/designated` override, or are the reverse direction of a bicycle-oneway.
 
 ## Country profiles
 

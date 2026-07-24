@@ -147,6 +147,54 @@ public class BicycleLinkPolicyTest {
 	}
 
 	// =========================================================================
+	// access=no/private/customer kill
+	// =========================================================================
+
+	@Test
+	void accessNo_isKilled() {
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "access", "no"), Direction.Forward);
+		assertTrue(link.getAllowedModes().isEmpty());
+	}
+
+	@Test
+	void accessPrivate_isKilled() {
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "access", "private"), Direction.Forward);
+		assertTrue(link.getAllowedModes().isEmpty());
+	}
+
+	@Test
+	void accessCustomer_isKilled() {
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "access", "customer"), Direction.Forward);
+		assertTrue(link.getAllowedModes().isEmpty());
+	}
+
+	@Test
+	void accessYes_keepsBike() {
+		// access=yes (and other unrestricted values) must not kill the link.
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "access", "yes"), Direction.Forward);
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
+	}
+
+	@Test
+	void accessPrivateButBicycleYes_keepsBike() {
+		// OSM: the bicycle-specific tag overrides the general access restriction.
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "access", "private", "bicycle", "yes"), Direction.Forward);
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
+	}
+
+	@Test
+	void accessNoButBicycleDesignated_keepsBike() {
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "access", "no", "bicycle", "designated"), Direction.Forward);
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
+	}
+
+	// =========================================================================
 	// helpers
 	// =========================================================================
 
