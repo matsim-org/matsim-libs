@@ -94,6 +94,13 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(BicycleNetworkPipeline.class);
 
+	// ---- option defaults: single source for the @Option annotations below and Params.defaults() ----
+
+	private static final String DEFAULT_MODE = TransportMode.bike;
+	private static final String DEFAULT_ELE_SAMPLE_STEP = "20.0";
+	private static final String DEFAULT_ELE_NOISE_TOLERANCE = "3.0";
+	private static final String DEFAULT_STORE_ORIGINAL_GEOMETRY = "false";
+
 	// ---- CLI options -----------------------------------------------------------
 
 	@Option(names = "--input", required = true, description = "Path to OSM input file (.osm.pbf)")
@@ -115,7 +122,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 	@Option(names = "--mode",
 		description = "Network mode name to assign to cyclable links. Default: ${DEFAULT-VALUE}.",
-		defaultValue = "bike")
+		defaultValue = DEFAULT_MODE)
 	private String mode;
 
 	@Option(names = "--country",
@@ -128,19 +135,19 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 	@Option(names = "--ele-sample-step",
 		description = "Distance between elevation samples along a link in meters (default: ${DEFAULT-VALUE})",
-		defaultValue = "10.0")
+		defaultValue = DEFAULT_ELE_SAMPLE_STEP)
 	private double eleSampleStepM;
 
 	@Option(names = "--ele-noise-tolerance",
 		description = "Douglas-Peucker vertical tolerance for smoothing the profile in meters (default: ${DEFAULT-VALUE})",
-		defaultValue = "3.0")
+		defaultValue = DEFAULT_ELE_NOISE_TOLERANCE)
 	private double eleNoiseToleranceM;
 
 	@Option(names = "--store-original-geometry", negatable = true,
 		description = "Store the true OSM road course in the 'origgeom' link attribute so "
 			+ "links keep their real shape through simplification. Use "
 			+ "--no-store-original-geometry to switch it off. Default: ${DEFAULT-VALUE}.",
-		defaultValue = "false")
+		defaultValue = DEFAULT_STORE_ORIGINAL_GEOMETRY)
 	private boolean storeOriginalGeometry;
 
 
@@ -305,9 +312,12 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 						 double eleNoiseTolerance,
 						 boolean storeOriginalGeometry) {
 
-		/** The pipeline defaults, matching the CLI option defaults. */
+		/** The pipeline defaults, taken from the CLI option defaults above. */
 		public static Params defaults() {
-			return new Params(TransportMode.bike, 10.0, 3.0, false);
+			return new Params(DEFAULT_MODE,
+				Double.parseDouble(DEFAULT_ELE_SAMPLE_STEP),
+				Double.parseDouble(DEFAULT_ELE_NOISE_TOLERANCE),
+				Boolean.parseBoolean(DEFAULT_STORE_ORIGINAL_GEOMETRY));
 		}
 	}
 

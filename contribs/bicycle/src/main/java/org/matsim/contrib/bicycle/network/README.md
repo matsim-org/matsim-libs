@@ -41,8 +41,9 @@ mvn -pl contribs/bicycle exec:java \
 | `--crs` (required)      | —       | Output network CRS (e.g. `EPSG:25832`)                                                           |
 | `--mode`                | `bike`  | Network mode for cyclable links                                                                  |
 | `--country`             | `de`    | Country profile for traffic-sign interpretation: `de`, `at`, or `generic` (see Country profiles) |
-| `--ele-sample-step`     | `10.0`  | Distance between elevation samples along a link, in m                                            |
+| `--ele-sample-step`     | `20.0`  | Distance between elevation samples along a link, in m                                            |
 | `--ele-noise-tolerance` | `3.0`   | Douglas-Peucker vertical tolerance, in m                                                         |
+| `--store-original-geometry` | `false` | Keep each link's true OSM shape in the `origgeom` attribute through simplification (use `--no-store-original-geometry` to disable) |
 
 ## What gets attached to links
 
@@ -64,8 +65,8 @@ mvn -pl contribs/bicycle exec:java \
 Gradients are signed in the direction of travel, so reverse links get the opposite sign. `gradient` alone reads 0 % on a
 link with a hill between equal-height endpoints — `maxGradient`, `elevationGain` and `elevationLoss` fill that gap.
 
-Not all of these are consumed by the simulation: `averageElevation` and `osm:cycleway` are written for inspection only —
-handy for sanity-checking an extract, but not read by anything downstream.
+Not all of these are consumed by the simulation: `averageElevation`, `osm:bicycle` and `osm:cycleway` are written for
+inspection only — handy for sanity-checking an extract, but not read by anything downstream.
 
 For ad-hoc debugging you can forward **arbitrary** OSM tags onto links: add their keys to `TAGS_TO_COPY` in
 `BicycleNetworkPipeline` and `TagCopy` copies them on verbatim under the `osm:` prefix (empty by default, so a no-op
@@ -110,8 +111,9 @@ Tests live in `contribs/bicycle/src/test/java/.../network`:
    them from pipeline-internal attributes.
 3. `NetworkUtils.cleanNetwork` drops isolated components.
 4. Bicycle-aware simplification merges consecutive links only when their infra-relevant attributes agree
-   (`bicycle_infra`, `type`, `osm:surface`, `osm:bicycle`, `osm:smoothness`). The default simplifier would happily merge
-   across infra changes and lose that information.
+   (`bicycle_infra`, `type`, `osm:surface`, `osm:smoothness`, `allowed_speed`) and their link stats match (allowed
+   modes, lanes, freespeed, base capacity). The default simplifier would happily merge across infra changes and lose
+   that information.
 5. Service-link cleanup removes service dead-ends and hairline branches that don't connect anything useful.
 6. Second simplification pass; service cleanup may have created new merge candidates.
 7. Optionally rename mode `bike` → whatever was passed via `--mode`. By default (`--mode bike`) this is a no-op.
@@ -126,8 +128,9 @@ where the link count drops.
 
 ## Elevation parameters
 
-**`--ele-sample-step`** — distance between samples along a link. Pick roughly the DEM resolution: `10` for Sonny 20 m
-DTM (the default), `50` for Sonny 50 m DTM. Finer than the DEM adds no information.
+**`--ele-sample-step`** — distance between samples along a link. Pick roughly the DEM resolution: `20` for the Sonny
+20 m DTM (the default), `50` for the 50 m DTM. Finer than the DEM adds no information, and on a nearest-neighbor DEM it
+introduces staircase artifacts that the DP filter then has to remove.
 
 **`--ele-noise-tolerance`** — Douglas-Peucker vertical tolerance. Intermediate samples whose elevation deviates less
 than this from the straight line between their neighbors are dropped. Needed because DEM quantization, pixel-boundary
@@ -204,22 +207,43 @@ Sonny's DTMs (https://sonny.4lima.de/) are LiDAR-based, much better than SRTM. G
 
 ## Limitations
 
-- Elevation sampling walks the straight line between link endpoints, not the OSM way's curve geometry.
-- Nearest-neighbor DEM sampling (the DP filter compensates for most artifacts).
-- Bridges and tunnels aren't flagged as such; DP hides most of the resulting spurious gradients but very long bridges
-  can still look unrealistic.
-- After simplification, some nodes may have been removed. Nodes that survive but were never touched by the reader's
-  `setAfterLinkCreated` callback remain without a Z coordinate; the per-link metrics are unaffected because they sample
-  the DEM directly.
-- `type` and `origid` are not yet under the `osm:` prefix because both carry semantics that other code
-  depends on (`type=service` for `ServiceLinkCleaner`; `origid` for `NetworkSimplifier` merge tracking).
-- Elevation default sample step: The current default of `10` m oversamples the 20 m Sonny DTM — sampling finer than
-  the DEM resolution adds no real information. `20` m is likely the better default and would roughly halve the DEM
-  look-ups, but it hasn't been benchmarked against the 10 m default on a real scenario yet. Revisit once tested.
-- Some link attributes are written for inspection/debugging only and aren't consumed by the simulation:
-  `averageElevation` and `osm:cycleway`.
-- Today the simulation derives each link's gradient from the node Z coordinates (used in both the speed model and
-  scoring/routing). The intended direction is to stop relying on Z and
-  instead consume the pre-computed `gradient` attribute directly, plus the richer `maxGradient` / `elevationGain` /
-  `elevationLoss` metrics. How exactly those additional metrics should feed into speed, scoring and routing is still an
-  open design question. Until that's settled, both the Z coordinates and the gradient attributes are written.
+### Elevation
+
+- **Sampling follows the straight chord, not the way's real curve.** Elevations are sampled along the straight line
+  between a link's end nodes, not along its OSM geometry. `--store-original-geometry` now preserves that true shape in
+  the `origgeom` attribute, but the elevation profile does not read it yet — sampling along it (more accurate on curved
+  and merged links) is a possible future improvement.
+- **The Douglas-Peucker smoothing targets DEM vertical noise, not geometry — so it stays.** `--ele-noise-tolerance`
+  removes spurious gradient spikes from DEM quantization, pixel-boundary jumps, and terrain-vs-road mismatch (bridges,
+  cuttings) — up to 400 % on flat Berlin streets without it. That noise is vertical and independent of the horizontal
+  path, so sampling more accurate geometry would *not* remove the need for smoothing.
+- **Nearest-neighbor DEM sampling.** `ElevationDataParser` reads the nearest DEM pixel; the DP filter compensates for
+  most of the resulting artifacts.
+- **Bridges and tunnels aren't flagged as such.** DP hides most of the resulting spurious gradients, but very long
+  bridges can still look unrealistic.
+- **Node Z is transitional and on its way out.** Today the simulation derives each link's gradient from the node Z
+  coordinates (in both the speed model and scoring/routing). The intended direction is to stop relying on Z and instead
+  consume the pre-computed `gradient` attribute directly, plus the richer `maxGradient` / `elevationGain` /
+  `elevationLoss` metrics. How exactly those feed into speed, scoring and routing is still an open design question. Until
+  that's settled, both the Z coordinates and the gradient attributes are written.
+- **Some surviving nodes may lack a Z coordinate.** A node that survives simplification but was never touched by the
+  reader's `setAfterLinkCreated` callback keeps no Z. The per-link metrics are unaffected (they sample the DEM directly).
+  This gap disappears once node Z is retired.
+
+### Geometry
+
+- **Reverse-direction links need a geometry repair.** With `--store-original-geometry`, the reader copies geometry onto
+  its synthetic `*_bike-reverse` links in the wrong order; a heuristic pass (`repairReversedGeometry`) mirrors it back
+  before simplification. The proper fix belongs upstream in `OsmBicycleReader`.
+
+### Attributes & scoring
+
+- **Scoring reads unprefixed attribute keys.** `BicycleUtils.getSurface()` and `getCyclewaytype()` read `surface` /
+  `cycleway`, but this pipeline writes them as `osm:surface` / `osm:cycleway`. A network built here yields `null` there,
+  and the default scoring silently falls back to a comfort factor of 1.0 — no error, no warning. Until resolved, either
+  skip the `osm:` prefixing for those keys or give `BicycleUtils` a fallback to the prefixed keys. The same trap applies
+  to a future `type` → `osm:highway` rename, since `BicycleUtils.WAY_TYPE = "type"`.
+- **`type` and `origid` are not yet `osm:`-prefixed** because both carry semantics other code depends on
+  (`type=service` for `ServiceLinkCleaner`; `origid` for `NetworkSimplifier` merge tracking).
+- **Some attributes are inspection-only** and aren't consumed by the simulation: `averageElevation`, `osm:bicycle`, and
+  `osm:cycleway`.
