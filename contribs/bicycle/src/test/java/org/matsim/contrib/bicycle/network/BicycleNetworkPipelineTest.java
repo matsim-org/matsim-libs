@@ -32,6 +32,7 @@ import org.matsim.core.network.NetworkUtils;
 
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -386,6 +387,62 @@ public class BicycleNetworkPipelineTest {
 
 
 	// =========================================================================
+	// Tier 1 — reversed-geometry repair
+	// =========================================================================
+
+	@Test
+	void repairReversedGeometry_mirrorsBackwardsGeometry() {
+		Network net = NetworkUtils.createNetwork();
+		Node f = node(net, "F", 0, 0);
+		Node t = node(net, "T", 100, 0);
+		// listed backwards: first support point sits at the toNode, last at the fromNode
+		Link l = linkWithGeom(net, f, t, "T,100,0 mid,50,0 F,0,0");
+
+		int repaired = BicycleNetworkPipeline.repairReversedGeometry(net);
+
+		assertEquals(1, repaired);
+		assertEquals("F,0,0", firstGeomToken(l), "after mirroring, the fromNode point comes first");
+	}
+
+	@Test
+	void repairReversedGeometry_leavesCorrectGeometryUntouched() {
+		Network net = NetworkUtils.createNetwork();
+		Node f = node(net, "F", 0, 0);
+		Node t = node(net, "T", 100, 0);
+		Link l = linkWithGeom(net, f, t, "F,0,0 mid,50,0 T,100,0");
+
+		int repaired = BicycleNetworkPipeline.repairReversedGeometry(net);
+
+		assertEquals(0, repaired);
+		assertEquals("F,0,0", firstGeomToken(l), "already-correct geometry is left as is");
+	}
+
+	@Test
+	void repairReversedGeometry_skipsMalformedTokensWithoutThrowing() {
+		Network net = NetworkUtils.createNetwork();
+		Node f = node(net, "F", 0, 0);
+		Node t = node(net, "T", 100, 0);
+		// first support point is non-numeric -> unparseable, must be skipped
+		Link l = linkWithGeom(net, f, t, "F,east,north mid,50,0 T,100,0");
+
+		int repaired = assertDoesNotThrow(() -> BicycleNetworkPipeline.repairReversedGeometry(net));
+
+		assertEquals(0, repaired, "a malformed geometry is skipped, not repaired");
+		assertEquals("F,east,north", firstGeomToken(l), "the malformed value is left untouched");
+	}
+
+	@Test
+	void repairReversedGeometry_ignoresLinksWithoutStoredGeometry() {
+		Network net = NetworkUtils.createNetwork();
+		Node f = node(net, "F", 0, 0);
+		Node t = node(net, "T", 100, 0);
+		NetworkUtils.createAndAddLink(net, Id.createLinkId("F->T"), f, t, 100.0, 8.0, 1000.0, 1.0);
+
+		assertEquals(0, BicycleNetworkPipeline.repairReversedGeometry(net));
+	}
+
+
+	// =========================================================================
 	// helpers
 	// =========================================================================
 
@@ -433,6 +490,18 @@ public class BicycleNetworkPipelineTest {
 		simpLink(net, a, b, infraAB, 8.0, 1000.0, 1.0);
 		simpLink(net, b, c, infraBC, 8.0, 1000.0, 1.0);
 		return net;
+	}
+
+	/** A link carrying a stored geometry ({@code "id,x,y id,x,y ..."}) in the origgeom attribute. */
+	private static Link linkWithGeom(Network net, Node from, Node to, String geom) {
+		Link l = NetworkUtils.createAndAddLink(net, Id.createLinkId(from.getId() + "->" + to.getId()),
+			from, to, 100.0, 8.0, 1000.0, 1.0);
+		l.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, geom);
+		return l;
+	}
+
+	private static String firstGeomToken(Link link) {
+		return link.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM).toString().trim().split("\\s+")[0];
 	}
 
 	/** The (single, after collapse) link that starts at the given node id. */

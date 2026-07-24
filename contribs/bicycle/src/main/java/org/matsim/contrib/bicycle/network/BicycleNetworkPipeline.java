@@ -577,7 +577,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 *
 	 * @return the number of links whose geometry was mirrored
 	 */
-	private static int repairReversedGeometry(Network network) {
+	static int repairReversedGeometry(Network network) {
 		int repaired = 0;
 		for (Link link : network.getLinks().values()) {
 			Object value = link.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM);
