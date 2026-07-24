@@ -68,6 +68,11 @@ import java.util.function.BiPredicate;
  *   <li>Write the MATSim XML.</li>
  * </ol>
  *
+ * <p>Steps 2-7 are the pure network transformations; they live in {@link #process},
+ * which reads no files and can be run on a hand-built network. Simplification runs
+ * twice (before and after service-link cleanup); with {@code --store-original-geometry}
+ * the stored geometry is additionally repaired and its consistency checked.
+ *
  * <p>Elevation metrics are deliberately computed <em>after</em> the simplifier has
  * run: after merging, link lengths are longer and there are fewer of them, so
  * we sample only what survives.
@@ -81,6 +86,12 @@ import java.util.function.BiPredicate;
  *       {@link NetworkSimplifier})</li>
  * </ul>
  * Both touch additional code paths and are deferred to a separate commit.
+ *
+ * <p><b>Warning:</b> the {@code "type"} → {@code "osm:highway"} rename would break
+ * scoring the same way the {@code surface} / {@code cycleway} prefixing already does:
+ * {@code BicycleUtils.WAY_TYPE} reads the unprefixed {@code "type"}, so a network built
+ * after such a rename yields {@code null} there and the default scoring silently falls
+ * back. See the README "Limitations" before implementing it.
  *
  * @author smetzler
  */

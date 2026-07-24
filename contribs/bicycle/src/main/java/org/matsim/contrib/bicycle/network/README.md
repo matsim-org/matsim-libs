@@ -107,15 +107,17 @@ Tests live in `contribs/bicycle/src/test/java/.../network`:
 1. Read OSM with `OsmBicycleReader`. During read, each link's endpoints get a Z stamped from the DEM, and
    `BicycleLinkPolicy` classifies the link's cycling infrastructure via `BicycleInfraClassifier` — written to the
    `bicycle_infra` attribute as a `BicycleInfraCategory` name — and enforces access rules.
-2. Move OSM-derived attributes (`bicycle`, `surface`, `smoothness`, `cycleway`) under the `osm:` prefix to separate
-   them from pipeline-internal attributes.
+2. Normalize `origid` to a `String` (the reader stores it as a `Long`), move OSM-derived attributes (`bicycle`,
+   `surface`, `smoothness`, `cycleway`) under the `osm:` prefix, and — with `--store-original-geometry` — repair
+   reversed geometry on the reader's synthetic `*_bike-reverse` links.
 3. `NetworkUtils.cleanNetwork` drops isolated components.
 4. Bicycle-aware simplification merges consecutive links only when their infra-relevant attributes agree
    (`bicycle_infra`, `type`, `osm:surface`, `osm:smoothness`, `allowed_speed`) and their link stats match (allowed
    modes, lanes, freespeed, base capacity). The default simplifier would happily merge across infra changes and lose
    that information.
 5. Service-link cleanup removes service dead-ends and hairline branches that don't connect anything useful.
-6. Second simplification pass; service cleanup may have created new merge candidates.
+6. Second simplification pass; service cleanup may have created new merge candidates. With `--store-original-geometry`,
+   a geometry-consistency check then warns if any stored polyline no longer matches its link length.
 7. Optionally rename mode `bike` → whatever was passed via `--mode`. By default (`--mode bike`) this is a no-op.
 8. For each surviving link, sample elevations every `--ele-sample-step` meters along the straight line between
    endpoints, Douglas-Peucker-filter the profile with tolerance `--ele-noise-tolerance`, compute metrics.
