@@ -20,21 +20,30 @@ package org.matsim.contrib.bicycle.network;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.List;
 
 /**
  * Samples a link's elevation profile from an elevation source and derives
  * elevation metrics.
  *
- * <p>Samples are taken every {@code sampleStep} meters along the straight line
- * from the link's fromNode to its toNode (including both endpoints). The raw
- * samples are then simplified by a 1-D Douglas-Peucker filter with a vertical
- * tolerance {@code noiseToleranceM}: any intermediate point whose height
- * deviates less than the tolerance from the straight line between its kept
- * neighbours is removed. The metrics are computed on the simplified profile.
+ * <p>Samples are taken every {@code sampleStep} meters along the link's course,
+ * including both endpoints. When the link carries a stored original geometry
+ * ({@code origgeom}, written by {@code --store-original-geometry}), the samples
+ * follow that true OSM shape -- more accurate on curved and merged links, where
+ * the straight chord would cut corners and shorten the horizontal run the
+ * gradient is measured over. Without stored geometry the samples fall back to
+ * the straight line from the link's fromNode to its toNode. The raw samples are
+ * then simplified by a 1-D Douglas-Peucker filter with a vertical tolerance
+ * {@code noiseToleranceM}: any intermediate point whose height deviates less
+ * than the tolerance from the straight line between its kept neighbours is
+ * removed. The metrics are computed on the simplified profile.
  *
  * <p>Why the filter matters — a DEM has two sources of noise: quantisation
  * (Sonny's DTM is 0.1 m vertical) and projection mismatch between terrain and
@@ -88,12 +97,11 @@ public final class LinkElevationProfile {
 
 	public static Metrics compute(Link link, double sampleStep, double noiseToleranceM,
 							   ElevationSource elevation) {
-		Coord from = link.getFromNode().getCoord();
-		Coord to = link.getToNode().getCoord();
-
-		double dx = to.getX() - from.getX();
-		double dy = to.getY() - from.getY();
-		double length = Math.hypot(dx, dy);
+		// The link's course to sample along: its true OSM shape when the geometry
+		// was stored (--store-original-geometry), otherwise just [fromNode, toNode]
+		// -- i.e. the straight chord, exactly as before.
+		List<Coord> shape = shapeOf(link);
+		double length = shapeLength(shape);
 
 		int numSamples = Math.max(2, (int) Math.ceil(length / sampleStep) + 1);
 		double[] distances = new double[numSamples];
@@ -102,11 +110,14 @@ public final class LinkElevationProfile {
 		for (int i = 0; i < numSamples; i++) {
 			double t = (double) i / (numSamples - 1);
 			distances[i] = t * length;
-			double x = from.getX() + t * dx;
-			double y = from.getY() + t * dy;
-			heights[i] = elevation.at(new Coord(x, y));
+			heights[i] = elevation.at(pointAtDistance(shape, distances[i], length));
 		}
 
+		// Pin the endpoints to the node Z (support points carry none). This keeps
+		// the metrics consistent with the per-node elevation attribute and stops DP
+		// from ever removing the endpoints.
+		Coord from = link.getFromNode().getCoord();
+		Coord to = link.getToNode().getCoord();
 		if (from.hasZ()) heights[0] = from.getZ();
 		if (to.hasZ()) heights[numSamples - 1] = to.getZ();
 
@@ -114,6 +125,55 @@ public final class LinkElevationProfile {
 		boolean[] keep = computeDouglasPeucker(distances, heights, noiseToleranceM);
 
 		return computeMetrics(distances, heights, keep, length);
+	}
+
+	/**
+	 * The support points to sample along, endpoints included.
+	 * {@link NetworkUtils#getOriginalGeometry} returns the link's true OSM course
+	 * ({@code fromNode}, stored support points, {@code toNode}) when a geometry is
+	 * stored, and just {@code [fromNode, toNode]} otherwise.
+	 */
+	private static List<Coord> shapeOf(Link link) {
+		List<Node> nodes = NetworkUtils.getOriginalGeometry(link);
+		List<Coord> shape = new ArrayList<>(nodes.size());
+		for (Node n : nodes) shape.add(n.getCoord());
+		return shape;
+	}
+
+	/** Planar (x/y) length of the polyline; support points carry no Z. */
+	private static double shapeLength(List<Coord> shape) {
+		double length = 0;
+		for (int i = 1; i < shape.size(); i++) {
+			length += planarDistance(shape.get(i - 1), shape.get(i));
+		}
+		return length;
+	}
+
+	/**
+	 * The point at planar distance {@code target} along the polyline, linearly
+	 * interpolated within the segment it falls in and clamped to the endpoints.
+	 */
+	private static Coord pointAtDistance(List<Coord> shape, double target, double length) {
+		if (target <= 0 || shape.size() < 2) return shape.get(0);
+		if (target >= length) return shape.get(shape.size() - 1);
+
+		double acc = 0;
+		for (int i = 1; i < shape.size(); i++) {
+			Coord a = shape.get(i - 1);
+			Coord b = shape.get(i);
+			double seg = planarDistance(a, b);
+			if (acc + seg >= target) {
+				double f = seg == 0 ? 0 : (target - acc) / seg;
+				return new Coord(a.getX() + f * (b.getX() - a.getX()),
+					a.getY() + f * (b.getY() - a.getY()));
+			}
+			acc += seg;
+		}
+		return shape.get(shape.size() - 1);
+	}
+
+	private static double planarDistance(Coord a, Coord b) {
+		return Math.hypot(b.getX() - a.getX(), b.getY() - a.getY());
 	}
 
 	/**

@@ -44,6 +44,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li>Douglas-Peucker filter: spike below tolerance is dropped, real hill above
  *       tolerance is kept</li>
  *   <li>Reverse direction has flipped signs</li>
+ *   <li>Stored {@code origgeom}: samples follow the true course, and a collinear
+ *       support point reproduces the straight chord exactly</li>
  * </ul>
  *
  * @author smetzler
@@ -225,6 +227,48 @@ public class LinkElevationProfileTest {
 
 
 	// =========================================================================
+	// 7. Stored original geometry is sampled instead of the straight chord
+	// =========================================================================
+
+	@Test
+	void storedGeometry_isSampledAlongTheTrueCourse() {
+		// The straight chord runs along y = 0; the true course detours north via
+		// (50, 50). With height == y, the chord stays flat while the detour climbs
+		// to the ridge and back.
+		ElevationSource heightIsY = c -> c.getY();
+
+		Link chord = createLink(0, 0, 100);                 // no geometry -> straight chord
+		Metrics chordM = LinkElevationProfile.compute(chord, SAMPLE_STEP, TOLERANCE, heightIsY);
+		assertEquals(0.0, chordM.elevationGain(), EPS, "the flat chord sees no climb");
+		assertEquals(0.0, chordM.elevationLoss(), EPS);
+
+		Link detour = createLinkWithGeometry("mid,50,50"); // support point at (50, 50)
+		Metrics detourM = LinkElevationProfile.compute(detour, SAMPLE_STEP, TOLERANCE, heightIsY);
+		assertTrue(detourM.elevationGain() > 5.0,
+			"the detour climbs to the ridge, gain was " + detourM.elevationGain());
+		assertTrue(detourM.elevationLoss() > 5.0,
+			"and descends back down, loss was " + detourM.elevationLoss());
+	}
+
+	@Test
+	void collinearStoredGeometry_matchesTheStraightChord() {
+		// A support point sitting on the chord itself must not change the metrics.
+		ElevationSource rising = c -> c.getX() * 0.1;
+
+		Link chord = createLink(0, 0, 100);
+		Link withMidpoint = createLinkWithGeometry("mid,50,0");   // on the chord
+
+		Metrics a = LinkElevationProfile.compute(chord, SAMPLE_STEP, TOLERANCE, rising);
+		Metrics b = LinkElevationProfile.compute(withMidpoint, SAMPLE_STEP, TOLERANCE, rising);
+
+		assertEquals(a.gradient(), b.gradient(), EPS);
+		assertEquals(a.elevationGain(), b.elevationGain(), EPS);
+		assertEquals(a.elevationLoss(), b.elevationLoss(), EPS);
+		assertEquals(a.averageElevation(), b.averageElevation(), EPS);
+	}
+
+
+	// =========================================================================
 	// helpers
 	// =========================================================================
 
@@ -252,5 +296,17 @@ public class LinkElevationProfileTest {
 		net.addNode(to);
 		return NetworkUtils.createAndAddLink(net, Id.createLinkId("l"), from, to,
 			length, 1000.0, 1000.0, 1.0);
+	}
+
+	/**
+	 * A 100 m link from (0,0) to (100,0) carrying stored original geometry.
+	 * {@code origgeom} holds only the intermediate support points as
+	 * {@code "id,x,y"} tokens; {@link NetworkUtils#getOriginalGeometry} adds the
+	 * end nodes back.
+	 */
+	private static Link createLinkWithGeometry(String origgeom) {
+		Link link = createLink(0, 0, 100);
+		link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, origgeom);
+		return link;
 	}
 }

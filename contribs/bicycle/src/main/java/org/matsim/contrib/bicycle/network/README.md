@@ -103,7 +103,8 @@ Tests live in `contribs/bicycle/src/test/java/.../network`:
   (incl. the `bicycle=yes/designated` override), and bicycle-oneway handling
 - `ServiceLinkCleanerTest` — 4 cases: removing a service dead-end, keeping a service link that connects two roads,
   a no-op when there are no service links, and trimming a hairline twig while keeping the connecting spine
-- `LinkElevationProfileTest` — 7 cases using a synthetic `ElevationSource` (no DEM required, fast)
+- `LinkElevationProfileTest` — 9 cases using a synthetic `ElevationSource` (no DEM required, fast), incl. sampling
+  along a stored `origgeom` course vs. the straight chord
 - `ElevationDataParserTest` — 8 reference points in Berlin against Sonny's DTM 50 m. Uses a small cutout shipped in
   `contribs/bicycle/test/input/org/matsim/contrib/bicycle/network/` (see the README there for source and license); a
   different DTM can be passed via `-Ddem.path=…`. Skipped via `assumeTrue` when the DTM file is missing.
@@ -126,8 +127,9 @@ Tests live in `contribs/bicycle/src/test/java/.../network`:
 6. Second simplification pass; service cleanup may have created new merge candidates. With `--store-original-geometry`,
    a geometry-consistency check then warns if any stored polyline no longer matches its link length.
 7. Optionally rename mode `bike` → whatever was passed via `--mode`. By default (`--mode bike`) this is a no-op.
-8. For each surviving link, sample elevations every `--ele-sample-step` meters along the straight line between
-   endpoints, Douglas-Peucker-filter the profile with tolerance `--ele-noise-tolerance`, compute metrics.
+8. For each surviving link, sample elevations every `--ele-sample-step` meters along its stored `origgeom` course (or
+   the straight line between endpoints when none was stored), Douglas-Peucker-filter the profile with tolerance
+   `--ele-noise-tolerance`, compute metrics.
 9. Write MATSim XML.
 
 Elevation metrics are computed **after** the simplifier runs — on fewer, longer links — so we sample only what survives.
@@ -219,10 +221,10 @@ Sonny's DTMs (https://sonny.4lima.de/) are LiDAR-based, much better than SRTM. G
 
 ### Elevation
 
-- **Sampling follows the straight chord, not the way's real curve.** Elevations are sampled along the straight line
-  between a link's end nodes, not along its OSM geometry. `--store-original-geometry` now preserves that true shape in
-  the `origgeom` attribute, but the elevation profile does not read it yet — sampling along it (more accurate on curved
-  and merged links) is a possible future improvement.
+- **Sampling follows the true OSM course when it was stored.** With `--store-original-geometry`, elevations are sampled
+  along the link's real shape (the `origgeom` polyline), which is more accurate on curved and merged links — the
+  straight chord would cut corners and shorten the horizontal run the gradient is measured over. Without the flag no
+  geometry is stored, so sampling falls back to the straight line between the link's end nodes.
 - **The Douglas-Peucker smoothing targets DEM vertical noise, not geometry — so it stays.** `--ele-noise-tolerance`
   removes spurious gradient spikes from DEM quantization, pixel-boundary jumps, and terrain-vs-road mismatch (bridges,
   cuttings) — up to 400 % on flat Berlin streets without it. That noise is vertical and independent of the horizontal
