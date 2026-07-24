@@ -235,7 +235,7 @@ public class LinkElevationProfileTest {
 		// The straight chord runs along y = 0; the true course detours north via
 		// (50, 50). With height == y, the chord stays flat while the detour climbs
 		// to the ridge and back.
-		ElevationSource heightIsY = c -> c.getY();
+		ElevationSource heightIsY = Coord::getY;
 
 		Link chord = createLink(0, 0, 100);                 // no geometry -> straight chord
 		Metrics chordM = LinkElevationProfile.compute(chord, SAMPLE_STEP, TOLERANCE, heightIsY);

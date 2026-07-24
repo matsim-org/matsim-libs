@@ -154,8 +154,8 @@ public final class LinkElevationProfile {
 	 * interpolated within the segment it falls in and clamped to the endpoints.
 	 */
 	private static Coord pointAtDistance(List<Coord> shape, double target, double length) {
-		if (target <= 0 || shape.size() < 2) return shape.get(0);
-		if (target >= length) return shape.get(shape.size() - 1);
+		if (target <= 0 || shape.size() < 2) return shape.getFirst();
+		if (target >= length) return shape.getLast();
 
 		double acc = 0;
 		for (int i = 1; i < shape.size(); i++) {
@@ -169,7 +169,7 @@ public final class LinkElevationProfile {
 			}
 			acc += seg;
 		}
-		return shape.get(shape.size() - 1);
+		return shape.getLast();
 	}
 
 	private static double planarDistance(Coord a, Coord b) {
