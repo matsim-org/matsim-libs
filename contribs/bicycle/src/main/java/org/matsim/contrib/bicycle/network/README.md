@@ -32,11 +32,13 @@ mvn -pl contribs/bicycle exec:java \
                  --output berlin-bicycle-network.xml.gz"
 ```
 
+The DEM is optional — drop `--dem` / `--dem-crs` to build the network without elevation metrics.
+
 | Option                  | Default | Meaning                                                                                          |
 |-------------------------|---------|--------------------------------------------------------------------------------------------------|
 | `--input` (required)    | —       | OSM input (`.osm.pbf`)                                                                           |
-| `--dem` (required)      | —       | DEM GeoTIFF                                                                                      |
-| `--dem-crs` (required)  | —       | CRS of the DEM (e.g. `EPSG:32632` for Sonny Germany)                                             |
+| `--dem`                 | —       | DEM GeoTIFF. Optional: omit it to build the network without elevation metrics. Needs `--dem-crs` when given. |
+| `--dem-crs`             | —       | CRS of the DEM (e.g. `EPSG:32632` for Sonny Germany). Required only with `--dem`.                |
 | `--output` (required)   | —       | Output network; compression is picked from the extension: `.xml.gz` (gzip), `.xml.zst` (Zstandard), `.xml` (none) |
 | `--crs` (required)      | —       | Output network CRS (e.g. `EPSG:25832`)                                                           |
 | `--mode`                | `bike`  | Network mode for cyclable links                                                                  |
@@ -68,6 +70,9 @@ link with a hill between equal-height endpoints — `maxGradient`, `elevationGai
 Not all of these are consumed by the simulation: `averageElevation`, `osm:bicycle` and `osm:cycleway` are written for
 inspection only — handy for sanity-checking an extract, but not read by anything downstream.
 
+The five elevation attributes (`averageElevation`, `gradient`, `maxGradient`, `elevationGain`, `elevationLoss`) are only
+attached when a DEM is supplied via `--dem`; without one they are absent.
+
 For ad-hoc debugging you can forward **arbitrary** OSM tags onto links: add their keys to `TAGS_TO_COPY` in
 `BicycleNetworkPipeline` and `TagCopy` copies them on verbatim under the `osm:` prefix (empty by default, so a no-op
 until you populate it).
@@ -94,10 +99,11 @@ until you populate it).
 
 Tests live in `contribs/bicycle/src/test/java/.../network`:
 
-- `BicycleNetworkPipelineTest` — 20 cases for `process`, the pure transformation seam (no file I/O, synthetic
+- `BicycleNetworkPipelineTest` — 21 cases for `process`, the pure transformation seam (no file I/O, synthetic
   `ElevationSource`): two end-to-end runs on a reader-like network (orchestration, gradient signs, `osm:` prefixing,
-  `origid` normalization, mode rename) plus tier-1 cases for the individual step methods — simplification merge guards,
-  capacity de-boost, `origid` merging, and reversed-geometry repair
+  `origid` normalization, mode rename), a no-DEM run that attaches no elevation metrics, plus tier-1 cases for the
+  individual step methods — simplification merge guards, capacity de-boost, `origid` merging, and reversed-geometry
+  repair
 - `BicycleInfraClassifierTest` — 37 table-driven cases covering 22 of the 27 categories and the precedence ordering
 - `BicycleLinkPolicyTest` — 13 cases for the footway/pedestrian whitelist, `bicycle=no`, `access=no/private/customer`
   (incl. the `bicycle=yes/designated` override), and bicycle-oneway handling
@@ -112,9 +118,10 @@ Tests live in `contribs/bicycle/src/test/java/.../network`:
 
 ## Pipeline
 
-1. Read OSM with `OsmBicycleReader`. During read, each link's endpoints get a Z stamped from the DEM, and
-   `BicycleLinkPolicy` classifies the link's cycling infrastructure via `BicycleInfraClassifier` — written to the
-   `bicycle_infra` attribute as a `BicycleInfraCategory` name — and enforces access rules.
+1. Read OSM with `OsmBicycleReader`. During read, each link's endpoints get a Z stamped from the DEM (when one is
+   supplied via `--dem`), and `BicycleLinkPolicy` classifies the link's cycling infrastructure via
+   `BicycleInfraClassifier` — written to the `bicycle_infra` attribute as a `BicycleInfraCategory` name — and enforces
+   access rules.
 2. Normalize `origid` to a `String` (the reader stores it as a `Long`), move OSM-derived attributes (`bicycle`,
    `surface`, `smoothness`, `cycleway`) under the `osm:` prefix, and — with `--store-original-geometry` — repair
    reversed geometry on the reader's synthetic `*_bike-reverse` links.
@@ -129,7 +136,7 @@ Tests live in `contribs/bicycle/src/test/java/.../network`:
 7. Optionally rename mode `bike` → whatever was passed via `--mode`. By default (`--mode bike`) this is a no-op.
 8. For each surviving link, sample elevations every `--ele-sample-step` meters along its stored `origgeom` course (or
    the straight line between endpoints when none was stored), Douglas-Peucker-filter the profile with tolerance
-   `--ele-noise-tolerance`, compute metrics.
+   `--ele-noise-tolerance`, compute metrics. Skipped entirely when no DEM was supplied.
 9. Write MATSim XML.
 
 Elevation metrics are computed **after** the simplifier runs — on fewer, longer links — so we sample only what survives.

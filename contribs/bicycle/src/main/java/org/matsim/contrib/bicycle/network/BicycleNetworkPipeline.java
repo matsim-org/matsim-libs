@@ -51,8 +51,9 @@ import java.util.function.BiPredicate;
  * <p>Pipeline order:
  * <ol>
  *   <li>Read OSM with {@link OsmBicycleReader}. During read, each link's
- *       endpoints get a Z coordinate from the DEM, and {@link BicycleLinkPolicy}
- *       stamps the {@code bicycle_infra} attribute and enforces access rules.</li>
+ *       endpoints get a Z coordinate from the DEM (when one is provided), and
+ *       {@link BicycleLinkPolicy} stamps the {@code bicycle_infra} attribute and
+ *       enforces access rules.</li>
  *   <li>Move OSM-derived attributes under the {@code osm:} prefix to clearly
  *       separate them from pipeline-internal attributes.</li>
  *   <li>{@link NetworkUtils#cleanNetwork} drops isolated components.</li>
@@ -64,7 +65,7 @@ import java.util.function.BiPredicate;
  *       caller requested via {@code --mode}.</li>
  *   <li>For every surviving link, sample its elevation profile and attach the
  *       five metrics (averageElevation, gradient, maxGradient, elevationGain,
- *       elevationLoss).</li>
+ *       elevationLoss). Skipped when no DEM was provided.</li>
  *   <li>Write the MATSim XML.</li>
  * </ol>
  *
@@ -117,11 +118,14 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	@Option(names = "--input", required = true, description = "Path to OSM input file (.osm.pbf)")
 	private Path input;
 
-	@Option(names = "--dem", required = true, description = "Path to DEM GeoTIFF")
+	@Option(names = "--dem",
+		description = "Path to DEM GeoTIFF. Optional: without it the network is built without "
+			+ "elevation metrics (no gradient, elevationGain/Loss, averageElevation). Requires --dem-crs when given.")
 	private Path dem;
 
-	@Option(names = "--dem-crs", required = true,
-		description = "CRS of the DEM GeoTIFF, e.g. EPSG:32632 for Sonny's German DTM")
+	@Option(names = "--dem-crs",
+		description = "CRS of the DEM GeoTIFF, e.g. EPSG:32632 for Sonny's German DTM. "
+			+ "Required only when --dem is given.")
 	private String demCRS;
 
 	@Option(names = "--output", required = true,
@@ -219,7 +223,17 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		var elevationParser = new ElevationDataParser(dem.toString(), outputCRS, demCRS);
+		if (dem != null && demCRS == null) {
+			throw new IllegalArgumentException("--dem-crs is required when --dem is given.");
+		}
+
+		// The DEM is optional: without it the network is built without elevation metrics.
+		final ElevationDataParser elevationParser =
+			dem != null ? new ElevationDataParser(dem.toString(), outputCRS, demCRS) : null;
+		if (elevationParser == null) {
+			log.info("No --dem given: building the network without elevation metrics.");
+		}
+
 		var transformation = TransformationFactory.getCoordinateTransformation(
 			TransformationFactory.WGS84, outputCRS);
 
@@ -234,8 +248,10 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			.setCoordinateTransformation(transformation)
 			.setStoreOriginalGeometry(storeOriginalGeometry)
 			.setAfterLinkCreated((link, tags, direction) -> {
-				addNodeElevation(link.getFromNode(), elevationParser);
-				addNodeElevation(link.getToNode(), elevationParser);
+				if (elevationParser != null) {
+					addNodeElevation(link.getFromNode(), elevationParser);
+					addNodeElevation(link.getToNode(), elevationParser);
+				}
 				policy.apply(link, tags, direction);
 			})
 			.build()
@@ -245,7 +261,8 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		logBicycleInfraDistribution(network, "after OSM read");
 
 		// ---- 2-7. pure network transformations (no file I/O) -----------------
-		process(network, elevationParser::getElevation,
+		process(network,
+			elevationParser != null ? elevationParser::getElevation : null,
 			new Params(mode, eleSampleStepM, eleNoiseToleranceM, storeOriginalGeometry));
 
 		// ---- 8. write --------------------------------------------------------
@@ -265,7 +282,8 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * for a constant 2 % slope. The network is mutated in place.
 	 *
 	 * @param network   the freshly read (or hand-built) network
-	 * @param elevation elevation source sampled for the per-link metrics (step 7)
+	 * @param elevation elevation source sampled for the per-link metrics (step 7),
+	 *                  or {@code null} to skip elevation metrics entirely (no DEM)
 	 * @param params    the non-I/O parameters, decoupled from the picocli fields
 	 */
 	public static void process(Network network,
@@ -310,12 +328,16 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		// ---- 6. rename mode if requested (no-op when --mode bike) -----------
 		renameMode(network, TransportMode.bike, params.mode());
 
-		// ---- 7. elevation metrics on the final link set ----------------------
-		for (Link link : network.getLinks().values()) {
-			attachElevationMetrics(link, elevation, params.eleSampleStep(), params.eleNoiseTolerance());
+		// ---- 7. elevation metrics on the final link set (skipped without a DEM) --
+		if (elevation != null) {
+			for (Link link : network.getLinks().values()) {
+				attachElevationMetrics(link, elevation, params.eleSampleStep(), params.eleNoiseTolerance());
+			}
+			log.info("Attached elevation metrics to {} links (sample step = {} m, noise tolerance = {} m).",
+				network.getLinks().size(), params.eleSampleStep(), params.eleNoiseTolerance());
+		} else {
+			log.info("No elevation source: skipped elevation metrics.");
 		}
-		log.info("Attached elevation metrics to {} links (sample step = {} m, noise tolerance = {} m).",
-			network.getLinks().size(), params.eleSampleStep(), params.eleNoiseTolerance());
 		logBicycleInfraDistribution(network, "in final network");
 	}
 

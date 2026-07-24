@@ -180,6 +180,35 @@ public class BicycleNetworkPipelineTest {
 
 
 	// =========================================================================
+	// No DEM -> process runs but attaches no elevation metrics
+	// =========================================================================
+
+	@Test
+	void processWithoutElevationSource_transformsNetworkButAttachesNoMetrics() {
+		// A bidirectional cycleway so it survives cleanNetwork.
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		link(net, a, b, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 1L);
+		link(net, b, a, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 2L);
+
+		// a null elevation source stands in for "no --dem given"
+		BicycleNetworkPipeline.process(net, null, Params.defaults());
+
+		assertFalse(net.getLinks().isEmpty(), "the network survives without a DEM");
+		for (Link l : net.getLinks().values()) {
+			// the non-elevation transformations still run ...
+			assertEquals("asphalt", l.getAttributes().getAttribute("osm:surface"));
+			// ... but no elevation attribute is attached
+			for (String key : ELEVATION_KEYS) {
+				assertNull(l.getAttributes().getAttribute(key),
+					"no elevation attribute '" + key + "' should be attached without a DEM");
+			}
+		}
+	}
+
+
+	// =========================================================================
 	// Tier 1 — the individual step methods in isolation
 	// =========================================================================
 
