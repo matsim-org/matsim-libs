@@ -122,7 +122,7 @@ public class BicycleLinkPolicyTest {
 	}
 
 	// =========================================================================
-	// footway / pedestrian whitelist + bicycle=no kill
+	// footway / pedestrian whitelist + bicycle=no handling
 	// =========================================================================
 
 	@Test
@@ -140,10 +140,22 @@ public class BicycleLinkPolicyTest {
 	}
 
 	@Test
-	void bicycleNo_isKilled() {
+	void bicycleNo_onBikeOnlyLink_leavesNoModes() {
+		// A cycleway is bike-only, so dropping bike leaves it empty -> removed downstream.
 		Link link = link("1f");
 		policy.apply(link, tags("highway", "cycleway", "bicycle", "no"), Direction.Forward);
 		assertTrue(link.getAllowedModes().isEmpty());
+	}
+
+	@Test
+	void bicycleNo_onCarLink_keepsCarDropsBike() {
+		// highway=primary + bicycle=no: bikes are forbidden, but the road stays
+		// open to cars. The link must survive as a car-only link, not be killed.
+		Link link = link("1f");
+		link.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
+		policy.apply(link, tags("highway", "primary", "bicycle", "no"), Direction.Forward);
+		assertFalse(link.getAllowedModes().contains(TransportMode.bike), "bike is dropped");
+		assertTrue(link.getAllowedModes().contains(TransportMode.car), "car is kept");
 	}
 
 	// =========================================================================

@@ -43,7 +43,8 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
  *       {@link BicycleNetworkPipeline#LINK_ATTR_BICYCLE_INFRA},</li>
  *   <li>enforces footway/pedestrian whitelist: bike is only allowed when the OSM
  *       tags explicitly permit it,</li>
- *   <li>kills links tagged {@code bicycle=no},</li>
+ *   <li>drops the bike mode on links tagged {@code bicycle=no} (the link keeps
+ *       any other mode, e.g. {@code car} on a {@code highway=primary}),</li>
  *   <li>kills links whose general {@code access} is restricted
  *       ({@code no} / {@code private} / {@code customer}), unless a bicycle-specific
  *       tag ({@code bicycle=yes} / {@code =designated}) overrides it,</li>
@@ -80,9 +81,12 @@ public final class BicycleLinkPolicy {
 		enforceFootwayPedestrianWhitelist(link, tags);
 		if (link.getAllowedModes().isEmpty()) return;
 
-		// 3. bicycle=no -> kill
+		// 3. bicycle=no -> bikes forbidden, but the link itself stays open to the
+		//    other modes. On a highway=primary etc. that means it survives as a
+		//    car-only link; only where bike was the sole mode (cycleway, track,
+		//    ...) does dropping it leave the link empty (removed downstream).
 		if (NO.equals(tags.get(BICYCLE))) {
-			kill(link);
+			removeMode(link, BICYCLE_MODE);
 			return;
 		}
 
