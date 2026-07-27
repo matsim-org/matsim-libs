@@ -191,9 +191,11 @@ The `_ADJOINING` / `_ISOLATED` / `_ADJOINING_OR_ISOLATED` suffixes correspond to
 unset distinction. See `BicycleInfraCategory` for the full list and `BicycleInfraClassifier` for the classification
 rules.
 
-`BicycleLinkPolicy` additionally kills links (empty modes, zero capacity) when they're footway/pedestrian without
-explicit bike permission, tagged `bicycle=no`, have a restricted general `access` (`no` / `private` / `customer`) without
-a `bicycle=yes/designated` override, or are the reverse direction of a bicycle-oneway.
+`BicycleLinkPolicy` additionally drops links (empties their modes and zeroes capacity, so `cleanNetwork` prunes them)
+when they're footway/pedestrian without explicit bike permission, a `service=parking_aisle`, have a restricted general
+`access` (`no` / `private` / `customer`) without a `bicycle=yes/designated` override, or are the synthetic reverse of a
+bicycle-oneway. A `bicycle=no` link instead only loses its bike mode, so a `highway=primary` etc. survives as a car-only
+link.
 
 ## Country profiles
 

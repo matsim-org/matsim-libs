@@ -154,4 +154,6 @@ public final class BicycleOsmTags {
 	public static final String MTB_SCALE = "mtb:scale";
 	public static final String SURFACE = "surface";
 	public static final String SMOOTHNESS = "smoothness";
+	public static final String SERVICE = "service";
+	public static final String SV_PARKING_AISLE = "parking_aisle"; 	/** Aisle inside a parking lot; not a meaningful cycling route. */
 }

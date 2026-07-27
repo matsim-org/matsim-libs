@@ -80,7 +80,7 @@ public class BicycleLinkPolicyTest {
 	// =========================================================================
 
 	@Test
-	void onewayBicycleYes_forwardKeepsBike_reverseLosesBike_bikeReverseKilled() {
+	void onewayBicycleYes_forwardKeepsBike_reverseLosesBike_bikeReverseDropped() {
 		Map<String, String> tags = tags("highway", "cycleway", "oneway:bicycle", "yes");
 
 		Link forward = link("1f");
@@ -93,7 +93,7 @@ public class BicycleLinkPolicyTest {
 
 		assertTrue(forward.getAllowedModes().contains(TransportMode.bike), "forward keeps bike");
 		assertFalse(reverse.getAllowedModes().contains(TransportMode.bike), "'r' reverse loses bike");
-		assertTrue(bikeReverse.getAllowedModes().isEmpty(), "'_bike-reverse' is killed");
+		assertTrue(bikeReverse.getAllowedModes().isEmpty(), "'_bike-reverse' is dropped");
 	}
 
 	// =========================================================================
@@ -126,7 +126,7 @@ public class BicycleLinkPolicyTest {
 	// =========================================================================
 
 	@Test
-	void footwayWithoutBicycle_isKilled() {
+	void footwayWithoutBicycle_isDropped() {
 		Link link = link("1f");
 		policy.apply(link, tags("highway", "footway"), Direction.Forward);
 		assertTrue(link.getAllowedModes().isEmpty());
@@ -150,7 +150,7 @@ public class BicycleLinkPolicyTest {
 	@Test
 	void bicycleNo_onCarLink_keepsCarDropsBike() {
 		// highway=primary + bicycle=no: bikes are forbidden, but the road stays
-		// open to cars. The link must survive as a car-only link, not be killed.
+		// open to cars. The link must survive as a car-only link, not be dropped.
 		Link link = link("1f");
 		link.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
 		policy.apply(link, tags("highway", "primary", "bicycle", "no"), Direction.Forward);
@@ -159,25 +159,44 @@ public class BicycleLinkPolicyTest {
 	}
 
 	// =========================================================================
-	// access=no/private/customer kill
+	// service=parking_aisle drop
 	// =========================================================================
 
 	@Test
-	void accessNo_isKilled() {
+	void serviceParkingAisle_isDropped() {
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "service", "parking_aisle"), Direction.Forward);
+		assertTrue(link.getAllowedModes().isEmpty());
+	}
+
+	@Test
+	void serviceDriveway_isNotDroppedByParkingRule() {
+		// Only parking_aisle is dropped; other service subtypes stay cyclable.
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "service", "driveway"), Direction.Forward);
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
+	}
+
+	// =========================================================================
+	// access=no/private/customer drop
+	// =========================================================================
+
+	@Test
+	void accessNo_isDropped() {
 		Link link = link("1f");
 		policy.apply(link, tags("highway", "service", "access", "no"), Direction.Forward);
 		assertTrue(link.getAllowedModes().isEmpty());
 	}
 
 	@Test
-	void accessPrivate_isKilled() {
+	void accessPrivate_isDropped() {
 		Link link = link("1f");
 		policy.apply(link, tags("highway", "service", "access", "private"), Direction.Forward);
 		assertTrue(link.getAllowedModes().isEmpty());
 	}
 
 	@Test
-	void accessCustomer_isKilled() {
+	void accessCustomer_isDropped() {
 		Link link = link("1f");
 		policy.apply(link, tags("highway", "service", "access", "customer"), Direction.Forward);
 		assertTrue(link.getAllowedModes().isEmpty());
@@ -185,7 +204,7 @@ public class BicycleLinkPolicyTest {
 
 	@Test
 	void accessYes_keepsBike() {
-		// access=yes (and other unrestricted values) must not kill the link.
+		// access=yes (and other unrestricted values) must not drop the link.
 		Link link = link("1f");
 		policy.apply(link, tags("highway", "service", "access", "yes"), Direction.Forward);
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
