@@ -39,6 +39,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -63,6 +64,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private static final Logger log = LogManager.getLogger(PersonPrepareForSim.class);
 	private final Scenario scenario;
+	private final Set<String> modesThatCanHaveOneLegOnly;
 
 	/*
 	 * To be used by the controller which creates multiple instances of this class which would
@@ -78,6 +80,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
 		this.scenario = scenario ;
+		modesThatCanHaveOneLegOnly = new HashSet<>(scenario.getConfig().routing().getTeleportedModeParams().keySet());
+		modesThatCanHaveOneLegOnly.add(TransportMode.walk);
 	}
 
 	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
@@ -94,6 +98,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
 		this.scenario = scenario ;
+		modesThatCanHaveOneLegOnly = new HashSet<>(scenario.getConfig().routing().getTeleportedModeParams().keySet());
+		modesThatCanHaveOneLegOnly.add(TransportMode.walk);
 	}
 
 	@Override
@@ -135,31 +141,25 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			}
 
 			// There is router without access/egress routing any more. Trips with one leg only are outdated.
-			for (Trip trip : TripStructureUtils.getTrips(plan)) {
-				if (trip.getLegsOnly().size() > 1) {
-					// we are ok here, since trip consists of more than one leg. We assume that it has access/egress than.
-					continue;
-				}
+			if (this.scenario.getConfig().routing().getAccessEgressConsistencyCheck() != RoutingConfigGroup.AccessEgressConsistencyCheck.disable) {
 
-				// in this case, there is only one leg.
-				Leg leg = trip.getLegsOnly().getFirst();
-				if (leg.getMode().equals(TransportMode.walk) && !this.scenario.getConfig().qsim().getMainModes().contains(TransportMode.walk)) {
-					// we are ok here, since walk is the fallback mode. Thus, walk-only trips are not expected to have access/egress legs.
-					continue;
-				}
+				for (Trip trip : TripStructureUtils.getTrips(plan)) {
+					if (trip.getLegsOnly().size() > 1) continue;
 
-				switch (this.scenario.getConfig().routing().getAccessEgressConsistencyCheck()) {
-					case disable -> {
-						// don't do anything here
+					Leg leg = trip.getLegsOnly().getFirst();
+					// Should ideally check against config.routing().getWalkMode() or similar instead of hardcoded string
+
+					if (this.modesThatCanHaveOneLegOnly.contains(leg.getMode()) && !this.scenario.getConfig().qsim().getMainModes().contains(leg.getMode())) {
+						// we are ok here, since this mode is allowed to be single-leg (teleported or explicitly walked).
+						continue;
 					}
-					case reroute -> {
+
+					if (this.scenario.getConfig().routing().getAccessEgressConsistencyCheck() == RoutingConfigGroup.AccessEgressConsistencyCheck.abortOnInconsistency) {
+						throw new RuntimeException("Person" + person.getId() + " has a trip with no access/egress leg. Aborting! If this is intended, set the routing config parameter 'accessEgressConsistencyCheck' to 'disable' or 'reroute'.");
+					} else {
 						needsReRoute = true;
 					}
-					case abortOnInconsistency -> {
-						throw new RuntimeException("Person" + person.getId() + " has a trip with no access/egress leg. Aborting! If this is intended, set the routing config parameter 'accessEgressConsistencyCheck' to 'disable' or 'reroute'.");
-					}
 				}
-
 			}
 
 			if (needsXY2Links) {
