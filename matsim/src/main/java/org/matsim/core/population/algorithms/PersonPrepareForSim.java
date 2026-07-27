@@ -133,9 +133,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 							break planLoop;
 						}
 					}
-					case Leg leg -> {
-						needsReRoute |= needsReRoute(person, leg);
-					}
+					case Leg leg -> needsReRoute |= needsReRoute(person, leg);
 					default -> throw new IllegalStateException("Unexpected PlanElement: " + pe);
 				}
 			}
@@ -147,8 +145,6 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					if (trip.getLegsOnly().size() > 1) continue;
 
 					Leg leg = trip.getLegsOnly().getFirst();
-					// Should ideally check against config.routing().getWalkMode() or similar instead of hardcoded string
-
 					if (this.modesThatCanHaveOneLegOnly.contains(leg.getMode()) && !this.scenario.getConfig().qsim().getMainModes().contains(leg.getMode())) {
 						// we are ok here, since this mode is allowed to be single-leg (teleported or explicitly walked).
 						continue;
@@ -258,7 +254,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
 			List<Leg> legs = trip.getLegsOnly();
 			if (!legs.isEmpty()) {
-				String routingMode = TripStructureUtils.getRoutingMode(legs.get(0));
+				String routingMode = TripStructureUtils.getRoutingMode(legs.getFirst());
 
 				for (Leg leg : legs) {
 					// check all legs either have the same routing mode or all have routingMode==null
@@ -286,7 +282,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 				if (routingMode == null) {
 					if (legs.size() == 1) {
 						// there is only a single leg (e.g. after Trips2Legs and a mode choice replanning module)
-						routingMode = legs.get(0).getMode();
+						routingMode = legs.getFirst().getMode();
 						if (routingMode.equals(TransportMode.transit_walk)) {
 							String errorMessage = "Found a trip of only one leg of mode transit_walk. "
 									+ "This should not happen during simulation since transit_walk was replaced by walk and "
@@ -294,7 +290,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 							log.error(errorMessage);
 							throw new RuntimeException(errorMessage);
 						}
-						TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
+						TripStructureUtils.setRoutingMode(legs.getFirst(), routingMode);
 					} else {
 						String errorMessage = "Found a trip whose legs have no routingMode. "
 								+ "This is only allowed for (outdated) input plans, not during simulation (after PrepareForSim). Agent id: "
