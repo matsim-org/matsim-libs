@@ -56,6 +56,11 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
  * zero capacity; the empty-mode link is then pruned by {@code cleanNetwork},
  * which is easier for the downstream simplifiers than removing it here.
  *
+ * <p>When an {@link AreaMarker} is supplied, only the ways carrying that marker
+ * tag run through the steps above; every other way keeps the reader's modes (so
+ * bikes may still ride it) but has its bicycle detail stripped -- no
+ * classification, no bike attributes, and no elevation metrics.
+ *
  * @author smetzler, esarikaya
  */
 public final class BicycleLinkPolicy {
@@ -65,12 +70,35 @@ public final class BicycleLinkPolicy {
 	private final BicycleInfraClassifier classifier;
 	private final TagCopy tagCopy;
 
+	/** Selects the ways that get the full bicycle treatment; {@code null} = every way. */
+	private final AreaMarker areaMarker;
+
 	public BicycleLinkPolicy(BicycleInfraClassifier classifier, TagCopy tagCopy) {
+		this(classifier, tagCopy, null);
+	}
+
+	/**
+	 * @param areaMarker restricts the full bicycle treatment to the ways carrying this
+	 *                   OSM marker tag; every other way is reduced to a plain car link.
+	 *                   {@code null} treats every way as cyclable (the default).
+	 */
+	public BicycleLinkPolicy(BicycleInfraClassifier classifier, TagCopy tagCopy, AreaMarker areaMarker) {
 		this.classifier = classifier;
 		this.tagCopy = tagCopy;
+		this.areaMarker = areaMarker;
 	}
 
 	public void apply(Link link, Map<String, String> tags, Direction direction) {
+
+		// Bicycle-area gating: outside the marked area keep the reader's link as is --
+		// its modes stay, so bikes may still ride it -- but strip the bicycle detail
+		// (no classification, no bike attributes, no elevation later). Ways outside are
+		// a pre-filtered major-road network, so the access rules below would barely
+		// fire there anyway. No marker configured -> every way is treated as cyclable.
+		if (areaMarker != null && !areaMarker.matches(tags)) {
+			stripBicycleDetail(link);
+			return;
+		}
 
 		// 0. copy selected raw OSM tags onto the link (no-op if TagCopy has no keys)
 		tagCopy.copy(link, tags);
@@ -158,6 +186,21 @@ public final class BicycleLinkPolicy {
 		link.setCapacity(0);
 	}
 
+	/**
+	 * Strip the bicycle-scoring detail from a link outside the marked bicycle area:
+	 * remove the bike-specific attributes the reader stamped ({@code surface},
+	 * {@code smoothness}, {@code cycleway}, {@code bicycle}) and, by returning before
+	 * classification, leave {@code bicycle_infra} unset. The allowed modes are left
+	 * untouched -- bikes may still ride the link -- and it gets no elevation metrics
+	 * later, which key off {@code bicycle_infra}.
+	 */
+	private static void stripBicycleDetail(Link link) {
+		link.getAttributes().removeAttribute(SURFACE);
+		link.getAttributes().removeAttribute(SMOOTHNESS);
+		link.getAttributes().removeAttribute(CYCLEWAY);
+		link.getAttributes().removeAttribute(BICYCLE);
+	}
+
 	private static void removeMode(Link link, String mode) {
 		var modes = new HashSet<>(link.getAllowedModes());
 		modes.remove(mode);
@@ -176,5 +219,33 @@ public final class BicycleLinkPolicy {
 			return !NO.equals(tags.get(ONEWAY_BICYCLE));
 		}
 		return false;
+	}
+
+	/**
+	 * Selects the OSM ways that should get the full bicycle treatment, parsed from
+	 * the {@code --bike-area-marker} CLI value. A bare {@code "key"} matches any way
+	 * carrying that tag key regardless of its value; {@code "key=value"} matches only
+	 * that exact value.
+	 */
+	public record AreaMarker(String key, String value) {
+
+		/** Parse a {@code key} or {@code key=value} spec; the value part is optional. */
+		public static AreaMarker parse(String spec) {
+			int eq = spec.indexOf('=');
+			return eq < 0
+				? new AreaMarker(spec.trim(), null)
+				: new AreaMarker(spec.substring(0, eq).trim(), spec.substring(eq + 1).trim());
+		}
+
+		/** Whether the given raw OSM tag map carries this marker. */
+		public boolean matches(Map<String, String> tags) {
+			String v = tags.get(key);
+			return v != null && (value == null || value.equals(v));
+		}
+
+		@Override
+		public String toString() {
+			return value == null ? key : key + "=" + value;
+		}
 	}
 }

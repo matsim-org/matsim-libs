@@ -150,6 +150,14 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		defaultValue = "de")
 	private String country;
 
+	@Option(names = "--bike-area-marker",
+		description = "OSM tag selecting the ways that get the full bicycle treatment, given as "
+			+ "'key' or 'key=value' (e.g. 'city_center' or 'city_center=yes'). Ways without it "
+			+ "keep their modes (bikes may still ride them) but get no bicycle attributes, "
+			+ "no infrastructure classification and no elevation metrics. "
+			+ "Omit to treat every way as cyclable.")
+	private String bikeAreaMarker;
+
 	@Option(names = "--ele-sample-step",
 		description = "Distance between elevation samples along a link in meters (default: ${DEFAULT-VALUE})",
 		defaultValue = DEFAULT_ELE_SAMPLE_STEP)
@@ -241,7 +249,13 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		log.info("Using country profile: {}", profile.getClass().getSimpleName());
 		var classifier = new BicycleInfraClassifier(profile);
 		var tagCopy = new TagCopy(TAGS_TO_COPY, OSM_PREFIX);
-		var policy = new BicycleLinkPolicy(classifier, tagCopy);
+
+		var areaMarker = bikeAreaMarker != null ? BicycleLinkPolicy.AreaMarker.parse(bikeAreaMarker) : null;
+		if (areaMarker != null) {
+			log.info("Bicycle-area marker '{}': only matching ways get the full bicycle treatment; "
+				+ "other ways keep their modes but get no bicycle detail.", areaMarker);
+		}
+		var policy = new BicycleLinkPolicy(classifier, tagCopy, areaMarker);
 
 		// ---- 1. OSM read: stamps node elevations + infra on each new link ----
 		Network network = new OsmBicycleReader.Builder()
@@ -329,12 +343,18 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		renameMode(network, TransportMode.bike, params.mode());
 
 		// ---- 7. elevation metrics on the final link set (skipped without a DEM) --
+		// Elevation is part of the full bicycle treatment, so attach it only where
+		// bicycle_infra was set -- i.e. inside the --bike-area-marker area, or on
+		// every link when no marker is configured. Ways outside the area are skipped.
 		if (elevation != null) {
+			int withMetrics = 0;
 			for (Link link : network.getLinks().values()) {
+				if (link.getAttributes().getAttribute(LINK_ATTR_BICYCLE_INFRA) == null) continue;
 				attachElevationMetrics(link, elevation, params.eleSampleStep(), params.eleNoiseTolerance());
+				withMetrics++;
 			}
-			log.info("Attached elevation metrics to {} links (sample step = {} m, noise tolerance = {} m).",
-				network.getLinks().size(), params.eleSampleStep(), params.eleNoiseTolerance());
+			log.info("Attached elevation metrics to {} of {} links (sample step = {} m, noise tolerance = {} m).",
+				withMetrics, network.getLinks().size(), params.eleSampleStep(), params.eleNoiseTolerance());
 		} else {
 			log.info("No elevation source: skipped elevation metrics.");
 		}

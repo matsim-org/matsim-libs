@@ -34,8 +34,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -223,6 +225,74 @@ public class BicycleLinkPolicyTest {
 		Link link = link("1f");
 		policy.apply(link, tags("highway", "service", "access", "no", "bicycle", "designated"), Direction.Forward);
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
+	}
+
+	// =========================================================================
+	// --bike-area-marker gating
+	// =========================================================================
+
+	private static final BicycleLinkPolicy GATED = new BicycleLinkPolicy(
+		new BicycleInfraClassifier(), new TagCopy(List.of(), "osm:"),
+		BicycleLinkPolicy.AreaMarker.parse("city_center=yes"));
+
+	@Test
+	void areaMarker_parsesKeyOnly() {
+		BicycleLinkPolicy.AreaMarker m = BicycleLinkPolicy.AreaMarker.parse("city_center");
+		assertEquals("city_center", m.key());
+		assertNull(m.value());
+		assertTrue(m.matches(tags("city_center", "whatever")), "any value matches a key-only marker");
+		assertFalse(m.matches(tags("highway", "primary")));
+	}
+
+	@Test
+	void areaMarker_parsesKeyValue() {
+		BicycleLinkPolicy.AreaMarker m = BicycleLinkPolicy.AreaMarker.parse("city_center=yes");
+		assertEquals("city_center", m.key());
+		assertEquals("yes", m.value());
+		assertTrue(m.matches(tags("city_center", "yes")));
+		assertFalse(m.matches(tags("city_center", "no")), "a different value does not match");
+	}
+
+	@Test
+	void markedWay_getsFullBicycleTreatment() {
+		Link link = link("1f");   // {bike}
+		GATED.apply(link, tags("highway", "cycleway", "city_center", "yes"), Direction.Forward);
+
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike), "marked way keeps bike");
+		assertNotNull(link.getAttributes().getAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA),
+			"marked way gets bicycle_infra");
+	}
+
+	@Test
+	void unmarkedWay_keepsModesButStripsBicycleDetail() {
+		Link link = link("1f");
+		link.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
+		// mimic the bike attributes the reader stamps before the policy runs
+		link.getAttributes().putAttribute("surface", "asphalt");
+		link.getAttributes().putAttribute("smoothness", "good");
+		link.getAttributes().putAttribute("cycleway", "lane");
+		link.getAttributes().putAttribute("bicycle", "yes");
+
+		GATED.apply(link, tags("highway", "secondary"), Direction.Forward);   // no marker tag
+
+		assertEquals(Set.of(TransportMode.car, TransportMode.bike), link.getAllowedModes(),
+			"outside the area the reader's modes are kept -- bike stays open");
+		assertNull(link.getAttributes().getAttribute("surface"));
+		assertNull(link.getAttributes().getAttribute("smoothness"));
+		assertNull(link.getAttributes().getAttribute("cycleway"));
+		assertNull(link.getAttributes().getAttribute("bicycle"));
+		assertNull(link.getAttributes().getAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA),
+			"no bicycle_infra outside the area");
+	}
+
+	@Test
+	void unmarkedBikeOnlyWay_keepsBikeButNoDetail() {
+		// A cycleway outside the area keeps its bike mode (still rideable) but gets
+		// no bicycle_infra -- and therefore no elevation metrics later.
+		Link link = link("1f");   // {bike}
+		GATED.apply(link, tags("highway", "cycleway"), Direction.Forward);
+		assertEquals(Set.of(TransportMode.bike), link.getAllowedModes());
+		assertNull(link.getAttributes().getAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA));
 	}
 
 	// =========================================================================
