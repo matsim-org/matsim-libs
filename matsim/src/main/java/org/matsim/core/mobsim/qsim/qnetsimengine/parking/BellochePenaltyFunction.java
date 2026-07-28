@@ -28,8 +28,11 @@ public class BellochePenaltyFunction implements ParkingSearchTimeFunction {
 		Tuple<Double, Double> weightedOccK = getWeightedOccK(parkingCount);
 
 		if (weightedOccK.getSecond() == 0) {
-			// The total capacity of parking spots is 0. As fallback, we assume that the occupancy rate is 1, so each link is full.
-			return alpha * Math.exp(-beta);
+			// No parking capacity exists in the considered area. This may occur when the
+			// destination link does not support parking, for example on a motorway.
+			// In that case, parking search is considered not applicable and no penalty is applied.
+			// To model parking scarcity, provide an explicit positive parking capacity.
+			return 0.0;
 		}
 
 		return alpha * Math.exp(-beta * (weightedOccK.getFirst() / weightedOccK.getSecond()));
