@@ -32,10 +32,6 @@ class DrtParallelInserterParamsTest {
         originalParams.setLogThreadActivity(true);
         originalParams.setVehiclesPartitioner(DrtParallelInserterParams.VehiclesPartitioner.RoundRobinVehicleEntryPartitioner);
         originalParams.setRequestsPartitioner(DrtParallelInserterParams.RequestsPartitioner.RoundRobinRequestsPartitioner);
-		originalParams.setServiceQualityProbeSpatialResolution(DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE);
-		originalParams.setServiceQualityProbeZoneCellSize(5000.);
-		originalParams.setServiceQualityProbeStopPairInputFiles("first.csv.gz,second.csv");
-
 		drtConfigGroup.addParameterSet(originalParams);
 
         config.addModule(drtConfigGroup);
@@ -57,8 +53,5 @@ class DrtParallelInserterParamsTest {
         assertTrue(loadedParams.isLogThreadActivity());
         assertEquals(DrtParallelInserterParams.VehiclesPartitioner.RoundRobinVehicleEntryPartitioner, loadedParams.getVehiclesPartitioner());
         assertEquals(DrtParallelInserterParams.RequestsPartitioner.RoundRobinRequestsPartitioner, loadedParams.getRequestsPartitioner());
-		assertEquals(DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE, loadedParams.getServiceQualityProbeSpatialResolution());
-		assertEquals(5000., loadedParams.getServiceQualityProbeZoneCellSize());
-		assertEquals("first.csv.gz,second.csv", loadedParams.getServiceQualityProbeStopPairInputFiles());
     }
 }

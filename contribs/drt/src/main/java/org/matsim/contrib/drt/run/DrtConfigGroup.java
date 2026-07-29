@@ -44,6 +44,7 @@ import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSe
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtParallelInserterParams;
+import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtServiceQualityProbeParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
@@ -290,6 +291,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Nullable
 	private DrtParallelInserterParams drtParallelInserterParams;
 
+	@Nullable
+	private DrtServiceQualityProbeParams drtServiceQualityProbeParams;
+
 	private ZoneSystemParams analysisZoneSystemParams;
 
 	public DrtConfigGroup() {
@@ -346,6 +350,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtParallelInserterParams.SET_NAME, DrtParallelInserterParams::new,
 			() -> drtParallelInserterParams,
 			params -> drtParallelInserterParams = (DrtParallelInserterParams)params);
+
+		addDefinition(DrtServiceQualityProbeParams.SET_NAME, DrtServiceQualityProbeParams::new,
+			() -> drtServiceQualityProbeParams,
+			params -> drtServiceQualityProbeParams = (DrtServiceQualityProbeParams) params);
 
 		// estimator (optional)
 		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
@@ -443,6 +451,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			Verify.verify(drtSpeedUpParams == null, "Simulation type is estimateAndTeleport, but drtSpeedUpParams is set. " +
 				"Please remove drtSpeedUpParams from the config, as these two functionalities are not compatible.");
 		}
+
+		if (drtServiceQualityProbeParams != null && drtServiceQualityProbeParams.isEnabled()) {
+			Verify.verify(!(drtInsertionSearchParams instanceof RepeatedSelectiveInsertionSearchParams),
+				"The side-effect-free DRT service quality probe is not supported with repeated-selective insertion search.");
+		}
 	}
 
 	@Override
@@ -470,6 +483,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<DrtParallelInserterParams> getDrtParallelInserterParams() {
 		return Optional.ofNullable(drtParallelInserterParams);
+	}
+
+	public Optional<DrtServiceQualityProbeParams> getDrtServiceQualityProbeParams() {
+		return Optional.ofNullable(drtServiceQualityProbeParams);
 	}
 
 	public Optional<DrtFareParams> getDrtFareParams() {

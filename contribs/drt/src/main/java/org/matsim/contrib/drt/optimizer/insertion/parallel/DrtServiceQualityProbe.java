@@ -44,6 +44,7 @@ import org.matsim.contrib.drt.routing.DrtRouteConstraintsCalculator;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
@@ -55,6 +56,10 @@ import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -72,7 +77,7 @@ import java.util.stream.Collectors;
 /**
  * Estimates stop-to-stop DRT service quality from the current optimizer state without scheduling the requests.
  */
-class DrtServiceQualityProbe {
+class DrtServiceQualityProbe implements MobsimEngine, MobsimBeforeCleanupListener {
 	private static final Logger LOG = LogManager.getLogger(DrtServiceQualityProbe.class);
 	private static final List<Id<Person>> PASSENGER_IDS = List.of(Id.createPersonId("drt-service-quality-probe"));
 
@@ -88,10 +93,12 @@ class DrtServiceQualityProbe {
 	private final DvrpLoad load;
 	private final RequestFleetFilter requestFleetFilter;
 	private final Provider<DrtInsertionSearch> insertionSearchProvider;
+	private final Fleet fleet;
+	private final VehicleEntry.EntryFactory vehicleEntryFactory;
 	private final List<Double> probeTimes;
 	private final String outputFile;
 	private final String delimiter;
-	private final DrtParallelInserterParams.ServiceQualityProbeSpatialResolution spatialResolution;
+	private final DrtServiceQualityProbeParams.SpatialResolution spatialResolution;
 	private final double zoneCellSize;
 	private final Person dummyPerson = PopulationUtils.getFactory().createPerson(Id.createPersonId("drt-service-quality-probe"));
 	private final Attributes tripAttributes = new AttributesImpl();
@@ -123,7 +130,8 @@ class DrtServiceQualityProbe {
 						   TravelDisutilityFactory travelDisutilityFactory,
 						   DrtRouteConstraintsCalculator constraintsCalculator, DvrpLoadFromTrip loadFromTrip,
 						   RequestFleetFilter requestFleetFilter, Provider<DrtInsertionSearch> insertionSearchProvider,
-						   DrtParallelInserterParams params) {
+						   Fleet fleet, VehicleEntry.EntryFactory vehicleEntryFactory,
+						   DrtServiceQualityProbeParams params) {
 		this.matsimServices = matsimServices;
 		this.mode = mode;
 		this.stops = stopNetwork.getDrtStops().values().stream()
@@ -132,14 +140,14 @@ class DrtServiceQualityProbe {
 		this.network = network;
 		this.delimiter = matsimServices.getConfig().global().getDefaultDelimiter();
 		this.spatialResolution = params.getServiceQualityProbeSpatialResolution();
-		this.stopPairs = spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.STOP_TO_STOP
+		this.stopPairs = spatialResolution == DrtServiceQualityProbeParams.SpatialResolution.STOP_TO_STOP
 			? createStopPairs(params.getServiceQualityProbeStopPairInputFiles()) : List.of();
-		if (spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE
+		if (spatialResolution == DrtServiceQualityProbeParams.SpatialResolution.ZONE_TO_ZONE
 			&& !params.getServiceQualityProbeStopPairInputFiles().isBlank()) {
 			throw new IllegalArgumentException("serviceQualityProbeStopPairInputFiles can only be used with STOP_TO_STOP probing");
 		}
 		this.zoneCellSize = params.getServiceQualityProbeZoneCellSize();
-		this.zoneLocations = spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE
+		this.zoneLocations = spatialResolution == DrtServiceQualityProbeParams.SpatialResolution.ZONE_TO_ZONE
 			? createZoneLocations()
 			: List.of();
 		this.travelTime = travelTime;
@@ -149,12 +157,36 @@ class DrtServiceQualityProbe {
 		this.load = loadFromTrip.getLoad(dummyPerson, tripAttributes);
 		this.requestFleetFilter = requestFleetFilter;
 		this.insertionSearchProvider = insertionSearchProvider;
+		this.fleet = fleet;
+		this.vehicleEntryFactory = vehicleEntryFactory;
 		this.probeTimes = parseProbeTimes(params.getServiceQualityProbeTimes());
 		this.outputFile = params.getServiceQualityProbeOutputFile();
 	}
 
 	boolean isEnabled() {
 		return !probeTimes.isEmpty();
+	}
+
+	@Override
+	public void doSimStep(double time) {
+		if (matsimServices.getIterationNumber() != matsimServices.getConfig().controller().getLastIteration()) {
+			return;
+		}
+		while (nextProbeTimeIndex < probeTimes.size() && time >= probeTimes.get(nextProbeTimeIndex)) {
+			double probeTime = probeTimes.get(nextProbeTimeIndex++);
+			probe(probeTime, calculateVehicleEntries(probeTime));
+		}
+	}
+
+	private Map<Id<DvrpVehicle>, VehicleEntry> calculateVehicleEntries(double time) {
+		return fleet.getVehicles().values().stream()
+			.map(vehicle -> vehicleEntryFactory.create(vehicle, time))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toMap(entry -> entry.vehicle.getId(), entry -> entry, (first, second) -> first, TreeMap::new));
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
 	}
 
 	boolean isDue(double now) {
@@ -173,6 +205,11 @@ class DrtServiceQualityProbe {
 		}
 	}
 
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent event) {
+		writeOutput();
+	}
+
 	void writeOutput() {
 		if (outputWriter == null) {
 			return;
@@ -189,7 +226,7 @@ class DrtServiceQualityProbe {
 	private void probe(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
 		try {
 			ensureOutputWriter();
-			if (spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE) {
+			if (spatialResolution == DrtServiceQualityProbeParams.SpatialResolution.ZONE_TO_ZONE) {
 				probeZones(time, vehicleEntries);
 			} else {
 				probeStops(time, vehicleEntries);
@@ -451,7 +488,7 @@ class DrtServiceQualityProbe {
 		}
 		String filename = matsimServices.getControllerIO().getOutputFilename(outputFile);
 		outputWriter = IOUtils.getBufferedWriter(filename);
-		if (spatialResolution == DrtParallelInserterParams.ServiceQualityProbeSpatialResolution.ZONE_TO_ZONE) {
+		if (spatialResolution == DrtServiceQualityProbeParams.SpatialResolution.ZONE_TO_ZONE) {
 			outputWriter.write(String.join(delimiter, "time", "originZone", "originX", "originY", "destinationZone",
 				"destinationX", "destinationY", "waitTime", "directRideTime", "rideTimeWithDetour", "detourFactor"));
 		} else {

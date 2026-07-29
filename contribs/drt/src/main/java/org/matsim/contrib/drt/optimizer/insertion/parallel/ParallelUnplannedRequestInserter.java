@@ -19,7 +19,6 @@ package org.matsim.contrib.drt.optimizer.insertion.parallel;
  * *********************************************************************** */
 
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -102,7 +101,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	private final PartitionActivityLogger activityLogger;
 	private final ConflictResolver conflictResolver;
 	private final PerformanceLogger performanceLogger;
-	private final Optional<DrtServiceQualityProbe> serviceQualityProbe;
 
 	public ParallelUnplannedRequestInserter(MatsimServices matsimServices, RequestsPartitioner requestsPartitioner, VehicleEntryPartitioner vehicleEntryPartitioner, DrtParallelInserterParams drtParallelInserterParams, DrtConfigGroup drtCfg, Fleet fleet,
 											EventsManager eventsManager, Provider<RequestInsertionScheduler> insertionSchedulerProvider,
@@ -111,22 +109,12 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 											PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter,
 											DrtRequestInsertionRetryQueue insertionRetryQueue) {
 		this(matsimServices, requestsPartitioner, vehicleEntryPartitioner, drtParallelInserterParams, drtCfg.getMode(), fleet, eventsManager, insertionSchedulerProvider, vehicleEntryFactory,
-			insertionSearch, drtOfferAcceptor, stopDurationProvider, requestFleetFilter, insertionRetryQueue, Optional.empty());
-	}
-
-	@VisibleForTesting
-	ParallelUnplannedRequestInserter(MatsimServices matsimServices, RequestsPartitioner requestsPartitioner, VehicleEntryPartitioner vehicleEntryPartitioner, DrtParallelInserterParams drtParallelInserterParams, String mode, Fleet fleet, EventsManager eventsManager,
-									 Provider<RequestInsertionScheduler> insertionSchedulerProvider, VehicleEntry.EntryFactory vehicleEntryFactory, Provider<DrtInsertionSearch> insertionSearch,
-									 DrtOfferAcceptor drtOfferAcceptor, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
-		this(matsimServices, requestsPartitioner, vehicleEntryPartitioner, drtParallelInserterParams, mode, fleet, eventsManager,
-			insertionSchedulerProvider, vehicleEntryFactory, insertionSearch, drtOfferAcceptor, stopDurationProvider,
-			requestFleetFilter, insertionRetryQueue, Optional.empty());
+			insertionSearch, drtOfferAcceptor, stopDurationProvider, requestFleetFilter, insertionRetryQueue);
 	}
 
 	ParallelUnplannedRequestInserter(MatsimServices matsimServices, RequestsPartitioner requestsPartitioner, VehicleEntryPartitioner vehicleEntryPartitioner, DrtParallelInserterParams drtParallelInserterParams, String mode, Fleet fleet, EventsManager eventsManager,
-									 Provider<RequestInsertionScheduler> insertionSchedulerProvider, VehicleEntry.EntryFactory vehicleEntryFactory, Provider<DrtInsertionSearch> insertionSearch,
-									 DrtOfferAcceptor drtOfferAcceptor, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter, DrtRequestInsertionRetryQueue insertionRetryQueue,
-									 Optional<DrtServiceQualityProbe> serviceQualityProbe) {
+										 Provider<RequestInsertionScheduler> insertionSchedulerProvider, VehicleEntry.EntryFactory vehicleEntryFactory, Provider<DrtInsertionSearch> insertionSearch,
+										 DrtOfferAcceptor drtOfferAcceptor, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
 		this.collectionPeriod = drtParallelInserterParams.getCollectionPeriod();
 		this.mode = mode;
 		this.fleet = fleet;
@@ -150,7 +138,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		this.activityLogger = new PartitionActivityLogger(matsimServices, mode, drtParallelInserterParams);
 		this.conflictResolver = new ConflictResolver();
 		this.performanceLogger = new PerformanceLogger(matsimServices, mode, drtParallelInserterParams);
-		this.serviceQualityProbe = serviceQualityProbe;
 	}
 
 	private List<RequestInsertWorker> createWorkers(int n) {
@@ -339,9 +326,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 
 		result.rejected().forEach(req -> retryOrReject(req, time, NO_INSERTION_FOUND_CAUSE));
 		LOG.debug("Scheduled requests #{} ", result.scheduledCount());
-		serviceQualityProbe.filter(probe -> probe.isDue(time))
-			.ifPresent(probe -> probe.probeIfDue(time, calculateVehicleEntries(time, this.fleet.getVehicles().values())));
-
 		if (cycleBuilder != null) {
 			cycleBuilder.totalScheduled(result.scheduledCount())
 				.totalRejected(result.rejected().size())
@@ -467,7 +451,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 		activityLogger.writeOutputs();
 		performanceLogger.writeOutputs();
-		serviceQualityProbe.ifPresent(DrtServiceQualityProbe::writeOutput);
 		inserterExecutorService.shutdown();
 		LOG.info("Avg. conflict share {} ", conflictResolver.getAverageConflictShare());
 	}
