@@ -9,7 +9,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class HbefaUtilsTest {
@@ -61,10 +63,31 @@ class HbefaUtilsTest {
 		assertThrows(IllegalArgumentException.class, () -> HbefaUtils.checkAndCorrectHbefaTechnologyAndEmissionConcept(scenario.getVehicles()));
 	}
 
+	@Test
+	void ignoresVehicleTypeWithMissingTechnologyOrEmissionConcept() {
+		VehicleType missingTechnology = createVehicleType(null, "diesel");
+		VehicleType missingEmissionConcept = createVehicleType("average", null);
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario.getVehicles().addVehicleType(missingTechnology);
+		scenario.getVehicles().addVehicleType(missingEmissionConcept);
+
+		assertDoesNotThrow(() -> HbefaUtils.checkAndCorrectHbefaTechnologyAndEmissionConcept(scenario));
+		assertNull(VehicleUtils.getHbefaTechnology(missingTechnology.getEngineInformation()));
+		assertEquals("diesel", VehicleUtils.getHbefaEmissionsConcept(missingTechnology.getEngineInformation()));
+		assertEquals("average", VehicleUtils.getHbefaTechnology(missingEmissionConcept.getEngineInformation()));
+		assertNull(VehicleUtils.getHbefaEmissionsConcept(missingEmissionConcept.getEngineInformation()));
+	}
+
 	private VehicleType createVehicleType(String technology, String emissionConcept) {
-		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("type", VehicleType.class));
-		VehicleUtils.setHbefaTechnology(vehicleType.getEngineInformation(), technology);
-		VehicleUtils.setHbefaEmissionsConcept(vehicleType.getEngineInformation(), emissionConcept);
+		String id = String.valueOf(technology) + '_' + emissionConcept;
+		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(id, VehicleType.class));
+		if (technology != null) {
+			VehicleUtils.setHbefaTechnology(vehicleType.getEngineInformation(), technology);
+		}
+		if (emissionConcept != null) {
+			VehicleUtils.setHbefaEmissionsConcept(vehicleType.getEngineInformation(), emissionConcept);
+		}
 		return vehicleType;
 	}
 }
