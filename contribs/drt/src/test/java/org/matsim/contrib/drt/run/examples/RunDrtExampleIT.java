@@ -146,6 +146,8 @@ public class RunDrtExampleIT {
 		drtCfg.addOrGetDrtOptimizationConstraintsParams()
 			.addOrGetDefaultDrtOptimizationConstraintsSet()
 			.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		DrtParallelInserterParams parallelInserterParams = new DrtParallelInserterParams();
+		drtCfg.addParameterSet(parallelInserterParams);
 		DrtServiceQualityProbeParams params = new DrtServiceQualityProbeParams();
 		params.setWriteServiceQualityProbes(true);
 		params.setServiceQualityProbeTimes("28800");
