@@ -45,7 +45,6 @@ public final class HbefaUtils {
 				log.info("No hbefa technology or emissionConcept present for vehicle type {}. Skipping.",  vehicleType.getId());
 				continue;
 			}
-
 			boolean averageTechnology = AVERAGE.equals(technology);
 			boolean averageEmissionConcept = AVERAGE.equals(emissionConcept);
 
