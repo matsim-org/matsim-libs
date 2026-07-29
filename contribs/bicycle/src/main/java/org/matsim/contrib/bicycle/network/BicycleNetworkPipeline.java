@@ -318,6 +318,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 		// ---- 2. drop isolated components -------------------------------------
 		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.bike));
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car));
 		log.info("After cleanNetwork: {} links", network.getLinks().size());
 
 		// ---- 3. bicycle-aware simplification ---------------------------------
