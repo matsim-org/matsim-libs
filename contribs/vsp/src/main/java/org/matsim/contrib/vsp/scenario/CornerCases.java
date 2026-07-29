@@ -107,6 +107,8 @@ public class CornerCases {
 		scenario.getNetwork().getLinks().values().stream()
 			.filter(link -> link.getAllowedModes().contains(TransportMode.car))
 			.filter(link -> isInShape(link, geometries))
+			// TODO: The "type" attribute is optional. Guard against null and non-string
+			// values here; otherwise an untyped car link aborts the operation.
 			.filter(link -> !((String) link.getAttributes().getAttribute("type")).contains("motorway"))
 			.forEach(link ->
 				link.setFreespeed(link.getFreespeed() * factor)
@@ -213,6 +215,8 @@ public class CornerCases {
 
 			.filter(link -> {
 				String typeObj = (String) link.getAttributes().getAttribute("type");
+				// TODO: Missing link types are currently excluded, although this method
+				// is documented to exclude only motorways and trunks.
 				return typeObj != null
 					&& !typeObj.contains("motorway")
 					&& !typeObj.contains("trunk");
@@ -220,11 +224,14 @@ public class CornerCases {
 
 			.forEach(link -> {
 
+				// TODO: Validate that reductionFactor is finite and in the intended range.
+				// Very small or non-positive values can produce invalid network properties.
 				if (link.getCapacity() > 0) {
 					link.setCapacity(link.getCapacity() * reductionFactor);
 				}
 
 				if (link.getNumberOfLanes() > 2.0) {
+					// TODO: Consider clamping the result to at least one lane.
 					link.setNumberOfLanes(link.getNumberOfLanes() * reductionFactor);
 				}
 			});
@@ -236,6 +243,8 @@ public class CornerCases {
 	}
 
 	// Returns true if either endpoint of the link is in any of the given geometries.
+	// TODO: This misses links that cross a geometry while both endpoints are outside.
+	// Boundary points may also be excluded by the underlying "contains" test.
 	private static boolean isInShape(Link link, List<PreparedGeometry> geometries) {
 	    return ShpGeometryUtils.isCoordInPreparedGeometries(
 	        link.getFromNode().getCoord(),
