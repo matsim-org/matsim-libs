@@ -64,6 +64,49 @@ class Hbefa41ScenarioCheckerTest {
 	}
 
 	@Test
+	void averageEmissionConceptShouldPass() {
+		Scenario scenario = createScenario(
+			VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort,
+			"diesel"
+		);
+
+		assertDoesNotThrow(() -> checker.checkConsistencyBeforeRun(scenario));
+	}
+
+	@Test
+	void invalidEmissionConceptShouldThrowWhenAbortEnabled() {
+		Scenario scenario = createScenario(
+			VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort,
+			"diesel"
+		);
+		VehicleUtils.setHbefaEmissionsConcept(
+			scenario.getVehicles().getVehicleTypes().values().iterator().next().getEngineInformation(),
+			"PC-D-Euro-3"
+		);
+
+		RuntimeException exception = assertThrows(
+			RuntimeException.class,
+			() -> checker.checkConsistencyBeforeRun(scenario)
+		);
+
+		assertTrue(exception.getMessage().contains("vsp-abort"));
+	}
+
+	@Test
+	void invalidEmissionConceptShouldNotThrowWhenWarnEnabled() {
+		Scenario scenario = createScenario(
+			VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn,
+			"diesel"
+		);
+		VehicleUtils.setHbefaEmissionsConcept(
+			scenario.getVehicles().getVehicleTypes().values().iterator().next().getEngineInformation(),
+			"PC-D-Euro-3"
+		);
+
+		assertDoesNotThrow(() -> checker.checkConsistencyBeforeRun(scenario));
+	}
+
+	@Test
 	void mixtureOfValidAndInvalidVehicleTypesShouldThrow() {
 		Scenario scenario = createScenario(
 			VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort
@@ -131,6 +174,10 @@ class Hbefa41ScenarioCheckerTest {
 		VehicleUtils.setHbefaTechnology(
 			vehicleType.getEngineInformation(),
 			technology
+		);
+		VehicleUtils.setHbefaEmissionsConcept(
+			vehicleType.getEngineInformation(),
+			"average"
 		);
 
 		scenario.getVehicles().addVehicleType(vehicleType);
