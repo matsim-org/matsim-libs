@@ -21,7 +21,11 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.PURPOSE;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.SUBPOPULATION;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
+
+class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 	private static final Logger log = LogManager.getLogger(DefaultUnhandledServicesSolution.class);
 	private static final Joiner JOIN = Joiner.on("\t");
 
@@ -70,16 +74,16 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 		for (Carrier carrier : nonCompleteSolvedCarriers) {
 			// get the necessary attributes from a carrier which are not already saved in carrierAttributes (perhaps an existing carrier file was read)
 			if (generator.getCarrierId2carrierAttributes().get(carrier.getId()) == null) {
-				int purpose = carrier.getAttributes().getAttribute("purpose") == null ? 0 : Integer.parseInt(
-					carrier.getAttributes().getAttribute("purpose").toString());
+				int purpose = carrier.getAttributes().getAttribute( PURPOSE ) == null ? 0 : Integer.parseInt(
+					carrier.getAttributes().getAttribute( PURPOSE ).toString());
 				String carrierId = carrier.getId().toString();
-				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType;
+				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment;
 				String modeORvehType;
-				if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("commercialPersonTraffic")) {
-					smallScaleCommercialTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic;
+				if (carrier.getAttributes().getAttribute( SUBPOPULATION ).toString().contains("commercialPersonTraffic")) {
+					smallScaleCommercialTrafficSegment = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.commercialPersonTraffic;
 					modeORvehType = "total";
-				} else if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("goodsTraffic")) {
-					smallScaleCommercialTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
+				} else if (carrier.getAttributes().getAttribute( SUBPOPULATION ).toString().contains("goodsTraffic")) {
+					smallScaleCommercialTrafficSegment = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.goodsTraffic;
 					String[] split = carrierId.split("vehTyp")[1].split("_"); //TODO make this via attributes
 					modeORvehType = "vehTyp" + split[0];
 				} else {
@@ -87,17 +91,18 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					continue;
 				}
 		OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = generator.odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose,
-					modeORvehType, smallScaleCommercialTrafficType);
-				String startZone = carrier.getAttributes().getAttribute("tourStartArea") == null ? "" : carrier.getAttributes().getAttribute(
-					"tourStartArea").toString();
+					modeORvehType, smallScaleCommercialTrafficSegment );
+				String startZone = carrier.getAttributes().getAttribute(
+					TOUR_START_AREA ) == null ? "" : carrier.getAttributes().getAttribute(
+					TOUR_START_AREA ).toString();
 				Object startCategoryAttribute = carrier.getAttributes().getAttribute("startCategory");
-				SmallScaleCommercialTrafficUtils.StructuralAttribute selectedStartCategory = startCategoryAttribute == null
+				SmallScaleCommercialTrafficUtils.ZoneAttribute selectedStartCategory = startCategoryAttribute == null
 					? generator.getSelectedStartCategory(startZone, odMatrixEntry)
-					: SmallScaleCommercialTrafficUtils.StructuralAttribute.fromLabel(startCategoryAttribute.toString())
-					.orElseGet(() -> SmallScaleCommercialTrafficUtils.StructuralAttribute.valueOf(startCategoryAttribute.toString()));
+					: SmallScaleCommercialTrafficUtils.ZoneAttribute.fromLabel(startCategoryAttribute.toString() )
+					                                                .orElseGet(() -> SmallScaleCommercialTrafficUtils.ZoneAttribute.valueOf(startCategoryAttribute.toString() ) );
 				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = new GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes(
 					purpose, startZone, selectedStartCategory, modeORvehType,
-					smallScaleCommercialTrafficType, null, odMatrixEntry);
+						smallScaleCommercialTrafficSegment, null, odMatrixEntry);
 				generator.getCarrierId2carrierAttributes().putIfAbsent(carrier.getId(), carrierAttributes);
 			}
 		}
@@ -275,14 +280,14 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 			int tourDuration = 0;
 			// Samples tour duration until long enough or tries expire
 			while (tourDuration < maxSingleUnhandledServiceDuration * generator.getFactorForTravelBufferCalculation() && tries++ < 200) {
-				t = generator.getTourDistribution().get(carrierAttributes.smallScaleCommercialTrafficType()).sample();
+				t = generator.getTourDistribution().get(carrierAttributes.smallScaleCommercialTrafficSegment() ).sample();
 				tourDuration = t.getVehicleTourDuration(this.rnd);
 			}
 
 			// Sets minimum tour duration if sampling fails
 			if (tourDuration < maxSingleUnhandledServiceDuration * generator.getFactorForTravelBufferCalculation()) {
 				tourDuration = (int) Math.ceil(maxSingleUnhandledServiceDuration);
-				t = generator.getTourDistribution().get(carrierAttributes.smallScaleCommercialTrafficType()).sample();
+				t = generator.getTourDistribution().get(carrierAttributes.smallScaleCommercialTrafficSegment() ).sample();
 			}
 			assert t != null;
 			int vehicleStartTime = t.getVehicleStartTime(this.rnd);

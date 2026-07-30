@@ -65,6 +65,7 @@ public class SwissRailRaptorData {
     final RTransfer[] transfers;
 	final Int2ObjectMap<RChained[]> chainedDepartures; // departure id to other departure ids
     final Map<TransitStopFacility, Integer> stopFacilityIndices;
+    final TransitStopFacility[] stopFacilities; // reverse lookup: index -> facility
     final Map<TransitStopFacility, int[]> routeStopsPerStopFacility;
     final QuadTree<TransitStopFacility> stopsQT;
     final Map<String, Map<String, QuadTree<TransitStopFacility>>> stopFilterAttribute2Value2StopsQT;
@@ -91,6 +92,10 @@ public class SwissRailRaptorData {
         this.transfers = transfers;
 		this.chainedDepartures = chainedDepartures;
         this.stopFacilityIndices = stopFacilityIndices;
+        this.stopFacilities = new TransitStopFacility[countStops];
+        for (Map.Entry<TransitStopFacility, Integer> entry : stopFacilityIndices.entrySet()) {
+            this.stopFacilities[entry.getValue()] = entry.getKey();
+        }
         this.routeStopsPerStopFacility = routeStopsPerStopFacility;
         this.stopsQT = stopsQT;
         this.stopFilterAttribute2Value2StopsQT = new HashMap<>();

@@ -17,6 +17,10 @@ import java.util.StringJoiner;
 @CommandLine.Command(name = "generate-plan-variants-for-freight", description = "Generates variants of plans for a population of freight agents", showDefaultValues = true)
 
 public class CreateDifferentPlansForFreightPopulation implements MATSimAppCommand {
+	// yyyyyy could you please explain when this might be needed?  In general, activity sequences of carrier plans should be
+	// optimized by jsprit, and then not be changed afterwards.  It _might_ be plausible to change the time structure, in the
+	// same sense as by time mutation, but this should then be a within-matsim strategy, and not a prepare class such as this
+	// one here.  kai, jul'2026
 
 	private enum PlanVariantStrategy {changeStartingTimes, activityOrderVariation}
 
