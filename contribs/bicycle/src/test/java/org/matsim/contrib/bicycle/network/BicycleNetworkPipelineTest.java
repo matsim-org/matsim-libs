@@ -28,8 +28,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.bicycle.network.BicycleNetworkPipeline.Params;
 import org.matsim.contrib.bicycle.network.LinkElevationProfile.ElevationSource;
+import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.core.network.NetworkUtils;
+import picocli.CommandLine;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -472,8 +476,47 @@ public class BicycleNetworkPipelineTest {
 
 
 	// =========================================================================
+	// Tier 1 — CLI wiring
+	// =========================================================================
+
+	// The free-speed factor is consumed by the OSM reader, not by process(), so it
+	// never shows up in Params. Pin it at the option level instead -- that is the
+	// only seam it crosses without a real .osm.pbf.
+
+	@Test
+	void freeSpeedFactorMatchesReaderDefault() {
+		double factor = parseAndReadFreeSpeedFactor();
+
+		assertEquals(LinkProperties.DEFAULT_FREESPEED_FACTOR, factor, EPS,
+			"the pipeline default must stay in sync with the OSM reader default");
+	}
+
+	@Test
+	void freeSpeedFactorIsTakenFromTheCommandLine() {
+		double factor = parseAndReadFreeSpeedFactor("--free-speed-factor", "0.7");
+
+		assertEquals(0.7, factor, EPS, "an explicit factor must override the default");
+	}
+
+
+	// =========================================================================
 	// helpers
 	// =========================================================================
+
+	/**
+	 * Parses a minimal valid command line plus the given extra arguments and returns
+	 * the resolved {@code --free-speed-factor}. Parsing only fills the option fields;
+	 * no file is opened, so the input/output paths need not exist.
+	 */
+	private static double parseAndReadFreeSpeedFactor(String... extraArgs) {
+		List<String> args = new ArrayList<>(List.of(
+			"--input", "any.osm.pbf", "--output", "any.xml.gz", "--crs", "EPSG:25832"));
+		args.addAll(List.of(extraArgs));
+
+		CommandLine cli = new CommandLine(new BicycleNetworkPipeline());
+		cli.parseArgs(args.toArray(String[]::new));
+		return cli.getCommandSpec().findOption("--free-speed-factor").getValue();
+	}
 
 	private static Node node(Network net, String id, double x, double y) {
 		Node n = net.getFactory().createNode(Id.createNodeId(id), new Coord(x, y));

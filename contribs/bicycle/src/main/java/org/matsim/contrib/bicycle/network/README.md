@@ -43,6 +43,7 @@ The DEM is optional — drop `--dem` / `--dem-crs` to build the network without 
 | `--crs` (required)      | —       | Output network CRS (e.g. `EPSG:25832`)                                                           |
 | `--mode`                | `bike`  | Network mode for cyclable links                                                                  |
 | `--country`             | `de`    | Country profile for traffic-sign interpretation: `de`, `at`, or `generic` (see Country profiles) |
+| `--free-speed-factor`   | `0.9`   | Free-speed factor for urban links; inherited from the OSM reader (see Free speed)                |
 | `--ele-sample-step`     | `20.0`  | Distance between elevation samples along a link, in m                                            |
 | `--ele-noise-tolerance` | `3.0`   | Douglas-Peucker vertical tolerance, in m                                                         |
 | `--store-original-geometry` | `false` | Keep each link's true OSM shape in the `origgeom` attribute through simplification (use `--no-store-original-geometry` to disable) |
@@ -99,11 +100,12 @@ until you populate it).
 
 Tests live in `contribs/bicycle/src/test/java/.../network`:
 
-- `BicycleNetworkPipelineTest` — 21 cases for `process`, the pure transformation seam (no file I/O, synthetic
+- `BicycleNetworkPipelineTest` — 23 cases, mostly for `process`, the pure transformation seam (no file I/O, synthetic
   `ElevationSource`): two end-to-end runs on a reader-like network (orchestration, gradient signs, `osm:` prefixing,
   `origid` normalization, mode rename), a no-DEM run that attaches no elevation metrics, plus tier-1 cases for the
   individual step methods — simplification merge guards, capacity de-boost, `origid` merging, and reversed-geometry
-  repair
+  repair. Two further cases parse a command line to pin `--free-speed-factor`, which the OSM reader consumes and
+  `process` never sees
 - `BicycleInfraClassifierTest` — 37 table-driven cases covering 22 of the 27 categories and the precedence ordering
 - `BicycleLinkPolicyTest` — 13 cases for the footway/pedestrian whitelist, `bicycle=no`, `access=no/private/customer`
   (incl. the `bicycle=yes/designated` override), and bicycle-oneway handling
@@ -143,6 +145,13 @@ Elevation metrics are computed **after** the simplifier runs — on fewer, longe
 
 The pipeline logs a one-line summary after each step (`After OSM read: …`, `After cleanNetwork: …` etc.) so you can see
 where the link count drops.
+
+## Free speed
+
+`--free-speed-factor` is a MATSim OSM-reader concept, not a bicycle one: it scales only links with an OSM `maxspeed`
+tag below 51 km/h, everything else keeps the speed derived from its highway type. `allowed_speed` keeps the unscaled
+value, so `freespeed < allowed_speed` marks the links it hit. `0.7` matches SUMO-converted scenarios such as Dresden
+v1.0.
 
 ## Elevation parameters
 

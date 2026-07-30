@@ -109,6 +109,13 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	// ---- option defaults: single source for the @Option annotations below and Params.defaults() ----
 
 	private static final String DEFAULT_MODE = TransportMode.bike;
+
+	/**
+	 * Mirrors {@link LinkProperties#DEFAULT_FREESPEED_FACTOR}. Kept as a String literal because
+	 * an annotation default has to be a compile-time constant; {@code freeSpeedFactorMatchesReaderDefault}
+	 * pins the two together.
+	 */
+	private static final String DEFAULT_FREE_SPEED_FACTOR = "0.9";
 	private static final String DEFAULT_ELE_SAMPLE_STEP = "20.0";
 	private static final String DEFAULT_ELE_NOISE_TOLERANCE = "3.0";
 	private static final String DEFAULT_STORE_ORIGINAL_GEOMETRY = "false";
@@ -157,6 +164,15 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			+ "no infrastructure classification and no elevation metrics. "
 			+ "Omit to treat every way as cyclable.")
 	private String bikeAreaMarker;
+
+	@Option(names = "--free-speed-factor",
+		description = "Factor applied to the free speed of urban links to account for traffic lights, "
+			+ "right of way etc. Default: ${DEFAULT-VALUE}. Only links that carry an OSM maxspeed tag "
+			+ "below 51 km/h are affected -- without the tag the speed is derived from the highway type "
+			+ "and the factor does not apply. Lower values (SUMO-converted scenarios such as Dresden "
+			+ "v1.0 use 0.7) yield a slower car network.",
+		defaultValue = DEFAULT_FREE_SPEED_FACTOR)
+	private double freeSpeedFactor;
 
 	@Option(names = "--ele-sample-step",
 		description = "Distance between elevation samples along a link in meters (default: ${DEFAULT-VALUE})",
@@ -257,9 +273,13 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		}
 		var policy = new BicycleLinkPolicy(classifier, tagCopy, areaMarker);
 
+		log.info("Free-speed factor {}: applied to links with a maxspeed tag below 51 km/h; "
+			+ "the allowed_speed attribute keeps the untouched tag value.", freeSpeedFactor);
+
 		// ---- 1. OSM read: stamps node elevations + infra on each new link ----
 		Network network = new OsmBicycleReader.Builder()
 			.setCoordinateTransformation(transformation)
+			.setFreeSpeedFactor(freeSpeedFactor)
 			.setStoreOriginalGeometry(storeOriginalGeometry)
 			.setAfterLinkCreated((link, tags, direction) -> {
 				if (elevationParser != null) {
