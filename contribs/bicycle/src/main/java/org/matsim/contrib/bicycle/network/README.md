@@ -139,7 +139,7 @@ Tests live in `contribs/bicycle/src/test/java/.../network`:
 8. For each surviving link, sample elevations every `--ele-sample-step` meters along its stored `origgeom` course (or
    the straight line between endpoints when none was stored), Douglas-Peucker-filter the profile with tolerance
    `--ele-noise-tolerance`, compute metrics. Skipped entirely when no DEM was supplied.
-9. Write MATSim XML.
+9. Write MATSim XML, with `--crs` recorded on the network as the `coordinateReferenceSystem` attribute.
 
 Elevation metrics are computed **after** the simplifier runs — on fewer, longer links — so we sample only what survives.
 

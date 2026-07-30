@@ -33,6 +33,7 @@ import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.osm.networkReader.OsmBicycleReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import picocli.CommandLine.Command;
@@ -66,7 +67,7 @@ import java.util.function.BiPredicate;
  *   <li>For every surviving link, sample its elevation profile and attach the
  *       five metrics (averageElevation, gradient, maxGradient, elevationGain,
  *       elevationLoss). Skipped when no DEM was provided.</li>
- *   <li>Write the MATSim XML.</li>
+ *   <li>Tag the network with its CRS and write the MATSim XML.</li>
  * </ol>
  *
  * <p>Steps 2-7 are the pure network transformations; they live in {@link #process},
@@ -300,6 +301,9 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			new Params(mode, eleSampleStepM, eleNoiseToleranceM, storeOriginalGeometry));
 
 		// ---- 8. write --------------------------------------------------------
+		// Record the CRS the coordinates are actually in. Without it every consumer has
+		// to be told the projection out of band, and --crs is already required here.
+		ProjectionUtils.putCRS(network, outputCRS);
 		new NetworkWriter(network).write(output.toString());
 
 		return 0;
