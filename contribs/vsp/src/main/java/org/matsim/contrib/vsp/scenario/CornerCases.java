@@ -3,22 +3,25 @@ package org.matsim.contrib.vsp.scenario;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
+import org.locationtech.jts.operation.union.UnaryUnionOp;
 import org.matsim.analysis.personMoney.PersonMoneyEventsAnalysisModule;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
-import playground.vsp.simpleParkingCostHandler.ParkingCostConfigGroup;
-import playground.vsp.simpleParkingCostHandler.ParkingCostModule;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.api.core.v01.network.Link;
+import playground.vsp.simpleParkingCostHandler.ParkingCostConfigGroup;
+import playground.vsp.simpleParkingCostHandler.ParkingCostModule;
 
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 
 /**
 
@@ -40,6 +43,8 @@ import java.util.List;
 public class CornerCases {
 
 	private static final Logger log = LogManager.getLogger(CornerCases.class);
+	public static final String SPEED_REDUCTION_FACTOR_ATTRIBUTE = "cornerCasesSpeedReductionFactor";
+	public static final String CAPACITY_REDUCTION_FACTOR_ATTRIBUTE = "cornerCasesCapacityReductionFactor";
 
 	//teleported non teleported
 	/**
@@ -48,6 +53,7 @@ public class CornerCases {
 	 */
 	public static void modifyBikeSpeed(Scenario scenario, double factor) {
 
+		validatePositiveFactor(factor);
 		Config config = scenario.getConfig();
 
 		// teleported routing
@@ -87,32 +93,37 @@ public class CornerCases {
 				"Modified network bike speed by factor {}",
 				factor
 			);
+
+			return;
 		}
+
+		throw new IllegalArgumentException(
+			"Bike mode is configured neither as a teleported mode nor as a network vehicle type."
+		);
 	}
 
 	/**
-	 * Reduces car speed inside a shape area.
+	 * Reduces car speed inside a shape area, except on links whose type matches
+	 * one of the supplied exclusions.
 	 */
 	public static void reduceCarSpeed(
 		Scenario scenario,
 		Path shp,
-		double factor
+		double factor,
+		Set<String> typesToExclude
 	) {
 
-		List<PreparedGeometry> geometries =
-			ShpGeometryUtils.loadPreparedGeometries(
-				IOUtils.resolveFileOrResource(shp.toString())
-			);
+		validateReductionFactor(factor);
+		PreparedGeometry area = loadPreparedArea(shp);
 
 		scenario.getNetwork().getLinks().values().stream()
 			.filter(link -> link.getAllowedModes().contains(TransportMode.car))
-			.filter(link -> isInShape(link, geometries))
-			// TODO: The "type" attribute is optional. Guard against null and non-string
-			// values here; otherwise an untyped car link aborts the operation.
-			.filter(link -> !((String) link.getAttributes().getAttribute("type")).contains("motorway"))
-			.forEach(link ->
-				link.setFreespeed(link.getFreespeed() * factor)
-			);
+			.filter(link -> isInShape(link, area))
+			.filter(link -> !hasExcludedType(link, typesToExclude))
+			.forEach(link -> {
+				link.setFreespeed(link.getFreespeed() * factor);
+				link.getAttributes().putAttribute(SPEED_REDUCTION_FACTOR_ATTRIBUTE, factor);
+			});
 
 		log.info("Reduced speeds by factor {}", factor);
 	}
@@ -158,16 +169,13 @@ public class CornerCases {
 		double residentialParkingFee
 	) {
 
-		List<PreparedGeometry> geometries =
-			ShpGeometryUtils.loadPreparedGeometries(
-				IOUtils.resolveFileOrResource(shp.toString())
-			);
+		PreparedGeometry area = loadPreparedArea(shp);
 
 		scenario.getNetwork().getLinks().values().stream()
 			.filter(link ->
 				link.getAllowedModes().contains(TransportMode.car)
 			)
-			.filter(link -> isInShape(link, geometries))
+			.filter(link -> isInShape(link, area))
 			.forEach(link -> {
 
 				link.getAttributes().putAttribute(
@@ -195,45 +203,36 @@ public class CornerCases {
 	}
 
 	/**
-	 * Reduce the capacities of car links in the specified area,
-	 * excluding motorways and trunks.
+	 * Reduces capacities of car links in the specified area, except on links whose
+	 * type matches one of the supplied exclusions.
 	 */
 	public static void reduceCarCapacities(
 		Scenario scenario,
-		List<PreparedGeometry> areaFilter,
-		double reductionFactor
+		Path shp,
+		double reductionFactor,
+		Set<String> typesToExclude
 	) {
 
-		if (areaFilter == null || areaFilter.isEmpty()) {
-			throw new IllegalArgumentException("areaFilter must be provided and not empty.");
-		}
+		validateReductionFactor(reductionFactor);
+		PreparedGeometry area = loadPreparedArea(shp);
 
 		scenario.getNetwork().getLinks().values().stream()
 
 			.filter(link -> link.getAllowedModes().contains(TransportMode.car))
-			.filter(link -> isInShape(link, areaFilter))
-
-			.filter(link -> {
-				String typeObj = (String) link.getAttributes().getAttribute("type");
-				// TODO: Missing link types are currently excluded, although this method
-				// is documented to exclude only motorways and trunks.
-				return typeObj != null
-					&& !typeObj.contains("motorway")
-					&& !typeObj.contains("trunk");
-			})
+			.filter(link -> isInShape(link, area))
+			.filter(link -> !hasExcludedType(link, typesToExclude))
 
 			.forEach(link -> {
 
-				// TODO: Validate that reductionFactor is finite and in the intended range.
-				// Very small or non-positive values can produce invalid network properties.
 				if (link.getCapacity() > 0) {
 					link.setCapacity(link.getCapacity() * reductionFactor);
 				}
 
 				if (link.getNumberOfLanes() > 2.0) {
-					// TODO: Consider clamping the result to at least one lane.
-					link.setNumberOfLanes(link.getNumberOfLanes() * reductionFactor);
+					link.setNumberOfLanes(Math.max(1, Math.round(link.getNumberOfLanes() * reductionFactor)));
 				}
+
+				link.getAttributes().putAttribute(CAPACITY_REDUCTION_FACTOR_ATTRIBUTE, reductionFactor);
 			});
 
 		log.info(
@@ -242,18 +241,42 @@ public class CornerCases {
 		);
 	}
 
-	// Returns true if either endpoint of the link is in any of the given geometries.
-	// TODO: This misses links that cross a geometry while both endpoints are outside.
-	// Boundary points may also be excluded by the underlying "contains" test.
-	private static boolean isInShape(Link link, List<PreparedGeometry> geometries) {
-	    return ShpGeometryUtils.isCoordInPreparedGeometries(
-	        link.getFromNode().getCoord(),
-	        geometries
-	    ) ||
-	    ShpGeometryUtils.isCoordInPreparedGeometries(
-	        link.getToNode().getCoord(),
-	        geometries
-	    );
+	private static PreparedGeometry loadPreparedArea(Path shp) {
+		var geometries = ShpGeometryUtils.loadGeometries(
+			IOUtils.resolveFileOrResource(shp.toString())
+		);
+		if (geometries.isEmpty()) {
+			throw new IllegalArgumentException("The shape file does not contain any geometries: " + shp);
+		}
+		return PreparedGeometryFactory.prepare(UnaryUnionOp.union(geometries));
+	}
+
+	private static boolean hasExcludedType(Link link, Set<String> typesToExclude) {
+		if (typesToExclude == null || typesToExclude.isEmpty()) {
+			return false;
+		}
+		Object type = link.getAttributes().getAttribute("type");
+		return type instanceof String typeName
+			&& typesToExclude.contains(typeName);
+	}
+
+	private static void validateReductionFactor(double factor) {
+		if (!Double.isFinite(factor) || factor <= 0 || factor > 1) {
+			throw new IllegalArgumentException("Reduction factor must be finite and in the range (0, 1].");
+		}
+	}
+
+	private static void validatePositiveFactor(double factor) {
+		if (!Double.isFinite(factor) || factor <= 0) {
+			throw new IllegalArgumentException("Factor must be finite and greater than zero.");
+		}
+	}
+
+	// Endpoint-based selection is intentional because MATSim links do not contain
+	// high-resolution road geometries.
+	private static boolean isInShape(Link link, PreparedGeometry area) {
+		return area.contains(MGC.coord2Point(link.getFromNode().getCoord()))
+			|| area.contains(MGC.coord2Point(link.getToNode().getCoord()));
 	}
 
 }
