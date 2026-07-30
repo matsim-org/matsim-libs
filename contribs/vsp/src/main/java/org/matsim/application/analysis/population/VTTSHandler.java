@@ -40,15 +40,19 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypeIdentifier;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
 import java.util.*;
+import java.util.function.Function;
 
 
 /**
@@ -82,6 +86,15 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		List<TripData> trips = new ArrayList<>();
 		double firstActivityEndTime = Double.NaN;
 		String firstActivityType ;
+
+		// The activities handed to the scoring below are reconstructed from the events and carry no attributes.  So we
+		// align them with the main (non-stage) activities of the person's selected plan and copy the plan activities'
+		// attributes over, so that scoring variants which read per-activity parameters off the activity (e.g. a
+		// per-activity typical duration) see the same values as in the simulated run.
+		List<Activity> planActivities;
+		int nextPlanActivityIndex = 1;
+		Activity firstPlanActivity;
+		Activity currentPlanActivity;
 	}
 	private final Map<Id<Person>,SimData> simDataMap = new HashMap<>();
 
@@ -102,12 +115,28 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 
 	private final ScoringParametersForPerson scoringParametersForPerson;
 
+	/** Creates the activity scoring the marginal computations use; null means the stock Charypar-Nagel activity scoring. */
+	private final Function<ScoringParameters, SumScoringFunction.ActivityScoring> activityScoringFactory;
+
 
 	@Inject VTTSHandler( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson ) {
+		this( scenario, scoringParametersForPerson, null );
+	}
+
+	/**
+	 * @param activityScoringFactory creates the activity scoring used for the marginal computations, so that scoring
+	 *   variants other than the stock Charypar-Nagel activity scoring can be used (e.g. one with a
+	 *   {@link org.matsim.core.scoring.functions.TypicalDurationCalculator}); null means the stock scoring.  The
+	 *   activities handed to it carry the attributes of the corresponding selected-plan activities, so implementations
+	 *   must read per-activity parameters off the handed activities themselves (do not pass a person).
+	 */
+	public VTTSHandler( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson,
+			Function<ScoringParameters, SumScoringFunction.ActivityScoring> activityScoringFactory ) {
 		// yyyy it would (presumably) be much better to pull the scoring function from injection.  Rather than self-constructing the
 		// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.
 		// Which we almost surely do not have (e.g. bicycle scoring addition, bus penalty addition, ...).  Also see a similar comment further
 		// down, where the local scoring fct is constructed.  kai, gr, jul'25
+		this.activityScoringFactory = activityScoringFactory;
 
 		if (scenario.getConfig().scoring().getMarginalUtilityOfMoney() == 0.) {
 			log.warn("The marginal utility of money must not be 0.0. The VTTS is computed in Money per Time.");
@@ -140,6 +169,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 
 		incompletedPlanWarning = 0;
 		noCarVTTSWarning = 0;
+		planAlignmentWarnCnt = 0;
 
 		this.personIdsToBeIgnored.clear();
 		this.departedPersonIds.clear();
@@ -198,6 +228,42 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		SimData simData = simDataMap.get( personId );
 		simData.currentActivityStartTime = event.getTime();
 		simData.currentActivityType = event.getActType();
+		simData.currentPlanActivity = planActivity( personId, simData, simData.nextPlanActivityIndex++, event.getActType() );
+	}
+
+	private static int planAlignmentWarnCnt = 0;
+
+	/**
+	 * The main activity of the person's selected plan at the given index, as the source of per-activity scoring
+	 * parameters (attributes) for the activity observed in the events; null (i.e. no attributes, scoring falls back
+	 * to the activity type's config parameters) if the observed activity cannot be aligned with the plan.
+	 */
+	private Activity planActivity( Id<Person> personId, SimData simData, int index, String actType ) {
+		if ( simData.planActivities == null ) {
+			Person person = this.scenario.getPopulation().getPersons().get( personId );
+			if ( person == null || person.getSelectedPlan() == null ) {
+				return null;
+			}
+			simData.planActivities = TripStructureUtils.getActivities( person.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities );
+		}
+		if ( index < simData.planActivities.size() && simData.planActivities.get( index ).getType().equals( actType ) ) {
+			return simData.planActivities.get( index );
+		}
+		if ( planAlignmentWarnCnt < 10 ) {
+			planAlignmentWarnCnt++;
+			log.warn( "Cannot align activity (type={}) of person {} with main activity # {} of the selected plan; "
+					+ "scoring this activity without the plan activity's attributes.", actType, personId, index );
+			if ( planAlignmentWarnCnt == 10 ) {
+				log.warn( Gbl.FUTURE_SUPPRESSED );
+			}
+		}
+		return null;
+	}
+
+	private static void copyPlanAttributes( Activity planActivity, Activity to ) {
+		if ( planActivity != null ) {
+			AttributesUtils.copyAttributesFromTo( planActivity, to );
+		}
 	}
 
 	@Override
@@ -218,6 +284,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 			simData = new SimData();
 			simData.firstActivityEndTime = event.getTime();
 			simData.firstActivityType = event.getActType();
+			simData.firstPlanActivity = planActivity( personId, simData, 0, event.getActType() );
 			simDataMap.put( personId, simData );
 		} else {
 			// this is NOT the first activity ...
@@ -227,6 +294,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 
 			simData.currentActivityType = null;
 			simData.currentActivityStartTime = Double.NaN;
+			simData.currentPlanActivity = null;
 
 			this.departedPersonIds.remove( personId );
 		}
@@ -306,8 +374,11 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 			Person person = this.scenario.getPopulation().getPersons().get( personId );
 			String subpop = PopulationUtils.getSubpopulation( person );
 
-			final MarginalSumScoringFunction marginalSumScoringFunction = new MarginalSumScoringFunction(
-							new ScoringParameters.Builder( scoringConfigGroup, scoringConfigGroup.getScoringParameters( subpop ), scenario.getConfig().scenario() ).build() );
+			final ScoringParameters scoringParameters =
+							new ScoringParameters.Builder( scoringConfigGroup, scoringConfigGroup.getScoringParameters( subpop ), scenario.getConfig().scenario() ).build();
+			final MarginalSumScoringFunction marginalSumScoringFunction = this.activityScoringFactory == null ?
+							new MarginalSumScoringFunction( scoringParameters ) :
+							new MarginalSumScoringFunction( scoringParameters, () -> this.activityScoringFactory.apply( scoringParameters ) );
 			// yyyy it would (presumably) be much better to pull the scoring function from injection.  Rather than self-constructing the
 			// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.
 			// Which we almost surely do not have (e.g. bicycle scoring addition, bus penalty addition, ...).  kai, gr, jul'25
@@ -319,9 +390,11 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 				// ... now handle the first and last OR overnight activity. This is figured out by the scoring function itself (depending on the activity types).
 
 				Activity activityMorning = PopulationUtils.createActivityFromLinkId( simData.firstActivityType, null );
+				copyPlanAttributes( simData.firstPlanActivity, activityMorning );
 				activityMorning.setEndTime( simData.firstActivityEndTime );
 
 				Activity activityEvening = PopulationUtils.createActivityFromLinkId( simData.currentActivityType, null );
+				copyPlanAttributes( simData.currentPlanActivity, activityEvening );
 				activityEvening.setStartTime( simData.currentActivityStartTime );
 
 				scores = marginalSumScoringFunction.getOvernightActivityDelayDisutility( activityMorning, activityEvening, 1.0 );
@@ -333,6 +406,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 				// The activity has an end time indicating a 'normal' activity.
 
 				Activity activity = PopulationUtils.createActivityFromLinkId( simData.currentActivityType, null );
+				copyPlanAttributes( simData.currentPlanActivity, activity );
 				activity.setStartTime( simData.currentActivityStartTime );
 				activity.setEndTime( activityEndTime.seconds() );
 				scores = marginalSumScoringFunction.getNormalActivityDelayDisutility( personId, activity, 1.0 );
