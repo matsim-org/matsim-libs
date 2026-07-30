@@ -337,9 +337,10 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		}
 
 		// ---- 2. drop isolated components -------------------------------------
-		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.bike));
-		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car));
-		log.info("After cleanNetwork: {} links", network.getLinks().size());
+		// It also prunes the links that BicycleLinkPolicy emptied, which shrinks the input of the simplifier below.
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car, TransportMode.bike));
+		log.info("After cleanNetwork: {} nodes, {} links",
+			network.getNodes().size(), network.getLinks().size());
 
 		// ---- 3. bicycle-aware simplification ---------------------------------
 		simplifyUntilStable(network, params.storeOriginalGeometry());
@@ -359,6 +360,9 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		if (params.storeOriginalGeometry()) {
 			logGeometryConsistency(network);
 		}
+
+		// ---- 5c. clean again: the simplifier orphans every node it merges away ----
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car, TransportMode.bike));
 
 		// ---- 6. rename mode if requested (no-op when --mode bike) -----------
 		renameMode(network, TransportMode.bike, params.mode());

@@ -151,6 +151,42 @@ public class BicycleNetworkPipelineTest {
 			"uphill (node 1 -> node 4) should have a positive 2 % gradient");
 		assertEquals(-0.02, gradient(linkFrom(net, "4")), EPS,
 			"downhill (node 4 -> node 1) should have a negative 2 % gradient");
+
+		assertNoOrphanNodes(net);
+	}
+
+
+	// =========================================================================
+	// Orphan nodes from the second simplification pass
+	// =========================================================================
+
+	@Test
+	void processRemovesTheNodesTheSecondSimplificationPassOrphans() {
+		// Node b only becomes mergeable once the service dead-end hanging off it is
+		// gone: with three neighbours the simplifier passes over it in the 1st pass.
+		// So it is the 2nd pass that orphans b -- and that one runs after
+		// ServiceLinkCleaner, i.e. after the last node cleanup the pipeline used to do.
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node c = node(net, "c", 200, 0);
+		Node s = node(net, "s", 100, 100);
+
+		link(net, a, b, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 1L);
+		link(net, b, a, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 2L);
+		link(net, b, c, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 3L);
+		link(net, c, b, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 4L);
+
+		// the blocker: a service dead-end, removed in step 4
+		link(net, b, s, "highway.service", "NONE", "paving_stones", 5L);
+		link(net, s, b, "highway.service", "NONE", "paving_stones", 6L);
+
+		BicycleNetworkPipeline.process(net, null, Params.defaults());
+
+		assertEquals(2, net.getLinks().size(), "a-b-c collapses to one link per direction");
+		assertEquals(Set.of(Id.createNodeId("a"), Id.createNodeId("c")), net.getNodes().keySet(),
+			"the merged-away node b must not survive without links");
+		assertNoOrphanNodes(net);
 	}
 
 
@@ -180,6 +216,9 @@ public class BicycleNetworkPipelineTest {
 			assertNull(l.getAttributes().getAttribute("bicycle"),
 				"the unprefixed bicycle key should be gone");
 		}
+		// the final clean runs on the renamed mode -- it must not empty the network
+		assertFalse(net.getLinks().isEmpty(), "the renamed links must survive the final clean");
+		assertNoOrphanNodes(net);
 	}
 
 
@@ -502,6 +541,18 @@ public class BicycleNetworkPipelineTest {
 	// =========================================================================
 	// helpers
 	// =========================================================================
+
+	/**
+	 * No node may survive without any link attached. MATSim writes those out verbatim,
+	 * and nothing downstream removes them either.
+	 */
+	private static void assertNoOrphanNodes(Network net) {
+		List<Id<Node>> orphans = net.getNodes().values().stream()
+			.filter(n -> n.getInLinks().isEmpty() && n.getOutLinks().isEmpty())
+			.map(Node::getId)
+			.toList();
+		assertTrue(orphans.isEmpty(), "orphan nodes left in the network: " + orphans);
+	}
 
 	/**
 	 * Parses a minimal valid command line plus the given extra arguments and returns
