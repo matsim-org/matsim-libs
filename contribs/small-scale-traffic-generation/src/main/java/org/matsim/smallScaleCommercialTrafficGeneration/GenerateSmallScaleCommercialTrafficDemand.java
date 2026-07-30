@@ -182,7 +182,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private CreationOption carriersFileCreationOption;
 	/// see comments at {@link CreationOption}
 
-	@CommandLine.Option(names = "--smallScaleCommercialTrafficType", description = "Select traffic type. Options: commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic (contains both types)")
+	@CommandLine.Option(names = "--smallScaleCommercialTrafficType", description = "Select traffic segment. Options: commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic (contains both types)")
 	private SmallScaleCommercialTrafficSegment usedSmallScaleCommercialTrafficSegment;
 	// generate only one segment or the other, or both.
 
