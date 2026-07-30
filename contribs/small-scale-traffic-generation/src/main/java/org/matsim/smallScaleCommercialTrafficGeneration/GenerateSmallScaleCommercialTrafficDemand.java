@@ -296,61 +296,130 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private final String[] configArgs;
 
-	// yy if this class is meant to be used directly, the constructors below should be replaced by a builder
+	/**
+	 * Builder for {@link GenerateSmallScaleCommercialTrafficDemand}. Optional dependencies left unset use the default
+	 * implementations used by the command line entry point.
+	 */
+	public static final class Builder {
 
-	GenerateSmallScaleCommercialTrafficDemand() {
-		this(null, null, null, null, null, null);
+		private String[] configArgs;
+		private IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
+		private CommercialTourSpecifications commercialTourSpecifications;
+		private OdMatrixEntryInformationProvider odMatrixEntryInformationProvider;
+		private VehicleTypeSelection vehicleTypeSelection;
+		private UnhandledServicesSolution unhandledServicesSolution;
+
+		/**
+		 * Creates a builder for {@link GenerateSmallScaleCommercialTrafficDemand}.
+		 */
+		public static Builder newInstance() {
+			return new Builder();
+		}
+
+		private Builder() {}
+
+		/**
+		 * Sets additional config arguments passed to MATSim config loading.
+		 */
+		public Builder setConfigArgs(String... configArgs) {
+			this.configArgs = (configArgs == null) ? null : Arrays.copyOf(configArgs, configArgs.length);
+			return this;
+		}
+
+		Builder setIntegrateExistingTrafficToSmallScaleCommercial(
+			IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial) {
+			this.integrateExistingTrafficToSmallScaleCommercial = integrateExistingTrafficToSmallScaleCommercial;
+			return this;
+		}
+
+		/**
+		 * Sets the tour specifications. If unset, {@link DefaultTourSpecificationsByUsingKID2002} is used.
+		 */
+		public Builder setCommercialTourSpecifications(CommercialTourSpecifications commercialTourSpecifications) {
+			this.commercialTourSpecifications = commercialTourSpecifications;
+			return this;
+		}
+
+		/**
+		 * Sets the OD matrix entry information provider.
+		 */
+		public Builder setOdMatrixEntryInformationProvider(OdMatrixEntryInformationProvider odMatrixEntryInformationProvider) {
+			this.odMatrixEntryInformationProvider = odMatrixEntryInformationProvider;
+			return this;
+		}
+
+		/**
+		 * Sets the vehicle type selection used by the default OD matrix entry information provider.
+		 */
+		public Builder setVehicleTypeSelection(VehicleTypeSelection vehicleTypeSelection) {
+			this.vehicleTypeSelection = vehicleTypeSelection;
+			return this;
+		}
+
+		/**
+		 * Sets the solution strategy for unhandled services.
+		 */
+		public Builder setUnhandledServicesSolution(UnhandledServicesSolution unhandledServicesSolution) {
+			this.unhandledServicesSolution = unhandledServicesSolution;
+			return this;
+		}
+
+		/**
+		 * Builds the demand generation command.
+		 */
+		public GenerateSmallScaleCommercialTrafficDemand build() {
+			return new GenerateSmallScaleCommercialTrafficDemand(this);
+		}
 	}
 
-	GenerateSmallScaleCommercialTrafficDemand(String[] configArgs) {
-		this(configArgs, null, null, null, null, null);
+	/**
+	 * Creates the demand generation command with default dependencies.
+	 */
+	public GenerateSmallScaleCommercialTrafficDemand() {
+		this(Builder.newInstance());
 	}
 
-	GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-	                                                 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
-	                                                 VehicleTypeSelection vehicleTypeSelection, UnhandledServicesSolution unhandledServicesSolution) {
-		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, odMatrixEntryInformationProvider, vehicleTypeSelection, unhandledServicesSolution);
-	}
-	GenerateSmallScaleCommercialTrafficDemand(String[] configArgs,
-	                                                 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-	                                                 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
-	                                                 VehicleTypeSelection vehicleTypeSelection, UnhandledServicesSolution unhandledServicesSolution) {
+	private GenerateSmallScaleCommercialTrafficDemand(Builder builder) {
 
-		this.configArgs = (configArgs == null) ? new String[0] : configArgs;
+		this.configArgs = (builder.configArgs == null)
+			? new String[0]
+			: Arrays.copyOf(builder.configArgs, builder.configArgs.length);
 
-		if (integrateExistingTrafficToSmallScaleCommercial == null) {
+		if (builder.integrateExistingTrafficToSmallScaleCommercial == null) {
 			this.integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 			log.info("Using default {} if existing models are integrated!", DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class.getSimpleName());
 		} else {
-			this.integrateExistingTrafficToSmallScaleCommercial = integrateExistingTrafficToSmallScaleCommercial;
-			log.info("Using {} if existing models are integrated!", integrateExistingTrafficToSmallScaleCommercial.getClass().getSimpleName());
+			this.integrateExistingTrafficToSmallScaleCommercial = builder.integrateExistingTrafficToSmallScaleCommercial;
+			log.info("Using {} if existing models are integrated!", builder.integrateExistingTrafficToSmallScaleCommercial.getClass().getSimpleName());
 		}
-		if (commercialTourSpecifications == null) {
+		if (builder.commercialTourSpecifications == null) {
 			this.commercialTourSpecifications = new DefaultTourSpecificationsByUsingKID2002();
 			log.info("Using default {} for tour specifications!", DefaultTourSpecificationsByUsingKID2002.class.getSimpleName());
 		} else {
-			this.commercialTourSpecifications = commercialTourSpecifications;
-			log.info("Using {} for tour specifications!", commercialTourSpecifications.getClass().getSimpleName());
+			this.commercialTourSpecifications = builder.commercialTourSpecifications;
+			log.info("Using {} for tour specifications!", builder.commercialTourSpecifications.getClass().getSimpleName());
 		}
-		if (odMatrixEntryInformationProvider == null) {
-			if (vehicleTypeSelection != null) {
-				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider(vehicleTypeSelection);
-				log.info("Using default {} with provided {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName(), vehicleTypeSelection.getClass().getSimpleName());
+		if (builder.odMatrixEntryInformationProvider == null) {
+			if (builder.vehicleTypeSelection != null) {
+				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider(builder.vehicleTypeSelection);
+				log.info("Using default {} with provided {} for OD matrix entry information!",
+					DefaultOdMatrixEntryInformationProvider.class.getSimpleName(),
+					builder.vehicleTypeSelection.getClass().getSimpleName());
 			}
 			else {
 				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider();
 				log.info("Using default {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName());
 			}
 		} else {
-			this.odMatrixEntryInformationProvider = odMatrixEntryInformationProvider;
-			log.info("Using {} for OD matrix entry information!", odMatrixEntryInformationProvider.getClass().getSimpleName());
+			this.odMatrixEntryInformationProvider = builder.odMatrixEntryInformationProvider;
+			log.info("Using {} for OD matrix entry information!", builder.odMatrixEntryInformationProvider.getClass().getSimpleName());
 		}
-		if (unhandledServicesSolution == null) {
+		if (builder.unhandledServicesSolution == null) {
 			this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this);
 			log.info("Using default {} for unhandled-services-solution!", DefaultUnhandledServicesSolution.class.getSimpleName());
 		} else {
-			this.unhandledServicesSolution = unhandledServicesSolution;
-			log.info("Using {} for unhandled-services-solution!", unhandledServicesSolution.getClass().getSimpleName());
+			this.unhandledServicesSolution = builder.unhandledServicesSolution;
+			log.info("Using {} for unhandled-services-solution!", builder.unhandledServicesSolution.getClass().getSimpleName());
 		}
 	}
 
