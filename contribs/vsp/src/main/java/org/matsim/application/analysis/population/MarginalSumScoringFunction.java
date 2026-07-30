@@ -30,6 +30,8 @@ import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 
+import java.util.function.Supplier;
+
 /**
  * @author ikaddoura
  *
@@ -38,13 +40,23 @@ public final class MarginalSumScoringFunction {
 	private final static Logger log = LogManager.getLogger(MarginalSumScoringFunction.class);
 	private final ScoringParameters params;
 
-	CharyparNagelActivityScoring activityScoringA;
-	CharyparNagelActivityScoring activityScoringB;
+	private final Supplier<SumScoringFunction.ActivityScoring> activityScoringFactory;
 
 	public MarginalSumScoringFunction(ScoringParameters params) {
+		this(params, () -> new CharyparNagelActivityScoring(params));
+	}
+
+	/**
+	 * @param activityScoringFactory creates the activity scoring used for the marginal computations, so that scoring
+	 *   variants other than the stock {@link CharyparNagelActivityScoring} can be used (e.g. one with a
+	 *   {@link org.matsim.core.scoring.functions.TypicalDurationCalculator}).  A fresh instance is obtained for every
+	 *   computation, so stateful implementations are fine.  Implementations must read everything they need off the
+	 *   handed activities themselves; each computation only handles a single activity (or a morning/evening pair),
+	 *   never a person's full daily activity sequence.
+	 */
+	public MarginalSumScoringFunction(ScoringParameters params, Supplier<SumScoringFunction.ActivityScoring> activityScoringFactory) {
 		this.params = params;
-		activityScoringA = new CharyparNagelActivityScoring(params);
-		activityScoringB = new CharyparNagelActivityScoring(params);
+		this.activityScoringFactory = activityScoringFactory;
 	}
 
 	private static int deltaScoreZeroWrnCnt = 0;
@@ -61,11 +73,10 @@ public final class MarginalSumScoringFunction {
 	public final Scores getNormalActivityDelayDisutility( Id<Person> personId, Activity activity, double earlier ) {
 
 		SumScoringFunction sumScoringNormal = new SumScoringFunction() ;
-		sumScoringNormal.addScoringFunction(activityScoringA);
-		// yyyyyy it is not clear to me why this does not add the same scoring fct contribution multiple times.  kai, dec'25
+		sumScoringNormal.addScoringFunction(activityScoringFactory.get());
 
 		SumScoringFunction sumScoringEarly = new SumScoringFunction() ;
-		sumScoringEarly.addScoringFunction(activityScoringB);
+		sumScoringEarly.addScoringFunction(activityScoringFactory.get());
 
 		if (activity.getStartTime().seconds() != Double.NEGATIVE_INFINITY && activity.getEndTime().seconds() != Double.NEGATIVE_INFINITY) {
         	// activity is not the first and not the last activity
@@ -113,10 +124,10 @@ public final class MarginalSumScoringFunction {
 	public final Scores getOvernightActivityDelayDisutility(Activity activityMorning, Activity activityEveningNormal, double earlier) {
 
 		SumScoringFunction normalScoring = new SumScoringFunction() ;
-		normalScoring.addScoringFunction(activityScoringA);
+		normalScoring.addScoringFunction(activityScoringFactory.get());
 
 		SumScoringFunction earlyScoring = new SumScoringFunction() ;
-		earlyScoring.addScoringFunction(activityScoringB);
+		earlyScoring.addScoringFunction(activityScoringFactory.get());
 
 	//	log.info("activityMorning: " + activityMorning.toString());
 	//	log.info("activityEveningNormal: " + activityEveningNormal.toString());
