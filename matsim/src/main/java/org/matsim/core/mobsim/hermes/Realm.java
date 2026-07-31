@@ -62,11 +62,12 @@ class Realm {
     private final EventsManager eventsManager;
     // Current timestamp
     private int secs;
-	private final static int[] eventCountsPerHour = new int[31]; // Covers SIM_STEPS (typically 30 hours)
+	private final int[] eventCountsPerHour;
     Logger log = LogManager.getLogger(Realm.class);
 
-    public Realm(ScenarioImporter scenario, EventsManager eventsManager) {
+    public Realm(ScenarioImporter scenario, EventsManager eventsManager, int endTime) {
         this.si = scenario;
+		this.eventCountsPerHour = new int[(endTime/3600)+1];
         this.links = scenario.hermesLinks;
         // The plus one is necessary because we peek into the next slot on each tick.
         this.delayedLinksByWakeupTime = new ArrayList<>();
