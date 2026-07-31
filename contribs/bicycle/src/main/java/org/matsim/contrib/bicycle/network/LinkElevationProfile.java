@@ -100,7 +100,24 @@ public final class LinkElevationProfile {
 		// The link's course to sample along: its true OSM shape when the geometry
 		// was stored (--store-original-geometry), otherwise just [fromNode, toNode]
 		// -- i.e. the straight chord, exactly as before.
-		List<Coord> shape = shapeOf(link);
+		return compute(link, shapeOf(link), sampleStep, noiseToleranceM, elevation);
+	}
+
+	/**
+	 * Samples along an explicitly supplied course rather than the link's own geometry.
+	 *
+	 * <p>Needed on the SUMO path, where the true shape does not live on the link but on
+	 * the SUMO edge: netconvert folds the nodes removed by {@code geometry.remove} into
+	 * the edge polyline, so the curve is known without ever writing an
+	 * {@code origgeom} attribute.
+	 *
+	 * <p>The link is still used for the endpoint Z pinning, so the metrics stay
+	 * consistent with the per-node elevation regardless of where the shape came from.
+	 *
+	 * @param shape the course to sample along, at least two points, in the network CRS
+	 */
+	public static Metrics compute(Link link, List<Coord> shape, double sampleStep, double noiseToleranceM,
+							   ElevationSource elevation) {
 		double length = shapeLength(shape);
 
 		int numSamples = Math.max(2, (int) Math.ceil(length / sampleStep) + 1);

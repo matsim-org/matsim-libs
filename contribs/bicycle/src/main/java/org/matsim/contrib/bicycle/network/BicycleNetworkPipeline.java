@@ -196,13 +196,15 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 	// ---- attribute keys --------------------------------------------------------
 
-	public static final String LINK_ATTR_BICYCLE_INFRA = "bicycle_infra";
-	public static final String LINK_ATTR_GRADIENT = "gradient";
-	public static final String LINK_ATTR_MAX_GRADIENT = "maxGradient";
-	public static final String LINK_ATTR_ELEVATION_GAIN = "elevationGain";
-	public static final String LINK_ATTR_ELEVATION_LOSS = "elevationLoss";
+	// Defined in BicycleNetworkOps, which both this pipeline and the SUMO one write;
+	// kept here so existing callers of BicycleNetworkPipeline.LINK_ATTR_* keep compiling.
+	public static final String LINK_ATTR_BICYCLE_INFRA = BicycleNetworkOps.LINK_ATTR_BICYCLE_INFRA;
+	public static final String LINK_ATTR_GRADIENT = BicycleNetworkOps.LINK_ATTR_GRADIENT;
+	public static final String LINK_ATTR_MAX_GRADIENT = BicycleNetworkOps.LINK_ATTR_MAX_GRADIENT;
+	public static final String LINK_ATTR_ELEVATION_GAIN = BicycleNetworkOps.LINK_ATTR_ELEVATION_GAIN;
+	public static final String LINK_ATTR_ELEVATION_LOSS = BicycleNetworkOps.LINK_ATTR_ELEVATION_LOSS;
 
-	private static final String OSM_PREFIX = "osm:";
+	private static final String OSM_PREFIX = BicycleNetworkOps.OSM_PREFIX;
 
 	/**
 	 * OSM tag values that {@link OsmBicycleReader} writes verbatim into link
@@ -294,7 +296,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			.read(input.toString());
 		log.info("After OSM read: {} nodes, {} links",
 			network.getNodes().size(), network.getLinks().size());
-		logBicycleInfraDistribution(network, "after OSM read");
+		BicycleNetworkOps.logInfraDistribution(network,"after OSM read");
 
 		// ---- 2-7. pure network transformations (no file I/O) -----------------
 		process(network,
@@ -401,7 +403,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		} else {
 			log.info("No elevation source: skipped elevation metrics.");
 		}
-		logBicycleInfraDistribution(network, "in final network");
+		BicycleNetworkOps.logInfraDistribution(network,"in final network");
 	}
 
 	/**
@@ -447,102 +449,6 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			}
 		}
 		return moved;
-	}
-
-
-	// =========================================================================
-	// Bicycle infra distribution
-	// =========================================================================
-
-	/**
-	 * Counts links by their {@code bicycle_infra} attribute and logs a sorted
-	 * summary table including link counts, total length in km, and percentages.
-	 * Useful as a sanity check during scenario development -- if the {@code NONE}
-	 * count or {@code NEEDS_CLARIFICATION} count jumps unexpectedly between two
-	 * OSM extracts, this is the place where you'd notice.
-	 *
-	 * <p>Categories with zero count are omitted; links whose attribute value
-	 * doesn't match any known {@link BicycleInfraCategory} are tallied
-	 * separately under "(unparseable)".
-	 *
-	 * <p>Sorted by total length, descending. Ties broken by enum declaration
-	 * order.
-	 *
-	 * @param label short context tag included in the log header,
-	 *              e.g. {@code "after OSM read"} or {@code "in final network"}
-	 */
-	private static void logBicycleInfraDistribution(Network network, String label) {
-		EnumMap<BicycleInfraCategory, Integer> counts = new EnumMap<>(BicycleInfraCategory.class);
-		EnumMap<BicycleInfraCategory, Double> lengthsM = new EnumMap<>(BicycleInfraCategory.class);
-		int unparseableCount = 0;
-		double unparseableLengthM = 0;
-		int totalCount = 0;
-		double totalLengthM = 0;
-
-		for (Link link : network.getLinks().values()) {
-			Object raw = link.getAttributes().getAttribute(LINK_ATTR_BICYCLE_INFRA);
-			double len = link.getLength();
-			totalCount++;
-			totalLengthM += len;
-			if (raw == null) {
-				unparseableCount++;
-				unparseableLengthM += len;
-				continue;
-			}
-			try {
-				BicycleInfraCategory cat = BicycleInfraCategory.valueOf(raw.toString());
-				counts.merge(cat, 1, Integer::sum);
-				lengthsM.merge(cat, len, Double::sum);
-			} catch (IllegalArgumentException e) {
-				unparseableCount++;
-				unparseableLengthM += len;
-			}
-		}
-
-		if (totalCount == 0) {
-			log.info("Bicycle infra distribution ({}): no links.", label);
-			return;
-		}
-
-		// Find the longest category name for column alignment.
-		int nameWidth = 0;
-		for (BicycleInfraCategory cat : counts.keySet()) {
-			nameWidth = Math.max(nameWidth, cat.name().length());
-		}
-		if (unparseableCount > 0) {
-			nameWidth = Math.max(nameWidth, "(unparseable)".length());
-		}
-
-		StringBuilder sb = new StringBuilder();
-		sb.append("Bicycle infra distribution (").append(label).append("):\n");
-
-		// Sort by descending total length, ties broken by enum declaration order.
-		List<BicycleInfraCategory> sorted = new ArrayList<>(counts.keySet());
-		sorted.sort((a, b) -> {
-			int byLength = Double.compare(lengthsM.getOrDefault(b, 0.0), lengthsM.getOrDefault(a, 0.0));
-			return byLength != 0 ? byLength : a.compareTo(b);
-		});
-		for (BicycleInfraCategory cat : sorted) {
-			sb.append(formatRow(cat.name(), counts.get(cat), totalCount,
-				lengthsM.getOrDefault(cat, 0.0), totalLengthM, nameWidth));
-		}
-
-		if (unparseableCount > 0) {
-			sb.append(formatRow("(unparseable)", unparseableCount, totalCount,
-				unparseableLengthM, totalLengthM, nameWidth));
-		}
-		sb.append(formatRow("Total", totalCount, totalCount, totalLengthM, totalLengthM, nameWidth));
-
-		log.info(sb.toString());
-	}
-
-	private static String formatRow(String name, int count, int totalCount,
-									double lengthM, double totalLengthM, int nameWidth) {
-		double countPct = 100.0 * count / totalCount;
-		double lengthPct = totalLengthM > 0 ? 100.0 * lengthM / totalLengthM : 0.0;
-		return String.format(Locale.ROOT,
-			"  %-" + nameWidth + "s  %8d (%5.1f%%)  %9.1f km (%5.1f%%)%n",
-			name, count, countPct, lengthM / 1000.0, lengthPct);
 	}
 
 
@@ -593,31 +499,14 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	// Elevation
 	// =========================================================================
 
-	private static synchronized void addNodeElevation(Node node, ElevationDataParser parser) {
-		if (!node.getCoord().hasZ()) {
-			double z = parser.getElevation(node.getCoord());
-			node.setCoord(CoordUtils.createCoord(node.getCoord().getX(), node.getCoord().getY(), z));
-		}
+	private static void addNodeElevation(Node node, ElevationDataParser parser) {
+		BicycleNetworkOps.addNodeElevation(node, parser);
 	}
 
 	private static void attachElevationMetrics(Link link, LinkElevationProfile.ElevationSource elevation,
 											   double sampleStep, double noiseTolerance) {
-		LinkElevationProfile.Metrics m = LinkElevationProfile.compute(
-			link, sampleStep, noiseTolerance, elevation);
-
-		// Elevations in meters — round to 1 decimal (matches DEM resolution).
-		link.getAttributes().putAttribute(BicycleUtils.AVERAGE_ELEVATION, round(m.averageElevation(), 1));
-		link.getAttributes().putAttribute(LINK_ATTR_ELEVATION_GAIN, round(m.elevationGain(), 1));
-		link.getAttributes().putAttribute(LINK_ATTR_ELEVATION_LOSS, round(m.elevationLoss(), 1));
-
-		// Dimensionless ratios — 3 decimals = 0.1% resolution.
-		link.getAttributes().putAttribute(LINK_ATTR_GRADIENT, round(m.gradient(), 3));
-		link.getAttributes().putAttribute(LINK_ATTR_MAX_GRADIENT, round(m.maxGradient(), 3));
-	}
-
-	private static double round(double v, int decimals) {
-		double factor = Math.pow(10, decimals);
-		return Math.round(v * factor) / factor;
+		BicycleNetworkOps.attachElevationMetrics(link,
+			LinkElevationProfile.compute(link, sampleStep, noiseTolerance, elevation));
 	}
 
 
