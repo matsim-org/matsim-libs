@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.network;
 
+import java.util.Set;
+
 /**
  * Bicycle-specific OSM tag keys and values used by {@link BicycleInfraClassifier}
  * and {@link BicycleLinkPolicy}.
@@ -156,4 +158,33 @@ public final class BicycleOsmTags {
 	public static final String SMOOTHNESS = "smoothness";
 	public static final String SERVICE = "service";
 	public static final String SV_PARKING_AISLE = "parking_aisle"; 	/** Aisle inside a parking lot; not a meaningful cycling route. */
+
+	// ------------------------------------------------------------------------
+	// Key set
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Every OSM tag <em>key</em> that {@link BicycleInfraClassifier} or
+	 * {@link BicycleLinkPolicy} consults. Deliberately keys only — the {@code HW_*},
+	 * {@code CW_*} and access constants above are tag <em>values</em> and have no
+	 * business here.
+	 *
+	 * <p>Two consumers read this: {@link OsmWayTags}, which keeps only these keys when
+	 * parsing an OSM file, and the {@code osm.extra-attributes} list handed to
+	 * netconvert. Adding a key to the classifier without adding it here means the
+	 * classifier will never see it.
+	 */
+	public static Set<String> classificationKeys() {
+		return Set.of(
+			HIGHWAY, BICYCLE, FOOT, VEHICLE, MOTOR_VEHICLE, ACCESS, ONEWAY, ONEWAY_BICYCLE,
+			CYCLEWAY, CYCLEWAY_RIGHT, CYCLEWAY_LEFT, CYCLEWAY_BOTH,
+			CYCLEWAY_LANE, CYCLEWAY_RIGHT_LANE, CYCLEWAY_LEFT_LANE, CYCLEWAY_BOTH_LANE,
+			CYCLEWAY_RIGHT_ONEWAY, CYCLEWAY_LEFT_ONEWAY, CYCLEWAY_LANES, BICYCLE_LANES,
+			BUSWAY_RIGHT, BUSWAY_LEFT, BUSWAY_BOTH,
+			SIDEWALK_RIGHT_BICYCLE, SIDEWALK_LEFT_BICYCLE, SIDEWALK_BOTH_BICYCLE,
+			IS_SIDEPATH, SEGREGATED, SEPARATION_LEFT, SEPARATION_RIGHT,
+			TRAFFIC_MODE_LEFT, TRAFFIC_MODE_RIGHT,
+			TRAFFIC_SIGN, BICYCLE_ROAD, MTB_SCALE, SURFACE, SMOOTHNESS, SERVICE
+		);
+	}
 }

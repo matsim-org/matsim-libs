@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Hand-written OSM fixture for OsmWayTagsTest. Covers: whitelisted vs. discarded
+     tags, a way without any relevant tag, tags on nodes and relations that must not
+     leak into the way maps, and elements the parser has to walk past (nd, member,
+     bounds). Derived from the shapes used for the netconvert join experiments. -->
+<osm version="0.6" generator="handmade">
+
+  <bounds minlat="51.3000" minlon="12.3400" maxlat="51.3700" maxlon="12.3700"/>
+
+  <!-- node tags must not end up on any way -->
+  <node id="1" lat="51.3100" lon="12.3500">
+    <tag k="highway" v="traffic_signals"/>
+    <tag k="surface" v="paving_stones"/>
+  </node>
+  <node id="2" lat="51.3100" lon="12.3520"/>
+  <node id="3" lat="51.3100" lon="12.3540"/>
+  <node id="4" lat="51.3100" lon="12.3560"/>
+
+  <!-- a plain residential road with a side-specific cycleway -->
+  <way id="1001">
+    <nd ref="1"/><nd ref="2"/>
+    <tag k="highway" v="residential"/>
+    <tag k="cycleway:right" v="lane"/>
+    <tag k="cycleway:left" v="no"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="name" v="Teststrasse"/>
+    <tag k="maxspeed" v="30"/>
+  </way>
+
+  <!-- everything here is outside the whitelist, so the way is not stored at all -->
+  <way id="2001">
+    <nd ref="2"/><nd ref="3"/>
+    <tag k="waterway" v="ditch"/>
+    <tag k="name" v="Namenlos"/>
+  </way>
+
+  <!-- combined foot and cycleway, the classifier's bread and butter -->
+  <way id="3001">
+    <nd ref="3"/><nd ref="4"/>
+    <tag k="highway" v="path"/>
+    <tag k="bicycle" v="designated"/>
+    <tag k="foot" v="designated"/>
+    <tag k="segregated" v="no"/>
+    <tag k="is_sidepath" v="yes"/>
+    <tag k="traffic_sign" v="DE:240"/>
+  </way>
+
+  <!-- an area marker that is not part of the default whitelist -->
+  <way id="4001">
+    <nd ref="1"/><nd ref="4"/>
+    <tag k="highway" v="cycleway"/>
+    <tag k="city_center" v="yes"/>
+  </way>
+
+  <!-- relation tags must not leak either -->
+  <relation id="9001">
+    <member type="way" ref="1001" role=""/>
+    <member type="way" ref="3001" role=""/>
+    <tag k="highway" v="motorway"/>
+    <tag k="bicycle" v="no"/>
+    <tag k="type" v="route"/>
+  </relation>
+</osm>
