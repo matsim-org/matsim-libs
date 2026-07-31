@@ -18,6 +18,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.network;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -29,16 +33,22 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import static org.matsim.contrib.bicycle.network.BicycleNetworkOps.LINK_ATTR_BICYCLE_INFRA;
 import static org.matsim.contrib.bicycle.network.BicycleNetworkOps.OSM_PREFIX;
@@ -103,6 +113,10 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	private static final int DEM_PROBE_SIZE = 200;
 	private static final double MIN_DEM_COVERAGE = 0.5;
 
+	/** Companion file naming, as used by {@code network-from-sumo}. */
+	private static final String GEOMETRY_SUFFIX = "-linkGeometries.csv";
+	private static final String FEATURE_SUFFIX = "-ft.csv";
+
 	// ---- CLI options -----------------------------------------------------------
 
 	@Option(names = "--network", required = true,
@@ -151,6 +165,12 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	@Option(names = "--ele-noise-tolerance", defaultValue = DEFAULT_ELE_NOISE_TOLERANCE,
 		description = "Douglas-Peucker vertical tolerance for smoothing the profile, in m")
 	private double eleNoiseToleranceM;
+
+	@Option(names = "--compress-geometries", negatable = true, defaultValue = "false",
+		description = "Write the link geometries gzipped. Off by default so the file name matches "
+			+ "what network-from-sumo produces; worth turning on for large networks, where the "
+			+ "uncompressed file runs to a few hundred MB.")
+	private boolean compressGeometries;
 
 	public static void main(String[] args) {
 		new SumoBicycleAttributes().execute(args);
@@ -207,7 +227,101 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		BicycleNetworkOps.logInfraDistribution(network, "in final network");
 
 		new NetworkWriter(network).write(output.toString());
+		writeGeometries(network, sumo, companion(output, GEOMETRY_SUFFIX, compressGeometries));
+		filterFeatures(network, companion(networkFile, FEATURE_SUFFIX, true), companion(output, FEATURE_SUFFIX, true));
 		return 0;
+	}
+
+	// ------------------------------------------------------------------------
+	// Companion files
+	// ------------------------------------------------------------------------
+
+	/**
+	 * The path {@code network-from-sumo} would use for a companion file of that network:
+	 * next to it, with {@code .xml[.gz]} replaced by the suffix.
+	 */
+	static Path companion(Path network, String suffix, boolean gzip) {
+		String name = network.getFileName().toString().replace(".xml", suffix).replace(".gz", "");
+		if (gzip) name = name + ".gz";
+		Path dir = network.getParent();
+		return dir != null ? dir.resolve(name) : Path.of(name);
+	}
+
+	/**
+	 * Writes one polyline per link, in the format {@code network-from-sumo} uses, so the
+	 * annotated network arrives with a companion file under the matching name.
+	 *
+	 * <p>The file {@code network-from-sumo} wrote does cover these links — this command
+	 * only ever removes links, never renames or adds them — but it is named after the
+	 * network before annotation and still carries the rows of everything since dropped.
+	 *
+	 * <p>Generated from the SUMO edges rather than copied, using the same course the
+	 * elevation sampling used, so the two cannot disagree about a link's shape.
+	 */
+	static void writeGeometries(Network network, SumoNetworkHandler sumo, Path path) {
+
+		try (CSVPrinter out = new CSVPrinter(IOUtils.getBufferedWriter(path.toString()),
+			CSVFormat.DEFAULT.withHeader("LinkId", "Geometry"))) {
+
+			for (Link link : network.getLinks().values()) {
+				List<Coord> shape = shapeOf(link, sumo.getEdges().get(link.getId().toString()), sumo);
+				out.printRecord(link.getId().toString(), shape.stream()
+					.map(c -> String.format(Locale.US, "(%f,%f)", c.getX(), c.getY()))
+					.collect(Collectors.joining(",")));
+			}
+			log.info("Wrote geometries of {} link(s) to {}", network.getLinks().size(), path);
+
+		} catch (IOException e) {
+			throw new UncheckedIOException("Could not write link geometries to " + path, e);
+		}
+	}
+
+	/**
+	 * Copies the link features next to the annotated network, dropping the rows of links
+	 * that did not survive.
+	 *
+	 * <p>Not regenerated: the features describe the SUMO network and are
+	 * {@code SumoNetworkFeatureExtractor}'s business. Filtering keeps them in step with
+	 * the network they now sit beside, which is what {@code apply-network-params} needs.
+	 *
+	 * <p>Silently skipped when there is nothing to filter — the features are optional,
+	 * and a scenario that does not calibrate never asks for them.
+	 */
+	private static void filterFeatures(Network network, Path in, Path out) {
+
+		if (!Files.exists(in)) {
+			log.info("No link features at {}; nothing to carry over.", in);
+			return;
+		}
+
+		Set<String> surviving = network.getLinks().keySet().stream()
+			.map(Object::toString).collect(Collectors.toSet());
+
+		try (CSVParser parser = CSVParser.parse(IOUtils.getBufferedReader(in.toString()),
+			CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+
+			String[] header = parser.getHeaderNames().toArray(new String[0]);
+			int kept = 0;
+			int dropped = 0;
+
+			try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(out.toString()),
+				CSVFormat.DEFAULT.withHeader(header))) {
+
+				for (CSVRecord record : parser) {
+					if (surviving.contains(record.get(0))) {
+						printer.printRecord(record);
+						kept++;
+					} else {
+						dropped++;
+					}
+				}
+			}
+			log.info("Carried over {} of {} link feature row(s) to {} ({} dropped with their links).",
+				kept, kept + dropped, out, dropped);
+
+		} catch (IOException e) {
+			throw new UncheckedIOException("Could not filter link features from " + in, e);
+		}
 	}
 
 	/**

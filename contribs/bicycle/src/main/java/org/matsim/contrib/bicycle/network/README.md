@@ -67,6 +67,21 @@ $(sc) prepare bicycle-attributes \
 | `--bike-area-marker` | — | OSM tag (`key` or `key=value`) restricting the full treatment to marked ways |
 | `--ele-sample-step` | `20.0` | distance between elevation samples along a link, in m |
 | `--ele-noise-tolerance` | `3.0` | Douglas-Peucker vertical tolerance, in m |
+| `--compress-geometries` | `false` | gzip the link geometries; worth it on large networks |
+
+It writes the two companion files alongside the network, under the matching name and in the
+same format `network-from-sumo` uses:
+
+| File | |
+|---|---|
+| `<output>-linkGeometries.csv[.gz]` | generated from the SUMO edges, one polyline per surviving link — the same course the elevation sampling used, so the two cannot disagree |
+| `<output>-ft.csv.gz` | the link features from next to `--network`, minus the rows of links that were dropped. Skipped when there are none; `apply-network-params` is what reads them. |
+
+Without these the annotated network would have no companion files of its own: the ones
+`network-from-sumo` produced are named after the network *before* annotation and still list
+everything since dropped. They stay valid by link id — this command only ever removes links,
+never renames or adds them — but nothing that looks for `<network>-linkGeometries.csv` finds
+them.
 
 The network CRS is read from the network's own `coordinateReferenceSystem` attribute, so there is no `--crs`.
 Elevation is sampled along the **SUMO edge polyline**, which holds the geometry nodes `--geometry.remove` folded

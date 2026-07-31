@@ -254,6 +254,59 @@ public class SumoBicycleAttributesTest {
 			"the message should point at the likely cause");
 	}
 
+	// ------------------------------------------------------------------------
+	// Companion files
+	// ------------------------------------------------------------------------
+
+	@Test
+	void derivesCompanionNamesLikeNetworkFromSumo() {
+		Path net = Path.of("in", "dresden.xml.gz");
+
+		// network-from-sumo writes the geometries uncompressed and the features gzipped
+		assertEquals(Path.of("in", "dresden-linkGeometries.csv"),
+			SumoBicycleAttributes.companion(net, "-linkGeometries.csv", false));
+		assertEquals(Path.of("in", "dresden-ft.csv.gz"),
+			SumoBicycleAttributes.companion(net, "-ft.csv", true));
+
+		// an uncompressed network works the same way
+		assertEquals(Path.of("in", "dresden-linkGeometries.csv"),
+			SumoBicycleAttributes.companion(Path.of("in", "dresden.xml"), "-linkGeometries.csv", false));
+	}
+
+	/**
+	 * A ".gz" further up the path must not be mangled — the suffix swap applies to the
+	 * file name, not to the whole path.
+	 */
+	@Test
+	void leavesTheDirectoryAlone() {
+		assertEquals(Path.of("a.gz.dir", "net-linkGeometries.csv"),
+			SumoBicycleAttributes.companion(Path.of("a.gz.dir", "net.xml.gz"), "-linkGeometries.csv", false));
+	}
+
+	@Test
+	void writesGeometriesForExactlyTheSurvivingLinks() throws Exception {
+
+		Fixture f = read();
+		Path out = Files.createTempDirectory("bike").resolve("net.xml.gz");
+
+		SumoBicycleAttributes.process(f.network(), f.sumo(), f.tags(), null,
+			SumoBicycleAttributes.Params.defaults());
+		SumoBicycleAttributes.writeGeometries(f.network(), f.sumo(),
+			SumoBicycleAttributes.companion(out, "-linkGeometries.csv", false));
+
+		Path csv = out.resolveSibling("net-linkGeometries.csv");
+		assertTrue(Files.exists(csv), "the geometry file must sit next to the network");
+
+		List<String> lines = Files.readAllLines(csv);
+		assertEquals("LinkId,Geometry", lines.get(0), "same header as network-from-sumo writes");
+		assertEquals(f.network().getLinks().size(), lines.size() - 1,
+			"one row per surviving link, no rows for the dropped ones");
+
+		// the merged link keeps the geometry node between its two ways
+		String merged = lines.stream().filter(l -> l.startsWith("1001,")).findFirst().orElseThrow();
+		assertEquals(3, merged.split("\\),\\(").length, "two ways joined at one interior point");
+	}
+
 	/** Everything the network holds, in a stable order, for comparing two runs. */
 	private static String describe(Network network) {
 		return network.getLinks().values().stream()
