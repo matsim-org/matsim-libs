@@ -154,10 +154,9 @@ public class SumoBicycleAttributesTest {
 		assertNull(link(f.network(), "3001"), "access=private must be gone");
 		assertNull(link(f.network(), "-3001"));
 
-		// what netconvert already handles is only counted, and there is nothing to count here
-		assertEquals(0, stats.bicycleNoStillRideable);
-		assertEquals(0, stats.accessNoSurvived);
-		assertEquals(0, stats.footwayWithoutPermissionRideable);
+		// the footway in this fixture carries bicycle=yes, so the whitelist keeps it
+		assertEquals(0, stats.droppedFootwayWithoutBike);
+		assertNotNull(link(f.network(), "8001"));
 	}
 
 	@Test

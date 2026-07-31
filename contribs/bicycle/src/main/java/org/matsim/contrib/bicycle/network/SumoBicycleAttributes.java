@@ -394,15 +394,16 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * The two access rules netconvert does not cover. Measured against netconvert 1.27.1:
-	 * it drops {@code access=no} and honours {@code bicycle=no} and the footway
-	 * whitelist, but ignores {@code access=private} and {@code access=customer}
-	 * entirely — those roads stay fully routable — and it keeps parking aisles as
-	 * bike-accessible.
+	 * The access rules, ported from {@link BicycleLinkPolicy}.
 	 *
-	 * <p>The natively covered rules are only counted here, never re-applied: a second
-	 * opinion that always agrees is noise, and one that disagrees would be a bug worth
-	 * seeing in the numbers.
+	 * <p>netconvert covers some of these itself, but not reliably. On a synthetic test it
+	 * dropped {@code access=no} on a residential road and removed a footway without bike
+	 * permission — yet on a real Leipzig extract 68 links with {@code access=no} and no
+	 * bicycle override survived (mostly {@code highway=service}), as did 47 footways and
+	 * 10 links tagged {@code bicycle=no} that kept their bike mode. Applying the rules
+	 * unconditionally is idempotent where netconvert already did the work, and closes the
+	 * gap where it did not — which is why the counters below report what this command
+	 * actually removed rather than second-guessing netconvert.
 	 *
 	 * <p>"Drop" empties the modes and zeroes the capacity; {@code cleanNetwork} prunes
 	 * the link afterwards. On a merged link a single offending way is enough — half a
@@ -422,27 +423,31 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			return;
 		}
 
-		// counters for what netconvert already handled
+		if (ways.stream().anyMatch(SumoBicycleAttributes::isFootwayWithoutBikePermission)) {
+			drop(link);
+			stats.droppedFootwayWithoutBike++;
+			return;
+		}
+
+		// bicycle=no forbids cycling but leaves the road open to everything else, so a
+		// highway=primary survives as a car link rather than disappearing.
 		if (ways.stream().anyMatch(t -> NO.equals(t.get(BICYCLE)))
 			&& link.getAllowedModes().contains(TransportMode.bike)) {
-			stats.bicycleNoStillRideable++;
-		}
-		if (ways.stream().anyMatch(t -> NO.equals(t.get(ACCESS)))) {
-			stats.accessNoSurvived++;
-		}
-		if (ways.stream().anyMatch(SumoBicycleAttributes::isFootwayWithoutBikePermission)
-			&& link.getAllowedModes().contains(TransportMode.bike)) {
-			stats.footwayWithoutPermissionRideable++;
+			Set<String> modes = new HashSet<>(link.getAllowedModes());
+			modes.remove(TransportMode.bike);
+			link.setAllowedModes(modes);
+			stats.bikeModeRemoved++;
 		}
 	}
 
 	/**
-	 * {@code access=private} / {@code =customer} without a bicycle-specific permission.
-	 * {@code access=no} is left out because netconvert already removes those links.
+	 * A restricted general {@code access} without a bicycle-specific permission
+	 * overriding it. Same predicate as {@link BicycleLinkPolicy}.
 	 */
 	private static boolean isAccessRestricted(Map<String, String> tags) {
 		String access = tags.get(ACCESS);
-		return (PRIVATE.equals(access) || CUSTOMER.equals(access)) && !bicycleExplicitlyAllowed(tags);
+		boolean restricted = NO.equals(access) || PRIVATE.equals(access) || CUSTOMER.equals(access);
+		return restricted && !bicycleExplicitlyAllowed(tags);
 	}
 
 	private static boolean isFootwayWithoutBikePermission(Map<String, String> tags) {
@@ -596,11 +601,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 		int droppedParkingAisle;
 		int droppedRestrictedAccess;
-
-		/** Rules netconvert should have handled; a non-zero count means it did not. */
-		int bicycleNoStillRideable;
-		int accessNoSurvived;
-		int footwayWithoutPermissionRideable;
+		int droppedFootwayWithoutBike;
+		int bikeModeRemoved;
 
 		int withElevation;
 		int linksWithTrueShape;
@@ -620,18 +622,17 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 				  merged links, ways disagreed         %d  (recorded as NEEDS_CLARIFICATION)
 				  tag values dropped as ambiguous      %d
 				  dropped: service=parking_aisle       %d
-				  dropped: access=private/customer     %d
-				  bicycle=no but still rideable        %d  (expected 0, netconvert handles this)
-				  access=no but link survived          %d  (expected 0, netconvert handles this)
-				  footway w/o permission, rideable     %d  (expected 0, netconvert handles this)
+				  dropped: access=no/private/customer  %d
+				  dropped: footway without bike        %d
+				  bike mode removed (bicycle=no)       %d
 				  links with elevation metrics         %d
 				    sampled along the true polyline    %d
 				    sampled along the chord            %d
 				  links renamed to the target mode     %d"""
 				.formatted(classified, linksWithoutEdge, linksWithoutWayTags, outsideArea,
 					agreeingMultiWay, mixedMultiWay, tagsDroppedAsAmbiguous,
-					droppedParkingAisle, droppedRestrictedAccess,
-					bicycleNoStillRideable, accessNoSurvived, footwayWithoutPermissionRideable,
+					droppedParkingAisle, droppedRestrictedAccess, droppedFootwayWithoutBike,
+					bikeModeRemoved,
 					withElevation, linksWithTrueShape, linksSampledAlongChord, modesRenamed);
 		}
 	}
