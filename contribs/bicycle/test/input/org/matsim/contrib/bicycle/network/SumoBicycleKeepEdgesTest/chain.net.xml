@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fixture for SumoBicycleKeepEdgesTest, generated with netconvert 1.27.1 from chain.osm
+     WITHOUT geometry.remove, so every edge comes from exactly one OSM way. Five
+     residential segments with identical SUMO attributes; only the bicycle tags differ.
+     See chain.osm for which boundaries are expected where. --><net version="1.20" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+
+    <location netOffset="-733469.28,-5689629.11" convBoundary="0.00,0.00,696.75,31.88" origBoundary="12.350000,51.310000,12.360000,51.310000" projParameter="+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"/>
+
+    <type id="highway.residential" priority="3" numLanes="1" speed="13.89" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" oneway="0"/>
+
+    <edge id="-1001" from="2" to="1" priority="3" type="highway.residential">
+        <lane id="-1001_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="13.89" length="139.50" shape="139.28,7.97 -0.07,1.60">
+            <param key="origId" value="1001"/>
+        </lane>
+        <param key="highway" value="residential"/>
+        <param key="surface" value="asphalt"/>
+    </edge>
+    <edge id="-2001" from="3" to="2" priority="3" type="highway.residential">
+        <lane id="-2001_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="13.89" length="139.50" shape="277.13,14.27 139.28,7.97">
+            <param key="origId" value="2001"/>
+        </lane>
+        <param key="highway" value="residential"/>
+        <param key="surface" value="asphalt"/>
+    </edge>
+    <edge id="-3001" from="4" to="3" priority="3" type="highway.residential">
+        <lane id="-3001_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="13.89" length="139.50" shape="417.98,20.72 280.13,14.41">
+            <param key="origId" value="3001"/>
+        </lane>
+        <param key="cycleway:right" value="lane"/>
+        <param key="highway" value="residential"/>
+        <param key="surface" value="asphalt"/>
+    </edge>
+    <edge id="-4001" from="5" to="4" priority="3" type="highway.residential">
+        <lane id="-4001_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="13.89" length="139.50" shape="557.33,27.10 417.98,20.72">
+            <param key="origId" value="4001"/>
+        </lane>
+        <param key="cycleway:right" value="lane"/>
+        <param key="highway" value="residential"/>
+        <param key="surface" value="asphalt"/>
+    </edge>
+    <edge id="-5001" from="6" to="5" priority="3" type="highway.residential">
+        <lane id="-5001_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="13.89" length="139.50" shape="696.68,33.48 557.33,27.10">
+            <param key="origId" value="5001"/>
+        </lane>
+        <param key="cycleway:right" value="lane"/>
+        <param key="highway" value="residential"/>
+        <param key="surface" value="cobblestone"/>
+    </edge>
+    <edge id="1001" from="1" to="2" priority="3" type="highway.residential">
+        <lane id="1001_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="13.89" length="139.50" shape="0.07,-1.60 139.42,4.77">
+            <param key="origId" value="1001"/>
+        </lane>
+        <param key="highway" value="residential"/>
+        <param key="surface" value="asphalt"/>
+    </edge>
+    <edge id="2001" from="2" to="3" priority="3" type="highway.residential">
+        <lane id="2001_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="13.89" length="139.50" shape="139.42,4.77 277.27,11.07">
+            <param key="origId" value="2001"/>
+        </lane>
+        <param key="highway" value="residential"/>
+        <param key="surface" value="asphalt"/>
+    </edge>
+    <edge id="3001" from="3" to="4" priority="3" type="highway.residential">
+        <lane id="3001_0" index="0" allow="bicycle" speed="13.89" length="139.50" width="1.00" shape="280.37,9.11 418.22,15.42">
+            <param key="origId" value="3001"/>
+        </lane>
+        <lane id="3001_1" index="1" disallow="pedestrian bicycle tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="13.89" length="139.50" shape="280.27,11.21 418.12,17.52">
+            <param key="origId" value="3001"/>
+        </lane>
+        <param key="cycleway:right" value="lane"/>
+        <param key="highway" value="residential"/>
+        <param key="surface" value="asphalt"/>
+    </edge>
+    <edge id="4001" from="4" to="5" priority="3" type="highway.residential">
+        <lane id="4001_0" index="0" allow="bicycle" speed="13.89" length="139.50" width="1.00" shape="418.22,15.42 557.57,21.80">
+            <param key="origId" value="4001"/>
+        </lane>
+        <lane id="4001_1" index="1" disallow="pedestrian bicycle tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="13.89" length="139.50" shape="418.12,17.52 557.47,23.90">
+            <param key="origId" value="4001"/>
+        </lane>
+        <param key="cycleway:right" value="lane"/>
+        <param key="highway" value="residential"/>
+        <param key="surface" value="asphalt"/>
+    </edge>
+    <edge id="5001" from="5" to="6" priority="3" type="highway.residential">
+        <lane id="5001_0" index="0" allow="bicycle" speed="13.89" length="139.50" width="1.00" shape="557.57,21.80 696.92,28.18">
+            <param key="origId" value="5001"/>
+        </lane>
+        <lane id="5001_1" index="1" disallow="pedestrian bicycle tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="13.89" length="139.50" shape="557.47,23.90 696.82,30.28">
+            <param key="origId" value="5001"/>
+        </lane>
+        <param key="cycleway:right" value="lane"/>
+        <param key="highway" value="residential"/>
+        <param key="surface" value="cobblestone"/>
+    </edge>
+
+    <junction id="1" type="priority" x="0.00" y="0.00" incLanes="-1001_0" intLanes="" shape="0.00,0.00 -0.15,3.20 0.00,0.00">
+        <request index="0" response="0" foes="0"/>
+    </junction>
+    <junction id="2" type="priority" x="139.35" y="6.37" incLanes="-2001_0 1001_0" intLanes="" shape="139.20,9.57 139.50,3.17 139.20,9.57">
+        <request index="0" response="00" foes="00"/>
+        <request index="1" response="00" foes="00"/>
+    </junction>
+    <junction id="3" type="priority" x="278.70" y="12.74" incLanes="-3001_0 2001_0" intLanes="" shape="280.05,16.01 280.39,8.61 279.25,8.82 278.49,9.27 278.01,9.43 277.35,9.47 277.06,15.87">
+        <request index="0" response="000" foes="000"/>
+        <request index="1" response="000" foes="000"/>
+        <request index="2" response="000" foes="000"/>
+    </junction>
+    <junction id="4" type="priority" x="418.05" y="19.12" incLanes="-4001_0 3001_0 3001_1" intLanes="" shape="417.90,22.32 418.24,14.92 417.90,22.32">
+        <request index="0" response="000" foes="000"/>
+        <request index="1" response="000" foes="000"/>
+        <request index="2" response="000" foes="000"/>
+    </junction>
+    <junction id="5" type="priority" x="557.40" y="25.50" incLanes="-5001_0 4001_0 4001_1" intLanes="" shape="557.25,28.70 557.59,21.30 557.25,28.70">
+        <request index="0" response="000" foes="000"/>
+        <request index="1" response="000" foes="000"/>
+        <request index="2" response="000" foes="000"/>
+    </junction>
+    <junction id="6" type="priority" x="696.75" y="31.88" incLanes="5001_0 5001_1" intLanes="" shape="696.75,31.88 696.94,27.68 696.75,31.88">
+        <request index="0" response="0" foes="0"/>
+    </junction>
+
+    <connection from="-1001" to="1001" fromLane="0" toLane="0" dir="t" state="M"/>
+    <connection from="-2001" to="-1001" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from="-3001" to="-2001" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from="-4001" to="-3001" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from="-5001" to="-4001" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from="1001" to="2001" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from="2001" to="3001" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from="2001" to="3001" fromLane="0" toLane="1" dir="s" state="M"/>
+    <connection from="3001" to="4001" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from="3001" to="4001" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from="4001" to="5001" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from="4001" to="5001" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from="5001" to="-5001" fromLane="1" toLane="0" dir="t" state="M"/>
+
+</net>

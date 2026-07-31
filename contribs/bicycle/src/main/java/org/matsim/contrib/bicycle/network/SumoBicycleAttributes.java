@@ -289,7 +289,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * ways; empty when the edge has no {@code origId} (a merged-in foreign network) or
 	 * none of its ways carried a tag we keep.
 	 */
-	private static List<Map<String, String>> wayTagsOf(SumoNetworkHandler.Edge edge, OsmWayTags wayTags) {
+	static List<Map<String, String>> wayTagsOf(SumoNetworkHandler.Edge edge, OsmWayTags wayTags) {
 
 		String origId = edge.getOrigId();
 		if (origId == null || origId.isBlank()) return List.of();
