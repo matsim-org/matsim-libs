@@ -99,6 +99,10 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	/** OSM highway values that are paved by default, used by the surface fallback. */
 	private static final List<String> ASPHALT_BY_DEFAULT = List.of("primary", "secondary");
 
+	/** How many network nodes to probe the DEM with, and how many of them must have data. */
+	private static final int DEM_PROBE_SIZE = 200;
+	private static final double MIN_DEM_COVERAGE = 0.5;
+
 	// ---- CLI options -----------------------------------------------------------
 
 	@Option(names = "--network", required = true,
@@ -187,6 +191,10 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 						+ "reprojected onto it. Re-run network-from-sumo with --target-crs, or drop --dem.");
 			}
 			elevationParser = new ElevationDataParser(dem.toString(), networkCRS, demCRS);
+			// Fail now rather than after half an hour of work: a DEM in the wrong CRS
+			// reads as no-data everywhere, which downstream is indistinguishable from
+			// perfectly flat terrain.
+			elevationParser.requireCoverageOf(probeCoords(network), MIN_DEM_COVERAGE);
 		} else {
 			log.info("No --dem given: no elevation metrics will be attached.");
 		}
@@ -475,7 +483,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 										Params params, Stats stats) {
 
 		for (Node node : network.getNodes().values()) {
-			BicycleNetworkOps.addNodeElevation(node, elevation);
+			if (!BicycleNetworkOps.addNodeElevation(node, elevation)) stats.nodesWithoutElevation++;
 		}
 
 		for (Link link : network.getLinks().values()) {
@@ -488,9 +496,10 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			if (shape.size() > 2) stats.linksWithTrueShape++;
 			else stats.linksSampledAlongChord++;
 
-			BicycleNetworkOps.attachElevationMetrics(link,
+			boolean written = BicycleNetworkOps.attachElevationMetrics(link,
 				LinkElevationProfile.compute(link, shape, params.eleSampleStep(), params.eleNoiseTolerance(), elevation));
-			stats.withElevation++;
+			if (written) stats.withElevation++;
+			else stats.linksWithoutElevationData++;
 		}
 	}
 
@@ -550,6 +559,23 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		}
 	}
 
+	/**
+	 * A spread-out sample of node coordinates to probe the DEM with. Every n-th node
+	 * rather than the first n, so the probe covers the whole area instead of whichever
+	 * corner the iteration happens to start in.
+	 */
+	private static List<Coord> probeCoords(Network network) {
+		List<? extends Node> nodes = List.copyOf(network.getNodes().values());
+		if (nodes.isEmpty()) return List.of();
+
+		int stride = Math.max(1, nodes.size() / DEM_PROBE_SIZE);
+		List<Coord> probe = new ArrayList<>();
+		for (int i = 0; i < nodes.size(); i += stride) {
+			probe.add(nodes.get(i).getCoord());
+		}
+		return probe;
+	}
+
 	/** Renames the bike mode on every link; a no-op when both names are equal. */
 	private static int renameMode(Network network, String from, String to) {
 		if (from.equals(to)) return 0;
@@ -607,6 +633,9 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		int withElevation;
 		int linksWithTrueShape;
 		int linksSampledAlongChord;
+		/** Links the DEM had no data for; they keep no elevation attributes at all. */
+		int linksWithoutElevationData;
+		int nodesWithoutElevation;
 
 		int modesRenamed;
 		boolean laneRestrictionsMissing;
@@ -628,12 +657,15 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 				  links with elevation metrics         %d
 				    sampled along the true polyline    %d
 				    sampled along the chord            %d
+				  links the DEM had no data for        %d
+				  nodes left without a Z               %d
 				  links renamed to the target mode     %d"""
 				.formatted(classified, linksWithoutEdge, linksWithoutWayTags, outsideArea,
 					agreeingMultiWay, mixedMultiWay, tagsDroppedAsAmbiguous,
 					droppedParkingAisle, droppedRestrictedAccess, droppedFootwayWithoutBike,
 					bikeModeRemoved,
-					withElevation, linksWithTrueShape, linksSampledAlongChord, modesRenamed);
+					withElevation, linksWithTrueShape, linksSampledAlongChord,
+					linksWithoutElevationData, nodesWithoutElevation, modesRenamed);
 		}
 	}
 }

@@ -20,12 +20,17 @@ package org.matsim.contrib.bicycle.network;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.Coord;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
@@ -139,6 +144,66 @@ public class ElevationDataParserTest {
 	@Test
 	void uBahnhofBoddinstrasse() {
 		assertElevation(13.423210, 52.480278, 52.3);
+	}
+
+
+	// =========================================================================
+	// Missing data
+	// =========================================================================
+
+	/**
+	 * A point outside the raster used to raise {@link ArrayIndexOutOfBoundsException}
+	 * from deep inside the raster access, with an index in the billions and nothing
+	 * saying which coordinate caused it.
+	 */
+	@Test
+	void returnsNaNOutsideTheRaster() {
+		// Munich - inside the projection but far outside a Berlin cutout
+		assertTrue(Double.isNaN(parser.getElevation(11.5820, 48.1351)),
+			"a coordinate outside the DEM must yield NaN, not an exception and not a number");
+	}
+
+	/**
+	 * The failure this guards against: a DEM read with the wrong CRS answers every query
+	 * with its no-data value, which is a perfectly ordinary double. Averaged into a
+	 * gradient it produces a network that looks flat rather than one that looks broken.
+	 */
+	@Test
+	void reportsMissingDataInsteadOfTheNoDataValue() {
+		long before = parser.getMissingCount();
+
+		double value = parser.getElevation(11.5820, 48.1351);
+
+		assertTrue(Double.isNaN(value));
+		assertEquals(before + 1, parser.getMissingCount(), "missing samples are counted");
+	}
+
+	@Test
+	void coverageCheckPassesForPointsInsideTheDem() {
+		assertDoesNotThrow(() -> parser.requireCoverageOf(
+			List.of(new Coord(13.40993, 52.52191), new Coord(13.379491, 52.487610)), 1.0));
+	}
+
+	@Test
+	void coverageCheckFailsWithADiagnosisForPointsOutside() {
+
+		IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+			() -> parser.requireCoverageOf(
+				List.of(new Coord(11.5820, 48.1351), new Coord(11.6, 48.2)), 0.5));
+
+		// the message has to carry enough to act on: what was wrong, and what to compare
+		assertTrue(e.getMessage().contains("--dem-crs"), "should name the likely cause");
+		assertTrue(e.getMessage().contains(DEM_CRS), "should name the DEM CRS in use");
+		assertTrue(e.getMessage().contains("DEM extent"), "should name the extent to compare against");
+	}
+
+	@Test
+	void coverageCheckAcceptsPartialCoverageWithinTheRatio() {
+		// one inside, one outside - fine at 50 %, not at 100 %
+		List<Coord> mixed = List.of(new Coord(13.40993, 52.52191), new Coord(11.5820, 48.1351));
+
+		assertDoesNotThrow(() -> parser.requireCoverageOf(mixed, 0.5));
+		assertThrows(IllegalArgumentException.class, () -> parser.requireCoverageOf(mixed, 1.0));
 	}
 
 

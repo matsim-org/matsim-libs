@@ -92,19 +92,34 @@ public final class BicycleNetworkOps {
 
 	/**
 	 * Same, against any elevation source — lets tests drive it without a DEM file.
+	 *
+	 * @return whether a Z was stamped; {@code false} when the DEM has no data there
 	 */
-	static synchronized void addNodeElevation(Node node, LinkElevationProfile.ElevationSource elevation) {
-		if (!node.getCoord().hasZ()) {
-			double z = elevation.at(node.getCoord());
-			node.setCoord(CoordUtils.createCoord(node.getCoord().getX(), node.getCoord().getY(), z));
-		}
+	static synchronized boolean addNodeElevation(Node node, LinkElevationProfile.ElevationSource elevation) {
+		if (node.getCoord().hasZ()) return false;
+
+		double z = elevation.at(node.getCoord());
+		if (Double.isNaN(z)) return false;
+
+		node.setCoord(CoordUtils.createCoord(node.getCoord().getX(), node.getCoord().getY(), z));
+		return true;
 	}
 
 	/**
 	 * Writes the five elevation metrics onto the link, rounded to the resolution the
 	 * numbers actually carry.
+	 *
+	 * <p>Writes nothing when the profile came out as NaN, which happens when the DEM has
+	 * no data along that link. An absent attribute says "not known" — a rounded NaN, or
+	 * worse a raw no-data value, would read as a measurement.
+	 *
+	 * @return whether the metrics were written
 	 */
-	static void attachElevationMetrics(Link link, LinkElevationProfile.Metrics m) {
+	static boolean attachElevationMetrics(Link link, LinkElevationProfile.Metrics m) {
+
+		if (Double.isNaN(m.averageElevation()) || Double.isNaN(m.gradient())) {
+			return false;
+		}
 
 		// Elevations in meters — round to 1 decimal (matches DEM resolution).
 		link.getAttributes().putAttribute(BicycleUtils.AVERAGE_ELEVATION, round(m.averageElevation(), 1));
@@ -114,6 +129,7 @@ public final class BicycleNetworkOps {
 		// Dimensionless ratios — 3 decimals = 0.1% resolution.
 		link.getAttributes().putAttribute(LINK_ATTR_GRADIENT, round(m.gradient(), 3));
 		link.getAttributes().putAttribute(LINK_ATTR_MAX_GRADIENT, round(m.maxGradient(), 3));
+		return true;
 	}
 
 	static double round(double v, int decimals) {
