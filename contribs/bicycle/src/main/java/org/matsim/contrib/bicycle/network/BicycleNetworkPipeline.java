@@ -31,6 +31,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.osm.networkReader.OsmBicycleReader;
+import org.matsim.contrib.osm.networkReader.SupersonicOsmNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.scenario.ProjectionUtils;
@@ -287,7 +288,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 					addNodeElevation(link.getFromNode(), elevationParser);
 					addNodeElevation(link.getToNode(), elevationParser);
 				}
-				policy.apply(link, tags, direction);
+				policy.apply(link, tags, toBicycleDirection(direction));
 			})
 			.build()
 			.read(input.toString());
@@ -307,6 +308,19 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		new NetworkWriter(network).write(output.toString());
 
 		return 0;
+	}
+
+	/**
+	 * Maps the reader's own direction enum onto the package's reader-neutral
+	 * {@link Direction}. This is the only place the two meet: the classifier and
+	 * the policy speak {@link Direction} so they can also run on links that never
+	 * saw this reader (e.g. a SUMO-converted network, where the direction comes
+	 * from the sign of the link id).
+	 */
+	private static Direction toBicycleDirection(SupersonicOsmNetworkReader.Direction direction) {
+		return direction == SupersonicOsmNetworkReader.Direction.Reverse
+			? Direction.REVERSE
+			: Direction.FORWARD;
 	}
 
 	/**

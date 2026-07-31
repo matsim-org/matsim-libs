@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.osm.networkReader.SupersonicOsmNetworkReader.Direction;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -68,8 +67,8 @@ public class BicycleLinkPolicyTest {
 		Map<String, String> tags = tags("highway", "cycleway");
 
 		// Neither direction may throw, and both keep bike (no oneway restriction).
-		assertDoesNotThrow(() -> policy.apply(forward, tags, Direction.Forward));
-		assertDoesNotThrow(() -> policy.apply(reverse, tags, Direction.Reverse));
+		assertDoesNotThrow(() -> policy.apply(forward, tags, Direction.FORWARD));
+		assertDoesNotThrow(() -> policy.apply(reverse, tags, Direction.REVERSE));
 		assertTrue(forward.getAllowedModes().contains(TransportMode.bike));
 		assertTrue(reverse.getAllowedModes().contains(TransportMode.bike));
 
@@ -89,9 +88,9 @@ public class BicycleLinkPolicyTest {
 		Link reverse = link("1r");
 		Link bikeReverse = link("1_bike-reverse");
 
-		policy.apply(forward, tags, Direction.Forward);
-		policy.apply(reverse, tags, Direction.Reverse);
-		policy.apply(bikeReverse, tags, Direction.Reverse);
+		policy.apply(forward, tags, Direction.FORWARD);
+		policy.apply(reverse, tags, Direction.REVERSE);
+		policy.apply(bikeReverse, tags, Direction.REVERSE);
 
 		assertTrue(forward.getAllowedModes().contains(TransportMode.bike), "forward keeps bike");
 		assertFalse(reverse.getAllowedModes().contains(TransportMode.bike), "'r' reverse loses bike");
@@ -107,7 +106,7 @@ public class BicycleLinkPolicyTest {
 		Map<String, String> tags = tags("highway", "cycleway", "oneway", "yes");
 		Link reverse = link("1r");
 
-		policy.apply(reverse, tags, Direction.Reverse);
+		policy.apply(reverse, tags, Direction.REVERSE);
 
 		assertFalse(reverse.getAllowedModes().contains(TransportMode.bike));
 	}
@@ -118,7 +117,7 @@ public class BicycleLinkPolicyTest {
 		Map<String, String> tags = tags("highway", "cycleway", "oneway", "yes", "oneway:bicycle", "no");
 		Link reverse = link("1r");
 
-		policy.apply(reverse, tags, Direction.Reverse);
+		policy.apply(reverse, tags, Direction.REVERSE);
 
 		assertTrue(reverse.getAllowedModes().contains(TransportMode.bike));
 	}
@@ -130,14 +129,14 @@ public class BicycleLinkPolicyTest {
 	@Test
 	void footwayWithoutBicycle_isDropped() {
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "footway"), Direction.Forward);
+		policy.apply(link, tags("highway", "footway"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().isEmpty());
 	}
 
 	@Test
 	void footwayWithBicycleYes_keepsBike() {
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "footway", "bicycle", "yes"), Direction.Forward);
+		policy.apply(link, tags("highway", "footway", "bicycle", "yes"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
 	}
 
@@ -145,7 +144,7 @@ public class BicycleLinkPolicyTest {
 	void bicycleNo_onBikeOnlyLink_leavesNoModes() {
 		// A cycleway is bike-only, so dropping bike leaves it empty -> removed downstream.
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "cycleway", "bicycle", "no"), Direction.Forward);
+		policy.apply(link, tags("highway", "cycleway", "bicycle", "no"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().isEmpty());
 	}
 
@@ -155,7 +154,7 @@ public class BicycleLinkPolicyTest {
 		// open to cars. The link must survive as a car-only link, not be dropped.
 		Link link = link("1f");
 		link.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
-		policy.apply(link, tags("highway", "primary", "bicycle", "no"), Direction.Forward);
+		policy.apply(link, tags("highway", "primary", "bicycle", "no"), Direction.FORWARD);
 		assertFalse(link.getAllowedModes().contains(TransportMode.bike), "bike is dropped");
 		assertTrue(link.getAllowedModes().contains(TransportMode.car), "car is kept");
 	}
@@ -167,7 +166,7 @@ public class BicycleLinkPolicyTest {
 	@Test
 	void serviceParkingAisle_isDropped() {
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "service", "service", "parking_aisle"), Direction.Forward);
+		policy.apply(link, tags("highway", "service", "service", "parking_aisle"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().isEmpty());
 	}
 
@@ -175,7 +174,7 @@ public class BicycleLinkPolicyTest {
 	void serviceDriveway_isNotDroppedByParkingRule() {
 		// Only parking_aisle is dropped; other service subtypes stay cyclable.
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "service", "service", "driveway"), Direction.Forward);
+		policy.apply(link, tags("highway", "service", "service", "driveway"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
 	}
 
@@ -186,21 +185,21 @@ public class BicycleLinkPolicyTest {
 	@Test
 	void accessNo_isDropped() {
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "service", "access", "no"), Direction.Forward);
+		policy.apply(link, tags("highway", "service", "access", "no"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().isEmpty());
 	}
 
 	@Test
 	void accessPrivate_isDropped() {
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "service", "access", "private"), Direction.Forward);
+		policy.apply(link, tags("highway", "service", "access", "private"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().isEmpty());
 	}
 
 	@Test
 	void accessCustomer_isDropped() {
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "service", "access", "customer"), Direction.Forward);
+		policy.apply(link, tags("highway", "service", "access", "customer"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().isEmpty());
 	}
 
@@ -208,7 +207,7 @@ public class BicycleLinkPolicyTest {
 	void accessYes_keepsBike() {
 		// access=yes (and other unrestricted values) must not drop the link.
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "service", "access", "yes"), Direction.Forward);
+		policy.apply(link, tags("highway", "service", "access", "yes"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
 	}
 
@@ -216,14 +215,14 @@ public class BicycleLinkPolicyTest {
 	void accessPrivateButBicycleYes_keepsBike() {
 		// OSM: the bicycle-specific tag overrides the general access restriction.
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "service", "access", "private", "bicycle", "yes"), Direction.Forward);
+		policy.apply(link, tags("highway", "service", "access", "private", "bicycle", "yes"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
 	}
 
 	@Test
 	void accessNoButBicycleDesignated_keepsBike() {
 		Link link = link("1f");
-		policy.apply(link, tags("highway", "service", "access", "no", "bicycle", "designated"), Direction.Forward);
+		policy.apply(link, tags("highway", "service", "access", "no", "bicycle", "designated"), Direction.FORWARD);
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
 	}
 
@@ -256,7 +255,7 @@ public class BicycleLinkPolicyTest {
 	@Test
 	void markedWay_getsFullBicycleTreatment() {
 		Link link = link("1f");   // {bike}
-		GATED.apply(link, tags("highway", "cycleway", "city_center", "yes"), Direction.Forward);
+		GATED.apply(link, tags("highway", "cycleway", "city_center", "yes"), Direction.FORWARD);
 
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike), "marked way keeps bike");
 		assertNotNull(link.getAttributes().getAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA),
@@ -273,7 +272,7 @@ public class BicycleLinkPolicyTest {
 		link.getAttributes().putAttribute("cycleway", "lane");
 		link.getAttributes().putAttribute("bicycle", "yes");
 
-		GATED.apply(link, tags("highway", "secondary"), Direction.Forward);   // no marker tag
+		GATED.apply(link, tags("highway", "secondary"), Direction.FORWARD);   // no marker tag
 
 		assertEquals(Set.of(TransportMode.car, TransportMode.bike), link.getAllowedModes(),
 			"outside the area the reader's modes are kept -- bike stays open");
@@ -290,7 +289,7 @@ public class BicycleLinkPolicyTest {
 		// A cycleway outside the area keeps its bike mode (still rideable) but gets
 		// no bicycle_infra -- and therefore no elevation metrics later.
 		Link link = link("1f");   // {bike}
-		GATED.apply(link, tags("highway", "cycleway"), Direction.Forward);
+		GATED.apply(link, tags("highway", "cycleway"), Direction.FORWARD);
 		assertEquals(Set.of(TransportMode.bike), link.getAllowedModes());
 		assertNull(link.getAttributes().getAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA));
 	}

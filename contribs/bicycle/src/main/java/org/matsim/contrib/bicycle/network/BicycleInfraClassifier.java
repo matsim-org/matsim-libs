@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.network;
 
-import org.matsim.contrib.osm.networkReader.SupersonicOsmNetworkReader.Direction;
-
 import java.util.Map;
 
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
@@ -220,7 +218,7 @@ public final class BicycleInfraClassifier {
 	// -------------------------------------------------------------------------
 
 	private BicycleInfraCategory getSharedBusLaneTypeForDirection(Map<String, String> tags, Direction dir) {
-		boolean forward = dir == Direction.Forward;
+		boolean forward = dir == Direction.FORWARD;
 
 		String highway = getValueByKey(tags, HIGHWAY);
 		String cycleway = getValueByKey(tags, CYCLEWAY);
@@ -268,7 +266,7 @@ public final class BicycleInfraClassifier {
 	// -------------------------------------------------------------------------
 
 	private static boolean isSharedMotorVehicleLaneForDirection(Map<String, String> tags, Direction dir) {
-		boolean forward = dir == Direction.Forward;
+		boolean forward = dir == Direction.FORWARD;
 
 		String highway = getValueByKey(tags, HIGHWAY);
 		String cycleway = getValueByKey(tags, CYCLEWAY);
@@ -322,7 +320,7 @@ public final class BicycleInfraClassifier {
 
 	private static boolean hasCyclewayOnHighwayAdvisoryForDirection(Map<String, String> tags, Direction dir) {
 		if (!isCyclewayOnHighwayAdvisoryOrExclusiveBase(tags)) return false;
-		boolean forward = dir == Direction.Forward;
+		boolean forward = dir == Direction.FORWARD;
 
 		boolean rightBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_RIGHT_ONEWAY));
 		boolean leftBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_LEFT_ONEWAY));
@@ -338,7 +336,7 @@ public final class BicycleInfraClassifier {
 
 	private static boolean hasCyclewayOnHighwayExclusiveForDirection(Map<String, String> tags, Direction dir) {
 		if (!isCyclewayOnHighwayAdvisoryOrExclusiveBase(tags)) return false;
-		boolean forward = dir == Direction.Forward;
+		boolean forward = dir == Direction.FORWARD;
 
 		boolean rightBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_RIGHT_ONEWAY));
 		boolean leftBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_LEFT_ONEWAY));
@@ -353,7 +351,7 @@ public final class BicycleInfraClassifier {
 	}
 
 	private static boolean hasCyclewayOnHighwayAdvisoryOrExclusiveForDirection(Map<String, String> tags, Direction dir) {
-		boolean forward = dir == Direction.Forward;
+		boolean forward = dir == Direction.FORWARD;
 
 		boolean rightBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_RIGHT_ONEWAY));
 		boolean leftBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_LEFT_ONEWAY));
@@ -373,7 +371,7 @@ public final class BicycleInfraClassifier {
 	// -------------------------------------------------------------------------
 
 	private BicycleInfraCategory getCyclewayTypeForDirection(Map<String, String> tags, Direction dir) {
-		boolean forward = dir == Direction.Forward;
+		boolean forward = dir == Direction.FORWARD;
 
 		String highway = getValueByKey(tags, HIGHWAY);
 		String cycleway = getValueByKey(tags, CYCLEWAY);
@@ -473,7 +471,7 @@ public final class BicycleInfraClassifier {
 	// -------------------------------------------------------------------------
 
 	private BicycleInfraCategory getFootwayBicycleYesTypeForDirection(Map<String, String> tags, Direction dir) {
-		boolean forward = dir == Direction.Forward;
+		boolean forward = dir == Direction.FORWARD;
 		String highway = getValueByKey(tags, HIGHWAY);
 
 		// Case 1: sidewalk:*:bicycle=yes (directional)

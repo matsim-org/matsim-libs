@@ -20,7 +20,6 @@ package org.matsim.contrib.bicycle.network;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.osm.networkReader.SupersonicOsmNetworkReader.Direction;
 
 import java.util.HashSet;
 import java.util.Map;
