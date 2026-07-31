@@ -54,4 +54,46 @@ public class SumoNetworkConverterTest {
 		Assertions.assertEquals("highway_type", header.get(1));
 
 	}
+
+	/**
+	 * The bike-carrying highway types have no entry in
+	 * {@code LinkProperties.createLinkProperties()}, so without the extra puts in
+	 * {@link SumoNetworkConverter#convert(Network)} their edges are dropped with
+	 * "Skipping unknown link type" and the cycling infrastructure on them is lost.
+	 */
+	@Test
+	void convertsBikeCarryingHighwayTypes() throws Exception {
+
+		Path input = Files.createTempFile("sumo-bike-types", ".xml");
+		Path output = Files.createTempFile("matsim-bike-types", ".xml");
+
+		Files.copy(Resources.getResource("bike-types.net.xml").openStream(), input, StandardCopyOption.REPLACE_EXISTING);
+
+		SumoNetworkConverter.newInstance(List.of(input), output, "EPSG:25832", "EPSG:25832").call();
+
+		Network network = NetworkUtils.readNetwork(output.toString());
+
+		for (String type : List.of("footway", "pedestrian", "track", "cycleway")) {
+			List<? extends Link> links = network.getLinks().values().stream()
+				.filter(l -> ("highway." + type).equals(l.getAttributes().getAttribute(NetworkUtils.TYPE)))
+				.toList();
+
+			Assertions.assertFalse(links.isEmpty(), "No link of type highway." + type + " survived the conversion");
+
+			for (Link link : links) {
+				Assertions.assertTrue(link.getAllowedModes().contains(TransportMode.bike),
+					"Link " + link.getId() + " (highway." + type + ") must allow bike");
+				Assertions.assertTrue(link.getCapacity() > 0,
+					"Link " + link.getId() + " (highway." + type + ") must have a positive capacity");
+				Assertions.assertTrue(link.getFreespeed() > 0,
+					"Link " + link.getId() + " (highway." + type + ") must have a positive freespeed");
+			}
+		}
+
+		// the residential control keeps car access, so the added properties did not leak into it
+		Assertions.assertTrue(network.getLinks().values().stream()
+				.filter(l -> "highway.residential".equals(l.getAttributes().getAttribute(NetworkUtils.TYPE)))
+				.allMatch(l -> l.getAllowedModes().contains(TransportMode.car)),
+			"Residential control links must still allow car");
+	}
 }

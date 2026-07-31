@@ -266,6 +266,15 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		// This is for bikes
 		linkProperties.put(OsmTags.CYCLEWAY, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 300, false));
 
+		// These carry bike traffic but have no LinkProperties of their own, so their edges are
+		// dropped ("Skipping unknown link type") — which removes cycling infrastructure, not just
+		// detail: in a Leipzig test extract they were 10 % of the network length, and 97 % of the
+		// footways among them carried bicycle=yes. Values follow the neighbours above: a track is
+		// about a service road, a footway or pedestrian area about a path.
+		linkProperties.put(OsmTags.TRACK, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 450, false));
+		linkProperties.put(OsmTags.FOOTWAY, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 300, false));
+		linkProperties.put(OsmTags.PEDESTRIAN, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 300, false));
+
 		for (SumoNetworkHandler.Edge edge : sumoHandler.edges.values()) {
 
 			// skip railways and unknowns
