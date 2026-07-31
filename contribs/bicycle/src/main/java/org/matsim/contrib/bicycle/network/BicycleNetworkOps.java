@@ -50,6 +50,18 @@ public final class BicycleNetworkOps {
 	/** Cycling infrastructure category, holding a {@link BicycleInfraCategory} name. */
 	public static final String LINK_ATTR_BICYCLE_INFRA = "bicycle_infra";
 
+	/**
+	 * Set to {@code true} on links whose OSM ways were merged into one edge but classify
+	 * differently, so their {@code bicycle_infra} had to fall back to
+	 * {@link BicycleInfraCategory#NEEDS_CLARIFICATION}.
+	 *
+	 * <p>Without this the category alone would conflate two unrelated things: tags that
+	 * are genuinely ambiguous (what the classifier means by it) and an artifact of
+	 * netconvert's {@code geometry.remove}. Only the second one can be made to go away,
+	 * by keeping the category boundary — so it needs to be countable on its own.
+	 */
+	public static final String LINK_ATTR_BICYCLE_INFRA_MIXED = "bicycle_infra_mixed";
+
 	/** Signed end-to-end gradient as a ratio, e.g. {@code +0.03} for 3 % uphill. */
 	public static final String LINK_ATTR_GRADIENT = "gradient";
 
@@ -75,8 +87,15 @@ public final class BicycleNetworkOps {
 	 * the OSM reader calls this from its worker threads.
 	 */
 	static synchronized void addNodeElevation(Node node, ElevationDataParser parser) {
+		addNodeElevation(node, parser::getElevation);
+	}
+
+	/**
+	 * Same, against any elevation source — lets tests drive it without a DEM file.
+	 */
+	static synchronized void addNodeElevation(Node node, LinkElevationProfile.ElevationSource elevation) {
 		if (!node.getCoord().hasZ()) {
-			double z = parser.getElevation(node.getCoord());
+			double z = elevation.at(node.getCoord());
 			node.setCoord(CoordUtils.createCoord(node.getCoord().getX(), node.getCoord().getY(), z));
 		}
 	}

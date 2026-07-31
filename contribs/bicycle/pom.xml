@@ -26,6 +26,12 @@
           <scope>compile</scope>
       </dependency>
       <dependency>
+          <groupId>org.matsim.contrib</groupId>
+          <artifactId>sumo</artifactId>
+          <version>${project.parent.version}</version>
+          <scope>compile</scope>
+      </dependency>
+      <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-api</artifactId>
       </dependency>
