@@ -19,6 +19,7 @@
 package org.matsim.contrib.bicycle.network;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -27,6 +28,7 @@ import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.sumo.SumoNetworkConverter;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,8 +51,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class SumoBicycleAttributesTest {
 
-	private static final Path DIR =
-		Path.of("test/input/org/matsim/contrib/bicycle/network/SumoBicycleAttributesTest");
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	/** Constant-slope elevation along x, so gradients are predictable without a DEM. */
 	private static final LinkElevationProfile.ElevationSource SLOPE = c -> c.getX() * 0.01;
@@ -58,15 +60,19 @@ public class SumoBicycleAttributesTest {
 	private record Fixture(Network network, SumoNetworkHandler sumo, OsmWayTags tags) {
 	}
 
-	private static Fixture read() throws Exception {
+	private Fixture read() throws Exception {
 		Network network = NetworkUtils.createNetwork();
 		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(
-				List.of(DIR.resolve("ring.net.xml")), Files.createTempFile("net", ".xml"),
+				List.of(input("ring.net.xml")), Path.of(utils.getOutputDirectory(), "net.xml"),
 				"EPSG:25832", "EPSG:25832")
 			// the ring contains a footway; without this the converter would skip it
 			.setKeepCyclableMinorWays(true);
 		SumoNetworkHandler sumo = converter.convert(network);
-		return new Fixture(network, sumo, OsmWayTags.read(DIR.resolve("ring.osm")));
+		return new Fixture(network, sumo, OsmWayTags.read(input("ring.osm")));
+	}
+
+	private Path input(String file) {
+		return Path.of(utils.getClassInputDirectory(), file);
 	}
 
 	private static SumoBicycleAttributes.Stats run(Fixture f,
@@ -294,14 +300,14 @@ public class SumoBicycleAttributesTest {
 
 		Fixture f = read();
 		// uncompressed output network, so the derived companion is plain CSV and readable below
-		Path out = Files.createTempDirectory("bike").resolve("net.xml");
+		Path out = Path.of(utils.getOutputDirectory(), "annotated.xml");
 
 		SumoBicycleAttributes.process(f.network(), f.sumo(), f.tags(), null,
 			SumoBicycleAttributes.Params.defaults());
 		SumoBicycleAttributes.writeGeometries(f.network(), f.sumo(),
 			SumoBicycleAttributes.companion(out, "-linkGeometries.csv"));
 
-		Path csv = out.resolveSibling("net-linkGeometries.csv");
+		Path csv = out.resolveSibling("annotated-linkGeometries.csv");
 		assertTrue(Files.exists(csv), "the geometry file must sit next to the network");
 
 		List<String> lines = Files.readAllLines(csv);

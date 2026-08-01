@@ -19,12 +19,13 @@
 package org.matsim.contrib.bicycle.network;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.sumo.SumoNetworkConverter;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -43,16 +44,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class SumoBicycleKeepEdgesTest {
 
-	private static final Path DIR =
-		Path.of("test/input/org/matsim/contrib/bicycle/network/SumoBicycleKeepEdgesTest");
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private static SumoBicycleKeepEdges.Result run() throws Exception {
+	private SumoBicycleKeepEdges.Result run() throws Exception {
 		Network network = NetworkUtils.createNetwork();
 		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(
-			List.of(DIR.resolve("chain.net.xml")), Files.createTempFile("net", ".xml"),
+			List.of(input("chain.net.xml")), Path.of(utils.getOutputDirectory(), "net.xml"),
 			"EPSG:25832", "EPSG:25832");
 		SumoNetworkHandler sumo = converter.convert(network);
-		return SumoBicycleKeepEdges.collect(network, sumo, OsmWayTags.read(DIR.resolve("chain.osm")), "de");
+		return SumoBicycleKeepEdges.collect(network, sumo, OsmWayTags.read(input("chain.osm")), "de");
+	}
+
+	private Path input(String file) {
+		return Path.of(utils.getClassInputDirectory(), file);
 	}
 
 	@Test

@@ -18,9 +18,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.network;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,8 +70,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class ElevationDataParserTest {
 
 	private static final String DEM_PROPERTY = "dem.path";
-	private static final String DEFAULT_DEM_PATH =
-		"test/input/org/matsim/contrib/bicycle/network/sonny-dtm-50m-berlin-cutout.tif";
+	private static final String DEM_FILE = "sonny-dtm-50m-berlin-cutout.tif";
 
 	private static final String DEM_CRS = "EPSG:32632";       // UTM 32N
 	private static final String SAMPLE_CRS = "EPSG:4326";      // WGS84
@@ -79,15 +80,21 @@ public class ElevationDataParserTest {
 	 */
 	private static final double ELEVATION_TOLERANCE_M = 2.0;
 
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+	/** Loaded once and cached across the test methods; the GeoTIFF read is the expensive part. */
 	private static ElevationDataParser parser;
 
 
-	@BeforeAll
-	static void setUp() {
+	@BeforeEach
+	void setUp() {
+		if (parser != null) return;
+
 		// Default: small Berlin cutout in the test inputs of this package.
 		// Can be overridden via -Ddem.path=<path-to.tif> for testing against a
 		// different DTM (e.g. the full Germany version).
-		String demPath = System.getProperty(DEM_PROPERTY, DEFAULT_DEM_PATH);
+		String demPath = System.getProperty(DEM_PROPERTY, utils.getPackageInputDirectory() + DEM_FILE);
 
 		Path dem = Paths.get(demPath);
 		assumeTrue(Files.exists(dem),

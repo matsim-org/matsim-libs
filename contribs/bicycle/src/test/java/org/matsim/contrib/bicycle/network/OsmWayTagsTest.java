@@ -19,6 +19,8 @@
 package org.matsim.contrib.bicycle.network;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -34,13 +36,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class OsmWayTagsTest {
 
-	private static final Path WAYS =
-		Path.of("test/input/org/matsim/contrib/bicycle/network/OsmWayTagsTest/ways.osm");
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+	private Path ways() {
+		return Path.of(utils.getClassInputDirectory(), "ways.osm");
+	}
 
 	@Test
 	void readsWhitelistedTagsPerWay() {
 
-		OsmWayTags tags = OsmWayTags.read(WAYS);
+		OsmWayTags tags = OsmWayTags.read(ways());
 
 		Map<String, String> road = tags.get(1001);
 		assertEquals("residential", road.get(BicycleOsmTags.HIGHWAY));
@@ -60,7 +66,7 @@ public class OsmWayTagsTest {
 	@Test
 	void discardsTagsOutsideTheWhitelist() {
 
-		OsmWayTags tags = OsmWayTags.read(WAYS);
+		OsmWayTags tags = OsmWayTags.read(ways());
 
 		// name and maxspeed are on way 1001 in the fixture but not classification-relevant
 		assertNull(tags.get(1001).get("name"));
@@ -74,7 +80,7 @@ public class OsmWayTagsTest {
 	@Test
 	void ignoresTagsOnNodesAndRelations() {
 
-		OsmWayTags tags = OsmWayTags.read(WAYS);
+		OsmWayTags tags = OsmWayTags.read(ways());
 
 		// the fixture's relation carries highway=motorway + bicycle=no, its nodes carry
 		// highway=traffic_signals - none of that may show up as a way
@@ -91,10 +97,10 @@ public class OsmWayTagsTest {
 
 		// an area marker is not part of the default whitelist, so callers have to add it
 		assertFalse(BicycleOsmTags.classificationKeys().contains("city_center"));
-		assertNull(OsmWayTags.read(WAYS).get(4001).get("city_center"));
+		assertNull(OsmWayTags.read(ways()).get(4001).get("city_center"));
 
 		Set<String> keys = Set.of(BicycleOsmTags.HIGHWAY, "city_center");
-		OsmWayTags tags = OsmWayTags.read(WAYS, keys);
+		OsmWayTags tags = OsmWayTags.read(ways(), keys);
 
 		assertEquals("yes", tags.get(4001).get("city_center"));
 		assertEquals("cycleway", tags.get(4001).get(BicycleOsmTags.HIGHWAY));
@@ -108,6 +114,6 @@ public class OsmWayTagsTest {
 	void countsOnlyStoredWays() {
 
 		// 1001, 3001 and 4001 carry a whitelisted tag; 2001 does not
-		assertEquals(3, OsmWayTags.read(WAYS).size());
+		assertEquals(3, OsmWayTags.read(ways()).size());
 	}
 }
