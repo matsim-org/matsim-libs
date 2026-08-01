@@ -36,6 +36,7 @@ import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.io.IOException;
@@ -105,9 +106,6 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(SumoBicycleAttributes.class);
 
-	private static final String DEFAULT_ELE_SAMPLE_STEP = "20.0";
-	private static final String DEFAULT_ELE_NOISE_TOLERANCE = "3.0";
-
 	/** OSM highway values that are paved by default, used by the surface fallback. */
 	private static final List<String> ASPHALT_BY_DEFAULT = List.of("primary", "secondary");
 
@@ -138,35 +136,11 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	@Option(names = "--output", required = true, description = "Path to the output network")
 	private Path output;
 
-	@Option(names = "--dem",
-		description = "DEM GeoTIFF. Optional: without it no elevation metrics are attached. "
-			+ "Requires --dem-crs when given.")
-	private Path dem;
+	@Mixin
+	private final BicycleBuildOptions buildOptions = new BicycleBuildOptions();
 
-	@Option(names = "--dem-crs", description = "CRS of the DEM, e.g. EPSG:32632. Required only with --dem.")
-	private String demCRS;
-
-	@Option(names = "--country", defaultValue = "de",
-		description = "Country profile for traffic-sign interpretation: de, at, or generic.")
-	private String country;
-
-	@Option(names = "--mode", defaultValue = TransportMode.bike,
-		description = "Network mode name for cyclable links. Renamed from 'bike' at the very end.")
-	private String mode;
-
-	@Option(names = "--bike-area-marker",
-		description = "OSM tag selecting the ways that get the full bicycle treatment, as 'key' or "
-			+ "'key=value'. Ways without it keep their modes but get no bicycle attributes, no "
-			+ "classification and no elevation. Omit to treat every way as cyclable.")
-	private String bikeAreaMarker;
-
-	@Option(names = "--ele-sample-step", defaultValue = DEFAULT_ELE_SAMPLE_STEP,
-		description = "Distance between elevation samples along a link, in m")
-	private double eleSampleStepM;
-
-	@Option(names = "--ele-noise-tolerance", defaultValue = DEFAULT_ELE_NOISE_TOLERANCE,
-		description = "Douglas-Peucker vertical tolerance for smoothing the profile, in m")
-	private double eleNoiseToleranceM;
+	@Mixin
+	private final DemOptions demOptions = new DemOptions();
 
 	public static void main(String[] args) {
 		new SumoBicycleAttributes().execute(args);
@@ -175,9 +149,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		if (dem != null && demCRS == null) {
-			throw new IllegalArgumentException("--dem-crs is required when --dem is given.");
-		}
+		demOptions.validate();
 
 		Network network = NetworkUtils.readNetwork(networkFile.toString());
 		log.info("Read network: {} nodes, {} links", network.getNodes().size(), network.getLinks().size());
@@ -185,8 +157,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		SumoNetworkHandler sumo = SumoNetworkHandler.read(sumoNetworkFile.toFile());
 		log.info("Read SUMO network: {} edges", sumo.getEdges().size());
 
-		BicycleLinkPolicy.AreaMarker areaMarker =
-			bikeAreaMarker != null ? BicycleLinkPolicy.AreaMarker.parse(bikeAreaMarker) : null;
+		BicycleLinkPolicy.AreaMarker areaMarker = buildOptions.areaMarkerOrNull();
 
 		// The marker key is not part of the classification keys, so it has to be added
 		// explicitly or OsmWayTags would drop it and every way would look unmarked.
@@ -200,13 +171,13 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 		String networkCRS = org.matsim.core.scenario.ProjectionUtils.getCRS(network);
 		ElevationDataParser elevationParser = null;
-		if (dem != null) {
+		if (demOptions.isSet()) {
 			if (networkCRS == null) {
 				throw new IllegalArgumentException(
 					"The network carries no coordinateReferenceSystem attribute, so the DEM cannot be "
 						+ "reprojected onto it. Re-run network-from-sumo with --target-crs, or drop --dem.");
 			}
-			elevationParser = new ElevationDataParser(dem.toString(), networkCRS, demCRS);
+			elevationParser = demOptions.createParser(networkCRS);
 			// Fail now rather than after half an hour of work: a DEM in the wrong CRS
 			// reads as no-data everywhere, which downstream is indistinguishable from
 			// perfectly flat terrain.
@@ -215,7 +186,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			log.info("No --dem given: no elevation metrics will be attached.");
 		}
 
-		Params params = new Params(country, mode, areaMarker, eleSampleStepM, eleNoiseToleranceM);
+		Params params = new Params(buildOptions.country(), buildOptions.mode(), areaMarker,
+			buildOptions.eleSampleStep(), buildOptions.eleNoiseTolerance());
 		Stats stats = process(network, sumo, wayTags,
 			elevationParser != null ? elevationParser::getElevation : null, params);
 
@@ -698,8 +670,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 		static Params defaults() {
 			return new Params("de", TransportMode.bike, null,
-				Double.parseDouble(DEFAULT_ELE_SAMPLE_STEP),
-				Double.parseDouble(DEFAULT_ELE_NOISE_TOLERANCE));
+				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_SAMPLE_STEP),
+				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE));
 		}
 	}
 

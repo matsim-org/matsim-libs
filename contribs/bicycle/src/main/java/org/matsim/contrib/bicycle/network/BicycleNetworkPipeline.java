@@ -38,6 +38,7 @@ import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.nio.file.Path;
@@ -109,32 +110,18 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 	// ---- option defaults: single source for the @Option annotations below and Params.defaults() ----
 
-	private static final String DEFAULT_MODE = TransportMode.bike;
-
 	/**
 	 * Mirrors {@link LinkProperties#DEFAULT_FREESPEED_FACTOR}. Kept as a String literal because
 	 * an annotation default has to be a compile-time constant; {@code freeSpeedFactorMatchesReaderDefault}
 	 * pins the two together.
 	 */
 	private static final String DEFAULT_FREE_SPEED_FACTOR = "0.9";
-	private static final String DEFAULT_ELE_SAMPLE_STEP = "20.0";
-	private static final String DEFAULT_ELE_NOISE_TOLERANCE = "3.0";
 	private static final String DEFAULT_STORE_ORIGINAL_GEOMETRY = "false";
 
 	// ---- CLI options -----------------------------------------------------------
 
 	@Option(names = "--input", required = true, description = "Path to OSM input file (.osm.pbf)")
 	private Path input;
-
-	@Option(names = "--dem",
-		description = "Path to DEM GeoTIFF. Optional: without it the network is built without "
-			+ "elevation metrics (no gradient, elevationGain/Loss, averageElevation). Requires --dem-crs when given.")
-	private Path dem;
-
-	@Option(names = "--dem-crs",
-		description = "CRS of the DEM GeoTIFF, e.g. EPSG:32632 for Sonny's German DTM. "
-			+ "Required only when --dem is given.")
-	private String demCRS;
 
 	@Option(names = "--output", required = true,
 		description = "Path to output network. The compression is chosen from the file extension: "
@@ -145,27 +132,6 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	@Option(names = "--crs", required = true, description = "Output CRS (e.g. EPSG:25832)")
 	private String outputCRS;
 
-	@Option(names = "--mode",
-		description = "Network mode name to assign to cyclable links. Default: ${DEFAULT-VALUE}.",
-		defaultValue = DEFAULT_MODE)
-	private String mode;
-
-	@Option(names = "--country",
-		description = "Country profile for traffic-sign interpretation. "
-			+ "Supported: de, at, generic. Default: ${DEFAULT-VALUE}. "
-			+ "Use 'generic' if your country isn't listed; it skips traffic-sign matching "
-			+ "and relies on tag-based classification only (cycleway=*, segregated=*, etc.).",
-		defaultValue = "de")
-	private String country;
-
-	@Option(names = "--bike-area-marker",
-		description = "OSM tag selecting the ways that get the full bicycle treatment, given as "
-			+ "'key' or 'key=value' (e.g. 'city_center' or 'city_center=yes'). Ways without it "
-			+ "keep their modes (bikes may still ride them) but get no bicycle attributes, "
-			+ "no infrastructure classification and no elevation metrics. "
-			+ "Omit to treat every way as cyclable.")
-	private String bikeAreaMarker;
-
 	@Option(names = "--free-speed-factor",
 		description = "Factor applied to the free speed of urban links to account for traffic lights, "
 			+ "right of way etc. Default: ${DEFAULT-VALUE}. Only links that carry an OSM maxspeed tag "
@@ -175,22 +141,18 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		defaultValue = DEFAULT_FREE_SPEED_FACTOR)
 	private double freeSpeedFactor;
 
-	@Option(names = "--ele-sample-step",
-		description = "Distance between elevation samples along a link in meters (default: ${DEFAULT-VALUE})",
-		defaultValue = DEFAULT_ELE_SAMPLE_STEP)
-	private double eleSampleStepM;
-
-	@Option(names = "--ele-noise-tolerance",
-		description = "Douglas-Peucker vertical tolerance for smoothing the profile in meters (default: ${DEFAULT-VALUE})",
-		defaultValue = DEFAULT_ELE_NOISE_TOLERANCE)
-	private double eleNoiseToleranceM;
-
 	@Option(names = "--store-original-geometry", negatable = true,
 		description = "Store the true OSM road course in the 'origgeom' link attribute so "
 			+ "links keep their real shape through simplification. Use "
 			+ "--no-store-original-geometry to switch it off. Default: ${DEFAULT-VALUE}.",
 		defaultValue = DEFAULT_STORE_ORIGINAL_GEOMETRY)
 	private boolean storeOriginalGeometry;
+
+	@Mixin
+	private final BicycleBuildOptions buildOptions = new BicycleBuildOptions();
+
+	@Mixin
+	private final DemOptions demOptions = new DemOptions();
 
 
 	// ---- attribute keys --------------------------------------------------------
@@ -243,13 +205,11 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		if (dem != null && demCRS == null) {
-			throw new IllegalArgumentException("--dem-crs is required when --dem is given.");
-		}
+		demOptions.validate();
 
 		// The DEM is optional: without it the network is built without elevation metrics.
 		final ElevationDataParser elevationParser =
-			dem != null ? new ElevationDataParser(dem.toString(), outputCRS, demCRS) : null;
+			demOptions.isSet() ? demOptions.createParser(outputCRS) : null;
 		if (elevationParser == null) {
 			log.info("No --dem given: building the network without elevation metrics.");
 		}
@@ -257,12 +217,12 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		var transformation = TransformationFactory.getCoordinateTransformation(
 			TransformationFactory.WGS84, outputCRS);
 
-		var profile = BicycleCountryProfiles.forCode(country);
+		var profile = BicycleCountryProfiles.forCode(buildOptions.country());
 		log.info("Using country profile: {}", profile.getClass().getSimpleName());
 		var classifier = new BicycleInfraClassifier(profile);
 		var tagCopy = new TagCopy(TAGS_TO_COPY, OSM_PREFIX);
 
-		var areaMarker = bikeAreaMarker != null ? BicycleLinkPolicy.AreaMarker.parse(bikeAreaMarker) : null;
+		var areaMarker = buildOptions.areaMarkerOrNull();
 		if (areaMarker != null) {
 			log.info("Bicycle-area marker '{}': only matching ways get the full bicycle treatment; "
 				+ "other ways keep their modes but get no bicycle detail.", areaMarker);
@@ -293,7 +253,8 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		// ---- 2-7. pure network transformations (no file I/O) -----------------
 		process(network,
 			elevationParser != null ? elevationParser::getElevation : null,
-			new Params(mode, eleSampleStepM, eleNoiseToleranceM, storeOriginalGeometry));
+			new Params(buildOptions.mode(), buildOptions.eleSampleStep(),
+				buildOptions.eleNoiseTolerance(), storeOriginalGeometry));
 
 		// ---- 8. write --------------------------------------------------------
 		// Record the CRS the coordinates are actually in. Without it every consumer has
@@ -407,11 +368,11 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 						 double eleNoiseTolerance,
 						 boolean storeOriginalGeometry) {
 
-		/** The pipeline defaults, taken from the CLI option defaults above. */
+		/** The pipeline defaults, matching the CLI option defaults. */
 		public static Params defaults() {
-			return new Params(DEFAULT_MODE,
-				Double.parseDouble(DEFAULT_ELE_SAMPLE_STEP),
-				Double.parseDouble(DEFAULT_ELE_NOISE_TOLERANCE),
+			return new Params(TransportMode.bike,
+				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_SAMPLE_STEP),
+				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE),
 				Boolean.parseBoolean(DEFAULT_STORE_ORIGINAL_GEOMETRY));
 		}
 	}
