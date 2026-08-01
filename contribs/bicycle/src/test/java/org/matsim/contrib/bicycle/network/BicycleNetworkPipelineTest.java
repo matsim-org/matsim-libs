@@ -73,10 +73,10 @@ public class BicycleNetworkPipelineTest {
 
 	/** The five elevation attribute keys every surviving link must carry. */
 	private static final String[] ELEVATION_KEYS = {
-		BicycleNetworkPipeline.LINK_ATTR_GRADIENT,
-		BicycleNetworkPipeline.LINK_ATTR_MAX_GRADIENT,
-		BicycleNetworkPipeline.LINK_ATTR_ELEVATION_GAIN,
-		BicycleNetworkPipeline.LINK_ATTR_ELEVATION_LOSS,
+		BicycleUtils.GRADIENT,
+		BicycleUtils.MAX_GRADIENT,
+		BicycleUtils.ELEVATION_GAIN,
+		BicycleUtils.ELEVATION_LOSS,
 		BicycleUtils.AVERAGE_ELEVATION
 	};
 
@@ -586,7 +586,7 @@ public class BicycleNetworkPipelineTest {
 		l.setAllowedModes(Set.of(TransportMode.bike));
 		l.getAttributes().putAttribute("type", type);
 		l.getAttributes().putAttribute(BicycleOsmTags.SURFACE, surface);
-		l.getAttributes().putAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA, infra);
+		l.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRA, infra);
 		l.getAttributes().putAttribute("origid", origid);   // Long, exactly as the reader writes it
 		return l;
 	}
@@ -600,7 +600,7 @@ public class BicycleNetworkPipelineTest {
 			from, to, length, freespeed, capacity, lanes);
 		l.setAllowedModes(Set.of(TransportMode.bike));
 		l.getAttributes().putAttribute("type", "highway.cycleway");
-		l.getAttributes().putAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA, infra);
+		l.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRA, infra);
 		return l;
 	}
 
@@ -636,7 +636,7 @@ public class BicycleNetworkPipelineTest {
 	}
 
 	private static double gradient(Link link) {
-		return ((Number) link.getAttributes().getAttribute(BicycleNetworkPipeline.LINK_ATTR_GRADIENT))
+		return ((Number) link.getAttributes().getAttribute(BicycleUtils.GRADIENT))
 			.doubleValue();
 	}
 }

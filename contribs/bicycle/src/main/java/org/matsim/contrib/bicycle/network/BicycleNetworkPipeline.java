@@ -66,8 +66,8 @@ import java.util.function.BiPredicate;
  *   <li>Optionally rename the network mode {@code "bike"} to whatever the
  *       caller requested via {@code --mode}.</li>
  *   <li>For every surviving link, sample its elevation profile and attach the
- *       five metrics (averageElevation, gradient, maxGradient, elevationGain,
- *       elevationLoss). Skipped when no DEM was provided.</li>
+ *       five metrics (average_elevation, gradient, max_gradient, elevation_gain,
+ *       elevation_loss). Skipped when no DEM was provided.</li>
  *   <li>Tag the network with its CRS and write the MATSim XML.</li>
  * </ol>
  *
@@ -195,15 +195,8 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 	// ---- attribute keys --------------------------------------------------------
 
-	// Defined in BicycleNetworkOps, which both this pipeline and the SUMO one write;
-	// kept here so existing callers of BicycleNetworkPipeline.LINK_ATTR_* keep compiling.
-	public static final String LINK_ATTR_BICYCLE_INFRA = BicycleNetworkOps.LINK_ATTR_BICYCLE_INFRA;
-	public static final String LINK_ATTR_GRADIENT = BicycleNetworkOps.LINK_ATTR_GRADIENT;
-	public static final String LINK_ATTR_MAX_GRADIENT = BicycleNetworkOps.LINK_ATTR_MAX_GRADIENT;
-	public static final String LINK_ATTR_ELEVATION_GAIN = BicycleNetworkOps.LINK_ATTR_ELEVATION_GAIN;
-	public static final String LINK_ATTR_ELEVATION_LOSS = BicycleNetworkOps.LINK_ATTR_ELEVATION_LOSS;
-
-	private static final String OSM_PREFIX = BicycleNetworkOps.OSM_PREFIX;
+	// The attribute keys live in BicycleUtils, next to the getters scoring reads them with.
+	private static final String OSM_PREFIX = BicycleUtils.OSM_PREFIX;
 
 	/**
 	 * OSM tag values that {@link OsmBicycleReader} writes verbatim into link
@@ -233,7 +226,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * <p>"type" stays unprefixed for now (see TODO above).
 	 */
 	private static final List<String> SIMPLIFY_MATCH_KEYS = List.of(
-		LINK_ATTR_BICYCLE_INFRA,
+		BicycleUtils.BICYCLE_INFRA,
 		"type",
 		OSM_PREFIX + "surface",
 		OSM_PREFIX + "smoothness",
@@ -393,7 +386,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		if (elevation != null) {
 			int withMetrics = 0;
 			for (Link link : network.getLinks().values()) {
-				if (link.getAttributes().getAttribute(LINK_ATTR_BICYCLE_INFRA) == null) continue;
+				if (link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA) == null) continue;
 				attachElevationMetrics(link, elevation, params.eleSampleStep(), params.eleNoiseTolerance());
 				withMetrics++;
 			}

@@ -94,4 +94,33 @@ public class BicycleUtilsTest {
 
 		assertEquals(0.2, new BicycleParamsDefaultImpl().computeSurfaceFactor(link), 1e-9);
 	}
+
+	/**
+	 * Pins the on-disk attribute names against accidental renames: snake_case, matching
+	 * what network-from-sumo writes on the same networks (allowed_speed, restricted_lanes).
+	 * Written as literals on purpose — through the constants this would be a tautology.
+	 */
+	@Test
+	void networkAttributeKeysAreSnakeCase() {
+		Link link = link();
+		link.getAttributes().putAttribute("bicycle_infra", "NONE");
+		link.getAttributes().putAttribute("average_elevation", 110.0);
+		link.getAttributes().putAttribute("gradient", 0.03);
+		link.getAttributes().putAttribute("max_gradient", 0.08);
+		link.getAttributes().putAttribute("elevation_gain", 5.0);
+		link.getAttributes().putAttribute("elevation_loss", 2.0);
+
+		assertEquals("NONE", BicycleUtils.getBicycleInfra(link));
+		assertEquals(110.0, BicycleUtils.getAverageElevation(link));
+		assertEquals(0.03, BicycleUtils.getGradient(link));
+		assertEquals(0.08, BicycleUtils.getMaxGradient(link));
+		assertEquals(5.0, BicycleUtils.getElevationGain(link));
+		assertEquals(2.0, BicycleUtils.getElevationLoss(link));
+	}
+
+	@Test
+	void elevationGettersAreNullWithoutMetrics() {
+		assertNull(BicycleUtils.getGradient(link()));
+		assertNull(BicycleUtils.getBicycleInfra(link()));
+	}
 }

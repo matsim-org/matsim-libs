@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.matsim.contrib.bicycle.network.BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA;
+import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
 
 /**
@@ -39,7 +39,7 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
  *   <li>optionally copies selected raw OSM tags onto the link (via {@link TagCopy}),</li>
  *   <li>classifies the link's cycling infrastructure with {@link BicycleInfraClassifier}
  *       and writes it to the link attribute
- *       {@link BicycleNetworkPipeline#LINK_ATTR_BICYCLE_INFRA},</li>
+ *       {@link org.matsim.contrib.bicycle.BicycleUtils#BICYCLE_INFRA},</li>
  *   <li>drops parking-lot aisles ({@code service=parking_aisle}) outright -- they
  *       are not a meaningful cycling route,</li>
  *   <li>enforces footway/pedestrian whitelist: bike is only allowed when the OSM
@@ -104,7 +104,7 @@ public final class BicycleLinkPolicy {
 
 		// 1. classify cycling infrastructure
 		BicycleInfraCategory infra = classifier.classify(tags, direction);
-		link.getAttributes().putAttribute(LINK_ATTR_BICYCLE_INFRA, infra.name());
+		link.getAttributes().putAttribute(BICYCLE_INFRA, infra.name());
 
 		// 2. service=parking_aisle -> drop outright. Parking-lot aisles are no real
 		//    cycling route; unlike the ServiceLinkCleaner (which keeps aisles that

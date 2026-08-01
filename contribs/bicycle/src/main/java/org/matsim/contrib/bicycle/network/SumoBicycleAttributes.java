@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -50,8 +51,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static org.matsim.contrib.bicycle.network.BicycleNetworkOps.LINK_ATTR_BICYCLE_INFRA;
-import static org.matsim.contrib.bicycle.network.BicycleNetworkOps.OSM_PREFIX;
+import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA;
+import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA_MIXED;
+import static org.matsim.contrib.bicycle.BicycleUtils.OSM_PREFIX;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.ACCESS;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.BICYCLE;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.CUSTOMER;
@@ -89,7 +91,7 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.YES;
  * links of differing infrastructure end up as one link is decided earlier, by
  * netconvert's {@code geometry.remove}. Links whose constituent ways disagree are
  * recorded as {@link BicycleInfraCategory#NEEDS_CLARIFICATION}, marked with
- * {@link BicycleNetworkOps#LINK_ATTR_BICYCLE_INFRA_MIXED} and counted — never guessed at.
+ * {@link BicycleUtils#BICYCLE_INFRA_MIXED} and counted — never guessed at.
  *
  * @author smetzler
  */
@@ -358,7 +360,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			}
 
 			Direction direction = directionOf(link);
-			link.getAttributes().putAttribute(LINK_ATTR_BICYCLE_INFRA,
+			link.getAttributes().putAttribute(BICYCLE_INFRA,
 				classify(classifier, ways, direction, link, stats).name());
 
 			stampOsmTags(link, ways, stats);
@@ -436,7 +438,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * used when they agree; otherwise the link is honestly marked as unclear rather than
 	 * given the category of whichever way happened to win.
 	 *
-	 * <p>A disagreement also sets {@link BicycleNetworkOps#LINK_ATTR_BICYCLE_INFRA_MIXED},
+	 * <p>A disagreement also sets {@link BicycleUtils#BICYCLE_INFRA_MIXED},
 	 * because the classifier produces {@code NEEDS_CLARIFICATION} on its own too — a bare
 	 * {@code highway=cycleway} does — and the two causes need telling apart: one is a
 	 * property of the OSM data, the other of how the network was built.
@@ -449,7 +451,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		for (int i = 1; i < ways.size(); i++) {
 			if (classifier.classify(ways.get(i), direction) != first) {
 				stats.mixedMultiWay++;
-				link.getAttributes().putAttribute(BicycleNetworkOps.LINK_ATTR_BICYCLE_INFRA_MIXED, true);
+				link.getAttributes().putAttribute(BICYCLE_INFRA_MIXED, true);
 				return BicycleInfraCategory.NEEDS_CLARIFICATION;
 			}
 		}
@@ -599,7 +601,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		for (Link link : network.getLinks().values()) {
 			// Elevation is part of the full bicycle treatment, so it follows the
 			// classification: no category means the link was never looked at.
-			if (link.getAttributes().getAttribute(LINK_ATTR_BICYCLE_INFRA) == null) continue;
+			if (link.getAttributes().getAttribute(BICYCLE_INFRA) == null) continue;
 
 			SumoNetworkHandler.Edge edge = sumo.getEdges().get(link.getId().toString());
 			List<Coord> shape = shapeOf(link, edge, sumo);

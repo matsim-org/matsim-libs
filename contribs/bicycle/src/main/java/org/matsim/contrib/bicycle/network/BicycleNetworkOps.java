@@ -33,52 +33,17 @@ import java.util.Locale;
 
 /**
  * The pieces of bicycle network building that are independent of where the network
- * came from: the link attribute names, elevation stamping, and the infrastructure
- * distribution table.
+ * came from: elevation stamping and the infrastructure distribution table. The link
+ * attribute keys live in {@link BicycleUtils}, next to the getters scoring uses.
  *
  * <p>Two pipelines share these — {@link BicycleNetworkPipeline}, which reads OSM
  * directly, and {@link SumoBicycleAttributes}, which post-processes a network that
  * came out of SUMO. Everything here works on a finished {@link Link}, so it does not
  * care which of the two produced it.
  */
-public final class BicycleNetworkOps {
+final class BicycleNetworkOps {
 
 	private static final Logger log = LogManager.getLogger(BicycleNetworkOps.class);
-
-	// ---- link attribute keys ---------------------------------------------------
-
-	/** Cycling infrastructure category, holding a {@link BicycleInfraCategory} name. */
-	public static final String LINK_ATTR_BICYCLE_INFRA = "bicycle_infra";
-
-	/**
-	 * Set to {@code true} on links whose OSM ways were merged into one edge but classify
-	 * differently, so their {@code bicycle_infra} had to fall back to
-	 * {@link BicycleInfraCategory#NEEDS_CLARIFICATION}.
-	 *
-	 * <p>Without this the category alone would conflate two unrelated things: tags that
-	 * are genuinely ambiguous (what the classifier means by it) and an artifact of
-	 * netconvert's {@code geometry.remove}. Only the second one can be made to go away,
-	 * by keeping the category boundary — so it needs to be countable on its own.
-	 */
-	public static final String LINK_ATTR_BICYCLE_INFRA_MIXED = "bicycle_infra_mixed";
-
-	/** Signed end-to-end gradient as a ratio, e.g. {@code +0.03} for 3 % uphill. */
-	public static final String LINK_ATTR_GRADIENT = "gradient";
-
-	/** Steepest gradient on any sub-segment, as a ratio. */
-	public static final String LINK_ATTR_MAX_GRADIENT = "maxGradient";
-
-	/** Cumulative meters climbed along the link. */
-	public static final String LINK_ATTR_ELEVATION_GAIN = "elevationGain";
-
-	/** Cumulative meters descended along the link, as a positive number. */
-	public static final String LINK_ATTR_ELEVATION_LOSS = "elevationLoss";
-
-	/**
-	 * Prefix marking a link attribute as a verbatim OSM tag value. Defined in
-	 * {@link BicycleUtils}, whose getters fall back to the prefixed keys when scoring.
-	 */
-	public static final String OSM_PREFIX = BicycleUtils.OSM_PREFIX;
 
 	private BicycleNetworkOps() {
 	}
@@ -126,12 +91,12 @@ public final class BicycleNetworkOps {
 
 		// Elevations in meters — round to 1 decimal (matches DEM resolution).
 		link.getAttributes().putAttribute(BicycleUtils.AVERAGE_ELEVATION, round(m.averageElevation(), 1));
-		link.getAttributes().putAttribute(LINK_ATTR_ELEVATION_GAIN, round(m.elevationGain(), 1));
-		link.getAttributes().putAttribute(LINK_ATTR_ELEVATION_LOSS, round(m.elevationLoss(), 1));
+		link.getAttributes().putAttribute(BicycleUtils.ELEVATION_GAIN, round(m.elevationGain(), 1));
+		link.getAttributes().putAttribute(BicycleUtils.ELEVATION_LOSS, round(m.elevationLoss(), 1));
 
 		// Dimensionless ratios — 3 decimals = 0.1% resolution.
-		link.getAttributes().putAttribute(LINK_ATTR_GRADIENT, round(m.gradient(), 3));
-		link.getAttributes().putAttribute(LINK_ATTR_MAX_GRADIENT, round(m.maxGradient(), 3));
+		link.getAttributes().putAttribute(BicycleUtils.GRADIENT, round(m.gradient(), 3));
+		link.getAttributes().putAttribute(BicycleUtils.MAX_GRADIENT, round(m.maxGradient(), 3));
 		return true;
 	}
 
@@ -165,7 +130,7 @@ public final class BicycleNetworkOps {
 		double totalLengthM = 0;
 
 		for (Link link : network.getLinks().values()) {
-			Object raw = link.getAttributes().getAttribute(LINK_ATTR_BICYCLE_INFRA);
+			Object raw = link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA);
 			double len = link.getLength();
 			totalCount++;
 			totalLengthM += len;

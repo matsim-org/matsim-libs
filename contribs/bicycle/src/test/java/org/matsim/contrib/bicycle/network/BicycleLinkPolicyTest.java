@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -73,7 +74,7 @@ public class BicycleLinkPolicyTest {
 		assertTrue(reverse.getAllowedModes().contains(TransportMode.bike));
 
 		// bicycle_infra is always written.
-		assertNotNull(forward.getAttributes().getAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA));
+		assertNotNull(forward.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA));
 	}
 
 	// =========================================================================
@@ -258,7 +259,7 @@ public class BicycleLinkPolicyTest {
 		GATED.apply(link, tags("highway", "cycleway", "city_center", "yes"), Direction.FORWARD);
 
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike), "marked way keeps bike");
-		assertNotNull(link.getAttributes().getAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA),
+		assertNotNull(link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA),
 			"marked way gets bicycle_infra");
 	}
 
@@ -280,7 +281,7 @@ public class BicycleLinkPolicyTest {
 		assertNull(link.getAttributes().getAttribute("smoothness"));
 		assertNull(link.getAttributes().getAttribute("cycleway"));
 		assertNull(link.getAttributes().getAttribute("bicycle"));
-		assertNull(link.getAttributes().getAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA),
+		assertNull(link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA),
 			"no bicycle_infra outside the area");
 	}
 
@@ -291,7 +292,7 @@ public class BicycleLinkPolicyTest {
 		Link link = link("1f");   // {bike}
 		GATED.apply(link, tags("highway", "cycleway"), Direction.FORWARD);
 		assertEquals(Set.of(TransportMode.bike), link.getAllowedModes());
-		assertNull(link.getAttributes().getAttribute(BicycleNetworkPipeline.LINK_ATTR_BICYCLE_INFRA));
+		assertNull(link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA));
 	}
 
 	// =========================================================================

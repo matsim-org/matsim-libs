@@ -195,17 +195,19 @@ Everything below applies to both paths, except where a heading says otherwise.
 
 ## What gets attached to links
 
-Both paths write these. `bicycle_infra_mixed` and `origid` are the only path-specific ones.
+Both paths write these. `bicycle_infra_mixed` and `origid` are the only path-specific ones. The keys are
+defined in `BicycleUtils` (with typed getters) and are snake_case throughout — the convention
+`network-from-sumo` already uses on the same networks (`allowed_speed`, `restricted_lanes`).
 
 | Attribute          | Unit   | Meaning                                                                                |
 |--------------------|--------|----------------------------------------------------------------------------------------|
 | `bicycle_infra`    | string | Cycling infrastructure category (one of `BicycleInfraCategory.name()`, see below)      |
 | `bicycle_infra_mixed` | bool | *(SUMO path)* set when the category is `NEEDS_CLARIFICATION` because netconvert merged ways that classify differently — as opposed to the classifier finding the tags ambiguous. Only the former is fixable, via `bicycle-keep-edges`. |
-| `averageElevation` | m      | Mean elevation over the link                                                           |
+| `average_elevation` | m     | Mean elevation over the link                                                           |
 | `gradient`         | ratio  | Signed end-to-end gradient (`+0.03` = 3 % uphill)                                      |
-| `maxGradient`      | ratio  | Steepest gradient on any sub-segment                                                   |
-| `elevationGain`    | m      | Cumulative meters climbed                                                              |
-| `elevationLoss`    | m      | Cumulative meters descended                                                            |
+| `max_gradient`     | ratio  | Steepest gradient on any sub-segment                                                   |
+| `elevation_gain`   | m      | Cumulative meters climbed                                                              |
+| `elevation_loss`   | m      | Cumulative meters descended                                                            |
 | `osm:bicycle`      | string | Raw OSM `bicycle=…` value, if present                                                  |
 | `osm:surface`      | string | Raw OSM `surface=…` value, if present                                                  |
 | `osm:smoothness`   | string | Raw OSM `smoothness=…` value, if present                                               |
@@ -221,12 +223,12 @@ Scoring reads these through `BicycleUtils`: `getSurface()` and `getCyclewaytype(
 from either path scores the same.
 
 Gradients are signed in the direction of travel, so reverse links get the opposite sign. `gradient` alone reads 0 % on a
-link with a hill between equal-height endpoints — `maxGradient`, `elevationGain` and `elevationLoss` fill that gap.
+link with a hill between equal-height endpoints — `max_gradient`, `elevation_gain` and `elevation_loss` fill that gap.
 
-Not all of these are consumed by the simulation: `averageElevation` and `osm:bicycle` are written for
+Not all of these are consumed by the simulation: `average_elevation` and `osm:bicycle` are written for
 inspection only — handy for sanity-checking an extract, but not read by anything downstream.
 
-The five elevation attributes (`averageElevation`, `gradient`, `maxGradient`, `elevationGain`, `elevationLoss`) are only
+The five elevation attributes (`average_elevation`, `gradient`, `max_gradient`, `elevation_gain`, `elevation_loss`) are only
 attached when a DEM is supplied via `--dem`; without one they are absent.
 
 For ad-hoc debugging you can forward **arbitrary** OSM tags onto links: add their keys to `TAGS_TO_COPY` in
@@ -257,7 +259,8 @@ until you populate it).
   returns `NaN` where the DEM has no data
 - `LinkElevationProfile` — samples along a link, applies Douglas-Peucker smoothing, computes metrics
 - `ServiceLinkCleaner` — removes service-link components that don't connect anything useful
-- `BicycleNetworkOps` — the link attribute keys, elevation stamping, and the infra distribution table
+- `BicycleNetworkOps` — internal: elevation stamping and the infra distribution table; the attribute keys
+  live in `BicycleUtils`, next to the getters scoring reads them with
 
 **SUMO path:**
 
@@ -361,7 +364,7 @@ jumps, and terrain-vs-road mismatch (bridges, cuttings) produce spurious gradien
 | 5 m   | GraphHopper's default        |
 | 10 m  | Only big hills survive       |
 
-`gradient` is unaffected by DP (endpoints always kept); `maxGradient`, `elevationGain`, `elevationLoss` are what change.
+`gradient` is unaffected by DP (endpoints always kept); `max_gradient`, `elevation_gain`, `elevation_loss` are what change.
 
 ## Infra classification
 
@@ -455,8 +458,8 @@ prints the DEM's own extent, which is usually enough to spot the right one.
   bridges can still look unrealistic.
 - **Node Z is transitional and on its way out.** Today the simulation derives each link's gradient from the node Z
   coordinates (in both the speed model and scoring/routing). The intended direction is to stop relying on Z and instead
-  consume the pre-computed `gradient` attribute directly, plus the richer `maxGradient` / `elevationGain` /
-  `elevationLoss` metrics. How exactly those feed into speed, scoring and routing is still an open design question. Until
+  consume the pre-computed `gradient` attribute directly, plus the richer `max_gradient` / `elevation_gain` /
+  `elevation_loss` metrics. How exactly those feed into speed, scoring and routing is still an open design question. Until
   that's settled, both the Z coordinates and the gradient attributes are written.
 - **Some surviving nodes may lack a Z coordinate.** A node that survives simplification but was never touched by the
   reader's `setAfterLinkCreated` callback keeps no Z. The per-link metrics are unaffected (they sample the DEM directly).
@@ -474,5 +477,5 @@ prints the DEM's own extent, which is usually enough to spot the right one.
   (`type=service` for `ServiceLinkCleaner`; `origid` for `NetworkSimplifier` merge tracking) — and unlike
   `getSurface()` / `getCyclewaytype()`, `BicycleUtils.WAY_TYPE` reads the unprefixed `type` with no `osm:`
   fallback, so a `type` → `osm:highway` rename would silently break scoring.
-- **Some attributes are inspection-only** and aren't consumed by the simulation: `averageElevation` and
+- **Some attributes are inspection-only** and aren't consumed by the simulation: `average_elevation` and
   `osm:bicycle`.

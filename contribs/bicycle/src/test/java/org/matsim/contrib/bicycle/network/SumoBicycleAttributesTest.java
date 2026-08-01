@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.sumo.SumoNetworkConverter;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
@@ -79,7 +80,7 @@ public class SumoBicycleAttributesTest {
 	}
 
 	private static String infra(Network network, String id) {
-		return (String) link(network, id).getAttributes().getAttribute(BicycleNetworkOps.LINK_ATTR_BICYCLE_INFRA);
+		return (String) link(network, id).getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA);
 	}
 
 	// ------------------------------------------------------------------------
@@ -114,9 +115,9 @@ public class SumoBicycleAttributesTest {
 		// and the cause is recorded, because the classifier also emits NEEDS_CLARIFICATION
 		// on its own - a bare highway=cycleway does, see link 5001 below
 		assertEquals(Boolean.TRUE,
-			link(f.network(), "1001").getAttributes().getAttribute(BicycleNetworkOps.LINK_ATTR_BICYCLE_INFRA_MIXED));
+			link(f.network(), "1001").getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA_MIXED));
 		assertEquals("NEEDS_CLARIFICATION", infra(f.network(), "5001"));
-		assertNull(link(f.network(), "5001").getAttributes().getAttribute(BicycleNetworkOps.LINK_ATTR_BICYCLE_INFRA_MIXED),
+		assertNull(link(f.network(), "5001").getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA_MIXED),
 			"a single-way link is never a merge artifact");
 	}
 
@@ -129,11 +130,11 @@ public class SumoBicycleAttributesTest {
 		Link merged = link(f.network(), "1001");
 
 		// Both ways are surface=asphalt, so that one is safe to copy.
-		assertEquals("asphalt", merged.getAttributes().getAttribute(BicycleNetworkOps.OSM_PREFIX + "surface"));
+		assertEquals("asphalt", merged.getAttributes().getAttribute(BicycleUtils.OSM_PREFIX + "surface"));
 
 		// cycleway=lane is on way 1001 only. netconvert wrote it onto the merged edge as a
 		// param anyway - reading that param would claim a bike lane over twice the length.
-		assertNull(merged.getAttributes().getAttribute(BicycleNetworkOps.OSM_PREFIX + "cycleway"),
+		assertNull(merged.getAttributes().getAttribute(BicycleUtils.OSM_PREFIX + "cycleway"),
 			"a tag only one of the merged ways carries must not be adopted");
 		assertEquals("lane", f.sumo().getEdges().get("1001").getAttributes().get("cycleway"),
 			"the SUMO edge does carry it - which is precisely why we do not read it from there");
@@ -188,10 +189,10 @@ public class SumoBicycleAttributesTest {
 		// way 7001 is highway=primary with no surface tag; BicycleUtils.getSurface would
 		// otherwise read nothing and the scoring would silently fall back to a comfort of 1
 		assertEquals("asphalt",
-			link(f.network(), "7001").getAttributes().getAttribute(BicycleNetworkOps.OSM_PREFIX + "surface"));
+			link(f.network(), "7001").getAttributes().getAttribute(BicycleUtils.OSM_PREFIX + "surface"));
 
 		// living_street is not on the paved-by-default list, and tagged no surface either
-		assertNull(link(f.network(), "9001").getAttributes().getAttribute(BicycleNetworkOps.OSM_PREFIX + "surface"));
+		assertNull(link(f.network(), "9001").getAttributes().getAttribute(BicycleUtils.OSM_PREFIX + "surface"));
 	}
 
 	@Test
@@ -205,15 +206,15 @@ public class SumoBicycleAttributesTest {
 		assertEquals(2, stats.linksWithTrueShape, "both directions of the merged edge");
 
 		Link l = link(f.network(), "8001");
-		assertNotNull(l.getAttributes().getAttribute(BicycleNetworkOps.LINK_ATTR_GRADIENT));
-		assertNotNull(l.getAttributes().getAttribute(BicycleNetworkOps.LINK_ATTR_MAX_GRADIENT));
-		assertNotNull(l.getAttributes().getAttribute(BicycleNetworkOps.LINK_ATTR_ELEVATION_GAIN));
-		assertNotNull(l.getAttributes().getAttribute(BicycleNetworkOps.LINK_ATTR_ELEVATION_LOSS));
+		assertNotNull(l.getAttributes().getAttribute(BicycleUtils.GRADIENT));
+		assertNotNull(l.getAttributes().getAttribute(BicycleUtils.MAX_GRADIENT));
+		assertNotNull(l.getAttributes().getAttribute(BicycleUtils.ELEVATION_GAIN));
+		assertNotNull(l.getAttributes().getAttribute(BicycleUtils.ELEVATION_LOSS));
 
 		// gradients are signed in the direction of travel
-		double forward = (double) l.getAttributes().getAttribute(BicycleNetworkOps.LINK_ATTR_GRADIENT);
+		double forward = (double) l.getAttributes().getAttribute(BicycleUtils.GRADIENT);
 		double reverse = (double) link(f.network(), "-8001").getAttributes()
-			.getAttribute(BicycleNetworkOps.LINK_ATTR_GRADIENT);
+			.getAttribute(BicycleUtils.GRADIENT);
 		assertEquals(forward, -reverse, 1e-9);
 
 		// nodes get a Z so the simulation's own gradient calculation agrees
@@ -228,7 +229,7 @@ public class SumoBicycleAttributesTest {
 
 		assertEquals(0, stats.withElevation);
 		assertTrue(f.network().getLinks().values().stream().allMatch(
-			l -> l.getAttributes().getAttribute(BicycleNetworkOps.LINK_ATTR_GRADIENT) == null));
+			l -> l.getAttributes().getAttribute(BicycleUtils.GRADIENT) == null));
 		assertFalse(f.network().getNodes().values().stream().anyMatch(n -> n.getCoord().hasZ()));
 	}
 
