@@ -56,7 +56,7 @@ public class BicycleInfraClassifierTest {
 			"is_sidepath", "yes",
 			"separation:left", "bollard"
 		);
-		assertEquals(CYCLEWAY_ON_HIGHWAY_PROTECTED, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_ON_HIGHWAY_PROTECTED, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class BicycleInfraClassifierTest {
 			"is_sidepath", "yes",
 			"traffic_mode:left", "parking"
 		);
-		assertEquals(CYCLEWAY_ON_HIGHWAY_PROTECTED, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_ON_HIGHWAY_PROTECTED, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -76,7 +76,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "cycleway",
 			"separation:left", "bollard"
 		);
-		BicycleInfraCategory result = classifier.classify(tags, Direction.FORWARD);
+		BicycleInfraCategory result = classifier.classify(tags, OsmWayDirection.FORWARD);
 		// Must NOT be PROTECTED. (Whatever else it ends up classified as is fine.)
 		assertNotEquals(CYCLEWAY_ON_HIGHWAY_PROTECTED, result,
 			"without is_sidepath=yes, separation:left alone should not yield PROTECTED, got " + result);
@@ -93,7 +93,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "cycleway",
 			"cycleway", "link"
 		);
-		assertEquals(CYCLEWAY_LINK, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_LINK, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -107,7 +107,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "cycleway",
 			"cycleway", "crossing"
 		);
-		assertEquals(CROSSING, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CROSSING, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -117,7 +117,7 @@ public class BicycleInfraClassifierTest {
 			"path", "crossing",
 			"bicycle", "designated"
 		);
-		assertEquals(CROSSING, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CROSSING, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -127,7 +127,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "footway",
 			"footway", "crossing"
 		);
-		BicycleInfraCategory result = classifier.classify(tags, Direction.FORWARD);
+		BicycleInfraCategory result = classifier.classify(tags, OsmWayDirection.FORWARD);
 		assertNotEquals(CROSSING, result,
 			"footway crossing without bicycle access must not be CROSSING, got " + result);
 	}
@@ -143,7 +143,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "residential",
 			"bicycle_road", "yes"
 		);
-		assertEquals(BICYCLE_ROAD, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(BICYCLE_ROAD, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -152,7 +152,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "residential",
 			"traffic_sign", "DE:244"
 		);
-		assertEquals(BICYCLE_ROAD, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(BICYCLE_ROAD, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -162,7 +162,7 @@ public class BicycleInfraClassifierTest {
 			"bicycle_road", "yes",
 			"vehicle", "destination"
 		);
-		assertEquals(BICYCLE_ROAD_VEHICLE_DESTINATION, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(BICYCLE_ROAD_VEHICLE_DESTINATION, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -172,7 +172,7 @@ public class BicycleInfraClassifierTest {
 			"bicycle_road", "yes",
 			"traffic_sign", "DE:244, Kfz-Verkehr frei"
 		);
-		assertEquals(BICYCLE_ROAD_VEHICLE_DESTINATION, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(BICYCLE_ROAD_VEHICLE_DESTINATION, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -186,7 +186,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "cycleway",
 			"cycleway", "share_busway"
 		);
-		assertEquals(SHARED_BUS_LANE_BUS_WITH_BIKE, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(SHARED_BUS_LANE_BUS_WITH_BIKE, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -195,7 +195,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "cycleway",
 			"lane", "share_busway"
 		);
-		assertEquals(SHARED_BUS_LANE_BIKE_WITH_BUS, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(SHARED_BUS_LANE_BIKE_WITH_BUS, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -209,7 +209,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "pedestrian",
 			"bicycle", "yes"
 		);
-		assertEquals(PEDESTRIAN_AREA_BICYCLE_YES, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(PEDESTRIAN_AREA_BICYCLE_YES, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -218,7 +218,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "pedestrian",
 			"bicycle", "designated"
 		);
-		assertEquals(PEDESTRIAN_AREA_BICYCLE_YES, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(PEDESTRIAN_AREA_BICYCLE_YES, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -232,7 +232,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "secondary",
 			"cycleway:right", "shared_lane"
 		);
-		assertEquals(SHARED_MOTOR_VEHICLE_LANE, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(SHARED_MOTOR_VEHICLE_LANE, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -246,7 +246,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "primary",
 			"cycleway:lanes", "|lane|"
 		);
-		assertEquals(CYCLEWAY_ON_HIGHWAY_BETWEEN_LANES, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_ON_HIGHWAY_BETWEEN_LANES, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -261,7 +261,7 @@ public class BicycleInfraClassifierTest {
 			"cycleway:right", "lane",
 			"cycleway:right:lane", "advisory"
 		);
-		assertEquals(CYCLEWAY_ON_HIGHWAY_ADVISORY, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_ON_HIGHWAY_ADVISORY, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -271,7 +271,7 @@ public class BicycleInfraClassifierTest {
 			"cycleway:right", "lane",
 			"cycleway:right:lane", "exclusive"
 		);
-		assertEquals(CYCLEWAY_ON_HIGHWAY_EXCLUSIVE, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_ON_HIGHWAY_EXCLUSIVE, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -280,7 +280,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "secondary",
 			"cycleway:right", "lane"
 		);
-		assertEquals(CYCLEWAY_ON_HIGHWAY_ADVISORY_OR_EXCLUSIVE, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_ON_HIGHWAY_ADVISORY_OR_EXCLUSIVE, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -295,7 +295,7 @@ public class BicycleInfraClassifierTest {
 			"cycleway", "track",
 			"is_sidepath", "yes"
 		);
-		assertEquals(CYCLEWAY_ADJOINING, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_ADJOINING, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -305,7 +305,7 @@ public class BicycleInfraClassifierTest {
 			"cycleway", "track",
 			"is_sidepath", "no"
 		);
-		assertEquals(CYCLEWAY_ISOLATED, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_ISOLATED, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -314,7 +314,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "cycleway",
 			"cycleway", "track"
 		);
-		assertEquals(CYCLEWAY_ADJOINING_OR_ISOLATED, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_ADJOINING_OR_ISOLATED, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -331,7 +331,7 @@ public class BicycleInfraClassifierTest {
 			"segregated", "yes"
 		);
 		// no is_sidepath → ADJOINING_OR_ISOLATED suffix
-		assertEquals(FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING_OR_ISOLATED, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING_OR_ISOLATED, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -343,7 +343,7 @@ public class BicycleInfraClassifierTest {
 			"segregated", "no",
 			"is_sidepath", "yes"
 		);
-		assertEquals(FOOT_AND_CYCLEWAY_SHARED_ADJOINING, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(FOOT_AND_CYCLEWAY_SHARED_ADJOINING, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -357,7 +357,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "footway",
 			"bicycle", "yes"
 		);
-		assertEquals(FOOTWAY_BICYCLE_YES_ADJOINING_OR_ISOLATED, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(FOOTWAY_BICYCLE_YES_ADJOINING_OR_ISOLATED, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -367,7 +367,7 @@ public class BicycleInfraClassifierTest {
 			"bicycle", "yes",
 			"is_sidepath", "yes"
 		);
-		assertEquals(FOOTWAY_BICYCLE_YES_ADJOINING, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(FOOTWAY_BICYCLE_YES_ADJOINING, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -376,7 +376,7 @@ public class BicycleInfraClassifierTest {
 			"highway", "secondary",
 			"sidewalk:right:bicycle", "yes"
 		);
-		assertEquals(FOOTWAY_BICYCLE_YES_ADJOINING, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(FOOTWAY_BICYCLE_YES_ADJOINING, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -390,7 +390,7 @@ public class BicycleInfraClassifierTest {
 		Map<String, String> tags = tags(
 			"highway", "cycleway"
 		);
-		assertEquals(NEEDS_CLARIFICATION, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(NEEDS_CLARIFICATION, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 
@@ -403,12 +403,12 @@ public class BicycleInfraClassifierTest {
 		Map<String, String> tags = tags(
 			"highway", "residential"
 		);
-		assertEquals(NONE, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(NONE, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
 	void none_emptyTags() {
-		assertEquals(NONE, classifier.classify(tags(), Direction.FORWARD));
+		assertEquals(NONE, classifier.classify(tags(), OsmWayDirection.FORWARD));
 	}
 
 
@@ -425,7 +425,7 @@ public class BicycleInfraClassifierTest {
 			"is_sidepath", "yes",
 			"separation:left", "bollard"
 		);
-		assertEquals(CYCLEWAY_ON_HIGHWAY_PROTECTED, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CYCLEWAY_ON_HIGHWAY_PROTECTED, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -437,7 +437,7 @@ public class BicycleInfraClassifierTest {
 			"bicycle", "designated",
 			"bicycle_road", "yes"
 		);
-		assertEquals(CROSSING, classifier.classify(tags, Direction.FORWARD));
+		assertEquals(CROSSING, classifier.classify(tags, OsmWayDirection.FORWARD));
 	}
 
 	@Test
@@ -448,14 +448,14 @@ public class BicycleInfraClassifierTest {
 			"bicycle_road", "yes",
 			"cycleway", "share_busway"
 		);
-		BicycleInfraCategory result = classifier.classify(tags, Direction.FORWARD);
+		BicycleInfraCategory result = classifier.classify(tags, OsmWayDirection.FORWARD);
 		assertTrue(result == BICYCLE_ROAD || result == BICYCLE_ROAD_VEHICLE_DESTINATION,
 			"bicycle road must beat bus lane, got " + result);
 	}
 
 
 	// =========================================================================
-	// Direction sensitivity
+	// OsmWayDirection sensitivity
 	// =========================================================================
 
 	@Test
@@ -465,8 +465,8 @@ public class BicycleInfraClassifierTest {
 			"highway", "secondary",
 			"sidewalk:right:bicycle", "yes"
 		);
-		assertEquals(FOOTWAY_BICYCLE_YES_ADJOINING, classifier.classify(tags, Direction.FORWARD));
-		assertEquals(NONE, classifier.classify(tags, Direction.REVERSE));
+		assertEquals(FOOTWAY_BICYCLE_YES_ADJOINING, classifier.classify(tags, OsmWayDirection.FORWARD));
+		assertEquals(NONE, classifier.classify(tags, OsmWayDirection.REVERSE));
 	}
 
 	@Test
@@ -475,8 +475,8 @@ public class BicycleInfraClassifierTest {
 			"highway", "secondary",
 			"sidewalk:left:bicycle", "yes"
 		);
-		assertEquals(NONE, classifier.classify(tags, Direction.FORWARD));
-		assertEquals(FOOTWAY_BICYCLE_YES_ADJOINING, classifier.classify(tags, Direction.REVERSE));
+		assertEquals(NONE, classifier.classify(tags, OsmWayDirection.FORWARD));
+		assertEquals(FOOTWAY_BICYCLE_YES_ADJOINING, classifier.classify(tags, OsmWayDirection.REVERSE));
 	}
 
 	@Test
@@ -486,8 +486,8 @@ public class BicycleInfraClassifierTest {
 			"highway", "secondary",
 			"cycleway:both", "track"
 		);
-		BicycleInfraCategory forward = classifier.classify(tags, Direction.FORWARD);
-		BicycleInfraCategory reverse = classifier.classify(tags, Direction.REVERSE);
+		BicycleInfraCategory forward = classifier.classify(tags, OsmWayDirection.FORWARD);
+		BicycleInfraCategory reverse = classifier.classify(tags, OsmWayDirection.REVERSE);
 		assertEquals(forward, reverse, "cycleway:both must be direction-symmetric");
 	}
 

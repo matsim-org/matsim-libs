@@ -175,7 +175,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	);
 
 	/**
-	 * Optional raw OSM tags to copy onto links via {@link TagCopy} (with "osm:"
+	 * Optional raw OSM tags to copy onto links via {@link TagCopier} (with "osm:"
 	 * prefix). Empty by default; populate to forward additional OSM tags that
 	 * {@link OsmBicycleReader} doesn't write itself.
 	 */
@@ -220,14 +220,14 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		var profile = BicycleCountryProfiles.forCode(buildOptions.country());
 		log.info("Using country profile: {}", profile.getClass().getSimpleName());
 		var classifier = new BicycleInfraClassifier(profile);
-		var tagCopy = new TagCopy(TAGS_TO_COPY, OSM_PREFIX);
+		var tagCopier = new TagCopier(TAGS_TO_COPY, OSM_PREFIX);
 
 		var areaMarker = buildOptions.areaMarkerOrNull();
 		if (areaMarker != null) {
 			log.info("Bicycle-area marker '{}': only matching ways get the full bicycle treatment; "
 				+ "other ways keep their modes but get no bicycle detail.", areaMarker);
 		}
-		var policy = new BicycleLinkPolicy(classifier, tagCopy, areaMarker);
+		var policy = new BicycleLinkPolicy(classifier, tagCopier, areaMarker);
 
 		log.info("Free-speed factor {}: applied to links with a maxspeed tag below 51 km/h; "
 			+ "the allowed_speed attribute keeps the untouched tag value.", freeSpeedFactor);
@@ -267,15 +267,15 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 
 	/**
 	 * Maps the reader's own direction enum onto the package's reader-neutral
-	 * {@link Direction}. This is the only place the two meet: the classifier and
-	 * the policy speak {@link Direction} so they can also run on links that never
+	 * {@link OsmWayDirection}. This is the only place the two meet: the classifier and
+	 * the policy speak {@link OsmWayDirection} so they can also run on links that never
 	 * saw this reader (e.g. a SUMO-converted network, where the direction comes
 	 * from the sign of the link id).
 	 */
-	private static Direction toBicycleDirection(SupersonicOsmNetworkReader.Direction direction) {
+	private static OsmWayDirection toBicycleDirection(SupersonicOsmNetworkReader.Direction direction) {
 		return direction == SupersonicOsmNetworkReader.Direction.Reverse
-			? Direction.REVERSE
-			: Direction.FORWARD;
+			? OsmWayDirection.REVERSE
+			: OsmWayDirection.FORWARD;
 	}
 
 	/**

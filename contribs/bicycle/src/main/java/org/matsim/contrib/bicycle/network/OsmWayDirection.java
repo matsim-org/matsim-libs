@@ -18,40 +18,25 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.network;
 
-import org.matsim.api.core.v01.network.Link;
-
-import java.util.List;
-import java.util.Map;
-
 /**
- * Copies selected OSM tag values onto link attributes, prefixed with a fixed
- * string. Used by {@link BicycleLinkPolicy} to forward raw OSM tags that the
- * {@link org.matsim.contrib.osm.networkReader.OsmBicycleReader} doesn't write
- * itself but that downstream consumers want to see (typically under the
- * {@code "osm:"} prefix).
+ * Travel direction of a link relative to the OSM way it was derived from.
  *
- * <p>Configured with a list of OSM keys and the target prefix; instances are
- * immutable and reusable across many links. Empty or missing values are
- * skipped, so an empty key list makes {@link #copy} a no-op.
+ * <p>Cycling infrastructure is frequently tagged per side of the road
+ * ({@code cycleway:right} / {@code cycleway:left}), so a single way yields
+ * different {@link BicycleInfraCategory} values per direction —
+ * {@link BicycleInfraClassifier} needs to know which one it is looking at.
  *
- * @author smetzler
+ * <p>Deliberately reader-neutral: the same classifier runs on links from the
+ * {@code SupersonicOsmNetworkReader} (which has its own {@code OsmWayDirection} enum,
+ * mapped at the call site) and on links from a SUMO-converted network, where
+ * the direction comes from the sign of the link id. Keeping this enum here is
+ * what frees the classifier from depending on any particular reader.
  */
-public final class TagCopy {
-	private final List<String> keys;
-	private final String prefix;
+public enum OsmWayDirection {
 
-	public TagCopy(List<String> keys, String prefix) {
-		this.keys = keys;
-		this.prefix = prefix;
-	}
+	/** Along the OSM way's node order. */
+	FORWARD,
 
-	public void copy(Link link, Map<String, String> tags) {
-		for (String k : keys) {
-			String v = tags.get(k);
-			if (v != null && !v.isBlank()) {
-				link.getAttributes().putAttribute(prefix + k, v);
-			}
-		}
-	}
+	/** Against the OSM way's node order. */
+	REVERSE
 }
-

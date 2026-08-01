@@ -36,7 +36,7 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
  * {@code .setAfterLinkCreated(policy::apply)}. For each freshly created link
  * this class:
  * <ol>
- *   <li>optionally copies selected raw OSM tags onto the link (via {@link TagCopy}),</li>
+ *   <li>optionally copies selected raw OSM tags onto the link (via {@link TagCopier}),</li>
  *   <li>classifies the link's cycling infrastructure with {@link BicycleInfraClassifier}
  *       and writes it to the link attribute
  *       {@link org.matsim.contrib.bicycle.BicycleUtils#BICYCLE_INFRA},</li>
@@ -67,13 +67,13 @@ public final class BicycleLinkPolicy {
 	private static final String BICYCLE_MODE = TransportMode.bike;
 
 	private final BicycleInfraClassifier classifier;
-	private final TagCopy tagCopy;
+	private final TagCopier tagCopier;
 
 	/** Selects the ways that get the full bicycle treatment; {@code null} = every way. */
 	private final AreaMarker areaMarker;
 
-	public BicycleLinkPolicy(BicycleInfraClassifier classifier, TagCopy tagCopy) {
-		this(classifier, tagCopy, null);
+	public BicycleLinkPolicy(BicycleInfraClassifier classifier, TagCopier tagCopier) {
+		this(classifier, tagCopier, null);
 	}
 
 	/**
@@ -81,13 +81,13 @@ public final class BicycleLinkPolicy {
 	 *                   OSM marker tag; every other way is reduced to a plain car link.
 	 *                   {@code null} treats every way as cyclable (the default).
 	 */
-	public BicycleLinkPolicy(BicycleInfraClassifier classifier, TagCopy tagCopy, AreaMarker areaMarker) {
+	public BicycleLinkPolicy(BicycleInfraClassifier classifier, TagCopier tagCopier, AreaMarker areaMarker) {
 		this.classifier = classifier;
-		this.tagCopy = tagCopy;
+		this.tagCopier = tagCopier;
 		this.areaMarker = areaMarker;
 	}
 
-	public void apply(Link link, Map<String, String> tags, Direction direction) {
+	public void apply(Link link, Map<String, String> tags, OsmWayDirection direction) {
 
 		// Bicycle-area gating: outside the marked area keep the reader's link as is --
 		// its modes stay, so bikes may still ride it -- but strip the bicycle detail
@@ -99,8 +99,8 @@ public final class BicycleLinkPolicy {
 			return;
 		}
 
-		// 0. copy selected raw OSM tags onto the link (no-op if TagCopy has no keys)
-		tagCopy.copy(link, tags);
+		// 0. copy selected raw OSM tags onto the link (no-op if TagCopier has no keys)
+		tagCopier.copy(link, tags);
 
 		// 1. classify cycling infrastructure
 		BicycleInfraCategory infra = classifier.classify(tags, direction);

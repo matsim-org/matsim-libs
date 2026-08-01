@@ -68,7 +68,7 @@ public final class BicycleInfraClassifier {
 	 * Precedence: first match wins, in the order of {@code BikelaneCategories.lua}
 	 * (see the class JavaDoc for the source).
 	 */
-	public BicycleInfraCategory classify(Map<String, String> tags, Direction direction) {
+	public BicycleInfraCategory classify(Map<String, String> tags, OsmWayDirection direction) {
 
 		// 1. Protected bike lane (must be on top)
 		if (isCyclewayOnHighwayProtected(tags)) {
@@ -217,8 +217,8 @@ public final class BicycleInfraClassifier {
 	// Bus lanes (directional)
 	// -------------------------------------------------------------------------
 
-	private BicycleInfraCategory getSharedBusLaneTypeForDirection(Map<String, String> tags, Direction dir) {
-		boolean forward = dir == Direction.FORWARD;
+	private BicycleInfraCategory getSharedBusLaneTypeForDirection(Map<String, String> tags, OsmWayDirection dir) {
+		boolean forward = dir == OsmWayDirection.FORWARD;
 
 		String highway = getValueByKey(tags, HIGHWAY);
 		String cycleway = getValueByKey(tags, CYCLEWAY);
@@ -265,8 +265,8 @@ public final class BicycleInfraClassifier {
 	// Shared lane (directional)
 	// -------------------------------------------------------------------------
 
-	private static boolean isSharedMotorVehicleLaneForDirection(Map<String, String> tags, Direction dir) {
-		boolean forward = dir == Direction.FORWARD;
+	private static boolean isSharedMotorVehicleLaneForDirection(Map<String, String> tags, OsmWayDirection dir) {
+		boolean forward = dir == OsmWayDirection.FORWARD;
 
 		String highway = getValueByKey(tags, HIGHWAY);
 		String cycleway = getValueByKey(tags, CYCLEWAY);
@@ -318,9 +318,9 @@ public final class BicycleInfraClassifier {
 		return true;
 	}
 
-	private static boolean hasCyclewayOnHighwayAdvisoryForDirection(Map<String, String> tags, Direction dir) {
+	private static boolean hasCyclewayOnHighwayAdvisoryForDirection(Map<String, String> tags, OsmWayDirection dir) {
 		if (!isCyclewayOnHighwayAdvisoryOrExclusiveBase(tags)) return false;
-		boolean forward = dir == Direction.FORWARD;
+		boolean forward = dir == OsmWayDirection.FORWARD;
 
 		boolean rightBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_RIGHT_ONEWAY));
 		boolean leftBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_LEFT_ONEWAY));
@@ -334,9 +334,9 @@ public final class BicycleInfraClassifier {
 		return CW_LANE_ADVISORY.equals(getValueByKey(tags, CYCLEWAY_BOTH_LANE)) || CW_LANE_ADVISORY.equals(getValueByKey(tags, CYCLEWAY_LANE));
 	}
 
-	private static boolean hasCyclewayOnHighwayExclusiveForDirection(Map<String, String> tags, Direction dir) {
+	private static boolean hasCyclewayOnHighwayExclusiveForDirection(Map<String, String> tags, OsmWayDirection dir) {
 		if (!isCyclewayOnHighwayAdvisoryOrExclusiveBase(tags)) return false;
-		boolean forward = dir == Direction.FORWARD;
+		boolean forward = dir == OsmWayDirection.FORWARD;
 
 		boolean rightBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_RIGHT_ONEWAY));
 		boolean leftBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_LEFT_ONEWAY));
@@ -350,8 +350,8 @@ public final class BicycleInfraClassifier {
 		return CW_LANE_EXCLUSIVE.equals(getValueByKey(tags, CYCLEWAY_BOTH_LANE)) || CW_LANE_EXCLUSIVE.equals(getValueByKey(tags, CYCLEWAY_LANE));
 	}
 
-	private static boolean hasCyclewayOnHighwayAdvisoryOrExclusiveForDirection(Map<String, String> tags, Direction dir) {
-		boolean forward = dir == Direction.FORWARD;
+	private static boolean hasCyclewayOnHighwayAdvisoryOrExclusiveForDirection(Map<String, String> tags, OsmWayDirection dir) {
+		boolean forward = dir == OsmWayDirection.FORWARD;
 
 		boolean rightBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_RIGHT_ONEWAY));
 		boolean leftBidirectional = NO.equals(getValueByKey(tags, CYCLEWAY_LEFT_ONEWAY));
@@ -370,8 +370,8 @@ public final class BicycleInfraClassifier {
 	// Separated cycleways (directional)
 	// -------------------------------------------------------------------------
 
-	private BicycleInfraCategory getCyclewayTypeForDirection(Map<String, String> tags, Direction dir) {
-		boolean forward = dir == Direction.FORWARD;
+	private BicycleInfraCategory getCyclewayTypeForDirection(Map<String, String> tags, OsmWayDirection dir) {
+		boolean forward = dir == OsmWayDirection.FORWARD;
 
 		String highway = getValueByKey(tags, HIGHWAY);
 		String cycleway = getValueByKey(tags, CYCLEWAY);
@@ -470,8 +470,8 @@ public final class BicycleInfraClassifier {
 	// Footway bicycle yes (directional for sidewalk:* tags)
 	// -------------------------------------------------------------------------
 
-	private BicycleInfraCategory getFootwayBicycleYesTypeForDirection(Map<String, String> tags, Direction dir) {
-		boolean forward = dir == Direction.FORWARD;
+	private BicycleInfraCategory getFootwayBicycleYesTypeForDirection(Map<String, String> tags, OsmWayDirection dir) {
+		boolean forward = dir == OsmWayDirection.FORWARD;
 		String highway = getValueByKey(tags, HIGHWAY);
 
 		// Case 1: sidewalk:*:bicycle=yes (directional)

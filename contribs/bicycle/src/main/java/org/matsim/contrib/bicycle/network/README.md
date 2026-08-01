@@ -232,7 +232,7 @@ The five elevation attributes (`average_elevation`, `gradient`, `max_gradient`, 
 attached when a DEM is supplied via `--dem`; without one they are absent.
 
 For ad-hoc debugging you can forward **arbitrary** OSM tags onto links: add their keys to `TAGS_TO_COPY` in
-`BicycleNetworkPipeline` and `TagCopy` copies them on verbatim under the `osm:` prefix (empty by default, so a no-op
+`BicycleNetworkPipeline` and `TagCopier` copies them on verbatim under the `osm:` prefix (empty by default, so a no-op
 until you populate it).
 
 ## Files
@@ -245,7 +245,7 @@ until you populate it).
   written to the link attribute
 - `BicycleOsmTags` — bicycle-specific OSM tag keys + frequently-used values, used as `import static`;
   `classificationKeys()` is the single list of tag keys the classifier consults
-- `Direction` — `FORWARD` / `REVERSE`, reader-neutral on purpose: the Supersonic path maps the reader's own enum
+- `OsmWayDirection` — `FORWARD` / `REVERSE`, reader-neutral on purpose: the Supersonic path maps the reader's own enum
   onto it, the SUMO path derives it from the sign of the link id
 - `BicycleCountryProfile` — interface for country-specific knobs (traffic-sign predicates, driving direction); see
   Country profiles below
@@ -273,7 +273,7 @@ until you populate it).
 - `BicycleNetworkPipeline` — full pipeline, entry point
 - `BicycleLinkPolicy` — per-link hook: infra classification + access rule enforcement (footway whitelist, `bicycle=no`,
   `access=no/private/customer`, oneway handling)
-- `TagCopy` — optional: copies selected raw OSM tags onto links with a prefix
+- `TagCopier` — optional: copies selected raw OSM tags onto links with a prefix
 
 **Deprecated, kept for now:** `BicycleOsmNetworkReaderV2`, `CreateBicycleNetworkWithElevation` — both build on the
 old `OsmNetworkReader` and are superseded by `BicycleNetworkPipeline`. Nothing references them.
@@ -309,7 +309,7 @@ ones, each with the `.osm` it came from so the setup can be reproduced:
   into a message naming both CRS. Uses a small cutout shipped in
   `contribs/bicycle/test/input/org/matsim/contrib/bicycle/network/` (see the README there for source and license); a
   different DTM can be passed via `-Ddem.path=…`. Skipped via `assumeTrue` when the DTM file is missing.
-- `TagCopyTest` — 2 cases for the optional raw-OSM-tag copying (`TagCopy`)
+- `TagCopierTest` — 2 cases for the optional raw-OSM-tag copying (`TagCopier`)
 
 ## Pipeline (Supersonic path)
 

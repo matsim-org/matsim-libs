@@ -32,7 +32,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests for {@link TagCopy}. Generates two Networks and compares them.
+ * Tests for {@link TagCopier}. Generates two Networks and compares them.
  *
  * <p>Coverage:
  * <ul>
@@ -42,20 +42,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author esarikaya
  */
-public class TagCopyTest {
+public class TagCopierTest {
 
 
 	/**
 	 * Tests basic tag-copy
 	 */
 	@Test
-	void simpleTagCopyTest() {
+	void simpleTagCopierTest() {
 		String prefix = "test";
 		Map <String, String> tags = new HashMap<>();
 		tags.put("tag1","1");
 		tags.put("tag2","2");
 
-		TagCopy tagCopy = new TagCopy(tags.keySet().stream().toList(), prefix);
+		TagCopier tagCopier = new TagCopier(tags.keySet().stream().toList(), prefix);
 
 		Network built = NetworkUtils.createNetwork();
 		Node fromBuilt = NetworkUtils.createNode(Id.createNodeId("from"), CoordUtils.createCoord(0,0));
@@ -84,7 +84,7 @@ public class TagCopyTest {
 			built,
 			0.0, 0.0, 0.0, 0.0);
 
-		tagCopy.copy(linkGenerated, tags);
+		tagCopier.copy(linkGenerated, tags);
 		generated.addNode(fromGenerated);
 		generated.addNode(toGenerated);
 		generated.addLink(linkGenerated);
@@ -96,13 +96,13 @@ public class TagCopyTest {
 	 * Tests "blank or null tag" edge case
 	 */
 	@Test
-	void blankAndNullTagCopyTest() {
+	void blankAndNullTagCopierTest() {
 		String prefix = "test";
 		Map <String, String> tags = new HashMap<>();
 		tags.put("tag1","");
 		tags.put("tag2",null);
 
-		TagCopy tagCopy = new TagCopy(tags.keySet().stream().toList(), prefix);
+		TagCopier tagCopier = new TagCopier(tags.keySet().stream().toList(), prefix);
 
 		Network built = NetworkUtils.createNetwork();
 		Node fromBuilt = NetworkUtils.createNode(Id.createNodeId("from"), CoordUtils.createCoord(0,0));
@@ -128,7 +128,7 @@ public class TagCopyTest {
 			built,
 			0.0, 0.0, 0.0, 0.0);
 
-		tagCopy.copy(linkGenerated, tags);
+		tagCopier.copy(linkGenerated, tags);
 		generated.addNode(fromGenerated);
 		generated.addNode(toGenerated);
 		generated.addLink(linkGenerated);

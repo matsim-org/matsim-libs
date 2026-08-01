@@ -37,7 +37,7 @@ package org.matsim.contrib.bicycle.network;
  *   <li><b>Driving direction.</b> {@link #isRightHandTraffic()} drives the
  *       {@code cycleway:right} vs {@code cycleway:left} interpretation.
  *       Currently always {@code true} for DE; the classifier still wires
- *       directionality based on the {@code Direction} parameter and assumes
+ *       directionality based on the {@code OsmWayDirection} parameter and assumes
  *       right-hand traffic in a number of places — flipping this to
  *       {@code false} will not magically produce correct UK results. See
  *       TODO in {@link BicycleInfraClassifier} for the list of sites that

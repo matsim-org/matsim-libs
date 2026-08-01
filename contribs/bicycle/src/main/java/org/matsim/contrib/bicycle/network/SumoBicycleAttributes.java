@@ -331,7 +331,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 				continue;
 			}
 
-			Direction direction = directionOf(link);
+			OsmWayDirection direction = directionOf(link);
 			link.getAttributes().putAttribute(BICYCLE_INFRA,
 				classify(classifier, ways, direction, link, stats).name());
 
@@ -372,8 +372,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * converter reuses the edge id as the link id — so the leading minus is the whole
 	 * rule. It holds for the contraflow edges {@code osm.bike-access} adds, too.
 	 */
-	static Direction directionOf(Link link) {
-		return link.getId().toString().startsWith("-") ? Direction.REVERSE : Direction.FORWARD;
+	static OsmWayDirection directionOf(Link link) {
+		return link.getId().toString().startsWith("-") ? OsmWayDirection.REVERSE : OsmWayDirection.FORWARD;
 	}
 
 	/**
@@ -417,7 +417,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 */
 	private static BicycleInfraCategory classify(BicycleInfraClassifier classifier,
 												 List<Map<String, String>> ways,
-												 Direction direction, Link link, Stats stats) {
+												 OsmWayDirection direction, Link link, Stats stats) {
 
 		BicycleInfraCategory first = classifier.classify(ways.get(0), direction);
 		for (int i = 1; i < ways.size(); i++) {

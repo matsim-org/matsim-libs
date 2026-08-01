@@ -182,8 +182,8 @@ public class SumoBicycleAttributesTest {
 		assertNotNull(infra(f.network(), "-6001"), "it must be classified, not skipped");
 
 		// its direction comes from the leading minus, same as any other reverse link
-		assertEquals(Direction.REVERSE, SumoBicycleAttributes.directionOf(contraflow));
-		assertEquals(Direction.FORWARD, SumoBicycleAttributes.directionOf(link(f.network(), "6001")));
+		assertEquals(OsmWayDirection.REVERSE, SumoBicycleAttributes.directionOf(contraflow));
+		assertEquals(OsmWayDirection.FORWARD, SumoBicycleAttributes.directionOf(link(f.network(), "6001")));
 	}
 
 	@Test
