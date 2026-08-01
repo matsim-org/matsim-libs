@@ -385,7 +385,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 		warnAboutMissingLaneRestrictions(network, stats);
 
-		stats.modesRenamed = renameMode(network, TransportMode.bike, params.mode());
+		stats.modesRenamed = BicycleNetworkOps.renameMode(network, TransportMode.bike, params.mode());
 
 		return stats;
 	}
@@ -686,22 +686,6 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			probe.add(nodes.get(i).getCoord());
 		}
 		return probe;
-	}
-
-	/** Renames the bike mode on every link; a no-op when both names are equal. */
-	private static int renameMode(Network network, String from, String to) {
-		if (from.equals(to)) return 0;
-
-		int renamed = 0;
-		for (Link link : network.getLinks().values()) {
-			if (!link.getAllowedModes().contains(from)) continue;
-			Set<String> modes = new HashSet<>(link.getAllowedModes());
-			modes.remove(from);
-			modes.add(to);
-			link.setAllowedModes(modes);
-			renamed++;
-		}
-		return renamed;
 	}
 
 	// ------------------------------------------------------------------------

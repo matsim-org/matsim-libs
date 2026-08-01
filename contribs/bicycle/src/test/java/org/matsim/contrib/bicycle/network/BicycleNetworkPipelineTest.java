@@ -301,7 +301,7 @@ public class BicycleNetworkPipelineTest {
 		Link car = link(net, b, a, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 2L);
 		car.setAllowedModes(Set.of("car"));
 
-		int renamed = BicycleNetworkPipeline.renameMode(net, TransportMode.bike, "bicycle");
+		int renamed = BicycleNetworkOps.renameMode(net, TransportMode.bike, "bicycle");
 
 		assertEquals(1, renamed);
 		assertEquals(Set.of("bicycle"), bike.getAllowedModes());
@@ -314,7 +314,7 @@ public class BicycleNetworkPipelineTest {
 		link(net, node(net, "a", 0, 0), node(net, "b", 100, 0),
 			"highway.cycleway", "CYCLEWAY_LINK", "asphalt", 1L);
 
-		assertEquals(0, BicycleNetworkPipeline.renameMode(net, TransportMode.bike, TransportMode.bike));
+		assertEquals(0, BicycleNetworkOps.renameMode(net, TransportMode.bike, TransportMode.bike));
 	}
 
 	@Test

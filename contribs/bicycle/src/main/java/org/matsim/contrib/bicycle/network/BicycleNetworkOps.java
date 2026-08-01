@@ -28,8 +28,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * The pieces of bicycle network building that are independent of where the network
@@ -103,6 +105,35 @@ final class BicycleNetworkOps {
 	static double round(double v, int decimals) {
 		double factor = Math.pow(10, decimals);
 		return Math.round(v * factor) / factor;
+	}
+
+	// ---- modes -----------------------------------------------------------------
+
+	/**
+	 * Renames a mode in every link's allowed-modes set; a no-op when {@code from} equals
+	 * {@code to}. Both pipelines run this last, driven by {@code --mode}.
+	 *
+	 * <p>The OSM {@code bicycle=...} restriction value is unaffected: it is stored under
+	 * {@code osm:bicycle}, not under the mode name.
+	 *
+	 * @return the number of links whose mode set was changed
+	 */
+	static int renameMode(Network network, String from, String to) {
+		if (from.equals(to)) {
+			log.info("Network mode is already '{}', no rename needed.", to);
+			return 0;
+		}
+		int renamed = 0;
+		for (Link link : network.getLinks().values()) {
+			Set<String> modes = new HashSet<>(link.getAllowedModes());
+			if (modes.remove(from)) {
+				modes.add(to);
+				link.setAllowedModes(modes);
+				renamed++;
+			}
+		}
+		log.info("Renamed network mode '{}' -> '{}' on {} links.", from, to, renamed);
+		return renamed;
 	}
 
 	// ---- reporting -------------------------------------------------------------

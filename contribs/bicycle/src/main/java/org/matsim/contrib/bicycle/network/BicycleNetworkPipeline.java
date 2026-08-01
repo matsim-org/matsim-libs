@@ -377,7 +377,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car, TransportMode.bike));
 
 		// ---- 6. rename mode if requested (no-op when --mode bike) -----------
-		renameMode(network, TransportMode.bike, params.mode());
+		BicycleNetworkOps.renameMode(network, TransportMode.bike, params.mode());
 
 		// ---- 7. elevation metrics on the final link set (skipped without a DEM) --
 		// Elevation is part of the full bicycle treatment, so attach it only where
@@ -499,39 +499,6 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 											   double sampleStep, double noiseTolerance) {
 		BicycleNetworkOps.attachElevationMetrics(link,
 			LinkElevationProfile.compute(link, sampleStep, noiseTolerance, elevation));
-	}
-
-
-	// =========================================================================
-	// Mode rename
-	// =========================================================================
-
-	/**
-	 * Rename a mode in each link's allowed-modes set. If {@code from} equals
-	 * {@code to}, this is a no-op.
-	 *
-	 * <p>Note: the OSM {@code bicycle=...} restriction value is no longer
-	 * stored under the mode-name key -- it now lives at "osm:bicycle" and is
-	 * unaffected by the mode rename.
-	 *
-	 * @return the number of links whose mode set was changed
-	 */
-	static int renameMode(Network network, String from, String to) {
-		if (from.equals(to)) {
-			log.info("Network mode is already '{}', no rename needed.", to);
-			return 0;
-		}
-		int renamed = 0;
-		for (Link link : network.getLinks().values()) {
-			Set<String> modes = new HashSet<>(link.getAllowedModes());
-			if (modes.remove(from)) {
-				modes.add(to);
-				link.setAllowedModes(modes);
-				renamed++;
-			}
-		}
-		log.info("Renamed network mode '{}' -> '{}' on {} links.", from, to, renamed);
-		return renamed;
 	}
 
 
