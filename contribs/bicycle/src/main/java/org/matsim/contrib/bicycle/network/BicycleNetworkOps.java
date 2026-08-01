@@ -74,8 +74,11 @@ public final class BicycleNetworkOps {
 	/** Cumulative meters descended along the link, as a positive number. */
 	public static final String LINK_ATTR_ELEVATION_LOSS = "elevationLoss";
 
-	/** Prefix marking a link attribute as a verbatim OSM tag value. */
-	public static final String OSM_PREFIX = "osm:";
+	/**
+	 * Prefix marking a link attribute as a verbatim OSM tag value. Defined in
+	 * {@link BicycleUtils}, whose getters fall back to the prefixed keys when scoring.
+	 */
+	public static final String OSM_PREFIX = BicycleUtils.OSM_PREFIX;
 
 	private BicycleNetworkOps() {
 	}

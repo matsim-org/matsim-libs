@@ -216,10 +216,14 @@ Both paths write these. `bicycle_infra_mixed` and `origid` are the only path-spe
 The SUMO path writes every tag of `BicycleOsmTags.classificationKeys()` it finds under the `osm:` prefix, not
 just the four listed above — and on a merged link only values all constituent ways agree on.
 
+Scoring reads these through `BicycleUtils`: `getSurface()` and `getCyclewaytype()` check the plain key
+(`surface`, as `OsmBicycleReader` writes it) first and fall back to the `osm:`-prefixed one, so a network
+from either path scores the same.
+
 Gradients are signed in the direction of travel, so reverse links get the opposite sign. `gradient` alone reads 0 % on a
 link with a hill between equal-height endpoints — `maxGradient`, `elevationGain` and `elevationLoss` fill that gap.
 
-Not all of these are consumed by the simulation: `averageElevation`, `osm:bicycle` and `osm:cycleway` are written for
+Not all of these are consumed by the simulation: `averageElevation` and `osm:bicycle` are written for
 inspection only — handy for sanity-checking an extract, but not read by anything downstream.
 
 The five elevation attributes (`averageElevation`, `gradient`, `maxGradient`, `elevationGain`, `elevationLoss`) are only
@@ -466,12 +470,9 @@ prints the DEM's own extent, which is usually enough to spot the right one.
 
 ### Attributes & scoring
 
-- **Scoring reads unprefixed attribute keys.** `BicycleUtils.getSurface()` and `getCyclewaytype()` read `surface` /
-  `cycleway`, but this pipeline writes them as `osm:surface` / `osm:cycleway`. A network built here yields `null` there,
-  and the default scoring silently falls back to a comfort factor of 1.0 — no error, no warning. Until resolved, either
-  skip the `osm:` prefixing for those keys or give `BicycleUtils` a fallback to the prefixed keys. The same trap applies
-  to a future `type` → `osm:highway` rename, since `BicycleUtils.WAY_TYPE = "type"`.
 - **`type` and `origid` are not yet `osm:`-prefixed** because both carry semantics other code depends on
-  (`type=service` for `ServiceLinkCleaner`; `origid` for `NetworkSimplifier` merge tracking).
-- **Some attributes are inspection-only** and aren't consumed by the simulation: `averageElevation`, `osm:bicycle`, and
-  `osm:cycleway`.
+  (`type=service` for `ServiceLinkCleaner`; `origid` for `NetworkSimplifier` merge tracking) — and unlike
+  `getSurface()` / `getCyclewaytype()`, `BicycleUtils.WAY_TYPE` reads the unprefixed `type` with no `osm:`
+  fallback, so a `type` → `osm:highway` rename would silently break scoring.
+- **Some attributes are inspection-only** and aren't consumed by the simulation: `averageElevation` and
+  `osm:bicycle`.

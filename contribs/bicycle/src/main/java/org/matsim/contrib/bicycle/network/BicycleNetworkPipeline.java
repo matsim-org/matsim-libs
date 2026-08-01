@@ -90,11 +90,10 @@ import java.util.function.BiPredicate;
  * </ul>
  * Both touch additional code paths and are deferred to a separate commit.
  *
- * <p><b>Warning:</b> the {@code "type"} → {@code "osm:highway"} rename would break
- * scoring the same way the {@code surface} / {@code cycleway} prefixing already does:
- * {@code BicycleUtils.WAY_TYPE} reads the unprefixed {@code "type"}, so a network built
- * after such a rename yields {@code null} there and the default scoring silently falls
- * back. See the README "Limitations" before implementing it.
+ * <p><b>Warning:</b> the {@code "type"} → {@code "osm:highway"} rename would silently
+ * break scoring: {@code BicycleUtils.WAY_TYPE} reads the unprefixed {@code "type"} and,
+ * unlike {@code BicycleUtils.getSurface()} / {@code getCyclewaytype()}, has no
+ * {@code osm:} fallback. See the README "Limitations" before implementing it.
  *
  * @author smetzler
  */
