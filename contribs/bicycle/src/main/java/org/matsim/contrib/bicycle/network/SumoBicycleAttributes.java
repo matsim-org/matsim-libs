@@ -166,12 +166,6 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		description = "Douglas-Peucker vertical tolerance for smoothing the profile, in m")
 	private double eleNoiseToleranceM;
 
-	@Option(names = "--compress-geometries", negatable = true, defaultValue = "false",
-		description = "Write the link geometries gzipped. Off by default so the file name matches "
-			+ "what network-from-sumo produces; worth turning on for large networks, where the "
-			+ "uncompressed file runs to a few hundred MB.")
-	private boolean compressGeometries;
-
 	public static void main(String[] args) {
 		new SumoBicycleAttributes().execute(args);
 	}
@@ -227,8 +221,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		BicycleNetworkOps.logInfraDistribution(network, "in final network");
 
 		new NetworkWriter(network).write(output.toString());
-		writeGeometries(network, sumo, companion(output, GEOMETRY_SUFFIX, compressGeometries));
-		filterFeatures(network, companion(networkFile, FEATURE_SUFFIX, true), companion(output, FEATURE_SUFFIX, true));
+		writeGeometries(network, sumo, companion(output, GEOMETRY_SUFFIX));
+		filterFeatures(network, companion(networkFile, FEATURE_SUFFIX), companion(output, FEATURE_SUFFIX));
 		return 0;
 	}
 
@@ -238,11 +232,13 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 	/**
 	 * The path {@code network-from-sumo} would use for a companion file of that network:
-	 * next to it, with {@code .xml[.gz]} replaced by the suffix.
+	 * next to it, with {@code .xml} swapped for the suffix. A compression extension after
+	 * the {@code .xml} stays put, so the companions inherit the network's own compression:
+	 * {@code net.xml.gz} gets {@code net-ft.csv.gz}, a plain {@code net.xml} plain CSVs.
+	 * {@link IOUtils} picks the codec from the extension when reading and writing them.
 	 */
-	static Path companion(Path network, String suffix, boolean gzip) {
-		String name = network.getFileName().toString().replace(".xml", suffix).replace(".gz", "");
-		if (gzip) name = name + ".gz";
+	static Path companion(Path network, String suffix) {
+		String name = network.getFileName().toString().replace(".xml", suffix);
 		Path dir = network.getParent();
 		return dir != null ? dir.resolve(name) : Path.of(name);
 	}

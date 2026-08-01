@@ -262,37 +262,41 @@ public class SumoBicycleAttributesTest {
 	void derivesCompanionNamesLikeNetworkFromSumo() {
 		Path net = Path.of("in", "dresden.xml.gz");
 
-		// network-from-sumo writes the geometries uncompressed and the features gzipped
-		assertEquals(Path.of("in", "dresden-linkGeometries.csv"),
-			SumoBicycleAttributes.companion(net, "-linkGeometries.csv", false));
+		// the companions inherit the network's compression, exactly like network-from-sumo:
+		// its .replace(".xml", suffix) leaves a trailing .gz in place
+		assertEquals(Path.of("in", "dresden-linkGeometries.csv.gz"),
+			SumoBicycleAttributes.companion(net, "-linkGeometries.csv"));
 		assertEquals(Path.of("in", "dresden-ft.csv.gz"),
-			SumoBicycleAttributes.companion(net, "-ft.csv", true));
+			SumoBicycleAttributes.companion(net, "-ft.csv"));
 
-		// an uncompressed network works the same way
+		// an uncompressed network gets uncompressed companions
 		assertEquals(Path.of("in", "dresden-linkGeometries.csv"),
-			SumoBicycleAttributes.companion(Path.of("in", "dresden.xml"), "-linkGeometries.csv", false));
+			SumoBicycleAttributes.companion(Path.of("in", "dresden.xml"), "-linkGeometries.csv"));
+		assertEquals(Path.of("in", "dresden-ft.csv"),
+			SumoBicycleAttributes.companion(Path.of("in", "dresden.xml"), "-ft.csv"));
 	}
 
 	/**
-	 * A ".gz" further up the path must not be mangled — the suffix swap applies to the
-	 * file name, not to the whole path.
+	 * An ".xml" further up the path must not be swapped — the suffix replacement applies
+	 * to the file name, not to the whole path.
 	 */
 	@Test
 	void leavesTheDirectoryAlone() {
-		assertEquals(Path.of("a.gz.dir", "net-linkGeometries.csv"),
-			SumoBicycleAttributes.companion(Path.of("a.gz.dir", "net.xml.gz"), "-linkGeometries.csv", false));
+		assertEquals(Path.of("nets.xml.d", "net-linkGeometries.csv.gz"),
+			SumoBicycleAttributes.companion(Path.of("nets.xml.d", "net.xml.gz"), "-linkGeometries.csv"));
 	}
 
 	@Test
 	void writesGeometriesForExactlyTheSurvivingLinks() throws Exception {
 
 		Fixture f = read();
-		Path out = Files.createTempDirectory("bike").resolve("net.xml.gz");
+		// uncompressed output network, so the derived companion is plain CSV and readable below
+		Path out = Files.createTempDirectory("bike").resolve("net.xml");
 
 		SumoBicycleAttributes.process(f.network(), f.sumo(), f.tags(), null,
 			SumoBicycleAttributes.Params.defaults());
 		SumoBicycleAttributes.writeGeometries(f.network(), f.sumo(),
-			SumoBicycleAttributes.companion(out, "-linkGeometries.csv", false));
+			SumoBicycleAttributes.companion(out, "-linkGeometries.csv"));
 
 		Path csv = out.resolveSibling("net-linkGeometries.csv");
 		assertTrue(Files.exists(csv), "the geometry file must sit next to the network");
