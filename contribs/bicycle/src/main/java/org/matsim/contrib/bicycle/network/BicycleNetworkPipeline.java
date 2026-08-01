@@ -227,9 +227,9 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 */
 	private static final List<String> SIMPLIFY_MATCH_KEYS = List.of(
 		BicycleUtils.BICYCLE_INFRA,
-		"type",
-		OSM_PREFIX + "surface",
-		OSM_PREFIX + "smoothness",
+		NetworkUtils.TYPE,
+		OSM_PREFIX + BicycleUtils.SURFACE,
+		OSM_PREFIX + BicycleUtils.SMOOTHNESS,
 		NetworkUtils.ALLOWED_SPEED
 	);
 
