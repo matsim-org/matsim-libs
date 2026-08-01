@@ -26,6 +26,12 @@ network. Both write the same attributes, so downstream code does not care which 
 
 Two commands, both `MATSimAppCommand`s, so a scenario reaches them as `$(sc) prepare <name>`.
 
+**`network-from-sumo` must be run with `--keep-cyclable-minor-ways`.** Footway, pedestrian and
+track edges have no link properties of their own, and without the flag the converter skips them
+as unknown types — on a Leipzig extract 10 % of the network length, 97 % of the footways among
+them tagged `bicycle=yes`. The flag is opt-in so that existing non-bicycle scenarios keep getting
+the exact network they had.
+
 ## `bicycle-attributes`
 
 Runs last, after `network-from-sumo` and `clean-network`, and attaches the categories, the OSM tags and the

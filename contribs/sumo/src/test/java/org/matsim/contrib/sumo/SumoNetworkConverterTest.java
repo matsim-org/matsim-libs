@@ -57,21 +57,14 @@ public class SumoNetworkConverterTest {
 
 	/**
 	 * The bike-carrying highway types have no entry in
-	 * {@code LinkProperties.createLinkProperties()}, so without the extra puts in
-	 * {@link SumoNetworkConverter#convert(Network)} their edges are dropped with
-	 * "Skipping unknown link type" and the cycling infrastructure on them is lost.
+	 * {@code LinkProperties.createLinkProperties()}, so their edges are dropped with
+	 * "Skipping unknown link type" and the cycling infrastructure on them is lost —
+	 * unless {@code --keep-cyclable-minor-ways} opts in.
 	 */
 	@Test
-	void convertsBikeCarryingHighwayTypes() throws Exception {
+	void convertsBikeCarryingHighwayTypesWhenOptedIn() throws Exception {
 
-		Path input = Files.createTempFile("sumo-bike-types", ".xml");
-		Path output = Files.createTempFile("matsim-bike-types", ".xml");
-
-		Files.copy(Resources.getResource("bike-types.net.xml").openStream(), input, StandardCopyOption.REPLACE_EXISTING);
-
-		SumoNetworkConverter.newInstance(List.of(input), output, "EPSG:25832", "EPSG:25832").call();
-
-		Network network = NetworkUtils.readNetwork(output.toString());
+		Network network = convertBikeTypesFixture(true);
 
 		for (String type : List.of("footway", "pedestrian", "track", "cycleway")) {
 			List<? extends Link> links = network.getLinks().values().stream()
@@ -95,5 +88,39 @@ public class SumoNetworkConverterTest {
 				.filter(l -> "highway.residential".equals(l.getAttributes().getAttribute(NetworkUtils.TYPE)))
 				.allMatch(l -> l.getAllowedModes().contains(TransportMode.car)),
 			"Residential control links must still allow car");
+	}
+
+	/**
+	 * Without the option the converter behaves exactly as before: footway, pedestrian and
+	 * track are skipped as unknown types, while cycleway has always been converted.
+	 */
+	@Test
+	void skipsCyclableMinorWaysByDefault() throws Exception {
+
+		Network network = convertBikeTypesFixture(false);
+
+		for (String type : List.of("footway", "pedestrian", "track")) {
+			Assertions.assertTrue(network.getLinks().values().stream()
+					.noneMatch(l -> ("highway." + type).equals(l.getAttributes().getAttribute(NetworkUtils.TYPE))),
+				"highway." + type + " must be skipped without --keep-cyclable-minor-ways");
+		}
+
+		Assertions.assertTrue(network.getLinks().values().stream()
+				.anyMatch(l -> "highway.cycleway".equals(l.getAttributes().getAttribute(NetworkUtils.TYPE))),
+			"highway.cycleway does not depend on the option");
+	}
+
+	private static Network convertBikeTypesFixture(boolean keepCyclableMinorWays) throws Exception {
+
+		Path input = Files.createTempFile("sumo-bike-types", ".xml");
+		Path output = Files.createTempFile("matsim-bike-types", ".xml");
+
+		Files.copy(Resources.getResource("bike-types.net.xml").openStream(), input, StandardCopyOption.REPLACE_EXISTING);
+
+		SumoNetworkConverter.newInstance(List.of(input), output, "EPSG:25832", "EPSG:25832")
+			.setKeepCyclableMinorWays(keepCyclableMinorWays)
+			.call();
+
+		return NetworkUtils.readNetwork(output.toString());
 	}
 }

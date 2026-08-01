@@ -60,8 +60,10 @@ public class SumoBicycleAttributesTest {
 	private static Fixture read() throws Exception {
 		Network network = NetworkUtils.createNetwork();
 		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(
-			List.of(DIR.resolve("ring.net.xml")), Files.createTempFile("net", ".xml"),
-			"EPSG:25832", "EPSG:25832");
+				List.of(DIR.resolve("ring.net.xml")), Files.createTempFile("net", ".xml"),
+				"EPSG:25832", "EPSG:25832")
+			// the ring contains a footway; without this the converter would skip it
+			.setKeepCyclableMinorWays(true);
 		SumoNetworkHandler sumo = converter.convert(network);
 		return new Fixture(network, sumo, OsmWayTags.read(DIR.resolve("ring.osm")));
 	}
