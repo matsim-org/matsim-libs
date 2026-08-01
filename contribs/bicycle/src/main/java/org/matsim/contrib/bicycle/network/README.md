@@ -28,9 +28,7 @@ Two commands, both `MATSimAppCommand`s, so a scenario reaches them as `$(sc) pre
 
 **`network-from-sumo` must be run with `--keep-cyclable-minor-ways`.** Footway, pedestrian and
 track edges have no link properties of their own, and without the flag the converter skips them
-as unknown types — on a Leipzig extract 10 % of the network length, 97 % of the footways among
-them tagged `bicycle=yes`. The flag is opt-in so that existing non-bicycle scenarios keep getting
-the exact network they had.
+as unknown types.
 
 ## `bicycle-attributes`
 
@@ -101,7 +99,7 @@ links dropped per rule, links the DEM had no data for.
 
 ### What netconvert does and does not handle
 
-Measured against netconvert 1.27.1 on a Leipzig extract. `--osm.bike-access` is **not optional**: it creates the
+The netconvert column describes version 1.27.1. `--osm.bike-access` is **not optional**: it creates the
 contraflow edges for `oneway:bicycle=no` and is what keeps `footway` + `bicycle=yes` alive through
 `--keep-edges.by-vclass` — without it that category disappears from the network entirely.
 
@@ -119,9 +117,7 @@ where it did not.
 ## `bicycle-keep-edges`
 
 netconvert's `--geometry.remove` joins consecutive edges whose SUMO attributes match, knowing nothing about
-cycling infrastructure — so it merges a stretch with a bike lane into one without. On a Leipzig extract 22.7 %
-of the network length sat on edges built from more than one OSM way, and a quarter of all mergeable crossings
-were real category boundaries.
+cycling infrastructure — so it merges a stretch with a bike lane into one without.
 
 This command produces the keep-edges list for a **second netconvert pass**:
 
@@ -130,9 +126,8 @@ netconvert WITHOUT --geometry.remove   →  network-from-sumo  →  bicycle-keep
 netconvert WITH    --geometry.remove --geometry.remove.keep-edges.input-file keep.txt
 ```
 
-Everything still merges except across category boundaries. Measured on the same extract: 43 049 edges against
-37 151 with unrestricted merging and 55 073 with none — **way-pure classification costs 16 % more links rather
-than 48 %**.
+Everything still merges except across category boundaries, so way-pure classification costs a small
+fraction of the additional links that skipping `--geometry.remove` entirely would.
 
 | Option | Default | Meaning |
 |---|---|---|
@@ -352,8 +347,7 @@ introduces staircase artifacts that the DP filter then has to remove.
 
 **`--ele-noise-tolerance`** — Douglas-Peucker vertical tolerance. Intermediate samples whose elevation deviates less
 than this from the straight line between their neighbors are dropped. Needed because DEM quantization, pixel-boundary
-jumps, and terrain-vs-road mismatch (bridges, cuttings) produce spurious gradient spikes — seen up to 400 % on flat
-Berlin streets without filtering.
+jumps, and terrain-vs-road mismatch (bridges, cuttings) produce spurious gradient spikes, even on flat streets.
 
 | Value | Behaviour                    |
 |-------|------------------------------|
@@ -427,9 +421,9 @@ Sonny's DTMs (https://sonny.4lima.de/) are LiDAR-based, much better than SRTM. G
 50 m (~300 MB), both in `EPSG:32632`. License: CC BY 4.0.
 
 **Watch the CRS of the per-state files.** The Germany-wide files are `EPSG:32632` (UTM 32N), the per-state ones
-are not — the Saxony DTM is `EPSG:25833` (UTM 33N). Getting `--dem-crs` wrong used to be silent: the DEM answers
-every query with its no-data value, which is an ordinary number, so the network came out looking flat rather
-than broken. `ElevationDataParser` now returns `NaN` for no-data and out-of-range readings, and
+are not — the Saxony DTM is `EPSG:25833` (UTM 33N). Getting `--dem-crs` wrong would otherwise be silent: the DEM
+answers every query with its no-data value, which is an ordinary number, so the network would come out looking
+flat rather than broken. `ElevationDataParser` therefore returns `NaN` for no-data and out-of-range readings, and
 `bicycle-attributes` probes 200 spread-out nodes before doing any work — the resulting error names both CRS and
 prints the DEM's own extent, which is usually enough to spot the right one.
 
@@ -443,16 +437,16 @@ prints the DEM's own extent, which is usually enough to spot the right one.
   geometry is stored, so sampling falls back to the straight line between the link's end nodes.
 - **The Douglas-Peucker smoothing targets DEM vertical noise, not geometry — so it stays.** `--ele-noise-tolerance`
   removes spurious gradient spikes from DEM quantization, pixel-boundary jumps, and terrain-vs-road mismatch (bridges,
-  cuttings) — up to 400 % on flat Berlin streets without it. That noise is vertical and independent of the horizontal
-  path, so sampling more accurate geometry would *not* remove the need for smoothing.
+  cuttings). That noise is vertical and independent of the horizontal path, so sampling more accurate geometry would
+  *not* remove the need for smoothing.
 - **Nearest-neighbor DEM sampling.** `ElevationDataParser` reads the nearest DEM pixel; the DP filter compensates for
   most of the resulting artifacts.
-- **Short links get implausible gradients.** On a Leipzig extract 2.0 % of links came out with `|gradient| > 10 %`,
-  up to 343 %. They are short — median 14.9 m against 33.7 m network-wide, 64 % under 20 m, the shortest 1.4 m —
-  and the cause is DEM quantization between two adjacent nodes. Douglas-Peucker cannot help here: it only removes
-  intermediate points, and the endpoints are pinned to the node Z. This hits the SUMO path harder than the
-  Supersonic one, whose simplifier produces longer links. Unfixed; a minimum length for the gradient calculation,
-  a cap at a physically sensible value, or smoothing node Z across the neighbourhood would each address it.
+- **Short links get implausible gradients.** The cause is DEM quantization between two adjacent nodes: on a link
+  of a few meters, a single pixel step already reads as a steep slope, so the affected links are almost all far
+  below the network's median link length. Douglas-Peucker cannot help here: it only removes intermediate points,
+  and the endpoints are pinned to the node Z. This hits the SUMO path harder than the Supersonic one, whose
+  simplifier produces longer links. Unfixed; a minimum length for the gradient calculation, a cap at a physically
+  sensible value, or smoothing node Z across the neighbourhood would each address it.
 - **Bridges and tunnels aren't flagged as such.** DP hides most of the resulting spurious gradients, but very long
   bridges can still look unrealistic.
 - **Node Z is transitional and on its way out.** Today the simulation derives each link's gradient from the node Z
