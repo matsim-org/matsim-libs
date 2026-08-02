@@ -20,10 +20,12 @@ package org.matsim.contrib.bicycle.network;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.sumo.SumoNetworkConverter;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
@@ -318,6 +320,163 @@ public class SumoBicycleAttributesTest {
 		// the merged link keeps the geometry node between its two ways
 		String merged = lines.stream().filter(l -> l.startsWith("1001,")).findFirst().orElseThrow();
 		assertEquals(3, merged.split("\\),\\(").length, "two ways joined at one interior point");
+	}
+
+	// ------------------------------------------------------------------------
+	// --simplify
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Two links per direction over a pass-through node, agreeing on every merge
+	 * criterion. The ring fixture has no such pair — every way carries a different
+	 * highway type by design — so the merge mechanics get a synthetic chain; the
+	 * fixture still supplies the {@link SumoNetworkHandler} (whose edge ids simply
+	 * never match, exercising the chord fallback for the constituents).
+	 */
+	private static Network mergeableChain() {
+		Network net = NetworkUtils.createNetwork();
+		Node n0 = net.getFactory().createNode(Id.createNodeId("n0"), new Coord(0, 0));
+		Node n1 = net.getFactory().createNode(Id.createNodeId("n1"), new Coord(100, 0));
+		Node n2 = net.getFactory().createNode(Id.createNodeId("n2"), new Coord(200, 0));
+		net.addNode(n0);
+		net.addNode(n1);
+		net.addNode(n2);
+		chainLink(net, "e1", n0, n1);
+		chainLink(net, "e2", n1, n2);
+		chainLink(net, "r2", n2, n1);
+		chainLink(net, "r1", n1, n0);
+		return net;
+	}
+
+	private static void chainLink(Network net, String id, Node from, Node to) {
+		Link l = net.getFactory().createLink(Id.createLinkId(id), from, to);
+		l.setLength(100);
+		l.setFreespeed(13.89);
+		l.setCapacity(600);
+		l.setNumberOfLanes(1);
+		l.setAllowedModes(java.util.Set.of(TransportMode.car, TransportMode.bike));
+		l.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRA, "NONE");
+		l.getAttributes().putAttribute(NetworkUtils.TYPE, "highway.residential");
+		l.getAttributes().putAttribute(BicycleUtils.OSM_PREFIX + "surface", "asphalt");
+		l.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, 13.89);
+		l.getAttributes().putAttribute("name", "Teststrasse");
+		l.getAttributes().putAttribute("restricted_lanes", 1);
+		net.addLink(l);
+	}
+
+	@Test
+	void simplifyMergesAndCarriesShapesAndProvenance() throws Exception {
+
+		Fixture f = read();
+		Network net = mergeableChain();
+		double kmBefore = net.getLinks().values().stream().mapToDouble(Link::getLength).sum();
+
+		SumoBicycleAttributes.MergeCarry carry = new SumoBicycleAttributes.MergeCarry();
+		int removed = SumoBicycleAttributes.simplifyAndTrack(net, f.sumo(), carry);
+
+		assertEquals(2, removed, "one merge per direction");
+		Link merged = link(net, "e1-e2");
+		assertNotNull(merged, "the merged forward link");
+		assertEquals(kmBefore,
+			net.getLinks().values().stream().mapToDouble(Link::getLength).sum(), 1e-9,
+			"merging must preserve the kilometres");
+		assertEquals(600, merged.getCapacity(), 1e-9, "constituent capacity, neither halved nor doubled");
+
+		// the vanished middle node survives as a support point of the carried shape...
+		List<Coord> shape = carry.shapes.get(merged.getId());
+		assertNotNull(shape, "the merge must carry a shape for the new link");
+		assertEquals(3, shape.size());
+		assertEquals(new Coord(100, 0), shape.get(1));
+
+		// ...but not as an orphan node in the network
+		assertNull(net.getNodes().get(Id.createNodeId("n1")),
+			"the merged-through node must not linger as an orphan");
+
+		// the feature row is inherited from the downstream constituent
+		assertEquals(Id.createLinkId("e2"), carry.featureSource.get(merged.getId()));
+
+		// equal-valued non-key attributes survive the merge
+		assertEquals("Teststrasse", merged.getAttributes().getAttribute("name"));
+		assertEquals(1, merged.getAttributes().getAttribute("restricted_lanes"));
+	}
+
+	@Test
+	void simplifyFeedsElevationAndGeometryForMergedLinks() throws Exception {
+
+		Fixture f = read();
+		Network net = mergeableChain();
+		SumoBicycleAttributes.MergeCarry carry = new SumoBicycleAttributes.MergeCarry();
+		SumoBicycleAttributes.simplifyAndTrack(net, f.sumo(), carry);
+
+		SumoBicycleAttributes.Stats stats = new SumoBicycleAttributes.Stats();
+		SumoBicycleAttributes.attachElevation(net, f.sumo(), carry.shapes, SLOPE,
+			SumoBicycleAttributes.Params.defaults(), stats);
+
+		// SLOPE rises 0.01 per metre of x, so the 200 m merged link climbs 2 m
+		Link merged = link(net, "e1-e2");
+		assertNotNull(merged.getAttributes().getAttribute(BicycleUtils.GRADIENT),
+			"a merged link must not lose its gradient");
+		assertEquals(0.01, (double) merged.getAttributes().getAttribute(BicycleUtils.GRADIENT), 1e-3);
+		assertTrue(stats.linksWithTrueShape >= 2, "merged links sample along the carried polyline");
+
+		// and the geometry companion writes the concatenated course under the merged id
+		Path out = Path.of(utils.getOutputDirectory(), "merged.xml");
+		SumoBicycleAttributes.writeGeometries(net, f.sumo(), carry.shapes,
+			SumoBicycleAttributes.companion(out, "-linkGeometries.csv"));
+		List<String> lines = Files.readAllLines(out.resolveSibling("merged-linkGeometries.csv"));
+		String row = lines.stream().filter(l -> l.startsWith("e1-e2,")).findFirst().orElseThrow();
+		assertEquals(3, row.split("\\),\\(").length, "three support points, not a two-point chord");
+	}
+
+	@Test
+	void simplifySynthesizesFeatureRowsForMergedLinks() throws Exception {
+
+		Fixture f = read();
+		Network net = mergeableChain();
+		SumoBicycleAttributes.MergeCarry carry = new SumoBicycleAttributes.MergeCarry();
+		SumoBicycleAttributes.simplifyAndTrack(net, f.sumo(), carry);
+
+		Path in = Path.of(utils.getOutputDirectory(), "in-ft.csv");
+		Files.write(in, List.of(
+			"linkId,highway_type,speed,length,num_lanes,junction_type",
+			"e1,residential,13.89,100.0,1,priority",
+			"e2,residential,13.89,100.0,1,traffic_light",
+			"r1,residential,13.89,100.0,1,priority",
+			"r2,residential,13.89,100.0,1,dead_end"));
+		Path out = Path.of(utils.getOutputDirectory(), "out-ft.csv");
+
+		SumoBicycleAttributes.filterFeatures(net, carry.featureSource, in, out);
+
+		List<String> lines = Files.readAllLines(out);
+		assertEquals("linkId,highway_type,speed,length,num_lanes,junction_type", lines.get(0));
+		String merged = lines.stream().filter(l -> l.startsWith("e1-e2,")).findFirst().orElseThrow();
+		assertEquals("e1-e2,residential,13.89,200.00,1,traffic_light", merged,
+			"row of the downstream constituent, id and length rewritten");
+		assertTrue(lines.stream().noneMatch(l -> l.startsWith("e1,")),
+			"the constituents' rows are gone with their links");
+	}
+
+	@Test
+	void processWithSimplifyKeepsKilometresAndElevatesEverything() throws Exception {
+
+		Fixture plain = read();
+		run(plain, SLOPE);
+		double kmPlain = plain.network().getLinks().values().stream().mapToDouble(Link::getLength).sum();
+
+		Fixture f = read();
+		SumoBicycleAttributes.MergeCarry carry = new SumoBicycleAttributes.MergeCarry();
+		SumoBicycleAttributes.Stats stats = SumoBicycleAttributes.process(f.network(), f.sumo(), f.tags(),
+			SLOPE, SumoBicycleAttributes.Params.defaults().withSimplify(), carry);
+
+		double km = f.network().getLinks().values().stream().mapToDouble(Link::getLength).sum();
+		assertEquals(kmPlain, km, 1e-6, "--simplify merges, it never filters");
+		assertTrue(stats.mergedBySimplify >= 0);
+
+		// every classified link has a gradient - merged ones included, because the
+		// metrics are computed after the merge
+		assertTrue(f.network().getLinks().values().stream()
+			.filter(l -> l.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA) != null)
+			.allMatch(l -> l.getAttributes().getAttribute(BicycleUtils.GRADIENT) != null));
 	}
 
 	/** Everything the network holds, in a stable order, for comparing two runs. */

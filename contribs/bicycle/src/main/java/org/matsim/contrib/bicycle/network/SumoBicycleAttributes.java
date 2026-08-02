@@ -25,6 +25,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -34,6 +35,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -44,12 +46,17 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA;
@@ -88,11 +95,20 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.YES;
  * it is a plain road. The {@code sumo.net.xml} also supplies the edge polyline, which
  * is what the elevation metrics are sampled along.
  *
- * <p><b>What it does not do.</b> It never merges or splits links. Whether consecutive
- * links of differing infrastructure end up as one link is decided earlier, by
- * netconvert's {@code geometry.remove}. Links whose constituent ways disagree are
- * recorded as {@link BicycleInfraCategory#NEEDS_CLARIFICATION}, marked with
+ * <p><b>What it does not do.</b> It never splits links, and it never merges across
+ * differing infrastructure. Whether consecutive links of differing infrastructure end
+ * up as one link is decided earlier, by netconvert's {@code geometry.remove}. Links
+ * whose constituent ways disagree are recorded as
+ * {@link BicycleInfraCategory#NEEDS_CLARIFICATION}, marked with
  * {@link BicycleUtils#BICYCLE_INFRA_MIXED} and counted — never guessed at.
+ *
+ * <p><b>{@code --simplify}.</b> Optionally merges consecutive links that agree on the
+ * bicycle attributes (and on modes, lanes, freespeed and capacity), with the same
+ * rules the Supersonic pipeline uses. The merge runs after the cleanups and before
+ * the elevation metrics, so gradients are computed over the merged polylines, and the
+ * companion files describe the merged links: the geometry CSV gets the concatenated
+ * SUMO shapes, the feature CSV a row inherited from the downstream constituent (whose
+ * to-junction the merged link now ends at), with the length column corrected.
  *
  * @author smetzler
  */
@@ -135,6 +151,13 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 	@Option(names = "--output", required = true, description = "Path to the output network")
 	private Path output;
+
+	@Option(names = "--simplify", defaultValue = "false",
+		description = "Merge consecutive links that agree on the bicycle attributes (and on "
+			+ "modes, lanes, freespeed and capacity), with the Supersonic pipeline's rules. "
+			+ "Runs after the cleanups and before the elevation metrics, so gradients cover "
+			+ "the merged polylines and the companion files describe the merged links.")
+	private boolean simplify;
 
 	@Mixin
 	private final BicycleBuildOptions buildOptions = new BicycleBuildOptions();
@@ -187,16 +210,17 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		}
 
 		Params params = new Params(buildOptions.country(), buildOptions.mode(), areaMarker,
-			buildOptions.eleSampleStep(), buildOptions.eleNoiseTolerance());
+			buildOptions.eleSampleStep(), buildOptions.eleNoiseTolerance(), simplify);
+		MergeCarry carry = new MergeCarry();
 		Stats stats = process(network, sumo, wayTags,
-			elevationParser != null ? elevationParser::getElevation : null, params);
+			elevationParser != null ? elevationParser::getElevation : null, params, carry);
 
 		log.info(stats.format());
 		BicycleNetworkOps.logInfraDistribution(network, "in final network");
 
 		new NetworkWriter(network).write(output.toString());
-		writeGeometries(network, sumo, companion(output, GEOMETRY_SUFFIX));
-		filterFeatures(network, companion(networkFile, FEATURE_SUFFIX), companion(output, FEATURE_SUFFIX));
+		writeGeometries(network, sumo, carry.shapes, companion(output, GEOMETRY_SUFFIX));
+		filterFeatures(network, carry.featureSource, companion(networkFile, FEATURE_SUFFIX), companion(output, FEATURE_SUFFIX));
 		return 0;
 	}
 
@@ -229,12 +253,22 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * elevation sampling used, so the two cannot disagree about a link's shape.
 	 */
 	static void writeGeometries(Network network, SumoNetworkHandler sumo, Path path) {
+		writeGeometries(network, sumo, Map.of(), path);
+	}
+
+	/**
+	 * Like {@link #writeGeometries(Network, SumoNetworkHandler, Path)}, but consults the
+	 * {@code --simplify} shape carry first — merged link ids resolve to their concatenated
+	 * polylines instead of falling back to the chord.
+	 */
+	static void writeGeometries(Network network, SumoNetworkHandler sumo,
+								Map<Id<Link>, List<Coord>> mergedShapes, Path path) {
 
 		try (CSVPrinter out = new CSVPrinter(IOUtils.getBufferedWriter(path.toString()),
 			CSVFormat.DEFAULT.withHeader("LinkId", "Geometry"))) {
 
 			for (Link link : network.getLinks().values()) {
-				List<Coord> shape = shapeOf(link, sumo.getEdges().get(link.getId().toString()), sumo);
+				List<Coord> shape = resolveShape(link, sumo, mergedShapes);
 				out.printRecord(link.getId().toString(), shape.stream()
 					.map(c -> String.format(Locale.US, "(%f,%f)", c.getX(), c.getY()))
 					.collect(Collectors.joining(",")));
@@ -254,10 +288,17 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * {@code SumoNetworkFeatureExtractor}'s business. Filtering keeps them in step with
 	 * the network they now sit beside, which is what {@code apply-network-params} needs.
 	 *
+	 * <p>Links {@code --simplify} merged get a row inherited from their downstream
+	 * constituent: the junction columns describe the exit junction at the to-node, and
+	 * after the merge that junction belongs to the downstream link. Only the id and the
+	 * length column are rewritten; speed and lane counts are identical on both
+	 * constituents by the merge predicate.
+	 *
 	 * <p>Silently skipped when there is nothing to filter — the features are optional,
 	 * and a scenario that does not calibrate never asks for them.
 	 */
-	private static void filterFeatures(Network network, Path in, Path out) {
+	static void filterFeatures(Network network, Map<Id<Link>, Id<Link>> featureSource,
+							   Path in, Path out) {
 
 		if (!Files.exists(in)) {
 			log.info("No link features at {}; nothing to carry over.", in);
@@ -270,14 +311,26 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		try (CSVParser parser = CSVParser.parse(IOUtils.getBufferedReader(in.toString()),
 			CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
 
-			String[] header = parser.getHeaderNames().toArray(new String[0]);
+			List<String> header = parser.getHeaderNames();
+			int lengthColumn = header.indexOf("length");
 			int kept = 0;
 			int dropped = 0;
+			int synthesized = 0;
+
+			// The rows of the merge constituents are needed after the pass over the file,
+			// so remember every row that could serve as a source. Cheap: it is bounded by
+			// the number of merges.
+			Set<String> wantedSources = featureSource.values().stream()
+				.map(Object::toString).collect(Collectors.toSet());
+			Map<String, CSVRecord> sources = new HashMap<>();
 
 			try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(out.toString()),
-				CSVFormat.DEFAULT.withHeader(header))) {
+				CSVFormat.DEFAULT.withHeader(header.toArray(new String[0])))) {
 
 				for (CSVRecord record : parser) {
+					if (wantedSources.contains(record.get(0))) {
+						sources.put(record.get(0), record);
+					}
 					if (surviving.contains(record.get(0))) {
 						printer.printRecord(record);
 						kept++;
@@ -285,13 +338,48 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 						dropped++;
 					}
 				}
+
+				List<Id<Link>> mergedIds = featureSource.keySet().stream()
+					.filter(id -> network.getLinks().containsKey(id))
+					.sorted(Comparator.comparing(Id::toString))
+					.toList();
+				for (Id<Link> id : mergedIds) {
+					CSVRecord source = sources.get(featureSource.get(id).toString());
+					if (source == null) continue;
+					List<String> row = new ArrayList<>(source.toList());
+					row.set(0, id.toString());
+					if (lengthColumn >= 0) {
+						row.set(lengthColumn, String.format(Locale.US, "%.2f",
+							network.getLinks().get(id).getLength()));
+					}
+					printer.printRecord(row);
+					synthesized++;
+				}
 			}
-			log.info("Carried over {} of {} link feature row(s) to {} ({} dropped with their links).",
-				kept, kept + dropped, out, dropped);
+			log.info("Carried over {} of {} link feature row(s) to {} ({} dropped with their links, "
+					+ "{} synthesized for merged links).",
+				kept, kept + dropped, out, dropped, synthesized);
 
 		} catch (IOException e) {
 			throw new UncheckedIOException("Could not filter link features from " + in, e);
 		}
+	}
+
+	/**
+	 * What the {@code --simplify} merge hands the companion writers: the concatenated
+	 * SUMO shape per merged link (consumed by the geometry CSV and the elevation
+	 * sampling), and the id of the downstream constituent whose feature row the merged
+	 * link inherits. Both empty when {@code --simplify} is off.
+	 */
+	static final class MergeCarry {
+		final Map<Id<Link>, List<Coord>> shapes = new HashMap<>();
+		final Map<Id<Link>, Id<Link>> featureSource = new HashMap<>();
+	}
+
+	/** @see #process(Network, SumoNetworkHandler, OsmWayTags, LinkElevationProfile.ElevationSource, Params, MergeCarry) */
+	static Stats process(Network network, SumoNetworkHandler sumo, OsmWayTags wayTags,
+						 LinkElevationProfile.ElevationSource elevation, Params params) {
+		return process(network, sumo, wayTags, elevation, params, new MergeCarry());
 	}
 
 	/**
@@ -300,9 +388,10 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * elevation source. The network is mutated in place.
 	 *
 	 * @param elevation elevation source for the metrics, or {@code null} to skip them
+	 * @param carry     filled by the {@code --simplify} merge, for the companion writers
 	 */
 	static Stats process(Network network, SumoNetworkHandler sumo, OsmWayTags wayTags,
-						 LinkElevationProfile.ElevationSource elevation, Params params) {
+						 LinkElevationProfile.ElevationSource elevation, Params params, MergeCarry carry) {
 
 		requireBikeLinks(network);
 
@@ -346,20 +435,77 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		log.info("Service-link cleanup removed {} link(s); {} remain.",
 			serviceLinksRemoved, network.getLinks().size());
 
-		if (elevation != null) {
-			attachElevation(network, sumo, elevation, params, stats);
-		}
-
 		// Picks up the links the rest policy emptied as well as anything the service
-		// cleanup disconnected.
+		// cleanup disconnected. Before the elevation (and the simplify) on purpose:
+		// what dies here should neither block a merge nor burn elevation samples.
 		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car, TransportMode.bike));
 		log.info("After cleanNetwork: {} nodes, {} links", network.getNodes().size(), network.getLinks().size());
+
+		if (params.simplify()) {
+			stats.mergedBySimplify = simplifyAndTrack(network, sumo, carry);
+		}
+
+		if (elevation != null) {
+			attachElevation(network, sumo, carry.shapes, elevation, params, stats);
+		}
 
 		warnAboutMissingLaneRestrictions(network, stats);
 
 		stats.modesRenamed = BicycleNetworkOps.renameMode(network, TransportMode.bike, params.mode());
 
 		return stats;
+	}
+
+	/**
+	 * The {@code --simplify} merge: {@link BicycleNetworkPipeline#simplifyUntilStable}
+	 * with a transfer consumer that keeps the companion data usable. For every merge it
+	 * concatenates the constituents' polylines (the vanished middle node stays a support
+	 * point — SUMO shapes contain their endpoints, so the tail is appended without its
+	 * first point), records the downstream constituent as the feature-row source
+	 * (resolved transitively, so cascaded merges still point at a real SUMO edge), and
+	 * carries {@code name} and {@code restricted_lanes} over when both sides agree —
+	 * they are not merge criteria, but dropping equal values would lose information
+	 * for no reason.
+	 */
+	static int simplifyAndTrack(Network network, SumoNetworkHandler sumo, MergeCarry carry) {
+
+		BiConsumer<Tuple<Link, Link>, Link> carryOver = (inOut, merged) -> {
+			Link in = inOut.getFirst();
+			Link out = inOut.getSecond();
+
+			List<Coord> shape = new ArrayList<>(resolveShape(in, sumo, carry.shapes));
+			List<Coord> tail = resolveShape(out, sumo, carry.shapes);
+			shape.addAll(tail.subList(1, tail.size()));
+			carry.shapes.put(merged.getId(), shape);
+
+			carry.featureSource.put(merged.getId(),
+				carry.featureSource.getOrDefault(out.getId(), out.getId()));
+
+			copyIfEqual(in, out, merged, "name");
+			copyIfEqual(in, out, merged, "restricted_lanes");
+		};
+
+		int before = network.getLinks().size();
+		int removed = BicycleNetworkPipeline.simplifyUntilStable(network, false, carryOver);
+		// NetworkSimplifier removes the merged links but leaves the merged-through
+		// nodes behind as orphans - visible as stray points in any GIS export, and
+		// the node-Z stamping would waste samples on them.
+		NetworkUtils.removeNodesWithoutLinks(network);
+		log.info("--simplify merged away {} link(s): {} -> {} ({} nodes remain)",
+			removed, before, network.getLinks().size(), network.getNodes().size());
+
+		// Only merged links that survived to the end matter for the companions; a link
+		// that was merged again re-registered under its new id.
+		carry.shapes.keySet().retainAll(network.getLinks().keySet());
+		carry.featureSource.keySet().retainAll(network.getLinks().keySet());
+		return removed;
+	}
+
+	private static void copyIfEqual(Link a, Link b, Link merged, String key) {
+		Object v = a.getAttributes().getAttribute(key);
+		if (v != null && Objects.equals(v, b.getAttributes().getAttribute(key))) {
+			merged.getAttributes().putAttribute(key, v);
+		}
 	}
 
 	// ------------------------------------------------------------------------
@@ -562,9 +708,10 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	// Elevation
 	// ------------------------------------------------------------------------
 
-	private static void attachElevation(Network network, SumoNetworkHandler sumo,
-										LinkElevationProfile.ElevationSource elevation,
-										Params params, Stats stats) {
+	static void attachElevation(Network network, SumoNetworkHandler sumo,
+								Map<Id<Link>, List<Coord>> mergedShapes,
+								LinkElevationProfile.ElevationSource elevation,
+								Params params, Stats stats) {
 
 		for (Node node : network.getNodes().values()) {
 			if (!BicycleNetworkOps.addNodeElevation(node, elevation)) stats.nodesWithoutElevation++;
@@ -575,8 +722,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			// classification: no category means the link was never looked at.
 			if (link.getAttributes().getAttribute(BICYCLE_INFRA) == null) continue;
 
-			SumoNetworkHandler.Edge edge = sumo.getEdges().get(link.getId().toString());
-			List<Coord> shape = shapeOf(link, edge, sumo);
+			List<Coord> shape = resolveShape(link, sumo, mergedShapes);
 			if (shape.size() > 2) stats.linksWithTrueShape++;
 			else stats.linksSampledAlongChord++;
 
@@ -585,6 +731,17 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			if (written) stats.withElevation++;
 			else stats.linksWithoutElevationData++;
 		}
+	}
+
+	/**
+	 * The link's true course: the {@code --simplify} carry when the link is a merge
+	 * product, otherwise the SUMO edge polyline. Never the silent chord for a merged
+	 * id — that is exactly the fallback this indirection exists to avoid.
+	 */
+	static List<Coord> resolveShape(Link link, SumoNetworkHandler sumo, Map<Id<Link>, List<Coord>> mergedShapes) {
+		List<Coord> carried = mergedShapes.get(link.getId());
+		if (carried != null) return carried;
+		return shapeOf(link, sumo.getEdges().get(link.getId().toString()), sumo);
 	}
 
 	/**
@@ -666,12 +823,16 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * The non-I/O parameters, decoupled from the picocli fields so a test can build them.
 	 */
 	record Params(String country, String mode, BicycleLinkPolicy.AreaMarker areaMarker,
-				  double eleSampleStep, double eleNoiseTolerance) {
+				  double eleSampleStep, double eleNoiseTolerance, boolean simplify) {
 
 		static Params defaults() {
 			return new Params("de", TransportMode.bike, null,
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_SAMPLE_STEP),
-				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE));
+				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE), false);
+		}
+
+		Params withSimplify() {
+			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, true);
 		}
 	}
 
@@ -707,6 +868,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 		int modesRenamed;
 		boolean laneRestrictionsMissing;
+		/** Links removed by the {@code --simplify} merge; 0 when the option is off. */
+		int mergedBySimplify;
 
 		String format() {
 			return """
@@ -722,6 +885,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 				  dropped: access=no/private/customer  %d
 				  dropped: footway without bike        %d
 				  bike mode removed (bicycle=no)       %d
+				  links merged away by --simplify      %d
 				  links with elevation metrics         %d
 				    sampled along the true polyline    %d
 				    sampled along the chord            %d
@@ -731,7 +895,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 				.formatted(classified, linksWithoutEdge, linksWithoutWayTags, outsideArea,
 					agreeingMultiWay, mixedMultiWay, tagsDroppedAsAmbiguous,
 					droppedParkingAisle, droppedRestrictedAccess, droppedFootwayWithoutBike,
-					bikeModeRemoved,
+					bikeModeRemoved, mergedBySimplify,
 					withElevation, linksWithTrueShape, linksSampledAlongChord,
 					linksWithoutElevationData, nodesWithoutElevation, modesRenamed);
 		}

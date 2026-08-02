@@ -71,6 +71,7 @@ $(sc) prepare bicycle-attributes \
 | `--bike-area-marker` | — | OSM tag (`key` or `key=value`) restricting the full treatment to marked ways |
 | `--ele-sample-step` | `20.0` | distance between elevation samples along a link, in m |
 | `--ele-noise-tolerance` | `3.0` | Douglas-Peucker vertical tolerance, in m |
+| `--simplify` | off | merge consecutive links that agree on the bicycle attributes (and on modes, lanes, freespeed and capacity), with the Supersonic pipeline's rules — see below |
 
 It writes the two companion files alongside the network, under the matching name and in the same
 format `network-from-sumo` uses — including its compression rule: the companions inherit the
@@ -91,6 +92,18 @@ them.
 The network CRS is read from the network's own `coordinateReferenceSystem` attribute, so there is no `--crs`.
 Elevation is sampled along the **SUMO edge polyline**, which holds the geometry nodes `--geometry.remove` folded
 in — so gradients follow the real curve without any stored geometry.
+
+**`--simplify`** re-merges what netconvert's attribute-strict `geometry.remove` and the cleanups leave
+fragmented: consecutive links merge only when they agree on `bicycle_infra`, `type`, `osm:surface`,
+`osm:smoothness` and `allowed_speed` AND on modes, lane count, freespeed and base capacity — the same
+rules (and code) the Supersonic pipeline uses, so no classification boundary and no physically different
+link is ever merged over. Kilometres are preserved exactly; capacities come out exact because both
+converters share `LinkProperties.getLaneCapacity` and its <50 m crossing boost. The merge runs after the
+cleanups and **before** the elevation metrics, so gradients are computed over the merged polylines, the
+geometry companion carries the concatenated SUMO shapes under the merged ids, and the feature companion
+gets a synthesized row per merged link (from the downstream constituent, whose to-junction the merged
+link now ends at; the length column is rewritten). What merged links do lose: `osm:` raw tags beyond
+surface/smoothness, and `name`/`restricted_lanes` when the constituents disagree on them.
 
 It fails fast rather than producing a plausible-looking wrong network: no link with mode `bike` (usually a
 `clean-network` run whose `--modes` forgot `bike`), or a DEM that does not cover the network (usually a wrong

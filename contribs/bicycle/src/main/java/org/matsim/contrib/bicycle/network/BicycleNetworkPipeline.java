@@ -36,6 +36,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -43,6 +44,7 @@ import picocli.CommandLine.Option;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
 
@@ -544,10 +546,20 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * @return the total number of links removed across all passes
 	 */
 	static int simplifyUntilStable(Network network, boolean storeOriginalGeometry) {
+		return simplifyUntilStable(network, storeOriginalGeometry, null);
+	}
+
+	/**
+	 * Variant with an additional transfer consumer, run for every merge on top of the
+	 * bicycle-aware attribute handling. {@code bicycle-attributes} uses it to carry the
+	 * SUMO edge shapes and the feature-row provenance through the merge.
+	 */
+	static int simplifyUntilStable(Network network, boolean storeOriginalGeometry,
+								   BiConsumer<Tuple<Link, Link>, Link> extraTransfer) {
 		int totalRemoved = 0;
 		for (int pass = 1; ; pass++) {
 			int before = network.getLinks().size();
-			simplifyWithBikeInfra(network, storeOriginalGeometry);
+			simplifyWithBikeInfra(network, storeOriginalGeometry, extraTransfer);
 			int after = network.getLinks().size();
 			log.info("Simplification pass {}: {} -> {} links", pass, before, after);
 			totalRemoved += before - after;
@@ -560,7 +572,8 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 * agree on the bicycle-relevant attributes. The default simplifier would
 	 * happily merge across infra changes, losing that information.
 	 */
-	private static void simplifyWithBikeInfra(Network network, boolean storeOriginalGeometry) {
+	private static void simplifyWithBikeInfra(Network network, boolean storeOriginalGeometry,
+											  BiConsumer<Tuple<Link, Link>, Link> extraTransfer) {
 
 		BiPredicate<Link, Link> attrsMustMatch = (a, b) -> {
 			for (String key : SIMPLIFY_MATCH_KEYS) {
@@ -613,6 +626,10 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 				mergeOrigGeom(a, b, newLink);
 			}
 		});
+
+		if (extraTransfer != null) {
+			simplifier.registerTransferAttributesConsumer(extraTransfer);
+		}
 
 		simplifier.run(network);
 	}
