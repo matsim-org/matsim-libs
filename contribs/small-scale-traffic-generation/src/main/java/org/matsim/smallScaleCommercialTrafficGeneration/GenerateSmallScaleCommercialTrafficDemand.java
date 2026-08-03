@@ -953,9 +953,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		for (VehicleType vehicleType : carrierVehicleTypes.getVehicleTypes().values()) {
 			CostInformation costInformation = vehicleType.getCostInformation();
+			// jsprit uses separate costs for service time and waiting before a time window opens. If no distinct values
+			// are provided, use the generic per-second transport cost for both.
 			VehicleUtils.setCostsPerSecondInService(costInformation, costInformation.getCostsPerSecond());
 			VehicleUtils.setCostsPerSecondWaiting(costInformation, costInformation.getCostsPerSecond());
-			// (what is this???)
 		}
 
 		// carriers:
