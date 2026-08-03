@@ -552,3 +552,38 @@ errorDiagrams(name="differencespeed_normalized", xlab="Difference speed factor: 
   plot_main2()
   plot_main2(fuel = "diesel")
 }
+
+# Accumulative Plots
+acc_plots <- function(vehicle="FIGO_TECHAVG") {
+  network_information <- read_csv(glue("{matsim_output_path}/PretoriaTest/networkInformation.csv")) %>%
+    separate(roadType, c("Region", "RoadType", "VClass"), sep="/")
+
+  pretoria_output <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_StopAndGoFraction.csv")) %>%
+    filter(linkId != 6555 & linkId != "cold") %>%
+    mutate(method = "StopAndGoFraction") %>%
+    left_join(network_information, by="linkId") %>%
+    pivot_longer(cols=c("CO_MATSim", "CO_pems", "CO2_MATSim", "CO2_pems", "NOx_MATSim", "NOx_pems"), names_to = "component", values_to = "value") %>%
+    separate(col="component", sep="_", into=c("component", "model")) %>%
+    mutate(abs_value=value*length) %>%
+    group_by(tripId, model, component) %>%
+    arrange(order, .by_group = TRUE) %>%
+    mutate(acc_abs_value = cumsum(abs_value), acc_length=cumsum(length)) %>%
+    ungroup() %>%
+    group_by(acc_length, model, component) %>%
+    summarize(acc_abs_value = mean(acc_abs_value))
+
+  ggplot() +
+    geom_line(data=pretoria_output, aes(x=acc_length, y=acc_abs_value, color = model)) +
+    facet_wrap(~component, scales="free")+
+    xlab("Driven distance (m)") +
+    ylab("Accumulative emission (mg)")
+
+  ggsave(glue("{plots_path}/{vehicle}_acc.png"),
+         width = 30,
+         height = 10,
+         dpi = 300)
+}
+
+{
+  acc_plots()
+}

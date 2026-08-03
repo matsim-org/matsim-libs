@@ -513,6 +513,7 @@ public class PretoriaTest {
 		writer.printRecord(
 			"tripId",
 			"linkId",
+			"order",
 			"load",
 			"driver",
 			"segment",
@@ -526,6 +527,7 @@ public class PretoriaTest {
 		);
 
 		AtomicReference<String> segment = new AtomicReference<>("none");
+		Map<Integer, Integer> tripId2count = new HashMap<>();
 		tripId2linkId2pollutant2realEmission.forEach((tripId, linkId2pollutant2realEmissions) -> {
 			var linkId2pollutant2warmEmissions = tripId2linkId2pollutant2warmEmission.get(tripId);
 
@@ -536,6 +538,7 @@ public class PretoriaTest {
 					writer.printRecord(
 						tripId,
 						"cold",
+						"-1",
 						tripId2load.get(tripId),
 						tripId2driver.get(tripId),
 						"none",
@@ -551,7 +554,10 @@ public class PretoriaTest {
 				}
 			}
 
-			linkId2pollutant2realEmissions.forEach((linkId, pollutant2realEmissions) -> {
+			for (Map.Entry<Id<Link>, Map<Pollutant, Double>> entry : linkId2pollutant2realEmissions.entrySet()) {
+				Id<Link> linkId = entry.getKey();
+				Map<Pollutant, Double> pollutant2realEmissions = entry.getValue();
+
 				var pollutant2warmEmissions = linkId2pollutant2warmEmissions.get(linkId);
 
 				if(linkId.equals(Id.createLinkId("28948")))
@@ -569,10 +575,15 @@ public class PretoriaTest {
 				if(linkId.equals(Id.createLinkId("37156")))
 					segment.set("none");
 
+				tripId2count.putIfAbsent(tripId, 0);
+				int count = tripId2count.get(tripId);
+				tripId2count.put(tripId, count+1);
+
 				try {
 					writer.printRecord(
 						tripId,
 						linkId,
+						count,
 						tripId2load.get(tripId),
 						tripId2driver.get(tripId),
 						segment,
@@ -587,7 +598,7 @@ public class PretoriaTest {
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
-			});
+			}
 		});
 		writer.flush();
 		writer.close();
@@ -776,7 +787,6 @@ public class PretoriaTest {
 			var accLen = accDistances.getLast();
 
 			// Lengths can be different, adjust accumulated lengths to MATSim lengths
-			System.out.println("#1234:" + (accumulatedLinkLengths4links.getLast()/accLen));
 			accDistances = accDistances.stream().map(d -> d*(1-1e-6)*(accumulatedLinkLengths4links.getLast()/accLen)).toList();
 
 			for (int i = 1; i < gpsEntries.size(); i++) {
