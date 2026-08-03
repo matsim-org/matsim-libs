@@ -967,22 +967,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			for (String startZone : odMatrix.getListOfZones()) {
 				for (String modeORvehType : odMatrix.getListOfModesOrVehTypes()) {
 
-					// Check if this purpose, startZone, modeORvehType combination is a possiblr starting location (by looking if it has a trip-distribution-entry)
-					boolean isStartingLocation = false;
-
-					// careful, the following is a labeled break!!!
-					// (but is it really needed?  "break" ignores intermediate "if" and so either a simple "break" or a simple "continue" should do what we need.)
-					checkIfIsStartingPosition:
-					{
-						for (String possibleStopZone : odMatrix.getListOfZones()) {
-							if (!modeORvehType.equals("pt") && !modeORvehType.equals("op"))
-								if (odMatrix.getTripDistributionValue(startZone, possibleStopZone, modeORvehType,
-									purpose, smallScaleCommercialTrafficSegment ) != 0) {
-									isStartingLocation = true;
-									break checkIfIsStartingPosition;
-								}
-						}
-					}
+					// Check if this purpose, startZone, modeORvehType combination has any outgoing OD flow.
+					boolean isStartingLocation = !modeORvehType.equals("pt") && !modeORvehType.equals("op")
+						&& odMatrix.getListOfZones().stream()
+						.anyMatch(possibleStopZone -> odMatrix.getTripDistributionValue(startZone, possibleStopZone, modeORvehType,
+							purpose, smallScaleCommercialTrafficSegment) != 0);
 
 					if (isStartingLocation) {
 						// Get the vehicle-types and start/stop-categories
