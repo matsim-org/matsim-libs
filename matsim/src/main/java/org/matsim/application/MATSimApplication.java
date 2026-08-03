@@ -161,10 +161,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 		if (yamlFilename != null)
 			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(yamlFilename));
 
-		if (remainingArgs != null) {
-			String[] args = remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
-			ConfigUtils.applyCommandline(config, args);
-		}
+		applyConfigCommandLineArgs(config);
 
 		if (iterations > -1)
 			config.controller().setLastIteration(iterations);
@@ -212,6 +209,32 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 	String getConfigPath() {
 		return configPath;
+	}
+
+	/**
+	 * Returns the MATSim config arguments from unmatched picocli arguments.
+	 * <p>
+	 * This is intended for subclasses with a custom {@link #call()} implementation that still need to apply
+	 * {@code --config:} or {@code -c:} command line overrides when loading a {@link Config}.
+	 */
+	protected final String[] getConfigCommandLineArgs() {
+		if (remainingArgs == null)
+			return new String[0];
+
+		List<String> unknownArgs = getUnknownArguments(remainingArgs);
+		if (!unknownArgs.isEmpty())
+			throw new IllegalArgumentException("Unknown arguments: " + unknownArgs);
+
+		return getConfigCommandLineArgs(remainingArgs);
+	}
+
+	/**
+	 * Applies {@code --config:} and {@code -c:} command line overrides to the provided config.
+	 */
+	protected final void applyConfigCommandLineArgs(Config config) {
+		String[] configArgs = getConfigCommandLineArgs();
+		if (configArgs.length > 0)
+			ConfigUtils.applyCommandline(config, configArgs);
 	}
 
 	//	/**
@@ -517,10 +540,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(app.yamlFilename));
 		}
 
-		if (app.remainingArgs != null) {
-			String[] extraArgs = app.remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
-			ConfigUtils.applyCommandline(config, extraArgs);
-		}
+		app.applyConfigCommandLineArgs(config);
 
 		final Scenario scenario = app.createScenario(config);
 		app.prepareScenario(scenario);
@@ -560,7 +580,27 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	 * Check if unmatched options are correct.
 	 */
 	private static List<String> unmatched(CommandLine.ParseResult parseResult) {
-		List<String> unmatched = Lists.newArrayList(parseResult.unmatched());
+		return getUnknownArguments(parseResult.unmatched());
+	}
+
+	private static String[] getConfigCommandLineArgs(List<String> args) {
+		List<String> configArgs = Lists.newArrayList();
+
+		String prev = null;
+		for (String current : args) {
+			if (isConfigCommandLineArgument(current))
+				configArgs.add(current.replace("-c:", "--config:"));
+			else if (isConfigCommandLineArgumentValue(current, prev))
+				configArgs.add(current);
+
+			prev = current;
+		}
+
+		return configArgs.toArray(String[]::new);
+	}
+
+	private static List<String> getUnknownArguments(List<String> args) {
+		List<String> unmatched = Lists.newArrayList(args);
 		ListIterator<String> it = unmatched.listIterator();
 
 		// previous string

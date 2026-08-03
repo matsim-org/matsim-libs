@@ -49,6 +49,20 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
+	void exposesConfigCommandLineArgsToCustomCall() {
+
+		ConfigArgsScenario.configArgs = null;
+
+		int ret = MATSimApplication.execute(ConfigArgsScenario.class,
+			"-c:controler.runId=Test123", "-c:global.numberOfThreads", "4", "--config:plans.inputCRS", "EPSG:1234");
+
+		assertThat(ret).isEqualTo(0);
+		assertThat(ConfigArgsScenario.configArgs).containsExactly(
+			"--config:controler.runId=Test123", "--config:global.numberOfThreads", "4", "--config:plans.inputCRS", "EPSG:1234");
+
+	}
+
+	@Test
 	void yaml() {
 
 		Path yml = Path.of(utils.getClassInputDirectory(), "specs.yml");
@@ -138,4 +152,17 @@ public class MATSimApplicationTest {
 		}
 	}
 
+	/**
+	 * Test scenario exposing config command line arguments from a custom call implementation.
+	 */
+	public static final class ConfigArgsScenario extends MATSimApplication {
+
+		static String[] configArgs;
+
+		@Override
+		public Integer call() {
+			configArgs = getConfigCommandLineArgs();
+			return 0;
+		}
+	}
 }
