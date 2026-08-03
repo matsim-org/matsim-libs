@@ -570,17 +570,25 @@ public abstract class MATSimApplication implements Callable<Integer> {
 			String current = it.next();
 
 			// filter string handled by matsim parser
-			if (current.startsWith("-c:") || current.startsWith("--config:"))
+			if (isConfigCommandLineArgument(current))
 				it.remove();
 
 			// separate arguments should also be valid, e.g --c:global.threads 5
-			if (!current.startsWith("--") && prev != null && (prev.startsWith("-c:") || prev.startsWith("--config:")))
+			else if (isConfigCommandLineArgumentValue(current, prev))
 				it.remove();
 
 			prev = current;
 		}
 
 		return unmatched;
+	}
+
+	private static boolean isConfigCommandLineArgument(String arg) {
+		return arg.startsWith("-c:") || arg.startsWith("--config:");
+	}
+
+	private static boolean isConfigCommandLineArgumentValue(String arg, String previous) {
+		return !arg.startsWith("--") && previous != null && isConfigCommandLineArgument(previous);
 	}
 
 	private static MATSimApplication newInstance(Class<? extends MATSimApplication> clazz, Config config) {
