@@ -386,11 +386,11 @@ public class Gui extends JFrame {
 
 		mntmCompressFile = new JMenuItem("Compress File…");
 		mnTools.add(mntmCompressFile);
-		mntmCompressFile.addActionListener(e -> GUnZipper.gzipFile());
+		mntmCompressFile.addActionListener(e -> GuiCompressionUtils.compressFile());
 
 		mntmUncompressFile = new JMenuItem("Uncompress File…");
 		mnTools.add(mntmUncompressFile);
-		mntmUncompressFile.addActionListener(e -> GUnZipper.gunzipFile());
+		mntmUncompressFile.addActionListener(e -> GuiCompressionUtils.uncompressFile());
 
 		mnTools.addSeparator();
 
