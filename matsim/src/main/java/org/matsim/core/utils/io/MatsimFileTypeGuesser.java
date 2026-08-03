@@ -85,6 +85,8 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 					this.fileType = FileType.Config;
 				} else if (shortSystemId.startsWith("counts_")) {
 					this.fileType = FileType.Counts;
+				} else if (shortSystemId.startsWith("laneDefinitions_")) {
+					this.fileType = FileType.LaneDefinitions;
 				} else if (shortSystemId.startsWith("vehicleDefinitions_")) {
 					this.fileType = FileType.Vehicles;
 				} else if (shortSystemId.startsWith("transitSchedule_")) {
@@ -130,7 +132,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 		try {
 			XmlHandler handler = new XmlHandler();
 			InputSource input = new InputSource(IOUtils.getBufferedReader(fileName));
-			factory.setFeature("http://apache.org/xml/features/validation/schema", true);
+			factory.setFeature("http://apache.org/xml/features/validation/schema", false);
 			SAXParser parser = factory.newSAXParser();
 			XMLReader reader = parser.getXMLReader();
 			reader.setContentHandler(handler);
@@ -193,20 +195,50 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 				this.exception  = new XMLTypeDetectionException(publicId, systemId);
 				this.detectedFirstEntity = true;
 			}
-			if (systemId.endsWith(".dtd")){
-				throw this.exception;
-			}
-			return null;
+			throw this.exception;
 		}
 
 		@Override
 		public void startElement(final String uri, final String localName, final String qName, final Attributes atts) throws SAXException {
 			String tag = (uri.length() == 0) ? qName : localName;
+			String schemaSystemId = extractSchemaSystemId(atts);
 			if (this.exception == null) {
-				this.exception = new XMLTypeDetectionException(null, null);
+				this.exception = new XMLTypeDetectionException(null, schemaSystemId);
+			} else if (this.exception.systemId == null && schemaSystemId != null) {
+				this.exception = new XMLTypeDetectionException(this.exception.publicId, schemaSystemId);
 			}
 			this.exception.rootTag = tag;
 			throw this.exception;
+		}
+
+		private String extractSchemaSystemId(final Attributes atts) {
+			String noNamespaceSchemaLocation = atts.getValue("http://www.w3.org/2001/XMLSchema-instance", "noNamespaceSchemaLocation");
+			if (noNamespaceSchemaLocation == null) {
+				noNamespaceSchemaLocation = atts.getValue("xsi:noNamespaceSchemaLocation");
+			}
+			if (noNamespaceSchemaLocation != null && !noNamespaceSchemaLocation.isBlank()) {
+				return noNamespaceSchemaLocation.trim();
+			}
+
+			String schemaLocation = atts.getValue("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
+			if (schemaLocation == null) {
+				schemaLocation = atts.getValue("xsi:schemaLocation");
+			}
+			if (schemaLocation == null || schemaLocation.isBlank()) {
+				return null;
+			}
+
+			String[] tokens = schemaLocation.trim().split("\\s+");
+			for (int i = tokens.length - 1; i >= 0; i--) {
+				if (tokens[i].endsWith(".xsd")) {
+					return tokens[i];
+				}
+			}
+
+			if (tokens.length > 0) {
+				return tokens[tokens.length - 1];
+			}
+			return null;
 		}
 	}
 
