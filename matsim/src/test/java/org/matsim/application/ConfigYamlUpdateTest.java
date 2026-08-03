@@ -19,6 +19,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+/**
+ * Tests YAML based config updates in {@link ApplicationUtils}.
+ */
 public class ConfigYamlUpdateTest {
 
 	@RegisterExtension
@@ -197,7 +200,9 @@ public class ConfigYamlUpdateTest {
 		});
 	}
 
-
+	/**
+	 * Config group fixture for nested YAML update tests.
+	 */
 	public static final class TestConfigGroup extends ReflectiveConfigGroup {
 
 		@Parameter
@@ -217,7 +222,9 @@ public class ConfigYamlUpdateTest {
 		}
 	}
 
-
+	/**
+	 * Parameter-set fixture for nested YAML update tests.
+	 */
 	public static final class TestParamSet extends ReflectiveConfigGroup {
 
 		@Parameter

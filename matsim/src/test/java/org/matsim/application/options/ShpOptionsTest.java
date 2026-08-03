@@ -17,6 +17,9 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+/**
+ * Tests shape file and GeoPackage access through {@link ShpOptions}.
+ */
 public class ShpOptionsTest {
 
 	@RegisterExtension

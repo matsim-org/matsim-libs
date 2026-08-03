@@ -8,6 +8,9 @@ import picocli.CommandLine;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Tests sample-size parsing and sample-aware file naming.
+ */
 public class SampleOptionsTest {
 
 	@Test

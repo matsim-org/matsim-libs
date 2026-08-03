@@ -14,6 +14,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+/**
+ * Tests CSV output formatting and delimiter detection.
+ */
 public class CsvOptionsTest {
 
 	@TempDir

@@ -1,7 +1,5 @@
-package org.matsim.application.analysis;
+package org.matsim.application;
 
-import org.matsim.application.CommandSpec;
-import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.ShpOptions;

@@ -3,13 +3,13 @@ package org.matsim.application;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.application.analysis.TestDependentAnalysis;
-import org.matsim.application.analysis.TestOtherAnalysis;
-import org.matsim.application.analysis.TestOtherDependentAnalysis;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Path;
 
+/**
+ * Tests command dependency handling and argument storage in {@link CommandRunner}.
+ */
 public class CommandRunnerTest {
 
 	@RegisterExtension
@@ -27,9 +27,9 @@ public class CommandRunnerTest {
 
 		runner.run(Path.of(utils.getInputDirectory()));
 
-		// Results will go into analysis subdirectory because of the commands package names
+		// Results will go into the application subdirectory because of the commands package names.
 
-		Assertions.assertThat(path.resolve("analysis"))
+		Assertions.assertThat(path.resolve("application"))
 				.isDirectoryContaining(p -> p.getFileName().toString().equals("out.xml"))
 				.isDirectoryContaining(p -> p.getFileName().toString().equals("processed.csv"));
 	}
