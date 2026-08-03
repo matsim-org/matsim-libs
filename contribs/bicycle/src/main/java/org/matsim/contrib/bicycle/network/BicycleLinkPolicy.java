@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_AREA;
 import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.*;
 
@@ -94,9 +95,15 @@ public final class BicycleLinkPolicy {
 		// (no classification, no bike attributes, no elevation later). Ways outside are
 		// a pre-filtered major-road network, so the access rules below would barely
 		// fire there anyway. No marker configured -> every way is treated as cyclable.
-		if (areaMarker != null && !areaMarker.matches(tags)) {
-			stripBicycleDetail(link);
-			return;
+		// Which side a link fell on is recorded either way, so downstream can filter on
+		// the area itself instead of inferring it from a missing category.
+		if (areaMarker != null) {
+			boolean inside = areaMarker.matches(tags);
+			link.getAttributes().putAttribute(BICYCLE_AREA, inside);
+			if (!inside) {
+				stripBicycleDetail(link);
+				return;
+			}
 		}
 
 		// 0. copy selected raw OSM tags onto the link (no-op if TagCopier has no keys)

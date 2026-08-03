@@ -191,6 +191,10 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	 */
 	private static final List<String> SIMPLIFY_MATCH_KEYS = List.of(
 		BicycleUtils.BICYCLE_INFRA,
+		// Also a match key, not just carried over: merging a link inside the bicycle
+		// area with one outside would join two differently treated links, and the
+		// merged link could only be wrong about one of them.
+		BicycleUtils.BICYCLE_AREA,
 		NetworkUtils.TYPE,
 		OSM_PREFIX + BicycleUtils.SURFACE,
 		OSM_PREFIX + BicycleUtils.SMOOTHNESS,

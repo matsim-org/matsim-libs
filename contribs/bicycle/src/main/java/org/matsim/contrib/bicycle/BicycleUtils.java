@@ -47,6 +47,15 @@ public final class BicycleUtils {
 	 */
 	public static final String BICYCLE_INFRA_MIXED = "bicycle_infra_mixed";
 
+	/**
+	 * Whether the link lies inside the area the {@code --bike-area-marker} selects:
+	 * {@code true} inside, {@code false} outside, absent when no marker was configured
+	 * and the whole network therefore got the full bicycle treatment. Outside links keep
+	 * their modes — bikes may still ride them — but carry no classification and no
+	 * elevation, so this is what to filter on rather than "has a category".
+	 */
+	public static final String BICYCLE_AREA = "bicycle_area";
+
 	/** Mean elevation over the link in m; written for inspection, not consumed by the simulation. */
 	public static final String AVERAGE_ELEVATION = "average_elevation";
 
@@ -82,6 +91,14 @@ public final class BicycleUtils {
 	/** The cycling infrastructure category name, or {@code null} on an unclassified link. */
 	public static String getBicycleInfra( Link link ){
 		return (String) link.getAttributes().getAttribute( BICYCLE_INFRA );
+	}
+
+	/**
+	 * Whether the link sits inside the bicycle area, or {@code null} when the network was
+	 * built without a {@code --bike-area-marker} — then every link had the full treatment.
+	 */
+	public static Boolean getBicycleArea( Link link ){
+		return (Boolean) link.getAttributes().getAttribute( BICYCLE_AREA );
 	}
 
 	// The elevation getters return null when the link carries no metrics — no DEM was

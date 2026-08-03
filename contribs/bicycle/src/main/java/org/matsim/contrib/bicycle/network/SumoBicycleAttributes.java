@@ -59,6 +59,7 @@ import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_AREA;
 import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA;
 import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA_MIXED;
 import static org.matsim.contrib.bicycle.BicycleUtils.OSM_PREFIX;
@@ -415,9 +416,15 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 			// Outside the marked area a link keeps its modes -- bikes may still ride it --
 			// but gets no bicycle detail, and no elevation later, which keys off the category.
-			if (params.areaMarker() != null && ways.stream().noneMatch(t -> params.areaMarker().matches(t))) {
-				stats.outsideArea++;
-				continue;
+			// Which side a link fell on is recorded either way, so downstream can filter on
+			// the area itself instead of inferring it from a missing category.
+			if (params.areaMarker() != null) {
+				boolean inside = ways.stream().anyMatch(t -> params.areaMarker().matches(t));
+				link.getAttributes().putAttribute(BICYCLE_AREA, inside);
+				if (!inside) {
+					stats.outsideArea++;
+					continue;
+				}
 			}
 
 			OsmWayDirection direction = directionOf(link);

@@ -94,8 +94,8 @@ Elevation is sampled along the **SUMO edge polyline**, which holds the geometry 
 in — so gradients follow the real curve without any stored geometry.
 
 **`--simplify`** re-merges what netconvert's attribute-strict `geometry.remove` and the cleanups leave
-fragmented: consecutive links merge only when they agree on `bicycle_infra`, `type`, `osm:surface`,
-`osm:smoothness` and `allowed_speed` AND on modes, lane count, freespeed and base capacity — the same
+fragmented: consecutive links merge only when they agree on `bicycle_infra`, `bicycle_area`, `type`,
+`osm:surface`, `osm:smoothness` and `allowed_speed` AND on modes, lane count, freespeed and base capacity — the same
 rules (and code) the Supersonic pipeline uses, so no classification boundary and no physically different
 link is ever merged over. Kilometres are preserved exactly; capacities come out exact because both
 converters share `LinkProperties.getLaneCapacity` and its <50 m crossing boost. The merge runs after the
@@ -216,6 +216,7 @@ defined in `BicycleUtils` (with typed getters) and are snake_case throughout —
 |--------------------|--------|----------------------------------------------------------------------------------------|
 | `bicycle_infra`    | string | Cycling infrastructure category (one of `BicycleInfraCategory.name()`, see below)      |
 | `bicycle_infra_mixed` | bool | *(SUMO path)* set when the category is `NEEDS_CLARIFICATION` because netconvert merged ways that classify differently — as opposed to the classifier finding the tags ambiguous. Only the former is fixable, via `bicycle-keep-edges`. |
+| `bicycle_area`     | bool   | Whether the link lies inside the `--bike-area-marker` area: `true` inside, `false` outside, **absent** when no marker was given and the whole network got the full treatment. Filter on this rather than on "has a category" — a link can also be uncategorised for unrelated reasons. |
 | `average_elevation` | m     | Mean elevation over the link                                                           |
 | `gradient`         | ratio  | Signed end-to-end gradient (`+0.03` = 3 % uphill)                                      |
 | `max_gradient`     | ratio  | Steepest gradient on any sub-segment                                                   |

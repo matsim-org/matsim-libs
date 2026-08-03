@@ -261,6 +261,30 @@ public class BicycleLinkPolicyTest {
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike), "marked way keeps bike");
 		assertNotNull(link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA),
 			"marked way gets bicycle_infra");
+		assertEquals(Boolean.TRUE, BicycleUtils.getBicycleArea(link), "and is flagged as inside");
+	}
+
+	/**
+	 * Which side of the area a link fell on is recorded on both sides, so downstream can
+	 * filter on the area itself rather than inferring it from a missing category - which
+	 * would also catch links that stayed unclassified for entirely different reasons.
+	 */
+	@Test
+	void bicycleArea_isRecordedOnBothSides() {
+		Link inside = link("1f");
+		GATED.apply(inside, tags("highway", "residential", "city_center", "yes"), OsmWayDirection.FORWARD);
+		assertEquals(Boolean.TRUE, BicycleUtils.getBicycleArea(inside));
+
+		Link outside = link("2f");
+		GATED.apply(outside, tags("highway", "residential"), OsmWayDirection.FORWARD);
+		assertEquals(Boolean.FALSE, BicycleUtils.getBicycleArea(outside));
+
+		// no marker configured -> the whole network had the full treatment, so the
+		// attribute stays absent rather than claiming an area that does not exist
+		Link ungated = link("3f");
+		new BicycleLinkPolicy(new BicycleInfraClassifier(), new TagCopier(List.of(), "osm:"), null)
+			.apply(ungated, tags("highway", "residential"), OsmWayDirection.FORWARD);
+		assertNull(BicycleUtils.getBicycleArea(ungated));
 	}
 
 	@Test

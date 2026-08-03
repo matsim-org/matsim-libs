@@ -323,6 +323,42 @@ public class SumoBicycleAttributesTest {
 	}
 
 	// ------------------------------------------------------------------------
+	// Bicycle area
+	// ------------------------------------------------------------------------
+
+	/**
+	 * With a marker configured, every link that reached the gate records which side it
+	 * fell on, so downstream can filter on the area itself rather than inferring it from
+	 * a missing category - which would also catch links left unclassified for other
+	 * reasons. Without a marker the attribute stays absent: the whole network had the
+	 * full treatment, and claiming an area would be a lie.
+	 */
+	@Test
+	void recordsWhichSideOfTheBicycleAreaALinkIsOn() throws Exception {
+
+		Fixture f = read();
+		// way 8001 carries highway=footway; use that as the marker so the ring splits
+		SumoBicycleAttributes.Params gated = new SumoBicycleAttributes.Params(
+			"de", TransportMode.bike, BicycleLinkPolicy.AreaMarker.parse("highway=footway"),
+			20.0, 3.0, false);
+		SumoBicycleAttributes.Stats stats = SumoBicycleAttributes.process(
+			f.network(), f.sumo(), f.tags(), null, gated);
+
+		assertTrue(stats.outsideArea > 0, "the ring has ways outside a footway-only area");
+		assertEquals(Boolean.TRUE, BicycleUtils.getBicycleArea(link(f.network(), "8001")),
+			"the footway is inside");
+		assertEquals(Boolean.FALSE, BicycleUtils.getBicycleArea(link(f.network(), "9001")),
+			"the living_street is outside, and says so");
+		assertNotNull(link(f.network(), "9001").getAllowedModes(),
+			"outside links keep their modes");
+
+		Fixture plain = read();
+		run(plain, null);
+		assertNull(BicycleUtils.getBicycleArea(link(plain.network(), "9001")),
+			"no marker configured -> no area attribute at all");
+	}
+
+	// ------------------------------------------------------------------------
 	// --simplify
 	// ------------------------------------------------------------------------
 
@@ -356,6 +392,7 @@ public class SumoBicycleAttributesTest {
 		l.setNumberOfLanes(1);
 		l.setAllowedModes(java.util.Set.of(TransportMode.car, TransportMode.bike));
 		l.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRA, "NONE");
+		l.getAttributes().putAttribute(BicycleUtils.BICYCLE_AREA, true);
 		l.getAttributes().putAttribute(NetworkUtils.TYPE, "highway.residential");
 		l.getAttributes().putAttribute(BicycleUtils.OSM_PREFIX + "surface", "asphalt");
 		l.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, 13.89);
@@ -398,6 +435,9 @@ public class SumoBicycleAttributesTest {
 		// equal-valued non-key attributes survive the merge
 		assertEquals("Teststrasse", merged.getAttributes().getAttribute("name"));
 		assertEquals(1, merged.getAttributes().getAttribute("restricted_lanes"));
+
+		// the area flag is a match key, so it is re-imposed rather than lost
+		assertEquals(Boolean.TRUE, BicycleUtils.getBicycleArea(merged));
 	}
 
 	@Test
