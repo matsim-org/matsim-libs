@@ -1,14 +1,14 @@
 package org.matsim.application;
 
 import org.junit.jupiter.api.Test;
-import org.matsim.application.analysis.TestAnalysis;
-import org.matsim.application.analysis.TestDependentAnalysis;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.application.prepare.population.CleanPopulation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests core helper methods for MATSim application commands.
+ */
 public class ApplicationUtilsTest {
 
 	@Test
@@ -25,8 +25,8 @@ public class ApplicationUtilsTest {
 
 		ApplicationUtils.checkCommand(TestAnalysis.class);
 
-		// Just picked a random class that does not use the command spec, if this command is converted, another one has to be picked.
-		assertThrows(IllegalArgumentException.class, () -> ApplicationUtils.checkCommand(CleanPopulation.class));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> ApplicationUtils.checkCommand(CommandWithoutSpec.class));
+		assertThat(exception).hasMessageContaining("has no @CommandSpec annotation");
 
 	}
 
@@ -40,5 +40,16 @@ public class ApplicationUtilsTest {
 		assertThat(result)
 			.containsExactly("--a", "1", "--b", "2", "--a", "3", "--c", "4");
 
+	}
+
+	/**
+	 * Command fixture intentionally missing {@link CommandSpec}.
+	 */
+	private static final class CommandWithoutSpec implements MATSimAppCommand {
+
+		@Override
+		public Integer call() {
+			return 0;
+		}
 	}
 }
