@@ -92,33 +92,42 @@ public class GeoFileWriter implements MatsimSomeWriter {
 	private static void writeGeoPackage(Collection<SimpleFeature> features, String filename, Name layerName, SimpleFeatureType featureType) throws IOException {
 		File file = new File(filename);
 		GeoPackage geopkg = new GeoPackage(file);
-		geopkg.init();
+		try {
+			geopkg.init();
 
-		String entryName = layerName != null ? layerName.getLocalPart() : featureType.getTypeName();
+			String entryName = layerName != null ? layerName.getLocalPart() : featureType.getTypeName();
 
-		// Calculate bounds from features
-		Envelope envelope = new Envelope();
-		for (SimpleFeature feature : features) {
-			Geometry geom = (Geometry) feature.getDefaultGeometry();
-			if (geom != null && !geom.isEmpty()) {
-				envelope.expandToInclude(geom.getEnvelopeInternal());
+			// Calculate bounds from features
+			Envelope envelope = new Envelope();
+			for (SimpleFeature feature : features) {
+				Geometry geom = (Geometry) feature.getDefaultGeometry();
+				if (geom != null && !geom.isEmpty()) {
+					envelope.expandToInclude(geom.getEnvelopeInternal());
+				}
+			}
+
+			FeatureEntry entry = new FeatureEntry();
+			entry.setTableName(entryName);
+			entry.setGeometryColumn(featureType.getGeometryDescriptor().getLocalName());
+			entry.setSrid(getSrid(featureType));
+			if (!envelope.isNull()) {
+				entry.setBounds(new ReferencedEnvelope(envelope, featureType.getCoordinateReferenceSystem()));
+			} else {
+				log.warn("All feature geometries are null/empty for '{}'; GeoPackage bounds remain unset.", filename);
+			}
+
+			DefaultFeatureCollection coll = new DefaultFeatureCollection();
+			coll.addAll(features);
+
+			geopkg.add(entry, coll);
+			geopkg.createSpatialIndex(entry);
+		} finally {
+			try {
+				geopkg.close();
+			} catch (Exception e) {
+				log.warn("Error while closing GeoPackage '{}': {}", filename, e.getMessage(), e);
 			}
 		}
-
-		FeatureEntry entry = new FeatureEntry();
-		entry.setTableName(entryName);
-		entry.setGeometryColumn(featureType.getGeometryDescriptor().getLocalName());
-		entry.setSrid(getSrid(featureType));
-		if (!envelope.isNull()) {
-			entry.setBounds(new ReferencedEnvelope(envelope, featureType.getCoordinateReferenceSystem()));
-		}
-
-		DefaultFeatureCollection coll = new DefaultFeatureCollection();
-		coll.addAll(features);
-
-		geopkg.add(entry, coll);
-		geopkg.createSpatialIndex(entry);
-		geopkg.close();
 	}
 
 	private static Integer getSrid(SimpleFeatureType featureType) {
