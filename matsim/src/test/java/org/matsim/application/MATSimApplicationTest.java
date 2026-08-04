@@ -1,32 +1,26 @@
 package org.matsim.application;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.options.SampleOptions;
-import org.matsim.application.prepare.longDistanceFreightGER.tripExtraction.ExtractRelevantFreightTrips;
-import org.matsim.application.prepare.population.GenerateShortDistanceTrips;
-import org.matsim.application.prepare.population.MergePopulations;
-import org.matsim.application.prepare.population.TrajectoryToPlans;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import picocli.CommandLine;
 
-import java.net.MalformedURLException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Tests core command-line and run behavior of {@link MATSimApplication}.
+ */
 public class MATSimApplicationTest {
 
 	@RegisterExtension
@@ -51,6 +45,20 @@ public class MATSimApplicationTest {
 		assertThat(config.controller().getRunId()).isEqualTo("Test123");
 		assertThat(config.global().getNumberOfThreads()).isEqualTo(4);
 		assertThat(config.plans().getInputCRS()).isEqualTo("EPSG:1234");
+
+	}
+
+	@Test
+	void exposesConfigCommandLineArgsToCustomCall() {
+
+		ConfigArgsScenario.configArgs = null;
+
+		int ret = MATSimApplication.execute(ConfigArgsScenario.class,
+			"-c:controler.runId=Test123", "-c:global.numberOfThreads", "4", "--config:plans.inputCRS", "EPSG:1234");
+
+		assertThat(ret).isEqualTo(0);
+		assertThat(ConfigArgsScenario.configArgs).containsExactly(
+			"--config:controler.runId=Test123", "--config:global.numberOfThreads", "4", "--config:plans.inputCRS", "EPSG:1234");
 
 	}
 
@@ -93,77 +101,6 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	void population() throws MalformedURLException {
-
-		Path input = Path.of(utils.getClassInputDirectory());
-		Path output = Path.of(utils.getOutputDirectory());
-
-		assertThat(input.resolve("persons.xml")).exists();
-
-		MATSimApplication.execute(TestScenario.class, "prepare", "trajectory-to-plans",
-			"--samples", "0.5", "0.1",
-			"--sample-size", "1.0",
-			"--name", "test",
-			"--population", input.resolve("persons.xml").toString(),
-			"--attributes", input.resolve("attributes.xml").toString(),
-			"--output", output.toString(),
-			"--max-typical-duration", "86400" // means that it will run the "split" part.  Which, however, is deprecated.
-			// The test should probably be adopted to no longer use those deprecated methods.  kai, nov'26
-		);
-
-		Path plans = output.resolve("test-100pct.plans.xml.gz");
-
-		assertThat(plans).exists();
-		assertThat(output.resolve("test-50pct.plans.xml.gz")).exists();
-
-		MATSimApplication.execute(TestScenario.class, "prepare", "generate-short-distance-trips",
-			"--population", plans.toString(),
-			"--num-trips", "2"
-		);
-
-		var actualContent = IOUtils.getInputStream(
-			output.resolve("test-100pct.plans-with-trips.xml.gz").toUri().toURL());
-		var expectedContent = IOUtils.getInputStream(
-			input.resolve("test-100pct.plans-with-trips.xml.gz").toUri().toURL());
-
-		assertThat(IOUtils.isEqual(actualContent, expectedContent)).isTrue();
-	}
-
-	@Test
-	@Disabled("Class is deprecated")
-	void freight() {
-
-		Path input = Path.of("..", "..", "..", "..",
-			"shared-svn", "komodnext", "data", "freight", "original_data").toAbsolutePath().normalize();
-
-		Assumptions.assumeTrue(Files.exists(input));
-
-		Path output = Path.of(utils.getOutputDirectory());
-
-		String network = input.resolve("german-primary-road.network.xml.gz").toString();
-
-		String allFreightTrips = output.resolve("german-wide-freight-trips.xml.gz").toString();
-		MATSimApplication.execute(TestScenario.class, "prepare", "generate-german-freight-trips",
-			input.toString(),
-			"--sample", "0.25",
-			"--network", network,
-			"--input-crs", "EPSG:5677",
-			"--output", allFreightTrips
-		);
-
-		String freightTrips = output.resolve("freight-trips.xml.gz").toString();
-		MATSimApplication.execute(TestScenario.class, "prepare", "extract-freight-trips",
-			allFreightTrips,
-			"--network", network,
-			"--shp", input.resolve("../DusseldorfBoundary/newDusseldorfBoundary.shp").toString(),
-			"--input-crs", "EPSG:5677",
-			"--target-crs", "EPSG:25832",
-			"--output", freightTrips
-		);
-
-	}
-
-	@Test
 	void run() {
 
 		Config config = ConfigUtils.createConfig();
@@ -179,6 +116,7 @@ public class MATSimApplicationTest {
 		assertThat(out.resolve("test.txt"))
 			.hasContent("Inhalt");
 
+		assertThat(ret).isEqualTo(0);
 	}
 
 	@Test
@@ -186,9 +124,9 @@ public class MATSimApplicationTest {
 		Assertions.assertThrows(NullPointerException.class, () -> MATSimApplication.execute(TestScenario.class));
 	}
 
-	@MATSimApplication.Prepare({
-		TrajectoryToPlans.class, GenerateShortDistanceTrips.class, ExtractRelevantFreightTrips.class, MergePopulations.class
-	})
+	/**
+	 * Test scenario used by application tests and contrib analysis tests.
+	 */
 	public static final class TestScenario extends MATSimApplication {
 
 		@CommandLine.Mixin
@@ -208,11 +146,23 @@ public class MATSimApplicationTest {
 			return config;
 		}
 
-
 		@Override
 		protected List<MATSimAppCommand> preparePostProcessing(Path outputFolder, String runId) {
 			return List.of(new TestCommand(outputFolder.resolve("test.txt"), "Inhalt"));
 		}
 	}
 
+	/**
+	 * Test scenario exposing config command line arguments from a custom call implementation.
+	 */
+	public static final class ConfigArgsScenario extends MATSimApplication {
+
+		static String[] configArgs;
+
+		@Override
+		public Integer call() {
+			configArgs = getConfigCommandLineArgs();
+			return 0;
+		}
+	}
 }

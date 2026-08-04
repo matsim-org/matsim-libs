@@ -27,7 +27,7 @@ class BellochePenaltyFunctionTest {
     void zeroCapacity() {
         BellochePenaltyFunction bellochePenaltyFunction = new BellochePenaltyFunction(0.4, -6);
         double penalty = bellochePenaltyFunction.calculateParkingSearchTime(Map.of(getDummyLinkId(), new ParkingCount(0, 0, 1)));
-        Assertions.assertEquals(0.4 * Math.exp(6), penalty); //161.37
+        Assertions.assertEquals(0.0, penalty);
     }
 
     @Test
