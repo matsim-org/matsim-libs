@@ -1,7 +1,7 @@
 /* *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** */
-package org.matsim.contrib.drt.optimizer.insertion.parallel;
+package org.matsim.contrib.drt.optimizer.servicequality;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 

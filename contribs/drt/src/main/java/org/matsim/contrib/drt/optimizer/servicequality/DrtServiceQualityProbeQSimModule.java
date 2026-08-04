@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.optimizer.insertion.parallel;
+package org.matsim.contrib.drt.optimizer.servicequality;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;

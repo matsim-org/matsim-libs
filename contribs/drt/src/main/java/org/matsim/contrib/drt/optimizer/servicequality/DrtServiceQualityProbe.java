@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.insertion.parallel;
+package org.matsim.contrib.drt.optimizer.servicequality;
 
 import com.google.inject.Provider;
 import org.apache.commons.csv.CSVFormat;

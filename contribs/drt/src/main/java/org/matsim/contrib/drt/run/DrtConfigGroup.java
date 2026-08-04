@@ -44,7 +44,7 @@ import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSe
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtParallelInserterParams;
-import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtServiceQualityProbeParams;
+import org.matsim.contrib.drt.optimizer.servicequality.DrtServiceQualityProbeParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;

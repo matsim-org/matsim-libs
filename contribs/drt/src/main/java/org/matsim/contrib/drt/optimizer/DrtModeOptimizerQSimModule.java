@@ -32,7 +32,7 @@ import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSele
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchQSimModule;
-import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtServiceQualityProbeQSimModule;
+import org.matsim.contrib.drt.optimizer.servicequality.DrtServiceQualityProbeQSimModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
