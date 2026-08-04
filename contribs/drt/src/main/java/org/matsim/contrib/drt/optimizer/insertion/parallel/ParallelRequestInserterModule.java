@@ -43,7 +43,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 
 import java.util.Optional;
-import org.matsim.core.api.experimental.events.EventsManager;
 
 import static org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.requests.LoadAwareRoundRobinRequestsPartitioner.getDefaultPartitionScalingFunction;
 
@@ -97,8 +96,7 @@ public class ParallelRequestInserterModule extends AbstractDvrpModeQSimModule {
 
 
 		bindModal(UnplannedRequestInserter.class).toProvider(modalProvider(
-			getter -> {
-				return new ParallelUnplannedRequestInserter(
+			getter -> new ParallelUnplannedRequestInserter(
 				getter.get(MatsimServices.class),
 				getter.getModal(RequestsPartitioner.class),
 				getter.getModal(VehicleEntryPartitioner.class),
@@ -112,10 +110,8 @@ public class ParallelRequestInserterModule extends AbstractDvrpModeQSimModule {
 				getter.getModal(DrtOfferAcceptor.class),
 				getter.getModal(PassengerStopDurationProvider.class),
 				getter.getModal(RequestFleetFilter.class),
-					getter.getModal(DrtRequestInsertionRetryQueue.class)
-				);
-			}
-		)).asEagerSingleton();
+				getter.getModal(DrtRequestInsertionRetryQueue.class)
+			))).asEagerSingleton();
 		addModalQSimComponentBinding().to(modalKey(UnplannedRequestInserter.class));
 
 		addModalComponent(QsimScopeForkJoinPool.class,

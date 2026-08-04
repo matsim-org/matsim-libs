@@ -19,6 +19,7 @@ package org.matsim.contrib.drt.optimizer.insertion.parallel;
  * *********************************************************************** */
 
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -112,9 +113,10 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 			insertionSearch, drtOfferAcceptor, stopDurationProvider, requestFleetFilter, insertionRetryQueue);
 	}
 
+	@VisibleForTesting
 	ParallelUnplannedRequestInserter(MatsimServices matsimServices, RequestsPartitioner requestsPartitioner, VehicleEntryPartitioner vehicleEntryPartitioner, DrtParallelInserterParams drtParallelInserterParams, String mode, Fleet fleet, EventsManager eventsManager,
-										 Provider<RequestInsertionScheduler> insertionSchedulerProvider, VehicleEntry.EntryFactory vehicleEntryFactory, Provider<DrtInsertionSearch> insertionSearch,
-										 DrtOfferAcceptor drtOfferAcceptor, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
+									 Provider<RequestInsertionScheduler> insertionSchedulerProvider, VehicleEntry.EntryFactory vehicleEntryFactory, Provider<DrtInsertionSearch> insertionSearch,
+									 DrtOfferAcceptor drtOfferAcceptor, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
 		this.collectionPeriod = drtParallelInserterParams.getCollectionPeriod();
 		this.mode = mode;
 		this.fleet = fleet;
@@ -326,6 +328,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 
 		result.rejected().forEach(req -> retryOrReject(req, time, NO_INSERTION_FOUND_CAUSE));
 		LOG.debug("Scheduled requests #{} ", result.scheduledCount());
+
 		if (cycleBuilder != null) {
 			cycleBuilder.totalScheduled(result.scheduledCount())
 				.totalRejected(result.rejected().size())
