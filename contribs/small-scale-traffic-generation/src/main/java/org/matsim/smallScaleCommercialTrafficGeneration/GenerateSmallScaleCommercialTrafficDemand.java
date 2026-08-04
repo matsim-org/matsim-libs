@@ -41,7 +41,6 @@ import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.contrib.common.conventions.vsp.SubpopulationDefaultNames;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.groups.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.network.NetworkUtils;
@@ -70,8 +69,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -134,6 +131,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the config for small scale commercial generation")
 	private Path configPath;
 	// ok
+
+	@CommandLine.Unmatched
+	private List<String> remainingArgs = new ArrayList<>();
 
 	private Path pathToZoneAttributes;
 	// command line string replaced 2026-07
@@ -218,16 +218,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private int numberOfPlanVariantsPerAgent;
 	/// This has to do with {@link CreateDifferentPlansForFreightPopulation}. See comments there.
 
-	@CommandLine.Option(names = "--network", description = "Overwrite network file in config")
-	private String network;
-	// ok
-	// yy since one reads a config, this here is not needed: can be set via --config:.... syntax
-
-	@CommandLine.Option(names = "--pathOutput", description = "Path for the output")
-	private Path output;
-	// ok
-	// yy since one reads a config, this here is not needed: can be set via --config:.... syntax
-
 	@CommandLine.Option(names = "--factorForTravelBufferCalculation", defaultValue = "1.2",
 		description = "Factor applied to the total service duration when estimating the required total tour duration for initial vehicle creation. Values above 1.0 reserve additional time for travel between services")
 	private double factorForTravelBufferCalculation;
@@ -239,18 +229,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	// yyyy as far as I can tell, this option is not honoured when using one of the two "useExistingCarrier..." options.
 
 	// ### only matsim- and jsprit-related params below
-
-	@CommandLine.Option(names = "--useRangeConstraintForTourPlanning",
-		description = "Option to use range constraint for planning the tours. If this is selected, the range is restricted based on consumption information in the vehicle types file.")
-	private boolean useRangeConstraintForTourPlanning;
-	// I think that this is a jsprit option.
-	// yy since one reads a config, this here is not needed
-
-	@CommandLine.Option(names = "--distanceConstraintUsableRange",
-		description = "Usable range in percent of the energy capacity applied to the vehicle range during tour planning. For example, a value of 80 limits the usable range to 80 percent. This option is only applied if --useRangeConstraintForTourPlanning is selected.", defaultValue = "100")
-	private double distanceConstraintUsableRange;
-	// I think that this is a jsprit option
-	// yy since one reads a config, this here is not needed: can be set via --config:freight.... syntax
 
 	@CommandLine.Option(names = "--smallScaleCommercialCarrierPartCount", defaultValue = "1",
 		description = "Number of independent carrier parts for small scale commercial tour planning. Use with --smallScaleCommercialCarrierPartIndex.")
@@ -294,15 +272,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private Index indexZones;
 
-	private final String[] configArgs;
-
 	/**
 	 * Builder for {@link GenerateSmallScaleCommercialTrafficDemand}. Optional dependencies left unset use the default
 	 * implementations used by the command line entry point.
 	 */
 	public static final class Builder {
 
-		private String[] configArgs;
 		private IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
 		private CommercialTourSpecifications commercialTourSpecifications;
 		private OdMatrixEntryInformationProvider odMatrixEntryInformationProvider;
@@ -317,14 +292,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 
 		private Builder() {}
-
-		/**
-		 * Sets additional config arguments passed to MATSim config loading.
-		 */
-		public Builder setConfigArgs(String... configArgs) {
-			this.configArgs = (configArgs == null) ? null : Arrays.copyOf(configArgs, configArgs.length);
-			return this;
-		}
 
 		Builder setIntegrateExistingTrafficToSmallScaleCommercial(
 			IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial) {
@@ -381,10 +348,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private GenerateSmallScaleCommercialTrafficDemand(Builder builder) {
 
-		this.configArgs = (builder.configArgs == null)
-			? new String[0]
-			: Arrays.copyOf(builder.configArgs, builder.configArgs.length);
-
 		if (builder.integrateExistingTrafficToSmallScaleCommercial == null) {
 			this.integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 			log.info("Using default {} if existing models are integrated!", DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class.getSimpleName());
@@ -440,20 +403,16 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		 * A carrier part ("chunk") run needs two different output concepts:
 		 * - finalOutput points to the shared traffic output folder created by the init step. The shared unsolved carrier
 		 *   file is read from there, and the merge step later writes the complete result there.
-		 * - configOutput points to the isolated part folder. It must be set before readAndCheckConfig initializes the
+		 * - output points to the isolated part folder. It must be set before configureConfig initializes the
 		 *   OutputDirectoryHierarchy, otherwise MATSim would touch or even delete the shared traffic output folder when
 		 *   a single part job starts on the cluster.
 		 */
-		Path requestedOutput = output;
-		Path configOutput = isSolvingOnlyCarrierPart() && requestedOutput != null
-			? getCarrierPartOutputPath(requestedOutput)
-			: requestedOutput;
-		Config config = readAndCheckConfig(configArgs, configPath, modelName, sampleName, configOutput);
+		Config config = ConfigUtils.loadConfig(IOUtils.getFileUrl(configPath.toString()), remainingArgs.toArray(String[]::new), new FreightCarriersConfigGroup());
+		Path finalOutput = getConfiguredOutputPath(config);
+		Path output = isSolvingOnlyCarrierPart() ? getCarrierPartOutputPath(finalOutput) : finalOutput;
+		configureConfig(config, output);
 		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. Not really sure if this is even need for commerical traffic. paul, jul'26
 		config.routing().setAccessEgressConsistencyCheck( RoutingConfigGroup.AccessEgressConsistencyCheck.disable );
-
-		output = Path.of(config.controller().getOutputDirectory());
-		Path finalOutput = isSolvingOnlyCarrierPart() && requestedOutput != null ? requestedOutput : output;
 
 		Scenario scenario;
 		if (mergeSmallScaleCommercialCarrierParts) {
@@ -866,27 +825,19 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		scenario.getConfig().routing().setNetworkModes(Sets.union(networkModes, modes));
 	}
 
-	/**
-	 * Reads and checks config if all necessary parameters are set.
-	 */
-	private Config readAndCheckConfig(String[] configArgs, Path configPath, String modelName, String sampleName, Path output) throws Exception {
+	private Path getConfiguredOutputPath(Config config) throws Exception {
+		if (config.controller().getOutputDirectory() == null || config.controller().getOutputDirectory().isBlank())
+			throw new Exception("No output directory was set");
+		return Path.of(config.controller().getOutputDirectory());
+	}
 
-		Config config = ConfigUtils.loadConfig(IOUtils.getFileUrl(configPath.toString()), configArgs);
-		if (output == null || output.toString().isEmpty())
-			config.controller().setOutputDirectory(Path.of(config.controller().getOutputDirectory()).resolve(modelName)
-				.resolve( usedSmallScaleCommercialTrafficSegment.toString() + "_" + sampleName + "pct" + "_"
-					+ LocalDate.now() + "_" + LocalTime.now().toSecondOfDay() + "_" + resistanceFactorsPerModelType)
-				.toString());
-		else
-			config.controller().setOutputDirectory(output.toString());
+	/**
+	 * Checks and prepares config if all necessary parameters are set.
+	 */
+	private void configureConfig(Config config, Path output) throws Exception {
+		config.controller().setOutputDirectory(output.toString());
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		if (useRangeConstraintForTourPlanning) {
-			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
-			log.info("Using range constraint for tour planning based on energy consumption information in the vehicle types file.");
-			freightCarriersConfigGroup.setDistanceConstraintUsableRange(distanceConstraintUsableRange);
-			log.info("Distance constraint safety margin is set to {} for vehicles with energy capacity information.", distanceConstraintUsableRange);
-		}
 		if (freightCarriersConfigGroup.getCarriersVehicleTypesFile() != null)
 			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
@@ -904,9 +855,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		config.qsim().setStorageCapFactor(sample);
 		config.qsim().setUsePersonIdForMissingVehicleId(true);
 		config.timeAllocationMutator().setMutateAroundInitialEndTimeOnly(false);
-		// Overwrite network
-		if (network != null)
-			config.network().setInputFile(network);
 
 		// Split-carrier steps share one traffic output folder. They must not delete it when a single init, part, or merge job starts.
 		if (createSmallScaleCommercialCarrierFileOnly || isSolvingOnlyCarrierPart() || mergeSmallScaleCommercialCarrierParts) {
@@ -923,10 +871,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			throw new Exception("No network file in config");
 		if (config.global().getCoordinateSystem() == null)
 			throw new Exception("No global CRS is set in config");
-		if (config.controller().getOutputDirectory() == null)
-			throw new Exception("No output directory was set");
-
-		return config;
 	}
 
 	/**
