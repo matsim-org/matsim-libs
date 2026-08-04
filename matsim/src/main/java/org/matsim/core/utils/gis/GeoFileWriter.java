@@ -22,8 +22,6 @@ package org.matsim.core.utils.gis;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.geotools.api.data.DataStore;
-import org.geotools.api.data.DataStoreFinder;
 import org.geotools.api.data.FileDataStore;
 import org.geotools.api.data.SimpleFeatureStore;
 import org.geotools.api.feature.simple.SimpleFeature;
@@ -31,9 +29,11 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.feature.type.Name;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.NameImpl;
-import org.geotools.geopkg.GeoPkgDataStoreFactory;
-import org.geotools.jdbc.JDBCDataStoreFactory;
+import org.geotools.geopkg.FeatureEntry;
+import org.geotools.geopkg.GeoPackage;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 
 import java.io.File;
@@ -41,8 +41,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This is a simple utility class that provides methods to write Feature instances
@@ -66,42 +64,82 @@ public class GeoFileWriter implements MatsimSomeWriter {
 		}
 
 		try {
-			SimpleFeatureStore featureSource;
 			SimpleFeatureType featureType = features.iterator().next().getFeatureType();
 
-			if(filename.endsWith(".shp")) {
+			if (filename.endsWith(".shp")) {
 				log.info("Writing shapefile to " + filename);
 				URL fileURL = (new File(filename)).toURI().toURL();
-        	    FileDataStore datastore = new ShapefileDataStore(fileURL);
+				FileDataStore datastore = new ShapefileDataStore(fileURL);
 				datastore.createSchema(featureType);
-				featureSource = (SimpleFeatureStore) datastore.getFeatureSource();
+				SimpleFeatureStore featureSource = (SimpleFeatureStore) datastore.getFeatureSource();
 				DefaultFeatureCollection coll = new DefaultFeatureCollection();
 				coll.addAll(features);
 				featureSource.addFeatures(coll);
 				datastore.dispose();
 
-			} else if(filename.endsWith(".gpkg")){
-				Map<String, Object> map = new HashMap<>();
-				map.put(GeoPkgDataStoreFactory.DBTYPE.key, GeoPkgDataStoreFactory.DBTYPE.sample);
-				map.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
-				map.put(JDBCDataStoreFactory.BATCH_INSERT_SIZE.key, 50);
-				DataStore datastore = DataStoreFinder.getDataStore(map);
-				datastore.createSchema(featureType);
-				if(layerName == null) {
-					layerName = new NameImpl(featureType.getTypeName());
-				}
-				featureSource = (SimpleFeatureStore) datastore.getFeatureSource(layerName);
-				DefaultFeatureCollection coll = new DefaultFeatureCollection();
-				coll.addAll(features);
-				featureSource.addFeatures(coll);
-				datastore.dispose();
-            } else {
-				throw new RuntimeException("Unsupported file type.");
+			} else if (filename.endsWith(".gpkg")) {
+				log.info("Writing GeoPackage to " + filename);
+				writeGeoPackage(features, filename, layerName, featureType);
+			} else {
+				throw new RuntimeException("Unsupported file type: " + filename);
 			}
-
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private static void writeGeoPackage(Collection<SimpleFeature> features, String filename, Name layerName, SimpleFeatureType featureType) throws IOException {
+		File file = new File(filename);
+		GeoPackage geopkg = new GeoPackage(file);
+		try {
+			geopkg.init();
+
+			String entryName = layerName != null ? layerName.getLocalPart() : featureType.getTypeName();
+
+			// Calculate bounds from features
+			Envelope envelope = new Envelope();
+			for (SimpleFeature feature : features) {
+				Geometry geom = (Geometry) feature.getDefaultGeometry();
+				if (geom != null && !geom.isEmpty()) {
+					envelope.expandToInclude(geom.getEnvelopeInternal());
+				}
+			}
+
+			FeatureEntry entry = new FeatureEntry();
+			entry.setTableName(entryName);
+			entry.setGeometryColumn(featureType.getGeometryDescriptor().getLocalName());
+			entry.setSrid(getSrid(featureType));
+			if (!envelope.isNull()) {
+				entry.setBounds(new ReferencedEnvelope(envelope, featureType.getCoordinateReferenceSystem()));
+			} else {
+				log.warn("All feature geometries are null/empty for '{}'; GeoPackage bounds remain unset.", filename);
+			}
+
+			DefaultFeatureCollection coll = new DefaultFeatureCollection();
+			coll.addAll(features);
+
+			geopkg.add(entry, coll);
+			geopkg.createSpatialIndex(entry);
+		} finally {
+			try {
+				geopkg.close();
+			} catch (Exception e) {
+				log.warn("Error while closing GeoPackage '{}': {}", filename, e.getMessage(), e);
+			}
+		}
+	}
+
+	private static Integer getSrid(SimpleFeatureType featureType) {
+		if (featureType.getCoordinateReferenceSystem() == null) {
+			return null;
+		}
+		try {
+			Integer code = org.geotools.referencing.CRS.lookupEpsgCode(featureType.getCoordinateReferenceSystem(), true);
+			return code;
+		} catch (Exception e) {
+			log.warn("Could not determine EPSG code for CRS: " + e.getMessage());
+			return null;
 		}
 	}
 }
