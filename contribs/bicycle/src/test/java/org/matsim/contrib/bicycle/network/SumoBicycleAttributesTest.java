@@ -35,6 +35,9 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -323,6 +326,59 @@ public class SumoBicycleAttributesTest {
 	}
 
 	// ------------------------------------------------------------------------
+	// OSM tag stamping
+	// ------------------------------------------------------------------------
+
+	/**
+	 * The classifier consults ~39 tag keys, but its verdict is on the link as
+	 * {@code bicycle_infra} — carrying the inputs along too would be dead weight on
+	 * every link of a city-sized network. By default only what something still reads
+	 * survives, which is also exactly what the Supersonic path writes.
+	 */
+	@Test
+	void keepsOnlyTheConsumedOsmTagsByDefault() throws Exception {
+
+		Fixture f = read();
+		run(f, null);
+
+		Set<String> stamped = stampedOsmKeys(f.network());
+
+		Set<String> unexpected = new TreeSet<>(stamped);
+		unexpected.removeAll(BicycleOsmTags.KEPT_ON_LINKS);
+		assertEquals(Set.of(), unexpected, "no tag outside the kept set may reach the links");
+		assertTrue(stamped.contains(BicycleOsmTags.SURFACE),
+			"the fixture tags surface, so stamping must still happen at all");
+	}
+
+	/** The escape hatch: everything the classifier saw, for working out why it decided as it did. */
+	@Test
+	void keepsEveryClassificationTagWithOsmTagsAll() throws Exception {
+
+		Fixture withAll = read();
+		SumoBicycleAttributes.process(withAll.network(), withAll.sumo(), withAll.tags(), null,
+			SumoBicycleAttributes.Params.defaults()
+				.withOsmTags(SumoBicycleAttributes.OsmTags.ALL));
+		Set<String> stamped = stampedOsmKeys(withAll.network());
+
+		assertTrue(stamped.contains(BicycleOsmTags.HIGHWAY),
+			"highway is the classifier's main input and must be visible again");
+
+		Fixture withMinimal = read();
+		run(withMinimal, null);
+		assertTrue(stamped.containsAll(stampedOsmKeys(withMinimal.network())),
+			"ALL is a superset of the default, never a different set");
+	}
+
+	/** The unprefixed OSM keys stamped onto any link of the network. */
+	private static Set<String> stampedOsmKeys(Network network) {
+		return network.getLinks().values().stream()
+			.flatMap(l -> l.getAttributes().getAsMap().keySet().stream())
+			.filter(k -> k.startsWith(BicycleUtils.OSM_PREFIX))
+			.map(k -> k.substring(BicycleUtils.OSM_PREFIX.length()))
+			.collect(Collectors.toSet());
+	}
+
+	// ------------------------------------------------------------------------
 	// Bicycle area
 	// ------------------------------------------------------------------------
 
@@ -340,7 +396,7 @@ public class SumoBicycleAttributesTest {
 		// way 8001 carries highway=footway; use that as the marker so the ring splits
 		SumoBicycleAttributes.Params gated = new SumoBicycleAttributes.Params(
 			"de", TransportMode.bike, BicycleLinkPolicy.AreaMarker.parse("highway=footway"),
-			20.0, 3.0, false, java.util.Set.of());
+			20.0, 3.0, false, Set.of(), SumoBicycleAttributes.OsmTags.MINIMAL);
 		SumoBicycleAttributes.Stats stats = SumoBicycleAttributes.process(
 			f.network(), f.sumo(), f.tags(), null, gated);
 

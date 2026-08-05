@@ -182,6 +182,28 @@ public final class BicycleOsmTags {
 	// ------------------------------------------------------------------------
 
 	/**
+	 * The OSM tags worth keeping on a finished link, as {@code osm:}-prefixed attributes.
+	 *
+	 * <p>Everything else in {@link #classificationKeys()} is *input* to the classifier —
+	 * its verdict is already on the link as {@code bicycle_infra}, so carrying the raw
+	 * tags along would only bloat the network. These four earn their place:
+	 *
+	 * <ul>
+	 *   <li>{@code surface} and {@code cycleway} are read by the scoring
+	 *       ({@code BicycleUtils.getSurface()} / {@code getCyclewaytype()} feed the
+	 *       comfort and infrastructure factors),</li>
+	 *   <li>{@code smoothness} is a merge criterion of the bicycle-aware simplifier —
+	 *       dropping it would silently merge links of differing surface quality,</li>
+	 *   <li>{@code bicycle} keeps the two build paths writing the same attribute set,
+	 *       which is what lets downstream code ignore where a network came from.</li>
+	 * </ul>
+	 *
+	 * <p>This is the list the Supersonic path has always written; the SUMO path used to
+	 * stamp all classification keys and now follows it, unless asked for everything.
+	 */
+	public static final Set<String> KEPT_ON_LINKS = Set.of(SURFACE, SMOOTHNESS, CYCLEWAY, BICYCLE);
+
+	/**
 	 * Every OSM tag <em>key</em> that {@link BicycleInfraClassifier} or
 	 * {@link BicycleLinkPolicy} consults. Deliberately keys only — the {@code HW_*},
 	 * {@code CW_*} and access constants above are tag <em>values</em> and have no
@@ -191,6 +213,9 @@ public final class BicycleOsmTags {
 	 * parsing an OSM file, and the {@code osm.extra-attributes} list handed to
 	 * netconvert. Adding a key to the classifier without adding it here means the
 	 * classifier will never see it.
+	 *
+	 * <p>These are what the classifier <em>reads</em>; what survives onto the finished
+	 * links is {@link #KEPT_ON_LINKS}.
 	 */
 	public static Set<String> classificationKeys() {
 		return Set.of(

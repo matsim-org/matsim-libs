@@ -73,6 +73,7 @@ $(sc) prepare bicycle-attributes \
 | `--ele-sample-step` | `20.0` | distance between elevation samples along a link, in m |
 | `--ele-noise-tolerance` | `3.0` | Douglas-Peucker vertical tolerance, in m |
 | `--simplify` | off | merge consecutive links that agree on the bicycle attributes (and on modes, lanes, freespeed and capacity), with the Supersonic pipeline's rules — see below |
+| `--osm-tags` | `MINIMAL` | which raw OSM tags survive onto the links: the four anything downstream reads, or `ALL` ~39 classification tags for inspection |
 
 It writes the two companion files alongside the network, under the matching name and in the same
 format `network-from-sumo` uses — including its compression rule: the companions inherit the
@@ -109,8 +110,8 @@ converters share `LinkProperties.getLaneCapacity` and its <50 m crossing boost. 
 cleanups and **before** the elevation metrics, so gradients are computed over the merged polylines, the
 geometry companion carries the concatenated SUMO shapes under the merged ids, and the feature companion
 gets a synthesized row per merged link (from the downstream constituent, whose to-junction the merged
-link now ends at; the length column is rewritten). What merged links do lose: `osm:` raw tags beyond
-surface/smoothness, and `name`/`restricted_lanes` when the constituents disagree on them.
+link now ends at; the length column is rewritten). What merged links do lose: any `osm:` tag the merge is
+not keyed on (relevant with `--osm-tags ALL`), and `name`/`restricted_lanes` when the constituents disagree.
 
 It fails fast rather than producing a plausible-looking wrong network: no link with mode `bike` (usually a
 `clean-network` run whose `--modes` forgot `bike`), or a DEM that does not cover the network (usually a wrong
@@ -236,8 +237,9 @@ defined in `BicycleUtils` (with typed getters) and are snake_case throughout —
 | `type`             | string | Raw OSM `highway=…` value (e.g. `service`) — not yet `osm:`-prefixed                   |
 | `origid`           | string | *(Supersonic path)* Original OSM way ID(s); hyphen-separated when multiple links were merged. On the SUMO path the way ids live in the `sumo.net.xml` instead. |
 
-The SUMO path writes every tag of `BicycleOsmTags.classificationKeys()` it finds under the `osm:` prefix, not
-just the four listed above — and on a merged link only values all constituent ways agree on.
+Both paths write exactly these four OSM tags (`BicycleOsmTags.KEPT_ON_LINKS`) — on a merged link, only values
+all constituent ways agree on. The classifier consults ~39 tags, but its verdict is already on the link as
+`bicycle_infra`; `--osm-tags ALL` keeps the rest anyway, for working out why a link was classified as it was.
 
 Scoring reads these through `BicycleUtils`: `getSurface()` and `getCyclewaytype()` check the plain key
 (`surface`, as `OsmBicycleReader` writes it) first and fall back to the `osm:`-prefixed one, so a network
@@ -247,7 +249,8 @@ Gradients are signed in the direction of travel, so reverse links get the opposi
 link with a hill between equal-height endpoints — `max_gradient`, `elevation_gain` and `elevation_loss` fill that gap.
 
 Not all of these are consumed by the simulation: `average_elevation` and `osm:bicycle` are written for
-inspection only — handy for sanity-checking an extract, but not read by anything downstream.
+inspection only — handy for sanity-checking an extract, but not read by anything downstream. `osm:smoothness`
+is not scored either; it is kept because `--simplify` matches on it.
 
 The five elevation attributes (`average_elevation`, `gradient`, `max_gradient`, `elevation_gain`, `elevation_loss`) are only
 attached when a DEM is supplied via `--dem`; without one they are absent.

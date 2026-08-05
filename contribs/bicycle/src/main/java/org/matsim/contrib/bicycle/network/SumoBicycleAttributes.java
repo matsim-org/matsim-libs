@@ -57,6 +57,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_AREA;
@@ -153,6 +154,18 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	@Option(names = "--output", required = true, description = "Path to the output network")
 	private Path output;
 
+	@Option(names = "--osm-tags", defaultValue = "MINIMAL",
+		description = "Which raw OSM tags to stamp onto the links as 'osm:*': "
+			+ "${COMPLETION-CANDIDATES}. MINIMAL keeps what the contrib actually consumes "
+			+ "(surface and cycleway for the scoring, smoothness as a --simplify merge "
+			+ "criterion, bicycle for parity with the Supersonic path). ALL keeps every "
+			+ "classification tag, ~39 attributes per link - useful for inspecting why a "
+			+ "link was classified the way it was, at the price of a much larger network.")
+	private OsmTags osmTags = OsmTags.MINIMAL;
+
+	/** How much of the raw OSM tagging survives onto the links. */
+	enum OsmTags { MINIMAL, ALL }
+
 	@Option(names = "--simplify", defaultValue = "false",
 		description = "Merge consecutive links that agree on the bicycle attributes (and on "
 			+ "modes, lanes, freespeed and capacity), with the Supersonic pipeline's rules. "
@@ -215,9 +228,15 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 				+ "carries bicycle=yes/designated.", buildOptions.dropWaysWithoutInfra());
 		}
 
+		if (osmTags == OsmTags.ALL) {
+			log.info("--osm-tags ALL: stamping every classification tag onto the links "
+				+ "({} keys), not just the {} the contrib consumes.",
+				BicycleOsmTags.classificationKeys().size(), BicycleOsmTags.KEPT_ON_LINKS);
+		}
+
 		Params params = new Params(buildOptions.country(), buildOptions.mode(), areaMarker,
 			buildOptions.eleSampleStep(), buildOptions.eleNoiseTolerance(), simplify,
-			buildOptions.dropWaysWithoutInfra());
+			buildOptions.dropWaysWithoutInfra(), osmTags);
 		MergeCarry carry = new MergeCarry();
 		Stats stats = process(network, sumo, wayTags,
 			elevationParser != null ? elevationParser::getElevation : null, params, carry);
@@ -437,7 +456,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			BicycleInfraCategory infra = classify(classifier, ways, direction, link, stats);
 			link.getAttributes().putAttribute(BICYCLE_INFRA, infra.name());
 
-			stampOsmTags(link, ways, stats);
+			stampOsmTags(link, ways, params, stats);
 			applySurfaceFallback(link, ways);
 			applyRestPolicy(link, ways, infra, params, stats);
 
@@ -600,10 +619,19 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * property of the merge, not of the road, and silently picking one is exactly the
 	 * failure mode this whole route exists to avoid.
 	 */
-	private static void stampOsmTags(Link link, List<Map<String, String>> ways, Stats stats) {
+	private static void stampOsmTags(Link link, List<Map<String, String>> ways, Params params, Stats stats) {
+
+		// The classifier has had its look at the raw tags by now and its verdict is on the
+		// link; keeping the input around is optional. MINIMAL keeps only what something
+		// downstream still reads - see BicycleOsmTags.KEPT_ON_LINKS.
+		Predicate<String> keep = params.osmTags() == OsmTags.ALL
+			? key -> true
+			: BicycleOsmTags.KEPT_ON_LINKS::contains;
 
 		if (ways.size() == 1) {
-			ways.get(0).forEach((k, v) -> link.getAttributes().putAttribute(OSM_PREFIX + k, v));
+			ways.get(0).forEach((k, v) -> {
+				if (keep.test(k)) link.getAttributes().putAttribute(OSM_PREFIX + k, v);
+			});
 			return;
 		}
 
@@ -611,6 +639,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		ways.forEach(t -> allKeys.addAll(t.keySet()));
 
 		for (String key : allKeys) {
+			if (!keep.test(key)) continue;
 			String value = ways.get(0).get(key);
 			boolean unanimous = value != null && ways.stream().allMatch(t -> value.equals(t.get(key)));
 			if (unanimous) {
@@ -868,21 +897,28 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 */
 	record Params(String country, String mode, BicycleLinkPolicy.AreaMarker areaMarker,
 				  double eleSampleStep, double eleNoiseTolerance, boolean simplify,
-				  Set<String> dropWaysWithoutInfra) {
+				  Set<String> dropWaysWithoutInfra, OsmTags osmTags) {
 
 		static Params defaults() {
 			return new Params("de", TransportMode.bike, null,
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_SAMPLE_STEP),
-				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE), false, Set.of());
+				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE), false, Set.of(),
+				OsmTags.MINIMAL);
 		}
 
 		Params withSimplify() {
 			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, true,
-				dropWaysWithoutInfra);
+				dropWaysWithoutInfra, osmTags);
 		}
 
 		Params withDropWaysWithoutInfra(Set<String> types) {
-			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify, types);
+			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify, types,
+				osmTags);
+		}
+
+		Params withOsmTags(OsmTags tags) {
+			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify,
+				dropWaysWithoutInfra, tags);
 		}
 	}
 
@@ -954,3 +990,4 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		}
 	}
 }
+
