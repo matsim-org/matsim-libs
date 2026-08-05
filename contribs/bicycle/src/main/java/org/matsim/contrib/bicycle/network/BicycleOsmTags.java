@@ -117,6 +117,24 @@ public final class BicycleOsmTags {
 	public static final String DESIGNATED = "designated";
 	public static final String PRIVATE = "private";
 	public static final String CUSTOMER = "customer";
+	public static final String CUSTOMERS = "customers";
+	public static final String EMERGENCY = "emergency";
+	public static final String PERMISSIVE = "permissive";
+	public static final String PERMIT = "permit";
+
+	/**
+	 * General {@code access} values that keep a way out of the bicycle network, unless a
+	 * bicycle-specific permission overrides them ({@code bicycle=yes} / {@code designated}).
+	 *
+	 * <p>Everything here is treated exactly like {@code access=no}. That is stricter than
+	 * OSM's own semantics for {@code permissive} and {@code permit} — those mean "usable
+	 * until the owner says otherwise" rather than "forbidden" — but such ways are private
+	 * ground, and routing cyclists across a supermarket yard or a company site produces
+	 * shortcuts nobody rides. {@code customer} and {@code customers} are both listed: the
+	 * plural is the documented value, the singular is common enough in the data to matter.
+	 */
+	public static final Set<String> ACCESS_RESTRICTED =
+		Set.of(NO, PRIVATE, CUSTOMER, CUSTOMERS, EMERGENCY, PERMISSIVE, PERMIT);
 
 	// ------------------------------------------------------------------------
 	// Busway directional family

@@ -120,7 +120,7 @@ contraflow edges for `oneway:bicycle=no` and is what keeps `footway` + `bicycle=
 |---|---|---|
 | contraflow for `oneway:bicycle=no`, `cycleway=opposite_lane` | yes, as `-<wayid>` edges allowing only `bicycle` | nothing to do |
 | `service=parking_aisle` | keeps it bike-accessible | drops it |
-| `access=no` / `private` / `customer` | inconsistent — `private` and `customer` ignored outright | drops it, unless `bicycle=yes`/`designated` overrides |
+| `access=no` / `private` / `customer(s)` / `emergency` / `permissive` / `permit` | inconsistent — most of these ignored outright | drops it, unless `bicycle=yes`/`designated` overrides |
 | footway/pedestrian without bike permission | mostly removes them, not always | drops the rest |
 | `bicycle=no` | mostly disallows bicycle, not always | removes the bike mode, link survives for other traffic |
 
@@ -286,7 +286,7 @@ until you populate it).
 
 - `BicycleNetworkPipeline` — full pipeline, entry point
 - `BicycleLinkPolicy` — per-link hook: infra classification + access rule enforcement (footway whitelist, `bicycle=no`,
-  `access=no/private/customer`, oneway handling)
+  `access` restrictions, oneway handling)
 - `TagCopier` — optional: copies selected raw OSM tags onto links with a prefix
 
 **Deprecated, kept for now:** `BicycleOsmNetworkReaderV2`, `CreateBicycleNetworkWithElevation` — both build on the
@@ -312,7 +312,7 @@ ones, each with the `.osm` it came from so the setup can be reproduced:
   repair. Two further cases parse a command line to pin `--free-speed-factor`, which the OSM reader consumes and
   `process` never sees
 - `BicycleInfraClassifierTest` — 37 table-driven cases covering 22 of the 27 categories and the precedence ordering
-- `BicycleLinkPolicyTest` — 13 cases for the footway/pedestrian whitelist, `bicycle=no`, `access=no/private/customer`
+- `BicycleLinkPolicyTest` — 13 cases for the footway/pedestrian whitelist, `bicycle=no`, `access` restrictions
   (incl. the `bicycle=yes/designated` override), and bicycle-oneway handling
 - `ServiceLinkCleanerTest` — 4 cases: removing a service dead-end, keeping a service link that connects two roads,
   a no-op when there are no service links, and trimming a hairline twig while keeping the connecting spine
@@ -408,7 +408,7 @@ rules.
 
 `BicycleLinkPolicy` additionally drops links (empties their modes and zeroes capacity, so `cleanNetwork` prunes them)
 when they're footway/pedestrian without explicit bike permission, a `service=parking_aisle`, have a restricted general
-`access` (`no` / `private` / `customer`) without a `bicycle=yes/designated` override, or are the synthetic reverse of a
+`access` (`no`, `private`, `customer`/`customers`, `emergency`, `permissive`, `permit`) without a `bicycle=yes/designated` override, or are the synthetic reverse of a
 bicycle-oneway. A `bicycle=no` link instead only loses its bike mode, so a `highway=primary` etc. survives as a car-only
 link.
 

@@ -64,8 +64,8 @@ import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA;
 import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA_MIXED;
 import static org.matsim.contrib.bicycle.BicycleUtils.OSM_PREFIX;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.ACCESS;
+import static org.matsim.contrib.bicycle.network.BicycleOsmTags.ACCESS_RESTRICTED;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.BICYCLE;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.CUSTOMER;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.DESIGNATED;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.HIGHWAY;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.HW_FOOTWAY;
@@ -691,7 +691,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 */
 	private static boolean isAccessRestricted(Map<String, String> tags) {
 		String access = tags.get(ACCESS);
-		boolean restricted = NO.equals(access) || PRIVATE.equals(access) || CUSTOMER.equals(access);
+		boolean restricted = access != null && ACCESS_RESTRICTED.contains(access);
 		return restricted && !bicycleExplicitlyAllowed(tags);
 	}
 

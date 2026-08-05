@@ -19,6 +19,8 @@
 package org.matsim.contrib.bicycle.network;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -202,6 +204,41 @@ public class BicycleLinkPolicyTest {
 		Link link = link("1f");
 		policy.apply(link, tags("highway", "service", "access", "customer"), OsmWayDirection.FORWARD);
 		assertTrue(link.getAllowedModes().isEmpty());
+	}
+
+	/**
+	 * Every value in {@code ACCESS_RESTRICTED} drops the link, not just no/private.
+	 * {@code permissive} and {@code permit} are deliberately included although OSM reads
+	 * them as "allowed until revoked": they mark private ground, and routing cyclists
+	 * across a supermarket yard produces shortcuts nobody rides.
+	 */
+	@ParameterizedTest
+	@ValueSource(strings = {"no", "private", "customer", "customers", "emergency", "permissive", "permit"})
+	void restrictedAccessValues_areDropped(String access) {
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "access", access), OsmWayDirection.FORWARD);
+		assertTrue(link.getAllowedModes().isEmpty(), "access=" + access + " must drop the link");
+	}
+
+	/** ...but a bicycle-specific permission still wins over every one of them. */
+	@ParameterizedTest
+	@ValueSource(strings = {"no", "private", "customer", "customers", "emergency", "permissive", "permit"})
+	void restrictedAccessValues_yieldToBicycleDesignated(String access) {
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "access", access, "bicycle", "designated"),
+			OsmWayDirection.FORWARD);
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike),
+			"access=" + access + " + bicycle=designated stays cyclable");
+	}
+
+	/** Values outside the set are not restrictions and must leave the link alone. */
+	@ParameterizedTest
+	@ValueSource(strings = {"yes", "destination", "agricultural", "forestry"})
+	void unrestrictedAccessValues_keepBike(String access) {
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "service", "access", access), OsmWayDirection.FORWARD);
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike),
+			"access=" + access + " is no reason to drop the link");
 	}
 
 	@Test

@@ -181,7 +181,7 @@ public final class BicycleLinkPolicy {
 		// Null-safe: raw OSM tag maps usually have no access key. Constant on the
 		// left to avoid an NPE.
 		String access = tags.get(ACCESS);
-		boolean restricted = NO.equals(access) || PRIVATE.equals(access) || CUSTOMER.equals(access);
+		boolean restricted = access != null && ACCESS_RESTRICTED.contains(access);
 		// A bicycle-specific permission overrides the general access restriction,
 		// e.g. access=private + bicycle=designated stays cyclable.
 		return restricted && !bicycleExplicitlyAllowed(tags);
