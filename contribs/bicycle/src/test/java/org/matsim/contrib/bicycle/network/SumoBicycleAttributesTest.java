@@ -351,7 +351,7 @@ public class SumoBicycleAttributesTest {
 		Link path = addLink(net, "path", a, b, Set.of(TransportMode.bike));
 		addLink(net, "depot", b, c, Set.of(TransportMode.truck, "freight"));
 
-		int changed = SumoBicycleAttributes.mirrorCarModes(net,
+		int changed = BicycleNetworkOps.mirrorCarModes(net,
 			Set.of(TransportMode.ride, TransportMode.truck, "freight"));
 
 		assertEquals(3, changed, "road gains three modes, stale loses one, depot loses its last two");

@@ -120,7 +120,8 @@ describe the same vehicles on the same roads, but drift apart on the way here: S
 own permissions, `freight` is never assigned at all, and every cleaner only ever *removes* `car`. Re-deriving
 them once, after everything that can change the link set, is cheaper than patching each cause. The names are
 not defaulted because scenarios disagree — Berlin v7.0 uses `freight`, Dresden v1.1 drops `truck` and adds
-`longDistanceFreight`.
+`longDistanceFreight`. Both commands share the option; on the Supersonic path — whose reader assigns `car`
+and `bike` only — it is also what makes the network carry a scenario population's motorised modes at all.
 
 Run `network-from-sumo` with `--turn-restrictions IGNORE_TURN_RESTRICTIONS` when building a bicycle network.
 `TurnRestrictionsNetworkCleaner` *adds* the mode it is cleaning to every link it collapses, and restrictions
@@ -217,6 +218,9 @@ The DEM is optional — drop `--dem` / `--dem-crs` to build the network without 
 | `--crs` (required)      | —       | Output network CRS (e.g. `EPSG:25832`)                                                           |
 | `--mode`                | `bike`  | Network mode for cyclable links                                                                  |
 | `--country`             | `de`    | Country profile for traffic-sign interpretation: `de`, `at`, or `generic` (see Country profiles) |
+| `--bike-area-marker`    | —       | OSM tag (`key` or `key=value`) restricting the full treatment to marked ways                     |
+| `--drop-ways-without-infra` | —   | minor way types, e.g. `track,path`, dropped where the link classified as `NONE` (see the `bicycle-attributes` section) |
+| `--mirror-car-modes`    | —       | modes given exactly the links that allow car, e.g. `ride,truck,freight` (see the `bicycle-attributes` section) |
 | `--free-speed-factor`   | `0.9`   | Free-speed factor for urban links; inherited from the OSM reader (see Free speed)                |
 | `--ele-sample-step`     | `20.0`  | Distance between elevation samples along a link, in m                                            |
 | `--ele-noise-tolerance` | `3.0`   | Douglas-Peucker vertical tolerance, in m                                                         |

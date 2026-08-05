@@ -260,7 +260,8 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		process(network,
 			elevationParser != null ? elevationParser::getElevation : null,
 			new Params(buildOptions.mode(), buildOptions.eleSampleStep(),
-				buildOptions.eleNoiseTolerance(), storeOriginalGeometry));
+				buildOptions.eleNoiseTolerance(), storeOriginalGeometry,
+				buildOptions.mirrorCarModes()));
 
 		// ---- 8. write --------------------------------------------------------
 		// Record the CRS the coordinates are actually in. Without it every consumer has
@@ -343,6 +344,12 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		// ---- 5c. clean again: the simplifier orphans every node it merges away ----
 		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car, TransportMode.bike));
 
+		// ---- 5d. mirror the motorised modes onto the car links ---------------
+		// After the last step that changes the link set, so the mirrored modes end up
+		// on exactly the cleaned car links. The reader assigns car and bike only; this
+		// is what makes the network carry the same modes as the SUMO path.
+		BicycleNetworkOps.mirrorCarModes(network, params.mirrorCarModes());
+
 		// ---- 6. rename mode if requested (no-op when --mode bike) -----------
 		BicycleNetworkOps.renameMode(network, TransportMode.bike, params.mode());
 
@@ -372,14 +379,19 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	public record Params(String mode,
 						 double eleSampleStep,
 						 double eleNoiseTolerance,
-						 boolean storeOriginalGeometry) {
+						 boolean storeOriginalGeometry,
+						 Set<String> mirrorCarModes) {
 
 		/** The pipeline defaults, matching the CLI option defaults. */
 		public static Params defaults() {
 			return new Params(TransportMode.bike,
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_SAMPLE_STEP),
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE),
-				Boolean.parseBoolean(DEFAULT_STORE_ORIGINAL_GEOMETRY));
+				Boolean.parseBoolean(DEFAULT_STORE_ORIGINAL_GEOMETRY), Set.of());
+		}
+
+		public Params withMirrorCarModes(Set<String> modes) {
+			return new Params(mode, eleSampleStep, eleNoiseTolerance, storeOriginalGeometry, modes);
 		}
 	}
 

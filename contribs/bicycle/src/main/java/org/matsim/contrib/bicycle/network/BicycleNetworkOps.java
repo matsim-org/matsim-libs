@@ -20,10 +20,13 @@ package org.matsim.contrib.bicycle.network;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.bicycle.BicycleUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * The pieces of bicycle network building that are independent of where the network
@@ -134,6 +138,54 @@ final class BicycleNetworkOps {
 		}
 		log.info("Renamed network mode '{}' -> '{}' on {} links.", from, to, renamed);
 		return renamed;
+	}
+
+	/**
+	 * Gives the configured modes exactly the links that allow car.
+	 *
+	 * <p>The motorised modes describe the same vehicles on the same roads, and scenarios
+	 * such as Berlin v7.0 carry them on an identical link set. They drift apart on the way
+	 * here: SUMO decides {@code truck} from its own permissions, the Supersonic reader
+	 * assigns {@code car} and {@code bike} only, and anything that removes car from a link
+	 * (the cleaners, most of all) does not touch the others. Rather than patch each cause,
+	 * the modes are re-derived from car once everything that can change the link set has
+	 * run — which is why both pipelines call this last.
+	 *
+	 * <p>A link whose <em>only</em> modes were mirrored ones — a truck-only depot access,
+	 * say — loses its last mode here and is removed along with its orphaned nodes, because
+	 * nothing cleans afterwards.
+	 *
+	 * <p>Which modes to mirror is deliberately not hardcoded: Berlin v7.0 uses
+	 * {@code freight}, while Dresden v1.1 drops {@code truck} and adds
+	 * {@code longDistanceFreight} instead.
+	 *
+	 * @return the number of links whose mode set was changed
+	 */
+	static int mirrorCarModes(Network network, Set<String> mirrored) {
+
+		if (mirrored.isEmpty()) return 0;
+
+		int changedLinks = 0;
+		List<Id<Link>> emptied = new ArrayList<>();
+		for (Link link : network.getLinks().values()) {
+			Set<String> modes = new TreeSet<>(link.getAllowedModes());
+			boolean car = modes.contains(TransportMode.car);
+			boolean changed = car ? modes.addAll(mirrored) : modes.removeAll(mirrored);
+			if (changed) {
+				link.setAllowedModes(modes);
+				changedLinks++;
+				if (modes.isEmpty()) emptied.add(link.getId());
+			}
+		}
+
+		if (!emptied.isEmpty()) {
+			emptied.forEach(network::removeLink);
+			NetworkUtils.removeNodesWithoutLinks(network);
+			log.info("Removed {} link(s) the mirroring left without any mode.", emptied.size());
+		}
+
+		log.info("Mirrored car onto {}: {} link(s) changed.", mirrored, changedLinks);
+		return changedLinks;
 	}
 
 	// ---- reporting -------------------------------------------------------------

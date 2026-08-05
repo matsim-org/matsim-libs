@@ -65,6 +65,16 @@ final class BicycleBuildOptions {
 			+ "cycling network; leave empty for rural models, where those tracks are the network.")
 	private Set<String> dropWaysWithoutInfra = Set.of();
 
+	@Option(names = "--mirror-car-modes", split = ",", paramLabel = "MODE",
+		description = "Modes that should end up on exactly the links that allow car - typically "
+			+ "'ride,truck,freight'. Without it the motorised modes drift apart (SUMO derives "
+			+ "truck from its own permissions, the Supersonic reader assigns car and bike only, "
+			+ "and the network cleaners only ever remove car); this re-derives them once, after "
+			+ "everything that can change the link set. Not defaulted, because the names differ "
+			+ "per scenario (Berlin v7.0 has freight, Dresden v1.1 drops truck and uses "
+			+ "longDistanceFreight).")
+	private Set<String> mirrorCarModes = Set.of();
+
 	@Option(names = "--ele-sample-step", defaultValue = DEFAULT_ELE_SAMPLE_STEP,
 		description = "Distance between elevation samples along a link, in m")
 	private double eleSampleStepM;
@@ -101,5 +111,10 @@ final class BicycleBuildOptions {
 	 */
 	Set<String> dropWaysWithoutInfra() {
 		return dropWaysWithoutInfra == null ? Set.of() : dropWaysWithoutInfra;
+	}
+
+	/** The {@code --mirror-car-modes} mode names; empty means the modes are left as built. */
+	Set<String> mirrorCarModes() {
+		return mirrorCarModes == null ? Set.of() : mirrorCarModes;
 	}
 }

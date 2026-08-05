@@ -154,15 +154,6 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	@Option(names = "--output", required = true, description = "Path to the output network")
 	private Path output;
 
-	@Option(names = "--mirror-car-modes", split = ",", paramLabel = "MODE",
-		description = "Modes that should end up on exactly the links that allow car - typically "
-			+ "'ride,truck,freight'. SUMO derives truck from its own permissions and the network "
-			+ "cleaners only ever remove car, so the motorised modes drift apart; this re-derives "
-			+ "them once, after everything that can change the link set. Not defaulted, because "
-			+ "the names differ per scenario (Berlin v7.0 has freight, Dresden v1.1 drops truck "
-			+ "and uses longDistanceFreight).")
-	private Set<String> mirrorCarModes = Set.of();
-
 	@Option(names = "--osm-tags", defaultValue = "MINIMAL",
 		description = "Which raw OSM tags to stamp onto the links as 'osm:*': "
 			+ "${COMPLETION-CANDIDATES}. MINIMAL keeps what the contrib actually consumes "
@@ -245,7 +236,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 		Params params = new Params(buildOptions.country(), buildOptions.mode(), areaMarker,
 			buildOptions.eleSampleStep(), buildOptions.eleNoiseTolerance(), simplify,
-			buildOptions.dropWaysWithoutInfra(), osmTags, mirrorCarModes);
+			buildOptions.dropWaysWithoutInfra(), osmTags, buildOptions.mirrorCarModes());
 		MergeCarry carry = new MergeCarry();
 		Stats stats = process(network, sumo, wayTags,
 			elevationParser != null ? elevationParser::getElevation : null, params, carry);
@@ -506,7 +497,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			attachElevation(network, sumo, carry.shapes, elevation, params, stats);
 		}
 
-		stats.modesMirrored = mirrorCarModes(network, params.mirrorCarModes());
+		stats.modesMirrored = BicycleNetworkOps.mirrorCarModes(network, params.mirrorCarModes());
 
 		warnAboutMissingLaneRestrictions(network, stats);
 
@@ -527,50 +518,6 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			.collect(Collectors.toCollection(TreeSet::new));
 		if (modes.isEmpty()) return;
 		NetworkUtils.cleanNetwork(network, modes);
-	}
-
-	/**
-	 * Gives the configured modes exactly the links that allow car.
-	 *
-	 * <p>The motorised modes describe the same vehicles on the same roads, and scenarios
-	 * such as Berlin v7.0 carry them on an identical link set. They drift apart on the way
-	 * here for two reasons: SUMO decides {@code truck} from its own permissions, and
-	 * anything that removes car from a link (the cleaner, most of all) does not touch the
-	 * others. Rather than patch each cause, the modes are re-derived from car once
-	 * everything that can change the link set has run.
-	 *
-	 * <p>Which modes those are is deliberately not hardcoded: Berlin v7.0 uses
-	 * {@code freight}, while Dresden v1.1 drops {@code truck} and adds
-	 * {@code longDistanceFreight} instead.
-	 */
-	static int mirrorCarModes(Network network, Set<String> mirrored) {
-
-		if (mirrored.isEmpty()) return 0;
-
-		int changedLinks = 0;
-		List<Id<Link>> emptied = new ArrayList<>();
-		for (Link link : network.getLinks().values()) {
-			Set<String> modes = new TreeSet<>(link.getAllowedModes());
-			boolean car = modes.contains(TransportMode.car);
-			boolean changed = car ? modes.addAll(mirrored) : modes.removeAll(mirrored);
-			if (changed) {
-				link.setAllowedModes(modes);
-				changedLinks++;
-				if (modes.isEmpty()) emptied.add(link.getId());
-			}
-		}
-
-		// A link that carried only mirrored modes without car - a truck-only depot access,
-		// say - just lost its last mode, and nothing cleans after this. Take it out here
-		// rather than shipping a dead link.
-		if (!emptied.isEmpty()) {
-			emptied.forEach(network::removeLink);
-			NetworkUtils.removeNodesWithoutLinks(network);
-			log.info("Removed {} link(s) the mirroring left without any mode.", emptied.size());
-		}
-
-		log.info("Mirrored car onto {}: {} link(s) changed.", mirrored, changedLinks);
-		return changedLinks;
 	}
 
 	/**

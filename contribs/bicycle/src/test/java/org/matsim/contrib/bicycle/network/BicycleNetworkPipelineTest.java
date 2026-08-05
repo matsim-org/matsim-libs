@@ -206,7 +206,7 @@ public class BicycleNetworkPipelineTest {
 		ba.getAttributes().putAttribute(BicycleOsmTags.BICYCLE, "yes");
 
 		BicycleNetworkPipeline.process(net, c -> 0.0,
-			new Params("bicycle", 10.0, 3.0, false));
+			new Params("bicycle", 10.0, 3.0, false, Set.of()));
 
 		for (Link l : net.getLinks().values()) {
 			assertEquals(Set.of("bicycle"), l.getAllowedModes(),
@@ -219,6 +219,48 @@ public class BicycleNetworkPipelineTest {
 		// the final clean runs on the renamed mode -- it must not empty the network
 		assertFalse(net.getLinks().isEmpty(), "the renamed links must survive the final clean");
 		assertNoOrphanNodes(net);
+	}
+
+
+	// =========================================================================
+	// Motorised modes mirrored onto the car links
+	// =========================================================================
+
+	/**
+	 * The reader assigns car and bike only, so a Supersonic network could not carry a
+	 * population whose plans use ride/truck/freight. With the option set, the pipeline
+	 * derives those modes from car at the very end — the same helper, and so the same
+	 * link sets, as the SUMO path.
+	 */
+	@Test
+	void processMirrorsTheMotorisedModesOntoTheCarLinks() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node c = node(net, "c", 200, 0);
+
+		// a road open to cars, and a cycleway that must stay bike-only
+		Link ab = link(net, a, b, "highway.residential", "NONE", "asphalt", 1L);
+		Link ba = link(net, b, a, "highway.residential", "NONE", "asphalt", 2L);
+		ab.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
+		ba.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
+		link(net, b, c, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 3L);
+		link(net, c, b, "highway.cycleway", "CYCLEWAY_LINK", "asphalt", 4L);
+
+		BicycleNetworkPipeline.process(net, null, Params.defaults()
+			.withMirrorCarModes(Set.of(TransportMode.ride, TransportMode.truck, "freight")));
+
+		for (Link l : net.getLinks().values()) {
+			if (l.getAllowedModes().contains(TransportMode.car)) {
+				assertEquals(Set.of(TransportMode.car, TransportMode.ride, TransportMode.truck,
+						"freight", TransportMode.bike), Set.copyOf(l.getAllowedModes()),
+					"every car link carries the mirrored modes: " + l.getId());
+			} else {
+				assertEquals(Set.of(TransportMode.bike), Set.copyOf(l.getAllowedModes()),
+					"a bike-only link gains nothing: " + l.getId());
+			}
+		}
+		assertEquals(4, net.getLinks().size(), "nothing merges or vanishes in this fixture");
 	}
 
 
