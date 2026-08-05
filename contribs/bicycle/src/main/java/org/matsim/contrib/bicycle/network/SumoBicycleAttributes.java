@@ -548,6 +548,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		if (mirrored.isEmpty()) return 0;
 
 		int changedLinks = 0;
+		List<Id<Link>> emptied = new ArrayList<>();
 		for (Link link : network.getLinks().values()) {
 			Set<String> modes = new TreeSet<>(link.getAllowedModes());
 			boolean car = modes.contains(TransportMode.car);
@@ -555,8 +556,19 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			if (changed) {
 				link.setAllowedModes(modes);
 				changedLinks++;
+				if (modes.isEmpty()) emptied.add(link.getId());
 			}
 		}
+
+		// A link that carried only mirrored modes without car - a truck-only depot access,
+		// say - just lost its last mode, and nothing cleans after this. Take it out here
+		// rather than shipping a dead link.
+		if (!emptied.isEmpty()) {
+			emptied.forEach(network::removeLink);
+			NetworkUtils.removeNodesWithoutLinks(network);
+			log.info("Removed {} link(s) the mirroring left without any mode.", emptied.size());
+		}
+
 		log.info("Mirrored car onto {}: {} link(s) changed.", mirrored, changedLinks);
 		return changedLinks;
 	}
@@ -1074,6 +1086,3 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		}
 	}
 }
-
-
-

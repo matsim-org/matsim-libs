@@ -341,23 +341,31 @@ public class SumoBicycleAttributesTest {
 		Network net = NetworkUtils.createNetwork();
 		Node a = addNode(net, "a", 0, 0);
 		Node b = addNode(net, "b", 100, 0);
+		Node c = addNode(net, "c", 200, 0);
 
-		// the three shapes this has to get right: car without the others, the others
-		// without car, and a bike-only link that must stay untouched
+		// the four shapes this has to get right: car without the others, the others without
+		// car but with something left, a bike-only link that must stay untouched, and a
+		// link whose ONLY modes are mirrored ones - it must go, not linger as modes=""
 		Link road = addLink(net, "road", a, b, Set.of(TransportMode.car));
-		Link stale = addLink(net, "stale", b, a, Set.of(TransportMode.ride, "freight"));
+		Link stale = addLink(net, "stale", b, a, Set.of(TransportMode.ride, TransportMode.bike));
 		Link path = addLink(net, "path", a, b, Set.of(TransportMode.bike));
+		addLink(net, "depot", b, c, Set.of(TransportMode.truck, "freight"));
 
 		int changed = SumoBicycleAttributes.mirrorCarModes(net,
 			Set.of(TransportMode.ride, TransportMode.truck, "freight"));
 
-		assertEquals(2, changed, "the car link gains three modes, the stale one loses two");
+		assertEquals(3, changed, "road gains three modes, stale loses one, depot loses its last two");
 		assertEquals(Set.of(TransportMode.car, TransportMode.ride, TransportMode.truck, "freight"),
 			Set.copyOf(road.getAllowedModes()));
-		assertEquals(Set.of(), Set.copyOf(stale.getAllowedModes()),
+		assertEquals(Set.of(TransportMode.bike), Set.copyOf(stale.getAllowedModes()),
 			"a motorised mode without car has nothing to be mirrored from");
 		assertEquals(Set.of(TransportMode.bike), Set.copyOf(path.getAllowedModes()),
 			"non-motorised modes are none of this method's business");
+
+		assertNull(net.getLinks().get(Id.createLinkId("depot")),
+			"a link whose last mode was mirrored away must not survive as a dead link");
+		assertNull(net.getNodes().get(Id.createNodeId("c")),
+			"its orphaned node goes with it");
 	}
 
 	private static Node addNode(Network net, String id, double x, double y) {

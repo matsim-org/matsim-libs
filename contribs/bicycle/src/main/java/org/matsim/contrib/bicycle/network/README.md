@@ -14,8 +14,9 @@ country profiles — is shared; what differs is where the network comes from.
 
 **Prefer the SUMO path for anything that has to end up in a VSP scenario**, because that is how those scenarios
 build their networks — the classification then lands in the scenario network itself instead of beside it. It
-also inherits what netconvert brings along: turn restrictions, traffic-light detection, junction joining, and
-integer lane counts per direction.
+also inherits what netconvert brings along: traffic-light detection, junction joining, and integer lane counts
+per direction. netconvert reads the OSM turn restrictions too, but only into its junction model — the finished
+MATSim network does not keep them (see the `--turn-restrictions` note further down).
 
 The Supersonic path stays as the reference implementation and is the shorter route for a standalone bicycle
 network. Both write the same attributes, so downstream code does not care which produced the network.
