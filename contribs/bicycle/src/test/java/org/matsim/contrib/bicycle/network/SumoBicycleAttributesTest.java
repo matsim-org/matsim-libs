@@ -340,7 +340,7 @@ public class SumoBicycleAttributesTest {
 		// way 8001 carries highway=footway; use that as the marker so the ring splits
 		SumoBicycleAttributes.Params gated = new SumoBicycleAttributes.Params(
 			"de", TransportMode.bike, BicycleLinkPolicy.AreaMarker.parse("highway=footway"),
-			20.0, 3.0, false);
+			20.0, 3.0, false, java.util.Set.of());
 		SumoBicycleAttributes.Stats stats = SumoBicycleAttributes.process(
 			f.network(), f.sumo(), f.tags(), null, gated);
 
@@ -356,6 +356,40 @@ public class SumoBicycleAttributesTest {
 		run(plain, null);
 		assertNull(BicycleUtils.getBicycleArea(link(plain.network(), "9001")),
 			"no marker configured -> no area attribute at all");
+	}
+
+	// ------------------------------------------------------------------------
+	// --drop-ways-without-infra
+	// ------------------------------------------------------------------------
+
+	/**
+	 * The ring's way 9001 is a living_street and 8001 a footway with bicycle=yes; neither
+	 * is a minor way type here, so listing them must change nothing. Way 5001 is a bare
+	 * highway=cycleway (classifies as NEEDS_CLARIFICATION, not NONE) and proves the
+	 * classification guard: even when its type is listed, a classified link survives.
+	 */
+	@Test
+	void dropWaysWithoutInfra_sparesClassifiedAndUnlistedTypes() throws Exception {
+
+		Fixture f = read();
+		SumoBicycleAttributes.Params p = SumoBicycleAttributes.Params.defaults()
+			.withDropWaysWithoutInfra(java.util.Set.of("cycleway", "track", "path"));
+		SumoBicycleAttributes.Stats stats = SumoBicycleAttributes.process(
+			f.network(), f.sumo(), f.tags(), null, p);
+
+		assertEquals(0, stats.droppedMinorWayWithoutInfra,
+			"the ring has no unclassified minor way, so nothing may be dropped");
+		assertNotNull(link(f.network(), "5001"), "a classified cycleway survives its type being listed");
+		assertNotNull(link(f.network(), "9001"), "living_street is not listed at all");
+	}
+
+	@Test
+	void dropWaysWithoutInfra_isOffByDefault() throws Exception {
+
+		Fixture f = read();
+		SumoBicycleAttributes.Stats stats = run(f, null);
+		assertEquals(0, stats.droppedMinorWayWithoutInfra);
+		assertTrue(SumoBicycleAttributes.Params.defaults().dropWaysWithoutInfra().isEmpty());
 	}
 
 	// ------------------------------------------------------------------------

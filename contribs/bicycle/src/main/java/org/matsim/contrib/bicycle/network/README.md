@@ -69,6 +69,7 @@ $(sc) prepare bicycle-attributes \
 | `--country` | `de` | country profile for traffic signs: `de`, `at`, `generic` |
 | `--mode` | `bike` | network mode for cyclable links |
 | `--bike-area-marker` | — | OSM tag (`key` or `key=value`) restricting the full treatment to marked ways |
+| `--drop-ways-without-infra` | — | minor way types, e.g. `track,path`, dropped where the link classified as `NONE` — see below |
 | `--ele-sample-step` | `20.0` | distance between elevation samples along a link, in m |
 | `--ele-noise-tolerance` | `3.0` | Douglas-Peucker vertical tolerance, in m |
 | `--simplify` | off | merge consecutive links that agree on the bicycle attributes (and on modes, lanes, freespeed and capacity), with the Supersonic pipeline's rules — see below |
@@ -92,6 +93,12 @@ them.
 The network CRS is read from the network's own `coordinateReferenceSystem` attribute, so there is no `--crs`.
 Elevation is sampled along the **SUMO edge polyline**, which holds the geometry nodes `--geometry.remove` folded
 in — so gradients follow the real curve without any stored geometry.
+
+**`--drop-ways-without-infra track,path`** thins out the field and forest tracks of a city model's rural
+ring. A link goes only when all of its ways are of the listed types, it classified as `NONE`, and none
+carries `bicycle=yes`/`designated` — so signposted and explicitly opened tracks survive. Values are OSM
+highway types (`unclassified` is a minor road, not "unclassified"). Dresden + 15 km: −28.5 % links; a pure
+city cutout loses almost nothing, which is why this is a ring option. Leave it empty for rural models.
 
 **`--simplify`** re-merges what netconvert's attribute-strict `geometry.remove` and the cleanups leave
 fragmented: consecutive links merge only when they agree on `bicycle_infra`, `bicycle_area`, `type`,

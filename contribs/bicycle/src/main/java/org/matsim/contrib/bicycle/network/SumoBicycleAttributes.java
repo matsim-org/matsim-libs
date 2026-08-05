@@ -210,8 +210,14 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			log.info("No --dem given: no elevation metrics will be attached.");
 		}
 
+		if (!buildOptions.dropWaysWithoutInfra().isEmpty()) {
+			log.info("Dropping minor ways of type {} where the link classified as NONE and no way "
+				+ "carries bicycle=yes/designated.", buildOptions.dropWaysWithoutInfra());
+		}
+
 		Params params = new Params(buildOptions.country(), buildOptions.mode(), areaMarker,
-			buildOptions.eleSampleStep(), buildOptions.eleNoiseTolerance(), simplify);
+			buildOptions.eleSampleStep(), buildOptions.eleNoiseTolerance(), simplify,
+			buildOptions.dropWaysWithoutInfra());
 		MergeCarry carry = new MergeCarry();
 		Stats stats = process(network, sumo, wayTags,
 			elevationParser != null ? elevationParser::getElevation : null, params, carry);
@@ -428,12 +434,12 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			}
 
 			OsmWayDirection direction = directionOf(link);
-			link.getAttributes().putAttribute(BICYCLE_INFRA,
-				classify(classifier, ways, direction, link, stats).name());
+			BicycleInfraCategory infra = classify(classifier, ways, direction, link, stats);
+			link.getAttributes().putAttribute(BICYCLE_INFRA, infra.name());
 
 			stampOsmTags(link, ways, stats);
 			applySurfaceFallback(link, ways);
-			applyRestPolicy(link, ways, stats);
+			applyRestPolicy(link, ways, infra, params, stats);
 
 			stats.classified++;
 		}
@@ -654,7 +660,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * the link afterwards. On a merged link a single offending way is enough — half a
 	 * parking aisle is not a through route.
 	 */
-	private static void applyRestPolicy(Link link, List<Map<String, String>> ways, Stats stats) {
+	private static void applyRestPolicy(Link link, List<Map<String, String>> ways,
+										BicycleInfraCategory infra, Params params, Stats stats) {
 
 		if (ways.stream().anyMatch(t -> SV_PARKING_AISLE.equals(t.get(SERVICE)))) {
 			drop(link);
@@ -683,6 +690,36 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			link.setAllowedModes(modes);
 			stats.bikeModeRemoved++;
 		}
+
+		// --drop-ways-without-infra, last so the more specific reasons keep their counters.
+		// Unlike the rules above this one wants ALL ways to be a minor type: a link merged
+		// from a track and a residential road is half a real road, and dropping it on the
+		// strength of the track half would be wrong. (Measured on Dresden: netconvert
+		// merges different highway types into one link exactly 6 times in 557 339, and
+		// those carry a cycleway and so never classify as NONE -- but the asymmetry is
+		// free, and it keeps the rule honest if netconvert settings change.)
+		if (isMinorWayWithoutInfra(ways, infra, params)) {
+			drop(link);
+			stats.droppedMinorWayWithoutInfra++;
+		}
+	}
+
+	/**
+	 * Whether every way behind the link is one of the {@code --drop-ways-without-infra}
+	 * minor types, the link classified as {@code NONE}, and no way carries a
+	 * bicycle-specific permission.
+	 *
+	 * <p>The classification check spares a signposted cycle route running over a
+	 * {@code highway=track} — traffic sign DE:237 or a shared foot/cycleway classifies it,
+	 * so it is never {@code NONE}. The {@code bicycle=yes/designated} check spares the
+	 * rest: plain tracks that OSM marks as open to bikes, which the classifier alone
+	 * leaves at {@code NONE} (measured on Dresden: 4 606 track links, 815 km).
+	 */
+	private static boolean isMinorWayWithoutInfra(List<Map<String, String>> ways,
+												  BicycleInfraCategory infra, Params params) {
+		if (params.dropWaysWithoutInfra().isEmpty() || infra != BicycleInfraCategory.NONE) return false;
+		if (ways.stream().anyMatch(SumoBicycleAttributes::bicycleExplicitlyAllowed)) return false;
+		return ways.stream().allMatch(t -> params.dropWaysWithoutInfra().contains(t.get(HIGHWAY)));
 	}
 
 	/**
@@ -830,16 +867,22 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * The non-I/O parameters, decoupled from the picocli fields so a test can build them.
 	 */
 	record Params(String country, String mode, BicycleLinkPolicy.AreaMarker areaMarker,
-				  double eleSampleStep, double eleNoiseTolerance, boolean simplify) {
+				  double eleSampleStep, double eleNoiseTolerance, boolean simplify,
+				  Set<String> dropWaysWithoutInfra) {
 
 		static Params defaults() {
 			return new Params("de", TransportMode.bike, null,
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_SAMPLE_STEP),
-				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE), false);
+				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE), false, Set.of());
 		}
 
 		Params withSimplify() {
-			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, true);
+			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, true,
+				dropWaysWithoutInfra);
+		}
+
+		Params withDropWaysWithoutInfra(Set<String> types) {
+			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify, types);
 		}
 	}
 
@@ -865,6 +908,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		int droppedRestrictedAccess;
 		int droppedFootwayWithoutBike;
 		int bikeModeRemoved;
+		/** Minor ways dropped by {@code --drop-ways-without-infra}; 0 when the option is off. */
+		int droppedMinorWayWithoutInfra;
 
 		int withElevation;
 		int linksWithTrueShape;
@@ -891,6 +936,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 				  dropped: service=parking_aisle       %d
 				  dropped: access=no/private/customer  %d
 				  dropped: footway without bike        %d
+				  dropped: minor way without infra     %d
 				  bike mode removed (bicycle=no)       %d
 				  links merged away by --simplify      %d
 				  links with elevation metrics         %d
@@ -902,7 +948,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 				.formatted(classified, linksWithoutEdge, linksWithoutWayTags, outsideArea,
 					agreeingMultiWay, mixedMultiWay, tagsDroppedAsAmbiguous,
 					droppedParkingAisle, droppedRestrictedAccess, droppedFootwayWithoutBike,
-					bikeModeRemoved, mergedBySimplify,
+					droppedMinorWayWithoutInfra, bikeModeRemoved, mergedBySimplify,
 					withElevation, linksWithTrueShape, linksSampledAlongChord,
 					linksWithoutElevationData, nodesWithoutElevation, modesRenamed);
 		}

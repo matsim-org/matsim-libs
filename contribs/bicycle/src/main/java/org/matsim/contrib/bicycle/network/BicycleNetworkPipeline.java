@@ -233,7 +233,12 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			log.info("Bicycle-area marker '{}': only matching ways get the full bicycle treatment; "
 				+ "other ways keep their modes but get no bicycle detail.", areaMarker);
 		}
-		var policy = new BicycleLinkPolicy(classifier, tagCopier, areaMarker);
+		var dropWaysWithoutInfra = buildOptions.dropWaysWithoutInfra();
+		if (!dropWaysWithoutInfra.isEmpty()) {
+			log.info("Dropping minor ways of type {} where the link classified as NONE and no way "
+				+ "carries bicycle=yes/designated.", dropWaysWithoutInfra);
+		}
+		var policy = new BicycleLinkPolicy(classifier, tagCopier, areaMarker, dropWaysWithoutInfra);
 
 		log.info("Free-speed factor {}: applied to links with a maxspeed tag below 51 km/h; "
 			+ "the allowed_speed attribute keeps the untouched tag value.", freeSpeedFactor);

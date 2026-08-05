@@ -73,19 +73,34 @@ public final class BicycleLinkPolicy {
 	/** Selects the ways that get the full bicycle treatment; {@code null} = every way. */
 	private final AreaMarker areaMarker;
 
+	/**
+	 * Minor way types — {@code track}, {@code path} and the like — dropped when the way
+	 * turns out to carry no cycling infrastructure. Empty switches the rule off.
+	 */
+	private final Set<String> dropWaysWithoutInfra;
+
 	public BicycleLinkPolicy(BicycleInfraClassifier classifier, TagCopier tagCopier) {
-		this(classifier, tagCopier, null);
+		this(classifier, tagCopier, null, Set.of());
+	}
+
+	public BicycleLinkPolicy(BicycleInfraClassifier classifier, TagCopier tagCopier, AreaMarker areaMarker) {
+		this(classifier, tagCopier, areaMarker, Set.of());
 	}
 
 	/**
-	 * @param areaMarker restricts the full bicycle treatment to the ways carrying this
-	 *                   OSM marker tag; every other way is reduced to a plain car link.
-	 *                   {@code null} treats every way as cyclable (the default).
+	 * @param areaMarker           restricts the full bicycle treatment to the ways carrying
+	 *                             this OSM marker tag; every other way is reduced to a plain
+	 *                             car link. {@code null} treats every way as cyclable.
+	 * @param dropWaysWithoutInfra OSM highway types of minor ways (typically {@code track}
+	 *                             and {@code path}) to drop where the way ended up with
+	 *                             {@code bicycle_infra=NONE}; empty switches the rule off.
 	 */
-	public BicycleLinkPolicy(BicycleInfraClassifier classifier, TagCopier tagCopier, AreaMarker areaMarker) {
+	public BicycleLinkPolicy(BicycleInfraClassifier classifier, TagCopier tagCopier, AreaMarker areaMarker,
+							 Set<String> dropWaysWithoutInfra) {
 		this.classifier = classifier;
 		this.tagCopier = tagCopier;
 		this.areaMarker = areaMarker;
+		this.dropWaysWithoutInfra = dropWaysWithoutInfra == null ? Set.of() : dropWaysWithoutInfra;
 	}
 
 	public void apply(Link link, Map<String, String> tags, OsmWayDirection direction) {
@@ -152,6 +167,31 @@ public final class BicycleLinkPolicy {
 				drop(link);
 			}
 		}
+
+		// 7. --drop-ways-without-infra: a field or forest track that turned out to carry
+		//    no cycling infrastructure. Last of the drop rules, so the more specific
+		//    reasons above keep their counters. Runs before cleanNetwork, which then
+		//    removes whatever this leaves stranded.
+		if (isMinorWayWithoutInfra(tags, infra)) {
+			drop(link);
+		}
+	}
+
+	/**
+	 * Whether the way is one of the configured minor way types, ended up without cycling
+	 * infrastructure, and carries no bicycle-specific permission.
+	 *
+	 * <p>Two conditions keep this rule out of trouble. The classification check spares a
+	 * signposted cycle route that happens to run over a {@code highway=track} — traffic
+	 * sign DE:237 or a shared foot/cycleway classifies it, so it is never {@code NONE}.
+	 * The {@code bicycle=yes/designated} check spares the rest: plain tracks that OSM
+	 * marks as open to bikes, which the classifier alone leaves at {@code NONE} (measured
+	 * on Dresden: 4 606 such track links, 815 km — the backbone of rural cycling).
+	 */
+	private boolean isMinorWayWithoutInfra(Map<String, String> tags, BicycleInfraCategory infra) {
+		if (dropWaysWithoutInfra.isEmpty() || infra != BicycleInfraCategory.NONE) return false;
+		String highway = tags.get(HIGHWAY);
+		return highway != null && dropWaysWithoutInfra.contains(highway) && !bicycleExplicitlyAllowed(tags);
 	}
 
 	// ------------------------------------------------------------------------

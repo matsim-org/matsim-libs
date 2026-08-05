@@ -38,6 +38,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -239,6 +240,66 @@ public class BicycleLinkPolicyTest {
 		policy.apply(link, tags("highway", "service", "access", access), OsmWayDirection.FORWARD);
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike),
 			"access=" + access + " is no reason to drop the link");
+	}
+
+	// =========================================================================
+	// --drop-ways-without-infra
+	// =========================================================================
+
+	private static final BicycleLinkPolicy DROPS_MINOR = new BicycleLinkPolicy(
+		new BicycleInfraClassifier(), new TagCopier(List.of(), "osm:"), null,
+		Set.of("track", "path"));
+
+	@Test
+	void minorWayWithoutInfra_isDropped() {
+		Link link = link("1f");
+		DROPS_MINOR.apply(link, tags("highway", "track"), OsmWayDirection.FORWARD);
+		assertTrue(link.getAllowedModes().isEmpty(), "a plain field track goes");
+	}
+
+	/**
+	 * The two escape hatches: an explicit bicycle permission, and a real classification.
+	 * Without them the rule would throw away signposted rural cycle routes.
+	 */
+	@ParameterizedTest
+	@ValueSource(strings = {"yes", "designated"})
+	void minorWayWithBicyclePermission_isKept(String bicycle) {
+		Link link = link("1f");
+		DROPS_MINOR.apply(link, tags("highway", "track", "bicycle", bicycle), OsmWayDirection.FORWARD);
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike),
+			"track + bicycle=" + bicycle + " is an opened field track and stays");
+	}
+
+	/**
+	 * Isolates the classification guard: traffic sign DE:237 makes this track a cycleway
+	 * without any bicycle=* tag, so it is the classification alone — not the permission
+	 * check — that keeps the link. This is the signposted field track through the fields.
+	 */
+	@Test
+	void minorWayWithInfrastructure_isKept() {
+		Link link = link("1f");
+		DROPS_MINOR.apply(link, tags("highway", "track", "traffic_sign", "DE:237"), OsmWayDirection.FORWARD);
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
+		assertNotEquals("NONE", link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA),
+			"DE:237 classifies the track, so the drop rule must not see NONE");
+	}
+
+	@Test
+	void unlistedType_isKeptEvenWithoutInfra() {
+		Link link = link("1f");
+		link.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
+		DROPS_MINOR.apply(link, tags("highway", "residential"), OsmWayDirection.FORWARD);
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike),
+			"residential is not in the list, so the rule must not fire");
+	}
+
+	@Test
+	void withoutTheOption_minorWaysSurvive() {
+		// Default behaviour is pinned: the plain policy keeps the very track that
+		// DROPS_MINOR removes.
+		Link link = link("1f");
+		policy.apply(link, tags("highway", "track"), OsmWayDirection.FORWARD);
+		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
 	}
 
 	@Test

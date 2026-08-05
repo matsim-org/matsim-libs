@@ -21,6 +21,8 @@ package org.matsim.contrib.bicycle.network;
 import org.matsim.api.core.v01.TransportMode;
 import picocli.CommandLine.Option;
 
+import java.util.Set;
+
 /**
  * The options shared by the two network-building commands ({@code bicycle-attributes},
  * {@code bicycle-network}), as a picocli mixin: declared once, embedded via
@@ -53,6 +55,16 @@ final class BicycleBuildOptions {
 			+ "elevation metrics. Omit to treat every way as cyclable.")
 	private String bikeAreaMarker;
 
+	@Option(names = "--drop-ways-without-infra", split = ",", paramLabel = "HIGHWAY_TYPE",
+		description = "Minor way types - typically 'track,path' - to drop where the link ended up "
+			+ "with bicycle_infra=NONE. A link goes only if ALL of its OSM ways are of these types, "
+			+ "it classified as NONE, and none of them carries bicycle=yes/designated, so signposted "
+			+ "and explicitly opened field tracks survive. Values are OSM highway types (note that "
+			+ "'unclassified' is one of them: a minor road, not 'without classification'). Meant for "
+			+ "city models with a rural ring, where field and forest tracks add many links and little "
+			+ "cycling network; leave empty for rural models, where those tracks are the network.")
+	private Set<String> dropWaysWithoutInfra = Set.of();
+
 	@Option(names = "--ele-sample-step", defaultValue = DEFAULT_ELE_SAMPLE_STEP,
 		description = "Distance between elevation samples along a link, in m")
 	private double eleSampleStepM;
@@ -80,5 +92,14 @@ final class BicycleBuildOptions {
 	/** The parsed {@code --bike-area-marker}, or {@code null} when every way is cyclable. */
 	BicycleLinkPolicy.AreaMarker areaMarkerOrNull() {
 		return bikeAreaMarker != null ? BicycleLinkPolicy.AreaMarker.parse(bikeAreaMarker) : null;
+	}
+
+	/**
+	 * The {@code --drop-ways-without-infra} highway types; empty means the rule is off.
+	 * These are minor way types such as {@code track} and {@code path} — not OSM's
+	 * {@code highway=unclassified}, which is an ordinary minor road.
+	 */
+	Set<String> dropWaysWithoutInfra() {
+		return dropWaysWithoutInfra == null ? Set.of() : dropWaysWithoutInfra;
 	}
 }
