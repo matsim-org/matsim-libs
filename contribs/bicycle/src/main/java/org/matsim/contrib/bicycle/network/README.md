@@ -74,6 +74,7 @@ $(sc) prepare bicycle-attributes \
 | `--ele-noise-tolerance` | `3.0` | Douglas-Peucker vertical tolerance, in m |
 | `--simplify` | off | merge consecutive links that agree on the bicycle attributes (and on modes, lanes, freespeed and capacity), with the Supersonic pipeline's rules — see below |
 | `--osm-tags` | `MINIMAL` | which raw OSM tags survive onto the links: the four anything downstream reads, or `ALL` ~39 classification tags for inspection |
+| `--mirror-car-modes` | — | modes given exactly the links that allow car, e.g. `ride,truck,freight` — see below |
 
 It writes the two companion files alongside the network, under the matching name and in the same
 format `network-from-sumo` uses — including its compression rule: the companions inherit the
@@ -112,6 +113,18 @@ geometry companion carries the concatenated SUMO shapes under the merged ids, an
 gets a synthesized row per merged link (from the downstream constituent, whose to-junction the merged
 link now ends at; the length column is rewritten). What merged links do lose: any `osm:` tag the merge is
 not keyed on (relevant with `--osm-tags ALL`), and `name`/`restricted_lanes` when the constituents disagree.
+
+**`--mirror-car-modes ride,truck,freight`** gives those modes exactly the links that allow `car`. They
+describe the same vehicles on the same roads, but drift apart on the way here: SUMO decides `truck` from its
+own permissions, `freight` is never assigned at all, and every cleaner only ever *removes* `car`. Re-deriving
+them once, after everything that can change the link set, is cheaper than patching each cause. The names are
+not defaulted because scenarios disagree — Berlin v7.0 uses `freight`, Dresden v1.1 drops `truck` and adds
+`longDistanceFreight`.
+
+Run `network-from-sumo` with `--turn-restrictions IGNORE_TURN_RESTRICTIONS` when building a bicycle network.
+`TurnRestrictionsNetworkCleaner` *adds* the mode it is cleaning to every link it collapses, and restrictions
+exist only for `car` — so car ends up on cycleways and footways (NNK sample: 37 links, 1.5 km; a Berlin build:
+6,480 links, 579 km) and stops matching `ride`. The MATSim scenarios do the same, for the same reason.
 
 It fails fast rather than producing a plausible-looking wrong network: no link with mode `bike` (usually a
 `clean-network` run whose `--modes` forgot `bike`), or a DEM that does not cover the network (usually a wrong

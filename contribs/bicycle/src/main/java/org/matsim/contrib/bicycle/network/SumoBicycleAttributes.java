@@ -154,6 +154,15 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	@Option(names = "--output", required = true, description = "Path to the output network")
 	private Path output;
 
+	@Option(names = "--mirror-car-modes", split = ",", paramLabel = "MODE",
+		description = "Modes that should end up on exactly the links that allow car - typically "
+			+ "'ride,truck,freight'. SUMO derives truck from its own permissions and the network "
+			+ "cleaners only ever remove car, so the motorised modes drift apart; this re-derives "
+			+ "them once, after everything that can change the link set. Not defaulted, because "
+			+ "the names differ per scenario (Berlin v7.0 has freight, Dresden v1.1 drops truck "
+			+ "and uses longDistanceFreight).")
+	private Set<String> mirrorCarModes = Set.of();
+
 	@Option(names = "--osm-tags", defaultValue = "MINIMAL",
 		description = "Which raw OSM tags to stamp onto the links as 'osm:*': "
 			+ "${COMPLETION-CANDIDATES}. MINIMAL keeps what the contrib actually consumes "
@@ -236,7 +245,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 		Params params = new Params(buildOptions.country(), buildOptions.mode(), areaMarker,
 			buildOptions.eleSampleStep(), buildOptions.eleNoiseTolerance(), simplify,
-			buildOptions.dropWaysWithoutInfra(), osmTags);
+			buildOptions.dropWaysWithoutInfra(), osmTags, mirrorCarModes);
 		MergeCarry carry = new MergeCarry();
 		Stats stats = process(network, sumo, wayTags,
 			elevationParser != null ? elevationParser::getElevation : null, params, carry);
@@ -470,22 +479,86 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		// Picks up the links the rest policy emptied as well as anything the service
 		// cleanup disconnected. Before the elevation (and the simplify) on purpose:
 		// what dies here should neither block a merge nor burn elevation samples.
-		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car, TransportMode.bike));
+		//
+		// Every mode the network carries, not just car and bike: cleaning only some of
+		// them leaves the others with pieces outside their own largest component, which
+		// downstream shows up as agents stuck on an unreachable link.
+		cleanAllModes(network);
 		log.info("After cleanNetwork: {} nodes, {} links", network.getNodes().size(), network.getLinks().size());
 
 		if (params.simplify()) {
 			stats.mergedBySimplify = simplifyAndTrack(network, sumo, carry);
+
+			// Merging can strand a stub: where a chain's interior node was a mode's only
+			// tie to the rest of the network, the merged link hangs off nothing. Measured
+			// on the NNK sample: 0 stranded links before the merge, 9 after (0.2 km).
+			// Still ahead of the elevation, so no samples are spent on links about to go.
+			int before = network.getLinks().size();
+			cleanAllModes(network);
+			stats.strandedBySimplify = before - network.getLinks().size();
+			if (stats.strandedBySimplify > 0) {
+				log.info("Cleanup after the merge removed {} stranded link(s); {} remain.",
+					stats.strandedBySimplify, network.getLinks().size());
+			}
 		}
 
 		if (elevation != null) {
 			attachElevation(network, sumo, carry.shapes, elevation, params, stats);
 		}
 
+		stats.modesMirrored = mirrorCarModes(network, params.mirrorCarModes());
+
 		warnAboutMissingLaneRestrictions(network, stats);
 
 		stats.modesRenamed = BicycleNetworkOps.renameMode(network, TransportMode.bike, params.mode());
 
 		return stats;
+	}
+
+	/**
+	 * Runs the cleaner over every mode the network actually uses.
+	 *
+	 * <p>{@code cleanNetwork} treats its argument as the list of modes to make routable,
+	 * so any mode left out keeps whatever unreachable pieces it had.
+	 */
+	private static void cleanAllModes(Network network) {
+		Set<String> modes = network.getLinks().values().stream()
+			.flatMap(l -> l.getAllowedModes().stream())
+			.collect(Collectors.toCollection(TreeSet::new));
+		if (modes.isEmpty()) return;
+		NetworkUtils.cleanNetwork(network, modes);
+	}
+
+	/**
+	 * Gives the configured modes exactly the links that allow car.
+	 *
+	 * <p>The motorised modes describe the same vehicles on the same roads, and scenarios
+	 * such as Berlin v7.0 carry them on an identical link set. They drift apart on the way
+	 * here for two reasons: SUMO decides {@code truck} from its own permissions, and
+	 * anything that removes car from a link (the cleaner, most of all) does not touch the
+	 * others. Rather than patch each cause, the modes are re-derived from car once
+	 * everything that can change the link set has run.
+	 *
+	 * <p>Which modes those are is deliberately not hardcoded: Berlin v7.0 uses
+	 * {@code freight}, while Dresden v1.1 drops {@code truck} and adds
+	 * {@code longDistanceFreight} instead.
+	 */
+	static int mirrorCarModes(Network network, Set<String> mirrored) {
+
+		if (mirrored.isEmpty()) return 0;
+
+		int changedLinks = 0;
+		for (Link link : network.getLinks().values()) {
+			Set<String> modes = new TreeSet<>(link.getAllowedModes());
+			boolean car = modes.contains(TransportMode.car);
+			boolean changed = car ? modes.addAll(mirrored) : modes.removeAll(mirrored);
+			if (changed) {
+				link.setAllowedModes(modes);
+				changedLinks++;
+			}
+		}
+		log.info("Mirrored car onto {}: {} link(s) changed.", mirrored, changedLinks);
+		return changedLinks;
 	}
 
 	/**
@@ -897,28 +970,33 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 */
 	record Params(String country, String mode, BicycleLinkPolicy.AreaMarker areaMarker,
 				  double eleSampleStep, double eleNoiseTolerance, boolean simplify,
-				  Set<String> dropWaysWithoutInfra, OsmTags osmTags) {
+				  Set<String> dropWaysWithoutInfra, OsmTags osmTags, Set<String> mirrorCarModes) {
 
 		static Params defaults() {
 			return new Params("de", TransportMode.bike, null,
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_SAMPLE_STEP),
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE), false, Set.of(),
-				OsmTags.MINIMAL);
+				OsmTags.MINIMAL, Set.of());
 		}
 
 		Params withSimplify() {
 			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, true,
-				dropWaysWithoutInfra, osmTags);
+				dropWaysWithoutInfra, osmTags, mirrorCarModes);
 		}
 
 		Params withDropWaysWithoutInfra(Set<String> types) {
 			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify, types,
-				osmTags);
+				osmTags, mirrorCarModes);
 		}
 
 		Params withOsmTags(OsmTags tags) {
 			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify,
-				dropWaysWithoutInfra, tags);
+				dropWaysWithoutInfra, tags, mirrorCarModes);
+		}
+
+		Params withMirrorCarModes(Set<String> modes) {
+			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify,
+				dropWaysWithoutInfra, osmTags, modes);
 		}
 	}
 
@@ -958,6 +1036,10 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		boolean laneRestrictionsMissing;
 		/** Links removed by the {@code --simplify} merge; 0 when the option is off. */
 		int mergedBySimplify;
+		/** Links the merge stranded and the cleanup afterwards took out. */
+		int strandedBySimplify;
+		/** Links whose motorised modes {@code --mirror-car-modes} changed. */
+		int modesMirrored;
 
 		String format() {
 			return """
@@ -975,19 +1057,23 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 				  dropped: minor way without infra     %d
 				  bike mode removed (bicycle=no)       %d
 				  links merged away by --simplify      %d
+				  links stranded by the merge, cleaned %d
 				  links with elevation metrics         %d
 				    sampled along the true polyline    %d
 				    sampled along the chord            %d
 				  links the DEM had no data for        %d
 				  nodes left without a Z               %d
-				  links renamed to the target mode     %d"""
+				  links renamed to the target mode     %d
+				  links with mirrored motorised modes  %d"""
 				.formatted(classified, linksWithoutEdge, linksWithoutWayTags, outsideArea,
 					agreeingMultiWay, mixedMultiWay, tagsDroppedAsAmbiguous,
 					droppedParkingAisle, droppedRestrictedAccess, droppedFootwayWithoutBike,
-					droppedMinorWayWithoutInfra, bikeModeRemoved, mergedBySimplify,
+					droppedMinorWayWithoutInfra, bikeModeRemoved, mergedBySimplify, strandedBySimplify,
 					withElevation, linksWithTrueShape, linksSampledAlongChord,
-					linksWithoutElevationData, nodesWithoutElevation, modesRenamed);
+					linksWithoutElevationData, nodesWithoutElevation, modesRenamed, modesMirrored);
 		}
 	}
 }
+
+
 

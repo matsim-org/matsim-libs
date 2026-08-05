@@ -326,6 +326,84 @@ public class SumoBicycleAttributesTest {
 	}
 
 	// ------------------------------------------------------------------------
+	// Motorised modes
+	// ------------------------------------------------------------------------
+
+	/**
+	 * The motorised modes describe the same vehicles on the same roads, so a scenario
+	 * wants them on one link set. SUMO derives truck separately and the cleaners only
+	 * ever take car away, so without this they drift apart — which downstream is a
+	 * routing failure for whichever mode kept a link car no longer has.
+	 */
+	@Test
+	void givesTheMirroredModesExactlyTheCarLinks() {
+
+		Network net = NetworkUtils.createNetwork();
+		Node a = addNode(net, "a", 0, 0);
+		Node b = addNode(net, "b", 100, 0);
+
+		// the three shapes this has to get right: car without the others, the others
+		// without car, and a bike-only link that must stay untouched
+		Link road = addLink(net, "road", a, b, Set.of(TransportMode.car));
+		Link stale = addLink(net, "stale", b, a, Set.of(TransportMode.ride, "freight"));
+		Link path = addLink(net, "path", a, b, Set.of(TransportMode.bike));
+
+		int changed = SumoBicycleAttributes.mirrorCarModes(net,
+			Set.of(TransportMode.ride, TransportMode.truck, "freight"));
+
+		assertEquals(2, changed, "the car link gains three modes, the stale one loses two");
+		assertEquals(Set.of(TransportMode.car, TransportMode.ride, TransportMode.truck, "freight"),
+			Set.copyOf(road.getAllowedModes()));
+		assertEquals(Set.of(), Set.copyOf(stale.getAllowedModes()),
+			"a motorised mode without car has nothing to be mirrored from");
+		assertEquals(Set.of(TransportMode.bike), Set.copyOf(path.getAllowedModes()),
+			"non-motorised modes are none of this method's business");
+	}
+
+	private static Node addNode(Network net, String id, double x, double y) {
+		Node n = net.getFactory().createNode(Id.createNodeId(id), new Coord(x, y));
+		net.addNode(n);
+		return n;
+	}
+
+	private static Link addLink(Network net, String id, Node from, Node to, Set<String> modes) {
+		Link l = net.getFactory().createLink(Id.createLinkId(id), from, to);
+		l.setAllowedModes(modes);
+		net.addLink(l);
+		return l;
+	}
+
+	/** Without the option the modes are left exactly as they came out of the converter. */
+	@Test
+	void leavesTheMotorisedModesAloneByDefault() throws Exception {
+
+		Fixture f = read();
+		run(f, null);
+
+		assertTrue(f.network().getLinks().values().stream().noneMatch(l -> l.getAllowedModes().contains("freight")),
+			"nothing may invent a freight mode on its own");
+	}
+
+	/**
+	 * The merge can leave a stub hanging off nothing where a chain's interior node was
+	 * the only tie to the rest of the network; the cleanup after it has to catch that,
+	 * or agents end up stuck on an unreachable link.
+	 */
+	@Test
+	void leavesNoStrandedLinksAfterTheMerge() throws Exception {
+
+		Fixture f = read();
+		SumoBicycleAttributes.process(f.network(), f.sumo(), f.tags(), null,
+			SumoBicycleAttributes.Params.defaults().withSimplify());
+
+		int linksBefore = f.network().getLinks().size();
+		NetworkUtils.cleanNetwork(f.network(), Set.of(TransportMode.car, TransportMode.bike));
+
+		assertEquals(linksBefore, f.network().getLinks().size(),
+			"a second cleaning pass must find nothing left to remove");
+	}
+
+	// ------------------------------------------------------------------------
 	// OSM tag stamping
 	// ------------------------------------------------------------------------
 
@@ -396,7 +474,7 @@ public class SumoBicycleAttributesTest {
 		// way 8001 carries highway=footway; use that as the marker so the ring splits
 		SumoBicycleAttributes.Params gated = new SumoBicycleAttributes.Params(
 			"de", TransportMode.bike, BicycleLinkPolicy.AreaMarker.parse("highway=footway"),
-			20.0, 3.0, false, Set.of(), SumoBicycleAttributes.OsmTags.MINIMAL);
+			20.0, 3.0, false, Set.of(), SumoBicycleAttributes.OsmTags.MINIMAL, Set.of());
 		SumoBicycleAttributes.Stats stats = SumoBicycleAttributes.process(
 			f.network(), f.sumo(), f.tags(), null, gated);
 
