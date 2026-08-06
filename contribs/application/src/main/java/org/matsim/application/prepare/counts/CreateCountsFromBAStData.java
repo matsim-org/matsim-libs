@@ -5,6 +5,11 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.TransformException;
+import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -68,6 +73,8 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 	private final CrsOptions crs = new CrsOptions("EPSG:25832");
 	@CommandLine.Option(names = "--network", description = "path to MATSim network", required = true)
 	private String network;
+	@CommandLine.Option(names = "--network-geometries", description = "path to link geometries, as written by the SumoNetworkConverter. Improves the matching of stations to links. Expected to be in the same crs as the network")
+	private String networkGeometries;
 	@CommandLine.Option(names = "--primary-data", description = "path to BASt Bundesstraßen-'Stundenwerte'-.txt file", required = true)
 	private Path primaryData;
 	@CommandLine.Option(names = "--motorway-data", description = "path to BASt Bundesautobahnen-'Stundenwerte'-.txt file", required = true)
@@ -349,8 +356,10 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			filteredNetwork = filter.applyFilters();
 		}
 
+		Map<Id<Link>, Geometry> geometries = readNetworkGeometries(crs);
+
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:25832", crs.getInputCRS());
-		NetworkIndex<BAStCountStation> index = new NetworkIndex<>(filteredNetwork, searchRange, station -> {
+		NetworkIndex<BAStCountStation> index = new NetworkIndex<>(filteredNetwork, geometries, searchRange, station -> {
 			Coord coord = station.getCoord();
 			Coord transform = coordinateTransformation.transform(coord);
 			return MGC.coord2Point(transform);
@@ -365,6 +374,26 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		log.info("+++++++ Match BASt stations with network +++++++");
 		for (var station : stations.values())
 			match(filteredNetwork, index, station, countsOption);
+	}
+
+	/**
+	 * Reads the link geometries, if given. They are expected to be in the same crs as the network.
+	 */
+	private Map<Id<Link>, Geometry> readNetworkGeometries(CrsOptions crs) {
+
+		if (networkGeometries == null)
+			return Map.of();
+
+		try {
+			CoordinateReferenceSystem networkCRS = CRS.decode(crs.getInputCRS());
+			Map<Id<Link>, Geometry> geometries = NetworkIndex.readGeometriesFromSumo(networkGeometries,
+				CRS.findMathTransform(networkCRS, networkCRS, true));
+
+			log.info("Read {} link geometries from {}", geometries.size(), networkGeometries);
+			return geometries;
+		} catch (IOException | FactoryException | TransformException e) {
+			throw new RuntimeException("Link geometries could not be read from " + networkGeometries, e);
+		}
 	}
 
 	private Map<String, BAStCountStation> readBAStCountStations(Path pathToAggregatedData, ShpOptions shp, CountsOptions counts) {
