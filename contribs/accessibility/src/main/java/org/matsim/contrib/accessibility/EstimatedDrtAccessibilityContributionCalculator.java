@@ -29,6 +29,11 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,9 +44,11 @@ import static org.matsim.contrib.accessibility.AccessibilityUtils.extractLeg;
  */
 final class EstimatedDrtAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger LOG = LogManager.getLogger(EstimatedDrtAccessibilityContributionCalculator.class);
+
 	private final String mode;
 	private final Scenario scenario;
 	private final ScoringConfigGroup scoringConfigGroup;
+	private final QueriedStopPairRecorder queriedStopPairRecorder;
 	private Network subNetwork;
 	private final double betaDrtTT_h;
 	private final double betaDrtDist_m;
@@ -59,12 +66,20 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	private final Person dummyPerson;
 
 
-	EstimatedDrtAccessibilityContributionCalculator(String mode, Scenario scenario, DvrpRoutingModule.AccessEgressFacilityFinder stopFinder, TripRouter tripRouter, DrtEstimator drtEstimator) {
+	EstimatedDrtAccessibilityContributionCalculator(String mode, Scenario scenario, DvrpRoutingModule.AccessEgressFacilityFinder stopFinder,
+			TripRouter tripRouter, DrtEstimator drtEstimator, Path queriedStopPairsOutputFile) {
+		this(mode, scenario, stopFinder, tripRouter, drtEstimator,
+			queriedStopPairsOutputFile == null ? null : new QueriedStopPairRecorder(queriedStopPairsOutputFile));
+	}
+
+	private EstimatedDrtAccessibilityContributionCalculator(String mode, Scenario scenario, DvrpRoutingModule.AccessEgressFacilityFinder stopFinder,
+			TripRouter tripRouter, DrtEstimator drtEstimator, QueriedStopPairRecorder queriedStopPairRecorder) {
 
 		this.mode = mode;
 
 		this.scenario = scenario;
 		this.scoringConfigGroup = scenario.getConfig().scoring();
+		this.queriedStopPairRecorder = queriedStopPairRecorder;
 		this.tripRouter = tripRouter;
 		this.stopFinder = stopFinder;
 		this.drtEstimator = drtEstimator;
@@ -165,21 +180,22 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			Facility opportunity = (Facility) destination.getNearestBasicLocation();
 			Facility nearestStopEgress = ((ClosestAccessEgressFacilityFinder) stopFinder).findClosestStop(opportunity);
 
-			// UTILITY OF DRT LEG
-			// first, we route a car trip from pickup DRT stop to dropoff DRT stop, and extract the travel distance and travel time.
-			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, dummyPerson, routingAttributes);
-			Leg mainLeg = extractLeg(planElements, TransportMode.car);
-			double directRideDistance_m = mainLeg.getRoute().getDistance();
-			double directRideTime_sec = mainLeg.getRoute().getTravelTime().seconds();
-
-
-			// DRT Estimator needs a "drt route"
-			DrtRoute drtRoute = new DrtRoute(Id.createLinkId("dummyFrom"), Id.createLinkId("dummyTo"));
-			drtRoute.setDistance(directRideDistance_m); // todo: since this is based on the distance and not the time of the direct car trips, congestion effects are not yet included.
-			drtRoute.setDirectRideTime(directRideTime_sec);
+			// DRT Estimator needs a route with stop links. CSV-backed estimates do not require car routing.
+			DrtRoute drtRoute = new DrtRoute(nearestStopAccess.getLinkId(), nearestStopEgress.getLinkId());
+			recordQueriedStopPair(nearestStopAccess, nearestStopEgress);
+			boolean sameStop = nearestStopAccess.getLinkId().equals(nearestStopEgress.getLinkId());
+			if (!sameStop && drtEstimator.requiresDirectTripRouting()) {
+				List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress,
+					departureTime, dummyPerson, routingAttributes);
+				Leg mainLeg = extractLeg(planElements, TransportMode.car);
+				drtRoute.setDistance(mainLeg.getRoute().getDistance());
+				drtRoute.setDirectRideTime(mainLeg.getRoute().getTravelTime().seconds());
+			}
 
 			// Use DRT Estimator to gather estimate ride time including detours, as well as wait time.
-			DrtEstimator.Estimate estimate = drtEstimator.estimate(drtRoute, OptionalTime.defined(departureTime));
+			DrtEstimator.Estimate estimate = sameStop
+				? new DrtEstimator.Estimate(0, 0, 0, 0)
+				: drtEstimator.estimate(drtRoute, OptionalTime.defined(departureTime));
 			double waitTime_s = estimate.waitingTime();
 			double rideTime_s = estimate.rideTime();
 
@@ -187,9 +203,8 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			double totalTime_h = (waitTime_s + rideTime_s) / 3600;
 			double utilityDrtTime = betaDrtTT_h * totalTime_h;
 
-			// calculate distance-based utility of DRT leg. NOTE: this distance does not include detours.
-			// As the Estimator adds the detour to the time, we didn't know how to include distance detours in clean and comparable manner.
-			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m;
+			// Calculate distance-based utility from the estimator's ride distance. Probe-backed estimates include detours.
+			double utilityDrtDistance = betaDrtDist_m * estimate.rideDistance();
 
 
 			// UTILITY OF EGRESS
@@ -251,7 +266,8 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	public EstimatedDrtAccessibilityContributionCalculator duplicate() {
 		LOG.info("Creating another EstimatedDrtAccessibilityContributionCalculator object.");
 		EstimatedDrtAccessibilityContributionCalculator estimatedDrtAccessibilityContributionCalculator =
-			new EstimatedDrtAccessibilityContributionCalculator(this.mode, this.scenario, this.stopFinder, this.tripRouter, this.drtEstimator);
+			new EstimatedDrtAccessibilityContributionCalculator(this.mode, this.scenario, this.stopFinder, this.tripRouter,
+				this.drtEstimator, this.queriedStopPairRecorder);
 		estimatedDrtAccessibilityContributionCalculator.subNetwork = this.subNetwork;
 //		estimatedDrtAccessibilityContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
 		estimatedDrtAccessibilityContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
@@ -321,5 +337,79 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		}
 		LOG.info("Aggregated " + opportunities.getFacilities().size() + " opportunities to " + opportunityClusterMap.size() + " drt stops.");
 		return opportunityClusterMap;
+	}
+
+	private void recordQueriedStopPair(Facility nearestStopAccess, Facility nearestStopEgress) {
+		if (queriedStopPairRecorder != null) {
+			if (!(nearestStopAccess instanceof DrtStopFacility accessStop) || !(nearestStopEgress instanceof DrtStopFacility egressStop)) {
+				throw new IllegalStateException("DRT accessibility stop finder must return DrtStopFacility instances");
+			}
+			queriedStopPairRecorder.record(new StopPair(accessStop.getId().toString(), accessStop.getLinkId().toString(),
+				egressStop.getId().toString(), egressStop.getLinkId().toString()));
+		}
+	}
+
+	@Override
+	public void finish() {
+		if (queriedStopPairRecorder != null) {
+			queriedStopPairRecorder.write();
+		}
+	}
+
+	private static final class QueriedStopPairRecorder {
+		private final Path outputFile;
+		private final ConcurrentHashMap<StopPair, LongAdder> stopPairs = new ConcurrentHashMap<>();
+
+		private QueriedStopPairRecorder(Path outputFile) {
+			this.outputFile = outputFile;
+		}
+
+		private void record(StopPair pair) {
+			stopPairs.computeIfAbsent(pair, ignored -> new LongAdder()).increment();
+		}
+
+		private void write() {
+			List<Map.Entry<StopPair, LongAdder>> sortedStopPairs = stopPairs.entrySet().stream()
+				.sorted(Map.Entry.comparingByKey())
+				.toList();
+
+			try {
+				Files.createDirectories(outputFile.toAbsolutePath().getParent());
+				try (BufferedWriter writer = Files.newBufferedWriter(outputFile)) {
+					writer.write("accessStopId;accessLinkId;egressStopId;egressLinkId;queryCount");
+					writer.newLine();
+					for (Map.Entry<StopPair, LongAdder> stopPair : sortedStopPairs) {
+						writer.write(stopPair.getKey().toCsvRow(stopPair.getValue().sum()));
+						writer.newLine();
+					}
+				}
+				LOG.info("Wrote {} unique queried DRT stop pairs to {}", sortedStopPairs.size(), outputFile);
+			} catch (IOException e) {
+				LOG.error("Could not write queried DRT stop pairs to {}", outputFile, e);
+			}
+		}
+	}
+
+	private record StopPair(String accessStopId, String accessLinkId, String egressStopId, String egressLinkId)
+		implements Comparable<StopPair> {
+
+		@Override
+		public int compareTo(StopPair other) {
+			int accessStopComparison = accessStopId.compareTo(other.accessStopId);
+			if (accessStopComparison != 0) {
+				return accessStopComparison;
+			}
+			return egressStopId.compareTo(other.egressStopId);
+		}
+
+		private String toCsvRow(long queryCount) {
+			return String.join(";",
+				accessStopId,
+				accessLinkId,
+				egressStopId,
+				egressLinkId,
+				String.valueOf(queryCount)
+			);
+		}
 	}
 }
