@@ -133,7 +133,8 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		var freightTrafficVolumes = station.getFreightTrafficVolume();
 
 		for (String hour : mivTrafficVolumes.keySet()) {
-			int h = Integer.parseInt(hour);
+			//BASt counts the hours 01 to 24, where 01 is the hour from 00:00 to 01:00, while a Measurable starts at 0
+			int h = Integer.parseInt(hour) - 1;
 			Double mivAtHour = mivTrafficVolumes.get(hour);
 			Double freightAtHour = freightTrafficVolumes.get(hour);
 
