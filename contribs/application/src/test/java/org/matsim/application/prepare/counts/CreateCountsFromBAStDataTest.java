@@ -66,6 +66,12 @@ public class CreateCountsFromBAStDataTest {
 
 			assertThat(e.getValue().hasMeasurableForMode(Measurable.VOLUMES, TransportMode.truck))
 				.isTrue();
+
+			// BASt hour 01 covers 00:00 to 01:00, so a profile runs from hour 0 to hour 23
+			Measurable volumes = e.getValue().getVolumesForMode(TransportMode.car);
+			assertThat(volumes.getAtHour(0)).isPresent();
+			assertThat(volumes.getAtHour(23)).isPresent();
+			assertThat(volumes.getAtHour(24)).isEmpty();
 		}
 	}
 
