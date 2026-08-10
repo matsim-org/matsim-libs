@@ -66,6 +66,9 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 		return changedServiceDurations;
 	}
 
+	/**
+	 * Repairs all carriers with unhandled jobs by iteratively adding vehicles, redrawing service durations, and replanning.
+	 */
 	@Override
 	public void tryToSolveAllCarriersCompletely(Scenario scenario, List<Carrier> nonCompleteSolvedCarriers) {
 		int startNumberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
