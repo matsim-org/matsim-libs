@@ -565,16 +565,16 @@ acc_plots <- function(vehicle="FIGO_TECHAVG") {
     pivot_longer(cols=c("CO_MATSim", "CO_pems", "CO2_MATSim", "CO2_pems", "NOx_MATSim", "NOx_pems"), names_to = "component", values_to = "value") %>%
     separate(col="component", sep="_", into=c("component", "model")) %>%
     mutate(abs_value=value*length) %>%
-    group_by(tripId, model, component) %>%
+    group_by(tripId, model, component, load) %>%
     arrange(order, .by_group = TRUE) %>%
     mutate(acc_abs_value = cumsum(abs_value), acc_length=cumsum(length)) %>%
     ungroup() %>%
-    group_by(acc_length, model, component) %>%
-    summarize(acc_abs_value = mean(acc_abs_value))
+    group_by(acc_length, model, component, load) %>%
+    summarize(acc_abs_value = mean(acc_abs_value), n = n())
 
   ggplot() +
-    geom_line(data=pretoria_output, aes(x=acc_length, y=acc_abs_value, color = model)) +
-    facet_wrap(~component, scales="free")+
+    geom_line(data=pretoria_output, aes(x=acc_length, y=acc_abs_value, color=model)) +
+    facet_wrap(load~component, scales="free")+
     xlab("Driven distance (m)") +
     ylab("Accumulative emission (mg)")
 
@@ -586,4 +586,5 @@ acc_plots <- function(vehicle="FIGO_TECHAVG") {
 
 {
   acc_plots()
+  acc_plots("RRV")
 }
