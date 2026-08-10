@@ -75,39 +75,7 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 		log.info("Starting with carrier-replanning loop.");
 
 		for (Carrier carrier : nonCompleteSolvedCarriers) {
-			// get the necessary attributes from a carrier which are not already saved in carrierAttributes (perhaps an existing carrier file was read)
-			if (generator.getCarrierId2carrierAttributes().get(carrier.getId()) == null) {
-				int purpose = carrier.getAttributes().getAttribute( PURPOSE ) == null ? 0 : Integer.parseInt(
-					carrier.getAttributes().getAttribute( PURPOSE ).toString());
-				String carrierId = carrier.getId().toString();
-				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment;
-				String modeORvehType;
-				if (carrier.getAttributes().getAttribute( SUBPOPULATION ).toString().contains("commercialPersonTraffic")) {
-					smallScaleCommercialTrafficSegment = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.commercialPersonTraffic;
-					modeORvehType = "total";
-				} else if (carrier.getAttributes().getAttribute( SUBPOPULATION ).toString().contains("goodsTraffic")) {
-					smallScaleCommercialTrafficSegment = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.goodsTraffic;
-					String[] split = carrierId.split("vehTyp")[1].split("_"); //TODO make this via attributes
-					modeORvehType = "vehTyp" + split[0];
-				} else {
-					log.warn("Carrier {} has no valid subpopulation. Skipping.", carrier.getId());
-					continue;
-				}
-		OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = generator.odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose,
-					modeORvehType, smallScaleCommercialTrafficSegment );
-				String startZone = carrier.getAttributes().getAttribute(
-					TOUR_START_AREA ) == null ? "" : carrier.getAttributes().getAttribute(
-					TOUR_START_AREA ).toString();
-				Object startCategoryAttribute = carrier.getAttributes().getAttribute("startCategory");
-				SmallScaleCommercialTrafficUtils.ZoneAttribute selectedStartCategory = startCategoryAttribute == null
-					? generator.getSelectedStartCategory(startZone, odMatrixEntry)
-					: SmallScaleCommercialTrafficUtils.ZoneAttribute.fromLabel(startCategoryAttribute.toString() )
-					                                                .orElseGet(() -> SmallScaleCommercialTrafficUtils.ZoneAttribute.valueOf(startCategoryAttribute.toString() ) );
-				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = new GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes(
-					purpose, startZone, selectedStartCategory, modeORvehType,
-						smallScaleCommercialTrafficSegment, null, odMatrixEntry);
-				generator.getCarrierId2carrierAttributes().putIfAbsent(carrier.getId(), carrierAttributes);
-			}
+			generator.getCarrierId2carrierAttributes().computeIfAbsent(carrier.getId(), _ -> createCarrierAttributes(carrier));
 		}
 		Path outputPath = Path.of(scenario.getConfig().controller().getOutputDirectory(),
 			"analysis/freight/Carriers_SolvingLoop_stats.tsv");
@@ -257,6 +225,43 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 		}
 	}
 
+	/**
+	 * Reconstructs carrier attributes when carriers were read from an existing file instead of being created by the generator.
+	 */
+	private GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes createCarrierAttributes(Carrier carrier) {
+		// get the necessary attributes from a carrier which are not already saved in carrierAttributes (perhaps an existing carrier file was read)
+		int purpose = carrier.getAttributes().getAttribute(PURPOSE) == null ? 0 : Integer.parseInt(
+				carrier.getAttributes().getAttribute(PURPOSE).toString());
+		String carrierId = carrier.getId().toString();
+		String subpopulation = Objects.requireNonNull(carrier.getAttributes().getAttribute(SUBPOPULATION),
+			"Carrier " + carrier.getId() + " has no subpopulation.").toString();
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment;
+		String modeORvehType;
+		if (subpopulation.equals(SubpopulationDefaultNames.SUBPOP_COM_PERSON)) {
+			smallScaleCommercialTrafficSegment = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.commercialPersonTraffic;
+			modeORvehType = "total";
+		} else if (subpopulation.equals(SubpopulationDefaultNames.SUBPOP_GOODS)) {
+			smallScaleCommercialTrafficSegment = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.goodsTraffic;
+			String[] split = carrierId.split("vehTyp")[1].split("_"); //TODO make this via attributes
+			modeORvehType = "vehTyp" + split[0];
+		} else {
+			throw new IllegalArgumentException("Carrier " + carrier.getId() + " has no valid subpopulation: " + subpopulation);
+		}
+		OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = generator.odMatrixEntryInformationProvider.getOdMatrixEntryInformation(
+				purpose,
+				modeORvehType, smallScaleCommercialTrafficSegment);
+		String startZone = carrier.getAttributes().getAttribute(
+				TOUR_START_AREA) == null ? "" : carrier.getAttributes().getAttribute(
+				TOUR_START_AREA).toString();
+		Object startCategoryAttribute = carrier.getAttributes().getAttribute("startCategory");
+		SmallScaleCommercialTrafficUtils.ZoneAttribute selectedStartCategory = startCategoryAttribute == null
+				? generator.getSelectedStartCategory(startZone, odMatrixEntry)
+				: SmallScaleCommercialTrafficUtils.ZoneAttribute.fromLabel(startCategoryAttribute.toString())
+				.orElseGet(() -> SmallScaleCommercialTrafficUtils.ZoneAttribute.valueOf(startCategoryAttribute.toString()));
+		return new GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes(
+				purpose, startZone, selectedStartCategory, modeORvehType,
+				smallScaleCommercialTrafficSegment, null, odMatrixEntry);
+	}
 	/**
 	 * Adds additional vehicles to the carrier until the sum of the maximum tour durations of the vehicles is higher than the sum of the service durations of the jobs (including the additional buffer).
 	 *
