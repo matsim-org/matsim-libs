@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.MATSimApplication;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.contrib.common.conventions.vsp.SubpopulationDefaultNames;
 import org.matsim.core.config.Config;
@@ -73,10 +72,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.*;
-import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.PURPOSE;
-import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.SUBPOPULATION;
-import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
-import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readZoneAttributes;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.*;
 import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.*;
 
 /**
@@ -104,10 +100,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	// Option 3: Leerkamp (nur in RVR Modell).
 
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
-	private static final String UNSOLVED_CARRIER_FILE = "output_carriers_unsolvedVRP.xml.gz";
-	private static final String SOLVED_CARRIER_FILE = "output_carriers_solvedVRP.xml.gz";
-	private static final String CARRIER_VEHICLE_TYPES_FILE = "output_carriersVehicleTypes.xml.gz";
-	private static final String CARRIER_PARTS_FOLDER = "carrierParts";
 	private final IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
 	private final CommercialTourSpecifications commercialTourSpecifications;
 	protected final OdMatrixEntryInformationProvider odMatrixEntryInformationProvider;
