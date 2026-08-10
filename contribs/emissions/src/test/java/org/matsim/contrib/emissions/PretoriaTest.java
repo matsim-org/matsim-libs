@@ -428,6 +428,7 @@ public class PretoriaTest {
 		Map<Integer, Map<Id<Link>, Map<Pollutant, Double>>> tripId2linkId2pollutant2warmEmission = new ArrayMap<>();
 		Map<Integer, Map<Id<Link>, Double>> tripId2linkId2pollutant2averageVelocity = new ArrayMap<>();
 		Map<Integer, Map<Pollutant, Double>> tripId2pollutant2coldEmission = new ArrayMap<>();
+		Map<Integer, List<Id<Link>>> tripId2linkOrder = new ArrayMap<>();
 
 		tripId2pretoriaGpsEntries.forEach((tripId, gpsEntries) -> {
 
@@ -455,6 +456,15 @@ public class PretoriaTest {
 			GPSToNetworkMapping1D mapping1D = new GPSToNetworkMapping1D(pretoriaNetwork, gpsEntries);
 			mapping1D.mapping();
 			mapping1D.computeLinkShares();
+
+			List<Id<Link>> distinctLinkOrder = new ArrayList<>(mapping1D.linkOrder.size());
+			Set<Id<Link>> seenLinks = new HashSet<>(mapping1D.linkOrder.size());
+			for (Link l : mapping1D.linkOrder) {
+				if (seenLinks.add(l.getId())) {
+					distinctLinkOrder.add(l.getId());
+				}
+			}
+			tripId2linkOrder.put(tripId, distinctLinkOrder);
 
 			// Extract PEMS Emissions
 			mapping1D.gpsEntry2linkId2proportion.forEach((gpsEntry, linkId2proportion) ->
@@ -529,7 +539,7 @@ public class PretoriaTest {
 		AtomicReference<String> segment = new AtomicReference<>("none");
 		Map<Integer, Integer> tripId2count = new HashMap<>();
 		tripId2linkId2pollutant2realEmission.forEach((tripId, linkId2pollutant2realEmissions) -> {
-			var linkId2pollutant2warmEmissions = tripId2linkId2pollutant2warmEmission.get(tripId);
+			Map<Id<Link>, Map<Pollutant, Double>> linkId2pollutant2warmEmissions = tripId2linkId2pollutant2warmEmission.get(tripId);
 
 			// Print the cold emissions if trip had a cold start
 			if(tripId2coldStart.get(tripId) && vehicle.computeColdEmissions){
@@ -554,11 +564,12 @@ public class PretoriaTest {
 				}
 			}
 
-			for (Map.Entry<Id<Link>, Map<Pollutant, Double>> entry : linkId2pollutant2realEmissions.entrySet()) {
-				Id<Link> linkId = entry.getKey();
-				Map<Pollutant, Double> pollutant2realEmissions = entry.getValue();
+			for (Id<Link> linkId : tripId2linkOrder.get(tripId)) {
+				Map<Pollutant, Double> pollutant2realEmissions = linkId2pollutant2realEmissions.get(linkId);
+				Map<Pollutant, Double> pollutant2warmEmissions = linkId2pollutant2warmEmissions.get(linkId);
 
-				var pollutant2warmEmissions = linkId2pollutant2warmEmissions.get(linkId);
+				if (pollutant2realEmissions == null || pollutant2warmEmissions == null)
+					continue;
 
 				if(linkId.equals(Id.createLinkId("28948")))
 					segment.set("A");
