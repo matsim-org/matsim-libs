@@ -66,7 +66,6 @@ import org.matsim.vehicles.VehicleUtils;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -213,7 +212,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--factorForTravelBufferCalculation", defaultValue = "1.2",
 		description = "Factor applied to the total service duration when estimating the required total tour duration for initial vehicle creation. Values above 1.0 reserve additional time for travel between services")
 	private double factorForTravelBufferCalculation;
-
 
 	@CommandLine.Option(names = "--createSmallScaleCommercialCarrierFileOnly", description = "Create the unsolved small scale commercial carrier file and stop before tour planning.")
 	private boolean createSmallScaleCommercialCarrierFileOnly;
@@ -698,7 +696,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param baseConfig config used to derive run-id-prefixed file names and carrier vehicle type locations
 	 * @param finalOutput final output folder of the complete traffic type run
 	 */
-	private void mergeSmallScaleCommercialCarrierParts(Config baseConfig, Path finalOutput) throws MalformedURLException {
+	private void mergeSmallScaleCommercialCarrierParts(Config baseConfig, Path finalOutput) {
 		Path carrierPartsFolder = smallScaleCommercialCarrierPartsFolder == null
 			? finalOutput.resolve(CARRIER_PARTS_FOLDER)
 			: smallScaleCommercialCarrierPartsFolder;
@@ -716,7 +714,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param finalOutput output folder for the merged carrier and vehicle type files
 	 * @param carrierFileName base name of the carrier file to merge
 	 */
-	private void mergeSmallScaleCommercialCarrierPartFiles(Config baseConfig, Path carrierPartsFolder, Path finalOutput, String carrierFileName) throws MalformedURLException {
+	private void mergeSmallScaleCommercialCarrierPartFiles(Config baseConfig, Path carrierPartsFolder, Path finalOutput, String carrierFileName) {
 		Path outputCarrierFile = finalOutput.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(baseConfig, carrierFileName));
 		if (Files.exists(outputCarrierFile)) {
 			throw new IllegalStateException("Merged small scale commercial carrier file already exists: " + outputCarrierFile
@@ -1013,7 +1011,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				ZoneAttribute selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
 				while ( attributesByZone.get(stopZone ).getDouble(selectedStopCategory ) == 0)
 					selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
-				// additionalTravelBufferPerTourAndIterationInMinutes is only used while resolving carriers with unhandled services.
 				int serviceTimePerStop = getServiceTimePerStop(carrierAttributes);
 				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window so that late tours can handle it
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow, countedServices);
