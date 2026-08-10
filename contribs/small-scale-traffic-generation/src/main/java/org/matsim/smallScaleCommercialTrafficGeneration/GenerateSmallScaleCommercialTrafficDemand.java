@@ -41,7 +41,6 @@ import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.contrib.common.conventions.vsp.SubpopulationDefaultNames;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.groups.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.network.NetworkUtils;
@@ -67,19 +66,13 @@ import org.matsim.vehicles.VehicleUtils;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.*;
-import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.PURPOSE;
-import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.SUBPOPULATION;
-import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
-import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readZoneAttributes;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.*;
 import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.*;
 
 /**
@@ -107,10 +100,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	// Option 3: Leerkamp (nur in RVR Modell).
 
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
-	private static final String UNSOLVED_CARRIER_FILE = "output_carriers_unsolvedVRP.xml.gz";
-	private static final String SOLVED_CARRIER_FILE = "output_carriers_solvedVRP.xml.gz";
-	private static final String CARRIER_VEHICLE_TYPES_FILE = "output_carriersVehicleTypes.xml.gz";
-	private static final String CARRIER_PARTS_FOLDER = "carrierParts";
 	private final IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
 	private final CommercialTourSpecifications commercialTourSpecifications;
 	protected final OdMatrixEntryInformationProvider odMatrixEntryInformationProvider;
@@ -134,6 +123,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the config for small scale commercial generation")
 	private Path configPath;
 	// ok
+
+	@CommandLine.Unmatched
+	private List<String> remainingArgs = new ArrayList<>();
 
 	private Path pathToZoneAttributes;
 	// command line string replaced 2026-07
@@ -166,23 +158,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private int nJspritIterations;
 	// ok
 
-	@CommandLine.Option(names = {"--additionalTravelBufferPerIterationInMinutes", "--additionalTravelBufferPerTourAndIterationInMinutes"}, defaultValue = "30",
-		description = "Additional travel buffer in minutes per scheduled tour and carrier-replanning iteration. Used while resolving carriers with unhandled services; if set too low, carriers may not serve all services.")
-	private int additionalTravelBufferPerTourAndIterationInMinutes;
-	// This has to do with the issue that the vehicle fleets are given a priori, since they need to match some externally given
-	// data.  With that, it may happen that not all services fit in.  In order to counter that, the tours (= driver workhours)
-	// are made longer and longer until it fits.
-
 	@CommandLine.Option(names = "--maxNumberOfLoopsForVRPSolving", defaultValue = "100",
 		description = "Limit of carrier replanning iterations, where carriers with unhandled services get new plans. If your carrier-plans are still not fully served, increase this limit.")
 	private int maxNumberOfLoopsForVRPSolving;
-	/// see {@link #additionalTravelBufferPerTourAndIterationInMinutes}
 
 	@CommandLine.Option(names = "--creationOption", description = "Set option of mode differentiation:  useExistingCarrierFileWithSolution, createNewCarrierFile, useExistingCarrierFileWithoutSolution")
 	private CreationOption carriersFileCreationOption;
 	/// see comments at {@link CreationOption}
 
-	@CommandLine.Option(names = "--smallScaleCommercialTrafficType", description = "Select traffic type. Options: commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic (contains both types)")
+	@CommandLine.Option(names = "--smallScaleCommercialTrafficType", description = "Select traffic segment. Options: commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic (contains both types)")
 	private SmallScaleCommercialTrafficSegment usedSmallScaleCommercialTrafficSegment;
 	// generate only one segment or the other, or both.
 
@@ -218,20 +202,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private int numberOfPlanVariantsPerAgent;
 	/// This has to do with {@link CreateDifferentPlansForFreightPopulation}. See comments there.
 
-	@CommandLine.Option(names = "--network", description = "Overwrite network file in config")
-	private String network;
-	// ok
-	// yy since one reads a config, this here is not needed: can be set via --config:.... syntax
-
-	@CommandLine.Option(names = "--pathOutput", description = "Path for the output")
-	private Path output;
-	// ok
-	// yy since one reads a config, this here is not needed: can be set via --config:.... syntax
-
 	@CommandLine.Option(names = "--factorForTravelBufferCalculation", defaultValue = "1.2",
 		description = "Factor applied to the total service duration when estimating the required total tour duration for initial vehicle creation. Values above 1.0 reserve additional time for travel between services")
 	private double factorForTravelBufferCalculation;
-
 
 	@CommandLine.Option(names = "--createSmallScaleCommercialCarrierFileOnly", description = "Create the unsolved small scale commercial carrier file and stop before tour planning.")
 	private boolean createSmallScaleCommercialCarrierFileOnly;
@@ -239,18 +212,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	// yyyy as far as I can tell, this option is not honoured when using one of the two "useExistingCarrier..." options.
 
 	// ### only matsim- and jsprit-related params below
-
-	@CommandLine.Option(names = "--useRangeConstraintForTourPlanning",
-		description = "Option to use range constraint for planning the tours. If this is selected, the range is restricted based on consumption information in the vehicle types file.")
-	private boolean useRangeConstraintForTourPlanning;
-	// I think that this is a jsprit option.
-	// yy since one reads a config, this here is not needed
-
-	@CommandLine.Option(names = "--distanceConstraintUsableRange",
-		description = "Usable range in percent of the energy capacity applied to the vehicle range during tour planning. For example, a value of 80 limits the usable range to 80 percent. This option is only applied if --useRangeConstraintForTourPlanning is selected.", defaultValue = "100")
-	private double distanceConstraintUsableRange;
-	// I think that this is a jsprit option
-	// yy since one reads a config, this here is not needed: can be set via --config:freight.... syntax
 
 	@CommandLine.Option(names = "--smallScaleCommercialCarrierPartCount", defaultValue = "1",
 		description = "Number of independent carrier parts for small scale commercial tour planning. Use with --smallScaleCommercialCarrierPartIndex.")
@@ -294,63 +255,117 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private Index indexZones;
 
-	private final String[] configArgs;
+	/**
+	 * Builder for {@link GenerateSmallScaleCommercialTrafficDemand}. Optional dependencies left unset use the default
+	 * implementations used by the command line entry point.
+	 */
+	public static final class Builder {
 
-	// yy if this class is meant to be used directly, the constructors below should be replaced by a builder
+		private IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
+		private CommercialTourSpecifications commercialTourSpecifications;
+		private OdMatrixEntryInformationProvider odMatrixEntryInformationProvider;
+		private VehicleTypeSelection vehicleTypeSelection;
+		private UnhandledServicesSolution unhandledServicesSolution;
 
-	GenerateSmallScaleCommercialTrafficDemand() {
-		this(null, null, null, null, null, null);
+		/**
+		 * Creates a builder for {@link GenerateSmallScaleCommercialTrafficDemand}.
+		 */
+		public static Builder newInstance() {
+			return new Builder();
+		}
+
+		private Builder() {}
+
+		Builder setIntegrateExistingTrafficToSmallScaleCommercial(
+			IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial) {
+			this.integrateExistingTrafficToSmallScaleCommercial = integrateExistingTrafficToSmallScaleCommercial;
+			return this;
+		}
+
+		/**
+		 * Sets the tour specifications. If unset, {@link DefaultTourSpecificationsByUsingKID2002} is used.
+		 */
+		public Builder setCommercialTourSpecifications(CommercialTourSpecifications commercialTourSpecifications) {
+			this.commercialTourSpecifications = commercialTourSpecifications;
+			return this;
+		}
+
+		/**
+		 * Sets the OD matrix entry information provider.
+		 */
+		public Builder setOdMatrixEntryInformationProvider(OdMatrixEntryInformationProvider odMatrixEntryInformationProvider) {
+			this.odMatrixEntryInformationProvider = odMatrixEntryInformationProvider;
+			return this;
+		}
+
+		/**
+		 * Sets the vehicle type selection used by the default OD matrix entry information provider.
+		 */
+		public Builder setVehicleTypeSelection(VehicleTypeSelection vehicleTypeSelection) {
+			this.vehicleTypeSelection = vehicleTypeSelection;
+			return this;
+		}
+
+		/**
+		 * Sets the solution strategy for unhandled services.
+		 */
+		public Builder setUnhandledServicesSolution(UnhandledServicesSolution unhandledServicesSolution) {
+			this.unhandledServicesSolution = unhandledServicesSolution;
+			return this;
+		}
+
+		/**
+		 * Builds the demand generation command.
+		 */
+		public GenerateSmallScaleCommercialTrafficDemand build() {
+			return new GenerateSmallScaleCommercialTrafficDemand(this);
+		}
 	}
 
-	GenerateSmallScaleCommercialTrafficDemand(String[] configArgs) {
-		this(configArgs, null, null, null, null, null);
+	/**
+	 * Creates the demand generation command with default dependencies.
+	 */
+	public GenerateSmallScaleCommercialTrafficDemand() {
+		this(Builder.newInstance());
 	}
 
-	GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-	                                                 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
-	                                                 VehicleTypeSelection vehicleTypeSelection, UnhandledServicesSolution unhandledServicesSolution) {
-		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, odMatrixEntryInformationProvider, vehicleTypeSelection, unhandledServicesSolution);
-	}
-	GenerateSmallScaleCommercialTrafficDemand(String[] configArgs,
-	                                                 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
-	                                                 CommercialTourSpecifications commercialTourSpecifications, OdMatrixEntryInformationProvider odMatrixEntryInformationProvider,
-	                                                 VehicleTypeSelection vehicleTypeSelection, UnhandledServicesSolution unhandledServicesSolution) {
+	private GenerateSmallScaleCommercialTrafficDemand(Builder builder) {
 
-		this.configArgs = (configArgs == null) ? new String[0] : configArgs;
-
-		if (integrateExistingTrafficToSmallScaleCommercial == null) {
+		if (builder.integrateExistingTrafficToSmallScaleCommercial == null) {
 			this.integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 			log.info("Using default {} if existing models are integrated!", DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class.getSimpleName());
 		} else {
-			this.integrateExistingTrafficToSmallScaleCommercial = integrateExistingTrafficToSmallScaleCommercial;
-			log.info("Using {} if existing models are integrated!", integrateExistingTrafficToSmallScaleCommercial.getClass().getSimpleName());
+			this.integrateExistingTrafficToSmallScaleCommercial = builder.integrateExistingTrafficToSmallScaleCommercial;
+			log.info("Using {} if existing models are integrated!", builder.integrateExistingTrafficToSmallScaleCommercial.getClass().getSimpleName());
 		}
-		if (commercialTourSpecifications == null) {
+		if (builder.commercialTourSpecifications == null) {
 			this.commercialTourSpecifications = new DefaultTourSpecificationsByUsingKID2002();
 			log.info("Using default {} for tour specifications!", DefaultTourSpecificationsByUsingKID2002.class.getSimpleName());
 		} else {
-			this.commercialTourSpecifications = commercialTourSpecifications;
-			log.info("Using {} for tour specifications!", commercialTourSpecifications.getClass().getSimpleName());
+			this.commercialTourSpecifications = builder.commercialTourSpecifications;
+			log.info("Using {} for tour specifications!", builder.commercialTourSpecifications.getClass().getSimpleName());
 		}
-		if (odMatrixEntryInformationProvider == null) {
-			if (vehicleTypeSelection != null) {
-				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider(vehicleTypeSelection);
-				log.info("Using default {} with provided {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName(), vehicleTypeSelection.getClass().getSimpleName());
+		if (builder.odMatrixEntryInformationProvider == null) {
+			if (builder.vehicleTypeSelection != null) {
+				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider(builder.vehicleTypeSelection);
+				log.info("Using default {} with provided {} for OD matrix entry information!",
+					DefaultOdMatrixEntryInformationProvider.class.getSimpleName(),
+					builder.vehicleTypeSelection.getClass().getSimpleName());
 			}
 			else {
 				this.odMatrixEntryInformationProvider = new DefaultOdMatrixEntryInformationProvider();
 				log.info("Using default {} for OD matrix entry information!", DefaultOdMatrixEntryInformationProvider.class.getSimpleName());
 			}
 		} else {
-			this.odMatrixEntryInformationProvider = odMatrixEntryInformationProvider;
-			log.info("Using {} for OD matrix entry information!", odMatrixEntryInformationProvider.getClass().getSimpleName());
+			this.odMatrixEntryInformationProvider = builder.odMatrixEntryInformationProvider;
+			log.info("Using {} for OD matrix entry information!", builder.odMatrixEntryInformationProvider.getClass().getSimpleName());
 		}
-		if (unhandledServicesSolution == null) {
+		if (builder.unhandledServicesSolution == null) {
 			this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this);
 			log.info("Using default {} for unhandled-services-solution!", DefaultUnhandledServicesSolution.class.getSimpleName());
 		} else {
-			this.unhandledServicesSolution = unhandledServicesSolution;
-			log.info("Using {} for unhandled-services-solution!", unhandledServicesSolution.getClass().getSimpleName());
+			this.unhandledServicesSolution = builder.unhandledServicesSolution;
+			log.info("Using {} for unhandled-services-solution!", builder.unhandledServicesSolution.getClass().getSimpleName());
 		}
 	}
 
@@ -371,20 +386,16 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		 * A carrier part ("chunk") run needs two different output concepts:
 		 * - finalOutput points to the shared traffic output folder created by the init step. The shared unsolved carrier
 		 *   file is read from there, and the merge step later writes the complete result there.
-		 * - configOutput points to the isolated part folder. It must be set before readAndCheckConfig initializes the
+		 * - output points to the isolated part folder. It must be set before configureConfig initializes the
 		 *   OutputDirectoryHierarchy, otherwise MATSim would touch or even delete the shared traffic output folder when
 		 *   a single part job starts on the cluster.
 		 */
-		Path requestedOutput = output;
-		Path configOutput = isSolvingOnlyCarrierPart() && requestedOutput != null
-			? getCarrierPartOutputPath(requestedOutput)
-			: requestedOutput;
-		Config config = readAndCheckConfig(configArgs, configPath, modelName, sampleName, configOutput);
+		Config config = ConfigUtils.loadConfig(IOUtils.getFileUrl(configPath.toString()), remainingArgs.toArray(String[]::new), new FreightCarriersConfigGroup());
+		Path finalOutput = getConfiguredOutputPath(config);
+		Path output = isSolvingOnlyCarrierPart() ? getCarrierPartOutputPath(finalOutput) : finalOutput;
+		configureConfig(config, output);
 		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. Not really sure if this is even need for commerical traffic. paul, jul'26
 		config.routing().setAccessEgressConsistencyCheck( RoutingConfigGroup.AccessEgressConsistencyCheck.disable );
-
-		output = Path.of(config.controller().getOutputDirectory());
-		Path finalOutput = isSolvingOnlyCarrierPart() && requestedOutput != null ? requestedOutput : output;
 
 		Scenario scenario;
 		if (mergeSmallScaleCommercialCarrierParts) {
@@ -678,7 +689,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param baseConfig config used to derive run-id-prefixed file names and carrier vehicle type locations
 	 * @param finalOutput final output folder of the complete traffic type run
 	 */
-	private void mergeSmallScaleCommercialCarrierParts(Config baseConfig, Path finalOutput) throws MalformedURLException {
+	private void mergeSmallScaleCommercialCarrierParts(Config baseConfig, Path finalOutput) {
 		Path carrierPartsFolder = smallScaleCommercialCarrierPartsFolder == null
 			? finalOutput.resolve(CARRIER_PARTS_FOLDER)
 			: smallScaleCommercialCarrierPartsFolder;
@@ -696,7 +707,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param finalOutput output folder for the merged carrier and vehicle type files
 	 * @param carrierFileName base name of the carrier file to merge
 	 */
-	private void mergeSmallScaleCommercialCarrierPartFiles(Config baseConfig, Path carrierPartsFolder, Path finalOutput, String carrierFileName) throws MalformedURLException {
+	private void mergeSmallScaleCommercialCarrierPartFiles(Config baseConfig, Path carrierPartsFolder, Path finalOutput, String carrierFileName) {
 		Path outputCarrierFile = finalOutput.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(baseConfig, carrierFileName));
 		if (Files.exists(outputCarrierFile)) {
 			throw new IllegalStateException("Merged small scale commercial carrier file already exists: " + outputCarrierFile
@@ -797,27 +808,19 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		scenario.getConfig().routing().setNetworkModes(Sets.union(networkModes, modes));
 	}
 
-	/**
-	 * Reads and checks config if all necessary parameters are set.
-	 */
-	private Config readAndCheckConfig(String[] configArgs, Path configPath, String modelName, String sampleName, Path output) throws Exception {
+	private Path getConfiguredOutputPath(Config config) throws Exception {
+		if (config.controller().getOutputDirectory() == null || config.controller().getOutputDirectory().isBlank())
+			throw new Exception("No output directory was set");
+		return Path.of(config.controller().getOutputDirectory());
+	}
 
-		Config config = ConfigUtils.loadConfig(IOUtils.getFileUrl(configPath.toString()), configArgs);
-		if (output == null || output.toString().isEmpty())
-			config.controller().setOutputDirectory(Path.of(config.controller().getOutputDirectory()).resolve(modelName)
-				.resolve( usedSmallScaleCommercialTrafficSegment.toString() + "_" + sampleName + "pct" + "_"
-					+ LocalDate.now() + "_" + LocalTime.now().toSecondOfDay() + "_" + resistanceFactorsPerModelType)
-				.toString());
-		else
-			config.controller().setOutputDirectory(output.toString());
+	/**
+	 * Checks and prepares config if all necessary parameters are set.
+	 */
+	private void configureConfig(Config config, Path output) throws Exception {
+		config.controller().setOutputDirectory(output.toString());
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		if (useRangeConstraintForTourPlanning) {
-			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
-			log.info("Using range constraint for tour planning based on energy consumption information in the vehicle types file.");
-			freightCarriersConfigGroup.setDistanceConstraintUsableRange(distanceConstraintUsableRange);
-			log.info("Distance constraint safety margin is set to {} for vehicles with energy capacity information.", distanceConstraintUsableRange);
-		}
 		if (freightCarriersConfigGroup.getCarriersVehicleTypesFile() != null)
 			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
@@ -835,9 +838,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		config.qsim().setStorageCapFactor(sample);
 		config.qsim().setUsePersonIdForMissingVehicleId(true);
 		config.timeAllocationMutator().setMutateAroundInitialEndTimeOnly(false);
-		// Overwrite network
-		if (network != null)
-			config.network().setInputFile(network);
 
 		// Split-carrier steps share one traffic output folder. They must not delete it when a single init, part, or merge job starts.
 		if (createSmallScaleCommercialCarrierFileOnly || isSolvingOnlyCarrierPart() || mergeSmallScaleCommercialCarrierParts) {
@@ -854,10 +854,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			throw new Exception("No network file in config");
 		if (config.global().getCoordinateSystem() == null)
 			throw new Exception("No global CRS is set in config");
-		if (config.controller().getOutputDirectory() == null)
-			throw new Exception("No output directory was set");
-
-		return config;
 	}
 
 	/**
@@ -884,9 +880,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		for (VehicleType vehicleType : carrierVehicleTypes.getVehicleTypes().values()) {
 			CostInformation costInformation = vehicleType.getCostInformation();
+			// jsprit uses separate costs for service time and waiting before a time window opens. If no distinct values
+			// are provided, use the generic per-second transport cost for both.
 			VehicleUtils.setCostsPerSecondInService(costInformation, costInformation.getCostsPerSecond());
 			VehicleUtils.setCostsPerSecondWaiting(costInformation, costInformation.getCostsPerSecond());
-			// (what is this???)
 		}
 
 		// carriers:
@@ -897,22 +894,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			for (String startZone : odMatrix.getListOfZones()) {
 				for (String modeORvehType : odMatrix.getListOfModesOrVehTypes()) {
 
-					// Check if this purpose, startZone, modeORvehType combination is a possiblr starting location (by looking if it has a trip-distribution-entry)
-					boolean isStartingLocation = false;
-
-					// careful, the following is a labeled break!!!
-					// (but is it really needed?  "break" ignores intermediate "if" and so either a simple "break" or a simple "continue" should do what we need.)
-					checkIfIsStartingPosition:
-					{
-						for (String possibleStopZone : odMatrix.getListOfZones()) {
-							if (!modeORvehType.equals("pt") && !modeORvehType.equals("op"))
-								if (odMatrix.getTripDistributionValue(startZone, possibleStopZone, modeORvehType,
-									purpose, smallScaleCommercialTrafficSegment ) != 0) {
-									isStartingLocation = true;
-									break checkIfIsStartingPosition;
-								}
-						}
-					}
+					// Check if this purpose, startZone, modeORvehType combination has any outgoing OD flow.
+					boolean isStartingLocation = !modeORvehType.equals("pt") && !modeORvehType.equals("op")
+						&& odMatrix.getListOfZones().stream()
+						.anyMatch(possibleStopZone -> odMatrix.getTripDistributionValue(startZone, possibleStopZone, modeORvehType,
+							purpose, smallScaleCommercialTrafficSegment) != 0);
 
 					if (isStartingLocation) {
 						// Get the vehicle-types and start/stop-categories
@@ -1018,9 +1004,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				ZoneAttribute selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
 				while ( attributesByZone.get(stopZone ).getDouble(selectedStopCategory ) == 0)
 					selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
-				// additionalTravelBufferPerTourAndIterationInMinutes is only used while resolving carriers with unhandled services.
 				int serviceTimePerStop = getServiceTimePerStop(carrierAttributes);
-				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window so that late tours can handle it
+				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 24 * 3600 - serviceTimePerStop); // the service should be finished until 24:00
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow, countedServices);
 				countedServices++;
 			}
@@ -1060,14 +1045,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Adds a service with the given attributes to the carrier.
 	 */
 	private void createService( Carrier newCarrier, ArrayList<String> noPossibleLinks, ZoneAttribute selectedStopCategory, String stopZone,
-	                            Integer serviceTimePerStop, TimeWindow serviceTimeWindow, int i) {
+	                            Integer serviceTimePerStop, TimeWindow serviceStartTimeWindow, int i) {
 		Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks);
 		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + (i + 1),
 			CarrierService.class);
 
 		CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId, 0)
 			.setServiceDuration(serviceTimePerStop)
-			.setServiceStartingTimeWindow(serviceTimeWindow)
+			.setServiceStartingTimeWindow(serviceStartTimeWindow)
 			.build();
 		CarriersUtils.addService(newCarrier, thisService);
 	}
@@ -1281,9 +1266,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		return maxNumberOfLoopsForVRPSolving;
 	}
 
-	public int getAdditionalTravelBufferPerTourAndIterationInMinutes(){
-		return additionalTravelBufferPerTourAndIterationInMinutes;
-	}
 	public double getFactorForTravelBufferCalculation(){
 		return factorForTravelBufferCalculation;
 	}

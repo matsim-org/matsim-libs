@@ -78,7 +78,10 @@ public class SmallScaleCommercialTrafficUtils {
 	public static final String TOUR_ID = "tourId";
 	public static final String SUBPOPULATION = "subpopulation";
 	public static final String PURPOSE = "purpose";
-
+	public static final String UNSOLVED_CARRIER_FILE = "output_carriers_unsolvedVRP.xml.gz";
+	public static final String SOLVED_CARRIER_FILE = "output_carriers_solvedVRP.xml.gz";
+	public static final String CARRIER_VEHICLE_TYPES_FILE = "output_carriersVehicleTypes.xml.gz";
+	public static final String CARRIER_PARTS_FOLDER = "carrierParts";
 	/**
 	 * Creates and return the Index of the zone shape.
 	 *
