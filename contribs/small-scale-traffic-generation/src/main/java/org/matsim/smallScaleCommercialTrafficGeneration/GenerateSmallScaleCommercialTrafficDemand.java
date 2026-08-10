@@ -1013,7 +1013,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				while ( attributesByZone.get(stopZone ).getDouble(selectedStopCategory ) == 0)
 					selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
 				int serviceTimePerStop = getServiceTimePerStop(carrierAttributes);
-				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window so that late tours can handle it
+				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 24 * 3600 - serviceTimePerStop); // the service should be finished until 24:00
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow, countedServices);
 				countedServices++;
 			}
@@ -1053,14 +1053,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Adds a service with the given attributes to the carrier.
 	 */
 	private void createService( Carrier newCarrier, ArrayList<String> noPossibleLinks, ZoneAttribute selectedStopCategory, String stopZone,
-	                            Integer serviceTimePerStop, TimeWindow serviceTimeWindow, int i) {
+	                            Integer serviceTimePerStop, TimeWindow serviceStartTimeWindow, int i) {
 		Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks);
 		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + (i + 1),
 			CarrierService.class);
 
 		CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId, 0)
 			.setServiceDuration(serviceTimePerStop)
-			.setServiceStartingTimeWindow(serviceTimeWindow)
+			.setServiceStartingTimeWindow(serviceStartTimeWindow)
 			.build();
 		CarriersUtils.addService(newCarrier, thisService);
 	}
