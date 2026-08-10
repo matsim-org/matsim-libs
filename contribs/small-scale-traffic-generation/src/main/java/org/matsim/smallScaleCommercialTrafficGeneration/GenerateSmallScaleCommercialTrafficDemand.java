@@ -166,17 +166,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private int nJspritIterations;
 	// ok
 
-	@CommandLine.Option(names = {"--additionalTravelBufferPerIterationInMinutes", "--additionalTravelBufferPerTourAndIterationInMinutes"}, defaultValue = "30",
-		description = "Additional travel buffer in minutes per scheduled tour and carrier-replanning iteration. Used while resolving carriers with unhandled services; if set too low, carriers may not serve all services.")
-	private int additionalTravelBufferPerTourAndIterationInMinutes;
-	// This has to do with the issue that the vehicle fleets are given a priori, since they need to match some externally given
-	// data.  With that, it may happen that not all services fit in.  In order to counter that, the tours (= driver workhours)
-	// are made longer and longer until it fits.
-
 	@CommandLine.Option(names = "--maxNumberOfLoopsForVRPSolving", defaultValue = "100",
 		description = "Limit of carrier replanning iterations, where carriers with unhandled services get new plans. If your carrier-plans are still not fully served, increase this limit.")
 	private int maxNumberOfLoopsForVRPSolving;
-	/// see {@link #additionalTravelBufferPerTourAndIterationInMinutes}
 
 	@CommandLine.Option(names = "--creationOption", description = "Set option of mode differentiation:  useExistingCarrierFileWithSolution, createNewCarrierFile, useExistingCarrierFileWithoutSolution")
 	private CreationOption carriersFileCreationOption;
@@ -1284,9 +1276,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		return maxNumberOfLoopsForVRPSolving;
 	}
 
-	public int getAdditionalTravelBufferPerTourAndIterationInMinutes(){
-		return additionalTravelBufferPerTourAndIterationInMinutes;
-	}
 	public double getFactorForTravelBufferCalculation(){
 		return factorForTravelBufferCalculation;
 	}
