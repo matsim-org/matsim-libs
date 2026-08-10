@@ -81,7 +81,7 @@ public class CommercialTrafficIT {
 	@Test
 	void testMainRunAndResults() {
 		String pathToConfig = utils.getPackageInputDirectory() + "config_demand.xml";
-		Path pathToDataDistributionToZones = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
+		Path pathToZoneAttributes = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
 		String pathToCommercialFacilities = "commercialFacilities.xml.gz";
 		String output = utils.getOutputDirectory();
 		String sample = "0.1";
@@ -96,7 +96,7 @@ public class CommercialTrafficIT {
 
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
 			pathToConfig,
-			"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
+			"--pathToZoneAttributes", pathToZoneAttributes.toString(),
 			"--pathToCommercialFacilities", pathToCommercialFacilities,
 			"--sample", sample,
 			"--jspritIterations", jspritIterations,
@@ -177,7 +177,7 @@ public class CommercialTrafficIT {
 	@Test
 	void testMainRunAndResultsWithCarrierParts() throws IOException {
 		String pathToConfig = utils.getPackageInputDirectory() + "config_demand.xml";
-		Path pathToDataDistributionToZones = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
+		Path pathToZoneAttributes = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
 		String pathToCommercialFacilities = "commercialFacilities.xml.gz";
 		Path output = Path.of(utils.getOutputDirectory()).resolve("carrierPartsRun");
 		Files.createDirectories(output);
@@ -186,7 +186,7 @@ public class CommercialTrafficIT {
 
 		List<String> commonArgs = new ArrayList<>(List.of(
 			pathToConfig,
-			"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
+			"--pathToZoneAttributes", pathToZoneAttributes.toString(),
 			"--pathToCommercialFacilities", pathToCommercialFacilities,
 			"--sample", "0.1",
 			"--jspritIterations", "2",
