@@ -572,15 +572,19 @@ acc_plots <- function(vehicle="FIGO_TECHAVG") {
     group_by(acc_length, model, component, load) %>%
     summarize(acc_abs_value = mean(acc_abs_value), n = n())
 
-  ggplot() +
+  n_components <- n_distinct(pretoria_output$component)
+  n_loads      <- n_distinct(pretoria_output$load)
+
+  p <- ggplot() +
     geom_line(data=pretoria_output, aes(x=acc_length, y=acc_abs_value, color=model)) +
-    facet_wrap(load~component, scales="free")+
+    facet_wrap(load~component, scales="free") +
     xlab("Driven distance (m)") +
     ylab("Accumulative emission (mg)")
 
   ggsave(glue("{plots_path}/{vehicle}_acc.png"),
-         width = 30,
-         height = 10,
+         plot = p,
+         width  = 10 * n_components,
+         height = 10 * n_loads,
          dpi = 300)
 }
 
