@@ -14,12 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,102 +82,40 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private TransitPerformance transitPerformance;
 
-    @SuppressWarnings("deprecation") // Commons CLI 1.11 has no non-deprecated formatter replacement.
-    private void printHelp(Options options) {
-        String header = "The MasterControler takes the following options:\n\n";
-        String footer = "";
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("MasterControler", header, options, footer, true);
-    }
-
     public SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
         lastIterationStartTime = System.currentTimeMillis();
         System.setProperty("matsim.preferLocalDtds", "true");
-        Options options = new Options();
-        options.addOption(Option.builder("c")
-                .longOpt("config")
-                .desc("Config file location")
-                .hasArg(true)
-                .argName("CONFIG.XML")
-                .required(false)
-                .get());
-        options.addOption("h", "host", true, "Host name or IP");
-        options.addOption("p", "port", true, "Port number of MasterControler");
-        options.addOption("t", "threads", true, "Number of threads for replanning.");
-        CommandLineParser parser = new DefaultParser();
-        CommandLine commandLine = parser.parse(options, args);
-
-
-        if (commandLine.hasOption("c")) {
+        SlaveCommandLineParser commandLineParser = new SlaveCommandLineParser();
+        SlaveLaunchArguments launchArguments = commandLineParser.parse(args);
+        if (launchArguments.configFile() != null) {
             try {
-                config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
-
+                config = ConfigUtils.loadConfig(launchArguments.configFile());
             } catch (UncheckedIOException e) {
                 System.err.println("Config file not found");
-                printHelp(options);
-                System.exit(1);
-            }
-        } else if (commandLine.getArgs().length>0) {
-            try {
-                config = ConfigUtils.loadConfig(commandLine.getArgs()[0]);
-
-            } catch (UncheckedIOException e) {
-                System.err.println("Config file not found");
-                printHelp(options);
+                commandLineParser.printHelp();
                 System.exit(1);
             }
         } else {
             System.err.println("Config file not specified");
-            System.out.println(options.toString());
+            System.out.println(commandLineParser.optionsDescription());
             System.exit(1);
         }
 
 
         final DistributedSimConfigGroup distributedSimConfigGroup = ConfigUtils.addOrGetModule(this.config,DistributedSimConfigGroup.GROUP_NAME,DistributedSimConfigGroup.class);
-
-        //The following line will make the controler use the events manager that doesn't check for event order
-        config.eventsManager().setSynchronizeOnSimSteps(false);
-        //if you don't set the number of threads, org.matsim.core.events.EventsUtils will just use the simstepmanager
-        int numThreads = config.global().getNumberOfThreads();
-        if (commandLine.hasOption("t"))
-            try {
-                numThreads = Integer.parseInt(commandLine.getOptionValue("t"));
-            } catch (NumberFormatException e) {
-                System.err.println("Number of threads should be int or it wasn't specced on cmd line. Taking the default of "+distributedSimConfigGroup.getDefaultNumThreadsOnSlave());
-                System.out.println(options.toString());
-                numThreads = distributedSimConfigGroup.getDefaultNumThreadsOnSlave();
-            }
-        else {
-            System.err.println("Will use the number of threads in config for simulation.");
-        }
-        config.global().setNumberOfThreads(numThreads);
-        config.eventsManager().setNumberOfThreads(1);
-
-        String hostname = "localhost";
-        if (commandLine.hasOption("h")) {
-            hostname = commandLine.getOptionValue("h");
-        } else
-            System.err.println("No host or IP specified, using default (localhost)");
+        SlaveConfigPreparer configPreparer = new SlaveConfigPreparer();
+        SlaveConfigPreparer.SlaveConnectionSettings connectionSettings = configPreparer.prepareForConnection(
+                config, distributedSimConfigGroup, launchArguments, System.out, System.err,
+                commandLineParser.optionsDescription());
 
         /*
         * INITIALIZING COMMS
         * */
         Socket socket = null;
-        int socketNumber = distributedSimConfigGroup.getMasterPortNumber();
-        if (commandLine.hasOption("p")) {
-            try {
-                socketNumber = Integer.parseInt(commandLine.getOptionValue("p"));
-            } catch (NumberFormatException e) {
-                System.err.println("Port number should be integer. Defaulting to "+ distributedSimConfigGroup.getMasterPortNumber());
-                System.out.println(options.toString());
-            }
-        } else {
-            System.err.println("Will accept connections on default port number 12345");
-        }
         boolean connected = false;
         while (!connected) {
             try {
-                socket = new Socket(hostname, socketNumber);
+                socket = new Socket(connectionSettings.hostname(), connectionSettings.port());
                 connected = true;
             } catch (ConnectException e) {
                 Thread.sleep(1000);
@@ -215,18 +147,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         writer.flush();
 
 
-        config.controller().setOutputDirectory(config.controller().getOutputDirectory() + "_" + myNumber);
-        //limit IO
-        config.linkStats().setWriteLinkStatsInterval(0);
-        config.controller().setCreateGraphsInterval(0);
-        config.controller().setWriteEventsInterval(0);
-        config.controller().setWritePlansInterval(0);
-        config.controller().setWriteSnapshotsInterval(0);
-        // don't load plans; receive them from master
-        config.plans().setInputFile(null);
-//        Important, otherwise Psim breaks
-        config.eventsManager().setSynchronizeOnSimSteps(false);
-        config.eventsManager().setNumberOfThreads(1);
+        configPreparer.prepareForScenario(config, myNumber);
         if (slaveMutationRate > 0)
             new ReplanningWeightUpdater().updateSlave(config, slaveMutationRate);
 
@@ -304,8 +225,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             matsimControler.getConfig().replanning().setPlanSelectorForRemoval("DiversityGeneratingPlansRemover");
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
-        matsimControler.getConfig().controller().setDumpDataAtEnd(false);
-        matsimControler.getConfig().replanning().setMaxAgentPlanMemorySize(numberOfPlansOnSlave);
+        configPreparer.prepareController(matsimControler.getConfig(), numberOfPlansOnSlave);
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
