@@ -455,34 +455,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     }
 
-    private double getMemoryUse() {
-        putOutTheGarbage();
-        double totalMemory = Runtime.getRuntime().totalMemory();
-        putOutTheGarbage();
-        double freeMemory = Runtime.getRuntime().freeMemory();
-        double usedMemoryEst = totalMemory - freeMemory;
-        double maxMemory = Runtime.getRuntime().maxMemory();
-        return usedMemoryEst / maxMemory;
-    }
-
-    private void putOutTheGarbage() {
-        collectGarbage();
-        collectGarbage();
-    }
-
-    private void collectGarbage() {
-        try {
-            System.gc();
-            long fSLEEP_INTERVAL = 100;
-            Thread.currentThread().sleep(fSLEEP_INTERVAL);
-            System.runFinalization();
-            Thread.currentThread().sleep(fSLEEP_INTERVAL);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-            somethingWentWrong = true;
-        }
-    }
-
     public void distributePersons() throws IOException, ClassNotFoundException {
         int masterCurrentIteration = reader.readInt();
         List<PersonSerializable> personSerializables = (List<PersonSerializable>) reader.readObject();
@@ -651,4 +623,3 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         communications();
     }
 }
-
