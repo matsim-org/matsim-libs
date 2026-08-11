@@ -587,54 +587,77 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         @Override
         public void run() {
-            try {
-                slaveLogger.warn("SlaveHandler " + myNumber + " entering comms mode: " + communicationsMode.toString());
-                writer.writeObject(communicationsMode);
-                writer.flush();
-                switch (communicationsMode) {
-                    case TRANSMIT_TRAVEL_TIMES:
-                        transmitTravelTimes();
-                        reader.readBoolean();
-                        communicationsMode = CommunicationsMode.CONTINUE;
-                        writer.writeObject(communicationsMode);
-                        writer.flush();
-                        break;
-                    case POOL_PERSONS:
-                        poolPersons();
-                        break;
-                    case DISTRIBUTE_PERSONS:
-                        distributePersons();
-                        break;
-                    case TRANSMIT_PLANS_TO_MASTER:
-                        writer.reset();
-                        transmitPlans();
-                        slaveIsOKForNextIter();
-                        break;
-                    case TRANSMIT_SCORES:
-                        transmitScores();
-                        break;
-                    case TRANSMIT_PERFORMANCE:
-                        transmitPerformance();
-                        break;
-                    case TRANSMIT_SCENARIO:
-                        transmitInitialPlans();
-                        reader.readBoolean();
-                        communicationsMode = CommunicationsMode.CONTINUE;
-                        writer.writeObject(communicationsMode);
-                        writer.flush();
-                        break;
-                    case DIE:
-                        return;
+            MasterSlaveCommunicationsLoop loop = new MasterSlaveCommunicationsLoop(
+                    new MasterSlaveCommunicationsLoop.Protocol() {
+                        @Override
+                        public void writeMode(CommunicationsMode mode) throws IOException {
+                            writer.writeObject(mode);
+                        }
+
+                        @Override
+                        public boolean readBoolean() throws IOException {
+                            return reader.readBoolean();
+                        }
+
+                        @Override
+                        public void flush() throws IOException {
+                            writer.flush();
+                        }
+
+                        @Override
+                        public void reset() throws IOException {
+                            writer.reset();
+                        }
+                    },
+                    communicationsOperations(),
+                    () -> somethingWentWrong = true,
+                    numThreads::decrementAndGet,
+                    slaveLogger);
+            communicationsMode = loop.run(communicationsMode, myNumber);
+        }
+
+        private MasterSlaveCommunicationsLoop.Operations communicationsOperations() {
+            return new MasterSlaveCommunicationsLoop.Operations() {
+                @Override
+                public void transmitTravelTimes() throws IOException {
+                    SlaveHandler.this.transmitTravelTimes();
                 }
-                reader.readBoolean();
-            } catch (IOException | InterruptedException | IndexOutOfBoundsException | ClassNotFoundException e) {
-                e.printStackTrace();
-                somethingWentWrong = true;
-                numThreads.decrementAndGet();
-            }
-            //end of a successful Thread.run()
-            numThreads.decrementAndGet();
-            slaveLogger.warn("SlaveHandler " + myNumber + " leaving comms mode: " + communicationsMode.toString());
+
+                @Override
+                public void poolPersons() throws IOException, ClassNotFoundException {
+                    SlaveHandler.this.poolPersons();
+                }
+
+                @Override
+                public void distributePersons() throws IOException, InterruptedException {
+                    SlaveHandler.this.distributePersons();
+                }
+
+                @Override
+                public void transmitPlans() throws IOException, ClassNotFoundException {
+                    SlaveHandler.this.transmitPlans();
+                }
+
+                @Override
+                public void readSlaveReadiness() throws IOException {
+                    SlaveHandler.this.slaveIsOKForNextIter();
+                }
+
+                @Override
+                public void transmitScores() throws IOException, ClassNotFoundException {
+                    SlaveHandler.this.transmitScores();
+                }
+
+                @Override
+                public void transmitPerformance() throws IOException {
+                    SlaveHandler.this.transmitPerformance();
+                }
+
+                @Override
+                public void transmitInitialPlans() throws IOException {
+                    SlaveHandler.this.transmitInitialPlans();
+                }
+            };
         }
 
         private void transmitScores() throws IOException, ClassNotFoundException {
