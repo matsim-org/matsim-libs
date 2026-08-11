@@ -980,33 +980,3 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
 }
 
-
-class MemoryUsageCalculator {
-
-    public long getMemoryUse() {
-        putOutTheGarbage();
-        long totalMemory = Runtime.getRuntime().totalMemory();
-        putOutTheGarbage();
-        long freeMemory = Runtime.getRuntime().freeMemory();
-        return (totalMemory - freeMemory);
-    }
-
-    private void putOutTheGarbage() {
-        collectGarbage();
-        collectGarbage();
-    }
-
-    private void collectGarbage() {
-        try {
-            System.gc();
-            long fSLEEP_INTERVAL = 100;
-            Thread.currentThread().sleep(fSLEEP_INTERVAL);
-            System.runFinalization();
-            Thread.currentThread().sleep(fSLEEP_INTERVAL);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-    }
-}
-
-

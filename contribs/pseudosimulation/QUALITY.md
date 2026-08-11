@@ -60,9 +60,9 @@ historic debt to be repaired in this setup change:
   local filter baselines five precisely matched legacy findings whose immediate
   fixes could change runtime or API behavior.
 - Tests permit no failures.
-- JaCoCo requires at least 30% line coverage and 28% branch coverage. The
-  characterization suite measured 806 of 2,577 lines (31.28%) and 219 of 743
-  branches (29.48%) on Java 25.
+- JaCoCo requires at least 31% line coverage and 29% branch coverage. The
+  current suite measures 32.18% line coverage and 29.48% branch coverage on
+  Java 25.
 
 In addition, `quality/metrics-baseline.properties` records a comparable quality
 scorecard. The final harness stage prints current values, baselines, deltas, and
