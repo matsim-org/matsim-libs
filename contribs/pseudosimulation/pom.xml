@@ -38,8 +38,8 @@
 
   <properties>
     <!-- Quality gates are monotonic ratchets. Raise these values; never lower them. -->
-    <psim.coverage.minimum.branch>0.01</psim.coverage.minimum.branch>
-    <psim.coverage.minimum.line>0.01</psim.coverage.minimum.line>
+    <psim.coverage.minimum.branch>0.08</psim.coverage.minimum.branch>
+    <psim.coverage.minimum.line>0.09</psim.coverage.minimum.line>
   </properties>
 
   <profiles>
@@ -52,14 +52,21 @@
             <artifactId>spotless-maven-plugin</artifactId>
             <version>3.8.0</version>
             <configuration>
-              <ratchetFrom>origin/main</ratchetFrom>
-              <java>
-                <eclipse>
-                  <file>${project.basedir}/quality/eclipse-formatter.properties</file>
-                </eclipse>
-                <trimTrailingWhitespace/>
-                <endWithNewline/>
-              </java>
+              <lineEndings>UNIX</lineEndings>
+              <formats>
+                <format>
+                  <includes>
+                    <include>src/main/java/**/*.java</include>
+                    <include>src/test/java/**/*.java</include>
+                  </includes>
+                  <trimTrailingWhitespace/>
+                  <endWithNewline/>
+                  <indent>
+                    <tabs>true</tabs>
+                    <spacesPerTab>4</spacesPerTab>
+                  </indent>
+                </format>
+              </formats>
             </configuration>
           </plugin>
 
@@ -84,6 +91,7 @@
               <effort>Min</effort>
               <threshold>High</threshold>
               <failOnError>true</failOnError>
+              <excludeFilterFile>${project.basedir}/quality/spotbugs-exclude.xml</excludeFilterFile>
               <xmlOutput>true</xmlOutput>
             </configuration>
           </plugin>

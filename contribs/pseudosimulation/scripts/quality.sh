@@ -8,7 +8,8 @@ REPO_ROOT=$(git -C "$MODULE_DIR" rev-parse --show-toplevel 2>/dev/null) || {
 	printf 'PSim quality: cannot locate the Git repository.\n' >&2
 	exit 2
 }
-MVN=(mvn --batch-mode -f "$MODULE_DIR/pom.xml" -Ppsim-quality -Dmatsim.preferLocalDtds=true -Dsource.skip)
+MVN=(mvn --batch-mode -f "$MODULE_DIR/pom.xml" -Ppsim-quality -Dmatsim.preferLocalDtds=true -Dmaven.test.redirectTestOutputToFile=true -Dsource.skip)
+SPOTLESS_FILES=
 
 print_help() {
 	cat <<'EOF'
@@ -82,6 +83,35 @@ run_stage() {
 	fi
 }
 
+find_changed_java() {
+	local path
+	local changed_file
+	local -a changed=()
+
+	changed_file=$(mktemp "${TMPDIR:-/tmp}/psim-java.XXXXXX") || {
+		printf 'PSim quality: cannot create a temporary changed-file list.\n' >&2
+		exit 2
+	}
+	if ! git -C "$REPO_ROOT" diff --name-only --diff-filter=ACMR -z origin/main -- \
+		contribs/pseudosimulation/src/main/java \
+		contribs/pseudosimulation/src/test/java >"$changed_file"; then
+		rm -f -- "$changed_file"
+		printf 'PSim quality: cannot determine Java changes from origin/main.\n' >&2
+		exit 2
+	fi
+	mapfile -d '' -t changed <"$changed_file"
+	rm -f -- "$changed_file"
+
+	for path in "${changed[@]}"; do
+		path=${path#contribs/pseudosimulation/}
+		if [[ -z "$SPOTLESS_FILES" ]]; then
+			SPOTLESS_FILES=$path
+		else
+			SPOTLESS_FILES+=",$path"
+		fi
+	done
+}
+
 case "${1:-}" in
 	--pre-commit) check_staged_files ;;
 	-h | --help) print_help; exit 0 ;;
@@ -98,15 +128,21 @@ command -v java >/dev/null 2>&1 || {
 	exit 2
 }
 
+find_changed_java
+
 run_stage \
 	'Dependency preparation' \
 	'Fix the Maven compilation/dependency error shown above.' \
 	mvn --batch-mode -pl contribs/pseudosimulation -am -DskipTests -Dsource.skip install -f "$REPO_ROOT/pom.xml"
 
-run_stage \
-	'Formatting' \
-	"Run $SCRIPT_DIR/format.sh, review the changes, and stage them." \
-	"${MVN[@]}" spotless:check
+if [[ -n "$SPOTLESS_FILES" ]]; then
+	run_stage \
+		'Formatting' \
+		"Run $SCRIPT_DIR/format.sh, review the changes, and stage them." \
+		"${MVN[@]}" "-DspotlessFiles=$SPOTLESS_FILES" spotless:check
+else
+	printf '\n==> Formatting\nPASS: Formatting (no Java changes from origin/main)\n'
+fi
 
 run_stage \
 	'Lint' \

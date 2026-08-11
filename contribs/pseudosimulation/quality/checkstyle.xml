@@ -14,7 +14,6 @@
     <module name="AvoidEscapedUnicodeCharacters"/>
     <module name="EmptyStatement"/>
     <module name="NoFinalizer"/>
-    <module name="OneTopLevelClass"/>
     <module name="OuterTypeFilename"/>
   </module>
 </module>

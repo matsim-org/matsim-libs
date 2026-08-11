@@ -22,9 +22,10 @@ specific repair command.
 
 ## Formatting
 
-Formatting uses Spotless and the Eclipse JDT formatter. Spotless ratchets from
-`origin/main`: existing formatting debt does not block unrelated work, while
-Java files changed on a branch must conform to the formatter.
+Formatting uses Spotless to normalize indentation, trailing whitespace, final
+newlines, and line endings according to the repository conventions. The local
+scripts pass only Java files changed from `origin/main` to Spotless: existing
+formatting debt does not block unrelated work, while changed files must conform.
 
 The commit hook only checks formatting; it never changes files. Apply fixes
 explicitly, inspect them, and stage them again:
@@ -55,9 +56,13 @@ The initial gates intentionally prevent regression without requiring all
 historic debt to be repaired in this setup change:
 
 - Checkstyle enables a small set of objective, low-noise rules.
-- SpotBugs reports only high-priority findings at minimum analysis effort.
+- SpotBugs reports only high-priority findings at minimum analysis effort. Its
+  local filter baselines five precisely matched legacy findings whose immediate
+  fixes could change runtime or API behavior.
 - Tests permit no failures.
-- JaCoCo requires at least 1% line coverage and 1% branch coverage.
+- JaCoCo requires at least 9% line coverage and 8% branch coverage. The initial
+  baseline measured 236 of 2,567 lines (9.19%) and 65 of 743 branches (8.75%)
+  using `RunPSimTest` on Java 25.
 
 The two coverage properties live in `pom.xml`. Treat every gate as a monotonic
 ratchet: increase coverage floors, add lint rules, and increase SpotBugs effort

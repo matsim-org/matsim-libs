@@ -53,7 +53,7 @@ public class RunPSim {
 	private Controler matsimControler;
 
 	public RunPSim(Config config, PSimConfigGroup pSimConfigGroup) {
-		this.scenario = ScenarioUtils.loadScenario(config);;
+		this.scenario = ScenarioUtils.loadScenario(config);
 
 		//The following line will make the controler use the events manager that doesn't check for event order.
 		//This is essential for pseudo-simulation as the PSim module generates events on a person-basis,
