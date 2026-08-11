@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
@@ -30,7 +31,7 @@ public class TrafficDashboard implements Dashboard {
 
 		String[] args = new String[]{"--transport-modes", String.join(",", this.modes)};
 		if (modes.size() == 1)
-			header.title = modes.stream().findFirst().get() + " Traffic";
+			header.title = StringUtils.capitalize(modes.stream().findFirst().get()) + " Traffic";
 		else
 			header.title = "Network Traffic";
 		header.description = "Traffic related analyses for the modes " + modes + ". Volumes for PT are not shown in this dashboard.";
