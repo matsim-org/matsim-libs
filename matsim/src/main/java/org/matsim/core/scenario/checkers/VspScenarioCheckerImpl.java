@@ -113,7 +113,7 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 
 		// check if there are corresponding scoring params for all subpopulations.
 		for (String subpopulation : subpopulations) {
-			if (!scenario.getConfig().scoring().getScoringParametersPerSubpopulation().containsKey(subpopulation)) {
+			if (!scenario.getConfig().scoring().getAllScoringParameterSetsPerSubpopulation().containsKey(subpopulation)) {
 				log.log(lvl,
 					"Found subpopulation '{}' but no corresponding scoring parameters. Please add scoring parameters for this subpopulation.",
 					subpopulation);

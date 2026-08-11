@@ -15,8 +15,8 @@ public class PtFareModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		getConfig().scoring().getModes().get(TransportMode.pt).setDailyMonetaryConstant(0);
-		getConfig().scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
+		getConfig().scoring().getDefaultModeParams().get(TransportMode.pt).setDailyMonetaryConstant(0);
+		getConfig().scoring().getDefaultModeParams().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
 		Multibinder<PtFareCalculator> ptFareCalculator = Multibinder.newSetBinder(binder(), PtFareCalculator.class);
 
 		PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(this.getConfig(), PtFareConfigGroup.class);

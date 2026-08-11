@@ -370,7 +370,7 @@ public class SwissRailRaptorTest {
 		//changing from train to ship is so expensive that direct walk is cheaper
 		assertNull(legs);
 	}
-	
+
 	@Test
 	void testLineChangeWithDifferentTravelTimeUtils() {
         Fixture f = new Fixture();
@@ -380,22 +380,22 @@ public class SwissRailRaptorTest {
 		swissRailRaptorConfigGroup.setTransferWalkMargin(0);
 		RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
         SwissRailRaptorData data = SwissRailRaptorData.create(f.schedule, null, RaptorUtils.createStaticConfig(f.config), f.network, null);
-        TransitRouter router = new SwissRailRaptor.Builder(data, f.config).with(new RaptorParametersForPerson() {	
+        TransitRouter router = new SwissRailRaptor.Builder(data, f.config).with(new RaptorParametersForPerson() {
 			@Override
 			public RaptorParameters getRaptorParameters(Person person) {
 				return raptorParams;
 			}
 		}).build();
-        
+
         // from C to G (see Fixture), competing between red line (express) and blue line (regular)
 		Coord fromCoord = new Coord(12000, 5000);
 		Coord toCoord = new Coord(28000, 5000);
-		
+
 		// default case
 		List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600 - 60.0, null));
 		assertEquals(3, legs.size());
 		assertEquals("red", ((TransitPassengerRoute) ((Leg) legs.get(1)).getRoute()).getLineId().toString());
-		
+
 		// routing by transport mode, same costs, choose red (train) again
 		raptorParams.setUseTransportModeUtilities(true);
 		raptorParams.setMarginalUtilityOfTravelTime_utl_s("train", -1e-3);
@@ -466,7 +466,7 @@ public class SwissRailRaptorTest {
          */
         Fixture f = new Fixture();
         f.init();
-        f.config.scoring().setUtilityOfLineSwitch(0);
+        f.config.scoring().setDefaultUtilityOfLineSwitch(0);
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null));
@@ -481,7 +481,7 @@ public class SwissRailRaptorTest {
 
         Config config = ConfigUtils.createConfig();
         double transferUtility = 300.0 * raptorParams.getMarginalUtilityOfTravelTime_utl_s(TransportMode.pt); // corresponds to 5 minutes transit travel time
-        config.scoring().setUtilityOfLineSwitch(transferUtility);
+        config.scoring().setDefaultUtilityOfLineSwitch(transferUtility);
         raptorParams = RaptorUtils.createParameters(config);
         Assertions.assertEquals(-transferUtility, raptorParams.getTransferPenaltyFixCostPerTransfer(), 0.0);
         router = createTransitRouter(f.schedule, config, f.network);
@@ -505,7 +505,7 @@ public class SwissRailRaptorTest {
          */
         Fixture f = new Fixture();
         f.init();
-        f.config.scoring().setUtilityOfLineSwitch(0);
+        f.config.scoring().setDefaultUtilityOfLineSwitch(0);
         f.config.transitRouter().setAdditionalTransferTime(0);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null));
@@ -972,7 +972,7 @@ public class SwissRailRaptorTest {
         walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
         config.routing().addParameterSet(walkParameters);
 
-        config.scoring().setUtilityOfLineSwitch(-transferFixedCost);
+        config.scoring().setDefaultUtilityOfLineSwitch(-transferFixedCost);
         srrConfig.setTransferPenaltyBaseCost(transferFixedCost);
         srrConfig.setTransferPenaltyCostPerTravelTimeHour(transferRelativeCostFactor);
 

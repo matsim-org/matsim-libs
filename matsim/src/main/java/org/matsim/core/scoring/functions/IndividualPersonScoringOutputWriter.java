@@ -51,14 +51,14 @@ public class IndividualPersonScoringOutputWriter implements IterationEndsListene
 		Set<String> modes = new LinkedHashSet<>();
 		Set<ModeUtilityParameters.Type> paramsTypes = new LinkedHashSet<>();
 
-		for (Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> e : config.getScoringParametersPerSubpopulation().entrySet()) {
+		for (Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> e : config.getAllScoringParameterSetsPerSubpopulation().entrySet()) {
 
 			TasteVariationsConfigParameterSet tasteVariationsParams = e.getValue().getTasteVariationsParams();
 			if (tasteVariationsParams != null) {
 				subpopulations.add(e.getKey());
 				excludeSubpopulations.addAll(tasteVariationsParams.getExcludeSubpopulations());
 				paramsTypes.addAll(tasteVariationsParams.getVariationsOf());
-				modes.addAll(e.getValue().getModes().keySet());
+				modes.addAll(e.getValue().getModeParams().keySet());
 			}
 		}
 

@@ -393,14 +393,14 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added aug'13:
-		if (config.scoring().getMarginalUtlOfWaiting_utils_hr() != 0.) {
+		if (config.scoring().getDefaultMarginalUtlOfWaiting_utils_hr() != 0.) {
 			problem = true;
 			System.out.flush();
 			log.log(lvl, "found marginal utility of waiting != 0.  vsp default is setting this to 0. ");
 		}
 
 		// added apr'15:
-		for (ActivityParams params : config.scoring().getActivityParams()) {
+		for (ActivityParams params : config.scoring().getDefaultActivityParams()) {
 			if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(params.getActivityType())) {
 				// they have typicalDurationScoreComputation==relative, but are not scored anyways. benjamin/kai, nov'15
 				continue;
@@ -416,7 +416,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 					throw new RuntimeException("unexpected setting; aborting ... ");
 			}
 		}
-		for (ModeParams params : config.scoring().getModes().values()) {
+		for (ModeParams params : config.scoring().getDefaultModeParams().values()) {
 			if (params.getMonetaryDistanceRate() > 0.) {
 				problem = true;
 				System.out.flush();
@@ -428,16 +428,16 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 
-		if (config.scoring().getModes().get( car ) != null && config.scoring().getModes().get( car ).getMonetaryDistanceRate() > 0) {
+		if (config.scoring().getDefaultModeParams().get( car ) != null && config.scoring().getDefaultModeParams().get( car ).getMonetaryDistanceRate() > 0) {
 			problem = true;
 		}
-		final ModeParams modeParamsPt = config.scoring().getModes().get( pt );
+		final ModeParams modeParamsPt = config.scoring().getDefaultModeParams().get( pt );
 		if (modeParamsPt != null && modeParamsPt.getMonetaryDistanceRate() > 0) {
 			problem = true;
 			System.out.flush();
 			log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here.");
 		}
-		if (config.scoring().getMarginalUtilityOfMoney() < 0.) {
+		if (config.scoring().getDefaultMarginalUtilityOfMoney() < 0.) {
 			problem = true;
 			System.out.flush();
 			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. ");
@@ -454,7 +454,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added apr'21:
-		for (Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> entry : config.scoring().getScoringParametersPerSubpopulation().entrySet()) {
+		for (Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> entry : config.scoring().getAllScoringParameterSetsPerSubpopulation().entrySet()) {
 			for (ActivityParams activityParam : entry.getValue().getActivityParams()) {
 				if (activityParam.getMinimalDuration().isDefined()) {
 					log.log(lvl, "Vsp default is to not define minimal duration.  Activity type=" + activityParam.getActivityType() + "; subpopulation=" + entry.getKey());
@@ -463,8 +463,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added may'23
-		for( ScoringConfigGroup.ScoringParameterSet scoringParams : config.scoring().getScoringParametersPerSubpopulation().values() ){
-			for( ModeParams params : scoringParams.getModes().values() ){
+		for( ScoringConfigGroup.ScoringParameterSet scoringParams : config.scoring().getAllScoringParameterSetsPerSubpopulation().values() ){
+			for( ModeParams params : scoringParams.getModeParams().values() ){
 				switch( config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng() ){
 					case allZeroExceptBikeAndRide -> {
 

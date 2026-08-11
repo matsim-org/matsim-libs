@@ -55,7 +55,6 @@ public class PtTripFareEstimatorTest {
 
 		Config config = TestScenario.loadConfig(utils);
 
-		Map<String, ScoringConfigGroup.ModeParams> modes = config.scoring().getScoringParameters("person").getModes();
 		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
 		PtFareConfigGroup fare = ConfigUtils.addOrGetModule(config, PtFareConfigGroup.class);

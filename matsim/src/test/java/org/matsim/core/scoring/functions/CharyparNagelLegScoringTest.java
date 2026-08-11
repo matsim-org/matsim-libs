@@ -114,7 +114,7 @@ public class CharyparNagelLegScoringTest {
 			})
 			.sum();
 		// we know that the second pt trip has a line switch this is rather difficult to figure out otherwise
-		var expectedLineSwitch = scoringParams.getUtilityOfLineSwitch();
+		var expectedLineSwitch = scoringParams.getDefaultUtilityOfLineSwitch();
 		// we know that we have one daily constant in this scenario
 		var dailyScore = calcDailyConstant(scoringParams, transitMode);
 		var expectedScore = dailyScore + expectedConstantPerTrip + expectedLegScore + expectedLineSwitch;
@@ -136,7 +136,7 @@ public class CharyparNagelLegScoringTest {
 		// distance: distance * marginalUtilityOfDistance
 		var utilDist = travelDist * modeParams.getMarginalUtilityOfDistance();
 		// distance costs: distance * monetaryDistanceCosts * marginalUtilityOfMoney
-		var utilDistCosts = travelDist * modeParams.getMonetaryDistanceRate() * scoringParams.getMarginalUtilityOfMoney();
+		var utilDistCosts = travelDist * modeParams.getMonetaryDistanceRate() * scoringParams.getDefaultMarginalUtilityOfMoney();
 
 		return utilTravelTime + utilDist + utilDistCosts;
 	}
@@ -144,7 +144,7 @@ public class CharyparNagelLegScoringTest {
 	private static double calcWaitScore(ScoringConfigGroup scoringParams, Leg leg) {
 		if (leg.getRoute() instanceof TransitPassengerRoute tpr) {
 			var waitTime = tpr.getBoardingTime().seconds() - leg.getDepartureTime().seconds();
-			var waitUtil = scoringParams.getMarginalUtlOfWaitingPt_utils_hr() / 3600 - scoringParams.getOrCreateModeParams(leg.getMode()).getMarginalUtilityOfTraveling() / 3600;
+			var waitUtil = scoringParams.getDefaultMarginalUtlOfWaitingPt_utils_hr() / 3600 - scoringParams.getOrCreateModeParams(leg.getMode()).getMarginalUtilityOfTraveling() / 3600;
 			return waitTime * waitUtil;
 		} else {
 			return 0.;
@@ -153,7 +153,7 @@ public class CharyparNagelLegScoringTest {
 
 	private static double calcDailyConstant(ScoringConfigGroup scoringParams, String mode) {
 		var modeParams = scoringParams.getOrCreateModeParams(mode);
-		return modeParams.getDailyUtilityConstant() + scoringParams.getMarginalUtilityOfMoney() * modeParams.getDailyMonetaryConstant();
+		return modeParams.getDailyUtilityConstant() + scoringParams.getDefaultMarginalUtilityOfMoney() * modeParams.getDailyMonetaryConstant();
 	}
 
 	private static double calcTripConstant(ScoringConfigGroup scoringParams, String mode) {
@@ -185,12 +185,12 @@ public class CharyparNagelLegScoringTest {
 
 	private static ScoringConfigGroup createScoringParams(String mode) {
 		var config = new ScoringConfigGroup();
-		config.setMarginalUtlOfWaitingPt_utils_hr(-3);
-		config.setMarginalUtilityOfMoney(5);
-		config.setEarlyDeparture_utils_hr(-7);
-		config.setLateArrival_utils_hr(-11);
-		config.setPerforming_utils_hr(13);
-		config.setUtilityOfLineSwitch(-17);
+		config.setDefaultMarginalUtlOfWaitingPt_utils_hr(-3);
+		config.setDefaultMarginalUtilityOfMoney(5);
+		config.setDefaultEarlyDeparture_utils_hr(-7);
+		config.setDefaultLateArrival_utils_hr(-11);
+		config.setDefaultPerforming_utils_hr(13);
+		config.setDefaultUtilityOfLineSwitch(-17);
 
 		config.getOrCreateModeParams(mode)
 			.setConstant(-19)

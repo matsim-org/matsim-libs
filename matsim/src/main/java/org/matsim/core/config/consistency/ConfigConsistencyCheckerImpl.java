@@ -68,22 +68,22 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	}
 
 	/*package because of test */ static void checkPlanCalcScore(final Config c) {
-		ModeParams ptModeParams = c.scoring().getModes().get(TransportMode.pt);
+		ModeParams ptModeParams = c.scoring().getDefaultModeParams().get(TransportMode.pt);
 		if (ptModeParams!=null && ptModeParams.getMarginalUtilityOfTraveling() > 0) {
 			log.warn(ScoringConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
 					"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		ModeParams carModeParams = c.scoring().getModes().get(TransportMode.car);
+		ModeParams carModeParams = c.scoring().getDefaultModeParams().get(TransportMode.car);
 		if (carModeParams!=null && carModeParams.getMarginalUtilityOfTraveling() > 0) {
 			log.warn(ScoringConfigGroup.GROUP_NAME + ".traveling is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		ModeParams bikeModeParams = c.scoring().getModes().get(TransportMode.bike);
+		ModeParams bikeModeParams = c.scoring().getDefaultModeParams().get(TransportMode.bike);
 		if (bikeModeParams!=null && bikeModeParams.getMarginalUtilityOfTraveling() > 0) {
 			log.warn(ScoringConfigGroup.GROUP_NAME + ".travelingBike is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		ModeParams walkModeParams = c.scoring().getModes().get(TransportMode.walk);
+		ModeParams walkModeParams = c.scoring().getDefaultModeParams().get(TransportMode.walk);
 		if (walkModeParams!=null && walkModeParams.getMarginalUtilityOfTraveling() > 0) {
 			log.warn(ScoringConfigGroup.GROUP_NAME + ".travelingWalk is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
