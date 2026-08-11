@@ -12,19 +12,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
-import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -35,10 +30,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import com.google.inject.Inject;
 
@@ -50,12 +42,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final MemoryUsageCalculator memoryUsageCalculator;
     private final ReplaceableTravelTime travelTime;
     private final boolean fullTransitPerformanceTransmission;
-    private final boolean IntelligentRouters;
     private final Logger slaveLogger;
     @Inject private  PlanCatcher plancatcher;
-    private static double slaveMutationRate;
-    private final int numberOfPlansOnSlave;
-    private boolean initialRouting;
     private int masterCurrentIteration = -1;
     private Config config;
     private Controler matsimControler;
@@ -99,104 +87,21 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         * */
         SlaveMasterSession.Connected connection = SlaveMasterSession.connect(connectionSettings, masterContext());
         masterSession = connection.session();
-        SlaveMasterSession.Initialization initialization = connection.initialization();
-        int myNumber = initialization.number();
+        SlaveRuntimeSettings settings = SlaveRuntimeSettings.from(connection.initialization());
         slaveLogger = masterSession.logger();
 
-        numberOfPSimIterationsPerCycle = initialization.iterationsPerCycle();
-        numberOfPlansOnSlave = initialization.numberOfPlans();
-        slaveMutationRate = initialization.mutationRate();
+        numberOfPSimIterationsPerCycle = settings.iterationsPerCycle();
         slaveLogger.warn("Running " + numberOfPSimIterationsPerCycle + " PSim iterations for every QSim iter");
-        config.controller().setLastIteration(initialization.lastIteration());
-        initialRouting = initialization.initialRouting();
-        iterationOrchestrator.configure(initialRouting, numberOfPSimIterationsPerCycle);
-        boolean quickReplannning = initialization.quickReplanning();
-        fullTransitPerformanceTransmission = initialization.fullTransitPerformance();
-        boolean trackGenome = initialization.trackGenome();
-        IntelligentRouters = initialization.intelligentRouters();
-        boolean diversityGeneratingPlanSelection = initialization.diversityGeneratingPlanSelection();
+        iterationOrchestrator.configure(settings.initialRouting(), numberOfPSimIterationsPerCycle);
+        fullTransitPerformanceTransmission = settings.fullTransitPerformance();
+        if (settings.initialRouting()) slaveLogger.warn("Performing initial routing.");
 
-        if (initialRouting) slaveLogger.warn("Performing initial routing.");
-
-        configPreparer.prepareForScenario(config, myNumber);
-        if (slaveMutationRate > 0)
-            new ReplanningWeightUpdater().updateSlave(config, slaveMutationRate);
-
-        scenario = ScenarioUtils.loadScenario(config);
-
-        //experimental, not to be used
-        DistributedPlanStrategyTranslationAndRegistration.TrackGenome = trackGenome;
-//        strategy substitution: mainly to register whether the option for quick replanning is to be used,
-//        as its original function is to mark plans for execution by PSim. But here, all plans are executed by PSim
-//        should rather be that PSim marks activities for execution in some other way
-        DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
-        matsimControler = new Controler(scenario);
-        DistributedPlanStrategyTranslationAndRegistration.registerStrategiesWithControler(this.matsimControler, plancatcher, quickReplannning, numberOfPSimIterationsPerCycle);
-        matsimControler.getConfig().controller().setOverwriteFileSetting(
-                true ?
-                        OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-                        OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
-        matsimControler.addControllerListener(this);
-
-//        init traveltime for when non yet has been received from master
-        travelTime = new ReplaceableTravelTime();
-        linkTravelTimes = new FreeSpeedTravelTime();
-        travelTime.setTravelTime(linkTravelTimes);
-
-        matsimControler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bindMobsim().toProvider(pSimProvider);
-            }
-        });
-
-        if (config.transit().isUseTransit()) {
-            // tell PlanSerializable to record transit routes
-            PlanSerializable.isUseTransit = true;
-
-        }
-        if (IntelligentRouters)
-            matsimControler.addOverridingModule(new AbstractModule() {
-                @Override
-                public void install() {
-//                    System.out.println("init routers");
-//                    transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(scenario,
-//                            waitTimes,
-//                            stopStopTimes);
-//                    bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
-                }
-            });
-
-        else {
-            final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
-                    new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config);
-            matsimControler.addOverridingModule(new AbstractModule() {
-                @Override
-                public void install() {
-                    addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(disutilityFactory);
-                }
-            });
-
-        }
-        matsimControler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(TravelTime.class).toInstance(travelTime);
-                if (scenario.getConfig().replanning().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
-                    bindPlanSelectorForRemoval().toProvider(DiversityGeneratingPlansRemover.Builder.class);
-                }
-            }
-        });
-
-
-        if (trackGenome) {
-
-        }
-        if (diversityGeneratingPlanSelection)
-            matsimControler.getConfig().replanning().setPlanSelectorForRemoval("DiversityGeneratingPlansRemover");
-        //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
-        // better to have plans written out every n successful iterations, specified in the config
-        configPreparer.prepareController(matsimControler.getConfig(), numberOfPlansOnSlave);
+        SlaveControllerAssembler.Result assembly = SlaveControllerAssembler.production(configPreparer)
+                .assemble(config, settings, this, plancatcher, pSimProvider);
+        scenario = assembly.scenario();
+        matsimControler = assembly.controller();
+        travelTime = assembly.travelTime();
+        linkTravelTimes = assembly.initialTravelTime();
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
