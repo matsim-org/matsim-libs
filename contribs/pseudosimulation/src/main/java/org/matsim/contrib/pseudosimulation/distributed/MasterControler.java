@@ -68,6 +68,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private TransitPerformanceRecorder transitPerformanceRecorder;
     private SerializableLinkTravelTimes linkTravelTimes;
     private final SlaveHandlerCoordinator slaveHandlerCoordinator = SlaveHandlerCoordinator.production(masterLogger);
+    private final MasterIterationOrchestrator iterationOrchestrator =
+            new MasterIterationOrchestrator(iterationOperations());
     private List<PersonSerializable> personPool;
     private static int loadBalanceInterval = 5;
     public static double planAllocationLimiter = 10.0;
@@ -266,81 +268,28 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     @Override
     public void notifyStartup(StartupEvent event) {
         masterLogger.warn(masterInitialLogString);
-        startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_SCENARIO);
-        if (initialRoutingOnSlaves) {
-            waitForSlaveThreads();
-            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
-            waitForSlaveThreads();
-            mergePlansFromSlaves();
-            //this code is a copy of the replanning strategy
-            for (Person person : matsimControler.getScenario().getPopulation().getPersons().values()) {
-//                person.removePlan(person.getSelectedPlan());
-                Plan plan = newPlans.get(person.getId().toString());
-                person.addPlan(plan);
-                person.setSelectedPlan(plan);
-            }
-            if (slaveHandlerTreeMap.size() > 1 || slavesHaveRequestedShutdown() || hydra.pendingCount() > 0)
-                loadBalance();
-            if (SelectedSimulationMode.equals(SimulationMode.PARALLEL)) {
-                waitForSlaveThreads();
-                startSlaveHandlersInMode(CommunicationsMode.CONTINUE);
-            }
-        }
+        iterationOrchestrator.startup(initialRoutingOnSlaves,
+                SelectedSimulationMode.equals(SimulationMode.PARALLEL),
+                () -> slaveHandlerTreeMap.size() > 1 || slavesHaveRequestedShutdown() || hydra.pendingCount() > 0);
     }
 
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
         this.currentIteration = event.getIteration();
-        if (innovationEndsAtIter > 0 && event.getIteration() > innovationEndsAtIter)
-            return;
-        //wait for previous transmissions to complete, if necessary
-        waitForSlaveThreads();
-        //start receiving plans from slaveHandlerTreeMap as the QSim runs
-        if (SelectedSimulationMode.equals(SimulationMode.PARALLEL))
-            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
+        iterationOrchestrator.iterationStarts(event.getIteration(), innovationEndsAtIter,
+                SelectedSimulationMode.equals(SimulationMode.PARALLEL));
 
     }
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        if (innovationEndsAtIter > 0 && event.getIteration() > innovationEndsAtIter)
-            return;
-        if (event.getIteration() == innovationEndsAtIter) {
-            startSlaveHandlersInMode(CommunicationsMode.DIE);
-            return;
-        }
-
-        if (SelectedSimulationMode.equals(SimulationMode.PARALLEL)) {
-            waitForSlaveThreads();
-            mergePlansFromSlaves();
-            waitForSlaveThreads();
-            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_SCORES);
-            waitForSlaveThreads();
-        }
-        boolean isLoadBalanceIteration = event.getIteration() > config.controller().getFirstIteration() &&
-                (event.getIteration() % loadBalanceInterval == 0 ||
-                        slavesHaveRequestedShutdown() ||
-                        hydra.pendingCount() > 0);
-        //do load balancing, if necessary
-        if (isLoadBalanceIteration)
-            loadBalance();
-        isLoadBalanceIteration = false;
-        waitForSlaveThreads();
-        linkTravelTimes = new SerializableLinkTravelTimes(matsimControler.getLinkTravelTimes(),
-                config.travelTimeCalculator().getTraveltimeBinSize(),
-				(int) config.qsim().getEndTime().seconds(),
-                scenario.getNetwork().getLinks().values());
-        startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
-        if (SelectedSimulationMode.equals(SimulationMode.SERIAL)) {
-            waitForSlaveThreads();
-            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
-            waitForSlaveThreads();
-            mergePlansFromSlaves();
-            waitForSlaveThreads();
-            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_SCORES);
-            waitForSlaveThreads();
-        }
+        iterationOrchestrator.afterMobsim(event.getIteration(), innovationEndsAtIter,
+                SelectedSimulationMode.equals(SimulationMode.PARALLEL),
+                () -> event.getIteration() > config.controller().getFirstIteration() &&
+                        (event.getIteration() % loadBalanceInterval == 0 ||
+                                slavesHaveRequestedShutdown() ||
+                                hydra.pendingCount() > 0));
     }
 
     private boolean slavesHaveRequestedShutdown() {
@@ -353,9 +302,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {
-        //start receiving plans from slaveHandlerTreeMap as the QSim runs
-        hydra.kill();
-        startSlaveHandlersInMode(CommunicationsMode.DIE);
+        iterationOrchestrator.shutdown();
     }
 
     private void loadBalance() {
@@ -494,6 +441,30 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 fullTransitPerformanceTransmission,
                 TrackGenome,
                 intelligentRouters));
+    }
+
+    private MasterIterationOrchestrator.Operations iterationOperations() {
+        return new MasterIterationOrchestrator.Operations() {
+            public void start(CommunicationsMode mode) { startSlaveHandlersInMode(mode); }
+            public void waitForSlaves() { waitForSlaveThreads(); }
+            public void mergePlans() { mergePlansFromSlaves(); }
+            public void applyInitialPlans() {
+                // This is intentionally the same behavior as the legacy replanning strategy copy.
+                for (Person person : matsimControler.getScenario().getPopulation().getPersons().values()) {
+                    Plan plan = newPlans.get(person.getId().toString());
+                    person.addPlan(plan);
+                    person.setSelectedPlan(plan);
+                }
+            }
+            public void loadBalance() { MasterControler.this.loadBalance(); }
+            public void updateTravelTimes() {
+                linkTravelTimes = new SerializableLinkTravelTimes(matsimControler.getLinkTravelTimes(),
+                        config.travelTimeCalculator().getTraveltimeBinSize(),
+                        (int) config.qsim().getEndTime().seconds(),
+                        scenario.getNetwork().getLinks().values());
+            }
+            public void stopRegistry() { hydra.kill(); }
+        };
     }
 
     private MasterSlaveSession.Context masterSlaveContext() {
