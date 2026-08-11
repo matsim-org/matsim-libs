@@ -14,7 +14,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,7 +57,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private int innovationEndsAtIter = -1;
     private int slaveNumberOfPlans=3;
     private final HashMap<String, Plan> newPlans = new HashMap<>();
-    private final Hydra hydra;
+    private final DynamicSlaveRegistry<SlaveHandler> hydra;
     private long bytesPerPerson;
     private Scenario scenario;
     private long scenarioMemoryUse;
@@ -128,7 +127,15 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
         writeServer.close();
         masterInitialLogString.append("MASTER accepted minimum number of incoming connections. All further slaves will be registered on the Hydra.\n");
-        hydra = new Hydra();
+        hydra = DynamicSlaveRegistry.production(
+                masterPortNumber,
+                SlaveHandler::new,
+                () -> slaveUniqueNumber++,
+                (slaveHandler, id) -> initializeSlave(slaveHandler, id, false),
+                slaveHandler -> slaveHandler.slavePersonPool = new ArrayList<>(),
+                slaveHandler -> slaveHandler.isOkForNextIter,
+                slaveHandler -> slaveHandler.myNumber,
+                masterLogger);
         Thread hydraThread = new Thread(hydra);
         hydraThread.setName("HYDRA");
         hydraThread.start();
@@ -242,7 +249,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 RuntimeException re
                 ) {
             masterLogger.error(re.getStackTrace());
-            master.hydra.killHydra();
+            master.hydra.kill();
             Runtime.getRuntime().halt(-1);
         }
         Runtime.getRuntime().halt(0);
@@ -276,7 +283,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 person.addPlan(plan);
                 person.setSelectedPlan(plan);
             }
-            if (slaveHandlerTreeMap.size() > 1 || slavesHaveRequestedShutdown() || hydra.hydraSlaves.size() > 0)
+            if (slaveHandlerTreeMap.size() > 1 || slavesHaveRequestedShutdown() || hydra.pendingCount() > 0)
                 loadBalance();
             if (SelectedSimulationMode.equals(SimulationMode.PARALLEL)) {
                 waitForSlaveThreads();
@@ -318,7 +325,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         boolean isLoadBalanceIteration = event.getIteration() > config.controller().getFirstIteration() &&
                 (event.getIteration() % loadBalanceInterval == 0 ||
                         slavesHaveRequestedShutdown() ||
-                        hydra.hydraSlaves.size() > 0);
+                        hydra.pendingCount() > 0);
         //do load balancing, if necessary
         if (isLoadBalanceIteration)
             loadBalance();
@@ -351,14 +358,14 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     @Override
     public void notifyShutdown(ShutdownEvent event) {
         //start receiving plans from slaveHandlerTreeMap as the QSim runs
-        hydra.killHydra();
+        hydra.kill();
         startSlaveHandlersInMode(CommunicationsMode.DIE);
     }
 
     private void loadBalance() {
         waitForSlaveThreads();
         //add any newly registered slaveHandlerTreeMap
-        slaveHandlerTreeMap.putAll(hydra.getNewSlaves());
+        slaveHandlerTreeMap.putAll(hydra.drainReadySlaves());
         if (slaveHandlerTreeMap.size() < 2)
             return;
         startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
@@ -685,67 +692,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             this.usedMemory = reader.readLong();
             this.maxMemory = reader.readLong();
             this.numberOfPlans = reader.readInt();
-        }
-    }
-
-    private class Hydra implements Runnable {
-        TreeMap<Integer, SlaveHandler> hydraSlaves = new TreeMap<>();
-        AtomicBoolean accessingMap = new AtomicBoolean(false);
-
-        public void killHydra() {
-            this.acceptSlaves = false;
-        }
-
-        boolean acceptSlaves = true;
-
-        public void run() {
-            ServerSocket writeServer = null;
-            try {
-                writeServer = new ServerSocket(masterPortNumber);
-                while (acceptSlaves) {
-                    Socket socket = writeServer.accept();
-                    int i = slaveUniqueNumber++;
-                    masterLogger.warn("Slave accepted.");
-                    SlaveHandler slaveHandler = new SlaveHandler(socket, i);
-                    while (accessingMap.get()) {
-//                    wait for the other process to finish modifying the map
-                        Thread.sleep(10);
-                    }
-                    accessingMap.set(true);
-                    hydraSlaves.put(i, slaveHandler);
-                    //order is important
-                    initializeSlave(slaveHandler, i, false);
-                    slaveHandler.slavePersonPool = new ArrayList<>();
-                    accessingMap.set(false);
-                    Thread.sleep(1000);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public TreeMap<Integer, SlaveHandler> getNewSlaves() {
-            TreeMap<Integer, SlaveHandler> slaveBatch;
-            while (accessingMap.get()) {
-                try {
-//                    wait for the other process to finish modifying the map
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            accessingMap.set(true);
-            List<Integer> slavesToDrop = new ArrayList<>();
-            for (SlaveHandler slaveHandler : hydraSlaves.values()) {
-                if (!slaveHandler.isOkForNextIter) slavesToDrop.add(slaveHandler.myNumber);
-            }
-            for (int i : slavesToDrop) hydraSlaves.remove(i);
-            slaveBatch = hydraSlaves;
-            hydraSlaves = new TreeMap<>();
-            accessingMap.set(false);
-            return slaveBatch;
         }
     }
 
