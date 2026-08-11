@@ -54,7 +54,7 @@ public class TransitPerformance implements Serializable {
         try {
             return linesToStopDwellEvents.get(line.toString()).getRouteTravelTime(route, originStop, destinationStop, time);
         }catch(NullPointerException ne){
-            return new Tuple(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
+            return new Tuple<>(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
         }
     }
 
