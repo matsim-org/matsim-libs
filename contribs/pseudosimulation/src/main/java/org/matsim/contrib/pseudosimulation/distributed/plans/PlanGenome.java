@@ -40,7 +40,7 @@ public class PlanGenome implements Plan {
     private Person person = null;
     private String type = null;
     private Customizable customizableDelegate;
-    
+
 	private final Attributes attributes = new AttributesImpl();
 	@Override
 	public final Attributes getAttributes() {
@@ -219,13 +219,13 @@ public class PlanGenome implements Plan {
     public void setType(final String type) {
         this.type = type;
     }
-    
+
 	@Override
 	public Id<Plan> getId() { return null; }
 
 	@Override
 	public void setPlanId(Id<Plan> planId) { /* nothing to do here */ }
-    
+
 	@Override
 	public int getIterationCreated() { return -1; }
 

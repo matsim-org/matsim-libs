@@ -9,7 +9,8 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 class VehicleTracker implements Serializable {
     public FullDeparture getFullDeparture() {

@@ -29,7 +29,9 @@ package org.matsim.contrib.pseudosimulation.distributed.io;
  *
  * $Id:  1.1 2005/10/26 17:19:05 isenhour Exp $
  */
-import java.io.*;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.zip.Deflater;
 
 public class CompressedBlockOutputStream extends FilterOutputStream {
@@ -138,4 +140,3 @@ public class CompressedBlockOutputStream extends FilterOutputStream {
         out.close();
     }
 }
-
