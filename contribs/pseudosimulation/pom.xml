@@ -38,8 +38,8 @@
 
   <properties>
     <!-- Quality gates are monotonic ratchets. Raise these values; never lower them. -->
-    <psim.coverage.minimum.branch>0.47</psim.coverage.minimum.branch>
-    <psim.coverage.minimum.line>0.49</psim.coverage.minimum.line>
+    <psim.coverage.minimum.branch>0.49</psim.coverage.minimum.branch>
+    <psim.coverage.minimum.line>0.50</psim.coverage.minimum.line>
   </properties>
 
   <profiles>
