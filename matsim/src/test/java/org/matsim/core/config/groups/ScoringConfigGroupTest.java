@@ -532,7 +532,7 @@ import org.matsim.testcases.MatsimTestUtils;
 			final String suffix = r.nextBoolean() ? ""+ca++ : settings.getActivityType();
 
 			if ( !suffix.equals( settings.getActivityType() ) ) {
-				module.addParam( "activityType_"+suffix , ""+settings.getActivityType() );
+				module.addParam( "activityType_"+suffix , settings.getActivityType());
 			}
 
 			settings.getClosingTime().ifDefined(t -> module.addParam("activityClosingTime_" + suffix, "" + t));
