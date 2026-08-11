@@ -68,9 +68,9 @@ class BicycleTravelDisutility implements TravelDisutility {
 
 	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, ScoringConfigGroup cnScoringGroup,
 													RoutingConfigGroup routingConfigGroup, TravelTime timeCalculator, double normalization, BicycleParams bicycleParams) {
-		final ScoringConfigGroup.ModeParams bicycleModeParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
+		final ScoringConfigGroup.ModeParams bicycleModeParams = cnScoringGroup.getDefaultModeParams().get(bicycleConfigGroup.getBicycleMode());
 		if (bicycleModeParams == null) {
-			throw new NullPointerException("Mode " + bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
+			throw new NullPointerException("Mode " + bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getDefaultModeParams().keySet());
 		}
 
 		this.bicycleParams = bicycleParams;

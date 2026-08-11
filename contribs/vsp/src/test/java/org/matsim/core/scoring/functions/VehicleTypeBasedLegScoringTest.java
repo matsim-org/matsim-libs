@@ -126,10 +126,10 @@ class VehicleTypeBasedLegScoringTest {
 		);
 		freightScoring.handleTrip(TripStructureUtils.getTrips2(List.of(createLeg(TransportMode.car, 20, 30, freightTruckId))).getFirst());
 
-		assertVehicleTypeParams(privateScoringParameterSet.getModes().get("privateTruck"));
-		assertNull(privateScoringParameterSet.getModes().get("freightTruck"));
-		assertVehicleTypeParams(freightScoringParameterSet.getModes().get("freightTruck"));
-		assertNull(freightScoringParameterSet.getModes().get("privateTruck"));
+		assertVehicleTypeParams(privateScoringParameterSet.getModeParams().get("privateTruck"));
+		assertNull(privateScoringParameterSet.getModeParams().get("freightTruck"));
+		assertVehicleTypeParams(freightScoringParameterSet.getModeParams().get("freightTruck"));
+		assertNull(freightScoringParameterSet.getModeParams().get("privateTruck"));
 
 		var outFile = utils.getOutputDirectory() + "/vehicle-type-based-scoring-config.xml";
 		new ConfigWriter(config).write(outFile);
@@ -139,10 +139,10 @@ class VehicleTypeBasedLegScoringTest {
 
 		var readPrivateParams = readConfig.scoring().getScoringParameters("private");
 		var readFreightParams = readConfig.scoring().getScoringParameters("freight");
-		assertVehicleTypeParams(readPrivateParams.getModes().get("privateTruck"));
-		assertNull(readPrivateParams.getModes().get("freightTruck"));
-		assertVehicleTypeParams(readFreightParams.getModes().get("freightTruck"));
-		assertNull(readFreightParams.getModes().get("privateTruck"));
+		assertVehicleTypeParams(readPrivateParams.getModeParams().get("privateTruck"));
+		assertNull(readPrivateParams.getModeParams().get("freightTruck"));
+		assertVehicleTypeParams(readFreightParams.getModeParams().get("freightTruck"));
+		assertNull(readFreightParams.getModeParams().get("privateTruck"));
 	}
 
 	@Test
@@ -167,7 +167,7 @@ class VehicleTypeBasedLegScoringTest {
 		var scoring = new VehicleTypeBasedLegScoring(vehicles, params, scoringParameterSet, Set.of());
 		scoring.handleTrip(TripStructureUtils.getTrips2(List.of(createLeg(TransportMode.car, 20, 30, truckId))).getFirst());
 
-		var truckParams = scoringConfig.getScoringParameters(null).getModes().get("truck");
+		var truckParams = scoringConfig.getScoringParameters(null).getModeParams().get("truck");
 		assertNotNull(truckParams);
 		assertEquals(-99.0, truckParams.getConstant(), MatsimTestUtils.EPSILON);
 		assertEquals(-88.0, truckParams.getMarginalUtilityOfTraveling(), MatsimTestUtils.EPSILON);
