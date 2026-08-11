@@ -165,7 +165,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
         int[] initialWeights = getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave,
                 bytesPerPlan, bytesPerPerson, 0.0, scenario.getPopulation().getPersons().size());
-        List<Person>[] personSplit = (List<Person>[]) CollectionUtils.split(scenario.getPopulation().getPersons().values(), initialWeights);
+        List<? extends Person>[] personSplit = CollectionUtils.split(scenario.getPopulation().getPersons().values(), initialWeights);
         j = 0;
         for (int i : slaveHandlerTreeMap.keySet()) {
             List<PersonSerializable> personsToSend = new ArrayList<>();
@@ -757,7 +757,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             int timesIteration = reader.readInt();
             slaveLogger.warn(String.format("Plan signature: M%03dP%03dT%03d ", currentIteration + 1, slaveIteration, timesIteration));
             slaveLogger.warn("(M = iteration for execution on master,P = PSim iteration when plan came from on slave, T = travel time iteration from master used to generate plan on slave)");
-            Map<String, PlanSerializable> serialPlans = (Map<String, PlanSerializable>) reader.readObject();
+            Map<String, PlanSerializable> serialPlans = SerializedObjectReader.readMap(reader);
             slaveLogger.warn("RECEIVED " + serialPlans.size() + " plans from slave number " + myNumber);
             for (Entry<String, PlanSerializable> entry : serialPlans.entrySet()) {
                 plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getScenario().getPopulation()));
@@ -791,7 +791,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             slavePersonPool = new ArrayList<>();
             writer.writeInt(currentPopulationSize - targetPopulationSize);
             writer.flush();
-            slavePersonPool = (List<PersonSerializable>) reader.readObject();
+            slavePersonPool = SerializedObjectReader.readList(reader);
         }
 
         public void distributePersons() throws IOException, InterruptedException {
@@ -979,4 +979,3 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
 }
-
