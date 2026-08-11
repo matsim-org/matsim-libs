@@ -8,7 +8,18 @@ import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.strategies.*;
+import org.matsim.core.replanning.strategies.ChangeExpBeta;
+import org.matsim.core.replanning.strategies.ChangeSingleTripMode;
+import org.matsim.core.replanning.strategies.ChangeTripMode;
+import org.matsim.core.replanning.strategies.KeepLastSelected;
+import org.matsim.core.replanning.strategies.ReRoute;
+import org.matsim.core.replanning.strategies.SelectBest;
+import org.matsim.core.replanning.strategies.SelectExpBeta;
+import org.matsim.core.replanning.strategies.SelectPathSizeLogit;
+import org.matsim.core.replanning.strategies.SelectRandom;
+import org.matsim.core.replanning.strategies.SubtourModeChoice;
+import org.matsim.core.replanning.strategies.TimeAllocationMutator;
+import org.matsim.core.replanning.strategies.TimeAllocationMutatorReRoute;
 
 import com.google.inject.Provider;
 import java.util.HashMap;
@@ -142,7 +153,6 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     }
 }
-
 
 
 

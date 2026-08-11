@@ -76,11 +76,11 @@ public class PSim implements Mobsim {
     private final TravelTime carLinkTravelTimes;
     private final Collection<Plan> plans;
     private final double endTime;
-    
+
     // Encapsulates TransitPerformance, WaitTime, StopStopTime, ...
     private TransitEmulator transitEmulator = null;
     private Set<String> transitModes = new LinkedHashSet<>();
-    
+
     public PSim(Scenario sc, EventsManager eventsManager, Collection<Plan> plans, TravelTime carLinkTravelTimes) {
         LogManager.getLogger(getClass()).warn("Constructing PSim");
         this.scenario = sc;
