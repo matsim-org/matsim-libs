@@ -12,6 +12,7 @@ import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -29,10 +30,8 @@ import org.matsim.simwrapper.SimWrapperModule;
 import org.matsim.simwrapper.dashboard.*;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 
 class MATSimIterations{
 	private static final Logger log = LogManager.getLogger( MATSimIterations.class );
@@ -128,7 +127,13 @@ class MATSimIterations{
 		if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
 			controller.addOverridingModule(new RoadPricingModule(RoadPricingUtils.addOrGetRoadPricingScheme(scenario)));
 		}
-		controller.addOverridingModule(new SimWrapperModule(sw) );
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(ScoringFunctionFactory.class).to(VehicleTypeBasedScoringFunctionFactory.class);
+			}
+		});
+		controller.addOverridingModule(new SimWrapperModule(sw));
 
 		// Creating inject always adds check for unmaterialized config groups.
 		controller.getInjector();
