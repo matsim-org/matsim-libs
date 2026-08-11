@@ -227,7 +227,7 @@ public class PSim implements Mobsim {
                          */
                         PersonArrivalEvent arrivalEvent = new PersonArrivalEvent( arrivalTime, personId, act.getLinkId(), prevLeg.getMode() );
                         eventQueue.add( arrivalEvent );
-                        ActivityStartEvent startEvent = new ActivityStartEvent( arrivalTime, personId, act.getLinkId(), act.getFacilityId(), act.getType() );
+                        ActivityStartEvent startEvent = new ActivityStartEvent( arrivalTime, personId, act.getLinkId(), act.getFacilityId(), act.getType(), null );
                         eventQueue.add( startEvent );
                     }
 
@@ -237,7 +237,7 @@ public class PSim implements Mobsim {
                          * departure events.
                          */
                         Leg nextLeg = (Leg) elements.get( idx + 1 );
-                        ActivityEndEvent endEvent = new ActivityEndEvent( actEndTime, personId, act.getLinkId(), act.getFacilityId(), act.getType() );
+                        ActivityEndEvent endEvent = new ActivityEndEvent( actEndTime, personId, act.getLinkId(), act.getFacilityId(), act.getType(), null );
                         eventQueue.add( endEvent );
                         PersonDepartureEvent departureEvent = new PersonDepartureEvent( actEndTime, personId, act.getLinkId(), nextLeg.getMode(), TripStructureUtils.getRoutingMode(nextLeg) );
 

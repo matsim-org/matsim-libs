@@ -39,7 +39,9 @@ public class PSimTravelTimeCalculator implements Provider<TravelTime>, LinkEnter
 
 	@Inject
 	PSimTravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, EventsManager eventsManager, Network network, MobSimSwitcher switcher) {
-		travelTimeCalculator = new TravelTimeCalculator(network, ttconfigGroup);
+		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
+		builder.configure(ttconfigGroup);
+		travelTimeCalculator = builder.build();
 		this.switcher = switcher;
 		eventsManager.addHandler( travelTimeCalculator );
 	}

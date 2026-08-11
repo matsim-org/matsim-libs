@@ -16,6 +16,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DistributedValueObjectsTest {
 
@@ -58,6 +61,30 @@ class DistributedValueObjectsTest {
 		assertEquals(102.0, times.getLinkTravelTime(first, 1800, null, null));
 		assertEquals(203.0, times.getLinkTravelTime(second, 3500, null, null));
 		assertEquals(100.0, times.getLinkTravelTime(first, 86400, null, null));
+	}
+
+	@Test
+	void serializableTravelTimesReportOutOfRangeBinsAndReturnNormalizedTime() {
+		Network network = NetworkUtils.createNetwork();
+		Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(0, 0));
+		Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(1, 0));
+		network.addNode(from);
+		network.addNode(to);
+		Link link = network.getFactory().createLink(Id.createLinkId("link"), from, to);
+		network.addLink(link);
+		SerializableLinkTravelTimes times = new SerializableLinkTravelTimes(
+				(ignoredLink, time, person, vehicle) -> time, 900, 3600, List.of(link));
+		ByteArrayOutputStream errorBytes = new ByteArrayOutputStream();
+		PrintStream originalError = System.err;
+		try {
+			System.setErr(new PrintStream(errorBytes));
+
+			assertEquals(7200.0, times.getLinkTravelTime(link, 7200, null, null));
+		} finally {
+			System.setErr(originalError);
+		}
+
+		assertTrue(errorBytes.toString().contains("ArrayIndexOutOfBoundsException"));
 	}
 
 	@Test

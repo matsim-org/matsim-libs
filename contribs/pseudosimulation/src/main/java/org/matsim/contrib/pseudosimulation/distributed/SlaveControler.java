@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
@@ -90,6 +90,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private TransitPerformance transitPerformance;
 
+    @SuppressWarnings("deprecation") // Commons CLI 1.11 has no non-deprecated formatter replacement.
     private void printHelp(Options options) {
         String header = "The MasterControler takes the following options:\n\n";
         String footer = "";
@@ -101,16 +102,17 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         lastIterationStartTime = System.currentTimeMillis();
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
-        options.addOption(OptionBuilder.withLongOpt("config")
-                .withDescription("Config file location")
+        options.addOption(Option.builder("c")
+                .longOpt("config")
+                .desc("Config file location")
                 .hasArg(true)
-                .withArgName("CONFIG.XML")
-                .isRequired(false)
-                .create("c"));
+                .argName("CONFIG.XML")
+                .required(false)
+                .get());
         options.addOption("h", "host", true, "Host name or IP");
         options.addOption("p", "port", true, "Port number of MasterControler");
         options.addOption("t", "threads", true, "Number of threads for replanning.");
-        CommandLineParser parser = new BasicParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine commandLine = parser.parse(options, args);
 
 
@@ -218,7 +220,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         config.controller().setOutputDirectory(config.controller().getOutputDirectory() + "_" + myNumber);
         //limit IO
         config.linkStats().setWriteLinkStatsInterval(0);
-        config.controller().setCreateGraphs(false);
+        config.controller().setCreateGraphsInterval(0);
         config.controller().setWriteEventsInterval(0);
         config.controller().setWritePlansInterval(0);
         config.controller().setWriteSnapshotsInterval(0);
@@ -281,7 +283,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
+                    addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(disutilityFactory);
                 }
             });
 
