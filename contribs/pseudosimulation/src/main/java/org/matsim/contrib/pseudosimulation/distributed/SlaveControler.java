@@ -1,11 +1,7 @@
 package org.matsim.contrib.pseudosimulation.distributed;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
-import java.net.ConnectException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,7 +19,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
-import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
@@ -72,8 +67,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private double totalIterationTime;
     private Controler matsimControler;
     private TravelTime linkTravelTimes;
-    private ObjectInputStream reader;
-    private ObjectOutputStream writer;
+    private SlaveMasterSession masterSession;
     private PSimProvider pSimProvider;
     private List<Long> iterationTimes = new ArrayList<>();
     private long lastIterationStartTime;
@@ -107,45 +101,30 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         SlaveConfigPreparer.SlaveConnectionSettings connectionSettings = configPreparer.prepareForConnection(
                 config, distributedSimConfigGroup, launchArguments, System.out, System.err,
                 commandLineParser.optionsDescription());
+        memoryUsageCalculator = new MemoryUsageCalculator();
 
         /*
         * INITIALIZING COMMS
         * */
-        Socket socket = null;
-        boolean connected = false;
-        while (!connected) {
-            try {
-                socket = new Socket(connectionSettings.hostname(), connectionSettings.port());
-                connected = true;
-            } catch (ConnectException e) {
-                Thread.sleep(1000);
-            }
-        }
-        this.reader = new ObjectInputStream(socket.getInputStream());
-        this.writer = new ObjectOutputStream(socket.getOutputStream());
+        SlaveMasterSession.Connected connection = SlaveMasterSession.connect(connectionSettings, masterContext());
+        masterSession = connection.session();
+        SlaveMasterSession.Initialization initialization = connection.initialization();
+        int myNumber = initialization.number();
+        slaveLogger = masterSession.logger();
 
-        int myNumber = reader.readInt();
-        slaveLogger = LogManager.getLogger(("SLAVE_" + myNumber));
-
-        numberOfPSimIterationsPerCycle = reader.readInt();
-        numberOfPlansOnSlave = reader.readInt();
-        slaveMutationRate = reader.readDouble();
+        numberOfPSimIterationsPerCycle = initialization.iterationsPerCycle();
+        numberOfPlansOnSlave = initialization.numberOfPlans();
+        slaveMutationRate = initialization.mutationRate();
         slaveLogger.warn("Running " + numberOfPSimIterationsPerCycle + " PSim iterations for every QSim iter");
-        config.controller().setLastIteration(reader.readInt());
-        initialRouting = reader.readBoolean();
-        boolean quickReplannning = reader.readBoolean();
-        fullTransitPerformanceTransmission = reader.readBoolean();
-        boolean trackGenome = reader.readBoolean();
-        IntelligentRouters = reader.readBoolean();
-        boolean diversityGeneratingPlanSelection = reader.readBoolean();
+        config.controller().setLastIteration(initialization.lastIteration());
+        initialRouting = initialization.initialRouting();
+        boolean quickReplannning = initialization.quickReplanning();
+        fullTransitPerformanceTransmission = initialization.fullTransitPerformance();
+        boolean trackGenome = initialization.trackGenome();
+        IntelligentRouters = initialization.intelligentRouters();
+        boolean diversityGeneratingPlanSelection = initialization.diversityGeneratingPlanSelection();
 
         if (initialRouting) slaveLogger.warn("Performing initial routing.");
-
-        memoryUsageCalculator = new MemoryUsageCalculator();
-        writeMemoryStats();
-        writer.writeInt(config.global().getNumberOfThreads());
-        writer.flush();
-
 
         configPreparer.prepareForScenario(config, myNumber);
         if (slaveMutationRate > 0)
@@ -247,12 +226,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         return config;
     }
 
-    private void writeMemoryStats() throws IOException {
-        writer.writeLong(memoryUsageCalculator.getMemoryUse());
-        writer.writeLong(Runtime.getRuntime().maxMemory());
-        writer.writeInt(getTotalNumberOfPlans());
-    }
-
     private int getTotalNumberOfPlans() {
         int total = 0;
         try {
@@ -330,139 +303,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         return personsToSend;
     }
 
-    public void transmitPlans() throws IOException, ClassNotFoundException {
-        Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
-        for (Person person : matsimControler.getScenario().getPopulation().getPersons().values()) {
-            PlanSerializable planSerializable = new PlanSerializable(person.getSelectedPlan());
-            planSerializable.pSimScore = planSerializable.getScore() == null ? 0 : planSerializable.getScore();
-            tempPlansCopyForSending.put(person.getId().toString(), planSerializable);
-        }
-        Map<String, PlanSerializable> plansCopyForSending = tempPlansCopyForSending;
-        slaveLogger.warn("Sending " + plansCopyForSending.size() + " plans...");
-        writer.writeInt(currentIteration);
-        writer.writeInt(masterCurrentIteration);
-        writer.writeObject(plansCopyForSending);
-        slaveLogger.warn("Sending completed.");
-
-    }
-
-    public void transmitTravelTimes() throws IOException, ClassNotFoundException {
-        slaveLogger.warn("RECEIVING travel times...");
-        masterCurrentIteration = reader.readInt();
-        linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
-        if (config.transit().isUseTransit()) {
-//            stopStopTimes = (StopStopTime) reader.readObject();
-//            waitTimes = (WaitTime) reader.readObject();
-            if (fullTransitPerformanceTransmission) {
-                Object o = reader.readObject();
-                transitPerformance = (TransitPerformance) o;
-            }
-        }
-        slaveLogger.warn("RECEIVING travel times completed. Master at iteration number " + masterCurrentIteration);
-    }
-
-    public void transmitPerformance() throws IOException {
-        if (totalIterationTime > 0) {
-            slaveLogger.warn("Spent a total of " + totalIterationTime +
-                    " running " + executedPlanCount +
-                    " person plans for " + numberOfPSimIterationsPerCycle +
-                    " PSim iterations.");
-        }
-        writer.writeDouble(totalIterationTime);
-        writer.writeInt(matsimControler.getScenario().getPopulation().getPersons().size());
-        //send memory usage fraction of max to prevent being assigned more persons
-        writeMemoryStats();
-
-    }
-
-    public void distributePersons() throws IOException, ClassNotFoundException {
-        int masterCurrentIteration = reader.readInt();
-        List<PersonSerializable> personSerializables = SerializedObjectReader.readList(reader);
-        addPersons(personSerializables);
-        iterationTimes = new ArrayList<>();
-        executedPlanCount = 0;
-        slaveLogger.warn("Received " + personSerializables.size() + " persons. Master.currentIteration = " + masterCurrentIteration);
-    }
-
-    public void poolPersons() throws IOException {
-        slaveLogger.warn("Load balancing...");
-        int diff = reader.readInt();
-        slaveLogger.warn("Received " + diff + " as lb instr from master");
-        List<PersonSerializable> personsToSend = new ArrayList<>();
-        if (diff > 0) {
-            personsToSend = getPersonsToSend(diff);
-        }
-        writer.writeObject(personsToSend);
-        slaveLogger.warn("Sent " + personsToSend.size() + " pax to master");
-    }
-
     public void communications() {
-        SlaveCommunicationsLoop communicationsLoop = new SlaveCommunicationsLoop(
-                () -> (CommunicationsMode) reader.readObject(),
-                new SlaveCommunicationsLoop.Acknowledger() {
-                    @Override
-                    public void acknowledge() throws IOException {
-                        // Sending a boolean forces the thread on the master to wait.
-                        writer.writeBoolean(true);
-                        writer.flush();
-                    }
-
-                    @Override
-                    public void reset() throws IOException {
-                        writer.reset();
-                    }
-                },
-                communicationsOperations(), Thread::sleep, Runtime.getRuntime()::halt, slaveLogger);
-        if (!communicationsLoop.run()) {
+        if (!masterSession.communicate()) {
             somethingWentWrong = true;
         }
-    }
-
-    private SlaveCommunicationsLoop.Operations communicationsOperations() {
-        return new SlaveCommunicationsLoop.Operations() {
-            @Override
-            public void distributePersons() throws IOException, ClassNotFoundException {
-                SlaveControler.this.distributePersons();
-            }
-
-            @Override
-            public void transmitTravelTimes() throws IOException, ClassNotFoundException {
-                SlaveControler.this.transmitTravelTimes();
-            }
-
-            @Override
-            public void poolPersons() throws IOException {
-                SlaveControler.this.poolPersons();
-            }
-
-            @Override
-            public void transmitPlans() throws IOException, ClassNotFoundException {
-                SlaveControler.this.transmitPlans();
-            }
-
-            @Override
-            public void transmitSlaveStatus() throws IOException {
-                slaveIsOKForNextIter();
-            }
-
-            @Override
-            public void transmitScores() throws IOException {
-                SlaveControler.this.transmitScores();
-            }
-
-            @Override
-            public void transmitPerformance() throws IOException {
-                SlaveControler.this.transmitPerformance();
-            }
-        };
-    }
-
-    private void transmitScores() throws IOException {
-        writer.writeObject(new SlaveScoreStatsCalculator().calculateScoreStats(scenario.getPopulation()));
-    }
-
-    private void slaveIsOKForNextIter() throws IOException {
-        writer.writeBoolean(isOkForNextIter);
     }
 
     @Override
@@ -515,5 +359,36 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         communications();
         //wait for the kill signal from master
         communications();
+    }
+
+    private SlaveMasterSession.Context masterContext() {
+        return new SlaveMasterSession.Context() {
+            public Iterable<? extends Person> persons() { return scenario.getPopulation().getPersons().values(); }
+            public org.matsim.api.core.v01.population.Population population() { return scenario.getPopulation(); }
+            public int currentIteration() { return currentIteration; }
+            public int masterIteration() { return masterCurrentIteration; }
+            public boolean transitEnabled() { return config.transit().isUseTransit(); }
+            public boolean fullTransitPerformance() { return fullTransitPerformanceTransmission; }
+            public void updateTravelTimes(int iteration, SerializableLinkTravelTimes times,
+                    TransitPerformance performance) {
+                masterCurrentIteration = iteration;
+                linkTravelTimes = times;
+                transitPerformance = performance;
+            }
+            public void addPersons(List<PersonSerializable> persons, int ignoredMasterIteration) {
+                SlaveControler.this.addPersons(persons);
+                iterationTimes = new ArrayList<>();
+                executedPlanCount = 0;
+            }
+            public List<PersonSerializable> takePersons(int difference) { return getPersonsToSend(difference); }
+            public boolean ready() { return isOkForNextIter; }
+            public double totalIterationTime() { return totalIterationTime; }
+            public int executedPlanCount() { return executedPlanCount; }
+            public int iterationsPerCycle() { return numberOfPSimIterationsPerCycle; }
+            public int populationSize() { return scenario.getPopulation().getPersons().size(); }
+            public long memoryUse() { return memoryUsageCalculator.getMemoryUse(); }
+            public long maximumMemory() { return Runtime.getRuntime().maxMemory(); }
+            public int totalNumberOfPlans() { return getTotalNumberOfPlans(); }
+        };
     }
 }
