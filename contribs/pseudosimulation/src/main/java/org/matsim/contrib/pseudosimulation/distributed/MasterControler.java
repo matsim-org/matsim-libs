@@ -6,9 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,10 +52,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private int slaveNumberOfPlans=3;
     private final HashMap<String, Plan> newPlans = new HashMap<>();
     private final DynamicSlaveRegistry<MasterSlaveSession> hydra;
-    private long bytesPerPerson;
     private Scenario scenario;
-    private long scenarioMemoryUse;
-    private long bytesPerPlan;
     private static boolean initialRoutingOnSlaves = true;
     private final int slaveIterationsPerMasterIteration;
     private Config config;
@@ -70,7 +65,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private final SlaveHandlerCoordinator slaveHandlerCoordinator = SlaveHandlerCoordinator.production(masterLogger);
     private final MasterIterationOrchestrator iterationOrchestrator =
             new MasterIterationOrchestrator(iterationOperations());
-    private List<PersonSerializable> personPool;
+    private MasterLoadBalancingCoordinator loadBalancingCoordinator;
     private static int loadBalanceInterval = 5;
     public static double planAllocationLimiter = 10.0;
     public static final long bytesPerSlaveBuffer = (long) 2e8;
@@ -142,10 +137,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         scenario = ScenarioUtils.loadScenario(this.config);
 //        determine the memory use of the population for some initial load balancing
         MemoryUsageCalculator memoryUsageCalculator = new MemoryUsageCalculator();
-        scenarioMemoryUse = memoryUsageCalculator.getMemoryUse();
+        long scenarioMemoryUse = memoryUsageCalculator.getMemoryUse();
         long currentPopulationMemoryUse = memoryUsageCalculator.getMemoryUse() - scenarioMemoryUse;
-        bytesPerPlan = Math.max(1000, currentPopulationMemoryUse / getTotalNumberOfPlansOnMaster());
-        bytesPerPerson = bytesPerPlan;
+        long bytesPerPlan = Math.max(1000, currentPopulationMemoryUse / getTotalNumberOfPlansOnMaster());
+        long bytesPerPerson = bytesPerPlan;
         masterInitialLogString.append("Estimated memory use per plan is " + bytesPerPlan + " bytes\n");
 
         matsimControler = new Controler(scenario);
@@ -165,6 +160,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             maxMemoryPerSlave[j] = slaveHandlerTreeMap.get(i).maxMemory();
             j++;
         }
+        loadBalancingCoordinator = new MasterLoadBalancingCoordinator(loadBalancingSessions(),
+                loadBalancingOperations(), MasterControler::getSlaveTargetPopulationSizes, masterLogger,
+                scenarioMemoryUse, bytesPerPlan, bytesPerPerson, loadBalanceDampeningFactor);
         int[] initialWeights = getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave,
                 bytesPerPlan, bytesPerPerson, 0.0, scenario.getPopulation().getPersons().size());
         List<? extends Person>[] personSplit = CollectionUtils.split(scenario.getPopulation().getPersons().values(), initialWeights);
@@ -213,14 +211,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             matsimControler.addControllerListener(new GenomeAnalysis(true, false, true));
         }
 
-    }
-
-    private int getTotalNumberOfPlansFromSlaves() {
-        int total = 0;
-        for (MasterSlaveSession slaveHandler : slaveHandlerTreeMap.values()) {
-            total += slaveHandler.numberOfPlans();
-        }
-        return total;
     }
 
     private int getTotalNumberOfPlansOnMaster() {
@@ -306,73 +296,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
     private void loadBalance() {
-        waitForSlaveThreads();
-        //add any newly registered slaveHandlerTreeMap
-        slaveHandlerTreeMap.putAll(hydra.drainReadySlaves());
-        if (slaveHandlerTreeMap.size() < 2)
-            return;
-        startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
-        waitForSlaveThreads();
-        if (getTotalNumberOfPlansFromSlaves() > 0) {
-            bytesPerPlan = getTotalSlavePopulationMemoryUse() / getTotalNumberOfPlansFromSlaves();
-            bytesPerPerson = getTotalSlavePopulationMemoryUse() / scenario.getPopulation().getPersons().size();
-        }
-        personPool = new ArrayList<>();
-        masterLogger.warn("About to start load balancing.");
-        Set<Integer> validSlaves = new TreeSet<>();
-        Set<Integer> inValidSlaves = new TreeSet<>();
-        validSlaves.addAll(slaveHandlerTreeMap.keySet());
-        for (MasterSlaveSession slaveHandler : slaveHandlerTreeMap.values()) {
-            if (!slaveHandler.readyForNextIteration()) {
-                validSlaves.remove(slaveHandler.slaveNumber());
-                inValidSlaves.add(slaveHandler.slaveNumber());
-                slaveHandler.setTargetPopulationSize(0);
-            }
-        }
-
-        double[] totalIterationTime = new double[validSlaves.size()];
-        int[] personsPerSlave = new int[validSlaves.size()];
-        long[] usedMemoryPerSlave = new long[validSlaves.size()];
-        long[] maxMemoryPerSlave = new long[validSlaves.size()];
-        int j = 0;
-        for (int i : validSlaves) {
-            totalIterationTime[j] = slaveHandlerTreeMap.get(i).totalIterationTime();
-            personsPerSlave[j] = slaveHandlerTreeMap.get(i).currentPopulationSize();
-            usedMemoryPerSlave[j] = slaveHandlerTreeMap.get(i).usedMemory();
-            maxMemoryPerSlave[j] = slaveHandlerTreeMap.get(i).maxMemory();
-            j++;
-        }
-
-        setSlaveTargetPopulationSizes(validSlaves,
-                getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave,
-                        bytesPerPlan, bytesPerPerson, loadBalanceDampeningFactor, scenario.getPopulation().getPersons().size()));
-        startSlaveHandlersInMode(CommunicationsMode.POOL_PERSONS);
-        waitForSlaveThreads();
-        mergePersonsFromSlaves();
-        masterLogger.warn("Distributing persons between  slaveHandlerTreeMap");
-        //kill slaveHandlerTreeMap that are not ok for another round
-        for (int i : inValidSlaves) {
-            slaveHandlerTreeMap.get(i).setCommunicationsMode(CommunicationsMode.DIE);
-            new Thread(slaveHandlerTreeMap.get(i)).start();
-            slaveHandlerTreeMap.remove(i);
-        }
-        startSlaveHandlersInMode(CommunicationsMode.DISTRIBUTE_PERSONS);
-    }
-
-    private long getTotalSlavePopulationMemoryUse() {
-        long total = 0;
-        for (MasterSlaveSession slaveHandler : slaveHandlerTreeMap.values()) {
-            total += (slaveHandler.usedMemory() - scenarioMemoryUse);
-        }
-        return total;
-    }
-
-    private void setSlaveTargetPopulationSizes(Set<Integer> keys, int[] slaveTargetPopulationSizes) {
-        int j = 0;
-        for (int i : keys) {
-            slaveHandlerTreeMap.get(i).setTargetPopulationSize(slaveTargetPopulationSizes[j]);
-            j++;
-        }
+        loadBalancingCoordinator.balance();
     }
 
     private void mergePlansFromSlaves() {
@@ -381,24 +305,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             newPlans.putAll(slaveHandler.plans());
         }
 
-    }
-
-    private synchronized List<PersonSerializable> getPersonsFromPool(int diff) throws IndexOutOfBoundsException {
-        List<PersonSerializable> outList = new ArrayList<>();
-        if (diff < 0) {
-            for (int i = 0; i > diff; i--) {
-                outList.add(personPool.get(0));
-                personPool.remove(0);
-            }
-        }
-        return outList;
-    }
-
-    private void mergePersonsFromSlaves() {
-        personPool.clear();
-        for (MasterSlaveSession loadBalanceThread : slaveHandlerTreeMap.values()) {
-            personPool.addAll(loadBalanceThread.persons());
-        }
     }
 
     public static int[] getSlaveTargetPopulationSizes(double[] totalIterationTime, int[] personsPerSlave,
@@ -441,6 +347,48 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 fullTransitPerformanceTransmission,
                 TrackGenome,
                 intelligentRouters));
+    }
+
+    private MasterLoadBalancingCoordinator.Sessions loadBalancingSessions() {
+        return new MasterLoadBalancingCoordinator.Sessions() {
+            public int size() { return slaveHandlerTreeMap.size(); }
+            public java.util.Set<Integer> ids() { return slaveHandlerTreeMap.keySet(); }
+            public java.util.Collection<? extends MasterLoadBalancingCoordinator.Participant> all() {
+                return slaveHandlerTreeMap.values().stream().map(MasterControler.this::loadBalancingParticipant).toList();
+            }
+            public MasterLoadBalancingCoordinator.Participant get(int number) {
+                return loadBalancingParticipant(slaveHandlerTreeMap.get(number));
+            }
+        };
+    }
+
+    private MasterLoadBalancingCoordinator.Participant loadBalancingParticipant(MasterSlaveSession session) {
+        return new MasterLoadBalancingCoordinator.Participant() {
+            public int number() { return session.slaveNumber(); }
+            public boolean ready() { return session.readyForNextIteration(); }
+            public int numberOfPlans() { return session.numberOfPlans(); }
+            public double totalIterationTime() { return session.totalIterationTime(); }
+            public int currentPopulationSize() { return session.currentPopulationSize(); }
+            public long usedMemory() { return session.usedMemory(); }
+            public long maximumMemory() { return session.maxMemory(); }
+            public java.util.Collection<? extends PersonSerializable> persons() { return session.persons(); }
+            public void targetPopulationSize(int value) { session.setTargetPopulationSize(value); }
+        };
+    }
+
+    private MasterLoadBalancingCoordinator.Operations loadBalancingOperations() {
+        return new MasterLoadBalancingCoordinator.Operations() {
+            public void waitForSlaves() { waitForSlaveThreads(); }
+            public void admitReadySessions() { slaveHandlerTreeMap.putAll(hydra.drainReadySlaves()); }
+            public void start(CommunicationsMode mode) { startSlaveHandlersInMode(mode); }
+            public int populationSize() { return scenario.getPopulation().getPersons().size(); }
+            public void terminate(int number) {
+                MasterSlaveSession session = slaveHandlerTreeMap.get(number);
+                session.setCommunicationsMode(CommunicationsMode.DIE);
+                new Thread(session).start();
+                slaveHandlerTreeMap.remove(number);
+            }
+        };
     }
 
     private MasterIterationOrchestrator.Operations iterationOperations() {
@@ -501,7 +449,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
             @Override
             public List<PersonSerializable> takePersons(int difference) {
-                return getPersonsFromPool(difference);
+                return loadBalancingCoordinator.takePersons(difference);
             }
 
             @Override
