@@ -60,8 +60,8 @@ historic debt to be repaired in this setup change:
   local filter records two narrowly matched compatibility boundaries: forced
   garbage collection and intentionally extensible strategy registries.
 - Tests permit no failures.
-- JaCoCo requires at least 48% line coverage and 46% branch coverage. The
-  current suite measures 48.29% line coverage and 46.39% branch coverage on
+- JaCoCo requires at least 49% line coverage and 47% branch coverage. The
+  current suite measures 49.64% line coverage and 47.83% branch coverage on
   Java 25.
 
 In addition, `quality/metrics-baseline.properties` records a comparable quality
