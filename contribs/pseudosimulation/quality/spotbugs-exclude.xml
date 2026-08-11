@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!-- Intentional legacy garbage collection in memory-measurement helpers. -->
+  <Match>
+    <Class name="org.matsim.contrib.pseudosimulation.distributed.MemoryUsageCalculator"/>
+    <Bug pattern="DM_GC"/>
+  </Match>
+  <Match>
+    <Class name="org.matsim.contrib.pseudosimulation.distributed.SlaveControler"/>
+    <Bug pattern="DM_GC"/>
+  </Match>
+
+  <!-- Public mutable legacy API; making these fields final may affect clients. -->
+  <Match>
+    <Class name="org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration"/>
+    <Field name="SupportedSelectors"/>
+    <Bug pattern="MS_SHOULD_BE_FINAL"/>
+  </Match>
+  <Match>
+    <Class name="org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration"/>
+    <Field name="SupportedMutators"/>
+    <Bug pattern="MS_SHOULD_BE_FINAL"/>
+  </Match>
+  <Match>
+    <Class name="org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration"/>
+    <Field name="SupportedMutatorGenes"/>
+    <Bug pattern="MS_SHOULD_BE_FINAL"/>
+  </Match>
+</FindBugsFilter>
