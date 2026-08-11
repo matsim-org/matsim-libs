@@ -657,6 +657,65 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		return params;
 	}
 
+	/**
+	 * Sets the scoring parameters of an existing subpopulation as the default subpopulation.
+	 *
+	 * @param subpopulation the subpopulation whose scoring parameters should be used as default
+	 * @return the scoring parameters registered for {@link #DEFAULT_SUBPOPULATION}
+	 * @throws RuntimeException if no scoring parameters exist for the given subpopulation
+	 * @throws RuntimeException if scoring parameters for {@link #DEFAULT_SUBPOPULATION} already exist
+	 */
+	public ScoringParameterSet setScoringParametersAsDefaultSubpopulation(String subpopulation) {
+		final ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (params == null) {
+			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
+		}
+		return setScoringParametersAsDefaultSubpopulation(params);
+	}
+
+	/**
+	 * Sets the given scoring parameters as the default subpopulation.
+	 *
+	 * @param params the scoring parameters to use as default
+	 * @return the scoring parameters registered for {@link #DEFAULT_SUBPOPULATION}
+	 * @throws RuntimeException if scoring parameters for {@link #DEFAULT_SUBPOPULATION} already exist and {@code params} is not that default set
+	 */
+	public ScoringParameterSet setScoringParametersAsDefaultSubpopulation(ScoringParameterSet params) {
+		testForLocked();
+		if (DEFAULT_SUBPOPULATION.equals(params.getSubpopulation())) {
+			return params;
+		}
+		if (getAllScoringParameterSetsPerSubpopulation().containsKey(DEFAULT_SUBPOPULATION)) {
+			throw new RuntimeException("ScoringParams for default subpopulation are already defined");
+		}
+
+		final ScoringParameterSet defaultParams = copyScoringParameterSet(params, DEFAULT_SUBPOPULATION);
+		addScoringParameterSet(defaultParams);
+		return defaultParams;
+	}
+
+	private static ScoringParameterSet copyScoringParameterSet(ScoringParameterSet source, String subpopulation) {
+		final ScoringParameterSet copy = new ScoringParameterSet(subpopulation);
+
+		copy.lateArrival = source.lateArrival;
+		copy.earlyDeparture = source.earlyDeparture;
+		copy.performing = source.performing;
+		copy.waiting = source.waiting;
+		copy.marginalUtilityOfMoney = source.marginalUtilityOfMoney;
+		copy.utilityOfLineSwitch = source.utilityOfLineSwitch;
+		copy.waitingPt = source.waitingPt;
+
+		for (Collection<? extends ConfigGroup> sourceSets : source.getParameterSets().values()) {
+			for (ConfigGroup sourceSet : sourceSets) {
+				final ConfigGroup copySet = copy.createParameterSet(sourceSet.getName());
+				ConfigUtils.copyFromTo(sourceSet, copySet);
+				copy.addParameterSet(copySet);
+			}
+		}
+
+		return copy;
+	}
+
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
 		switch (set.getName()) {
