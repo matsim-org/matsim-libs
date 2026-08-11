@@ -3,11 +3,8 @@ package org.matsim.contrib.pseudosimulation.distributed;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.cli.ParseException;
@@ -59,25 +56,19 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private static double slaveMutationRate;
     private final int numberOfPlansOnSlave;
     private boolean initialRouting;
-    private int numberOfIterations = -1;
-    private int executedPlanCount;
-    private int currentIteration = 0;
     private int masterCurrentIteration = -1;
     private Config config;
-    private double totalIterationTime;
     private Controler matsimControler;
     private TravelTime linkTravelTimes;
     private SlaveMasterSession masterSession;
     private PSimProvider pSimProvider;
-    private List<Long> iterationTimes = new ArrayList<>();
-    private long lastIterationStartTime;
-    private boolean somethingWentWrong = false;
     private boolean isOkForNextIter = true;
-    private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private TransitPerformance transitPerformance;
+    private final SlaveIterationOrchestrator iterationOrchestrator;
+    private final SelectedPlanScorePreserver scorePreserver = new SelectedPlanScorePreserver();
 
     public SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
-        lastIterationStartTime = System.currentTimeMillis();
+        iterationOrchestrator = new SlaveIterationOrchestrator(iterationOperations());
         System.setProperty("matsim.preferLocalDtds", "true");
         SlaveCommandLineParser commandLineParser = new SlaveCommandLineParser();
         SlaveLaunchArguments launchArguments = commandLineParser.parse(args);
@@ -118,6 +109,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         slaveLogger.warn("Running " + numberOfPSimIterationsPerCycle + " PSim iterations for every QSim iter");
         config.controller().setLastIteration(initialization.lastIteration());
         initialRouting = initialization.initialRouting();
+        iterationOrchestrator.configure(initialRouting, numberOfPSimIterationsPerCycle);
         boolean quickReplannning = initialization.quickReplanning();
         fullTransitPerformanceTransmission = initialization.fullTransitPerformance();
         boolean trackGenome = initialization.trackGenome();
@@ -248,38 +240,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
-        if (numberOfIterations >= 0 || initialRouting)
-            iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
-// send plans only after the previous iteration has completed
-        if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterationsPerCycle == 0)) {
-            this.totalIterationTime = getTotalIterationTime();
-            communications();
-            if (somethingWentWrong) Runtime.getRuntime().halt(0);
-            initialRouting = false;
-        }
-        this.currentIteration = event.getIteration();
-        lastIterationStartTime = System.currentTimeMillis();
-        travelTime.setTravelTime(linkTravelTimes);
-        pSimProvider.setTravelTime(linkTravelTimes);
-        if (config.transit().isUseTransit()) {
-//            pSimProvider.setStopStopTime(stopStopTimes);
-//            pSimProvider.setWaitTime(waitTimes);
-//            pSimProvider.setTransitPerformance(transitPerformance);
-//            if (transitRouterEventsWSFactory != null) {
-//                transitRouterEventsWSFactory.setStopStopTimeCalculator(stopStopTimes);
-//                transitRouterEventsWSFactory.setWaitTimeCalculator(waitTimes);
-//            }
-        }
-        plancatcher.init();
-        numberOfIterations++;
+        iterationOrchestrator.iterationStarts(event.getIteration());
     }
 
     public double getTotalIterationTime() {
-        double sumTimes = 0;
-        for (long t : iterationTimes) {
-            sumTimes += t;
-        }
-        return sumTimes;
+        return iterationOrchestrator.sumIterationTimes();
     }
 
     private void addPersons(List<PersonSerializable> persons) {
@@ -304,14 +269,12 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
 
     public void communications() {
-        if (!masterSession.communicate()) {
-            somethingWentWrong = true;
-        }
+        iterationOrchestrator.communicateNow();
     }
 
     @Override
     public void notifyStartup(StartupEvent event) {
-        communications();
+        iterationOrchestrator.startup();
     }
 
 
@@ -323,49 +286,26 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        selectedPlanScoreMemory = new HashMap<>(scenario.getPopulation().getPersons().size());
-        if (event.getIteration() == 0) {
-            plancatcher.init();
-            for (Person person : scenario.getPopulation().getPersons().values()) {
-                plancatcher.addPlansForPsim(person.getSelectedPlan());
-            }
-        } else {
-            for (Person person : scenario.getPopulation().getPersons().values()) {
-                selectedPlanScoreMemory.put(person.getId(), person.getSelectedPlan().getScore());
-            }
-            for (Plan plan : plancatcher.getPlansForPSim()) {
-                selectedPlanScoreMemory.remove(plan.getPerson().getId());
-            }
-        }
-
-        executedPlanCount += plancatcher.getPlansForPSim().size();
+        scorePreserver.beforeMobsim(event.getIteration(), scenario.getPopulation(), plancatcher);
     }
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        Iterator<Map.Entry<Id<Person>, Double>> iterator = selectedPlanScoreMemory.entrySet().iterator();
 //        StopStopTimeCalculatorSerializable.printCallStatisticsAndReset();
 //        WaitTimeCalculatorSerializable.printCallStatisticsAndReset();
-        while (iterator.hasNext()) {
-            Map.Entry<Id<Person>, Double> entry = iterator.next();
-            scenario.getPopulation().getPersons().get(entry.getKey()).getSelectedPlan().setScore(entry.getValue());
-        }
+        scorePreserver.afterMobsim(scenario.getPopulation());
     }
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {
-        //send the last iteratin's plans
-        this.totalIterationTime = getTotalIterationTime();
-        communications();
-        //wait for the kill signal from master
-        communications();
+        iterationOrchestrator.shutdown();
     }
 
     private SlaveMasterSession.Context masterContext() {
         return new SlaveMasterSession.Context() {
             public Iterable<? extends Person> persons() { return scenario.getPopulation().getPersons().values(); }
             public org.matsim.api.core.v01.population.Population population() { return scenario.getPopulation(); }
-            public int currentIteration() { return currentIteration; }
+            public int currentIteration() { return iterationOrchestrator.currentIteration(); }
             public int masterIteration() { return masterCurrentIteration; }
             public boolean transitEnabled() { return config.transit().isUseTransit(); }
             public boolean fullTransitPerformance() { return fullTransitPerformanceTransmission; }
@@ -377,18 +317,30 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             }
             public void addPersons(List<PersonSerializable> persons, int ignoredMasterIteration) {
                 SlaveControler.this.addPersons(persons);
-                iterationTimes = new ArrayList<>();
-                executedPlanCount = 0;
+                iterationOrchestrator.resetIterationTimes();
+                scorePreserver.resetExecutedPlanCount();
             }
             public List<PersonSerializable> takePersons(int difference) { return getPersonsToSend(difference); }
             public boolean ready() { return isOkForNextIter; }
-            public double totalIterationTime() { return totalIterationTime; }
-            public int executedPlanCount() { return executedPlanCount; }
+            public double totalIterationTime() { return iterationOrchestrator.totalIterationTime(); }
+            public int executedPlanCount() { return scorePreserver.executedPlanCount(); }
             public int iterationsPerCycle() { return numberOfPSimIterationsPerCycle; }
             public int populationSize() { return scenario.getPopulation().getPersons().size(); }
             public long memoryUse() { return memoryUsageCalculator.getMemoryUse(); }
             public long maximumMemory() { return Runtime.getRuntime().maxMemory(); }
             public int totalNumberOfPlans() { return getTotalNumberOfPlans(); }
+        };
+    }
+
+    private SlaveIterationOrchestrator.Operations iterationOperations() {
+        return new SlaveIterationOrchestrator.Operations() {
+            public boolean communicate() { return masterSession.communicate(); }
+            public void halt() { Runtime.getRuntime().halt(0); }
+            public void activateTravelTime() {
+                travelTime.setTravelTime(linkTravelTimes);
+                pSimProvider.setTravelTime(linkTravelTimes);
+            }
+            public void initializePlanCatcher() { plancatcher.init(); }
         };
     }
 }
