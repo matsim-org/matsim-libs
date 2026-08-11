@@ -153,6 +153,41 @@ public class ConfigConsistencyCheckerImplTest {
 
 	}
 
+	@Test
+	void testCheckScoring_SubpopulationTraveling() {
+		Config config = new Config();
+		config.addCoreModules();
+
+		ScoringConfigGroup.ScoringParameterSet scoringParameters =
+			config.scoring().getOrCreateScoringParameters("freight");
+		scoringParameters.addModeParams(new ScoringConfigGroup.ModeParams(TransportMode.car)
+			.setMarginalUtilityOfTraveling(3.0));
+
+		LogCounter logger = new LogCounter(Level.WARN);
+		try {
+			logger.activate();
+			ConfigConsistencyCheckerImpl.checkScoring(config);
+			Assertions.assertEquals(1, logger.getWarnCount());
+		} finally {
+			// make sure counter is deactivated at the end
+			logger.deactivate();
+		}
+	}
+
+	@Test
+	void testCheckScoring_SubpopulationPtInteractionActivity() {
+		Config config = new Config();
+		config.addCoreModules();
+
+		ScoringConfigGroup.ScoringParameterSet scoringParameters =
+			config.scoring().getOrCreateScoringParameters("freight");
+		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		transitActivityParams.setClosingTime(1.);
+		scoringParameters.addActivityParams(transitActivityParams);
+
+		Assertions.assertThrows(RuntimeException.class, () -> ConfigConsistencyCheckerImpl.checkScoring(config));
+	}
+
 
 	@Test
 	void checkConsistencyBetweenRouterAndTravelTimeCalculatorTest(){
