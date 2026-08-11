@@ -541,7 +541,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             output.put(i, ((int) Math.ceil(popSize / timesPerPlan[i] / sumOfReciprocals)));
             total += output.get(i);
         }
-        int j = 0; // TODO ??????
         while (total > popSize) {
             for (int i : validSlaveIndices) {
                 output.put(i, output.get(i) - 1);
