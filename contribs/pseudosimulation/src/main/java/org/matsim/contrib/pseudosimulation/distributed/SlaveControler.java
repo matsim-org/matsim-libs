@@ -34,10 +34,8 @@ import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.
 import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
-import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -230,7 +228,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         config.eventsManager().setSynchronizeOnSimSteps(false);
         config.eventsManager().setNumberOfThreads(1);
         if (slaveMutationRate > 0)
-            setReplanningWeights(config, slaveMutationRate);
+            new ReplanningWeightUpdater().updateSlave(config, slaveMutationRate);
 
         scenario = ScenarioUtils.loadScenario(config);
 
@@ -582,39 +580,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             scenario.getPopulation().getPersons().get(entry.getKey()).getSelectedPlan().setScore(entry.getValue());
         }
     }
-
-    private void setReplanningWeights(Config config, double mutationRate) {
-        if (mutationRate > 1)
-            mutationRate = 0.9999;
-        List<ReplanningConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
-        strategySettings.addAll(config.replanning().getStrategySettings());
-        Map<Integer, Double> selectors = new HashMap<>();
-        Map<Integer, Double> mutators = new HashMap<>();
-        for (int i = 0; i < strategySettings.size(); i++) {
-            ReplanningConfigGroup.StrategySettings setting = strategySettings.get(i);
-            if (DistributedPlanStrategyTranslationAndRegistration.SupportedSelectors.keySet().contains(setting.getStrategyName()))
-                selectors.put(i, setting.getWeight());
-            else {
-                mutators.put(i, setting.getWeight());
-            }
-        }
-
-        double mutatorSum = CollectionUtils.sumElements(mutators.values());
-        double selectorSum = CollectionUtils.sumElements(selectors.values());
-        // set to new weight
-        for (Map.Entry<Integer, Double> entry : selectors.entrySet()) {
-            strategySettings.get(entry.getKey()).setWeight((1 - mutationRate) * entry.getValue() / selectorSum);
-        }
-        for (Map.Entry<Integer, Double> entry : mutators.entrySet()) {
-            strategySettings.get(entry.getKey()).setWeight(mutationRate * entry.getValue() / mutatorSum);
-        }
-        //put it back in the config
-        config.replanning().clearStrategySettings();
-        for (ReplanningConfigGroup.StrategySettings strategySetting : strategySettings) {
-            config.replanning().addStrategySettings(strategySetting);
-        }
-    }
-
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {
