@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.utils.LogCounter;
@@ -38,14 +39,14 @@ import java.util.Set;
 public class ConfigConsistencyCheckerImplTest {
 
 	@Test
-	void testCheckPlanCalcScore_DefaultsOk() {
+	void testCheckScoring_DefaultsOk() {
 		Config config = new Config();
 		config.addCoreModules();
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
 			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(0, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
@@ -54,7 +55,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	void testCheckPlanCalcScore_Traveling() {
+	void testCheckScoring_Traveling() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -63,7 +64,7 @@ public class ConfigConsistencyCheckerImplTest {
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
 			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
@@ -72,7 +73,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	void testCheckPlanCalcScore_TravelingPt() {
+	void testCheckScoring_TravelingPt() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -81,7 +82,7 @@ public class ConfigConsistencyCheckerImplTest {
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
 			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
@@ -90,7 +91,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	void testCheckPlanCalcScore_TravelingBike() {
+	void testCheckScoring_TravelingBike() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -99,7 +100,7 @@ public class ConfigConsistencyCheckerImplTest {
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
 			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
@@ -108,7 +109,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	void testCheckPlanCalcScore_TravelingWalk() {
+	void testCheckScoring_TravelingWalk() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -117,7 +118,7 @@ public class ConfigConsistencyCheckerImplTest {
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
 			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
@@ -126,7 +127,7 @@ public class ConfigConsistencyCheckerImplTest {
 	}
 
 	@Test
-	void testCheckPlanCalcScore_PtInteractionActivity() {
+	void testCheckScoring_PtInteractionActivity() {
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -135,7 +136,7 @@ public class ConfigConsistencyCheckerImplTest {
 		config.scoring().addActivityParams(transitActivityParams);
 
 		try {
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkScoring(config);
 			Assertions.assertEquals(0,1) ; // should never get here
 		} catch ( Exception ee ){
 
@@ -145,7 +146,7 @@ public class ConfigConsistencyCheckerImplTest {
 		config.vspExperimental().setAbleToOverwritePtInteractionParams(true) ;
 
 		try {
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config );
+			ConfigConsistencyCheckerImpl.checkScoring(config );
 		} catch ( Exception ee ){
 			Assertions.assertEquals(0,1) ; // should never get here
 		}
