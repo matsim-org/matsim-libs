@@ -1,8 +1,6 @@
 package org.matsim.contrib.pseudosimulation.distributed;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,37 +99,30 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         slaveIterationsPerMasterIteration = distributedSimConfigGroup.getSlaveIterationsPerMasterIteration();
         fullTransitPerformanceTransmission = distributedSimConfigGroup.isFullTransitPerformanceTransmission();
 
-        slaveHandlerTreeMap = new TreeMap<>();
         slaveScoreStats = new SlaveScoreStats(this.config);
 
         innovationEndsAtIter = new ReplanningWeightUpdater().updateMaster(
                 this.config, masterMutationRate, masterBorrowingRate);
 
-//        register initial number of slaves
-        ServerSocket writeServer = new ServerSocket(masterPortNumber);
-        for (int i = 0; i < initialNumberOfSlaves; i++) {
-            Socket socket = writeServer.accept();
-            System.out.println("Slave " + (i + 1) + " out of an initial " + initialNumberOfSlaves + " accepted.\n");
-            MasterSlaveSession slaveHandler = new MasterSlaveSession(socket, slaveUniqueNumber, masterSlaveContext());
-            slaveHandlerTreeMap.put(slaveUniqueNumber, slaveHandler);
-            //order is important
-            initializeSlave(slaveHandler, slaveUniqueNumber++, initialRoutingOnSlaves);
-            Thread.sleep(10);
-        }
-        writeServer.close();
+        MasterStartupBootstrap<MasterSlaveSession, DynamicSlaveRegistry<MasterSlaveSession>> bootstrap =
+                MasterStartupBootstrap.production(masterPortNumber, initialNumberOfSlaves,
+                        (socket, id) -> new MasterSlaveSession(socket, id, masterSlaveContext()),
+                        this::initializeSlave,
+                        idSupplier -> DynamicSlaveRegistry.production(
+                                masterPortNumber,
+                                (socket, id) -> new MasterSlaveSession(socket, id, masterSlaveContext()),
+                                idSupplier,
+                                (slaveHandler, id) -> initializeSlave(slaveHandler, id, false),
+                                slaveHandler -> slaveHandler.setPersons(new ArrayList<>()),
+                                MasterSlaveSession::readyForNextIteration,
+                                MasterSlaveSession::slaveNumber,
+                                masterLogger),
+                        slaveIds());
+        MasterStartupBootstrap.Result<MasterSlaveSession, DynamicSlaveRegistry<MasterSlaveSession>> startup =
+                bootstrap.start();
+        slaveHandlerTreeMap = startup.initialSlaves();
         masterInitialLogString.append("MASTER accepted minimum number of incoming connections. All further slaves will be registered on the Hydra.\n");
-        hydra = DynamicSlaveRegistry.production(
-                masterPortNumber,
-                (socket, id) -> new MasterSlaveSession(socket, id, masterSlaveContext()),
-                () -> slaveUniqueNumber++,
-                (slaveHandler, id) -> initializeSlave(slaveHandler, id, false),
-                slaveHandler -> slaveHandler.setPersons(new ArrayList<>()),
-                MasterSlaveSession::readyForNextIteration,
-                MasterSlaveSession::slaveNumber,
-                masterLogger);
-        Thread hydraThread = new Thread(hydra);
-        hydraThread.setName("HYDRA");
-        hydraThread.start();
+        hydra = startup.registry();
 
 
         scenario = ScenarioUtils.loadScenario(this.config);
@@ -347,6 +338,18 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 fullTransitPerformanceTransmission,
                 TrackGenome,
                 intelligentRouters));
+    }
+
+    private MasterStartupBootstrap.IdSequence slaveIds() {
+        return new MasterStartupBootstrap.IdSequence() {
+            public int current() {
+                return slaveUniqueNumber;
+            }
+
+            public void advance() {
+                slaveUniqueNumber++;
+            }
+        };
     }
 
     private MasterLoadBalancingCoordinator.Sessions loadBalancingSessions() {
