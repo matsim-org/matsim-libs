@@ -195,7 +195,7 @@ public class PtAlongALine2Test {
 
 		// === SCORING: ===
 
-		double margUtlTravPt = config.scoring().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+		double margUtlTravPt = config.scoring().getDefaultModeParams().get(TransportMode.pt).getMarginalUtilityOfTraveling();
 		if (drtMode != DrtMode.none) {
 			// (scoring parameters for drt modes)
 			config.scoring()
@@ -654,8 +654,7 @@ public class PtAlongALine2Test {
 
 		// === SCORING: ===
 		{
-			double margUtlTravPt = config.scoring()
-					.getModes()
+			double margUtlTravPt = config.scoring().getDefaultModeParams()
 					.get(TransportMode.pt)
 					.getMarginalUtilityOfTraveling();
 			config.scoring()

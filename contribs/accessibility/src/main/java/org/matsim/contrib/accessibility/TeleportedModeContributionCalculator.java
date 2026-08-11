@@ -38,9 +38,9 @@ public class TeleportedModeContributionCalculator implements AccessibilityContri
 		this.mode = mode;
 		this.scoringConfigGroup = scoringConfigGroup;
 
-		this.betaTT_h = scoringConfigGroup.getModes().get(mode).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		this.betaDist_m = scoringConfigGroup.getModes().get(mode).getMarginalUtilityOfDistance();
-		this.asc = scoringConfigGroup.getModes().get(mode).getConstant();
+		this.betaTT_h = scoringConfigGroup.getDefaultModeParams().get(mode).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		this.betaDist_m = scoringConfigGroup.getDefaultModeParams().get(mode).getMarginalUtilityOfDistance();
+		this.asc = scoringConfigGroup.getDefaultModeParams().get(mode).getConstant();
 
 	}
 

@@ -416,7 +416,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 					throw new RuntimeException("unexpected setting; aborting ... ");
 			}
 		}
-		for (ModeParams params : config.scoring().getModes().values()) {
+		for (ModeParams params : config.scoring().getDefaultModeParams().values()) {
 			if (params.getMonetaryDistanceRate() > 0.) {
 				problem = true;
 				System.out.flush();
@@ -428,10 +428,10 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 
-		if (config.scoring().getModes().get( car ) != null && config.scoring().getModes().get( car ).getMonetaryDistanceRate() > 0) {
+		if (config.scoring().getDefaultModeParams().get( car ) != null && config.scoring().getDefaultModeParams().get( car ).getMonetaryDistanceRate() > 0) {
 			problem = true;
 		}
-		final ModeParams modeParamsPt = config.scoring().getModes().get( pt );
+		final ModeParams modeParamsPt = config.scoring().getDefaultModeParams().get( pt );
 		if (modeParamsPt != null && modeParamsPt.getMonetaryDistanceRate() > 0) {
 			problem = true;
 			System.out.flush();
