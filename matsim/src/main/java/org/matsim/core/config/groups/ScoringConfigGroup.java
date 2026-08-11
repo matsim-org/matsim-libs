@@ -505,7 +505,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		if (scoringParameterSet != null)
 			return scoringParameterSet.getModeParams();
 		else
-			throw new RuntimeException("Default subpopulation is not defined");
+			throw new RuntimeException("Mode parameters for subpopulation " + subpopulation + " are not defined");
 	}
 
 	/**
