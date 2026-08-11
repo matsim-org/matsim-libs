@@ -454,7 +454,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added apr'21:
-		for (Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> entry : config.scoring().getScoringParametersPerSubpopulation().entrySet()) {
+		for (Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> entry : config.scoring().getAllScoringParameterSetsPerSubpopulation().entrySet()) {
 			for (ActivityParams activityParam : entry.getValue().getActivityParams()) {
 				if (activityParam.getMinimalDuration().isDefined()) {
 					log.log(lvl, "Vsp default is to not define minimal duration.  Activity type=" + activityParam.getActivityType() + "; subpopulation=" + entry.getKey());

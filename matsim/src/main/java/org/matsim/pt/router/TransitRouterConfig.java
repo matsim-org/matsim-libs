@@ -114,7 +114,7 @@ public class TransitRouterConfig implements MatsimParameters {
 	{
 		pcsConfig.setLocked(); routingConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
 
-		if (pcsConfig.getScoringParametersPerSubpopulation().size()>1){
+		if (pcsConfig.getAllScoringParameterSetsPerSubpopulation().size()>1){
 			subPopulationWarning.warn("More than one subpopulation is used in plansCalcScore. "
 				+ "This is not currently implemented in the TransitRouter (but should work for scoring),"
 				+ " so the values for the \"default\" subpopulation will be used. (jb, Feb 2018)");
