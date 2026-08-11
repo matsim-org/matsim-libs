@@ -60,15 +60,42 @@ historic debt to be repaired in this setup change:
   local filter baselines five precisely matched legacy findings whose immediate
   fixes could change runtime or API behavior.
 - Tests permit no failures.
-- JaCoCo requires at least 9% line coverage and 8% branch coverage. The initial
-  baseline measured 236 of 2,567 lines (9.19%) and 65 of 743 branches (8.75%)
-  using `RunPSimTest` on Java 25.
+- JaCoCo requires at least 30% line coverage and 28% branch coverage. The
+  characterization suite measured 806 of 2,577 lines (31.28%) and 219 of 743
+  branches (29.48%) on Java 25.
 
-The two coverage properties live in `pom.xml`. Treat every gate as a monotonic
-ratchet: increase coverage floors, add lint rules, and increase SpotBugs effort
-or sensitivity as the refactor progresses. Never lower or remove a gate merely
-to make a change pass. Narrow, documented exclusions are acceptable only when
-a finding is proven to be a false positive and cannot be expressed more safely.
+In addition, `quality/metrics-baseline.properties` records a comparable quality
+scorecard. The final harness stage prints current values, baselines, deltas, and
+the result for each independent metric:
+
+- line and branch coverage may not decrease;
+- the number of executed tests may not decrease;
+- test failures, errors, and skipped tests may not increase;
+- Checkstyle violations and non-baselined SpotBugs findings may not increase.
+
+Run the scorecard alone after the Maven reports have been generated:
+
+```bash
+contribs/pseudosimulation/scripts/quality-metrics.sh --check
+```
+
+When metrics improve, ratchet the committed baseline upward with:
+
+```bash
+contribs/pseudosimulation/scripts/quality-metrics.sh --ratchet
+```
+
+The ratchet refuses to write a baseline if any metric regressed. Review and
+commit the resulting baseline change alongside the tests or quality fix that
+caused the improvement. `--report` prints deltas without enforcing them.
+
+The two coarse Maven coverage properties live in `pom.xml`; the scorecard keeps
+the more precise iteration-to-iteration baseline. Treat every gate as a
+monotonic ratchet: increase coverage floors, add lint rules, and increase
+SpotBugs effort or sensitivity as the refactor progresses. Never lower or
+remove a gate merely to make a change pass. Narrow, documented exclusions are
+acceptable only when a finding is proven to be a false positive and cannot be
+expressed more safely.
 
 JaCoCo's HTML report is written to `target/site/jacoco/index.html`. Surefire and
 SpotBugs details are written under `target/surefire-reports` and
