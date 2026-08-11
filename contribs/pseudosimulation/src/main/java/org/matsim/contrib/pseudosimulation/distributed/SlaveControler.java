@@ -397,57 +397,64 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
 
     public void communications() {
-        CommunicationsMode communicationsMode = CommunicationsMode.WAIT;
-        slaveLogger.warn("Initializing communications...");
-        try {
-            while (!communicationsMode.equals(CommunicationsMode.CONTINUE)) {
-                communicationsMode = (CommunicationsMode) reader.readObject();
-                switch (communicationsMode) {
-                    case TRANSMIT_SCENARIO:
-                        distributePersons();
-                        break;
-                    case TRANSMIT_TRAVEL_TIMES:
-                        transmitTravelTimes();
-                        break;
-                    case POOL_PERSONS:
-                        poolPersons();
-                        break;
-                    case DISTRIBUTE_PERSONS:
-                        distributePersons();
-                        break;
-                    case TRANSMIT_PLANS_TO_MASTER:
-                        transmitPlans();
-                        slaveIsOKForNextIter();
-                        break;
-                    case TRANSMIT_SCORES:
-                        transmitScores();
-                        break;
-                    case TRANSMIT_PERFORMANCE:
-                        transmitPerformance();
-                        break;
-                    case CONTINUE:
-                        break;
-                    case WAIT:
-                        Thread.sleep(10);
-                        break;
-                    case DIE:
-                        slaveLogger.error("Got the kill signal from MASTER. Bye.");
-                        Runtime.getRuntime().halt(0);
-                        break;
+        SlaveCommunicationsLoop communicationsLoop = new SlaveCommunicationsLoop(
+                () -> (CommunicationsMode) reader.readObject(),
+                new SlaveCommunicationsLoop.Acknowledger() {
+                    @Override
+                    public void acknowledge() throws IOException {
+                        // Sending a boolean forces the thread on the master to wait.
+                        writer.writeBoolean(true);
+                        writer.flush();
+                    }
 
-                }
-                // sending a boolean forces the thread on the master to wait
-                writer.writeBoolean(true);
-                writer.flush();
-            }
-            writer.reset();
-        } catch (ClassNotFoundException | IOException | InterruptedException e) {
-            e.printStackTrace();
-            slaveLogger.error("Something went wrong. Exiting.");
+                    @Override
+                    public void reset() throws IOException {
+                        writer.reset();
+                    }
+                },
+                communicationsOperations(), Thread::sleep, Runtime.getRuntime()::halt, slaveLogger);
+        if (!communicationsLoop.run()) {
             somethingWentWrong = true;
-            return;
         }
-        slaveLogger.warn("Communications completed.");
+    }
+
+    private SlaveCommunicationsLoop.Operations communicationsOperations() {
+        return new SlaveCommunicationsLoop.Operations() {
+            @Override
+            public void distributePersons() throws IOException, ClassNotFoundException {
+                SlaveControler.this.distributePersons();
+            }
+
+            @Override
+            public void transmitTravelTimes() throws IOException, ClassNotFoundException {
+                SlaveControler.this.transmitTravelTimes();
+            }
+
+            @Override
+            public void poolPersons() throws IOException {
+                SlaveControler.this.poolPersons();
+            }
+
+            @Override
+            public void transmitPlans() throws IOException, ClassNotFoundException {
+                SlaveControler.this.transmitPlans();
+            }
+
+            @Override
+            public void transmitSlaveStatus() throws IOException {
+                slaveIsOKForNextIter();
+            }
+
+            @Override
+            public void transmitScores() throws IOException {
+                SlaveControler.this.transmitScores();
+            }
+
+            @Override
+            public void transmitPerformance() throws IOException {
+                SlaveControler.this.transmitPerformance();
+            }
+        };
     }
 
     private void transmitScores() throws IOException {
