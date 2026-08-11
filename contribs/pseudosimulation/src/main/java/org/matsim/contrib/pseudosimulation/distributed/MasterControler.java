@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,10 +72,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 //    private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private TransitPerformanceRecorder transitPerformanceRecorder;
     private SerializableLinkTravelTimes linkTravelTimes;
-    private AtomicInteger numThreads = new AtomicInteger(0);
+    private final SlaveHandlerCoordinator slaveHandlerCoordinator = SlaveHandlerCoordinator.production(masterLogger);
     private List<PersonSerializable> personPool;
     private static int loadBalanceInterval = 5;
-    private boolean somethingWentWrong = false;
     public static double planAllocationLimiter = 10.0;
     public static final long bytesPerSlaveBuffer = (long) 2e8;
     public int slaveUniqueNumber = 0;
@@ -255,33 +253,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
     public void startSlaveHandlersInMode(CommunicationsMode mode) {
-        if (numThreads.get() > 0)
-            masterLogger.warn("All slaveHandlers have not finished previous operation but they are being asked to " + mode.toString());
-        numThreads = new AtomicInteger(slaveHandlerTreeMap.size());
-        for (SlaveHandler slaveHandler : slaveHandlerTreeMap.values()) {
-            slaveHandler.communicationsMode = mode;
-            Thread slaveThread = new Thread(slaveHandler);
-            slaveThread.setName("slave_" + slaveHandler.myNumber + ":" + mode.toString());
-            slaveThread.start();
-
-        }
+        slaveHandlerCoordinator.start(slaveHandlerTreeMap.values(), mode);
     }
 
     public void waitForSlaveThreads() {
-        masterLogger.warn("Waiting for " + numThreads.get() +
-                " slaveHandlers");
-        while (numThreads.get() > 0)
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                throw new RuntimeException();
-            }
-        if (somethingWentWrong) {
-            masterLogger.error("Something went wrong. Exiting.");
-            throw new RuntimeException();
-        }
-        masterLogger.warn("All slaveHandlers done.");
+        slaveHandlerCoordinator.waitForCompletion();
     }
 
     @Override
@@ -503,7 +479,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
 
-    private class SlaveHandler implements Runnable {
+    private class SlaveHandler implements SlaveHandlerCoordinator.Handler {
         final Logger slaveLogger = LogManager.getLogger(this.getClass());
         final Map<String, Plan> plans = new HashMap<>();
         ObjectInputStream reader;
@@ -587,6 +563,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         @Override
         public void run() {
+            Runnable completion = slaveHandlerCoordinator.completion();
             MasterSlaveCommunicationsLoop loop = new MasterSlaveCommunicationsLoop(
                     new MasterSlaveCommunicationsLoop.Protocol() {
                         @Override
@@ -610,10 +587,20 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                         }
                     },
                     communicationsOperations(),
-                    () -> somethingWentWrong = true,
-                    numThreads::decrementAndGet,
+                    slaveHandlerCoordinator::failed,
+                    completion::run,
                     slaveLogger);
             communicationsMode = loop.run(communicationsMode, myNumber);
+        }
+
+        @Override
+        public void setCommunicationsMode(CommunicationsMode mode) {
+            communicationsMode = mode;
+        }
+
+        @Override
+        public int slaveNumber() {
+            return myNumber;
         }
 
         private MasterSlaveCommunicationsLoop.Operations communicationsOperations() {
