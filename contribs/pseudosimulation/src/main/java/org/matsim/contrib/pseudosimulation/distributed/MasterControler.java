@@ -30,7 +30,6 @@ import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTra
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -115,7 +114,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         slaveHandlerTreeMap = new TreeMap<>();
         slaveScoreStats = new SlaveScoreStats(this.config);
 
-        setReplanningWeights(this.config, masterMutationRate, masterBorrowingRate);
+        innovationEndsAtIter = new ReplanningWeightUpdater().updateMaster(
+                this.config, masterMutationRate, masterBorrowingRate);
 
 //        register initial number of slaves
         ServerSocket writeServer = new ServerSocket(masterPortNumber);
@@ -211,58 +211,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
 
     }
-
-    /**
-     * Experimental or parameter optimization. Probably won't work with subpopulations
-     *
-     * @param config
-     * @param masterMutationRate
-     * @param borrowingRate
-     */
-    private void setReplanningWeights(Config config, double masterMutationRate, double borrowingRate) {
-        int disableAfterIteration = config.controller().getLastIteration();
-        int maximumIterationForMutationDisabling = -1;
-        if (borrowingRate + masterMutationRate >= 1) {
-            borrowingRate = 0.9999 * borrowingRate / (masterMutationRate + borrowingRate);
-            masterMutationRate = 0.9999 * masterMutationRate / (masterMutationRate + borrowingRate);
-        }
-        List<ReplanningConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
-        strategySettings.addAll(config.replanning().getStrategySettings());
-        Map<Integer, Double> selectors = new HashMap<>();
-        Map<Integer, Double> mutators = new HashMap<>();
-        for (int i = 0; i < strategySettings.size(); i++) {
-            ReplanningConfigGroup.StrategySettings setting = strategySettings.get(i);
-            if (DistributedPlanStrategyTranslationAndRegistration.SupportedSelectors.keySet().contains(setting.getStrategyName()))
-                selectors.put(i, setting.getWeight());
-            else {
-                mutators.put(i, setting.getWeight());
-                maximumIterationForMutationDisabling = Math.max(setting.getDisableAfter(), maximumIterationForMutationDisabling);
-            }
-        }
-
-        double mutatorSum = CollectionUtils.sumElements(mutators.values());
-        double selectorSum = CollectionUtils.sumElements(selectors.values());
-        // set to new weight
-        for (Entry<Integer, Double> entry : selectors.entrySet()) {
-            strategySettings.get(entry.getKey()).setWeight((1 - masterMutationRate - borrowingRate) * entry.getValue() / selectorSum);
-        }
-        for (Entry<Integer, Double> entry : mutators.entrySet()) {
-            strategySettings.get(entry.getKey()).setWeight(masterMutationRate * entry.getValue() / mutatorSum);
-        }
-        //put it back in the config
-        config.replanning().clearStrategySettings();
-        for (ReplanningConfigGroup.StrategySettings strategySetting : strategySettings) {
-            config.replanning().addStrategySettings(strategySetting);
-        }
-        // add the borrowing rate entry
-        ReplanningConfigGroup.StrategySettings borrowingSetting = new ReplanningConfigGroup.StrategySettings();
-        borrowingSetting.setWeight(borrowingRate);
-        borrowingSetting.setStrategyName("ReplacePlanFromSlave");
-        borrowingSetting.setDisableAfter(maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling : disableAfterIteration);
-        config.replanning().addStrategySettings(borrowingSetting);
-        this.innovationEndsAtIter = maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling : disableAfterIteration;
-    }
-
 
     private int getTotalNumberOfPlansFromSlaves() {
         int total = 0;
