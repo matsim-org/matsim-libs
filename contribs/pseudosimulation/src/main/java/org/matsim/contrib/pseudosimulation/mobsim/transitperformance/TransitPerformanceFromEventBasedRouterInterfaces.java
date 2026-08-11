@@ -81,7 +81,7 @@ public class TransitPerformanceFromEventBasedRouterInterfaces implements Transit
 		// and the transitroutestop is different for each time it stops at
 		// the same facility
 		TransitRouteStop orig = transitRoute.getStop(stopFacilities.get(route.getAccessStopId()));
-		Id dest = route.getEgressStopId();
+		Id<TransitStopFacility> dest = route.getEgressStopId();
 		int i = transitRoute.getStops().indexOf(orig);
 		// int j = transitRoute.getStops().indexOf(dest);
 		// if(i>=j){
@@ -96,9 +96,9 @@ public class TransitPerformanceFromEventBasedRouterInterfaces implements Transit
 		// }
 		boolean destinationFound = false;
 		while (i < transitRoute.getStops().size() - 1) {
-			Id fromId = transitRoute.getStops().get(i).getStopFacility().getId();
+			Id<TransitStopFacility> fromId = transitRoute.getStops().get(i).getStopFacility().getId();
 			TransitRouteStop toStop = transitRoute.getStops().get(i + 1);
-			Id toId = toStop.getStopFacility().getId();
+			Id<TransitStopFacility> toId = toStop.getStopFacility().getId();
 //			travelTime += stopStopTimes.getStopStopTime(fromId, toId, prevStopTime);
 			prevStopTime += travelTime;
 			if (toStop.getStopFacility().getId().equals(dest)) {
