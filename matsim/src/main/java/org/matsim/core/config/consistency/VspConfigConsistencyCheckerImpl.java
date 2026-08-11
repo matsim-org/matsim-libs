@@ -463,8 +463,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added may'23
-		for( ScoringConfigGroup.ScoringParameterSet scoringParams : config.scoring().getScoringParametersPerSubpopulation().values() ){
-			for( ModeParams params : scoringParams.getModes().values() ){
+		for( ScoringConfigGroup.ScoringParameterSet scoringParams : config.scoring().getAllScoringParameterSetsPerSubpopulation().values() ){
+			for( ModeParams params : scoringParams.getModeParams().values() ){
 				switch( config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng() ){
 					case allZeroExceptBikeAndRide -> {
 
