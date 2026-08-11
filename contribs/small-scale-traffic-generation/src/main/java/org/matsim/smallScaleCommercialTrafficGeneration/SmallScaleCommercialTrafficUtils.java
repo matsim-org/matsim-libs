@@ -42,6 +42,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ProjectionUtils;
@@ -294,6 +295,14 @@ public class SmallScaleCommercialTrafficUtils {
 			routeCopy.setTravelTime(carrierLeg.getExpectedTransportTime());
 			leg.setRoute(routeCopy);
 		}
+	}
+
+	static void ensureDefaultModeParams(Config config, Set<String> modes) {
+		modes.forEach(mode -> {
+			if (!config.scoring().getDefaultModeParams().containsKey(mode)) {
+				config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(mode));
+			}
+		});
 	}
 
 	static String getSampleNameOfOutputFolder(double sample) {
