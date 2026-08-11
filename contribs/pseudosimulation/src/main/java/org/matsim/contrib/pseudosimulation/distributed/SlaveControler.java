@@ -457,7 +457,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     public void distributePersons() throws IOException, ClassNotFoundException {
         int masterCurrentIteration = reader.readInt();
-        List<PersonSerializable> personSerializables = (List<PersonSerializable>) reader.readObject();
+        List<PersonSerializable> personSerializables = SerializedObjectReader.readList(reader);
         addPersons(personSerializables);
         iterationTimes = new ArrayList<>();
         executedPlanCount = 0;
