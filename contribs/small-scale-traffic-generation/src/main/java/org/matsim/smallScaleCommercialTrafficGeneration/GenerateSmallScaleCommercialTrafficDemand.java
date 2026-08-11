@@ -552,7 +552,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			usedSmallScaleCommercialTrafficSegment, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent );
 
 		if (MATSimIterationsAfterDemandGeneration != null && MATSimIterationsAfterDemandGeneration >= 0) {
-			matsimIterations = new MATSimIterations( MATSimIterationsAfterDemandGeneration, this.sample );
+			matsimIterations = new MATSimIterations(this.sample );
 			matsimIterations.runMATSimIterations( scenario, config, this );
 		}
 		return 0;
@@ -792,14 +792,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 *
 	 * @param scenario scenario
 	 */
-	private static void prepareConfigForResultingModes(Scenario scenario) {
+	private void prepareConfigForResultingModes(Scenario scenario) {
 		Set<String> modes = scenario.getVehicles().getVehicleTypes().values().stream()
 			.map(VehicleType::getNetworkMode).collect(Collectors.toSet());
 
-		modes.forEach(mode -> {
-			ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
-			scenario.getConfig().scoring().addModeParams(thisModeParams);
-		});
+		SmallScaleCommercialTrafficUtils.ensureDefaultModeParams(scenario.getConfig(), modes);
 
 		Set<String> qsimModes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
 		scenario.getConfig().qsim().setMainModes(Sets.union(qsimModes, modes));
@@ -1264,6 +1261,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	public int getMaxNumberOfLoopsForVRPSolving(){
 		return maxNumberOfLoopsForVRPSolving;
+	}
+
+	public SmallScaleCommercialTrafficSegment getUsedSmallScaleCommercialTrafficSegment() {
+		return usedSmallScaleCommercialTrafficSegment;
 	}
 
 	public double getFactorForTravelBufferCalculation(){

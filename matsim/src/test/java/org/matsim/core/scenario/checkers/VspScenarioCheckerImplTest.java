@@ -38,6 +38,24 @@ class VspScenarioCheckerImplTest {
 	}
 
 	@Test
+	void warnsWithoutNpeWhenSubpopulationHasNoScoringParameters() {
+		Config config = ConfigUtils.createConfig();
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p1"));
+		PopulationUtils.putSubpopulation(person, "freight");
+		Plan plan = PopulationUtils.createPlan();
+		Activity act = PopulationUtils.createActivityFromCoord("home", new Coord(0, 0));
+		plan.addActivity(act);
+		person.addPlan(plan);
+		person.setSelectedPlan(plan);
+		scenario.getPopulation().addPerson(person);
+
+		VspScenarioCheckerImpl checker = new VspScenarioCheckerImpl();
+		assertDoesNotThrow(() -> checker.checkConsistencyBeforeRun(scenario));
+	}
+
+	@Test
 	void doesNotComplainWhenActivityMatchesFacilityLinkAndCoord() {
 		Scenario scenario = createScenarioWithAbortLevel();
 		Id<Link> linkId = Id.createLinkId("link1");
