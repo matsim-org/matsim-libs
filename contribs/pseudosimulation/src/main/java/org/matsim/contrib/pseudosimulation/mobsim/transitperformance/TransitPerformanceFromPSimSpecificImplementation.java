@@ -28,6 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import com.google.inject.Inject;
 
@@ -55,8 +56,8 @@ public class TransitPerformanceFromPSimSpecificImplementation implements Transit
 	public Trip findTrip(Leg prevLeg, double earliestDepartureTime_s) {
 
 		TransitPassengerRoute route = (TransitPassengerRoute) prevLeg.getRoute();
-		Id accessStopId = route.getAccessStopId();
-		Id egressStopId = route.getEgressStopId();
+		Id<TransitStopFacility> accessStopId = route.getAccessStopId();
+		Id<TransitStopFacility> egressStopId = route.getEgressStopId();
 
 		Tuple<Double, Double> routeTravelTime = transitPerformance.getRouteTravelTime(route.getLineId(),
 				route.getRouteId(), accessStopId, egressStopId, earliestDepartureTime_s);
