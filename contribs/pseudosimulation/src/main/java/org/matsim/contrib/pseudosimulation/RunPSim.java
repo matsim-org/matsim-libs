@@ -101,7 +101,7 @@ public class RunPSim {
 
 	public static void main(String args[]) {
 		Config config = ConfigUtils.loadConfig(args[0]);
-		config.controller().setCreateGraphs(false);
+		config.controller().setCreateGraphsInterval(0);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);

@@ -61,7 +61,7 @@ historic debt to be repaired in this setup change:
   fixes could change runtime or API behavior.
 - Tests permit no failures.
 - JaCoCo requires at least 37% line coverage and 31% branch coverage. The
-  current suite measures 37.11% line coverage and 31.90% branch coverage on
+  current suite measures 37.23% line coverage and 31.90% branch coverage on
   Java 25.
 
 In addition, `quality/metrics-baseline.properties` records a comparable quality

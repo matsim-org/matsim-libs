@@ -72,6 +72,7 @@ class MemoryUsageCalculator {
 		}
 
 		@Override
+		@SuppressWarnings("removal") // Preserve the legacy measurement sequence until finalization disappears from Java.
 		public void runFinalization() {
 			System.runFinalization();
 		}

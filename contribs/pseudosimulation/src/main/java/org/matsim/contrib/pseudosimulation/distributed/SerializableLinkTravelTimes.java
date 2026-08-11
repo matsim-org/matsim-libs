@@ -43,7 +43,7 @@ public class SerializableLinkTravelTimes implements Serializable, TravelTime {
 		try {
 			return times[indices.get(link.getId().toString())][TimeBinUtils.getTimeBinIndex(time, travelTimeBinSize, endTime)];
 		} catch (ArrayIndexOutOfBoundsException e) {
-			// TODO Auto-generated catch block
+			// Preserve the legacy fallback to the normalized query time.
 			e.printStackTrace();
 		}
 		return time;

@@ -79,16 +79,16 @@ public class DistributedPlanStrategyTranslationAndRegistration {
         SupportedMutators.put("SubtourModeChoice", SubtourModeChoice.class);
         SupportedMutators.put("ChangeTripMode", ChangeTripMode.class);
 
-        SupportedMutatorGenes.put("ReRoute", new Character('A'));
-        SupportedMutatorGenes.put("TimeAllocationMutator", new Character('B'));
-        SupportedMutatorGenes.put("TimeAllocationMutator_ReRoute", new Character('C'));
-        SupportedMutatorGenes.put("ChangeLegMode", new Character('D'));
-        SupportedMutatorGenes.put("ChangeSingleLegMode", new Character('E'));
-        SupportedMutatorGenes.put("ChangeSingleTripMode", new Character('F'));
-        SupportedMutatorGenes.put("SubtourModeChoice", new Character('G'));
-        SupportedMutatorGenes.put("ChangeTripMode", new Character('H'));
-        SupportedMutatorGenes.put("TripSubtourModeChoice", new Character('J'));
-        SupportedMutatorGenes.put("TransitLocationChoice", new Character('K'));
+        SupportedMutatorGenes.put("ReRoute", 'A');
+        SupportedMutatorGenes.put("TimeAllocationMutator", 'B');
+        SupportedMutatorGenes.put("TimeAllocationMutator_ReRoute", 'C');
+        SupportedMutatorGenes.put("ChangeLegMode", 'D');
+        SupportedMutatorGenes.put("ChangeSingleLegMode", 'E');
+        SupportedMutatorGenes.put("ChangeSingleTripMode", 'F');
+        SupportedMutatorGenes.put("SubtourModeChoice", 'G');
+        SupportedMutatorGenes.put("ChangeTripMode", 'H');
+        SupportedMutatorGenes.put("TripSubtourModeChoice", 'J');
+        SupportedMutatorGenes.put("TransitLocationChoice", 'K');
 
     }
 
@@ -153,7 +153,6 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     }
 }
-
 
 
 
