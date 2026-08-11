@@ -45,12 +45,12 @@ public class TransitRouterConfigTest {
 		planScoring.getDefaultModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
 
 //		planScoring.setMarginalUtlOfWaiting_utils_hr(-13.0);
-		planScoring.setMarginalUtlOfWaitingPt_utils_hr(-13.0);
+		planScoring.setDefaultMarginalUtlOfWaitingPt_utils_hr(-13.0);
 		// naturally, this failed after the functionality was moved to a separate planCalcScore parameter.  kai, oct'12
 
-		planScoring.setPerforming_utils_hr(+6.0);
+		planScoring.setDefaultPerforming_utils_hr(+6.0);
 
-		planScoring.setUtilityOfLineSwitch(-2.34);
+		planScoring.setDefaultUtilityOfLineSwitch(-2.34);
 
 		planRouting.setTeleportedModeSpeed(TransportMode.walk, 1.37 );
 		// (this will clear all defaults!)

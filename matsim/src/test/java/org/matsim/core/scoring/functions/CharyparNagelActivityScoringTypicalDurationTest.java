@@ -25,9 +25,9 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 	private static Config config() {
 		Config config = ConfigUtils.createConfig();
 		ScoringConfigGroup scoring = config.scoring();
-		scoring.setPerforming_utils_hr(6.);
-		scoring.setLateArrival_utils_hr(-18.);
-		scoring.setEarlyDeparture_utils_hr(-6.);
+		scoring.setDefaultPerforming_utils_hr(6.);
+		scoring.setDefaultLateArrival_utils_hr(-18.);
+		scoring.setDefaultEarlyDeparture_utils_hr(-6.);
 		for (String type : new String[]{"home", "work", "home_evening"}) {
 			scoring.addActivityParams(new ScoringConfigGroup.ActivityParams(type).setTypicalDuration(2. * 3600.));
 		}
@@ -133,15 +133,15 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 		for (ScoringConfigGroup.TypicalDurationScoreComputation computation : ScoringConfigGroup.TypicalDurationScoreComputation.values()) {
 			// A: work typical 2h in the config, but 8h as activity attribute (home/home_evening attribute-less in this plan)
 			Config configA = config();
-			configA.scoring().getActivityParams("work").setTypicalDurationScoreComputation(computation);
+			configA.scoring().getDefaultActivityParams("work").setTypicalDurationScoreComputation(computation);
 			Plan planA = planWithWorkTypical(28800.);
 			((Activity) planA.getPlanElements().get(0)).getAttributes().removeAttribute(ActivityAttributeTypicalDurationCalculator.TYPICAL_DURATION_ATTRIBUTE);
 			double withAttribute = score(attributeScoring(configA, person(planA)), 30600., 59400.);
 
 			// B: work typical 8h in the config, stock scoring on the bare activities
 			Config configB = config();
-			configB.scoring().getActivityParams("work").setTypicalDurationScoreComputation(computation);
-			configB.scoring().getActivityParams("work").setTypicalDuration(28800.);
+			configB.scoring().getDefaultActivityParams("work").setTypicalDurationScoreComputation(computation);
+			configB.scoring().getDefaultActivityParams("work").setTypicalDuration(28800.);
 			double fromConfig = score(new CharyparNagelActivityScoring(params(configB)), 30600., 59400.);
 
 			assertEquals(fromConfig, withAttribute, 1e-9, "computation mode " + computation);

@@ -349,8 +349,8 @@ public class RunExample {
 		c.scoring().addActivityParams(pre);
 		c.scoring().addActivityParams(post);
 
-		c.scoring().setLateArrival_utils_hr(0.);
-		c.scoring().setPerforming_utils_hr(0.);
+		c.scoring().setDefaultLateArrival_utils_hr(0.);
+		c.scoring().setDefaultPerforming_utils_hr(0.);
 	}
 
 	private static void createPopulation(Scenario sc) {

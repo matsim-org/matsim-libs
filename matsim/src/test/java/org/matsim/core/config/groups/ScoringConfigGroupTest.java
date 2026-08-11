@@ -61,8 +61,8 @@ import org.matsim.testcases.MatsimTestUtils;
 			Assertions.assertNotNull( scoringConfig.getDefaultModeParams().get( TransportMode.other ) );
 
 			// default stage/interaction params are there for pt and drt (as a service):
-			Assertions.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.pt ) ) );
-			Assertions.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.drt ) ) );
+			Assertions.assertNotNull(scoringConfig.getDefaultActivityParams(createStageActivityType(TransportMode.pt)));
+			Assertions.assertNotNull( scoringConfig.getDefaultActivityParams( createStageActivityType( TransportMode.drt ) ) );
 		}
 		// default stage/interaction params for modes routed on the network are not yet there:
 //		for( String networkMode : config.plansCalcRoute().getNetworkModes() ){
@@ -74,7 +74,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 		// default stage/interaction params for modes routed on the network are now there:
 		for( String networkMode : config.routing().getNetworkModes() ){
-			Assertions.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( networkMode ) ) );
+			Assertions.assertNotNull( scoringConfig.getDefaultActivityParams( createStageActivityType( networkMode ) ) );
 		}
 	}
 
@@ -88,7 +88,7 @@ import org.matsim.testcases.MatsimTestUtils;
 			log.warn(  modeParams );
 		}
 		log.warn( "" );
-		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+		for( ActivityParams activityParams : scoringConfig.getDefaultActivityParams() ){
 			log.warn(  activityParams );
 		}
 		log.warn( "" );
@@ -101,7 +101,7 @@ import org.matsim.testcases.MatsimTestUtils;
 			log.warn(  modeParams );
 		}
 		log.warn( "" );
-		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+		for( ActivityParams activityParams : scoringConfig.getDefaultActivityParams() ){
 			log.warn(  activityParams );
 		}
 		log.warn( "" );
@@ -117,7 +117,7 @@ import org.matsim.testcases.MatsimTestUtils;
 			log.warn(  modeParams );
 		}
 		log.warn( "" );
-		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+		for( ActivityParams activityParams : scoringConfig.getDefaultActivityParams() ){
 			log.warn(  activityParams );
 		}
 		log.warn( "" );
@@ -130,7 +130,7 @@ import org.matsim.testcases.MatsimTestUtils;
 			log.warn(  modeParams );
 		}
 		log.warn( "" );
-		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+		for( ActivityParams activityParams : scoringConfig.getDefaultActivityParams() ){
 			log.warn(  activityParams );
 		}
 		log.warn( "" );
@@ -139,14 +139,15 @@ import org.matsim.testcases.MatsimTestUtils;
 	 @Test
 	 void testAddActivityParams() {
 		ScoringConfigGroup c = new ScoringConfigGroup();
-        int originalSize = c.getActivityParams().size();
-		Assertions.assertNull(c.getActivityParams("type1"));
-        Assertions.assertEquals(originalSize, c.getActivityParams().size());
+        int originalSize = c.getDefaultActivityParams().size();
+		Assertions.assertNull(c.getDefaultActivityParams("type1"));
+        Assertions.assertEquals(originalSize, c.getDefaultActivityParams().size());
 
 		ActivityParams ap = new ActivityParams("type1");
 		c.addActivityParams(ap);
-		Assertions.assertEquals(ap, c.getActivityParams("type1"));
-        Assertions.assertEquals(originalSize + 1, c.getActivityParams().size());
+		Assertions.assertEquals(ap, c.getDefaultActivityParams("type1"));
+        Assertions.assertEquals(originalSize + 1, c.getDefaultActivityParams().size());
+	}
 	}
 
 	 @Test
@@ -209,13 +210,13 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong constantWalk "+msg);
 		Assertions.assertEquals(
-				initialGroup.getLateArrival_utils_hr(),
-				inputConfigGroup.getLateArrival_utils_hr(),
+				initialGroup.getDefaultLateArrival_utils_hr(),
+				inputConfigGroup.getDefaultLateArrival_utils_hr(),
 				1e-7,
 				"wrong lateArrival_utils_hr "+msg );
 		Assertions.assertEquals(
-				initialGroup.getEarlyDeparture_utils_hr(),
-				inputConfigGroup.getEarlyDeparture_utils_hr(),
+				initialGroup.getDefaultEarlyDeparture_utils_hr(),
+				inputConfigGroup.getDefaultEarlyDeparture_utils_hr(),
 				1e-7,
 				"wrong earlyDeparture_utils_hr "+msg );
 		Assertions.assertEquals(
@@ -224,8 +225,8 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong learningRate "+msg );
 		Assertions.assertEquals(
-				initialGroup.getMarginalUtilityOfMoney(),
-				inputConfigGroup.getMarginalUtilityOfMoney() ,
+				initialGroup.getDefaultMarginalUtilityOfMoney(),
+				inputConfigGroup.getDefaultMarginalUtilityOfMoney() ,
 				1e-7,
 				"wrong marginalUtilityOfMoney "+msg);
 		Assertions.assertEquals(
@@ -239,13 +240,13 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong marginalUtlOfDistanceWalk "+msg);
 		Assertions.assertEquals(
-				initialGroup.getMarginalUtlOfWaiting_utils_hr(),
-				inputConfigGroup.getMarginalUtlOfWaiting_utils_hr(),
+				initialGroup.getDefaultMarginalUtlOfWaiting_utils_hr(),
+				inputConfigGroup.getDefaultMarginalUtlOfWaiting_utils_hr(),
 				1e-7,
 				"wrong marginalUtlOfWaiting_utils_hr "+msg );
 		Assertions.assertEquals(
-				initialGroup.getMarginalUtlOfWaitingPt_utils_hr(),
-				inputConfigGroup.getMarginalUtlOfWaitingPt_utils_hr(),
+				initialGroup.getDefaultMarginalUtlOfWaitingPt_utils_hr(),
+				inputConfigGroup.getDefaultMarginalUtlOfWaitingPt_utils_hr(),
 				1e-7,
 				"wrong marginalUtlOfWaitingPt_utils_hr "+msg );
 		Assertions.assertEquals(
@@ -264,8 +265,8 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong pathSizeLogitBeta "+msg );
 		Assertions.assertEquals(
-				initialGroup.getPerforming_utils_hr(),
-				inputConfigGroup.getPerforming_utils_hr(),
+				initialGroup.getDefaultPerforming_utils_hr(),
+				inputConfigGroup.getDefaultPerforming_utils_hr(),
 				1e-7,
 				"wrong performing_utils_hr "+msg );
 		Assertions.assertEquals(
@@ -294,14 +295,14 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong travelingWalk_utils_hr "+msg);
 		Assertions.assertEquals(
-				initialGroup.getUtilityOfLineSwitch(),
-				inputConfigGroup.getUtilityOfLineSwitch(),
+				initialGroup.getDefaultUtilityOfLineSwitch(),
+				inputConfigGroup.getDefaultUtilityOfLineSwitch(),
 				1e-7,
 				"wrong utilityOfLineSwitch "+msg );
 
-		for ( ActivityParams initialSettings : initialGroup.getActivityParams() ) {
+		for ( ActivityParams initialSettings : initialGroup.getDefaultActivityParams() ) {
 			final ActivityParams inputSettings =
-				inputConfigGroup.getActivityParams(
+				inputConfigGroup.getDefaultActivityParams(
 						initialSettings.getActivityType() );
 			Assertions.assertEquals(
 					initialSettings.getActivityType(),
@@ -376,7 +377,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 		final Random r = new Random( 456 );
 		int ca = 0;
-		for ( ActivityParams settings : initialGroup.getActivityParams() ) {
+		for ( ActivityParams settings : initialGroup.getDefaultActivityParams()) {
 			final String suffix = r.nextBoolean() ? ""+ca++ : settings.getActivityType();
 
 			if ( !suffix.equals( settings.getActivityType() ) ) {

@@ -141,22 +141,22 @@ public class TransitRouterConfig implements MatsimParameters {
 		// yyyyyy the two above need to be moved away from walk since otherwise one is not able to move walk routing to network routing!!!!!! Now trying access_walk ...  kai,
 		// apr'19
 
-		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
+		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getDefaultPerforming_utils_hr()/3600. ;
 
-		this.marginalUtilityOfTravelDistanceWalk_utl_m = pcsConfig.getMarginalUtilityOfMoney() *
+		this.marginalUtilityOfTravelDistanceWalk_utl_m = pcsConfig.getDefaultMarginalUtilityOfMoney() *
 				pcsConfig.getDefaultModeParams().get(TransportMode.walk).getMonetaryDistanceRate() +
 				pcsConfig.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
 		// pt:
-		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getDefaultModeParams().get(TransportMode.pt).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
+		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getDefaultModeParams().get(TransportMode.pt).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getDefaultPerforming_utils_hr()/3600. ;
 
-		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() *
+		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getDefaultMarginalUtilityOfMoney() *
 				pcsConfig.getDefaultModeParams().get(TransportMode.pt).getMonetaryDistanceRate() +
 				pcsConfig.getDefaultModeParams().get(TransportMode.pt).getMarginalUtilityOfDistance();
 
-		this.marginalUtilityOfWaitingPt_utl_s = pcsConfig.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
+		this.marginalUtilityOfWaitingPt_utl_s = pcsConfig.getDefaultMarginalUtlOfWaitingPt_utils_hr() / 3600.0 - pcsConfig.getDefaultPerforming_utils_hr()/3600. ;
 
-		this.utilityOfLineSwitch_utl = pcsConfig.getUtilityOfLineSwitch();
+		this.utilityOfLineSwitch_utl = pcsConfig.getDefaultUtilityOfLineSwitch();
 
 		// router:
 		this.setSearchRadius(trConfig.getSearchRadius());

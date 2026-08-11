@@ -393,14 +393,14 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added aug'13:
-		if (config.scoring().getMarginalUtlOfWaiting_utils_hr() != 0.) {
+		if (config.scoring().getDefaultMarginalUtlOfWaiting_utils_hr() != 0.) {
 			problem = true;
 			System.out.flush();
 			log.log(lvl, "found marginal utility of waiting != 0.  vsp default is setting this to 0. ");
 		}
 
 		// added apr'15:
-		for (ActivityParams params : config.scoring().getActivityParams()) {
+		for (ActivityParams params : config.scoring().getDefaultActivityParams()) {
 			if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(params.getActivityType())) {
 				// they have typicalDurationScoreComputation==relative, but are not scored anyways. benjamin/kai, nov'15
 				continue;
@@ -437,7 +437,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			System.out.flush();
 			log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here.");
 		}
-		if (config.scoring().getMarginalUtilityOfMoney() < 0.) {
+		if (config.scoring().getDefaultMarginalUtilityOfMoney() < 0.) {
 			problem = true;
 			System.out.flush();
 			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. ");
