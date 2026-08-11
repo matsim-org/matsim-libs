@@ -752,8 +752,24 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		getScoringParameters(null).addModeParams(params);
 	}
 
+	public void addModeParamsForSubpopulation(final ModeParams params, String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet == null) {
+			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
+		}
+		scoringParameterSet.addModeParams(params);
+	}
+
 	public void addActivityParams(final ActivityParams params) {
 		getScoringParameters(null).addActivityParams(params);
+	}
+
+	public void addActivityParamsForSubpopulation(final ActivityParams params, String subpopulation) {
+		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
+		if (scoringParameterSet == null) {
+			throw new RuntimeException("ScoringParams for subpopulation " + subpopulation + " are not defined");
+		}
+		scoringParameterSet.addActivityParams(params);
 	}
 
 	public enum TypicalDurationScoreComputation {
