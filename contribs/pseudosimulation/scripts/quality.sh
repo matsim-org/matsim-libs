@@ -112,6 +112,17 @@ find_changed_java() {
 	done
 }
 
+clear_stale_test_reports() {
+	local report
+	for report in "$MODULE_DIR"/target/surefire-reports/TEST-*.xml; do
+		[[ -e "$report" ]] || continue
+		rm -- "$report" || {
+			printf 'PSim quality: cannot remove stale test report: %s\n' "$report" >&2
+			return 1
+		}
+	done
+}
+
 case "${1:-}" in
 	--pre-commit) check_staged_files ;;
 	-h | --help) print_help; exit 0 ;;
@@ -154,9 +165,15 @@ run_stage \
 	"Resolve the high-priority SpotBugs findings above; XML details are in $MODULE_DIR/target/spotbugsXml.xml." \
 	"${MVN[@]}" compile spotbugs:check
 
+clear_stale_test_reports || exit 2
 run_stage \
 	'Unit tests and coverage' \
 	"Fix the failing test or add coverage. Reports are under $MODULE_DIR/target/surefire-reports and target/site/jacoco." \
 	"${MVN[@]}" verify
+
+run_stage \
+	'Quality metrics ratchet' \
+	"Restore every regressed metric shown above. After an improvement, run $SCRIPT_DIR/quality-metrics.sh --ratchet and commit the raised baseline." \
+	"$SCRIPT_DIR/quality-metrics.sh" --check
 
 printf '\nPSim quality gate passed.\n'
