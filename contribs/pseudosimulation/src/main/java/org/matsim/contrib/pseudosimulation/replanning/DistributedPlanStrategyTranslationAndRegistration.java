@@ -52,9 +52,9 @@ import java.util.Map;
  */
 public class DistributedPlanStrategyTranslationAndRegistration {
     public static final String SUFFIX = "PSIM";
-    public static Map<String, Class<? extends Provider<PlanStrategy>>> SupportedSelectors = new HashMap<>();
-    public static Map<String, Class<? extends Provider<PlanStrategy>>> SupportedMutators = new HashMap<>();
-    public static Map<String, Character> SupportedMutatorGenes = new HashMap<>();
+    public static final Map<String, Class<? extends Provider<PlanStrategy>>> SupportedSelectors = new HashMap<>();
+    public static final Map<String, Class<? extends Provider<PlanStrategy>>> SupportedMutators = new HashMap<>();
+    public static final Map<String, Character> SupportedMutatorGenes = new HashMap<>();
     public static boolean TrackGenome = false;
 
     private DistributedPlanStrategyTranslationAndRegistration() {
@@ -153,6 +153,3 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     }
 }
-
-
-

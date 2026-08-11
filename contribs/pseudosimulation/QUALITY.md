@@ -57,11 +57,11 @@ historic debt to be repaired in this setup change:
 
 - Checkstyle enables a small set of objective, low-noise rules.
 - SpotBugs reports only high-priority findings at minimum analysis effort. Its
-  local filter baselines five precisely matched legacy findings whose immediate
-  fixes could change runtime or API behavior.
+  local filter records two narrowly matched compatibility boundaries: forced
+  garbage collection and intentionally extensible strategy registries.
 - Tests permit no failures.
-- JaCoCo requires at least 37% line coverage and 31% branch coverage. The
-  current suite measures 37.23% line coverage and 31.90% branch coverage on
+- JaCoCo requires at least 39% line coverage and 33% branch coverage. The
+  current suite measures 39.03% line coverage and 33.65% branch coverage on
   Java 25.
 
 In addition, `quality/metrics-baseline.properties` records a comparable quality

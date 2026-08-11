@@ -153,7 +153,8 @@ public class PSim implements Mobsim {
             for( Plan plan : threadPlans ){
                 Queue<Event> eventQueue = new LinkedList<>();
                 Id<Person> personId = plan.getPerson().getId();
-                Id<Vehicle> personVehicleId = Id.createVehicleId( personId.toString() ); // TODO: find cleaner access to vehicle id
+                // Preserve the legacy convention that each person's vehicle has the same textual ID.
+                Id<Vehicle> personVehicleId = Id.createVehicleId( personId.toString() );
                 List<PlanElement> elements = plan.getPlanElements();
 
                 double prevEndTime = 0;
