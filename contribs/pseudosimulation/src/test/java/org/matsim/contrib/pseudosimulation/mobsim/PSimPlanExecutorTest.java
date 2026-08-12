@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -50,7 +49,6 @@ class PSimPlanExecutorTest {
                 execution.events.stream().map(Event::getClass).toList());
         assertEquals(List.of(10.0, 10.0, 17.0, 17.0, 17.0),
                 execution.events.stream().map(Event::getTime).toList());
-        assertEquals(1, execution.completions.get());
     }
 
     @Test
@@ -117,12 +115,11 @@ class PSimPlanExecutorTest {
         List<Event> events = new ArrayList<>();
         EventsManager eventsManager = EventsUtils.createEventsManager();
         eventsManager.addHandler((BasicEventHandler) events::add);
-        AtomicInteger completions = new AtomicInteger();
         PSimPlanExecutor executor = new PSimPlanExecutor(endTime, (link, time, person, vehicle) -> 1,
-                emulator, transitModes, completions::incrementAndGet);
+                emulator, transitModes);
         executor.initialize(List.of(plan), network, eventsManager);
         executor.run();
-        return new Execution(events, completions);
+        return new Execution(events);
     }
 
     private static Plan createPlan(String mode, double activityEnd, Integer routeTravelTime) {
@@ -145,6 +142,6 @@ class PSimPlanExecutorTest {
         return plan;
     }
 
-    private record Execution(List<Event> events, AtomicInteger completions) {
+    private record Execution(List<Event> events) {
     }
 }

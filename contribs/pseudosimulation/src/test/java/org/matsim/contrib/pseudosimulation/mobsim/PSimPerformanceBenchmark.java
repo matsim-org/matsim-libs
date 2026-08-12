@@ -99,7 +99,7 @@ class PSimPerformanceBenchmark {
         EventCounter eventCounter = new EventCounter();
         EventsManager eventManager = createEventManager(eventCounter);
         PSimPlanExecutor executor = new PSimPlanExecutor(END_TIME, (link, time, person, vehicle) -> 1,
-                TRANSIT_EMULATOR, TRANSIT_MODES, () -> { });
+                TRANSIT_EMULATOR, TRANSIT_MODES);
         executor.initialize(plans, network, eventManager);
 
         for (int round = 0; round < WARMUP_ROUNDS; round++) {

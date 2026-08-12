@@ -45,18 +45,16 @@ final class PSimPlanExecutor implements PSimExecutionCoordinator.Worker {
     private final TravelTime carLinkTravelTimes;
     private final TransitEmulator transitEmulator;
     private final Set<String> transitModes;
-    private final Runnable completion;
     private Collection<Plan> plans;
     private EventsManager eventManager;
     private Network network;
 
     PSimPlanExecutor(double endTime, TravelTime carLinkTravelTimes, TransitEmulator transitEmulator,
-            Set<String> transitModes, Runnable completion) {
+            Set<String> transitModes) {
         this.endTime = endTime;
         this.carLinkTravelTimes = carLinkTravelTimes;
         this.transitEmulator = transitEmulator;
         this.transitModes = transitModes;
-        this.completion = completion;
     }
 
     @Override
@@ -71,8 +69,6 @@ final class PSimPlanExecutor implements PSimExecutionCoordinator.Worker {
         for (Plan plan : plans) {
             execute(plan);
         }
-        // Intentionally not in a finally block: legacy worker failures leave PSim waiting.
-        completion.run();
     }
 
     private void execute(Plan plan) {
