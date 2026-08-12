@@ -57,31 +57,54 @@ public class PSimTravelTimeCalculator implements Provider<TravelTime>, LinkEnter
 	}
 
 	public void handleEvent( final LinkEnterEvent e ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( e );
 	}
 
 	public void handleEvent( final LinkLeaveEvent e ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( e );
 	}
 
 	public void handleEvent( VehicleEntersTrafficEvent event ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( event );
 	}
 
 	public void handleEvent( final VehicleLeavesTrafficEvent event ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( event );
 	}
 
 	public void handleEvent( VehicleArrivesAtFacilityEvent event ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( event );
 	}
 
 	public void handleEvent( VehicleAbortsEvent event ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( event );
 	}
 
+	/** A PSim iteration reads these travel times; it must not also write to them. */
+	private boolean recording() {
+		return switcher == null || switcher.isQSimIteration();
+	}
+
 	public void reset( int iteration ){
-		if (switcher == null || switcher.isQSimIteration()) {
+		if (recording()) {
 			LogManager.getLogger( travelTimeCalculator.getClass() ).error(
 					"Calling reset on traveltimecalc" );
 			travelTimeCalculator.reset( iteration );
