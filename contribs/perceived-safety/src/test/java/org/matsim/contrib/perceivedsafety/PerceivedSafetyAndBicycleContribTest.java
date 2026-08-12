@@ -98,7 +98,7 @@ public class PerceivedSafetyAndBicycleContribTest {
 			modeParams.setMarginalUtilityOfTraveling(0.);
 			config.scoring().addModeParams(modeParams);
 			config.scoring().setWriteExperiencedPlans(true);
-			config.scoring().getActivityParams()
+			config.scoring().getDefaultActivityParams()
 				.forEach(a -> a.setScoringThisActivityAtAll(false));
 
 			switch (setup) {
@@ -306,7 +306,7 @@ public class PerceivedSafetyAndBicycleContribTest {
 			modeParams.setMarginalUtilityOfTraveling(0.);
 			config.scoring().addModeParams(modeParams);
 			config.scoring().setWriteExperiencedPlans(true);
-			config.scoring().getActivityParams()
+			config.scoring().getDefaultActivityParams()
 				.forEach(a -> a.setScoringThisActivityAtAll(false));
 
 			switch (setup) {

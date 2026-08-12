@@ -76,7 +76,7 @@ public class PerceivedSafetyScoringTest {
             modeParams.setMarginalUtilityOfTraveling(0.);
             config.scoring().addModeParams(modeParams);
             config.scoring().setWriteExperiencedPlans(true);
-            config.scoring().getActivityParams()
+            config.scoring().getDefaultActivityParams()
                     .forEach(a -> a.setScoringThisActivityAtAll(false));
 
 //      add perceivedSafetyCfgGroup and configure

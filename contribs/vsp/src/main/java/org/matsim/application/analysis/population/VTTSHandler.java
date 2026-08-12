@@ -138,7 +138,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		// down, where the local scoring fct is constructed.  kai, gr, jul'25
 		this.activityScoringFactory = activityScoringFactory;
 
-		if (scenario.getConfig().scoring().getMarginalUtilityOfMoney() == 0.) {
+		if (scenario.getConfig().scoring().getDefaultMarginalUtilityOfMoney() == 0.) {
 			log.warn("The marginal utility of money must not be 0.0. The VTTS is computed in Money per Time.");
 		}
 
@@ -146,9 +146,9 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		this.scoringParametersForPerson = scoringParametersForPerson;
 		this.currentIteration = Integer.MIN_VALUE;
 		this.defaultVTTS_moneyPerHour =
-				(this.scenario.getConfig().scoring().getPerforming_utils_hr()
-						 + this.scenario.getConfig().scoring().getModeParams().get( TransportMode.car ).getMarginalUtilityOfTraveling() * (-1.0)
-				) / this.scenario.getConfig().scoring().getMarginalUtilityOfMoney();
+				(this.scenario.getConfig().scoring().getDefaultPerforming_utils_hr()
+						 + this.scenario.getConfig().scoring().getDefaultModeParams().get( TransportMode.car ).getMarginalUtilityOfTraveling() * (-1.0)
+				) / this.scenario.getConfig().scoring().getDefaultMarginalUtilityOfMoney();
 	}
 
 	public Map<Id<Person>,List<TripData>> getTripDataMap() {
@@ -448,7 +448,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		simData.trips.getLast().VTTSh = mUTTS_h / marginalUtilityOfMoney;
 
 		simData.trips.getLast().actType = simData.currentActivityType;
-		simData.trips.getLast().actTypDur_h = scoringConfigGroup.getActivityParams( simData.currentActivityType ).getTypicalDuration().seconds() / 3600. ;
+		simData.trips.getLast().actTypDur_h = scoringConfigGroup.getDefaultActivityParams( simData.currentActivityType ).getTypicalDuration().seconds() / 3600. ;
 
 	}
 	private static double handleIncompletePlan( Id<Person> personId, double performing_utils_hr ){

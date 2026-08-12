@@ -43,7 +43,7 @@ public class ConfigYamlUpdateTest {
 		assertThat(scoring.getDefaultModeParams())
 			.hasSize(7);
 
-		assertThat(scoring.getPerforming_utils_hr())
+		assertThat(scoring.getDefaultPerforming_utils_hr())
 			.isEqualTo(6.88);
 
 		ScoringConfigGroup.ModeParams car = scoring.getDefaultModeParams().get(TransportMode.car);

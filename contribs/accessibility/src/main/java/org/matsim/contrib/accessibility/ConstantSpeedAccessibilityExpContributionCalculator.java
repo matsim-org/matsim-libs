@@ -90,12 +90,12 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 		}
 		this.modeSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(mode) * 3600.;
 
-		betaModeTT = modeParams.getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 		final ScoringConfigGroup.ModeParams modeParams = scoringConfigGroup.getOrCreateDefaultModeParams(mode);
+		betaModeTT = modeParams.getMarginalUtilityOfTraveling() - scoringConfigGroup.getDefaultPerforming_utils_hr();
 		betaModeTD = modeParams.getMarginalUtilityOfDistance();
 		constMode = modeParams.getConstant();
 
-		betaWalkTT = scoringConfigGroup.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		betaWalkTT = scoringConfigGroup.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getDefaultPerforming_utils_hr();
 		betaWalkTD = scoringConfigGroup.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfDistance();
 		this.walkSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600;
 	}

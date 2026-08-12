@@ -41,7 +41,7 @@
 //		config.controller().setLastIteration(0);
 //		config.scoring().setExplainScores(true);
 //		config.scoring().setWriteExperiencedPlans(true);
-//		config.scoring().getOrCreateModeParams(TransportMode.car).setMarginalUtilityOfTraveling(0);
+//		config.scoring().getOrCreateDefaultModeParams(TransportMode.car).setMarginalUtilityOfTraveling(0);
 //
 //		ScoringConfigGroup.ActivityParams paramsWork = new ScoringConfigGroup.ActivityParams();
 //		// eight hours
@@ -110,7 +110,7 @@
 //		config.controller().setLastIteration(0);
 //		config.scoring().setExplainScores(true);
 //		config.scoring().setWriteExperiencedPlans(true);
-//		config.scoring().getOrCreateModeParams(TransportMode.car).setMarginalUtilityOfTraveling(0);
+//		config.scoring().getOrCreateDefaultModeParams(TransportMode.car).setMarginalUtilityOfTraveling(0);
 //
 //		ScoringConfigGroup.ActivityParams paramsWork = new ScoringConfigGroup.ActivityParams();
 //		// eight hours

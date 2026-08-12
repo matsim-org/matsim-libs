@@ -185,7 +185,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			}
 		} else {
 			log.warn("prefs are taken from the config and if available from the desires as there is no preferences file specified \n");
-			for (ActivityParams activityParams : this.scenario.getConfig().scoring().getActivityParams()) {
+			for (ActivityParams activityParams : this.scenario.getConfig().scoring().getDefaultActivityParams()) {
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
 					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(),
 							activityParams.getTypicalDuration());

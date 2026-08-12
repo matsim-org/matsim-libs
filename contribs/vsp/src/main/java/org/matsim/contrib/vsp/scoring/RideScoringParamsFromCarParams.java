@@ -32,6 +32,6 @@ public class RideScoringParamsFromCarParams {
 
 		// rider and driver have marginalUtilityOfTravelling, the driver additionally loses the opportunity to perform an activity
 		rideParams.setMarginalUtilityOfTraveling((alpha + 1.0) * carParams.getMarginalUtilityOfTraveling() +
-			alpha * -scoringConfigGroup.getPerforming_utils_hr());
+			alpha * -scoringConfigGroup.getDefaultPerforming_utils_hr());
 	}
 }

@@ -14,7 +14,7 @@ public class RideScoringParamsFromCarParamsTest {
 		Config config = ConfigUtils.createConfig();
 		ScoringConfigGroup scoringConfigGroup = config.scoring();
 
-		scoringConfigGroup.setPerforming_utils_hr(6.0);
+		scoringConfigGroup.setDefaultPerforming_utils_hr(6.0);
 		ScoringConfigGroup.ModeParams carParams = scoringConfigGroup.getOrCreateDefaultModeParams(TransportMode.car);
 		carParams.setDailyMonetaryConstant(-10.0);
 		carParams.setMarginalUtilityOfDistance(-2.0);

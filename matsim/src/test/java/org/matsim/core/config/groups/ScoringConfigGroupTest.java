@@ -248,9 +248,9 @@ import org.matsim.testcases.MatsimTestUtils;
 		Assertions.assertFalse(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
 		Assertions.assertEquals(4., scoringConfigGroup.getDefaultMarginalUtilityOfMoney(), 1e-7);
 		Assertions.assertEquals(23.,
-			scoringConfigGroup.getModeParams().get("truck").getConstant(), 1e-7);
+			scoringConfigGroup.getDefaultModeParams().get("truck").getConstant(), 1e-7);
 		Assertions.assertEquals(freightActivityParams.getTypicalDuration(),
-			scoringConfigGroup.getActivityParams("freightInteraction").getTypicalDuration());
+			scoringConfigGroup.getDefaultActivityParams("freightInteraction").getTypicalDuration());
 		Assertions.assertThrows(RuntimeException.class,
 			() -> scoringConfigGroup.getModeParamsForSubpopulation(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
 		Assertions.assertThrows(RuntimeException.class,
@@ -287,7 +287,7 @@ import org.matsim.testcases.MatsimTestUtils;
 		truckModeParams.setConstant(42.);
 
 		Assertions.assertEquals(23.,
-			scoringConfigGroup.getModeParams().get("truck").getConstant(), 1e-7);
+			scoringConfigGroup.getDefaultModeParams().get("truck").getConstant(), 1e-7);
 		Assertions.assertEquals(42.,
 			scoringConfigGroup.getModeParamsForSubpopulation("freight").get("truck").getConstant(), 1e-7);
 	}

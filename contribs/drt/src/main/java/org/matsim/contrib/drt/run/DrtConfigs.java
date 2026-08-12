@@ -41,7 +41,7 @@ public class DrtConfigs {
 	public static void adjustDrtConfig(DrtConfigGroup drtCfg, ScoringConfigGroup planCalcScoreCfg,
 					   RoutingConfigGroup plansCalcRouteCfg) {
 		String drtStageActivityType = ScoringConfigGroup.createStageActivityType(drtCfg.getMode());
-		if (planCalcScoreCfg.getActivityParams(drtStageActivityType) == null) {
+		if (planCalcScoreCfg.getDefaultActivityParams(drtStageActivityType) == null) {
 			addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType);
 		}
 		// yyyy I think that the above functionality could/should be moved into the config consistency checker.  kai, feb'24

@@ -78,7 +78,7 @@ public class AccessibilityUtils {
 
 			// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
 			double walkBetaTT_utils_h = config.scoring().getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling()
-					- config.scoring().getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
+					- config.scoring().getDefaultPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
 			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / walkSpeed_m_h);
 
 			double expVjk = Math.exp(config.scoring().getBrainExpBeta() * VjkWalkTravelTime);
