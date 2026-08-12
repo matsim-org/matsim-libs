@@ -45,7 +45,7 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 	}
 
 	private static ScoringParameters params(Config config) {
-		return new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParameters(null), config.scenario()).build();
+		return new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParametersOrDefault(null), config.scenario()).build();
 	}
 
 	private static CharyparNagelActivityScoring attributeScoring(Config config, Person person) {

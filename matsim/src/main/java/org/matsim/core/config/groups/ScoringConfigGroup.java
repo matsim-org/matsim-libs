@@ -210,7 +210,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityType_".length()));
 
 			actParams.setActivityType(value);
-			getScoringParameters(null).removeParameterSet(actParams);
+			getDefaultScoringParameterSet().removeParameterSet(actParams);
 			addActivityParams(actParams);
 		} else if (key.startsWith("activityPriority_")) {
 			log.warn(key + msg);
@@ -357,7 +357,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 //			usesDeprecatedSyntax = true ;
 			// this is the stuff with the default subpopulation
 
-			getScoringParameters(null).addParam(key, value);
+			getDefaultScoringParameterSet().addParam(key, value);
 		} else {
 			delegate.addParam(key, value);
 		}
@@ -448,13 +448,13 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * @returns a list of all Activities over all Subpopulations (if existent)
 	 */
 	public Collection<String> getActivityTypes() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getActivityParamsPerType().keySet();
-		else {
-			Set<String> activities = new HashSet<>();
-			getAllScoringParameterSetsPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
-			return activities;
-		}
+		final ScoringParameterSet rootParams = getAllScoringParameterSetsPerSubpopulation().get(null);
+		if (rootParams != null)
+			return rootParams.getActivityParamsPerType().keySet();
+
+		Set<String> activities = new HashSet<>();
+		getAllScoringParameterSetsPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
+		return activities;
 	}
 
 	/*
@@ -462,8 +462,9 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * @returns a list of all Modes over all Subpopulations (if existent)
 	 */
 	public Collection<String> getAllModes() {
-		if (getScoringParameters(null) != null) {
-			return getScoringParameters(null).getModeParams().keySet();
+		final ScoringParameterSet rootParams = getAllScoringParameterSetsPerSubpopulation().get(null);
+		if (rootParams != null) {
+			return rootParams.getModeParams().keySet();
 
 		} else {
 			Set<String> modes = new HashSet<>();
@@ -511,7 +512,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	/**
 	 * Returns the mode parameters explicitly configured for the given subpopulation key.
-	 * In contrast to {@link #getScoringParameters(String)}, this method does not apply any fallback.
+	 * In contrast to {@link #getScoringParametersOrDefault(String)}, this method does not apply any fallback.
 	 */
 	public Map<String, ModeParams> getModeParamsForSubpopulation(String subpopulation) {
 		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
@@ -581,7 +582,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	/**
 	 * Returns the activity parameters explicitly configured for the given subpopulation key.
-	 * In contrast to {@link #getScoringParameters(String)}, this method does not apply any fallback.
+	 * In contrast to {@link #getScoringParametersOrDefault(String)}, this method does not apply any fallback.
 	 */
 	public Collection<ActivityParams> getActivityParamsForSubpopulation(String subpopulation) {
 		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
@@ -637,28 +638,50 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	/**
-	 * Looks up the scoring parameter set for the given subpopulation and falls back to the
-	 * default entry identified by {@code null}. This method is intentionally not using
-	 * {@link #DEFAULT_SUBPOPULATION} as an additional implicit fallback because config
-	 * management code relies on stable "exact-or-root" semantics.
+	 * Returns the scoring parameters for the given subpopulation, falling back to the configured default
+	 * scoring parameters if no exact match exists.
+	 *
+	 * @deprecated This method name hides that a default fallback is applied. Use
+	 * {@link #getScoringParametersOrDefault(String)} for scoring runtime fallback, or
+	 * {@link #getAllScoringParameterSetsPerSubpopulation()} for exact lookup without fallback.
 	 */
+	@Deprecated(since = "2026-08")
 	public ScoringParameterSet getScoringParameters(String subpopulation) {
+		return getScoringParametersOrDefault(subpopulation);
+	}
+
+	/**
+	 * Returns the scoring parameters that should be used for the given subpopulation during scoring.
+	 * An exact subpopulation match wins. If no exact match exists, the configured default scoring
+	 * parameters are returned.
+	 * <p>
+	 * The default may be represented by the root entry identified by {@code null} or by
+	 * {@link #DEFAULT_SUBPOPULATION}. Code that needs to know whether a scoring parameter set exists
+	 * exactly for a subpopulation should use {@link #getAllScoringParameterSetsPerSubpopulation()}
+	 * instead.
+	 *
+	 * @param subpopulation the subpopulation key, or {@code null}
+	 * @return scoring parameters for the subpopulation, or the configured default scoring parameters
+	 */
+	public ScoringParameterSet getScoringParametersOrDefault(String subpopulation) {
 		final ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
-		return params != null ? params : getAllScoringParameterSetsPerSubpopulation().get(null);
+		return params != null ? params : getDefaultScoringParameterSet();
 	}
 
 	/**
 	 * @return {@code true} if there is a default scoring parameter set (i.e. with key {@code null} or {@link #DEFAULT_SUBPOPULATION}), {@code false} otherwise.
 	 */
 	public boolean hasDefaultScoringParameters() {
-		if (getScoringParameters(null) != null)
-			return true;
-		else return getScoringParameters(DEFAULT_SUBPOPULATION) != null;
+		final Map<String, ScoringParameterSet> params = getAllScoringParameterSetsPerSubpopulation();
+		return params.containsKey(null) || params.containsKey(DEFAULT_SUBPOPULATION);
 	}
 
 	/**
 	 * Returns the explicitly configured scoring parameter set for the given subpopulation,
 	 * creating one if necessary.
+	 * <p>
+	 * This method does not apply default fallback. If there is no exact entry for the given
+	 * subpopulation key, a new scoring parameter set for that key is created.
 	 */
 	public ScoringParameterSet getOrCreateScoringParameters(String subpopulation) {
 		ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
@@ -748,21 +771,25 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	private void addScoringParameterSet(final ScoringParameterSet params) {
-		final ScoringParameterSet previous = this.getScoringParameters(params.getSubpopulation());
+		final Map<String, ScoringParameterSet> existingParams = getAllScoringParameterSetsPerSubpopulation();
 
-		if (previous != null) {
-			log.info("scoring parameters for subpopulation " + previous.getSubpopulation() + " were just replaced.");
-
-			final boolean removed = removeParameterSet(previous);
-			if (!removed)
-				throw new RuntimeException("problem replacing scoring params ");
+		if (params.getSubpopulation() != null && existingParams.containsKey(params.getSubpopulation())) {
+			throw new IllegalStateException("already a parameter set for subpopulation "
+				+ params.getSubpopulation()
+				+ ". Please remove the existing set before adding a new one or edit existing parameter set");
 		}
 
+		final ScoringParameterSet rootParams = existingParams.get(null);
+		if (rootParams != null) {
+			final boolean removed = removeParameterSet(rootParams);
+			if (!removed)
+				throw new RuntimeException("problem replacing root scoring params ");
+		}
 		super.addParameterSet(params);
 	}
 
 	public void addModeParams(final ModeParams params) {
-		getScoringParameters(null).addModeParams(params);
+		getDefaultScoringParameterSet().addModeParams(params);
 	}
 
 	public void addModeParamsForSubpopulation(final ModeParams params, String subpopulation) {
@@ -774,7 +801,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	public void addActivityParams(final ActivityParams params) {
-		getScoringParameters(null).addActivityParams(params);
+		getDefaultScoringParameterSet().addActivityParams(params);
 	}
 
 	public void addActivityParamsForSubpopulation(final ActivityParams params, String subpopulation) {
@@ -808,7 +835,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 					throw new RuntimeException("wrong class for " + module);
 				}
 				final String s = ((ScoringParameterSet) module).getSubpopulation();
-				if (getScoringParameters(s) != null) {
+				if (getAllScoringParameterSetsPerSubpopulation().get(s) != null) {
 					throw new IllegalStateException("already a parameter set for subpopulation " + s);
 				}
 				break;
@@ -1111,12 +1138,14 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	private ScoringParameterSet getDefaultScoringParameterSet() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null);
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION);
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
+		final Map<String, ScoringParameterSet> params = getAllScoringParameterSetsPerSubpopulation();
+		final ScoringParameterSet rootParams = params.get(null);
+		if (rootParams != null)
+			return rootParams;
+		final ScoringParameterSet defaultParams = params.get(DEFAULT_SUBPOPULATION);
+		if (defaultParams != null)
+			return defaultParams;
+		throw new RuntimeException("Default subpopulation is not defined");
 	}
 
 	public void setFractionOfIterationsToStartScoreMSA(Double val) {

@@ -375,7 +375,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 			String subpop = PopulationUtils.getSubpopulation( person );
 
 			final ScoringParameters scoringParameters =
-							new ScoringParameters.Builder( scoringConfigGroup, scoringConfigGroup.getScoringParameters( subpop ), scenario.getConfig().scenario() ).build();
+							new ScoringParameters.Builder( scoringConfigGroup, scoringConfigGroup.getScoringParametersOrDefault( subpop ), scenario.getConfig().scenario() ).build();
 			final MarginalSumScoringFunction marginalSumScoringFunction = this.activityScoringFactory == null ?
 							new MarginalSumScoringFunction( scoringParameters ) :
 							new MarginalSumScoringFunction( scoringParameters, () -> this.activityScoringFactory.apply( scoringParameters ) );

@@ -98,7 +98,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 
 		this.marginaSumScoringFunction =
 				new MarginalSumScoringFunction(
-						new ScoringParameters.Builder(scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParameters(null), scenario.getConfig().scenario()).build());
+						new ScoringParameters.Builder(scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParametersOrDefault(null), scenario.getConfig().scenario()).build());
 	}
 
 	@Override

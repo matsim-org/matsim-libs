@@ -137,8 +137,8 @@ class VehicleTypeBasedLegScoringTest {
 		var readConfig = ConfigUtils.createConfig();
 		new ConfigReader(readConfig).readFile(outFile);
 
-		var readPrivateParams = readConfig.scoring().getScoringParameters("private");
-		var readFreightParams = readConfig.scoring().getScoringParameters("freight");
+		var readPrivateParams = readConfig.scoring().getExplicitScoringParameterSetsPerSubpopulation().get("private");
+		var readFreightParams = readConfig.scoring().getExplicitScoringParameterSetsPerSubpopulation().get("freight");
 		assertVehicleTypeParams(readPrivateParams.getModeParams().get("privateTruck"));
 		assertNull(readPrivateParams.getModeParams().get("freightTruck"));
 		assertVehicleTypeParams(readFreightParams.getModeParams().get("freightTruck"));
@@ -156,7 +156,7 @@ class VehicleTypeBasedLegScoringTest {
 		var truckId = addVehicle(vehicles, "truck-1", truckType);
 
 		var scoringConfig = createScoringConfig();
-		var scoringParameterSet = scoringConfig.getScoringParameters(null);
+		var scoringParameterSet = scoringConfig.getScoringParametersOrDefault(null);
 		scoringConfig.getOrCreateDefaultModeParams("truck")
 			.setConstant(-99.0)
 			.setMarginalUtilityOfTraveling(-88.0)
@@ -167,7 +167,7 @@ class VehicleTypeBasedLegScoringTest {
 		var scoring = new VehicleTypeBasedLegScoring(vehicles, params, scoringParameterSet, Set.of());
 		scoring.handleTrip(TripStructureUtils.getTrips2(List.of(createLeg(TransportMode.car, 20, 30, truckId))).getFirst());
 
-		var truckParams = scoringConfig.getScoringParameters(null).getModeParams().get("truck");
+		var truckParams = scoringConfig.getScoringParametersOrDefault(null).getModeParams().get("truck");
 		assertNotNull(truckParams);
 		assertEquals(-99.0, truckParams.getConstant(), MatsimTestUtils.EPSILON);
 		assertEquals(-88.0, truckParams.getMarginalUtilityOfTraveling(), MatsimTestUtils.EPSILON);
@@ -182,7 +182,7 @@ class VehicleTypeBasedLegScoringTest {
 	}
 
 	private static ScoringParameters createScoringParameters(ScoringConfigGroup scoringConfig) {
-		return createScoringParameters(scoringConfig, scoringConfig.getScoringParameters(null));
+		return createScoringParameters(scoringConfig, scoringConfig.getScoringParametersOrDefault(null));
 	}
 
 	private static ScoringParameters createScoringParameters(ScoringConfigGroup scoringConfig, ScoringConfigGroup.ScoringParameterSet scoringParameterSet) {

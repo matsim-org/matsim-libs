@@ -452,7 +452,7 @@ class AgentWiseComparisonKNUtils{
 		final double avIncome = sumIncome / incomeCnt;
 		for( Person person : basePopulation.getPersons().values() ){
 			String subPop = PopulationUtils.getSubpopulation( person );
-			final double marginalUtilityOfMoney = scenario.getConfig().scoring().getScoringParameters( subPop ).getMarginalUtilityOfMoney();
+			final double marginalUtilityOfMoney = scenario.getConfig().scoring().getScoringParametersOrDefault( subPop ).getMarginalUtilityOfMoney();
 			Double income = PersonUtils.getIncome( person );
 			// this should consider the subpop!!
 			if ( income != null ) {

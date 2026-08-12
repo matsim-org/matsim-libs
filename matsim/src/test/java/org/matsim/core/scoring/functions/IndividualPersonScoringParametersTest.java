@@ -87,7 +87,7 @@ public class IndividualPersonScoringParametersTest {
 		// Enable income-based utility
 		TasteVariationsConfigParameterSet tasteParams = new TasteVariationsConfigParameterSet();
 		tasteParams.setIncomeExponent(0.5);
-		scoringConfig.getScoringParameters(null).setTasteVariationsParams(tasteParams);
+		scoringConfig.getScoringParametersOrDefault(null).setTasteVariationsParams(tasteParams);
 
 		// Create a few persons with different incomes
 		Person person1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("person1"));
@@ -128,7 +128,7 @@ public class IndividualPersonScoringParametersTest {
 			ModeUtilityParameters.Type.constant,
 			ModeUtilityParameters.Type.marginalUtilityOfTraveling_s
 		));
-		scoringConfig.getScoringParameters(null).setTasteVariationsParams(tasteParams);
+		scoringConfig.getScoringParametersOrDefault(null).setTasteVariationsParams(tasteParams);
 
 		// Create a person with mode taste variations
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("person1", Person.class));
@@ -169,7 +169,7 @@ public class IndividualPersonScoringParametersTest {
 			ModeUtilityParameters.Type.monetaryDistanceCostRate
 		));
 
-		scoringConfig.getScoringParameters(null).setTasteVariationsParams(tasteParams);
+		scoringConfig.getScoringParametersOrDefault(null).setTasteVariationsParams(tasteParams);
 
 		// Create a person with both income and taste variations
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("person1", Person.class));
@@ -203,7 +203,7 @@ public class IndividualPersonScoringParametersTest {
 		// Enable taste variations requirement
 		TasteVariationsConfigParameterSet tasteParams = new TasteVariationsConfigParameterSet();
 		tasteParams.setVariationsOf(Set.of(ModeUtilityParameters.Type.constant));
-		scoringConfig.getScoringParameters(null).setTasteVariationsParams(tasteParams);
+		scoringConfig.getScoringParametersOrDefault(null).setTasteVariationsParams(tasteParams);
 
 		// Create a person without taste variations
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("person1", Person.class));

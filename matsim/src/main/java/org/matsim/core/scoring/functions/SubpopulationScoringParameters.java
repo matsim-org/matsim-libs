@@ -67,7 +67,7 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 	}
 
 	private ScoringParameters newScoringParameters(String subpopulation) {
-		ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, this.config.getScoringParameters(subpopulation), scConfig);
+		ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, this.config.getScoringParametersOrDefault(subpopulation), scConfig);
 		if (transitConfigGroup.isUseTransit()) {
 			// yyyy this should go away somehow. :-)
 			ScoringConfigGroup.ActivityParams transitActivityParams = new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);

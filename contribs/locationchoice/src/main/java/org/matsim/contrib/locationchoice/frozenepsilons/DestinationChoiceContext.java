@@ -111,7 +111,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 
 	public void init() {
 		if ( params==null ){
-			this.params = new ScoringParameters.Builder( scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParameters( null ),
+			this.params = new ScoringParameters.Builder( scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParametersOrDefault( null ),
 				  scenario.getConfig().scenario() ).build();
 			this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), FrozenTastesConfigGroup.class );
 			ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler( this.dccg );

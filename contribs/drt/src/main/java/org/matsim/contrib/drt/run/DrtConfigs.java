@@ -47,13 +47,13 @@ public class DrtConfigs {
 		// yyyy I think that the above functionality could/should be moved into the config consistency checker.  kai, feb'24
 	}
 
-	private static void addDrtStageActivityParams(ScoringConfigGroup planCalcScoreCfg, String stageActivityType) {
+	private static void addDrtStageActivityParams(ScoringConfigGroup scoringConfigGroup, String stageActivityType) {
 		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams(stageActivityType);
 		params.setTypicalDuration(1);
 		params.setScoringThisActivityAtAll(false);
-		planCalcScoreCfg.getAllScoringParameterSetsPerSubpopulation().values().forEach(k -> k.addActivityParams(params));
-		if (planCalcScoreCfg.getScoringParameters(null) != null)
-			planCalcScoreCfg.addActivityParams(params);
+		scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().values().forEach(k -> k.addActivityParams(params));
+		if (scoringConfigGroup.getScoringParametersOrDefault(null) != null)
+			scoringConfigGroup.addActivityParams(params);
 		LOGGER.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 	}
 

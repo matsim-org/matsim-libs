@@ -91,7 +91,7 @@ public class AdvancedMarginalCongestionPricingIT {
 
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
 
-		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
+		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParametersOrDefault(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 
@@ -154,7 +154,7 @@ public class AdvancedMarginalCongestionPricingIT {
 
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
 
-		ScoringParameters params = new ScoringParameters.Builder(scoringConfigGroup, scoringConfigGroup.getScoringParameters(null), scenarioConfig).build();
+		ScoringParameters params = new ScoringParameters.Builder(scoringConfigGroup, scoringConfigGroup.getScoringParametersOrDefault(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 
@@ -207,7 +207,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		plansCalcScoreConfigGroup.setDefaultPerforming_utils_hr(6.);
 
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
+		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParametersOrDefault(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 

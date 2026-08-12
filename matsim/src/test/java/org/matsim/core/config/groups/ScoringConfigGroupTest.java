@@ -150,8 +150,8 @@ import org.matsim.testcases.MatsimTestUtils;
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	void testGetOrCreateDefaultModeParams() {
+		// Tests that default mode params are created on the default scoring parameter set.
 		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
 		int originalSize = scoringConfigGroup.getDefaultModeParams().size();
 
@@ -163,8 +163,98 @@ import org.matsim.testcases.MatsimTestUtils;
 	}
 
 	@Test
+	void testGetScoringParametersOrDefaultUsesRootDefault() {
+		// Tests that missing subpopulations fall back to the root scoring parameter set.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+		ScoringConfigGroup.ScoringParameterSet rootParams =
+			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get(null);
+
+		Assertions.assertSame(rootParams, scoringConfigGroup.getScoringParametersOrDefault("missing"));
+		Assertions.assertSame(rootParams, scoringConfigGroup.getScoringParametersOrDefault(null));
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	void testDeprecatedGetScoringParametersDelegatesToOrDefault() {
+		// Tests that the deprecated getter keeps the OrDefault behavior.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+
+		Assertions.assertSame(
+			scoringConfigGroup.getScoringParametersOrDefault("missing"),
+			scoringConfigGroup.getScoringParameters("missing"));
+
+		ScoringConfigGroup.ScoringParameterSet freightParams = scoringConfigGroup.getOrCreateScoringParameters("freight");
+		ScoringConfigGroup.ScoringParameterSet defaultParams =
+			scoringConfigGroup.setScoringParametersAsDefaultSubpopulation("freight");
+
+		Assertions.assertSame(freightParams, scoringConfigGroup.getScoringParameters("freight"));
+		Assertions.assertSame(defaultParams, scoringConfigGroup.getScoringParameters("missing"));
+	}
+
+	@Test
+	void testAddScoringParameterSetReplacesRootIfPresent() {
+		// Tests that adding scoring params replaces an existing root scoring parameter set.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+		ScoringConfigGroup.ScoringParameterSet constructorRootParams =
+			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get(null);
+
+		ScoringConfigGroup.ScoringParameterSet configuredRootParams =
+			(ScoringConfigGroup.ScoringParameterSet) scoringConfigGroup.createParameterSet(ScoringConfigGroup.ScoringParameterSet.SET_TYPE);
+		configuredRootParams.setMarginalUtilityOfMoney(3.);
+
+		scoringConfigGroup.addParameterSet(configuredRootParams);
+
+		Assertions.assertSame(configuredRootParams,
+			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get(null));
+		Assertions.assertNotSame(constructorRootParams,
+			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get(null));
+
+		ScoringConfigGroup.ScoringParameterSet replacementRootParams =
+			(ScoringConfigGroup.ScoringParameterSet) scoringConfigGroup.createParameterSet(ScoringConfigGroup.ScoringParameterSet.SET_TYPE);
+
+		scoringConfigGroup.addParameterSet(replacementRootParams);
+
+		Assertions.assertSame(replacementRootParams,
+			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get(null));
+	}
+
+	@Test
+	void testAddScoringParameterSetRejectsDuplicateExplicitSubpopulation() {
+		// Tests that duplicate explicit subpopulation scoring params are rejected.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+		scoringConfigGroup.getOrCreateScoringParameters("freight");
+
+		ScoringConfigGroup.ScoringParameterSet duplicateFreightParams =
+			(ScoringConfigGroup.ScoringParameterSet) scoringConfigGroup.createParameterSet(ScoringConfigGroup.ScoringParameterSet.SET_TYPE);
+		duplicateFreightParams.setSubpopulation("freight");
+
+		Assertions.assertThrows(IllegalStateException.class,
+			() -> scoringConfigGroup.addParameterSet(duplicateFreightParams));
+	}
+
+	@Test
+	void testAddScoringParameterSetRejectsDuplicateExplicitSubpopulationWithoutRemovingRoot() {
+		// Tests that a duplicate explicit subpopulation does not remove the root params.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+		ScoringConfigGroup.ScoringParameterSet freightParams = scoringConfigGroup.getOrCreateScoringParameters("freight");
+
+		ScoringConfigGroup.ScoringParameterSet rootParams =
+			(ScoringConfigGroup.ScoringParameterSet) scoringConfigGroup.createParameterSet(ScoringConfigGroup.ScoringParameterSet.SET_TYPE);
+		scoringConfigGroup.addParameterSet(rootParams);
+
+		ScoringConfigGroup.ScoringParameterSet duplicateFreightParams =
+			(ScoringConfigGroup.ScoringParameterSet) scoringConfigGroup.createParameterSet(ScoringConfigGroup.ScoringParameterSet.SET_TYPE);
+		duplicateFreightParams.setSubpopulation("freight");
+
+		Assertions.assertThrows(IllegalStateException.class,
+			() -> scoringConfigGroup.addParameterSet(duplicateFreightParams));
+		Assertions.assertSame(rootParams, scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get(null));
+		Assertions.assertSame(freightParams, scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get("freight"));
+	}
+
+	@Test
 	void testExplicitSubpopulationGettersDoNotFallback() {
-		// Explicit subpopulation accessors should only return parameters defined for exactly that subpopulation.
+		// Tests that explicit subpopulation accessors do not fall back to default params.
 		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
 
 		ScoringConfigGroup.ScoringParameterSet freightParams = scoringConfigGroup.getOrCreateScoringParameters("freight");
@@ -197,7 +287,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 	@Test
 	void testAddParamsForSubpopulationRequiresExplicitSubpopulation() {
-		// Adding mode and activity parameters for a subpopulation should require that the subpopulation already exists.
+		// Tests that adding subpopulation params requires an existing explicit subpopulation.
 		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
 
 		scoringConfigGroup.getOrCreateScoringParameters("freight");
@@ -222,7 +312,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 	@Test
 	void testSetScoringParametersAsDefaultSubpopulationUsesExistingParameters() {
-		// Setting an existing subpopulation as default should create an independent default parameter set.
+		// Tests that setting a subpopulation as default creates an independent default set.
 		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
 
 		ScoringConfigGroup.ScoringParameterSet freightParams = scoringConfigGroup.getOrCreateScoringParameters("freight");
@@ -242,7 +332,14 @@ import org.matsim.testcases.MatsimTestUtils;
 			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
 		Assertions.assertSame(freightParams,
 			scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().get("freight"));
+		Assertions.assertFalse(scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().containsKey(null));
 		Assertions.assertFalse(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
+		Assertions.assertSame(defaultParams,
+			scoringConfigGroup.getScoringParametersOrDefault("missing"));
+		Assertions.assertSame(defaultParams,
+			scoringConfigGroup.getScoringParametersOrDefault(null));
+		Assertions.assertSame(freightParams,
+			scoringConfigGroup.getScoringParametersOrDefault("freight"));
 		Assertions.assertEquals(4., scoringConfigGroup.getDefaultMarginalUtilityOfMoney(), 1e-7);
 		Assertions.assertEquals(23.,
 			scoringConfigGroup.getDefaultModeParams().get("truck").getConstant(), 1e-7);
@@ -286,7 +383,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 	@Test
 	void testSetScoringParametersAsDefaultSubpopulationRequiresExistingSubpopulation() {
-		// Missing subpopulations should fail instead of creating an empty default by accident.
+		// Tests that missing subpopulations cannot be set as default.
 		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
 
 		Assertions.assertThrows(RuntimeException.class,
@@ -295,7 +392,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 	@Test
 	void testSetScoringParametersAsDefaultSubpopulationFailsIfDefaultAlreadyExists() {
-		// An already explicit default should not be overwritten by another subpopulation.
+		// Tests that an existing default subpopulation cannot be overwritten.
 		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
 
 		scoringConfigGroup.getOrCreateScoringParameters("freight");
@@ -557,7 +654,7 @@ import org.matsim.testcases.MatsimTestUtils;
 			module.addParam( "monetaryDistanceRate_"+mode , ""+settings.getMonetaryDistanceRate() );
 		}
 
-		for ( Map.Entry<String, String> params : initialGroup.getScoringParameters( null ).getParams().entrySet() ) {
+		for ( Map.Entry<String, String> params : initialGroup.getScoringParametersOrDefault( null ).getParams().entrySet() ) {
 			if ( params.getKey().equals( "subpopulation" ) ) continue;
 			module.addParam( params.getKey() , params.getValue() );
 		}

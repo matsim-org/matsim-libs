@@ -205,7 +205,7 @@ public class CharyparNagelLegScoringTest {
 	private static CharyparNagelLegScoring createScoringFunction(ScoringConfigGroup config, Set<String> ptModes) {
 
 		var scenarioConfig = new ScenarioConfigGroup();
-		var scoringParams = new ScoringParameters.Builder(config, config.getScoringParameters(null), Map.of(), scenarioConfig)
+		var scoringParams = new ScoringParameters.Builder(config, config.getScoringParametersOrDefault(null), Map.of(), scenarioConfig)
 			.build();
 		return new CharyparNagelLegScoring(scoringParams, ptModes);
 	}
