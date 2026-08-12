@@ -76,16 +76,25 @@ public final class PSimConvergenceExperiment {
 
 	public static void main(String[] args) throws IOException {
 		if (args.length < 1) {
-			throw new IllegalArgumentException("usage: <outputDirectory> [baseline|psim|both]");
+			throw new IllegalArgumentException(
+					"usage: <outputDirectory> [baseline|psim|both] "
+							+ "[fullTransitPerformance|waitAndStopStopTimes] "
+							+ "[perIteration|perCycle|<rate per iteration, e.g. 0.05>]");
 		}
 		Path root = Path.of(args[0]);
 		String which = args.length > 1 ? args[1] : "both";
+		PSimConfigGroup.TransitEmulation emulation = args.length > 2
+				? PSimConfigGroup.TransitEmulation.valueOf(args[2])
+				: PSimConfigGroup.TransitEmulation.fullTransitPerformance;
+		// Either a named budget or an explicit per-iteration rate, so the trade-off between
+		// stability and convergence speed can be scanned.
+		String budget = args.length > 3 ? args[3] : "perIteration";
 
 		if (which.equals("baseline") || which.equals("both")) {
 			runBaseline(root.resolve("qsim-baseline"));
 		}
 		if (which.equals("psim") || which.equals("both")) {
-			runPSim(root.resolve("psim-1to24"));
+			runPSim(root.resolve("psim-1to24-" + emulation + "-" + budget), emulation, rateOf(budget));
 		}
 		LOG.info("Experiment finished under {}", root.toAbsolutePath());
 	}
@@ -143,15 +152,27 @@ public final class PSimConvergenceExperiment {
 		recorder.write();
 	}
 
-	private static void runPSim(Path output) throws IOException {
-		LOG.info("=== PSim: QSim:PSim 1:{}, {} QSim iterations, replanning rate {} ===",
-				PSIM_ITERATIONS_PER_CYCLE - 1, PSIM_QSIM_ITERATIONS, TOTAL_REPLANNING_RATE_PSIM);
+	private static double rateOf(String budget) {
+		return switch (budget) {
+			case "perIteration" -> TOTAL_REPLANNING_RATE_PSIM;
+			case "perCycle" -> TOTAL_REPLANNING_RATE_BASELINE / PSIM_ITERATIONS_PER_CYCLE;
+			default -> Double.parseDouble(budget);
+		};
+	}
+
+	private static void runPSim(Path output, PSimConfigGroup.TransitEmulation emulation, double rate)
+			throws IOException {
+		LOG.info("=== PSim: QSim:PSim 1:{}, {} QSim iterations, replanning rate {} per iteration "
+				+ "({} per cycle), transit emulation {} ===",
+				PSIM_ITERATIONS_PER_CYCLE - 1, PSIM_QSIM_ITERATIONS, rate,
+				rate * PSIM_ITERATIONS_PER_CYCLE, emulation);
 		int lastIteration = PSIM_QSIM_ITERATIONS * PSIM_ITERATIONS_PER_CYCLE;
-		Config config = baseConfig(output, lastIteration, TOTAL_REPLANNING_RATE_PSIM);
+		Config config = baseConfig(output, lastIteration, rate);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);
 		pSimConfigGroup.setIterationsPerCycle(PSIM_ITERATIONS_PER_CYCLE);
+		pSimConfigGroup.setTransitEmulation(emulation);
 
 		RunPSim runPSim = new RunPSim(config, pSimConfigGroup);
 		Controler controler = (Controler) runPSim.getMatsimControler();

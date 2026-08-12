@@ -31,9 +31,14 @@ import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.contrib.pseudosimulation.mobsim.SwitchingMobsimProvider;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEmulator;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
+import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitPerformanceFromEventBasedRouterInterfaces;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitPerformanceFromPSimSpecificImplementation;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
+import org.matsim.contrib.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
 import org.matsim.contrib.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
+import org.matsim.contrib.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
+import org.matsim.contrib.pseudosimulation.trafficinfo.StopStopTime;
+import org.matsim.contrib.pseudosimulation.trafficinfo.WaitTime;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -69,10 +74,12 @@ public class RunPSim {
 		MobSimSwitcher mobSimSwitcher = new MobSimSwitcher(pSimConfigGroup,scenario);
 		matsimControler.addControllerListener(mobSimSwitcher);
 
+		final PSimConfigGroup.TransitEmulation transitEmulation = transitEmulation(config, pSimConfigGroup);
+
 		// A PSim iteration reads transit performance recorded during the preceding QSim iteration.
 		// Without a recorder there is nothing to read, so transit legs would take no time at all.
 		final TransitPerformanceRecorder transitPerformanceRecorder =
-				emulatesTransit(config, pSimConfigGroup)
+				transitEmulation == PSimConfigGroup.TransitEmulation.fullTransitPerformance
 						? new TransitPerformanceRecorder(scenario, matsimControler.getEvents(), mobSimSwitcher)
 						: null;
 
@@ -91,15 +98,28 @@ public class RunPSim {
 				// Registered as the handler itself so that its guarded reset survives PSim
 				// iterations; see PSimTravelTimeCalculator.
 				addEventHandlerBinding().to(PSimTravelTimeCalculator.class);
-				if (transitPerformanceRecorder == null) {
-					bind(TransitEmulator.class).to(NoTransitEmulator.class).in(Singleton.class);
-				} else {
-					Provider<TransitPerformance> transitPerformance =
-							transitPerformanceRecorder::getTransitPerformance;
-					bind(TransitPerformanceRecorder.class).toInstance(transitPerformanceRecorder);
-					bind(TransitPerformance.class).toProvider(transitPerformance);
-					bind(TransitEmulator.class).to(TransitPerformanceFromPSimSpecificImplementation.class)
-							.in(Singleton.class);
+				switch (transitEmulation) {
+					case none -> bind(TransitEmulator.class).to(NoTransitEmulator.class).in(Singleton.class);
+					case fullTransitPerformance -> {
+						Provider<TransitPerformance> transitPerformance =
+								transitPerformanceRecorder::getTransitPerformance;
+						bind(TransitPerformanceRecorder.class).toInstance(transitPerformanceRecorder);
+						bind(TransitPerformance.class).toProvider(transitPerformance);
+						bind(TransitEmulator.class).to(TransitPerformanceFromPSimSpecificImplementation.class)
+								.in(Singleton.class);
+					}
+					case waitAndStopStopTimes -> {
+						// Registered as the handlers themselves, for the same reason as
+						// PSimTravelTimeCalculator: their guards live in reset and handleEvent.
+						bind(PSimWaitTimeCalculator.class).in(Singleton.class);
+						bind(PSimStopStopTimeCalculator.class).in(Singleton.class);
+						addEventHandlerBinding().to(PSimWaitTimeCalculator.class);
+						addEventHandlerBinding().to(PSimStopStopTimeCalculator.class);
+						bind(WaitTime.class).toProvider(PSimWaitTimeCalculator.class);
+						bind(StopStopTime.class).toProvider(PSimStopStopTimeCalculator.class);
+						bind(TransitEmulator.class).to(TransitPerformanceFromEventBasedRouterInterfaces.class)
+								.in(Singleton.class);
+					}
 				}
 				bind(PlanCatcher.class).toInstance(new PlanCatcher());
 				bind(PSimProvider.class).toInstance(new PSimProvider(scenario,matsimControler.getEvents()));
@@ -109,11 +129,14 @@ public class RunPSim {
 	}
 
 	/**
-	 * Transit is emulated only when the scenario actually simulates it and the recorded transit
-	 * performance is requested. Otherwise PSim falls back to not emulating transit at all.
+	 * A scenario that does not simulate transit has no transit performance to record, so the
+	 * configured emulation is overridden rather than left to measure nothing.
 	 */
-	static boolean emulatesTransit(Config config, PSimConfigGroup pSimConfigGroup) {
-		return config.transit().isUseTransit() && pSimConfigGroup.isFullTransitPerformanceTransmission();
+	static PSimConfigGroup.TransitEmulation transitEmulation(Config config, PSimConfigGroup pSimConfigGroup) {
+		if (!config.transit().isUseTransit()) {
+			return PSimConfigGroup.TransitEmulation.none;
+		}
+		return pSimConfigGroup.resolveTransitEmulation();
 	}
 
 	/**

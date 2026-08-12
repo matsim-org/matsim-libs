@@ -206,18 +206,27 @@ public class PSimSiouxFallsIntegrationTest {
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 
 		config.transit().setUseTransit(true);
-		pSimConfigGroup.setFullTransitPerformanceTransmission(true);
-		assertTrue(RunPSim.emulatesTransit(config, pSimConfigGroup));
+		assertEquals(PSimConfigGroup.TransitEmulation.fullTransitPerformance,
+				RunPSim.transitEmulation(config, pSimConfigGroup),
+				"a transit scenario emulates transit unless told otherwise");
 
 		assertAll(() -> {
 			config.transit().setUseTransit(false);
-			assertFalse(RunPSim.emulatesTransit(config, pSimConfigGroup),
+			assertEquals(PSimConfigGroup.TransitEmulation.none,
+					RunPSim.transitEmulation(config, pSimConfigGroup),
 					"a scenario without transit has no transit performance to record");
 		}, () -> {
 			config.transit().setUseTransit(true);
-			pSimConfigGroup.setFullTransitPerformanceTransmission(false);
-			assertFalse(RunPSim.emulatesTransit(config, pSimConfigGroup),
-					"transit emulation is opt-out through the PSim config group");
+			pSimConfigGroup.setTransitEmulation(PSimConfigGroup.TransitEmulation.waitAndStopStopTimes);
+			assertEquals(PSimConfigGroup.TransitEmulation.waitAndStopStopTimes,
+					RunPSim.transitEmulation(config, pSimConfigGroup),
+					"the emulator is chosen through the PSim config group");
+		}, () -> {
+			config.transit().setUseTransit(false);
+			pSimConfigGroup.setTransitEmulation(PSimConfigGroup.TransitEmulation.waitAndStopStopTimes);
+			assertEquals(PSimConfigGroup.TransitEmulation.none,
+					RunPSim.transitEmulation(config, pSimConfigGroup),
+					"the scenario overrides the config group, not the other way round");
 		});
 	}
 }
