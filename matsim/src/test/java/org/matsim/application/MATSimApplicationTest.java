@@ -74,7 +74,7 @@ public class MATSimApplicationTest {
 
 		ScoringConfigGroup score = controler.getConfig().scoring();
 
-		ScoringConfigGroup.ScoringParameterSet params = score.getScoringParameters(null);
+		ScoringConfigGroup.ScoringParameterSet params = score.getScoringParametersOrDefault(null);
 
 		assertThat(params.getOrCreateModeParams("car").getConstant())
 			.isEqualTo(-1);

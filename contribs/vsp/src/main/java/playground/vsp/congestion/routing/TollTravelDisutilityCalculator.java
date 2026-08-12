@@ -61,7 +61,7 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getDefaultModeParams().get(TransportMode.car).getMonetaryDistanceRate();
 		// ignores cnScoringGroup.getModeParams().get(TransportMode.car).getMarginalUtilityOfDistance();
-		this.marginalUtlOfTravelTime = (-cnScoringGroup.getDefaultModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+		this.marginalUtlOfTravelTime = (-cnScoringGroup.getDefaultModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getDefaultPerforming_utils_hr() / 3600.0);
 		this.tollHandler = tollHandler;
 
 		log.info("The 'blend factor' which is used for the calculation of the expected tolls in the next iteration is set to " + this.blendFactor);

@@ -423,7 +423,7 @@ public class EstimatedDrtAccessibilityTest {
 		// DRT
 		// DRT: Scoring Params
 		ScoringConfigGroup.ModeParams drtScoringParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
-		config.scoring().addModeParams(drtScoringParams);
+		config.scoring().addDefaultModeParams(drtScoringParams);
 
 		// DRT: DVRP Config Group
 		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );

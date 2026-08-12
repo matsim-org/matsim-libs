@@ -239,7 +239,8 @@ public class TopKMinMaxTest {
 
 			tripBinder.addBinding(TransportMode.car).toInstance(new CarTripEstimator());
 
-			ScoringParameters.Builder scoring = new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParameters("person"), Map.of(), config.scenario());
+			ScoringParameters.Builder scoring = new ScoringParameters.Builder(config.scoring(),
+				config.scoring().getScoringParametersOrDefault("person"), Map.of(), config.scenario());
 
 			bind(ScoringParametersForPerson.class).toInstance(person -> scoring.build());
 			bind(InformedModeChoiceConfigGroup.class).toInstance(ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class));

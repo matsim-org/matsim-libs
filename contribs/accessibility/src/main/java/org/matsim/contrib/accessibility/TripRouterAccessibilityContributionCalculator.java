@@ -88,7 +88,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 		this.networkConfigGroup = scenario.getConfig().network();
 		this.scenario = scenario;
 
-		betaWalkTT = scoringConfigGroup.getModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		betaWalkTT = scoringConfigGroup.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getDefaultPerforming_utils_hr();
 
 		this.walkSpeed_m_s = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk);
 
@@ -158,7 +158,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 				}
 				utility += (leg.getRoute().getDistance() + endLinkLength) * this.scoringConfigGroup.getDefaultModeParams().get(leg.getMode()).getMarginalUtilityOfDistance();
 				utility += (leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.scoringConfigGroup.getDefaultModeParams().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
-				utility += -(leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.scoringConfigGroup.getPerforming_utils_hr() / 3600.;
+				utility += -(leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.scoringConfigGroup.getDefaultPerforming_utils_hr() / 3600.;
 			}
 
 			// Utility based on opportunities that are attached to destination node

@@ -70,14 +70,14 @@ public enum SnzActivities {
 
 		for (SnzActivities value : SnzActivities.values()) {
 			for (long ii = 600; ii <= 97200; ii += 600) {
-				config.scoring().addActivityParams(value.apply(new ActivityParams(value.name() + "_" + ii).setTypicalDuration(ii)));
+				config.scoring().addDefaultActivityParams(value.apply(new ActivityParams(value.name() + "_" + ii).setTypicalDuration(ii)));
 			}
 		}
 
-		config.scoring().addActivityParams(new ActivityParams("other").setTypicalDuration(600 * 3));
+		config.scoring().addDefaultActivityParams(new ActivityParams("other").setTypicalDuration(600 * 3));
 
-		config.scoring().addActivityParams(new ActivityParams("freight_start").setTypicalDuration(60 * 15));
-		config.scoring().addActivityParams(new ActivityParams("freight_end").setTypicalDuration(60 * 15));
+		config.scoring().addDefaultActivityParams(new ActivityParams("freight_start").setTypicalDuration(60 * 15));
+		config.scoring().addDefaultActivityParams(new ActivityParams("freight_end").setTypicalDuration(60 * 15));
 
 	}
 	/**
@@ -88,9 +88,9 @@ public enum SnzActivities {
 
 		for (SnzActivities value : SnzActivities.values()) {
 			for (long ii = 600; ii <= 97200; ii += 600) {
-				config.scoring().addActivityParams(new ActivityParams(value.name() + "_" + ii).setTypicalDuration(ii) );
-				config.scoring().addActivityParams(new ActivityParams( SnzActivities.createMorningActivityType( value.name())+"_"+ii).setTypicalDuration(ii) );
-				config.scoring().addActivityParams(new ActivityParams( SnzActivities.createEveningActivityType( value.name())+"_"+ii).setTypicalDuration(ii) );
+				config.scoring().addDefaultActivityParams(new ActivityParams(value.name() + "_" + ii).setTypicalDuration(ii) );
+				config.scoring().addDefaultActivityParams(new ActivityParams( SnzActivities.createMorningActivityType( value.name())+"_"+ii).setTypicalDuration(ii) );
+				config.scoring().addDefaultActivityParams(new ActivityParams( SnzActivities.createEveningActivityType( value.name())+"_"+ii).setTypicalDuration(ii) );
 			}
 		}
 	}

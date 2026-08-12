@@ -264,11 +264,11 @@ public class PrebookingTestEnvironment {
 		config.qsim().setSimEndtimeInterpretation(EndtimeInterpretation.onlyUseEndtime);
 
 		ModeParams drtParams = new ModeParams("drt");
-		config.scoring().addModeParams(drtParams);
+		config.scoring().addDefaultModeParams(drtParams);
 
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(genericParams);
+		config.scoring().addDefaultActivityParams(genericParams);
 
 		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
 		DvrpTravelTimeMatrixParams matrixParams = dvrpConfig.getTravelTimeMatrixParams();

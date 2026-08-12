@@ -106,9 +106,9 @@ public class SimulateAndScoreTest {
 		config.scoring().getDefaultModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 0);
 		config.scoring().getDefaultModeParams().get(TransportMode.car).setMonetaryDistanceRate((double) 10);
 		config.scoring().getDefaultModeParams().get(TransportMode.pt).setMonetaryDistanceRate((double) 0);
-		config.scoring().addActivityParams(h);
-		config.scoring().addActivityParams(w);
-		config.scoring().addActivityParams(transitActivityParams);
+		config.scoring().addDefaultActivityParams(h);
+		config.scoring().addDefaultActivityParams(w);
+		config.scoring().addDefaultActivityParams(transitActivityParams);
 
 		// ---
 
@@ -294,8 +294,8 @@ public class SimulateAndScoreTest {
 		scenario.getConfig().scoring().getDefaultModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
 		double monetaryDistanceRatePt = -0.001;
 		scenario.getConfig().scoring().getDefaultModeParams().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
-		scenario.getConfig().scoring().addActivityParams(h);
-		scenario.getConfig().scoring().addActivityParams(w);
+		scenario.getConfig().scoring().addDefaultActivityParams(h);
+		scenario.getConfig().scoring().addDefaultActivityParams(w);
 		EventsToScore scorer = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);

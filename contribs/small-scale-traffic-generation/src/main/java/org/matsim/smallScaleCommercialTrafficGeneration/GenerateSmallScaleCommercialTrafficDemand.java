@@ -401,7 +401,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (mergeSmallScaleCommercialCarrierParts) {
 			mergeSmallScaleCommercialCarrierParts(config, finalOutput);
 			scenario = SmallScaleCommercialTrafficUtils.loadScenarioWithCarrierFile(config,
-				finalOutput.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(config, SOLVED_CARRIER_FILE)), CARRIER_VEHICLE_TYPES_FILE);
+				finalOutput.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(config, SOLVED_CARRIER_FILE)));
 			// (I think that this execution path just merges already existing parts (chunks).)
 		} else {
 			if (isSolvingOnlyCarrierPart()) {
@@ -693,7 +693,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Path carrierPartsFolder = smallScaleCommercialCarrierPartsFolder == null
 			? finalOutput.resolve(CARRIER_PARTS_FOLDER)
 			: smallScaleCommercialCarrierPartsFolder;
-		mergeSmallScaleCommercialCarrierPartFiles(baseConfig, carrierPartsFolder, finalOutput, SOLVED_CARRIER_FILE);
+		mergeSmallScaleCommercialCarrierPartFiles(baseConfig, carrierPartsFolder, finalOutput);
 	}
 
 	/**
@@ -702,13 +702,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * The method is used for the solved VRP result. It also collects the carrier vehicle types from the part folders
 	 * and writes one merged vehicle type file next to the merged carriers.
 	 *
-	 * @param baseConfig config used for run-id-prefixed file names and for loading the part carrier files
+	 * @param baseConfig         config used for run-id-prefixed file names and for loading the part carrier files
 	 * @param carrierPartsFolder folder containing all {@code part-xxx-of-yyy} subfolders
-	 * @param finalOutput output folder for the merged carrier and vehicle type files
-	 * @param carrierFileName base name of the carrier file to merge
+	 * @param finalOutput        output folder for the merged carrier and vehicle type files
 	 */
-	private void mergeSmallScaleCommercialCarrierPartFiles(Config baseConfig, Path carrierPartsFolder, Path finalOutput, String carrierFileName) {
-		Path outputCarrierFile = finalOutput.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(baseConfig, carrierFileName));
+	private void mergeSmallScaleCommercialCarrierPartFiles(Config baseConfig, Path carrierPartsFolder, Path finalOutput) {
+		Path outputCarrierFile = finalOutput.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(baseConfig,
+			SmallScaleCommercialTrafficUtils.SOLVED_CARRIER_FILE));
 		if (Files.exists(outputCarrierFile)) {
 			throw new IllegalStateException("Merged small scale commercial carrier file already exists: " + outputCarrierFile
 				+ ". Delete or move this file before running the merge again.");
@@ -718,11 +718,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Carriers mergedCarriers = CarriersUtils.addOrGetCarriers(mergedScenario);
 		for (int partIndex = 0; partIndex < smallScaleCommercialCarrierPartCount; partIndex++) {
 			Path partCarrierFile = carrierPartsFolder.resolve(SmallScaleCommercialTrafficUtils.getCarrierPartSuffix(partIndex, smallScaleCommercialCarrierPartCount))
-				.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(baseConfig, carrierFileName));
+				.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(baseConfig, SmallScaleCommercialTrafficUtils.SOLVED_CARRIER_FILE));
 			if (!Files.exists(partCarrierFile)) {
 				throw new IllegalArgumentException("Missing small scale commercial carrier part file: " + partCarrierFile);
 			}
-			Scenario partScenario = SmallScaleCommercialTrafficUtils.loadScenarioWithCarrierFileOnly(baseConfig, partCarrierFile, CARRIER_VEHICLE_TYPES_FILE);
+			Scenario partScenario = SmallScaleCommercialTrafficUtils.loadScenarioWithCarrierFileOnly(baseConfig, partCarrierFile);
 			CarriersUtils.getOrAddCarrierVehicleTypes(partScenario).getVehicleTypes().forEach((vehicleTypeId, vehicleType) ->
 				CarriersUtils.getOrAddCarrierVehicleTypes(mergedScenario).getVehicleTypes().putIfAbsent(vehicleTypeId, vehicleType));
 			for (Carrier carrier : CarriersUtils.getCarriers(partScenario).getCarriers().values()) {

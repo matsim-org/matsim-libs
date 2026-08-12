@@ -41,19 +41,19 @@ public class DrtConfigs {
 	public static void adjustDrtConfig(DrtConfigGroup drtCfg, ScoringConfigGroup planCalcScoreCfg,
 					   RoutingConfigGroup plansCalcRouteCfg) {
 		String drtStageActivityType = ScoringConfigGroup.createStageActivityType(drtCfg.getMode());
-		if (planCalcScoreCfg.getActivityParams(drtStageActivityType) == null) {
+		if (planCalcScoreCfg.getDefaultActivityParams(drtStageActivityType) == null) {
 			addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType);
 		}
 		// yyyy I think that the above functionality could/should be moved into the config consistency checker.  kai, feb'24
 	}
 
-	private static void addDrtStageActivityParams(ScoringConfigGroup planCalcScoreCfg, String stageActivityType) {
+	private static void addDrtStageActivityParams(ScoringConfigGroup scoringConfigGroup, String stageActivityType) {
 		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams(stageActivityType);
 		params.setTypicalDuration(1);
 		params.setScoringThisActivityAtAll(false);
-		planCalcScoreCfg.getAllScoringParameterSetsPerSubpopulation().values().forEach(k -> k.addActivityParams(params));
-		if (planCalcScoreCfg.getScoringParameters(null) != null)
-			planCalcScoreCfg.addActivityParams(params);
+		scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().values().forEach(k -> k.addActivityParams(params));
+		if (scoringConfigGroup.getScoringParametersOrDefault(null) != null)
+			scoringConfigGroup.addDefaultActivityParams(params);
 		LOGGER.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 	}
 

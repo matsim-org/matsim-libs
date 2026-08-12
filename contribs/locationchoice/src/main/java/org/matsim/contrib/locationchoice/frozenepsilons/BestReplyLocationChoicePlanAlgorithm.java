@@ -230,7 +230,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		double betaTime = this.scenario.getConfig().scoring().getDefaultModeParams().get(TransportMode.car ).getMarginalUtilityOfTraveling();
 //		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
 		if ( this.scenario.getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
-			betaTime -= this.scenario.getConfig().scoring().getPerforming_utils_hr() ;
+			betaTime -= this.scenario.getConfig().scoring().getDefaultPerforming_utils_hr() ;
 			// needs to be negative (I think) since AH uses this as a cost parameter. kai, jan'13
 		}
 		double maxTravelTime = Double.MAX_VALUE;

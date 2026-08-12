@@ -89,11 +89,11 @@ public class TestScenarioBuilder {
 
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(genericParams);
+		config.scoring().addDefaultActivityParams(genericParams);
 
 		ActivityParams chargingParams = new ActivityParams("car charging interaction");
 		chargingParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(chargingParams);
+		config.scoring().addDefaultActivityParams(chargingParams);
 
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());

@@ -76,8 +76,8 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 		logWarningsIfNecessary( cnScoringGroup, params );
 
 		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
-		final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-		final double marginalCostOfDistance_m = - params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney()
+		final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getDefaultPerforming_utils_hr() / 3600.0);
+		final double marginalCostOfDistance_m = - params.getMonetaryDistanceRate() * cnScoringGroup.getDefaultMarginalUtilityOfMoney()
 				- params.getMarginalUtilityOfDistance() ;
 
 		double normalization = 1;
@@ -121,7 +121,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 				log.warn("in the xml config");
 			}
 
-			if ( (params.getMarginalUtilityOfTraveling() + cnScoringGroup.getPerforming_utils_hr())  == 0. && this.sigma != 0. ) {
+			if ( (params.getMarginalUtilityOfTraveling() + cnScoringGroup.getDefaultPerforming_utils_hr())  == 0. && this.sigma != 0. ) {
 				log.warn("There will be no routing randomness for mode={}. The randomization of the travel disutility requires the travel time cost rate "
 						+ "to be different than zero. Continuing anyway.", mode) ;
 			}

@@ -125,29 +125,29 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 		// kai, dec'19
 
-		this.addModeParams(new ModeParams(TransportMode.car));
-		this.addModeParams(new ModeParams(TransportMode.pt));
-		this.addModeParams(new ModeParams(TransportMode.walk));
-		this.addModeParams(new ModeParams(TransportMode.bike));
-		this.addModeParams(new ModeParams(TransportMode.ride));
-		this.addModeParams(new ModeParams(TransportMode.other));
+		this.addDefaultModeParams(new ModeParams(TransportMode.car));
+		this.addDefaultModeParams(new ModeParams(TransportMode.pt));
+		this.addDefaultModeParams(new ModeParams(TransportMode.walk));
+		this.addDefaultModeParams(new ModeParams(TransportMode.bike));
+		this.addDefaultModeParams(new ModeParams(TransportMode.ride));
+		this.addDefaultModeParams(new ModeParams(TransportMode.other));
 		///  (I do not know why the above works since the same does NOT work in {@link ScoringParameterSet}.)
 
-		this.addActivityParams(new ActivityParams("dummy").setTypicalDuration(2. * 3600.));
+		this.addDefaultActivityParams(new ActivityParams("dummy").setTypicalDuration(2. * 3600.));
 		// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
 		// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
 //			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
 
 		// yyyyyy find better solution for this. kai, dec'15
 		// Probably no longer needed; see checkConsistency method.  kai, jan'21
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.car)).setScoringThisActivityAtAll(false));
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.pt)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.car)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.pt)).setScoringThisActivityAtAll(false));
 		// (need this for self-programmed pseudo pt. kai, nov'16)
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.bike)).setScoringThisActivityAtAll(false));
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.drt)).setScoringThisActivityAtAll(false));
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.taxi)).setScoringThisActivityAtAll(false));
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.other)).setScoringThisActivityAtAll(false));
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.walk)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.bike)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.drt)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.taxi)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.other)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.walk)).setScoringThisActivityAtAll(false));
 		// (bushwhacking_walk---network_walk---bushwhacking_walk)
 	}
 
@@ -210,8 +210,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityType_".length()));
 
 			actParams.setActivityType(value);
-			getScoringParameters(null).removeParameterSet(actParams);
-			addActivityParams(actParams);
+			getDefaultScoringParameterSet().removeParameterSet(actParams);
+			addDefaultActivityParams(actParams);
 		} else if (key.startsWith("activityPriority_")) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
@@ -255,32 +255,32 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		} else if (key.startsWith("traveling_")) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			ModeParams modeParams = getOrCreateModeParams(key.substring("traveling_".length()));
+			ModeParams modeParams = getOrCreateDefaultModeParams(key.substring("traveling_".length()));
 			modeParams.setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if (key.startsWith("marginalUtlOfDistance_")) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			ModeParams modeParams = getOrCreateModeParams(key.substring("marginalUtlOfDistance_".length()));
+			ModeParams modeParams = getOrCreateDefaultModeParams(key.substring("marginalUtlOfDistance_".length()));
 			modeParams.setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if (key.startsWith("monetaryDistanceRate_")) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			ModeParams modeParams = getOrCreateModeParams(key.substring("monetaryDistanceRate_".length()));
+			ModeParams modeParams = getOrCreateDefaultModeParams(key.substring("monetaryDistanceRate_".length()));
 			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
 		} else if ("monetaryDistanceRateCar".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			ModeParams modeParams = getOrCreateModeParams(TransportMode.car);
+			ModeParams modeParams = getOrCreateDefaultModeParams(TransportMode.car);
 			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
 		} else if ("monetaryDistanceRatePt".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			ModeParams modeParams = getOrCreateModeParams(TransportMode.pt);
+			ModeParams modeParams = getOrCreateDefaultModeParams(TransportMode.pt);
 			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
 		} else if (key.startsWith("constant_")) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			ModeParams modeParams = getOrCreateModeParams(key.substring("constant_".length()));
+			ModeParams modeParams = getOrCreateDefaultModeParams(key.substring("constant_".length()));
 			modeParams.setConstant(Double.parseDouble(value));
 		}
 
@@ -288,65 +288,65 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		else if ("traveling".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getDefaultModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingPt".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getDefaultModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingWalk".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getDefaultModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingOther".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModeParams().get(TransportMode.other).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getDefaultModeParams().get(TransportMode.other).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingBike".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+			this.getDefaultModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		}
 
 		// backward compatibility: "typed" util of distance
 		else if ("marginalUtlOfDistanceCar".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModeParams().get(TransportMode.car).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getDefaultModeParams().get(TransportMode.car).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistancePt".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModeParams().get(TransportMode.pt).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getDefaultModeParams().get(TransportMode.pt).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistanceWalk".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModeParams().get(TransportMode.walk).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getDefaultModeParams().get(TransportMode.walk).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistanceOther".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			this.getModeParams().get(TransportMode.other).setMarginalUtilityOfDistance(Double.parseDouble(value));
+			this.getDefaultModeParams().get(TransportMode.other).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		}
 
 		// backward compatibility: "typed" constants
 		else if ("constantCar".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModeParams().get(TransportMode.car).setConstant(Double.parseDouble(value));
+			getDefaultModeParams().get(TransportMode.car).setConstant(Double.parseDouble(value));
 		} else if ("constantWalk".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModeParams().get(TransportMode.walk).setConstant(Double.parseDouble(value));
+			getDefaultModeParams().get(TransportMode.walk).setConstant(Double.parseDouble(value));
 		} else if ("constantOther".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModeParams().get(TransportMode.other).setConstant(Double.parseDouble(value));
+			getDefaultModeParams().get(TransportMode.other).setConstant(Double.parseDouble(value));
 		} else if ("constantPt".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModeParams().get(TransportMode.pt).setConstant(Double.parseDouble(value));
+			getDefaultModeParams().get(TransportMode.pt).setConstant(Double.parseDouble(value));
 		} else if ("constantBike".equals(key)) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
-			getModeParams().get(TransportMode.bike).setConstant(Double.parseDouble(value));
+			getDefaultModeParams().get(TransportMode.bike).setConstant(Double.parseDouble(value));
 		}
 
 		// old-fashioned scoring parameters: default subpopulation
@@ -357,7 +357,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 //			usesDeprecatedSyntax = true ;
 			// this is the stuff with the default subpopulation
 
-			getScoringParameters(null).addParam(key, value);
+			getDefaultScoringParameterSet().addParam(key, value);
 		} else {
 			delegate.addParam(key, value);
 		}
@@ -378,8 +378,21 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		return actType;
 	}
 
+	/**
+	 * Returns the mode parameters for the given mode from the default/root scoring parameters,
+	 * creating them if necessary.
+	 */
+	public ModeParams getOrCreateDefaultModeParams(String modeName) {
+		return getDefaultScoringParameterSet().getOrCreateModeParams(modeName);
+	}
+
+	/**
+	 * @deprecated Use {@link #getOrCreateDefaultModeParams(String)} for default scoring parameters or
+	 * {@link ScoringParameterSet#getOrCreateModeParams(String)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-08")
 	public ModeParams getOrCreateModeParams(String modeName) {
-		return getScoringParameters(null).getOrCreateModeParams(modeName);
+		return getOrCreateDefaultModeParams(modeName);
 	}
 
 	@Override
@@ -435,13 +448,13 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * @returns a list of all Activities over all Subpopulations (if existent)
 	 */
 	public Collection<String> getActivityTypes() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getActivityParamsPerType().keySet();
-		else {
-			Set<String> activities = new HashSet<>();
-			getAllScoringParameterSetsPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
-			return activities;
-		}
+		final ScoringParameterSet rootParams = getAllScoringParameterSetsPerSubpopulation().get(null);
+		if (rootParams != null)
+			return rootParams.getActivityParamsPerType().keySet();
+
+		Set<String> activities = new HashSet<>();
+		getAllScoringParameterSetsPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
+		return activities;
 	}
 
 	/*
@@ -449,8 +462,9 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 * @returns a list of all Modes over all Subpopulations (if existent)
 	 */
 	public Collection<String> getAllModes() {
-		if (getScoringParameters(null) != null) {
-			return getScoringParameters(null).getModeParams().keySet();
+		final ScoringParameterSet rootParams = getAllScoringParameterSetsPerSubpopulation().get(null);
+		if (rootParams != null) {
+			return rootParams.getModeParams().keySet();
 
 		} else {
 			Set<String> modes = new HashSet<>();
@@ -493,12 +507,12 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	 */
 	@Deprecated(since = "2026-02")
 	public Map<String, ModeParams> getModes() {
-		return getModeParams();
+		return getDefaultModeParams();
 	}
 
 	/**
 	 * Returns the mode parameters explicitly configured for the given subpopulation key.
-	 * In contrast to {@link #getScoringParameters(String)}, this method does not apply any fallback.
+	 * In contrast to {@link #getScoringParametersOrDefault(String)}, this method does not apply any fallback.
 	 */
 	public Map<String, ModeParams> getModeParamsForSubpopulation(String subpopulation) {
 		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
@@ -568,7 +582,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	/**
 	 * Returns the activity parameters explicitly configured for the given subpopulation key.
-	 * In contrast to {@link #getScoringParameters(String)}, this method does not apply any fallback.
+	 * In contrast to {@link #getScoringParametersOrDefault(String)}, this method does not apply any fallback.
 	 */
 	public Collection<ActivityParams> getActivityParamsForSubpopulation(String subpopulation) {
 		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
@@ -624,28 +638,51 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	/**
-	 * Looks up the scoring parameter set for the given subpopulation and falls back to the
-	 * default entry identified by {@code null}. This method is intentionally not using
-	 * {@link #DEFAULT_SUBPOPULATION} as an additional implicit fallback because config
-	 * management code relies on stable "exact-or-root" semantics.
+	 * Returns the scoring parameters for the given subpopulation, falling back to the configured default
+	 * scoring parameters if no exact match exists.
+	 *
+	 * @deprecated This method name hides that a default fallback is applied. Use
+	 * {@link #getScoringParametersOrDefault(String)} for scoring runtime fallback, or
+	 * {@link #getAllScoringParameterSetsPerSubpopulation()} for exact lookup without fallback.
 	 */
+	@Deprecated(since = "2026-08")
 	public ScoringParameterSet getScoringParameters(String subpopulation) {
+		return getScoringParametersOrDefault(subpopulation);
+	}
+
+	/**
+	 * Returns the scoring parameters that should be used for the given subpopulation during scoring.
+	 * An exact subpopulation match wins. If no exact match exists, the configured default scoring
+	 * parameters are returned.
+	 * <p>
+	 * The default may be represented by the root entry identified by {@code null} or by
+	 * {@link #DEFAULT_SUBPOPULATION}. Code that needs to know whether a scoring parameter set exists
+	 * exactly for a subpopulation should use {@link #getAllScoringParameterSetsPerSubpopulation()}
+	 * instead.
+	 *
+	 * @param subpopulation the subpopulation key, or {@code null}
+	 * @return scoring parameters for the subpopulation, or the configured default scoring parameters
+	 */
+	public ScoringParameterSet getScoringParametersOrDefault(String subpopulation) {
 		final ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
-		return params != null ? params : getAllScoringParameterSetsPerSubpopulation().get(null);
+		return params != null ? params : getDefaultScoringParameterSet();
 	}
 
 	/**
 	 * @return {@code true} if there is a default scoring parameter set (i.e. with key {@code null} or {@link #DEFAULT_SUBPOPULATION}), {@code false} otherwise.
 	 */
 	public boolean hasDefaultScoringParameters() {
-		if (getScoringParameters(null) != null)
-			return true;
-		else return getScoringParameters(DEFAULT_SUBPOPULATION) != null;
+		final Map<String, ScoringParameterSet> params = getAllScoringParameterSetsPerSubpopulation();
+		return params.containsKey(null) || params.containsKey(DEFAULT_SUBPOPULATION);
 	}
 
 	/**
 	 * Returns the explicitly configured scoring parameter set for the given subpopulation,
-	 * creating one if necessary.
+	 * creating and registering one if necessary.
+	 * <p>
+	 * This method does not apply default fallback. If there is no exact entry for the given
+	 * subpopulation key, a new scoring parameter set for that key is created and added to this
+	 * config group.
 	 */
 	public ScoringParameterSet getOrCreateScoringParameters(String subpopulation) {
 		ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
@@ -721,10 +758,10 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	public void addParameterSet(final ConfigGroup set) {
 		switch (set.getName()) {
 			case ActivityParams.SET_TYPE:
-				addActivityParams((ActivityParams) set);
+				addDefaultActivityParams((ActivityParams) set);
 				break;
 			case ModeParams.SET_TYPE:
-				addModeParams((ModeParams) set);
+				addDefaultModeParams((ModeParams) set);
 				break;
 			case ScoringParameterSet.SET_TYPE:
 				addScoringParameterSet((ScoringParameterSet) set);
@@ -734,24 +771,62 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 	}
 
+	/**
+	 * Adds a scoring parameter set while preserving the legacy default-root handover.
+	 * <p>
+	 * A scoring parameter set with a non-{@code null} subpopulation key must be unique. Adding another
+	 * set for an already configured non-{@code null} subpopulation fails with an
+	 * {@link IllegalStateException}.
+	 * <p>
+	 * The root scoring parameter set identified by {@code null} is treated as the default/root handover
+	 * entry. If such a root set exists, it is replaced by the newly added set. This keeps old config
+	 * parsing behavior where explicitly provided scoring parameter sets can take over generated root
+	 * defaults.
+	 * <p>
+	 * This method intentionally does not use {@link #getScoringParametersOrDefault(String)}. The
+	 * {@link #DEFAULT_SUBPOPULATION} entry is a configured default and must not be removed just
+	 * because a new subpopulation-specific set is added.
+	 */
 	private void addScoringParameterSet(final ScoringParameterSet params) {
-		final ScoringParameterSet previous = this.getScoringParameters(params.getSubpopulation());
+		final Map<String, ScoringParameterSet> existingParams = getAllScoringParameterSetsPerSubpopulation();
 
-		if (previous != null) {
-			log.info("scoring parameters for subpopulation " + previous.getSubpopulation() + " were just replaced.");
-
-			final boolean removed = removeParameterSet(previous);
-			if (!removed)
-				throw new RuntimeException("problem replacing scoring params ");
+		if (params.getSubpopulation() != null && existingParams.containsKey(params.getSubpopulation())) {
+			throw new IllegalStateException("already a parameter set for subpopulation "
+				+ params.getSubpopulation()
+				+ ". Please remove the existing set before adding a new one or edit existing parameter set");
 		}
 
+		final ScoringParameterSet rootParams = existingParams.get(null);
+		if (rootParams != null) {
+			final boolean removed = removeParameterSet(rootParams);
+			if (!removed)
+				throw new RuntimeException("problem replacing root scoring params ");
+		}
 		super.addParameterSet(params);
 	}
 
-	public void addModeParams(final ModeParams params) {
-		getScoringParameters(null).addModeParams(params);
+	/**
+	 * Adds the given mode parameters to the default/root scoring parameter set.
+	 * <p>
+	 * Use {@link ScoringParameterSet#addModeParams(ModeParams)} when adding mode parameters to an
+	 * explicit subpopulation scoring parameter set.
+	 */
+	public void addDefaultModeParams(final ModeParams params) {
+		getDefaultScoringParameterSet().addModeParams(params);
 	}
 
+	/**
+	 * @deprecated Use {@link #addDefaultModeParams(ModeParams)} for default scoring parameters or
+	 * {@link ScoringParameterSet#addModeParams(ModeParams)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-08")
+	public void addModeParams(final ModeParams params) {
+		addDefaultModeParams(params);
+	}
+
+	/**
+	 * Adds the given mode parameters to an explicitly configured subpopulation scoring parameter set.
+	 */
 	public void addModeParamsForSubpopulation(final ModeParams params, String subpopulation) {
 		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
 		if (scoringParameterSet == null) {
@@ -760,10 +835,28 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		scoringParameterSet.addModeParams(params);
 	}
 
-	public void addActivityParams(final ActivityParams params) {
-		getScoringParameters(null).addActivityParams(params);
+	/**
+	 * Adds the given activity parameters to the default/root scoring parameter set.
+	 * <p>
+	 * Use {@link ScoringParameterSet#addActivityParams(ActivityParams)} when adding activity parameters to an
+	 * explicit subpopulation scoring parameter set.
+	 */
+	public void addDefaultActivityParams(final ActivityParams params) {
+		getDefaultScoringParameterSet().addActivityParams(params);
 	}
 
+	/**
+	 * @deprecated Use {@link #addDefaultActivityParams(ActivityParams)} for default scoring parameters or
+	 * {@link ScoringParameterSet#addActivityParams(ActivityParams)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-08")
+	public void addActivityParams(final ActivityParams params) {
+		addDefaultActivityParams(params);
+	}
+
+	/**
+	 * Adds the given activity parameters to an explicitly configured subpopulation scoring parameter set.
+	 */
 	public void addActivityParamsForSubpopulation(final ActivityParams params, String subpopulation) {
 		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
 		if (scoringParameterSet == null) {
@@ -795,7 +888,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 					throw new RuntimeException("wrong class for " + module);
 				}
 				final String s = ((ScoringParameterSet) module).getSubpopulation();
-				if (getScoringParameters(s) != null) {
+				if (getAllScoringParameterSetsPerSubpopulation().get(s) != null) {
 					throw new IllegalStateException("already a parameter set for subpopulation " + s);
 				}
 				break;
@@ -1001,8 +1094,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	/**
-	 * @deprecated Use {@link #getDefaultMarginalUtilityOfMoney()} for default scoring parameters or
-	 * {@link #getMarginalUtilityOfMoney(String)} for explicit subpopulation scoring parameters.
+	 * @deprecated Use {@link #getDefaultMarginalUtilityOfMoney()} for default scoring parameters.
 	 */
 	@Deprecated(since = "2026-02")
 	public double getMarginalUtilityOfMoney() {
@@ -1011,14 +1103,6 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	public double getDefaultMarginalUtilityOfMoney() {
 		return getDefaultScoringParameterSet().getMarginalUtilityOfMoney();
-	}
-
-	public double getMarginalUtilityOfMoney(String subpopulation) {
-		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
-		if (scoringParameterSet != null)
-			return scoringParameterSet.getMarginalUtilityOfMoney();
-		else
-			throw new RuntimeException("MarginalUtilityOfMoney for subpopulation " + subpopulation + " is not defined or the scoringParams for subpopulation is not defined");
 	}
 
 	public void setDefaultMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
@@ -1083,8 +1167,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	/**
-	 * @deprecated Use {@link #getDefaultMarginalUtlOfWaiting_utils_hr()} for default scoring parameters or
-	 * {@link #getMarginalUtlOfWaiting_utils_hr(String)} for explicit subpopulation scoring parameters.
+	 * @deprecated Use {@link #getDefaultMarginalUtlOfWaiting_utils_hr()} for default scoring parameters.
 	 */
 	@Deprecated(since = "2026-02")
 	public double getMarginalUtlOfWaiting_utils_hr() {
@@ -1093,14 +1176,6 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	public double getDefaultMarginalUtlOfWaiting_utils_hr() {
 		return getDefaultScoringParameterSet().getMarginalUtlOfWaiting_utils_hr();
-	}
-
-	public double getMarginalUtlOfWaiting_utils_hr(String subpopulation) {
-		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
-		if (scoringParameterSet != null)
-			return scoringParameterSet.getMarginalUtlOfWaiting_utils_hr();
-		else
-			throw new RuntimeException("MarginalUtlOfWaiting_utils_hr for subpopulation " + subpopulation + " is not defined");
 	}
 
 	public void setDefaultMarginalUtlOfWaiting_utils_hr(double waiting) {
@@ -1116,12 +1191,14 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	private ScoringParameterSet getDefaultScoringParameterSet() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null);
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION);
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
+		final Map<String, ScoringParameterSet> params = getAllScoringParameterSetsPerSubpopulation();
+		final ScoringParameterSet rootParams = params.get(null);
+		if (rootParams != null)
+			return rootParams;
+		final ScoringParameterSet defaultParams = params.get(DEFAULT_SUBPOPULATION);
+		if (defaultParams != null)
+			return defaultParams;
+		throw new RuntimeException("Default subpopulation is not defined");
 	}
 
 	public void setFractionOfIterationsToStartScoreMSA(Double val) {

@@ -170,7 +170,7 @@ public class PersonInitializedEventTest {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(100);
-		config.scoring().addActivityParams(homeParams);
+		config.scoring().addDefaultActivityParams(homeParams);
 		config.transit().setUseTransit(true);
 		
 		Scenario scen = ScenarioUtils.createScenario(config);

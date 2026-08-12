@@ -74,9 +74,9 @@ class BicycleTravelDisutility implements TravelDisutility {
 		}
 
 		this.bicycleParams = bicycleParams;
-		this.marginalCostOfDistance_m = -(bicycleModeParams.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney())
+		this.marginalCostOfDistance_m = -(bicycleModeParams.getMonetaryDistanceRate() * cnScoringGroup.getDefaultMarginalUtilityOfMoney())
 				- bicycleModeParams.getMarginalUtilityOfDistance();
-		this.marginalCostOfTime_s = -(bicycleModeParams.getMarginalUtilityOfTraveling() / 3600.0) + cnScoringGroup.getPerforming_utils_hr() / 3600.0;
+		this.marginalCostOfTime_s = -(bicycleModeParams.getMarginalUtilityOfTraveling() / 3600.0) + cnScoringGroup.getDefaultPerforming_utils_hr() / 3600.0;
 
 		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());
 		this.marginalCostOfComfort_m = -(bicycleConfigGroup.getMarginalUtilityOfComfort_m());
