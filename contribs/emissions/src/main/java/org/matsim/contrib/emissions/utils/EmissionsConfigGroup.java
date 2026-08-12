@@ -57,7 +57,6 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String SUMMARIZE_PM_METHOD = "summarizePmMethod";
 	private SummarizePmMethod summarizePmMethod = SummarizePmMethod.crashOnVelDifference;
 
-	// TODO Add aggregateByFleetComposition
 	public enum DuplicateSubsegments {crashIfDuplicateExists, useFirstDuplicate, overwriteOldDuplicates, aggregateByFleetComposition}
 	private static final String DUPLICATE_SUBSEGMENTS = "duplicateSubsegments";
 	private DuplicateSubsegments duplicateSubsegments = DuplicateSubsegments.crashIfDuplicateExists;

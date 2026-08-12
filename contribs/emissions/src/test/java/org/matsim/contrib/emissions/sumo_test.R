@@ -129,7 +129,7 @@
   components_det <- unique(hbefa_det$Component)
   components <- intersect(components_avg, components_det)
 
-  # TODO: Check, that components = components_avg = components_det
+  # Assumes components = components_avg = components_det
 
   diff_out_cleaned <- diff_out %>%
     select(segment, "CO-SUMO", "CO-MATSIM", "CO2(total)-SUMO", "CO2(total)-MATSIM", "HC-SUMO", "HC-MATSIM", "PM-SUMO", "PM-MATSIM", "NOx-SUMO", "NOx-MATSIM") %>%
@@ -284,29 +284,6 @@
     summarize(value = sum(value)) %>%
     mutate(model = "SUMO_PHEMLight5", value=value/1000)
 
-  # TODO make sure, that this actually is a petrol car! It is just called "default"
-  # Load data from SUMO with HBEFA3 and summarize for each interval
-  # data.SUMO_HBEFA3 <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_average_hbefa3_output.csv",
-  #                                delim = ";",
-  #                                col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
-  #                                col_types = cols(
-  #                                  time = col_integer(),
-  #                                  velocity = col_double(),
-  #                                  acceleration = col_double(),
-  #                                  slope = col_double(),
-  #                                  CO = col_double(),
-  #                                  CO2 = col_double(),
-  #                                  HC = col_double(),
-  #                                  PMx = col_double(),
-  #                                  NOx = col_double(),
-  #                                  fuel = col_double(),
-  #                                  electricity = col_double())) %>%
-  #   pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
-  #   mutate(segment = cut(time, breaks = c(0, intervals$endTime), labels = FALSE, right = FALSE, include.lowest = TRUE)-as.integer(1)) %>%
-  #   group_by(segment, component) %>%
-  #   summarize(value = sum(value)) %>%
-  #   mutate(model = "SUMO_HBEFA3", value=value/1000)
-
   # Append all datasets together
   data_list <- mget(ls(pattern = "^data\\."), envir = .GlobalEnv)
 
@@ -341,7 +318,6 @@
 
 # ==== Plot with different Freespeed-factors
 {
-  # TODO Do this for all MATSim diffs
   r <- read_matsim("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_1.2_out.csv", "1.2")
   data.MATSIM_1_2 <- r[[1]]
   intervals <- r[[2]]
@@ -838,7 +814,7 @@
 
 # ==== CADC Test (using phem_lib)
 {
-  #TODO init phem_lib
+  # note: uses sumo_phem_lib
   fuel <- "diesel"
 
   # WLTP

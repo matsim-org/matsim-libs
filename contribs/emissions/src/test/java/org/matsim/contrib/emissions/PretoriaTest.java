@@ -166,7 +166,6 @@ public class PretoriaTest {
 			throw new RuntimeException(e);
 		}
 
-		// TODO Some parts of the coord mapping assume 2d coords, maybe add as attribute instead
 		for(var node : cRoute.getNodes().values()){
 			double alt = coordHeights.parallelStream()
 				.map(t -> new Tuple<>(CoordUtils.calcEuclideanDistance(node.getCoord(), t.getFirst()), t.getSecond()))
@@ -675,7 +674,7 @@ public class PretoriaTest {
 			this.projectedAccumulatedDistances4gpsEntries = getProjectedAccumulatedDistances();
 		}
 
-		/// Returns the path links from start to end using BFS. TODO Check/Test
+		/// Returns the path links from start to end using BFS.
 		private List<Link> retrieveInBetweenLinks(Link startLink, Link endLink){
 			if(startLink.getId().equals(endLink.getId()))
 				return new ArrayList<>(List.of(startLink));
@@ -789,7 +788,7 @@ public class PretoriaTest {
 				return -index - 1;
 		}
 
-		// TODO Velocities still overestimated, check why
+		// TODO Velocities still often overestimated, check why
 		private void computeLinkShares() {
 			gpsEntry2linkId2proportion = new ArrayMap<>();
 			linkId2time = new ArrayMap<>();

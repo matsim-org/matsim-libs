@@ -486,7 +486,7 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
 
 }
 
-# MATSim Driving Style Analysis # TODO Outdated, remove eventually
+# MATSim Driving Style Analysis
 {
   fuel <- "petrol"
   selected_component <- "NOx"

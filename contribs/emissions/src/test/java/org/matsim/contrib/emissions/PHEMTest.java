@@ -138,13 +138,6 @@ public class PHEMTest {
 					// We have found a minimum, crate a new sublist
 					drivingSegments.add(currentList);
 					currentList = new ArrayList<>();
-
-					/*// TODO DEBUG ONLY
-					try{
-						csvPrinter.printRecord(drivingCycleSeconds.get(sec).second);
-					} catch(Exception e){
-						System.out.println(e);
-					*/
 				}
 			} else if(cutSetting == LinkCutSetting.minSpacingMinimum){
 				/*
@@ -152,9 +145,6 @@ public class PHEMTest {
 				1. every minimum
 				2. every end of a standing period
 				But only if the last end of a segment was at least 'spacing'-seconds before.
-
-				TODO currently, it is impossible to simulate standing times. How do we want to overcome this?
-				TODO -> currently, the program creates links with 0 speed and length, which will probably cause problems
 				 */
 
 				if (lastDelta <= 0 && currentDelta > 0 && sec - lastTime > cutSetting.getAttr()) {
@@ -195,7 +185,7 @@ public class PHEMTest {
 
 			double freespeed = segment.stream().map(s -> s.vel).max(Comparator.naturalOrder()).get()/3.6;
 
-			// Use default hbefa Hbefa Road Type mapping TODO NoOfLanes is important for this to work! Currently statically set to 1
+			// Use default hbefa Hbefa Road Type mapping
 			Link link = NetworkUtils.createLink(Id.createLinkId("l" + i), null, null, null, len, freespeed, 1, 1);
 			String roadType = mapping.determineHbefaType(link);
 
@@ -597,7 +587,6 @@ public class PHEMTest {
 	}
 
 	// ----- Sub-Test methods -----
-	// TODO Update these tests for the paper, Add a highway deviation test
 
 	/**
 	 * Tests if the values match the HBEFA v4.1 reference values exactly.
@@ -1022,7 +1011,6 @@ public class PHEMTest {
 	 */
 	private record CycleLinkComparison(int segment, int startTime, int travelTime, double length, double[] CO, double[] CO2, double[] HC, double[] PMx, double[] NOx){}
 
-	// TODO Due to enums being a singleton, the variables can cause unexpected behavior if not used properly! The current implementation propagates that the value is object bound. Change this for the final test!
 	public enum LinkCutSetting {
 		/**
 		 * The easiest setting: Each link corresponds to predefined {@link CycleLinkAttributes}.

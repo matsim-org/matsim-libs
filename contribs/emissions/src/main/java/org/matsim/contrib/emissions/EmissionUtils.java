@@ -537,7 +537,6 @@ public abstract class EmissionUtils {
 	/**
 	 * Some hbefa table have missing entries for specific keys. This causes the hbefa-reader to crash. This method inserts null values for all missing keys.
 	 * The fixed table is saved as a copy with an appended "_fixed". <i>NOTE: Tables will grow exponentially, when using this method!</i>
-	 * TODO Check if we really need all pattern combinations for the read to succeed or if this method is even needed at all
 	 * @param pathIn Path to the table to fix.
 	 * @param pathOut Path to the output.
 	 * @param type Type of the given table. Use {@link HbefaType}: average / detailed and hot / cold

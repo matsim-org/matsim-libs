@@ -238,14 +238,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		return calculateWarmEmissions(travelTime, EmissionUtils.getHbefaRoadType(link), freeVelocity, link.getLength(), deltaHeight, vehicleInformationTuple);
 	}
 
-	// TODO Check if calls to this method can be updated to use slopes
 	@Deprecated
 	Map<Pollutant, Double> calculateWarmEmissions(double travelTime_sec, String roadType, double freeVelocity_ms,
 												  double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple){
 		return calculateWarmEmissions(travelTime_sec, roadType, freeVelocity_ms, linkLength_m, 0, vehicleInformationTuple);
 	}
 
-	// TODO The current deltaHeight implementation causes vehicles, that drive over a link to always have the same slop even if driving in opposite directions
 	Map<Pollutant, Double> calculateWarmEmissions(double travelTime_sec, String roadType, double freeVelocity_ms,
 												  double linkLength_m, double deltaHeight_m,
 												  Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
@@ -490,7 +488,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	}
 
 	private HbefaRoadGradient getHbefaRoadGradientFromSlope(double slope_percent) {
-		// TODO +/- values are currently not implemented
 		slope_percent *= 100;
 
 		if (slope_percent < -5) return HbefaRoadGradient.MINUS_6;
@@ -504,8 +501,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		throw new IllegalArgumentException("Unexpected slope: " + slope_percent);
 	}
 
-	// TODO Replace list by a fixed sized structure
-	// TODO Refactor the method as a whole
+	// Only left for documentation purposes, not meant to be merged into main
+	@Deprecated
 	private List<Tuple<HbefaWarmEmissionFactorKey, Double>> determineInterpolationTriangle(HbefaWarmEmissionFactorKey lowerVClassKey,
 																						   HbefaWarmEmissionFactorKey higherVClassKey,
 																						   Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple,
@@ -609,7 +606,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		throw new RuntimeException("Could not determine interpolation triangle!");
 	}
 
-	// TODO Replace list by a fixed sized structure
 	private List<Double> getTriangleLambdas(List<Tuple<Double, Double>> vertices, Tuple<Double, Double> point){
 		double det_T =
 			((vertices.get(1).getSecond() - vertices.get(2).getSecond())*(vertices.get(0).getFirst() - vertices.get(2).getFirst())) +

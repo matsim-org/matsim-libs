@@ -126,7 +126,7 @@
     merge(groups, by="group")
 
   difference <- merge(matsim_file, sumo_file, by=c("group", "component")) %>%
-    mutate(delta = value.x-value.y, percent = 100*(value.x/value.y)-100) # TODO percent works okay-ish, but try to find a better solution
+    mutate(delta = value.x-value.y, percent = 100*(value.x/value.y)-100)
 
   # Single plot
   selected_component <- "PMx"
@@ -197,7 +197,7 @@
     plot_annotation(title= glue("DeltaHeatMap for {fuel}"))
 }
 
-# Histogram over the datapoint distribution TODO WIP
+# Histogram over the datapoint distribution
 {
 
   # WLTP ALL
@@ -243,7 +243,7 @@
 
 # =====
 
-# Display the results in a heatmap (dots) TODO remove
+# Display the results in a heatmap (dots)
 {
   fuel <- "petrol"
   selected_component <- "NOx"
