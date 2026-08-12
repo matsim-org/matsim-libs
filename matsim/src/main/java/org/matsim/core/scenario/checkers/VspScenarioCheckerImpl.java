@@ -37,9 +37,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.facilities.ActivityFacility;
 
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
@@ -106,14 +104,11 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 			problem = true;
 		}
 
-		Set<String> subpopulations = scenario.getPopulation().getPersons().values().stream()
-			.map(PopulationUtils::getSubpopulation)
-			.filter(Objects::nonNull)
-			.collect(Collectors.toSet());
+		Set<String> subpopulations = PopulationUtils.getSubpopulationsOfPopulation(scenario.getPopulation());
 
 		// check if there are corresponding scoring params for all subpopulations.
 		for (String subpopulation : subpopulations) {
-			if (!scenario.getConfig().scoring().getScoringParametersPerSubpopulation().containsKey(subpopulation)) {
+			if (!scenario.getConfig().scoring().getAllScoringParameterSetsPerSubpopulation().containsKey(subpopulation)) {
 				log.log(lvl,
 					"Found subpopulation '{}' but no corresponding scoring parameters. Please add scoring parameters for this subpopulation.",
 					subpopulation);
@@ -185,8 +180,14 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 			counter.incCounter();
 			timeTracker.setTime(0.);
 			for (Activity activity : TripStructureUtils.getActivities(person.getSelectedPlan(), ExcludeStageActivities)) {
-				ScoringConfigGroup.ActivityParams actParams = scenario.getConfig().scoring().getScoringParameters(subpopulation).getActivityParams(
-					activity.getType());
+				ScoringConfigGroup.ScoringParameterSet scoringParams = scenario.getConfig().scoring().getScoringParametersOrDefault(subpopulation);
+				if (scoringParams == null) {
+					continue;
+				}
+				ScoringConfigGroup.ActivityParams actParams = scoringParams.getActivityParams(activity.getType());
+				if (actParams == null) {
+					continue;
+				}
 
 				if (actParams.getClosingTime().isDefined()) {
 					if (actParams.getClosingTime().seconds() < timeTracker.getTime().seconds()) {

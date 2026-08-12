@@ -587,8 +587,8 @@ public class SBBTransitEngineTest {
 		f.config.dsim().setEndTime(f.config.qsim().getEndTime().orElse(86400));
 
 		// DSim scoring requires activity type params to be declared
-		f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
-		f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
+		f.config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
+		f.config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
 		// DSim requires every node and link to carry a partition attribute
 		f.scenario.getNetwork().getNodes().values().forEach(
@@ -670,8 +670,8 @@ public class SBBTransitEngineTest {
 
 			f.addSingleTransitDemand();
 
-			f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
-			f.config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
+			f.config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
+			f.config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
 			// Partition 0: nodes 1–3, links 1–2 (stops A, B, C)
 			// Partition 1: nodes 4–5, links 3–4 (stops D, E)

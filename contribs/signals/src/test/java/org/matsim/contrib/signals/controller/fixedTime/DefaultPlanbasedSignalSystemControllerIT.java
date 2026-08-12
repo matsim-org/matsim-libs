@@ -756,7 +756,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 			{
 				ActivityParams dummyAct = new ActivityParams("dummy");
 				dummyAct.setTypicalDuration(12 * 3600);
-				config.scoring().addActivityParams(dummyAct);
+				config.scoring().addDefaultActivityParams(dummyAct);
 			}
 			return config;
 		}

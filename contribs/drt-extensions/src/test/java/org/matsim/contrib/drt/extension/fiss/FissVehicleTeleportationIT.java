@@ -136,9 +136,9 @@ class FissVehicleTeleportationIT {
 		config.qsim().setMainModes(List.of(TransportMode.car));
 		config.qsim().setEndTime(24 * 3600);
 		config.routing().setNetworkModes(List.of(TransportMode.car));
-		config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
-		config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600));
-		config.scoring().addModeParams(new ModeParams(TransportMode.car));
+		config.scoring().addDefaultActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultModeParams(new ModeParams(TransportMode.car));
 		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1));
 		config.controller().setLastIteration(0);
 		config.controller()
@@ -270,9 +270,9 @@ class FissVehicleTeleportationIT {
 		config.qsim().setMainModes(List.of(TransportMode.car));
 		config.qsim().setEndTime(24 * 3600);
 		config.routing().setNetworkModes(List.of(TransportMode.car));
-		config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
-		config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600));
-		config.scoring().addModeParams(new ModeParams(TransportMode.car));
+		config.scoring().addDefaultActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultModeParams(new ModeParams(TransportMode.car));
 		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1));
 		config.controller().setLastIteration(0);
 		config.controller()
@@ -473,9 +473,9 @@ class FissVehicleTeleportationIT {
 		config.qsim().setMainModes(List.of(TransportMode.car));
 		config.qsim().setEndTime(24 * 3600);
 		config.routing().setNetworkModes(List.of(TransportMode.car));
-		config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
-		config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600));
-		config.scoring().addModeParams(new ModeParams(TransportMode.car));
+		config.scoring().addDefaultActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultModeParams(new ModeParams(TransportMode.car));
 		config.replanning().addStrategySettings(
 				new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1));
 		config.controller().setLastIteration(0);
@@ -644,9 +644,9 @@ class FissVehicleTeleportationIT {
 		config.qsim().setMainModes(List.of(TransportMode.car));
 		config.qsim().setEndTime(24 * 3600);
 		config.routing().setNetworkModes(List.of(TransportMode.car));
-		config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
-		config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600));
-		config.scoring().addModeParams(new ModeParams(TransportMode.car));
+		config.scoring().addDefaultActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultModeParams(new ModeParams(TransportMode.car));
 		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1));
 		config.controller().setLastIteration(0);
 		config.controller()

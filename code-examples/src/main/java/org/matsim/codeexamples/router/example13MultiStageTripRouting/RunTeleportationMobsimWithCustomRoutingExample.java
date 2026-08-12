@@ -110,12 +110,12 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 		scoreTelepInteract.setTypicalDuration( 2 * 60 );
 		scoreTelepInteract.setOpeningTime( 0 );
 		scoreTelepInteract.setClosingTime( 0 );
-		config.scoring().addActivityParams( scoreTelepInteract );
+		config.scoring().addDefaultActivityParams( scoreTelepInteract );
 
 
 		final ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams(
 				MyRoutingModule.TELEPORTATION_LEG_MODE);
-		config.scoring().addModeParams(modeParams);
+		config.scoring().addDefaultModeParams(modeParams);
 	}
 
 	private static ActivityFacility createFacility(

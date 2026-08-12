@@ -65,7 +65,7 @@ class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		if (!this.usingIndividualScoringParameters) {
 			Config config = this.scenario.getConfig();
 			String subPopulationAttributeName = null;
-			this.nonPersonalizedScoringParameters = new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParameters(subPopulationAttributeName), config.scenario()).build();
+			this.nonPersonalizedScoringParameters = new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParametersOrDefault(subPopulationAttributeName), config.scenario()).build();
 		}
 	}
 

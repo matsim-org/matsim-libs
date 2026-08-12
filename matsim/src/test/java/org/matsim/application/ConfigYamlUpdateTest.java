@@ -40,13 +40,13 @@ public class ConfigYamlUpdateTest {
 
 		ScoringConfigGroup scoring = ConfigUtils.addOrGetModule(config, ScoringConfigGroup.class);
 
-		assertThat(scoring.getModes())
+		assertThat(scoring.getDefaultModeParams())
 			.hasSize(7);
 
-		assertThat(scoring.getPerforming_utils_hr())
+		assertThat(scoring.getDefaultPerforming_utils_hr())
 			.isEqualTo(6.88);
 
-		ScoringConfigGroup.ModeParams car = scoring.getModes().get(TransportMode.car);
+		ScoringConfigGroup.ModeParams car = scoring.getDefaultModeParams().get(TransportMode.car);
 
 		assertThat(car.getConstant()).isEqualTo(-0.62);
 		assertThat(car.getMarginalUtilityOfTraveling()).isEqualTo(0);
@@ -66,8 +66,8 @@ public class ConfigYamlUpdateTest {
 		assertThat(config.controller().getRunId()).isEqualTo("567");
 		assertThat(config.global().getNumberOfThreads()).isEqualTo(8);
 
-		assertThat(config.scoring().getOrCreateModeParams("car").getConstant()).isEqualTo(-1);
-		assertThat(config.scoring().getOrCreateModeParams("bike").getConstant()).isEqualTo(-2);
+		assertThat(config.scoring().getOrCreateDefaultModeParams("car").getConstant()).isEqualTo(-1);
+		assertThat(config.scoring().getOrCreateDefaultModeParams("bike").getConstant()).isEqualTo(-2);
 	}
 
 	@Test

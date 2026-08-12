@@ -42,6 +42,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ProjectionUtils;
@@ -296,6 +297,14 @@ public class SmallScaleCommercialTrafficUtils {
 		}
 	}
 
+	static void ensureDefaultModeParams(Config config, Set<String> modes) {
+		modes.forEach(mode -> {
+			if (!config.scoring().getDefaultModeParams().containsKey(mode)) {
+				config.scoring().addDefaultModeParams(new ScoringConfigGroup.ModeParams(mode));
+			}
+		});
+	}
+
 	static String getSampleNameOfOutputFolder(double sample) {
 		String sampleName;
 		if ((sample * 100) % 1 == 0)
@@ -361,15 +370,15 @@ public class SmallScaleCommercialTrafficUtils {
 	 * The freight config is updated with absolute paths before loading. This avoids path resolution surprises when
 	 * carrier part folders or merge folders are outside the config file directory.
 	 *
-	 * @param baseConfig config that should be used as loading context
+	 * @param baseConfig  config that should be used as loading context
 	 * @param carrierFile carrier file to load
-	 * @param carrierVehicleTypesFileName base name of the carrier vehicle type file located next to the carrier file
 	 * @return scenario with carriers loaded according to the freight config
 	 */
-	static Scenario loadScenarioWithCarrierFile(Config baseConfig, Path carrierFile, String carrierVehicleTypesFileName) {
+	static Scenario loadScenarioWithCarrierFile(Config baseConfig, Path carrierFile) {
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(baseConfig, FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setCarriersFile(carrierFile.toAbsolutePath().toString());
-		Path carrierVehicleTypesFile = resolveCarrierVehicleTypesFile(baseConfig, carrierFile, carrierVehicleTypesFileName);
+		Path carrierVehicleTypesFile = resolveCarrierVehicleTypesFile(baseConfig, carrierFile,
+			SmallScaleCommercialTrafficUtils.CARRIER_VEHICLE_TYPES_FILE);
 		if (carrierVehicleTypesFile != null) {
 			freightCarriersConfigGroup.setCarriersVehicleTypesFile(carrierVehicleTypesFile.toAbsolutePath().toString());
 		} else if (baseConfig.vehicles() != null && freightCarriersConfigGroup.getCarriersVehicleTypesFile() == null) {
@@ -386,18 +395,18 @@ public class SmallScaleCommercialTrafficUtils {
 	 * This avoids loading the network when callers only need to read carrier files, for example when merging carrier
 	 * part outputs.
 	 *
-	 * @param baseConfig config that should be used as path resolution context
+	 * @param baseConfig  config that should be used as path resolution context
 	 * @param carrierFile carrier file to load
-	 * @param carrierVehicleTypesFileName base name of the carrier vehicle type file located next to the carrier file
 	 * @return scenario with carriers loaded according to the freight config, but without loading other scenario inputs
 	 */
-	static Scenario loadScenarioWithCarrierFileOnly(Config baseConfig, Path carrierFile, String carrierVehicleTypesFileName) {
+	static Scenario loadScenarioWithCarrierFileOnly(Config baseConfig, Path carrierFile) {
 		Config carrierConfig = ConfigUtils.createConfig();
 		carrierConfig.setContext(baseConfig.getContext());
 		FreightCarriersConfigGroup carrierFreightConfigGroup = ConfigUtils.addOrGetModule(carrierConfig, FreightCarriersConfigGroup.class);
 		carrierFreightConfigGroup.setCarriersFile(carrierFile.toAbsolutePath().toString());
 
-		Path carrierVehicleTypesFile = resolveCarrierVehicleTypesFile(baseConfig, carrierFile, carrierVehicleTypesFileName);
+		Path carrierVehicleTypesFile = resolveCarrierVehicleTypesFile(baseConfig, carrierFile,
+			SmallScaleCommercialTrafficUtils.CARRIER_VEHICLE_TYPES_FILE);
 		if (carrierVehicleTypesFile != null) {
 			carrierFreightConfigGroup.setCarriersVehicleTypesFile(carrierVehicleTypesFile.toAbsolutePath().toString());
 		} else {

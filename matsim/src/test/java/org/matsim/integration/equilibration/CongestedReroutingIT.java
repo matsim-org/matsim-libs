@@ -52,7 +52,7 @@ class CongestedReroutingIT{
 
 		config.qsim().setMainModes( modesAsSet );
 
-		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( car2 ) );
+		config.scoring().addDefaultModeParams( new ScoringConfigGroup.ModeParams( car2 ) );
 
 		// ===
 

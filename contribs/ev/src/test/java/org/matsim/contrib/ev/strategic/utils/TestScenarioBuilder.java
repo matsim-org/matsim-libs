@@ -389,7 +389,7 @@ public class TestScenarioBuilder {
 
 		ActivityParams genericActivity = new ActivityParams("generic");
 		genericActivity.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(genericActivity);
+		config.scoring().addDefaultActivityParams(genericActivity);
 
 		config.controller().setLastIteration(iterations);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
@@ -414,27 +414,27 @@ public class TestScenarioBuilder {
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(homeParams);
+		config.scoring().addDefaultActivityParams(homeParams);
 
 		ActivityParams workParams = new ActivityParams("work");
 		workParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(workParams);
+		config.scoring().addDefaultActivityParams(workParams);
 
 		ActivityParams plugParams = new ActivityParams(WithinDayEvEngine.PLUG_ACTIVITY_TYPE);
 		plugParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(plugParams);
+		config.scoring().addDefaultActivityParams(plugParams);
 
 		ActivityParams unplugParams = new ActivityParams(WithinDayEvEngine.UNPLUG_ACTIVITY_TYPE);
 		unplugParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(unplugParams);
+		config.scoring().addDefaultActivityParams(unplugParams);
 
 		ActivityParams accessParams = new ActivityParams(WithinDayEvEngine.ACCESS_ACTIVITY_TYPE);
 		accessParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(accessParams);
+		config.scoring().addDefaultActivityParams(accessParams);
 
 		ActivityParams waitParams = new ActivityParams(WithinDayEvEngine.WAIT_ACTIVITY_TYPE);
 		waitParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(waitParams);
+		config.scoring().addDefaultActivityParams(waitParams);
 
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 

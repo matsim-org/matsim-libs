@@ -55,9 +55,9 @@ public class DecongestionTollingP_MCP implements DecongestionTollSetting, LinkLe
 	@Override
 	public void updateTolls() {
 
-		final double vtts = ( this.congestionInfo.getScenario().getConfig().scoring().getPerforming_utils_hr()
-				- this.congestionInfo.getScenario().getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() )
-				/ this.congestionInfo.getScenario().getConfig().scoring().getMarginalUtilityOfMoney();
+		final double vtts = ( this.congestionInfo.getScenario().getConfig().scoring().getDefaultPerforming_utils_hr()
+				- this.congestionInfo.getScenario().getConfig().scoring().getDefaultModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() )
+				/ this.congestionInfo.getScenario().getConfig().scoring().getDefaultMarginalUtilityOfMoney();
 
 
 		final double toleratedAvgDelay = this.congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec();

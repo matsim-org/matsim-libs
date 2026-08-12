@@ -35,17 +35,6 @@
 	</module>
 	<module name="scoring">
 		<param name="fractionOfIterationsToStartScoreMSA" value="0.8"/>
-		<parameterset type="modeParams" >
-			<!-- [utils] alternative-specific constant.  Normally per trip, but that is probably buggy for multi-leg trips. -->
-			<param name="constant" value="0.56" />
-			<!-- [unit_of_money/day] Fixed cost of mode, per day. -->
-			<param name="dailyMonetaryConstant" value="-3.0" />
-			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
-			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
-			<param name="mode" value="car" />
-			<!-- [unit_of_money/m] conversion of distance into money. Normally negative. -->
-			<param name="monetaryDistanceRate" value="-1.49E-4" />
-		</parameterset>
 	</module>
 	<module name="replanning">
 		<param name="fractionOfIterationsToDisableInnovation" value="0.8" />
