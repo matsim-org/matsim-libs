@@ -49,10 +49,10 @@ public final class RunBicycleContribExample{
 			config.replanning().addStrategySettings( new StrategySettings().setStrategyName("ChangeExpBeta" ).setWeight(0.8 ) );
 			config.replanning().addStrategySettings( new StrategySettings().setStrategyName("ReRoute" ).setWeight(0.2 ) );
 
-			config.scoring().addActivityParams( new ActivityParams("home").setTypicalDuration(12*60*60 ) );
-			config.scoring().addActivityParams( new ActivityParams("work").setTypicalDuration(8*60*60 ) );
+			config.scoring().addDefaultActivityParams( new ActivityParams("home").setTypicalDuration(12*60*60 ) );
+			config.scoring().addDefaultActivityParams( new ActivityParams("work").setTypicalDuration(8*60*60 ) );
 
-			config.scoring().addModeParams( new ModeParams( BICYCLE ).setConstant(0. ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(0. ).setMonetaryDistanceRate(0. ) );
+			config.scoring().addDefaultModeParams( new ModeParams( BICYCLE ).setConstant(0. ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(0. ).setMonetaryDistanceRate(0. ) );
 
 			config.global().setNumberOfThreads(1 );
 			config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );

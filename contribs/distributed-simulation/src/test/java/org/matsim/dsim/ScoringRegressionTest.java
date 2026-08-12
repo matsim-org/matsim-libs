@@ -238,7 +238,7 @@ public class ScoringRegressionTest {
 		var walkModeParam = new ScoringConfigGroup.ModeParams("walk")
 			.setConstant(0)
 			.setMarginalUtilityOfDistance(-1);
-		config.scoring().addModeParams(walkModeParam);
+		config.scoring().addDefaultModeParams(walkModeParam);
 		return config;
 	}
 

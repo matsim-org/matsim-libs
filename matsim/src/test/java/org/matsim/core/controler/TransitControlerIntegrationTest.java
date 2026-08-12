@@ -146,10 +146,10 @@ public class TransitControlerIntegrationTest {
 
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(16.0*3600);
-		config.scoring().addActivityParams(params);
+		config.scoring().addDefaultActivityParams(params);
 		params = new ActivityParams("w");
 		params.setTypicalDuration(8.0*3600);
-		config.scoring().addActivityParams(params);
+		config.scoring().addDefaultActivityParams(params);
 
 		StrategySettings tam = new StrategySettings(Id.create(1, StrategySettings.class));
 		tam.setStrategyName("TimeAllocationMutator");

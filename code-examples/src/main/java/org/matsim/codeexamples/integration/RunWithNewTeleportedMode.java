@@ -60,8 +60,8 @@ public class RunWithNewTeleportedMode {
         config.subtourModeChoice().setModes(new String[]{TransportMode.car, MY_BIKE});
 
         config.routing().addTeleportedModeParams(new RoutingConfigGroup.TeleportedModeParams().setMode(TransportMode.walk).setTeleportedModeSpeed(2.0));
-        config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(TransportMode.walk));
-        config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(MY_BIKE));
+        config.scoring().addDefaultModeParams(new ScoringConfigGroup.ModeParams(TransportMode.walk));
+        config.scoring().addDefaultModeParams(new ScoringConfigGroup.ModeParams(MY_BIKE));
 
 
         config.routing().addTeleportedModeParams(bike);

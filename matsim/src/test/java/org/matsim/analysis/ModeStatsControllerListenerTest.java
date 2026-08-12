@@ -69,13 +69,13 @@ public class ModeStatsControllerListenerTest {
 		ModeParams modeParam5 = new ModeParams(TransportMode.ride);
 		ModeParams modeParam6 = new ModeParams(TransportMode.other);
 		ModeParams modeParam7 = new ModeParams(TransportMode.bike);
-		scoreConfig.addModeParams(modeParam1);
-		scoreConfig.addModeParams(modeParam2);
-		scoreConfig.addModeParams(modeParam3);
-		scoreConfig.addModeParams(modeParam4);
-		scoreConfig.addModeParams(modeParam5);
-		scoreConfig.addModeParams(modeParam6);
-		scoreConfig.addModeParams(modeParam7);
+		scoreConfig.addDefaultModeParams(modeParam1);
+		scoreConfig.addDefaultModeParams(modeParam2);
+		scoreConfig.addDefaultModeParams(modeParam3);
+		scoreConfig.addDefaultModeParams(modeParam4);
+		scoreConfig.addDefaultModeParams(modeParam5);
+		scoreConfig.addDefaultModeParams(modeParam6);
+		scoreConfig.addDefaultModeParams(modeParam7);
 
 		/* ########Person 1######### --- creating person 1*/
 		final Plan plan = PopulationUtils

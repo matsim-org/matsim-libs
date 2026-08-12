@@ -179,8 +179,8 @@ public class RunFissDrtScenarioIT {
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
-		config.scoring().addModeParams(new ModeParams("drt"));
-		config.scoring().addModeParams(new ModeParams("walk"));
+		config.scoring().addDefaultModeParams(new ModeParams("drt"));
+		config.scoring().addDefaultModeParams(new ModeParams("walk"));
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
@@ -191,11 +191,11 @@ public class RunFissDrtScenarioIT {
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
 
-		config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
-		config.scoring().addActivityParams(new ActivityParams("other").setTypicalDuration(4 * 3600));
-		config.scoring().addActivityParams(new ActivityParams("education").setTypicalDuration(6 * 3600));
-		config.scoring().addActivityParams(new ActivityParams("shopping").setTypicalDuration(2 * 3600));
-		config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(2 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("other").setTypicalDuration(4 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("education").setTypicalDuration(6 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("shopping").setTypicalDuration(2 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("work").setTypicalDuration(2 * 3600));
 
 		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1));
 

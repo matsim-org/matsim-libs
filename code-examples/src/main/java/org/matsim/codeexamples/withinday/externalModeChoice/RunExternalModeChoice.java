@@ -36,7 +36,7 @@ public class RunExternalModeChoice {
         config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
         // add walk scoring parameters, because the default router adds access and egress legs with mode walk.
-        config.scoring().addModeParams(new ScoringConfigGroup.ModeParams("walk"));
+        config.scoring().addDefaultModeParams(new ScoringConfigGroup.ModeParams("walk"));
 
         //
 

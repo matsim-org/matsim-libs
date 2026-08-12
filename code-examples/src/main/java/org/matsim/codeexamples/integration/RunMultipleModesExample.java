@@ -111,7 +111,7 @@ final class RunMultipleModesExample{
 
 			// set up bike scoring:
 			ModeParams params = new ModeParams( TransportMode.bike ) ;
-			config.scoring().addModeParams( params );
+			config.scoring().addDefaultModeParams( params );
 
 			// set up the bike qsim
 			config.qsim().setMainModes( new HashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) ) ;

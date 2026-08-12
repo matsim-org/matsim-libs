@@ -75,16 +75,16 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		this.cnScoringGroup = scenario.getConfig().scoring();
 
-		if (cnScoringGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
+		if (cnScoringGroup.getOrCreateDefaultModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
 			LOG.error("Marginal utility of distance for car different from zero, but not used in accessibility computations");
 		}
-		if (cnScoringGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0.) {
+		if (cnScoringGroup.getOrCreateDefaultModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0.) {
 			LOG.error("Marginal utility of distance for pt different from zero, but not used in accessibility computations");
 		}
-		if (cnScoringGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceRate() != 0.) {
+		if (cnScoringGroup.getOrCreateDefaultModeParams(TransportMode.bike).getMonetaryDistanceRate() != 0.) {
 			LOG.error("Monetary distance cost rate for bike different from zero, but not used in accessibility computations");
 		}
-		if (cnScoringGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
+		if (cnScoringGroup.getOrCreateDefaultModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
 			LOG.error("Monetary distance cost rate for walk different from zero, but not used in accessibility computations");
 		}
 	}

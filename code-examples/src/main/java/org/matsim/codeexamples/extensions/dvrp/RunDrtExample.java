@@ -115,9 +115,9 @@ class RunDrtExample{
 		}
 		{
 			// add params so that scoring works:
-			config.scoring().addModeParams( new ModeParams( DRT_A ) );
-			config.scoring().addModeParams( new ModeParams( DRT_B ) );
-			config.scoring().addModeParams( new ModeParams( DRT_C ) );
+			config.scoring().addDefaultModeParams( new ModeParams( DRT_A ) );
+			config.scoring().addDefaultModeParams( new ModeParams( DRT_B ) );
+			config.scoring().addDefaultModeParams( new ModeParams( DRT_C ) );
 		}
 		{
 			// clear strategy settings from config file:

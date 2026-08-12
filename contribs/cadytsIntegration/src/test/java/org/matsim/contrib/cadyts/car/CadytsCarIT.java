@@ -333,12 +333,12 @@ public class CadytsCarIT {
 		config.qsim().setRemoveStuckVehicles(false);
 		{
 			ActivityParams params = new ActivityParams("h");
-			config.scoring().addActivityParams(params);
+			config.scoring().addDefaultActivityParams(params);
 			params.setTypicalDuration(12 * 60 * 60.);
 		}
 		{
 			ActivityParams params = new ActivityParams("w");
-			config.scoring().addActivityParams(params);
+			config.scoring().addDefaultActivityParams(params);
 			params.setTypicalDuration(8 * 60 * 60.);
 		}
 		config.counts().setInputFile(inputDir + "counts5.xml");

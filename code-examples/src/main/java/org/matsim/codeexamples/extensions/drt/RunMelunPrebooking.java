@@ -106,10 +106,10 @@ public class RunMelunPrebooking {
 
 		ActivityParams activityParams = new ActivityParams("generic");
 		activityParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(activityParams);
+		config.scoring().addDefaultActivityParams(activityParams);
 
 		ModeParams modeParams = new ModeParams("drt");
-		config.scoring().addModeParams(modeParams);
+		config.scoring().addDefaultModeParams(modeParams);
 
 		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
 		DrtConfigGroup drtConfig = new DrtConfigGroup();

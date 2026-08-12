@@ -94,7 +94,7 @@ public class MultiModalPTCombinationTest {
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16 * 3600);
-		config.scoring().addActivityParams(homeParams);
+		config.scoring().addDefaultActivityParams(homeParams);
 
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;

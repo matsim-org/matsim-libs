@@ -44,7 +44,7 @@ class PerceivedSafetyDisutilityTest {
 
 		ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams(TransportMode.bike);
 		modeParams.setMarginalUtilityOfTraveling(0.);
-		config.scoring().addModeParams(modeParams);
+		config.scoring().addDefaultModeParams(modeParams);
 
 //		add perceivedSafetyCfgGroup and configure
 		PerceivedSafetyConfigGroup perceivedSafetyConfigGroup = ConfigUtils.addOrGetModule(config, PerceivedSafetyConfigGroup.class);

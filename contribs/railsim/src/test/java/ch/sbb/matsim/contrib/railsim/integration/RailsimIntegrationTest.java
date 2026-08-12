@@ -643,7 +643,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		}
 
 		for (String type : activityTypes) {
-			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams(type).setTypicalDuration(1234.));
+			config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams(type).setTypicalDuration(1234.));
 		}
 
 		Controler controler = new Controler(scenario);

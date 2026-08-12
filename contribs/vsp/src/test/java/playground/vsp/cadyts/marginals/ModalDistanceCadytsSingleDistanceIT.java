@@ -151,7 +151,7 @@ public class ModalDistanceCadytsSingleDistanceIT {
 		home.setMinimalDuration(6 * 3600);
 		home.setTypicalDuration(6 * 3600);
 		home.setEarliestEndTime(6 * 3600);
-		config.scoring().addActivityParams(home);
+		config.scoring().addDefaultActivityParams(home);
 
 		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setMinimalDuration(8 * 3600);
@@ -159,7 +159,7 @@ public class ModalDistanceCadytsSingleDistanceIT {
 		work.setEarliestEndTime(14 * 3600);
 		work.setOpeningTime(6 * 3600);
 		work.setClosingTime(18 * 3600);
-		config.scoring().addActivityParams(work);
+		config.scoring().addDefaultActivityParams(work);
 
 		// have random selection of plans to generate heterogenity in the beginning, so that cadyts can calibrate its correction
 		ReplanningConfigGroup.StrategySettings selectRandom = new ReplanningConfigGroup.StrategySettings();

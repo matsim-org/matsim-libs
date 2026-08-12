@@ -269,7 +269,7 @@ public final class FacilitiesFromPopulation {
 		for (ActivityFacility af : this.facilities.getFacilities().values()) {
 			for (ActivityOption ao : af.getActivityOptions().values()) {
 				String actType = ao.getType();
-				ActivityParams params = this.scoringConfigGroup.getActivityParams(actType);
+				ActivityParams params = this.scoringConfigGroup.getDefaultActivityParams(actType);
 				if (params == null) {
 					if (missingActTypes.add(actType)) {
 						log.error("No information for activity type " + actType + " found in given configuration.");

@@ -34,9 +34,9 @@ class RunInformedModeChoiceExample{
 		config.replanning().addStrategySettings( new ReplanningConfigGroup.StrategySettings().setStrategyName(
 				InformedModeChoiceModule.SELECT_BEST_K_PLAN_MODES_STRATEGY ).setWeight( 0.1 ) );
 
-		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( "bike" ) );
-		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( "car" ).setDailyUtilityConstant( -50 ) );
-		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( "walk" ) );
+		config.scoring().addDefaultModeParams( new ScoringConfigGroup.ModeParams( "bike" ) );
+		config.scoring().addDefaultModeParams( new ScoringConfigGroup.ModeParams( "car" ).setDailyUtilityConstant( -50 ) );
+		config.scoring().addDefaultModeParams( new ScoringConfigGroup.ModeParams( "walk" ) );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 

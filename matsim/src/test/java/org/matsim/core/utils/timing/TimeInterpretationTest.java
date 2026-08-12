@@ -103,7 +103,7 @@ public class TimeInterpretationTest {
 
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(genericParams);
+		config.scoring().addDefaultActivityParams(genericParams);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

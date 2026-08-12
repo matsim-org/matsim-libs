@@ -189,7 +189,7 @@ public class EvChargingIntegrationTest {
 		var config = EvDSimTestFixture.createConfig(outputDir);
 		var chargingParams = new ScoringConfigGroup.ActivityParams(ChargingActivityEngine.CHARGING_INTERACTION)
 			.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(chargingParams);
+		config.scoring().addDefaultActivityParams(chargingParams);
 		return config;
 	}
 

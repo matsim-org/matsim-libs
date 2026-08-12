@@ -39,10 +39,10 @@ public class VTTSHandlerPerActivityTypicalDurationTest {
 	private static Config config(double workTypicalDuration) {
 		Config config = ConfigUtils.createConfig();
 		ScoringConfigGroup scoring = config.scoring();
-		scoring.setPerforming_utils_hr(6.);
-		scoring.addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8. * 3600.));
-		scoring.addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(workTypicalDuration));
-		scoring.addActivityParams(new ScoringConfigGroup.ActivityParams("home_evening").setTypicalDuration(8. * 3600.));
+		scoring.setDefaultPerforming_utils_hr(6.);
+		scoring.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8. * 3600.));
+		scoring.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(workTypicalDuration));
+		scoring.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home_evening").setTypicalDuration(8. * 3600.));
 		return config;
 	}
 
@@ -78,7 +78,7 @@ public class VTTSHandlerPerActivityTypicalDurationTest {
 		handler.computeFinalVTTS();
 		List<VTTSHandler.TripData> trips = handler.getTripDataMap().get(PID);
 		// trip 0 is the trip to work; its marginal utility of schedule delay refers to the work activity
-		return trips.get(0).musl_h;
+		return trips.getFirst().musl_h;
 	}
 
 	@Test

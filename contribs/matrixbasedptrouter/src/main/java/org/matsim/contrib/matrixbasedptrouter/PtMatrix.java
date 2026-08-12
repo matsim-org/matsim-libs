@@ -294,10 +294,10 @@ public final class PtMatrix {
 	}
 
 	public LeastCostPathCalculator asPathCalculator(ScoringConfigGroup scoringConfigGroup) {
-		final double betaWalkTT	= scoringConfigGroup.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		final double betaWalkTT	= scoringConfigGroup.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getDefaultPerforming_utils_hr();
 		final double betaWalkTD	= scoringConfigGroup.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfDistance();
-		final double betaPtTT = scoringConfigGroup.getDefaultModeParams().get(TransportMode.pt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		final double betaPtTD = scoringConfigGroup.getMarginalUtilityOfMoney() * scoringConfigGroup.getDefaultModeParams().get(TransportMode.pt).getMonetaryDistanceRate();
+		final double betaPtTT = scoringConfigGroup.getDefaultModeParams().get(TransportMode.pt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getDefaultPerforming_utils_hr();
+		final double betaPtTD = scoringConfigGroup.getDefaultMarginalUtilityOfMoney() * scoringConfigGroup.getDefaultModeParams().get(TransportMode.pt).getMonetaryDistanceRate();
 		final double constPt = scoringConfigGroup.getDefaultModeParams().get(TransportMode.pt).getConstant();
 
 		return new LeastCostPathCalculator() {

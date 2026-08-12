@@ -133,7 +133,7 @@ public class ConfigConsistencyCheckerImplTest {
 
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setClosingTime(1.) ;
-		config.scoring().addActivityParams(transitActivityParams);
+		config.scoring().addDefaultActivityParams(transitActivityParams);
 
 		try {
 			ConfigConsistencyCheckerImpl.checkScoring(config);

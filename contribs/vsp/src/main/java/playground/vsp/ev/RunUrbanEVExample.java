@@ -114,9 +114,9 @@ public class RunUrbanEVExample {
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		//register charging interaction activities for car
-		config.scoring().addActivityParams(
+		config.scoring().addDefaultActivityParams(
 				new ActivityParams(TransportMode.car + UrbanEVModule.PLUGOUT_INTERACTION).setScoringThisActivityAtAll(false ) );
-		config.scoring().addActivityParams(
+		config.scoring().addDefaultActivityParams(
 				new ActivityParams( TransportMode.car + UrbanEVModule.PLUGIN_INTERACTION).setScoringThisActivityAtAll( false ) );
 		return config;
 	}

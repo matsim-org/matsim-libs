@@ -74,9 +74,9 @@ public class PerceivedSafetyScoringTest {
             //            set all scoring params to 0 such that we only see the score change caused through perceived safety
             ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams(mode);
             modeParams.setMarginalUtilityOfTraveling(0.);
-            config.scoring().addModeParams(modeParams);
+            config.scoring().addDefaultModeParams(modeParams);
             config.scoring().setWriteExperiencedPlans(true);
-            config.scoring().getActivityParams()
+            config.scoring().getDefaultActivityParams()
                     .forEach(a -> a.setScoringThisActivityAtAll(false));
 
 //      add perceivedSafetyCfgGroup and configure

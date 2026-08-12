@@ -522,17 +522,17 @@ public class CharyparNagelScoringFunctionTest {
 		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8 * 3600);
 
-		f.config.scoring().addActivityParams(params);
-		f.config.scoring().getActivityParams("h").setTypicalDuration(6.0 * 3600);
+		f.config.scoring().addDefaultActivityParams(params);
+		f.config.scoring().getDefaultActivityParams("h").setTypicalDuration(6.0 * 3600);
 
 		if (typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)) {
-			for (ActivityParams p : f.config.scoring().getActivityParams()) {
+			for (ActivityParams p : f.config.scoring().getDefaultActivityParams()) {
 				p.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
 			}
 		}
 
 		double perf = +6.0;
-		f.config.scoring().setPerforming_utils_hr(perf);
+		f.config.scoring().setDefaultPerforming_utils_hr(perf);
 		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0, typicalDurationComputation);
 		double zeroUtilDurH = getZeroUtilDuration_hrs(6.0, 1.0, typicalDurationComputation);
 		double zeroUtilDurH2 = getZeroUtilDuration_hrs(8.0, 1.0, typicalDurationComputation);
@@ -563,11 +563,11 @@ public class CharyparNagelScoringFunctionTest {
 		// this would amount to a smaller-than-zero expected contribution of
 		// the home activity at 7 hours, and smaller-than-zero contributions
 		// are truncated, so we wouldn't test anything. :-/
-		f.config.scoring().getActivityParams("h").setTypicalDuration(7.0 * 3600);
-		f.config.scoring().setPerforming_utils_hr(perf);
+		f.config.scoring().getDefaultActivityParams("h").setTypicalDuration(7.0 * 3600);
+		f.config.scoring().setDefaultPerforming_utils_hr(perf);
 
 		if (typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)) {
-			for (ActivityParams p : f.config.scoring().getActivityParams()) {
+			for (ActivityParams p : f.config.scoring().getDefaultActivityParams()) {
 				p.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
 			}
 		}
@@ -747,12 +747,12 @@ public class CharyparNagelScoringFunctionTest {
 			// setup activity types h and w for scoring
 			ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("h");
 			params.setTypicalDuration(15 * 3600);
-			scoring.addActivityParams(params);
+			scoring.addDefaultActivityParams(params);
 
 
 			params = new ScoringConfigGroup.ActivityParams("w");
 			params.setTypicalDuration(3 * 3600);
-			scoring.addActivityParams(params);
+			scoring.addDefaultActivityParams(params);
 
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = (Network) this.scenario.getNetwork();

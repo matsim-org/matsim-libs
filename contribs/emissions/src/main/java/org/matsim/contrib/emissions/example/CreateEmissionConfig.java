@@ -88,10 +88,10 @@ public final class CreateEmissionConfig {
 			ScoringConfigGroup pcs = controler.getConfig().scoring();
 			ActivityParams homeP = new ActivityParams("home");
 			homeP.setTypicalDuration(12 * 3600);
-			pcs.addActivityParams(homeP);
+			pcs.addDefaultActivityParams(homeP);
 			ActivityParams workP = new ActivityParams("work");
 			workP.setTypicalDuration(8 * 3600);
-			pcs.addActivityParams(workP);
+			pcs.addDefaultActivityParams(workP);
 
 		// strategy
 			ReplanningConfigGroup scg = controler.getConfig().replanning();

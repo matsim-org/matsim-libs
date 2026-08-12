@@ -180,7 +180,7 @@ public final class VspScenarioCheckerImpl implements ScenarioChecker {
 			counter.incCounter();
 			timeTracker.setTime(0.);
 			for (Activity activity : TripStructureUtils.getActivities(person.getSelectedPlan(), ExcludeStageActivities)) {
-				ScoringConfigGroup.ScoringParameterSet scoringParams = scenario.getConfig().scoring().getScoringParameters(subpopulation);
+				ScoringConfigGroup.ScoringParameterSet scoringParams = scenario.getConfig().scoring().getScoringParametersOrDefault(subpopulation);
 				if (scoringParams == null) {
 					continue;
 				}

@@ -283,7 +283,7 @@ public class StrategicChargingUtils {
 			WithinDayEvEngine.WAIT_ACTIVITY_TYPE)) {
 			ActivityParams activityParams = new ActivityParams(activityType);
 			activityParams.setScoringThisActivityAtAll(false);
-			config.scoring().addActivityParams(activityParams);
+			config.scoring().addDefaultActivityParams(activityParams);
 		}
 	}
 

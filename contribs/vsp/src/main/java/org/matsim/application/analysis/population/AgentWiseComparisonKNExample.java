@@ -167,8 +167,8 @@ class AgentWiseComparisonKNExample{
 		config.routing().addTeleportedModeParams( new TeleportedModeParams().setMode( TransportMode.pt ).setTeleportedModeSpeed( 50./3.6 ).setBeelineDistanceFactor( 1.3 ) );
 */
 
-		config.scoring().addActivityParams( new ActivityParams( "home_12" ).setTypicalDuration( 12. * 3600 ) );
-		config.scoring().addActivityParams( new ActivityParams( "work_12" ).setTypicalDuration( 12. * 3600 ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams( "home_12" ).setTypicalDuration( 12. * 3600 ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams( "work_12" ).setTypicalDuration( 12. * 3600 ) );
 
 		for( ModeParams modeParams : config.scoring().getDefaultModeParams().values() ){
 			modeParams.setMarginalUtilityOfTraveling( 0. );

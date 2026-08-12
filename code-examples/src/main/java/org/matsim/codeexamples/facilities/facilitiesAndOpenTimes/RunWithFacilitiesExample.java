@@ -67,14 +67,14 @@ public final class RunWithFacilitiesExample {
 			params.setTypicalDuration(12.*3600);
 			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
 			// note no opening/closing times for the activity type (given by facility)
-			config.scoring().addActivityParams(params);
+			config.scoring().addDefaultActivityParams(params);
 		}
 		{
 			ActivityParams params = new ActivityParams("shop") ;
 			params.setTypicalDuration(1.*3600);
 			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
 			// note no opening/closing times for the activity type (given by facility)
-			config.scoring().addActivityParams(params);
+			config.scoring().addDefaultActivityParams(params);
 		}
 
 		scenario = ScenarioUtils.createScenario( config ) ;

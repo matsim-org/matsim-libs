@@ -489,18 +489,18 @@ public class BicycleTest {
 
 		ActivityParams homeActivity = new ActivityParams("home");
 		homeActivity.setTypicalDuration(12*60*60);
-		config.scoring().addActivityParams(homeActivity);
+		config.scoring().addDefaultActivityParams(homeActivity);
 
 		ActivityParams workActivity = new ActivityParams("work");
 		workActivity.setTypicalDuration(8*60*60);
-		config.scoring().addActivityParams(workActivity);
+		config.scoring().addDefaultActivityParams(workActivity);
 
 		ModeParams bicycle = new ModeParams( bicycleMode );
 		bicycle.setConstant(0.);
 		bicycle.setMarginalUtilityOfDistance(-0.0004); // util/m
 		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
 		bicycle.setMonetaryDistanceRate(0.);
-		config.scoring().addModeParams(bicycle);
+		config.scoring().addDefaultModeParams(bicycle);
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		config.routing().setNetworkModes(mainModeList);
 
@@ -585,18 +585,18 @@ public class BicycleTest {
 
 		ActivityParams homeActivity = new ActivityParams("home");
 		homeActivity.setTypicalDuration(12*60*60);
-		config.scoring().addActivityParams(homeActivity);
+		config.scoring().addDefaultActivityParams(homeActivity);
 
 		ActivityParams workActivity = new ActivityParams("work");
 		workActivity.setTypicalDuration(8*60*60);
-		config.scoring().addActivityParams(workActivity);
+		config.scoring().addDefaultActivityParams(workActivity);
 
 		ModeParams bicycle = new ModeParams("bicycle");
 		bicycle.setConstant(0.);
 		bicycle.setMarginalUtilityOfDistance(-999999); // util/m
 		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
 		bicycle.setMonetaryDistanceRate(0.);
-		config.scoring().addModeParams(bicycle);
+		config.scoring().addDefaultModeParams(bicycle);
 
 		config.routing().setNetworkModes(mainModeList);
 

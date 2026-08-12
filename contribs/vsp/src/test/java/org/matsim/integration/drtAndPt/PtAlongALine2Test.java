@@ -199,17 +199,17 @@ public class PtAlongALine2Test {
 		if (drtMode != DrtMode.none) {
 			// (scoring parameters for drt modes)
 			config.scoring()
-					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
+					.addDefaultModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
 			if (drt2) {
 				config.scoring()
-						.addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
+						.addDefaultModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 			if (drt3) {
 				config.scoring()
-						.addModeParams(new ModeParams("drt3").setMarginalUtilityOfTraveling(margUtlTravPt));
+						.addDefaultModeParams(new ModeParams("drt3").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 		}
-		config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
+		config.scoring().addDefaultModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 
 		// === QSIM: ===
 
@@ -658,9 +658,9 @@ public class PtAlongALine2Test {
 					.get(TransportMode.pt)
 					.getMarginalUtilityOfTraveling();
 			config.scoring()
-					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
-			config.scoring().addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
-			config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
+					.addDefaultModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
+			config.scoring().addDefaultModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
+			config.scoring().addDefaultModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 		}
 		// === QSIM: ===
 

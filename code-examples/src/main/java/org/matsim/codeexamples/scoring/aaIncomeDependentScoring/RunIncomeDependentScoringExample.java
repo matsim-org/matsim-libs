@@ -63,7 +63,7 @@ class RunIncomeDependentScoringExample{
 
 		ScoringConfigGroup.ModeParams params = new ScoringConfigGroup.ModeParams( "car" );
 		params.setDailyMonetaryConstant( 10. );
-		config.scoring().addModeParams( params );
+		config.scoring().addDefaultModeParams( params );
 
 		// ---
 

@@ -16,8 +16,8 @@ public class RideScoringParamsFromCarParams {
 	 *              be alpha >= 0.
 	 */
 	public static void setRideScoringParamsBasedOnCarParams (ScoringConfigGroup scoringConfigGroup, double alpha) {
-		ScoringConfigGroup.ModeParams carParams = scoringConfigGroup.getOrCreateModeParams(TransportMode.car);
-		ScoringConfigGroup.ModeParams rideParams = scoringConfigGroup.getOrCreateModeParams(TransportMode.ride);
+		ScoringConfigGroup.ModeParams carParams = scoringConfigGroup.getOrCreateDefaultModeParams(TransportMode.car);
+		ScoringConfigGroup.ModeParams rideParams = scoringConfigGroup.getOrCreateDefaultModeParams(TransportMode.ride);
 
 		// constant is a calibration parameter and should not be changed
 
@@ -32,6 +32,6 @@ public class RideScoringParamsFromCarParams {
 
 		// rider and driver have marginalUtilityOfTravelling, the driver additionally loses the opportunity to perform an activity
 		rideParams.setMarginalUtilityOfTraveling((alpha + 1.0) * carParams.getMarginalUtilityOfTraveling() +
-			alpha * -scoringConfigGroup.getPerforming_utils_hr());
+			alpha * -scoringConfigGroup.getDefaultPerforming_utils_hr());
 	}
 }

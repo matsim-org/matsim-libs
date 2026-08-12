@@ -214,7 +214,7 @@ public class SimulatedLaneFlowCapacityTest {
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
-		config.scoring().addActivityParams(dummyAct);
+		config.scoring().addDefaultActivityParams(dummyAct);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
@@ -243,7 +243,7 @@ public class SimulatedLaneFlowCapacityTest {
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
-		config.scoring().addActivityParams(dummyAct);
+		config.scoring().addDefaultActivityParams(dummyAct);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
@@ -276,7 +276,7 @@ public class SimulatedLaneFlowCapacityTest {
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
-		config.scoring().addActivityParams(dummyAct);
+		config.scoring().addDefaultActivityParams(dummyAct);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
@@ -310,7 +310,7 @@ public class SimulatedLaneFlowCapacityTest {
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
-		config.scoring().addActivityParams(dummyAct);
+		config.scoring().addDefaultActivityParams(dummyAct);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());

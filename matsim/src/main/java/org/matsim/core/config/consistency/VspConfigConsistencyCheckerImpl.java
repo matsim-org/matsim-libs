@@ -374,7 +374,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 	private static boolean checkScoringConfigGroup(Config config, Level lvl, boolean problem) {
 		// added jan'26
-		if (config.scoring().getScoringParameters(null) != null) {
+		if (config.scoring().getAllScoringParameterSetsPerSubpopulation().containsKey(null)) {
 			problem = true;
 			System.out.flush();
 			log.log(lvl, "Problem: you have null scoring parameters. At VSP we should have one scoring parameter per subpopulation.");

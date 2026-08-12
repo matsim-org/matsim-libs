@@ -1001,11 +1001,11 @@ public class SwissRailRaptorTest {
 
         ModeParams railParams = new ModeParams("rail");
         railParams.setMarginalUtilityOfTraveling(-6.0);
-        f.config.scoring().addModeParams(railParams);
+        f.config.scoring().addDefaultModeParams(railParams);
 
         ModeParams roadParams = new ModeParams("road");
         roadParams.setMarginalUtilityOfTraveling(-6.0);
-        f.config.scoring().addModeParams(roadParams);
+        f.config.scoring().addDefaultModeParams(roadParams);
 
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord toCoord = new Coord(16100, 10050);
@@ -1063,11 +1063,11 @@ public class SwissRailRaptorTest {
 
             ModeParams railParams = new ModeParams("rail");
             railParams.setMarginalUtilityOfTraveling(-6.0);
-            config.scoring().addModeParams(railParams);
+            config.scoring().addDefaultModeParams(railParams);
 
             ModeParams roadParams = new ModeParams("road");
             roadParams.setMarginalUtilityOfTraveling(-6.0);
-            config.scoring().addModeParams(roadParams);
+            config.scoring().addDefaultModeParams(roadParams);
         }
 
         { // test with similar costs, the red line should still be cheaper
@@ -1095,7 +1095,7 @@ public class SwissRailRaptorTest {
             // (the access/egress legs to red are each 2 meters shorter than to green line, which adds a little additional penalty for the green line, about 0.02)
             ModeParams roadParams = new ModeParams("road");
             roadParams.setMarginalUtilityOfTraveling(2.83);
-            config.scoring().addModeParams(roadParams);
+            config.scoring().addDefaultModeParams(roadParams);
 
             TransitRouter router = createTransitRouter(f.schedule, config, f.network);
             List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0 * 3600 - 5 * 60, null));

@@ -138,7 +138,7 @@ public class FlowEfficiencyCalculatorTest {
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setTypicalDuration(1.0);
 
-		config.scoring().addActivityParams(genericParams);
+		config.scoring().addDefaultActivityParams(genericParams);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

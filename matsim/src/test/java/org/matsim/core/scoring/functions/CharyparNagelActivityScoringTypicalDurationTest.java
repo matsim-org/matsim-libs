@@ -29,11 +29,11 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 		scoring.setDefaultLateArrival_utils_hr(-18.);
 		scoring.setDefaultEarlyDeparture_utils_hr(-6.);
 		for (String type : new String[]{"home", "work", "home_evening"}) {
-			scoring.addActivityParams(new ScoringConfigGroup.ActivityParams(type).setTypicalDuration(2. * 3600.));
+			scoring.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams(type).setTypicalDuration(2. * 3600.));
 		}
 		ScoringConfigGroup.ActivityParams interaction = new ScoringConfigGroup.ActivityParams("pt interaction");
 		interaction.setScoringThisActivityAtAll(false);
-		scoring.addActivityParams(interaction);
+		scoring.addDefaultActivityParams(interaction);
 		return config;
 	}
 
@@ -45,7 +45,7 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 	}
 
 	private static ScoringParameters params(Config config) {
-		return new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParameters(null), config.scenario()).build();
+		return new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParametersOrDefault(null), config.scenario()).build();
 	}
 
 	private static CharyparNagelActivityScoring attributeScoring(Config config, Person person) {
@@ -135,7 +135,7 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 			Config configA = config();
 			configA.scoring().getDefaultActivityParams("work").setTypicalDurationScoreComputation(computation);
 			Plan planA = planWithWorkTypical(28800.);
-			((Activity) planA.getPlanElements().get(0)).getAttributes().removeAttribute(ActivityAttributeTypicalDurationCalculator.TYPICAL_DURATION_ATTRIBUTE);
+			((Activity) planA.getPlanElements().getFirst()).getAttributes().removeAttribute(ActivityAttributeTypicalDurationCalculator.TYPICAL_DURATION_ATTRIBUTE);
 			double withAttribute = score(attributeScoring(configA, person(planA)), 30600., 59400.);
 
 			// B: work typical 8h in the config, stock scoring on the bare activities
@@ -200,7 +200,7 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 	@Test
 	void alignmentMismatchFallsBackToConfigParameters() {
 		Config config = config();
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("unexpected").setTypicalDuration(2. * 3600.));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("unexpected").setTypicalDuration(2. * 3600.));
 
 		CharyparNagelActivityScoring diverged = attributeScoring(config, person(plan()));
 		diverged.handleFirstActivity(bare("unexpected", null, 28800.));

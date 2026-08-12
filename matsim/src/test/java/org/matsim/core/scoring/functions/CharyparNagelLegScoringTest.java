@@ -130,7 +130,7 @@ public class CharyparNagelLegScoringTest {
 	}
 
 	private static double calcBaseScore(ScoringConfigGroup scoringParams, String mode, double travelTime, double travelDist) {
-		var modeParams = scoringParams.getOrCreateModeParams(mode);
+		var modeParams = scoringParams.getOrCreateDefaultModeParams(mode);
 		// trave time: travelTime * marginalUtilityOfTraveling / 3600
 		var utilTravelTime = travelTime * modeParams.getMarginalUtilityOfTraveling() / 3600;
 		// distance: distance * marginalUtilityOfDistance
@@ -144,7 +144,7 @@ public class CharyparNagelLegScoringTest {
 	private static double calcWaitScore(ScoringConfigGroup scoringParams, Leg leg) {
 		if (leg.getRoute() instanceof TransitPassengerRoute tpr) {
 			var waitTime = tpr.getBoardingTime().seconds() - leg.getDepartureTime().seconds();
-			var waitUtil = scoringParams.getDefaultMarginalUtlOfWaitingPt_utils_hr() / 3600 - scoringParams.getOrCreateModeParams(leg.getMode()).getMarginalUtilityOfTraveling() / 3600;
+			var waitUtil = scoringParams.getDefaultMarginalUtlOfWaitingPt_utils_hr() / 3600 - scoringParams.getOrCreateDefaultModeParams(leg.getMode()).getMarginalUtilityOfTraveling() / 3600;
 			return waitTime * waitUtil;
 		} else {
 			return 0.;
@@ -152,12 +152,12 @@ public class CharyparNagelLegScoringTest {
 	}
 
 	private static double calcDailyConstant(ScoringConfigGroup scoringParams, String mode) {
-		var modeParams = scoringParams.getOrCreateModeParams(mode);
+		var modeParams = scoringParams.getOrCreateDefaultModeParams(mode);
 		return modeParams.getDailyUtilityConstant() + scoringParams.getDefaultMarginalUtilityOfMoney() * modeParams.getDailyMonetaryConstant();
 	}
 
 	private static double calcTripConstant(ScoringConfigGroup scoringParams, String mode) {
-		return scoringParams.getOrCreateModeParams(mode).getConstant();
+		return scoringParams.getOrCreateDefaultModeParams(mode).getConstant();
 	}
 
 	private static Person createPerson(PopulationFactory factory) {
@@ -192,7 +192,7 @@ public class CharyparNagelLegScoringTest {
 		config.setDefaultPerforming_utils_hr(13);
 		config.setDefaultUtilityOfLineSwitch(-17);
 
-		config.getOrCreateModeParams(mode)
+		config.getOrCreateDefaultModeParams(mode)
 			.setConstant(-19)
 			.setMarginalUtilityOfDistance(-23)
 			.setMonetaryDistanceRate(-29)
@@ -205,7 +205,7 @@ public class CharyparNagelLegScoringTest {
 	private static CharyparNagelLegScoring createScoringFunction(ScoringConfigGroup config, Set<String> ptModes) {
 
 		var scenarioConfig = new ScenarioConfigGroup();
-		var scoringParams = new ScoringParameters.Builder(config, config.getScoringParameters(null), Map.of(), scenarioConfig)
+		var scoringParams = new ScoringParameters.Builder(config, config.getScoringParametersOrDefault(null), Map.of(), scenarioConfig)
 			.build();
 		return new CharyparNagelLegScoring(scoringParams, ptModes);
 	}

@@ -212,7 +212,7 @@ public class EventsToScoreTest {
 
 		ScoringConfigGroup.ActivityParams dummyAct = new ScoringConfigGroup.ActivityParams("dummy");
 		dummyAct.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(dummyAct);
+		config.scoring().addDefaultActivityParams(dummyAct);
 
 		Controler controler = new Controler(scenario);
 		EventsManager events = controler.getEvents();
