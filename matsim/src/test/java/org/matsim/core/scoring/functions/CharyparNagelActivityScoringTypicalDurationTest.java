@@ -29,11 +29,11 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 		scoring.setDefaultLateArrival_utils_hr(-18.);
 		scoring.setDefaultEarlyDeparture_utils_hr(-6.);
 		for (String type : new String[]{"home", "work", "home_evening"}) {
-			scoring.addActivityParams(new ScoringConfigGroup.ActivityParams(type).setTypicalDuration(2. * 3600.));
+			scoring.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams(type).setTypicalDuration(2. * 3600.));
 		}
 		ScoringConfigGroup.ActivityParams interaction = new ScoringConfigGroup.ActivityParams("pt interaction");
 		interaction.setScoringThisActivityAtAll(false);
-		scoring.addActivityParams(interaction);
+		scoring.addDefaultActivityParams(interaction);
 		return config;
 	}
 
@@ -200,7 +200,7 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 	@Test
 	void alignmentMismatchFallsBackToConfigParameters() {
 		Config config = config();
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("unexpected").setTypicalDuration(2. * 3600.));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("unexpected").setTypicalDuration(2. * 3600.));
 
 		CharyparNagelActivityScoring diverged = attributeScoring(config, person(plan()));
 		diverged.handleFirstActivity(bare("unexpected", null, 28800.));

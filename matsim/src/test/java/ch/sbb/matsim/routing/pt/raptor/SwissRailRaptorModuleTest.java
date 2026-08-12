@@ -152,14 +152,14 @@ public class SwissRailRaptorModuleTest {
         Config config = f.config;
         ScoringConfigGroup.ActivityParams homeScoring = new ScoringConfigGroup.ActivityParams("home");
         homeScoring.setTypicalDuration(16*3600);
-        f.config.scoring().addActivityParams(homeScoring);
+        f.config.scoring().addDefaultActivityParams(homeScoring);
         ScoringConfigGroup.ActivityParams workScoring = new ScoringConfigGroup.ActivityParams("work");
         workScoring.setTypicalDuration(8*3600);
-        f.config.scoring().addActivityParams(workScoring);
+        f.config.scoring().addDefaultActivityParams(workScoring);
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         // prepare rest of config
 
@@ -266,10 +266,10 @@ public class SwissRailRaptorModuleTest {
         Config config = f.config;
         ScoringConfigGroup.ActivityParams homeScoring = new ScoringConfigGroup.ActivityParams("home");
         homeScoring.setTypicalDuration(16*3600);
-        f.config.scoring().addActivityParams(homeScoring);
+        f.config.scoring().addDefaultActivityParams(homeScoring);
         ScoringConfigGroup.ActivityParams workScoring = new ScoringConfigGroup.ActivityParams("work");
         workScoring.setTypicalDuration(8*3600);
-        f.config.scoring().addActivityParams(workScoring);
+        f.config.scoring().addDefaultActivityParams(workScoring);
 
         f.config.scoring().getOrCreateDefaultModeParams(TransportMode.walk).setMarginalUtilityOfTraveling(0.0);
 

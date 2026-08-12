@@ -522,7 +522,7 @@ public class CharyparNagelScoringFunctionTest {
 		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8 * 3600);
 
-		f.config.scoring().addActivityParams(params);
+		f.config.scoring().addDefaultActivityParams(params);
 		f.config.scoring().getDefaultActivityParams("h").setTypicalDuration(6.0 * 3600);
 
 		if (typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)) {
@@ -747,12 +747,12 @@ public class CharyparNagelScoringFunctionTest {
 			// setup activity types h and w for scoring
 			ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("h");
 			params.setTypicalDuration(15 * 3600);
-			scoring.addActivityParams(params);
+			scoring.addDefaultActivityParams(params);
 
 
 			params = new ScoringConfigGroup.ActivityParams("w");
 			params.setTypicalDuration(3 * 3600);
-			scoring.addActivityParams(params);
+			scoring.addDefaultActivityParams(params);
 
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = (Network) this.scenario.getNetwork();

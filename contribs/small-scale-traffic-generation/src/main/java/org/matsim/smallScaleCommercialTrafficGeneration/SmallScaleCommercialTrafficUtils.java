@@ -300,7 +300,7 @@ public class SmallScaleCommercialTrafficUtils {
 	static void ensureDefaultModeParams(Config config, Set<String> modes) {
 		modes.forEach(mode -> {
 			if (!config.scoring().getDefaultModeParams().containsKey(mode)) {
-				config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(mode));
+				config.scoring().addDefaultModeParams(new ScoringConfigGroup.ModeParams(mode));
 			}
 		});
 	}

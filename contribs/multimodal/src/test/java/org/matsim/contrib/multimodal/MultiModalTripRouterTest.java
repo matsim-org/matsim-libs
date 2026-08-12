@@ -79,7 +79,7 @@ public class MultiModalTripRouterTest {
 		config.routing().addParam("teleportedModeSpeed_walk", "1.34");
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
-		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( TransportMode.ride ) );
+		config.scoring().addDefaultModeParams( new ScoringConfigGroup.ModeParams( TransportMode.ride ) );
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 
 		createNetwork(scenario);

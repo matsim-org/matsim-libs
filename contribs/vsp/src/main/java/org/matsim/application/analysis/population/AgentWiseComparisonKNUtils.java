@@ -615,10 +615,10 @@ class AgentWiseComparisonKNUtils{
 		config.controller().setOutputDirectory( "output/dummyOutputFromAgentWiseComparisonKN" );
 		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
-//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
-//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
-//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
-//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addDefaultActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addDefaultActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addDefaultActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addDefaultActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
 		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the reduced config specifies them in an incomplete
 		// way, but I am not sure if that is the problem. --> that probably is indeed the problem.  In general, they are created automatically,
 		// but if they already exist in some other way (i.e., in this case coming from the reduced config), then those are not over-written.

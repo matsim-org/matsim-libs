@@ -96,7 +96,7 @@ public class PerceivedSafetyAndBicycleContribTest {
 			//            set all scoring params to 0 such that we only see the score change caused through perceived safety
 			ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams(TransportMode.bike);
 			modeParams.setMarginalUtilityOfTraveling(0.);
-			config.scoring().addModeParams(modeParams);
+			config.scoring().addDefaultModeParams(modeParams);
 			config.scoring().setWriteExperiencedPlans(true);
 			config.scoring().getDefaultActivityParams()
 				.forEach(a -> a.setScoringThisActivityAtAll(false));
@@ -304,7 +304,7 @@ public class PerceivedSafetyAndBicycleContribTest {
 			//            set all scoring params to 0 such that we only see the score change caused through perceived safety
 			ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams(TransportMode.bike);
 			modeParams.setMarginalUtilityOfTraveling(0.);
-			config.scoring().addModeParams(modeParams);
+			config.scoring().addDefaultModeParams(modeParams);
 			config.scoring().setWriteExperiencedPlans(true);
 			config.scoring().getDefaultActivityParams()
 				.forEach(a -> a.setScoringThisActivityAtAll(false));

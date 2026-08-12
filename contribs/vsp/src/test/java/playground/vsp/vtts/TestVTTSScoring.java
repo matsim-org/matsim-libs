@@ -52,8 +52,8 @@
 //		paramsHome.setActivityType("home");
 //		// twelve hours of home activity
 //		paramsHome.setTypicalDuration(12*3600);
-//		config.scoring().addActivityParams(paramsHome);
-//		config.scoring().addActivityParams(paramsWork);
+//		config.scoring().addDefaultActivityParams(paramsHome);
+//		config.scoring().addDefaultActivityParams(paramsWork);
 //		config.scoring().getScoringParameters(null).setLateArrival_utils_hr(0.);
 //		config.scoring().getScoringParameters(null).setMarginalUtlOfWaiting_utils_hr(0.);
 //		config.scoring().getScoringParameters(null).setMarginalUtlOfWaitingPt_utils_hr(0.);
@@ -121,8 +121,8 @@
 //		paramsHome.setActivityType("home");
 //		// twelve hours of home activity
 //		paramsHome.setTypicalDuration(12*3600);
-//		config.scoring().addActivityParams(paramsHome);
-//		config.scoring().addActivityParams(paramsWork);
+//		config.scoring().addDefaultActivityParams(paramsHome);
+//		config.scoring().addDefaultActivityParams(paramsWork);
 //		config.scoring().getScoringParameters(null).setLateArrival_utils_hr(0.);
 //		config.scoring().getScoringParameters(null).setMarginalUtlOfWaiting_utils_hr(0.);
 //		config.scoring().getScoringParameters(null).setMarginalUtlOfWaitingPt_utils_hr(0.);

@@ -83,7 +83,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		activityParams.setOpeningTime(7 * 3600.);
 		activityParams.setClosingTime(18 * 3600.);
 
-		plansCalcScoreConfigGroup.addActivityParams(activityParams);
+		plansCalcScoreConfigGroup.addDefaultActivityParams(activityParams);
 		plansCalcScoreConfigGroup.setDefaultEarlyDeparture_utils_hr(0.);
 		plansCalcScoreConfigGroup.setDefaultLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setDefaultMarginalUtlOfWaiting_utils_hr(0.);
@@ -146,7 +146,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		ActivityParams activityParams = new ActivityParams("overnightActivity");
 		activityParams.setTypicalDuration(12 * 3600.);
 
-		scoringConfigGroup.addActivityParams(activityParams);
+		scoringConfigGroup.addDefaultActivityParams(activityParams);
 		scoringConfigGroup.setDefaultEarlyDeparture_utils_hr(0.);
 		scoringConfigGroup.setDefaultLateArrival_utils_hr(0.);
 		scoringConfigGroup.setDefaultMarginalUtlOfWaiting_utils_hr(0.);
@@ -198,8 +198,8 @@ public class AdvancedMarginalCongestionPricingIT {
 		ActivityParams activityParams2 = new ActivityParams("lastActivityType");
 		activityParams2.setTypicalDuration(12 * 3600.);
 
-		plansCalcScoreConfigGroup.addActivityParams(activityParams1);
-		plansCalcScoreConfigGroup.addActivityParams(activityParams2);
+		plansCalcScoreConfigGroup.addDefaultActivityParams(activityParams1);
+		plansCalcScoreConfigGroup.addDefaultActivityParams(activityParams2);
 
 		plansCalcScoreConfigGroup.setDefaultEarlyDeparture_utils_hr(0.);
 		plansCalcScoreConfigGroup.setDefaultLateArrival_utils_hr(0.);

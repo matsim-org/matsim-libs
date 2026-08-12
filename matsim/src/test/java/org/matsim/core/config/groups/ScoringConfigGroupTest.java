@@ -137,16 +137,52 @@ import org.matsim.testcases.MatsimTestUtils;
 	}
 
 	@Test
-	void testAddActivityParams() {
+	void testAddDefaultActivityParams() {
+		// Tests that activity params are added to the default scoring parameter set.
 		ScoringConfigGroup c = new ScoringConfigGroup();
-        int originalSize = c.getDefaultActivityParams().size();
+		int originalSize = c.getDefaultActivityParams().size();
 		Assertions.assertNull(c.getDefaultActivityParams("type1"));
-        Assertions.assertEquals(originalSize, c.getDefaultActivityParams().size());
+		Assertions.assertEquals(originalSize, c.getDefaultActivityParams().size());
 
 		ActivityParams ap = new ActivityParams("type1");
-		c.addActivityParams(ap);
+		c.addDefaultActivityParams(ap);
 		Assertions.assertEquals(ap, c.getDefaultActivityParams("type1"));
-        Assertions.assertEquals(originalSize + 1, c.getDefaultActivityParams().size());
+		Assertions.assertEquals(originalSize + 1, c.getDefaultActivityParams().size());
+	}
+
+	@Test
+	void testAddDefaultModeParams() {
+		// Tests that mode params are added to the default scoring parameter set.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+		int originalSize = scoringConfigGroup.getDefaultModeParams().size();
+
+		ModeParams params = new ModeParams("hoverboard");
+		scoringConfigGroup.addDefaultModeParams(params);
+
+		Assertions.assertSame(params, scoringConfigGroup.getDefaultModeParams().get("hoverboard"));
+		Assertions.assertEquals(originalSize + 1, scoringConfigGroup.getDefaultModeParams().size());
+	}
+
+	@Test
+	void testAddParameterSetRoutesModeParamsToDefault() {
+		// Tests that top-level mode parameter sets are routed to default scoring parameters.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+		ModeParams params = new ModeParams("hoverboard");
+
+		scoringConfigGroup.addParameterSet(params);
+
+		Assertions.assertSame(params, scoringConfigGroup.getDefaultModeParams().get("hoverboard"));
+	}
+
+	@Test
+	void testAddParameterSetRoutesActivityParamsToDefault() {
+		// Tests that top-level activity parameter sets are routed to default scoring parameters.
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+		ActivityParams params = new ActivityParams("type1");
+
+		scoringConfigGroup.addParameterSet(params);
+
+		Assertions.assertSame(params, scoringConfigGroup.getDefaultActivityParams("type1"));
 	}
 
 	@Test
@@ -702,7 +738,7 @@ import org.matsim.testcases.MatsimTestUtils;
 			settings.setPriority( random.nextInt( 10 ) );
 			settings.setTypicalDuration( random.nextInt( 24*3600 ) );
 
-			group.addActivityParams( settings );
+			group.addDefaultActivityParams( settings );
 		}
 
 		for ( int i=0; i < 10; i++ ) {

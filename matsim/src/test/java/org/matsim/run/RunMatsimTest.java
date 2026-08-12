@@ -46,8 +46,8 @@ class RunMatsimTest {
 		config.routing().addTeleportedModeParams(new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(3. / 3.6));
 		config.routing().addTeleportedModeParams(new RoutingConfigGroup.TeleportedModeParams(E_BIKE).setTeleportedModeSpeed(25. / 3.6));
 
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(12 * 3600));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(12 * 3600));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Population population = scenario.getPopulation();
@@ -82,8 +82,8 @@ class RunMatsimTest {
 		config.controller().setLastIteration(0);
 		config.routing().setNetworkModes(Set.of(E_BIKE));
 		config.qsim().setMainModes(Set.of(E_BIKE));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(12 * 3600));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(12 * 3600));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

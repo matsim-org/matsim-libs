@@ -58,7 +58,7 @@ public class DriveDischargingHandlerTest {
 
 		for (int k = 0; k < retries; k++) {
 			Config config = createBaseConfig(utils.getOutputDirectory(), 5.0);
-			config.scoring().addActivityParams(new ActivityParams("generic").setScoringThisActivityAtAll(false));
+			config.scoring().addDefaultActivityParams(new ActivityParams("generic").setScoringThisActivityAtAll(false));
 
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			createTwoLinkNetwork(scenario);
@@ -181,8 +181,8 @@ public class DriveDischargingHandlerTest {
 	@Test
 	public void testLastTimestepEventsProcessedInAfterMobsim() {
 		Config config = createBaseConfig(utils.getOutputDirectory(), 3600.0);
-		config.scoring().addActivityParams(new ActivityParams("home").setScoringThisActivityAtAll(false));
-		config.scoring().addActivityParams(new ActivityParams("work").setScoringThisActivityAtAll(false));
+		config.scoring().addDefaultActivityParams(new ActivityParams("home").setScoringThisActivityAtAll(false));
+		config.scoring().addDefaultActivityParams(new ActivityParams("work").setScoringThisActivityAtAll(false));
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

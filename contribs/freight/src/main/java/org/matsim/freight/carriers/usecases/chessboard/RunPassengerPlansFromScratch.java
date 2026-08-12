@@ -40,10 +40,10 @@ final class RunPassengerPlansFromScratch {
 
 		ActivityParams workParams = new ActivityParams("work");
 		workParams.setTypicalDuration(60 * 60 * 8);
-		config.scoring().addActivityParams(workParams);
+		config.scoring().addDefaultActivityParams(workParams);
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16 * 60 * 60);
-		config.scoring().addActivityParams(homeParams);
+		config.scoring().addDefaultActivityParams(homeParams);
 		config.global().setCoordinateSystem("EPSG:32632");
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(2);

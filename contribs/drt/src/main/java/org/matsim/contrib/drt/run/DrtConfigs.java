@@ -53,7 +53,7 @@ public class DrtConfigs {
 		params.setScoringThisActivityAtAll(false);
 		scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().values().forEach(k -> k.addActivityParams(params));
 		if (scoringConfigGroup.getScoringParametersOrDefault(null) != null)
-			scoringConfigGroup.addActivityParams(params);
+			scoringConfigGroup.addDefaultActivityParams(params);
 		LOGGER.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 	}
 

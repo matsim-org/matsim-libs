@@ -125,29 +125,29 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 		// kai, dec'19
 
-		this.addModeParams(new ModeParams(TransportMode.car));
-		this.addModeParams(new ModeParams(TransportMode.pt));
-		this.addModeParams(new ModeParams(TransportMode.walk));
-		this.addModeParams(new ModeParams(TransportMode.bike));
-		this.addModeParams(new ModeParams(TransportMode.ride));
-		this.addModeParams(new ModeParams(TransportMode.other));
+		this.addDefaultModeParams(new ModeParams(TransportMode.car));
+		this.addDefaultModeParams(new ModeParams(TransportMode.pt));
+		this.addDefaultModeParams(new ModeParams(TransportMode.walk));
+		this.addDefaultModeParams(new ModeParams(TransportMode.bike));
+		this.addDefaultModeParams(new ModeParams(TransportMode.ride));
+		this.addDefaultModeParams(new ModeParams(TransportMode.other));
 		///  (I do not know why the above works since the same does NOT work in {@link ScoringParameterSet}.)
 
-		this.addActivityParams(new ActivityParams("dummy").setTypicalDuration(2. * 3600.));
+		this.addDefaultActivityParams(new ActivityParams("dummy").setTypicalDuration(2. * 3600.));
 		// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
 		// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
 //			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
 
 		// yyyyyy find better solution for this. kai, dec'15
 		// Probably no longer needed; see checkConsistency method.  kai, jan'21
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.car)).setScoringThisActivityAtAll(false));
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.pt)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.car)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.pt)).setScoringThisActivityAtAll(false));
 		// (need this for self-programmed pseudo pt. kai, nov'16)
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.bike)).setScoringThisActivityAtAll(false));
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.drt)).setScoringThisActivityAtAll(false));
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.taxi)).setScoringThisActivityAtAll(false));
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.other)).setScoringThisActivityAtAll(false));
-		this.addActivityParams(new ActivityParams(createStageActivityType(TransportMode.walk)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.bike)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.drt)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.taxi)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.other)).setScoringThisActivityAtAll(false));
+		this.addDefaultActivityParams(new ActivityParams(createStageActivityType(TransportMode.walk)).setScoringThisActivityAtAll(false));
 		// (bushwhacking_walk---network_walk---bushwhacking_walk)
 	}
 
@@ -211,7 +211,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 			actParams.setActivityType(value);
 			getDefaultScoringParameterSet().removeParameterSet(actParams);
-			addActivityParams(actParams);
+			addDefaultActivityParams(actParams);
 		} else if (key.startsWith("activityPriority_")) {
 			log.warn(key + msg);
 			usesDeprecatedSyntax = true;
@@ -757,10 +757,10 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	public void addParameterSet(final ConfigGroup set) {
 		switch (set.getName()) {
 			case ActivityParams.SET_TYPE:
-				addActivityParams((ActivityParams) set);
+				addDefaultActivityParams((ActivityParams) set);
 				break;
 			case ModeParams.SET_TYPE:
-				addModeParams((ModeParams) set);
+				addDefaultModeParams((ModeParams) set);
 				break;
 			case ScoringParameterSet.SET_TYPE:
 				addScoringParameterSet((ScoringParameterSet) set);
@@ -804,10 +804,28 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		super.addParameterSet(params);
 	}
 
-	public void addModeParams(final ModeParams params) {
+	/**
+	 * Adds the given mode parameters to the default/root scoring parameter set.
+	 * <p>
+	 * Use {@link ScoringParameterSet#addModeParams(ModeParams)} when adding mode parameters to an
+	 * explicit subpopulation scoring parameter set.
+	 */
+	public void addDefaultModeParams(final ModeParams params) {
 		getDefaultScoringParameterSet().addModeParams(params);
 	}
 
+	/**
+	 * @deprecated Use {@link #addDefaultModeParams(ModeParams)} for default scoring parameters or
+	 * {@link ScoringParameterSet#addModeParams(ModeParams)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-08")
+	public void addModeParams(final ModeParams params) {
+		addDefaultModeParams(params);
+	}
+
+	/**
+	 * Adds the given mode parameters to an explicitly configured subpopulation scoring parameter set.
+	 */
 	public void addModeParamsForSubpopulation(final ModeParams params, String subpopulation) {
 		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
 		if (scoringParameterSet == null) {
@@ -816,10 +834,28 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		scoringParameterSet.addModeParams(params);
 	}
 
-	public void addActivityParams(final ActivityParams params) {
+	/**
+	 * Adds the given activity parameters to the default/root scoring parameter set.
+	 * <p>
+	 * Use {@link ScoringParameterSet#addActivityParams(ActivityParams)} when adding activity parameters to an
+	 * explicit subpopulation scoring parameter set.
+	 */
+	public void addDefaultActivityParams(final ActivityParams params) {
 		getDefaultScoringParameterSet().addActivityParams(params);
 	}
 
+	/**
+	 * @deprecated Use {@link #addDefaultActivityParams(ActivityParams)} for default scoring parameters or
+	 * {@link ScoringParameterSet#addActivityParams(ActivityParams)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-08")
+	public void addActivityParams(final ActivityParams params) {
+		addDefaultActivityParams(params);
+	}
+
+	/**
+	 * Adds the given activity parameters to an explicitly configured subpopulation scoring parameter set.
+	 */
 	public void addActivityParamsForSubpopulation(final ActivityParams params, String subpopulation) {
 		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
 		if (scoringParameterSet == null) {

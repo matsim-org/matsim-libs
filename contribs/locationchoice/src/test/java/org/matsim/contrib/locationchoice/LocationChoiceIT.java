@@ -199,13 +199,13 @@ public class LocationChoiceIT {
 
 		ActivityParams home = new ActivityParams("home");
 		home.setTypicalDuration(12*60*60);
-		config.scoring().addActivityParams(home);
+		config.scoring().addDefaultActivityParams(home);
 		ActivityParams work = new ActivityParams("work");
 		work.setTypicalDuration(12*60*60);
-		config.scoring().addActivityParams(work);
+		config.scoring().addDefaultActivityParams(work);
 		ActivityParams shop = new ActivityParams("shop");
 		shop.setTypicalDuration(1.*60*60);
-		config.scoring().addActivityParams(shop);
+		config.scoring().addDefaultActivityParams(shop);
 
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("MyLocationChoice");

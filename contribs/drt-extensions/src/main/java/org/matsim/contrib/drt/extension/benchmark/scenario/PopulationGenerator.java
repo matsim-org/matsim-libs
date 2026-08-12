@@ -77,10 +77,10 @@ public class PopulationGenerator {
 	private void addActivityParams(Scenario scenario) {
 		var scoring = scenario.getConfig().scoring();
 		if (scoring.getDefaultActivityParams("home") == null) {
-			scoring.addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
+			scoring.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
 		}
 		if (scoring.getDefaultActivityParams("work") == null) {
-			scoring.addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
+			scoring.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 		}
 	}
 

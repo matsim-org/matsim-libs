@@ -92,7 +92,7 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);
-		config.scoring().addActivityParams(homeParams);
+		config.scoring().addDefaultActivityParams(homeParams);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

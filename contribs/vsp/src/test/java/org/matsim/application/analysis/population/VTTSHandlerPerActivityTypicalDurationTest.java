@@ -40,9 +40,9 @@ public class VTTSHandlerPerActivityTypicalDurationTest {
 		Config config = ConfigUtils.createConfig();
 		ScoringConfigGroup scoring = config.scoring();
 		scoring.setDefaultPerforming_utils_hr(6.);
-		scoring.addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8. * 3600.));
-		scoring.addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(workTypicalDuration));
-		scoring.addActivityParams(new ScoringConfigGroup.ActivityParams("home_evening").setTypicalDuration(8. * 3600.));
+		scoring.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8. * 3600.));
+		scoring.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(workTypicalDuration));
+		scoring.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home_evening").setTypicalDuration(8. * 3600.));
 		return config;
 	}
 

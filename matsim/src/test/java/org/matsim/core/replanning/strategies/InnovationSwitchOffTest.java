@@ -100,12 +100,12 @@ public class InnovationSwitchOffTest {
 		{
 			ActivityParams params = new ActivityParams("h");
 			params.setTypicalDuration(12. * 3600.);
-			config.scoring().addActivityParams(params);
+			config.scoring().addDefaultActivityParams(params);
 		}
 		{
 			ActivityParams params = new ActivityParams("w");
 			params.setTypicalDuration(8. * 3600.);
-			config.scoring().addActivityParams(params);
+			config.scoring().addDefaultActivityParams(params);
 		}
 		config.controller().setCreateGraphs(false);
 

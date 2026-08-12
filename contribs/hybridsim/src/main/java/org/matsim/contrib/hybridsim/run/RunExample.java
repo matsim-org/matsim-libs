@@ -346,8 +346,8 @@ public class RunExample {
 		post.setEarliestEndTime(49);
 		post.setLatestStartTime(49);
 		post.setOpeningTime(49);
-		c.scoring().addActivityParams(pre);
-		c.scoring().addActivityParams(post);
+		c.scoring().addDefaultActivityParams(pre);
+		c.scoring().addDefaultActivityParams(post);
 
 		c.scoring().setDefaultLateArrival_utils_hr(0.);
 		c.scoring().setDefaultPerforming_utils_hr(0.);
