@@ -82,6 +82,9 @@ public class RunPSim {
 
 				bind(PSimTravelTimeCalculator.class).in( Singleton.class ) ;
 				bind(TravelTime.class).toProvider(PSimTravelTimeCalculator.class);
+				// Registered as the handler itself so that its guarded reset survives PSim
+				// iterations; see PSimTravelTimeCalculator.
+				addEventHandlerBinding().to(PSimTravelTimeCalculator.class);
 //				bind(TransitRouter.class).toProvider(TransitRouterEventsWSFactory.class);
 				bind(PlanCatcher.class).toInstance(new PlanCatcher());
 				bind(PSimProvider.class).toInstance(new PSimProvider(scenario,matsimControler.getEvents()));
