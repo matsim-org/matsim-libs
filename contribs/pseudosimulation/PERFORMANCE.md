@@ -33,6 +33,11 @@ the exact number of emitted events; an optimization that changes observable outp
 The `serialized-link-lookup` workload performs 100 lookups per configured plan against two links and validates the
 accumulated result. Its throughput column represents lookups rather than events.
 
+The transit-history probe compares the preserved legacy scan with the indexed chronological path over a 10,000-event
+history. It defaults to 10,000 late-history queries and validates the accumulated sampled in-vehicle time. Configure
+these independently with `PSIM_BENCHMARK_JVM_ARGS=-Dpsim.transit.benchmark.history=...` and
+`-Dpsim.transit.benchmark.lookups=...`.
+
 Results contain the median and minimum elapsed time, events emitted per invocation, and throughput calculated from the
 median. Warm-up rounds are excluded. End-to-end results include worker startup and the coordinator's completion wait.
 
