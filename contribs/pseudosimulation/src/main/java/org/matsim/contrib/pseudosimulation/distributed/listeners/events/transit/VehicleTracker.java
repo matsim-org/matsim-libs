@@ -52,6 +52,8 @@ class VehicleTracker implements Serializable {
     }
 
     public void registerDeparture(VehicleDepartsAtFacilityEvent event) {
+        //a departure without a preceding arrival has no dwell event to complete
+        if (lastDwellEvent == null) return;
         lastDwellEvent.setDepartureTime(event.getTime());
         lastDwellEvent.setOccupancyAtDeparture(getOccupancy());
     }
