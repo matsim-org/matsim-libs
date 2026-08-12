@@ -30,6 +30,9 @@ The benchmark creates fixed teleport, car, transit, and evenly mixed populations
 plans traverse a two-link network, and transit plans use a deterministic emulator. Every measured invocation verifies
 the exact number of emitted events; an optimization that changes observable output fails the benchmark.
 
+The `serialized-link-lookup` workload performs 100 lookups per configured plan against two links and validates the
+accumulated result. Its throughput column represents lookups rather than events.
+
 Results contain the median and minimum elapsed time, events emitted per invocation, and throughput calculated from the
 median. Warm-up rounds are excluded. End-to-end results include worker startup and the coordinator's completion wait.
 

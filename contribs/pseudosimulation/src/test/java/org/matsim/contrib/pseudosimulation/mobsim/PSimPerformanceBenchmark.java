@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
+import org.matsim.contrib.pseudosimulation.distributed.SerializableLinkTravelTimes;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -45,6 +46,7 @@ class PSimPerformanceBenchmark {
     private static final Set<String> TRANSIT_MODES = Set.of(TransportMode.pt);
     private static final TransitEmulator TRANSIT_EMULATOR = (leg, departure) ->
             new TransitEmulator.Trip(null, departure + 2, departure + 8);
+    private static volatile double lookupResult;
 
     @Test
     void measureRepresentativeWorkloads() {
@@ -55,6 +57,7 @@ class PSimPerformanceBenchmark {
         System.out.println("workload,median_ms,min_ms,events_per_run,median_events_per_second");
 
         BenchmarkNetwork benchmarkNetwork = createNetwork();
+        measureSerializedTravelTimeLookup(benchmarkNetwork);
         measureCore("teleport", createPlans(Workload.TELEPORT, benchmarkNetwork), benchmarkNetwork.network(),
                 PLAN_COUNT * 5L);
         measureCore("car", createPlans(Workload.CAR, benchmarkNetwork), benchmarkNetwork.network(), PLAN_COUNT * 10L);
@@ -64,6 +67,32 @@ class PSimPerformanceBenchmark {
         long mixedEventCount = mixedEventCount();
         measureCore("mixed", mixedPlans, benchmarkNetwork.network(), mixedEventCount);
         measureEndToEnd("mixed-end-to-end", mixedPlans, benchmarkNetwork.network(), mixedEventCount);
+    }
+
+    private static void measureSerializedTravelTimeLookup(BenchmarkNetwork network) {
+        SerializableLinkTravelTimes travelTimes = new SerializableLinkTravelTimes(
+                (link, time, person, vehicle) -> link == network.start() ? 1 : 2,
+                900, (int) END_TIME, List.of(network.start(), network.end()));
+        int lookups = PLAN_COUNT * 100;
+        Runnable lookup = () -> {
+            double result = 0;
+            for (int index = 0; index < lookups; index++) {
+                Link link = index % 2 == 0 ? network.start() : network.end();
+                result += travelTimes.getLinkTravelTime(link, index % 86_400, null, null);
+            }
+            lookupResult = result;
+        };
+        for (int round = 0; round < WARMUP_ROUNDS; round++) {
+            lookup.run();
+        }
+        long[] samples = new long[MEASUREMENT_ROUNDS];
+        for (int round = 0; round < MEASUREMENT_ROUNDS; round++) {
+            long start = System.nanoTime();
+            lookup.run();
+            samples[round] = System.nanoTime() - start;
+        }
+        assertEquals(lookups * 1.5, lookupResult);
+        printResult("serialized-link-lookup", samples, lookups);
     }
 
     private static void measureCore(String name, Collection<Plan> plans, Network network, long expectedEvents) {

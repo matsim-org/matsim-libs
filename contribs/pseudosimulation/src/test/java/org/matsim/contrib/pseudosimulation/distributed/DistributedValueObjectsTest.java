@@ -17,6 +17,10 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -85,6 +89,47 @@ class DistributedValueObjectsTest {
 		}
 
 		assertTrue(errorBytes.toString().contains("ArrayIndexOutOfBoundsException"));
+	}
+
+	@Test
+	void serializableTravelTimesFailForUnknownLinks() {
+		Network network = createTwoNodeNetwork();
+		Link known = network.getFactory().createLink(Id.createLinkId("known"),
+				network.getNodes().get(Id.createNodeId("from")), network.getNodes().get(Id.createNodeId("to")));
+		Link unknown = network.getFactory().createLink(Id.createLinkId("unknown"),
+				network.getNodes().get(Id.createNodeId("from")), network.getNodes().get(Id.createNodeId("to")));
+		SerializableLinkTravelTimes times = new SerializableLinkTravelTimes(
+				(link, time, person, vehicle) -> 1, 900, 3600, List.of(known));
+
+		assertThrows(NullPointerException.class, () -> times.getLinkTravelTime(unknown, 0, null, null));
+	}
+
+	@Test
+	void serializableTravelTimesRebuildLookupIndexAfterRoundTrip() throws IOException, ClassNotFoundException {
+		Network network = createTwoNodeNetwork();
+		Link link = network.getFactory().createLink(Id.createLinkId("serialized"),
+				network.getNodes().get(Id.createNodeId("from")), network.getNodes().get(Id.createNodeId("to")));
+		SerializableLinkTravelTimes original = new SerializableLinkTravelTimes(
+				(ignored, time, person, vehicle) -> 10 + time / 900, 900, 3600, List.of(link));
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+			output.writeObject(original);
+		}
+
+		SerializableLinkTravelTimes copy;
+		try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+			copy = (SerializableLinkTravelTimes) input.readObject();
+		}
+
+		assertEquals(12.0, copy.getLinkTravelTime(link, 1800, null, null));
+		assertEquals(10.0, copy.getLinkTravelTime(link, 86400, null, null));
+	}
+
+	private static Network createTwoNodeNetwork() {
+		Network network = NetworkUtils.createNetwork();
+		network.addNode(network.getFactory().createNode(Id.createNodeId("from"), new Coord(0, 0)));
+		network.addNode(network.getFactory().createNode(Id.createNodeId("to"), new Coord(1, 0)));
+		return network;
 	}
 
 	@Test
