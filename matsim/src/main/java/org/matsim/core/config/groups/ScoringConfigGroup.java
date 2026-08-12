@@ -378,8 +378,21 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		return actType;
 	}
 
+	/**
+	 * Returns the mode parameters for the given mode from the default/root scoring parameters,
+	 * creating them if necessary.
+	 */
+	public ModeParams getOrCreateDefaultModeParams(String modeName) {
+		return getDefaultScoringParameterSet().getOrCreateModeParams(modeName);
+	}
+
+	/**
+	 * @deprecated Use {@link #getOrCreateDefaultModeParams(String)} for default scoring parameters or
+	 * {@link ScoringParameterSet#getOrCreateModeParams(String)} on an explicit subpopulation scoring parameter set.
+	 */
+	@Deprecated(since = "2026-08")
 	public ModeParams getOrCreateModeParams(String modeName) {
-		return getScoringParameters(null).getOrCreateModeParams(modeName);
+		return getOrCreateDefaultModeParams(modeName);
 	}
 
 	@Override

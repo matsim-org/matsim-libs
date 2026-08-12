@@ -79,7 +79,7 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 		this.config = scenario.getConfig();
 		final ScoringConfigGroup scoringConfigGroup = config.scoring() ;
 
-		if (scoringConfigGroup.getOrCreateModeParams(mode).getMonetaryDistanceRate() != 0.) {
+		if (scoringConfigGroup.getOrCreateDefaultModeParams(mode).getMonetaryDistanceRate() != 0.) {
 			LOG.error("Monetary distance cost rate for " + mode + " different from zero, but not used in accessibility computations");
 		}
 
@@ -90,8 +90,8 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 		}
 		this.modeSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(mode) * 3600.;
 
-		final ScoringConfigGroup.ModeParams modeParams = scoringConfigGroup.getOrCreateModeParams(mode);
 		betaModeTT = modeParams.getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		final ScoringConfigGroup.ModeParams modeParams = scoringConfigGroup.getOrCreateDefaultModeParams(mode);
 		betaModeTD = modeParams.getMarginalUtilityOfDistance();
 		constMode = modeParams.getConstant();
 

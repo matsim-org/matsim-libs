@@ -16,8 +16,8 @@ public class RideScoringParamsFromCarParams {
 	 *              be alpha >= 0.
 	 */
 	public static void setRideScoringParamsBasedOnCarParams (ScoringConfigGroup scoringConfigGroup, double alpha) {
-		ScoringConfigGroup.ModeParams carParams = scoringConfigGroup.getOrCreateModeParams(TransportMode.car);
-		ScoringConfigGroup.ModeParams rideParams = scoringConfigGroup.getOrCreateModeParams(TransportMode.ride);
+		ScoringConfigGroup.ModeParams carParams = scoringConfigGroup.getOrCreateDefaultModeParams(TransportMode.car);
+		ScoringConfigGroup.ModeParams rideParams = scoringConfigGroup.getOrCreateDefaultModeParams(TransportMode.ride);
 
 		// constant is a calibration parameter and should not be changed
 

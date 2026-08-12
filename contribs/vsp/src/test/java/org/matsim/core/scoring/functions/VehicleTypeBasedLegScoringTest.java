@@ -41,7 +41,7 @@ class VehicleTypeBasedLegScoringTest {
 		var truckId = addVehicle(vehicles, "truck-1", truckType);
 		var scoringConfig = createScoringConfig();
 
-		scoringConfig.getOrCreateModeParams(TransportMode.car)
+		scoringConfig.getOrCreateDefaultModeParams(TransportMode.car)
 			.setConstant(-100)
 			.setMarginalUtilityOfTraveling(-100)
 			.setMarginalUtilityOfDistance(-100)
@@ -49,7 +49,7 @@ class VehicleTypeBasedLegScoringTest {
 			.setDailyMonetaryConstant(-100)
 			.setDailyUtilityConstant(-100);
 
-		scoringConfig.getOrCreateModeParams("truck")
+		scoringConfig.getOrCreateDefaultModeParams("truck")
 			.setConstant(-1)
 			.setMarginalUtilityOfTraveling(-7.2)
 			.setMarginalUtilityOfDistance(-0.3)
@@ -76,7 +76,7 @@ class VehicleTypeBasedLegScoringTest {
 			.setCostsPerSecond(0.2);
 		var truckId = addVehicle(vehicles, "truck-1", truckType);
 		var scoringConfig = createScoringConfig();
-		scoringConfig.getOrCreateModeParams(TransportMode.car);
+		scoringConfig.getOrCreateDefaultModeParams(TransportMode.car);
 
 		var params = createScoringParameters(scoringConfig);
 		var scoring = new VehicleTypeBasedLegScoring(vehicles, params, Set.of());
@@ -157,7 +157,7 @@ class VehicleTypeBasedLegScoringTest {
 
 		var scoringConfig = createScoringConfig();
 		var scoringParameterSet = scoringConfig.getScoringParameters(null);
-		scoringConfig.getOrCreateModeParams("truck")
+		scoringConfig.getOrCreateDefaultModeParams("truck")
 			.setConstant(-99.0)
 			.setMarginalUtilityOfTraveling(-88.0)
 			.setMarginalUtilityOfDistance(-77.0)
@@ -177,7 +177,7 @@ class VehicleTypeBasedLegScoringTest {
 
 	private static ScoringConfigGroup createScoringConfig() {
 		var scoringConfig = new ScoringConfigGroup();
-		scoringConfig.setMarginalUtilityOfMoney(1.0);
+		scoringConfig.setDefaultMarginalUtilityOfMoney(1.0);
 		return scoringConfig;
 	}
 

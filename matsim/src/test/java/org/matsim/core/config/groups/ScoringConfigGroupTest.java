@@ -150,6 +150,19 @@ import org.matsim.testcases.MatsimTestUtils;
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
+	void testGetOrCreateDefaultModeParams() {
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
+		int originalSize = scoringConfigGroup.getDefaultModeParams().size();
+
+		Assertions.assertNull(scoringConfigGroup.getDefaultModeParams().get("hoverboard"));
+		ModeParams created = scoringConfigGroup.getOrCreateDefaultModeParams("hoverboard");
+
+		Assertions.assertSame(created, scoringConfigGroup.getDefaultModeParams().get("hoverboard"));
+		Assertions.assertEquals(originalSize + 1, scoringConfigGroup.getDefaultModeParams().size());
+	}
+
+	@Test
 	void testExplicitSubpopulationGettersDoNotFallback() {
 		// Explicit subpopulation accessors should only return parameters defined for exactly that subpopulation.
 		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();

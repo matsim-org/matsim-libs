@@ -66,8 +66,8 @@ public class ConfigYamlUpdateTest {
 		assertThat(config.controller().getRunId()).isEqualTo("567");
 		assertThat(config.global().getNumberOfThreads()).isEqualTo(8);
 
-		assertThat(config.scoring().getOrCreateModeParams("car").getConstant()).isEqualTo(-1);
-		assertThat(config.scoring().getOrCreateModeParams("bike").getConstant()).isEqualTo(-2);
+		assertThat(config.scoring().getOrCreateDefaultModeParams("car").getConstant()).isEqualTo(-1);
+		assertThat(config.scoring().getOrCreateDefaultModeParams("bike").getConstant()).isEqualTo(-2);
 	}
 
 	@Test

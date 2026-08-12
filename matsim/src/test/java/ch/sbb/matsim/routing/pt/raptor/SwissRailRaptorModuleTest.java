@@ -271,7 +271,7 @@ public class SwissRailRaptorModuleTest {
         workScoring.setTypicalDuration(8*3600);
         f.config.scoring().addActivityParams(workScoring);
 
-        f.config.scoring().getOrCreateModeParams(TransportMode.walk).setMarginalUtilityOfTraveling(0.0);
+        f.config.scoring().getOrCreateDefaultModeParams(TransportMode.walk).setMarginalUtilityOfTraveling(0.0);
 
         StrategySettings reRoute = new StrategySettings();
         reRoute.setStrategyName("ReRoute");
@@ -301,7 +301,7 @@ public class SwissRailRaptorModuleTest {
         // test that swiss rail raptor was used
         TripRouter tripRouter = controler.getInjector().getInstance(TripRouter.class);
         RoutingModule module = tripRouter.getRoutingModule(TransportMode.pt);
-        Assertions.assertTrue(module instanceof SwissRailRaptorRoutingModule);
+		Assertions.assertInstanceOf(SwissRailRaptorRoutingModule.class, module);
 
         // Check routed plan
         List<PlanElement> planElements = p1.getSelectedPlan().getPlanElements();
@@ -310,13 +310,13 @@ public class SwissRailRaptorModuleTest {
         }
 
         Assertions.assertEquals(7, planElements.size(), "wrong number of PlanElements.");
-        Assertions.assertTrue(planElements.get(0) instanceof Activity);
-        Assertions.assertTrue(planElements.get(1) instanceof Leg);
-        Assertions.assertTrue(planElements.get(2) instanceof Activity);
-        Assertions.assertTrue(planElements.get(3) instanceof Leg);
-        Assertions.assertTrue(planElements.get(4) instanceof Activity);
-        Assertions.assertTrue(planElements.get(5) instanceof Leg);
-        Assertions.assertTrue(planElements.get(6) instanceof Activity);
+		Assertions.assertInstanceOf(Activity.class, planElements.get(0));
+		Assertions.assertInstanceOf(Leg.class, planElements.get(1));
+		Assertions.assertInstanceOf(Activity.class, planElements.get(2));
+		Assertions.assertInstanceOf(Leg.class, planElements.get(3));
+		Assertions.assertInstanceOf(Activity.class, planElements.get(4));
+		Assertions.assertInstanceOf(Leg.class, planElements.get(5));
+		Assertions.assertInstanceOf(Activity.class, planElements.get(6));
 
         Assertions.assertEquals("home", ((Activity) planElements.get(0)).getType());
         Assertions.assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((Activity) planElements.get(2)).getType());
@@ -473,7 +473,7 @@ public class SwissRailRaptorModuleTest {
         // this test mostly checks that no exception occurred
 
         RoutingModule module = tripRouter.getRoutingModule(TransportMode.pt);
-        Assertions.assertTrue(module instanceof SwissRailRaptorRoutingModule);
+		Assertions.assertInstanceOf(SwissRailRaptorRoutingModule.class, module);
     }
 
 }
