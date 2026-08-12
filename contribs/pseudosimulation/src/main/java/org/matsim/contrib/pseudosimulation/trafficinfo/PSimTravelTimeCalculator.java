@@ -19,7 +19,6 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.contrib.pseudosimulation.MobSimSwitcher;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -37,13 +36,19 @@ public class PSimTravelTimeCalculator implements Provider<TravelTime>, LinkEnter
 	private final MobSimSwitcher switcher;
 	private final TravelTimeCalculator travelTimeCalculator;
 
+	/**
+	 * This class must itself be registered as the event handler, through
+	 * {@code addEventHandlerBinding()}. Registering the delegate instead would hand MATSim a
+	 * handler whose {@link #reset(int)} is not the guarded one below, and the travel times of the
+	 * preceding QSim iteration - the whole input of a pseudo-simulation iteration - would be
+	 * discarded at the start of every PSim iteration and rebuilt from PSim's own events.
+	 */
 	@Inject
-	PSimTravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, EventsManager eventsManager, Network network, MobSimSwitcher switcher) {
+	PSimTravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, Network network, MobSimSwitcher switcher) {
 		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
 		builder.configure(ttconfigGroup);
 		travelTimeCalculator = builder.build();
 		this.switcher = switcher;
-		eventsManager.addHandler( travelTimeCalculator );
 	}
 
 	@Override

@@ -31,25 +31,35 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * An attempt to carve out the TransitPerformance based transit emulation.
- * Largely cut & paste from PSim. Not tested with an actual model.
+ * Largely cut & paste from PSim.
  *
  * @author Gunnar Flötteröd
  *
  */
 public class TransitPerformanceFromPSimSpecificImplementation implements TransitEmulator {
 
-	private TransitPerformance transitPerformance;
+	private final Provider<TransitPerformance> transitPerformance;
 
 	private Map<Id<TransitLine>, TransitLine> transitLines;
 
+	/**
+	 * TransitPerformanceRecorder replaces its TransitPerformance on every QSim iteration, so the
+	 * emulator has to resolve the current one per lookup rather than capture one at construction.
+	 */
 	@Inject
-	public TransitPerformanceFromPSimSpecificImplementation(TransitPerformance transitPerformance,
+	public TransitPerformanceFromPSimSpecificImplementation(Provider<TransitPerformance> transitPerformance,
 			TransitSchedule transitSchedule) {
 		this.transitPerformance = transitPerformance;
 		this.transitLines = transitSchedule.getTransitLines();
+	}
+
+	public TransitPerformanceFromPSimSpecificImplementation(TransitPerformance transitPerformance,
+			TransitSchedule transitSchedule) {
+		this(() -> transitPerformance, transitSchedule);
 	}
 
 	@Override
@@ -59,7 +69,7 @@ public class TransitPerformanceFromPSimSpecificImplementation implements Transit
 		Id<TransitStopFacility> accessStopId = route.getAccessStopId();
 		Id<TransitStopFacility> egressStopId = route.getEgressStopId();
 
-		Tuple<Double, Double> routeTravelTime = transitPerformance.getRouteTravelTime(route.getLineId(),
+		Tuple<Double, Double> routeTravelTime = transitPerformance.get().getRouteTravelTime(route.getLineId(),
 				route.getRouteId(), accessStopId, egressStopId, earliestDepartureTime_s);
 		final double accessTime_s = earliestDepartureTime_s + routeTravelTime.getFirst();
 		final double egressTime_s = accessTime_s + routeTravelTime.getSecond();

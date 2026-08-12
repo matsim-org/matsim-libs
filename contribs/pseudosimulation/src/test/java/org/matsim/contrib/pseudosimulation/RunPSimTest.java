@@ -108,7 +108,11 @@ public class RunPSimTest {
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
 		PopulationComparison.compare( popExpected, popActual ) ;
-		Assertions.assertEquals(135.84418218045528, psimScore, MatsimTestUtils.EPSILON, "RunPsim score changed.");
+		// Was 135.84418218045528 while PSimTravelTimeCalculator registered its delegate as the
+		// event handler, which let MATSim reset the link travel times at the start of every PSim
+		// iteration. PSim iterations now score against the travel times the preceding QSim
+		// iteration actually measured, which is the point of the method, so the value moved.
+		Assertions.assertEquals(135.91328164128274, psimScore, MatsimTestUtils.EPSILON, "RunPsim score changed.");
 
 	}
 
