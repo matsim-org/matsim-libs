@@ -1014,8 +1014,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	/**
-	 * @deprecated Use {@link #getDefaultMarginalUtilityOfMoney()} for default scoring parameters or
-	 * {@link #getMarginalUtilityOfMoney(String)} for explicit subpopulation scoring parameters.
+	 * @deprecated Use {@link #getDefaultMarginalUtilityOfMoney()} for default scoring parameters.
 	 */
 	@Deprecated(since = "2026-02")
 	public double getMarginalUtilityOfMoney() {
@@ -1024,14 +1023,6 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	public double getDefaultMarginalUtilityOfMoney() {
 		return getDefaultScoringParameterSet().getMarginalUtilityOfMoney();
-	}
-
-	public double getMarginalUtilityOfMoney(String subpopulation) {
-		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
-		if (scoringParameterSet != null)
-			return scoringParameterSet.getMarginalUtilityOfMoney();
-		else
-			throw new RuntimeException("MarginalUtilityOfMoney for subpopulation " + subpopulation + " is not defined or the scoringParams for subpopulation is not defined");
 	}
 
 	public void setDefaultMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
@@ -1096,8 +1087,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	/**
-	 * @deprecated Use {@link #getDefaultMarginalUtlOfWaiting_utils_hr()} for default scoring parameters or
-	 * {@link #getMarginalUtlOfWaiting_utils_hr(String)} for explicit subpopulation scoring parameters.
+	 * @deprecated Use {@link #getDefaultMarginalUtlOfWaiting_utils_hr()} for default scoring parameters.
 	 */
 	@Deprecated(since = "2026-02")
 	public double getMarginalUtlOfWaiting_utils_hr() {
@@ -1106,14 +1096,6 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	public double getDefaultMarginalUtlOfWaiting_utils_hr() {
 		return getDefaultScoringParameterSet().getMarginalUtlOfWaiting_utils_hr();
-	}
-
-	public double getMarginalUtlOfWaiting_utils_hr(String subpopulation) {
-		final ScoringParameterSet scoringParameterSet = getExplicitScoringParameterSetsPerSubpopulation().get(subpopulation);
-		if (scoringParameterSet != null)
-			return scoringParameterSet.getMarginalUtlOfWaiting_utils_hr();
-		else
-			throw new RuntimeException("MarginalUtlOfWaiting_utils_hr for subpopulation " + subpopulation + " is not defined");
 	}
 
 	public void setDefaultMarginalUtlOfWaiting_utils_hr(double waiting) {

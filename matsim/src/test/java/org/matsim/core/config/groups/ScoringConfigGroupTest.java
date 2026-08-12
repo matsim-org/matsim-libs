@@ -136,8 +136,8 @@ import org.matsim.testcases.MatsimTestUtils;
 		log.warn( "" );
 	}
 
-	 @Test
-	 void testAddActivityParams() {
+	@Test
+	void testAddActivityParams() {
 		ScoringConfigGroup c = new ScoringConfigGroup();
         int originalSize = c.getDefaultActivityParams().size();
 		Assertions.assertNull(c.getDefaultActivityParams("type1"));
@@ -180,19 +180,16 @@ import org.matsim.testcases.MatsimTestUtils;
 			() -> scoringConfigGroup.getActivityParamsForSubpopulation("missing"));
 		Assertions.assertThrows(RuntimeException.class,
 			() -> scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", "missing"));
-		Assertions.assertThrows(RuntimeException.class,
-			() -> scoringConfigGroup.getMarginalUtilityOfMoney("missing"));
-		Assertions.assertThrows(RuntimeException.class,
-			() -> scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr("missing"));
+		Assertions.assertFalse(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey("missing"));
 
 		Assertions.assertSame(truckModeParams,
 			scoringConfigGroup.getModeParamsForSubpopulation("freight").get("truck"));
 		Assertions.assertSame(freightActivityParams,
 			scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", "freight"));
 		Assertions.assertEquals(freightParams.getMarginalUtilityOfMoney(),
-			scoringConfigGroup.getMarginalUtilityOfMoney("freight"), 1e-7);
+			scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().get("freight").getMarginalUtilityOfMoney(), 1e-7);
 		Assertions.assertEquals(freightParams.getMarginalUtlOfWaiting_utils_hr(),
-			scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr("freight"), 1e-7);
+			scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().get("freight").getMarginalUtlOfWaiting_utils_hr(), 1e-7);
 		Assertions.assertTrue(scoringConfigGroup.getAllScoringParameterSetsPerSubpopulation().containsKey("freight"));
 		Assertions.assertTrue(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey("freight"));
 		Assertions.assertFalse(scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().containsKey(null));
@@ -257,11 +254,6 @@ import org.matsim.testcases.MatsimTestUtils;
 			() -> scoringConfigGroup.getActivityParamsForSubpopulation(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
 		Assertions.assertThrows(RuntimeException.class,
 			() -> scoringConfigGroup.getActivityParamsForSubpopulation("freightInteraction", ScoringConfigGroup.DEFAULT_SUBPOPULATION));
-		Assertions.assertThrows(RuntimeException.class,
-			() -> scoringConfigGroup.getMarginalUtilityOfMoney(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
-		Assertions.assertThrows(RuntimeException.class,
-			() -> scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr(ScoringConfigGroup.DEFAULT_SUBPOPULATION));
-
 		scoringConfigGroup.setDefaultMarginalUtilityOfMoney(5.);
 		scoringConfigGroup.setDefaultMarginalUtlOfWaiting_utils_hr(-2.);
 		scoringConfigGroup.setDefaultMarginalUtlOfWaitingPt_utils_hr(-3.);
@@ -271,9 +263,9 @@ import org.matsim.testcases.MatsimTestUtils;
 		scoringConfigGroup.setDefaultUtilityOfLineSwitch(-7.);
 
 		Assertions.assertEquals(5., scoringConfigGroup.getDefaultMarginalUtilityOfMoney(), 1e-7);
-		Assertions.assertEquals(4., scoringConfigGroup.getMarginalUtilityOfMoney("freight"), 1e-7);
+		Assertions.assertEquals(4., scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().get("freight").getMarginalUtilityOfMoney(), 1e-7);
 		Assertions.assertEquals(-2., scoringConfigGroup.getDefaultMarginalUtlOfWaiting_utils_hr(), 1e-7);
-		Assertions.assertEquals(0., scoringConfigGroup.getMarginalUtlOfWaiting_utils_hr("freight"), 1e-7);
+		Assertions.assertEquals(0., scoringConfigGroup.getExplicitScoringParameterSetsPerSubpopulation().get("freight").getMarginalUtlOfWaiting_utils_hr(), 1e-7);
 		Assertions.assertEquals(-3., scoringConfigGroup.getDefaultMarginalUtlOfWaitingPt_utils_hr(), 1e-7);
 		Assertions.assertEquals(-4., scoringConfigGroup.getDefaultLateArrival_utils_hr(), 1e-7);
 		Assertions.assertEquals(-18., freightParams.getLateArrival_utils_hr(), 1e-7);
