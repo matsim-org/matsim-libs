@@ -47,9 +47,11 @@ check_staged_files() {
 		printf 'PSim quality: cannot inspect staged files.\n' >&2
 		exit 2
 	fi
-	mapfile -d '' -t staged <"$staged_file"
+	while IFS= read -r -d '' path; do
+		staged+=("$path")
+	done <"$staged_file"
 	rm -f -- "$staged_file"
-	for path in "${staged[@]}"; do
+	for path in ${staged[@]+"${staged[@]}"}; do
 		if is_relevant_path "$path"; then
 			relevant+=("$path")
 		fi
@@ -99,10 +101,12 @@ find_changed_java() {
 		printf 'PSim quality: cannot determine Java changes from origin/main.\n' >&2
 		exit 2
 	fi
-	mapfile -d '' -t changed <"$changed_file"
+	while IFS= read -r -d '' path; do
+		changed+=("$path")
+	done <"$changed_file"
 	rm -f -- "$changed_file"
 
-	for path in "${changed[@]}"; do
+	for path in ${changed[@]+"${changed[@]}"}; do
 		path=${path#contribs/pseudosimulation/}
 		if [[ -z "$SPOTLESS_FILES" ]]; then
 			SPOTLESS_FILES=$path
