@@ -678,10 +678,11 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	/**
 	 * Returns the explicitly configured scoring parameter set for the given subpopulation,
-	 * creating one if necessary.
+	 * creating and registering one if necessary.
 	 * <p>
 	 * This method does not apply default fallback. If there is no exact entry for the given
-	 * subpopulation key, a new scoring parameter set for that key is created.
+	 * subpopulation key, a new scoring parameter set for that key is created and added to this
+	 * config group.
 	 */
 	public ScoringParameterSet getOrCreateScoringParameters(String subpopulation) {
 		ScoringParameterSet params = getAllScoringParameterSetsPerSubpopulation().get(subpopulation);
