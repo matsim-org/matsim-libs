@@ -136,7 +136,7 @@ public class RunPSim {
 		if (!config.transit().isUseTransit()) {
 			return PSimConfigGroup.TransitEmulation.none;
 		}
-		return pSimConfigGroup.getTransitEmulation();
+		return pSimConfigGroup.resolveTransitEmulation();
 	}
 
 	/**

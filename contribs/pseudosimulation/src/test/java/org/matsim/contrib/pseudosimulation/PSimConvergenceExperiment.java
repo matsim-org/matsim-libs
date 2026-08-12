@@ -77,7 +77,9 @@ public final class PSimConvergenceExperiment {
 	public static void main(String[] args) throws IOException {
 		if (args.length < 1) {
 			throw new IllegalArgumentException(
-					"usage: <outputDirectory> [baseline|psim|both] [fullTransitPerformance|waitAndStopStopTimes]");
+					"usage: <outputDirectory> [baseline|psim|both] "
+							+ "[fullTransitPerformance|waitAndStopStopTimes] "
+							+ "[perIteration|perCycle|<rate per iteration, e.g. 0.05>]");
 		}
 		Path root = Path.of(args[0]);
 		String which = args.length > 1 ? args[1] : "both";

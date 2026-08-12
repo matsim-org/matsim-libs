@@ -95,7 +95,10 @@ rate as its fourth argument.
 ## Transit
 
 `psim.transitEmulation` selects how a pseudo-simulation iteration works out what a transit leg costs
-an agent. A scenario that does not simulate transit (`transit.useTransit`) always gets `none`,
+an agent. It supersedes `psim.fullTransitPerformanceTransmission`, which could only say whether to
+emulate transit at all. A config that sets the old flag alone keeps its meaning - `false` maps to
+`none` and `true` to `fullTransitPerformance` - and logs a warning naming the replacement. Setting
+both is accepted while they agree on whether transit is emulated and rejected when they do not. A scenario that does not simulate transit (`transit.useTransit`) always gets `none`,
 whatever the setting says, because there is no transit performance to record.
 
 | value | behaviour |
