@@ -1,9 +1,8 @@
 package org.matsim.contrib.pseudosimulation.mobsim;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -77,10 +76,10 @@ final class PSimPlanExecutor implements PSimExecutionCoordinator.Worker {
     }
 
     private void execute(Plan plan) {
-        Queue<Event> eventQueue = new LinkedList<>();
         Id<Person> personId = plan.getPerson().getId();
         Id<Vehicle> personVehicleId = Id.createVehicleId(personId.toString());
         List<PlanElement> elements = plan.getPlanElements();
+        List<Event> eventQueue = new ArrayList<>(Math.max(10, elements.size() * 3));
         double previousEndTime = 0;
 
         for (int index = 0; index < elements.size(); index += 2) {
@@ -115,7 +114,7 @@ final class PSimPlanExecutor implements PSimExecutionCoordinator.Worker {
     }
 
     private Double createLegEvents(Leg leg, double departureTime, Id<Person> personId, Id<Vehicle> vehicleId,
-            Queue<Event> eventQueue) {
+            List<Event> eventQueue) {
         if (leg.getMode().equals(TransportMode.car)) {
             try {
                 eventQueue.add(new PersonEntersVehicleEvent(departureTime, personId, vehicleId));
@@ -157,7 +156,7 @@ final class PSimPlanExecutor implements PSimExecutionCoordinator.Worker {
         return travelTime;
     }
 
-    private void publishEvents(Queue<Event> eventQueue, Id<Person> personId) {
+    private void publishEvents(List<Event> eventQueue, Id<Person> personId) {
         for (Event event : eventQueue) {
             if (event.getTime() > endTime) {
                 eventManager.processEvent(new PersonStuckEvent(endTime, personId, null, null));
@@ -167,7 +166,7 @@ final class PSimPlanExecutor implements PSimExecutionCoordinator.Worker {
         }
     }
 
-    private double calculateRouteTravelTime(NetworkRoute route, double startTime, Queue<Event> eventQueue,
+    private double calculateRouteTravelTime(NetworkRoute route, double startTime, List<Event> eventQueue,
             Id<Vehicle> vehicleId) {
         double travelTime = 0;
         if (route.getStartLinkId() != route.getEndLinkId()) {
