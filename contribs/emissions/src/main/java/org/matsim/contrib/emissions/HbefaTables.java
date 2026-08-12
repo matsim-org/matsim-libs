@@ -86,8 +86,6 @@ public abstract class HbefaTables {
     }
 
     static Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> loadAverageCold(URL file, EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments) {
-		// TODO Check if %OfSubsegment exists for cold-hbefa tables
-
         return load(
 			file,
 			duplicateSubsegments,
@@ -99,8 +97,6 @@ public abstract class HbefaTables {
     }
 
     static Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> loadDetailedCold(URL file, EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments) {
-		// TODO Check if %OfSubsegment exists for cold-hbefa tables
-
         return load(file,
 			duplicateSubsegments,
 			record -> {

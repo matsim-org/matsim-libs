@@ -854,17 +854,17 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			case tryDetailedThenTechnologyAverageThenAverageTable -> {
 				HbefaWarmEmissionFactor ef;
 				ef = tryDetailed(vehicleInformationTuple, efkey);
-				if (ef != null) return null;
+				if (ef != null) return ef;
 
 				fallbackTechAverageLogWarning(efkey);
 
 				ef = tryTechnologyAverage(vehicleInformationTuple, efkey);
-				if (ef != null) return null;
+				if (ef != null) return ef;
 
 				fallbackAverageLogWarning(efkey);
 
 				ef = tryAverage(vehicleInformationTuple, efkey);
-				if (ef != null) return null;
+				if (ef != null) return ef;
 
 			}
 			case directlyTryAverageTable -> {

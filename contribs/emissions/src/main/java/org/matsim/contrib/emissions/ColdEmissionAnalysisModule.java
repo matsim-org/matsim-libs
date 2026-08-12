@@ -129,8 +129,6 @@ final class ColdEmissionAnalysisModule {
 
 	private static int cnt =10;
 	Map<Pollutant, Double> calculateColdEmissions(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km ) {
-		// For testing purposes, I made this class package-private, as the WarmEmission equivalent method is also package-private aleks Jan'26.
-
 		final Map<Pollutant, Double> coldEmissionsOfEvent = new EnumMap<>( Pollutant.class );
 
 		logger.debug("VehId: {} ; Tuple.first = {}", vehicleId, vehicleInformationTuple.getFirst());
@@ -344,17 +342,17 @@ final class ColdEmissionAnalysisModule {
 			case tryDetailedThenTechnologyAverageThenAverageTable -> {
 				HbefaColdEmissionFactor ef;
 				ef = tryDetailed(vehicleInformationTuple, efkey);
-				if (ef != null) return null;
+				if (ef != null) return ef;
 
 				fallbackTechAverageLogWarning(efkey);
 
 				ef = tryTechnologyAverage(vehicleInformationTuple, efkey);
-				if (ef != null) return null;
+				if (ef != null) return ef;
 
 				fallbackAverageLogWarning(efkey);
 
 				ef = tryAverage(vehicleInformationTuple, efkey);
-				if (ef != null) return null;
+				if (ef != null) return ef;
 			}
 			case directlyTryAverageTable -> {
 				HbefaColdEmissionFactor ef;
