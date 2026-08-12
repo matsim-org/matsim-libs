@@ -245,7 +245,6 @@ public class IndividualPersonScoringParametersTest {
 		subpopParams.addModeParams(workerCarParams);
 
 		subpopParams.addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
-		scoringConfig.addParameterSet(subpopParams);
 
 		// Create persons from different subpopulations
 		Person defaultPerson = PopulationUtils.getFactory().createPerson(Id.create("default", Person.class));
