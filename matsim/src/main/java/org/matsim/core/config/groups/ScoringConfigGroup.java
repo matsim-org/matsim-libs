@@ -770,6 +770,22 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 	}
 
+	/**
+	 * Adds a scoring parameter set while preserving the legacy default-root handover.
+	 * <p>
+	 * A scoring parameter set with a non-{@code null} subpopulation key must be unique. Adding another
+	 * set for an already configured non-{@code null} subpopulation fails with an
+	 * {@link IllegalStateException}.
+	 * <p>
+	 * The root scoring parameter set identified by {@code null} is treated as the default/root handover
+	 * entry. If such a root set exists, it is replaced by the newly added set. This keeps old config
+	 * parsing behavior where explicitly provided scoring parameter sets can take over generated root
+	 * defaults.
+	 * <p>
+	 * This method intentionally does not use {@link #getScoringParametersOrDefault(String)}. The
+	 * {@link #DEFAULT_SUBPOPULATION} entry is a configured default and must not be removed just
+	 * because a new subpopulation-specific set is added.
+	 */
 	private void addScoringParameterSet(final ScoringParameterSet params) {
 		final Map<String, ScoringParameterSet> existingParams = getAllScoringParameterSetsPerSubpopulation();
 
