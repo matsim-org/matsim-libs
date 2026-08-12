@@ -22,24 +22,41 @@ config group:
 `iterationsPerCycle` of 25 means one queue simulation iteration followed by 24 pseudo-simulation
 iterations. The first and the last iteration of a run are always queue simulations.
 
-## Choosing a replanning rate
+## Choosing a replanning rate and a cycle length
 
-The replanning rate applies to every iteration, pseudo-simulation iterations included, so a cycle of
-`iterationsPerCycle` iterations perturbs the population that many times before the queue simulation
-next gets to check the result. Carrying a queue-simulation-only rate straight over is the most
-common way to make a pseudo-simulation run worse than the run it replaces.
+**These two settings are not independent, and neither can be carried over unchanged from a
+queue-simulation-only run.** The replanning rate applies to every iteration, pseudo-simulation
+iterations included, so what the population actually experiences between two reality checks is
 
-Rerouting is a best-response module evaluated against a surrogate with no agent interaction, so every
-rerouted agent is sent down whatever corridor looked fastest in the preceding queue simulation. Left
-unchecked for a whole cycle this concentrates the population onto a few links, and the following
-queue simulation cannot serve the result: it gridlocks, roughly a quarter of the day's trips never
-happen, and the mean score collapses before recovering over the next cycle.
+```
+perturbation per cycle = replanning rate x iterationsPerCycle
+```
 
-What matters is the **cumulative** rate over a cycle, expressed as a multiple of the rate an
-equivalent queue-simulation-only run would use per iteration. Measured on Sioux Falls 2014, 84,110
-agents, `iterationsPerCycle` 25, against a 100-iteration queue-simulation baseline at a 30% rate:
+Changing `iterationsPerCycle` therefore changes how hard the population is perturbed even if the
+rate is untouched. Going from 25 to 10 at a fixed 5% rate drops the budget from 125% to 50% per
+cycle and the run will under-converge; going from 10 to 25 raises it from 50% to 125% and it may
+gridlock. Tune them together, or hold their product fixed when you change one.
 
-| rate per iteration | per cycle | QSim iterations to reach the baseline's final score | wall clock | gridlock episodes |
+### Why it matters
+
+Rerouting is a best-response module evaluated against a surrogate with no agent interaction. Every
+rerouted agent is sent down whatever corridor was fastest in the preceding queue simulation, and
+nothing in a pseudo-simulation iteration notices that thousands of other agents just received the
+same advice. Repeat that for a whole cycle and the population concentrates onto a few links; the
+next queue simulation then cannot serve the result.
+
+The failure is easy to recognise once you know the signature. A queue simulation iteration executes
+far fewer trips than its neighbours, the mean score collapses, and the following cycle slowly digs
+back out. On Sioux Falls a gridlocked iteration executed 98,870 car departures where a healthy one
+executed 133,556 - about a quarter of the day's trips never happened - and the score fell from 19.3
+to -29.6. It is not a crash and nothing in the logs flags it, so it is easy to mistake for noise.
+
+### What the trade-off looks like
+
+Measured on Sioux Falls 2014, 84,110 agents, `iterationsPerCycle` 25, against a 100-iteration
+queue-simulation baseline at a 30% rate. The multiple is of that baseline's per-iteration rate:
+
+| rate per iteration | per cycle | QSim iterations to the baseline's final score | wall clock | gridlock episodes |
 | ---: | ---: | ---: | ---: | ---: |
 | baseline, no PSim | - | 84 | 774 s | 0 |
 | 1.2% | 30% (1x) | never reached | - | 0 |
@@ -47,16 +64,33 @@ agents, `iterationsPerCycle` 25, against a 100-iteration queue-simulation baseli
 | **5.0%** | **125% (4x)** | **26** | **495 s** | **0** |
 | 10.0% | 250% (8x) | 16 | 337 s | 2 |
 
-Around four times the baseline's per-iteration rate, spread across the cycle, converges more than
-three times faster than the baseline in queue simulations and stays stable. Below that the run is
-stable but too little innovation reaches the population to beat the baseline at all. Above it the
-run is faster still, and gridlocks.
+Both ends of that range are bad in different ways. Too low and the run is perfectly stable but never
+reaches the score the baseline reaches, because too little innovation ever gets to the population -
+at 30% per cycle it is slower in wall clock than not using pseudo-simulation at all. Too high and it
+converges fastest of all, then periodically destroys what it built.
 
-The onset of gridlock lies between 125% and 250% per cycle in this scenario, and there is no reason
-to expect that boundary to transfer unchanged to another network. Treat the table as a method for
-choosing the rate - scan upward until gridlock appears, then step back - rather than as values to
-copy. `PSimConvergenceExperiment` in the test sources runs this scan; it takes an explicit
-per-iteration rate as its fourth argument.
+At 125% per cycle the run reached the baseline's final score in 26 queue simulations against 84,
+finished slightly higher (19.313 against 19.268), and showed no gridlock in 38 post-convergence
+queue simulations.
+
+### How to tune it
+
+The gridlock threshold depends on how congested the network is and on which replanning modules are
+in the strategy, so these numbers are a starting point, not a constant to copy.
+
+1. Fix `iterationsPerCycle` first, from how much queue simulation time you are trying to avoid.
+2. Set the rate so that `rate x iterationsPerCycle` is roughly the per-iteration rate an equivalent
+   queue-simulation-only run would use. This is the safe, stable starting point.
+3. Raise the rate until the score trace shows a collapsing queue simulation iteration, then step
+   back. Look at queue simulation iterations only.
+4. Re-check after any change to `iterationsPerCycle`, since step 2's product has moved.
+
+Watch queue simulation iterations specifically. The score MATSim writes for a pseudo-simulation
+iteration covers only the agents that were replanned, so it is not comparable with the score of a
+queue simulation iteration and the raw series in `scorestats.csv` will look discontinuous.
+
+`PSimConvergenceExperiment` in the test sources runs this scan; it takes an explicit per-iteration
+rate as its fourth argument.
 
 ## Transit
 
