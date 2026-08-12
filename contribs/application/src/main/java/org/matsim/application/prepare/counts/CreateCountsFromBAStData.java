@@ -198,7 +198,8 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			}
 
 			MeasurementLocation<Link> location = counts.createAndAddMeasureLocation(station.getMatchedLink().getId(),
-				station.getName() + "_" + station.getDirection());
+				station.getName() + "_" + station.getDirection() + ", " + station.getId() + "_" + station.getDirectionField());
+			location.setCoordinates(station.getCoord());
 
 			Measurable carVolume = location.createVolume(TransportMode.car);
 			Measurable freightVolume = location.createVolume(TransportMode.truck);
@@ -259,7 +260,8 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 				BAStCountStation station = stations.get(entry.getKey());
 				MeasurementLocation<Link> location = counts.createAndAddMeasureLocation(station.getMatchedLink().getId(),
-					station.getName() + "_" + station.getDirection());
+					station.getName() + "_" + station.getDirection() + ", " + station.getId() + "_" + station.getDirectionField());
+				location.setCoordinates(station.getCoord());
 
 				Measurable car = location.createVolume(TransportMode.car);
 				Measurable freight = location.createVolume(TransportMode.truck);

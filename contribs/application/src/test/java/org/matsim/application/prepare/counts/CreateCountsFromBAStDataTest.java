@@ -132,7 +132,7 @@ public class CreateCountsFromBAStDataTest {
 		String version = "manual-matched";
 
 		//Map contains supposed matching from manual.csv
-		Map<Id<Link>, String> manual = Map.of(Id.createLinkId("4205"), "Neukölln_N", Id.createLinkId("4219"), "Neukölln_S");
+		Map<Id<Link>, String> manual = Map.of(Id.createLinkId("4205"), "Neukölln_N, 2012_1_R1", Id.createLinkId("4219"), "Neukölln_S, 2012_2_R2");
 
 		new CreateCountsFromBAStData().execute(args(version,
 			"--counts-mapping=" + utils.getPackageInputDirectory() + mapping));
