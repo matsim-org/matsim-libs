@@ -43,11 +43,11 @@ public abstract class HbefaTables {
 
 	private static int getterErrorCnt = 0;
 
-	private static final TriFunction<String, CSVRecord, String, String> safeGetLambda = (key, record, defaultValue) -> {
+	private static final TriFunction<String, CSVRecord, Double, Double> safeGetDoubleLambda = (key, record, defaultValue) -> {
 		// Only try if the key is there
 		if (record.getParser().getHeaderMap().containsKey(key)) {
 			try {
-				return record.get(key);
+				return Double.parseDouble(record.get(key));
 			} catch (IllegalArgumentException e){
 				if (getterErrorCnt < 1){
 					logger.warn(e);
@@ -65,7 +65,7 @@ public abstract class HbefaTables {
 			duplicateSubsegments,
 			HbefaTables::createWarmKey,
 			record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA_weighted")), Double.parseDouble(record.get("V_weighted"))),
-			record -> Double.parseDouble(safeGetLambda.apply("%OfSubsegment", record, "0.0")),
+			record -> safeGetDoubleLambda.apply("%OfSubsegment", record, 0.0),
 			HbefaTables::aggregateWarmKeys
 		);
     }
@@ -80,7 +80,7 @@ public abstract class HbefaTables {
 				return key;
         	},
 			record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA")), Double.parseDouble(record.get("V"))),
-			record -> Double.parseDouble(safeGetLambda.apply("%OfSubsegment", record, "0.0")),
+			record -> safeGetDoubleLambda.apply("%OfSubsegment", record, 0.0),
 			HbefaTables::aggregateWarmKeys
 		);
     }
@@ -91,7 +91,7 @@ public abstract class HbefaTables {
 			duplicateSubsegments,
 			HbefaTables::createColdKey,
 			record -> new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA_weighted"))),
-			record -> Double.parseDouble(safeGetLambda.apply("%OfSubsegment", record, "0.0")),
+			record -> safeGetDoubleLambda.apply("%OfSubsegment", record, 0.0),
 			HbefaTables::aggregateColdKeys
 		);
     }
@@ -105,7 +105,7 @@ public abstract class HbefaTables {
 				return key;
         	},
 			record -> new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA"))),
-			record -> Double.parseDouble(safeGetLambda.apply("%OfSubsegment", record, "0.0")),
+			record -> safeGetDoubleLambda.apply("%OfSubsegment", record, 0.0),
 			HbefaTables::aggregateColdKeys
 		);
     }
