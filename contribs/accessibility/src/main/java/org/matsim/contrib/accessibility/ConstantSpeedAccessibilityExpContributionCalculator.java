@@ -114,7 +114,7 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 			modeSet.add(mode);
 		}
 		filter.filter(subNetwork, modeSet);
-		if (subNetwork.getNodes().size() == 0) {
+		if (subNetwork.getNodes().isEmpty()) {
 			throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");
 		}
 		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");

@@ -78,7 +78,7 @@ public class VTTSHandlerPerActivityTypicalDurationTest {
 		handler.computeFinalVTTS();
 		List<VTTSHandler.TripData> trips = handler.getTripDataMap().get(PID);
 		// trip 0 is the trip to work; its marginal utility of schedule delay refers to the work activity
-		return trips.get(0).musl_h;
+		return trips.getFirst().musl_h;
 	}
 
 	@Test

@@ -137,7 +137,7 @@ public class AccessibilityUtils {
 			modeSet.add(mode);
 		}
 		filter.filter(subNetwork, modeSet);
-		if (subNetwork.getNodes().size() == 0) {throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");}
+		if (subNetwork.getNodes().isEmpty()) {throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");}
 		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
 		return subNetwork;
 	}
