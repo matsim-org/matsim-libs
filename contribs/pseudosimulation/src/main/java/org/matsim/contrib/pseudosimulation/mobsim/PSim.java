@@ -48,8 +48,7 @@ public class PSim implements Mobsim {
         double endTime = scenario.getConfig().qsim().getEndTime().seconds();
         int workerCount = scenario.getConfig().global().getNumberOfThreads();
         coordinator = PSimExecutionCoordinator.create(workerCount,
-                completion -> new PSimPlanExecutor(endTime, carLinkTravelTimes, transitEmulator, transitModes,
-                        completion));
+                () -> new PSimPlanExecutor(endTime, carLinkTravelTimes, transitEmulator, transitModes));
     }
 
     @Override

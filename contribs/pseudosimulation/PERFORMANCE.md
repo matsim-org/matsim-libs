@@ -82,3 +82,13 @@ primary question.
 
 The approximately 97 ms gap between mixed-core and end-to-end medians also confirms that the coordinator's 100 ms
 polling interval dominates small and medium PSim iterations in this workload.
+
+## Completion-coordinator result
+
+After replacing polling with executor futures, the same default workload produced a 5.894 ms mixed end-to-end median
+and a 4.232 ms minimum. The core-only mixed median was 3.410 ms in that run. This removes approximately 94.8 ms, or
+94%, from the measured end-to-end median while preserving the benchmark's exact 140,001-event correctness check.
+
+The result was captured on 2026-08-12 in the same command sandbox and with the same Java version, processor count,
+plan count, warm-up count, and measured-round count as the initial baseline. It also confirms that creating and
+terminating one bounded executor per PSim invocation adds little latency compared with the removed polling interval.

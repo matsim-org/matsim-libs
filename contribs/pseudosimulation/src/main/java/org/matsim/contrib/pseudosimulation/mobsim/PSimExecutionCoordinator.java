@@ -1,8 +1,15 @@
 package org.matsim.contrib.pseudosimulation.mobsim;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
@@ -16,56 +23,88 @@ final class PSimExecutionCoordinator {
     }
 
     interface WorkerFactory {
-        Worker create(Runnable completion);
+        Worker create();
     }
 
-    interface ThreadStarter {
-        void start(Runnable worker);
-    }
-
-    interface Sleeper {
-        void sleep(long milliseconds) throws InterruptedException;
+    interface ExecutorFactory {
+        ExecutorService create(int workerCount);
     }
 
     private final Worker[] workers;
-    private final ThreadStarter threadStarter;
-    private final Sleeper sleeper;
-    private AtomicInteger remainingWorkers;
+    private final ExecutorFactory executorFactory;
 
     static PSimExecutionCoordinator create(int workerCount, WorkerFactory workerFactory) {
-        return new PSimExecutionCoordinator(workerCount, workerFactory, worker -> new Thread(worker).start(), Thread::sleep);
+        return new PSimExecutionCoordinator(workerCount, workerFactory, Executors::newFixedThreadPool);
     }
 
-    PSimExecutionCoordinator(int workerCount, WorkerFactory workerFactory, ThreadStarter threadStarter, Sleeper sleeper) {
-        this.threadStarter = threadStarter;
-        this.sleeper = sleeper;
+    PSimExecutionCoordinator(int workerCount, WorkerFactory workerFactory, ExecutorFactory executorFactory) {
+        this.executorFactory = executorFactory;
         workers = new Worker[workerCount];
         for (int i = 0; i < workerCount; i++) {
-            workers[i] = workerFactory.create(this::workerCompleted);
+            workers[i] = workerFactory.create();
         }
     }
 
     void execute(Collection<Plan> plans, Network network, EventsManager eventManager) {
         int segmentCount = Math.min(plans.size(), workers.length);
-        List<Plan>[] segments = CollectionUtils.split(plans, segmentCount);
-
-        // Deliberately count configured workers, not launched segments, to retain legacy behavior.
-        remainingWorkers = new AtomicInteger(workers.length);
-        for (int i = 0; i < segments.length; i++) {
-            workers[i].initialize(segments[i], network, eventManager);
-            threadStarter.start(workers[i]);
+        if (segmentCount == 0) {
+            return;
         }
+        List<Plan>[] segments = CollectionUtils.split(plans, segmentCount);
+        ExecutorService executor = executorFactory.create(segmentCount);
+        CompletionService<Boolean> completions = new ExecutorCompletionService<>(executor);
+        List<Future<?>> tasks = new ArrayList<>(segmentCount);
+        try {
+            for (int i = 0; i < segments.length; i++) {
+                workers[i].initialize(segments[i], network, eventManager);
+                tasks.add(completions.submit(workers[i], Boolean.TRUE));
+            }
+            executor.shutdown();
+            awaitTasks(completions, segmentCount);
+        } catch (RuntimeException exception) {
+            boolean interrupted = Thread.interrupted();
+            cancel(tasks);
+            executor.shutdownNow();
+            awaitTermination(executor);
+            if (interrupted) {
+                Thread.currentThread().interrupt();
+            }
+            throw exception;
+        }
+        awaitTermination(executor);
+    }
 
-        while (remainingWorkers.get() > 0) {
+    private static void awaitTasks(CompletionService<Boolean> completions, int taskCount) {
+        for (int i = 0; i < taskCount; i++) {
             try {
-                sleeper.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                completions.take().get();
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Interrupted while waiting for PSim workers", exception);
+            } catch (ExecutionException exception) {
+                throw new IllegalStateException("PSim worker failed", exception.getCause());
             }
         }
     }
 
-    private void workerCompleted() {
-        remainingWorkers.decrementAndGet();
+    private static void cancel(List<Future<?>> tasks) {
+        for (Future<?> task : tasks) {
+            task.cancel(true);
+        }
+    }
+
+    private static void awaitTermination(ExecutorService executor) {
+        boolean interrupted = false;
+        while (!executor.isTerminated()) {
+            try {
+                executor.awaitTermination(1, TimeUnit.DAYS);
+            } catch (InterruptedException exception) {
+                interrupted = true;
+                executor.shutdownNow();
+            }
+        }
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
