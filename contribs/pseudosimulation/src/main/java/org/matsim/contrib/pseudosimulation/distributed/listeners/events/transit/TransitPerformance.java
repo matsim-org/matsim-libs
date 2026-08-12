@@ -1,7 +1,5 @@
 package org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit;
 
-import cern.colt.list.DoubleArrayList;
-import cern.jet.stat.Descriptive;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
@@ -12,7 +10,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -30,6 +27,11 @@ public class TransitPerformance implements Serializable {
 
     public TransitPerformance(BoardingModel boardingModel) {
         this.boardingModel = boardingModel;
+    }
+
+    TransitPerformance(BoardingModel boardingModel, Random random) {
+        this.boardingModel = boardingModel;
+        this.rand = random;
     }
 
     public TransitPerformance() {
@@ -60,7 +62,9 @@ public class TransitPerformance implements Serializable {
 
 
     private class DwellEventsAtStop implements Serializable {
+        private static final int SAMPLE_SIZE = 6;
         private List<DwellEvent> dwellEvents;
+        private boolean chronologicallyOrdered = true;
 
         public DwellEventsAtStop() {
             this.dwellEvents = new ArrayList<>();
@@ -68,39 +72,52 @@ public class TransitPerformance implements Serializable {
         }
 
         public void addVehicleDwellEventAtStop(DwellEvent dwellEvent) {
+            if (!dwellEvents.isEmpty()
+                    && dwellEvent.getArrivalTime() < dwellEvents.get(dwellEvents.size() - 1).getArrivalTime()) {
+                chronologicallyOrdered = false;
+            }
             this.dwellEvents.add(dwellEvent);
         }
 
         public Tuple<Double, Double> getTravelTime(Id<TransitStopFacility> destinationStop, double time) {
-            double inVehicleTime = Double.POSITIVE_INFINITY;
-            LinkedList<Double> lastInvehicleTime = new LinkedList<>();
-            for (DwellEvent dwellEvent : dwellEvents) {
-                lastInvehicleTime.add(dwellEvent.getVehicle().getInVehicleTime(dwellEvent, destinationStop));
-                if (lastInvehicleTime.size() > 6) lastInvehicleTime.removeFirst();
+            int firstCandidate = chronologicallyOrdered ? firstArrivalAtOrAfter(time) : 0;
+            int start = Math.max(0, firstCandidate - (SAMPLE_SIZE - 1));
+            double[] recentInVehicleTimes = new double[SAMPLE_SIZE];
+            int recentCount = 0;
+            int nextSlot = 0;
+            for (int index = start; index < dwellEvents.size(); index++) {
+                DwellEvent dwellEvent = dwellEvents.get(index);
+                recentInVehicleTimes[nextSlot] = dwellEvent.getVehicle()
+                        .getInVehicleTime(dwellEvent, destinationStop);
+                nextSlot = (nextSlot + 1) % SAMPLE_SIZE;
+                recentCount = Math.min(recentCount + 1, SAMPLE_SIZE);
                 if (dwellEvent.getArrivalTime() >= time) {
-                    //check if it's possible to board
-                    if (!boardingModel.canBoard(dwellEvent.getOccupancyAtDeparture()))
+                    if (!boardingModel.canBoard(dwellEvent.getOccupancyAtDeparture())) {
                         continue;
-
-                    DoubleArrayList doubleArrayList = new DoubleArrayList();
-                    doubleArrayList.addAllOf(lastInvehicleTime);
-                    double mean = Descriptive.mean(doubleArrayList);
-//                    try {
-                        inVehicleTime = lastInvehicleTime.get(rand.nextInt(lastInvehicleTime.size()));
-//                        inVehicleTime = new NormalDistributionImpl(mean, Math.sqrt(Descriptive.sampleVariance(doubleArrayList,mean))).inverseCumulativeProbability(MatsimRandom.getRandom().nextDouble());
-//                    } catch (MathException e) {
-//                        inVehicleTime= mean;
-//                    }catch (MathRuntimeException re){
-//                        inVehicleTime= mean;
-//                    }
-
-//                    inVehicleTime = dwellEvent.getVehicle().getInVehicleTime(dwellEvent, destinationStop);
-                }
-                if (!Double.isInfinite(inVehicleTime)) {
-                    return new Tuple<>(dwellEvent.getArrivalTime() - time, inVehicleTime);
+                    }
+                    int oldestSlot = recentCount == SAMPLE_SIZE ? nextSlot : 0;
+                    int sampledSlot = (oldestSlot + rand.nextInt(recentCount)) % SAMPLE_SIZE;
+                    double inVehicleTime = recentInVehicleTimes[sampledSlot];
+                    if (!Double.isInfinite(inVehicleTime)) {
+                        return new Tuple<>(dwellEvent.getArrivalTime() - time, inVehicleTime);
+                    }
                 }
             }
             return new Tuple<>(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+        }
+
+        private int firstArrivalAtOrAfter(double time) {
+            int low = 0;
+            int high = dwellEvents.size();
+            while (low < high) {
+                int middle = (low + high) >>> 1;
+                if (dwellEvents.get(middle).getArrivalTime() < time) {
+                    low = middle + 1;
+                } else {
+                    high = middle;
+                }
+            }
+            return low;
         }
     }
 

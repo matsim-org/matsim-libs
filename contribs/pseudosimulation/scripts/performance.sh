@@ -24,7 +24,7 @@ fi
 
 exec mvn --batch-mode -f "$REPO_ROOT/pom.xml" \
 	-pl contribs/pseudosimulation -am \
-	-Dtest=PSimPerformanceBenchmark \
+	-Dtest=PSimPerformanceBenchmark,TransitPerformanceBenchmark \
 	-Dsurefire.failIfNoSpecifiedTests=false \
 	-Dmatsim.preferLocalDtds=true \
 	-Dmaven.test.redirectTestOutputToFile=false \
