@@ -135,7 +135,7 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 			Config configA = config();
 			configA.scoring().getDefaultActivityParams("work").setTypicalDurationScoreComputation(computation);
 			Plan planA = planWithWorkTypical(28800.);
-			((Activity) planA.getPlanElements().get(0)).getAttributes().removeAttribute(ActivityAttributeTypicalDurationCalculator.TYPICAL_DURATION_ATTRIBUTE);
+			((Activity) planA.getPlanElements().getFirst()).getAttributes().removeAttribute(ActivityAttributeTypicalDurationCalculator.TYPICAL_DURATION_ATTRIBUTE);
 			double withAttribute = score(attributeScoring(configA, person(planA)), 30600., 59400.);
 
 			// B: work typical 8h in the config, stock scoring on the bare activities
