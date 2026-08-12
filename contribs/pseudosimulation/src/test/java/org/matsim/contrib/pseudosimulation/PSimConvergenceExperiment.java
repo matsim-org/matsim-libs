@@ -76,16 +76,20 @@ public final class PSimConvergenceExperiment {
 
 	public static void main(String[] args) throws IOException {
 		if (args.length < 1) {
-			throw new IllegalArgumentException("usage: <outputDirectory> [baseline|psim|both]");
+			throw new IllegalArgumentException(
+					"usage: <outputDirectory> [baseline|psim|both] [fullTransitPerformance|waitAndStopStopTimes]");
 		}
 		Path root = Path.of(args[0]);
 		String which = args.length > 1 ? args[1] : "both";
+		PSimConfigGroup.TransitEmulation emulation = args.length > 2
+				? PSimConfigGroup.TransitEmulation.valueOf(args[2])
+				: PSimConfigGroup.TransitEmulation.fullTransitPerformance;
 
 		if (which.equals("baseline") || which.equals("both")) {
 			runBaseline(root.resolve("qsim-baseline"));
 		}
 		if (which.equals("psim") || which.equals("both")) {
-			runPSim(root.resolve("psim-1to24"));
+			runPSim(root.resolve("psim-1to24-" + emulation), emulation);
 		}
 		LOG.info("Experiment finished under {}", root.toAbsolutePath());
 	}
@@ -143,15 +147,16 @@ public final class PSimConvergenceExperiment {
 		recorder.write();
 	}
 
-	private static void runPSim(Path output) throws IOException {
-		LOG.info("=== PSim: QSim:PSim 1:{}, {} QSim iterations, replanning rate {} ===",
-				PSIM_ITERATIONS_PER_CYCLE - 1, PSIM_QSIM_ITERATIONS, TOTAL_REPLANNING_RATE_PSIM);
+	private static void runPSim(Path output, PSimConfigGroup.TransitEmulation emulation) throws IOException {
+		LOG.info("=== PSim: QSim:PSim 1:{}, {} QSim iterations, replanning rate {}, transit emulation {} ===",
+				PSIM_ITERATIONS_PER_CYCLE - 1, PSIM_QSIM_ITERATIONS, TOTAL_REPLANNING_RATE_PSIM, emulation);
 		int lastIteration = PSIM_QSIM_ITERATIONS * PSIM_ITERATIONS_PER_CYCLE;
 		Config config = baseConfig(output, lastIteration, TOTAL_REPLANNING_RATE_PSIM);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);
 		pSimConfigGroup.setIterationsPerCycle(PSIM_ITERATIONS_PER_CYCLE);
+		pSimConfigGroup.setTransitEmulation(emulation);
 
 		RunPSim runPSim = new RunPSim(config, pSimConfigGroup);
 		Controler controler = (Controler) runPSim.getMatsimControler();
