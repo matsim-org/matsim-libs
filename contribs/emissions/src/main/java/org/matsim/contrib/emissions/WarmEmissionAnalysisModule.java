@@ -65,6 +65,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private int detailedTransformToHbefa4Cnt = 0;
 	private int fallbackTechAverageWarnCnt = 0;
 	private int fallbackAverageTableWarnCnt = 0;
+	private int gradientReadingErrCnt = 0;
 
 	private int freeFlowCounter = 0;
 	private int saturatedCounter = 0;
@@ -233,7 +234,14 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		double freeVelocity = link.getFreespeed(); //TODO: what about time dependence
 
-		double deltaHeight = link.getToNode().getCoord().getZ() - link.getFromNode().getCoord().getZ();
+		double deltaHeight = 0.0;
+		try {
+			deltaHeight = link.getToNode().getCoord().getZ() - link.getFromNode().getCoord().getZ();
+		} catch (Exception e){
+			if (gradientReadingErrCnt++ < 10) {
+				logger.warn(e);
+			}
+		}
 
 		return calculateWarmEmissions(travelTime, EmissionUtils.getHbefaRoadType(link), freeVelocity, link.getLength(), deltaHeight, vehicleInformationTuple);
 	}
