@@ -44,14 +44,18 @@ public abstract class HbefaTables {
 	private static int getterErrorCnt = 0;
 
 	private static final TriFunction<String, CSVRecord, String, String> safeGetLambda = (key, record, defaultValue) -> {
-		try {
-			return record.get(key);
-		} catch (IllegalArgumentException e){
-			if (getterErrorCnt < 1){
-				logger.warn(e);
-				getterErrorCnt++;
+		// Only try if the key is there
+		if (record.getParser().getHeaderMap().containsKey(key)) {
+			try {
+				return record.get(key);
+			} catch (IllegalArgumentException e){
+				if (getterErrorCnt < 1){
+					logger.warn(e);
+					getterErrorCnt++;
+				}
 			}
 		}
+
 		return defaultValue;
 	};
 
