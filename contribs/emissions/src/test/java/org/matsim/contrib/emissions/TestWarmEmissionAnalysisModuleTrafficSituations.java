@@ -237,6 +237,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setComponent(wp);
 				detWarmKey.setRoadCategory(hbefaRoadCategory);
+				detWarmKey.setRoadGradient(HbefaRoadGradient.ZERO);
 				detWarmKey.setTrafficSituation(trafficSituation);
 				detWarmKey.setVehicleAttributes(vehAtt);
 				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
@@ -262,6 +263,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setComponent(wp);
 				detWarmKey.setRoadCategory(hbefaRoadCategory);
+				detWarmKey.setRoadGradient(HbefaRoadGradient.ZERO);
 				detWarmKey.setTrafficSituation(trafficSituation);
 				detWarmKey.setVehicleAttributes(vehAtt);
 				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
