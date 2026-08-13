@@ -236,7 +236,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 		Params params = new Params(buildOptions.country(), buildOptions.mode(), areaMarker,
 			buildOptions.eleSampleStep(), buildOptions.eleNoiseTolerance(), simplify,
-			buildOptions.dropWaysWithoutInfra(), osmTags, buildOptions.mirrorCarModes());
+			buildOptions.dropWaysWithoutInfra(), osmTags, buildOptions.mirrorCarModes(),
+			buildOptions.splitBikeLinks());
 		MergeCarry carry = new MergeCarry();
 		Stats stats = process(network, sumo, wayTags,
 			elevationParser != null ? elevationParser::getElevation : null, params, carry);
@@ -294,7 +295,15 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			CSVFormat.DEFAULT.withHeader("LinkId", "Geometry"))) {
 
 			for (Link link : network.getLinks().values()) {
-				List<Coord> shape = resolveShape(link, sumo, mergedShapes);
+				// A split-off bike link has no SUMO edge of its own; it shares its car
+				// link's course by construction, so resolve that one instead.
+				Link shapeSource = link;
+				String carLink = BicycleUtils.getCarLink(link);
+				if (carLink != null) {
+					Link car = network.getLinks().get(Id.createLinkId(carLink));
+					if (car != null) shapeSource = car;
+				}
+				List<Coord> shape = resolveShape(shapeSource, sumo, mergedShapes);
 				out.printRecord(link.getId().toString(), shape.stream()
 					.map(c -> String.format(Locale.US, "(%f,%f)", c.getX(), c.getY()))
 					.collect(Collectors.joining(",")));
@@ -502,6 +511,15 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		warnAboutMissingLaneRestrictions(network, stats);
 
 		stats.modesRenamed = BicycleNetworkOps.renameMode(network, TransportMode.bike, params.mode());
+
+		// Last on purpose: nothing after this may change the link set, or the pair
+		// references would go stale. The twins inherit the elevation metrics and the
+		// renamed mode; the feature companion deliberately gets no rows for them.
+		if (params.splitBikeLinks()) {
+			stats.bikeLinksSplit = SplitBikeLinks.process(network, params.mode(),
+				Double.parseDouble(SplitBikeLinks.DEFAULT_BIKE_FREESPEED),
+				Double.parseDouble(SplitBikeLinks.DEFAULT_BIKE_CAPACITY)).size();
+		}
 
 		return stats;
 	}
@@ -929,33 +947,39 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 */
 	record Params(String country, String mode, BicycleLinkPolicy.AreaMarker areaMarker,
 				  double eleSampleStep, double eleNoiseTolerance, boolean simplify,
-				  Set<String> dropWaysWithoutInfra, OsmTags osmTags, Set<String> mirrorCarModes) {
+				  Set<String> dropWaysWithoutInfra, OsmTags osmTags, Set<String> mirrorCarModes,
+				  boolean splitBikeLinks) {
 
 		static Params defaults() {
 			return new Params("de", TransportMode.bike, null,
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_SAMPLE_STEP),
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE), false, Set.of(),
-				OsmTags.MINIMAL, Set.of());
+				OsmTags.MINIMAL, Set.of(), true);
 		}
 
 		Params withSimplify() {
 			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, true,
-				dropWaysWithoutInfra, osmTags, mirrorCarModes);
+				dropWaysWithoutInfra, osmTags, mirrorCarModes, splitBikeLinks);
 		}
 
 		Params withDropWaysWithoutInfra(Set<String> types) {
 			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify, types,
-				osmTags, mirrorCarModes);
+				osmTags, mirrorCarModes, splitBikeLinks);
 		}
 
 		Params withOsmTags(OsmTags tags) {
 			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify,
-				dropWaysWithoutInfra, tags, mirrorCarModes);
+				dropWaysWithoutInfra, tags, mirrorCarModes, splitBikeLinks);
 		}
 
 		Params withMirrorCarModes(Set<String> modes) {
 			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify,
-				dropWaysWithoutInfra, osmTags, modes);
+				dropWaysWithoutInfra, osmTags, modes, splitBikeLinks);
+		}
+
+		Params withoutSplitBikeLinks() {
+			return new Params(country, mode, areaMarker, eleSampleStep, eleNoiseTolerance, simplify,
+				dropWaysWithoutInfra, osmTags, mirrorCarModes, false);
 		}
 	}
 
@@ -999,6 +1023,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		int strandedBySimplify;
 		/** Links whose motorised modes {@code --mirror-car-modes} changed. */
 		int modesMirrored;
+		/** Parallel bike links split off centerline-tagged infrastructure. */
+		int bikeLinksSplit;
 
 		String format() {
 			return """
@@ -1023,13 +1049,16 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 				  links the DEM had no data for        %d
 				  nodes left without a Z               %d
 				  links renamed to the target mode     %d
-				  links with mirrored motorised modes  %d"""
+				  links with mirrored motorised modes  %d
+				  bike links split off car links       %d"""
 				.formatted(classified, linksWithoutEdge, linksWithoutWayTags, outsideArea,
 					agreeingMultiWay, mixedMultiWay, tagsDroppedAsAmbiguous,
 					droppedParkingAisle, droppedRestrictedAccess, droppedFootwayWithoutBike,
 					droppedMinorWayWithoutInfra, bikeModeRemoved, mergedBySimplify, strandedBySimplify,
 					withElevation, linksWithTrueShape, linksSampledAlongChord,
-					linksWithoutElevationData, nodesWithoutElevation, modesRenamed, modesMirrored);
+					linksWithoutElevationData, nodesWithoutElevation, modesRenamed, modesMirrored,
+					bikeLinksSplit);
 		}
 	}
 }
+

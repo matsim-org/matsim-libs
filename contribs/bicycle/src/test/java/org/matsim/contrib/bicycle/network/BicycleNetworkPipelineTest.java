@@ -206,7 +206,7 @@ public class BicycleNetworkPipelineTest {
 		ba.getAttributes().putAttribute(BicycleOsmTags.BICYCLE, "yes");
 
 		BicycleNetworkPipeline.process(net, c -> 0.0,
-			new Params("bicycle", 10.0, 3.0, false, Set.of()));
+			new Params("bicycle", 10.0, 3.0, false, Set.of(), true));
 
 		for (Link l : net.getLinks().values()) {
 			assertEquals(Set.of("bicycle"), l.getAllowedModes(),
@@ -261,6 +261,49 @@ public class BicycleNetworkPipelineTest {
 			}
 		}
 		assertEquals(4, net.getLinks().size(), "nothing merges or vanishes in this fixture");
+	}
+
+
+	// =========================================================================
+	// Centerline-tagged infrastructure split off by default
+	// =========================================================================
+
+	/**
+	 * The split is the pipeline's default final step and runs after the mode rename,
+	 * so the twins must carry the renamed mode and the pair attributes — and turning
+	 * it off must leave the classic single-link structure untouched.
+	 */
+	@Test
+	void processSplitsCenterlineTaggedInfraByDefault() {
+
+		Params renamed = new Params("bicycle", 10.0, 3.0, false, Set.of(), true);
+
+		Network net = laneTaggedRoad();
+		BicycleNetworkPipeline.process(net, null, renamed);
+
+		Link bike = net.getLinks().get(Id.createLinkId("a->b_bike"));
+		assertNotNull(bike, "the default must split centerline-tagged infrastructure");
+		assertEquals(Set.of("bicycle"), bike.getAllowedModes(),
+			"the split runs after the rename, so the twin carries the final mode name");
+		assertEquals("a->b", BicycleUtils.getCarLink(bike));
+		assertEquals(Set.of(TransportMode.car), net.getLinks().get(Id.createLinkId("a->b")).getAllowedModes());
+
+		Network untouched = laneTaggedRoad();
+		BicycleNetworkPipeline.process(untouched, null, renamed.withoutSplitBikeLinks());
+		assertNull(untouched.getLinks().get(Id.createLinkId("a->b_bike")),
+			"--no-split-bike-links keeps the single-link structure");
+	}
+
+	/** A bidirectional car road with a cycle lane tagged on the way itself. */
+	private static Network laneTaggedRoad() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Link ab = link(net, a, b, "highway.residential", "CYCLEWAY_ON_HIGHWAY_ADVISORY", "asphalt", 1L);
+		Link ba = link(net, b, a, "highway.residential", "CYCLEWAY_ON_HIGHWAY_ADVISORY", "asphalt", 2L);
+		ab.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
+		ba.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
+		return net;
 	}
 
 
@@ -682,3 +725,4 @@ public class BicycleNetworkPipelineTest {
 			.doubleValue();
 	}
 }
+

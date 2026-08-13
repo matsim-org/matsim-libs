@@ -77,6 +77,26 @@ public final class BicycleUtils {
 	 */
 	public static final String OSM_PREFIX = "osm:";
 
+	// ---- separate bike links (bicycle-split-links) ----
+	//
+	// Where cycling infrastructure is tagged on the road way itself - a lane, or a track
+	// mapped on the centerline instead of as its own OSM way - the network tools can split
+	// a parallel bike-only link off the car link, so bikes stop queueing behind cars.
+	// These two attributes tie such a pair together, in both directions.
+	//
+	// They record STRUCTURE, not scoring policy: a split link pair exists wherever the
+	// infrastructure was centerline-tagged, including physically separated tracks. Whether
+	// motorized interaction between the pair is counted, scored, or ignored is decided
+	// downstream (BicycleScoreEventsCreator), typically per BICYCLE_INFRA category of the
+	// bike link - which is also what allows counting the interactions an infrastructure
+	// *avoided*. Build lookup maps from these attributes; do not parse link id suffixes.
+
+	/** On a split-off bike link: the id of the car link it runs parallel to. */
+	public static final String CAR_LINK = "carLink";
+
+	/** On a split car link: the id of the parallel bike-only link that was split off it. */
+	public static final String BIKE_LINK = "bikeLink";
+
 	private BicycleUtils() {
 		// Don't allow to create instances of this class
 	}
@@ -122,6 +142,16 @@ public final class BicycleUtils {
 
 	public static Double getElevationLoss( Link link ){
 		return (Double) link.getAttributes().getAttribute( ELEVATION_LOSS );
+	}
+
+	/** The parallel car link's id, or {@code null} when this is not a split-off bike link. */
+	public static String getCarLink( Link link ){
+		return (String) link.getAttributes().getAttribute( CAR_LINK );
+	}
+
+	/** The split-off bike link's id, or {@code null} when no bike link was split off this link. */
+	public static String getBikeLink( Link link ){
+		return (String) link.getAttributes().getAttribute( BIKE_LINK );
 	}
 
 	/**

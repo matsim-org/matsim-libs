@@ -75,6 +75,14 @@ final class BicycleBuildOptions {
 			+ "longDistanceFreight).")
 	private Set<String> mirrorCarModes = Set.of();
 
+	@Option(names = "--split-bike-links", negatable = true, defaultValue = "true", fallbackValue = "true",
+		description = "Split a parallel bike-only link off every car link whose cycling "
+			+ "infrastructure is tagged on the road way itself (a lane, or a track mapped on "
+			+ "the centerline), so bikes stop queueing behind cars. On by default - use "
+			+ "--no-split-bike-links for a network with the old single-link structure. The "
+			+ "pair is tied together by the carLink/bikeLink attributes; see bicycle-split-links.")
+	private boolean splitBikeLinks;
+
 	@Option(names = "--ele-sample-step", defaultValue = DEFAULT_ELE_SAMPLE_STEP,
 		description = "Distance between elevation samples along a link, in m")
 	private double eleSampleStepM;
@@ -116,5 +124,10 @@ final class BicycleBuildOptions {
 	/** The {@code --mirror-car-modes} mode names; empty means the modes are left as built. */
 	Set<String> mirrorCarModes() {
 		return mirrorCarModes == null ? Set.of() : mirrorCarModes;
+	}
+
+	/** Whether to split parallel bike links off centerline-tagged infrastructure; on by default. */
+	boolean splitBikeLinks() {
+		return splitBikeLinks;
 	}
 }

@@ -482,7 +482,7 @@ public class SumoBicycleAttributesTest {
 		// way 8001 carries highway=footway; use that as the marker so the ring splits
 		SumoBicycleAttributes.Params gated = new SumoBicycleAttributes.Params(
 			"de", TransportMode.bike, BicycleLinkPolicy.AreaMarker.parse("highway=footway"),
-			20.0, 3.0, false, Set.of(), SumoBicycleAttributes.OsmTags.MINIMAL, Set.of());
+			20.0, 3.0, false, Set.of(), SumoBicycleAttributes.OsmTags.MINIMAL, Set.of(), true);
 		SumoBicycleAttributes.Stats stats = SumoBicycleAttributes.process(
 			f.network(), f.sumo(), f.tags(), null, gated);
 
@@ -704,3 +704,4 @@ public class SumoBicycleAttributesTest {
 			.reduce("", (a, b) -> a + "\n" + b);
 	}
 }
+

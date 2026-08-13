@@ -71,6 +71,8 @@ import java.util.function.BiPredicate;
  *   <li>For every surviving link, sample its elevation profile and attach the
  *       five metrics (average_elevation, gradient, max_gradient, elevation_gain,
  *       elevation_loss). Skipped when no DEM was provided.</li>
+ *   <li>Split parallel bike-only links off car links with centerline-tagged
+ *       cycling infrastructure (on by default; see {@link SplitBikeLinks}).</li>
  *   <li>Tag the network with its CRS and write the MATSim XML.</li>
  * </ol>
  *
@@ -261,7 +263,7 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 			elevationParser != null ? elevationParser::getElevation : null,
 			new Params(buildOptions.mode(), buildOptions.eleSampleStep(),
 				buildOptions.eleNoiseTolerance(), storeOriginalGeometry,
-				buildOptions.mirrorCarModes()));
+				buildOptions.mirrorCarModes(), buildOptions.splitBikeLinks()));
 
 		// ---- 8. write --------------------------------------------------------
 		// Record the CRS the coordinates are actually in. Without it every consumer has
@@ -369,6 +371,16 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		} else {
 			log.info("No elevation source: skipped elevation metrics.");
 		}
+		// ---- 8. split parallel bike links off centerline-tagged infrastructure ----
+		// Last on purpose: after the simplifier (which would merge the twins and tear
+		// the pair references), after the rename (the twins carry the final mode name)
+		// and after the elevation metrics (which the twins inherit as copies).
+		if (params.splitBikeLinks()) {
+			SplitBikeLinks.process(network, params.mode(),
+				Double.parseDouble(SplitBikeLinks.DEFAULT_BIKE_FREESPEED),
+				Double.parseDouble(SplitBikeLinks.DEFAULT_BIKE_CAPACITY));
+		}
+
 		BicycleNetworkOps.logInfraDistribution(network,"in final network");
 	}
 
@@ -380,18 +392,25 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 						 double eleSampleStep,
 						 double eleNoiseTolerance,
 						 boolean storeOriginalGeometry,
-						 Set<String> mirrorCarModes) {
+						 Set<String> mirrorCarModes,
+						 boolean splitBikeLinks) {
 
 		/** The pipeline defaults, matching the CLI option defaults. */
 		public static Params defaults() {
 			return new Params(TransportMode.bike,
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_SAMPLE_STEP),
 				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE),
-				Boolean.parseBoolean(DEFAULT_STORE_ORIGINAL_GEOMETRY), Set.of());
+				Boolean.parseBoolean(DEFAULT_STORE_ORIGINAL_GEOMETRY), Set.of(), true);
 		}
 
 		public Params withMirrorCarModes(Set<String> modes) {
-			return new Params(mode, eleSampleStep, eleNoiseTolerance, storeOriginalGeometry, modes);
+			return new Params(mode, eleSampleStep, eleNoiseTolerance, storeOriginalGeometry, modes,
+				splitBikeLinks);
+		}
+
+		public Params withoutSplitBikeLinks() {
+			return new Params(mode, eleSampleStep, eleNoiseTolerance, storeOriginalGeometry,
+				mirrorCarModes, false);
 		}
 	}
 
@@ -751,3 +770,4 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		return Math.abs(x - y) <= 1e-9 * Math.max(Math.abs(x), Math.abs(y));
 	}
 }
+

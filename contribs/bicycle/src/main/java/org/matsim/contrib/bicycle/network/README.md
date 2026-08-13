@@ -76,6 +76,7 @@ $(sc) prepare bicycle-attributes \
 | `--simplify` | off | merge consecutive links that agree on the bicycle attributes (and on modes, lanes, freespeed and capacity), with the Supersonic pipeline's rules — see below |
 | `--osm-tags` | `MINIMAL` | which raw OSM tags survive onto the links: the four anything downstream reads, or `ALL` ~39 classification tags for inspection |
 | `--mirror-car-modes` | — | modes given exactly the links that allow car, e.g. `ride,truck,freight` — see below |
+| `--split-bike-links` | **on** | split parallel bike links off centerline-tagged infrastructure; `--no-split-bike-links` for the single-link structure — see `bicycle-split-links` |
 
 It writes the two companion files alongside the network, under the matching name and in the same
 format `network-from-sumo` uses — including its compression rule: the companions inherit the
@@ -221,6 +222,7 @@ The DEM is optional — drop `--dem` / `--dem-crs` to build the network without 
 | `--bike-area-marker`    | —       | OSM tag (`key` or `key=value`) restricting the full treatment to marked ways                     |
 | `--drop-ways-without-infra` | —   | minor way types, e.g. `track,path`, dropped where the link classified as `NONE` (see the `bicycle-attributes` section) |
 | `--mirror-car-modes`    | —       | modes given exactly the links that allow car, e.g. `ride,truck,freight` (see the `bicycle-attributes` section) |
+| `--split-bike-links`    | **on**  | split parallel bike links off centerline-tagged infrastructure; `--no-split-bike-links` disables (see `bicycle-split-links`) |
 | `--free-speed-factor`   | `0.9`   | Free-speed factor for urban links; inherited from the OSM reader (see Free speed)                |
 | `--ele-sample-step`     | `20.0`  | Distance between elevation samples along a link, in m                                            |
 | `--ele-noise-tolerance` | `3.0`   | Douglas-Peucker vertical tolerance, in m                                                         |
@@ -231,6 +233,63 @@ The DEM is optional — drop `--dem` / `--dem-crs` to build the network without 
 # Shared reference
 
 Everything below applies to both paths, except where a heading says otherwise.
+
+## Split bike links (`--split-bike-links` / `bicycle-split-links`)
+
+Both pipelines split, **by default and as their final step**, a parallel bike-only link off every car link
+whose cycling infrastructure is tagged **on the road itself** — a lane on the carriageway, or a track mapped
+on the road's centerline instead of as its own OSM way. `--no-split-bike-links` keeps the classic single-link
+structure. The standalone command `bicycle-split-links` applies the same split to a network built earlier or
+elsewhere; its collision check refuses networks that are already split.
+
+**Why.** On such a link MATSim puts cars and bikes into one queue. When the cars back up at the junction, the
+bike is held at the same queue front although its lane is free — `PassingVehicleQ` only reorders free-flow
+traffic, it does not dissolve a jam. A separate link has its own queue. Roads whose cycleway was mapped as its
+own OSM way never had the problem: they are separate links already. That is why classification plus mode set
+is a sufficient trigger — a link carrying car **and** bike **and** a dedicated-infrastructure category got
+that category from tags on the road way itself.
+
+Options of the standalone command (the pipelines use the same defaults):
+
+| Option | Default | Meaning |
+|---|---|---|
+| `--network` (required) | — | finished bicycle network, from either path |
+| `--output` (required) | — | output network |
+| `--mode` | `bike` | name of the bike mode in this network |
+| `--bike-freespeed` | `5.56` | freespeed of the split-off links in m/s (20 km/h, the netconvert cycleway convention) |
+| `--bike-capacity` | `1500` | capacity of the split-off links in vehicles/h |
+| `--link-geometries` | — | geometry companion of the input; a copy with one row per bike link is written next to the output (the pipelines do this automatically) |
+
+The bike link `<id>_bike` shares its car link's nodes and **exact length** — interaction models compare
+traversal-time windows across the pair. It takes over `bicycle_infra`, inherits the scoring inputs (surface,
+smoothness, cyclewaytype, elevation) as copies, and leaves car bookkeeping (`restricted_lanes`, `speed_factor`)
+behind. The car link loses the bike mode, so routing has no choice to make. `--bike-freespeed` is a cap, not a
+speed: `BicycleLinkSpeedCalculator` takes the minimum of the cyclist's own speed and the link freespeed.
+
+**Structure, not policy.** Splitting is a different question from scoring motorized interaction, and the
+network deliberately encodes only the first. Every qualifying link is split the same way — including
+physically protected lanes and centerline-tagged tracks — and no attribute prescribes whether interaction
+applies. The pair is tied together by `carLink` / `bikeLink` (see the attribute table below); the `_bike`
+suffix is a readable convention, not an interface, so consumers build their maps from the attributes and never
+parse ids. Downstream, `BicycleScoreEventsCreator` decides per `bicycle_infra` category of the bike link what
+to count and what to score — which is also what makes it possible to count the car encounters an
+infrastructure *avoided* without scoring them as exposure.
+
+**What is not split:** `SHARED_MOTOR_VEHICLE_LANE` (a sharrow has no space of its own — the bike genuinely
+rides in the car queue, and that *is* the model), bicycle roads (there the carriageway is the infrastructure
+and cars are the guests), pedestrian areas, crossings, cycleway links, and `NEEDS_CLARIFICATION`. Mixed
+traffic stays as it is; letting bikes filter past a jam there is the mobsim's job (seepage), not the network's.
+
+**Companions and calibration.** The twins get rows in the geometry companion (their car link's polyline) but
+deliberately **none** in the feature companion. A later `apply-network-params` run should pass
+`--junction-types traffic_light,right_before_left,priority`: without a feature row a twin's junction type is
+empty, so that filter skips the twins silently — otherwise they carry their road's `type`, and a calibration
+restricted only by road types would mistake them for car links and cap the bike speed.
+
+Measured on the NNK sample: 9,033 → 10,076 links, 1,043 pairs (414 advisory lanes, 320 exclusive, 221
+centerline tracks, 52 bus lanes, 21 unspecified, 15 between-lanes). Bike link count and bike kilometres are
+unchanged — every twin created is a car link that lost the mode — and every mode stays fully connected,
+because a twin replicates its car link's connectivity exactly.
 
 ## What gets attached to links
 
@@ -254,6 +313,8 @@ defined in `BicycleUtils` (with typed getters) and are snake_case throughout —
 | `osm:cycleway`     | string | Raw OSM `cycleway=…` value, if present                                                 |
 | `type`             | string | Raw OSM `highway=…` value (e.g. `service`) — not yet `osm:`-prefixed                   |
 | `origid`           | string | *(Supersonic path)* Original OSM way ID(s); hyphen-separated when multiple links were merged. On the SUMO path the way ids live in the `sumo.net.xml` instead. |
+| `carLink`          | string | *(after `bicycle-split-links`)* On a split-off bike link: the id of the car link it runs parallel to |
+| `bikeLink`         | string | *(after `bicycle-split-links`)* On a split car link: the id of the bike link split off it |
 
 Both paths write exactly these four OSM tags (`BicycleOsmTags.KEPT_ON_LINKS`) — on a merged link, only values
 all constituent ways agree on. The classifier consults ~39 tags, but its verdict is already on the link as
