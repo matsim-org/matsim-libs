@@ -293,7 +293,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 
 		// hedge against odd average speeds:
-		// TODO Rewrite for better compatibility with InterpolationFraction methods
 		if(averageSpeed_kmh <= 0.0){
 			throw new RuntimeException("Average speed has been calculated to 0.0 or a negative value. Aborting...");
 		}
