@@ -933,6 +933,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		var keys = hbefaRoadVClasses.get(efKeyCopy);
 
+		if (keys.isEmpty()) {
+			throw new RuntimeException("No v-class entries found in detailedHbefaWarmTable for RoadCategory " + efkey.getRoadCategory() + " (vehicle: " + efkey.getVehicleCategory() + ", component: " + efkey.getComponent() + ")");
+		}
+
 		// Round to next higher v-class
 		double lastVValue = Double.POSITIVE_INFINITY;
 
@@ -964,7 +968,11 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		HbefaWarmEmissionFactorKey efKeyCopy = new HbefaWarmEmissionFactorKey(efkey);
 		efKeyCopy.setTrafficSituation(FREEFLOW);
 
-		var keys = hbefaRoadVClasses.get(efKeyCopy).reversed();
+		var rawKeys = hbefaRoadVClasses.get(efKeyCopy);
+		if (rawKeys == null || rawKeys.isEmpty()) {
+			throw new RuntimeException("No v-class entries found for RoadCategory " + efkey.getRoadCategory() + " (vehicle: " + efkey.getVehicleCategory() + ", component: " + efkey.getComponent() + "). Was getHigherVClass called first?");
+		}
+		var keys = rawKeys.reversed();
 
 		// Round to next higher v-class
 		double lastVValue = Double.NEGATIVE_INFINITY;
