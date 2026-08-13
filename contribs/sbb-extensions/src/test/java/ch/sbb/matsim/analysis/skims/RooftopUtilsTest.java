@@ -227,6 +227,20 @@ public class RooftopUtilsTest {
     }
 
 	@Test
+	void testCalcAverageAdaptionTime_singleDepartureEarlyTwoHourWindow() {
+        List<ODConnection> connections = new ArrayList<>();
+
+        // Departure time is 06:15, access time is 5min, so the effective departure time is 06:10.
+        connections.add(new ODConnection(Time.parseTime("06:15:00"), 16080, 300, 125, 5, null));
+
+        double adaptionTime = RooftopUtils.calcAverageAdaptionTime(connections, Time.parseTime("07:00:00"), Time.parseTime("09:00:00"));
+
+        // Over the two-hour window, adaption time grows from 50min at 07:00 to 170min at 09:00.
+        // Average adaption time is therefore (50min + 170min) / 2 = 110min = 6600s.
+        Assertions.assertEquals(6600.0, adaptionTime, 1e-7);
+    }
+
+	@Test
 	void testCalcConnectionShares() {
         List<ODConnection> connections = new ArrayList<>();
 
@@ -282,6 +296,26 @@ public class RooftopUtilsTest {
         Assertions.assertEquals(8.0 / 60.0, shares.get(c3), 1e-7);
         Assertions.assertEquals(20.0 / 60.0, shares.get(c7), 1e-7);
         Assertions.assertEquals(2.0 / 60.0, shares.get(c5), 1e-7);
+    }
+
+	@Test
+	void testCalcConnectionShares_twoHourWindow() {
+        List<ODConnection> connections = new ArrayList<>();
+
+        // 15-min headway over a two-hour skim window.
+        for (String departureTime : List.of("07:50:00", "08:05:00", "08:20:00", "08:35:00", "08:50:00", "09:05:00", "09:20:00", "09:35:00", "09:50:00", "10:05:00")) {
+            connections.add(new ODConnection(Time.parseTime(departureTime), 600, 60, 150, 0, null));
+        }
+
+        Map<ODConnection, Double> shares = RooftopUtils.calcConnectionShares(connections, Time.parseTime("08:00:00"), Time.parseTime("10:00:00"));
+
+        // Shares are fractions of the selected skim window. They must sum to 1.0 even if the window is longer than one hour.
+        Assertions.assertEquals(10, shares.size());
+        Assertions.assertEquals(1.0, sum(shares), 1e-7);
+
+        // A regular middle connection covers 15min of the 120min window, so its share is 15/120.
+        // With the old hard-coded 3600s denominator, this would incorrectly have been 15/60.
+        Assertions.assertEquals(15.0 / 120.0, shares.get(connections.get(2)), 1e-7);
     }
 
 	@Test
@@ -429,5 +463,13 @@ public class RooftopUtilsTest {
 
         Map<ODConnection, Double> shares = RooftopUtils.calcConnectionShares(connections, Time.parseTime("07:00:00"), Time.parseTime("08:00:00"));
         Assertions.assertEquals(1.0, shares.get(c0), 1e-7);
+    }
+
+    private static double sum(Map<ODConnection, Double> shares) {
+        double sum = 0;
+        for (double share : shares.values()) {
+            sum += share;
+        }
+        return sum;
     }
 }
