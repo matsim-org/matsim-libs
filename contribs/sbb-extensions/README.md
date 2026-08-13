@@ -404,7 +404,7 @@ This repository contains code to calculate a variety of skim matrices based on M
   - travel time, routed on network (loaded or unloaded)
   - travel distances, routed on network (loaded or unloaded)
 - for public transport:
-  - travel time (from departure at first stop to arrival at last stop of a trip)
+  - travel time (from origin to destination, including access and egress time)
   - access time (from origin to first stop)
   - egress time (from last stop to destination)
   - number of transfers required
@@ -414,6 +414,8 @@ This repository contains code to calculate a variety of skim matrices based on M
   - percentage of the travel time spent in rail-based transportation within a public transport trip 
 - general:
   - bee-line distances between zones
+
+For public transport skims, travel time, access time, egress time, distance, transfer count, transfer wait time, and train-share values describe a typical trip within the selected departure-time window.
 
 ### Usage
 
