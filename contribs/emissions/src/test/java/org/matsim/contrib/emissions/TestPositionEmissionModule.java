@@ -81,6 +81,8 @@ public class TestPositionEmissionModule {
 	void compareToOtherModule_singleVehicleSingleLink() {
 
         var emissionConfig = new EmissionsConfigGroup();
+		emissionConfig.setHbefaConsistencyChecker(EmissionsConfigGroup.UseHbefaConsistencyChecker.skip);
+		emissionConfig.setAddPmTotalEntries(EmissionsConfigGroup.AddPMTotalEntries.skip);
         emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
         emissionConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
