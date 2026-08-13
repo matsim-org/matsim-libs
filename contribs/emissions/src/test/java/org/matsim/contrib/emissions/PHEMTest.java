@@ -49,21 +49,16 @@ import static org.apache.commons.lang3.math.IEEE754rUtils.min;
  */
 @Disabled
 public class PHEMTest {
-
-	// TODO #090226 contains the settings which emulate the old emission model, remove when paper is finished
-
+	// Note: The output directories are cleared after each test configuration. If output is needed for analysis, set it to an external folder.
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
-	// TODO Files were changed to local for debugging purposes. Cange them back to the svn entries, when fixed hbefa tables are available
+	// TODO Files were changed to local for debugging purposes. Change them back to the svn entries, when new hbefa tables are available
 	private final static String HBEFA_4_1_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/hbefa/";
 	private final static String HBEFA_HOT_AVG = HBEFA_4_1_PATH + "EFA_HOT_Vehcat_2020_Average.csv";
 	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
-
-	// TODO Try to fix the deletion bug, so that we can use utils.getOutput() instead of a fixed path
-	private final static String OUTPUT_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput";
 
 	// ----- Helper methods -----
 
@@ -361,10 +356,8 @@ public class PHEMTest {
 	private static Config configureTest(EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments, EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod){
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		// #090226: ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed );
 		ecg.setEmissionsComputationMethod( emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-		// #090226: ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.overwriteOldDuplicates );
 		ecg.setDuplicateSubsegments( duplicateSubsegments );
 		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
 		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
@@ -703,9 +696,8 @@ public class PHEMTest {
 		// Prepare data for comparison (and print out a csv for debugging)
 		List<CycleLinkComparison> comparison = compare(cycleLinkAttributes, link_pollutant2grams, sumoSegments);
 
-		// Print out the results as csv TODO Change path back to test-output folder
-		// #090226: String path = "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/ExplorativeAnalysis/OldModelAVGResults/";
-		String path = OUTPUT_PATH + "/PHEMTest/";
+		// Print out the results as csv
+		String path = utils.getOutputDirectory();
 		String diff_name = "diff_" + cycle + "_" + fuel + "_output_" + duplicateSubsegments + "_" + emissionsComputationMethod + "_" + cutSetting + "_" + cutSetting.getAttr() + ".csv";
 		writeDiffFile(path + diff_name, comparison);
 
@@ -723,6 +715,7 @@ public class PHEMTest {
 
 
 	/// Start the main-test with settings to match the outputs of the old EmissionModule (from late 2024)
+	/// Note: Due to the useFirstDuplicate setting, this method generates a lot of warning messages.
 	public void basicTestWithOldSettings(Cycle cycle,
 										 Fuel fuel,
 										 boolean ignoreSumo,
@@ -754,7 +747,7 @@ public class PHEMTest {
 		List<CycleLinkComparison> comparison = compare(cycleLinkAttributes, link_pollutant2grams, sumoSegments);
 
 		// Print out the results as csv
-		String path = OUTPUT_PATH + "/PHEMTest/";
+		String path = utils.getOutputDirectory();
 		String diff_name = "diff_" + cycle + "_" + fuel + "_output_oldEmissionModule.csv";
 		writeDiffFile(path + diff_name, comparison);
 
@@ -772,6 +765,7 @@ public class PHEMTest {
 
 	// ----- Caller functions -----
 
+	// TODO Update reference files
 	@TestFactory
 	Collection<DynamicTest> startBasicWLTPTest() {
 		LinkCutSetting[] cutSettings = new LinkCutSetting[]{
@@ -1081,7 +1075,6 @@ public class PHEMTest {
 	}
 }
 
-// TODO This class is only temporary here
 class PHEMTestHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
 
 	// have this here, since the existing mappers have a build method as well.
