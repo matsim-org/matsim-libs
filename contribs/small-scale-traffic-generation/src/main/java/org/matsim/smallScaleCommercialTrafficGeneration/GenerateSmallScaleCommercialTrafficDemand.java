@@ -276,7 +276,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		private Builder() {}
 
-		Builder setIntegrateExistingTrafficToSmallScaleCommercial(
+		public Builder setIntegrateExistingTrafficToSmallScaleCommercial(
 			IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial) {
 			this.integrateExistingTrafficToSmallScaleCommercial = integrateExistingTrafficToSmallScaleCommercial;
 			return this;
