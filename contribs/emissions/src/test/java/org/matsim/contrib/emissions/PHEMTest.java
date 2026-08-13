@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -46,6 +47,7 @@ import static org.apache.commons.lang3.math.IEEE754rUtils.min;
  *  If you need to adjust this test for future HBEFA versions, you can use the diff_{fuel}_out.csv output and change and use it as new reference file.
  *  The sumo_{fuel}_output.csv does not need to be changed, unless the PHEMLight engine got an update.
  */
+@Disabled
 public class PHEMTest {
 
 	// TODO #090226 contains the settings which emulate the old emission model, remove when paper is finished

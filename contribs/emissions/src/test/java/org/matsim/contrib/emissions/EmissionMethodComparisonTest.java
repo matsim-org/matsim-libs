@@ -3,6 +3,7 @@ package org.matsim.contrib.emissions;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.matsim.api.core.v01.Scenario;
@@ -18,6 +19,7 @@ import org.matsim.core.utils.io.IOUtils;
 import java.io.IOException;
 import java.util.*;
 
+@Disabled
 public class EmissionMethodComparisonTest {
 
 	private final static String HBEFA_4_1_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/hbefa/";

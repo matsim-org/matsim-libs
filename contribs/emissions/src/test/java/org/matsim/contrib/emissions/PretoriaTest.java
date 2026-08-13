@@ -6,6 +6,8 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -41,6 +43,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
+@Disabled
 public class PretoriaTest {
 	// TODO Replace paths with Test-paths
 
@@ -64,8 +67,9 @@ public class PretoriaTest {
 	// TODO The GPS files are too large for Git. Upload them into the public-svn
 	private final static String GPS_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data";
 
-	// TODO Remove for final commit, as this was just used once for data preparation
-	public static void main(String[] args) {
+	// This was just used once for data preparation
+	@Test
+	 void fixBrokenNetwork() {
 		Network cRoute = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_pems.xml");
 		Network full = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_hbefa.xml.gz");
 
