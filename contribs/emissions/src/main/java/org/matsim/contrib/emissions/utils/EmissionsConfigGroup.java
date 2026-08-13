@@ -49,9 +49,13 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
 	private boolean isWritingEmissionsEvents = true;
 
-	public enum UseHbefaConsistencyChecker {skip, check;}
+	public enum UseHbefaConsistencyChecker {skip, check}
 	private static final String USE_HBEFA_CONSISTENCY_CHECKER = "useHbefaConsistencyChecker";
 	private UseHbefaConsistencyChecker useHbefaConsistencyChecker = UseHbefaConsistencyChecker.check;
+
+	public enum AddPMTotalEntries {add, skip}
+	private static final String ADD_PM_TOTAL_ENTRIES = "addPMTotalEntries";
+	private AddPMTotalEntries addPMTotalEntries = AddPMTotalEntries.add;
 
 	public enum SummarizePmMethod {crashOnVelDifference, usePmVel, usePmNonExhaustVel, useAvgVel;}
 	private static final String SUMMARIZE_PM_METHOD = "summarizePmMethod";
@@ -353,6 +357,16 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(USE_HBEFA_CONSISTENCY_CHECKER)
 	public void setHbefaConsistencyChecker(UseHbefaConsistencyChecker use){
 		useHbefaConsistencyChecker = use;
+	}
+	// ============================================
+	// ============================================
+	@StringGetter(USE_HBEFA_CONSISTENCY_CHECKER)
+	public AddPMTotalEntries getAddPMTotalEntries(){
+		return addPMTotalEntries;
+	}
+	@StringSetter(USE_HBEFA_CONSISTENCY_CHECKER)
+	public void setAddPmTotalEntries(AddPMTotalEntries add){
+		addPMTotalEntries = add;
 	}
 	// ============================================
 	// ============================================

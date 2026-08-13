@@ -36,6 +36,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.AddPMTotalEntries.add;
+
 /**
  * @author benjamin
  *
@@ -175,7 +177,8 @@ public final class EmissionModule {
 			// field. kai, dec'22
 
 			this.avgHbefaWarmTable = HbefaTables.loadAverageWarm(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()), emissionConfigGroup.getDuplicateSubsegments());
-			addWarmCombinedPMEntries(avgHbefaWarmTable);
+			if (emissionConfigGroup.getAddPMTotalEntries() == add)
+				addWarmCombinedPMEntries(avgHbefaWarmTable);
 			addPollutantsToMap(warmPollutants, avgHbefaWarmTable.keySet());
 		}
 		if (shouldCreateDetailedTables()) {
@@ -183,7 +186,8 @@ public final class EmissionModule {
 			addPollutantsToMap(coldPollutants, detailedHbefaColdTable.keySet());
 
 			this.detailedHbefaWarmTable = HbefaTables.loadDetailedWarm(emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(scenario.getConfig().getContext()), emissionConfigGroup.getDuplicateSubsegments());
-			addWarmCombinedPMEntries(detailedHbefaWarmTable);
+			if (emissionConfigGroup.getAddPMTotalEntries() == add)
+				addWarmCombinedPMEntries(detailedHbefaWarmTable);
 			addPollutantsToMap(warmPollutants, detailedHbefaWarmTable.keySet());
 		}
 
@@ -263,6 +267,9 @@ public final class EmissionModule {
 			var searchKey = combineKeyFunction.apply(e_pm.getKey());
 			searchKey.setComponent(Pollutant.PM_non_exhaust);
 			var v_pm_non_exhaust = entries_PM_non_exhaust.get(searchKey);
+			if (v_pm_non_exhaust == null) {
+				throw new IllegalArgumentException("HBEFA Table has missing PM_non_exhaust keys! Fix the table OR disable PM_TOTAL key generation with EmissionConfigGroup.setAddPMTotalEntries(skip)");
+			}
 
 			// Generate combined key
 			var combinedKey = combineKeyFunction.apply(e_pm.getKey());
