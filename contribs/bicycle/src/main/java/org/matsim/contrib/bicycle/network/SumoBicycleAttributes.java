@@ -159,7 +159,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			+ "${COMPLETION-CANDIDATES}. MINIMAL keeps what the contrib actually consumes "
 			+ "(surface and cycleway for the scoring, smoothness as a --simplify merge "
 			+ "criterion, bicycle for parity with the Supersonic path). ALL keeps every "
-			+ "classification tag, ~39 attributes per link - useful for inspecting why a "
+			+ "classification tag, 38 attributes per link - useful for inspecting why a "
 			+ "link was classified the way it was, at the price of a much larger network.")
 	private OsmTags osmTags = OsmTags.MINIMAL;
 
@@ -1061,4 +1061,5 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		}
 	}
 }
+
 

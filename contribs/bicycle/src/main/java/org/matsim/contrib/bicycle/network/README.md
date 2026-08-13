@@ -19,7 +19,8 @@ per direction. netconvert reads the OSM turn restrictions too, but only into its
 MATSim network does not keep them (see the `--turn-restrictions` note further down).
 
 The Supersonic path stays as the reference implementation and is the shorter route for a standalone bicycle
-network. Both write the same attributes, so downstream code does not care which produced the network.
+network. Both produce the same shape of network — the same attributes, the same modes (via
+`--mirror-car-modes`), the same split-off bike links — so downstream code does not care which produced it.
 
 ---
 
@@ -74,7 +75,7 @@ $(sc) prepare bicycle-attributes \
 | `--ele-sample-step` | `20.0` | distance between elevation samples along a link, in m |
 | `--ele-noise-tolerance` | `3.0` | Douglas-Peucker vertical tolerance, in m |
 | `--simplify` | off | merge consecutive links that agree on the bicycle attributes (and on modes, lanes, freespeed and capacity), with the Supersonic pipeline's rules — see below |
-| `--osm-tags` | `MINIMAL` | which raw OSM tags survive onto the links: the four anything downstream reads, or `ALL` ~39 classification tags for inspection |
+| `--osm-tags` | `MINIMAL` | which raw OSM tags survive onto the links: the four anything downstream reads, or `ALL` the 38 classification tags for inspection |
 | `--mirror-car-modes` | — | modes given exactly the links that allow car, e.g. `ride,truck,freight` — see below |
 | `--split-bike-links` | **on** | split parallel bike links off centerline-tagged infrastructure; `--no-split-bike-links` for the single-link structure — see `bicycle-split-links` |
 
@@ -317,7 +318,7 @@ defined in `BicycleUtils` (with typed getters) and are snake_case throughout —
 | `bikeLink`         | string | *(after `bicycle-split-links`)* On a split car link: the id of the bike link split off it |
 
 Both paths write exactly these four OSM tags (`BicycleOsmTags.KEPT_ON_LINKS`) — on a merged link, only values
-all constituent ways agree on. The classifier consults ~39 tags, but its verdict is already on the link as
+all constituent ways agree on. The classifier consults 38 tags, but its verdict is already on the link as
 `bicycle_infra`; `--osm-tags ALL` keeps the rest anyway, for working out why a link was classified as it was.
 
 Scoring reads these through `BicycleUtils`: `getSurface()` and `getCyclewaytype()` check the plain key
@@ -362,7 +363,10 @@ until you populate it).
   returns `NaN` where the DEM has no data
 - `LinkElevationProfile` — samples along a link, applies Douglas-Peucker smoothing, computes metrics
 - `ServiceLinkCleaner` — removes service-link components that don't connect anything useful
-- `BicycleNetworkOps` — internal: elevation stamping and the infra distribution table; the attribute keys
+- `SplitBikeLinks` — the `bicycle-split-links` command, and the split both pipelines run by default; ties each
+  pair together via the `carLink`/`bikeLink` attributes
+- `BicycleNetworkOps` — internal: the link operations both pipelines share — elevation stamping, the
+  motorised-mode mirroring, the mode rename, the infra distribution table; the attribute keys
   live in `BicycleUtils`, next to the getters scoring reads them with
 
 **SUMO path:**
@@ -385,34 +389,39 @@ Tests live in `contribs/bicycle/src/test/java/.../network`. The SUMO-path tests 
 fixtures checked in under `contribs/bicycle/test/input/.../<TestName>/` — real network files, not hand-written
 ones, each with the `.osm` it came from so the setup can be reproduced:
 
-- `SumoBicycleAttributesTest` — 10 cases against a ring of nine OSM ways (a ring, because two of them get dropped
+- `SumoBicycleAttributesTest` — runs against a ring of nine OSM ways (a ring, because two of them get dropped
   and a chain would fall apart). Covers classification from way tags, the contraflow link, the asphalt fallback,
-  the drop rules, elevation along the SUMO polyline, a run without a DEM, and idempotence. One case pins the
-  central point: netconvert wrote `cycleway=lane` onto a merged edge although only one of its two ways carried
-  it, and the command must not adopt it
-- `SumoBicycleKeepEdgesTest` — 5 cases against a chain of five identically-attributed ways. Pins that the
+  the drop rules, the `--simplify` merge with its companion files, `--osm-tags`, the motorised-mode mirroring,
+  elevation along the SUMO polyline, a run without a DEM, and idempotence. One case pins the central point:
+  netconvert wrote `cycleway=lane` onto a merged edge although only one of its two ways carried it, and the
+  command must not adopt it
+- `SumoBicycleKeepEdgesTest` — a chain of five identically-attributed ways. Pins that the
   comparison is directed: a `cycleway:right=lane` boundary appears along the way but not against it
-- `OsmWayTagsTest` — 5 cases: whitelist filtering, ways with no relevant tag, and tags on nodes and relations
+- `OsmWayTagsTest` — whitelist filtering, ways with no relevant tag, and tags on nodes and relations
   that must not leak onto ways
-- `BicycleNetworkPipelineTest` — 23 cases, mostly for `process`, the pure transformation seam (no file I/O, synthetic
-  `ElevationSource`): two end-to-end runs on a reader-like network (orchestration, gradient signs, `osm:` prefixing,
-  `origid` normalization, mode rename), a no-DEM run that attaches no elevation metrics, plus tier-1 cases for the
-  individual step methods — simplification merge guards, capacity de-boost, `origid` merging, and reversed-geometry
-  repair. Two further cases parse a command line to pin `--free-speed-factor`, which the OSM reader consumes and
-  `process` never sees
-- `BicycleInfraClassifierTest` — 37 table-driven cases covering 22 of the 27 categories and the precedence ordering
-- `BicycleLinkPolicyTest` — 13 cases for the footway/pedestrian whitelist, `bicycle=no`, `access` restrictions
-  (incl. the `bicycle=yes/designated` override), and bicycle-oneway handling
-- `ServiceLinkCleanerTest` — 4 cases: removing a service dead-end, keeping a service link that connects two roads,
+- `BicycleNetworkPipelineTest` — mostly for `process`, the pure transformation seam (no file I/O, synthetic
+  `ElevationSource`): end-to-end runs on a reader-like network (orchestration, gradient signs, `osm:` prefixing,
+  `origid` normalization, mode rename, the motorised-mode mirroring, the default bike-link split), a no-DEM run
+  that attaches no elevation metrics, plus tier-1 cases for the individual step methods — simplification merge
+  guards, capacity de-boost, `origid` merging, and reversed-geometry repair. Two further cases parse a command
+  line to pin `--free-speed-factor`, which the OSM reader consumes and `process` never sees
+- `SplitBikeLinksTest` — drives `SplitBikeLinks.process` on hand-built links: the pair attributes in both
+  directions, the category moving onto the bike link, what deliberately stays unsplit (sharrows, bicycle roads,
+  links without car), and the id-collision hard stop
+- `BicycleInfraClassifierTest` — table-driven cases covering the categories and the precedence ordering
+- `BicycleLinkPolicyTest` — the footway/pedestrian whitelist, `bicycle=no`, `access` restrictions
+  (incl. the `bicycle=yes/designated` override), bicycle-oneway handling, the drop-ways rule and the
+  bicycle-area gating
+- `ServiceLinkCleanerTest` — removing a service dead-end, keeping a service link that connects two roads,
   a no-op when there are no service links, and trimming a hairline twig while keeping the connecting spine
-- `LinkElevationProfileTest` — 9 cases using a synthetic `ElevationSource` (no DEM required, fast), incl. sampling
+- `LinkElevationProfileTest` — synthetic `ElevationSource` (no DEM required, fast), incl. sampling
   along a stored `origgeom` course vs. the straight chord
-- `ElevationDataParserTest` — 8 reference points in Berlin against Sonny's DTM 50 m, plus 5 cases for missing
+- `ElevationDataParserTest` — 8 reference points in Berlin against Sonny's DTM 50 m, plus cases for missing
   data: `NaN` outside the raster instead of an exception, and the coverage check that turns a wrong `--dem-crs`
   into a message naming both CRS. Uses a small cutout shipped in
   `contribs/bicycle/test/input/org/matsim/contrib/bicycle/network/` (see the README there for source and license); a
   different DTM can be passed via `-Ddem.path=…`. Skipped via `assumeTrue` when the DTM file is missing.
-- `TagCopierTest` — 2 cases for the optional raw-OSM-tag copying (`TagCopier`)
+- `TagCopierTest` — the optional raw-OSM-tag copying (`TagCopier`)
 
 ## Pipeline (Supersonic path)
 
@@ -425,17 +434,21 @@ ones, each with the `.osm` it came from so the setup can be reproduced:
    reversed geometry on the reader's synthetic `*_bike-reverse` links.
 3. `NetworkUtils.cleanNetwork` drops isolated components.
 4. Bicycle-aware simplification merges consecutive links only when their infra-relevant attributes agree
-   (`bicycle_infra`, `type`, `osm:surface`, `osm:smoothness`, `allowed_speed`) and their link stats match (allowed
-   modes, lanes, freespeed, base capacity). The default simplifier would happily merge across infra changes and lose
-   that information.
+   (`bicycle_infra`, `bicycle_area`, `type`, `osm:surface`, `osm:smoothness`, `allowed_speed`) and their link stats
+   match (allowed modes, lanes, freespeed, base capacity). The default simplifier would happily merge across infra
+   changes and lose that information.
 5. Service-link cleanup removes service dead-ends and hairline branches that don't connect anything useful.
 6. Second simplification pass; service cleanup may have created new merge candidates. With `--store-original-geometry`,
-   a geometry-consistency check then warns if any stored polyline no longer matches its link length.
-7. Optionally rename mode `bike` → whatever was passed via `--mode`. By default (`--mode bike`) this is a no-op.
-8. For each surviving link, sample elevations every `--ele-sample-step` meters along its stored `origgeom` course (or
+   a geometry-consistency check then warns if any stored polyline no longer matches its link length. Another
+   `cleanNetwork` removes what the merges orphaned.
+7. With `--mirror-car-modes`, give the listed motorised modes exactly the links that allow car.
+8. Optionally rename mode `bike` → whatever was passed via `--mode`. By default (`--mode bike`) this is a no-op.
+9. For each surviving link, sample elevations every `--ele-sample-step` meters along its stored `origgeom` course (or
    the straight line between endpoints when none was stored), Douglas-Peucker-filter the profile with tolerance
    `--ele-noise-tolerance`, compute metrics. Skipped entirely when no DEM was supplied.
-9. Write MATSim XML, with `--crs` recorded on the network as the `coordinateReferenceSystem` attribute.
+10. Split parallel bike-only links off car links with centerline-tagged cycling infrastructure — on by default,
+    `--no-split-bike-links` disables; see the split section above.
+11. Write MATSim XML, with `--crs` recorded on the network as the `coordinateReferenceSystem` attribute.
 
 Elevation metrics are computed **after** the simplifier runs — on fewer, longer links — so we sample only what survives.
 
@@ -582,3 +595,4 @@ prints the DEM's own extent, which is usually enough to spot the right one.
   fallback, so a `type` → `osm:highway` rename would silently break scoring.
 - **Some attributes are inspection-only** and aren't consumed by the simulation: `average_elevation` and
   `osm:bicycle`.
+

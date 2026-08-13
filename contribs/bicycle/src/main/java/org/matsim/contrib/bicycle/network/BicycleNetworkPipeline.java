@@ -66,6 +66,8 @@ import java.util.function.BiPredicate;
  *       infra-relevant attributes match (standard simplifier ignores those).</li>
  *   <li>Service-link cleanup removes service dead-ends and hairline branches
  *       that don't actually connect anything useful.</li>
+ *   <li>With {@code --mirror-car-modes}, give the listed motorised modes exactly
+ *       the links that allow car.</li>
  *   <li>Optionally rename the network mode {@code "bike"} to whatever the
  *       caller requested via {@code --mode}.</li>
  *   <li>For every surviving link, sample its elevation profile and attach the
@@ -76,10 +78,11 @@ import java.util.function.BiPredicate;
  *   <li>Tag the network with its CRS and write the MATSim XML.</li>
  * </ol>
  *
- * <p>Steps 2-7 are the pure network transformations; they live in {@link #process},
- * which reads no files and can be run on a hand-built network. Simplification runs
- * twice (before and after service-link cleanup); with {@code --store-original-geometry}
- * the stored geometry is additionally repaired and its consistency checked.
+ * <p>Everything between the OSM read and the final write is the pure network
+ * transformation seam; it lives in {@link #process}, which reads no files and can be
+ * run on a hand-built network. Simplification runs twice (before and after
+ * service-link cleanup); with {@code --store-original-geometry} the stored geometry
+ * is additionally repaired and its consistency checked.
  *
  * <p>Elevation metrics are deliberately computed <em>after</em> the simplifier has
  * run: after merging, link lengths are longer and there are fewer of them, so
