@@ -5,7 +5,7 @@
   library(glue)
 
   # ==== Paths to ressources ====
-  matsim_input_path <- "/Users/aleksander/Documents/VSP/PHEMTest/matsim-libs-phem/contribs/emissions/test/input/org/matsim/contrib/emissions"
+  matsim_input_path <- "/test/input/org/matsim/contrib/emissions"
   matsim_output_path <- "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput"
   sumo_path <- "/Users/aleksander/Documents/VSP/PHEMTest/sumo2"
   hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
