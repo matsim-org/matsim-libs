@@ -100,7 +100,10 @@ public class PositionEmissionsModule extends AbstractModule {
 
 			var vehicleAttributes = getVehicleAttributes(vehicle);
 			var roadType = EmissionUtils.getHbefaRoadType(link);
-			double deltaHeight = link.getToNode().getCoord().getZ() - link.getFromNode().getCoord().getZ();
+			double deltaHeight = 0.0;
+			try {
+				deltaHeight = link.getToNode().getCoord().getZ() - link.getFromNode().getCoord().getZ();
+			} catch (Exception ignored){}
 			return emissionModule.getWarmEmissionAnalysisModule().calculateWarmEmissions(time, roadType, link.getFreespeed(), distance, deltaHeight, vehicleAttributes);
 		}
 
