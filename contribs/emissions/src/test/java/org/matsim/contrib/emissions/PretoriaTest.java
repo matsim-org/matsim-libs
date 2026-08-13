@@ -45,8 +45,6 @@ import java.util.stream.Stream;
 
 @Disabled
 public class PretoriaTest {
-	// TODO Replace paths with Test-paths
-
 	private static final Logger logger = LogManager.getLogger(PretoriaTest.class);
 
 	@RegisterExtension
@@ -61,10 +59,7 @@ public class PretoriaTest {
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Concept_Aleks_V1.1.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
 
-	// TODO Try to fix the deletion bug, so that we can use utils.getOutput() instead of a fixed path
-	private final static String OUTPUT_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput";
-
-	// TODO The GPS files are too large for Git. Upload them into the public-svn
+	// TODO The GPS files are too large for Git. Upload them into the svn
 	private final static String GPS_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data";
 
 	// This was just used once for data preparation
@@ -366,7 +361,7 @@ public class PretoriaTest {
 
 		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter(OUTPUT_PATH + "/PretoriaTest/networkInformation.csv"),
+			IOUtils.getBufferedWriter(utils.getOutputDirectory() + "/networkInformation.csv"),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
 			"linkId",
@@ -521,7 +516,7 @@ public class PretoriaTest {
 
 		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter(OUTPUT_PATH + "/PretoriaTest/output_" + vehicle + "_" + method + ".csv"),
+			IOUtils.getBufferedWriter(utils.getOutputDirectory() + "/output_" + vehicle + "_" + method + ".csv"),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
 			"tripId",
@@ -631,7 +626,6 @@ public class PretoriaTest {
 		/// Toyota Etios 1.5 (1496ccm, 66kW) Sprint hatchback light passenger vehicle with a Euro 6 classification (138g/km) (file: public-etios.csv).
 		ETIOS("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR, true),
 
-		//TODO Add load entry
 		/// Isuzu FTR850 AMT (Road-Rail Vehicle) medium heavy vehicle with a Euro 3 classification (file: public-rrv.csv).
 		RRV("diesel", "HGV D Euro-III", "average", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE, false),
 		RRV_TECHAVG("diesel", "average", "average", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE, false),
