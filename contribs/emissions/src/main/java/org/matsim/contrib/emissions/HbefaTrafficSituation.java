@@ -30,25 +30,4 @@ package org.matsim.contrib.emissions;
 
 	HbefaTrafficSituation(){
 	}
-
-	// TODO Check if works properly and replace unnecessary methods by this method
-	public HbefaTrafficSituation getLower(){
-		switch(this){
-			case FREEFLOW -> {
-				return HEAVY;
-			}
-			case HEAVY -> {
-				return SATURATED;
-			}
-			case SATURATED -> {
-				return STOPANDGO;
-			}
-			case STOPANDGO -> {
-				return STOPANDGO_HEAVY;
-			}
-			default -> {
-				return null;
-			}
-		}
-	}
 }
