@@ -55,15 +55,19 @@ public class DvrpRoutingModule implements RoutingModule {
 	private final AccessEgressFacilityFinder stopFinder;
 	private final String mode;
 	private final RoutingModule mainRouter;
+	private final RoutingModule walkRouter;
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
 	private final TimeInterpretation timeInterpretation;
 
-	public DvrpRoutingModule(RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
+	public DvrpRoutingModule(RoutingModule mainRouter,
+							 RoutingModule accessRouter, RoutingModule egressRouter,
+							 RoutingModule walkRouter,
 			AccessEgressFacilityFinder stopFinder, String mode, TimeInterpretation timeInterpretation) {
 		this.mainRouter = mainRouter;
 		this.stopFinder = stopFinder;
 		this.mode = mode;
+		this.walkRouter = walkRouter;
 		this.accessRouter = accessRouter;
 		this.egressRouter = egressRouter;
 		this.timeInterpretation = timeInterpretation;
@@ -108,6 +112,13 @@ public class DvrpRoutingModule implements RoutingModule {
 		// access (sub-)trip:
 		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(
 				DefaultRoutingRequest.of(fromFacility, accessFacility, now, person, request.getAttributes()));
+
+		if (accessTrip == null) {
+			//access could not be routed. fall back to walking
+			accessTrip = walkRouter.calcRoute(
+				DefaultRoutingRequest.of(fromFacility, accessFacility, now, person, request.getAttributes()));
+		}
+
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
 			now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
@@ -125,6 +136,13 @@ public class DvrpRoutingModule implements RoutingModule {
 		// egress (sub-)trip:
 		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(
 				DefaultRoutingRequest.of(egressFacility, toFacility, now, person, request.getAttributes()));
+
+		if (egressTrip == null) {
+			//egress could not be routed. fall back to walking
+			egressTrip = walkRouter.calcRoute(
+				DefaultRoutingRequest.of(egressFacility, toFacility, now, person, request.getAttributes()));
+		}
+
 		if (!egressTrip.isEmpty()) {
 			// interaction activity:
 			trip.add(createDrtStageActivity(egressFacility, now));

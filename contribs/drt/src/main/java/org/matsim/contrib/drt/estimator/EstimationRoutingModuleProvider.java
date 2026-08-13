@@ -62,7 +62,7 @@ public class EstimationRoutingModuleProvider extends ModalProviders.AbstractProv
 		RoutingModule accessRouter = stageRouters.getOrDefault(Stage.ACCESS, walkRouter);
 		RoutingModule egressRouter = stageRouters.getOrDefault(Stage.EGRESS, walkRouter);
 
-		DvrpRoutingModule routingModule = new DvrpRoutingModule(mainRouter, accessRouter, egressRouter,
+		DvrpRoutingModule routingModule = new DvrpRoutingModule(mainRouter, accessRouter, egressRouter, walkRouter,
 			getModalInstance(DvrpRoutingModule.AccessEgressFacilityFinder.class), getMode(), timeInterpretation);
 		return new EstimationRoutingModule(routingModule, estimators.get(DvrpModes.mode(getMode())));
 	}

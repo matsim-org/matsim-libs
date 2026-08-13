@@ -60,7 +60,7 @@ public class DvrpRoutingModuleProvider extends ModalProviders.AbstractProvider<D
 		RoutingModule accessRouter = stageRouters.getOrDefault(Stage.ACCESS, walkRouter);
 		RoutingModule egressRouter = stageRouters.getOrDefault(Stage.EGRESS, walkRouter);
 
-		return new DvrpRoutingModule(mainRouter, accessRouter, egressRouter,
+		return new DvrpRoutingModule(mainRouter, accessRouter, egressRouter, walkRouter,
 				getModalInstance(DvrpRoutingModule.AccessEgressFacilityFinder.class), getMode(), timeInterpretation);
 	}
 }
