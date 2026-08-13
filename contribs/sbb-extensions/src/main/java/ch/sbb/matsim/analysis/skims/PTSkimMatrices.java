@@ -44,8 +44,8 @@ import java.util.stream.Collectors;
 /**
  * Calculates zone-to-zone matrices containing a number of performance indicators related to public transport.
  * <p>
- * Amongst the performance indicators are: - travel time (measured from the first departure to the last arrival, without access/egress time) - travel distance (measured from first departure to last
- * arrival, without access/egress time) - access time - egress time - perceived frequency - share of travel time within trains - share of travel distance within trains
+ * Amongst the performance indicators are: - travel time (including access/egress time) - travel distance (measured from first departure to last arrival, without access/egress time) - access time -
+ * egress time - perceived frequency - share of travel time within trains - share of travel distance within trains
  * <p>
  * The main idea to calculate the frequencies follows the rooftop-algorithm from Niek Guis (ca. 2015).
  * <p>

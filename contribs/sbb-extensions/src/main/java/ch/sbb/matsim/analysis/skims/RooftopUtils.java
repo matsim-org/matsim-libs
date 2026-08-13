@@ -87,6 +87,7 @@ public class RooftopUtils {
 
     public static double calcAverageAdaptionTime(List<ODConnection> connections, double minDepartureTime, double maxDepartureTime) {
         ODConnection prevConnection = null;
+        double duration = maxDepartureTime - minDepartureTime;
         double sum = 0;
         for (ODConnection connection : connections) {
             if (prevConnection != null) {
@@ -138,10 +139,10 @@ public class RooftopUtils {
             double depTime = prevConnection.departureTime - prevConnection.accessTime;
             if (depTime < minDepartureTime) {
                 double delta = minDepartureTime - depTime;
-                sum = (3600 + delta) * (3600 + delta) / 2 - (delta * delta / 2);
+                sum = (duration + delta) * (duration + delta) / 2 - (delta * delta / 2);
             } else if (depTime > maxDepartureTime) {
                 double delta = depTime - maxDepartureTime;
-                sum = (3600 + delta) * (3600 + delta) / 2 - (delta * delta / 2);
+                sum = (duration + delta) * (duration + delta) / 2 - (delta * delta / 2);
             } else {
                 sum += (maxDepartureTime - depTime) * (maxDepartureTime - depTime) / 2;
             }
@@ -152,7 +153,7 @@ public class RooftopUtils {
                 sum += (maxDepartureTime - depTime) * (maxDepartureTime - depTime) / 2;
             }
         }
-        return sum / (maxDepartureTime - minDepartureTime);
+        return sum / duration;
     }
 
     /**
@@ -160,6 +161,7 @@ public class RooftopUtils {
      */
     public static Map<ODConnection, Double> calcConnectionShares(List<ODConnection> connections, double minDepartureTime, double maxDepartureTime) {
         Map<ODConnection, Double> shares = new HashMap<>();
+        double duration = maxDepartureTime - minDepartureTime;
 
         ODConnection prevConnection = null;
         for (ODConnection connection : connections) {
@@ -184,8 +186,8 @@ public class RooftopUtils {
                     double deltaTravelTime = travelTime2 - travelTime1;
                     double zenith = ((depTime1 + deltaTravelTime) + depTime2) / 2;
 
-                    double share1 = (zenith - depTime1) / 3600;
-                    double share2 = (depTime2 - zenith) / 3600;
+                    double share1 = (zenith - depTime1) / duration;
+                    double share2 = (depTime2 - zenith) / duration;
 
                     if (share1 < 0) {
                         // this can happen if zenith if before minDepTime
@@ -209,7 +211,7 @@ public class RooftopUtils {
                 double depTime = connection.departureTime - connection.accessTime;
                 if (depTime >= minDepartureTime && depTime < maxDepartureTime) {
                     // calculate the first triangle
-                    double share = (depTime - minDepartureTime) / 3600;
+                    double share = (depTime - minDepartureTime) / duration;
                     shares.compute(connection, (c, oldVal) -> (oldVal == null ? share : (oldVal + share)));
                 }
             }
@@ -221,7 +223,7 @@ public class RooftopUtils {
             double depTime = prevConnection.departureTime - prevConnection.accessTime;
             if (depTime < maxDepartureTime) {
                 // there is no departure after maxDepartureTime, so we're still missing the final part
-                double share = (maxDepartureTime - depTime) / 3600;
+                double share = (maxDepartureTime - depTime) / duration;
                 shares.compute(prevConnection, (c, oldVal) -> (oldVal == null ? share : (oldVal + share)));
             }
         }
