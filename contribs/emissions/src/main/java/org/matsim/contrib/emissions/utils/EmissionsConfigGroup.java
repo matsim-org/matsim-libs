@@ -360,11 +360,11 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	}
 	// ============================================
 	// ============================================
-	@StringGetter(USE_HBEFA_CONSISTENCY_CHECKER)
+	@StringGetter(ADD_PM_TOTAL_ENTRIES)
 	public AddPMTotalEntries getAddPMTotalEntries(){
 		return addPMTotalEntries;
 	}
-	@StringSetter(USE_HBEFA_CONSISTENCY_CHECKER)
+	@StringSetter(ADD_PM_TOTAL_ENTRIES)
 	public void setAddPmTotalEntries(AddPMTotalEntries add){
 		addPMTotalEntries = add;
 	}
