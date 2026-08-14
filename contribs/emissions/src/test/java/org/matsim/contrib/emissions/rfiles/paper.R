@@ -2,6 +2,7 @@
   library(tidyverse)
   library(glue)
   library(kableExtra)
+  library(patchwork)
 
   # ==== Paths to ressources ====
   matsim_output_path <- "/Users/aleksander/Documents/VSP/PHEMTest/MatsimOutput"
@@ -554,34 +555,52 @@ errorDiagrams(name="differencespeed_normalized", xlab="Difference speed factor: 
 }
 
 # Accumulative Plots
-acc_plots <- function(vehicle="FIGO_TECHAVG") {
+acc_plots <- function(vehicle="FIGO_TECHAVG", method="StopAndGoFraction") {
   network_information <- read_csv(glue("{matsim_output_path}/PretoriaTest/networkInformation.csv")) %>%
     separate(roadType, c("Region", "RoadType", "VClass"), sep="/")
 
-  pretoria_output <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_StopAndGoFraction.csv")) %>%
-    filter(linkId != 6555 & linkId != "cold") %>%
-    mutate(method = "StopAndGoFraction") %>%
+  pretoria_output <- read_csv(glue("{matsim_output_path}/PretoriaTest/output_{vehicle}_{method}.csv")) %>%
+    filter(linkId != 6555) %>%
+    mutate(method = method) %>%
     left_join(network_information, by="linkId") %>%
     pivot_longer(cols=c("CO_MATSim", "CO_pems", "CO2_MATSim", "CO2_pems", "NOx_MATSim", "NOx_pems"), names_to = "component", values_to = "value") %>%
     separate(col="component", sep="_", into=c("component", "model")) %>%
-    mutate(abs_value=value*length) %>%
     group_by(tripId, model, component, load) %>%
     arrange(order, .by_group = TRUE) %>%
-    mutate(acc_abs_value = cumsum(abs_value), acc_length=cumsum(length)) %>%
+    mutate(acc_value = cumsum(value), acc_length=cumsum(length), ) %>%
     ungroup() %>%
     group_by(acc_length, model, component, load) %>%
-    summarize(acc_abs_value = mean(acc_abs_value), n = n())
+    summarize(acc_value = mean(acc_value), segment = first(segment), n = n())
+
+  segment_ranges <- pretoria_output %>%
+    distinct(acc_length, segment) %>%
+    arrange(acc_length) %>%
+    group_by(segment) %>%
+    summarize(xmin = min(acc_length), xmax = max(acc_length), .groups = "drop")
 
   n_components <- n_distinct(pretoria_output$component)
   n_loads      <- n_distinct(pretoria_output$load)
 
   p <- ggplot() +
-    geom_line(data=pretoria_output, aes(x=acc_length, y=acc_abs_value, color=model)) +
+    geom_line(data=pretoria_output, aes(x=acc_length, y=acc_value, color=model)) +
+    geom_rect(
+      data = segment_ranges,
+      aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = segment),
+      alpha = 0.15, inherit.aes = FALSE
+    ) +
+    scale_fill_manual(
+      values = c(
+        "A" = "#1f77b4",
+        "B" = "#ff7f0e",
+        "C" = "#2ca02c",
+        "none" = "grey70"
+      )
+    ) +
     facet_wrap(load~component, scales="free") +
     xlab("Driven distance (m)") +
-    ylab("Accumulative emission (mg)")
+    ylab("Accumulative emission (g)")
 
-  ggsave(glue("{plots_path}/{vehicle}_acc.png"),
+  ggsave(glue("{plots_path}/{vehicle}_{method}_acc.png"),
          plot = p,
          width  = 10 * n_components,
          height = 10 * n_loads,
@@ -590,5 +609,7 @@ acc_plots <- function(vehicle="FIGO_TECHAVG") {
 
 {
   acc_plots()
+  acc_plots(method = "InterpolationFraction")
   acc_plots("RRV")
+  acc_plots("RRV", method = "InterpolationFraction")
 }
