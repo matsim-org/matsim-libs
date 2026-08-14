@@ -689,7 +689,10 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 	}
 
 	/**
-	 * Calculates the latest departure time from a vehicle depot that can still reach the service before its latest start.
+	 * Calculates the latest departure time from a vehicle depot that can still reach the service. The preferred
+	 * departure keeps the fallback slack before the service latest start. If this slack cannot be maintained, the search
+	 * falls back to the actual service latest start instead of rejecting reachable depots only because travel times vary
+	 * over the day.
 	 *
 	 * @param vehicle vehicle that provides the depot and type information
 	 * @param service service whose latest start time is checked
@@ -704,21 +707,17 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 		Location depot = Location.newInstance(vehicle.getLinkId().toString());
 		Location serviceLocation = Location.newInstance(service.getServiceLinkId().toString());
 		com.graphhopper.jsprit.core.problem.vehicle.Vehicle jspritVehicle = createJspritVehicle(vehicle);
-		double outboundTravelTime = transportCosts.getTransportTime(depot, serviceLocation, minDepartureTime, null, jspritVehicle);
-		double latestArrivalTime = latestServiceStartTime - TIME_WINDOW_FALLBACK_SLACK;
-		if (minDepartureTime + outboundTravelTime > latestArrivalTime) {
-			latestArrivalTime = latestServiceStartTime;
-		}
-		if (minDepartureTime + outboundTravelTime > latestArrivalTime) {
-			return OptionalDouble.empty();
-		}
 
-		double departureTime = Math.max(minDepartureTime, latestArrivalTime - outboundTravelTime);
-		outboundTravelTime = transportCosts.getTransportTime(depot, serviceLocation, departureTime, null, jspritVehicle);
-		if (departureTime + outboundTravelTime > latestArrivalTime) {
-			return OptionalDouble.empty();
+		double latestArrivalWithSlack = latestServiceStartTime - TIME_WINDOW_FALLBACK_SLACK;
+		if (latestArrivalWithSlack >= minDepartureTime) {
+			OptionalDouble latestDepartureWithSlack = findLatestFeasibleDepartureTime(depot, serviceLocation, transportCosts,
+				jspritVehicle, minDepartureTime, latestArrivalWithSlack);
+			if (latestDepartureWithSlack.isPresent()) {
+				return latestDepartureWithSlack;
+			}
 		}
-		return OptionalDouble.of(departureTime);
+		return findLatestFeasibleDepartureTime(depot, serviceLocation, transportCosts, jspritVehicle, minDepartureTime,
+			latestServiceStartTime);
 	}
 
 	/**
@@ -736,6 +735,73 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 		Location depot = Location.newInstance(vehicle.getLinkId().toString());
 		Location serviceLocation = Location.newInstance(service.getServiceLinkId().toString());
 		com.graphhopper.jsprit.core.problem.vehicle.Vehicle jspritVehicle = createJspritVehicle(vehicle);
+		return canReachServiceStart(depot, serviceLocation, transportCosts, jspritVehicle, departureTime, latestServiceStartTime);
+	}
+
+	/**
+	 * Searches the latest departure time that still reaches the service location before the requested latest arrival.
+	 *
+	 * @param depot fallback depot location
+	 * @param serviceLocation service location
+	 * @param transportCosts network-based travel-time provider
+	 * @param jspritVehicle jsprit vehicle used for travel-time lookup
+	 * @param minDepartureTime earliest allowed fallback departure
+	 * @param latestArrivalTime latest allowed service arrival
+	 * @return latest feasible departure time, or {@link OptionalDouble#empty()} if even the earliest departure fails
+	 */
+	private OptionalDouble findLatestFeasibleDepartureTime(Location depot, Location serviceLocation,
+	                                                      NetworkBasedTransportCosts transportCosts,
+	                                                      com.graphhopper.jsprit.core.problem.vehicle.Vehicle jspritVehicle,
+	                                                      double minDepartureTime, double latestArrivalTime) {
+		if (latestArrivalTime < minDepartureTime) {
+			return OptionalDouble.empty();
+		}
+
+		double earliestTravelTime = transportCosts.getTransportTime(depot, serviceLocation, minDepartureTime, null, jspritVehicle);
+		if (!Double.isFinite(earliestTravelTime) || minDepartureTime + earliestTravelTime > latestArrivalTime) {
+			return OptionalDouble.empty();
+		}
+
+		double lowerFeasibleDepartureTime = minDepartureTime;
+		double upperDepartureTime = latestArrivalTime;
+		double estimatedLatestDepartureTime = latestArrivalTime - earliestTravelTime;
+		if (estimatedLatestDepartureTime > minDepartureTime && estimatedLatestDepartureTime < latestArrivalTime) {
+			if (canReachServiceStart(depot, serviceLocation, transportCosts, jspritVehicle, estimatedLatestDepartureTime,
+				latestArrivalTime)) {
+				lowerFeasibleDepartureTime = estimatedLatestDepartureTime;
+			} else {
+				upperDepartureTime = estimatedLatestDepartureTime;
+			}
+		}
+
+		if (canReachServiceStart(depot, serviceLocation, transportCosts, jspritVehicle, upperDepartureTime,
+			latestArrivalTime)) {
+			return OptionalDouble.of(upperDepartureTime);
+		}
+
+		// Limit route-cost lookups during search for the latest feasible departure.
+		int searchIterations = 30;
+		// Stop the search once the feasible and infeasible departure bounds differ by at most one second.
+		double searchTolerance = 1.;
+		for (int iteration = 0; iteration < searchIterations
+			&& upperDepartureTime - lowerFeasibleDepartureTime > searchTolerance; iteration++) {
+			double candidateDepartureTime = (lowerFeasibleDepartureTime + upperDepartureTime) / 2.;
+			if (canReachServiceStart(depot, serviceLocation, transportCosts, jspritVehicle, candidateDepartureTime,
+				latestArrivalTime)) {
+				lowerFeasibleDepartureTime = candidateDepartureTime;
+			} else {
+				upperDepartureTime = candidateDepartureTime;
+			}
+		}
+		return OptionalDouble.of(lowerFeasibleDepartureTime);
+	}
+
+	/**
+	 * Checks whether the depot-service trip reaches the service location before the requested latest arrival.
+	 */
+	private boolean canReachServiceStart(Location depot, Location serviceLocation, NetworkBasedTransportCosts transportCosts,
+	                                     com.graphhopper.jsprit.core.problem.vehicle.Vehicle jspritVehicle,
+	                                     double departureTime, double latestServiceStartTime) {
 		double outboundTravelTime = transportCosts.getTransportTime(depot, serviceLocation, departureTime, null, jspritVehicle);
 		return departureTime + outboundTravelTime <= latestServiceStartTime;
 	}
