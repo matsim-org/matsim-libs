@@ -53,55 +53,26 @@ import java.util.function.BiPredicate;
  * enriched with cycling infrastructure classification and DEM-based elevation
  * metrics.
  *
- * <p>Pipeline order:
- * <ol>
- *   <li>Read OSM with {@link OsmBicycleReader}. During read, each link's
- *       endpoints get a Z coordinate from the DEM (when one is provided), and
- *       {@link BicycleLinkPolicy} stamps the {@code bicycle_infra} attribute and
- *       enforces access rules.</li>
- *   <li>Move OSM-derived attributes under the {@code osm:} prefix to clearly
- *       separate them from pipeline-internal attributes.</li>
- *   <li>{@link NetworkUtils#cleanNetwork} drops isolated components.</li>
- *   <li>Bicycle-aware simplification merges consecutive links only when their
- *       infra-relevant attributes match (standard simplifier ignores those).</li>
- *   <li>Service-link cleanup removes service dead-ends and hairline branches
- *       that don't actually connect anything useful.</li>
- *   <li>With {@code --mirror-car-modes}, give the listed motorised modes exactly
- *       the links that allow car.</li>
- *   <li>Optionally rename the network mode {@code "bike"} to whatever the
- *       caller requested via {@code --mode}.</li>
- *   <li>For every surviving link, sample its elevation profile and attach the
- *       five metrics (average_elevation, gradient, max_gradient, elevation_gain,
- *       elevation_loss). Skipped when no DEM was provided.</li>
- *   <li>Split parallel bike-only links off car links with centerline-tagged
- *       cycling infrastructure (on by default; see {@link SplitBikeLinks}).</li>
- *   <li>Tag the network with its CRS and write the MATSim XML.</li>
- * </ol>
+ * <p>Pipeline order, in short: read OSM with {@link OsmBicycleReader} (during the
+ * read, {@link BicycleLinkPolicy} stamps {@code bicycle_infra} and enforces the
+ * access rules, and the DEM puts a Z on the nodes), move the OSM-derived
+ * attributes under {@code osm:}, clean, simplify bicycle-aware — twice, around the
+ * service-link cleanup — mirror the motorised modes, rename the bike mode, attach
+ * the per-link elevation metrics (after the merges on purpose: fewer, longer
+ * links), split the parallel bike links off ({@link SplitBikeLinks}), record the
+ * CRS and write. The package README documents every step; the numbered step
+ * comments in {@link #process} mirror the same order.
  *
  * <p>Everything between the OSM read and the final write is the pure network
  * transformation seam; it lives in {@link #process}, which reads no files and can be
- * run on a hand-built network. Simplification runs twice (before and after
- * service-link cleanup); with {@code --store-original-geometry} the stored geometry
- * is additionally repaired and its consistency checked.
+ * run on a hand-built network.
  *
- * <p>Elevation metrics are deliberately computed <em>after</em> the simplifier has
- * run: after merging, link lengths are longer and there are fewer of them, so
- * we sample only what survives.
- *
- * <p>TODO: also move the remaining OSM-derived attributes under the {@code osm:}
- * prefix once their renames are sorted out:
- * <ul>
- *   <li>{@code "type"} → {@code "osm:highway"} (still carries the {@code "highway."}
- *       value prefix; see {@link ServiceLinkCleaner})</li>
- *   <li>{@code "origid"} → {@code "osm:way_id"} (carries merge semantics from
- *       {@link NetworkSimplifier})</li>
- * </ul>
- * Both touch additional code paths and are deferred to a separate commit.
- *
- * <p><b>Warning:</b> the {@code "type"} → {@code "osm:highway"} rename would silently
- * break scoring: {@code BicycleUtils.WAY_TYPE} reads the unprefixed {@code "type"} and,
- * unlike {@code BicycleUtils.getSurface()} / {@code getCyclewaytype()}, has no
- * {@code osm:} fallback. See the README "Limitations" before implementing it.
+ * <p>TODO: {@code "type"} and {@code "origid"} are the two OSM-derived attributes still
+ * left unprefixed. Both carry semantics other code depends on — {@code type=service} for
+ * {@link ServiceLinkCleaner}, {@code origid} for {@link NetworkSimplifier} merge tracking
+ * — and renaming {@code "type"} to {@code "osm:highway"} would silently break scoring,
+ * because {@code BicycleUtils.WAY_TYPE} has no {@code osm:} fallback (see the README
+ * "Limitations").
  *
  * @author smetzler
  */
@@ -143,8 +114,8 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 		description = "Factor applied to the free speed of urban links to account for traffic lights, "
 			+ "right of way etc. Default: ${DEFAULT-VALUE}. Only links that carry an OSM maxspeed tag "
 			+ "below 51 km/h are affected -- without the tag the speed is derived from the highway type "
-			+ "and the factor does not apply. Lower values (SUMO-converted scenarios such as Dresden "
-			+ "v1.0 use 0.7) yield a slower car network.",
+			+ "and the factor does not apply. Lower values yield a slower car network; SUMO-converted "
+			+ "scenarios tend to sit around 0.7.",
 		defaultValue = DEFAULT_FREE_SPEED_FACTOR)
 	private double freeSpeedFactor;
 
@@ -291,9 +262,8 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	}
 
 	/**
-	 * Everything between reading the OSM file and writing the network: attribute
-	 * prefixing, isolated-component cleanup, bicycle-aware simplification,
-	 * service-link cleanup, optional mode rename and per-link elevation metrics.
+	 * Everything between reading the OSM file and writing the network; the numbered
+	 * step comments below mirror the README's pipeline list.
 	 *
 	 * <p>Performs no file access and reads no CLI state, so it can be exercised on
 	 * a hand-built network with a synthetic

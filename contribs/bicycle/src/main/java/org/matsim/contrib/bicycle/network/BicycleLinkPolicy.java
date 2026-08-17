@@ -185,8 +185,8 @@ public final class BicycleLinkPolicy {
 	 * signposted cycle route that happens to run over a {@code highway=track} — traffic
 	 * sign DE:237 or a shared foot/cycleway classifies it, so it is never {@code NONE}.
 	 * The {@code bicycle=yes/designated} check spares the rest: plain tracks that OSM
-	 * marks as open to bikes, which the classifier alone leaves at {@code NONE} (measured
-	 * on Dresden: 4 606 such track links, 815 km — the backbone of rural cycling).
+	 * marks as open to bikes, which the classifier alone leaves at {@code NONE} — on
+	 * rural ground the backbone of everyday cycling.
 	 */
 	private boolean isMinorWayWithoutInfra(Map<String, String> tags, BicycleInfraCategory infra) {
 		if (dropWaysWithoutInfra.isEmpty() || infra != BicycleInfraCategory.NONE) return false;

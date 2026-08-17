@@ -57,22 +57,18 @@ final class BicycleBuildOptions {
 
 	@Option(names = "--drop-ways-without-infra", split = ",", paramLabel = "HIGHWAY_TYPE",
 		description = "Minor way types - typically 'track,path' - to drop where the link ended up "
-			+ "with bicycle_infra=NONE. A link goes only if ALL of its OSM ways are of these types, "
-			+ "it classified as NONE, and none of them carries bicycle=yes/designated, so signposted "
-			+ "and explicitly opened field tracks survive. Values are OSM highway types (note that "
-			+ "'unclassified' is one of them: a minor road, not 'without classification'). Meant for "
-			+ "city models with a rural ring, where field and forest tracks add many links and little "
-			+ "cycling network; leave empty for rural models, where those tracks are the network.")
+			+ "with bicycle_infra=NONE. A link goes only if ALL of its OSM ways are of these types "
+			+ "and none carries bicycle=yes/designated, so signposted and explicitly opened tracks "
+			+ "survive. Values are OSM highway types ('unclassified' is a minor road, not 'without "
+			+ "classification'). Meant for city models with a rural ring; leave empty for rural "
+			+ "models, where those tracks are the network.")
 	private Set<String> dropWaysWithoutInfra = Set.of();
 
 	@Option(names = "--mirror-car-modes", split = ",", paramLabel = "MODE",
 		description = "Modes that should end up on exactly the links that allow car - typically "
-			+ "'ride,truck,freight'. Without it the motorised modes drift apart (SUMO derives "
-			+ "truck from its own permissions, the Supersonic reader assigns car and bike only, "
-			+ "and the network cleaners only ever remove car); this re-derives them once, after "
-			+ "everything that can change the link set. Not defaulted, because the names differ "
-			+ "per scenario (Berlin v7.0 has freight, Dresden v1.1 drops truck and uses "
-			+ "longDistanceFreight).")
+			+ "'ride,truck,freight'. The motorised modes drift apart during conversion and "
+			+ "cleanup; this re-derives them from car once, after everything that can change "
+			+ "the link set. Not defaulted, because scenarios disagree on the mode names.")
 	private Set<String> mirrorCarModes = Set.of();
 
 	@Option(names = "--split-bike-links", negatable = true, defaultValue = "true", fallbackValue = "true",

@@ -23,8 +23,7 @@ package org.matsim.contrib.bicycle.network;
  *
  * <p>Every link in a bicycle network is assigned exactly one of these
  * categories. The {@code .name()} of the chosen value is what gets written to
- * the link attribute {@code bicycle_infra}, so the on-disk attribute values
- * are unchanged from the previous string-based implementation.
+ * the link attribute {@code bicycle_infra}.
  *
  * <p><b>Compatibility — enum names are an on-disk contract.</b> The string
  * form is the {@code bicycle_infra} attribute value in MATSim network XML.

@@ -42,13 +42,11 @@ import java.util.Set;
  * it came from ({@code origId}) — so the classifier can be fed the original way tags
  * instead of what survived the conversion.
  *
- * <p><b>Why not read the tags netconvert exported?</b> netconvert can pass OSM tags
- * through as edge params, but it ignores them when deciding whether to merge two
- * edges. On a merged edge the values of the constituent ways are concatenated, and —
- * worse — a tag present on only one of them wins silently: a 139 m way tagged
- * {@code cycleway=lane} merged with a 139 m way carrying no cycleway tag yields one
- * 278 m edge tagged {@code cycleway=lane}, with nothing in the network hinting that
- * half of it is wrong. Going back to the ways is the only way to see that.
+ * <p><b>Why not read the tags netconvert exported?</b> netconvert merges edges
+ * without looking at OSM tags, and on a merged edge a tag present on only one
+ * constituent way wins silently over the full length. Going back to the ways is the
+ * only way to see that; the package README ("Why the tags come from the OSM file")
+ * has the worked example.
  *
  * <p>Only the keys handed to {@link #read(Path, Set)} are kept, so memory stays at
  * O(ways × whitelist) rather than O(all tags). Ways without a single matching tag are

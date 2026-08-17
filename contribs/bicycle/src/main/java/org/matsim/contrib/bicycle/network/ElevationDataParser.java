@@ -49,20 +49,13 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  *
  * <p>DEM sources we know about:
  * <ul>
- *   <li>Sonny's DTMs — https://sonny.4lima.de/ (CC BY 4.0). LiDAR-based,
- *       much better quality than SRTM. Germany available as 20 m (~1.1 GB) or
- *       50 m (~300 MB), both in {@code EPSG:32632}. Careful: the per-state files
- *       from the same source are <em>not</em> in that CRS.</li>
+ *   <li>Sonny's DTMs — https://sonny.4lima.de/ (CC BY 4.0). LiDAR-based and
+ *       markedly better than SRTM or EU-DEM; Germany comes as a 20 m and a 50 m
+ *       raster, both in {@code EPSG:32632}. Careful: the per-state files from the
+ *       same source are <em>not</em> in that CRS.</li>
  *   <li>For future reference, see also GraphHopper PR #3287
  *       (https://github.com/graphhopper/graphhopper/pull/3287) which switched
  *       to Sonny.</li>
- * </ul>
- *
- * <p>Deprecated alternatives that we have used historically:
- * <ul>
- *   <li>SRTM1 — http://earthexplorer.usgs.gov/ (login required)</li>
- *   <li>SRTM3 — http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp</li>
- *   <li>EU-DEM — http://data.eox.at/eudem</li>
  * </ul>
  *
  * @author smetzler, dziemke

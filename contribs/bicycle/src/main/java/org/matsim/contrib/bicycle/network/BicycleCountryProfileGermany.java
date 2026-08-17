@@ -22,16 +22,14 @@ package org.matsim.contrib.bicycle.network;
  * German implementation of {@link BicycleCountryProfile}.
  *
  * <p>Encodes the German traffic-sign codes (StVO / VzKat) referenced by
- * {@link BicycleInfraClassifier}. This is the default profile and the
- * behaviour matches the pre-profile implementation byte-for-byte.
+ * {@link BicycleInfraClassifier}. This is the default profile.
  *
  * <p>The {@code traffic_sign} values arriving here are raw OSM strings,
  * possibly with concatenated subsigns (e.g. {@code "DE:244,1020-30"} or
  * {@code "DE:245,1022-10,1026-30"}). Matching is via {@code contains} /
- * {@code startsWith} on the raw string — same approach as the previous
- * inline checks, same false-positive surface (e.g. a hypothetical
- * {@code "DE:1244"} would match a {@code "DE:244"} probe, but no such
- * sign exists in the catalogue).
+ * {@code startsWith} on the raw string, which accepts a false positive that
+ * cannot occur in practice (a hypothetical {@code "DE:1244"} would match a
+ * {@code "DE:244"} probe, but no such sign exists in the catalogue).
  *
  * @author smetzler, esarikaya
  */
@@ -67,9 +65,8 @@ public final class BicycleCountryProfileGermany extends BicycleCountryProfile {
 
 	@Override
 	public boolean isSharedFootCyclewaySign(String trafficSign) {
-		// DE:240 — Gemeinsamer Geh-/Radweg. The classifier checks via
-		// `contains("240")` rather than `contains("DE:240")` for historical
-		// reasons (parity with the FixMyCity Lua); kept as-is here.
+		// DE:240 — Gemeinsamer Geh-/Radweg. Matched via `contains("240")` rather
+		// than `contains("DE:240")`, for parity with the FixMyCity Lua rules.
 		return !isEmpty(trafficSign) && trafficSign.contains("240");
 	}
 

@@ -21,11 +21,11 @@ package org.matsim.contrib.bicycle.network;
 /**
  * Country-specific knobs for {@link BicycleInfraClassifier}.
  *
- * <p>Everything in this interface is hard-coded to Germany in
- * {@link BicycleCountryProfileGermany} (the default). The interface exists so
- * that other countries — France, UK, …  — can be added without forking the
- * classifier. Only knobs that are actually used today are exposed; further
- * methods will be added when the first non-DE profile lands.
+ * <p>The default is {@link BicycleCountryProfileGermany}; {@link BicycleCountryProfileAustria}
+ * and {@link BicycleCountryProfileGeneric} come with the package. The type exists so that
+ * further countries can be added without forking the classifier — it exposes only the
+ * knobs the rules need today, and grows with them. Implementations currently have to live
+ * in this package, because the methods below are package-private.
  *
  * <p><b>Scope.</b> Two kinds of knobs live here:
  * <ul>
@@ -34,14 +34,11 @@ package org.matsim.contrib.bicycle.network;
  *       gemeinsamer Geh-/Radweg, …). Each method below takes the raw value
  *       of the tag (the classifier does no parsing) and returns whether it
  *       matches the country's sign for that category.</li>
- *   <li><b>Driving direction.</b> {@link #isRightHandTraffic()} drives the
- *       {@code cycleway:right} vs {@code cycleway:left} interpretation.
- *       Currently always {@code true} for DE; the classifier still wires
- *       directionality based on the {@code OsmWayDirection} parameter and assumes
- *       right-hand traffic in a number of places — flipping this to
- *       {@code false} will not magically produce correct UK results. See
- *       TODO in {@link BicycleInfraClassifier} for the list of sites that
- *       need to be revisited when the first left-hand profile is added.</li>
+ *   <li><b>Driving direction.</b> {@link #isRightHandTraffic()} — currently
+ *       {@code true} for every profile. The classifier still hard-codes right-hand
+ *       assumptions in several places, so flipping it alone will not produce
+ *       correct left-hand results; the TODO in {@link BicycleInfraClassifier}
+ *       lists the sites to revisit.</li>
  * </ul>
  *
  * <p>The {@code traffic_sign} values passed in are the raw OSM strings,

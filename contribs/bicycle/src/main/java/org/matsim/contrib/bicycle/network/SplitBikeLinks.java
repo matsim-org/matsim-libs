@@ -70,8 +70,8 @@ import static org.matsim.contrib.bicycle.BicycleUtils.CAR_LINK;
  *
  * <p><b>What a split does.</b> The bike link {@code <id>_bike} shares the car link's
  * nodes and exact length (downstream interaction models compare traversal-time windows
- * across the pair). It takes over {@code bicycle_infra} and the bicycle speed factor,
- * inherits every other attribute as a copy, and gets bike-typical freespeed and capacity.
+ * across the pair). It takes over {@code bicycle_infra}, inherits the scoring inputs as
+ * copies, leaves the car bookkeeping behind, and gets bike-typical freespeed and capacity.
  * The car link loses the bike mode, so routing has no choice to make. The pair is tied
  * together by the attributes {@link BicycleUtils#CAR_LINK} and
  * {@link BicycleUtils#BIKE_LINK}; the {@code _bike} id suffix is a readable convention,
@@ -80,8 +80,8 @@ import static org.matsim.contrib.bicycle.BicycleUtils.CAR_LINK;
  * <p><b>Structure, not policy.</b> Splitting is deliberately a different question from
  * scoring motorized interaction. Every qualifying link is split the same way, including
  * physically protected lanes and centerline-tagged tracks, and no attribute prescribes
- * whether interaction applies. The scoring side decides that per
- * {@code bicycle_infra} category of the bike link — which is also what makes it possible
+ * whether interaction applies. A scoring consumer can decide that per
+ * {@code bicycle_infra} category of the bike link — which is what would make it possible
  * to <em>count</em> the car encounters an infrastructure avoided without scoring them.
  *
  * <p><b>What is not split.</b> {@code SHARED_MOTOR_VEHICLE_LANE} (a sharrow has no space

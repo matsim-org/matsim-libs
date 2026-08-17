@@ -283,10 +283,10 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
 		// These carry bike traffic but have no LinkProperties of their own, so their edges are
 		// dropped ("Skipping unknown link type") — which removes cycling infrastructure, not just
-		// detail: in a Leipzig test extract they were 10 % of the network length, and 97 % of the
-		// footways among them carried bicycle=yes. Values follow the neighbours above: a track is
-		// about a service road, a footway or pedestrian area about a path. Opt-in, so existing
-		// scenarios keep getting the exact network they had.
+		// detail: on a city extract they account for roughly a tenth of the network length, and
+		// nearly every footway among them is tagged bicycle=yes. Values follow the neighbours
+		// above: a track is about a service road, a footway or pedestrian area about a path.
+		// Opt-in, so existing scenarios keep getting the exact network they had.
 		if (keepCyclableMinorWays) {
 			linkProperties.put(OsmTags.TRACK, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 450, false));
 			linkProperties.put(OsmTags.FOOTWAY, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 300, false));

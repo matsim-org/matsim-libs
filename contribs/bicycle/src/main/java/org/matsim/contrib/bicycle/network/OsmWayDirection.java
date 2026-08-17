@@ -27,7 +27,7 @@ package org.matsim.contrib.bicycle.network;
  * {@link BicycleInfraClassifier} needs to know which one it is looking at.
  *
  * <p>Deliberately reader-neutral: the same classifier runs on links from the
- * {@code SupersonicOsmNetworkReader} (which has its own {@code OsmWayDirection} enum,
+ * {@code SupersonicOsmNetworkReader} (which has its own {@code Direction} enum,
  * mapped at the call site) and on links from a SUMO-converted network, where
  * the direction comes from the sign of the link id. Keeping this enum here is
  * what frees the classifier from depending on any particular reader.

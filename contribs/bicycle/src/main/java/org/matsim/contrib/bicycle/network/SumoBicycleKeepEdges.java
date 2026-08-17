@@ -47,8 +47,8 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.SURFACE;
  * <p>netconvert's {@code geometry.remove} joins consecutive edges whose SUMO attributes
  * match. It has no idea about cycling infrastructure, so it happily merges a stretch with
  * a bike lane into one without — and the result claims the lane over the whole length,
- * with nothing in the network hinting otherwise. In a Leipzig extract 22.7 % of the
- * network length sat on edges built from more than one OSM way.
+ * with nothing in the network hinting otherwise. In a city-sized extract this affects a
+ * fifth of the network length, which is how much sits on edges built from several OSM ways.
  *
  * <p>The fix is a second netconvert pass. This command produces its input:
  *

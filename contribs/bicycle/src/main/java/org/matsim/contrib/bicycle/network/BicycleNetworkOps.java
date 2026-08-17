@@ -144,7 +144,7 @@ final class BicycleNetworkOps {
 	 * Gives the configured modes exactly the links that allow car.
 	 *
 	 * <p>The motorised modes describe the same vehicles on the same roads, and scenarios
-	 * such as Berlin v7.0 carry them on an identical link set. They drift apart on the way
+	 * usually carry them on an identical link set. They drift apart on the way
 	 * here: SUMO decides {@code truck} from its own permissions, the Supersonic reader
 	 * assigns {@code car} and {@code bike} only, and anything that removes car from a link
 	 * (the cleaners, most of all) does not touch the others. Rather than patch each cause,
@@ -155,9 +155,9 @@ final class BicycleNetworkOps {
 	 * say — loses its last mode here and is removed along with its orphaned nodes, because
 	 * nothing cleans afterwards.
 	 *
-	 * <p>Which modes to mirror is deliberately not hardcoded: Berlin v7.0 uses
-	 * {@code freight}, while Dresden v1.1 drops {@code truck} and adds
-	 * {@code longDistanceFreight} instead.
+	 * <p>Which modes to mirror is deliberately not hardcoded: scenarios disagree on the
+	 * names — some carry {@code freight}, others drop {@code truck} or add a
+	 * long-distance freight mode of their own.
 	 *
 	 * @return the number of links whose mode set was changed
 	 */

@@ -86,10 +86,10 @@ public final class BicycleUtils {
 	//
 	// They record STRUCTURE, not scoring policy: a split link pair exists wherever the
 	// infrastructure was centerline-tagged, including physically separated tracks. Whether
-	// motorized interaction between the pair is counted, scored, or ignored is decided
-	// downstream (BicycleScoreEventsCreator), typically per BICYCLE_INFRA category of the
-	// bike link - which is also what allows counting the interactions an infrastructure
-	// *avoided*. Build lookup maps from these attributes; do not parse link id suffixes.
+	// motorized interaction between the pair is counted, scored, or ignored is left to the
+	// consumer, which can decide it per BICYCLE_INFRA category of the bike link - what
+	// allows counting the interactions an infrastructure *avoided*. Build lookup maps from
+	// these attributes; do not parse link id suffixes.
 
 	/** On a split-off bike link: the id of the car link it runs parallel to. */
 	public static final String CAR_LINK = "car_link";

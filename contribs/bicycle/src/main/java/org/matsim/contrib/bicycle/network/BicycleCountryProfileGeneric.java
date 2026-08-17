@@ -56,10 +56,8 @@ public final class BicycleCountryProfileGeneric extends BicycleCountryProfile {
 
 	@Override
 	public boolean isRightHandTraffic() {
-		// Most of the world drives on the right. Left-hand traffic countries
-		// (UK, IE, MT, CY, AU, NZ, JP, …) would need their own profile anyway
-		// because the classifier still hard-codes a number of right-hand
-		// assumptions beyond this flag — see the TODO in BicycleInfraClassifier.
+		// Left-hand-traffic countries need their own profile anyway — the classifier
+		// hard-codes right-hand assumptions beyond this flag (see its TODO).
 		return true;
 	}
 

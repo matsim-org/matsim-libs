@@ -89,14 +89,11 @@ import static org.matsim.contrib.bicycle.network.BicycleOsmTags.YES;
  * {@code network.osm} netconvert consumed.
  *
  * <p><b>Why all three.</b> A MATSim link carries the SUMO edge id verbatim, and the
- * SUMO edge knows the OSM way id(s) it was built from. That chain is what lets the
- * classifier see the original way tags. Reading the tags netconvert exported as edge
- * params instead would be cheaper but wrong on merged edges: netconvert ignores OSM
- * tags when deciding whether to join two edges, so a way tagged
- * {@code cycleway=lane} merged with an untagged one yields a single edge tagged
- * {@code cycleway=lane} over twice the length, with nothing to indicate that half of
- * it is a plain road. The {@code sumo.net.xml} also supplies the edge polyline, which
- * is what the elevation metrics are sampled along.
+ * SUMO edge knows the OSM way id(s) it was built from — that chain lets the
+ * classifier see the original way tags instead of what survived netconvert's
+ * tag-blind edge merging (see {@link OsmWayTags} and the package README). The
+ * {@code sumo.net.xml} also supplies the edge polyline the elevation metrics are
+ * sampled along.
  *
  * <p><b>What it does not do.</b> It never splits links, and it never merges across
  * differing infrastructure. Whether consecutive links of differing infrastructure end
@@ -491,9 +488,9 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			stats.mergedBySimplify = simplifyAndTrack(network, sumo, carry);
 
 			// Merging can strand a stub: where a chain's interior node was a mode's only
-			// tie to the rest of the network, the merged link hangs off nothing. Measured
-			// on the NNK sample: 0 stranded links before the merge, 9 after (0.2 km).
-			// Still ahead of the elevation, so no samples are spent on links about to go.
+			// tie to the rest of the network, the merged link hangs off nothing. Rare, but
+			// only the merge creates them, so this has to run after it -- and still ahead
+			// of the elevation, so no samples are spent on links about to go.
 			int before = network.getLinks().size();
 			cleanAllModes(network);
 			stats.strandedBySimplify = before - network.getLinks().size();
@@ -727,14 +724,12 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	/**
 	 * The access rules, ported from {@link BicycleLinkPolicy}.
 	 *
-	 * <p>netconvert covers some of these itself, but not reliably. On a synthetic test it
-	 * dropped {@code access=no} on a residential road and removed a footway without bike
-	 * permission — yet on a real Leipzig extract 68 links with {@code access=no} and no
-	 * bicycle override survived (mostly {@code highway=service}), as did 47 footways and
-	 * 10 links tagged {@code bicycle=no} that kept their bike mode. Applying the rules
-	 * unconditionally is idempotent where netconvert already did the work, and closes the
-	 * gap where it did not — which is why the counters below report what this command
-	 * actually removed rather than second-guessing netconvert.
+	 * <p>netconvert covers some of these itself, but not reliably: on real extracts links
+	 * with {@code access=no} and no bicycle override survive (mostly {@code highway=service}),
+	 * as do footways without bike permission and {@code bicycle=no} links that kept their
+	 * bike mode. Applying the rules unconditionally is idempotent where netconvert already
+	 * did the work, and closes the gap where it did not — which is why the counters below
+	 * report what this command actually removed rather than second-guessing netconvert.
 	 *
 	 * <p>"Drop" empties the modes and zeroes the capacity; {@code cleanNetwork} prunes
 	 * the link afterwards. On a merged link a single offending way is enough — half a
@@ -785,15 +780,10 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	}
 
 	/**
-	 * Whether every way behind the link is one of the {@code --drop-ways-without-infra}
-	 * minor types, the link classified as {@code NONE}, and no way carries a
-	 * bicycle-specific permission.
-	 *
-	 * <p>The classification check spares a signposted cycle route running over a
-	 * {@code highway=track} — traffic sign DE:237 or a shared foot/cycleway classifies it,
-	 * so it is never {@code NONE}. The {@code bicycle=yes/designated} check spares the
-	 * rest: plain tracks that OSM marks as open to bikes, which the classifier alone
-	 * leaves at {@code NONE} (measured on Dresden: 4 606 track links, 815 km).
+	 * Merged-link variant of {@link BicycleLinkPolicy}'s minor-way rule: here EVERY way
+	 * behind the link must be one of the {@code --drop-ways-without-infra} types, the
+	 * link must have classified as {@code NONE}, and no way may carry a bicycle-specific
+	 * permission. The policy's javadoc explains why the two guard conditions exist.
 	 */
 	private static boolean isMinorWayWithoutInfra(List<Map<String, String>> ways,
 												  BicycleInfraCategory infra, Params params) {
@@ -985,8 +975,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	}
 
 	/**
-	 * Per-run counters. Everything that could quietly go wrong gets a number here rather
-	 * than a log line nobody reads.
+	 * Per-run counters. Everything that could quietly go wrong gets a number here.
 	 */
 	static final class Stats {
 
