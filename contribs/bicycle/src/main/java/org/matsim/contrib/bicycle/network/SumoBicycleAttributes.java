@@ -35,6 +35,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine.Command;
@@ -206,7 +207,7 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 		OsmWayTags wayTags = OsmWayTags.read(osmFile, keys);
 
-		String networkCRS = org.matsim.core.scenario.ProjectionUtils.getCRS(network);
+		String networkCRS = ProjectionUtils.getCRS(network);
 		ElevationDataParser elevationParser = null;
 		if (demOptions.isSet()) {
 			if (networkCRS == null) {
@@ -1061,5 +1062,3 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		}
 	}
 }
-
-
