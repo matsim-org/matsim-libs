@@ -109,6 +109,8 @@ public class BicycleUtilsTest {
 		link.getAttributes().putAttribute("max_gradient", 0.08);
 		link.getAttributes().putAttribute("elevation_gain", 5.0);
 		link.getAttributes().putAttribute("elevation_loss", 2.0);
+		link.getAttributes().putAttribute("car_link", "ab");
+		link.getAttributes().putAttribute("bike_link", "ab_bike");
 
 		assertEquals("NONE", BicycleUtils.getBicycleInfra(link));
 		assertEquals(110.0, BicycleUtils.getAverageElevation(link));
@@ -116,6 +118,8 @@ public class BicycleUtilsTest {
 		assertEquals(0.08, BicycleUtils.getMaxGradient(link));
 		assertEquals(5.0, BicycleUtils.getElevationGain(link));
 		assertEquals(2.0, BicycleUtils.getElevationLoss(link));
+		assertEquals("ab", BicycleUtils.getCarLink(link));
+		assertEquals("ab_bike", BicycleUtils.getBikeLink(link));
 	}
 
 	@Test

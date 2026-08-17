@@ -92,10 +92,10 @@ public final class BicycleUtils {
 	// *avoided*. Build lookup maps from these attributes; do not parse link id suffixes.
 
 	/** On a split-off bike link: the id of the car link it runs parallel to. */
-	public static final String CAR_LINK = "carLink";
+	public static final String CAR_LINK = "car_link";
 
 	/** On a split car link: the id of the parallel bike-only link that was split off it. */
-	public static final String BIKE_LINK = "bikeLink";
+	public static final String BIKE_LINK = "bike_link";
 
 	private BicycleUtils() {
 		// Don't allow to create instances of this class

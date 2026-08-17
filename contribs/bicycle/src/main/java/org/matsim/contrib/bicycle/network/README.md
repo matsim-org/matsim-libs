@@ -270,7 +270,7 @@ speed: `BicycleLinkSpeedCalculator` takes the minimum of the cyclist's own speed
 **Structure, not policy.** Splitting is a different question from scoring motorized interaction, and the
 network deliberately encodes only the first. Every qualifying link is split the same way — including
 physically protected lanes and centerline-tagged tracks — and no attribute prescribes whether interaction
-applies. The pair is tied together by `carLink` / `bikeLink` (see the attribute table below); the `_bike`
+applies. The pair is tied together by `car_link` / `bike_link` (see the attribute table below); the `_bike`
 suffix is a readable convention, not an interface, so consumers build their maps from the attributes and never
 parse ids. Downstream, `BicycleScoreEventsCreator` decides per `bicycle_infra` category of the bike link what
 to count and what to score — which is also what makes it possible to count the car encounters an
@@ -314,8 +314,8 @@ defined in `BicycleUtils` (with typed getters) and are snake_case throughout —
 | `osm:cycleway`     | string | Raw OSM `cycleway=…` value, if present                                                 |
 | `type`             | string | Raw OSM `highway=…` value (e.g. `service`) — not yet `osm:`-prefixed                   |
 | `origid`           | string | *(Supersonic path)* Original OSM way ID(s); hyphen-separated when multiple links were merged. On the SUMO path the way ids live in the `sumo.net.xml` instead. |
-| `carLink`          | string | *(after `bicycle-split-links`)* On a split-off bike link: the id of the car link it runs parallel to |
-| `bikeLink`         | string | *(after `bicycle-split-links`)* On a split car link: the id of the bike link split off it |
+| `car_link`         | string | *(after `bicycle-split-links`)* On a split-off bike link: the id of the car link it runs parallel to |
+| `bike_link`        | string | *(after `bicycle-split-links`)* On a split car link: the id of the bike link split off it |
 
 Both paths write exactly these four OSM tags (`BicycleOsmTags.KEPT_ON_LINKS`) — on a merged link, only values
 all constituent ways agree on. The classifier consults a few dozen tags, but its verdict is already on the link as
@@ -364,7 +364,7 @@ until you populate it).
 - `LinkElevationProfile` — samples along a link, applies Douglas-Peucker smoothing, computes metrics
 - `ServiceLinkCleaner` — removes service-link components that don't connect anything useful
 - `SplitBikeLinks` — the `bicycle-split-links` command, and the split both pipelines run by default; ties each
-  pair together via the `carLink`/`bikeLink` attributes
+  pair together via the `car_link`/`bike_link` attributes
 - `BicycleNetworkOps` — internal: the link operations both pipelines share — elevation stamping, the
   motorised-mode mirroring, the mode rename, the infra distribution table; the attribute keys
   live in `BicycleUtils`, next to the getters scoring reads them with

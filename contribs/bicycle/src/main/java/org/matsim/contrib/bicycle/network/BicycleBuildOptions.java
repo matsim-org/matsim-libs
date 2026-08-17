@@ -80,7 +80,7 @@ final class BicycleBuildOptions {
 			+ "infrastructure is tagged on the road way itself (a lane, or a track mapped on "
 			+ "the centerline), so bikes stop queueing behind cars. On by default - use "
 			+ "--no-split-bike-links for a network with the old single-link structure. The "
-			+ "pair is tied together by the carLink/bikeLink attributes; see bicycle-split-links.")
+			+ "pair is tied together by the car_link/bike_link attributes; see bicycle-split-links.")
 	private boolean splitBikeLinks;
 
 	@Option(names = "--ele-sample-step", defaultValue = DEFAULT_ELE_SAMPLE_STEP,
