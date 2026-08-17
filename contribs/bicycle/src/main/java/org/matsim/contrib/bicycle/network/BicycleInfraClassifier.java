@@ -203,11 +203,11 @@ public final class BicycleInfraClassifier {
 		if (HW_CYCLEWAY.equals(highway) && CW_CROSSING.equals(getValueByKey(tags, CYCLEWAY))) return true;
 
 		// highway=path + path=crossing + bicycle=yes/designated
-		if (HW_PATH.equals(highway) && CW_CROSSING.equals(getValueByKey(tags, "path"))
+		if (HW_PATH.equals(highway) && CW_CROSSING.equals(getValueByKey(tags, PATH))
 			&& isAnyOf(bicycle, YES, DESIGNATED)) return true;
 
 		// highway=footway + footway=crossing + bicycle=yes/designated
-		if (HW_FOOTWAY.equals(highway) && CW_CROSSING.equals(getValueByKey(tags, "footway"))
+		if (HW_FOOTWAY.equals(highway) && CW_CROSSING.equals(getValueByKey(tags, FOOTWAY))
 			&& isAnyOf(bicycle, YES, DESIGNATED)) return true;
 
 		return false;
@@ -232,7 +232,7 @@ public final class BicycleInfraClassifier {
 			if (profile.isSharedBusLaneBusWithBikeSign(trafficSign)) {
 				return BicycleInfraCategory.SHARED_BUS_LANE_BUS_WITH_BIKE;
 			}
-			if (CW_SHARE_BUSWAY.equals(getValueByKey(tags, "lane"))) {
+			if (CW_SHARE_BUSWAY.equals(getValueByKey(tags, LANE))) {
 				return BicycleInfraCategory.SHARED_BUS_LANE_BIKE_WITH_BUS;
 			}
 			if (profile.isSharedBusLaneBikeWithBusSign(trafficSign)) {
@@ -553,7 +553,7 @@ public final class BicycleInfraClassifier {
 		if (HW_PATH.equals(highway) && DESIGNATED.equals(bicycle)) {
 
 			// exclude MTB-ish
-			if (!isEmpty(getValueByKey(tags, MTB_SCALE)) || YES.equals(getValueByKey(tags, "mtb"))) return false;
+			if (!isEmpty(getValueByKey(tags, MTB_SCALE)) || YES.equals(getValueByKey(tags, MTB))) return false;
 
 			String surface = getValueByKey(tags, SURFACE);
 			if (isAnyOf(surface, "ground", "dirt", "fine_gravel", "gravel", "pebblestone", "earth")) return false;

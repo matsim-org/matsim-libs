@@ -493,6 +493,45 @@ public class BicycleInfraClassifierTest {
 
 
 	// =========================================================================
+	// classificationKeys() completeness (SUMO path)
+	// =========================================================================
+
+	/**
+	 * The SUMO path hands the classifier only the tags whitelisted in
+	 * {@link BicycleOsmTags#classificationKeys()} ({@code OsmWayTags} discards
+	 * everything else while parsing) — a key the classifier reads but the
+	 * whitelist misses makes the two build paths classify the same way
+	 * differently, silently. Each case below hinges on one of the keys that
+	 * used to be missing (path, footway, lane, mtb): the verdict must be the
+	 * expected one on the full tag map AND on the map filtered like the SUMO
+	 * path filters it.
+	 */
+	@Test
+	void classificationKeys_coverEveryKeyTheRulesRead() {
+		assertSameVerdictWhenFiltered(CROSSING, tags(
+			"highway", "path", "path", "crossing", "bicycle", "yes"));
+		assertSameVerdictWhenFiltered(CROSSING, tags(
+			"highway", "footway", "footway", "crossing", "bicycle", "yes"));
+		assertSameVerdictWhenFiltered(SHARED_BUS_LANE_BIKE_WITH_BUS, tags(
+			"highway", "cycleway", "lane", "share_busway"));
+		// mtb=yes flips path+designated from NEEDS_CLARIFICATION to NONE, so the
+		// key must survive the filter for both paths to agree.
+		assertSameVerdictWhenFiltered(NONE, tags(
+			"highway", "path", "bicycle", "designated", "mtb", "yes"));
+	}
+
+	private void assertSameVerdictWhenFiltered(BicycleInfraCategory expected, Map<String, String> tags) {
+		Map<String, String> filtered = new HashMap<>(tags);
+		filtered.keySet().retainAll(BicycleOsmTags.classificationKeys());
+		assertEquals(expected, classifier.classify(tags, OsmWayDirection.FORWARD),
+			"full tag map " + tags);
+		assertEquals(expected, classifier.classify(filtered, OsmWayDirection.FORWARD),
+			"tag map filtered by classificationKeys() — a key the classifier reads is "
+				+ "missing from the whitelist; was " + tags + ", filtered to " + filtered);
+	}
+
+
+	// =========================================================================
 	// helpers
 	// =========================================================================
 

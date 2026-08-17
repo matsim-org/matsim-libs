@@ -166,6 +166,18 @@ public final class BicycleOsmTags {
 	public static final String TRAFFIC_MODE_RIGHT = "traffic_mode:right";
 
 	// ------------------------------------------------------------------------
+	// Refinement keys — spelled like some HW_*/CW_* *values* above, but these
+	// are tag keys: path=crossing / footway=crossing refine the highway type,
+	// lane=share_busway marks the bus-lane variant on a cycleway, mtb=yes a
+	// mountain-bike route.
+	// ------------------------------------------------------------------------
+
+	public static final String PATH = "path";
+	public static final String FOOTWAY = "footway";
+	public static final String LANE = "lane";
+	public static final String MTB = "mtb";
+
+	// ------------------------------------------------------------------------
 	// Misc
 	// ------------------------------------------------------------------------
 
@@ -209,10 +221,9 @@ public final class BicycleOsmTags {
 	 * {@code CW_*} and access constants above are tag <em>values</em> and have no
 	 * business here.
 	 *
-	 * <p>Two consumers read this: {@link OsmWayTags}, which keeps only these keys when
-	 * parsing an OSM file, and the {@code osm.extra-attributes} list handed to
-	 * netconvert. Adding a key to the classifier without adding it here means the
-	 * classifier will never see it.
+	 * <p>{@link OsmWayTags} keeps only these keys when parsing an OSM file, so on
+	 * the SUMO path the classifier never sees any other tag: reading a new key in
+	 * the classifier without adding it here silently disables that rule there.
 	 *
 	 * <p>These are what the classifier <em>reads</em>; what survives onto the finished
 	 * links is {@link #KEPT_ON_LINKS}.
@@ -220,6 +231,7 @@ public final class BicycleOsmTags {
 	public static Set<String> classificationKeys() {
 		return Set.of(
 			HIGHWAY, BICYCLE, FOOT, VEHICLE, MOTOR_VEHICLE, ACCESS, ONEWAY, ONEWAY_BICYCLE,
+			PATH, FOOTWAY, LANE, MTB,
 			CYCLEWAY, CYCLEWAY_RIGHT, CYCLEWAY_LEFT, CYCLEWAY_BOTH,
 			CYCLEWAY_LANE, CYCLEWAY_RIGHT_LANE, CYCLEWAY_LEFT_LANE, CYCLEWAY_BOTH_LANE,
 			CYCLEWAY_RIGHT_ONEWAY, CYCLEWAY_LEFT_ONEWAY, CYCLEWAY_LANES, BICYCLE_LANES,

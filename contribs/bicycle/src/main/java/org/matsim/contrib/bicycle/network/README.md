@@ -75,7 +75,7 @@ $(sc) prepare bicycle-attributes \
 | `--ele-sample-step` | `20.0` | distance between elevation samples along a link, in m |
 | `--ele-noise-tolerance` | `3.0` | Douglas-Peucker vertical tolerance, in m |
 | `--simplify` | off | merge consecutive links that agree on the bicycle attributes (and on modes, lanes, freespeed and capacity), with the Supersonic pipeline's rules — see below |
-| `--osm-tags` | `MINIMAL` | which raw OSM tags survive onto the links: the four anything downstream reads, or `ALL` the 38 classification tags for inspection |
+| `--osm-tags` | `MINIMAL` | which raw OSM tags survive onto the links: the four anything downstream reads, or `ALL` classification tags for inspection |
 | `--mirror-car-modes` | — | modes given exactly the links that allow car, e.g. `ride,truck,freight` — see below |
 | `--split-bike-links` | **on** | split parallel bike links off centerline-tagged infrastructure; `--no-split-bike-links` for the single-link structure — see `bicycle-split-links` |
 
@@ -318,7 +318,7 @@ defined in `BicycleUtils` (with typed getters) and are snake_case throughout —
 | `bikeLink`         | string | *(after `bicycle-split-links`)* On a split car link: the id of the bike link split off it |
 
 Both paths write exactly these four OSM tags (`BicycleOsmTags.KEPT_ON_LINKS`) — on a merged link, only values
-all constituent ways agree on. The classifier consults 38 tags, but its verdict is already on the link as
+all constituent ways agree on. The classifier consults a few dozen tags, but its verdict is already on the link as
 `bicycle_infra`; `--osm-tags ALL` keeps the rest anyway, for working out why a link was classified as it was.
 
 Scoring reads these through `BicycleUtils`: `getSurface()` and `getCyclewaytype()` check the plain key
