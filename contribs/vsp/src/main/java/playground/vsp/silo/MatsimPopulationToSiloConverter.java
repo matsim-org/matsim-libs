@@ -13,11 +13,14 @@ import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
-import java.util.List;
 import java.util.Random;
 
+// todo: read in zonal system and add to correct zone
 
 public class MatsimPopulationToSiloConverter {
+
+	static final String outputFolder = "/Users/jakob/git/silo/useCases/berlinBrandenburg/scenario/microdata/";
+
 
 	static final IntColumn id = IntColumn.create("id");
 	static final IntColumn hhid = IntColumn.create("hhid");
@@ -42,12 +45,7 @@ public class MatsimPopulationToSiloConverter {
 
 	static final StringColumn dd_type = StringColumn.create("type");
 
-
-
-
-
 	static final Random rnd = new Random(42);
-
 
 
 	public static void main(String[] args) {
@@ -68,6 +66,8 @@ public class MatsimPopulationToSiloConverter {
 
 		Int2ObjectMap<Id<Person>> siloToMatsimIdMap = new Int2ObjectAVLTreeMap<>();
 		int personIdCounter = 0;
+
+		//for each person
 		for(Person person : scenario.getPopulation().getPersons().values()){
 
 			if(person.getAttributes().getAttribute("subpopulation") == null || !person.getAttributes().getAttribute("subpopulation").equals("person")){
@@ -116,7 +116,7 @@ public class MatsimPopulationToSiloConverter {
 		}
 
 		// Build the pp table
-		String ppPath = "output/silo/pp_2011.csv";
+		String ppPath = outputFolder + "pp_2011.csv";
 		Table tablePp = Table.create("pp")
 			.addColumns(id, hhid, age, gender, relationShip, race, occupation,
 				driversLicense, workplace, income, nationality,
@@ -125,18 +125,33 @@ public class MatsimPopulationToSiloConverter {
 		tablePp.write().csv(ppPath);
 
 		// Build hh table
-		String hhPath = "output/silo/hh_2011.csv";
+		String hhPath = outputFolder + "hh_2011.csv";
 		Table tableHh = Table.create("hh")
 			.addColumns(id, id.copy().setName("dwelling"), homeZone.copy().setName("zone"), ones.copy().setName("hhSize"), ones.copy().setName("autos"));
 
 		tableHh.write().csv(hhPath);
 
 		// Build dd table
-		String ddPath = "output/silo/dd_2011.csv";
+		String ddPath = outputFolder + "dd_2011.csv";
 		Table tableDd = Table.create("dd")
 			.addColumns(id, homeZone.copy().setName("zone"), dd_type, id.copy().setName("hhID"), ones.copy().setName("bedrooms"), ones.copy().setName("quality"), ones.copy().multiply(500).asIntColumn().setName("monthlyCost"), ones.copy().multiply(1995).asIntColumn().setName("yearBuilt"), coordX, coordY);
 
 		tableDd.write().csv(ddPath);
+
+
+		// build siloId2MatsimId Table
+		String idKeyPath = outputFolder + "matsimToSiloIdsKey.csv";
+		IntColumn siloId = IntColumn.create("map_key");
+		StringColumn matsimId = StringColumn.create("person_id");
+
+		siloToMatsimIdMap.forEach((key, id) -> {
+			siloId.append(key);
+			matsimId.append(String.valueOf(id));
+		});
+
+		Table.create("persons", siloId, matsimId)
+			.write()
+			.csv(idKeyPath);
 	}
 
 	private static int getEducationLevel() {
