@@ -19,7 +19,7 @@ import java.util.Random;
 
 public class MatsimPopulationToSiloConverter {
 
-	static final String outputFolder = "/Users/jakob/git/silo/useCases/berlinBrandenburg/scenario/microdata/";
+	static final String outputFolder = "../silo/useCases/berlinBrandenburg/scenario/microdata/";
 
 
 	static final IntColumn id = IntColumn.create("id");
