@@ -419,7 +419,7 @@ class AgentWiseComparisonKNUtils{
 	static void writeAscTable( Config config ){
 		Table summaryTable = Table.create( DoubleColumn.create( "ASC" ), StringColumn.create( "mode" ));
 
-		for( ScoringConfigGroup.ModeParams modeParams : config.scoring().getModes().values() ){
+		for( ScoringConfigGroup.ModeParams modeParams : config.scoring().getDefaultModeParams().values() ){
 			summaryTable.doubleColumn( "ASC" ).append( modeParams.getConstant() );
 			summaryTable.stringColumn( "mode" ).append( modeParams.getMode() ) ;
 		}
@@ -452,7 +452,7 @@ class AgentWiseComparisonKNUtils{
 		final double avIncome = sumIncome / incomeCnt;
 		for( Person person : basePopulation.getPersons().values() ){
 			String subPop = PopulationUtils.getSubpopulation( person );
-			final double marginalUtilityOfMoney = scenario.getConfig().scoring().getScoringParameters( subPop ).getMarginalUtilityOfMoney();
+			final double marginalUtilityOfMoney = scenario.getConfig().scoring().getScoringParametersOrDefault( subPop ).getMarginalUtilityOfMoney();
 			Double income = PersonUtils.getIncome( person );
 			// this should consider the subpop!!
 			if ( income != null ) {
@@ -615,10 +615,10 @@ class AgentWiseComparisonKNUtils{
 		config.controller().setOutputDirectory( "output/dummyOutputFromAgentWiseComparisonKN" );
 		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
-//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
-//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
-//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
-//		config.scoring().addActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addDefaultActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addDefaultActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addDefaultActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
+//		config.scoring().addDefaultActivityParams( new ScoringConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
 		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the reduced config specifies them in an incomplete
 		// way, but I am not sure if that is the problem. --> that probably is indeed the problem.  In general, they are created automatically,
 		// but if they already exist in some other way (i.e., in this case coming from the reduced config), then those are not over-written.

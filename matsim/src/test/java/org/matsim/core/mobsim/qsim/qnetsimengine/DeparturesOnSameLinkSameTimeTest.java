@@ -156,7 +156,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 			config.routing().setNetworkModes(Arrays.asList(travelMode));
 			config.travelTimeCalculator().setAnalyzedModesAsString(travelMode );
 			config.travelTimeCalculator().setSeparateModes(true);
-			config.scoring().getOrCreateModeParams(travelMode);
+			config.scoring().getOrCreateDefaultModeParams(travelMode);
 
 			network = this.scenario.getNetwork();
 			population = this.scenario.getPopulation();

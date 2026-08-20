@@ -74,12 +74,12 @@ public class RunTeleportationBikesharing {
 		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
 
 		// We need to add interaction activity types to scoring
-		config.scoring().addActivityParams( new ActivityParams(SharingUtils.PICKUP_ACTIVITY).setScoringThisActivityAtAll(false ) );
-		config.scoring().addActivityParams( new ActivityParams(SharingUtils.DROPOFF_ACTIVITY).setScoringThisActivityAtAll(false ) );
-		config.scoring().addActivityParams( new ActivityParams(SharingUtils.BOOKING_ACTIVITY).setScoringThisActivityAtAll(false ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams(SharingUtils.PICKUP_ACTIVITY).setScoringThisActivityAtAll(false ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams(SharingUtils.DROPOFF_ACTIVITY).setScoringThisActivityAtAll(false ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams(SharingUtils.BOOKING_ACTIVITY).setScoringThisActivityAtAll(false ) );
 
 		// We need to score bike
-		config.scoring().addModeParams( new ModeParams("bike") );
+		config.scoring().addDefaultModeParams( new ModeParams("bike") );
 
 		// Write out all events (DEBUG)
 		config.controller().setWriteEventsInterval(1);

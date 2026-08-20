@@ -79,27 +79,27 @@ public class TestScenario extends MATSimApplication {
 			for (String act : List.of("home", "restaurant", "other", "visit", "errands", "accomp_other", "accomp_children",
 					"educ_higher", "educ_secondary", "educ_primary", "educ_tertiary", "educ_kiga", "educ_other")) {
 				config.scoring()
-						.addActivityParams(new ScoringConfigGroup.ActivityParams(act + "_" + ii).setTypicalDuration(ii));
+						.addDefaultActivityParams(new ScoringConfigGroup.ActivityParams(act + "_" + ii).setTypicalDuration(ii));
 			}
 
-			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work_" + ii).setTypicalDuration(ii)
+			config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work_" + ii).setTypicalDuration(ii)
 					.setOpeningTime(6. * 3600.).setClosingTime(20. * 3600.));
-			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("business_" + ii).setTypicalDuration(ii)
+			config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("business_" + ii).setTypicalDuration(ii)
 					.setOpeningTime(6. * 3600.).setClosingTime(20. * 3600.));
-			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("leisure_" + ii).setTypicalDuration(ii)
+			config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("leisure_" + ii).setTypicalDuration(ii)
 					.setOpeningTime(9. * 3600.).setClosingTime(27. * 3600.));
 
-			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("shop_daily_" + ii).setTypicalDuration(ii)
+			config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("shop_daily_" + ii).setTypicalDuration(ii)
 					.setOpeningTime(8. * 3600.).setClosingTime(20. * 3600.));
-			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("shop_other_" + ii).setTypicalDuration(ii)
+			config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("shop_other_" + ii).setTypicalDuration(ii)
 					.setOpeningTime(8. * 3600.).setClosingTime(20. * 3600.));
 		}
 
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("car interaction").setTypicalDuration(60));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("car interaction").setTypicalDuration(60));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
 
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
 
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 		imc.setModes(Set.of("car", "ride", "bike", "walk", "pt"));

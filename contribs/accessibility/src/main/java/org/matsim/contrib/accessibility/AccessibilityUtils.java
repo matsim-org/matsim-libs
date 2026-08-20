@@ -77,8 +77,8 @@ public class AccessibilityUtils {
 			double distance_m = NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
 
 			// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-			double walkBetaTT_utils_h = config.scoring().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
-					- config.scoring().getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
+			double walkBetaTT_utils_h = config.scoring().getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling()
+					- config.scoring().getDefaultPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
 			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / walkSpeed_m_h);
 
 			double expVjk = Math.exp(config.scoring().getBrainExpBeta() * VjkWalkTravelTime);
@@ -137,7 +137,7 @@ public class AccessibilityUtils {
 			modeSet.add(mode);
 		}
 		filter.filter(subNetwork, modeSet);
-		if (subNetwork.getNodes().size() == 0) {throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");}
+		if (subNetwork.getNodes().isEmpty()) {throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");}
 		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
 		return subNetwork;
 	}
@@ -146,9 +146,9 @@ public class AccessibilityUtils {
 	public static double getModeSpecificConstantForAccessibilities(String mode, ScoringConfigGroup scoringConfigGroup) {
 		double modeSpecificConstant;
 		if (mode.equals(Modes4Accessibility.freespeed.name())) {
-			modeSpecificConstant = scoringConfigGroup.getModes().get(TransportMode.car).getConstant();
+			modeSpecificConstant = scoringConfigGroup.getDefaultModeParams().get(TransportMode.car).getConstant();
 		} else {
-			modeSpecificConstant = scoringConfigGroup.getModes().get(mode).getConstant();
+			modeSpecificConstant = scoringConfigGroup.getDefaultModeParams().get(mode).getConstant();
 		}
 		return modeSpecificConstant;
 	}

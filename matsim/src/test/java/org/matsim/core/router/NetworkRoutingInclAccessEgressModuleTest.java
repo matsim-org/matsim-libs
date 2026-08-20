@@ -111,11 +111,11 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         final ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("home");
         homeParams.setTypicalDuration(1);
-        config.scoring().addActivityParams(homeParams);
+        config.scoring().addDefaultActivityParams(homeParams);
 
         final ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work");
         workParams.setTypicalDuration(1);
-        config.scoring().addActivityParams(workParams);
+        config.scoring().addDefaultActivityParams(workParams);
 
         ReplanningConfigGroup.StrategySettings replanning = new ReplanningConfigGroup.StrategySettings();
         replanning.setStrategyName("ReRoute");
@@ -194,11 +194,11 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         ScoringConfigGroup.ModeParams slowParams = new ScoringConfigGroup.ModeParams(SLOW_MODE);
         slowParams.setMarginalUtilityOfTraveling(-1);
-        scoring.addModeParams(slowParams);
+        scoring.addDefaultModeParams(slowParams);
 
         ScoringConfigGroup.ModeParams fastParams = new ScoringConfigGroup.ModeParams(FAST_MODE);
         fastParams.setMarginalUtilityOfTraveling(-1);
-        scoring.addModeParams(fastParams);
+        scoring.addDefaultModeParams(fastParams);
 
         Scenario scenario = createScenario(config);
 

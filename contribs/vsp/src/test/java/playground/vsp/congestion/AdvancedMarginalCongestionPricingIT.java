@@ -83,15 +83,15 @@ public class AdvancedMarginalCongestionPricingIT {
 		activityParams.setOpeningTime(7 * 3600.);
 		activityParams.setClosingTime(18 * 3600.);
 
-		plansCalcScoreConfigGroup.addActivityParams(activityParams);
-		plansCalcScoreConfigGroup.setEarlyDeparture_utils_hr(0.);
-		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
-		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
-		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
+		plansCalcScoreConfigGroup.addDefaultActivityParams(activityParams);
+		plansCalcScoreConfigGroup.setDefaultEarlyDeparture_utils_hr(0.);
+		plansCalcScoreConfigGroup.setDefaultLateArrival_utils_hr(0.);
+		plansCalcScoreConfigGroup.setDefaultMarginalUtlOfWaiting_utils_hr(0.);
+		plansCalcScoreConfigGroup.setDefaultPerforming_utils_hr(6.);
 
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
 
-		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
+		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParametersOrDefault(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 
@@ -142,19 +142,19 @@ public class AdvancedMarginalCongestionPricingIT {
 	@Test
 	final void test0b(){
 
-		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
 		ActivityParams activityParams = new ActivityParams("overnightActivity");
 		activityParams.setTypicalDuration(12 * 3600.);
 
-		plansCalcScoreConfigGroup.addActivityParams(activityParams);
-		plansCalcScoreConfigGroup.setEarlyDeparture_utils_hr(0.);
-		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
-		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
-		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
+		scoringConfigGroup.addDefaultActivityParams(activityParams);
+		scoringConfigGroup.setDefaultEarlyDeparture_utils_hr(0.);
+		scoringConfigGroup.setDefaultLateArrival_utils_hr(0.);
+		scoringConfigGroup.setDefaultMarginalUtlOfWaiting_utils_hr(0.);
+		scoringConfigGroup.setDefaultPerforming_utils_hr(6.);
 
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
 
-		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
+		ScoringParameters params = new ScoringParameters.Builder(scoringConfigGroup, scoringConfigGroup.getScoringParametersOrDefault(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 
@@ -198,16 +198,16 @@ public class AdvancedMarginalCongestionPricingIT {
 		ActivityParams activityParams2 = new ActivityParams("lastActivityType");
 		activityParams2.setTypicalDuration(12 * 3600.);
 
-		plansCalcScoreConfigGroup.addActivityParams(activityParams1);
-		plansCalcScoreConfigGroup.addActivityParams(activityParams2);
+		plansCalcScoreConfigGroup.addDefaultActivityParams(activityParams1);
+		plansCalcScoreConfigGroup.addDefaultActivityParams(activityParams2);
 
-		plansCalcScoreConfigGroup.setEarlyDeparture_utils_hr(0.);
-		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
-		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
-		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
+		plansCalcScoreConfigGroup.setDefaultEarlyDeparture_utils_hr(0.);
+		plansCalcScoreConfigGroup.setDefaultLateArrival_utils_hr(0.);
+		plansCalcScoreConfigGroup.setDefaultMarginalUtlOfWaiting_utils_hr(0.);
+		plansCalcScoreConfigGroup.setDefaultPerforming_utils_hr(6.);
 
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
+		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParametersOrDefault(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 
@@ -303,15 +303,15 @@ public class AdvancedMarginalCongestionPricingIT {
 		Assertions.assertEquals(1, moneyEvents.size(), "Wrong number of money events.");
 
 		// test if the delay is 2 seconds
-		double delay = congestionEvents.get(0).getDelay();
+		double delay = congestionEvents.getFirst().getDelay();
 		Assertions.assertEquals(2.0, delay, MatsimTestUtils.EPSILON, "Wrong delay.");
 
-		double amountFromEvent = moneyEvents.get(0).getAmount();
-		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
+		double amountFromEvent = moneyEvents.getFirst().getAmount();
+		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getDefaultModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 		// with delay --> 70.570685898554200
 		// without delay --> 70.573360291244900
 		double activityDelayDisutility = 70.573360291244900 - 70.570685898554200;
-		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().scoring().getMarginalUtilityOfMoney();
+		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().scoring().getDefaultMarginalUtilityOfMoney();
 		Assertions.assertEquals(amount, amountFromEvent, MatsimTestUtils.EPSILON, "Wrong amount.");
 	 }
 
@@ -383,11 +383,11 @@ public class AdvancedMarginalCongestionPricingIT {
 		Assertions.assertEquals(1, moneyEvents.size(), "Wrong number of money events.");
 
 		// test if the delay is 2 seconds
-		double delay = congestionEvents.get(0).getDelay();
+		double delay = congestionEvents.getFirst().getDelay();
 		Assertions.assertEquals(2.0, delay, MatsimTestUtils.EPSILON, "Wrong delay.");
 
-		double amountFromEvent = moneyEvents.get(0).getAmount();
-		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
+		double amountFromEvent = moneyEvents.getFirst().getAmount();
+		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getDefaultModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 
 		// home duration morning: 28800.
 		// home duration evening with delay: (24 * 3600.) - 57705.
@@ -397,7 +397,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		// without delay --> 80.584243964094500
 
 		double activityDelayDisutility = 80.584243964094500 - 80.581739442040600;
-		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().scoring().getMarginalUtilityOfMoney();
+		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().scoring().getDefaultMarginalUtilityOfMoney();
 		Assertions.assertEquals(amount, amountFromEvent, MatsimTestUtils.EPSILON, "Wrong amount.");
 	 }
 

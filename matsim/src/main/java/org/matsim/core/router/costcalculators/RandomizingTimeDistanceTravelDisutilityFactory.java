@@ -67,7 +67,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 		// ).getMarginalUtilityOfMoney(); That line, or some variant of it, would need to be in the TravelDisutility directly. And I am quite unsure what is the status of
 		// the "default" subpopulation anyways ... I seem to recall that Thibaut wanted to get rid of that.  The following method at least outputs
 		// a warning.  However, we know by now that few people think about such warnings. kai, mar'20
-		final ScoringConfigGroup.ModeParams params = cnScoringGroup.getModes().get( mode ) ;
+		final ScoringConfigGroup.ModeParams params = cnScoringGroup.getDefaultModeParams().get( mode ) ;
 		if ( params == null ) {
 			throw new IllegalStateException("No scoring parameters are defined for mode '" + mode
 				+ "'. Please add a modeParams parameter set for mode '" + mode + "' to the scoring configuration.");
@@ -76,8 +76,8 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 		logWarningsIfNecessary( cnScoringGroup, params );
 
 		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
-		final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-		final double marginalCostOfDistance_m = - params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney()
+		final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getDefaultPerforming_utils_hr() / 3600.0);
+		final double marginalCostOfDistance_m = - params.getMonetaryDistanceRate() * cnScoringGroup.getDefaultMarginalUtilityOfMoney()
 				- params.getMarginalUtilityOfDistance() ;
 
 		double normalization = 1;
@@ -104,7 +104,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 			}
 
 			final Set<String> monoSubpopKeyset = Collections.singleton( null );
-			if ( !cnScoringGroup.getScoringParametersPerSubpopulation().keySet().equals( monoSubpopKeyset ) ) {
+			if ( !cnScoringGroup.getAllScoringParameterSetsPerSubpopulation().keySet().equals( monoSubpopKeyset ) ) {
 				log.warn( "Scoring parameters are defined for different subpopulations." +
 						" The routing disutility will only consider the ones of the default subpopulation.");
 				log.warn( "This warning can safely be ignored if disutility of traveling only depends on travel time.");
@@ -121,7 +121,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 				log.warn("in the xml config");
 			}
 
-			if ( (params.getMarginalUtilityOfTraveling() + cnScoringGroup.getPerforming_utils_hr())  == 0. && this.sigma != 0. ) {
+			if ( (params.getMarginalUtilityOfTraveling() + cnScoringGroup.getDefaultPerforming_utils_hr())  == 0. && this.sigma != 0. ) {
 				log.warn("There will be no routing randomness for mode={}. The randomization of the travel disutility requires the travel time cost rate "
 						+ "to be different than zero. Continuing anyway.", mode) ;
 			}

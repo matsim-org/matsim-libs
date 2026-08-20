@@ -59,7 +59,7 @@ class RunLocationChoiceFrozenEpsilonsExample{
 //		dccg.setRandomSeed( 221177 ); // is default
 		dccg.setDestinationSamplePercent( 5. );
 
-		config.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll( false ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll( false ) );
 		// (yyyy not clear why this is needed--??)
 
 		// ---

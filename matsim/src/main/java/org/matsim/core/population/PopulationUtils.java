@@ -59,6 +59,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author nagel, ikaddoura
@@ -1321,6 +1322,16 @@ public final class PopulationUtils {
 
 	public static void removeSubpopulation(Person person) {
 		person.getAttributes().removeAttribute(SUBPOPULATION_ATTRIBUTE_NAME);
+	}
+
+	/**
+	 * Returns all non-null subpopulation names used by the population.
+	 */
+	public static Set<String> getSubpopulationsOfPopulation(Population population) {
+		return population.getPersons().values().stream()
+			.map(PopulationUtils::getSubpopulation)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
 	public static Population getOrCreateAllPersons(Scenario scenario) {

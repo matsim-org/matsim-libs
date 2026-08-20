@@ -154,7 +154,6 @@ public class CarriersAnalysis {
 	}
 
 	private void createScenarioForCarriersAnalysis(String vehiclesPath, String networkPath, String carriersPath, String carriersVehicleTypesPath, String globalCrs) {
-		log.info("########## Starting Carriers Analysis ##########");
 
 		Config config = ConfigUtils.createConfig();
 		config.vehicles().setVehiclesFile(vehiclesPath);
@@ -192,6 +191,8 @@ public class CarriersAnalysis {
 	 * @param analysisType The type of the analysis
 	 */
 	public void runCarrierAnalysis(CarrierAnalysisType analysisType) {
+		log.info("########## Starting Carriers Analysis ##########");
+		log.info("Selected analysis type: {}", analysisType);
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
 		if (!folder.exists()) {
 			//noinspection ResultOfMethodCallIgnored

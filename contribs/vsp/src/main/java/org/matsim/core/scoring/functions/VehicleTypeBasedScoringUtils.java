@@ -12,7 +12,7 @@ final class VehicleTypeBasedScoringUtils {
 	static ScoringConfigGroup.ModeParams getOrCreateModeParams(ScoringConfigGroup.ScoringParameterSet scoringParameterSet, VehicleType vehicleType) {
 		synchronized (scoringParameterSet) {
 			String mode = vehicleType.getId().toString();
-			ScoringConfigGroup.ModeParams modeParams = scoringParameterSet.getModes().get(mode);
+			ScoringConfigGroup.ModeParams modeParams = scoringParameterSet.getModeParams().get(mode);
 			if (modeParams != null) {
 				return modeParams;
 			}

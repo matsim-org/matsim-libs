@@ -213,10 +213,10 @@ public final class EvDSimTestFixture {
 		// Scoring — needed to avoid config validation errors
 		ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("home");
 		homeParams.setTypicalDuration(8 * 3600);
-		config.scoring().addActivityParams(homeParams);
+		config.scoring().addDefaultActivityParams(homeParams);
 		ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work");
 		workParams.setTypicalDuration(8 * 3600);
-		config.scoring().addActivityParams(workParams);
+		config.scoring().addDefaultActivityParams(workParams);
 
 		// EV config — charger file is overridden programmatically
 		EvConfigGroup evConfig = new EvConfigGroup();
