@@ -108,12 +108,12 @@ public class DrtRoutingModuleTest {
 				scenario.getNetwork(), QuadTrees.createQuadTree(drtStops.values()));
 		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
 				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
-				new DefaultDrtRouteConstraintsCalculator(drtCfg, 
+				new DefaultDrtRouteConstraintsCalculator(drtCfg,
 						(departureTime, accessActLink, egressActLink, person, tripAttributes) -> Optional.of(defaultConstraintsSet)),
 						loadCreator, loadType);
 		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtMode, scenario.getNetwork(),
 				scenario.getPopulation().getFactory(), drtRouteCreator);
-		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder,
+		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, walkRouter, stopFinder,
 				drtMode, TimeInterpretation.create(scenario.getConfig()));
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
