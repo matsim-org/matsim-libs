@@ -32,11 +32,11 @@
 		<argLine>--add-opens=java.base/java.lang.invoke=ALL-UNNAMED</argLine>
 
 		<log4j.version>2.26.1</log4j.version>
-		<geotools.version>35.0</geotools.version>
+		<geotools.version>35.1</geotools.version>
 		<osmosis.version>0.49.2</osmosis.version>
 		<jts.version>1.20.0</jts.version>
 		<guice.version>7.0.0</guice.version>
-		<jackson.version>2.22.1</jackson.version>
+		<jackson.version>2.22.2</jackson.version>
 		<fory.version>1.6.1</fory.version>
 		<jogl.version>2.6.0</jogl.version>
 		<junit.version>6.1.3</junit.version>
@@ -135,7 +135,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>33.6.0-jre</version>
+				<version>33.7.0-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -409,14 +409,14 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.18.11</version>
+				<version>1.18.12</version>
 				<scope>test</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>io.github.classgraph</groupId>
 				<artifactId>classgraph</artifactId>
-				<version>4.8.188</version>
+				<version>4.8.192</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.fory</groupId>
