@@ -17,7 +17,6 @@ import java.util.List;
  * Dashboard for stuck agents.
  */
 public class StuckAgentDashboard implements Dashboard {
-
 	@Override
 	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
