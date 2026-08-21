@@ -26,7 +26,10 @@ package org.matsim.contrib.pseudosimulation.distributed.io;
  *
  * $Id:  1.2 2005/10/26 17:40:19 isenhour Exp $
  */
-import java.io.*;
+import java.io.EOFException;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.Inflater;
 import java.util.zip.DataFormatException;
 
