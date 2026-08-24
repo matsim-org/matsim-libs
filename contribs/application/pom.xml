@@ -255,6 +255,16 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- Avro 1.12.2+ only deserializes classes from trusted packages; whitelist the generated Avro classes -->
+					<systemPropertyVariables>
+						<org.apache.avro.SERIALIZABLE_PACKAGES>org.matsim.application.avro</org.apache.avro.SERIALIZABLE_PACKAGES>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.avro</groupId>
 				<artifactId>avro-maven-plugin</artifactId>
 				<version>${avro.version}</version>
