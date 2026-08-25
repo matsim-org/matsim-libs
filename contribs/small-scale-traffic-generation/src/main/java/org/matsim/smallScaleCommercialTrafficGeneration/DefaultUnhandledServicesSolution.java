@@ -423,7 +423,7 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 			"Carrier " + carrier.getId() + " has no subpopulation.").toString();
 		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment;
 		String modeORvehType;
-		if (subpopulation.equals(SubpopulationDefaultNames.SUBPOP_COM_PERSON)) {
+		if (subpopulation.equals(SubpopulationDefaultNames.SUBPOP_COM_PERSON) || subpopulation.equals(SubpopulationDefaultNames.SUBPOP_COM_PERSON_SERVICE)) {
 			smallScaleCommercialTrafficSegment = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.commercialPersonTraffic;
 			modeORvehType = "total";
 		} else if (subpopulation.equals(SubpopulationDefaultNames.SUBPOP_GOODS)) {
