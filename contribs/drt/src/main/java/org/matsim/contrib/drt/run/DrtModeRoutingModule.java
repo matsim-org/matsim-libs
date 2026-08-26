@@ -50,6 +50,7 @@ import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule.DefaultMainLegRouterProvider;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider;
+import org.matsim.contrib.dvrp.router.TimeDependentAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -130,25 +131,56 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 						-> Optional.of(optimizationConstraintsSet)
 		).in(Singleton.class);
 
-		switch(drtCfg.getOperationalScheme()){
-			case door2door -> bindModal( AccessEgressFacilityFinder.class ).toProvider(
-												       modalProvider( getter -> new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ) ) )
-										       .asEagerSingleton();
-			case stopbased, serviceAreaBased -> {
-				bindModal( AccessEgressFacilityFinder.class ).toProvider( modalProvider(
-						getter -> {
-							Network network = getter.get( Network.class );
-							return new ClosestAccessEgressFacilityFinder(
-									// maxWalkDistance is a property of the constraints set, and which constraints set applies
-									// is decided per trip by the ConstraintSetChooser (as in DefaultDrtRouteConstraintsCalculator)
-									maxWalkDistance( getter.getModal( ConstraintSetChooser.class ), optimizationConstraintsSet, network ),
-									optimizationConstraintsSet.getMaxWalkDistance(),
-														     network,
-														     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) );
-						} ) )
-									     .asEagerSingleton();
+		if (drtCfg.getServiceConfigurationsParams().isPresent()) {
+			bindModal(DrtServiceConfigurations.class).toProvider(modalProvider(
+					getter -> new DrtServiceConfigurations(drtCfg.getServiceConfigurationsParams().orElseThrow(),
+							getter.getModal(DrtStopNetwork.class)))).asEagerSingleton();
+
+			// the service time is enforced by the composite finder, hence the delegates stay unaware of time
+			bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(getter -> {
+				Network network = getter.get(Network.class);
+				var maxWalkDistance = maxWalkDistance(getter.getModal(ConstraintSetChooser.class),
+						optimizationConstraintsSet, network);
+				// for door2door there are no stops, so all time windows share one delegate and only the time restricts
+				var door2doorFinder = drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.door2door ?
+						new DecideOnLinkAccessEgressFacilityFinder(network) :
+						null;
+				List<TimeDependentAccessEgressFacilityFinder.TimeWindow> timeWindows = getter.getModal(
+								DrtServiceConfigurations.class)
+						.getRegimes()
+						.stream()
+						.map(regime -> new TimeDependentAccessEgressFacilityFinder.TimeWindow(
+								regime.startTime().orElse(Double.NEGATIVE_INFINITY),
+								regime.endTime().orElse(Double.POSITIVE_INFINITY),
+								door2doorFinder != null ?
+										door2doorFinder :
+										new ClosestAccessEgressFacilityFinder(maxWalkDistance,
+												optimizationConstraintsSet.getMaxWalkDistance(), network,
+												QuadTrees.createQuadTree(regime.stops()))))
+						.toList();
+				return new TimeDependentAccessEgressFacilityFinder(timeWindows);
+			})).asEagerSingleton();
+		} else {
+			switch(drtCfg.getOperationalScheme()){
+				case door2door -> bindModal( AccessEgressFacilityFinder.class ).toProvider(
+													       modalProvider( getter -> new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ) ) )
+											       .asEagerSingleton();
+				case stopbased, serviceAreaBased -> {
+					bindModal( AccessEgressFacilityFinder.class ).toProvider( modalProvider(
+							getter -> {
+								Network network = getter.get( Network.class );
+								return new ClosestAccessEgressFacilityFinder(
+										// maxWalkDistance is a property of the constraints set, and which constraints set applies
+										// is decided per trip by the ConstraintSetChooser (as in DefaultDrtRouteConstraintsCalculator)
+										maxWalkDistance( getter.getModal( ConstraintSetChooser.class ), optimizationConstraintsSet, network ),
+										optimizationConstraintsSet.getMaxWalkDistance(),
+															     network,
+															     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) );
+							} ) )
+										     .asEagerSingleton();
+				}
+				default -> throw new IllegalStateException( "Unexpected value: " + drtCfg.getOperationalScheme());
 			}
-			default -> throw new IllegalStateException( "Unexpected value: " + drtCfg.getOperationalScheme());
 		}
 
 		// this is, we think, updating the max travel time based on congested travel time and the alpha-beta thing:

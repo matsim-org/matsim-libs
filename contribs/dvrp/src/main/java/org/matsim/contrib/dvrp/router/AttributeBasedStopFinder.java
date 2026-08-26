@@ -101,7 +101,11 @@ public class AttributeBasedStopFinder implements AccessEgressFacilityFinder {
 		return new AttributeBasedStopFinder(facilityFinders);
 	}
 
-	private static Set<String> parseStopNetworks(Attributable facility) {
+	/**
+	 * @return the stop networks the given facility (or link) belongs to, i.e. the comma-separated values of its
+	 * {@value #FACILITY_STOP_NETWORKS_ATTRIBUTE} attribute, or an empty set if the attribute is not set
+	 */
+	public static Set<String> parseStopNetworks(Attributable facility) {
 		String attributeValue = (String)facility.getAttributes().getAttribute(FACILITY_STOP_NETWORKS_ATTRIBUTE);
 
 		if (attributeValue != null) {

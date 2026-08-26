@@ -23,6 +23,7 @@ package org.matsim.contrib.drt.run;
 import com.google.inject.Singleton;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
+import org.matsim.contrib.drt.passenger.DrtServiceTimeRequestValidator;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
 import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
@@ -116,7 +117,16 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 			bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
 		}
 
-		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
+		if (drtCfg.getServiceConfigurationsParams().isPresent()) {
+			// the service configuration is a hard constraint, also for requests which have not been routed in this run
+			// (prebooking, within-day replanning, input plans carrying finished DRT routes)
+			bindModal(PassengerRequestValidator.class).toProvider(modalProvider(
+					getter -> new CompositePassengerRequestValidator(new DefaultPassengerRequestValidator(),
+							new DrtServiceTimeRequestValidator(getter.getModal(DrtServiceConfigurations.class)))))
+					.asEagerSingleton();
+		} else {
+			bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
+		}
 
 		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(getter -> {
 			EventsManager eventsManager = getter.get(EventsManager.class);

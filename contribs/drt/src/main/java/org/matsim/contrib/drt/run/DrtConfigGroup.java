@@ -290,6 +290,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Nullable
 	private DrtParallelInserterParams drtParallelInserterParams;
 
+	@Nullable
+	private DrtServiceConfigurationsParams serviceConfigurationsParams;
+
 	private ZoneSystemParams analysisZoneSystemParams;
 
 	public DrtConfigGroup() {
@@ -351,6 +354,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
 			() -> drtEstimatorParams,
 			params -> drtEstimatorParams = (DrtEstimatorParams) params);
+
+		// time-dependent service configurations (optional)
+		addDefinition(DrtServiceConfigurationsParams.SET_NAME, DrtServiceConfigurationsParams::new,
+			() -> serviceConfigurationsParams,
+			params -> serviceConfigurationsParams = (DrtServiceConfigurationsParams) params);
 
 		// load
 		addDefinition(DvrpLoadParams.SET_NAME, DvrpLoadParams::new,
@@ -439,6 +447,15 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, getMode());
 		}
 
+		if (serviceConfigurationsParams != null && getOperationalScheme() == OperationalScheme.door2door) {
+			// with door2door there are no stops, so a stopNetwork would be silently ineffective
+			serviceConfigurationsParams.getServiceConfigurations()
+					.forEach(serviceConfiguration -> Verify.verify(serviceConfiguration.getStopNetwork() == null,
+							"stopNetwork of %s '%s' must not be set when operationalScheme is %s",
+							DrtServiceConfigurationParams.SET_NAME, serviceConfiguration.getServiceConfigurationName(),
+							OperationalScheme.door2door));
+		}
+
 		if (getSimulationType() == SimulationType.estimateAndTeleport) {
 			Verify.verify(drtSpeedUpParams == null, "Simulation type is estimateAndTeleport, but drtSpeedUpParams is set. " +
 				"Please remove drtSpeedUpParams from the config, as these two functionalities are not compatible.");
@@ -490,6 +507,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<DrtEstimatorParams> getDrtEstimatorParams() {
 		return Optional.ofNullable(drtEstimatorParams);
+	}
+
+	public Optional<DrtServiceConfigurationsParams> getServiceConfigurationsParams() {
+		return Optional.ofNullable(serviceConfigurationsParams);
 	}
 
 	public DvrpLoadParams addOrGetLoadParams() {
