@@ -32,7 +32,6 @@ import picocli.CommandLine;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -55,6 +54,8 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 	private final ShpOptions shp = new ShpOptions();
 	@CommandLine.Option(names = "--type", required = true, description = "Provide the dashboard type to be generated. See DashboardType enum within this class.")
 	private DashboardType dashboardType;
+	@CommandLine.Option(names = "--reference-run-directory", description = "Optional reference run for the impact analysis dashboard.")
+	private Path referenceRunDirectory;
 	@CommandLine.Parameters(arity = "1..*", description = "Path to run output directories for which the dashboards is to be generated.")
 	private List<Path> inputPaths;
 
@@ -116,11 +117,9 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 					sw.addDashboard(new PublicTransitDashboard());
 				}
 				case impactAnalysis -> {
-					HashSet<String> modes = new HashSet<>();
-					modes.add("car");
-					modes.add("freight");
-
-					sw.addDashboard(new ImpactAnalysisDashboard(modes));
+					sw.addDashboard(referenceRunDirectory == null
+						? new ImpactAnalysisDashboard()
+						: new ImpactAnalysisDashboard(referenceRunDirectory));
 				}
 				case bvwp -> {
 					sw.addDashboard(new BvwpDashboard(Set.of("car"), Set.of("freight", "truck")));
@@ -156,4 +155,3 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 	}
 
 }
-

@@ -21,7 +21,8 @@ public class DefaultDashboardProvider implements DashboardProvider {
 		List<Dashboard> result = new ArrayList<>(List.of(
 			new OverviewDashboard(Set.copyOf(config.qsim().getMainModes())),
 			new TripDashboard(),
-			new TrafficDashboard(Set.copyOf(config.qsim().getMainModes()))
+			new TrafficDashboard(Set.copyOf(config.qsim().getMainModes())),
+			new ImpactAnalysisDashboard()
 		));
 
 		if (config.transit().isUseTransit()) {
@@ -34,7 +35,6 @@ public class DefaultDashboardProvider implements DashboardProvider {
 
 		if (ConfigUtils.hasModule(config, EmissionsConfigGroup.class)) {
 			result.add(new EmissionsDashboard(config.global().getCoordinateSystem()));
-			result.add(new ImpactAnalysisDashboard(config.qsim().getMainModes()));
 		}
 
 		if (ConfigUtils.hasModule(config, NoiseConfigGroup.class)) {

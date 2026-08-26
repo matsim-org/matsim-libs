@@ -41,6 +41,10 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Sample size of the run, which may be required by certain analysis functions.")
 	private Double sampleSize = 1.0d;
 
+	@Parameter
+	@Comment("Optional path to the MATSim output directory used as base case by comparative analyses.")
+	private String baseCase = null;
+
 	public SimWrapperConfigGroup() {
 		super(NAME);
 		get("");
@@ -148,6 +152,18 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
 	public void setSampleSize(Double sampleSize) {
 		this.sampleSize = sampleSize;
+	}
+
+	/**
+	 * Returns the optional base-case output directory. Keeping this setting in the shared SimWrapper configuration
+	 * allows all comparative dashboards to use the same reference without adding dashboard-specific CLI options.
+	 */
+	public String getBaseCase() {
+		return baseCase;
+	}
+
+	public void setBaseCase(String baseCase) {
+		this.baseCase = baseCase;
 	}
 
 	/**

@@ -8,95 +8,111 @@ import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.viz.Table;
 import org.matsim.simwrapper.viz.TextBlock;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
- * Dashboard with general overview.
+ * Dashboard for absolute physical impacts and, optionally, a comparison with a reference run.
  */
 public class ImpactAnalysisDashboard implements Dashboard {
 
 	private final Collection<String> modes;
+	private final String referenceRunDirectory;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param modes The modes to display.
+	 * Creates an absolute impact dashboard containing all modes found in the run.
+	 */
+	public ImpactAnalysisDashboard() {
+		this(null, (String) null);
+	}
+
+	/**
+	 * Creates an absolute impact dashboard for selected modes.
 	 */
 	public ImpactAnalysisDashboard(Collection<String> modes) {
+		this(modes, (String) null);
+	}
+
+	/**
+	 * Creates a comparative impact dashboard containing all modes found in both runs.
+	 */
+	public ImpactAnalysisDashboard(Path referenceRunDirectory) {
+		this(null, referenceRunDirectory);
+	}
+
+	public ImpactAnalysisDashboard(Collection<String> modes, Path referenceRunDirectory) {
+		this(modes, referenceRunDirectory == null ? null : referenceRunDirectory.toString());
+	}
+
+	public ImpactAnalysisDashboard(Collection<String> modes, String referenceRunDirectory) {
 		this.modes = modes;
+		this.referenceRunDirectory = referenceRunDirectory;
 	}
 
 	@Override
 	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
-		header.title = "Impact Analysis";
-		header.description = "Impact overview of the MATSim run.";
+		// An explicitly supplied path wins. Otherwise the common SimWrapper setting makes the dashboard comparative.
+		String effectiveReference = referenceRunDirectory != null && !referenceRunDirectory.isBlank()
+			? referenceRunDirectory : configGroup.getBaseCase();
+		boolean comparison = effectiveReference != null && !effectiveReference.isBlank();
+		header.title = "Wirkungsanalyse";
+		header.description = comparison
+			? "Absolute Wirkungen des Szenarios und Veraenderungen gegenueber dem Bezugsfall."
+			: "Absolute verkehrliche, physikalische und umweltbezogene Wirkungen des Szenarios.";
 
-		List<String> modeArgs = new ArrayList<>(List.of("--modes", String.join(",", modes)));
+		String[] args = analysisArgs(effectiveReference);
 
-		String[] modeArgsArray = modeArgs.toArray(new String[0]);
+		layout.row("traffic", "Verkehrliche und physikalische Wirkungen")
+			.el(Table.class, (viz, data) -> {
+				viz.title = comparison
+					? "Szenario und Bezugsfall"
+					: "Absolute Szenariowirkungen";
+				viz.description = comparison
+					? "Die Differenz ist als Szenario minus Bezugsfall definiert."
+					: "Tageswerte werden mit der konfigurierten Stichprobengroesse auf die Gesamtbevoelkerung hochgerechnet.";
+				viz.style = "topsheet";
+				viz.dataset = data.compute(ImpactAnalysis.class, "impact.csv", args);
+				viz.enableFilter = true;
+				viz.showAllRows = true;
+				viz.width = 1d;
+				viz.height = 9d;
+				viz.alignment = new String[]{"left", "left", "left", "left", "left", "left", "right", "right",
+					"right", "right", "left", "left"};
+			});
 
-		modes.forEach(mode -> {
-			layout.row(mode)
-				.el(Table.class, (viz, data) -> {
-					viz.title = "Central Traffic / Physical Effects (" + mode.substring(0, 1).toUpperCase() + mode.substring(1) + ")";
-					viz.style = "topsheet";
-					viz.dataset = data.computeWithPlaceholder(ImpactAnalysis.class, "general_%s.csv", mode, modeArgsArray);
-					viz.enableFilter = false;
-					viz.showAllRows = true;
-					viz.width = 1d;
-					viz.height = 5d;
-					viz.alignment = new String[]{"right", "right", "left"};
-				})
-
-				.el(Table.class, (viz, data) -> {
-					viz.title = "Change In Exhaust Emissions (" + mode.substring(0, 1).toUpperCase() + mode.substring(1) + ")";
-					viz.style = "topsheet";
-					viz.dataset = data.computeWithPlaceholder(ImpactAnalysis.class, "emissions_%s.csv", mode, modeArgsArray);
-					viz.enableFilter = false;
-					viz.showAllRows = true;
-					viz.width = 1d;
-					viz.height = 5d;
-					viz.alignment = new String[]{"right", "right", "left"};
-				});
-		});
-
-		layout.row("disclaimer")
+		layout.row("scope")
 			.el(TextBlock.class, (viz, data) -> {
 				viz.backgroundColor = "white";
-				viz.content = """
-					# Disclaimer
+				viz.content = comparison
+					? """
+						## Einordnung
 
-					Die in dieser Analyse verwendeten Verkehrsdaten basieren auf einer Hochrechnung von Verkehrszahlen eines einzelnen Tages auf ein gesamtes Jahr. Die Grundlage dieser Hochrechnung stammt aus dem Bericht: \s
+						Dieser erste Analyseschritt zeigt absolute physikalische Wirkungen und deren Veraenderung. Monetarisierte Nutzen, Verkehrssicherheit, Barwerte und NKV werden in den naechsten Ausbaustufen ergaenzt.
+						"""
+					: """
+						## Einordnung
 
-					**Grundsätzliche Überprüfung und Weiterentwicklung der Nutzen-Kosten-Analyse im Bewertungsverfahren der Bundesverkehrswegeplanung** \s
-					FE-PROJEKTNR.: 960974/2011 \s
-					Endbericht für das Bundesministerium für Verkehr und digitale Infrastruktur \s
-					Essen, Berlin, München, 24. März 2015 \s
-
-					Die spezifischen Hochrechnungsfaktoren wurden wie folgt angewendet: \s
-					- Für PKW und alle anderen Verkehrsmittel: **Faktor 334** \s
-					- Für LKW: **Faktor 302** \s
-
-					Diese Faktoren basieren auf den Angaben des genannten Berichts (Seite 172) und wurden ebenfalls im Rahmen des Bundesverkehrswegeplans 2030 verwendet. \s
-
-					# Disclaimer (English)
-
-					The traffic data used in this analysis is based on an extrapolation of single-day traffic figures to an entire year. The basis for this extrapolation is derived from the report: \s
-
-					**Fundamental Review and Further Development of the Cost-Benefit Analysis in the Assessment Procedure of Federal Transport Infrastructure Planning** \s
-					FE-PROJECT NO.: 960974/2011 \s
-					Final Report for the Federal Ministry of Transport and Digital Infrastructure \s
-					Essen, Berlin, Munich, March 24, 2015 \s
-
-					The specific extrapolation factors applied are as follows: \s
-					- For passenger cars (PKW) and all other modes of transport: **Factor 334** \s
-					- For trucks (LKW): **Factor 302** \s
-
-					These factors are based on the data provided in the mentioned report (page 172) and were also used in the Federal Transport Infrastructure Plan 2030. \s
-					""";
+						Ohne Bezugsfall zeigt das Dashboard absolute Szenariowirkungen. Es werden keine Nutzen und kein Nutzen-Kosten-Verhaeltnis ausgewiesen. Monetarisierte Wirkungen und Verkehrssicherheit werden in den naechsten Ausbaustufen ergaenzt.
+						""";
 			});
+	}
+
+	private String[] analysisArgs(String effectiveReference) {
+
+		List<String> args = new ArrayList<>();
+		if (modes != null && !modes.isEmpty()) {
+			args.add("--modes");
+			args.add(String.join(",", modes));
+		}
+
+		if (effectiveReference != null && !effectiveReference.isBlank()) {
+			args.add("--reference-run-directory");
+			args.add(effectiveReference);
+		}
+
+		return args.toArray(new String[0]);
 	}
 }
