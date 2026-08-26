@@ -79,19 +79,18 @@ public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFi
 
 		// the closest facilities do not depend on the maximum distance, so they can be determined first and passed on
 		// to the MaxAccessEgressDistance
-		Facility accessFacility = findClosestStop(fromFacility, Double.POSITIVE_INFINITY);
-		Facility egressFacility = findClosestStop(toFacility, Double.POSITIVE_INFINITY);
-		if (accessFacility == null || egressFacility == null) {
+		ClosestStop access = findClosestStopWithDistance(fromFacility);
+		ClosestStop egress = findClosestStopWithDistance(toFacility);
+		if (access == null || egress == null) {
 			return Optional.empty();
 		}
 
-		double maxDistance = maxAccessEgressDistance.get(request, accessFacility, egressFacility);
-		if (calcDistance(fromFacility, accessFacility) > maxDistance
-				|| calcDistance(toFacility, egressFacility) > maxDistance) {
+		double maxDistance = maxAccessEgressDistance.get(request, access.facility(), egress.facility());
+		if (access.distance() > maxDistance || egress.distance() > maxDistance) {
 			return Optional.empty();
 		}
 
-		return Optional.of(new ImmutablePair<>(accessFacility, egressFacility));
+		return Optional.of(new ImmutablePair<>(access.facility(), egress.facility()));
 	}
 
 	public Facility findClosestStop(Facility facility) {
@@ -102,17 +101,23 @@ public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFi
 	 * @return the facility closest to the given facility, or {@code null} if it is farther away than {@code maxDistance}
 	 */
 	public Facility findClosestStop(Facility facility, double maxDistance) {
-		Coord coord = getFacilityCoord(facility, network);
-		Facility closestStop = facilityQuadTree.getClosest(coord.getX(), coord.getY());
-		if (closestStop == null) {
-			return null;
-		}
-		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
-		return closestStopDistance > maxDistance ? null : closestStop;
+		ClosestStop closestStop = findClosestStopWithDistance(facility);
+		return closestStop == null || closestStop.distance() > maxDistance ? null : closestStop.facility();
 	}
 
-	private double calcDistance(Facility facility, Facility stop) {
-		return CoordUtils.calcEuclideanDistance(getFacilityCoord(facility, network), stop.getCoord());
+	/**
+	 * @return the facility closest to the given facility together with its distance, or {@code null} if there is no
+	 * facility at all
+	 */
+	private ClosestStop findClosestStopWithDistance(Facility facility) {
+		Coord coord = getFacilityCoord(facility, network);
+		Facility closestStop = facilityQuadTree.getClosest(coord.getX(), coord.getY());
+		return closestStop == null ?
+				null :
+				new ClosestStop(closestStop, CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord()));
+	}
+
+	private record ClosestStop(Facility facility, double distance) {
 	}
 
 	static Coord getFacilityCoord(Facility facility, Network network) {
