@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.matsim.contrib.dvrp.router.AttributeBasedStopFinder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -158,6 +159,68 @@ class DrtServiceConfigurationsParamsTest {
 	}
 
 	@Test
+	void testWriteAndReadServiceAreaFile() {
+		DrtConfigGroup drtConfig = drtConfig();
+		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
+		params.addParameterSet(serviceConfiguration("peak", at(6 * 3600), at(10 * 3600), "peakStops"));
+		params.setServiceAreaFile("serviceAreas.shp");
+		params.setServiceAreaAttribute("networks");
+		drtConfig.addParameterSet(params);
+
+		DrtServiceConfigurationsParams reloaded = writeAndRead(drtConfig).getServiceConfigurationsParams()
+				.orElseThrow();
+
+		assertThat(reloaded.getServiceAreaFile()).isEqualTo("serviceAreas.shp");
+		assertThat(reloaded.getServiceAreaAttribute()).isEqualTo("networks");
+	}
+
+	@Test
+	void testServiceAreaFileIsOptionalAndTheAttributeDefaultsToTheStopAttribute() {
+		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
+
+		assertThat(params.getServiceAreaFile()).isNull();
+		assertThat(params.getServiceAreaAttribute()).isEqualTo(
+				AttributeBasedStopFinder.FACILITY_STOP_NETWORKS_ATTRIBUTE);
+	}
+
+	@Test
+	void testServiceAreaFileReplacesDrtServiceAreaShapeFile() {
+		assertThatCode(() -> serviceAreaBasedConfig(null, "serviceAreas.shp").checkConsistency(
+				ConfigUtils.createConfig())).doesNotThrowAnyException();
+		assertThatCode(() -> serviceAreaBasedConfig("serviceArea.shp", null).checkConsistency(
+				ConfigUtils.createConfig())).doesNotThrowAnyException();
+	}
+
+	@Test
+	void testServiceAreaBasedWithoutAnyAreaIsRejected() {
+		assertThatExceptionOfType(VerifyException.class).isThrownBy(
+						() -> serviceAreaBasedConfig(null, null).checkConsistency(ConfigUtils.createConfig()))
+				.withMessageContaining(DrtServiceConfigurationsParams.SERVICE_AREA_FILE);
+	}
+
+	@Test
+	void testBothAreaSourcesAtOnceAreRejected() {
+		assertThatExceptionOfType(VerifyException.class).isThrownBy(
+						() -> serviceAreaBasedConfig("serviceArea.shp", "serviceAreas.shp").checkConsistency(
+								ConfigUtils.createConfig()))
+				.withMessageContaining("must not be set at the same time");
+	}
+
+	@Test
+	void testServiceAreaFileIsRejectedForDoor2Door() {
+		DrtConfigGroup drtConfig = drtConfig();
+		drtConfig.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
+		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
+		params.addParameterSet(serviceConfiguration("peak", at(6 * 3600), at(10 * 3600), null));
+		params.setServiceAreaFile("serviceAreas.shp");
+		drtConfig.addParameterSet(params);
+
+		assertThatExceptionOfType(VerifyException.class).isThrownBy(
+						() -> drtConfig.checkConsistency(ConfigUtils.createConfig()))
+				.withMessageContaining(DrtServiceConfigurationsParams.SERVICE_AREA_FILE);
+	}
+
+	@Test
 	void testExistingConfigsRemainReadable() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_stop_based_drt_config.xml");
@@ -175,6 +238,21 @@ class DrtServiceConfigurationsParamsTest {
 		}
 		drtConfig.addParameterSet(params);
 		drtConfig.checkConsistency(ConfigUtils.createConfig());
+	}
+
+	/**
+	 * @return a {@code serviceAreaBased} DRT config with one service configuration and the given area sources, of
+	 * which exactly one is expected to be set
+	 */
+	private static DrtConfigGroup serviceAreaBasedConfig(String drtServiceAreaShapeFile, String serviceAreaFile) {
+		DrtConfigGroup drtConfig = drtConfig();
+		drtConfig.setOperationalScheme(DrtConfigGroup.OperationalScheme.serviceAreaBased);
+		drtConfig.setDrtServiceAreaShapeFile(drtServiceAreaShapeFile);
+		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
+		params.addParameterSet(serviceConfiguration("peak", at(6 * 3600), at(10 * 3600), "peakStops"));
+		params.setServiceAreaFile(serviceAreaFile);
+		drtConfig.addParameterSet(params);
+		return drtConfig;
 	}
 
 	private DrtConfigGroup writeAndRead(DrtConfigGroup drtConfig) {

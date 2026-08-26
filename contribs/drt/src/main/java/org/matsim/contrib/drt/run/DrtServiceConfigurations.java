@@ -32,6 +32,7 @@ import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.dvrp.router.AttributeBasedStopFinder;
 import org.matsim.core.utils.misc.OptionalTime;
 
+import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
@@ -80,6 +81,14 @@ public class DrtServiceConfigurations {
 						|| AttributeBasedStopFinder.parseStopNetworks(stop)
 						.contains(serviceConfiguration.getStopNetwork()))
 				.collect(ImmutableList.toImmutableList());
+		if (serviceConfiguration.getStopNetwork() != null) {
+			// otherwise the service configuration would silently serve nobody
+			Verify.verify(!stops.isEmpty(),
+					"No stop belongs to the stop network '%s' of %s '%s'. Check the '%s' attribute of the stops or the"
+							+ " service areas they are derived from.", serviceConfiguration.getStopNetwork(),
+					DrtServiceConfigurationParams.SET_NAME, serviceConfiguration.getServiceConfigurationName(),
+					AttributeBasedStopFinder.FACILITY_STOP_NETWORKS_ATTRIBUTE);
+		}
 		Set<Id<Link>> linkIds = stops.stream().map(DrtStopFacility::getLinkId).collect(ImmutableSet.toImmutableSet());
 		return new Regime(serviceConfiguration.getServiceConfigurationName(), serviceConfiguration.getStartTime(),
 				serviceConfiguration.getEndTime(), stops, linkIds);

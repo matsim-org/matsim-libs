@@ -36,6 +36,10 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -69,8 +73,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTrees;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.GeoFileWriter;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.examples.ExamplesUtils;
@@ -89,6 +98,9 @@ public class DrtServiceTimeIT {
 
 	private static final double SERVICE_START = 6 * 3600;
 	private static final double SERVICE_END = 10 * 3600;
+
+	/** the column names of shapefiles are limited to 10 characters, so the default 'stopNetworks' does not fit */
+	private static final String SERVICE_AREA_ATTRIBUTE = "networks";
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
@@ -172,6 +184,72 @@ public class DrtServiceTimeIT {
 		// both configurations are actually used
 		assertThat(tracker.submitted.stream().filter(e -> e.getEarliestDepartureTime() < 12 * 3600)).isNotEmpty();
 		assertThat(tracker.submitted.stream().filter(e -> e.getEarliestDepartureTime() >= 12 * 3600)).isNotEmpty();
+	}
+
+	/**
+	 * The stops of a {@code serviceAreaBased} service can also be derived from the polygons of the service
+	 * configurations, i.e. without a hand-attributed network or stops file: every link inside a polygon becomes a stop
+	 * of the service configurations named by that polygon.
+	 */
+	@Test
+	void testServiceAreasPerServiceConfiguration() {
+		Id.resetCaches();
+		Config config = config("mielec_serviceArea_based_drt_config.xml");
+		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
+
+		// the whole town is served in the morning, only its western half in the afternoon
+		Network network = readNetwork(config);
+		DrtServiceConfigurationsParams params = addServiceConfigurations(drtConfig,
+				serviceConfiguration("morning", OptionalTime.undefined(), OptionalTime.defined(12 * 3600), "morning"),
+				serviceConfiguration("afternoon", OptionalTime.defined(12 * 3600), OptionalTime.undefined(),
+						"afternoon"));
+		PreparedGeometry westernHalf = writeServiceAreas(network, drtConfig, params);
+
+		Controler controller = DrtControlerCreator.createControler(config, false);
+		Tracker tracker = Tracker.install(controller);
+		controller.run();
+
+		// the same containment test as DrtServiceAreas, so that the expectation cannot drift from the implementation
+		Set<Id<Link>> westernLinks = network.getLinks()
+				.values()
+				.stream()
+				.filter(link -> westernHalf.contains(MGC.coord2Point(link.getToNode().getCoord())))
+				.map(Link::getId)
+				.collect(Collectors.toSet());
+		assertThat(westernLinks).isNotEmpty().hasSizeLessThan(network.getLinks().size());
+
+		Set<Id<Request>> rejectedForServiceArea = tracker.rejected.stream()
+				.filter(event -> hasCause(event, DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_AREA_ACCESS_CAUSE)
+						|| hasCause(event, DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_AREA_EGRESS_CAUSE))
+				.map(PassengerRequestRejectedEvent::getRequestId)
+				.collect(Collectors.toSet());
+
+		// in the afternoon only the western half is served, in the morning the whole network is
+		assertThat(tracker.submitted.stream().filter(event -> event.getEarliestDepartureTime() >= 12 * 3600))
+				.isNotEmpty()
+				.allSatisfy(event -> {
+					if (westernLinks.contains(event.getFromLinkId()) && westernLinks.contains(event.getToLinkId())) {
+						return;
+					}
+					// the departure drifted from the morning into the afternoon, where these stops are not served any
+					// more, so the validator rejects the request
+					assertThat(rejectedForServiceArea).contains(event.getRequestId());
+				});
+		assertThat(tracker.submitted.stream()
+				.filter(event -> event.getEarliestDepartureTime() < 12 * 3600)
+				.filter(event -> !westernLinks.contains(event.getFromLinkId()))).isNotEmpty();
+
+		// the derived stops and their stop networks are dumped, so the service areas are documented in the output
+		Map<Id<Link>, Set<String>> dumpedStopNetworks = readDumpedStopNetworks(drtConfig);
+		assertThat(dumpedStopNetworks.keySet()).containsAnyElementsOf(westernLinks);
+		assertThat(dumpedStopNetworks.keySet().stream().filter(linkId -> !westernLinks.contains(linkId))).isNotEmpty();
+		assertThat(dumpedStopNetworks).allSatisfy((linkId, stopNetworks) -> {
+			if (westernLinks.contains(linkId)) {
+				assertThat(stopNetworks).containsExactlyInAnyOrder("morning", "afternoon");
+			} else {
+				assertThat(stopNetworks).containsExactly("morning");
+			}
+		});
 	}
 
 	@Test
@@ -302,13 +380,14 @@ public class DrtServiceTimeIT {
 		return config;
 	}
 
-	private static void addServiceConfigurations(DrtConfigGroup drtConfig,
+	private static DrtServiceConfigurationsParams addServiceConfigurations(DrtConfigGroup drtConfig,
 			DrtServiceConfigurationParams... serviceConfigurations) {
 		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
 		for (DrtServiceConfigurationParams serviceConfiguration : serviceConfigurations) {
 			params.addParameterSet(serviceConfiguration);
 		}
 		drtConfig.addParameterSet(params);
+		return params;
 	}
 
 	private static DrtServiceConfigurationParams serviceConfiguration(String name, OptionalTime startTime,
@@ -360,6 +439,82 @@ public class DrtServiceTimeIT {
 		drtConfig.setTransitStopFile(stopsFile.toString());
 
 		return linksPerStopNetwork;
+	}
+
+	private static Network readNetwork(Config config) {
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readURL(
+				IOUtils.extendUrl(config.getContext(), config.network().getInputFile()));
+		return network;
+	}
+
+	/**
+	 * Writes two service areas next to the output directory and points the config to them: one covering the whole
+	 * network and belonging to the stop network "morning", one covering its western half and belonging to "afternoon".
+	 * The served area is the union of both, and the stops of the western half belong to both stop networks.
+	 *
+	 * @return the geometry of the western half
+	 */
+	private PreparedGeometry writeServiceAreas(Network network, DrtConfigGroup drtConfig,
+			DrtServiceConfigurationsParams params) {
+		double[] boundingBox = NetworkUtils.getBoundingBox(network.getNodes().values());
+		// the boundary of a polygon does not belong to it, hence the margin around the network
+		double margin = 1000;
+		double minX = boundingBox[0] - margin;
+		double minY = boundingBox[1] - margin;
+		double maxX = boundingBox[2] + margin;
+		double maxY = boundingBox[3] + margin;
+		double middleX = 0.5 * (boundingBox[0] + boundingBox[2]);
+
+		// the Mielec network is metric, its config declares WGS84, which is why the CRS is given explicitly here
+		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().setName("serviceAreas")
+				.setCrs(MGC.getCRS("EPSG:32633"))
+				// column names of shapefiles are limited to 10 characters, hence the short name
+				.addAttribute(SERVICE_AREA_ATTRIBUTE, String.class)
+				.create();
+		Coordinate[] westernHalf = rectangle(minX, minY, middleX, maxY);
+		Path serviceAreaFile = Paths.get(utils.getOutputDirectory())
+				.toAbsolutePath()
+				.getParent()
+				.resolve("service_areas.shp");
+		GeoFileWriter.writeGeometries(List.of(
+				factory.createPolygon(rectangle(minX, minY, maxX, maxY), Map.of(SERVICE_AREA_ATTRIBUTE, "morning"),
+						"wholeTown"),
+				factory.createPolygon(westernHalf, Map.of(SERVICE_AREA_ATTRIBUTE, "afternoon"), "westernHalf")),
+				serviceAreaFile.toString());
+
+		// the areas of the service configurations replace the static service area
+		drtConfig.setDrtServiceAreaShapeFile(null);
+		params.setServiceAreaFile(serviceAreaFile.toString());
+		params.setServiceAreaAttribute(SERVICE_AREA_ATTRIBUTE);
+
+		return new PreparedGeometryFactory().create(new GeometryFactory().createPolygon(closed(westernHalf)));
+	}
+
+	private static Coordinate[] rectangle(double minX, double minY, double maxX, double maxY) {
+		return new Coordinate[] { new Coordinate(minX, minY), new Coordinate(maxX, minY), new Coordinate(maxX, maxY),
+				new Coordinate(minX, maxY) };
+	}
+
+	private static Coordinate[] closed(Coordinate[] ring) {
+		Coordinate[] closed = Arrays.copyOf(ring, ring.length + 1);
+		closed[ring.length] = ring[0];
+		return closed;
+	}
+
+	/**
+	 * @return the stop networks per link of the stops written by {@link org.matsim.contrib.drt.util.DumpDrtStopsAtEnd}
+	 */
+	private Map<Id<Link>, Set<String>> readDumpedStopNetworks(DrtConfigGroup drtConfig) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new TransitScheduleReader(scenario).readFile(
+				Paths.get(utils.getOutputDirectory(), "output_drt_stops_" + drtConfig.getMode() + ".xml.gz").toString());
+		return scenario.getTransitSchedule()
+				.getFacilities()
+				.values()
+				.stream()
+				.collect(Collectors.toMap(TransitStopFacility::getLinkId,
+						AttributeBasedStopFinder::parseStopNetworks));
 	}
 
 	/**

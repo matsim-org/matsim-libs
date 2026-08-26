@@ -423,9 +423,27 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		Verify.verify(getOperationalScheme() != OperationalScheme.stopbased || getTransitStopFile() != null,
 				"transitStopFile must not be null when operationalScheme is " + OperationalScheme.stopbased);
 
-		Verify.verify(getOperationalScheme() != OperationalScheme.serviceAreaBased || getDrtServiceAreaShapeFile() != null,
-				"drtServiceAreaShapeFile must not be null when operationalScheme is "
-						+ OperationalScheme.serviceAreaBased);
+		// the polygons of the service configurations are an alternative source of the served area, see DrtServiceAreas
+		String serviceAreaFile = serviceConfigurationsParams == null ?
+				null :
+				serviceConfigurationsParams.getServiceAreaFile();
+
+		if (getOperationalScheme() == OperationalScheme.serviceAreaBased) {
+			Verify.verify(getDrtServiceAreaShapeFile() != null || serviceAreaFile != null,
+					"Either drtServiceAreaShapeFile or %s of %s must be set when operationalScheme is %s",
+					DrtServiceConfigurationsParams.SERVICE_AREA_FILE, DrtServiceConfigurationsParams.SET_NAME,
+					OperationalScheme.serviceAreaBased);
+			Verify.verify(getDrtServiceAreaShapeFile() == null || serviceAreaFile == null,
+					"drtServiceAreaShapeFile and %s of %s must not be set at the same time: the served area is the"
+							+ " union of the polygons of %s.", DrtServiceConfigurationsParams.SERVICE_AREA_FILE,
+					DrtServiceConfigurationsParams.SET_NAME, DrtServiceConfigurationsParams.SERVICE_AREA_FILE);
+		}
+
+		Verify.verify(serviceAreaFile == null || getOperationalScheme() != OperationalScheme.door2door,
+				"%s of %s must not be set when operationalScheme is %s: door2door serves every link, so service"
+						+ " configurations can only restrict the time there.",
+				DrtServiceConfigurationsParams.SERVICE_AREA_FILE, DrtServiceConfigurationsParams.SET_NAME,
+				OperationalScheme.door2door);
 
 		Verify.verify(getNumberOfThreads() <= Runtime.getRuntime().availableProcessors(),
 				"numberOfThreads is higher than the number of logical cores available to JVM");

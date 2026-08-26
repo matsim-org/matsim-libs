@@ -25,6 +25,7 @@ import java.awt.Paint;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.google.inject.Provider;
@@ -41,6 +42,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
 import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtServiceAreas;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -177,7 +179,11 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		modalMapBinder(String.class, ZoneSystem.class).addBinding(ANALYSIS_ZONE_SYSTEM).toProvider(modalProvider(getter -> {
 			Network network = getter.getModal(Network.class);
 			Predicate<Zone> zoneFilter;
-			if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+			// the areas of the service configurations are the alternative source of the served area, see DrtServiceAreas
+			Optional<DrtServiceAreas> serviceAreas = DrtServiceAreas.createIfConfigured(getConfig(), drtCfg);
+			if (serviceAreas.isPresent()) {
+				zoneFilter = zone -> serviceAreas.get().intersects(zone.getPreparedGeometry().getGeometry());
+			} else if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
 				List<PreparedGeometry> serviceAreaGeoms = ShpGeometryUtils.loadPreparedGeometries(
 						ConfigGroup.getInputFileURL(this.getConfig().getContext(), this.drtCfg.getDrtServiceAreaShapeFile()));
 				zoneFilter = zone -> serviceAreaGeoms.stream()

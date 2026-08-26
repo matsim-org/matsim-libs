@@ -20,9 +20,13 @@
 
 package org.matsim.contrib.drt.run;
 
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.Comparator;
 import java.util.List;
 
+import org.matsim.contrib.dvrp.router.AttributeBasedStopFinder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -39,8 +43,45 @@ import com.google.common.base.Verify;
 public final class DrtServiceConfigurationsParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "serviceConfigurations";
 
+	public static final String SERVICE_AREA_FILE = "serviceAreaFile";
+	public static final String SERVICE_AREA_ATTRIBUTE = "serviceAreaAttribute";
+
+	@Parameter(SERVICE_AREA_FILE)
+	@Comment("Path to a GIS file (shp or gpkg) holding the service areas of the service configurations. Every polygon"
+			+ " names the service configurations it belongs to in the attribute given by serviceAreaAttribute"
+			+ " (comma-separated, may be empty), and those names are stamped onto the stops as their 'stopNetworks'"
+			+ " attribute. With operationalScheme=serviceAreaBased this file replaces drtServiceAreaShapeFile: every"
+			+ " link inside any polygon becomes a stop. With stopbased it only tags the stops of the transitStopFile,"
+			+ " so they do not have to be attributed by hand. Not supported for door2door.")
+	@Nullable
+	private String serviceAreaFile = null;
+
+	@Parameter(SERVICE_AREA_ATTRIBUTE)
+	@Comment("Name of the attribute of the serviceAreaFile polygons that names the service configurations a polygon"
+			+ " belongs to. Note that column names of shapefiles are limited to 10 characters, so the default cannot"
+			+ " be used there.")
+	@NotBlank
+	private String serviceAreaAttribute = AttributeBasedStopFinder.FACILITY_STOP_NETWORKS_ATTRIBUTE;
+
 	public DrtServiceConfigurationsParams() {
 		super(SET_NAME);
+	}
+
+	@Nullable
+	public String getServiceAreaFile() {
+		return serviceAreaFile;
+	}
+
+	public void setServiceAreaFile(@Nullable String serviceAreaFile) {
+		this.serviceAreaFile = serviceAreaFile;
+	}
+
+	public String getServiceAreaAttribute() {
+		return serviceAreaAttribute;
+	}
+
+	public void setServiceAreaAttribute(String serviceAreaAttribute) {
+		this.serviceAreaAttribute = serviceAreaAttribute;
 	}
 
 	public List<DrtServiceConfigurationParams> getServiceConfigurations() {

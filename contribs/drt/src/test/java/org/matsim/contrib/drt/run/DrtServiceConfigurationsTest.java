@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.run;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -33,6 +34,7 @@ import org.matsim.contrib.dvrp.router.AttributeBasedStopFinder;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -106,6 +108,14 @@ class DrtServiceConfigurationsTest {
 
 		Regime morning = serviceConfigurations.getActiveRegime(8 * 3600).orElseThrow();
 		assertThat(morning.linkIds()).containsExactlyInAnyOrder(peakStop.getLinkId(), alwaysStop.getLinkId());
+	}
+
+	@Test
+	void testStopNetworkWithoutAnyStopIsRejected() {
+		assertThatExceptionOfType(VerifyException.class).isThrownBy(() -> serviceConfigurations(
+						serviceConfiguration("night", OptionalTime.undefined(), OptionalTime.undefined(), "nightStops")))
+				.withMessageContaining("nightStops")
+				.withMessageContaining("night");
 	}
 
 	private static DrtServiceConfigurations serviceConfigurations(DrtStopNetwork stopNetwork,

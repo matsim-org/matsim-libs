@@ -109,7 +109,8 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 		// yyyy possibly not used for door2door; try to move inside the corresponding switch statement below.  kai, feb'24
 
-		if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.stopbased) {
+		// with service area polygons the stops (and their stop networks) are derived, so they are worth dumping as well
+		if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.stopbased || hasServiceAreas(drtCfg)) {
 			bindModal(DumpDrtStopsAtEnd.class).toProvider(modalProvider(
 					getter -> new DumpDrtStopsAtEnd(
 							this.getMode(),
@@ -256,17 +257,30 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 
 		@Override
 		public DrtStopNetwork get() {
+			Optional<DrtServiceAreas> serviceAreas = DrtServiceAreas.createIfConfigured(config, drtCfg);
 			switch (drtCfg.getOperationalScheme()) {
 				case door2door:
 					return ImmutableMap::of;
-				case stopbased:
-					return createDrtStopNetworkFromTransitSchedule(config, drtCfg);
+				case stopbased: {
+					// the polygons only tag the transit stops, the inventory stays the one of the transit stop file
+					DrtStopNetwork stopNetwork = createDrtStopNetworkFromTransitSchedule(config, drtCfg);
+					return serviceAreas.map(areas -> areas.tag(stopNetwork)).orElse(stopNetwork);
+				}
 				case serviceAreaBased:
-					return createDrtStopNetworkFromServiceArea(config, drtCfg, getModalInstance(Network.class));
+					// exactly one of the two area sources is set, see DrtConfigGroup.checkConsistency
+					return serviceAreas.map(areas -> areas.createStopNetwork(getModalInstance(Network.class)))
+							.orElseGet(() -> createDrtStopNetworkFromServiceArea(config, drtCfg,
+									getModalInstance(Network.class)));
 				default:
 					throw new RuntimeException("Unsupported operational scheme: " + drtCfg.getOperationalScheme());
 			}
 		}
+	}
+
+	private static boolean hasServiceAreas(DrtConfigGroup drtCfg) {
+		return drtCfg.getServiceConfigurationsParams()
+				.map(params -> params.getServiceAreaFile() != null)
+				.orElse(false);
 	}
 
 	private static DrtStopNetwork createDrtStopNetworkFromServiceArea(Config config, DrtConfigGroup drtCfg,
