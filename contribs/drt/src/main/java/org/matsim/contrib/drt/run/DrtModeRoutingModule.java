@@ -136,10 +136,16 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 										       .asEagerSingleton();
 			case stopbased, serviceAreaBased -> {
 				bindModal( AccessEgressFacilityFinder.class ).toProvider( modalProvider(
-						getter -> new ClosestAccessEgressFacilityFinder(
-								optimizationConstraintsSet.getMaxWalkDistance(),
-													     getter.get( Network.class ),
-													     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) ) ) )
+						getter -> {
+							Network network = getter.get( Network.class );
+							return new ClosestAccessEgressFacilityFinder(
+									// maxWalkDistance is a property of the constraints set, and which constraints set applies
+									// is decided per trip by the ConstraintSetChooser (as in DefaultDrtRouteConstraintsCalculator)
+									maxWalkDistance( getter.getModal( ConstraintSetChooser.class ), optimizationConstraintsSet, network ),
+									optimizationConstraintsSet.getMaxWalkDistance(),
+														     network,
+														     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) );
+						} ) )
 									     .asEagerSingleton();
 			}
 			default -> throw new IllegalStateException( "Unexpected value: " + drtCfg.getOperationalScheme());
@@ -167,6 +173,21 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 		// this binds the above as a controler listener:
 		addControllerListenerBinding().to(modalKey(DrtRouteUpdater.class));
 
+	}
+
+	/**
+	 * Asks the {@link ConstraintSetChooser} which constraints set applies to the trip at hand and returns its
+	 * {@code maxWalkDistance}. The chooser is asked with the access and egress <b>stop</b> links, which is consistent
+	 * with {@link DrtRouteCreator}, where the chooser also sees the stop links and not the activity links.
+	 */
+	public static ClosestAccessEgressFacilityFinder.MaxAccessEgressDistance maxWalkDistance(
+			ConstraintSetChooser constraintSetChooser, DrtOptimizationConstraintsSet defaultConstraintsSet,
+			Network network) {
+		return (request, accessFacility, egressFacility) -> constraintSetChooser.chooseConstraintSet(
+						request.getDepartureTime(), network.getLinks().get(accessFacility.getLinkId()),
+						network.getLinks().get(egressFacility.getLinkId()), request.getPerson(), request.getAttributes())
+				.orElse(defaultConstraintsSet)
+				.getMaxWalkDistance();
 	}
 
 	private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DvrpMode, DrtRouteCreator> {

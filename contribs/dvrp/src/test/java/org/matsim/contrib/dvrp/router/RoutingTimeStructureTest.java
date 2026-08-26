@@ -61,7 +61,8 @@ public class RoutingTimeStructureTest {
 		when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
 
 		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
-		when(stopFinder.findFacilities(eq(fromFacility), eq(toFacility), any())).thenReturn(
+		when(stopFinder.findFacilities(argThat(
+				(RoutingRequest r) -> r.getFromFacility() == fromFacility && r.getToFacility() == toFacility))).thenReturn(
 				Optional.of(Pair.of(accessFacility, egressFacility)));
 
 		RoutingModule accessRouter = mock(RoutingModule.class);
@@ -121,7 +122,8 @@ public class RoutingTimeStructureTest {
 		when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
 
 		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
-		when(stopFinder.findFacilities(eq(fromFacility), eq(toFacility), any())).thenReturn(
+		when(stopFinder.findFacilities(argThat(
+				(RoutingRequest r) -> r.getFromFacility() == fromFacility && r.getToFacility() == toFacility))).thenReturn(
 				Optional.of(Pair.of(accessFacility, egressFacility)));
 
 		RoutingModule accessRouter = mock(RoutingModule.class);
