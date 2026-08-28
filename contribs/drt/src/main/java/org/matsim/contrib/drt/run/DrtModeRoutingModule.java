@@ -23,6 +23,7 @@ package org.matsim.contrib.drt.run;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
@@ -50,6 +51,7 @@ import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule.DefaultMainLegRouterProvider;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider;
+import org.matsim.contrib.dvrp.router.TimeDependentAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -71,6 +73,8 @@ import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.OptionalBinder;
 
 /**
  * This is a DRT-customised version of DvrpModeRoutingModule
@@ -105,10 +109,18 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 				new DrtRouteCreatorProvider(drtCfg));// not singleton
 		// this is used in DvrpModeRoutingModule (recruited by the DvrpRoutingModuleProvider above)
 
+		// the GIS file is read once here and shared with everything that needs the served area (the stop network, the
+		// request validator and the analysis and rebalancing zone systems)
+		OptionalBinder<DrtServiceAreas> serviceAreasBinder = OptionalBinder.newOptionalBinder(binder(),
+				modalKey(DrtServiceAreas.class));
+		DrtServiceAreas.createIfConfigured(getConfig(), drtCfg)
+				.ifPresent(serviceAreas -> serviceAreasBinder.setBinding().toInstance(serviceAreas));
+
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 		// yyyy possibly not used for door2door; try to move inside the corresponding switch statement below.  kai, feb'24
 
-		if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.stopbased) {
+		// with service area polygons the stops (and their stop networks) are derived, so they are worth dumping as well
+		if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.stopbased || DrtServiceAreas.isConfigured(drtCfg)) {
 			bindModal(DumpDrtStopsAtEnd.class).toProvider(modalProvider(
 					getter -> new DumpDrtStopsAtEnd(
 							this.getMode(),
@@ -130,25 +142,57 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 						-> Optional.of(optimizationConstraintsSet)
 		).in(Singleton.class);
 
-		switch(drtCfg.getOperationalScheme()){
-			case door2door -> bindModal( AccessEgressFacilityFinder.class ).toProvider(
-												       modalProvider( getter -> new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ) ) )
-										       .asEagerSingleton();
-			case stopbased, serviceAreaBased -> {
-				bindModal( AccessEgressFacilityFinder.class ).toProvider( modalProvider(
-						getter -> {
-							Network network = getter.get( Network.class );
-							return new ClosestAccessEgressFacilityFinder(
-									// maxWalkDistance is a property of the constraints set, and which constraints set applies
-									// is decided per trip by the ConstraintSetChooser (as in DefaultDrtRouteConstraintsCalculator)
-									maxWalkDistance( getter.getModal( ConstraintSetChooser.class ), optimizationConstraintsSet, network ),
-									optimizationConstraintsSet.getMaxWalkDistance(),
-														     network,
-														     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) );
-						} ) )
-									     .asEagerSingleton();
+		if (drtCfg.getServiceRegimesParams().isPresent()) {
+			bindModal(DrtServiceRegimes.class).toProvider(modalProvider(
+					getter -> new DrtServiceRegimes(drtCfg.getServiceRegimesParams().orElseThrow(),
+							getter.getModal(DrtStopNetwork.class)))).asEagerSingleton();
+
+			// the service time is enforced by the composite finder, hence the delegates stay unaware of time
+			bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(getter -> {
+				Network network = getter.get(Network.class);
+				Function<DrtServiceRegimes.Regime, AccessEgressFacilityFinder> delegateFactory;
+				if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.door2door) {
+					// door2door has no stops, so all regimes share one delegate and only the time restricts
+					var door2doorFinder = new DecideOnLinkAccessEgressFacilityFinder(network);
+					delegateFactory = regime -> door2doorFinder;
+				} else {
+					var maxWalkDistance = maxWalkDistance(getter.getModal(ConstraintSetChooser.class),
+							optimizationConstraintsSet, network);
+					delegateFactory = regime -> new ClosestAccessEgressFacilityFinder(maxWalkDistance,
+							optimizationConstraintsSet.getMaxWalkDistance(), network,
+							QuadTrees.createQuadTree(regime.stops()));
+				}
+				List<TimeDependentAccessEgressFacilityFinder.TimeWindow> timeWindows = getter.getModal(
+								DrtServiceRegimes.class)
+						.getRegimes()
+						.stream()
+						.map(regime -> new TimeDependentAccessEgressFacilityFinder.TimeWindow(
+								regime.startTime().orElse(Double.NEGATIVE_INFINITY),
+								regime.endTime().orElse(Double.POSITIVE_INFINITY), delegateFactory.apply(regime)))
+						.toList();
+				return new TimeDependentAccessEgressFacilityFinder(timeWindows);
+			})).asEagerSingleton();
+		} else {
+			switch(drtCfg.getOperationalScheme()){
+				case door2door -> bindModal( AccessEgressFacilityFinder.class ).toProvider(
+													       modalProvider( getter -> new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ) ) )
+											       .asEagerSingleton();
+				case stopbased, serviceAreaBased -> {
+					bindModal( AccessEgressFacilityFinder.class ).toProvider( modalProvider(
+							getter -> {
+								Network network = getter.get( Network.class );
+								return new ClosestAccessEgressFacilityFinder(
+										// maxWalkDistance is a property of the constraints set, and which constraints set applies
+										// is decided per trip by the ConstraintSetChooser (as in DefaultDrtRouteConstraintsCalculator)
+										maxWalkDistance( getter.getModal( ConstraintSetChooser.class ), optimizationConstraintsSet, network ),
+										optimizationConstraintsSet.getMaxWalkDistance(),
+															     network,
+															     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) );
+							} ) )
+										     .asEagerSingleton();
+				}
+				default -> throw new IllegalStateException( "Unexpected value: " + drtCfg.getOperationalScheme());
 			}
-			default -> throw new IllegalStateException( "Unexpected value: " + drtCfg.getOperationalScheme());
 		}
 
 		// this is, we think, updating the max travel time based on congested travel time and the alpha-beta thing:
@@ -224,13 +268,21 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 
 		@Override
 		public DrtStopNetwork get() {
+			Optional<DrtServiceAreas> serviceAreas = getModalInstance(new TypeLiteral<Optional<DrtServiceAreas>>() {
+			});
 			switch (drtCfg.getOperationalScheme()) {
 				case door2door:
 					return ImmutableMap::of;
-				case stopbased:
-					return createDrtStopNetworkFromTransitSchedule(config, drtCfg);
+				case stopbased: {
+					// the polygons only tag the transit stops, the inventory stays the one of the transit stop file
+					DrtStopNetwork stopNetwork = createDrtStopNetworkFromTransitSchedule(config, drtCfg);
+					return serviceAreas.map(areas -> areas.tag(stopNetwork)).orElse(stopNetwork);
+				}
 				case serviceAreaBased:
-					return createDrtStopNetworkFromServiceArea(config, drtCfg, getModalInstance(Network.class));
+					// exactly one of the two area sources is set, see DrtConfigGroup.checkConsistency
+					return serviceAreas.map(areas -> areas.createStopNetwork(getModalInstance(Network.class)))
+							.orElseGet(() -> createDrtStopNetworkFromServiceArea(config, drtCfg,
+									getModalInstance(Network.class)));
 				default:
 					throw new RuntimeException("Unsupported operational scheme: " + drtCfg.getOperationalScheme());
 			}
