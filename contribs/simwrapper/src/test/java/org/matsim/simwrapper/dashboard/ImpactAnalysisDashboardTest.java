@@ -45,13 +45,28 @@ class ImpactAnalysisDashboardTest {
 			.exists()
 			.content()
 			.contains("title: Wirkungsanalyse")
-			.contains("impact.csv")
-			.contains("Absolute Szenariowirkungen");
+			.contains("Absolute Szenariowirkungen")
+			.contains("title: Fahrten")
+			.contains("type: csv")
+			.contains("dataset: analysis/impact/impact_person_trips_base.csv")
+			.contains("dataset: analysis/impact/impact_person_distance_policy.csv")
+			.contains("dataset: analysis/impact/impact_freight_time_difference.csv")
+			.contains("title: Emissionen")
+			.contains("dataset: analysis/impact/impact_emissions_base.csv")
+			.contains("title: Agentenvergleich")
+			.contains("title: Nutzen-Kosten-Analyse");
+
+		Assertions.assertThat(runDirectory.resolve("analysis/impact/impact_person_trips_policy.csv"))
+			.exists()
+			.content()
+			.contains("Modus,Fahrten pro Tag,Fahrten pro Jahr")
+			.contains("car,1\u2060,334\u2060")
+			.doesNotContain("freight");
 
 		Assertions.assertThat(impact)
 			.exists()
 			.content()
-			.contains("section,metric,component,mode,period,unit,reference,scenario,difference,benefit,status,source")
+			.contains("section,metric,component,mode,period,unit,reference,scenario,difference,relative_change,status,source")
 			.contains("Personenverkehr,Reisezeit Personen,Reisezeit Personen,car,year,Mio. Personen-h/a")
 			.contains("Score,Summe ausgefuehrter Score")
 			.contains("missing_emissions")
@@ -102,6 +117,11 @@ class ImpactAnalysisDashboardTest {
 			.contains("Personenverkehr,Verkehrsleistung Personen,Verkehrsleistung Personen,car,year,Mio. Personen-km/a,0.003340,0.002672,-0.000668")
 			.contains("Agentenvergleich,Verbleiber")
 			.contains("Agentenvergleich,Mittlere Scoredifferenz gemeinsamer Personen");
+
+		Assertions.assertThat(scenarioDirectory.resolve("analysis/impact/impact_person_distance_policy.csv"))
+			.content()
+			.contains("Modus,Verkehrsleistung Personen (pkm/Tag),Verkehrsleistung Personen (Mio. pkm/Jahr)")
+			.contains("car,8.000\u2060,0.003\u2060");
 	}
 
 	private void writeRunInputs(Path runDirectory, String legs, String trips) throws IOException {

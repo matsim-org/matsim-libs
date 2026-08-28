@@ -63,8 +63,9 @@ final class ImpactRunReader {
 	private void readLegs(Path file, double scale, ImpactAnalysisResult result) {
 		try (CSVParser parser = parser(file)) {
 			for (CSVRecord record : parser) {
-				// Missing network_mode denotes a passenger/non-network leg and must not become a vehicle movement.
-				String mode = text(record, "network_mode");
+				// Standard MATSim legs output uses `mode`; network-based exports may additionally provide `network_mode`.
+				// Falling back to mode keeps vehicle metrics available for both output variants.
+				String mode = text(record, "network_mode", "mode");
 				if (mode == null || !vehicleModes.contains(mode) || !consider(mode)) continue;
 				ImpactAnalysisResult.ModeImpact impact = result.byMode.computeIfAbsent(mode, ignored -> new ImpactAnalysisResult.ModeImpact());
 				double distance = number(record, "distance");
@@ -72,6 +73,10 @@ final class ImpactRunReader {
 				impact.vehicleLegs += scale;
 				if (!Double.isNaN(distance)) impact.vehicleDistanceMeters += distance * scale;
 				if (!Double.isNaN(travelTime)) impact.vehicleTravelTimeSeconds += travelTime * scale;
+				if (!Double.isNaN(travelTime)) {
+					if (distance <= 50_000.) impact.vehicleTravelTimeShortSeconds += travelTime * scale;
+					else impact.vehicleTravelTimeLongSeconds += travelTime * scale;
+				}
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

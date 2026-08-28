@@ -65,19 +65,19 @@ final class ImpactCsvWriter {
 			int days = days(mode);
 			boolean freight = freightModes.contains(mode);
 			String section = freight ? "Gueterverkehr" : "Personenverkehr";
-			row(printer, section, "Fahrten", mode, "Fahrten/Tag", referenceMode, policyMode, value -> value.trips);
-			row(printer, section, "Fahrten", mode, "Fahrten/a", referenceMode, policyMode, value -> value.trips * days);
+			row(printer, section, "Fahrten", mode, "trips/day", referenceMode, policyMode, value -> value.trips);
+			row(printer, section, "Fahrten", mode, "trips/year", referenceMode, policyMode, value -> value.trips * days);
 			row(printer, section, freight ? "Zurueckgelegte Distanz" : "Verkehrsleistung Personen", mode,
-				freight ? "km/Tag" : "Personen-km/Tag", referenceMode, policyMode,
+				freight ? "km/day" : "person-km/day", referenceMode, policyMode,
 				value -> value.personDistanceMeters / METERS_PER_KILOMETER);
 			row(printer, section, freight ? "Zurueckgelegte Distanz" : "Verkehrsleistung Personen", mode,
-				freight ? "Mio. km/a" : "Mio. Personen-km/a", referenceMode, policyMode,
+				freight ? "million km/year" : "million person-km/year", referenceMode, policyMode,
 				value -> annualKilometers(value.personDistanceMeters, days));
 			row(printer, section, freight ? "Reisezeit" : "Reisezeit Personen", mode,
-				freight ? "h/Tag" : "Personen-h/Tag", referenceMode, policyMode,
+				freight ? "hours/day" : "person-hours/day", referenceMode, policyMode,
 				value -> value.personTravelTimeSeconds / SECONDS_PER_HOUR);
 			row(printer, section, freight ? "Reisezeit" : "Reisezeit Personen", mode,
-				freight ? "Mio. h/a" : "Mio. Personen-h/a", referenceMode, policyMode,
+				freight ? "million hours/year" : "million person-hours/year", referenceMode, policyMode,
 				value -> annualHours(value.personTravelTimeSeconds, days));
 			if (vehicleModes.contains(mode)) vehicleTraffic(printer, section, mode, days, referenceMode, policyMode);
 		}
@@ -85,15 +85,25 @@ final class ImpactCsvWriter {
 
 	private void vehicleTraffic(CSVPrinter printer, String section, String mode, int days,
 			ImpactAnalysisResult.ModeImpact reference, ImpactAnalysisResult.ModeImpact policy) throws IOException {
-		row(printer, section, "Fahrzeugfahrten", mode, "Fahrzeug-Legs/Tag", reference, policy, value -> value.vehicleLegs);
-		row(printer, section, "Fahrzeugverkehrsleistung", mode, "Mio. Fahrzeug-km/a", reference, policy,
+		row(printer, section, "Fahrzeugfahrten", mode, "vehicle-legs/day", reference, policy, value -> value.vehicleLegs);
+		row(printer, section, "Fahrzeugfahrten", mode, "vehicle-legs/year", reference, policy,
+			value -> value.vehicleLegs * days);
+		row(printer, section, "Fahrzeugverkehrsleistung", mode, "million vehicle-km/year", reference, policy,
 			value -> annualKilometers(value.vehicleDistanceMeters, days));
-		row(printer, section, "Fahrzeugverkehrsleistung", mode, "Fahrzeug-km/Tag", reference, policy,
+		row(printer, section, "Fahrzeugverkehrsleistung", mode, "vehicle-km/day", reference, policy,
 			value -> value.vehicleDistanceMeters / METERS_PER_KILOMETER);
-		row(printer, section, "Fahrzeugeinsatzzeit", mode, "Mio. Fahrzeug-h/a", reference, policy,
-			value -> annualHours(value.vehicleTravelTimeSeconds, days));
-		row(printer, section, "Fahrzeugeinsatzzeit", mode, "Fahrzeug-h/Tag", reference, policy,
+		row(printer, section, "Vehicle Operating Times (≤ 50 km)", mode, "hours/day", reference, policy,
+			value -> value.vehicleTravelTimeShortSeconds / SECONDS_PER_HOUR);
+		row(printer, section, "Vehicle Operating Times (> 50 km)", mode, "hours/day", reference, policy,
+			value -> value.vehicleTravelTimeLongSeconds / SECONDS_PER_HOUR);
+		row(printer, section, "Vehicle Operating Times", mode, "hours/day", reference, policy,
 			value -> value.vehicleTravelTimeSeconds / SECONDS_PER_HOUR);
+		row(printer, section, "Vehicle Operating Times (≤ 50 km)", mode, "million hours/year", reference, policy,
+			value -> annualHours(value.vehicleTravelTimeShortSeconds, days));
+		row(printer, section, "Vehicle Operating Times (> 50 km)", mode, "million hours/year", reference, policy,
+			value -> annualHours(value.vehicleTravelTimeLongSeconds, days));
+		row(printer, section, "Vehicle Operating Times", mode, "million hours/year", reference, policy,
+			value -> annualHours(value.vehicleTravelTimeSeconds, days));
 	}
 
 	private void emissions(CSVPrinter printer, ImpactAnalysisResult policy, ImpactAnalysisResult reference) throws IOException {
@@ -110,22 +120,28 @@ final class ImpactCsvWriter {
 				Double referenceYear = reference == null ? null : emission(reference, mode, pollutant, true);
 				String status = policyDay == null || reference != null && referenceDay == null ? "missing_emissions"
 					: reference == null ? ABSOLUTE : COMPARISON;
-				values(printer, "Emissionen", pollutant, mode, "kg/Tag", referenceDay, policyDay, status);
-				values(printer, "Emissionen", pollutant, mode, "t/a", referenceYear, policyYear, status);
+				values(printer, "Emissionen", pollutant, mode, "kg/day", referenceDay, policyDay, status);
+				values(printer, "Emissionen", pollutant, mode, "tonnes/year", referenceYear, policyYear, status);
 			}
 		}
 	}
 
 	private void scores(CSVPrinter printer, ImpactAnalysisResult policy, ImpactAnalysisResult reference) throws IOException {
-		// Scores remain utilities and are not annualized or silently interpreted as monetary values.
 		Double referenceMean = reference == null || reference.scoredPersons == 0 ? null : reference.scoreSum / reference.scoredPersons;
 		Double policyMean = policy.scoredPersons == 0 ? null : policy.scoreSum / policy.scoredPersons;
 		String status = reference == null ? ABSOLUTE : COMPARISON;
-		values(printer, "Score", "Personen mit ausgefuehrtem Score", "all", "Personen/Tag",
+		values(printer, "Score", "Personen mit ausgefuehrtem Score", "all", "persons/day",
 			reference == null ? null : reference.scoredPersons, policy.scoredPersons, status);
-		values(printer, "Score", "Summe ausgefuehrter Score", "all", "utils/Tag",
+		values(printer, "Score", "Personen mit ausgefuehrtem Score", "all", "persons/year",
+			reference == null ? null : reference.scoredPersons * personDays,
+			policy.scoredPersons * personDays, status);
+		values(printer, "Score", "Summe ausgefuehrter Score", "all", "utils/day",
 			reference == null ? null : reference.scoreSum, policy.scoreSum, status);
-		values(printer, "Score", "Mittlerer ausgefuehrter Score", "all", "utils/Person", referenceMean, policyMean, status);
+		values(printer, "Score", "Summe ausgefuehrter Score", "all", "utils/year",
+			reference == null ? null : reference.scoreSum * personDays,
+			policy.scoreSum * personDays, status);
+		values(printer, "Score", "Mittlerer ausgefuehrter Score", "all", "utils/person (year)", referenceMean, policyMean, status);
+		values(printer, "Score", "Mittlerer ausgefuehrter Score", "all", "utils/person", referenceMean, policyMean, status);
 	}
 
 	private void persons(CSVPrinter printer, ImpactAnalysisResult policy, ImpactAnalysisResult reference,
@@ -191,9 +207,9 @@ final class ImpactCsvWriter {
 			Double reference, Double policy, String status) throws IOException {
 		// Physical deltas always use policy minus reference. A zero reference has no meaningful relative change,
 		// therefore the relative field stays empty instead of emitting infinity or an invented zero.
-		String difference = reference == null || policy == null ? "" : format(policy - reference);
-		String relative = reference == null || policy == null || reference == 0. ? "" : format((policy - reference) / reference);
-		printer.printRecord(section, metric, metric, mode, unit.contains("/a") ? "year" : "day", unit,
+		String difference = reference == null || policy == null ? "" : format(reference - policy);
+		String relative = reference == null || policy == null || reference == 0. ? "" : format((reference - policy) / reference);
+		printer.printRecord(section, metric, metric, mode, unit.toLowerCase(Locale.ROOT).contains("/year") || unit.contains("Year") ? "year" : "day", unit,
 			reference == null ? "" : format(reference), policy == null ? "" : format(policy), difference, relative,
 			status, "MATSim standard output");
 	}

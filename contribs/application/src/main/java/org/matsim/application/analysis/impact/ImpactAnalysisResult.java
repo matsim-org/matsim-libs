@@ -25,6 +25,8 @@ final class ImpactAnalysisResult {
 		double vehicleLegs;
 		double vehicleDistanceMeters;
 		double vehicleTravelTimeSeconds;
+		double vehicleTravelTimeShortSeconds;
+		double vehicleTravelTimeLongSeconds;
 	}
 
 	static final class PersonImpact {

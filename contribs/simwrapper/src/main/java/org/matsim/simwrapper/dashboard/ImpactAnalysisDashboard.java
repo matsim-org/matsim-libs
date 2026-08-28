@@ -1,6 +1,7 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.impact.ImpactAnalysis;
+import org.matsim.application.analysis.impact.ImpactDashboardTables;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
@@ -58,47 +59,87 @@ public class ImpactAnalysisDashboard implements Dashboard {
 		String effectiveReference = referenceRunDirectory != null && !referenceRunDirectory.isBlank()
 			? referenceRunDirectory : configGroup.getBaseCase();
 		boolean comparison = effectiveReference != null && !effectiveReference.isBlank();
-		header.title = "Wirkungsanalyse";
+		header.title = "Impact Analysis";
 		header.description = comparison
-			? "Absolute Wirkungen des Szenarios und Veraenderungen gegenueber dem Bezugsfall."
-			: "Absolute verkehrliche, physikalische und umweltbezogene Wirkungen des Szenarios.";
+			? "Absolute impacts of the policy case and changes relative to the base case."
+			: "Absolute traffic, physical and environmental impacts of the scenario.";
 
 		String[] args = analysisArgs(effectiveReference);
 
-		layout.row("traffic", "Verkehrliche und physikalische Wirkungen")
-			.el(Table.class, (viz, data) -> {
-				viz.title = comparison
-					? "Szenario und Bezugsfall"
-					: "Absolute Szenariowirkungen";
-				viz.description = comparison
-					? "Die Differenz ist als Szenario minus Bezugsfall definiert."
-					: "Tageswerte werden mit der konfigurierten Stichprobengroesse auf die Gesamtbevoelkerung hochgerechnet.";
-				viz.style = "topsheet";
-				viz.dataset = data.compute(ImpactAnalysis.class, "impact.csv", args);
-				viz.enableFilter = true;
-				viz.showAllRows = true;
-				viz.width = 1d;
-				viz.height = 9d;
-				viz.alignment = new String[]{"left", "left", "left", "left", "left", "left", "right", "right",
-					"right", "right", "left", "left"};
-			});
+		for (String mode : modes == null || modes.isEmpty() ? List.of("car", "truck", "freight", "bike", "pt") : modes)
+			modeTables(layout, args, mode);
+		displayScoreTables(layout, args);
 
-		layout.row("scope")
-			.el(TextBlock.class, (viz, data) -> {
-				viz.backgroundColor = "white";
-				viz.content = comparison
-					? """
-						## Einordnung
-
-						Dieser erste Analyseschritt zeigt absolute physikalische Wirkungen und deren Veraenderung. Monetarisierte Nutzen, Verkehrssicherheit, Barwerte und NKV werden in den naechsten Ausbaustufen ergaenzt.
-						"""
-					: """
-						## Einordnung
-
-						Ohne Bezugsfall zeigt das Dashboard absolute Szenariowirkungen. Es werden keine Nutzen und kein Nutzen-Kosten-Verhaeltnis ausgewiesen. Monetarisierte Wirkungen und Verkehrssicherheit werden in den naechsten Ausbaustufen ergaenzt.
-						""";
-			});
 	}
+
+	private void displayScoreTables(Layout layout, String[] args) {
+		for (String period : List.of("day", "year")) {
+			layout.row("score-" + period).el(Table.class, (viz, data) -> {
+				data.compute(ImpactAnalysis.class, "impact.csv", args);
+				viz.title = "Score – " + (period.equals("day") ? "per Day" : "per Year");
+				viz.dataset = data.compute(ImpactDashboardTables.class, "impact_scores_" + period + ".csv");
+				viz.style = "topsheet"; viz.enableFilter = false; viz.hideHeader = false; viz.showAllRows = true;
+				viz.alignment = new String[]{"left", "right", "right", "right", "right", "left"};
+			});
+		}
+	}
+
+	private void modeTables(Layout layout, String[] args, String mode) {
+		String label = mode.substring(0, 1).toUpperCase() + mode.substring(1);
+		periodTables(layout, args, mode, label, "day", "per day");
+		periodTables(layout, args, mode, label, "year", "per year");
+	}
+
+	private void periodTables(Layout layout, String[] args, String mode, String label, String period, String periodLabel) {
+		layout.row(mode + "-" + period).el(Table.class, (viz, data) -> {
+			data.compute(ImpactAnalysis.class, "impact.csv", args);
+			viz.title = "Central Traffic / Physical Effects (" + label + ", " + periodLabel + ")";
+			viz.dataset = data.compute(ImpactDashboardTables.class, "impact_general_" + mode + "_" + period + ".csv");
+			viz.style = "topsheet"; viz.enableFilter = false; viz.hideHeader = false; viz.showAllRows = true;
+			viz.width = 0.5d; viz.height = 5d; viz.alignment = new String[]{"left", "right", "right", "right", "left"};
+		}).el(Table.class, (viz, data) -> {
+			data.compute(ImpactAnalysis.class, "impact.csv", args);
+			viz.title = "Change In Exhaust Emissions (" + label + ", " + periodLabel + ")";
+			viz.dataset = data.compute(ImpactDashboardTables.class, "impact_emissions_" + mode + "_" + period + ".csv");
+			viz.style = "topsheet"; viz.enableFilter = false; viz.hideHeader = false; viz.showAllRows = true;
+			viz.width = 0.5d; viz.height = 5d; viz.alignment = new String[]{"left", "right", "right", "right", "left"};
+		});
+	}
+
+	private void trafficSection(Layout layout, String[] args, String section, List<ImpactView> views) {
+		layout.row(section.toLowerCase() + "-header").el(TextBlock.class, (viz, data) -> {
+			viz.title = section;
+			viz.content = "## " + section;
+		});
+		for (ImpactView view : views) {
+			String id = (section + "-" + view.metric()).toLowerCase().replace(' ', '-');
+			displayCaseTables(layout, args, id, view.metric(), view.file(), 4d);
+		}
+	}
+
+	private void displayCaseTables(Layout layout, String[] args, String id, String title, String file, double height) {
+		Layout.Row row = layout.row(id);
+		for (String kind : List.of("base", "policy", "difference")) {
+			String label = switch (kind) { case "base" -> "Base"; case "policy" -> "Policy"; default -> "Differenz"; };
+			row.el(Table.class, (viz, data) -> {
+				data.compute(ImpactAnalysis.class, "impact.csv", args);
+				viz.title = title + " – " + label;
+				viz.dataset = data.compute(ImpactDashboardTables.class, file + "_" + kind + ".csv");
+				viz.height = height;
+				viz.style = "topsheet";
+				viz.enableFilter = false;
+				viz.hideHeader = false;
+				viz.showAllRows = true;
+				viz.alignment = file.contains("person_") || file.contains("freight_")
+					? new String[]{"left", "right", "right"}
+					: file.contains("emissions")
+					? new String[]{"left", "left", "right", "right"}
+					: new String[]{"left", "left", "right"};
+			});
+		}
+	}
+
+	private record ImpactView(String metric, String file) { }
 
 	private String[] analysisArgs(String effectiveReference) {
 
