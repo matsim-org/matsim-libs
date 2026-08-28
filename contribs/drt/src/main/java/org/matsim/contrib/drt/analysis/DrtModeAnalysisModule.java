@@ -23,14 +23,13 @@ package org.matsim.contrib.drt.analysis;
 import java.awt.Color;
 import java.awt.Paint;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
+import com.google.inject.multibindings.OptionalBinder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.matsim.api.core.v01.network.Network;
@@ -60,14 +59,12 @@ import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileCalculator;
 import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileView;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import java.awt.*;
 import java.util.Comparator;
 import java.util.Map;
@@ -176,21 +173,14 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 			getter.getModal(DvrpLoadType.class))));
 
 
+		// bound in DrtModeRoutingModule, which is installed alongside
+		OptionalBinder.newOptionalBinder(binder(), modalKey(DrtServiceAreas.class));
+
 		modalMapBinder(String.class, ZoneSystem.class).addBinding(ANALYSIS_ZONE_SYSTEM).toProvider(modalProvider(getter -> {
 			Network network = getter.getModal(Network.class);
-			Predicate<Zone> zoneFilter;
-			// the areas of the service configurations are the alternative source of the served area, see DrtServiceAreas
-			Optional<DrtServiceAreas> serviceAreas = DrtServiceAreas.createIfConfigured(getConfig(), drtCfg);
-			if (serviceAreas.isPresent()) {
-				zoneFilter = zone -> serviceAreas.get().intersects(zone.getPreparedGeometry().getGeometry());
-			} else if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
-				List<PreparedGeometry> serviceAreaGeoms = ShpGeometryUtils.loadPreparedGeometries(
-						ConfigGroup.getInputFileURL(this.getConfig().getContext(), this.drtCfg.getDrtServiceAreaShapeFile()));
-				zoneFilter = zone -> serviceAreaGeoms.stream()
-						.anyMatch((serviceArea) -> serviceArea.intersects(zone.getPreparedGeometry().getGeometry()));
-			} else {
-				zoneFilter = zone -> true;
-			}
+			Predicate<Zone> zoneFilter = DrtServiceAreas.servedAreaZoneFilter(getConfig(), drtCfg,
+					getter.getModal(new TypeLiteral<Optional<DrtServiceAreas>>() {
+					}));
 			String crs = getConfig().global().getCoordinateSystem();
 			ZoneSystemParams zoneSystemParams = drtCfg.addOrGetAnalysisZoneSystemParams();
 			return ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network, zoneSystemParams, crs, zoneFilter);

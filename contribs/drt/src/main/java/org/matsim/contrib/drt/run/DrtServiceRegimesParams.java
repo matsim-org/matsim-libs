@@ -35,20 +35,20 @@ import org.matsim.core.utils.misc.Time;
 import com.google.common.base.Verify;
 
 /**
- * Container of the time-dependent service configurations of one DRT service. If present, only bookings with a desired
+ * Container of the time-dependent service regimes of one DRT service. If present, only bookings with a desired
  * departure time covered by one of the configured time windows are served.
  *
  * @author nkuehnel / MOIA
  */
-public final class DrtServiceConfigurationsParams extends ReflectiveConfigGroup {
-	public static final String SET_NAME = "serviceConfigurations";
+public final class DrtServiceRegimesParams extends ReflectiveConfigGroup {
+	public static final String SET_NAME = "serviceRegimes";
 
 	public static final String SERVICE_AREA_FILE = "serviceAreaFile";
 	public static final String SERVICE_AREA_ATTRIBUTE = "serviceAreaAttribute";
 
 	@Parameter(SERVICE_AREA_FILE)
-	@Comment("Path to a GIS file (shp or gpkg) holding the service areas of the service configurations. Every polygon"
-			+ " names the service configurations it belongs to in the attribute given by serviceAreaAttribute"
+	@Comment("Path to a GIS file (shp or gpkg) holding the service areas of the service regimes. Every polygon"
+			+ " names the service regimes it belongs to in the attribute given by serviceAreaAttribute"
 			+ " (comma-separated, may be empty), and those names are stamped onto the stops as their 'stopNetworks'"
 			+ " attribute. With operationalScheme=serviceAreaBased this file replaces drtServiceAreaShapeFile: every"
 			+ " link inside any polygon becomes a stop. With stopbased it only tags the stops of the transitStopFile,"
@@ -57,13 +57,13 @@ public final class DrtServiceConfigurationsParams extends ReflectiveConfigGroup 
 	private String serviceAreaFile = null;
 
 	@Parameter(SERVICE_AREA_ATTRIBUTE)
-	@Comment("Name of the attribute of the serviceAreaFile polygons that names the service configurations a polygon"
+	@Comment("Name of the attribute of the serviceAreaFile polygons that names the service regimes a polygon"
 			+ " belongs to. Note that column names of shapefiles are limited to 10 characters, so the default cannot"
 			+ " be used there.")
 	@NotBlank
 	private String serviceAreaAttribute = AttributeBasedStopFinder.FACILITY_STOP_NETWORKS_ATTRIBUTE;
 
-	public DrtServiceConfigurationsParams() {
+	public DrtServiceRegimesParams() {
 		super(SET_NAME);
 	}
 
@@ -84,17 +84,17 @@ public final class DrtServiceConfigurationsParams extends ReflectiveConfigGroup 
 		this.serviceAreaAttribute = serviceAreaAttribute;
 	}
 
-	public List<DrtServiceConfigurationParams> getServiceConfigurations() {
-		return getParameterSets(DrtServiceConfigurationParams.SET_NAME).stream()
-				.filter(DrtServiceConfigurationParams.class::isInstance)
-				.map(DrtServiceConfigurationParams.class::cast)
+	public List<DrtServiceRegimeParams> getServiceRegimes() {
+		return getParameterSets(DrtServiceRegimeParams.SET_NAME).stream()
+				.filter(DrtServiceRegimeParams.class::isInstance)
+				.map(DrtServiceRegimeParams.class::cast)
 				.toList();
 	}
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		if (DrtServiceConfigurationParams.SET_NAME.equals(type)) {
-			return new DrtServiceConfigurationParams();
+		if (DrtServiceRegimeParams.SET_NAME.equals(type)) {
+			return new DrtServiceRegimeParams();
 		}
 		throw new IllegalArgumentException("unknown set type " + type);
 	}
@@ -103,39 +103,39 @@ public final class DrtServiceConfigurationsParams extends ReflectiveConfigGroup 
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		List<DrtServiceConfigurationParams> serviceConfigurations = getServiceConfigurations();
-		Verify.verify(!serviceConfigurations.isEmpty(), "At least one %s is required.",
-				DrtServiceConfigurationParams.SET_NAME);
-		Verify.verify(serviceConfigurations.stream().map(DrtServiceConfigurationParams::getServiceConfigurationName).distinct().count()
-				== serviceConfigurations.size(), "Cannot have several %s with identical names.",
-				DrtServiceConfigurationParams.SET_NAME);
+		List<DrtServiceRegimeParams> serviceRegimes = getServiceRegimes();
+		Verify.verify(!serviceRegimes.isEmpty(), "At least one %s is required.",
+				DrtServiceRegimeParams.SET_NAME);
+		Verify.verify(serviceRegimes.stream().map(DrtServiceRegimeParams::getServiceRegimeName).distinct().count()
+				== serviceRegimes.size(), "Cannot have several %s with identical names.",
+				DrtServiceRegimeParams.SET_NAME);
 
-		for (DrtServiceConfigurationParams serviceConfiguration : serviceConfigurations) {
-			if (serviceConfiguration.getStartTime().isDefined() && serviceConfiguration.getEndTime().isDefined()) {
-				Verify.verify(serviceConfiguration.getEndTime().seconds() > serviceConfiguration.getStartTime().seconds(),
-						"endTime must be later than startTime in %s '%s'.", DrtServiceConfigurationParams.SET_NAME,
-						serviceConfiguration.getServiceConfigurationName());
+		for (DrtServiceRegimeParams serviceRegime : serviceRegimes) {
+			if (serviceRegime.getStartTime().isDefined() && serviceRegime.getEndTime().isDefined()) {
+				Verify.verify(serviceRegime.getEndTime().seconds() > serviceRegime.getStartTime().seconds(),
+						"endTime must be later than startTime in %s '%s'.", DrtServiceRegimeParams.SET_NAME,
+						serviceRegime.getServiceRegimeName());
 			}
 		}
 
-		Verify.verify(serviceConfigurations.stream().filter(s -> s.getStartTime().isUndefined()).count() <= 1,
-				"At most one %s may have an undefined startTime.", DrtServiceConfigurationParams.SET_NAME);
-		Verify.verify(serviceConfigurations.stream().filter(s -> s.getEndTime().isUndefined()).count() <= 1,
-				"At most one %s may have an undefined endTime.", DrtServiceConfigurationParams.SET_NAME);
+		Verify.verify(serviceRegimes.stream().filter(s -> s.getStartTime().isUndefined()).count() <= 1,
+				"At most one %s may have an undefined startTime.", DrtServiceRegimeParams.SET_NAME);
+		Verify.verify(serviceRegimes.stream().filter(s -> s.getEndTime().isUndefined()).count() <= 1,
+				"At most one %s may have an undefined endTime.", DrtServiceRegimeParams.SET_NAME);
 
 		// the time windows are half-open [startTime, endTime), so touching windows are fine, overlapping ones are not
-		List<DrtServiceConfigurationParams> sorted = serviceConfigurations.stream()
+		List<DrtServiceRegimeParams> sorted = serviceRegimes.stream()
 				.sorted(Comparator.comparingDouble(s -> s.getStartTime().orElse(Double.NEGATIVE_INFINITY)))
 				.toList();
 		for (int i = 1; i < sorted.size(); i++) {
-			DrtServiceConfigurationParams earlier = sorted.get(i - 1);
-			DrtServiceConfigurationParams later = sorted.get(i);
+			DrtServiceRegimeParams earlier = sorted.get(i - 1);
+			DrtServiceRegimeParams later = sorted.get(i);
 			double earlierEnd = earlier.getEndTime().orElse(Double.POSITIVE_INFINITY);
 			double laterStart = later.getStartTime().orElse(Double.NEGATIVE_INFINITY);
 			Verify.verify(earlierEnd <= laterStart,
 					"Time windows of %s '%s' (ending %s) and '%s' (starting %s) overlap.",
-					DrtServiceConfigurationParams.SET_NAME, earlier.getServiceConfigurationName(), Time.writeTime(earlier.getEndTime()),
-					later.getServiceConfigurationName(), Time.writeTime(later.getStartTime()));
+					DrtServiceRegimeParams.SET_NAME, earlier.getServiceRegimeName(), Time.writeTime(earlier.getEndTime()),
+					later.getServiceRegimeName(), Time.writeTime(later.getStartTime()));
 		}
 	}
 }

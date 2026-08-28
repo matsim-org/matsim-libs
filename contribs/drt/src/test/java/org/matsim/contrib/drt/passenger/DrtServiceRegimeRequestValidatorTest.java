@@ -21,9 +21,10 @@
 package org.matsim.contrib.drt.passenger;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.passenger.DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_AREA_ACCESS_CAUSE;
-import static org.matsim.contrib.drt.passenger.DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_AREA_EGRESS_CAUSE;
-import static org.matsim.contrib.drt.passenger.DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_TIME_CAUSE;
+import static org.matsim.contrib.drt.passenger.DrtServiceRegimeRequestValidator.OUTSIDE_SERVICE_AREA_ACCESS_CAUSE;
+import static org.matsim.contrib.drt.passenger.DrtServiceRegimeRequestValidator.OUTSIDE_SERVICE_AREA_EGRESS_CAUSE;
+import static org.matsim.contrib.drt.passenger.DrtServiceRegimeRequestValidator.OUTSIDE_SERVICE_TIME_CAUSE;
+import static org.matsim.contrib.drt.run.DrtServiceRegimesFixtures.serviceRegime;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -34,13 +35,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
-import org.matsim.contrib.drt.run.DrtServiceConfigurationParams;
-import org.matsim.contrib.drt.run.DrtServiceConfigurations;
-import org.matsim.contrib.drt.run.DrtServiceConfigurationsParams;
+import org.matsim.contrib.drt.run.DrtServiceRegimeParams;
+import org.matsim.contrib.drt.run.DrtServiceRegimes;
+import org.matsim.contrib.drt.run.DrtServiceRegimesFixtures;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.router.AttributeBasedStopFinder;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import com.google.common.collect.ImmutableMap;
@@ -48,7 +48,7 @@ import com.google.common.collect.ImmutableMap;
 /**
  * @author nkuehnel / MOIA
  */
-class DrtServiceTimeRequestValidatorTest {
+class DrtServiceRegimeRequestValidatorTest {
 
 	private final Network network = NetworkUtils.createNetwork();
 
@@ -61,17 +61,17 @@ class DrtServiceTimeRequestValidatorTest {
 
 	@Test
 	void testRequestInsideTheServiceTimeAndAreaIsAccepted() {
-		var validator = new DrtServiceTimeRequestValidator(
-				serviceConfigurations(serviceConfiguration("morning", 6 * 3600, 10 * 3600, "peak")));
+		var validator = new DrtServiceRegimeRequestValidator(
+				serviceRegimes(serviceRegime("morning", 6 * 3600, 10 * 3600, "peak")));
 
 		assertThat(validator.validateRequest(request(8 * 3600, peakLink, alwaysLink))).isEmpty();
 	}
 
 	@Test
 	void testRequestOutsideAllServiceTimeWindowsIsRejected() {
-		var validator = new DrtServiceTimeRequestValidator(
-				serviceConfigurations(serviceConfiguration("morning", 6 * 3600, 10 * 3600, "peak"),
-						serviceConfiguration("evening", 16 * 3600, 20 * 3600, "peak")));
+		var validator = new DrtServiceRegimeRequestValidator(
+				serviceRegimes(serviceRegime("morning", 6 * 3600, 10 * 3600, "peak"),
+						serviceRegime("evening", 16 * 3600, 20 * 3600, "peak")));
 
 		// before the first window
 		assertThat(validator.validateRequest(request(5 * 3600, peakLink, alwaysLink))).containsExactly(
@@ -86,8 +86,8 @@ class DrtServiceTimeRequestValidatorTest {
 
 	@Test
 	void testLinksNotServedInTheActiveRegimeAreRejected() {
-		var validator = new DrtServiceTimeRequestValidator(
-				serviceConfigurations(serviceConfiguration("morning", 6 * 3600, 10 * 3600, "peak")));
+		var validator = new DrtServiceRegimeRequestValidator(
+				serviceRegimes(serviceRegime("morning", 6 * 3600, 10 * 3600, "peak")));
 
 		assertThat(validator.validateRequest(request(8 * 3600, offpeakLink, alwaysLink))).containsExactly(
 				OUTSIDE_SERVICE_AREA_ACCESS_CAUSE);
@@ -100,8 +100,8 @@ class DrtServiceTimeRequestValidatorTest {
 	@Test
 	void testWithoutStopsOnlyTheTimeIsChecked() {
 		// door2door: the stop network is empty, so any link is served
-		var validator = new DrtServiceTimeRequestValidator(
-				serviceConfigurations(ImmutableMap::of, serviceConfiguration("morning", 6 * 3600, 10 * 3600, null)));
+		var validator = new DrtServiceRegimeRequestValidator(
+				DrtServiceRegimesFixtures.serviceRegimes(ImmutableMap::of, serviceRegime("morning", 6 * 3600, 10 * 3600, null)));
 
 		assertThat(validator.validateRequest(request(8 * 3600, offpeakLink, offpeakLink))).isEmpty();
 		assertThat(validator.validateRequest(request(13 * 3600, offpeakLink, offpeakLink))).containsExactly(
@@ -110,8 +110,8 @@ class DrtServiceTimeRequestValidatorTest {
 
 	@Test
 	void testEndOfServiceTimeIsSoft() {
-		var validator = new DrtServiceTimeRequestValidator(
-				serviceConfigurations(serviceConfiguration("morning", 6 * 3600, 10 * 3600, "peak")));
+		var validator = new DrtServiceRegimeRequestValidator(
+				serviceRegimes(serviceRegime("morning", 6 * 3600, 10 * 3600, "peak")));
 
 		// only the desired departure time counts; a request submitted or picked up later is still served
 		DrtRequest request = DrtRequest.newBuilder()
@@ -159,25 +159,7 @@ class DrtServiceTimeRequestValidatorTest {
 		return () -> drtStops;
 	}
 
-	private DrtServiceConfigurations serviceConfigurations(DrtServiceConfigurationParams... serviceConfigurations) {
-		return serviceConfigurations(stopNetwork, serviceConfigurations);
-	}
-
-	private static DrtServiceConfigurations serviceConfigurations(DrtStopNetwork stopNetwork,
-			DrtServiceConfigurationParams... serviceConfigurations) {
-		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
-		for (DrtServiceConfigurationParams serviceConfiguration : serviceConfigurations) {
-			params.addParameterSet(serviceConfiguration);
-		}
-		return new DrtServiceConfigurations(params, stopNetwork);
-	}
-
-	private static DrtServiceConfigurationParams serviceConfiguration(String name, double startTime, double endTime,
-			String stopNetwork) {
-		DrtServiceConfigurationParams serviceConfiguration = new DrtServiceConfigurationParams(name);
-		serviceConfiguration.setStartTime(OptionalTime.defined(startTime));
-		serviceConfiguration.setEndTime(OptionalTime.defined(endTime));
-		serviceConfiguration.setStopNetwork(stopNetwork);
-		return serviceConfiguration;
+	private DrtServiceRegimes serviceRegimes(DrtServiceRegimeParams... serviceRegimes) {
+		return DrtServiceRegimesFixtures.serviceRegimes(stopNetwork, serviceRegimes);
 	}
 }

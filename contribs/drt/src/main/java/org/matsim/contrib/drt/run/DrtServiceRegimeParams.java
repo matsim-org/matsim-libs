@@ -28,21 +28,21 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * One time-dependent configuration of a DRT service, i.e. one service time window and the set of stops served within
+ * One time-dependent regime of a DRT service, i.e. one service time window and the set of stops served within
  * that window. Bookings with a desired departure time outside all configured windows are not served.
  *
  * @author nkuehnel / MOIA
  */
-public final class DrtServiceConfigurationParams extends ReflectiveConfigGroup {
-	public static final String SET_NAME = "serviceConfiguration";
+public final class DrtServiceRegimeParams extends ReflectiveConfigGroup {
+	public static final String SET_NAME = "serviceRegime";
 
 	public static final String START_TIME = "startTime";
 	public static final String END_TIME = "endTime";
 
 	@Parameter
-	@Comment("Name of this service configuration. Used in logging and error messages. Must be unique.")
+	@Comment("Name of this service regime. Used in logging and error messages. Must be unique.")
 	@NotBlank
-	private String serviceConfigurationName;
+	private String serviceRegimeName;
 
 	@Comment("Start of the service time window (inclusive). Undefined means that the window is open at its beginning."
 			+ " Times beyond 24h (e.g. '25:00:00') are allowed, there is no wrap-around at midnight.")
@@ -59,21 +59,21 @@ public final class DrtServiceConfigurationParams extends ReflectiveConfigGroup {
 	@Nullable
 	private String stopNetwork = null;
 
-	public DrtServiceConfigurationParams() {
+	public DrtServiceRegimeParams() {
 		super(SET_NAME);
 	}
 
-	public DrtServiceConfigurationParams(String serviceConfigurationName) {
+	public DrtServiceRegimeParams(String serviceRegimeName) {
 		this();
-		this.serviceConfigurationName = serviceConfigurationName;
+		this.serviceRegimeName = serviceRegimeName;
 	}
 
-	public String getServiceConfigurationName() {
-		return serviceConfigurationName;
+	public String getServiceRegimeName() {
+		return serviceRegimeName;
 	}
 
-	public void setServiceConfigurationName(String serviceConfigurationName) {
-		this.serviceConfigurationName = serviceConfigurationName;
+	public void setServiceRegimeName(String serviceRegimeName) {
+		this.serviceRegimeName = serviceRegimeName;
 	}
 
 	public OptionalTime getStartTime() {

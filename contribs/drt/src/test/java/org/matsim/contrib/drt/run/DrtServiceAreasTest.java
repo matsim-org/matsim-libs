@@ -32,6 +32,7 @@ import org.geotools.api.feature.simple.SimpleFeature;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -79,6 +80,21 @@ class DrtServiceAreasTest {
 
 		assertThat(serviceAreas.covers(new Coord(500, 500))).isTrue();
 		assertThat(serviceAreas.stopNetworksAt(new Coord(500, 500))).isEmpty();
+	}
+
+	@Test
+	void testIntersectsIsTheUnionOfAllAreas() {
+		// two disjoint areas, so only their union describes the served area
+		DrtServiceAreas serviceAreas = serviceAreas(area(0, 0, 500, 1000, "morning"),
+				area(2000, 0, 2500, 1000, "evening"));
+
+		assertThat(serviceAreas.intersects(geometry(400, 400, 600, 600))).isTrue();
+		assertThat(serviceAreas.intersects(geometry(1900, 400, 2100, 600))).isTrue();
+		// a zone between the two areas is not served, even though it lies between them
+		assertThat(serviceAreas.intersects(geometry(1000, 0, 1500, 1000))).isFalse();
+		// a zone which only touches an area intersects it, unlike a coordinate on the boundary, which is not covered
+		assertThat(serviceAreas.intersects(geometry(500, 400, 700, 600))).isTrue();
+		assertThat(serviceAreas.covers(new Coord(500, 500))).isFalse();
 	}
 
 	@Test
@@ -133,7 +149,7 @@ class DrtServiceAreasTest {
 				stopNetwork.getDrtStops().keySet());
 		assertThat(stopNetworks(tagged, "west")).containsExactlyInAnyOrder("manuallyTagged", "morning", "evening");
 		assertThat(stopNetworks(tagged, "east")).containsExactly("morning");
-		// a stop outside all areas is kept unchanged, so a service configuration without stopNetwork still serves it
+		// a stop outside all areas is kept unchanged, so a service regime without stopNetwork still serves it
 		assertThat(stopNetworks(tagged, "outside")).isEmpty();
 	}
 
@@ -168,6 +184,10 @@ class DrtServiceAreasTest {
 				.create();
 		Map<String, Object> attributes = stopNetworks == null ? Map.of() : Map.of(ATTRIBUTE, stopNetworks);
 		return factory.createPolygon(square(minX, minY, maxX, maxY), attributes, "area");
+	}
+
+	private static Geometry geometry(double minX, double minY, double maxX, double maxY) {
+		return (Geometry)area(minX, minY, maxX, maxY, null).getDefaultGeometry();
 	}
 
 	private static Coordinate[] square(double minX, double minY, double maxX, double maxY) {

@@ -291,7 +291,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private DrtParallelInserterParams drtParallelInserterParams;
 
 	@Nullable
-	private DrtServiceConfigurationsParams serviceConfigurationsParams;
+	private DrtServiceRegimesParams serviceRegimesParams;
 
 	private ZoneSystemParams analysisZoneSystemParams;
 
@@ -355,10 +355,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			() -> drtEstimatorParams,
 			params -> drtEstimatorParams = (DrtEstimatorParams) params);
 
-		// time-dependent service configurations (optional)
-		addDefinition(DrtServiceConfigurationsParams.SET_NAME, DrtServiceConfigurationsParams::new,
-			() -> serviceConfigurationsParams,
-			params -> serviceConfigurationsParams = (DrtServiceConfigurationsParams) params);
+		// time-dependent service regimes (optional)
+		addDefinition(DrtServiceRegimesParams.SET_NAME, DrtServiceRegimesParams::new,
+			() -> serviceRegimesParams,
+			params -> serviceRegimesParams = (DrtServiceRegimesParams) params);
 
 		// load
 		addDefinition(DvrpLoadParams.SET_NAME, DvrpLoadParams::new,
@@ -423,26 +423,26 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		Verify.verify(getOperationalScheme() != OperationalScheme.stopbased || getTransitStopFile() != null,
 				"transitStopFile must not be null when operationalScheme is " + OperationalScheme.stopbased);
 
-		// the polygons of the service configurations are an alternative source of the served area, see DrtServiceAreas
-		String serviceAreaFile = serviceConfigurationsParams == null ?
+		// the polygons of the service regimes are an alternative source of the served area, see DrtServiceAreas
+		String serviceAreaFile = serviceRegimesParams == null ?
 				null :
-				serviceConfigurationsParams.getServiceAreaFile();
+				serviceRegimesParams.getServiceAreaFile();
 
 		if (getOperationalScheme() == OperationalScheme.serviceAreaBased) {
 			Verify.verify(getDrtServiceAreaShapeFile() != null || serviceAreaFile != null,
 					"Either drtServiceAreaShapeFile or %s of %s must be set when operationalScheme is %s",
-					DrtServiceConfigurationsParams.SERVICE_AREA_FILE, DrtServiceConfigurationsParams.SET_NAME,
+					DrtServiceRegimesParams.SERVICE_AREA_FILE, DrtServiceRegimesParams.SET_NAME,
 					OperationalScheme.serviceAreaBased);
 			Verify.verify(getDrtServiceAreaShapeFile() == null || serviceAreaFile == null,
 					"drtServiceAreaShapeFile and %s of %s must not be set at the same time: the served area is the"
-							+ " union of the polygons of %s.", DrtServiceConfigurationsParams.SERVICE_AREA_FILE,
-					DrtServiceConfigurationsParams.SET_NAME, DrtServiceConfigurationsParams.SERVICE_AREA_FILE);
+							+ " union of the polygons of %s.", DrtServiceRegimesParams.SERVICE_AREA_FILE,
+					DrtServiceRegimesParams.SET_NAME, DrtServiceRegimesParams.SERVICE_AREA_FILE);
 		}
 
 		Verify.verify(serviceAreaFile == null || getOperationalScheme() != OperationalScheme.door2door,
 				"%s of %s must not be set when operationalScheme is %s: door2door serves every link, so service"
-						+ " configurations can only restrict the time there.",
-				DrtServiceConfigurationsParams.SERVICE_AREA_FILE, DrtServiceConfigurationsParams.SET_NAME,
+						+ " regimes can only restrict the time there.",
+				DrtServiceRegimesParams.SERVICE_AREA_FILE, DrtServiceRegimesParams.SET_NAME,
 				OperationalScheme.door2door);
 
 		Verify.verify(getNumberOfThreads() <= Runtime.getRuntime().availableProcessors(),
@@ -465,12 +465,12 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, getMode());
 		}
 
-		if (serviceConfigurationsParams != null && getOperationalScheme() == OperationalScheme.door2door) {
+		if (serviceRegimesParams != null && getOperationalScheme() == OperationalScheme.door2door) {
 			// with door2door there are no stops, so a stopNetwork would be silently ineffective
-			serviceConfigurationsParams.getServiceConfigurations()
-					.forEach(serviceConfiguration -> Verify.verify(serviceConfiguration.getStopNetwork() == null,
+			serviceRegimesParams.getServiceRegimes()
+					.forEach(serviceRegime -> Verify.verify(serviceRegime.getStopNetwork() == null,
 							"stopNetwork of %s '%s' must not be set when operationalScheme is %s",
-							DrtServiceConfigurationParams.SET_NAME, serviceConfiguration.getServiceConfigurationName(),
+							DrtServiceRegimeParams.SET_NAME, serviceRegime.getServiceRegimeName(),
 							OperationalScheme.door2door));
 		}
 
@@ -527,8 +527,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return Optional.ofNullable(drtEstimatorParams);
 	}
 
-	public Optional<DrtServiceConfigurationsParams> getServiceConfigurationsParams() {
-		return Optional.ofNullable(serviceConfigurationsParams);
+	public Optional<DrtServiceRegimesParams> getServiceRegimesParams() {
+		return Optional.ofNullable(serviceRegimesParams);
 	}
 
 	public DvrpLoadParams addOrGetLoadParams() {

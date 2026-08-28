@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -43,8 +45,11 @@ public class DrtStopFacilityImpl implements DrtStopFacility {
 
 	public static DrtStopFacility createFromLink(Link link) {
 		// the link attributes are passed on (as createFromFacility does for facility attributes) because for
-		// serviceAreaBased operation they are the only place where stop attributes can be specified
-		return new DrtStopFacilityImpl(Id.create(link.getId(), DrtStopFacility.class), link.getId(), link.getToNode().getCoord(), link.getAttributes());
+		// serviceAreaBased operation they are the only place where stop attributes can be specified. They are copied
+		// so that the stop does not share the mutable Attributes instance with the network link.
+		Attributes attributes = new AttributesImpl();
+		AttributesUtils.copyTo(link.getAttributes(), attributes);
+		return new DrtStopFacilityImpl(Id.create(link.getId(), DrtStopFacility.class), link.getId(), link.getToNode().getCoord(), attributes);
 	}
 
 	private final Id<DrtStopFacility> id;

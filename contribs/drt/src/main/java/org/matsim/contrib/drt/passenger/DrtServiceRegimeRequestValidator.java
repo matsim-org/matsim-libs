@@ -26,12 +26,12 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.run.DrtServiceConfigurations;
+import org.matsim.contrib.drt.run.DrtServiceRegimes;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 
 /**
- * Enforces the time-dependent service configuration as a hard constraint: a request is only accepted if its desired
+ * Enforces the time-dependent service regime as a hard constraint: a request is only accepted if its desired
  * departure time is covered by one of the configured service time windows and if both its links are served in that
  * window.
  * <p>
@@ -43,21 +43,21 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
  *
  * @author nkuehnel / MOIA
  */
-public class DrtServiceTimeRequestValidator implements PassengerRequestValidator {
+public class DrtServiceRegimeRequestValidator implements PassengerRequestValidator {
 
 	public static final String OUTSIDE_SERVICE_TIME_CAUSE = "outside_service_time";
 	public static final String OUTSIDE_SERVICE_AREA_ACCESS_CAUSE = "outside_service_area_access";
 	public static final String OUTSIDE_SERVICE_AREA_EGRESS_CAUSE = "outside_service_area_egress";
 
-	private final DrtServiceConfigurations serviceConfigurations;
+	private final DrtServiceRegimes serviceRegimes;
 
-	public DrtServiceTimeRequestValidator(DrtServiceConfigurations serviceConfigurations) {
-		this.serviceConfigurations = serviceConfigurations;
+	public DrtServiceRegimeRequestValidator(DrtServiceRegimes serviceRegimes) {
+		this.serviceRegimes = serviceRegimes;
 	}
 
 	@Override
 	public Set<String> validateRequest(PassengerRequest request) {
-		Optional<DrtServiceConfigurations.Regime> regime = serviceConfigurations.getActiveRegime(
+		Optional<DrtServiceRegimes.Regime> regime = serviceRegimes.getActiveRegime(
 				request.getEarliestStartTime());
 		if (regime.isEmpty()) {
 			return Set.of(OUTSIDE_SERVICE_TIME_CAUSE);

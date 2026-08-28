@@ -23,6 +23,7 @@ package org.matsim.contrib.drt.run;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.matsim.contrib.drt.run.DrtServiceRegimesFixtures.serviceRegime;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -42,52 +43,52 @@ import com.google.common.base.VerifyException;
 /**
  * @author nkuehnel / MOIA
  */
-class DrtServiceConfigurationsParamsTest {
+class DrtServiceRegimesParamsTest {
 
 	@TempDir
 	private Path temporaryDirectory;
 
 	@Test
-	void testServiceConfigurationsAreOptional() {
+	void testServiceRegimesAreOptional() {
 		DrtConfigGroup drtConfig = drtConfig();
-		assertThat(drtConfig.getServiceConfigurationsParams()).isEmpty();
+		assertThat(drtConfig.getServiceRegimesParams()).isEmpty();
 		assertThatCode(() -> drtConfig.checkConsistency(ConfigUtils.createConfig())).doesNotThrowAnyException();
 	}
 
 	@Test
-	void testWriteAndReadTwoServiceConfigurations() {
+	void testWriteAndReadTwoServiceRegimes() {
 		DrtConfigGroup drtConfig = drtConfig();
-		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
-		params.addParameterSet(serviceConfiguration("peak", at(6 * 3600), at(10 * 3600), "peakStops"));
-		params.addParameterSet(serviceConfiguration("offpeak", at(10 * 3600), at(20 * 3600), null));
+		DrtServiceRegimesParams params = new DrtServiceRegimesParams();
+		params.addParameterSet(serviceRegime("peak", at(6 * 3600), at(10 * 3600), "peakStops"));
+		params.addParameterSet(serviceRegime("offpeak", at(10 * 3600), at(20 * 3600), null));
 		drtConfig.addParameterSet(params);
 
 		DrtConfigGroup reloaded = writeAndRead(drtConfig);
 
-		List<DrtServiceConfigurationParams> serviceConfigurations = reloaded.getServiceConfigurationsParams()
+		List<DrtServiceRegimeParams> serviceRegimes = reloaded.getServiceRegimesParams()
 				.orElseThrow()
-				.getServiceConfigurations();
-		assertThat(serviceConfigurations).hasSize(2);
-		assertThat(serviceConfigurations.get(0).getServiceConfigurationName()).isEqualTo("peak");
-		assertThat(serviceConfigurations.get(0).getStartTime()).isEqualTo(OptionalTime.defined(6 * 3600));
-		assertThat(serviceConfigurations.get(0).getEndTime()).isEqualTo(OptionalTime.defined(10 * 3600));
-		assertThat(serviceConfigurations.get(0).getStopNetwork()).isEqualTo("peakStops");
-		assertThat(serviceConfigurations.get(1).getServiceConfigurationName()).isEqualTo("offpeak");
-		assertThat(serviceConfigurations.get(1).getStartTime()).isEqualTo(OptionalTime.defined(10 * 3600));
-		assertThat(serviceConfigurations.get(1).getEndTime()).isEqualTo(OptionalTime.defined(20 * 3600));
-		assertThat(serviceConfigurations.get(1).getStopNetwork()).isNull();
+				.getServiceRegimes();
+		assertThat(serviceRegimes).hasSize(2);
+		assertThat(serviceRegimes.get(0).getServiceRegimeName()).isEqualTo("peak");
+		assertThat(serviceRegimes.get(0).getStartTime()).isEqualTo(OptionalTime.defined(6 * 3600));
+		assertThat(serviceRegimes.get(0).getEndTime()).isEqualTo(OptionalTime.defined(10 * 3600));
+		assertThat(serviceRegimes.get(0).getStopNetwork()).isEqualTo("peakStops");
+		assertThat(serviceRegimes.get(1).getServiceRegimeName()).isEqualTo("offpeak");
+		assertThat(serviceRegimes.get(1).getStartTime()).isEqualTo(OptionalTime.defined(10 * 3600));
+		assertThat(serviceRegimes.get(1).getEndTime()).isEqualTo(OptionalTime.defined(20 * 3600));
+		assertThat(serviceRegimes.get(1).getStopNetwork()).isNull();
 	}
 
 	@Test
 	void testWriteAndReadUndefinedTimes() {
 		DrtConfigGroup drtConfig = drtConfig();
-		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
-		params.addParameterSet(serviceConfiguration("allDay", undefined(), undefined(), null));
+		DrtServiceRegimesParams params = new DrtServiceRegimesParams();
+		params.addParameterSet(serviceRegime("allDay", undefined(), undefined(), null));
 		drtConfig.addParameterSet(params);
 
-		DrtServiceConfigurationParams reloaded = writeAndRead(drtConfig).getServiceConfigurationsParams()
+		DrtServiceRegimeParams reloaded = writeAndRead(drtConfig).getServiceRegimesParams()
 				.orElseThrow()
-				.getServiceConfigurations()
+				.getServiceRegimes()
 				.get(0);
 
 		assertThat(reloaded.getStartTime().isUndefined()).isTrue();
@@ -97,23 +98,23 @@ class DrtServiceConfigurationsParamsTest {
 	@Test
 	void testDuplicateNamesAreRejected() {
 		assertThatExceptionOfType(VerifyException.class).isThrownBy(
-						() -> checkConsistency(serviceConfiguration("service", at(0), at(10 * 3600), null),
-								serviceConfiguration("service", at(10 * 3600), at(20 * 3600), null)))
+						() -> checkConsistency(serviceRegime("service", at(0), at(10 * 3600), null),
+								serviceRegime("service", at(10 * 3600), at(20 * 3600), null)))
 				.withMessageContaining("identical names");
 	}
 
 	@Test
 	void testOverlappingWindowsAreRejected() {
 		assertThatExceptionOfType(VerifyException.class).isThrownBy(
-						() -> checkConsistency(serviceConfiguration("morning", at(6 * 3600), at(12 * 3600), null),
-								serviceConfiguration("evening", at(11 * 3600), at(20 * 3600), null)))
+						() -> checkConsistency(serviceRegime("morning", at(6 * 3600), at(12 * 3600), null),
+								serviceRegime("evening", at(11 * 3600), at(20 * 3600), null)))
 				.withMessageContaining("overlap");
 	}
 
 	@Test
 	void testEndTimeBeforeStartTimeIsRejected() {
 		assertThatExceptionOfType(VerifyException.class).isThrownBy(
-						() -> checkConsistency(serviceConfiguration("backwards", at(12 * 3600), at(6 * 3600), null)))
+						() -> checkConsistency(serviceRegime("backwards", at(12 * 3600), at(6 * 3600), null)))
 				.withMessageContaining("endTime must be later than startTime");
 	}
 
@@ -125,23 +126,23 @@ class DrtServiceConfigurationsParamsTest {
 
 	@Test
 	void testAdjacentWindowsAreAccepted() {
-		assertThatCode(() -> checkConsistency(serviceConfiguration("morning", at(6 * 3600), at(12 * 3600), null),
-				serviceConfiguration("evening", at(12 * 3600), at(20 * 3600), null))).doesNotThrowAnyException();
+		assertThatCode(() -> checkConsistency(serviceRegime("morning", at(6 * 3600), at(12 * 3600), null),
+				serviceRegime("evening", at(12 * 3600), at(20 * 3600), null))).doesNotThrowAnyException();
 	}
 
 	@Test
 	void testAtMostOneOpenStartAndOneOpenEnd() {
-		assertThatCode(() -> checkConsistency(serviceConfiguration("early", undefined(), at(12 * 3600), null),
-				serviceConfiguration("late", at(12 * 3600), undefined(), null))).doesNotThrowAnyException();
+		assertThatCode(() -> checkConsistency(serviceRegime("early", undefined(), at(12 * 3600), null),
+				serviceRegime("late", at(12 * 3600), undefined(), null))).doesNotThrowAnyException();
 
 		assertThatExceptionOfType(VerifyException.class).isThrownBy(
-						() -> checkConsistency(serviceConfiguration("late", at(12 * 3600), undefined(), null),
-								serviceConfiguration("alsoLate", at(20 * 3600), undefined(), null)))
+						() -> checkConsistency(serviceRegime("late", at(12 * 3600), undefined(), null),
+								serviceRegime("alsoLate", at(20 * 3600), undefined(), null)))
 				.withMessageContaining("undefined endTime");
 
 		assertThatExceptionOfType(VerifyException.class).isThrownBy(
-						() -> checkConsistency(serviceConfiguration("early", undefined(), at(6 * 3600), null),
-								serviceConfiguration("alsoEarly", undefined(), at(12 * 3600), null)))
+						() -> checkConsistency(serviceRegime("early", undefined(), at(6 * 3600), null),
+								serviceRegime("alsoEarly", undefined(), at(12 * 3600), null)))
 				.withMessageContaining("undefined startTime");
 	}
 
@@ -149,8 +150,8 @@ class DrtServiceConfigurationsParamsTest {
 	void testStopNetworkIsRejectedForDoor2Door() {
 		DrtConfigGroup drtConfig = drtConfig();
 		drtConfig.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
-		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
-		params.addParameterSet(serviceConfiguration("peak", at(6 * 3600), at(10 * 3600), "peakStops"));
+		DrtServiceRegimesParams params = new DrtServiceRegimesParams();
+		params.addParameterSet(serviceRegime("peak", at(6 * 3600), at(10 * 3600), "peakStops"));
 		drtConfig.addParameterSet(params);
 
 		assertThatExceptionOfType(VerifyException.class).isThrownBy(
@@ -161,13 +162,13 @@ class DrtServiceConfigurationsParamsTest {
 	@Test
 	void testWriteAndReadServiceAreaFile() {
 		DrtConfigGroup drtConfig = drtConfig();
-		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
-		params.addParameterSet(serviceConfiguration("peak", at(6 * 3600), at(10 * 3600), "peakStops"));
+		DrtServiceRegimesParams params = new DrtServiceRegimesParams();
+		params.addParameterSet(serviceRegime("peak", at(6 * 3600), at(10 * 3600), "peakStops"));
 		params.setServiceAreaFile("serviceAreas.shp");
 		params.setServiceAreaAttribute("networks");
 		drtConfig.addParameterSet(params);
 
-		DrtServiceConfigurationsParams reloaded = writeAndRead(drtConfig).getServiceConfigurationsParams()
+		DrtServiceRegimesParams reloaded = writeAndRead(drtConfig).getServiceRegimesParams()
 				.orElseThrow();
 
 		assertThat(reloaded.getServiceAreaFile()).isEqualTo("serviceAreas.shp");
@@ -176,7 +177,7 @@ class DrtServiceConfigurationsParamsTest {
 
 	@Test
 	void testServiceAreaFileIsOptionalAndTheAttributeDefaultsToTheStopAttribute() {
-		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
+		DrtServiceRegimesParams params = new DrtServiceRegimesParams();
 
 		assertThat(params.getServiceAreaFile()).isNull();
 		assertThat(params.getServiceAreaAttribute()).isEqualTo(
@@ -195,7 +196,7 @@ class DrtServiceConfigurationsParamsTest {
 	void testServiceAreaBasedWithoutAnyAreaIsRejected() {
 		assertThatExceptionOfType(VerifyException.class).isThrownBy(
 						() -> serviceAreaBasedConfig(null, null).checkConsistency(ConfigUtils.createConfig()))
-				.withMessageContaining(DrtServiceConfigurationsParams.SERVICE_AREA_FILE);
+				.withMessageContaining(DrtServiceRegimesParams.SERVICE_AREA_FILE);
 	}
 
 	@Test
@@ -210,14 +211,14 @@ class DrtServiceConfigurationsParamsTest {
 	void testServiceAreaFileIsRejectedForDoor2Door() {
 		DrtConfigGroup drtConfig = drtConfig();
 		drtConfig.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
-		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
-		params.addParameterSet(serviceConfiguration("peak", at(6 * 3600), at(10 * 3600), null));
+		DrtServiceRegimesParams params = new DrtServiceRegimesParams();
+		params.addParameterSet(serviceRegime("peak", at(6 * 3600), at(10 * 3600), null));
 		params.setServiceAreaFile("serviceAreas.shp");
 		drtConfig.addParameterSet(params);
 
 		assertThatExceptionOfType(VerifyException.class).isThrownBy(
 						() -> drtConfig.checkConsistency(ConfigUtils.createConfig()))
-				.withMessageContaining(DrtServiceConfigurationsParams.SERVICE_AREA_FILE);
+				.withMessageContaining(DrtServiceRegimesParams.SERVICE_AREA_FILE);
 	}
 
 	@Test
@@ -227,29 +228,29 @@ class DrtServiceConfigurationsParamsTest {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup());
 
 		DrtConfigGroup drtConfig = MultiModeDrtConfigGroup.get(config).getModalElements().iterator().next();
-		assertThat(drtConfig.getServiceConfigurationsParams()).isEmpty();
+		assertThat(drtConfig.getServiceRegimesParams()).isEmpty();
 	}
 
-	private void checkConsistency(DrtServiceConfigurationParams... serviceConfigurations) {
+	private void checkConsistency(DrtServiceRegimeParams... serviceRegimes) {
 		DrtConfigGroup drtConfig = drtConfig();
-		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
-		for (DrtServiceConfigurationParams serviceConfiguration : serviceConfigurations) {
-			params.addParameterSet(serviceConfiguration);
+		DrtServiceRegimesParams params = new DrtServiceRegimesParams();
+		for (DrtServiceRegimeParams serviceRegime : serviceRegimes) {
+			params.addParameterSet(serviceRegime);
 		}
 		drtConfig.addParameterSet(params);
 		drtConfig.checkConsistency(ConfigUtils.createConfig());
 	}
 
 	/**
-	 * @return a {@code serviceAreaBased} DRT config with one service configuration and the given area sources, of
+	 * @return a {@code serviceAreaBased} DRT config with one service regime and the given area sources, of
 	 * which exactly one is expected to be set
 	 */
 	private static DrtConfigGroup serviceAreaBasedConfig(String drtServiceAreaShapeFile, String serviceAreaFile) {
 		DrtConfigGroup drtConfig = drtConfig();
 		drtConfig.setOperationalScheme(DrtConfigGroup.OperationalScheme.serviceAreaBased);
 		drtConfig.setDrtServiceAreaShapeFile(drtServiceAreaShapeFile);
-		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
-		params.addParameterSet(serviceConfiguration("peak", at(6 * 3600), at(10 * 3600), "peakStops"));
+		DrtServiceRegimesParams params = new DrtServiceRegimesParams();
+		params.addParameterSet(serviceRegime("peak", at(6 * 3600), at(10 * 3600), "peakStops"));
 		params.setServiceAreaFile(serviceAreaFile);
 		drtConfig.addParameterSet(params);
 		return drtConfig;
@@ -270,7 +271,7 @@ class DrtServiceConfigurationsParamsTest {
 
 	/**
 	 * @return a DRT config which passes {@link DrtConfigGroup#checkConsistency} on its own, so that the tests only see
-	 * failures caused by the service configurations
+	 * failures caused by the service regimes
 	 */
 	private static DrtConfigGroup drtConfig() {
 		DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -279,15 +280,6 @@ class DrtServiceConfigurationsParamsTest {
 				.addOrGetDefaultDrtOptimizationConstraintsSet()
 				.setMaxWaitTime(600);
 		return drtConfig;
-	}
-
-	private static DrtServiceConfigurationParams serviceConfiguration(String name, OptionalTime startTime,
-			OptionalTime endTime, String stopNetwork) {
-		DrtServiceConfigurationParams serviceConfiguration = new DrtServiceConfigurationParams(name);
-		serviceConfiguration.setStartTime(startTime);
-		serviceConfiguration.setEndTime(endTime);
-		serviceConfiguration.setStopNetwork(stopNetwork);
-		return serviceConfiguration;
 	}
 
 	private static OptionalTime at(double time) {

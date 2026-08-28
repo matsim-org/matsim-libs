@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.run.examples;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.matsim.contrib.drt.run.DrtServiceRegimesFixtures.serviceRegime;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -47,7 +48,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.passenger.DrtServiceTimeRequestValidator;
+import org.matsim.contrib.drt.passenger.DrtServiceRegimeRequestValidator;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
@@ -55,8 +56,9 @@ import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.drt.run.DrtServiceConfigurationParams;
-import org.matsim.contrib.drt.run.DrtServiceConfigurationsParams;
+import org.matsim.contrib.drt.run.DrtServiceRegimeParams;
+import org.matsim.contrib.drt.run.DrtServiceRegimesFixtures;
+import org.matsim.contrib.drt.run.DrtServiceRegimesParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
@@ -90,11 +92,11 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * Integration tests for the time-dependent {@code serviceConfiguration} of a DRT service, based on the Mielec example.
+ * Integration tests for the time-dependent {@code serviceRegime} of a DRT service, based on the Mielec example.
  *
  * @author nkuehnel / MOIA
  */
-public class DrtServiceTimeIT {
+public class DrtServiceRegimesIT {
 
 	private static final double SERVICE_START = 6 * 3600;
 	private static final double SERVICE_END = 10 * 3600;
@@ -106,14 +108,14 @@ public class DrtServiceTimeIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
-	 * A single service configuration covering the whole day must not change anything.
+	 * A single service regime covering the whole day must not change anything.
 	 */
 	@Test
-	void testOneAllDayServiceConfigurationDoesNotChangeTheResults() {
+	void testOneAllDayServiceRegimeDoesNotChangeTheResults() {
 		Id.resetCaches();
 		Config config = stopBasedConfig();
-		addServiceConfigurations(DrtConfigGroup.getSingleModeDrtConfig(config),
-				serviceConfiguration("allDay", OptionalTime.undefined(), OptionalTime.undefined(), null));
+		addServiceRegimes(DrtConfigGroup.getSingleModeDrtConfig(config),
+				serviceRegime("allDay", OptionalTime.undefined(), OptionalTime.undefined(), null));
 
 		RunDrtExample.run(config, false);
 
@@ -133,8 +135,8 @@ public class DrtServiceTimeIT {
 	void testServiceTimeSuppressesDrtOutsideTheWindow() {
 		Id.resetCaches();
 		Config config = stopBasedConfig();
-		addServiceConfigurations(DrtConfigGroup.getSingleModeDrtConfig(config),
-				serviceConfiguration("service", OptionalTime.defined(SERVICE_START), OptionalTime.defined(SERVICE_END),
+		addServiceRegimes(DrtConfigGroup.getSingleModeDrtConfig(config),
+				serviceRegime("service", OptionalTime.defined(SERVICE_START), OptionalTime.defined(SERVICE_END),
 						null));
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
@@ -148,16 +150,16 @@ public class DrtServiceTimeIT {
 	}
 
 	@Test
-	void testStopNetworksPerServiceConfiguration() {
+	void testStopNetworksPerServiceRegime() {
 		Id.resetCaches();
 		Config config = stopBasedConfig();
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		// split the Mielec stops into two stop networks and let each of them be served in one half of the day
 		Map<String, Set<Id<Link>>> linksPerStopNetwork = writeStopsWithStopNetworks(config, drtConfig);
-		addServiceConfigurations(drtConfig,
-				serviceConfiguration("morning", OptionalTime.undefined(), OptionalTime.defined(12 * 3600), "even"),
-				serviceConfiguration("afternoon", OptionalTime.defined(12 * 3600), OptionalTime.undefined(), "odd"));
+		addServiceRegimes(drtConfig,
+				serviceRegime("morning", OptionalTime.undefined(), OptionalTime.defined(12 * 3600), "even"),
+				serviceRegime("afternoon", OptionalTime.defined(12 * 3600), OptionalTime.undefined(), "odd"));
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
 		Tracker tracker = Tracker.install(controller);
@@ -166,8 +168,8 @@ public class DrtServiceTimeIT {
 		assertThat(tracker.submitted).isNotEmpty();
 
 		Set<Id<Request>> rejectedForServiceArea = tracker.rejected.stream()
-				.filter(event -> hasCause(event, DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_AREA_ACCESS_CAUSE)
-						|| hasCause(event, DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_AREA_EGRESS_CAUSE))
+				.filter(event -> hasCause(event, DrtServiceRegimeRequestValidator.OUTSIDE_SERVICE_AREA_ACCESS_CAUSE)
+						|| hasCause(event, DrtServiceRegimeRequestValidator.OUTSIDE_SERVICE_AREA_EGRESS_CAUSE))
 				.map(PassengerRequestRejectedEvent::getRequestId)
 				.collect(Collectors.toSet());
 
@@ -181,27 +183,61 @@ public class DrtServiceTimeIT {
 			// stops are not served any more. The validator is the safety net for exactly this case.
 			assertThat(rejectedForServiceArea).contains(event.getRequestId());
 		});
-		// both configurations are actually used
+		// both regimes are actually used
 		assertThat(tracker.submitted.stream().filter(e -> e.getEarliestDepartureTime() < 12 * 3600)).isNotEmpty();
 		assertThat(tracker.submitted.stream().filter(e -> e.getEarliestDepartureTime() >= 12 * 3600)).isNotEmpty();
 	}
 
 	/**
-	 * The stops of a {@code serviceAreaBased} service can also be derived from the polygons of the service
-	 * configurations, i.e. without a hand-attributed network or stops file: every link inside a polygon becomes a stop
-	 * of the service configurations named by that polygon.
+	 * A {@code stopbased} service can have service areas as well, but there the polygons only tag the transit stops,
+	 * they do not restrict the inventory. A service regime without a {@code stopNetwork} therefore still serves all
+	 * stops, including those outside all polygons.
 	 */
 	@Test
-	void testServiceAreasPerServiceConfiguration() {
+	void testServiceAreasDoNotRestrictAStopbasedRegimeWithoutStopNetwork() {
+		Id.resetCaches();
+		Config config = stopBasedConfig();
+		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
+		DrtServiceRegimesParams params = addServiceRegimes(drtConfig,
+				serviceRegime("allDay", OptionalTime.undefined(), OptionalTime.undefined(), null));
+		writeServiceAreas(readNetwork(config), drtConfig, params);
+
+		RunDrtExample.run(config, false);
+
+		// the same values as testOneAllDayServiceRegimeDoesNotChangeTheResults, i.e. all stops are still served
+		var expectedStats = RunDrtExampleIT.Stats.newBuilder()
+				.rejectionRate(0.05)
+				.rejections(17)
+				.waitAverage(260.24)
+				.inVehicleTravelTimeMean(375.14)
+				.totalTravelTimeMean(635.38)
+				.build();
+		RunDrtExampleIT.verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+
+		// the stops are tagged nonetheless, so another regime could restrict itself to one of the areas
+		List<TransitStopFacility> dumpedStops = readDumpedStops(drtConfig);
+		assertThat(dumpedStops).isNotEmpty()
+				.allSatisfy(stop -> assertThat(AttributeBasedStopFinder.parseStopNetworks(stop)).contains("morning"));
+		assertThat(dumpedStops.stream()
+				.filter(stop -> AttributeBasedStopFinder.parseStopNetworks(stop).contains("afternoon"))).isNotEmpty();
+	}
+
+	/**
+	 * The stops of a {@code serviceAreaBased} service can also be derived from the polygons of the service
+	 * regimes, i.e. without a hand-attributed network or stops file: every link inside a polygon becomes a stop
+	 * of the service regimes named by that polygon.
+	 */
+	@Test
+	void testServiceAreasPerServiceRegime() {
 		Id.resetCaches();
 		Config config = config("mielec_serviceArea_based_drt_config.xml");
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		// the whole town is served in the morning, only its western half in the afternoon
 		Network network = readNetwork(config);
-		DrtServiceConfigurationsParams params = addServiceConfigurations(drtConfig,
-				serviceConfiguration("morning", OptionalTime.undefined(), OptionalTime.defined(12 * 3600), "morning"),
-				serviceConfiguration("afternoon", OptionalTime.defined(12 * 3600), OptionalTime.undefined(),
+		DrtServiceRegimesParams params = addServiceRegimes(drtConfig,
+				serviceRegime("morning", OptionalTime.undefined(), OptionalTime.defined(12 * 3600), "morning"),
+				serviceRegime("afternoon", OptionalTime.defined(12 * 3600), OptionalTime.undefined(),
 						"afternoon"));
 		PreparedGeometry westernHalf = writeServiceAreas(network, drtConfig, params);
 
@@ -219,8 +255,8 @@ public class DrtServiceTimeIT {
 		assertThat(westernLinks).isNotEmpty().hasSizeLessThan(network.getLinks().size());
 
 		Set<Id<Request>> rejectedForServiceArea = tracker.rejected.stream()
-				.filter(event -> hasCause(event, DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_AREA_ACCESS_CAUSE)
-						|| hasCause(event, DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_AREA_EGRESS_CAUSE))
+				.filter(event -> hasCause(event, DrtServiceRegimeRequestValidator.OUTSIDE_SERVICE_AREA_ACCESS_CAUSE)
+						|| hasCause(event, DrtServiceRegimeRequestValidator.OUTSIDE_SERVICE_AREA_EGRESS_CAUSE))
 				.map(PassengerRequestRejectedEvent::getRequestId)
 				.collect(Collectors.toSet());
 
@@ -256,8 +292,8 @@ public class DrtServiceTimeIT {
 	void testServiceTimeForDoor2Door() {
 		Id.resetCaches();
 		Config config = door2doorConfig();
-		addServiceConfigurations(DrtConfigGroup.getSingleModeDrtConfig(config),
-				serviceConfiguration("service", OptionalTime.defined(SERVICE_START), OptionalTime.defined(SERVICE_END),
+		addServiceRegimes(DrtConfigGroup.getSingleModeDrtConfig(config),
+				serviceRegime("service", OptionalTime.defined(SERVICE_START), OptionalTime.defined(SERVICE_END),
 						null));
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
@@ -270,15 +306,15 @@ public class DrtServiceTimeIT {
 
 	/**
 	 * The validator is the safety net for requests which reach the optimizer without having been routed under the
-	 * service configuration (prebooking, within-day replanning, input plans carrying finished DRT routes). Here this is
+	 * service regime (prebooking, within-day replanning, input plans carrying finished DRT routes). Here this is
 	 * emulated by binding a time-unaware stop finder, so that the routing offers DRT around the clock.
 	 */
 	@Test
 	void testValidatorRejectsRequestsWhichTheRoutingDidNotSuppress() {
 		Id.resetCaches();
 		Config config = stopBasedConfig();
-		addServiceConfigurations(DrtConfigGroup.getSingleModeDrtConfig(config),
-				serviceConfiguration("service", OptionalTime.defined(SERVICE_START), OptionalTime.defined(SERVICE_END),
+		addServiceRegimes(DrtConfigGroup.getSingleModeDrtConfig(config),
+				serviceRegime("service", OptionalTime.defined(SERVICE_START), OptionalTime.defined(SERVICE_END),
 						null));
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
@@ -289,7 +325,7 @@ public class DrtServiceTimeIT {
 		assertThat(tracker.submitted.stream()
 				.filter(event -> event.getEarliestDepartureTime() >= SERVICE_END)).isNotEmpty();
 		assertThat(tracker.rejected.stream()
-				.filter(event -> hasCause(event, DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_TIME_CAUSE))).isNotEmpty();
+				.filter(event -> hasCause(event, DrtServiceRegimeRequestValidator.OUTSIDE_SERVICE_TIME_CAUSE))).isNotEmpty();
 	}
 
 	/**
@@ -301,8 +337,8 @@ public class DrtServiceTimeIT {
 		Id.resetCaches();
 		Config config = stopBasedConfig();
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
-		addServiceConfigurations(drtConfig,
-				serviceConfiguration("service", OptionalTime.defined(SERVICE_START), OptionalTime.defined(SERVICE_END),
+		addServiceRegimes(drtConfig,
+				serviceRegime("service", OptionalTime.defined(SERVICE_START), OptionalTime.defined(SERVICE_END),
 						null));
 		PrebookingParams prebookingParams = new PrebookingParams();
 		prebookingParams.setAbortRejectedPrebookings(false);
@@ -318,7 +354,7 @@ public class DrtServiceTimeIT {
 		Map<Id<Request>, Double> desiredDepartureTimes = desiredDepartureTimes(tracker);
 
 		List<PassengerRequestRejectedEvent> prebookedRejections = tracker.rejected.stream()
-				.filter(event -> hasCause(event, DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_TIME_CAUSE))
+				.filter(event -> hasCause(event, DrtServiceRegimeRequestValidator.OUTSIDE_SERVICE_TIME_CAUSE))
 				.filter(event -> event.getRequestId().toString().contains("prebooked"))
 				.toList();
 
@@ -345,7 +381,7 @@ public class DrtServiceTimeIT {
 
 		Map<Id<Request>, Double> desiredDepartureTimes = desiredDepartureTimes(tracker);
 		assertThat(tracker.rejected.stream()
-				.filter(event -> hasCause(event, DrtServiceTimeRequestValidator.OUTSIDE_SERVICE_TIME_CAUSE))).allSatisfy(
+				.filter(event -> hasCause(event, DrtServiceRegimeRequestValidator.OUTSIDE_SERVICE_TIME_CAUSE))).allSatisfy(
 				event -> assertThat(desiredDepartureTimes.get(event.getRequestId())).isGreaterThanOrEqualTo(SERVICE_END));
 	}
 
@@ -380,23 +416,11 @@ public class DrtServiceTimeIT {
 		return config;
 	}
 
-	private static DrtServiceConfigurationsParams addServiceConfigurations(DrtConfigGroup drtConfig,
-			DrtServiceConfigurationParams... serviceConfigurations) {
-		DrtServiceConfigurationsParams params = new DrtServiceConfigurationsParams();
-		for (DrtServiceConfigurationParams serviceConfiguration : serviceConfigurations) {
-			params.addParameterSet(serviceConfiguration);
-		}
+	private static DrtServiceRegimesParams addServiceRegimes(DrtConfigGroup drtConfig,
+			DrtServiceRegimeParams... serviceRegimes) {
+		DrtServiceRegimesParams params = DrtServiceRegimesFixtures.serviceRegimesParams(serviceRegimes);
 		drtConfig.addParameterSet(params);
 		return params;
-	}
-
-	private static DrtServiceConfigurationParams serviceConfiguration(String name, OptionalTime startTime,
-			OptionalTime endTime, String stopNetwork) {
-		DrtServiceConfigurationParams serviceConfiguration = new DrtServiceConfigurationParams(name);
-		serviceConfiguration.setStartTime(startTime);
-		serviceConfiguration.setEndTime(endTime);
-		serviceConfiguration.setStopNetwork(stopNetwork);
-		return serviceConfiguration;
 	}
 
 	/**
@@ -456,7 +480,7 @@ public class DrtServiceTimeIT {
 	 * @return the geometry of the western half
 	 */
 	private PreparedGeometry writeServiceAreas(Network network, DrtConfigGroup drtConfig,
-			DrtServiceConfigurationsParams params) {
+			DrtServiceRegimesParams params) {
 		double[] boundingBox = NetworkUtils.getBoundingBox(network.getNodes().values());
 		// the boundary of a polygon does not belong to it, hence the margin around the network
 		double margin = 1000;
@@ -483,7 +507,7 @@ public class DrtServiceTimeIT {
 				factory.createPolygon(westernHalf, Map.of(SERVICE_AREA_ATTRIBUTE, "afternoon"), "westernHalf")),
 				serviceAreaFile.toString());
 
-		// the areas of the service configurations replace the static service area
+		// the areas of the service regimes replace the static service area
 		drtConfig.setDrtServiceAreaShapeFile(null);
 		params.setServiceAreaFile(serviceAreaFile.toString());
 		params.setServiceAreaAttribute(SERVICE_AREA_ATTRIBUTE);
@@ -503,16 +527,21 @@ public class DrtServiceTimeIT {
 	}
 
 	/**
-	 * @return the stop networks per link of the stops written by {@link org.matsim.contrib.drt.util.DumpDrtStopsAtEnd}
+	 * @return the stops written by {@link org.matsim.contrib.drt.util.DumpDrtStopsAtEnd}
 	 */
-	private Map<Id<Link>, Set<String>> readDumpedStopNetworks(DrtConfigGroup drtConfig) {
+	private List<TransitStopFacility> readDumpedStops(DrtConfigGroup drtConfig) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readFile(
 				Paths.get(utils.getOutputDirectory(), "output_drt_stops_" + drtConfig.getMode() + ".xml.gz").toString());
-		return scenario.getTransitSchedule()
-				.getFacilities()
-				.values()
-				.stream()
+		return List.copyOf(scenario.getTransitSchedule().getFacilities().values());
+	}
+
+	/**
+	 * @return the stop networks per link of the dumped stops. A {@code serviceAreaBased} service has exactly one stop
+	 * per link, unlike a {@code stopbased} one, where several stops may share a link.
+	 */
+	private Map<Id<Link>, Set<String>> readDumpedStopNetworks(DrtConfigGroup drtConfig) {
+		return readDumpedStops(drtConfig).stream()
 				.collect(Collectors.toMap(TransitStopFacility::getLinkId,
 						AttributeBasedStopFinder::parseStopNetworks));
 	}
