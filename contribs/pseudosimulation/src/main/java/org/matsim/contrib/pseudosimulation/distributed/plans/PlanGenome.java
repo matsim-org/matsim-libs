@@ -1,13 +1,13 @@
 package org.matsim.contrib.pseudosimulation.distributed.plans;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -19,7 +19,6 @@ import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponen
 import org.matsim.contrib.pseudosimulation.distributed.scoring.ScoreComponentType;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -39,8 +38,8 @@ public class PlanGenome implements Plan {
     private Double score = null;
     private Person person = null;
     private String type = null;
-    private Customizable customizableDelegate;
-    
+    private Map<String, Object> customAttributes;
+
 	private final Attributes attributes = new AttributesImpl();
 	@Override
 	public final Attributes getAttributes() {
@@ -219,13 +218,13 @@ public class PlanGenome implements Plan {
     public void setType(final String type) {
         this.type = type;
     }
-    
+
 	@Override
 	public Id<Plan> getId() { return null; }
 
 	@Override
 	public void setPlanId(Id<Plan> planId) { /* nothing to do here */ }
-    
+
 	@Override
 	public int getIterationCreated() { return -1; }
 
@@ -390,10 +389,10 @@ public class PlanGenome implements Plan {
 
     @Override
     public Map<String, Object> getCustomAttributes() {
-        if (this.customizableDelegate == null) {
-            this.customizableDelegate = CustomizableUtils.createCustomizable();
+        if (this.customAttributes == null) {
+            this.customAttributes = new HashMap<>();
         }
-        return this.customizableDelegate.getCustomAttributes();
+        return this.customAttributes;
     }
 
     public double getpSimScore() {

@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+set -eu
+
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || {
+	printf 'PSim quality: cannot locate the Git repository.\n' >&2
+	exit 2
+}
+exec "$REPO_ROOT/contribs/pseudosimulation/scripts/quality.sh" --pre-commit
