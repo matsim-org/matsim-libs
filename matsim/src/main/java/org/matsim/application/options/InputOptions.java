@@ -262,7 +262,7 @@ public final class InputOptions {
 				.type(String.class)
 				.setter(setter)
 				.description(description)
-				.required(true);
+				.required(!spec.autoResolveInputs());
 
 		return arg.build();
 	}

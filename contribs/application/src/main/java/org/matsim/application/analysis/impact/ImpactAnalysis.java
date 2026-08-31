@@ -7,7 +7,6 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
-import org.matsim.application.options.SampleOptions;
 import picocli.CommandLine;
 
 import java.nio.file.Files;
@@ -16,7 +15,7 @@ import java.util.Set;
 
 /** Orchestrates absolute and reference-policy impact analysis for the SimWrapper dashboard. */
 @CommandLine.Command(name = "impact", description = "Calculates absolute and optionally comparative MATSim impacts.")
-@CommandSpec(requireRunDirectory = true, requires = {"legs.csv", "trips.csv", "persons.csv"},
+@CommandSpec(requireRunDirectory = true, autoResolveInputs = true, requires = {"legs.csv", "trips.csv", "persons.csv"},
 	dependsOn = {@Dependency(value = AirPollutionAnalysis.class, files = "emissions_per_network_mode.csv")},
 	produces = "impact.csv")
 public class ImpactAnalysis implements MATSimAppCommand {
@@ -25,8 +24,8 @@ public class ImpactAnalysis implements MATSimAppCommand {
 	private final InputOptions input = InputOptions.ofCommand(ImpactAnalysis.class);
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(ImpactAnalysis.class);
-	@CommandLine.Mixin
-	private SampleOptions sample;
+	@CommandLine.Option(names = "--sample-size", defaultValue = "1.0", description = "Simulated sample fraction in (0, 1].")
+	private double sampleSize;
 
 	@CommandLine.Option(names = "--reference-run-directory", description = "Optional run directory used as reference case.")
 	private Path referenceRunDirectory;
@@ -50,14 +49,13 @@ public class ImpactAnalysis implements MATSimAppCommand {
 		validateOptions();
 		// SampleOptions describes the simulated population share. Only additive quantities are upscaled;
 		// person-level means are calculated later from the unscaled matched observations.
-		double policyScale = sample.getUpscaleFactor();
+		double policyScale = 1. / sampleSize;
 		double referenceScale = referenceSampleSize == null ? policyScale : 1. / referenceSampleSize;
 		ImpactRunReader reader = new ImpactRunReader(modes, vehicleModes);
 
-		// The policy files are supplied by the standard MATSim application input mechanism. Reference files are
-		// matched independently because the reference directory is read-only and outside the current run context.
-		ImpactAnalysisResult policy = reader.read(Path.of(input.getPath("trips.csv")), Path.of(input.getPath("legs.csv")),
-			Path.of(input.getPath("persons.csv")), scenarioEmissions(), policyScale);
+		// Explicit input paths override automatic resolution from the policy run directory.
+		ImpactAnalysisResult policy = reader.read(resolveInput("trips.csv"), resolveInput("legs.csv"),
+			resolveInput("persons.csv"), scenarioEmissions(), policyScale);
 		ImpactAnalysisResult reference = referenceRunDirectory == null ? null : reader.read(
 			ApplicationUtils.matchInput("trips.csv", referenceRunDirectory), ApplicationUtils.matchInput("legs.csv", referenceRunDirectory),
 			ApplicationUtils.matchInput("persons.csv", referenceRunDirectory), findEmissions(referenceRunDirectory), referenceScale);
@@ -67,10 +65,18 @@ public class ImpactAnalysis implements MATSimAppCommand {
 	}
 
 	private void validateOptions() {
+		if (sampleSize <= 0. || sampleSize > 1.)
+			throw new IllegalArgumentException("--sample-size must be in (0, 1].");
 		if (referenceSampleSize != null && (referenceSampleSize <= 0. || referenceSampleSize > 1.))
 			throw new IllegalArgumentException("--reference-sample-size must be in (0, 1].");
 		if (personTrafficDaysPerYear <= 0 || freightTrafficDaysPerYear <= 0)
 			throw new IllegalArgumentException("Annualization factors must be positive.");
+	}
+
+	private Path resolveInput(String name) {
+		String configured = input.getPath(name);
+		if (configured != null && !configured.isBlank()) return Path.of(configured);
+		return ApplicationUtils.matchInput(name, input.getRunDirectory());
 	}
 
 	private Path scenarioEmissions() {
