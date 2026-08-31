@@ -117,7 +117,7 @@ public class ImpactDashboardTables implements MATSimAppCommand {
 			List<ImpactRecord> ordered = records.stream().sorted(java.util.Comparator.comparingInt(r -> factorOrder(factorName(r.metric)))).toList();
 			for (ImpactRecord record : ordered) {
 				if (emissions != record.section.equals("Emissionen") || !record.period.equals(period)) continue;
-				String factor = factorName(record.metric);
+				String factor = emissions ? pollutantName(record.metric) : factorName(record.metric);
 				if (factor == null) continue;
 				printer.printRecord(factor, blankOrDash(record.scenario), blankOrDash(record.difference), percent(record.relativeChange), englishUnit(record.unit));
 			}
@@ -142,6 +142,18 @@ public class ImpactDashboardTables implements MATSimAppCommand {
 			case "Fahrzeugverkehrsleistung" -> "Travel Distance";
 		case "Vehicle Operating Times (≤ 50 km)", "Vehicle Operating Times (> 50 km)", "Vehicle Operating Times" -> metric;
 		default -> null;
+		};
+	}
+
+	private String pollutantName(String pollutant) {
+		return switch (pollutant) {
+			case "CO2_TOTAL" -> "Total Carbon Dioxide (CO₂)";
+			case "NOx" -> "Nitrogen Oxides (NOₓ)";
+			case "CO" -> "Carbon Monoxide (CO)";
+			case "HC" -> "Hydrocarbons (HC)";
+			case "PM" -> "Particulate Matter (PM)";
+			case "SO2" -> "Sulfur Dioxide (SO₂)";
+			default -> pollutant;
 		};
 	}
 

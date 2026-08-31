@@ -140,7 +140,7 @@ final class ImpactCsvWriter {
 		values(printer, "Score", "Summe ausgefuehrter Score", "all", "utils/year",
 			reference == null ? null : reference.scoreSum * personDays,
 			policy.scoreSum * personDays, status);
-		values(printer, "Score", "Mittlerer ausgefuehrter Score", "all", "utils/person (year)", referenceMean, policyMean, status);
+		values(printer, "Score", "Mittlerer ausgefuehrter Score", "all", "utils/person/year", referenceMean, policyMean, status);
 		values(printer, "Score", "Mittlerer ausgefuehrter Score", "all", "utils/person", referenceMean, policyMean, status);
 	}
 

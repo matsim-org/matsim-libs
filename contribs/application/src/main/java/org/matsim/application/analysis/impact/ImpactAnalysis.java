@@ -83,7 +83,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 		// Prefer the dependency output resolved by SimWrapper. A directory lookup also supports invoking the command
 		// manually against a run for which the emissions analysis has already been generated.
 		String configured = input.getPath(AirPollutionAnalysis.class, "emissions_per_network_mode.csv");
-		Path path = configured == null ? null : Path.of(configured);
+		Path path = configured == null || configured.isBlank() ? null : Path.of(configured);
 		return path != null && Files.exists(path) ? path : findEmissions(input.getRunDirectory());
 	}
 
