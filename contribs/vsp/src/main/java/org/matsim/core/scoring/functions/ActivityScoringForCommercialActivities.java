@@ -22,6 +22,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 	private static short firstLastActOpeningTimesWarning = 0;
 
 	private final ScoringParameters params;
+	private final double personSpecificMarginalUtilityOfTime;
 	private final OpeningIntervalCalculator openingIntervalCalculator;
 	private Activity firstActivity;
 
@@ -31,9 +32,18 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 		this(params, new ActivityTypeOpeningIntervalCalculator(params));
 	}
 
+	public ActivityScoringForCommercialActivities(final ScoringParameters params, double adjustedMarginalUtilityOfPerforming_s) {
+		// for the commercial agents the specific vehicle of this person is set. The time costs of this vehicle are the time costs of the person.
+		// That's why we are using these costs in combination with the marginalUtilityOfMoney are used for the performing and waiting costs
+		this.params = params;
+		this.openingIntervalCalculator = new ActivityTypeOpeningIntervalCalculator(params);
+		this.personSpecificMarginalUtilityOfTime = adjustedMarginalUtilityOfPerforming_s;
+	}
+
 	public ActivityScoringForCommercialActivities(final ScoringParameters params, final OpeningIntervalCalculator openingIntervalCalculator) {
 		this.params = params;
 		this.openingIntervalCalculator = openingIntervalCalculator;
+		this.personSpecificMarginalUtilityOfTime = params.marginalUtilityOfPerforming_s;
 	}
 
 	@Override
@@ -92,7 +102,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 			if (arrivalTime < activityStart) {
 				double waitTime = activityStart - arrivalTime;
 				tmpScore.actWaiting_s += waitTime;
-				tmpScore.actWaiting_util += this.params.marginalUtilityOfWaiting_s * waitTime;
+				tmpScore.actWaiting_util += this.personSpecificMarginalUtilityOfTime * waitTime;
 			}
 
 			OptionalTime latestStartTime = actParams.getLatestStartTime();
@@ -103,7 +113,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 			}
 
 			tmpScore.actPerforming_s += duration;
-			tmpScore.actPerforming_util += this.params.marginalUtilityOfPerforming_s * duration;
+			tmpScore.actPerforming_util += this.personSpecificMarginalUtilityOfTime * duration;
 
 			OptionalTime earliestEndTime = actParams.getEarliestEndTime();
 			if (earliestEndTime.isDefined() && activityEnd < earliestEndTime.seconds()) {
@@ -115,7 +125,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 			if (activityEnd < departureTime) {
 				double waiting = departureTime - activityEnd;
 				tmpScore.actWaiting_s += waiting;
-				tmpScore.actWaiting_util += this.params.marginalUtilityOfWaiting_s * waiting;
+				tmpScore.actWaiting_util += this.personSpecificMarginalUtilityOfTime * waiting;
 			}
 
 			OptionalTime minimalDuration = actParams.getMinimalDuration();
