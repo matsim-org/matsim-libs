@@ -90,6 +90,7 @@ public class IterationTravelStatsControllerListenerTest {
 		scenario.getPopulation().addPerson(person2);
 		scenario.getPopulation().addPerson(person3);
 		scenario.getPopulation().addPerson(person4);
+		plans.facilities.getFacilities().values().forEach(scenario.getActivityFacilities()::addActivityFacility);
 
 		performTest(scenario, utils.getOutputDirectory() + "/IterationTravelStatsControllerListener");
 	}
