@@ -79,13 +79,13 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private int numberOfThreads = 2;
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String NUMBER_OF_THREADS_CMT = "\"global\" number of threads.  "
-			+ "This number is used, e.g., for replanning, but NOT in QSim.  "
-			+ "This can typically be set to as many cores as you have available, or possibly even slightly more.";
+								    + "This number is used, e.g., for replanning, but NOT in QSim.  "
+								    + "This can typically be set to as many cores as you have available, or possibly even slightly more.";
 
-    private static final String DEFAULT_DELIMITER = "defaultDelimiter";
-    private static final String DEFAULT_DELIMITER_CMT = "Default Delimiter for CSV files. May not be recognized by all writers.";
-    @NotBlank
-    private String defaultDelimiter = ";";
+	private static final String DEFAULT_DELIMITER = "defaultDelimiter";
+	private static final String DEFAULT_DELIMITER_CMT = "Default Delimiter for CSV files. May not be recognized by all writers.";
+	@NotBlank
+	private String defaultDelimiter = ";";
 
 	/**
 	 * @return {@link #NUMBER_OF_THREADS_CMT}
@@ -128,15 +128,15 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		return this;
 	}
 	// ---
-    @StringGetter(DEFAULT_DELIMITER)
-    public String getDefaultDelimiter() {
-        return defaultDelimiter;
-    }
-    @StringSetter(DEFAULT_DELIMITER)
-    public GlobalConfigGroup setDefaultDelimiter(String defaultDelimiter) {
-        this.defaultDelimiter = defaultDelimiter;
+	@StringGetter(DEFAULT_DELIMITER)
+	public String getDefaultDelimiter() {
+		return defaultDelimiter;
+	}
+	@StringSetter(DEFAULT_DELIMITER)
+	public GlobalConfigGroup setDefaultDelimiter(String defaultDelimiter) {
+		this.defaultDelimiter = defaultDelimiter;
 		return this;
-    }
+	}
 	// ---
 	private double relativeToleranceForSampleSizeFactors = 0.;
 	@StringSetter( "relativeToleranceForSampleSizeFactors" )
@@ -149,6 +149,16 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	public double getRelativeToleranceForSampleSizeFactor() {
 		return this.relativeToleranceForSampleSizeFactors;
 	}
+	// ---
+	private String baseCasePathName;
+//	@StringGetter( "pathToBaseCase" )
+	public String getBaseCasePathName() {
+		return baseCasePathName;
+	}
+//	@StringSetter("pathToBaseCase")
+	public void setBaseCasePathName( String str ) {
+		baseCasePathName = str;
+	}
 	// ===
 	@Override protected void checkConsistency( Config config ){
 		super.checkConsistency( config );
@@ -158,14 +168,14 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		final double relativeTolerance = this.relativeToleranceForSampleSizeFactors;
 		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, config.qsim().getStorageCapFactor(), relativeTolerance ) ) {
 			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
-										   + ". (The old approach of setting the stor cap fact larger than the flow cap fact is no longer needed since the qsim became a lot more deterministic.)  Relative tolerance can be set in the global config group." );
+							   + ". (The old approach of setting the stor cap fact larger than the flow cap fact is no longer needed since the qsim became a lot more deterministic.)  Relative tolerance can be set in the global config group." );
 		}
 		if ( config.counts().getCountsFileName()!=null && !config.counts().getCountsFileName().isEmpty() ){
 			// CountsComparisonAlgorithm multiplies the count-value from sim with the countsScaleFactor, i.e. we need the inverse of the flowCapFactor here
 			if( !Precision.equalsWithRelativeTolerance( flowCapFactor, 1. / config.counts().getCountsScaleFactor(), relativeTolerance ) ){
 				throw new RuntimeException(
 					"your countsScaleFactor=" + config.counts().getCountsScaleFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
-				+ ". Relative tolerance can be set in the global config group.");
+						+ ". Relative tolerance can be set in the global config group.");
 			}
 		}
 	}
