@@ -8,14 +8,17 @@ import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.contrib.pseudosimulation.MobSimSwitcher;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -33,11 +36,19 @@ public class PSimTravelTimeCalculator implements Provider<TravelTime>, LinkEnter
 	private final MobSimSwitcher switcher;
 	private final TravelTimeCalculator travelTimeCalculator;
 
+	/**
+	 * This class must itself be registered as the event handler, through
+	 * {@code addEventHandlerBinding()}. Registering the delegate instead would hand MATSim a
+	 * handler whose {@link #reset(int)} is not the guarded one below, and the travel times of the
+	 * preceding QSim iteration - the whole input of a pseudo-simulation iteration - would be
+	 * discarded at the start of every PSim iteration and rebuilt from PSim's own events.
+	 */
 	@Inject
-	PSimTravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, EventsManager eventsManager, Network network, MobSimSwitcher switcher) {
-		travelTimeCalculator = new TravelTimeCalculator(network, ttconfigGroup);
+	PSimTravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, Network network, MobSimSwitcher switcher) {
+		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
+		builder.configure(ttconfigGroup);
+		travelTimeCalculator = builder.build();
 		this.switcher = switcher;
-		eventsManager.addHandler( travelTimeCalculator );
 	}
 
 	@Override
@@ -46,31 +57,54 @@ public class PSimTravelTimeCalculator implements Provider<TravelTime>, LinkEnter
 	}
 
 	public void handleEvent( final LinkEnterEvent e ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( e );
 	}
 
 	public void handleEvent( final LinkLeaveEvent e ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( e );
 	}
 
 	public void handleEvent( VehicleEntersTrafficEvent event ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( event );
 	}
 
 	public void handleEvent( final VehicleLeavesTrafficEvent event ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( event );
 	}
 
 	public void handleEvent( VehicleArrivesAtFacilityEvent event ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( event );
 	}
 
 	public void handleEvent( VehicleAbortsEvent event ){
+		if (!recording()) {
+			return;
+		}
 		travelTimeCalculator.handleEvent( event );
 	}
 
+	/** A PSim iteration reads these travel times; it must not also write to them. */
+	private boolean recording() {
+		return switcher == null || switcher.isQSimIteration();
+	}
+
 	public void reset( int iteration ){
-		if (switcher == null || switcher.isQSimIteration()) {
+		if (recording()) {
 			LogManager.getLogger( travelTimeCalculator.getClass() ).error(
 					"Calling reset on traveltimecalc" );
 			travelTimeCalculator.reset( iteration );

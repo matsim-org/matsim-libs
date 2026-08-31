@@ -23,7 +23,7 @@ public class ReplacePlanFromSlave implements PlanStrategy {
 //		however, this doesn't have to be the case for all scenarios.
 //		person.removePlan(person.getSelectedPlan());
 		Plan plan = plans.get(person.getId().toString());
-		person.addPlan(plan);	
+		person.addPlan(plan);
 		person.setSelectedPlan(plan);
 
 	}
