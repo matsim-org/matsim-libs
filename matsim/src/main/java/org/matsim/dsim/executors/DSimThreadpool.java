@@ -4,6 +4,7 @@ import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.ManyToManyConcurrentArrayQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.dsim.DSimConfigGroup;
 
 import java.util.Collection;
 import java.util.Random;
@@ -33,13 +34,13 @@ import java.util.function.Supplier;
  * NOTE: With a busy-spin idle strategy this pool spins until tasks are submitted. This will fry your CPU and block other threads. Use {@link #pause()}
  * and {@link #resume()} to free CPU ressources
  */
-class BusyThreadpool {
+class DSimThreadpool {
 
-	private static final Logger log = LogManager.getLogger(BusyThreadpool.class);
+	private static final Logger log = LogManager.getLogger(DSimThreadpool.class);
 
 	private enum ExecutionMode {
 		PAUSED,
-		BUSY,
+		RUNNING,
 		SHUTDOWN
 	}
 
@@ -52,9 +53,9 @@ class BusyThreadpool {
 	/**
 	 * @param size                the number of worker threads to spawn
 	 * @param idleStrategyFactory supplies the {@link IdleStrategy} used while threads wait for work
-	 * @see #BusyThreadpool(int, int, Supplier)
+	 * @see #DSimThreadpool(int, int, Supplier)
 	 */
-	BusyThreadpool(int size, Supplier<IdleStrategy> idleStrategyFactory) {
+	DSimThreadpool(int size, Supplier<IdleStrategy> idleStrategyFactory) {
 		// use 128 tasks per default. Usually, we have less than 10 tasks per sim step.
 		this(size, 128, idleStrategyFactory);
 	}
@@ -67,7 +68,7 @@ class BusyThreadpool {
 	 *                               {@link IdleStrategy}. The factory is invoked size + 1 time and is expected to yield a new instance of
 	 *                               {@link IdleStrategy} every time.
 	 */
-	BusyThreadpool(int size, int perWorkerQueueCapacity, Supplier<IdleStrategy> idleStrategyFactory) {
+	DSimThreadpool(int size, int perWorkerQueueCapacity, Supplier<IdleStrategy> idleStrategyFactory) {
 		log.info("Initializing BusyThreadpool with {} workers; per-worker queue capacity={}", size, perWorkerQueueCapacity);
 
 		this.submitIdleStrategy = idleStrategyFactory.get();
@@ -194,7 +195,7 @@ class BusyThreadpool {
 			while (true) {
 				switch (executionMode) {
 					case PAUSED -> LockSupport.park(this);
-					case BUSY, SHUTDOWN -> {
+					case RUNNING, SHUTDOWN -> {
 						return;
 					}
 				}
@@ -213,11 +214,12 @@ class BusyThreadpool {
 	}
 
 	/**
-	 * Unparks all workers. The pool eagerly awaits tasks after this. Internally,
-	 * it uses busy spin to wait for new tasks, which will cause a lot of CPU usage.
+	 * Unparks all workers. The pool awaits tasks after this. Internally,
+	 * it uses the supplied {@link IdleStrategy} to await new tasks, in case of {@link DSimConfigGroup.ThreadScheduling#eager}
+	 * this will cause high CPU load.
 	 */
 	public void resume() {
-		executionMode = ExecutionMode.BUSY;
+		executionMode = ExecutionMode.RUNNING;
 		for (Worker w : workers) {
 			w.unpark();
 		}
@@ -249,7 +251,7 @@ class BusyThreadpool {
 
 	/**
 	 * Submit multiple tasks to the pool. The pool will execute all tasks as soon as there is a free worker thread.
-	 * This method is equivalent to calling {@link #submit(Runnable)} for each task but it only produces a single future.
+	 * This method is equivalent to calling {@link #submit(Runnable)} for each task, but it only produces a single future.
 	 * This saves a tiny bit of allocation for tasks, such as the SimProcess, which need to be submitted and awaited
 	 * together often.
 	 *
@@ -289,7 +291,7 @@ class BusyThreadpool {
 	/**
 	 * Submits a task to the pool. The pool will execute this task as soon as there is a free worker thread.
 	 *
-	 * @return A future which completes when the task has been executed.
+	 * @return A future that completes when the task has been executed.
 	 */
 	public Future<?> submit(Runnable task) {
 		if (isShutdown() || isPaused()) {
@@ -302,7 +304,7 @@ class BusyThreadpool {
 	}
 
 	/**
-	 * Internal mechanism to submit a task to the workers. A random worker queue is selected and we try to submit
+	 * Internal mechanism to submit a task to the workers. A random worker queue is selected, and we try to submit
 	 * to its queue. If we fail to do so, we try all other workers. If this fails too, we start another round,
 	 * starting from the worker next to the one we tried the very first.
 	 */

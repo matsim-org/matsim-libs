@@ -23,7 +23,7 @@ public final class PoolExecutor implements LPExecutor {
 
 	private static final Logger log = LogManager.getLogger(PoolExecutor.class);
 
-	private final BusyThreadpool executor;
+	private final DSimThreadpool executor;
 	private final SerializationProvider serializer;
 
 	/**
@@ -47,7 +47,7 @@ public final class PoolExecutor implements LPExecutor {
 			case eager -> BusySpinIdleStrategy::new;
 			case backoff -> BackoffIdleStrategy::new;
 		};
-		this.executor = new BusyThreadpool(size, idleStrategyFactory);
+		this.executor = new DSimThreadpool(size, idleStrategyFactory);
 	}
 
 	/**
