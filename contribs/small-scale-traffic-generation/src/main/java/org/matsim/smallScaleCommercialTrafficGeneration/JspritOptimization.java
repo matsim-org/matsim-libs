@@ -66,34 +66,29 @@ class JspritOptimization{
 				int countedVehicles = 0;
 				if (carrier.getServices().size() > maxServicesPerCarrier) {
 					splitCarriers++;
-					int numberOfNewCarrier = (int) Math
-						.ceil((double) carrier.getServices().size() / (double) maxServicesPerCarrier);
-					int numberOfServicesPerNewCarrier = (int) Math
-						.floor((double) carrier.getServices().size() / numberOfNewCarrier);
+					int numberOfNewCarrier = (int) Math.ceil((double) carrier.getServices().size() / (double) maxServicesPerCarrier);
+					int numberOfServicesPerNewCarrier = (int) Math.floor((double) carrier.getServices().size() / numberOfNewCarrier);
 
 					int totalVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().size();
 					int numberOfVehiclesPerNewCarrier = totalVehicles / numberOfNewCarrier;
 					int numberOfVehiclesRemainder = totalVehicles % numberOfNewCarrier;
 
-					List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>(
-						carrier.getCarrierCapabilities().getCarrierVehicles().keySet());
+					List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>( carrier.getCarrierCapabilities().getCarrierVehicles().keySet());
 					vehiclesForNewCarrier.sort( Comparator.comparing(Id::toString ) );
-					List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>(
-						carrier.getServices().keySet());
+					List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>( carrier.getServices().keySet());
 					servicesForNewCarrier.sort(Comparator.comparing(Id::toString));
 
-					for (int j = 0; j < numberOfNewCarrier; j++) {
+					for (int jj = 0; jj < numberOfNewCarrier; jj++) {
 
 						int numberOfServicesForNewCarrier = numberOfServicesPerNewCarrier;
-						if (j + 1 == numberOfNewCarrier)
+						if (jj + 1 == numberOfNewCarrier){
 							numberOfServicesForNewCarrier = carrier.getServices().size() - countedServices;
-
+						}
 						int numberOfVehiclesForNewCarrier = numberOfVehiclesPerNewCarrier;
-						if (j < numberOfVehiclesRemainder)
+						if (jj < numberOfVehiclesRemainder){
 							numberOfVehiclesForNewCarrier++;
-
-						Carrier newCarrier = CarriersUtils.createCarrier(
-							Id.create(carrier.getId().toString() + "_part_" + (j + 1), Carrier.class));
+						}
+						Carrier newCarrier = CarriersUtils.createCarrier( Id.create(carrier.getId().toString() + "_part_" + (jj + 1), Carrier.class));
 						CarrierCapabilities newCarrierCapabilities = CarrierCapabilities.Builder.newInstance()
 						                                                                        .setFleetSize(carrier.getCarrierCapabilities().getFleetSize()).build();
 						newCarrierCapabilities.getVehicleTypes().addAll(carrier.getCarrierCapabilities().getVehicleTypes());
