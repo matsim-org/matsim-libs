@@ -173,15 +173,15 @@ public class AgentTable {
 		duckConn.createStatement().execute(
 			"COPY (SELECT * FROM read_parquet('" + agentsParquetPath + "') " +
 				"ORDER BY agent_id) " +
-				"TO '" + agentsSortedCsvPath + "' (FORMAT CSV, COMPRESSION zstd)"
+				"TO '" + agentsSortedCsvPath + "' (FORMAT CSV, HEADER, DELIMITER ',', COMPRESSION zstd)"
 		);
 
 
-		java.nio.file.Path dbPath = java.nio.file.Path.of(this.outputDirectory + "/sla.db");
+		java.nio.file.Path dbPath = java.nio.file.Path.of(this.outputDirectory + "/sla.sqlite3");
 		java.nio.file.Files.deleteIfExists(dbPath);
 
 		duckConn.createStatement().execute(
-			"ATTACH '" + this.outputDirectory + "/sla.db' AS sqlite_db (TYPE SQLITE)"
+			"ATTACH '" + this.outputDirectory + "/sla.sqlite3' AS sqlite_db (TYPE SQLITE3)"
 		);
 
 		duckConn.createStatement().execute(
