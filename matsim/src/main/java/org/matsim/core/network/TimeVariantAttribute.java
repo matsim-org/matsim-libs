@@ -19,7 +19,8 @@
 
 package org.matsim.core.network;
 
-import java.util.TreeMap;
+import java.util.List;
+import java.util.NavigableMap;
 
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
@@ -58,7 +59,13 @@ public interface TimeVariantAttribute
 
 	boolean isRecalcRequired();
 
-	void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents, ChangeValueGetter valueGetter, double baseValue);
+	/**
+	 * @param changeEvents all change events registered on the link, grouped by start time. Several events may share a
+	 *                     start time; every event at a given time is applied, in registration order, and together they
+	 *                     yield a single value for that time.
+	 */
+	void recalc(NavigableMap<Double, List<NetworkChangeEvent>> changeEvents, ChangeValueGetter valueGetter,
+			double baseValue);
 
 	void incChangeEvents();
 
