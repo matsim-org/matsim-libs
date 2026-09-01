@@ -105,7 +105,6 @@ public class EvDriveDischargingIntegrationTest {
 	 */
 	@Test
 	@Order(2)
-	@org.matsim.testcases.DisabledOnGitHubWindowsCI
 	void threeNodes() throws InterruptedException, ExecutionException, TimeoutException {
 		var outputDirectory = utils.getOutputDirectory();
 		var size = 3;

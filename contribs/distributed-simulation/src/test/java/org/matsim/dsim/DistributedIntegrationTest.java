@@ -26,8 +26,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -121,12 +119,8 @@ public class DistributedIntegrationTest {
 		controler.run();
 	}
 
-	/**
-	 * Disable test for now, as we have changed the output.
-	 */
 	@Test
 	@Order(3)
-	@org.matsim.testcases.DisabledOnGitHubWindowsCI
 	void runDistributed() throws IOException {
 
 		int size = 2;

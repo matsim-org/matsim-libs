@@ -19,13 +19,6 @@
  * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import ch.sbb.matsim.mobsim.qsim.SBBTransitModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,45 +27,39 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.communication.LocalCommunicator;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.dsim.DistributedContext;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.dsim.DSimConfigGroup;
+import org.matsim.dsim.DistributedContext;
 import org.matsim.dsim.NetworkDecomposition;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.DisabledOnGitHubWindowsCI;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.DistributedExecution;
 import org.matsim.testcases.utils.EventsCollector;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mrieser / SBB
@@ -651,7 +638,6 @@ public class SBBTransitEngineTest {
 	 */
 	@Test
 	@Timeout(value = 2, unit = TimeUnit.MINUTES)
-	@DisabledOnGitHubWindowsCI
 	void testDistributedDSimIntegration() throws IOException {
 		int size = 2;
 		var comms = LocalCommunicator.create(size);

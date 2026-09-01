@@ -123,7 +123,6 @@ public class ThreeLinkIntegrationTest {
 
 	@Test
 	@Order(2)
-	@org.matsim.testcases.DisabledOnGitHubWindowsCI
 	void oneAgentThreeNodes() {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
@@ -156,7 +155,6 @@ public class ThreeLinkIntegrationTest {
 
 	@Test
 	@Order(2)
-	@org.matsim.testcases.DisabledOnGitHubWindowsCI
 	void oneAgentThreeNodesTwoIterations() {
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var outputDirectory = utils.getOutputDirectory(); // this also creats the directory

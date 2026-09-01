@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -62,7 +61,6 @@ public class DSimIntegrationTest {
 
 	@Test
 	@Order(2)
-	@org.matsim.testcases.DisabledOnGitHubWindowsCI
 	void runDistributed() throws IOException {
 
 		Path output = Path.of(utils.getOutputDirectory());
