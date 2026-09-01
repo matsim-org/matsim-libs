@@ -50,7 +50,7 @@
           <plugin>
             <groupId>com.diffplug.spotless</groupId>
             <artifactId>spotless-maven-plugin</artifactId>
-            <version>3.8.0</version>
+            <version>3.10.1</version>
             <configuration>
               <lineEndings>UNIX</lineEndings>
               <formats>
@@ -86,7 +86,7 @@
           <plugin>
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs-maven-plugin</artifactId>
-            <version>4.10.3.0</version>
+            <version>4.10.4.0</version>
             <configuration>
               <effort>Min</effort>
               <threshold>High</threshold>
