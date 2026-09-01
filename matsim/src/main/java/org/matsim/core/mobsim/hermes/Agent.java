@@ -95,7 +95,7 @@ class Agent {
     // <0101> StopArriveType  | 4 bits unused | 16 bit event id  | 8 bits unused   | 16 bit route id | 16 station id
     // <1000> StopDelayType   | 20 departure sec                 | 8 bits unused   | 16 bit route id | 16 station id
     // <0110> StopDepartType  | 4 bits unused | 16 bit event id  | 8 bits unused   | 16 bit route id | 16 station id
-    protected final PlanArray plan; // TODO - use a byte buffer instead of a long[]...
+    protected final PlanArray plan;
 
     protected final EventArray events;
 

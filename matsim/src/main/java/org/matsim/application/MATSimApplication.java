@@ -24,9 +24,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * A helper class to define and execute MATSim scenarios, including a pipeline of prepare and analysis scripts.
- * This class provides a common scenario setup procedure and command line parsing.
- * Scenarios simply need to extend it and overwrite the *prepare methods if needed.
+ * A helper class to define and execute MATSim scenarios, including a pipeline of prepare and analysis scripts. This class provides a common scenario
+ * setup procedure and command line parsing. Scenarios simply need to extend it and overwrite the *prepare methods if needed.
  * <p>
  * To run your application use:
  * <code>
@@ -35,8 +34,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * <p>
  * There are also other variants of this method, e.g. to run the scenario within code.
  * <p>
- * This class also automatically registers classes from the {@link Prepare} and {@link Analysis} annotations as subcommands.
- * These can be used to build a pipeline with command needed for preparation analysis.
+ * This class also automatically registers classes from the {@link Prepare} and {@link Analysis} annotations as subcommands. These can be used to
+ * build a pipeline with command needed for preparation analysis.
  *
  * @see #start(Class, String...)
  * @see #execute(Class, Config, String...)
@@ -142,10 +141,10 @@ public abstract class MATSimApplication implements Callable<Integer> {
 			// would, in my understanding, set the context separately from the config path name.
 			//  But I am not sure how this would execute in everything that follows.  kai, feb'26
 
-			String path = Objects.requireNonNull( configPath, "No config given; use --config=<path-to-config.xml>" );
+			String path = Objects.requireNonNull(configPath, "No config given; use --config=<path-to-config.xml>");
 
 			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path));
-			Config preparedConfig = prepareConfig( config1 );
+			Config preparedConfig = prepareConfig(config1);
 
 			config = preparedConfig != null ? preparedConfig : config1;
 			// (The above lines of code come from inlining so maybe it happened there: I cannot see how "preparedConfig" could
@@ -159,13 +158,10 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 		Objects.requireNonNull(config);
 
-		if ( yamlFilename != null)
-			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource( yamlFilename ) );
+		if (yamlFilename != null)
+			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(yamlFilename));
 
-		if (remainingArgs != null) {
-			String[] args = remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
-			ConfigUtils.applyCommandline(config, args);
-		}
+		applyConfigCommandLineArgs(config);
 
 		if (iterations > -1)
 			config.controller().setLastIteration(iterations);
@@ -184,7 +180,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 			prepareScenario(scenario);
 
-			Controler controler = new Controler(scenario);
+			Controler controler = createControler(scenario);
 			prepareControler(controler);
 
 			// Check if simulation needs to be run
@@ -194,7 +190,8 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 		if (post != PostProcessOption.disabled) {
 
-			List<MATSimAppCommand> commands = preparePostProcessing(Path.of(config.controller().getOutputDirectory()), config.controller().getRunId());
+			List<MATSimAppCommand> commands = preparePostProcessing(Path.of(config.controller().getOutputDirectory()),
+				config.controller().getRunId());
 
 			for (MATSimAppCommand command : commands) {
 
@@ -207,7 +204,6 @@ public abstract class MATSimApplication implements Callable<Integer> {
 			}
 		}
 
-
 		return 0;
 	}
 
@@ -215,30 +211,56 @@ public abstract class MATSimApplication implements Callable<Integer> {
 		return configPath;
 	}
 
-//	/**
-//	 * Custom module configs that will be added to the {@link Config} object.
-//	 *
-//	 * @return {@link ConfigGroup} to add
-//	 */
-//	protected List<ConfigGroup> getCustomModules() {
-//		return Lists.newArrayList();
-//	}
+	/**
+	 * Returns the MATSim config arguments from unmatched picocli arguments.
+	 * <p>
+	 * This is intended for subclasses with a custom {@link #call()} implementation that still need to apply
+	 * {@code --config:} or {@code -c:} command line overrides when loading a {@link Config}.
+	 */
+	protected final String[] getConfigCommandLineArgs() {
+		if (remainingArgs == null)
+			return new String[0];
+
+		List<String> unknownArgs = getUnknownArguments(remainingArgs);
+		if (!unknownArgs.isEmpty())
+			throw new IllegalArgumentException("Unknown arguments: " + unknownArgs);
+
+		return getConfigCommandLineArgs(remainingArgs);
+	}
+
+	/**
+	 * Applies {@code --config:} and {@code -c:} command line overrides to the provided config.
+	 */
+	protected final void applyConfigCommandLineArgs(Config config) {
+		String[] configArgs = getConfigCommandLineArgs();
+		if (configArgs.length > 0)
+			ConfigUtils.applyCommandline(config, configArgs);
+	}
+
+	//	/**
+	//	 * Custom module configs that will be added to the {@link Config} object.
+	//	 *
+	//	 * @return {@link ConfigGroup} to add
+	//	 */
+	//	protected List<ConfigGroup> getCustomModules() {
+	//		return Lists.newArrayList();
+	//	}
 	// (no longer used IMO.  kai, feb'26)
 	// (I think that this was meant to add "configurable modules".  However, modules are configurable via the sebhoerl
 	// command line syntax anyways.  I can't say if they possibly behave in a different way re non-default
 	// modules but am relatively sure that, because the corresponding
 	// command was commented out below, it would not have worked anyways with the current setup.)
 
-//	/**
-//	 * Modules that are configurable via command line arguments.
-//	 */
-//	protected List<ConfigGroup> getConfigurableModules() {
-//		return Lists.newArrayList(
-//			new ControllerConfigGroup(),
-//			new GlobalConfigGroup(),
-//			new QSimConfigGroup()
-//		);
-//	}
+	//	/**
+	//	 * Modules that are configurable via command line arguments.
+	//	 */
+	//	protected List<ConfigGroup> getConfigurableModules() {
+	//		return Lists.newArrayList(
+	//			new ControllerConfigGroup(),
+	//			new GlobalConfigGroup(),
+	//			new QSimConfigGroup()
+	//		);
+	//	}
 	// (never used IMO.  kai, feb'26)
 
 	/**
@@ -267,16 +289,22 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	}
 
 	/**
-	 * Allows scenario creation with other loadScenario signatures
-	 * e.g. with AttributeConverter
+	 * Allows scenario creation with other loadScenario signatures e.g. with AttributeConverter
 	 */
 	protected Scenario createScenario(Config config) {
 		return ScenarioUtils.loadScenario(config);
 	}
 
 	/**
-	 * Preparation of {@link MATSimAppCommand} to run after the simulation has finished. The instances have to be fully constructed in this method
-	 * no further arguments are passed down to them.
+	 * Allows creating a controller other than the default. This is useful for distributed applications, for example.
+	 */
+	protected Controler createControler(Scenario scenario) {
+		return new Controler(scenario);
+	}
+
+	/**
+	 * Preparation of {@link MATSimAppCommand} to run after the simulation has finished. The instances have to be fully constructed in this method no
+	 * further arguments are passed down to them.
 	 *
 	 * @return list of commands to run.
 	 */
@@ -321,8 +349,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	}
 
 	/**
-	 * Start the application class and terminates when done.
-	 * This should never be used in tests and only in main methods.
+	 * Start the application class and terminates when done. This should never be used in tests and only in main methods.
 	 */
 	public static void start(Class<? extends MATSimApplication> clazz, String... args) {
 		MATSimApplication app = newInstance(clazz, null);
@@ -376,7 +403,6 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	/**
 	 * <p>Convenience method to run a scenario from code or automatically with gui when desktop application is detected.
 	 * This method may also be used to predefine some default arguments.</p>
-	 *
 	 * <p>With respect to args it looks like arguments are treated in the following sequence (programmed in the run method):
 	 * <ul>
 	 *         <li>ConfigUtils.loadConfig without args</li>
@@ -384,9 +410,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	 *         <li>config options from some yaml file which can be provided as a command line option</li>
 	 *         <li>config options on command line </li>
 	 * </ul></p>
-	 *
 	 * <p>defaultArgs could be used to provide defaults when calling this method here; they would go in addition to what is coming in from "upstream" which is typically the command line.</p>
-	 *
 	 * <p>There are many execution paths that can be reached from this class, but a typical one for matsim-scenarios seems to be:<ul>
 	 * <li> This method runs MATSimApplication.start( TheScenarioClass.class , args ).</li>
 	 * <li> That run class will instantiate an instance of TheScenarioClass (*), then do some args consistenty checking, then call the piccoli execute method. </li>
@@ -465,7 +489,6 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 		CommandLine cli = prepare(app);
 
-
 		AtomicReference<Exception> exc = new AtomicReference<>();
 		cli.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
 			exc.set(ex);
@@ -496,8 +519,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	}
 
 	/**
-	 * Prepare and return controller without running the scenario.
-	 * This allows to configure the controller after setup has been run.
+	 * Prepare and return controller without running the scenario. This allows to configure the controller after setup has been run.
 	 */
 	public static Controler prepare(MATSimApplication app, Config config, String... args) {
 		CommandLine cli = prepare(app);
@@ -515,13 +537,10 @@ public abstract class MATSimApplication implements Callable<Integer> {
 		config = tmp != null ? tmp : config;
 
 		if (app.yamlFilename != null) {
-			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(app.yamlFilename ) );
+			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(app.yamlFilename));
 		}
 
-		if (app.remainingArgs != null) {
-			String[] extraArgs = app.remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
-			ConfigUtils.applyCommandline(config, extraArgs);
-		}
+		app.applyConfigCommandLineArgs(config);
 
 		final Scenario scenario = app.createScenario(config);
 		app.prepareScenario(scenario);
@@ -533,9 +552,8 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	}
 
 	/**
-	 * Prepare and return controller without running the scenario.
-	 * This allows to configure the controller after setup has been run.
-	 * This method tries to use one of the constructors of the given class automatically.
+	 * Prepare and return controller without running the scenario. This allows to configure the controller after setup has been run. This method tries
+	 * to use one of the constructors of the given class automatically.
 	 *
 	 * @see #prepare(MATSimApplication, Config, String...)
 	 */
@@ -562,7 +580,27 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	 * Check if unmatched options are correct.
 	 */
 	private static List<String> unmatched(CommandLine.ParseResult parseResult) {
-		List<String> unmatched = Lists.newArrayList(parseResult.unmatched());
+		return getUnknownArguments(parseResult.unmatched());
+	}
+
+	private static String[] getConfigCommandLineArgs(List<String> args) {
+		List<String> configArgs = Lists.newArrayList();
+
+		String prev = null;
+		for (String current : args) {
+			if (isConfigCommandLineArgument(current))
+				configArgs.add(current.replace("-c:", "--config:"));
+			else if (isConfigCommandLineArgumentValue(current, prev))
+				configArgs.add(current);
+
+			prev = current;
+		}
+
+		return configArgs.toArray(String[]::new);
+	}
+
+	private static List<String> getUnknownArguments(List<String> args) {
+		List<String> unmatched = Lists.newArrayList(args);
 		ListIterator<String> it = unmatched.listIterator();
 
 		// previous string
@@ -572,17 +610,25 @@ public abstract class MATSimApplication implements Callable<Integer> {
 			String current = it.next();
 
 			// filter string handled by matsim parser
-			if (current.startsWith("-c:") || current.startsWith("--config:"))
+			if (isConfigCommandLineArgument(current))
 				it.remove();
 
 			// separate arguments should also be valid, e.g --c:global.threads 5
-			if (!current.startsWith("--") && prev != null && (prev.startsWith("-c:") || prev.startsWith("--config:")))
+			else if (isConfigCommandLineArgumentValue(current, prev))
 				it.remove();
 
 			prev = current;
 		}
 
 		return unmatched;
+	}
+
+	private static boolean isConfigCommandLineArgument(String arg) {
+		return arg.startsWith("-c:") || arg.startsWith("--config:");
+	}
+
+	private static boolean isConfigCommandLineArgumentValue(String arg, String previous) {
+		return !arg.startsWith("--") && previous != null && isConfigCommandLineArgument(previous);
 	}
 
 	private static MATSimApplication newInstance(Class<? extends MATSimApplication> clazz, Config config) {
@@ -595,7 +641,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 			try {
 				return clazz.getDeclaredConstructor(Config.class).newInstance(config);
 			} catch (NoSuchMethodException e) {
-				throw new RuntimeException( "Requested constructor not available", e );
+				throw new RuntimeException("Requested constructor not available", e);
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException("Could not instantiate the application class", e);
 			}
@@ -614,8 +660,8 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	private static CommandLine prepare(MATSimApplication app) {
 		CommandLine cli = new CommandLine(app);
 
-		if (cli.getCommandName().equals(DEFAULT_NAME)){
-			cli.setCommandName( app.getClass().getSimpleName() );
+		if (cli.getCommandName().equals(DEFAULT_NAME)) {
+			cli.setCommandName(app.getClass().getSimpleName());
 		}
 		// (commandName is what is displayed in the command line help text.  It seems that, with inheritance,
 		// piccoli sets this to the base class, but we want to have it set to the outermost class. kai,)
@@ -627,10 +673,9 @@ public abstract class MATSimApplication implements Callable<Integer> {
 		// (this extracts the "Prepare" and "Analysis" subcommands.  yy Note
 		// that additional subcommand namespaces need to be programmed here.)
 
-
-//		List<ConfigGroup> modules = Lists.newArrayList();
-//		modules.addAll(app.getConfigurableModules());
-//		modules.addAll(app.getCustomModules());
+		//		List<ConfigGroup> modules = Lists.newArrayList();
+		//		modules.addAll(app.getConfigurableModules());
+		//		modules.addAll(app.getCustomModules());
 		// I found the following with setupConfig( cli, modules ) commented out.  I am not touching the line to leave git annotate intact ...
 		// ... from here ...
 

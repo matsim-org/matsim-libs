@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
+import org.matsim.contrib.common.conventions.vsp.SubpopulationDefaultNames;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -96,7 +97,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
 		scenario.getPopulation().getPersons().forEach((k, v) -> {
 
 			if (PopulationUtils.getSubpopulation(v) == null)
-				PopulationUtils.putSubpopulation(v, "person");
+				PopulationUtils.putSubpopulation(v, SubpopulationDefaultNames.SUBPOP_PERSON);
 		});
 		// (if a <person/> does not yet have a subpopulation attribute, tag it as a "person".  kai, feb'2024)
 

@@ -20,7 +20,7 @@
 
 package org.matsim.core.population.io;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
@@ -58,7 +58,7 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {
+	public void writeHeaderAndStartElement(Writer out) throws IOException {
 		out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 		out.write("<!DOCTYPE plans SYSTEM \"" + MatsimXmlWriter.DEFAULT_DTD_LOCATION + "plans_v0.dtd\">\n\n");
 	}
@@ -68,12 +68,12 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
+	public void startPlans(final Population plans, final Writer out) throws IOException {
 		out.write("<plans>\n\n");
 	}
 
 	@Override
-	public void endPlans(final BufferedWriter out) throws IOException {
+	public void endPlans(final Writer out) throws IOException {
 		out.write("</plans>\n");
 		out.flush();
 	}
@@ -83,14 +83,14 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startPerson(final Person person, final BufferedWriter out) throws IOException {
+	public void startPerson(final Person person, final Writer out) throws IOException {
 		out.write("\t<person");
 		out.write(" id=\"" + person.getId() + "\"");
 		out.write(">\n");
 	}
 
 	@Override
-	public void endPerson(final BufferedWriter out) throws IOException {
+	public void endPerson(final Writer out) throws IOException {
 		out.write("\t</person>\n\n");
 	}
 
@@ -99,11 +99,11 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startTravelCard(final String travelcard, final BufferedWriter out) throws IOException {
+	public void startTravelCard(final String travelcard, final Writer out) throws IOException {
 	}
 
 	@Override
-	public void endTravelCard(final BufferedWriter out) throws IOException {
+	public void endTravelCard(final Writer out) throws IOException {
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -111,7 +111,7 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
+	public void startPlan(final Plan plan, final Writer out) throws IOException {
 		out.write("\t\t<plan");
 		if (plan.getScore() != null)
 			out.write(" score=\"" + plan.getScore().toString() + "\"");
@@ -123,7 +123,7 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	@Override
-	public void endPlan(final BufferedWriter out) throws IOException {
+	public void endPlan(final Writer out) throws IOException {
 		out.write("\t\t</plan>\n\n");
 	}
 
@@ -132,7 +132,7 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
+	public void startAct(final Activity act, final Writer out) throws IOException {
 		out.write("\t\t\t<act");
 		out.write(" type=\"" + act.getType() + "\"");
 		if (act.getCoord() != null) {
@@ -152,7 +152,7 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	@Override
-	public void endAct(final BufferedWriter out) throws IOException {
+	public void endAct(final Writer out) throws IOException {
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -160,7 +160,7 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
+	public void startLeg(final Leg leg, final Writer out) throws IOException {
 		out.write("\t\t\t<leg");
 		out.write(" mode=\"" + leg.getMode() + "\"");
 		if (leg.getDepartureTime().seconds() != Integer.MIN_VALUE)
@@ -177,7 +177,7 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	@Override
-	public void endLeg(final BufferedWriter out) throws IOException {
+	public void endLeg(final Writer out) throws IOException {
 		out.write("\t\t\t</leg>\n");
 	}
 
@@ -186,7 +186,7 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startRoute(final Route route, final BufferedWriter out) throws IOException {
+	public void startRoute(final Route route, final Writer out) throws IOException {
 		out.write("\t\t\t\t<route>");
 
 		if (route instanceof NetworkRoute) {
@@ -199,7 +199,7 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	@Override
-	public void endRoute(final BufferedWriter out) throws IOException {
+	public void endRoute(final Writer out) throws IOException {
 		out.write("</route>\n");
 	}
 
@@ -208,7 +208,7 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void writeSeparator(final BufferedWriter out) throws IOException {
+	public void writeSeparator(final Writer out) throws IOException {
 		out.write("<!-- =================================================" +
 							"===================== -->\n\n");
 	}

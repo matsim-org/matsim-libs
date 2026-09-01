@@ -16,7 +16,7 @@ public class IntArrayListSerializer extends CollectionSerializer<IntArrayList> {
 	public void write(WriteContext context, IntArrayList value) {
 		var buffer = context.getBuffer();
 		buffer.writeInt32(value.size());
-		buffer.writePrimitiveArray(value.elements(), 0, value.size() * Integer.BYTES);
+		buffer.writeInts(value.elements(), 0, value.size());
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class IntArrayListSerializer extends CollectionSerializer<IntArrayList> {
 		int size = buffer.readInt32();
 		int[] data = new int[size];
 
-		buffer.readToUnsafe(data, 0, size * Integer.BYTES);
+		buffer.readInts(data, 0, size);
 
 		return IntArrayList.wrap(data);
 	}

@@ -35,4 +35,115 @@
       <scope>test</scope>
   </dependency>
   </dependencies>
+
+  <properties>
+    <!-- Quality gates are monotonic ratchets. Raise these values; never lower them. -->
+    <psim.coverage.minimum.branch>0.65</psim.coverage.minimum.branch>
+    <psim.coverage.minimum.line>0.62</psim.coverage.minimum.line>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>psim-quality</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <version>3.8.0</version>
+            <configuration>
+              <lineEndings>UNIX</lineEndings>
+              <formats>
+                <format>
+                  <includes>
+                    <include>src/main/java/**/*.java</include>
+                    <include>src/test/java/**/*.java</include>
+                  </includes>
+                  <trimTrailingWhitespace/>
+                  <endWithNewline/>
+                  <indent>
+                    <tabs>true</tabs>
+                    <spacesPerTab>4</spacesPerTab>
+                  </indent>
+                </format>
+              </formats>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>3.6.0</version>
+            <configuration>
+              <configLocation>${project.basedir}/quality/checkstyle.xml</configLocation>
+              <consoleOutput>true</consoleOutput>
+              <failOnViolation>true</failOnViolation>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <linkXRef>false</linkXRef>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>4.10.3.0</version>
+            <configuration>
+              <effort>Min</effort>
+              <threshold>High</threshold>
+              <failOnError>true</failOnError>
+              <excludeFilterFile>${project.basedir}/quality/spotbugs-exclude.xml</excludeFilterFile>
+              <xmlOutput>true</xmlOutput>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.15</version>
+            <executions>
+              <execution>
+                <id>psim-quality-prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>psim-quality-report</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>psim-quality-check</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <rule>
+                      <element>BUNDLE</element>
+                      <limits>
+                        <limit>
+                          <counter>LINE</counter>
+                          <value>COVEREDRATIO</value>
+                          <minimum>${psim.coverage.minimum.line}</minimum>
+                        </limit>
+                        <limit>
+                          <counter>BRANCH</counter>
+                          <value>COVEREDRATIO</value>
+                          <minimum>${psim.coverage.minimum.branch}</minimum>
+                        </limit>
+                      </limits>
+                    </rule>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

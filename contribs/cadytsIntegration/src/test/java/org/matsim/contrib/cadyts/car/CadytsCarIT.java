@@ -42,6 +42,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
@@ -165,6 +166,8 @@ public class CadytsCarIT {
 		config.scoring().setBrainExpBeta(beta);
 
 		config.replanning().addStrategySettings(new StrategySettings().setStrategyName(DefaultSelector.ChangeExpBeta).setWeight(1.0));
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		// ===
 
@@ -330,12 +333,12 @@ public class CadytsCarIT {
 		config.qsim().setRemoveStuckVehicles(false);
 		{
 			ActivityParams params = new ActivityParams("h");
-			config.scoring().addActivityParams(params);
+			config.scoring().addDefaultActivityParams(params);
 			params.setTypicalDuration(12 * 60 * 60.);
 		}
 		{
 			ActivityParams params = new ActivityParams("w");
-			config.scoring().addActivityParams(params);
+			config.scoring().addDefaultActivityParams(params);
 			params.setTypicalDuration(8 * 60 * 60.);
 		}
 		config.counts().setInputFile(inputDir + "counts5.xml");

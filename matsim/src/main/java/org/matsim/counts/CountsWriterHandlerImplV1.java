@@ -22,7 +22,7 @@ package org.matsim.counts;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 /*package*/ class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 	private final CoordinateTransformation coordinateTransformation;
@@ -32,7 +32,7 @@ import java.io.IOException;
 	}
 
 	@Override
-	public void startCounts(final Counts counts, final BufferedWriter out) throws IOException {
+	public void startCounts(final Counts counts, final Writer out) throws IOException {
 		out.write("<counts ");
 		out.write("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
 		out.write("xsi:noNamespaceSchemaLocation=\"http://matsim.org/files/dtd/counts_v1.xsd\"\n");
@@ -50,12 +50,12 @@ import java.io.IOException;
 	}
 
 	@Override
-	public void endCounts(final BufferedWriter out) throws IOException {
+	public void endCounts(final Writer out) throws IOException {
 		out.write("</counts>\n");
 	}
 
 	@Override
-	public void startCount(final Count count, final BufferedWriter out) throws IOException {
+	public void startCount(final Count count, final Writer out) throws IOException {
 		out.write("\t<count");
 		out.write(" loc_id=\"" + count.getId() + "\"");
 		out.write(" cs_id=\"" + count.getCsLabel() + "\"");
@@ -68,12 +68,12 @@ import java.io.IOException;
 	}
 
 	@Override
-	public void endCount(final BufferedWriter out) throws IOException {
+	public void endCount(final Writer out) throws IOException {
 		out.write("\t</count>\n\n");
 	}
 
 	@Override
-	public void startVolume(final Volume volume, final BufferedWriter out) throws IOException {
+	public void startVolume(final Volume volume, final Writer out) throws IOException {
 		out.write("\t\t<volume");
 		out.write(" h=\"" + volume.getHourOfDayStartingWithOne() + "\"");
 		out.write(" val=\"" + volume.getValue() + "\"");
@@ -81,11 +81,11 @@ import java.io.IOException;
 	}
 
 	@Override
-	public void endVolume(final BufferedWriter out) throws IOException {
+	public void endVolume(final Writer out) throws IOException {
 	}
 
 	@Override
-	public void writeSeparator(final BufferedWriter out) throws IOException {
+	public void writeSeparator(final Writer out) throws IOException {
 		out.write("<!-- ====================================================================== -->\n\n");
 	}
 }

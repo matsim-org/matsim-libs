@@ -91,12 +91,12 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 		ActivityParams paramsA = new ActivityParams();
 		paramsA.setActivityType("home");
 		paramsA.setTypicalDuration(1234.);
-		config.scoring().addActivityParams(paramsA);
+		config.scoring().addDefaultActivityParams(paramsA);
 
 		ActivityParams paramsB = new ActivityParams();
 		paramsB.setActivityType("work");
 		paramsB.setTypicalDuration(1234.);
-		config.scoring().addActivityParams(paramsB);
+		config.scoring().addDefaultActivityParams(paramsB);
 
 		config.network().setTimeVariantNetwork(true);
 

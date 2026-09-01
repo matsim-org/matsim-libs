@@ -28,7 +28,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
@@ -118,7 +118,7 @@ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
     // <facilities ... > ... </facilities>
     //////////////////////////////////////////////////////////////////////
 
-    private void startFacilities(final ActivityFacilities facilities, final BufferedWriter out) {
+    private void startFacilities(final ActivityFacilities facilities, final Writer out) {
         List<Tuple<String, String>> attributes = new ArrayList<>();
         if (facilities.getName() != null) {
             attributes.add(new Tuple<>("name", facilities.getName()));
@@ -182,7 +182,7 @@ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
     // <capacity ... />
     //////////////////////////////////////////////////////////////////////
 
-    private void writeCapacity(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
+    private void writeCapacity(final ActivityOptionImpl activity, final Writer out) throws IOException {
         if (activity.getCapacity() != Integer.MAX_VALUE) {
             out.write("\t\t\t<capacity");
             out.write(" value=\"" + activity.getCapacity() + "\"");
@@ -194,7 +194,7 @@ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
     // <opentime ... />
     //////////////////////////////////////////////////////////////////////
 
-    private void writeOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException {
+    private void writeOpentime(final OpeningTime opentime, final Writer out) throws IOException {
         out.write("\t\t\t<opentime");
         out.write(" day=\"wkday\"");
         out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");

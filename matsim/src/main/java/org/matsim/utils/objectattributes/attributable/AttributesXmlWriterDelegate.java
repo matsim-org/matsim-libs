@@ -25,7 +25,7 @@ import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.Map;
 public class AttributesXmlWriterDelegate {
 	private final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 
-	public final void writeAttributes(final String indentation, final BufferedWriter writer, final Attributes attributes) {
+	public final void writeAttributes(final String indentation, final Writer writer, final Attributes attributes) {
 		writeAttributes(indentation, writer, attributes, true);
 	}
 
@@ -44,7 +44,7 @@ public class AttributesXmlWriterDelegate {
 		writeAttributes(indentation, writer, attributes, true);
 	}
 
-	public final void writeAttributes(final String indentation, final BufferedWriter writer, final Attributes attributes, boolean emptyLineAfter) {
+	public final void writeAttributes(final String indentation, final Writer writer, final Attributes attributes, boolean emptyLineAfter) {
 		if (attributes.size() == 0) {
 			return;
 		}

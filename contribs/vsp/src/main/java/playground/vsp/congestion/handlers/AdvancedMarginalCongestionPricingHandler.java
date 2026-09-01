@@ -98,7 +98,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 
 		this.marginaSumScoringFunction =
 				new MarginalSumScoringFunction(
-						new ScoringParameters.Builder(scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParameters(null), scenario.getConfig().scenario()).build());
+						new ScoringParameters.Builder(scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParametersOrDefault(null), scenario.getConfig().scenario()).build());
 	}
 
 	@Override
@@ -235,21 +235,21 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 				if (incompletedPlanWarning <= 10) {
 					log.warn("Agent " + personId + " has not yet completed the plan/trip (the agent is probably stucking). Cannot compute the disutility of being late at this activity. "
 							+ "Something like the disutility of not arriving at the activity is required. Try to avoid this by setting a smaller stuck time period.");
-					log.warn("Setting the disutilty of being delayed on the previous trip using the config parameters; assuming the marginal disutility of being delayed at the (hypothetical) activity to be equal to beta_performing: " + this.scenario.getConfig().scoring().getPerforming_utils_hr());
+					log.warn("Setting the disutilty of being delayed on the previous trip using the config parameters; assuming the marginal disutility of being delayed at the (hypothetical) activity to be equal to beta_performing: " + this.scenario.getConfig().scoring().getDefaultPerforming_utils_hr());
 
 					if (incompletedPlanWarning == 10) {
 						log.warn("Additional warnings of this type are suppressed.");
 					}
 					incompletedPlanWarning++;
 				}
-				activityDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().scoring().getPerforming_utils_hr();
+				activityDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().scoring().getDefaultPerforming_utils_hr();
 			}
 
 			// Calculate the agent's trip delay disutility (could be done similar to the activity delay disutility).
-			double tripDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
+			double tripDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().scoring().getDefaultModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 
 			// Translate the disutility into monetary units.
-			double totalDelayCost = (activityDelayDisutility + tripDelayDisutility) / this.scenario.getConfig().scoring().getMarginalUtilityOfMoney();
+			double totalDelayCost = (activityDelayDisutility + tripDelayDisutility) / this.scenario.getConfig().scoring().getDefaultMarginalUtilityOfMoney();
 			double delayCostPerSecond = totalDelayCost / totalDelayThisPerson;
 
 			// store the VTTS for analysis purposes

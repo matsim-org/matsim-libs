@@ -27,8 +27,10 @@ public class RunDiscreteModeChoiceExampleTest{
 		try{
 			RunDiscreteModeChoiceExample.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ).toString()
 					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
-					, "--config:controler.lastIteration=2"
-			} );
+					, "--config:controler.lastIteration=2",
+				//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+			"--config:routing.accessEgressConsistencyCheck=disable"});
+
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.zst";
 				String actual = utils.getOutputDirectory() + "/output_events.xml.zst";

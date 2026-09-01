@@ -78,6 +78,13 @@ public class CHTTFCustomizer {
     private static final int PARALLEL_REAL_EDGE_THRESHOLD = 200;
 
     public void customize(CHGraph chGraph, TravelTime tt, TravelDisutility td) {
+        if (!chGraph.isTimeDependent()) {
+            throw new IllegalStateException(
+                    "CHTTFCustomizer.customize requires a time-dependent CHGraph; "
+                    + "the supplied graph was built with timeDependent=false "
+                    + "(no ttf/minTTF/ttfHash storage). Use CHCustomizer for "
+                    + "static-only CH graphs.");
+        }
         // Quick-check: sample a few original edges to detect if travel times
         // changed since the last customization.  This avoids the expensive full
         // scan (~20M getLinkTravelTime calls for a 200k-link network) when nothing

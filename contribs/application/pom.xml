@@ -21,7 +21,7 @@
 	</repositories>
 
 	<properties>
-		<avro.version>1.12.1</avro.version>
+		<avro.version>1.12.2</avro.version>
 	</properties>
 
 	<dependencies>
@@ -60,6 +60,11 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
@@ -187,7 +192,7 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents.core5</groupId>
 			<artifactId>httpcore5</artifactId>
-			<version>5.4.2</version>
+			<version>5.4.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
@@ -214,7 +219,7 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents.client5</groupId>
 			<artifactId>httpclient5</artifactId>
-			<version>5.6.1</version>
+			<version>5.6.4</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -249,6 +254,16 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- Avro 1.12.2+ only deserializes classes from trusted packages; whitelist the generated Avro classes -->
+					<systemPropertyVariables>
+						<org.apache.avro.SERIALIZABLE_PACKAGES>org.matsim.application.avro</org.apache.avro.SERIALIZABLE_PACKAGES>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.avro</groupId>
 				<artifactId>avro-maven-plugin</artifactId>

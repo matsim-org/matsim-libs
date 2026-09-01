@@ -192,7 +192,7 @@ public class ControlerIT {
 		ActivityParams actParams = new ActivityParams("h");
 		actParams.setTypicalDuration(8 * 3600);
 		actParams.setPriority(1.0);
-		config.scoring().addActivityParams(actParams);
+		config.scoring().addDefaultActivityParams(actParams);
 		// - define iterations
 		config.controller().setLastIteration(0);
 		// - make sure we don't use threads, as they are not deterministic
@@ -333,7 +333,7 @@ public class ControlerIT {
 		ActivityParams actParams = new ActivityParams("h");
 		actParams.setTypicalDuration(8 * 3600);
 		actParams.setPriority(1.0);
-		config.scoring().addActivityParams(actParams);
+		config.scoring().addDefaultActivityParams(actParams);
 		// - define iterations
 		config.controller().setLastIteration(0);
 		// - make sure we don't use threads, as they are not deterministic
@@ -432,7 +432,7 @@ public class ControlerIT {
 		ActivityParams actParams = new ActivityParams("h");
 		actParams.setTypicalDuration(8 * 3600);
 		actParams.setPriority(1.0);
-		config.scoring().addActivityParams(actParams);
+		config.scoring().addDefaultActivityParams(actParams);
 		// - define iterations
 		config.controller().setLastIteration(0);
 		// - make sure we don't use threads, as they are not deterministic
@@ -893,6 +893,8 @@ public class ControlerIT {
 	@Test
 	void testOneSnapshotWriterInConfig() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.controller().setLastIteration(0);
 		config.controller().setWriteEventsInterval(0);
 		config.controller().setWritePlansInterval(0);
@@ -910,6 +912,8 @@ public class ControlerIT {
 	@Test
 	void testTransimsSnapshotWriterOnQSim() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.controller().setLastIteration(2);
 		config.controller().setWriteEventsInterval(0);
 		config.controller().setWritePlansInterval(0);

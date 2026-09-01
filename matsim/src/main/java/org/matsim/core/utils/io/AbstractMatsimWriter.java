@@ -20,11 +20,11 @@
 
 package org.matsim.core.utils.io;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
@@ -41,7 +41,7 @@ public abstract class AbstractMatsimWriter {
 	protected static final String NL = "\n";
 
 	/** The writer output can be written to. */
-	protected BufferedWriter writer = null;
+	protected Writer writer = null;
 
 	/** Whether or not the output is gzip-compressed. If <code>null</code>, the
 	 * usage of compression is decided by the filename (whether it ends with .gz
@@ -70,11 +70,9 @@ public abstract class AbstractMatsimWriter {
 	 */
 	protected final void openFile(final String filename) throws UncheckedIOException {
 		assertNotAlreadyOpen();
-		if (this.useCompression == null) {
-			this.writer = IOUtils.getBufferedWriter(filename);
-		} else {
-			this.writer = IOUtils.getBufferedWriter(filename + ".gz");
-		}
+		final String target = (this.useCompression == null) ? filename : filename + ".gz";
+		final OutputStream outputStream = IOUtils.getOutputStream(IOUtils.getFileUrl(target), false);
+		this.writer = new FastBufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
 	}
 
 	/**
@@ -85,9 +83,9 @@ public abstract class AbstractMatsimWriter {
 		assertNotAlreadyOpen();
 		try {
 			if (this.useCompression == null || this.useCompression) {
-				this.writer = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+				this.writer = new FastBufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
 			} else {
-				this.writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream), StandardCharsets.UTF_8));
+				this.writer = new FastBufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream), StandardCharsets.UTF_8));
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

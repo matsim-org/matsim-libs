@@ -41,8 +41,8 @@ public final class RunDiscreteModeChoiceExample{
 		config.routing().addTeleportedModeParams( new RoutingConfigGroup.TeleportedModeParams(modeC).setTeleportedModeSpeed(10. ) );
 		config.routing().addTeleportedModeParams( new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(4./3.6 ) );
 
-		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( modeB ).setConstant( 13. ) );
-		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( modeC ).setConstant( 12. ) );
+		config.scoring().addDefaultModeParams( new ScoringConfigGroup.ModeParams( modeB ).setConstant( 13. ) );
+		config.scoring().addDefaultModeParams( new ScoringConfigGroup.ModeParams( modeC ).setConstant( 12. ) );
 
 		// the following is first inlined and then adapted from DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement( config );
 		config.replanning().addStrategySettings( new StrategySettings().setStrategyName( DiscreteModeChoiceModule.STRATEGY_NAME ).setWeight( 1. ) );

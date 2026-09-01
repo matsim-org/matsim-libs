@@ -57,6 +57,11 @@ public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
     private UseDistanceConstraintForTourPlanning useDistanceConstraintForTourPlanning = UseDistanceConstraintForTourPlanning.noDistanceConstraint;
     private static final String USE_DISTANCE_CONSTRAINT_DESC = "Use distance constraint within the tour planning phase. This does NOT ensure that the tours in MATSim will respect this limitation";
 
+	static final String DISTANCE_CONSTRAINT_USABLE_RANGE = "distanceConstraintUsableRange";
+	private static final String DISTANCE_CONSTRAINT_USABLE_RANGE_DESC = "Usable vehicle range in percent for tour planning in Jsprit. "
+		+ "For example, a value of 90 limits the usable range to 90 percent of the vehicle range. Default value is 100 percent.";
+	private double distanceConstraintUsableRange = 100.;
+
     public FreightCarriersConfigGroup() {
         super(GROUPNAME);
     }
@@ -176,6 +181,22 @@ public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
 		this.useDistanceConstraintForTourPlanning = useDistanceConstraintForTourPlanning;
 	}
 
+	/**
+	 * @return distanceConstraintUsableRange -- {@value #DISTANCE_CONSTRAINT_USABLE_RANGE_DESC}
+	 */
+	@StringGetter(DISTANCE_CONSTRAINT_USABLE_RANGE)
+	public double getDistanceConstraintUsableRange() {
+		return distanceConstraintUsableRange;
+	}
+
+	/**
+	 * @param distanceConstraintUsableRange {@value #DISTANCE_CONSTRAINT_USABLE_RANGE_DESC}
+	 */
+	@StringSetter(DISTANCE_CONSTRAINT_USABLE_RANGE)
+	public void setDistanceConstraintUsableRange(double distanceConstraintUsableRange) {
+		this.distanceConstraintUsableRange = distanceConstraintUsableRange;
+	}
+
 	//---
 	//---
 	@Override
@@ -186,6 +207,7 @@ public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
         map.put(VEHICLE_ROUTING_ALGORITHM, VEHICLE_ROUTING_ALGORITHM_DESC);
         map.put(TRAVEL_TIME_SLICE_WIDTH, TRAVEL_TIME_SLICE_WIDTH_DESC);
         map.put(USE_DISTANCE_CONSTRAINT, USE_DISTANCE_CONSTRAINT_DESC);
+        map.put(DISTANCE_CONSTRAINT_USABLE_RANGE, DISTANCE_CONSTRAINT_USABLE_RANGE_DESC);
         return map;
     }
 

@@ -31,6 +31,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -59,6 +60,8 @@ public class ScoreStatsModuleTest {
 
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 		config.routing().setAccessEgressType(isInsertingAccessEgressWalk ? AccessEgressType.accessEgressModeToLink : AccessEgressType.none);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		config.controller().setLastIteration(1);
 		Controler controler = new Controler(config);

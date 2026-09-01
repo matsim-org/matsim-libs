@@ -20,7 +20,7 @@
 
 package org.matsim.core.config;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
@@ -41,7 +41,7 @@ import java.util.Map;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	 void startConfig(final Config config, final BufferedWriter out) throws UncheckedIOException {
+	 void startConfig(final Config config, final Writer out) throws UncheckedIOException {
 		try {
 			out.write("<config>");
 			out.write(this.newline);
@@ -52,7 +52,7 @@ import java.util.Map;
 	}
 
 	@Override
-	 void endConfig(final BufferedWriter out) throws UncheckedIOException {
+	 void endConfig(final Writer out) throws UncheckedIOException {
 		try {
 			out.write("</config>");
 			out.write(this.newline);
@@ -66,7 +66,7 @@ import java.util.Map;
 //////////////////////////////////////////////////////////////////////
 
 	@Override
-	 void writeModule(final ConfigGroup module, final BufferedWriter out) throws UncheckedIOException {
+	 void writeModule(final ConfigGroup module, final Writer out) throws UncheckedIOException {
 		Map<String, String> params = module.getParams();
 		Map<String, String> comments = module.getComments();
 
@@ -105,7 +105,7 @@ import java.util.Map;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	 void writeSeparator(final BufferedWriter out) throws UncheckedIOException {
+	 void writeSeparator(final Writer out) throws UncheckedIOException {
 		try {
 			out.write("<!-- ====================================================================== -->");
 			out.write(this.newline);

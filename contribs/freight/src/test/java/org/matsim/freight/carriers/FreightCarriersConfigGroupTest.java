@@ -47,6 +47,8 @@ public class FreightCarriersConfigGroupTest {
 		Assertions.assertTrue(params.containsKey(FreightCarriersConfigGroup.VEHICLE_ROUTING_ALGORITHM));
 		Assertions.assertTrue(params.containsKey(FreightCarriersConfigGroup.TRAVEL_TIME_SLICE_WIDTH));
 		Assertions.assertTrue(params.containsKey(FreightCarriersConfigGroup.USE_DISTANCE_CONSTRAINT));
+		Assertions.assertTrue(params.containsKey(FreightCarriersConfigGroup.DISTANCE_CONSTRAINT_USABLE_RANGE));
+		Assertions.assertEquals(100., freight.getDistanceConstraintUsableRange());
 	}
 
 	@Test
@@ -64,6 +66,7 @@ public class FreightCarriersConfigGroupTest {
 			    <param name="vehicleRoutingAlgorithmFile" value="/path/to/carriersRoutingAlgorithm.xml" />
 			    <param name="travelTimeSliceWidth" value="3600" />
 			    <param name="useDistanceConstraintForTourPlanning" value="basedOnEnergyConsumption" />
+			    <param name="distanceConstraintUsableRange" value="75" />
 			  </module>
 			</config>""";
 
@@ -76,6 +79,7 @@ public class FreightCarriersConfigGroupTest {
 		Assertions.assertEquals("/path/to/carriersRoutingAlgorithm.xml", freight.getVehicleRoutingAlgorithmFile());
 		Assertions.assertEquals(3600.0, freight.getTravelTimeSliceWidth(), 1e-8);
 		Assertions.assertEquals(UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption, freight.getUseDistanceConstraintForTourPlanning());
+		Assertions.assertEquals(75., freight.getDistanceConstraintUsableRange());
 	}
 
 }

@@ -28,7 +28,7 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ScoringParameterSet;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 	}
 
 	private void writeModule(
-			final BufferedWriter writer,
+			final Writer writer,
 			final String indent,
 			final String moduleTag,
 			final String moduleNameAtt,
@@ -103,7 +103,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		}
 	}
 
-	private Boolean processParameterSets(BufferedWriter writer, String indent, String moduleTag, String moduleNameAtt, String moduleName,
+	private Boolean processParameterSets(Writer writer, String indent, String moduleTag, String moduleNameAtt, String moduleName,
 							 ConfigGroup module, ConfigGroup comparisonModule, Boolean headerHasBeenWritten) throws IOException {
 		for ( Entry<String, ? extends Collection<? extends ConfigGroup>> entry : module.getParameterSets().entrySet() ) {
 			Collection<? extends ConfigGroup> comparisonSets = new ArrayList<>() ;
@@ -161,7 +161,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		return headerHasBeenWritten;
 	}
 
-	private Boolean writeRegularEntries(BufferedWriter writer, String indent, String moduleTag, String moduleNameAtt,
+	private Boolean writeRegularEntries(Writer writer, String indent, String moduleTag, String moduleNameAtt,
 							String moduleName, ConfigGroup comparisonModule, Map<String, String> params,
 							Map<String, String> comments) throws IOException {
 		boolean headerHasBeenWritten = false ;
@@ -221,7 +221,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		return headerHasBeenWritten;
 	}
 
-	private static void writeHeader(BufferedWriter writer, String indent, String moduleTag, String moduleNameAtt, String moduleName, String newline) throws IOException {
+	private static void writeHeader(Writer writer, String indent, String moduleTag, String moduleNameAtt, String moduleName, String newline) throws IOException {
 		//			writer.write( this.newline );
 		writer.write( indent );
 		writer.write("\t<"+moduleTag);
@@ -262,7 +262,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 	@Override
 	 void startConfig(
 			final Config config,
-			final BufferedWriter out) {
+			final Writer out) {
 		try {
 			out.write("<"+CONFIG+">");
 			out.write( this.newline );
@@ -274,7 +274,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 
 	@Override
 	 void endConfig(
-			final BufferedWriter out) {
+			final Writer out) {
 		try {
 			out.write( this.newline );
 			out.write("</"+CONFIG+">");
@@ -287,7 +287,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 	@Override
 	 void writeModule(
 			final ConfigGroup module,
-			final BufferedWriter out) {
+			final Writer out) {
 			ConfigGroup comparisonConfig = null ;
 			switch( verbosity ) {
 				case all -> {
@@ -311,7 +311,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 	}
 
 	@Override
-	 void writeSeparator(final BufferedWriter out) {
+	 void writeSeparator(final Writer out) {
 //		try {
 ////			out.write( this.newline );
 //			out.write("<!-- ====================================================================== -->");

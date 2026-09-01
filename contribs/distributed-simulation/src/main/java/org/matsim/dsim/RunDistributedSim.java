@@ -25,31 +25,31 @@ import java.util.concurrent.Callable;
 	description = "Run a distributed simulation")
 public class RunDistributedSim implements Callable<Integer> {
 
-	@CommandLine.Option(names = {"-r", "--rank"}, description = "Rank of this node", defaultValue = "0")
+	@CommandLine.Option(names = { "-r", "--rank" }, description = "Rank of this node", defaultValue = "0")
 	private int rank;
 
-	@CommandLine.Option(names = {"-t", "--total"}, description = "Total number of nodes", defaultValue = "1")
+	@CommandLine.Option(names = { "-t", "--total" }, description = "Total number of nodes", defaultValue = "1")
 	private int total;
 
-	@CommandLine.Option(names = {"--threads"}, description = "Number of threads on a node", defaultValue = "4")
+	@CommandLine.Option(names = { "--threads" }, description = "Number of threads on a node", defaultValue = "4")
 	private int threads;
 
-	@CommandLine.Option(names = {"--write-events"}, description = "Write events to the output directory", defaultValue = "false")
+	@CommandLine.Option(names = { "--write-events" }, description = "Write events to the output directory", defaultValue = "false")
 	private boolean writeEvents;
 
-	@CommandLine.Option(names = {"--nodes"}, description = "List of all nodes", defaultValue = "")
+	@CommandLine.Option(names = { "--nodes" }, description = "List of all nodes", defaultValue = "")
 	private String nodes;
 
-	@CommandLine.Option(names = {"--address"}, description = "Address of this node", defaultValue = "")
+	@CommandLine.Option(names = { "--address" }, description = "Address of this node", defaultValue = "")
 	private String address;
 
-	@CommandLine.Option(names = {"-c", "--communicator"}, description = "Type of communicator", defaultValue = "LOCAL")
+	@CommandLine.Option(names = { "-c", "--communicator" }, description = "Type of communicator", defaultValue = "LOCAL")
 	private Type communicator;
 
-	@CommandLine.Option(names = {"-s", "--scenario"}, description = "Scenario to run (from matsim-examples)", defaultValue = "kelheim")
+	@CommandLine.Option(names = { "-s", "--scenario" }, description = "Scenario to run (from matsim-examples)", defaultValue = "kelheim")
 	private String scenario;
 
-	@CommandLine.Option(names = {"-o", "--output"}, description = "Overwrite output path in the config")
+	@CommandLine.Option(names = { "-o", "--output" }, description = "Overwrite output path in the config")
 	private String output;
 
 	public static void main(String[] args) {
@@ -76,7 +76,7 @@ public class RunDistributedSim implements Callable<Integer> {
 			case AERON -> new AeronCommunicator(rank, total, false, address);
 			case AERON_IPC -> new AeronCommunicator(rank, total, true, address);
 			case HAZELCAST -> new HazelcastCommunicator(rank, total, Communicator.parseNodeList(address, nodes));
-			case SHM -> new SharedMemoryCommunicator(rank, total);
+			case SHM -> new SharedMemoryCommunicator(rank, total, Path.of(System.getProperty("java.io.tmpdir"), "dsim-shared-mem-comm"));
 			case LOCAL -> new NullCommunicator();
 		};
 

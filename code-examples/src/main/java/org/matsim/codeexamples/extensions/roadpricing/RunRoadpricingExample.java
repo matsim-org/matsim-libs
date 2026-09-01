@@ -22,6 +22,7 @@ package org.matsim.codeexamples.extensions.roadpricing;
 
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.application.prepare.population.CleanPopulation;
 import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,13 +40,14 @@ public class RunRoadpricingExample {
 			config = ConfigUtils.loadConfig( "scenarios/equil-extended/config-with-roadpricing.xml" );
 			config.controller().setOutputDirectory( "output" );
 			config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-			config.controller().setLastIteration( 1 );
+			config.controller().setLastIteration( 0 );
 		} else {
 			config = ConfigUtils.loadConfig( args );
 		}
 
 		// load the scenario:
 		Scenario scenario = ScenarioUtils.loadScenario( config );
+		new CleanPopulation.CleanPopulationBuilder().setRmRoutes(true).createCleanPopulation().cleanPopulation(scenario.getPopulation());
 
 		// instantiate the controler:
 		Controler controler = new Controler(scenario);

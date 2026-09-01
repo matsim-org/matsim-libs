@@ -59,6 +59,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author nagel, ikaddoura
@@ -68,10 +69,7 @@ public final class PopulationUtils {
 	private static final PopulationFactory populationFactory = createPopulation(
 			new PlansConfigGroup(), null, null).getFactory();
 
-//	/**
-//	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
-//	 */
-//	@Deprecated
+
 	private static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
 
 
@@ -918,6 +916,7 @@ public final class PopulationUtils {
 		for( Plan inPlan : in.getPlans() ){
 			Plan outPlan = getFactory().createPlan();
 			copyFromTo( inPlan, outPlan );
+			out.addPlan(outPlan);
 		}
 	}
 
@@ -1323,6 +1322,16 @@ public final class PopulationUtils {
 
 	public static void removeSubpopulation(Person person) {
 		person.getAttributes().removeAttribute(SUBPOPULATION_ATTRIBUTE_NAME);
+	}
+
+	/**
+	 * Returns all non-null subpopulation names used by the population.
+	 */
+	public static Set<String> getSubpopulationsOfPopulation(Population population) {
+		return population.getPersons().values().stream()
+			.map(PopulationUtils::getSubpopulation)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
 	public static Population getOrCreateAllPersons(Scenario scenario) {

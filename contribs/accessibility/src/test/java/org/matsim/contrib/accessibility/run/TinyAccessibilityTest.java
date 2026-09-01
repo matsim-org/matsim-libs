@@ -228,7 +228,7 @@ public class TinyAccessibilityTest {
 		final Config config = createTestConfig();
 
 
-		config.scoring().getModes().get(TransportMode.walk).setConstant(-10);
+		config.scoring().getDefaultModeParams().get(TransportMode.walk).setConstant(-10);
 		double min = 0.; // Values for bounding box usually come from a config file
 		double max = 200.;
 
@@ -297,7 +297,7 @@ public class TinyAccessibilityTest {
 
 		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
 //		drtParams.setMarginalUtilityOfTraveling(0);
-		config.scoring().addModeParams(drtParams);
+		config.scoring().addDefaultModeParams(drtParams);
 
 		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );
 
@@ -500,7 +500,7 @@ public class TinyAccessibilityTest {
 		final Config config = createTestConfig();
 		config.controller().setLastIteration(1);
 		config.replanning().addStrategySettings(new ReplanningConfigGroup.StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1.));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("dummy").setTypicalDuration(60));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("dummy").setTypicalDuration(60));
 
 
 		final Scenario scenario = createTestScenario(config);

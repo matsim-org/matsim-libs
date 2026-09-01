@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.LeastCostPathUtils.NoPathBehavior;
 import org.matsim.vehicles.Vehicle;
 
 public interface LeastCostPathCalculator {
@@ -42,6 +43,26 @@ public interface LeastCostPathCalculator {
 
 	default Path calcLeastCostPath(Link fromLink, Link toLink, double startTime, final Person person, final Vehicle vehicle) {
 		return calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), startTime, person, vehicle);
+	}
+
+	/**
+	 * Bounded variant of {@link #calcLeastCostPath(Link, Link, double, Person, Vehicle)}.
+	 *
+	 * <p>Implementations that support a search cutoff may return {@code null} as soon as it is
+	 * provable that no path with cost {@code <= maxCost} exists, instead of exploring the
+	 * remaining reachable subgraph. This is useful for callers that would discard any path
+	 * above a known threshold anyway (e.g. mapping algorithms that fall back to artificial
+	 * links beyond a maximum travel-cost factor).</p>
+	 *
+	 * <p>The default implementation ignores {@code maxCost} and delegates to the unbounded
+	 * overload, preserving behaviour for implementations that do not support a cutoff.</p>
+	 *
+	 * @param maxCost maximum allowed path cost; pass {@link Double#POSITIVE_INFINITY} to
+	 *                disable the cutoff. Must be {@code >= 0}.
+	 * @return the least-cost path, or {@code null} if no path with cost {@code <= maxCost} exists.
+	 */
+	default Path calcLeastCostPath(Link fromLink, Link toLink, double startTime, final Person person, final Vehicle vehicle, double maxCost) {
+		return calcLeastCostPath(fromLink, toLink, startTime, person, vehicle);
 	}
 
 	class Path {
@@ -65,4 +86,6 @@ public interface LeastCostPathCalculator {
 			return nodes.get(nodes.size() - 1);
 		}
 	}
+
+	public void setNoPathBehavior(NoPathBehavior behavior);
 }

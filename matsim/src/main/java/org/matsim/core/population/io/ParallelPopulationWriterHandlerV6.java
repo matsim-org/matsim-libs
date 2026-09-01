@@ -38,7 +38,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.Vehicle;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.HashMap;
@@ -104,7 +104,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		}
 	}
 
-	private void tryInitWriterThread(BufferedWriter out) {
+	private void tryInitWriterThread(Writer out) {
 		if (this.writeThread == null) {
 			this.writer = new ParallelPopulationWriterV6(this.outputQueue, out);
 			writeThread = new Thread(this.writer);
@@ -160,13 +160,13 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	}
 
 	@Override
-	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {
+	public void writeHeaderAndStartElement(Writer out) throws IOException {
 		out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 		out.write("<!DOCTYPE population SYSTEM \"" + MatsimXmlWriter.DEFAULT_DTD_LOCATION + "population_v6.dtd\">\n\n");
 	}
 
 	@Override
-	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
+	public void startPlans(final Population plans, final Writer out) throws IOException {
 		out.write("<population");
 		if (plans.getName() != null) {
 			out.write(" desc=\"" + encodeAttributeValue(plans.getName()) + "\"");
@@ -181,7 +181,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	}
 
 	@Override
-	public void writePerson(Person person, BufferedWriter out) throws IOException {
+	public void writePerson(Person person, Writer out) throws IOException {
 		try {
 			CompletableFuture<String> f = new CompletableFuture<>();
 			this.inputQueue.put(new PersonData(person, f));
@@ -192,13 +192,13 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	}
 
 	@Override
-	public void endPlans(final BufferedWriter out) throws IOException {
+	public void endPlans(final Writer out) throws IOException {
 		joinThreads();
 		out.write("</population>\n");
 	}
 
 	@Override
-	public void writeSeparator(BufferedWriter out) throws IOException {
+	public void writeSeparator(Writer out) throws IOException {
 		out.append("<!-- ====================================================================== -->\n\n");
 	}
 
@@ -216,10 +216,10 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	public static class ParallelPopulationWriterV6 implements Runnable {
 		private final Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 		private final BlockingQueue<CompletableFuture<String>> outputQueue;
-		private final BufferedWriter out;
+		private final Writer out;
 
 
-		ParallelPopulationWriterV6(BlockingQueue<CompletableFuture<String>> outputQueue, BufferedWriter out) {
+		ParallelPopulationWriterV6(BlockingQueue<CompletableFuture<String>> outputQueue, Writer out) {
 			this.outputQueue = outputQueue;
 			this.out = out;
 		}

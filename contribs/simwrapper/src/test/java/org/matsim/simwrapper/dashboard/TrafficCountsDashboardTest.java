@@ -106,7 +106,8 @@ public class TrafficCountsDashboardTest {
 			String absolutPath = Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath() + "/dummy_counts.xml";
 
 			config.counts().setInputFile(absolutPath);
-			config.counts().setCountsScaleFactor( config.qsim().getFlowCapFactor() );
+			// due to implementation in CountsComparisonAlgorithm this needs to be the inverse of flowCapFactor
+			config.counts().setCountsScaleFactor( 1. / config.qsim().getFlowCapFactor());
 			new CountsWriter(counts).write(absolutPath);
 		} catch (IOException e) {
 			e.printStackTrace();

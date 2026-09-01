@@ -50,6 +50,10 @@ public class WeightedRandomSelection<T> {
 	}
 
 	public T select() {
+		return this.select(random);
+	}
+
+	public T select(RandomGenerator random) {
 		Preconditions.checkState(!entryList.isEmpty(), "No entries in the list to select from");
 		Preconditions.checkState(totalWeight > 0, "Total weight is not positive");
 

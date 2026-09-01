@@ -20,7 +20,7 @@
 
 package org.matsim.core.population.io;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.util.Map;
 
@@ -34,15 +34,15 @@ import org.matsim.utils.objectattributes.AttributeConverter;
  */
 public interface PopulationWriterHandler {
 
-	void writeHeaderAndStartElement(BufferedWriter out) throws IOException;
+	void writeHeaderAndStartElement(Writer out) throws IOException;
 
-	void startPlans(final Population plans, final BufferedWriter out) throws IOException;
+	void startPlans(final Population plans, final Writer out) throws IOException;
 
-	void writePerson(final Person person, final BufferedWriter out) throws IOException;
+	void writePerson(final Person person, final Writer out) throws IOException;
 
-	void endPlans(final BufferedWriter out) throws IOException;
+	void endPlans(final Writer out) throws IOException;
 
-	void writeSeparator(final BufferedWriter out) throws IOException;
+	void writeSeparator(final Writer out) throws IOException;
 
 	default void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
 		if (!converters.isEmpty()) {

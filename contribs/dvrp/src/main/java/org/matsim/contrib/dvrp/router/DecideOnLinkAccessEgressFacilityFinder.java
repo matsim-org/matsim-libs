@@ -27,9 +27,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.router.LinkWrapperFacility;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -42,10 +42,11 @@ public class DecideOnLinkAccessEgressFacilityFinder implements AccessEgressFacil
 	}
 
 	@Override
-	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility, Attributes tripAttributes) {
+	public Optional<Pair<Facility, Facility>> findFacilities(RoutingRequest request) {
 		LinkWrapperFacility accessFacility = new LinkWrapperFacility(
-				FacilitiesUtils.decideOnLink(fromFacility, network));
-		LinkWrapperFacility egressFacility = new LinkWrapperFacility(FacilitiesUtils.decideOnLink(toFacility, network));
+				FacilitiesUtils.decideOnLink(request.getFromFacility(), network));
+		LinkWrapperFacility egressFacility = new LinkWrapperFacility(
+				FacilitiesUtils.decideOnLink(request.getToFacility(), network));
 		return Optional.of(ImmutablePair.of(accessFacility, egressFacility));
 	}
 }

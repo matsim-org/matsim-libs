@@ -78,79 +78,86 @@ class BicycleScoreEventsCreator implements
 	}
 
 	@Override public void handleEvent( VehicleEntersTrafficEvent event ){
-		vehicle2driver.handleEvent( event );
+		if (!event.getLinkId().toString().startsWith("pt_")) {
+			vehicle2driver.handleEvent( event );
 
-		this.firstLinkIdMap.put( event.getVehicleId(), event.getLinkId() );
+			this.firstLinkIdMap.put( event.getVehicleId(), event.getLinkId() );
 
-		if ( this.bicycleConfig.isMotorizedInteraction() ){
-			modeFromVehicle.put( event.getVehicleId(), event.getNetworkMode() );
+			if ( this.bicycleConfig.isMotorizedInteraction() ){
+				modeFromVehicle.put( event.getVehicleId(), event.getNetworkMode() );
 
-			// inc count by one:
-			numberOfVehiclesOnLinkByMode.putIfAbsent( event.getNetworkMode(), new LinkedHashMap<>() );
-			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get( event.getNetworkMode() );
-			map.merge( event.getLinkId(), 1., Double::sum );
+				// inc count by one:
+				numberOfVehiclesOnLinkByMode.putIfAbsent( event.getNetworkMode(), new LinkedHashMap<>() );
+				Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get( event.getNetworkMode() );
+				map.merge( event.getLinkId(), 1., Double::sum );
+			}
 		}
 	}
 
 	@Override public void handleEvent( LinkEnterEvent event ) {
-		if ( this.bicycleConfig.isMotorizedInteraction() ){
-			// inc count by one:
-			String mode = this.modeFromVehicle.get( event.getVehicleId() );
-			numberOfVehiclesOnLinkByMode.putIfAbsent( mode, new LinkedHashMap<>() );
-			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get( mode );
-			map.merge( event.getLinkId(), 1., Double::sum );
+		if (!event.getLinkId().toString().startsWith("pt_")) {
+			if (this.bicycleConfig.isMotorizedInteraction()) {
+				// inc count by one:
+				String mode = this.modeFromVehicle.get(event.getVehicleId());
+				numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
+				Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
+				map.merge(event.getLinkId(), 1., Double::sum);
+			}
 		}
 	}
 
 	@Override public void handleEvent( LinkLeaveEvent event ){
-		if ( this.bicycleConfig.isMotorizedInteraction() ){
-			// dec count by one:
-			String mode = this.modeFromVehicle.get( event.getVehicleId() );
-			numberOfVehiclesOnLinkByMode.putIfAbsent( mode, new LinkedHashMap<>() );
-			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get( mode );
-			Gbl.assertIf( map.merge( event.getLinkId(), -1., Double::sum ) >= 0 );
-		}
+		if (!event.getLinkId().toString().startsWith("pt_")) {
+			if (this.bicycleConfig.isMotorizedInteraction()) {
+				// dec count by one:
+				String mode = this.modeFromVehicle.get(event.getVehicleId());
+				numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
+				Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
+				Gbl.assertIf(map.merge(event.getLinkId(), -1., Double::sum) >= 0);
+			}
 
-		if ( vehicle2driver.getDriverOfVehicle( event.getVehicleId() ) != null ){
-			double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ),
-				event.getVehicleId(), this.bicycleMode );
+			if (vehicle2driver.getDriverOfVehicle(event.getVehicleId()) != null) {
+				double amount = additionalBicycleLinkScore.computeLinkBasedScore(network.getLinks().get(event.getLinkId()),
+					event.getVehicleId(), this.bicycleMode);
 
-			// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.
+				// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.
 //			it would be more straight forward to do the mode check here,
 //			but we do not have the Vehicles Object in this class, which we need to retrieve the mode
 //			of the current vehicle. -sm0925
-			if (!Double.isNaN(amount)) {
-				if ( this.bicycleConfig.isMotorizedInteraction() ) {
-					// yyyy this is the place where instead a data structure would need to be build that counts interaction with every car
-					// that entered the link after the bicycle, and left it before.  kai, jul'23
-					var carCounts = this.numberOfVehiclesOnLinkByMode.get( TransportMode.car );
-					if ( carCounts != null ){
-						amount -= 0.004 * carCounts.getOrDefault( event.getLinkId(), 0. );
+				if (!Double.isNaN(amount)) {
+					if (this.bicycleConfig.isMotorizedInteraction()) {
+						// yyyy this is the place where instead a data structure would need to be build that counts interaction with every car
+						// that entered the link after the bicycle, and left it before.  kai, jul'23
+						var carCounts = this.numberOfVehiclesOnLinkByMode.get(TransportMode.car);
+						if (carCounts != null) {
+							amount -= 0.004 * carCounts.getOrDefault(event.getLinkId(), 0.);
+						}
 					}
-				}
 
-				final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle( event.getVehicleId() );
-				Gbl.assertNotNull( driverOfVehicle );
-				this.eventsManager.processEvent( new PersonScoreEvent( event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore" ) );
+					final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle(event.getVehicleId());
+					Gbl.assertNotNull(driverOfVehicle);
+					this.eventsManager.processEvent(new PersonScoreEvent(event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore"));
+				}
+			} else {
+				log.warn("no driver found for vehicleId={}; not clear why this could happen", event.getVehicleId());
 			}
-		} else {
-			log.warn( "no driver found for vehicleId=" + event.getVehicleId() + "; not clear why this could happen");
 		}
 	}
 
 	@Override public void handleEvent( VehicleLeavesTrafficEvent event ){
-		if ( this.bicycleConfig.isMotorizedInteraction() ){
-			// dec count by one:
-			String mode = this.modeFromVehicle.get( event.getVehicleId() );
-			numberOfVehiclesOnLinkByMode.putIfAbsent( mode, new LinkedHashMap<>() );
-			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get( mode );
-			Gbl.assertIf( map.merge( event.getLinkId(), -1., Double::sum ) >= 0. );
-		}
-		if ( vehicle2driver.getDriverOfVehicle( event.getVehicleId() ) != null ){
-			if( !Objects.equals( this.firstLinkIdMap.get( event.getVehicleId() ), event.getLinkId() ) ){
-				// what is this good for?  maybe that bicycles that enter and leave on the same link should not receive the additional score?  kai, jul'23
+		if (!event.getLinkId().toString().startsWith("pt_")) {
+			if (this.bicycleConfig.isMotorizedInteraction()) {
+				// dec count by one:
+				String mode = this.modeFromVehicle.get(event.getVehicleId());
+				numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
+				Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
+				Gbl.assertIf(map.merge(event.getLinkId(), -1., Double::sum) >= 0.);
+			}
+			if (vehicle2driver.getDriverOfVehicle(event.getVehicleId()) != null) {
+				if (!Objects.equals(this.firstLinkIdMap.get(event.getVehicleId()), event.getLinkId())) {
+					// what is this good for?  maybe that bicycles that enter and leave on the same link should not receive the additional score?  kai, jul'23
 
-				// yyyy in the link based scoring, it actually uses event.getReleativePositionOnLink.  Good idea!  kai, jul'23
+					// yyyy in the link based scoring, it actually uses event.getReleativePositionOnLink.  Good idea!  kai, jul'23
 
 //				I am pretty sure that here the last link is scored twice. It is already scored for LinkLeaveEvent, so why are we doing it again here? -sm0325
 //				because when an agent gets to the final link of a route the sequence is NOT LinkEnter - LinkLeave
@@ -158,25 +165,25 @@ class BicycleScoreEventsCreator implements
 
 //				yyyy still, the last link is not counted in for e.g. trip distance in output_trips nor trip distance in experienced_plans??
 
-				double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ),
-					event.getVehicleId(), this.bicycleMode);
+					double amount = additionalBicycleLinkScore.computeLinkBasedScore(network.getLinks().get(event.getLinkId()),
+						event.getVehicleId(), this.bicycleMode);
 
-				// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.
+					// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.
 //				it would be more straight forward to do the mode check here,
 //				but we do not have the Vehicles Object in this class, which we need to retrieve the mode
 //				of the current vehicle. -sm0925
-				if (!Double.isNaN(amount)) {
-					final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle( event.getVehicleId() );
-					Gbl.assertNotNull( driverOfVehicle );
-					this.eventsManager.processEvent( new PersonScoreEvent( event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore" ) );
+					if (!Double.isNaN(amount)) {
+						final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle(event.getVehicleId());
+						Gbl.assertNotNull(driverOfVehicle);
+						this.eventsManager.processEvent(new PersonScoreEvent(event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore"));
+					}
 				}
+			} else {
+				log.warn("no driver found for vehicleId={}; not clear why this could happen", event.getVehicleId());
 			}
-		} else {
-			log.warn( "no driver found for vehicleId=" + event.getVehicleId() + "; not clear why this could happen" );
+			// Needs to be called last, because it will remove driver information
+			vehicle2driver.handleEvent(event);
+			// ---
 		}
-		// Needs to be called last, because it will remove driver information
-		vehicle2driver.handleEvent( event );
-		// ---
 	}
-
 }

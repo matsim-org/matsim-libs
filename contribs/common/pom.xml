@@ -20,12 +20,12 @@
 		<dependency>
 			<groupId>one.util</groupId>
 			<artifactId>streamex</artifactId>
-			<version>0.8.4</version>
+			<version>0.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.uber</groupId>
 			<artifactId>h3</artifactId>
-			<version>4.4.0</version>
+			<version>4.5.0</version>
 		</dependency>
         <dependency>
             <groupId>org.geotools</groupId>

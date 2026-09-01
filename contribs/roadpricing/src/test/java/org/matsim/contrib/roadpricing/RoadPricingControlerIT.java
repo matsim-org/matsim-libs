@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -50,6 +51,9 @@ public class RoadPricingControlerIT {
 		config.plans().setInputFile("plans1.xml");
 		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/basecase/");
 		config.controller().setWritePlansInterval(0);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
+
 		Controler controler1 = new Controler(config);
 		controler1.getConfig().controller().setCreateGraphs(false);
 		controler1.getConfig().controller().setDumpDataAtEnd(false);

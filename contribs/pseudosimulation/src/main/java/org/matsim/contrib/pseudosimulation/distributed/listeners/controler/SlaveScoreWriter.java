@@ -41,7 +41,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 					+ history[INDEX_BEST][idx] + "\n");
 			out.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// Preserve legacy continuation when one iteration cannot be written.
 			e.printStackTrace();
 		}
 		// create chart when data of more than one iteration is available.
@@ -84,6 +84,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 		try {
 			this.out.close();
 		} catch (IOException e) {
+			// Preserve legacy shutdown behavior: report a close failure without masking shutdown.
 			e.printStackTrace();
 		}
 

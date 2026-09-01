@@ -41,7 +41,7 @@ public class CharyparNagelScoringFunctionModule extends AbstractModule {
     public void install() {
         bind(ScoringFunctionFactory.class).to(CharyparNagelScoringFunctionFactory.class);
 
-		Map<String, ScoringConfigGroup.ScoringParameterSet> scoringParameter = getConfig().scoring().getScoringParametersPerSubpopulation();
+		Map<String, ScoringConfigGroup.ScoringParameterSet> scoringParameter = getConfig().scoring().getAllScoringParameterSetsPerSubpopulation();
 
 		boolean tasteVariations = scoringParameter.values().stream().anyMatch(s -> s.getTasteVariationsParams() != null);
 
