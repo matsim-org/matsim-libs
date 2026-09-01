@@ -1,5 +1,6 @@
 package org.matsim.dsim.executors;
 
+import org.agrona.concurrent.BackoffIdleStrategy;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ public class BusyThreadpoolTest {
 
 	@BeforeEach
 	void setUp() {
-		pool = new BusyThreadpool(4, 128);
+		pool = new BusyThreadpool(4, 128, BackoffIdleStrategy::new);
 	}
 
 	@AfterEach

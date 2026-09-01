@@ -1,6 +1,5 @@
 package org.matsim.dsim.executors;
 
-import org.agrona.concurrent.BusySpinIdleStrategy;
 import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.ManyToManyConcurrentArrayQueue;
 import org.apache.logging.log4j.LogManager;
@@ -8,26 +7,31 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
 import java.util.Random;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
+import java.util.function.Supplier;
 
 /**
- * A thread pool implementation that uses busy-waiting for worker threads to process tasks. This threadpool is optimized for the workload of
+ * A thread pool implementation that can use busy-waiting for worker threads to process tasks. This threadpool is optimized for the workload of
  * {@link PoolExecutor} which drives the DSim.
  * <p>
  * The threadpool spawns `size` threads on creation. The threads immediately go into park. Before the pool can be used {@link #resume()} must be
- * called which wakes up all worker threads of the pool. Ater {@link #resume()} has been called, worker threads busy spin for new tasks which will
- * saturate the CPU if sufficient tasks are requested. The busy spinning can be paused by calling {@link #pause()}. When paused, the pool does NOT
- * accept new tasks. It will continue to finish all submitted tasks, before worker threads are parked.
+ * called which wakes up all worker threads of the pool. Ater {@link #resume()} has been called, worker threads wait for new tasks using the
+ * {@link org.agrona.concurrent.IdleStrategy} supplied to the constructor. With a busy-spin strategy this saturates the CPU if sufficient tasks are
+ * requested; a back-off strategy trades latency for lower CPU usage when threads outnumber cores. Waiting can be paused by calling {@link #pause()}.
+ * When paused, the pool does NOT accept new tasks. It will continue to finish all submitted tasks, before worker threads are parked.
  * <p>
  * NOTE: This pool is optimized for one coordinator thread which submits new tasks. I have not tested how it behaves with multiple threads submitting
  * tasks. I guess it will work 🙃
  * <p>
- * NOTE: This pool busy spins until tasks are submitted. This will fry your CPU and block other threads. Use {@link #pause()} and {@link #resume()} to
- * free CPU ressources
+ * NOTE: With a busy-spin idle strategy this pool spins until tasks are submitted. This will fry your CPU and block other threads. Use {@link #pause()}
+ * and {@link #resume()} to free CPU ressources
  */
 class BusyThreadpool {
 
@@ -41,21 +45,35 @@ class BusyThreadpool {
 
 	private final Worker[] workers;
 	private final AtomicLong submitIndex = new AtomicLong(0);
-	private final IdleStrategy submitIdleStrategy = new BusySpinIdleStrategy();
+	private final IdleStrategy submitIdleStrategy;
 
 	private volatile ExecutionMode executionMode = ExecutionMode.PAUSED;
 
-	BusyThreadpool(int size) {
+	/**
+	 * @param size                the number of worker threads to spawn
+	 * @param idleStrategyFactory supplies the {@link IdleStrategy} used while threads wait for work
+	 * @see #BusyThreadpool(int, int, Supplier)
+	 */
+	BusyThreadpool(int size, Supplier<IdleStrategy> idleStrategyFactory) {
 		// use 128 tasks per default. Usually, we have less than 10 tasks per sim step.
-		this(size, 128);
+		this(size, 128, idleStrategyFactory);
 	}
 
-	BusyThreadpool(int size, int perWorkerQueueCapacity) {
+	/**
+	 * @param size                   the number of worker threads to spawn
+	 * @param perWorkerQueueCapacity capacity of each worker's task queue
+	 * @param idleStrategyFactory    supplies the {@link IdleStrategy} used while threads wait for work.
+	 *                               A factory (rather than a single shared instance) is required because every thread needs its own
+	 *                               {@link IdleStrategy}. The factory is invoked size + 1 time and is expected to yield a new instance of
+	 *                               {@link IdleStrategy} every time.
+	 */
+	BusyThreadpool(int size, int perWorkerQueueCapacity, Supplier<IdleStrategy> idleStrategyFactory) {
 		log.info("Initializing BusyThreadpool with {} workers; per-worker queue capacity={}", size, perWorkerQueueCapacity);
 
+		this.submitIdleStrategy = idleStrategyFactory.get();
 		this.workers = new Worker[size];
 		for (int i = 0; i < size; i++) {
-			workers[i] = new Worker(i, perWorkerQueueCapacity);
+			workers[i] = new Worker(i, perWorkerQueueCapacity, idleStrategyFactory.get());
 		}
 		for (Worker w : workers) {
 			w.start();
@@ -66,7 +84,7 @@ class BusyThreadpool {
 		private final Thread thread;
 		private final int workerId;
 		private final Random rnd;
-		private final IdleStrategy idleStrategy = new BusySpinIdleStrategy();
+		private final IdleStrategy idleStrategy;
 
 		/**
 		 * Per-worker task queue.
@@ -74,12 +92,13 @@ class BusyThreadpool {
 		 */
 		private final ManyToManyConcurrentArrayQueue<Runnable> queue;
 
-		private Worker(int workerId, int queueCapacity) {
+		private Worker(int workerId, int queueCapacity, IdleStrategy idleStrategy) {
 			this.thread = new Thread(this, "DSim-Worker-" + workerId);
 			this.workerId = workerId;
 			this.thread.setDaemon(true); // optional
 			this.queue = new ManyToManyConcurrentArrayQueue<>(queueCapacity);
 			this.rnd = new Random(workerId);
+			this.idleStrategy = idleStrategy;
 		}
 
 		void start() {

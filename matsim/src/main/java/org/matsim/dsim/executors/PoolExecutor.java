@@ -1,6 +1,9 @@
 package org.matsim.dsim.executors;
 
 import com.google.inject.Inject;
+import org.agrona.concurrent.BackoffIdleStrategy;
+import org.agrona.concurrent.BusySpinIdleStrategy;
+import org.agrona.concurrent.IdleStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
@@ -14,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public final class PoolExecutor implements LPExecutor {
 
@@ -39,7 +43,11 @@ public final class PoolExecutor implements LPExecutor {
 	public PoolExecutor(SerializationProvider serializer, DSimConfigGroup config) {
 		this.serializer = serializer;
 		var size = config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads();
-		this.executor = new BusyThreadpool(size);
+		Supplier<IdleStrategy> idleStrategyFactory = switch (config.getThreadScheduling()) {
+			case eager -> BusySpinIdleStrategy::new;
+			case backoff -> BackoffIdleStrategy::new;
+		};
+		this.executor = new BusyThreadpool(size, idleStrategyFactory);
 	}
 
 	/**
