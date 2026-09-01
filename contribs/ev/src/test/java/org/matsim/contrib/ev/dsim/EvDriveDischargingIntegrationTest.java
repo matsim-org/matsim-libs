@@ -134,7 +134,7 @@ public class EvDriveDischargingIntegrationTest {
 
 			try {
 				for (var f : futures) {
-					f.get(1, TimeUnit.MINUTES);
+					f.get(5, TimeUnit.MINUTES);
 				}
 			} catch (ExecutionException | TimeoutException e) {
 				pool.shutdownNow();

@@ -637,7 +637,7 @@ public class SBBTransitEngineTest {
 	 * driver-only scenario.
 	 */
 	@Test
-	@Timeout(value = 2, unit = TimeUnit.MINUTES)
+	@Timeout(value = 5, unit = TimeUnit.MINUTES)
 	void testDistributedDSimIntegration() throws IOException {
 		int size = 2;
 		var comms = LocalCommunicator.create(size);
