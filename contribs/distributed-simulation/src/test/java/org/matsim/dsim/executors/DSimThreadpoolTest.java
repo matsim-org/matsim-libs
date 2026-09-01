@@ -1,5 +1,6 @@
 package org.matsim.dsim.executors;
 
+import org.agrona.concurrent.BackoffIdleStrategy;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,13 +17,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BusyThreadpoolTest {
+public class DSimThreadpoolTest {
 
-	private BusyThreadpool pool;
+	private DSimThreadpool pool;
 
 	@BeforeEach
 	void setUp() {
-		pool = new BusyThreadpool(4, 128);
+		pool = new DSimThreadpool(4, 128, BackoffIdleStrategy::new);
 	}
 
 	@AfterEach
