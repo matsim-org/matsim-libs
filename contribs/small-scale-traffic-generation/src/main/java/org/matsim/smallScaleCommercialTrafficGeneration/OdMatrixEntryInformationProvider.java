@@ -4,12 +4,15 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
 
 import java.util.List;
+
+import static org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.*;
+
 /**
  * Provides the OD matrix entry information needed by {@link GenerateSmallScaleCommercialTrafficDemand}.
  * Standard implementation is {@link DefaultOdMatrixEntryInformationProvider}.
  * Any configuration settings and external data-sources should be saved as attributes during initialization in the constructor of the class.
  */
-public interface OdMatrixEntryInformationProvider{
+interface OdMatrixEntryInformationProvider{
 
 	class OdMatrixEntryInformation {
 		double occupancyRate;
@@ -29,5 +32,5 @@ public interface OdMatrixEntryInformationProvider{
 	 * @param smallScaleCommercialTrafficSegment Selected traffic types. Options: commercialPersonTraffic, goodsTraffic
 	 * @return class holding the information that is specified by the given entry.
 	 */
-	OdMatrixEntryInformation getOdMatrixEntryInformation(int purpose, String modeORvehType, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment );
+	OdMatrixEntryInformation getOdMatrixEntryInformation(int purpose, String modeORvehType, SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment );
 }

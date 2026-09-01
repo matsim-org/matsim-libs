@@ -67,6 +67,8 @@ import java.util.concurrent.ExecutionException;
 	+ " *          column titles of the input csv should not be changed. The format of"
 	+ " *          these files are given in the example project. See: TODO", showDefaultValues = true)
 public class BasicCommercialDemandGeneration implements MATSimAppCommand {
+	// yyyyyy what is now the difference of this (package) here to "smallScaleCommercialTrafficGeneration"?
+	//  yyyyyy Is long-distance demand included (as the name implies)?
 
 	private final DemandGenerationSpecification demandGenerationSpecification;
 

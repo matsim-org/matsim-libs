@@ -9,7 +9,7 @@ import org.matsim.smallScaleCommercialTrafficGeneration.data.GetGenerationRates;
 
 import java.util.*;
 
-public class DefaultOdMatrixEntryInformationProvider implements OdMatrixEntryInformationProvider{
+class DefaultOdMatrixEntryInformationProvider implements OdMatrixEntryInformationProvider{
 	private final VehicleTypeSelection vehicleTypeSelection;
 	private final EnumMap<SmallScaleCommercialTrafficSegment,
 		Map<Integer, Map<ZoneAttribute, Double>>> generationRatesStartByType = new EnumMap<>( SmallScaleCommercialTrafficSegment.class);

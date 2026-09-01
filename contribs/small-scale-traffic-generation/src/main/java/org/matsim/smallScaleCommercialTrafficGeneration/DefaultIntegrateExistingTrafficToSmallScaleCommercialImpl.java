@@ -30,7 +30,7 @@ import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommerc
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.getObjectiveFunction;
 import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.makeTrafficVolumeKey;
 
-public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implements IntegrateExistingTrafficToSmallScaleCommercial {
+class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implements IntegrateExistingTrafficToSmallScaleCommercial {
 	private static final Logger log = LogManager.getLogger(DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class);
 
 	/**
