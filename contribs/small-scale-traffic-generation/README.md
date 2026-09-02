@@ -66,6 +66,3 @@ For generating the traffic, the following steps are necessary:
 ### Example
 An example is given as a test.
 See tests `RunCreateDataDistributionOfStructureDataTest` and `CommercialTrafficIT.java` and the related input data.
-
-[//]: # (yyyyyy I cannot find the second run class.)
-
