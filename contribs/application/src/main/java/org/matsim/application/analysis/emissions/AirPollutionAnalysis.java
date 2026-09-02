@@ -85,12 +85,20 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--grid-size", description = "Grid size in meter", defaultValue = "100")
 	private double gridSize;
 
+	private final List<String> stringsOfPollutants = new ArrayList<>(
+		Arrays.stream(Pollutant.values())
+			.map(Enum::name)
+			.toList());
+
 	public static void main(String[] args) {
 		new AirPollutionAnalysis().execute(args);
 	}
 
 	@Override
 	public Integer call() throws Exception {
+		stringsOfPollutants.add("PM2_5_SUM");
+		stringsOfPollutants.add("PM_SUM");
+		stringsOfPollutants.add("BC_SUM");
 
 		Config config = prepareConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -152,6 +160,14 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		writeTimeDependentRaster(filteredNetwork, config, emissionsEventHandler);
 
 		return 0;
+	}
+
+	private Pollutant valueOfOrNull(String value) {
+		try {
+			return Pollutant.valueOf(value);
+		} catch (IllegalArgumentException | NullPointerException e) {
+			return null;
+		}
 	}
 
 	private Config prepareConfig() {
@@ -307,9 +323,27 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		try (CSVPrinter total = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_total.csv")), CSVFormat.DEFAULT)) {
 
 			total.printRecord("Pollutant", "kg");
-			for (Pollutant p : Pollutant.values()) {
-				double val = (sum.getDouble(p) * sample.getUpscaleFactor()) / 1000;
-				total.printRecord(p, val < 100_000 && val > 100 ? simple.format(val) : scientific.format(val));
+			for (String s : stringsOfPollutants) {
+				Pollutant p = valueOfOrNull(s);
+
+				double val;
+				if (p == null) {
+					val = switch (s) {
+						case "PM2_5_SUM" -> (sum.getDouble(Pollutant.PM2_5) * sample.getUpscaleFactor()) / 1000
+							+ (sum.getDouble(Pollutant.PM2_5_non_exhaust) * sample.getUpscaleFactor());
+						case "PM_SUM" -> (sum.getDouble(Pollutant.PM) * sample.getUpscaleFactor()) / 1000
+							+ (sum.getDouble(Pollutant.PM_non_exhaust) * sample.getUpscaleFactor());
+						case "BC_SUM" -> (sum.getDouble(Pollutant.BC_exhaust) * sample.getUpscaleFactor()) / 1000
+							+ (sum.getDouble(Pollutant.BC_non_exhaust) * sample.getUpscaleFactor());
+						default -> {
+							log.fatal("Unknown pollutant: {}", s);
+							throw new IllegalStateException("");
+						}
+					};
+				} else {
+					val = (sum.getDouble(p) * sample.getUpscaleFactor()) / 1000;
+				}
+				total.printRecord(s, val < 100_000 && val > 100 ? simple.format(val) : scientific.format(val));
 			}
 
 		} catch (IOException e) {
@@ -334,7 +368,10 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		List<Integer> yLength = rasterMap.values().stream().map(Raster::getYLength).distinct().toList();
 		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
 
-		for (Pollutant pollutant : Pollutant.values()) {
+
+		for (String s : stringsOfPollutants) {
+			Pollutant pollutant = valueOfOrNull(s);
+
 			XYTData avroData = new XYTData();
 			avroData.setCrs(crs);
 
@@ -349,7 +386,24 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 			for (int xi = 0; xi < xLength.get(0); xi++) {
 				for (int yi = 0; yi < yLength.get(0); yi++) {
 					Coord coord = raster.getCoordForIndex(xi, yi);
-					double value = rasterMap.get(pollutant).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
+
+					double value;
+					if (pollutant == null) {
+						value = switch (s) {
+							case "PM2_5_SUM" -> rasterMap.get(Pollutant.PM2_5).getValueByIndex(xi, yi) * sample.getUpscaleFactor()
+								+ rasterMap.get(Pollutant.PM2_5_non_exhaust).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
+							case "PM_SUM" -> rasterMap.get(Pollutant.PM).getValueByIndex(xi, yi) * sample.getUpscaleFactor()
+								+ rasterMap.get(Pollutant.PM_non_exhaust).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
+							case "BC_SUM" -> rasterMap.get(Pollutant.BC_exhaust).getValueByIndex(xi, yi) * sample.getUpscaleFactor()
+								+ rasterMap.get(Pollutant.BC_non_exhaust).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
+							default -> {
+								log.fatal("Unknown pollutant: {}", s);
+								throw new IllegalStateException("");
+							}
+						};
+					} else {
+						value = rasterMap.get(pollutant).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
+					}
 					if (xi == 0) yCoords.add((float) coord.getY());
 					if (yi == 0) xCoords.add((float) coord.getX());
 					valuesList.add((float) value);
@@ -357,7 +411,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 			}
 
 
-			values.put(String.valueOf(pollutant), valuesList);
+			values.put(s, valuesList);
 
 			avroData.setYCoords(yCoords);
 			avroData.setXCoords(xCoords);
@@ -368,7 +422,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 			try (DataFileWriter<XYTData> dataFileWriter = new DataFileWriter<>(datumWriter)) {
 				dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
 				String fileName = output.getPath("emissions_grid_per_day.%s", "avro").toString();
-				fileName = fileName.replace("emissions_grid_per_day", pollutant + "_" + "emissions_grid_per_day");
+				fileName = fileName.replace("emissions_grid_per_day", s + "_" + "emissions_grid_per_day");
 				dataFileWriter.create(avroData.getSchema(), IOUtils.getOutputStream(IOUtils.getFileUrl(fileName), false));
 				dataFileWriter.append(avroData);
 			} catch (IOException e) {
