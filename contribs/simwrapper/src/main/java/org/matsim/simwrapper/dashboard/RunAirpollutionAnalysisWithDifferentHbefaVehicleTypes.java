@@ -14,6 +14,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.simwrapper.Dashboard;
+import org.matsim.simwrapper.SimWrapper;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import picocli.CommandLine;
 
@@ -27,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
+import static org.matsim.simwrapper.dashboard.MobilityToGridScenariosUtils.addEngineInformationToVehicleTypes;
 
 @CommandLine.Command(name = "air-pollution-hbefa-types", description = "Run AirPollutionAnalysis with different combinations of HBEFA vehicle types.")
 public class RunAirpollutionAnalysisWithDifferentHbefaVehicleTypes implements MATSimAppCommand {

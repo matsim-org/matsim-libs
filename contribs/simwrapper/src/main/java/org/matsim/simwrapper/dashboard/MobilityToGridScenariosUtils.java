@@ -57,7 +57,7 @@ public final class MobilityToGridScenariosUtils {
 					}
 					case "freight", TransportMode.truck -> {
 						VehicleUtils.setHbefaVehicleCategory(engineInformation, HbefaVehicleCategory.NON_HBEFA_VEHICLE.toString());
-						VehicleUtils.setHbefaTechnology(engineInformation, Hbefa41Technology.DIESEL.toString());
+						VehicleUtils.setHbefaTechnology(engineInformation, Hbefa41Technology.DIESEL.id);
 						VehicleUtils.setHbefaSizeClass(engineInformation, AVERAGE);
 						VehicleUtils.setHbefaEmissionsConcept(engineInformation, AVERAGE);
 					}
@@ -121,5 +121,13 @@ public final class MobilityToGridScenariosUtils {
 	/**
 	 * Enum for setting HBEFA 4.1 technology = fuel type for a vehicle type.
 	 */
-	public enum Hbefa41Technology {PETROL_4S, DIESEL, ELECTRICITY}
+	public enum Hbefa41Technology {
+		PETROL_4S("petrol (4S)"), DIESEL("diesel"), ELECTRICITY("electricity");
+
+		public final String id;
+
+		Hbefa41Technology(String id){
+			this.id = id;
+		}
+	}
 }
