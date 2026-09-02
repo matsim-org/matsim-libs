@@ -35,8 +35,22 @@ import org.matsim.contrib.common.zones.Zone;
  * @author michalm
  */
 public class TransportProblem<P, C> {
+	/** No limit on the cost of a single producer-consumer arc. */
+	public static final int NO_MAX_COST = Integer.MAX_VALUE;
+
 	public static List<Flow<Zone, Zone>> solveForVehicleSurplus(
 			List<AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus> vehicleSurplus) {
+		return solveForVehicleSurplus(vehicleSurplus, NO_MAX_COST);
+	}
+
+	/**
+	 * @param maxCost arcs more expensive than this are left out of the graph, i.e. no vehicle is relocated further
+	 *                than {@code maxCost} metres. This shrinks the graph but makes the problem harder to saturate: if a
+	 *                zone has no producer within range, its deficit stays unserved and the solver returns less flow
+	 *                than the scarce side would allow.
+	 */
+	public static List<Flow<Zone, Zone>> solveForVehicleSurplus(
+			List<AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus> vehicleSurplus, int maxCost) {
 		List<Pair<Zone, Integer>> supply = new ArrayList<>();
 		List<Pair<Zone, Integer>> demand = new ArrayList<>();
 		for (AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus s : vehicleSurplus) {
@@ -46,7 +60,8 @@ public class TransportProblem<P, C> {
 				demand.add(Pair.of(s.zone, -s.surplus));
 			}
 		}
-		return new TransportProblem<Zone, Zone>(TransportProblem::calcStraightLineDistance).solve(supply, demand);
+		return new TransportProblem<Zone, Zone>(TransportProblem::calcStraightLineDistance, maxCost).solve(supply,
+				demand);
 	}
 
 	private static int calcStraightLineDistance(Zone zone1, Zone zone2) {
@@ -57,9 +72,15 @@ public class TransportProblem<P, C> {
 	}
 
 	private final ToIntBiFunction<P, C> costFunction;
+	private final int maxCost;
 
 	public TransportProblem(ToIntBiFunction<P, C> costFunction) {
+		this(costFunction, NO_MAX_COST);
+	}
+
+	public TransportProblem(ToIntBiFunction<P, C> costFunction, int maxCost) {
 		this.costFunction = costFunction;
+		this.maxCost = maxCost;
 	}
 
 	public List<Flow<P, C>> solve(List<Pair<P, Integer>> supply, List<Pair<C, Integer>> demand) {
@@ -89,8 +110,11 @@ public class TransportProblem<P, C> {
 			Pair<P, Integer> producer = supply.get(i);
 			for (int j = 0; j < C; j++) {
 				Pair<C, Integer> consumer = demand.get(j);
-				int capacity = Math.min(producer.getValue(), consumer.getValue());
 				int cost = costFunction.applyAsInt(producer.getKey(), consumer.getKey());
+				if (cost > maxCost) {
+					continue;
+				}
+				int capacity = Math.min(producer.getValue(), consumer.getValue());
 				MinCostFlow.addEdge(graph, 1 + i, 1 + P + j, capacity, cost);
 			}
 		}
