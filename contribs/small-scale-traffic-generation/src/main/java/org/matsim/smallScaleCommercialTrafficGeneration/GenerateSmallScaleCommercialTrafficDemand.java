@@ -379,7 +379,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		String modelName = configPath.getParent().getFileName().toString();
 
-		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
+		String sampleName = getSampleNameOfOutputFolder(sample);
 
 		/*
 		 * A carrier part ("chunk") run needs two different output concepts:
@@ -400,13 +400,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Scenario scenario;
 		if (mergeSmallScaleCommercialCarrierParts) {
 			mergeSmallScaleCommercialCarrierParts(config, finalOutput);
-			scenario = SmallScaleCommercialTrafficUtils.loadScenarioWithCarrierFile(config,
-				finalOutput.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(config, SOLVED_CARRIER_FILE)));
+			scenario = loadScenarioWithCarrierFile(config,
+				finalOutput.resolve( getRunIdPrefixedFileName(config, SOLVED_CARRIER_FILE ) ) );
 			// (I think that this execution path just merges already existing parts (chunks).)
 		} else {
 			if (isSolvingOnlyCarrierPart()) {
 				if ( carriersFileCreationOption == CreationOption.createNewCarrierFile) {
-					Path sharedCarrierFile = finalOutput.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(config, UNSOLVED_CARRIER_FILE));
+					Path sharedCarrierFile = finalOutput.resolve( getRunIdPrefixedFileName(config, UNSOLVED_CARRIER_FILE ) );
 					if (!Files.exists(sharedCarrierFile)) {
 						throw new IllegalStateException("Missing shared small scale commercial carrier file without solution: " + sharedCarrierFile
 							+ ". Run with --createSmallScaleCommercialCarrierFileOnly before starting carrier part jobs.");
@@ -448,7 +448,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					if (freightCarriersConfigGroup.getCarriersFile() == null){
 						freightCarriersConfigGroup.setCarriersFile( carrierFilePath.toAbsolutePath().toString() );
 					}
-					Path carrierVehicleTypesFile = SmallScaleCommercialTrafficUtils.resolveCarrierVehicleTypesFile(config, carrierFilePath, CARRIER_VEHICLE_TYPES_FILE);
+					Path carrierVehicleTypesFile = resolveCarrierVehicleTypesFile(config, carrierFilePath, CARRIER_VEHICLE_TYPES_FILE);
 					if (carrierVehicleTypesFile != null){
 						freightCarriersConfigGroup.setCarriersVehicleTypesFile( carrierVehicleTypesFile.toAbsolutePath().toString() );
 					} else if (config.vehicles() != null && freightCarriersConfigGroup.getCarriersVehicleTypesFile() == null) {
@@ -472,7 +472,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						if (!Files.exists(shapeFileZonePath)) {
 							throw new Exception("Required districts shape file {} not found" + shapeFileZonePath.toString());
 						}
-						indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
+						indexZones = getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
 						filterFacilitiesForZones(scenario);
 						linksPerZone = filterLinksForZones(scenario, this.indexZones, facilitiesPerZoneWithProbabilities, shapeFileZoneNameColumn);
 					}
@@ -496,11 +496,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					jspritOptimization = new JspritOptimization( nJspritIterations, this.carrierId2carrierAttributes, this.maxNumberOfLoopsForVRPSolving, this.linksPerZone, unhandledServicesSolution );
 					jspritOptimization.solveVRP(scenario );
 				}
-				default -> {
+				case createNewCarrierFile -> {
 					if (!Files.exists(shapeFileZonePath)) {
 						throw new Exception("Required districts shape file {} not found" + shapeFileZonePath.toString());
 					}
-					indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
+					indexZones = getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
 
 					filterFacilitiesForZones(scenario);
 					prepareConfigForResultingModes(scenario);
@@ -535,6 +535,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					jspritOptimization = new JspritOptimization( nJspritIterations, this.carrierId2carrierAttributes, this.maxNumberOfLoopsForVRPSolving, this.linksPerZone, unhandledServicesSolution );
 					jspritOptimization.solveVRP(scenario );
 				}
+				default -> throw new IllegalStateException("Unexpected value: " + carriersFileCreationOption);
 			}
 		}
 		CarriersUtils.writeCarrierVehicleTypes(scenario, CARRIER_VEHICLE_TYPES_FILE);
@@ -548,7 +549,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				smallScaleCommercialCarrierPartIndex + 1, smallScaleCommercialCarrierPartCount);
 			return 0;
 		}
-		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(scenario,
+		createPlansBasedOnCarrierPlans(scenario,
 			usedSmallScaleCommercialTrafficSegment, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent );
 
 		if (MATSimIterationsAfterDemandGeneration != null && MATSimIterationsAfterDemandGeneration >= 0) {
@@ -642,7 +643,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private Path getCarrierPartOutputPath(Path finalOutput) {
 		return finalOutput.resolve(CARRIER_PARTS_FOLDER)
-			.resolve(SmallScaleCommercialTrafficUtils.getCarrierPartSuffix(smallScaleCommercialCarrierPartIndex, smallScaleCommercialCarrierPartCount));
+			.resolve( getCarrierPartSuffix(smallScaleCommercialCarrierPartIndex, smallScaleCommercialCarrierPartCount ) );
 	}
 
 	/**
@@ -658,7 +659,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (!isSolvingOnlyCarrierPart()) {
 			return;
 		}
-		SmallScaleCommercialTrafficUtils.filterCarriersForPart(scenario, smallScaleCommercialCarrierPartIndex, smallScaleCommercialCarrierPartCount);
+		filterCarriersForPart(scenario, smallScaleCommercialCarrierPartIndex, smallScaleCommercialCarrierPartCount);
 	}
 
 	/**
@@ -707,8 +708,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param finalOutput        output folder for the merged carrier and vehicle type files
 	 */
 	private void mergeSmallScaleCommercialCarrierPartFiles(Config baseConfig, Path carrierPartsFolder, Path finalOutput) {
-		Path outputCarrierFile = finalOutput.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(baseConfig,
-			SmallScaleCommercialTrafficUtils.SOLVED_CARRIER_FILE));
+		Path outputCarrierFile = finalOutput.resolve( getRunIdPrefixedFileName(baseConfig,
+			SOLVED_CARRIER_FILE ));
 		if (Files.exists(outputCarrierFile)) {
 			throw new IllegalStateException("Merged small scale commercial carrier file already exists: " + outputCarrierFile
 				+ ". Delete or move this file before running the merge again.");
@@ -717,12 +718,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Scenario mergedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Carriers mergedCarriers = CarriersUtils.addOrGetCarriers(mergedScenario);
 		for (int partIndex = 0; partIndex < smallScaleCommercialCarrierPartCount; partIndex++) {
-			Path partCarrierFile = carrierPartsFolder.resolve(SmallScaleCommercialTrafficUtils.getCarrierPartSuffix(partIndex, smallScaleCommercialCarrierPartCount))
-				.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(baseConfig, SmallScaleCommercialTrafficUtils.SOLVED_CARRIER_FILE));
+			Path partCarrierFile = carrierPartsFolder.resolve( getCarrierPartSuffix(partIndex, smallScaleCommercialCarrierPartCount ) )
+				.resolve( getRunIdPrefixedFileName(baseConfig, SOLVED_CARRIER_FILE ) );
 			if (!Files.exists(partCarrierFile)) {
 				throw new IllegalArgumentException("Missing small scale commercial carrier part file: " + partCarrierFile);
 			}
-			Scenario partScenario = SmallScaleCommercialTrafficUtils.loadScenarioWithCarrierFileOnly(baseConfig, partCarrierFile);
+			Scenario partScenario = loadScenarioWithCarrierFileOnly(baseConfig, partCarrierFile);
 			CarriersUtils.getOrAddCarrierVehicleTypes(partScenario).getVehicleTypes().forEach((vehicleTypeId, vehicleType) ->
 				CarriersUtils.getOrAddCarrierVehicleTypes(mergedScenario).getVehicleTypes().putIfAbsent(vehicleTypeId, vehicleType));
 			for (Carrier carrier : CarriersUtils.getCarriers(partScenario).getCarriers().values()) {
@@ -733,7 +734,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			}
 		}
 		CarriersUtils.writeCarrierVehicleTypes(CarriersUtils.getOrAddCarrierVehicleTypes(mergedScenario),
-			finalOutput.resolve(SmallScaleCommercialTrafficUtils.getRunIdPrefixedFileName(baseConfig, CARRIER_VEHICLE_TYPES_FILE)).toAbsolutePath().toString());
+			finalOutput.resolve( getRunIdPrefixedFileName(baseConfig, CARRIER_VEHICLE_TYPES_FILE ) ).toAbsolutePath().toString() );
 		CarriersUtils.writeCarriers(mergedCarriers, outputCarrierFile.toString());
 		log.info("Merged {} small scale commercial carrier parts into {}.", smallScaleCommercialCarrierPartCount, outputCarrierFile);
 	}
@@ -741,15 +742,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private void createCarriersAndDemand(Path outputPath, Scenario scenario,
 										 SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment,
 										 boolean includeExistingModels, Index indexZones) throws Exception {
-		ArrayList<String> modesORvehTypes;
-		if ( smallScaleCommercialTrafficSegment.equals( goodsTraffic )){
-			modesORvehTypes = new ArrayList<>( Arrays.asList( "vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5" ) );
-		} else if ( smallScaleCommercialTrafficSegment.equals( commercialPersonTraffic )){
-			modesORvehTypes = new ArrayList<>( List.of( "total" ) );
-		} else{
-			throw new Exception( "Invalid traffic type selected!" );
-		}
-//		setInputParameters(smallScaleCommercialTrafficType);
+		ArrayList<String> modesORvehTypes = switch( smallScaleCommercialTrafficSegment ){
+			case SmallScaleCommercialTrafficSegment.goodsTraffic ->
+				new ArrayList<>( Arrays.asList( "vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5" ) );
+			case SmallScaleCommercialTrafficSegment.commercialPersonTraffic -> new ArrayList<>( List.of( "total" ) );
+			default -> throw new Exception( "Invalid traffic type selected!" );
+		};
+
+		//		setInputParameters(smallScaleCommercialTrafficType);
 		// is now done in the TrafficVolumeGeneration constructor below
 
 		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( smallScaleCommercialTrafficSegment );
@@ -766,8 +766,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			// "models" are functions. Presumably, this means "include existing model results".
 			integrateExistingTrafficToSmallScaleCommercial.readExistingCarriersFromFolder(scenario, sample, indexZones);
 			integrateExistingTrafficToSmallScaleCommercial.reduceDemandBasedOnExistingCarriers(scenario, indexZones,
-				smallScaleCommercialTrafficSegment,
-				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
+				smallScaleCommercialTrafficSegment, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 		}
 
 		NetworkUtils.cleanNetwork(scenario.getNetwork(), scenario.getConfig().qsim().getMainModes());
@@ -796,7 +795,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Set<String> modes = scenario.getVehicles().getVehicleTypes().values().stream()
 			.map(VehicleType::getNetworkMode).collect(Collectors.toSet());
 
-		SmallScaleCommercialTrafficUtils.ensureDefaultModeParams(scenario.getConfig(), modes);
+		ensureDefaultModeParams(scenario.getConfig(), modes);
 
 		Set<String> qsimModes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
 		scenario.getConfig().qsim().setMainModes(Sets.union(qsimModes, modes));
@@ -1145,7 +1144,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			int numberOfPossibleLinks = linksPerZone.get(zone).size();
 
 			// searches and selects the nearest link of the possible links in this zone
-			newLink = SmallScaleCommercialTrafficUtils.findNearestPossibleLink(zone, noPossibleLinks, linksPerZone, null,
+			newLink = findNearestPossibleLink(zone, noPossibleLinks, linksPerZone, null,
 				centroidPointOfBuildingPolygon, numberOfPossibleLinks);
 		}
 		if (newLink == null)

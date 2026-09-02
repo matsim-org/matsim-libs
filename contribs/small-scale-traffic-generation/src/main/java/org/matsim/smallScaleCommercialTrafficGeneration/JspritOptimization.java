@@ -9,6 +9,7 @@ import org.matsim.freight.carriers.*;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import static java.lang.String.join;
 import static org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.*;
@@ -41,56 +42,60 @@ class JspritOptimization{
 	 *
 	 * @param originalScenario                          complete Scenario
 	 */
-	void solveVRP( Scenario originalScenario ) throws Exception {
+	void solveVRP( Scenario originalScenario ) {
 
 		CarriersUtils.addRoadPricingForVRPToEnsureSolutionsBasedOnNetworkModes(originalScenario );
 
+		boolean splitCarrier = true;
 
 		// comparison of results for hannover: increasing to maxServicesPerCarrier = 300 results in:
 		// computationTime *4; numberOfVehicles -2%; Jsprit score: -0,4%, drivenDistanc: -4,4%
 		// RE: result is to set this to maxServicesPerCarrier = 100;
-		boolean splitCarrier = true;
+		// yy increasing from where?  kai, sep'26
 		int maxServicesPerCarrier = 100;
+
 		Carriers carriers = CarriersUtils.addOrGetCarriers(originalScenario );
 		Map<Id<Carrier>, List<Id<Carrier>>> carrierId2subCarrierIds = new HashMap<>();
 
-		int splitCarriers = 0;
+		int numberOfSplitCarriers = 0;
 
 		if (splitCarrier) {
 			Map<Id<Carrier>, Carrier> subCarriersToAdd = new HashMap<>();
 			List<Id<Carrier>> keyListCarrierToRemove = new ArrayList<>();
 			for (Carrier carrier : carriers.getCarriers().values()) {
-				if (CarriersUtils.getJspritIterations(carrier) == 0 || CarriersUtils.allJobsHandledBySelectedPlan(carrier))
+				if (CarriersUtils.getJspritIterations(carrier) == 0 || CarriersUtils.allJobsHandledBySelectedPlan(carrier)){
 					continue;
+				}
 				int countedServices = 0;
 				int countedVehicles = 0;
 				if (carrier.getServices().size() > maxServicesPerCarrier) {
-					splitCarriers++;
-					int numberOfNewCarrier = (int) Math.ceil((double) carrier.getServices().size() / (double) maxServicesPerCarrier);
-					int numberOfServicesPerNewCarrier = (int) Math.floor((double) carrier.getServices().size() / numberOfNewCarrier);
+					numberOfSplitCarriers++;
+					int numberOfNewCarriers = (int) Math.ceil((double) carrier.getServices().size() / (double) maxServicesPerCarrier);
+					int numberOfServicesPerNewCarrier = (int) Math.floor((double) carrier.getServices().size() / numberOfNewCarriers);
 
 					int totalVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().size();
-					int numberOfVehiclesPerNewCarrier = totalVehicles / numberOfNewCarrier;
-					int numberOfVehiclesRemainder = totalVehicles % numberOfNewCarrier;
+					int numberOfVehiclesPerNewCarrier = totalVehicles / numberOfNewCarriers;
+					int numberOfVehiclesRemainder = totalVehicles % numberOfNewCarriers;
 
-					List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>( carrier.getCarrierCapabilities().getCarrierVehicles().keySet());
+					List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>( carrier.getCarrierCapabilities().getCarrierVehicles().keySet() );
 					vehiclesForNewCarrier.sort( Comparator.comparing(Id::toString ) );
-					List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>( carrier.getServices().keySet());
-					servicesForNewCarrier.sort(Comparator.comparing(Id::toString));
 
-					for (int jj = 0; jj < numberOfNewCarrier; jj++) {
+					List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>( carrier.getServices().keySet() );
+					servicesForNewCarrier.sort( Comparator.comparing(Id::toString) );
+
+					for (int jj = 0; jj < numberOfNewCarriers; jj++) {
 
 						int numberOfServicesForNewCarrier = numberOfServicesPerNewCarrier;
-						if (jj + 1 == numberOfNewCarrier){
+						if (jj + 1 == numberOfNewCarriers){
 							numberOfServicesForNewCarrier = carrier.getServices().size() - countedServices;
 						}
 						int numberOfVehiclesForNewCarrier = numberOfVehiclesPerNewCarrier;
 						if (jj < numberOfVehiclesRemainder){
 							numberOfVehiclesForNewCarrier++;
+							// (the first couple of split carriers get one vehicle more in order to allocate the remainder)
 						}
 						Carrier newCarrier = CarriersUtils.createCarrier( Id.create(carrier.getId().toString() + "_part_" + (jj + 1), Carrier.class));
-						CarrierCapabilities newCarrierCapabilities = CarrierCapabilities.Builder.newInstance()
-						                                                                        .setFleetSize(carrier.getCarrierCapabilities().getFleetSize()).build();
+						CarrierCapabilities newCarrierCapabilities = CarrierCapabilities.Builder.newInstance().setFleetSize(carrier.getCarrierCapabilities().getFleetSize()).build();
 						newCarrierCapabilities.getVehicleTypes().addAll(carrier.getCarrierCapabilities().getVehicleTypes());
 						newCarrierCapabilities.getCarrierVehicles().putAll(carrier.getCarrierCapabilities().getCarrierVehicles());
 						newCarrier.setCarrierCapabilities(newCarrierCapabilities);
@@ -111,6 +116,7 @@ class JspritOptimization{
 						// just to be sure that the index is not out of bounds
 						toIndexVehicles = Math.min(toIndexVehicles, vehiclesForNewCarrier.size());
 						toIndexServices = Math.min(toIndexServices, servicesForNewCarrier.size());
+						// (should not happen?  --> rather use Gbl.assert or similar?)
 
 						if (fromIndexVehicles == toIndexVehicles && fromIndexServices == toIndexServices) {
 							throw new IllegalStateException("No remaining vehicles/services but still splitting: " + carrier.getId());
@@ -119,8 +125,7 @@ class JspritOptimization{
 						List<Id<Vehicle>> subListVehicles = vehiclesForNewCarrier.subList(fromIndexVehicles, toIndexVehicles);
 						List<Id<CarrierService>> subListServices = servicesForNewCarrier.subList(fromIndexServices, toIndexServices);
 
-						newCarrier.getCarrierCapabilities().getCarrierVehicles().keySet()
-							.retainAll(subListVehicles);
+						newCarrier.getCarrierCapabilities().getCarrierVehicles().keySet().retainAll(subListVehicles);
 						newCarrier.getServices().keySet().retainAll(subListServices);
 
 						countedVehicles += newCarrier.getCarrierCapabilities().getCarrierVehicles().size();
@@ -130,16 +135,16 @@ class JspritOptimization{
 					}
 					keyListCarrierToRemove.add(carrier.getId());
 					if (countedVehicles != carrier.getCarrierCapabilities().getCarrierVehicles().size())
-						throw new Exception("Split parts of the carrier " + carrier.getId().toString()
+						throw new RuntimeException("Split parts of the carrier " + carrier.getId().toString()
 							+ " has a different number of vehicles than the original carrier");
 					if (countedServices != carrier.getServices().size())
-						throw new Exception("Split parts of the carrier " + carrier.getId().toString()
+						throw new RuntimeException("Split parts of the carrier " + carrier.getId().toString()
 							+ " has a different number of services than the original carrier");
 
 				}
 			}
-			log.info("Splitting carriers: {}/{}, because the maximum number of services per carriers is set to {}.", splitCarriers, carriers.getCarriers().size(),
-				maxServicesPerCarrier );
+			log.info("Splitting carriers: {}/{}, because the maximum number of services per carriers is set to {}.",
+				numberOfSplitCarriers, carriers.getCarriers().size(), maxServicesPerCarrier );
 			// add created parts of new carriers and delete the old ones
 			carriers.getCarriers().putAll(subCarriersToAdd);
 			for (Id<Carrier> id : keyListCarrierToRemove) {
@@ -152,13 +157,18 @@ class JspritOptimization{
 		// Map the values to the new subcarriers
 		for (Id<Carrier> oldCarrierId : carrierId2subCarrierIds.keySet()) {
 			for (Id<Carrier> newCarrierId : carrierId2subCarrierIds.get(oldCarrierId)) {
-				if ( this.carrierId2carrierAttributes.putIfAbsent(newCarrierId, this.carrierId2carrierAttributes.get(oldCarrierId ) ) != null)
-					throw new Exception("CarrierAttributes already exist for the carrier " + newCarrierId.toString());
+				if ( this.carrierId2carrierAttributes.putIfAbsent(newCarrierId, this.carrierId2carrierAttributes.get(oldCarrierId ) ) != null){
+					throw new RuntimeException( "CarrierAttributes already exist for the carrier " + newCarrierId.toString() );
+				}
 			}
 		}
 
 		log.info("Start solving {} carriers. Carriers with 0 Jsprit iterations will be skipped and carriers with existing plans will be skipped.", carriers.getCarriers().size() );
-		CarriersUtils.runJsprit(originalScenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
+		try{
+			CarriersUtils.runJsprit(originalScenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
+		} catch( ExecutionException | InterruptedException e ){
+			throw new RuntimeException( e );
+		}
 		List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
 		if (!nonCompleteSolvedCarriers.isEmpty() && this.maxNumberOfLoopsForVRPSolving > 0) {
 			CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario),
