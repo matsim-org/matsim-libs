@@ -123,7 +123,8 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 				bindModal(ZonalRelocationCalculator.class).toProvider(modalProvider(
 						getter -> new AggregatedMinCostRelocationCalculator(
-								getter.getModal(DrtZoneTargetLinkSelector.class)))).asEagerSingleton();
+								getter.getModal(DrtZoneTargetLinkSelector.class),
+								strategyParams.getMaxRelocationDistance()))).asEagerSingleton();
 			}
 		});
 
