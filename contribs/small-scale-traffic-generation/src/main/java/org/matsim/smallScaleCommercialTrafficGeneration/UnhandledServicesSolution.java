@@ -9,7 +9,7 @@ import java.util.List;
  * When generating service-durations for {@link Carrier}s it may happen service durations of their plans
  * are too long to be fully handled. This implementation solves this problem.
  */
-public interface UnhandledServicesSolution {
+interface UnhandledServicesSolution {
 
 	/**
 	 *

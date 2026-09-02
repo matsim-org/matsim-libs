@@ -112,11 +112,11 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 		}
 
 		ShpOptions.Index indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
-		ShpOptions.Index indexBuildings = SmallScaleCommercialTrafficUtils.getIndexBuildings(shapeFileBuildingsPath, shapeCRS,
-			shapeFileBuildingTypeColumn);
-		ShpOptions.Index indexLanduse = SmallScaleCommercialTrafficUtils.getIndexLanduse(shapeFileLandusePath, shapeCRS, shapeFileLanduseTypeColumn);
-		ShpOptions.Index indexInvestigationAreaRegions = SmallScaleCommercialTrafficUtils.getIndexRegions(shapeFileRegionsPath, shapeCRS,
-			regionsShapeRegionColumn);
+		ShpOptions.Index indexBuildings = SmallScaleCommercialTrafficPrepareUtils.getIndexBuildings(shapeFileBuildingsPath, shapeCRS,
+			shapeFileBuildingTypeColumn );
+		ShpOptions.Index indexLanduse = SmallScaleCommercialTrafficPrepareUtils.getIndexLanduse(shapeFileLandusePath, shapeCRS, shapeFileLanduseTypeColumn );
+		ShpOptions.Index indexInvestigationAreaRegions = SmallScaleCommercialTrafficPrepareUtils.getIndexRegions(shapeFileRegionsPath, shapeCRS,
+			regionsShapeRegionColumn );
 
 		if (Files.notExists(outputFacilityFile.getParent()))
 			new File(outputFacilityFile.toString()).mkdir();

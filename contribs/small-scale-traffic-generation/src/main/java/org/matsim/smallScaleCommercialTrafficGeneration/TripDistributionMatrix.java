@@ -559,7 +559,7 @@ class TripDistributionMatrix {
 	/**
 	 * Writes every matrix for each mode and purpose
 	 */
-	void writeODMatrices(Path output, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment ) throws UncheckedIOException, MalformedURLException {
+	void writeODMatrices(Path output, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment ) {
 		ArrayList<String> usedModesORvehTypes = getListOfModesOrVehTypes();
 		ArrayList<String> usedZones = getListOfZones();
 		Collections.sort(usedZones);
@@ -571,9 +571,8 @@ class TripDistributionMatrix {
 				Path outputFolder = output.resolve("calculatedData")
 						.resolve("odMatrix_" + smallScaleCommercialTrafficSegment + "_" + modeORvehType + "_purpose" + purpose + ".csv" );
 
-				BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder.toUri().toURL(), StandardCharsets.UTF_8,
-						true);
-				try {
+				try ( BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder.toUri().toURL(), StandardCharsets.UTF_8,
+						true); ) {
 
 					List<String> headerRow = new ArrayList<>();
 					headerRow.add("O/D");

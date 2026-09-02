@@ -184,8 +184,11 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 			for (int i = 1; i <= generator.getMaxNumberOfLoopsForVRPSolving(); i++) {
 				double start = System.currentTimeMillis();
 				log.info("carrier-replanning loop iteration {}. Solving {} carriers (of {} carriers) with unhandled jobs", i, nonCompleteSolvedCarriers.size(), CarriersUtils.getCarriers(scenario).getCarriers().size());
-				int numberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
+				final int numberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
+
 				int addedVehicles = 0;
+				// (this is a bookkeeping variable that will count vehicles that are given additionally to the carrier)
+
 				int changedServiceDurations = 0;
 				double effectiveTravelBufferFactor = effectiveTravelBufferFactor(i);
 				Set<VehicleType> vehicleTypes = nonCompleteSolvedCarriers.stream()
@@ -311,32 +314,35 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 						checkAdditionalVehicles, addTimeWindowFallbackBeforeRedraw, checkServiceDurationChange
 					);
 					int addedVehiclesForCarrier = 0;
-					if (checkAdditionalVehicles)
-						addedVehiclesForCarrier += addAdditionalVehicles(nonCompleteSolvedCarrier, carrierAttributes, unhandledServices, unusedVehicles,
-							handledServices.size(), vehicleAdditionTargetDuration, sumMaxTourDurationsVehicles, effectiveTravelBufferFactor,
-							maxVehicleSetsToAdd);
+					if (checkAdditionalVehicles) {
+						addedVehiclesForCarrier += addAdditionalVehicles( nonCompleteSolvedCarrier, carrierAttributes,
+							unhandledServices, unusedVehicles,
+							handledServices.size(), vehicleAdditionTargetDuration, sumMaxTourDurationsVehicles,
+							effectiveTravelBufferFactor,
+							maxVehicleSetsToAdd );
+					}
 					if (addTimeWindowFallbackBeforeRedraw) {
 						int addedTimeWindowFallbackVehicles = addTimeWindowFallbackVehicles(nonCompleteSolvedCarrier, carrierAttributes,
 							servicesWithoutUnusedTimeWindow, transportCosts, effectiveTravelBufferFactor);
 						addedVehiclesForCarrier += addedTimeWindowFallbackVehicles;
-						if (addedTimeWindowFallbackVehicles == 0)
+						if (addedTimeWindowFallbackVehicles == 0){
 							stagnationVehicleFallbackSets = previousStagnationVehicleFallbackSets;
+						}
 					}
 					addedVehicles += addedVehiclesForCarrier;
-					boolean singleServiceVehicleAddedThisLoop = unhandledServices.size() == 1
-						&& addedVehiclesForCarrier > 0;
+					boolean singleServiceVehicleAddedThisLoop = unhandledServices.size() == 1 && addedVehiclesForCarrier > 0;
 
 					// If this loop changed the fleet, let jsprit try the capped fallback vehicles before altering service
 					// durations. If a carrier remains unresolved after adding a vehicle for one open service, redraw all jobs
 					// that are open in the next loop without adding another vehicle; jsprit may have shifted the open set.
 					// A subsequent loop may add a vehicle again, alternating both repair strategies while the carrier stagnates.
 					// In the final loop, apply both repairs to all open services because no alternating follow-up remains.
-					if (checkServiceDurationChange && (addedVehiclesForCarrier == 0 || forceRedrawAfterSingleServiceFallback
-						|| forceFinalLoopRepair))
-						changedServiceDurations += redrawUnhandledServiceDurations(nonCompleteSolvedCarrier, carrierAttributes, unhandledServices,
-							effectiveTravelBufferFactor, redrawDueToStagnation || forceRedrawAfterSingleServiceFallback
-								|| forceFinalLoopRepair);
-					else if (checkServiceDurationChange) {
+					if (checkServiceDurationChange && (addedVehiclesForCarrier == 0 || forceRedrawAfterSingleServiceFallback || forceFinalLoopRepair)){
+						changedServiceDurations += redrawUnhandledServiceDurations( nonCompleteSolvedCarrier,
+							carrierAttributes, unhandledServices,
+							effectiveTravelBufferFactor,
+							redrawDueToStagnation || forceRedrawAfterSingleServiceFallback || forceFinalLoopRepair );
+					} else if (checkServiceDurationChange) {
 						log.info(
 							"Carrier '{}': Deferred service-duration redraw because {} capped fallback vehicle(s) were added in this loop.",
 							nonCompleteSolvedCarrier.getId(), addedVehiclesForCarrier);
@@ -346,14 +352,19 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 							stagnationVehicleFallbackSets, stagnationVehicleFallbackSetLimit, unhandledServiceIds,
 							singleServiceVehicleAddedThisLoop));
 				}
+				// (At this point we have gone through all carriers.)
+
 				// Specialized repair strategies, for example range-aware fallbacks, can inspect the updated fleet here.
 				// The selected plans are still available, so implementations can distinguish used from currently free
 				// vehicles. The old plans are cleared only afterwards to force jsprit to solve the adjusted carriers.
 				List<Carrier> carriersForPreReplanningVehicleAddition = nonCompleteSolvedCarriers.stream()
 					.filter(carrier -> !carriersWithForcedSingleServiceRedraw.contains(carrier.getId()))
 					.toList();
-				addedVehicles += preReplanningVehicleAddition.addVehiclesBeforeReplanning(scenario, carriersForPreReplanningVehicleAddition,
-					effectiveTravelBufferFactor);
+
+				addedVehicles += preReplanningVehicleAddition.addVehiclesBeforeReplanning(scenario, carriersForPreReplanningVehicleAddition, effectiveTravelBufferFactor);
+				/// (the only implemented version of the above is a lambda expression in the constructor of {@link
+				/// DefaultUnhandledServicesSolution}, and that lambda expression does nothing and returns zero.)
+
 				nonCompleteSolvedCarriers.forEach(Carrier::clearPlans);
 				try {
 					CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
@@ -401,7 +412,7 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 					CarriersUtils.writeCarriers(CarriersUtils.getCarriers(scenario),
 						scenario.getConfig().controller().getOutputDirectory() + "/" + scenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved_it_" + i + ".xml.gz"
 					);
-			}
+			} // goto next attempt at unhandled services except if solved or maxNumberOfTrials exhausted
 
 			if (!nonCompleteSolvedCarriers.isEmpty()) {
 				log.warn("Not all services were handled!");
