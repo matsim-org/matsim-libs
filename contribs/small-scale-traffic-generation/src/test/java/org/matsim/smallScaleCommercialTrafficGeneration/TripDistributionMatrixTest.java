@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.StartOrStop;
 import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.TrafficVolumeKey;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreatorForOSM_Data;
@@ -85,10 +86,10 @@ public class TripDistributionMatrixTest {
 		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( usedTrafficType );
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType, "start"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType, StartOrStop.start
 		                                                                                                                                 );
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType, "stop"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType, StartOrStop.stop
 		                                                                                                                                );
 		ArrayList<String> listOfZones = new ArrayList<>( List.of("area1", "area2", "area3"));
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
@@ -187,10 +188,10 @@ public class TripDistributionMatrixTest {
 		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( usedTrafficType );
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.start
 		                                                                                                                                 );
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.stop
 		                                                                                                                                );
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
 				.newInstance(getZoneIndex(inputDataDirectory), shapeFileZoneNameColumn, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType,

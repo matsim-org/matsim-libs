@@ -34,6 +34,7 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.StartOrStop;
 import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.TrafficVolumeKey;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreator;
@@ -91,10 +92,10 @@ public class TrafficVolumesGeneratorTest{
 		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( usedTrafficType );
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.start
 		                                                                                                                                 );
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.stop
 		                                                                                                                                );
 
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
@@ -149,10 +150,10 @@ public class TrafficVolumesGeneratorTest{
 		sample = 0.25;
 
 		trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes( resultingDataPerZone,
-			outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+			outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.start
 		                                                                                );
 		trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes( resultingDataPerZone,
-			outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+			outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.stop
 		                                                                               );
 
 		Assertions.assertEquals(3, trafficVolumePerTypeAndZone_start.size());
@@ -230,10 +231,10 @@ public class TrafficVolumesGeneratorTest{
 		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( usedTrafficType );
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.start
 		                                                                                                                                 );
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.stop
 		                                                                                                                                );
 
 		Assertions.assertEquals(15, trafficVolumePerTypeAndZone_start.size());
@@ -558,10 +559,10 @@ public class TrafficVolumesGeneratorTest{
 		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( usedTrafficType );
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.start
 		                                                                                                                                 );
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.stop
 		                                                                                                                                );
 
 		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, SCTUtils.getZoneIndex(inputDataDirectory));
@@ -725,10 +726,10 @@ public class TrafficVolumesGeneratorTest{
 		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( usedTrafficType );
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "start"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.start
 		                                                                                                                                 );
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
-			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, "stop"
+			resultingDataPerZone, outputDataDistributionFile.getParent(), sample, (List<String>) modesORvehTypes, usedTrafficType, StartOrStop.stop
 		                                                                                                                                );
 
 		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, SCTUtils.getZoneIndex(inputDataDirectory));
