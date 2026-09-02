@@ -88,16 +88,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	// run several of these in a pipeline, and do that from Java rather than from Makefile, he or she should write an
 	// orchestration class in Java and call all of these from there.  kai, jul'26
 
-
-	// freight traffic from extern:
-
-	// Option 1: take "as is" from Chengqi code.
-
-	// Option 2: differentiate FTL and LTL by Gütergruppe.  FTL as in option 1.  LTL per Gütergruppe _ein_ Ziel in Zone, = "Hub".  Verteilverkehr
-	// von dort.  Startseite genauso.
-
-	// Option 3: Leerkamp (nur in RVR Modell).
-
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 	private final IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
 	private final CommercialTourSpecifications commercialTourSpecifications;
@@ -755,15 +745,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		final TrafficVolumesGenerator trafficVolumesGenerator = new TrafficVolumesGenerator( smallScaleCommercialTrafficSegment );
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = trafficVolumesGenerator.createTrafficVolumes(
-			attributesByZone, outputPath, sample, modesORvehTypes, smallScaleCommercialTrafficSegment, "start"
+			attributesByZone, outputPath, sample, modesORvehTypes, smallScaleCommercialTrafficSegment, StartOrStop.start
 		                                                                                                                                 );
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = trafficVolumesGenerator.createTrafficVolumes(
-			attributesByZone, outputPath, sample, modesORvehTypes, smallScaleCommercialTrafficSegment, "stop"
+			attributesByZone, outputPath, sample, modesORvehTypes, smallScaleCommercialTrafficSegment, StartOrStop.stop
 		                                                                                                                                );
 		// at this point we have, per zone, the inbound and outbound volumes
 
 		if (includeExistingModels) {
-			// "models" are functions. Presumably, this means "include existing model results".
+			// "models" are functions. Presumably, this means "include existing model results".  Currently only for RVR.
 			integrateExistingTrafficToSmallScaleCommercial.readExistingCarriersFromFolder(scenario, sample, indexZones);
 			integrateExistingTrafficToSmallScaleCommercial.reduceDemandBasedOnExistingCarriers(scenario, indexZones,
 				smallScaleCommercialTrafficSegment, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
@@ -899,67 +889,72 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						.anyMatch(possibleStopZone -> odMatrix.getTripDistributionValue(startZone, possibleStopZone, modeORvehType,
 							purpose, smallScaleCommercialTrafficSegment) != 0);
 
-					if (isStartingLocation) {
-						// Get the vehicle-types and start/stop-categories
-						OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose, modeORvehType,
-							smallScaleCommercialTrafficSegment );
-
-						// use only types of the possibleTypes which are in the given types file
-						List<String> vehicleTypesAsStrings = new ArrayList<>();
-						assert odMatrixEntry.possibleVehicleTypes != null: "possibleVehicleTypes is null for odMatrixEntry:" + odMatrixEntry;
-						// yy has this a consequence?  will it abort?  kai, sep'26
-						// --> will abort in a couple of lines.  But then why the above (unused) assert? kai, sep'26
-
-						for (String possibleVehicleType : odMatrixEntry.possibleVehicleTypes) {
-							if (CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().containsKey( Id.create(possibleVehicleType, VehicleType.class))){
-								vehicleTypesAsStrings.add( possibleVehicleType );
-							}
-							// yy the "containsKey" method means that we have essentially already made the lookup; better same this as real vehicle type right away.  kai, sep'26
-						}
-						if (vehicleTypesAsStrings.isEmpty()){
-							throw new RuntimeException(
-								"The possible vehicle types found for purpose " + purpose + ", modeORvehType "
-									+ modeORvehType + ", smallScaleCommercialTrafficType " + smallScaleCommercialTrafficSegment + " do not exist in the given vehicle types file. PLease check your input file." );
-						}
-
-						ZoneAttribute selectedStartCategory = getSelectedStartCategory(startZone, odMatrixEntry );
-
-						// Generate carrierName
-						String carrierName = null;
-						if ( smallScaleCommercialTrafficSegment.equals( goodsTraffic )) {
-							carrierName = "Carrier_Goods_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
-						} else if ( smallScaleCommercialTrafficSegment.equals( commercialPersonTraffic )){
-							carrierName = "Carrier_Business_" + startZone + "_purpose_" + purpose;
-							// yyyy what will happen if there are multiple modes per the same startZone x purpose?  kai, sep'26
-							// --> I think that it is said at some point that all commercial person
-							// traffic is initially generated as "car", and can switch to other modes
-							// during matsim iterations.  kai, sep'26
-						}
-
-						// Create the Carrier
-						CarrierCapabilities.FleetSize fleetSize = CarrierCapabilities.FleetSize.FINITE;
-						ArrayList<String> vehicleDepots = new ArrayList<>();
-						nCreatedCarriers++;
-						log.info("Create carrier number {} of a maximum Number of {} carriers.", nCreatedCarriers, maxNumberOfCarriers);
-
-						CarrierAttributes carrierAttributes = new CarrierAttributes(purpose, startZone, selectedStartCategory, modeORvehType,
-							smallScaleCommercialTrafficSegment, vehicleDepots, odMatrixEntry);
-						if(carrierId2carrierAttributes.putIfAbsent(Id.create(carrierName, Carrier.class), carrierAttributes) != null){
-							throw new RuntimeException( "CarrierAttributes already exist for the carrier " + carrierName );
-						}
-
-						Carrier newCarrier = CarriersUtils.createCarrier(Id.create(carrierName, Carrier.class));
-						// Now Create services for this carrier
-						createServicesAndAddIntoCarrier(newCarrier, carrierAttributes );
-						log.info("Carrier: {}; created services: {}", carrierName, newCarrier.getServices().size());
-
-						setupNewCarrierAndAddVehicleTypes(carrierVehicleTypes, newCarrier, carrierAttributes, vehicleTypesAsStrings, fleetSize, fixedNumberOfVehiclePerTypeAndLocation );
-						log.info("New: Carrier: {}; vehicles: {}; services: {}", carrierName, newCarrier.getCarrierCapabilities().getCarrierVehicles().size(), newCarrier.getServices().size());
-						// (yy what is the difference between carrierVehicleTypes and vehicleTypesAsStrings?  And why do we need both? kai, sep'26)
-						// (--> I think that vehicleTypesAsStrings contains the vehicleTypesAsStrings as Strings, and they still need to be converted.  (Which could, I think, be made upstream of calling this method. kai, sep'26)
-
-						carriers.addCarrier(newCarrier);
+					if ( !isStartingLocation ) {
+						continue;
 					}
+
+					// Get the vehicle-types and start/stop-categories
+					OdMatrixEntryInformationProvider.OdMatrixEntryInformation odMatrixEntry = odMatrixEntryInformationProvider.getOdMatrixEntryInformation(purpose, modeORvehType,
+						smallScaleCommercialTrafficSegment );
+
+					// use only types of the possibleTypes which are in the given types file
+					List<String> vehicleTypesAsStrings = new ArrayList<>();
+
+					Objects.requireNonNull( odMatrixEntry.possibleVehicleTypes,  "possibleVehicleTypes is null for odMatrixEntry:" + odMatrixEntry );
+
+					for (String possibleVehicleType : odMatrixEntry.possibleVehicleTypes) {
+						if (CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().containsKey( Id.create(possibleVehicleType, VehicleType.class))){
+							vehicleTypesAsStrings.add( possibleVehicleType );
+						}
+						// yy the "containsKey" method means that we have essentially already made the lookup; better same this as real vehicle type right away.  kai, sep'26
+					}
+					if (vehicleTypesAsStrings.isEmpty()){
+						throw new RuntimeException(
+							"The possible vehicle types found for purpose " + purpose + ", modeORvehType "
+								+ modeORvehType + ", smallScaleCommercialTrafficType " + smallScaleCommercialTrafficSegment + " do not exist in the given vehicle types file. PLease check your input file." );
+					}
+
+					ZoneAttribute selectedStartCategory = getSelectedStartCategory(startZone, odMatrixEntry );
+
+					// Generate carrierName
+					String carrierName = null;
+					if ( smallScaleCommercialTrafficSegment.equals( goodsTraffic )) {
+						carrierName = "Carrier_Goods_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
+					} else if ( smallScaleCommercialTrafficSegment.equals( commercialPersonTraffic )){
+						carrierName = "Carrier_Business_" + startZone + "_purpose_" + purpose;
+						// yyyy what will happen if there are multiple modes per the same startZone x purpose?  kai, sep'26
+						// --> I think that it is said at some point that all commercial person
+						// traffic is initially generated as "car", and can switch to other modes
+						// during matsim iterations.  kai, sep'26
+					}
+
+					// Create the Carrier
+					CarrierCapabilities.FleetSize fleetSize = CarrierCapabilities.FleetSize.FINITE;
+					ArrayList<String> vehicleDepots = new ArrayList<>();
+					nCreatedCarriers++;
+					log.info("Create carrier number {} of a maximum Number of {} carriers.", nCreatedCarriers, maxNumberOfCarriers);
+
+					CarrierAttributes carrierAttributes = new CarrierAttributes(purpose, startZone, selectedStartCategory, modeORvehType,
+						smallScaleCommercialTrafficSegment, vehicleDepots, odMatrixEntry);
+					if(carrierId2carrierAttributes.putIfAbsent(Id.create(carrierName, Carrier.class), carrierAttributes) != null){
+						throw new RuntimeException( "CarrierAttributes already exist for the carrier " + carrierName );
+					}
+
+					Carrier newCarrier = CarriersUtils.createCarrier(Id.create(carrierName, Carrier.class));
+					// Now Create services for this carrier
+					createServicesAndAddIntoCarrier(newCarrier, carrierAttributes );
+					log.info("Carrier: {}; created services: {}", carrierName, newCarrier.getServices().size());
+
+					setupNewCarrierAndAddVehicles(carrierVehicleTypes, newCarrier, carrierAttributes, vehicleTypesAsStrings, fleetSize, fixedNumberOfVehiclePerTypeAndLocation );
+					log.info("New: Carrier: {}; vehicles: {}; services: {}", carrierName, newCarrier.getCarrierCapabilities().getCarrierVehicles().size(), newCarrier.getServices().size());
+					// (yy what is the difference between carrierVehicleTypes and vehicleTypesAsStrings?  And why do we need both? kai, sep'26)
+					// (--> I think that vehicleTypesAsStrings contains the vehicleTypesAsStrings as Strings, and they still need to be converted.  (Which could, I think, be made upstream of calling this method. kai, sep'26)
+
+					// at this point, each carrier has a sufficient number of vehicles to cover the summed up
+					// service durations plus some buffer, but not enough for situations where service durations
+					// are relatively short compared to travel.  --> solved later.
+
+					carriers.addCarrier(newCarrier);
 				}
 			}
 		}
@@ -1057,9 +1052,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Adds a service with the given attributes to the carrier.
 	 */
-	private void createAndAddService( Carrier newCarrier, ArrayList<String> noPossibleLinks, ZoneAttribute selectedStopCategory, String stopZone,
+	private void createAndAddService( Carrier newCarrier, ArrayList<String> possibleLInks, ZoneAttribute selectedStopCategory, String stopZone,
 	                                  Integer serviceTimePerStop, TimeWindow serviceStartTimeWindow, int i ) {
-		Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks);
+
+		Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, possibleLInks);
+		// (this typically finds a link (how) even if possibleLinks is empty)
+
 		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + (i + 1),
 			CarrierService.class);
 
@@ -1073,9 +1071,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Creates the carrier and the related vehicles.
 	 */
-	private void setupNewCarrierAndAddVehicleTypes( CarrierVehicleTypes carrierVehicleTypes, Carrier thisCarrier, CarrierAttributes carrierAttributes,
-	                                                List<String> vehicleTypesAsStrings, CarrierCapabilities.FleetSize fleetSize,
-	                                                int fixedNumberOfVehiclePerTypeAndLocation ) {
+	private void setupNewCarrierAndAddVehicles( CarrierVehicleTypes carrierVehicleTypes, Carrier thisCarrier, CarrierAttributes carrierAttributes,
+	                                            List<String> vehicleTypesAsStrings, CarrierCapabilities.FleetSize fleetSize,
+	                                            int fixedNumberOfVehiclePerTypeAndLocation ) {
 		// createCarrier is a misnomer since the carrier comes in as method parameter.  kai, sep'26
 		// --> I changed the method name.
 
@@ -1103,6 +1101,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		double sumServiceDurationsJobs = thisCarrier.getServices().values().stream().mapToDouble(CarrierService::getServiceDuration).sum() * factorForTravelBufferCalculation;
 
 		double sumMaxTourDurationsOfVehicles = 0;
+
+		// The code above and below roughly does the following:
+		// * compute the approximate tour duration (by summing up service durations plus a buffer for the travel).  This may
+		// not be enough for situations where services are relatively short compared to travel.
+		// * generate a sufficient number of vehicles so that the tour duration is covered.
 
 		while (sumMaxTourDurationsOfVehicles <= sumServiceDurationsJobs) {
 			TourStartAndDuration t = tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficSegment ).sample();
@@ -1227,7 +1230,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
 		SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment, Scenario scenario, Path output )
-		throws Exception
 	{
 		ArrayList<String> listOfZones = new ArrayList<>();
 		trafficVolume_start.forEach((k, v) -> {

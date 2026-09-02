@@ -17,6 +17,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.StartOrStop;
 import org.matsim.vehicles.VehicleType;
 
 import java.nio.file.Files;
@@ -57,11 +58,11 @@ class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implements Integ
 		Object2DoubleMap<Integer> stopVolume = trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey_stop);
 
 		if (startVolume != null && startVolume.getDouble(purpose) == 0)
-			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_start, modeORvehType, purpose, "Start", trafficVolumeKey_start.zone());
+			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_start, modeORvehType, purpose, StartOrStop.start, trafficVolumeKey_start.zone() );
 		else if (startVolume != null)
 			startVolume.mergeDouble(purpose, -1, Double::sum);
 		if (stopVolume != null && stopVolume.getDouble(purpose) == 0)
-			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, "Stop", trafficVolumeKey_stop.zone());
+			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, StartOrStop.stop, trafficVolumeKey_stop.zone() );
 		else if (stopVolume != null)
 			stopVolume.mergeDouble(purpose, -1, Double::sum);
 	}
@@ -81,7 +82,7 @@ class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implements Integ
 	 */
 	private static void reduceVolumeForOtherArea(
 		Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone, String modeORvehType,
-		Integer purpose, String volumeType, String originalZone) {
+		Integer purpose, StartOrStop volumeType, String originalZone ) {
 		ArrayList<TrafficVolumesGenerator.TrafficVolumeKey> shuffledKeys = new ArrayList<>(
 			trafficVolumePerTypeAndZone.keySet());
 		Collections.shuffle(shuffledKeys, MatsimRandom.getRandom());

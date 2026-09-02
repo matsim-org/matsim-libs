@@ -169,11 +169,17 @@ class JspritOptimization{
 		} catch( ExecutionException | InterruptedException e ){
 			throw new RuntimeException( e );
 		}
+
 		List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
+		// (we have run jsprit with possibly not enough vehicles.  Jsprit in consequence will not handle all jobs.)
+
 		if (!nonCompleteSolvedCarriers.isEmpty() && this.maxNumberOfLoopsForVRPSolving > 0) {
 			CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario),
 				originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved.xml.gz");
+
 			this.unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers );
+			// (the above is a replacable implementation to address the situation when there are not enough vehicles)
+
 		}
 
 		CarriersUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
