@@ -64,12 +64,14 @@ read_attribute_total() {
 	printf '%d\n' "$total"
 }
 
+# Counts occurrences, not matching lines. SpotBugs writes the whole BugCollection
+# on a single line, so `grep -c` would report 1 for any non-zero number of findings.
 count_pattern() {
 	local pattern=$1
 	local file=$2
 	local count
-	count=$(grep -c -- "$pattern" "$file" || true)
-	printf '%d\n' "$count"
+	count=$(grep -o -- "$pattern" "$file" | wc -l)
+	printf '%d\n' "$((count))"
 }
 
 baseline_value() {
