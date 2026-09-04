@@ -20,6 +20,8 @@
 
 package org.matsim.core.network;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
@@ -36,7 +38,12 @@ import org.matsim.api.core.v01.network.*;
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private TreeMap<Double,NetworkChangeEvent> changeEvents;
+	/**
+	 * Change events by start time. Several events may be registered for the same start time, so each time maps to a
+	 * list rather than to a single event. Keying by time alone would let a later event silently evict an earlier one
+	 * while the attributes' event counters still expected both.
+	 */
+	private TreeMap<Double,List<NetworkChangeEvent>> changeEvents;
 
 	private final TimeVariantAttribute variableFreespeed;
 	private final TimeVariantAttribute variableFlowCapacity;
@@ -87,17 +94,36 @@ import org.matsim.api.core.v01.network.*;
 		if(this.changeEvents == null)
 			this.changeEvents = new TreeMap<>();
 
-		this.changeEvents.put(event.getStartTime(), event);
+		List<NetworkChangeEvent> atSameTime = this.changeEvents.computeIfAbsent(event.getStartTime(),
+				k -> new ArrayList<>(1));
 
-		if (event.getFreespeedChange() != null) {
+		// An attribute yields one value per distinct start time, however many events at that time change it. So an
+		// attribute's counter is only incremented when this event is the first at this time to change it.
+		boolean freespeedAlreadyChangedHere = hasChange(atSameTime, TimeVariantAttribute.FREESPEED_GETTER);
+		boolean flowCapacityAlreadyChangedHere = hasChange(atSameTime, TimeVariantAttribute.FLOW_CAPACITY_GETTER);
+		boolean lanesAlreadyChangedHere = hasChange(atSameTime, TimeVariantAttribute.LANES_GETTER);
+
+		atSameTime.add(event);
+
+		if (event.getFreespeedChange() != null && !freespeedAlreadyChangedHere) {
 			this.variableFreespeed.incChangeEvents();
 		}
-		if (event.getFlowCapacityChange() != null) {
+		if (event.getFlowCapacityChange() != null && !flowCapacityAlreadyChangedHere) {
 			this.variableFlowCapacity.incChangeEvents();
 		}
-		if (event.getLanesChange() != null) {
+		if (event.getLanesChange() != null && !lanesAlreadyChangedHere) {
 			this.variableLanes.incChangeEvents();
 		}
+	}
+
+	private static boolean hasChange(final List<NetworkChangeEvent> events,
+			final TimeVariantAttribute.ChangeValueGetter valueGetter) {
+		for (NetworkChangeEvent event : events) {
+			if (valueGetter.getChangeValue(event) != null) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 
