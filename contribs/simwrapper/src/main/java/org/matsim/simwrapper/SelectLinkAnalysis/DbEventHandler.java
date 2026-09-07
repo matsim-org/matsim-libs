@@ -22,10 +22,8 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.vehicles.Vehicle;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import java.util.*;
@@ -38,17 +36,18 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 	private final Map<Id<Vehicle>, Map<Id<Person>, String>> vehicleToPersonMap = new HashMap<>();
 	private final Map<Id<Person>, String> modeToPersonMap = new HashMap<>();
 
-	// 64MB - change 64 (long type) to something like 32 for 32MB for example.
-	// page size remaining the same for this test
-	final long rowGroupSize = 32L * 1024 * 1024;
-	final int pageSize = 512 * 1024;
+	// DuckDB needs a number of rows - doesn't work correctly when bytes are specified instead.
+	// sizes for tests:
+	// 4096
+	// 30720
+	// default duckdb size - 122880
+	// 491520
+	// 983040
+
+	final long rowGroupSize = 983_040;
 
 	ParquetWriter<Group> writerLinkTraversals;
-	ParquetWriter<Group> sortedWriterLinkTraversals;
-//	SimpleGroupFactory factoryLinkTraversals;
 	ParquetWriter<Group> writerLegSequences;
-	ParquetWriter<Group> sortedWriterLegSequences;
-//	SimpleGroupFactory factoryLegSequences;
 	Configuration conf = new Configuration();
 	FileSystem fs = FileSystem.get(new Configuration());
 
@@ -81,74 +80,6 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 	Path pathLinkTraversals;
 	Path pathLegSequences;
 
-	private record DictionaryCalibration(
-		long rowGroupSizeRows,
-		long dictionarySizeLimit,
-		long stringDictionaryPageSizeLimitBytes
-	) {}
-
-	private DictionaryCalibration calibrateDictionaryParams(Connection duckConn, String rawPath, String schema) throws SQLException {
-		long totalRows;
-		try (var stmt = duckConn.createStatement();
-		     var rs = stmt.executeQuery("SELECT COUNT(*) AS n FROM read_parquet('" + rawPath + "')")) {
-			rs.next();
-			totalRows = rs.getLong("n");
-		}
-
-		// Worst-case per-group NDV driver: agent_id / leg_id aren't correlated with the
-		// link_id/hour sort order, so their per-row-group cardinality approaches
-		// min(rows_per_group, global NDV). link_id benefits from sort locality so we
-		// don't need to calibrate against it.
-		record ColStats(long ndv, double avgLen) {}
-		Map<String, ColStats> stats = new HashMap<>();
-		List<String> colList = List.of();
-		if (schema.equals("links")) {
-			colList = List.of("link_id", "agent_id", "leg_id", "mode");
-		} else if (schema.equals("legs")) {
-			colList = List.of("leg_id", "trip_id", "agent_id");
-		}
-		for (String col : colList) {
-			try (var stmt = duckConn.createStatement();
-			     var rs = stmt.executeQuery(
-					 "SELECT CAST(approx_count_distinct(" + col + ") AS BIGINT) AS ndv, " +
-						 "AVG(LENGTH(" + col + ")) AS avg_len " +
-						 "FROM read_parquet('" + rawPath + "')")) {
-				rs.next();
-				stats.put(col, new ColStats(rs.getLong("ndv"), rs.getDouble("avg_len")));
-			}
-		}
-
-		// Pick a target row group row count. This keeps row groups from ballooning
-		// regardless of dataset size/compressibility - default DuckDB tips suggest
-		// 250k-500k rows for analytics tables, so we use that as an upper bound and
-		// never exceed it even if the dataset is small enough that fewer groups would do.
-		long targetRowGroupRows = Math.min(500_000L, Math.max(50_000L, totalRows / 20));
-
-		// Worst-case NDV within a single row group of that size, for the highest-cardinality
-		// uncorrelated column.
-		long worstCaseNdvPerGroup = stats.values().stream()
-			.mapToLong(s -> Math.min(targetRowGroupRows, s.ndv()))
-			.max().orElse(targetRowGroupRows);
-
-		// Add 50% headroom so we don't sit right at the edge (values won't be perfectly
-		// evenly distributed across row groups in practice).
-		long dictionarySizeLimit = (long) (worstCaseNdvPerGroup * 1.5);
-
-		double worstCaseAvgLen = stats.values().stream()
-			.mapToDouble(ColStats::avgLen)
-			.max().orElse(20.0);
-		long stringDictPageBytes = (long) (dictionarySizeLimit * worstCaseAvgLen * 1.5);
-		// Floor at the DuckDB default (1MB) so we never regress below stock behavior.
-		stringDictPageBytes = Math.max(stringDictPageBytes, 1_000_000L);
-
-		log.info("Calibrated writer params for " + schema + ": rowGroupRows={}, dictionarySizeLimit={}, " +
-				"stringDictPageBytes={} (from totalRows={}, worstCaseNdvPerGroup={})",
-			targetRowGroupRows, dictionarySizeLimit, stringDictPageBytes,
-			totalRows, worstCaseNdvPerGroup);
-
-		return new DictionaryCalibration(targetRowGroupRows, dictionarySizeLimit, stringDictPageBytes);
-	}
-
 	public DbEventHandler(String outputDirectory) throws IOException {
 		this.outputDirectory = outputDirectory;
 		pathLinkTraversals = new Path(outputDirectory + "/link-traversals.parquet");
@@ -169,29 +100,6 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 			.withDictionaryEncoding("hour", true)
 			.withDictionaryEncoding("mode", true)   // Explicitly for mode
 			.withWriterVersion(ParquetProperties.WriterVersion.PARQUET_2_0)
-			// Need to explain these row and page sizes
-			.withRowGroupSize(rowGroupSize)
-			.withPageSize(pageSize)
-//			originally thought I had to set a bloom filter here, but then the DuckDB copy operation later
-//			in this script which sorts this parquet file by hour and link_id removed the bloom filter.
-//			This is not a problem since DuckDB states: "As of the last feature release (1.2.0), DuckDB
-//			supports both reading and writing of Parquet Bloom filters. This happens completely transparently
-//			to users, no additional action or configuration is required."
-
-
-//			.withBloomFilterEnabled(true)
-//			.withBloomFilterEnabled("linkId", true)
-//			// best to set this to distinct num links, if possible.
-//			// Helps parquet reader with Bloom filter probability when it knows the amount of distinct values
-//			// EXAMPLE: running the following command in terminal (after entering duckdb environment by typing
-//			// duckdb) gives you distinct count:
-//			//		SELECT approx_count_distinct(l) AS ndv
-//			//		FROM (
-//			//			SELECT unnest(linkId) AS l
-//			//			FROM read_avro('network.avro')
-//			//		);
-//			.withBloomFilterNDV("linkId", 305298)
-
 			.build();
 
 		if (fs.exists(pathLegSequences)) fs.delete(pathLegSequences, true);
@@ -204,21 +112,6 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 			.withDictionaryEncoding("trip_id", true)
 			.withDictionaryEncoding("agent_id", true)
 			.withWriterVersion(ParquetProperties.WriterVersion.PARQUET_2_0)
-			// just took recommended page and row group sizes: https://parquet.apache.org/docs/file-format/configurations/
-			.withRowGroupSize(rowGroupSize)
-			.withPageSize(pageSize)
-//			.withBloomFilterEnabled(true)
-//			.withBloomFilterEnabled("leg_id", true)
-			// best to set this to distinct num legs, if possible. For this, you need to let this
-			// program run once to generate legs file first.
-			// Helps parquet reader with Bloom filter probability when it knows the amount of distinct values
-			// EXAMPLE: running the following command in terminal (after entering duckdb environment by typing
-			// duckdb) gives you distinct count:
-			//		SELECT approx_count_distinct(l) AS ndv
-			//		FROM (
-			//			SELECT leg_id AS l
-			//			FROM read_parquet('leg-sequences-sorted.parquet')
-//			.withBloomFilterNDV("leg_id", 364447)
 			.build();
 	}
 
@@ -315,150 +208,25 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 		String legSequencesCsvPath =  this.outputDirectory + "/leg-sequences-sorted.csv.zst";
 
 		String linkTraversalsCsvPathUncompressed =  this.outputDirectory + "/link-traversals-sorted.csv";
-		String tempPath = linkTraversalsSortedPath + ".tmp";
-		String tempPathLegs = legSequencesSortedPath + ".tmp";
-
-		if (fs.exists(new Path(tempPath))) fs.delete(new Path(tempPath), true);
-		if (fs.exists(new Path(tempPathLegs))) fs.delete(new Path(tempPathLegs), true);
+		String legSequencesCsvPathUncompressed =  this.outputDirectory + "/leg-seqeunces-sorted.csv";
 
 		duckConn.createStatement().execute(
 			"SET preserve_insertion_order=false"
 		);
 
-//		duckConn.createStatement().execute(
-//			"COPY (SELECT * FROM read_parquet('" + linkTraversalsPath + "') " +
-//				"ORDER BY link_id, hour) " +
-//				"TO '" + linkTraversalsSortedPath + "' " +
-//				"(FORMAT PARQUET, STRING_DICTIONARY_PAGE_SIZE_LIMIT 10000000, CODEC 'ZSTD', ROW_GROUP_SIZE_BYTES " + rowGroupSize + ")"
-//		);
-
-		DictionaryCalibration calLinks = calibrateDictionaryParams(duckConn, linkTraversalsPath, "links");
-
 		duckConn.createStatement().execute(
 			"COPY (SELECT * FROM read_parquet('" + linkTraversalsPath + "') " +
 				"ORDER BY link_id, hour) " +
 				"TO '" + linkTraversalsSortedPath + "' " +
-				"(FORMAT PARQUET, " +
-				"ROW_GROUP_SIZE " + calLinks.rowGroupSizeRows() + ", " +
-				"ROW_GROUP_SIZE_BYTES " + rowGroupSize + ", " +
-				"STRING_DICTIONARY_PAGE_SIZE_LIMIT " + calLinks.stringDictionaryPageSizeLimitBytes() + ", " +
-				"DICTIONARY_SIZE_LIMIT " + calLinks.dictionarySizeLimit() + ", " +
-				"CODEC 'ZSTD') "
+				"(FORMAT PARQUET, CODEC 'ZSTD', ROW_GROUP_SIZE " + rowGroupSize + ")"
 		);
-
-		DictionaryCalibration calLegs = calibrateDictionaryParams(duckConn, legSequencesPath, "legs");
 
 		duckConn.createStatement().execute(
 			"COPY (SELECT * FROM read_parquet('" + legSequencesPath + "') " +
 				"ORDER BY leg_id) " +
 				"TO '" + legSequencesSortedPath + "' " +
-				"(FORMAT PARQUET, " +
-				"ROW_GROUP_SIZE " + calLegs.rowGroupSizeRows() + ", " +
-				"ROW_GROUP_SIZE_BYTES " + rowGroupSize + ", " +
-				"STRING_DICTIONARY_PAGE_SIZE_LIMIT " + calLegs.stringDictionaryPageSizeLimitBytes() + ", " +
-				"DICTIONARY_SIZE_LIMIT " + calLegs.dictionarySizeLimit() + ", " +
-				"CODEC 'ZSTD') "
+				"(FORMAT PARQUET, CODEC 'ZSTD', ROW_GROUP_SIZE " + rowGroupSize + ")"
 		);
-
-//		duckConn.createStatement().execute(
-//			"COPY (SELECT * FROM read_parquet('" + legSequencesPath + "') " +
-//				"ORDER BY leg_id) " +
-//				"TO '" + legSequencesSortedPath + "' " +
-//				"(FORMAT PARQUET, CODEC 'ZSTD', ROW_GROUP_SIZE_BYTES " + rowGroupSize + ")"
-//		);
-
-
-		// 2. Calibrate NDV from that file's real per-row-group stats
-//		long calibratedNdv;
-//		try (var stmt = duckConn.createStatement();
-//		     var rs = stmt.executeQuery(
-//				 "SELECT CAST(approx_count_distinct(link_id) AS BIGINT) AS ndv " +
-//					 "FROM read_parquet('" + linkTraversalsSortedPath + "')")) {
-//			rs.next();
-//			calibratedNdv = rs.getLong("ndv");
-//		}
-//
-//		long calibratedNdvLegs;
-//		try (var stmt = duckConn.createStatement();
-//		     var rs = stmt.executeQuery(
-//				 "SELECT CAST(approx_count_distinct(leg_id) AS BIGINT) AS ndv " +
-//					 "FROM read_parquet('" + legSequencesSortedPath + "')")) {
-//			rs.next();
-//			calibratedNdvLegs = rs.getLong("ndv");
-//		}
-
-//		sortedWriterLinkTraversals = ExampleParquetWriter
-//			.builder(HadoopOutputFile.fromPath(new Path(tempPath), conf))
-//			.withType(schemaLinkTraversals)
-//			.withCompressionCodec(CompressionCodecName.ZSTD)
-//			.withDictionaryEncoding(true) // Enable for all columns
-////			.withDictionaryEncoding("link_id", true) // Explicitly for link_id
-////			.withDictionaryEncoding("agent_id", true)
-////			.withDictionaryEncoding("leg_id", true)
-////			.withDictionaryEncoding("hour", true)
-////			.withDictionaryEncoding("mode", true)   // Explicitly for mode
-//			.withWriterVersion(ParquetProperties.WriterVersion.PARQUET_2_0)
-//			// Need to explain these row and page sizes
-//			.withRowGroupSize(rowGroupSize)
-//			.withPageSize(pageSize)
-////			.withBloomFilterEnabled(false)
-////			.withBloomFilterEnabled("link_id", true)
-////			.withBloomFilterNDV("link_id", calibratedNdv)
-//			.build();
-//
-//		sortedWriterLegSequences = ExampleParquetWriter
-//			.builder(HadoopOutputFile.fromPath(new Path(tempPathLegs), conf))
-//			.withType(schemaLegSequences)
-//			.withCompressionCodec(CompressionCodecName.ZSTD)
-//			.withDictionaryEncoding(true) // Enable for all columns
-//			.withDictionaryEncoding("leg_id", true) // Explicitly for link_id
-//			.withDictionaryEncoding("trip_id", true)
-//			.withDictionaryEncoding("agent_id", true)
-//			.withWriterVersion(ParquetProperties.WriterVersion.PARQUET_2_0)
-//			// Need to explain these row and page sizes
-//			.withRowGroupSize(rowGroupSize)
-//			.withPageSize(pageSize)
-////			.withBloomFilterEnabled(false)
-////			.withBloomFilterEnabled("leg_id", true)
-////			.withBloomFilterNDV("leg_id", calibratedNdvLegs)
-//			.build();
-
-
-
-//		 3. Rewrite the SAME path via Java, using the calibrated NDV — this becomes the final file
-//		    (read from linkTraversalsSortedPath itself, since it's already sorted — no need to re-sort)
-//		Path pathLinkTraversalsSorted = new Path(linkTraversalsSortedPath);
-//		try (var stmt = duckConn.createStatement();
-//		     var rs = stmt.executeQuery(
-//				 "SELECT link_id, agent_id, leg_id, hour, mode FROM read_parquet('" + linkTraversalsSortedPath + "')")) {
-//			while (rs.next()) {
-//				sortedWriterLinkTraversals.write(factoryLinkTraversals.newGroup()
-//					.append("link_id", rs.getString("link_id"))
-//					.append("agent_id", rs.getString("agent_id"))
-//					.append("leg_id", rs.getString("leg_id"))
-//					.append("hour", rs.getInt("hour"))
-//					.append("mode", rs.getString("mode")));
-//			}
-//			// fully drain rs into memory or a temp list first, THEN delete+rewrite the path —
-//			// can't read and overwrite the same file at once
-//
-//		}
-
-//		Path pathLegSequencesSortedPath = new Path(legSequencesSortedPath);
-//		try (var stmt = duckConn.createStatement();
-//		     var rs = stmt.executeQuery(
-//				 "SELECT leg_id, trip_id, agent_id, leg_sequence FROM read_parquet('" + legSequencesSortedPath + "')")) {
-//			while (rs.next()) {
-//				sortedWriterLegSequences.write(factoryLegSequences.newGroup()
-//					.append("leg_id", rs.getString("leg_id"))
-//					.append("trip_id", rs.getString("trip_id"))
-//					.append("agent_id", rs.getString("agent_id"))
-//					.append("leg_sequence", rs.getString("leg_sequence")));
-//			}
-//			// fully drain rs into memory or a temp list first, THEN delete+rewrite the path —
-//			// can't read and overwrite the same file at once
-//
-//		}
 
 
 		duckConn.createStatement().execute(
@@ -471,6 +239,18 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 			"COPY (SELECT * FROM read_parquet('" + legSequencesSortedPath + "') " +
 				"ORDER BY leg_id) " +
 				"TO '" + legSequencesCsvPath + "' (FORMAT CSV, HEADER, DELIMITER ',', COMPRESSION zstd)"
+		);
+
+		duckConn.createStatement().execute(
+			"COPY (SELECT * FROM read_parquet('" + linkTraversalsSortedPath + "') " +
+				"ORDER BY link_id, hour) " +
+				"TO '" + linkTraversalsCsvPathUncompressed + "' (FORMAT CSV, HEADER, DELIMITER ',')"
+		);
+
+		duckConn.createStatement().execute(
+			"COPY (SELECT * FROM read_parquet('" + legSequencesSortedPath + "') " +
+				"ORDER BY leg_id) " +
+				"TO '" + legSequencesCsvPathUncompressed + "' (FORMAT CSV, HEADER, DELIMITER ',')"
 		);
 
 // 		this deletion already happens in AgentTabe.java, which runs before this method.
@@ -489,22 +269,7 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 			"CREATE TABLE IF NOT EXISTS sqlite_db.leg_sequences AS " +
 				"SELECT * FROM read_parquet('" + outputDirectory + "/leg-sequences-sorted.parquet')"
 		);
-
-//		fs.delete(new Path(linkTraversalsSortedPath), false);
-//		fs.rename(new Path(tempPath), new Path(linkTraversalsSortedPath));
-//		fs.delete(new Path(legSequencesSortedPath), false);
-//		fs.rename(new Path(tempPathLegs), new Path(legSequencesSortedPath));
-//
-//
-//		log.info("Calibrated NDV determined to be: {}", calibratedNdv);
-//		log.info("Calibrated NDV for legs determined to be: {}", calibratedNdvLegs);
-//
-//
-//		sortedWriterLinkTraversals.close();
-//		sortedWriterLegSequences.close();
 	}
-
-
 
 	public void finish() throws IOException {
 
@@ -517,9 +282,5 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 			throw new RuntimeException(e);
 		}
 
-	}
-
-	public Map<String, AgentState> getAgentStates() {
-		return agentStates;
 	}
 }
