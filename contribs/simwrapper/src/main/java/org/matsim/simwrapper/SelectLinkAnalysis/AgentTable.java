@@ -21,10 +21,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AgentTable {
 
@@ -33,6 +30,8 @@ public class AgentTable {
 	private final Population population;
 	private final static Logger log = LogManager.getLogger(AgentTable.class);
 	private String outputDirectory;
+	MessageType schemaAgents;
+	List<String> listSchemaAgents;
 
 	public AgentTable(Population population, String outputDirectory)  {
 		this.population = population;
@@ -48,8 +47,9 @@ public class AgentTable {
 		}
 		String parquetSchemaString = generateParquetSchema("persons", attributes);
 
-		MessageType schemaAgents = MessageTypeParser.parseMessageType(parquetSchemaString);
-		SimpleGroupFactory factoryAgents = new SimpleGroupFactory(schemaAgents);
+		this.schemaAgents = MessageTypeParser.parseMessageType(parquetSchemaString);
+		this.listSchemaAgents = schemaAgents.getPaths().stream().flatMap(Arrays::stream).toList();
+		SimpleGroupFactory factoryAgents = new SimpleGroupFactory(this.schemaAgents);
 
 		Configuration conf = new Configuration();
 		Path pathAgents = new Path(this.outputDirectory + "/agents.parquet");
@@ -163,6 +163,10 @@ public class AgentTable {
 		String agentsParquetPath = this.outputDirectory + "/agents.parquet";
 		String agentsParquetSortedPath = this.outputDirectory + "/agents-sorted.parquet";
 		String agentsSortedCsvPath = this.outputDirectory + "/agents-sorted.csv";
+
+		// leaving out specific agent bloom filter calibration - columns are dynamic depending on scenario and difficult to organize.
+//		DbEventHandler handler = new DbEventHandler(this.outputDirectory);
+//		DbEventHandler.DictionaryCalibration calAgents = handler.calibrateDictionaryParams(duckConn, agentsParquetSortedPath, this.listSchemaAgents);
 
 		duckConn.createStatement().execute(
 			"COPY (SELECT * FROM read_parquet('" + agentsParquetPath + "') " +
