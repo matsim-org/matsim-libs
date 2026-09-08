@@ -374,6 +374,40 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 //				"TO '" + legSequencesCsvPath + "' (FORMAT CSV, HEADER, DELIMITER ',', COMPRESSION zstd)"
 //		);
 
+		for (int hour = 0; hour < 35; hour++) {
+			String hourDir = this.outputDirectory + "/link-cotraversal-counts-csv/hour-" + hour;
+			fs.mkdirs(new Path(hourDir));
+
+			duckConn.createStatement().execute(
+				"COPY (" +
+					"SELECT lt.link_id, lt.hour, lt.leg_id, ls.leg_sequence " +
+					"FROM read_parquet('" + linkTraversalsSortedPath + "') lt " +
+					"JOIN read_parquet('" + legSequencesSortedPath + "') ls " +
+					"  ON lt.leg_id = ls.leg_id " +
+					"WHERE lt.hour = " + hour + " " +
+					"ORDER BY lt.link_id, lt.hour" +
+					") TO '" + hourDir + "/link-traversals-with-sequence-" + hour + ".csv.zst' " +
+					"(FORMAT CSV, HEADER, DELIMITER ',', COMPRESSION zstd)"
+			);
+		}
+
+//		for (int hour = 0; hour < 35; hour++) {
+//			String hourDir = this.outputDirectory + "/link-cotraversal-counts-csv/hour-" + hour;
+//			fs.mkdirs(new Path(hourDir));
+//
+//			duckConn.createStatement().execute(
+//				"COPY (" +
+//					"SELECT lt.link_id, lt.hour, lt.leg_id, ls.leg_sequence " +
+//					"FROM read_parquet('" + linkTraversalsSortedPath + "') lt " +
+//					"JOIN read_parquet('" + legSequencesSortedPath + "') ls " +
+//					"  ON lt.leg_id = ls.leg_id " +
+//					"WHERE lt.hour = " + hour + " " +
+//					"ORDER BY lt.link_id, lt.hour" +
+//					") TO '" + hourDir + "/link-traversals-with-sequence-uncompressed-" + hour + ".csv' " +
+//					"(FORMAT CSV, HEADER, DELIMITER ',')"
+//			);
+//		}
+
 //		duckConn.createStatement().execute(
 //			"COPY (SELECT * FROM read_parquet('" + linkTraversalsSortedPath + "') " +
 //				"ORDER BY link_id, hour) " +
@@ -390,18 +424,18 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 //		java.nio.file.Path dbPath = java.nio.file.Path.of(outputDirectory + "/sla.sqlite3");
 // 		Files.deleteIfExists(dbPath);
 
-//		duckConn.createStatement().execute(
-//			"ATTACH '" + outputDirectory + "/sla.sqlite3' AS sqlite_db (TYPE SQLITE)"
-//		);
-//
-//		duckConn.createStatement().execute(
-//			"CREATE TABLE IF NOT EXISTS sqlite_db.link_traversals AS " +
-//				"SELECT * FROM read_parquet('" + outputDirectory + "/link-traversals-sorted.parquet')"
-//		);
-//		duckConn.createStatement().execute(
-//			"CREATE TABLE IF NOT EXISTS sqlite_db.leg_sequences AS " +
-//				"SELECT * FROM read_parquet('" + outputDirectory + "/leg-sequences-sorted.parquet')"
-//		);
+		duckConn.createStatement().execute(
+			"ATTACH '" + outputDirectory + "/sla.sqlite3' AS sqlite_db (TYPE SQLITE)"
+		);
+
+		duckConn.createStatement().execute(
+			"CREATE TABLE IF NOT EXISTS sqlite_db.link_traversals AS " +
+				"SELECT * FROM read_parquet('" + outputDirectory + "/link-traversals-sorted.parquet')"
+		);
+		duckConn.createStatement().execute(
+			"CREATE TABLE IF NOT EXISTS sqlite_db.leg_sequences AS " +
+				"SELECT * FROM read_parquet('" + outputDirectory + "/leg-sequences-sorted.parquet')"
+		);
 	}
 
 	public void finish() throws IOException {

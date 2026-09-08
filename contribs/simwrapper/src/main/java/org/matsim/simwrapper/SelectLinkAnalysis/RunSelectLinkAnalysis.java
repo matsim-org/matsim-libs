@@ -42,7 +42,7 @@ public class RunSelectLinkAnalysis implements MATSimAppCommand {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		DbEventHandler DbEventHandler = new DbEventHandler(outputPath.toString());
+
 
 //		1. Initialize a config instance
 		Config config = ConfigUtils.createConfig();
@@ -56,6 +56,8 @@ public class RunSelectLinkAnalysis implements MATSimAppCommand {
 
 		AgentTable agentTable = new AgentTable(population, outputPath.toString());
 		agentTable.run();
+
+		DbEventHandler DbEventHandler = new DbEventHandler(outputPath.toString());
 
 		eventsManager.addHandler(DbEventHandler);
 
