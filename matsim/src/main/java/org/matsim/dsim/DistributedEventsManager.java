@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.messages.EventRegistry;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 
@@ -33,6 +34,7 @@ public final class DistributedEventsManager implements EventsManager {
 	private final ComputeNode computeNode;
 	private final LPExecutor executor;
 	private final SerializationProvider serializer;
+	private final MessageTypeRegistry typeRegistry = MessageTypeRegistry.getInstance();
 
 	/**
 	 * All event handlers and their tasks.
@@ -215,7 +217,7 @@ public final class DistributedEventsManager implements EventsManager {
 	private void addTaskForPart(EventHandlerTask task, int part) {
 
 		for (var type : task.getSupportedMessages()) {
-			if (!serializer.hasType(type)) {
+			if (!typeRegistry.hasType(type)) {
 				log.warn("No serializer for type {} from task {}", type, task.getName());
 				continue;
 			}
@@ -272,7 +274,7 @@ public final class DistributedEventsManager implements EventsManager {
 			Map<String, List<String>> info = new HashMap<>();
 
 			globalListener.forEach((type, list) -> {
-				String name = serializer.getType(type).getSimpleName();
+				String name = typeRegistry.getType(type).getSimpleName();
 				for (EventHandlerTask task : list) {
 					info.computeIfAbsent(task.getName(), _ -> new ArrayList<>()).add(name);
 				}
@@ -317,7 +319,7 @@ public final class DistributedEventsManager implements EventsManager {
 
 		Map<String, String> info = new HashMap<>();
 		for (Int2IntMap.Entry kv : remoteListener.int2IntEntrySet()) {
-			String name = serializer.getType(kv.getIntKey()).getSimpleName();
+			String name = typeRegistry.getType(kv.getIntKey()).getSimpleName();
 			info.put(name, "Node: %d".formatted(kv.getIntValue()));
 
 		}

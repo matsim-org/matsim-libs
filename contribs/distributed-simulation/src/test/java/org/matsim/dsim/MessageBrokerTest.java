@@ -3,7 +3,6 @@ package org.matsim.dsim;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.apache.fory.memory.MemoryBuffer;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
@@ -13,6 +12,7 @@ import org.matsim.api.core.v01.messages.EmptyMessage;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.MessageConsumer;
 import org.matsim.core.communication.MessageReceiver;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.core.serialization.SerializationProvider;
 import org.mockito.ArgumentCaptor;
 
@@ -179,7 +179,7 @@ public class MessageBrokerTest {
 
 		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 		var receiverTask = mock(LPTask.class);
-		when(receiverTask.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+		when(receiverTask.getSupportedMessages()).thenReturn(IntSet.of(MessageTypeRegistry.getInstance().getType(MessageA.class)));
 		var waitParts = new IntArraySet(TOPOLOGY.getNodeByIndex(otherRank).getParts());
 		when(receiverTask.waitForOtherParts(anyDouble())).thenReturn(waitParts);
 		broker.register(receiverTask, 0);
@@ -202,7 +202,7 @@ public class MessageBrokerTest {
 		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
 
 		var receiverTask = mock(LPTask.class);
-		when(receiverTask.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+		when(receiverTask.getSupportedMessages()).thenReturn(IntSet.of(MessageTypeRegistry.getInstance().getType(MessageA.class)));
 		// we want to wait for / sync from both other ranks
 		var waitParts = IntSet.of(2, 3, 4, 5);
 		when(receiverTask.waitForOtherParts(anyDouble())).thenReturn(waitParts);
@@ -314,7 +314,7 @@ public class MessageBrokerTest {
 		var msgCaptor = ArgumentCaptor.forClass(MemorySegment.class);
 		verify(comm, times(1)).send(eq(Communicator.BROADCAST_TO_ALL), msgCaptor.capture(), anyLong(), anyLong());
 
-		var type = serializer.getType(MessageA.class);
+		var type = MessageTypeRegistry.getInstance().getType(MessageA.class);
 		MessageA received = verifyMsg(seq(0), Communicator.BROADCAST_TO_ALL, Communicator.BROADCAST_TO_ALL, type,
 			msgCaptor.getValue().asByteBuffer());
 		assertEquals(msgA.payload(), received.payload());
@@ -345,11 +345,11 @@ public class MessageBrokerTest {
 		}).when(comm).recv(any(), any());
 
 		var task0 = mock(LPTask.class);
-		when(task0.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+		when(task0.getSupportedMessages()).thenReturn(IntSet.of(MessageTypeRegistry.getInstance().getType(MessageA.class)));
 		when(task0.waitForOtherParts(anyDouble())).thenReturn(LP.ALL_PARTS_BROADCAST);
 
 		var task1 = mock(LPTask.class);
-		when(task1.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+		when(task1.getSupportedMessages()).thenReturn(IntSet.of(MessageTypeRegistry.getInstance().getType(MessageA.class)));
 		when(task1.waitForOtherParts(anyDouble())).thenReturn(LP.ALL_PARTS_BROADCAST);
 
 		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
@@ -432,11 +432,11 @@ public class MessageBrokerTest {
 		}).when(comm).recv(any(), any());
 
 		var task0 = mock(LPTask.class);
-		when(task0.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+		when(task0.getSupportedMessages()).thenReturn(IntSet.of(MessageTypeRegistry.getInstance().getType(MessageA.class)));
 		when(task0.waitForOtherParts(anyDouble())).thenReturn(LP.ALL_PARTS_BROADCAST);
 
 		var task1 = mock(LPTask.class);
-		when(task1.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageB.class)));
+		when(task1.getSupportedMessages()).thenReturn(IntSet.of(MessageTypeRegistry.getInstance().getType(MessageB.class)));
 		// wait for partition 4 on rank 2
 		when(task1.waitForOtherParts(anyDouble())).thenReturn(IntSet.of(4));
 
@@ -500,7 +500,7 @@ public class MessageBrokerTest {
 			.when(comm).recv(any(), any());
 
 		var task0 = mock(LPTask.class);
-		when(task0.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+		when(task0.getSupportedMessages()).thenReturn(IntSet.of(MessageTypeRegistry.getInstance().getType(MessageA.class)));
 		when(task0.waitForOtherParts(anyDouble())).thenReturn(IntSet.of(2));
 
 		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
@@ -556,7 +556,7 @@ public class MessageBrokerTest {
 		}).when(comm).recv(any(), any());
 
 		var task0 = mock(LPTask.class);
-		when(task0.getSupportedMessages()).thenReturn(IntSet.of(serializer.getType(MessageA.class)));
+		when(task0.getSupportedMessages()).thenReturn(IntSet.of(MessageTypeRegistry.getInstance().getType(MessageA.class)));
 		when(task0.waitForOtherParts(anyDouble())).thenReturn(IntSet.of(2));
 
 		var broker = new MessageBroker(comm, TOPOLOGY, serializer);
@@ -610,19 +610,18 @@ public class MessageBrokerTest {
 	@SuppressWarnings("unchecked")
 	private <T extends Message> T verifyMsg(int expectedTag, int expectedReceiver, int expectedPartition, int expectedType, ByteBuffer actualBytes) {
 		actualBytes.order(ByteOrder.LITTLE_ENDIAN);
-		var memBuf = MemoryBuffer.fromByteBuffer(actualBytes);
 
 		// verify rank header
-		assertEquals(expectedTag, memBuf.readInt32());
-		assertEquals(0, memBuf.readInt32());
-		assertEquals(expectedReceiver, memBuf.readInt32());
+		assertEquals(expectedTag, actualBytes.getInt());
+		assertEquals(0, actualBytes.getInt());
+		assertEquals(expectedReceiver, actualBytes.getInt());
 
 		// verify part header
-		assertEquals(expectedPartition, memBuf.readInt32());
-		assertEquals(expectedType, memBuf.readInt32());
-		memBuf.readInt32(); // we don't care about the message size
+		assertEquals(expectedPartition, actualBytes.getInt());
+		assertEquals(expectedType, actualBytes.getInt());
+		actualBytes.getInt(); // we don't care about the message size
 
-		return (T) serializer.deserialize(memBuf, expectedType);
+		return (T) serializer.deserialize(actualBytes, expectedType);
 	}
 
 	private ByteBuffer msgBytes(int sender, int receiver, int partition, Message msg, int seq) {
