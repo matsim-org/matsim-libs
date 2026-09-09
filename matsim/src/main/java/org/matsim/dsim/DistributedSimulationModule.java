@@ -30,18 +30,22 @@ public class DistributedSimulationModule extends AbstractModule {
 		// Use distributed config
 		if (ctx instanceof DistributedContext o) {
 			dtx = o;
-			// A genuinely distributed run brings its own wire codec (see DistributedContext.create).
-			bind(SerializationProvider.class).toInstance(dtx.getSerializer());
 		} else {
-			// Create a distributed context from the local one if none was given. A single-node run never transfers
-			// messages between compute nodes, so no real serialization codec is required.
+			// Create a distributed context from the local one if none was given.
 			dtx = DistributedContext.createLocal(new NullCommunicator(), getSimulationContext().getTopology());
 			ctx = dtx;
-			bind(SerializationProvider.class).to(NoopSerializationProvider.class).in(Singleton.class);
 		}
 
 		bind(Communicator.class).toInstance(dtx.getComm());
 		bind(MessageTypeRegistry.class).toInstance(MessageTypeRegistry.getInstance());
+
+		// A run that spans several compute nodes brings its own wire codec (see DistributedContext.create). A
+		// single-node run never transfers messages between nodes, so no real serialization codec is required.
+		if (dtx.getSerializer() != null) {
+			bind(SerializationProvider.class).toInstance(dtx.getSerializer());
+		} else {
+			bind(SerializationProvider.class).to(NoopSerializationProvider.class).in(Singleton.class);
+		}
 
 		bind(MessageBroker.class).in(Singleton.class);
 		bind(DistributedEventsManager.class).in(Singleton.class);
