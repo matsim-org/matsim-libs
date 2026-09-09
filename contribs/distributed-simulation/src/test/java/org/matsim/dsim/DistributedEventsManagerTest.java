@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.executors.SingleExecutor;
@@ -33,7 +34,7 @@ class DistributedEventsManagerTest {
 	public void globalHandler() {
 		MessageBroker broker = mock(MessageBroker.class);
 		var provider = SerializationProvider.getInstance();
-		LPExecutor executor = new SingleExecutor(provider);
+		LPExecutor executor = new SingleExecutor(MessageTypeRegistry.getInstance());
 		var computeNode = ComputeNode.builder()
 			.rank(0)
 			.parts(IntList.of(0, 1))
@@ -59,7 +60,7 @@ class DistributedEventsManagerTest {
 	public void globalHandlerNotHeadNode() {
 		MessageBroker broker = mock(MessageBroker.class);
 		var provider = SerializationProvider.getInstance();
-		LPExecutor executor = new SingleExecutor(provider);
+		LPExecutor executor = new SingleExecutor(MessageTypeRegistry.getInstance());
 		var computeNode = ComputeNode.builder()
 			.rank(1)
 			.parts(IntList.of(0, 1))
@@ -83,7 +84,7 @@ class DistributedEventsManagerTest {
 	public void nodeHandler() {
 		MessageBroker broker = mock(MessageBroker.class);
 		var provider = SerializationProvider.getInstance();
-		LPExecutor executor = new SingleExecutor(provider);
+		LPExecutor executor = new SingleExecutor(MessageTypeRegistry.getInstance());
 		var computeNode = ComputeNode.builder()
 			.rank(0)
 			.parts(IntList.of(0, 1))
@@ -109,7 +110,7 @@ class DistributedEventsManagerTest {
 	public void nodeConcurrentHandler() {
 		MessageBroker broker = mock(MessageBroker.class);
 		var provider = SerializationProvider.getInstance();
-		LPExecutor executor = new SingleExecutor(provider);
+		LPExecutor executor = new SingleExecutor(MessageTypeRegistry.getInstance());
 		var computeNode = ComputeNode.builder()
 			.rank(0)
 			.parts(IntList.of(0, 1))
@@ -138,7 +139,7 @@ class DistributedEventsManagerTest {
 	public void nodeConcurrentHandlerDirect() {
 		MessageBroker broker = mock(MessageBroker.class);
 		var provider = SerializationProvider.getInstance();
-		LPExecutor executor = new SingleExecutor(provider);
+		LPExecutor executor = new SingleExecutor(MessageTypeRegistry.getInstance());
 		var computeNode = ComputeNode.builder()
 			.rank(0)
 			.parts(IntList.of(0, 1))
@@ -165,7 +166,7 @@ class DistributedEventsManagerTest {
 	public void partitionHandler() {
 		MessageBroker broker = mock(MessageBroker.class);
 		var serializationProvider = SerializationProvider.getInstance();
-		LPExecutor executor = new SingleExecutor(serializationProvider);
+		LPExecutor executor = new SingleExecutor(MessageTypeRegistry.getInstance());
 		var computeNode = ComputeNode.builder()
 			.rank(0)
 			.parts(IntList.of(0, 1))
@@ -197,7 +198,7 @@ class DistributedEventsManagerTest {
 
 		MessageBroker broker = mock(MessageBroker.class);
 		var serializationProvider = SerializationProvider.getInstance();
-		LPExecutor executor = new SingleExecutor(serializationProvider);
+		LPExecutor executor = new SingleExecutor(MessageTypeRegistry.getInstance());
 		var computeNode = ComputeNode.builder()
 			.rank(0)
 			.parts(IntList.of(0, 1))
@@ -223,7 +224,7 @@ class DistributedEventsManagerTest {
 
 		MessageBroker broker = mock(MessageBroker.class);
 		var serializationProvider = SerializationProvider.getInstance();
-		LPExecutor executor = new SingleExecutor(serializationProvider);
+		LPExecutor executor = new SingleExecutor(MessageTypeRegistry.getInstance());
 		var computeNode = ComputeNode.builder()
 			.rank(0)
 			.parts(IntList.of(0, 1))
@@ -282,11 +283,11 @@ class DistributedEventsManagerTest {
 			.computeNodes(List.of(node0, node1))
 			.build();
 
-		var executor0 = new SingleExecutor(provider);
+		var executor0 = new SingleExecutor(MessageTypeRegistry.getInstance());
 		var broker0 = new MessageBroker(communicators.getFirst(), topology, provider);
 		var manager0 = new DistributedEventsManager(broker0, node0, executor0, provider);
 
-		var executor1 = new SingleExecutor(provider);
+		var executor1 = new SingleExecutor(MessageTypeRegistry.getInstance());
 		var broker1 = new MessageBroker(communicators.getLast(), topology, provider);
 		var manager1 = new DistributedEventsManager(broker1, node1, executor1, provider);
 

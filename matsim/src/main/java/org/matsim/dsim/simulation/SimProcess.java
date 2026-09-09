@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.qsim.MobsimListenerManager;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.dsim.DistributedEventsManager;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
 import org.matsim.vehicles.Vehicle;
@@ -64,7 +64,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final NetworkPartition partition;
 	private final AgentSourcesContainer asc;
 	private final EventsManager em;
-	private final SerializationProvider serialization;
+	private final MessageTypeRegistry registry;
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
 	private NetworkTrafficEngine networkTrafficEngine;
@@ -76,12 +76,12 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Inject
 	SimProcess(Scenario scenario, NetworkPartition partition, PartitionTransfer messaging, AgentSourcesContainer asc, DistributedEventsManager em,
-			   SerializationProvider serialization) {
+			   MessageTypeRegistry registry) {
 		this.scenario = scenario;
 		this.partition = partition;
 		this.asc = asc;
 		this.em = em;
-		this.serialization = serialization;
+		this.registry = registry;
 		this.currentTime = new MobsimTimer();
 		this.partitionTransfer = messaging;
 	}
@@ -108,7 +108,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		if (component instanceof DSimComponentsMessageProcessor p) {
 			p.getMessageHandlers().forEach((clazz, handler) -> {
-				var type = serialization.getType(clazz);
+				var type = registry.getType(clazz);
 				messageHandlers.computeIfAbsent(type, _ -> new ArrayList<>()).add(handler);
 			});
 		}

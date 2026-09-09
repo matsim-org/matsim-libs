@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.DSimEventHandlingModule;
 import org.matsim.dsim.executors.LPExecutor;
@@ -35,6 +36,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		}
 
 		bind(Communicator.class).toInstance(dtx.getComm());
+		bind(MessageTypeRegistry.class).toInstance(MessageTypeRegistry.getInstance());
 		bind(SerializationProvider.class).toInstance(dtx.getSerializer());
 
 		bind(MessageBroker.class).in(Singleton.class);
