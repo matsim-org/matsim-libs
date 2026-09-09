@@ -18,13 +18,6 @@ import java.nio.ByteBuffer;
 public interface SerializationProvider {
 
 	/**
-	 * Transitional accessor. Will be removed once all call sites obtain the provider through Guice.
-	 */
-	static SerializationProvider getInstance() {
-		return ForySerializationProvider.getInstance();
-	}
-
-	/**
 	 * Serialize a message and return its byte representation.
 	 */
 	<T extends Message> byte[] toBytes(T msg);

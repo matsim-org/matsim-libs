@@ -22,26 +22,6 @@ import java.nio.ByteBuffer;
 @Singleton
 public class ForySerializationProvider implements SerializationProvider {
 
-	private static volatile ForySerializationProvider instance;
-
-	/**
-	 * Transitional accessor for call sites that create their serialization provider outside Guice (multi-node bootstrap
-	 * and tests).
-	 */
-	public static ForySerializationProvider getInstance() {
-		ForySerializationProvider result = instance;
-		if (result == null) {
-			synchronized (ForySerializationProvider.class) {
-				result = instance;
-				if (result == null) {
-					result = new ForySerializationProvider(MessageTypeRegistry.getInstance());
-					instance = result;
-				}
-			}
-		}
-		return result;
-	}
-
 	private final MessageTypeRegistry registry;
 
 	private final ThreadSafeFory fory;

@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.serialization.ForySerializationProvider;
 import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.core.serialization.SerializationProvider;
 
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 class DefaultEventHandlerTaskTest {
 
-	private static final SerializationProvider serializer = SerializationProvider.getInstance();
+	private static final SerializationProvider serializer = new ForySerializationProvider(MessageTypeRegistry.getInstance());
 	private static final MessageTypeRegistry registry = MessageTypeRegistry.getInstance();
 
 	@Test

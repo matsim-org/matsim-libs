@@ -12,7 +12,7 @@ import java.util.List;
 
 class SerializationProviderTest {
 
-	private final SerializationProvider provider = SerializationProvider.getInstance();
+	private final SerializationProvider provider = new ForySerializationProvider(MessageTypeRegistry.getInstance());
 
 	@Test
 	void serializeEvents() {

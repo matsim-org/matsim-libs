@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.messages.EmptyMessage;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.MessageConsumer;
 import org.matsim.core.communication.MessageReceiver;
+import org.matsim.core.serialization.ForySerializationProvider;
 import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.core.serialization.SerializationProvider;
 import org.mockito.ArgumentCaptor;
@@ -29,7 +30,7 @@ public class MessageBrokerTest {
 
 	// Topology: rank 0 → partitions [0,1], rank 1 → partitions [2,3], rank 2 → partitions [4,5]
 	private static final Topology TOPOLOGY = buildTopology();
-	private static final SerializationProvider serializer = SerializationProvider.getInstance();
+	private static final SerializationProvider serializer = new ForySerializationProvider(MessageTypeRegistry.getInstance());
 
 	private static Topology buildTopology() {
 		var node0 = ComputeNode.builder().distributed(true).rank(0).parts(IntList.of(0, 1)).cores(1).hostname("localhost").build();

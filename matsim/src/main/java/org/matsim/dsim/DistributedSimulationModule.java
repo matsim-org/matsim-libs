@@ -10,6 +10,7 @@ import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.serialization.MessageTypeRegistry;
+import org.matsim.core.serialization.NoopSerializationProvider;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.DSimEventHandlingModule;
 import org.matsim.dsim.executors.LPExecutor;
@@ -29,15 +30,18 @@ public class DistributedSimulationModule extends AbstractModule {
 		// Use distributed config
 		if (ctx instanceof DistributedContext o) {
 			dtx = o;
+			// A genuinely distributed run brings its own wire codec (see DistributedContext.create).
+			bind(SerializationProvider.class).toInstance(dtx.getSerializer());
 		} else {
-			// Create a distributed contex from the local one if none was given
+			// Create a distributed context from the local one if none was given. A single-node run never transfers
+			// messages between compute nodes, so no real serialization codec is required.
 			dtx = DistributedContext.createLocal(new NullCommunicator(), getSimulationContext().getTopology());
 			ctx = dtx;
+			bind(SerializationProvider.class).to(NoopSerializationProvider.class).in(Singleton.class);
 		}
 
 		bind(Communicator.class).toInstance(dtx.getComm());
 		bind(MessageTypeRegistry.class).toInstance(MessageTypeRegistry.getInstance());
-		bind(SerializationProvider.class).toInstance(dtx.getSerializer());
 
 		bind(MessageBroker.class).in(Singleton.class);
 		bind(DistributedEventsManager.class).in(Singleton.class);
