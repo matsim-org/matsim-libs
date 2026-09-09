@@ -367,24 +367,15 @@
 			<version>1.7</version>
 		</dependency>
 
-		<!-- Scan classpath to find providers -->
+		<!-- Scan classpath to find message types (org.matsim.core.serialization.MessageTypeRegistry) -->
 		<dependency>
 			<groupId>io.github.classgraph</groupId>
 			<artifactId>classgraph</artifactId>
 		</dependency>
 
-		<!-- These are for distributed simulation -->
-		<dependency>
-			<groupId>org.apache.fory</groupId>
-			<artifactId>fory-core</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.fory</groupId>
-			<artifactId>fory-format</artifactId>
-			<optional>true</optional>
-		</dependency>
-
+		<!-- Infrastructure for the DSim mobsim. The wire serialization (Fory) and the multi-node
+		     communicators live in the distributed-simulation contrib and are only needed to actually
+		     run a simulation across several compute nodes. -->
 		<dependency>
 			<groupId>org.agrona</groupId>
 			<artifactId>agrona</artifactId>
