@@ -1,23 +1,12 @@
 package org.matsim.core.serialization;
 
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfo;
-import io.github.classgraph.ScanResult;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.fory.Fory;
 import org.apache.fory.ThreadSafeFory;
 import org.apache.fory.config.Language;
 import org.apache.fory.memory.MemoryBuffer;
-import org.apache.fory.reflect.ReflectionUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Message;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.serialization.custom.AttributesSerializer;
 import org.matsim.core.serialization.custom.IdSerializer;
 import org.matsim.core.serialization.custom.IntArrayListSerializer;
@@ -27,6 +16,10 @@ import java.nio.ByteBuffer;
 
 /**
  * Provides serialization and deserialization of messages.
+ * <p>
+ * The message type catalog (which classes exist and what their ids are) lives in {@link MessageTypeRegistry}; this class
+ * only deals with turning those messages into bytes and back. It is only needed for runs that span multiple compute
+ * nodes.
  */
 public class SerializationProvider {
 
@@ -36,8 +29,7 @@ public class SerializationProvider {
 		return INSTANCE;
 	}
 
-	private final Int2ObjectMap<Class<? extends Message>> type2Class = new Int2ObjectOpenHashMap<>(128);
-	private final Object2IntMap<Class<? extends Message>> class2Type = new Object2IntOpenHashMap<>();
+	private final MessageTypeRegistry registry = MessageTypeRegistry.getInstance();
 
 	private final ThreadSafeFory fory;
 
@@ -71,37 +63,9 @@ public class SerializationProvider {
 		fory.registerSerializer(IntArrayList.class, IntArrayListSerializer.class);
 		fory.registerSerializer(AttributesImpl.class, AttributesSerializer.class);
 
-		try (ScanResult scanResult = new ClassGraph().enableClassInfo().scan()) {
-
-			// Register classes that are likely to be used as messages
-
-			for (ClassInfo info : scanResult.getClassesImplementing(Message.class)
-				.union(scanResult.getSubclasses(Event.class))
-				.union(scanResult.getSubclasses(Leg.class))
-				.union(scanResult.getSubclasses(Activity.class))
-			) {
-
-				@SuppressWarnings("unchecked")  // we filter for Subclasses of Message above, so this cast is safe.
-				Class<? extends Message> msgClass = (Class<? extends Message>) info.loadClass();
-
-				if (msgClass.isInterface() || ReflectionUtils.isAbstract(msgClass))
-					continue;
-
-				int msgType = msgClass.getName().hashCode();
-
-				// Protobuf message
-				fory.register(msgClass);
-
-				if (type2Class.containsKey(msgType)) {
-					throw new IllegalArgumentException("Duplicate provider for type %s. %s already registered.".formatted(msgClass,
-						type2Class.get(msgType)));
-				}
-
-//                System.out.println("Registering " + msgType.getSimpleName() + " with type " + msgType);
-				type2Class.put(msgType, msgClass);
-				class2Type.put(msgClass, msgType);
-
-			}
+		// Register all classes that are likely to be used as messages
+		for (Class<? extends Message> msgClass : registry.messageClasses()) {
+			fory.register(msgClass);
 		}
 	}
 
@@ -120,13 +84,14 @@ public class SerializationProvider {
 		return (T) fory.deserialize(buf);
 	}
 
+	@SuppressWarnings("unchecked")
 	public Message deserialize(MemoryBuffer in, int type) {
-		var msgClass = type2Class.get(type);
+		var msgClass = registry.getType(type);
 		if (msgClass == null) {
 			throw new IllegalArgumentException("Type " + type + " was not registered for serialization. Messages that should be serialized must be at least package private to be detected.");
 		}
 
-		return deserialize(in, msgClass);
+		return deserialize(in, (Class<? extends Message>) msgClass);
 	}
 
 	public <T extends Message> T deserialize(MemoryBuffer in, Class<T> clazz) {
@@ -134,7 +99,7 @@ public class SerializationProvider {
 	}
 
 	public <T extends Message> byte[] serialize(T message) {
-		if (!class2Type.containsKey(message.getClass())) {
+		if (!registry.isRegistered(message.getClass())) {
 			throw new IllegalArgumentException("Class " + message.getClass() + " was not registered for serialization. Messages that should be serialized must be at least package private to be detected.");
 		}
 		try {
@@ -146,47 +111,28 @@ public class SerializationProvider {
 
 	@Override
 	public String toString() {
-		return "SerializationProvider{" +
-			"classes=" + type2Class +
-			'}';
+		return "SerializationProvider{registry=" + registry + '}';
 	}
 
 	/**
 	 * Return whether the given type is supported.
 	 */
 	public boolean hasType(int type) {
-		return type == Event.ANY_TYPE || type2Class.containsKey(type);
+		return registry.hasType(type);
 	}
 
 	/**
-	 * Returns all types for a given class. This is useful for event handlers which listen to a baseclass
-	 * of events. For example, an event handler that listens for ActivityEvents also needs to handle SpecializedActivityEvents if
-	 * those extend ActivityEvent. This method will return a list of message types for the given class and all
-	 * its subclasses found in the object graph.
-	 *
-	 * @param clazz the class to find assignable types for
-	 * @return an array of types for all known subclasses of clazz including the type for clazz itself.
+	 * @see MessageTypeRegistry#getAssignableTypes(Class)
 	 */
 	public int[] getAssignableTypes(Class<?> clazz) {
-		return class2Type.keySet().stream()
-			.filter(clazz::isAssignableFrom)
-			.mapToInt(this::getType)
-			.toArray();
+		return registry.getAssignableTypes(clazz);
 	}
 
 	public int getType(Class<?> msgType) {
-		if (msgType == Event.class) {
-			return Event.ANY_TYPE;
-		}
-
-		if (!class2Type.containsKey(msgType)) {
-			throw new IllegalArgumentException("No type for class " + msgType);
-		}
-
-		return class2Type.getInt(msgType);
+		return registry.getType(msgType);
 	}
 
 	public Class<?> getType(int type) {
-		return type == Event.ANY_TYPE ? Event.class : type2Class.get(type);
+		return registry.getType(type);
 	}
 }
