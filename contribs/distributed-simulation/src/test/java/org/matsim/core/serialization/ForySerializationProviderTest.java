@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.events.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-class SerializationProviderTest {
+class ForySerializationProviderTest {
 
 	private final SerializationProvider provider = new ForySerializationProvider(MessageTypeRegistry.getInstance());
 
