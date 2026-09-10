@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Communicator for a single-node run: there is nobody to talk to. All collective operations resolve locally without ever
- * touching the {@link SerializationProvider}, so a single-node run works without a real wire codec on the classpath.
+ * Communicator for a single-node run. Every collective operation resolves locally and never touches the
+ * {@link SerializationProvider}, so a single-node run needs no wire codec on the classpath.
  */
 public class NullCommunicator implements Communicator {
 

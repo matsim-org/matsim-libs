@@ -6,9 +6,8 @@ import org.matsim.api.core.v01.Message;
 import java.nio.ByteBuffer;
 
 /**
- * {@link SerializationProvider} used for single-node simulation runs, which never transfer messages between compute
- * nodes. Every method fails: if a single-node run ever reaches this code, message serialization was attempted where it
- * should not have been, or the {@code distributed-simulation} contrib is missing from the classpath.
+ * {@link SerializationProvider} bound for single-node runs. Every method throws: reaching this code means a single-node
+ * run attempted cross-node serialization, or the {@code distributed-simulation} contrib is missing from the classpath.
  */
 public final class NoopSerializationProvider implements SerializationProvider {
 

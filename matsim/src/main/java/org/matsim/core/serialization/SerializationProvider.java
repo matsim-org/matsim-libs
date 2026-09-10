@@ -5,15 +5,11 @@ import org.matsim.api.core.v01.Message;
 import java.nio.ByteBuffer;
 
 /**
- * Turns {@link Message} objects into bytes and back for transfer between compute nodes.
+ * Turns {@link Message} objects into bytes and back for transfer between compute nodes. Only runs that span multiple
+ * compute nodes need this; the implementation ({@code ForySerializationProvider}) and its Fory dependency live in the
+ * {@code distributed-simulation} contrib. Single-node runs bind a {@link NoopSerializationProvider}.
  * <p>
- * This is only needed for simulation runs that actually span multiple compute nodes. Single-node runs (including
- * multi-threaded ones) never serialize any message and get a {@link NoopSerializationProvider}. The wire format
- * implementation ({@code ForySerializationProvider}) and its dependency on Fory live in the {@code distributed-simulation}
- * contrib.
- * <p>
- * The message type catalog (which classes exist and what their ids are) is independent of the wire format and lives in
- * {@link MessageTypeRegistry}.
+ * The message type catalog is a separate concern, see {@link MessageTypeRegistry}.
  */
 public interface SerializationProvider {
 

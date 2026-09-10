@@ -31,9 +31,8 @@ public final class DistributedContext implements ExecutionContext {
 	private final SerializationProvider serializer;
 
 	/**
-	 * The wire codec for cross-node message transfer. Only set for contexts created for a genuinely distributed run;
-	 * {@code null} for a locally created context, where {@link org.matsim.core.serialization.NoopSerializationProvider} is
-	 * bound instead.
+	 * The wire codec for cross-node message transfer, or {@code null} for a single-node context (which binds
+	 * {@link org.matsim.core.serialization.NoopSerializationProvider} instead).
 	 */
 	public SerializationProvider getSerializer() {
 		return serializer;
@@ -47,8 +46,7 @@ public final class DistributedContext implements ExecutionContext {
 	}
 
 	/**
-	 * Create a local context for a single-node run. No serialization codec is needed; message transfer never leaves the
-	 * jvm.
+	 * Create a context for a single-node run. No wire codec is needed, since messages never leave the JVM.
 	 */
 	public static DistributedContext createLocal(Communicator comm, Topology topology) {
 

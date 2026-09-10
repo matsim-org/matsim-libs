@@ -16,16 +16,13 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 
 /**
- * Catalog of all {@link Message} types on the classpath and their stable integer type ids.
+ * Catalog of every concrete {@link Message} type on the classpath, each mapped to a stable integer id derived from its
+ * fully qualified class name. The scan (via {@link ClassGraph}) also picks up subclasses of {@link Event}, {@link Leg}
+ * and {@link Activity}. The ids identify messages and events as they are routed through the simulation, whether or not
+ * the run is distributed.
  * <p>
- * The registry scans the classpath once (using {@link ClassGraph}) to find every concrete class that implements
- * {@link Message} - including subclasses of {@link Event}, {@link Leg} and {@link Activity} - and assigns each a stable
- * id derived from its fully qualified class name. These ids are used to route messages and events through the distributed
- * simulation, regardless of whether the run is actually distributed.
- * <p>
- * The classpath scan is comparatively expensive, therefore this class is a lazily initialized singleton. It contains no
- * serialization logic and has no dependency on the wire format; see {@link SerializationProvider} for the actual
- * serialization, which is only required for runs that span multiple compute nodes.
+ * The classpath scan is expensive, so this is a lazily initialized singleton. Wire-format serialization is a separate
+ * concern, handled by {@link SerializationProvider}.
  */
 public final class MessageTypeRegistry {
 
@@ -102,13 +99,11 @@ public final class MessageTypeRegistry {
 	}
 
 	/**
-	 * Returns all types for a given class. This is useful for event handlers which listen to a baseclass
-	 * of events. For example, an event handler that listens for ActivityEvents also needs to handle SpecializedActivityEvents if
-	 * those extend ActivityEvent. This method will return a list of message types for the given class and all
-	 * its subclasses found in the object graph.
+	 * Returns the type ids of {@code clazz} and every known subclass of it. A handler subscribed to a base event type
+	 * (e.g. {@code ActivityEvent}) uses this to also receive its more specific subtypes.
 	 *
 	 * @param clazz the class to find assignable types for
-	 * @return an array of types for all known subclasses of clazz including the type for clazz itself.
+	 * @return type ids for {@code clazz} and all its known subclasses
 	 */
 	public int[] getAssignableTypes(Class<?> clazz) {
 		return class2Type.keySet().stream()

@@ -373,9 +373,8 @@
 			<artifactId>classgraph</artifactId>
 		</dependency>
 
-		<!-- Infrastructure for the DSim mobsim. The wire serialization (Fory) and the multi-node
-		     communicators live in the distributed-simulation contrib and are only needed to actually
-		     run a simulation across several compute nodes. -->
+		<!-- Messaging internals of the DSim mobsim: agrona provides the lock-free queues and idle strategies,
+		     HdrHistogram the latency statistics. -->
 		<dependency>
 			<groupId>org.agrona</groupId>
 			<artifactId>agrona</artifactId>

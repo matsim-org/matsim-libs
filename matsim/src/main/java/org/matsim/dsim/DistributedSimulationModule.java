@@ -31,7 +31,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		if (ctx instanceof DistributedContext o) {
 			dtx = o;
 		} else {
-			// Create a distributed context from the local one if none was given.
+			// No distributed context was supplied, so build a single-node one.
 			dtx = DistributedContext.createLocal(new NullCommunicator(), getSimulationContext().getTopology());
 			ctx = dtx;
 		}
@@ -39,8 +39,8 @@ public class DistributedSimulationModule extends AbstractModule {
 		bind(Communicator.class).toInstance(dtx.getComm());
 		bind(MessageTypeRegistry.class).toInstance(MessageTypeRegistry.getInstance());
 
-		// A run that spans several compute nodes brings its own wire codec (see DistributedContext.create). A
-		// single-node run never transfers messages between nodes, so no real serialization codec is required.
+		// A multi-node run supplies its own wire codec via DistributedContext.create; a single-node run gets the
+		// no-op provider, since its messages never leave the JVM.
 		if (dtx.getSerializer() != null) {
 			bind(SerializationProvider.class).toInstance(dtx.getSerializer());
 		} else {

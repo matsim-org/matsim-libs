@@ -17,7 +17,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import java.nio.ByteBuffer;
 
 /**
- * Fory-backed {@link SerializationProvider}. This implementation is only used for runs that span multiple compute nodes.
+ * Fory-backed {@link SerializationProvider}, used for runs that span multiple compute nodes.
  */
 @Singleton
 public class ForySerializationProvider implements SerializationProvider {
@@ -31,8 +31,7 @@ public class ForySerializationProvider implements SerializationProvider {
 
 		this.registry = registry;
 
-		// Fory uses its own verbose logging. Disable this manually here, so users don't see the internals of how Fory compiles classes into
-		// wire formats.
+		// Silence Fory's own logging; its class-compilation chatter is noise to MATSim users.
 		org.apache.fory.logging.LoggerFactory.disableLogging();
 
 		fory = Fory.builder().withLanguage(Language.JAVA)

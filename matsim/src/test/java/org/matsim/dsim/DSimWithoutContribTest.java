@@ -19,10 +19,9 @@ import org.matsim.testcases.utils.EventsCollector;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * A single compute node run of the {@code dsim} mobsim must work with only the matsim core on the classpath. In
- * particular Fory (the wire codec) is not a dependency of this module, so if the run touched
- * {@code ForySerializationProvider} it would fail with a {@link NoClassDefFoundError}. The distributed-simulation contrib
- * is only required to run across multiple compute nodes.
+ * A single-node run of the {@code dsim} mobsim must work with only the matsim core on the classpath. Fory is not a
+ * dependency of this module, so any attempt to load {@code ForySerializationProvider} would fail with a
+ * {@link NoClassDefFoundError}. The distributed-simulation contrib is only needed for runs across multiple compute nodes.
  */
 class DSimWithoutContribTest {
 

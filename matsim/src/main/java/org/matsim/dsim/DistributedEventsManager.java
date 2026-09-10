@@ -218,7 +218,7 @@ public final class DistributedEventsManager implements EventsManager {
 
 		for (var type : task.getSupportedMessages()) {
 			if (!typeRegistry.hasType(type)) {
-				log.warn("No serializer for type {} from task {}", type, task.getName());
+				log.warn("Unknown message type {} from task {}", type, task.getName());
 				continue;
 			}
 			long address = MessageBroker.address(part, type);
