@@ -54,6 +54,7 @@ import java.net.URL;
 import java.util.*;
 
 import static org.matsim.core.config.groups.PlansConfigGroup.PERSON_ATTRIBUTES_DEPRECATION_MESSAGE;
+import static org.matsim.core.scenario.ScenarioFileFormatRegistry.getProvider;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -134,14 +135,16 @@ class ScenarioLoaderImpl {
 			URL networkUrl = this.config.network().getInputFileURL(this.config.getContext());
 			log.info("loading network from " + networkUrl);
 			String inputCRS = config.network().getInputCRS();
+			String targetCRS = config.global().getCoordinateSystem();
 
-			MatsimNetworkReader reader =
-					new MatsimNetworkReader(
-							inputCRS,
-							config.global().getCoordinateSystem(),
-							this.scenario.getNetwork());
-            reader.putAttributeConverters( attributeConverters );
-            reader.parse(networkUrl);
+			Optional<ScenarioFileFormat> provider = getProvider(this.config.network().getInputFile());
+			if (provider.isPresent()) {
+				provider.get().readNetwork(networkUrl, this.scenario, inputCRS, targetCRS, attributeConverters);
+			} else {
+				MatsimNetworkReader reader = new MatsimNetworkReader(inputCRS, targetCRS, this.scenario.getNetwork());
+				reader.putAttributeConverters(attributeConverters);
+				reader.parse(networkUrl);
+			}
 
 			if ((this.config.network().getChangeEventsInputFile()!= null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile());
@@ -162,9 +165,14 @@ class ScenarioLoaderImpl {
 			final String inputCRS = config.facilities().getInputCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-            MatsimFacilitiesReader reader = new MatsimFacilitiesReader(inputCRS, internalCRS, this.scenario.getActivityFacilities());
-            reader.putAttributeConverters(attributeConverters);
-            reader.parse(facilitiesFileName);
+			Optional<ScenarioFileFormat> provider = getProvider(this.config.facilities().getInputFile());
+			if (provider.isPresent()) {
+				provider.get().readFacilities(facilitiesFileName, this.scenario, inputCRS, internalCRS, attributeConverters);
+			} else {
+				MatsimFacilitiesReader reader = new MatsimFacilitiesReader(inputCRS, internalCRS, this.scenario.getActivityFacilities());
+				reader.putAttributeConverters(attributeConverters);
+				reader.parse(facilitiesFileName);
+			}
 
 			log.info("loaded " + this.scenario.getActivityFacilities().getFacilities().size() + " facilities from " + facilitiesFileName);
 		}
@@ -195,12 +203,17 @@ class ScenarioLoaderImpl {
 			URL populationFileName = this.config.plans().getInputFileURL(this.config.getContext());
 			log.info("loading population from " + populationFileName);
 
-            final String targetCRS = config.global().getCoordinateSystem();
+			final String targetCRS = config.global().getCoordinateSystem();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-            final PopulationReader reader = new PopulationReader(targetCRS, internalCRS, this.scenario);
-            reader.putAttributeConverters( attributeConverters );
-            reader.parse( populationFileName );
+			Optional<ScenarioFileFormat> provider = getProvider(this.config.plans().getInputFile());
+			if (provider.isPresent()) {
+				provider.get().readPopulation(populationFileName, this.scenario, targetCRS, internalCRS, attributeConverters);
+			} else {
+				final PopulationReader reader = new PopulationReader(targetCRS, internalCRS, this.scenario);
+				reader.putAttributeConverters(attributeConverters);
+				reader.parse(populationFileName);
+			}
 
 			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
 		}
@@ -249,9 +262,15 @@ class ScenarioLoaderImpl {
 		if ( (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
 			URL householdsFile = this.config.households().getInputFileURL(this.config.getContext());
 			log.info("loading households from " + householdsFile);
-			HouseholdsReaderV10 reader = new HouseholdsReaderV10(this.scenario.getHouseholds());
-			reader.putAttributeConverters(this.attributeConverters);
-			reader.parse(householdsFile);
+
+			Optional<ScenarioFileFormat> provider = getProvider(this.config.households().getInputFile());
+			if (provider.isPresent()) {
+				provider.get().readHouseholds(householdsFile, this.scenario, attributeConverters);
+			} else {
+				HouseholdsReaderV10 reader = new HouseholdsReaderV10(this.scenario.getHouseholds());
+				reader.putAttributeConverters(this.attributeConverters);
+				reader.parse(householdsFile);
+			}
 			log.info("households loaded.");
 		}
 		else {
@@ -286,7 +305,12 @@ class ScenarioLoaderImpl {
 			final String inputCRS = config.transit().getInputScheduleCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-            new TransitScheduleReader( inputCRS, internalCRS, this.scenario).readURL(transitScheduleFile );
+			Optional<ScenarioFileFormat> provider = getProvider(this.config.transit().getTransitScheduleFile());
+			if (provider.isPresent()) {
+				provider.get().readTransitSchedule(transitScheduleFile, this.scenario, inputCRS, internalCRS);
+			} else {
+				new TransitScheduleReader(inputCRS, internalCRS, this.scenario).readURL(transitScheduleFile);
+			}
 		}
 		else {
 			log.info("no transit schedule file set in config, not loading any transit schedule");
@@ -327,7 +351,14 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.transit().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading transit vehicles from " + vehiclesFile);
-			new MatsimVehicleReader(this.scenario.getTransitVehicles()).readURL(this.config.transit().getVehiclesFileURL(this.config.getContext() ) );
+			URL transitVehiclesUrl = this.config.transit().getVehiclesFileURL(this.config.getContext());
+
+			Optional<ScenarioFileFormat> provider = getProvider(vehiclesFile);
+			if (provider.isPresent()) {
+				provider.get().readTransitVehicles(transitVehiclesUrl, this.scenario);
+			} else {
+				new MatsimVehicleReader(this.scenario.getTransitVehicles()).readURL(transitVehiclesUrl);
+			}
 		}
 		else {
 			log.info("no transit vehicles file set in config, not loading any transit vehicles");
@@ -337,7 +368,14 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.vehicles().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading vehicles from " + vehiclesFile );
-			new MatsimVehicleReader(this.scenario.getVehicles()).readURL(IOUtils.extendUrl(this.config.getContext(), vehiclesFile ) );
+			URL vehiclesUrl = IOUtils.extendUrl(this.config.getContext(), vehiclesFile);
+
+			Optional<ScenarioFileFormat> provider = getProvider(vehiclesFile);
+			if (provider.isPresent()) {
+				provider.get().readVehicles(vehiclesUrl, this.scenario);
+			} else {
+				new MatsimVehicleReader(this.scenario.getVehicles()).readURL(vehiclesUrl);
+			}
 		}
 		else {
 			log.info("no vehicles file set in config, not loading any vehicles");
