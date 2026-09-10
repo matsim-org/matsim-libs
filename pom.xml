@@ -43,6 +43,8 @@
 		<fastutil.version>8.5.19</fastutil.version>
 		<!-- We have transitive dependencies to this dependency. Therefore, move it here, so we have one version across the project -->
 		<protobuf-javalite.version>4.36.1</protobuf-javalite.version>
+		<!-- default for the failsafe configuration below; overridden by -DskipTests on the command line -->
+		<skipTests>false</skipTests>
 	</properties>
 
 	<scm>
@@ -499,6 +501,10 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
 					<version>3.6.0</version>
+					<configuration>
+						<!-- Since 3.6.0 failsafe no longer reads the skipTests user property (only skipITs), so -DskipTests would run the ITs. -->
+						<skipTests>${skipTests}</skipTests>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
