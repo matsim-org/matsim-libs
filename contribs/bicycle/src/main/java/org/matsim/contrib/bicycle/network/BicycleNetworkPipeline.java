@@ -643,12 +643,15 @@ public class BicycleNetworkPipeline implements MATSimAppCommand {
 	}
 
 	/**
-	 * The OSM reader stores {@code origid} as {@link Long}, but
-	 * {@link NetworkUtils#getOrigId} -- called by {@link NetworkSimplifier}
-	 * whenever it merges two links -- casts the attribute to {@link String} and
-	 * would throw a {@link ClassCastException} on the first merge. Convert once
-	 * up front; this also gives the attribute a single consistent type in the
-	 * output (previously unmerged links carried Long, merged links String).
+	 * The OSM reader stores {@code origid} as {@link Long}, while
+	 * {@link NetworkSimplifier} writes a {@link String} whenever it merges two links.
+	 * Converting once up front gives the attribute a single consistent type in the
+	 * output; without it, unmerged links carry Long and merged links String.
+	 *
+	 * <p>This used to be load-bearing: {@link NetworkUtils#getOrigId} cast the
+	 * attribute to {@link String} and threw on the first merge of a Long-valued
+	 * {@code origid}. It reads the value via {@code toString()} since matsim-libs
+	 * #5107, so only the consistent output type is left as a reason.
 	 *
 	 * @return the number of links whose origid was converted to String
 	 */
