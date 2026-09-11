@@ -140,7 +140,7 @@ public class EvChargingIntegrationTest {
 
 					var scenario = createScenario(config, size);
 
-					var ctx = DistributedContext.create(comm, config);
+					var ctx = DistributedContext.create(comm, config, new org.matsim.core.serialization.ForySerializationProvider(org.matsim.core.serialization.MessageTypeRegistry.getInstance()));
 					var controller = new Controler(scenario, ctx);
 					installModules(controller);
 

@@ -1,6 +1,5 @@
 package org.matsim.core.serialization;
 
-import org.apache.fory.memory.MemoryBuffer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -8,11 +7,12 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
-class SerializationProviderTest {
+class ForySerializationProviderTest {
 
-	private final SerializationProvider provider = SerializationProvider.getInstance();
+	private final SerializationProvider provider = new ForySerializationProvider(MessageTypeRegistry.getInstance());
 
 	@Test
 	void serializeEvents() {
@@ -29,11 +29,12 @@ class SerializationProviderTest {
 
 			var bytes = provider.serialize(event);
 
-			MemoryBuffer buf = MemoryBuffer.fromByteArray(bytes);
+			ByteBuffer buf = ByteBuffer.wrap(bytes);
 
 			Message result = provider.deserialize(buf, event.getType());
 
 			Assertions.assertEquals(event, result);
+			Assertions.assertEquals(bytes.length, buf.position(), "deserialize must advance the buffer position");
 		}
 	}
 }

@@ -43,6 +43,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * This class provides helper methods for input/output in MATSim.
@@ -98,6 +101,7 @@ import java.util.zip.GZIPOutputStream;
  * <li><code>*.lz4</code>: LZ4 compression</li>
  * <li><code>*.bz2</code>: Bzip2 compression</li>
  * <li><code>*.zst</code>: ZStandard compression</li>
+ * <li><code>*.zip</code>: ZIP compression (single entry per archive)</li>
  * </ul>
  *
  * <h2>Encryption</h2>
@@ -140,7 +144,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	private IOUtils() {
 	}
 
-	private enum CompressionType { GZIP, LZ4, BZIP2, ZSTD }
+	private enum CompressionType { GZIP, LZ4, BZIP2, ZSTD, ZIP }
 
 	// Define compressions that can be used.
 	private static final Map<String, CompressionType> COMPRESSION_EXTENSIONS = new TreeMap<>();
@@ -150,6 +154,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		COMPRESSION_EXTENSIONS.put("lz4", CompressionType.LZ4);
 		COMPRESSION_EXTENSIONS.put("bz2", CompressionType.BZIP2);
 		COMPRESSION_EXTENSIONS.put("zst", CompressionType.ZSTD);
+		COMPRESSION_EXTENSIONS.put("zip", CompressionType.ZIP);
 	}
 
 	private static int zstdCompressionLevel = 3;
@@ -299,6 +304,11 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 					case ZSTD:
 						inputStream = new ZstdInputStream(inputStream);
 						break;
+					case ZIP:
+						ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+						zipInputStream.getNextEntry();
+						inputStream = zipInputStream;
+						break;
 				}
 			}
 
@@ -368,6 +378,15 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 						break;
 					case ZSTD:
 						outputStream = new ZstdOutputStream(outputStream, zstdCompressionLevel);
+						break;
+					case ZIP:
+						ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+						String zipEntryName = file.getName();
+						if (zipEntryName.toLowerCase(Locale.ROOT).endsWith(".zip")) {
+							zipEntryName = zipEntryName.substring(0, zipEntryName.length() - 4);
+						}
+						zipOutputStream.putNextEntry(new ZipEntry(zipEntryName));
+						outputStream = zipOutputStream;
 						break;
 				}
 			}

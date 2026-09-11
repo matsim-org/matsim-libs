@@ -82,7 +82,7 @@ public class DistributedController implements ControlerI {
 
 		config.dsim().setThreads(threads);
 
-		DistributedContext ctx = DistributedContext.create(comm, config);
+		DistributedContext ctx = DistributedContext.create(comm, config, new org.matsim.core.serialization.ForySerializationProvider(org.matsim.core.serialization.MessageTypeRegistry.getInstance()));
 		Controler defaultController = new Controler(scenario, ctx);
 
 		Injector injector = defaultController.getInjector();

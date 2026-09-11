@@ -28,6 +28,14 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
+		<!-- DrtIntegrationTest exercises DRT on the DSim mobsim across several ranks, which needs the Fory wire codec. -->
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>distributed-simulation</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
