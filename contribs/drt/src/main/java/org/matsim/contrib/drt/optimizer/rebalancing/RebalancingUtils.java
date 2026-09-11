@@ -48,7 +48,7 @@ public class RebalancingUtils {
 		rebalancableVehicles.filter(v -> v.getServiceEndTime() > time + params.getMinServiceTime()).forEach(v -> {
 			Link link = ((StayTask)v.getSchedule().getCurrentTask()).getLink();
 			Zone zone = zoneSystem.getZoneForLinkId(link.getId())
-				.orElse(ZoneImpl.createDummyZone(Id.create("single-vehicle-zone-" + v.getId(), Zone.class),
+				.orElseGet(() -> ZoneImpl.createDummyZone(Id.create("single-vehicle-zone-" + v.getId(), Zone.class),
 				link.getToNode().getCoord()));
 			rebalancableVehiclesPerZone.computeIfAbsent(zone, z -> new ArrayList<>()).add(v);
 		});

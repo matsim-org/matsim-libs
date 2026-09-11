@@ -92,7 +92,7 @@ public class Fixture {
 		conf.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(24.0 * 3600.0);
-		conf.scoring().addActivityParams(params);
+		conf.scoring().addDefaultActivityParams(params);
 
 		StrategySettings settings = new StrategySettings(Id.create("1", StrategySettings.class));
 		settings.setStrategyName("ChangeExpBeta");

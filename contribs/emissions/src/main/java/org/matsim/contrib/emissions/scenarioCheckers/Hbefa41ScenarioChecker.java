@@ -14,6 +14,8 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.util.Arrays;
 
+import static org.matsim.contrib.emissions.utils.HbefaUtils.AVERAGE;
+
 public class Hbefa41ScenarioChecker implements ScenarioChecker {
 	private static final Logger log = LogManager.getLogger(Hbefa41ScenarioChecker.class);
 
@@ -37,6 +39,7 @@ public class Hbefa41ScenarioChecker implements ScenarioChecker {
 
 		if (ConfigUtils.hasModule(scenario.getConfig(), EmissionsConfigGroup.class)) {
 			problem = checkHbefaTechnology(scenario, lvl, problem);
+			problem = checkHbefaEmissionConcept(scenario, lvl, problem);
 		}
 
 		if (problem && scenario.getConfig().vspExperimental().getVspDefaultsCheckingLevel() == VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort) {
@@ -64,7 +67,7 @@ public class Hbefa41ScenarioChecker implements ScenarioChecker {
 						t.id.equals(VehicleUtils.getHbefaTechnology(type.getEngineInformation())));
 
 //				allow average as technology
-				if (!validTechnology && VehicleUtils.getHbefaTechnology(type.getEngineInformation()).equals("average")) {
+				if (!validTechnology && VehicleUtils.getHbefaTechnology(type.getEngineInformation()).equals(AVERAGE)) {
 					validTechnology = true;
 				}
 
@@ -80,6 +83,19 @@ public class Hbefa41ScenarioChecker implements ScenarioChecker {
 			log.log(lvl, "You have configured vehicle types with invalid hbefa technology settings." +
 				"For Hbefa4.1 valid technologies are: {}", (Object) HbefaTechnology.values());
 			problem = true;
+		}
+		return problem;
+	}
+
+	private boolean checkHbefaEmissionConcept(Scenario scenario, Level lvl, boolean problem) {
+		for (VehicleType type : scenario.getVehicles().getVehicleTypes().values()) {
+			if (!type.getEngineInformation().getAttributes().isEmpty()
+				&& !AVERAGE.equals(VehicleUtils.getHbefaEmissionsConcept(type.getEngineInformation()))) {
+				log.log(lvl, "You have configured vehicle types with invalid hbefa emission concept settings."
+					+ " For Hbefa4.1, the only valid emission concept is: {}. " +
+					"If you want to analyse air pollution of different engine types, please use param HbefaTechnology.", AVERAGE);
+				return true;
+			}
 		}
 		return problem;
 	}

@@ -53,7 +53,7 @@ public class OutputTravelStatsTest {
 
 		ScoringConfigGroup.ModeParams walkParams = new ScoringConfigGroup.ModeParams("walk");
 		walkParams.setMarginalUtilityOfTraveling(0);
-		config.scoring().addModeParams(walkParams);
+		config.scoring().addDefaultModeParams(walkParams);
 
 		Controler c = new Controler(config);
 

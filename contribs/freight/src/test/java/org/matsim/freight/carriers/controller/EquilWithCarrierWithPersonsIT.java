@@ -51,8 +51,8 @@ public class EquilWithCarrierWithPersonsIT {
 	static Config commonConfig( MatsimTestUtils testUtils ) {
 		Config config = ConfigUtils.createConfig();
 
-		config.scoring().addActivityParams( new ActivityParams("w").setTypicalDuration(60 * 60 * 8 ) );
-		config.scoring().addActivityParams( new ActivityParams("h").setTypicalDuration(16 * 60 * 60 ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams("w").setTypicalDuration(60 * 60 * 8 ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams("h").setTypicalDuration(16 * 60 * 60 ) );
 		config.global().setCoordinateSystem("EPSG:32632");
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(2);

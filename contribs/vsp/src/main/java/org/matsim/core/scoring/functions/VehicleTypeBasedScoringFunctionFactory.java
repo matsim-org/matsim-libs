@@ -26,7 +26,7 @@ public class VehicleTypeBasedScoringFunctionFactory implements ScoringFunctionFa
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 		ScoringParameters parameters = params.getScoringParameters(person);
-		var scoringParameterSet = scenario.getConfig().scoring().getScoringParameters(PopulationUtils.getSubpopulation(person));
+		var scoringParameterSet = scenario.getConfig().scoring().getScoringParametersOrDefault(PopulationUtils.getSubpopulation(person));
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		sumScoringFunction.addScoringFunction(new ActivityScoringForCommercialActivities(parameters));

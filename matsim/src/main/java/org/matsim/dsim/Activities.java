@@ -72,24 +72,24 @@ public enum Activities {
 
         for (Activities value : Activities.values()) {
             for (long ii = 600; ii <= 97200; ii += 600) {
-                config.scoring().addActivityParams(value.apply(new ScoringConfigGroup.ActivityParams(value.name() + "_" + ii).setTypicalDuration(ii)));
+                config.scoring().addDefaultActivityParams(value.apply(new ScoringConfigGroup.ActivityParams(value.name() + "_" + ii).setTypicalDuration(ii)));
             }
         }
 
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("car interaction").setScoringThisActivityAtAll(false));
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("ride interaction").setScoringThisActivityAtAll(false));
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("bike interaction").setScoringThisActivityAtAll(false));
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("freight interaction").setScoringThisActivityAtAll(false));
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("pt interaction").setScoringThisActivityAtAll(false));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("car interaction").setScoringThisActivityAtAll(false));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("ride interaction").setScoringThisActivityAtAll(false));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("bike interaction").setScoringThisActivityAtAll(false));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("freight interaction").setScoringThisActivityAtAll(false));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("pt interaction").setScoringThisActivityAtAll(false));
 
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("service").setTypicalDuration(600 * 3));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("service").setTypicalDuration(600 * 3));
 
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
 
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("commercial_start").setTypicalDuration(3600));
-        config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("commercial_end").setTypicalDuration(3600));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("commercial_start").setTypicalDuration(3600));
+        config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("commercial_end").setTypicalDuration(3600));
     }
 
     /**

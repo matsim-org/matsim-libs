@@ -37,9 +37,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.DrtModeRoutingModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.load.IntegerLoadType;
@@ -239,6 +241,78 @@ public class DrtRoutingModuleTest {
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assertions.assertNull(routedList6);
 
+	}
+
+	/**
+	 * maxWalkDistance is a property of the constraints set, and which constraints set applies is decided per trip by
+	 * the {@link org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser}. Hence, the stop search has to
+	 * follow the chosen set instead of always using the default set.
+	 */
+	@Test
+	void testStopFinderFollowsTheChosenConstraintSet() {
+		Scenario scenario = createTestScenario();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario, 0.83333,
+				1.3, null);
+		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
+		String drtMode = "DrtX";
+		drtCfg.setMode(drtMode);
+
+		DrtOptimizationConstraintsSetImpl defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams()
+				.addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.setMaxWalkDistance(200);
+		defaultConstraintsSet.setMaxTravelTimeAlpha(1.5);
+		defaultConstraintsSet.setMaxTravelTimeBeta(5 * 60);
+		defaultConstraintsSet.setMaxWaitTime(5 * 60);
+
+		DrtOptimizationConstraintsSetImpl longWalkConstraintsSet = new DrtOptimizationConstraintsSetImpl();
+		longWalkConstraintsSet.setConstraintSetName("longWalk");
+		longWalkConstraintsSet.setMaxWalkDistance(5000);
+		longWalkConstraintsSet.setMaxTravelTimeAlpha(1.5);
+		longWalkConstraintsSet.setMaxTravelTimeBeta(5 * 60);
+		longWalkConstraintsSet.setMaxWaitTime(5 * 60);
+		drtCfg.addOrGetDrtOptimizationConstraintsParams().addParameterSet(longWalkConstraintsSet);
+
+		// person 2 is allowed to walk far, everybody else is not
+		Person p2 = scenario.getPopulation().getPersons().get(Id.createPersonId(2));
+		ConstraintSetChooser constraintSetChooser = (departureTime, accessActLink, egressActLink, person, tripAttributes) -> Optional.of(
+				person == p2 ? longWalkConstraintsSet : defaultConstraintsSet);
+
+		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
+				.getFacilities()
+				.values()
+				.stream()
+				.map(DrtStopFacilityImpl::createFromFacility)
+				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
+
+		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(
+				DrtModeRoutingModule.maxWalkDistance(constraintSetChooser, defaultConstraintsSet, scenario.getNetwork()),
+				defaultConstraintsSet.getMaxWalkDistance(), scenario.getNetwork(),
+				QuadTrees.createQuadTree(drtStops.values()));
+
+		DvrpLoadType loadType = new IntegerLoadType("passengers");
+		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
+				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
+				new DefaultDrtRouteConstraintsCalculator(drtCfg, constraintSetChooser),
+				new DefaultDvrpLoadFromTrip(loadType, "passengers"), loadType);
+		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtMode, scenario.getNetwork(),
+				scenario.getPopulation().getFactory(), drtRouteCreator);
+		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder,
+				drtMode, TimeInterpretation.create(scenario.getConfig()));
+
+		// origin and destination are more than 2000 m away from the next stop, so they are only served under the
+		// longWalk constraints set
+		Facility hf2 = FacilitiesUtils.toFacility((Activity)p2.getSelectedPlan().getPlanElements().get(0), facilities);
+		Facility wf2 = FacilitiesUtils.toFacility((Activity)p2.getSelectedPlan().getPlanElements().get(2), facilities);
+		Assertions.assertNotNull(
+				dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf2, wf2, 8 * 3600, p2)));
+
+		// person 6 starts at the same place as person 2, but is bound to the default constraints set
+		Person p6 = scenario.getPopulation().getPersons().get(Id.createPersonId(6));
+		Facility hf6 = FacilitiesUtils.toFacility((Activity)p6.getSelectedPlan().getPlanElements().get(0), facilities);
+		Facility wf6 = FacilitiesUtils.toFacility((Activity)p6.getSelectedPlan().getPlanElements().get(2), facilities);
+		Assertions.assertNull(
+				dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf6, wf6, 8 * 3600, p6)));
 	}
 
 	@Test

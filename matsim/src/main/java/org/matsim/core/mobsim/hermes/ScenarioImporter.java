@@ -272,7 +272,7 @@ class ScenarioImporter {
 	}
 
 	private void generateRealms() {
-		realm = new Realm(this, eventsManager);
+		realm = new Realm(this, eventsManager, scenario.getConfig().hermes().getEndTime());
 
 		// Put agents in their initial location (link or activity center)
 		for (Agent agent : hermesAgents) {

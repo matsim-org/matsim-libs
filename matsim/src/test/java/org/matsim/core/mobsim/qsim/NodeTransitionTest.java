@@ -641,7 +641,7 @@ public class NodeTransitionTest {
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			ScoringConfigGroup.ActivityParams dummyAct = new ScoringConfigGroup.ActivityParams("dummy");
 	        dummyAct.setTypicalDuration(12 * 3600);
-	        config.scoring().addActivityParams(dummyAct);
+	        config.scoring().addDefaultActivityParams(dummyAct);
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 			Scenario scenario = ScenarioUtils.createScenario(config);
@@ -683,7 +683,7 @@ public class NodeTransitionTest {
 			config.qsim().setRemoveStuckVehicles(false);
 			ScoringConfigGroup.ActivityParams dummyAct = new ScoringConfigGroup.ActivityParams("dummy");
 	        dummyAct.setTypicalDuration(12 * 3600);
-	        config.scoring().addActivityParams(dummyAct);
+	        config.scoring().addDefaultActivityParams(dummyAct);
 
 			Scenario scenario = ScenarioUtils.createScenario(config);
 

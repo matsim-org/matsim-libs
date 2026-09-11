@@ -94,9 +94,9 @@ public class RunMultiHubShiftDrtScenarioIT {
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
 		ScoringConfigGroup.ModeParams scoreParams = new ScoringConfigGroup.ModeParams("drt");
-		config.scoring().addModeParams(scoreParams);
+		config.scoring().addDefaultModeParams(scoreParams);
 		ScoringConfigGroup.ModeParams scoreParams2 = new ScoringConfigGroup.ModeParams("walk");
-		config.scoring().addModeParams(scoreParams2);
+		config.scoring().addDefaultModeParams(scoreParams2);
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
@@ -116,11 +116,11 @@ public class RunMultiHubShiftDrtScenarioIT {
 		final ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(2 * 3600);
 
-		config.scoring().addActivityParams(home);
-		config.scoring().addActivityParams(other);
-		config.scoring().addActivityParams(education);
-		config.scoring().addActivityParams(shopping);
-		config.scoring().addActivityParams(work);
+		config.scoring().addDefaultActivityParams(home);
+		config.scoring().addDefaultActivityParams(other);
+		config.scoring().addDefaultActivityParams(education);
+		config.scoring().addDefaultActivityParams(shopping);
+		config.scoring().addDefaultActivityParams(work);
 
 		final ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 		stratSets.setWeight(1);

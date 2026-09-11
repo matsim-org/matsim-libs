@@ -20,7 +20,9 @@
 package org.matsim.core.network;
 
 import java.util.Arrays;
-import java.util.TreeMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.trafficmonitoring.TimeBinUtils;
@@ -54,7 +56,7 @@ final class FixedIntervalTimeVariantAttribute implements TimeVariantAttribute {
 
 	//TODO before calling this method we could convert changeEvents into a sequence of non-null changeValues
 	@Override
-	public void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents, ChangeValueGetter valueGetter,
+	public void recalc(NavigableMap<Double, List<NetworkChangeEvent>> changeEvents, ChangeValueGetter valueGetter,
 			double baseValue1) {
 		this.baseValue = baseValue1;
 
@@ -65,44 +67,39 @@ final class FixedIntervalTimeVariantAttribute implements TimeVariantAttribute {
 		//To save memory, the array is constructed only if there is at least one ChangeEvent.
 		//This saves a lot of memory in cases when only one attribute is time variant, while
 		//the remaining two are invariant.
-		if (values == null) {
-			values = new double[numSlots];
-		}
+		double[] newValues = values == null ? new double[numSlots] : values;
 
 		int numEvent = 0;
 		int fromBin = 0;//inclusive
 		double currentValue = baseValue1;
 		if (changeEvents != null) {
-			for (NetworkChangeEvent event : changeEvents.values()) {
-				ChangeValue value = valueGetter.getChangeValue(event);
-				if (value != null) {
-					numEvent++;
-
-					Preconditions.checkArgument(event.getStartTime() >= 0,
-							"The current implementation supports only non-negative change event times");
-					int toBin = (int)(event.getStartTime() / timeSlice);//exclusive
-					Arrays.fill(values, fromBin, toBin, currentValue);
-
-					switch (value.getType()) {
-						case ABSOLUTE_IN_SI_UNITS:
-							currentValue = value.getValue();
-							break;
-						case FACTOR:
-							currentValue *= value.getValue();
-							break;
-						case OFFSET_IN_SI_UNITS:
-							currentValue += value.getValue();
-							break;
-						default:
-							throw new RuntimeException("unknown ChangeType");
+			for (Map.Entry<Double, List<NetworkChangeEvent>> entry : changeEvents.entrySet()) {
+				// Several events may share a start time. They all apply, in registration order, but they fill the
+				// bins once, so the attribute takes a single value from that time onwards.
+				double valueHere = currentValue;
+				boolean changedHere = false;
+				for (NetworkChangeEvent event : entry.getValue()) {
+					ChangeValue value = valueGetter.getChangeValue(event);
+					if (value != null) {
+						Preconditions.checkArgument(event.getStartTime() >= 0,
+								"The current implementation supports only non-negative change event times");
+						valueHere = apply(valueHere, value);
+						changedHere = true;
 					}
+				}
+
+				if (changedHere) {
+					numEvent++;
+					int toBin = (int)(entry.getKey() / timeSlice);//exclusive
+					Arrays.fill(newValues, fromBin, toBin, currentValue);
+					currentValue = valueHere;
 					fromBin = toBin;
 				}
 			}
 		}
-		Arrays.fill(values, fromBin, values.length, currentValue);
-		eventsCountWhenLastRecalc = eventsCount;
 
+		// Validate before publishing: leaving eventsCountWhenLastRecalc updated after a failure would make
+		// isRecalcRequired() report false and the half-filled array would then be read as if it were complete.
 		if (numEvent != this.eventsCount) {
 			throw new RuntimeException("Expected number of change events ("
 					+ (this.eventsCount)
@@ -110,6 +107,18 @@ final class FixedIntervalTimeVariantAttribute implements TimeVariantAttribute {
 					+ numEvent
 					+ ")!");
 		}
+
+		Arrays.fill(newValues, fromBin, newValues.length, currentValue);
+		this.values = newValues;
+		eventsCountWhenLastRecalc = eventsCount;
+	}
+
+	private static double apply(final double currentValue, final ChangeValue value) {
+		return switch (value.getType()) {
+			case ABSOLUTE_IN_SI_UNITS -> value.getValue();
+			case FACTOR -> currentValue * value.getValue();
+			case OFFSET_IN_SI_UNITS -> currentValue + value.getValue();
+		};
 	}
 
 	@Override

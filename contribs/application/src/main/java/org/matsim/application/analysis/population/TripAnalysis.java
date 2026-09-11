@@ -266,27 +266,44 @@ public class TripAnalysis implements MATSimAppCommand {
 
 
 		// Home filter by standard attribute
-		if (shp.isDefined() && filter == LocationFilter.home) {
-			log.info("Using home filter for TripAnalysis. Persons outside of the shape file will be removed from the analysis. Agents without home coordinates will be kept, because they are probably commercial agents.");
+		if (shp.isDefined() && (filter == LocationFilter.home || filter == LocationFilter.plan_start)) {
+			if (filter == LocationFilter.home) {
+				log.info(
+					"Using home filter for TripAnalysis. Persons outside of the shape file will be removed from the analysis. Agents without home coordinates will be kept, because they are probably commercial agents.");
+			} else {
+				log.info(
+					"Using plan_start filter for TripAnalysis. Persons whose first plan activity is outside of the shape file will be removed from the analysis.");
+			}
 			Geometry geometry = shp.getGeometry();
 			GeometryFactory f = new GeometryFactory();
 
 			IntList idx = new IntArrayList();
 
 			for (int i = 0; i < persons.rowCount(); i++) {
-				Row row = persons.row(i);
-				if (!new HashSet<>(row.columnNames()).containsAll(List.of("home_x", "home_y"))) {
-					idx.add(i); //assuming that these are commercial agents without home coordinates, we keep them in the analysis
-					continue;
-				}
-				Point p = f.createPoint(new Coordinate(row.getDouble("home_x"), row.getDouble("home_y")));
-				if (geometry.contains(p) || Double.isNaN(p.getX()) && Double.isNaN(p.getY())) {//TODO discuss what we should do with the commercial agents without home coordinates
-					idx.add(i);
+				if (filter == LocationFilter.home) {
+					Row row = persons.row(i);
+					if (!new HashSet<>(row.columnNames()).containsAll(List.of("home_x", "home_y"))) {
+						idx.add(i); //assuming that these are commercial agents without home coordinates, we keep them in the analysis
+						continue;
+					}
+					Point p = f.createPoint(new Coordinate(row.getDouble("home_x"), row.getDouble("home_y")));
+					if (geometry.contains(p) || Double.isNaN(p.getX()) && Double.isNaN(
+						p.getY())) {//TODO discuss what we should do with the commercial agents without home coordinates
+						idx.add(i);
+					}
+				} else if (filter == LocationFilter.plan_start) {
+					Row row = persons.row(i);
+					Point start = f.createPoint(new Coordinate(row.getDouble("first_act_x"), row.getDouble("first_act_y")));
+					if (geometry.contains(start)) {
+						idx.add(i);
+					}
 				}
 			}
 
 			persons = persons.where(Selection.with(idx.toIntArray()));
-			log.info("After filtering by set shp file and location filter 'LocationFilter.home' {} of initially {} persons are remaining for the TripAnalysis", persons.rowCount(), total);
+			log.info(
+				"After filtering by set shp file and location filter 'LocationFilter.{}' {} of initially {} persons are remaining for the TripAnalysis",
+				filter, persons.rowCount(), total);
 		}
 
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
@@ -312,7 +329,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			trips = trips.where(Selection.with(idx.toIntArray()));
 			log.info("After filtering by set shp file and location filter 'LocationFilter.trip_start_and_end' {} of initially {} trips are remaining for the TripAnalysis", trips.rowCount(), initialNumberOfTrips);
-//		trip filter with start OR end
+		// trip filter with start OR end
 		} else if (shp.isDefined() && filter == LocationFilter.trip_start_or_end) {
 			Geometry geometry = shp.getGeometry();
 			GeometryFactory f = new GeometryFactory();
@@ -1352,6 +1369,7 @@ public class TripAnalysis implements MATSimAppCommand {
 	enum LocationFilter {
 		trip_start_and_end,
 		trip_start_or_end,
+		plan_start,
 		home,
 		none
 	}

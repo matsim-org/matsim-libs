@@ -494,7 +494,17 @@ import org.matsim.vehicles.VehicleUtils;
 			bw1.newLine();
 
 			for (VehicleType vehicleType : vehicleTypesMap.values()) {
-				long nuOfVehicles = vehicleId2VehicleType.values().stream().filter(vehType -> vehType.getId() == vehicleType.getId()).count();
+				boolean vehicleTypeIsUsedByCarrier =
+					CarriersUtils.getCarriers(scenario).getCarriers().values().stream()
+						.flatMap(carrier -> carrier.getCarrierCapabilities().getVehicleTypes().stream())
+						.anyMatch(carrierVehicleType ->
+							carrierVehicleType.getId().equals(vehicleType.getId())
+						);
+
+				if (!vehicleTypeIsUsedByCarrier)
+					continue;
+
+				long nuOfVehicles = vehicleId2VehicleType.values().stream().filter(vehType -> vehType.getId().equals(vehicleType.getId())).count();
 
 				final Double costRatePerSecond = vehicleType.getCostInformation().getCostsPerSecond();
 				final Double costRatePerMeter = vehicleType.getCostInformation().getCostsPerMeter();

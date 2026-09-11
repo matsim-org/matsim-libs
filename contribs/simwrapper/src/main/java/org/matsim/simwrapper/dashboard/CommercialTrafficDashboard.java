@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.NonNull;
-import org.matsim.application.CommandRunner;
 import org.matsim.application.analysis.commercialTraffic.CommercialAnalysis;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
@@ -137,7 +136,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		header.description = getDescription();
 		double sampleSize = configGroup.getSampleSize();
 		appendAnalysisArgs(AnalysisTypeArgs.COMMERCIAL, "--sampleSize", String.valueOf(sampleSize));
-		createCommercialOverviewTab(layout);
+		createCommercialOverviewTab(layout, configGroup);
 		createCommercialTripsTab(layout);
 		createCommercialToursTab(layout);
 		createCommercialActivitiesTab(layout);
@@ -777,8 +776,9 @@ public class CommercialTrafficDashboard implements Dashboard {
 		}
 	}
 
-	private void createCommercialOverviewTab(Layout layout) {
-		layout.row("General_first", "General").el(PieChart.class, (viz, data) -> {
+	private void createCommercialOverviewTab(Layout layout, SimWrapperConfigGroup simWrapperConfigGroup) {
+		Layout.Row first = layout.row("General_first", "General");
+		first.el(PieChart.class, (viz, data) -> {
 				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "travelDistancesShares_%s.csv", "perMode", argsCommercialAnalysis);
 				viz.title = "Travel Distance Shares by Mode";
 				viz.description = "at final iteration";
@@ -800,13 +800,22 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.description = "at final iteration";
 
 			});
+		// this plot should be shown the agents are filtered by this shape for the TripAnalysis.
+		if (simWrapperConfigGroup.get("").getShp() != null) {
+				first.el(MapPlot.class, (viz, data) -> {
+					viz.title = "Investigation area";
+					viz.description = "The Commercial Analysis is filtered within this area with this strategy: Only agents with start of the tour within this area";
+					viz.display.fill.fixedColors = new String[]{"#4e79a7"};
+					viz.setShape(data.resource(data.context().getShp()));
+					viz.width = 0.5d;
+				});
+		}
 		layout.row("General_second", "General").el(Links.class, (viz, data) -> {
 			viz.title = "Link volumes of the commercial traffic";
-			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("The volumes are scaled to 100% sample size.", data, true);
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("The volumes can be filtered according to different types of traffic and vehicle types. Volume shows all vehicles of the set commercial subpopulations", data, true);
 			viz.datasets.csvFile = data.compute(CommercialAnalysis.class, "commercialTraffic_link_volume.csv", argsCommercialAnalysis);
 			viz.network = data.compute(CreateAvroNetwork.class, "network.avro",
 				"--with-properties"); //, "--match-id", "linkId", "--mode-filter", "none"
-			viz.description = "The volumes can be filtered according to different types of traffic and vehicle types.";
 			viz.height = 12.;
 		});
 	}

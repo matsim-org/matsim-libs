@@ -77,7 +77,7 @@ public final class RunBicycleExpresswayExample{
 		// (NetworkRoutingModule w/o access/egress does not pass the vehicle to the router --> cannot take vehicle max speed into account.  See comment in code in NetworkRoutingModule#calcRoute(...).  kai, jan'23)
 
 		// add (arbitrary) mode params for bike so that the scoring works:
-		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( BICYCLE ) );
+		config.scoring().addDefaultModeParams( new ScoringConfigGroup.ModeParams( BICYCLE ) );
 
 		// add bike as network mode to qsim:
 		config.qsim().setMainModes( Arrays.asList( TransportMode.car, BICYCLE ) );

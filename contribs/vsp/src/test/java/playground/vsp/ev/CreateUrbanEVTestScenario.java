@@ -52,9 +52,9 @@ class CreateUrbanEVTestScenario {
 		config.routing().setAccessEgressType( RoutingConfigGroup.AccessEgressType.none );
 
 		//register charging interaction activities for car
-		config.scoring().addActivityParams(
+		config.scoring().addDefaultActivityParams(
 				new ScoringConfigGroup.ActivityParams( TransportMode.car + UrbanEVModule.PLUGOUT_INTERACTION).setScoringThisActivityAtAll(false ) );
-		config.scoring().addActivityParams(
+		config.scoring().addDefaultActivityParams(
 				new ScoringConfigGroup.ActivityParams( TransportMode.car + UrbanEVModule.PLUGIN_INTERACTION).setScoringThisActivityAtAll( false ) );
 		config.network().setInputFile("1pctNetwork.xml");
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

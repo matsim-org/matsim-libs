@@ -87,12 +87,12 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		}
 
 		// drt params
-		this.betaDrtTT_h = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		this.betaDrtDist_m = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfDistance();
+		this.betaDrtTT_h = scoringConfigGroup.getDefaultModeParams().get(TransportMode.drt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getDefaultPerforming_utils_hr();
+		this.betaDrtDist_m = scoringConfigGroup.getDefaultModeParams().get(TransportMode.drt).getMarginalUtilityOfDistance();
 
 		// walk params
-		this.betaWalkTT_h = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		this.betaWalkDist_m = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
+		this.betaWalkTT_h = scoringConfigGroup.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getDefaultPerforming_utils_hr();
+		this.betaWalkDist_m = scoringConfigGroup.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
 	}
 

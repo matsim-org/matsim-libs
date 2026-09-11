@@ -21,18 +21,24 @@
 
 package org.matsim.contrib.pseudosimulation;
 
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
-//import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
-//import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
-//import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
-//import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
-//import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculator;
-//import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformanceRecorder;
+import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
+import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformanceRecorder;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.contrib.pseudosimulation.mobsim.SwitchingMobsimProvider;
+import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEmulator;
+import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
+import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitPerformanceFromEventBasedRouterInterfaces;
+import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitPerformanceFromPSimSpecificImplementation;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
+import org.matsim.contrib.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
 import org.matsim.contrib.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
+import org.matsim.contrib.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
+import org.matsim.contrib.pseudosimulation.trafficinfo.StopStopTime;
+import org.matsim.contrib.pseudosimulation.trafficinfo.WaitTime;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -53,7 +59,7 @@ public class RunPSim {
 	private Controler matsimControler;
 
 	public RunPSim(Config config, PSimConfigGroup pSimConfigGroup) {
-		this.scenario = ScenarioUtils.loadScenario(config);;
+		this.scenario = ScenarioUtils.loadScenario(config);
 
 		//The following line will make the controler use the events manager that doesn't check for event order.
 		//This is essential for pseudo-simulation as the PSim module generates events on a person-basis,
@@ -61,20 +67,27 @@ public class RunPSim {
 		config.eventsManager().setSynchronizeOnSimSteps(false);
 		config.eventsManager().setNumberOfThreads(1);
 
+		disableExperiencedPlanAnalysis(config);
+
 		this.matsimControler = new Controler(scenario);
 
 		MobSimSwitcher mobSimSwitcher = new MobSimSwitcher(pSimConfigGroup,scenario);
 		matsimControler.addControllerListener(mobSimSwitcher);
+
+		final PSimConfigGroup.TransitEmulation transitEmulation = transitEmulation(config, pSimConfigGroup);
+
+		// A PSim iteration reads transit performance recorded during the preceding QSim iteration.
+		// Without a recorder there is nothing to read, so transit legs would take no time at all.
+		final TransitPerformanceRecorder transitPerformanceRecorder =
+				transitEmulation == PSimConfigGroup.TransitEmulation.fullTransitPerformance
+						? new TransitPerformanceRecorder(scenario, matsimControler.getEvents(), mobSimSwitcher)
+						: null;
 
 		matsimControler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(MobSimSwitcher.class).toInstance(mobSimSwitcher);
 				bindMobsim().toProvider(SwitchingMobsimProvider.class);
-//				bind(WaitTimeCalculator.class).to(PSimWaitTimeCalculator.class);
-//				bind(WaitTime.class).toProvider(PSimWaitTimeCalculator.class);
-//				bind(StopStopTimeCalculator.class).to(PSimStopStopTimeCalculator.class);
-//				bind(StopStopTime.class).toProvider(PSimStopStopTimeCalculator.class);
 
 //				bind(TravelTimeCalculator.class).to(PSimTravelTimeCalculator.class);
 				// I made TravelTimeCalculator final, so PSimTravelTimeCalculator can no longer inherit from it.  The following statement binds PSimTravelTimeCalculator
@@ -82,26 +95,68 @@ public class RunPSim {
 
 				bind(PSimTravelTimeCalculator.class).in( Singleton.class ) ;
 				bind(TravelTime.class).toProvider(PSimTravelTimeCalculator.class);
-//				bind(TransitRouter.class).toProvider(TransitRouterEventsWSFactory.class);
+				// Registered as the handler itself so that its guarded reset survives PSim
+				// iterations; see PSimTravelTimeCalculator.
+				addEventHandlerBinding().to(PSimTravelTimeCalculator.class);
+				switch (transitEmulation) {
+					case none -> bind(TransitEmulator.class).to(NoTransitEmulator.class).in(Singleton.class);
+					case fullTransitPerformance -> {
+						Provider<TransitPerformance> transitPerformance =
+								transitPerformanceRecorder::getTransitPerformance;
+						bind(TransitPerformanceRecorder.class).toInstance(transitPerformanceRecorder);
+						bind(TransitPerformance.class).toProvider(transitPerformance);
+						bind(TransitEmulator.class).to(TransitPerformanceFromPSimSpecificImplementation.class)
+								.in(Singleton.class);
+					}
+					case waitAndStopStopTimes -> {
+						// Registered as the handlers themselves, for the same reason as
+						// PSimTravelTimeCalculator: their guards live in reset and handleEvent.
+						bind(PSimWaitTimeCalculator.class).in(Singleton.class);
+						bind(PSimStopStopTimeCalculator.class).in(Singleton.class);
+						addEventHandlerBinding().to(PSimWaitTimeCalculator.class);
+						addEventHandlerBinding().to(PSimStopStopTimeCalculator.class);
+						bind(WaitTime.class).toProvider(PSimWaitTimeCalculator.class);
+						bind(StopStopTime.class).toProvider(PSimStopStopTimeCalculator.class);
+						bind(TransitEmulator.class).to(TransitPerformanceFromEventBasedRouterInterfaces.class)
+								.in(Singleton.class);
+					}
+				}
 				bind(PlanCatcher.class).toInstance(new PlanCatcher());
 				bind(PSimProvider.class).toInstance(new PSimProvider(scenario,matsimControler.getEvents()));
 				bind(QSimProvider.class);
 			}
 		});
+	}
 
-//		if (config.transit().isUseTransit()) {
-//			if (pSimConfigGroup.isFullTransitPerformanceTransmission()) {
-//				transitPerformanceRecorder = new TransitPerformanceRecorder(matsimControler.getScenario(), matsimControler.getEvents(), mobSimSwitcher);
-//			}
-//		}
+	/**
+	 * A scenario that does not simulate transit has no transit performance to record, so the
+	 * configured emulation is overridden rather than left to measure nothing.
+	 */
+	static PSimConfigGroup.TransitEmulation transitEmulation(Config config, PSimConfigGroup pSimConfigGroup) {
+		if (!config.transit().isUseTransit()) {
+			return PSimConfigGroup.TransitEmulation.none;
+		}
+		return pSimConfigGroup.resolveTransitEmulation();
+	}
 
-
-
+	/**
+	 * PSim emits events only for the agents whose plans were replanned, so the experienced plans
+	 * assembled from that stream cover a fraction of the population. TripsAndLegsWriter fails
+	 * outright on those partial plans, and the travel distance and mode statistics derived from
+	 * them would silently describe the replanned subset rather than the population.
+	 */
+	private static void disableExperiencedPlanAnalysis(Config config) {
+		if (config.controller().getWriteTripsInterval() > 0) {
+			LogManager.getLogger(RunPSim.class).warn(
+					"Disabling trips and legs output: it is assembled from experienced plans, which PSim "
+							+ "iterations only produce for replanned agents.");
+			config.controller().setWriteTripsInterval(0);
+		}
 	}
 
 	public static void main(String args[]) {
 		Config config = ConfigUtils.loadConfig(args[0]);
-		config.controller().setCreateGraphs(false);
+		config.controller().setCreateGraphsInterval(0);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);

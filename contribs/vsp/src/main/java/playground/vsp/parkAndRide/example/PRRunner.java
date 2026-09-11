@@ -79,7 +79,7 @@ public class PRRunner {
 
 		ActivityParams prActivityParams = new ActivityParams(PRConstants.PARKANDRIDE_ACTIVITY_TYPE);
 		prActivityParams.setTypicalDuration(prSettings.getTypicalDuration());
-		controler.getConfig().scoring().addActivityParams(prActivityParams);
+		controler.getConfig().scoring().addDefaultActivityParams(prActivityParams);
 
         controler.setScoringFunctionFactory(new PRScoringFunctionFactory(controler.getScenario(), prSettings.getIntermodalTransferPenalty()));
 

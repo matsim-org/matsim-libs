@@ -62,8 +62,8 @@ public class SBBTransitChainedDepartureIntegrationTest {
 		config.scoring().setWriteExperiencedPlans(true);
 		config.qsim().setEndTime(Time.parseTime("36:00:00"));
 
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
 		SBBTransitConfigGroup sbb = ConfigUtils.addOrGetModule(config, SBBTransitConfigGroup.class);
 		sbb.setDeterministicServiceModes(Set.of("rail"));

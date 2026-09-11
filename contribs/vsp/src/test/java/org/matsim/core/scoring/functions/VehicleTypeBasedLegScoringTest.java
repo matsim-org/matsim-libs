@@ -41,7 +41,7 @@ class VehicleTypeBasedLegScoringTest {
 		var truckId = addVehicle(vehicles, "truck-1", truckType);
 		var scoringConfig = createScoringConfig();
 
-		scoringConfig.getOrCreateModeParams(TransportMode.car)
+		scoringConfig.getOrCreateDefaultModeParams(TransportMode.car)
 			.setConstant(-100)
 			.setMarginalUtilityOfTraveling(-100)
 			.setMarginalUtilityOfDistance(-100)
@@ -49,7 +49,7 @@ class VehicleTypeBasedLegScoringTest {
 			.setDailyMonetaryConstant(-100)
 			.setDailyUtilityConstant(-100);
 
-		scoringConfig.getOrCreateModeParams("truck")
+		scoringConfig.getOrCreateDefaultModeParams("truck")
 			.setConstant(-1)
 			.setMarginalUtilityOfTraveling(-7.2)
 			.setMarginalUtilityOfDistance(-0.3)
@@ -76,7 +76,7 @@ class VehicleTypeBasedLegScoringTest {
 			.setCostsPerSecond(0.2);
 		var truckId = addVehicle(vehicles, "truck-1", truckType);
 		var scoringConfig = createScoringConfig();
-		scoringConfig.getOrCreateModeParams(TransportMode.car);
+		scoringConfig.getOrCreateDefaultModeParams(TransportMode.car);
 
 		var params = createScoringParameters(scoringConfig);
 		var scoring = new VehicleTypeBasedLegScoring(vehicles, params, Set.of());
@@ -126,10 +126,10 @@ class VehicleTypeBasedLegScoringTest {
 		);
 		freightScoring.handleTrip(TripStructureUtils.getTrips2(List.of(createLeg(TransportMode.car, 20, 30, freightTruckId))).getFirst());
 
-		assertVehicleTypeParams(privateScoringParameterSet.getModes().get("privateTruck"));
-		assertNull(privateScoringParameterSet.getModes().get("freightTruck"));
-		assertVehicleTypeParams(freightScoringParameterSet.getModes().get("freightTruck"));
-		assertNull(freightScoringParameterSet.getModes().get("privateTruck"));
+		assertVehicleTypeParams(privateScoringParameterSet.getModeParams().get("privateTruck"));
+		assertNull(privateScoringParameterSet.getModeParams().get("freightTruck"));
+		assertVehicleTypeParams(freightScoringParameterSet.getModeParams().get("freightTruck"));
+		assertNull(freightScoringParameterSet.getModeParams().get("privateTruck"));
 
 		var outFile = utils.getOutputDirectory() + "/vehicle-type-based-scoring-config.xml";
 		new ConfigWriter(config).write(outFile);
@@ -137,12 +137,12 @@ class VehicleTypeBasedLegScoringTest {
 		var readConfig = ConfigUtils.createConfig();
 		new ConfigReader(readConfig).readFile(outFile);
 
-		var readPrivateParams = readConfig.scoring().getScoringParameters("private");
-		var readFreightParams = readConfig.scoring().getScoringParameters("freight");
-		assertVehicleTypeParams(readPrivateParams.getModes().get("privateTruck"));
-		assertNull(readPrivateParams.getModes().get("freightTruck"));
-		assertVehicleTypeParams(readFreightParams.getModes().get("freightTruck"));
-		assertNull(readFreightParams.getModes().get("privateTruck"));
+		var readPrivateParams = readConfig.scoring().getExplicitScoringParameterSetsPerSubpopulation().get("private");
+		var readFreightParams = readConfig.scoring().getExplicitScoringParameterSetsPerSubpopulation().get("freight");
+		assertVehicleTypeParams(readPrivateParams.getModeParams().get("privateTruck"));
+		assertNull(readPrivateParams.getModeParams().get("freightTruck"));
+		assertVehicleTypeParams(readFreightParams.getModeParams().get("freightTruck"));
+		assertNull(readFreightParams.getModeParams().get("privateTruck"));
 	}
 
 	@Test
@@ -156,8 +156,8 @@ class VehicleTypeBasedLegScoringTest {
 		var truckId = addVehicle(vehicles, "truck-1", truckType);
 
 		var scoringConfig = createScoringConfig();
-		var scoringParameterSet = scoringConfig.getScoringParameters(null);
-		scoringConfig.getOrCreateModeParams("truck")
+		var scoringParameterSet = scoringConfig.getScoringParametersOrDefault(null);
+		scoringConfig.getOrCreateDefaultModeParams("truck")
 			.setConstant(-99.0)
 			.setMarginalUtilityOfTraveling(-88.0)
 			.setMarginalUtilityOfDistance(-77.0)
@@ -167,7 +167,7 @@ class VehicleTypeBasedLegScoringTest {
 		var scoring = new VehicleTypeBasedLegScoring(vehicles, params, scoringParameterSet, Set.of());
 		scoring.handleTrip(TripStructureUtils.getTrips2(List.of(createLeg(TransportMode.car, 20, 30, truckId))).getFirst());
 
-		var truckParams = scoringConfig.getScoringParameters(null).getModes().get("truck");
+		var truckParams = scoringConfig.getScoringParametersOrDefault(null).getModeParams().get("truck");
 		assertNotNull(truckParams);
 		assertEquals(-99.0, truckParams.getConstant(), MatsimTestUtils.EPSILON);
 		assertEquals(-88.0, truckParams.getMarginalUtilityOfTraveling(), MatsimTestUtils.EPSILON);
@@ -177,12 +177,12 @@ class VehicleTypeBasedLegScoringTest {
 
 	private static ScoringConfigGroup createScoringConfig() {
 		var scoringConfig = new ScoringConfigGroup();
-		scoringConfig.setMarginalUtilityOfMoney(1.0);
+		scoringConfig.setDefaultMarginalUtilityOfMoney(1.0);
 		return scoringConfig;
 	}
 
 	private static ScoringParameters createScoringParameters(ScoringConfigGroup scoringConfig) {
-		return createScoringParameters(scoringConfig, scoringConfig.getScoringParameters(null));
+		return createScoringParameters(scoringConfig, scoringConfig.getScoringParametersOrDefault(null));
 	}
 
 	private static ScoringParameters createScoringParameters(ScoringConfigGroup scoringConfig, ScoringConfigGroup.ScoringParameterSet scoringParameterSet) {
