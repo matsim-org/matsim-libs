@@ -1,6 +1,8 @@
 package org.matsim.contrib.drt.extension.operations.shifts.schedule;
 
 import jakarta.validation.constraints.NotNull;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.schedule.IncidentHoldActivity;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.schedule.IncidentHoldTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -66,6 +68,12 @@ public class DrtOperationsActionCreator implements DynActionCreator {
                     changeoverTask.getDropoffRequests(),
                     changeoverTask.getPickupRequests());
 
+        }
+
+        // Handle IncidentHoldTask: a vehicle held in place for a remote-guidance incident. Its own dedicated activity
+        // (a plain idle-until-end wait) so it is identifiable in events/VIA instead of showing as a passenger DrtBusStop.
+        if (task instanceof IncidentHoldTask holdTask) {
+            return new IncidentHoldActivity(holdTask);
         }
 
         // Handle WaitForShiftTask

@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.common.util.reservation.ReservationManager;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalStop;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.FacilityStop;
 import org.matsim.contrib.drt.extension.services.schedule.DrtService;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
@@ -36,7 +36,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 /**
  * @author steffenaxer
  */
-public class DrtServiceTask extends DefaultStayTask implements OperationalStop {
+public class DrtServiceTask extends DefaultStayTask implements FacilityStop {
 
 	public static final DrtTaskType TYPE = new DrtTaskType("SERVICE", STAY);
 	Id<OperationFacility> facilityId;

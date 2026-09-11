@@ -25,8 +25,14 @@ public class ShiftChangeoverStopWaypoint implements StopWaypoint {
 
     public ShiftChangeoverStopWaypoint(ShiftChangeOverTask shiftChangeOverTask, DvrpLoadType loadType) {
         this.shiftChangeOverTask = shiftChangeOverTask;
-        this.latestArrivalTime = this.shiftChangeOverTask.getShift().getEndTime();
-        this.earliestArrivalTime = this.shiftChangeOverTask.getShift().getEndTime();
+        // A scheduled changeover is a hard commitment ("be at the hub at this time") that insertions must not push
+        // back. We anchor the arrival window to the changeover's own planned begin time, not to shift.getEndTime().
+        // For a regular end-of-shift changeover the two coincide (the changeover begins at the shift end), so this is
+        // behaviourally identical. For a changeover that was pulled forward (e.g. a remote-guidance recall, whose shift
+        // end is the far-off simulation horizon) this keeps the earlier commitment fixed instead of letting new
+        // requests stretch it back towards the horizon.
+        this.latestArrivalTime = this.shiftChangeOverTask.getBeginTime();
+        this.earliestArrivalTime = this.shiftChangeOverTask.getBeginTime();
         this.latestDepartureTime = Double.POSITIVE_INFINITY;
         this.emptyLoad = loadType.getEmptyLoad();
     }

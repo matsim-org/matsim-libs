@@ -1,0 +1,13 @@
+<shifts>
+    <!-- Remote guidance operator shifts. Each supervises up to 'defaultOperatorCapacity' vehicles at once.
+         Operators with capacity 5 (configured in the test) allow at most 10 of the 20 vehicles to operate
+         simultaneously per overlapping pair. Operators are staggered so their starts/ends exercise activation and the
+         hub-based handover when one ends while another still has capacity.
+         Morning pair (04:00-14:00 / 05:00-12:30) plus an afternoon/evening pair that overlaps the morning ones
+         (12:00-20:00 / 13:00-22:00), so supervision is continuous from 04:00 to 22:00 and covers the afternoon demand
+         peak instead of leaving it uncovered. -->
+    <shift id="operator_0" start="14400" end="50400" type="remoteGuidance"/>
+    <shift id="operator_1" start="18000" end="45000" type="remoteGuidance"/>
+    <shift id="operator_2" start="43200" end="72000" type="remoteGuidance"/>
+    <shift id="operator_3" start="46800" end="79200" type="remoteGuidance"/>
+</shifts>
