@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.events.MessageComparator;
 import org.matsim.api.core.v01.events.handler.BlockingMode;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.dsim.events.EventMessagingPattern;
 
 import java.nio.file.Path;
@@ -66,12 +66,12 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 
 
 	public DefaultEventHandlerTask(EventHandler handler, int partition, int totalPartitions,
-								   DistributedEventsManager em, SerializationProvider serializer,
+								   DistributedEventsManager em, MessageTypeRegistry registry,
 								   @Nullable AtomicInteger counter) {
-		super(handler, partition, supportsAsync(handler), serializer);
+		super(handler, partition, supportsAsync(handler), registry);
 		this.totalPartitions = totalPartitions;
 		this.counter = counter;
-		this.pattern = buildConsumers(serializer, em.getComputeNode().isDistributed());
+		this.pattern = buildConsumers(registry, em.getComputeNode().isDistributed());
 		this.em = em;
 
 		if (pattern != null && async)

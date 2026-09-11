@@ -696,7 +696,7 @@ public class SBBTransitEngineTest {
 			n.getLinks().get(Id.create(4, org.matsim.api.core.v01.network.Link.class)).getAttributes()
 				.putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 1);
 
-			var ctx = DistributedContext.create(comm, f.config);
+			var ctx = DistributedContext.create(comm, f.config, new org.matsim.core.serialization.ForySerializationProvider(org.matsim.core.serialization.MessageTypeRegistry.getInstance()));
 			var controler = new Controler(f.scenario, ctx);
 			controler.addOverridingModule(new SBBTransitModule());
 			controler.configureQSimComponents(components -> new SBBTransitEngineQSimModule().configure(components));

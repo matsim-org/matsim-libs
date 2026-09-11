@@ -209,7 +209,8 @@ public class DrtIntegrationTest {
 
 			scenario.getConfig().dsim().setThreads(2);
 
-			Controler controler = new Controler(scenario, DistributedContext.create(comm, scenario.getConfig()));
+			Controler controler = new Controler(scenario, DistributedContext.create(comm, scenario.getConfig(),
+				new org.matsim.core.serialization.ForySerializationProvider(org.matsim.core.serialization.MessageTypeRegistry.getInstance())));
 			prepareController(controler);
 
 			controler.run();

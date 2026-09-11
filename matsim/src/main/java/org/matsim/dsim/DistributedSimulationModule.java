@@ -9,6 +9,8 @@ import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.serialization.MessageTypeRegistry;
+import org.matsim.core.serialization.NoopSerializationProvider;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.DSimEventHandlingModule;
 import org.matsim.dsim.executors.LPExecutor;
@@ -29,13 +31,21 @@ public class DistributedSimulationModule extends AbstractModule {
 		if (ctx instanceof DistributedContext o) {
 			dtx = o;
 		} else {
-			// Create a distributed contex from the local one if none was given
+			// No distributed context was supplied, so build a single-node one.
 			dtx = DistributedContext.createLocal(new NullCommunicator(), getSimulationContext().getTopology());
 			ctx = dtx;
 		}
 
 		bind(Communicator.class).toInstance(dtx.getComm());
-		bind(SerializationProvider.class).toInstance(dtx.getSerializer());
+		bind(MessageTypeRegistry.class).toInstance(MessageTypeRegistry.getInstance());
+
+		// A multi-node run supplies its own wire codec via DistributedContext.create; a single-node run gets the
+		// no-op provider, since its messages never leave the JVM.
+		if (dtx.getSerializer() != null) {
+			bind(SerializationProvider.class).toInstance(dtx.getSerializer());
+		} else {
+			bind(SerializationProvider.class).to(NoopSerializationProvider.class).in(Singleton.class);
+		}
 
 		bind(MessageBroker.class).in(Singleton.class);
 		bind(DistributedEventsManager.class).in(Singleton.class);

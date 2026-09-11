@@ -28,8 +28,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.release>25</maven.compiler.release>
-		<!-- add-opens=java.base/java.lang.invoke=ALL-UNNAMED is required for SerializationProviderTest when upgrading org.apache.fory:fory-* to 1.3.0 -->
-		<argLine>--add-opens=java.base/java.lang.invoke=ALL-UNNAMED</argLine>
+		<!-- JVM options required by the DSim mobsim:
+		     - java.base/jdk.internal.misc: Agrona's UnsafeApi (agrona, a core dependency used by DSim)
+		     - java.base/java.lang.invoke: Fory's codegen (org.apache.fory:fory-*), exercised by the DSim
+		       serialization tests in the distributed-simulation, ev and sbb-extensions contribs -->
+		<argLine>--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED</argLine>
 
 		<log4j.version>2.26.1</log4j.version>
 		<geotools.version>35.1</geotools.version>
@@ -424,13 +427,6 @@
 				<groupId>org.apache.fory</groupId>
 				<artifactId>fory-core</artifactId>
 				<version>${fory.version}</version>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.fory</groupId>
-				<artifactId>fory-format</artifactId>
-				<version>${fory.version}</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>com.google.protobuf</groupId>

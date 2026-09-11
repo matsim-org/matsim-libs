@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.core.communication.Communicator;
-import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.serialization.SerializationProvider;
 
@@ -31,6 +30,10 @@ public final class DistributedContext implements ExecutionContext {
 
 	private final SerializationProvider serializer;
 
+	/**
+	 * The wire codec for cross-node message transfer, or {@code null} for a single-node context (which binds
+	 * {@link org.matsim.core.serialization.NoopSerializationProvider} instead).
+	 */
 	public SerializationProvider getSerializer() {
 		return serializer;
 	}
@@ -43,14 +46,7 @@ public final class DistributedContext implements ExecutionContext {
 	}
 
 	/**
-	 * Create a local distributed context with the given number of threads.
-	 */
-	public static DistributedContext createLocal(Config config) {
-		return create(new NullCommunicator(), config.dsim().getThreads());
-	}
-
-	/**
-	 * Create a local distributed context with the given number of threads.
+	 * Create a context for a single-node run. No wire codec is needed, since messages never leave the JVM.
 	 */
 	public static DistributedContext createLocal(Communicator comm, Topology topology) {
 
@@ -60,24 +56,16 @@ public final class DistributedContext implements ExecutionContext {
 			throw new RuntimeException("Local communication problem", e);
 		}
 
-		SerializationProvider serializer = SerializationProvider.getInstance();
-
 		log.info("Local topology has {} partitions.", topology.getTotalPartitions());
 
-		return new DistributedContext(comm, topology, serializer);
+		return new DistributedContext(comm, topology, null);
 	}
 
 	/**
-	 * Create distributed context with the given communicator and configuration.
+	 * Create a context for a run that spans multiple compute nodes. The given {@link SerializationProvider} is used to
+	 * exchange topology information during startup and is bound for the rest of the simulation.
 	 */
-	public static DistributedContext create(Communicator comm, Config config) {
-		return create(comm, config.dsim().getThreads());
-	}
-
-	/**
-	 * Create distributed context with the given communicator and number of threads.
-	 */
-	private static DistributedContext create(Communicator comm, int threads) {
+	public static DistributedContext create(Communicator comm, Config config, SerializationProvider serializer) {
 
 		log.info("#{} Waiting for {} other nodes to connect...", comm.getRank(), comm.getSize() - 1);
 		try {
@@ -88,10 +76,8 @@ public final class DistributedContext implements ExecutionContext {
 
 		log.info("#{} All nodes connected", comm.getRank());
 
-		SerializationProvider serializer = SerializationProvider.getInstance();
-
 		// This may be relevant if we want to partition the network or other lps
-		Topology topology = createTopology(comm, threads, serializer);
+		Topology topology = createTopology(comm, config.dsim().getThreads(), serializer);
 
 		log.info("Topology has {} partitions on {} nodes. Node {} has parts: {}",
 			topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNodeByIndex(comm.getRank()).getParts());

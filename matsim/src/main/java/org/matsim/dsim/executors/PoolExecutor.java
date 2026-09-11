@@ -8,7 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.dsim.*;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public final class PoolExecutor implements LPExecutor {
 	private static final Logger log = LogManager.getLogger(PoolExecutor.class);
 
 	private final DSimThreadpool executor;
-	private final SerializationProvider serializer;
+	private final MessageTypeRegistry registry;
 
 	/**
 	 * Executions from the current sim step.
@@ -40,8 +40,8 @@ public final class PoolExecutor implements LPExecutor {
 	private int step;
 
 	@Inject
-	public PoolExecutor(SerializationProvider serializer, DSimConfigGroup config) {
-		this.serializer = serializer;
+	public PoolExecutor(MessageTypeRegistry registry, DSimConfigGroup config) {
+		this.registry = registry;
 		var size = config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads();
 		Supplier<IdleStrategy> idleStrategyFactory = switch (config.getThreadScheduling()) {
 			case eager -> BusySpinIdleStrategy::new;
@@ -59,7 +59,7 @@ public final class PoolExecutor implements LPExecutor {
 
 	@Override
 	public LPTask register(LP lp, DistributedEventsManager manager, int part) {
-		LPTask task = new LPTask(lp, part, manager, serializer);
+		LPTask task = new LPTask(lp, part, manager, registry);
 		lpTasks.add(task);
 		allTasks.add(task);
 		return task;
@@ -67,7 +67,7 @@ public final class PoolExecutor implements LPExecutor {
 
 	@Override
 	public EventHandlerTask register(EventHandler handler, DistributedEventsManager em, int part, int totalParts, AtomicInteger counter) {
-		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, em, serializer, counter);
+		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, em, registry, counter);
 		eventHandlerTasks.add(task);
 		allTasks.add(task);
 		return task;

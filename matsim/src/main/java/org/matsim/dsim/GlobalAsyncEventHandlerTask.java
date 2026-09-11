@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.MessageComparator;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +55,9 @@ public final class GlobalAsyncEventHandlerTask extends EventHandlerTask {
 	private final DistributedEventsManager manager;
 
 	public GlobalAsyncEventHandlerTask(EventHandler handler, DistributedEventsManager manager, int partition,
-									   SerializationProvider serializer) {
-		super(handler, partition, true, serializer);
-		buildConsumers(serializer, manager.getComputeNode().isDistributed());
+									   MessageTypeRegistry registry) {
+		super(handler, partition, true, registry);
+		buildConsumers(registry, manager.getComputeNode().isDistributed());
 		this.manager = manager;
 	}
 

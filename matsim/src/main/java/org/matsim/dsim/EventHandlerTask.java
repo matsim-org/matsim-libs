@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.EventSource;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.dsim.events.AggregateFromAll;
 import org.matsim.dsim.events.EventMessagingPattern;
 
@@ -52,7 +52,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 */
 	protected final Int2ObjectMap<EventSource> eventSources = new Int2ObjectOpenHashMap<>();
 
-	protected final SerializationProvider serializer;
+	protected final MessageTypeRegistry registry;
 
 	/**
 	 * Runtimes of each iteration.
@@ -105,11 +105,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		this.future = future;
 	}
 
-	public EventHandlerTask(EventHandler handler, int partition, boolean async, SerializationProvider serializer) {
+	public EventHandlerTask(EventHandler handler, int partition, boolean async, MessageTypeRegistry registry) {
 		this.handler = handler;
 		this.partition = partition;
 		this.async = async;
-		this.serializer = serializer;
+		this.registry = registry;
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	}
 
 	@SuppressWarnings("unchecked")
-	protected EventMessagingPattern<?> buildConsumers(SerializationProvider serializer, boolean isDistributed) {
+	protected EventMessagingPattern<?> buildConsumers(MessageTypeRegistry registry, boolean isDistributed) {
 
 		DistributedEventHandler distributed = handler.getClass().getAnnotation(DistributedEventHandler.class);
 		boolean node = distributed != null && distributed.value() == DistributedMode.NODE;
@@ -169,7 +169,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 				Consumer<Message> consumer = createConsumer(handler, msgClass, target);
 
 				// register this handler for the given message and all its subtypes.
-				for (var type : serializer.getAssignableTypes(msgClass)) {
+				for (var type : registry.getAssignableTypes(msgClass)) {
 					consumers.put(type, consumer);
 				}
 
@@ -178,7 +178,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 					if (consumerMethod.isAnnotationPresent(EventsFrom.class)) {
 						source = consumerMethod.getAnnotation(EventsFrom.class).value();
 					}
-					var msgType = serializer.getType(msgClass);
+					var msgType = registry.getType(msgClass);
 					eventSources.put(msgType, source);
 				}
 			}
@@ -201,7 +201,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		if (handler instanceof AggregatingEventHandler<?>) {
 			AggregateFromAll<Message> h = new AggregateFromAll<>();
 			Method m = getHandlerSendMethod(handler);
-			int type = serializer.getType(m.getReturnType());
+			int type = registry.getType(m.getReturnType());
 			consumers.put(type, h);
 			return h;
 		}

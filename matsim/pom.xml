@@ -367,24 +367,14 @@
 			<version>1.7</version>
 		</dependency>
 
-		<!-- Scan classpath to find providers -->
+		<!-- Scan classpath to find message types (org.matsim.core.serialization.MessageTypeRegistry) -->
 		<dependency>
 			<groupId>io.github.classgraph</groupId>
 			<artifactId>classgraph</artifactId>
 		</dependency>
 
-		<!-- These are for distributed simulation -->
-		<dependency>
-			<groupId>org.apache.fory</groupId>
-			<artifactId>fory-core</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.fory</groupId>
-			<artifactId>fory-format</artifactId>
-			<optional>true</optional>
-		</dependency>
-
+		<!-- Messaging internals of the DSim mobsim: agrona provides the lock-free queues and idle strategies,
+		     HdrHistogram the latency statistics. -->
 		<dependency>
 			<groupId>org.agrona</groupId>
 			<artifactId>agrona</artifactId>

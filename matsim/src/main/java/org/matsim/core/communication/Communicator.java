@@ -2,6 +2,7 @@ package org.matsim.core.communication;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.matsim.api.core.v01.Message;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.core.serialization.SerializationProvider;
 
 import java.lang.foreign.Arena;
@@ -226,7 +227,7 @@ public interface Communicator extends AutoCloseable {
 
 		// wait for acknowlegement
 		var isAcknowledged = new AtomicBoolean(false);
-		var ackType = provider.getType(AckMsg.class);
+		var ackType = MessageTypeRegistry.getInstance().getType(AckMsg.class);
 		recv(() -> !isAcknowledged.get(), (buf) -> {
 			buf.order(ByteOrder.LITTLE_ENDIAN);
 			int t = buf.getInt();
@@ -250,7 +251,7 @@ public interface Communicator extends AutoCloseable {
 	 */
 	default <T extends Message> List<T> gatherFromAll(Class<T> msgClass, SerializationProvider provider) {
 		// wait for msgs
-		var msgType = provider.getType(msgClass);
+		var msgType = MessageTypeRegistry.getInstance().getType(msgClass);
 		var expectedNumberOfMsgs = getSize() - 1;
 		var messages = new ArrayList<T>(expectedNumberOfMsgs);
 		var senders = new IntArrayList(expectedNumberOfMsgs);
