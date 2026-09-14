@@ -236,7 +236,7 @@ public class PtAlongALine2Test {
 				defaultConstraintsSet.setMaxTravelTimeAlpha(2.0);
 				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
-				defaultConstraintsSet.setMaxWaitTime(Double.MAX_VALUE);
+				defaultConstraintsSet.setMaxWaitTime(defaultConstraintsSet.getMaxTravelTimeBeta());
 				defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
@@ -253,7 +253,7 @@ public class PtAlongALine2Test {
 				defaultConstraintsSet.setMaxTravelTimeAlpha(1.3);
 				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
-				defaultConstraintsSet.setMaxWaitTime(Double.MAX_VALUE);
+				defaultConstraintsSet.setMaxWaitTime(defaultConstraintsSet.getMaxTravelTimeBeta());
 				defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
@@ -269,7 +269,8 @@ public class PtAlongALine2Test {
 				defaultConstraintsSet.setMaxTravelTimeAlpha(1.3);
 				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
-				defaultConstraintsSet.setMaxWaitTime(Double.MAX_VALUE);
+				defaultConstraintsSet.setMaxWaitTime(
+						Math.min(defaultConstraintsSet.getMaxTravelTimeBeta(), Double.MAX_VALUE));
 				defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
