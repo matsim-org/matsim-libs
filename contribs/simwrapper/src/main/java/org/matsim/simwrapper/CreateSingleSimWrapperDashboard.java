@@ -122,6 +122,13 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 
 					sw.addDashboard(new ImpactAnalysisDashboard(modes));
 				}
+//				case scenarioComparison -> {
+//					//this is a special case, as it requires a base run to compare against
+//					if (simwrapperCfg.getBasePath() == null) {
+//						throw new IllegalArgumentException("ScenarioComparisonDashboard requires a base run to be set in the config.");
+//					}
+//					sw.addDashboard(new ScenarioComparisonDashboard(simwrapperCfg.getBasePath(), true));
+//				}
 				default -> throw new IllegalArgumentException("unkown dashboard type: " + dashboardType);
 			}
 
@@ -148,8 +155,8 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 		ODTrip,
 		trip,
 		publicTransit,
-		impactAnalysis
+		impactAnalysis,
+		scenarioComparison
 	}
 
 }
-

@@ -22,7 +22,6 @@ public interface DashboardProvider {
 	 * List of dashboards this provider will add to the output. Generally one {@link Dashboard} is represented as one tab.
 	 */
 	List<Dashboard> getDashboards(Config config, SimWrapper simWrapper);
-
 	/**
 	 * Providers with higher priority are loaded first.
 	 * If a provider with lower priority tries to add the same dashboard in the same context it will be discarded.
