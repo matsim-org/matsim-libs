@@ -52,7 +52,7 @@ public class IntervalBasedTollingAll implements LinkEnterEventHandler, VehicleEn
 	private DecongestionInfo decongestionInfo;
 
 	private double totalTollPayments;
-	private Map<Id<Vehicle>, Double> lastLinkEnterTime = new HashMap<>();
+	private final Map<Id<Vehicle>, Double> lastLinkEnterTime = new HashMap<>();
 
 	@Override
 	public void reset(int iteration) {
