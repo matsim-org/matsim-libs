@@ -20,6 +20,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.application.avro.XYTData;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import tech.tablesaw.api.*;
@@ -117,6 +118,7 @@ final class MergeNoiseOutput {
 		}
 	}
 
+	private static int linkWrnCnt = 0;
 	private void mergeLinkData(String pathParameter, String label) throws IOException {
 		log.info("Merging emissions data for label {}", label);
 		Object2DoubleMap<String> mergedData = new Object2DoubleOpenHashMap<>();
@@ -136,7 +138,17 @@ final class MergeNoiseOutput {
 				String linkId = row.getString("Link Id");
 				double value = row.getDouble(row.columnCount() - 1);
 				mergedData.mergeDouble(linkId, value, Double::max);
-
+				// yyyyyy If I am reading the above correctly, then it takes the maximum value over the day.  This
+				// is not the correct approach for noise levels.  There are two addtl things:
+				// (1) one needs to use enery averaging, not the max operation.  It would actually make sense to have this in some library.
+				// (2) one needs to add 5 dB for evening levels (in D: 18-22) and 10 dB for night levels (in D: 22-6).
+				if ( linkWrnCnt < 5 ) {
+					linkWrnCnt++;
+					log.warn( "MergeNoiseOutput#mergeLinkData is not using energetic addition; this is wrong." );
+					if ( linkWrnCnt==5 ) {
+						log.warn( Gbl.FUTURE_SUPPRESSED );
+					}
+				}
 			}
 		}
 
@@ -152,6 +164,8 @@ final class MergeNoiseOutput {
 		csvOutputMerged.write().csv(out);
 		log.info("Merged noise data written to {} ", out);
 	}
+
+	private static int pointWrnCnt = 0;
 
 	/**
 	 * Merges receiverPoint data (written by {@link org.matsim.contrib.noise.NoiseWriter}
@@ -219,15 +233,29 @@ final class MergeNoiseOutput {
 		Object2FloatMap<FloatFloatPair> perDay = new Object2FloatOpenHashMap<>();
 
 		for (Integer ts : xytHourData.getTimestamps()) {
-			Object2FloatMap<FloatFloatPair> d = data.get((int) ts);
+			Object2FloatMap<FloatFloatPair> dataForTimestamp = data.get((int) ts);
 
 			for (Float x : xytHourData.getXCoords()) {
 				for (Float y : xytHourData.getYCoords()) {
 					FloatFloatPair coord = FloatFloatPair.of(x, y);
-					float v = d.getOrDefault(coord, 0);
-					raw.add(v);
-					if (v > 0)
-						perDay.mergeFloat(coord, v, Float::sum);
+					float value = dataForTimestamp.getOrDefault(coord, 0);
+					raw.add(value);
+					if (value > 0){
+						perDay.mergeFloat( coord, value, Float::sum );
+						// yy why not double?  float is dangerous
+						// yyyyyy For immissions, one would need to use energetic addition, not simply "sum". !!!
+						// yyyyyy yyyyyy For damages, it is not even clear if one can add up hourly values
+						// to daily values. Or in other words, it is not even clear if the hourly values
+						// introduced by Ihab are indeed conceptually valid.
+						if ( pointWrnCnt < 5 ) {
+							pointWrnCnt++;
+							log.warn( "MergeNoiseOutput#mergeReceiverPointData is not using energetic addition; this is wrong. Also, one cannot simply add damages over the day." );
+							if ( pointWrnCnt==5 ) {
+								log.warn( Gbl.FUTURE_SUPPRESSED );
+							}
+						}
+
+					}
 				}
 			}
 		}
