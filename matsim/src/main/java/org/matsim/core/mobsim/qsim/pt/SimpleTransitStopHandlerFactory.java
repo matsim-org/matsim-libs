@@ -19,6 +19,10 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import com.google.inject.Inject;
+import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -26,10 +30,24 @@ import org.matsim.vehicles.Vehicle;
  */
 public class SimpleTransitStopHandlerFactory implements TransitStopHandlerFactory {
 
+	@Inject
+	private Scenario scenario;
+
 	@Override
 	public TransitStopHandler createTransitStopHandler(Vehicle vehicle) {
-		// TODO vehicle is not used, since constant values are used for access and egress time 
+		// TODO vehicle is not used, since constant values are used for access and egress time
 		return new SimpleTransitStopHandler();
+	}
+
+	@Override
+	public TransitStopHandler createTransitStopHandler(Message message) {
+
+		if (!(message instanceof SimpleTransitStopHandler.Msg m)) {
+			throw new IllegalArgumentException("SimpleTransitStopHandlerFactory can only handle messages of type SimpleTransitStopHandler.Msg");
+		}
+
+		TransitStopFacility stop = scenario.getTransitSchedule().getFacilities().get(m.lastHandledStop());
+		return new SimpleTransitStopHandler(stop);
 	}
 
 }

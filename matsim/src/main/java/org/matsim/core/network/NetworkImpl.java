@@ -23,12 +23,10 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -36,12 +34,12 @@ import java.util.*;
 
 /**
  * Design thoughts:<ul>
- * <li> This class is final, since it is sitting behind an interface, and thus delegation can be used for 
+ * <li> This class is final, since it is sitting behind an interface, and thus delegation can be used for
  * implementation modifications.  Access to the quad tree might be justified in some cases, but should then be realized
  * by specific methods and not via inheritance of the field (I would think).
 
  </ul>
- * 
+ *
  * @author nagel
  * @author mrieser
  */
@@ -67,8 +65,10 @@ import java.util.*;
 
 	private NetworkFactory factory;
 
+	private NetworkPartitioning partitioning = NetworkPartitioning.SINGLE_INSTANCE;
+
 //	private final Collection<NetworkChangeEvent> networkChangeEvents = new ArrayList<>();
-	
+
 	private final Queue<NetworkChangeEvent> networkChangeEvents
 //			= new PriorityQueue<>(11, new Comparator<NetworkChangeEvent>() {
 //		@Override
@@ -77,14 +77,16 @@ import java.util.*;
 //		}
 //	});
 			= new PriorityQueue<>(11, new NetworkChangeEvent.StartTimeComparator() ) ;
-	
+
 	private String name = null;
 
-	private int counter=0;
+//	private int counter=0;
+	private final Counter counter = new Counter( "adding link # ");
 
 	private int nextMsg=1;
 
-	private int counter2=0;
+//	private int counter2=0;
+	private final Counter counter2 = new Counter( "adding node # " );
 
 	private int nextMsg2=1;
 
@@ -146,23 +148,18 @@ import java.util.*;
 		}
 
 
-		// show counter
-		this.counter++;
-		if (this.counter % this.nextMsg == 0) {
-			this.nextMsg *= 4;
-			printLinksCount();
-		}
+//		// show counter
+//		this.counter++;
+//		if (this.counter % this.nextMsg == 0) {
+//			this.nextMsg *= 4;
+//			log.info(" link # " + this.counter );
+//		}
+
+		counter.incCounter();
+
 		if ( this.locked && link instanceof Lockable ) {
 			((Lockable)link).setLocked() ;
 		}
-	}
-
-	private void printLinksCount() {
-		log.info(" link # " + this.counter);
-	}
-
-	private void printNodesCount() {
-		log.info(" node # " + this.counter2);
 	}
 
 	@Override
@@ -194,17 +191,20 @@ import java.util.*;
 			}
 		}
 
-		// show counter
-		this.counter2++;
-		if (this.counter2 % this.nextMsg2 == 0) {
-			this.nextMsg2 *= 4;
-			printNodesCount();
-		}
+//		// show counter
+//		this.counter2++;
+//		if (this.counter2 % this.nextMsg2 == 0) {
+//			this.nextMsg2 *= 4;
+//			log.info(" node # " + this.counter2 );
+//		}
+
+		counter2.incCounter();
 
 		if ( this.locked && nn instanceof Lockable ) {
 			((Lockable)nn).setLocked() ;
 		}
 	}
+
 	// ////////////////////////////////////////////////////////////////////
 	// remove methods
 	// ////////////////////////////////////////////////////////////////////
@@ -506,5 +506,15 @@ import java.util.*;
 	@Override public QuadTree<Node> getNodeQuadTree() {
 		if (this.nodeQuadTree == null) buildQuadTree();
 		return this.nodeQuadTree ;
+	}
+
+	@Override
+	public NetworkPartitioning getPartitioning() {
+		return partitioning;
+	}
+
+	@Override
+	public void setPartitioning(NetworkPartitioning partitioning) {
+		this.partitioning = partitioning;
 	}
 }

@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
+import org.matsim.core.router.speedy.CHRouterFactory;
 import org.matsim.core.router.util.*;
 
 public class LeastCostPathCalculatorModule extends AbstractModule {
@@ -43,6 +44,8 @@ public class LeastCostPathCalculatorModule extends AbstractModule {
             bind(LeastCostPathCalculatorFactory.class).to(AStarLandmarksFactory.class);
         } else if (config.controller().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.SpeedyALT)) {
             bind(LeastCostPathCalculatorFactory.class).to(SpeedyALTFactory.class);
+        } else if (config.controller().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.CHRouter)) {
+            bind(LeastCostPathCalculatorFactory.class).to(CHRouterFactory.class);
         }
     }
 

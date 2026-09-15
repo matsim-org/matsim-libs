@@ -42,7 +42,8 @@ public class MATSimTripScoringConfigGroup extends ComponentConfigGroup {
 
 	@StringSetter(PT_LEG_MODES)
 	public void setPtLegModesAsString(String ptLegModes) {
-		this.ptLegModes = Arrays.asList(ptLegModes.split(",")).stream().map(String::trim).collect(Collectors.toSet());
+		this.ptLegModes = Arrays.asList(ptLegModes.split(",")).stream().map(String::trim).filter(s -> !s.isEmpty())
+				.collect(Collectors.toSet());
 	}
 
 	@StringGetter(PT_LEG_MODES)

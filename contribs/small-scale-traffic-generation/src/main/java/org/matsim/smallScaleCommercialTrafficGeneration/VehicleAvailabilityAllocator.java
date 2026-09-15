@@ -7,7 +7,7 @@ import java.util.*;
  * <i>NOTE: This class does not actually change anything in the scenario. It is just a tool to check if Service and Vehicle TimeWindows are
  * compatible.</i>
  */
-public class VehicleAvailabilityAllocator {
+class VehicleAvailabilityAllocator {
 	private List<Double> availableVehicleTime;
 
 	/**

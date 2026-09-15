@@ -159,6 +159,8 @@ public class LinkProperties {
 
     /**
      * Calculate free speed of a link based on heuristic if it is an urban link.
+	 * <br>
+	 * "urban link" is defined as maxSpeed < 51km/h.
      */
 	public static double calculateSpeedIfSpeedTag(double maxSpeed, double freeSpeedFactor) {
         double urbanSpeedFactor = maxSpeed < 51 / 3.6 ? freeSpeedFactor : 1.0;

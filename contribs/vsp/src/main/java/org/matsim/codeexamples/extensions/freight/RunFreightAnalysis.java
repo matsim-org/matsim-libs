@@ -35,9 +35,9 @@ public class RunFreightAnalysis {
 
 		CarriersAnalysis analysis = new CarriersAnalysis(
 				"MA_output\\byPopulationAndAge_demandPerPerson_1pt\\",
-				"MA_output\\byPopulationAndAge_demandPerPerson_1pt\\analysis", null, "EPSG:25832");
+				"MA_output\\byPopulationAndAge_demandPerPerson_1pt\\analysis", "EPSG:25832");
 		try {
-			analysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
+			analysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnEvents);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

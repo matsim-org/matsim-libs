@@ -71,6 +71,8 @@ public class StuckAgentTest {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.qsim().setEndTime(24*3600);
 
 		config.controller().setLastIteration(0);
@@ -86,7 +88,7 @@ public class StuckAgentTest {
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);
-		config.scoring().addActivityParams(homeParams);
+		config.scoring().addDefaultActivityParams(homeParams);
 
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
@@ -153,7 +155,7 @@ public class StuckAgentTest {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);
 
-        controler.addOverridingModule(new MultiModalModule());
+		controler.addOverridingModule(new MultiModalModule());
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);

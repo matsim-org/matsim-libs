@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
@@ -113,7 +112,7 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 		}
 		//if no possible parking was found. The vehicle takes a random next link. Background assumption: parking only at given parking slots
 		if (actualRoute == null) {
-			List<Link> outGoingLinks = ParkingUtils.getOutgoingLinksForMode(network.getLinks().get(currentLinkId), mode);
+			List<Link> outGoingLinks = NetworkUtils.getOutgoingLinksForMode(network.getLinks().get(currentLinkId), mode);
 			return outGoingLinks.get(random.nextInt(outGoingLinks.size())).getId();
 		}
 		if (currentLinkIdx == actualRoute.getLinkIds().size()) {
@@ -235,7 +234,7 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 			ActivityOption parkingOptions = activityFacility.getActivityOptions().get("parking");
 			if (!parkingOptions.getOpeningTimes().isEmpty()) {
 				if (parkingOptions.getOpeningTimes().first().getStartTime() > now && parkingOptions.getOpeningTimes().first()
-																								   .getEndTime() < latestEndOfParking) {
+					.getEndTime() < latestEndOfParking) {
 					continue;
 				}
 			}

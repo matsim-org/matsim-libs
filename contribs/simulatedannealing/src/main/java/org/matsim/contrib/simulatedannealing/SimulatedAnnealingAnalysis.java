@@ -83,7 +83,7 @@ public final class SimulatedAnnealingAnalysis<T> implements IterationStartsListe
 
 	private BufferedWriter getAppendingBufferedWriter(String prefix, String extension) {
 		return IOUtils.getAppendingBufferedWriter(
-				matsimServices.getControlerIO().getOutputFilename(prefix + "_" + extension));
+				matsimServices.getControllerIO().getOutputFilename(prefix + "_" + extension));
 	}
 }
 

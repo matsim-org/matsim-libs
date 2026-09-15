@@ -20,37 +20,14 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CyclicBarrier;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -73,10 +50,15 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.*;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CyclicBarrier;
+
 /**
  * Collects link travel times over a given time span (storedTravelTimesBinSize)
  * and calculates an average travel time over this time span.
- *
+ * <p>
  * TODO:
  * - make storedTravelTimesBinSize configurable (e.g. via config)
  *
@@ -84,10 +66,10 @@ import org.matsim.vehicles.Vehicle;
  */
 @Singleton
 public class WithinDayTravelTime implements TravelTime,
-		LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler,
-		VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler,
-		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
-		MobsimBeforeCleanupListener {
+	LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler,
+	VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler,
+	MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
+	MobsimBeforeCleanupListener {
 
 	private static final Logger log = LogManager.getLogger(WithinDayTravelTime.class);
 
@@ -100,7 +82,7 @@ public class WithinDayTravelTime implements TravelTime,
 	private TravelTimeInfoProvider travelTimeInfoProvider;
 
 	// Links that are changed by network change events
-	private TreeMap<Double, Map<Link,Double>> changedLinksByTime;
+	private TreeMap<Double, Map<Link, Double>> changedLinksByTime;
 	// yy better a priority queue.  kai, dec'17
 
 	/*
@@ -111,6 +93,7 @@ public class WithinDayTravelTime implements TravelTime,
 	private UpdateMeanTravelTimesRunnable[] updateMeanTravelTimesRunnables;
 	private final int numOfThreads;
 
+	// These two variables determine the interval at which info is printed
 	private final int infoTimeStep = 3600;
 	private int nextInfoTime = 0;
 
@@ -118,10 +101,10 @@ public class WithinDayTravelTime implements TravelTime,
 	private final Set<String> analyzedModes;
 	private final boolean filterModes;
 
-	private boolean problem = true ;
+	private boolean problem = true;
 	private int resetCnt = 0;
 
-	private double now = Double.NEGATIVE_INFINITY ;
+	private double now = Double.NEGATIVE_INFINITY;
 
 	@Inject
 	WithinDayTravelTime(Scenario scenario) {
@@ -198,28 +181,28 @@ public class WithinDayTravelTime implements TravelTime,
 		ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();
 		if (freespeedChange != null) {
 			double startTime = networkChangeEvent.getStartTime();
-			Map<Link,Double> newLinkSpeedsAtThisTime = changedLinksByTime.computeIfAbsent(startTime, k -> new HashMap<>());
-			for ( Link link : networkChangeEvent.getLinks() ) {
+			Map<Link, Double> newLinkSpeedsAtThisTime = changedLinksByTime.computeIfAbsent(startTime, k -> new HashMap<>());
+			for (Link link : networkChangeEvent.getLinks()) {
 				// yy seems that the following should be available centrally. kai, dec'17
-				double newSpeed ;
-				switch ( freespeedChange.getType() ) {
+				double newSpeed;
+				switch (freespeedChange.getType()) {
 					case ABSOLUTE_IN_SI_UNITS:
-						newSpeed = freespeedChange.getValue() ;
+						newSpeed = freespeedChange.getValue();
 						break;
 					case FACTOR:
-						newSpeed = link.getFreespeed() * freespeedChange.getValue() ;
+						newSpeed = link.getFreespeed() * freespeedChange.getValue();
 						break;
 					case OFFSET_IN_SI_UNITS:
-						newSpeed = link.getFreespeed() + freespeedChange.getValue() ;
+						newSpeed = link.getFreespeed() + freespeedChange.getValue();
 						break;
 					default:
-						throw new RuntimeException("change event type not implemented") ;
+						throw new RuntimeException("change event type not implemented");
 				}
-				if ( startTime > 0. ) {
-					log.debug( "registering a change event for time=" + startTime
-					+ "; linkId=" + link.getId() ) ;
+				if (startTime > 0.) {
+					log.debug("registering a change event for time=" + startTime
+						+ "; linkId=" + link.getId());
 				}
-				newLinkSpeedsAtThisTime.put( link, newSpeed ) ;
+				newLinkSpeedsAtThisTime.put(link, newSpeed);
 			}
 		}
 	}
@@ -237,11 +220,11 @@ public class WithinDayTravelTime implements TravelTime,
 	@Override
 	public void reset(int iteration) {
 		init();
-		resetCnt++ ;
-		if ( resetCnt >1 ) {
-			if ( problem ) {
+		resetCnt++;
+		if (resetCnt > 1) {
+			if (problem) {
 				throw new RuntimeException("using WithinDayTravelTime, but mobsim notifications not called between two resets.  "
-						+ "Did you really add this as a mobsim listener?") ;
+					+ "Did you really add this as a mobsim listener?");
 			}
 		}
 	}
@@ -324,7 +307,7 @@ public class WithinDayTravelTime implements TravelTime,
 	 */
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		problem = false ;
+		problem = false;
 
 		if (e.getQueueSimulation() instanceof QSim) {
 			double simStartTime = ((QSim) e.getQueueSimulation()).getSimTimer().getSimStartTime();
@@ -333,7 +316,7 @@ public class WithinDayTravelTime implements TravelTime,
 			 * infoTime may be < simStartTime, this ensures to print
 			 * out the info at the very first timestep already
 			 */
-			this.nextInfoTime = (int)(Math.floor(simStartTime / this.infoTimeStep) * this.infoTimeStep);
+			this.nextInfoTime = (int) (Math.floor(simStartTime / this.infoTimeStep) * this.infoTimeStep);
 		}
 
 
@@ -352,7 +335,7 @@ public class WithinDayTravelTime implements TravelTime,
 	// Update Link TravelTimeInfos if link attributes have changed
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
-		problem = false ;
+		problem = false;
 
 		// yyyy In terms of "bushfire evacuation" design (and maybe even in terms of more general transport telematics)
 		// one would need some settable TimeDependentNetworkUpdater class.  kai, dec'17
@@ -362,20 +345,20 @@ public class WithinDayTravelTime implements TravelTime,
 		// if someone adds a link change event in between two integer
 		// time steps?  kai, dec'17
 
-		while( !changedLinksByTime.isEmpty() && changedLinksByTime.firstKey() <= e.getSimulationTime() ) {
+		while (!changedLinksByTime.isEmpty() && changedLinksByTime.firstKey() <= e.getSimulationTime()) {
 			Map<Link, Double> map = changedLinksByTime.pollFirstEntry().getValue();
-			for ( Map.Entry<Link,Double> link2speed : map.entrySet() ) {
-				Link link = link2speed.getKey() ;
-				double freeSpeedTravelTime = link.getLength() / link2speed.getValue() ;
-				if ( e.getSimulationTime() > ((QSim)e.getQueueSimulation()).getSimTimer().getSimStartTime() ) {
+			for (Map.Entry<Link, Double> link2speed : map.entrySet()) {
+				Link link = link2speed.getKey();
+				double freeSpeedTravelTime = link.getLength() / link2speed.getValue();
+				if (e.getSimulationTime() > ((QSim) e.getQueueSimulation()).getSimTimer().getSimStartTime()) {
 					// (otherwise, in some simulations one gets a lot of change events at time 0. kai, dec'17)
 					log.debug("time=" + e.getSimulationTime() +
-									  "; network change event for link=" + link.getId() +
-									  "; new ttime="+ freeSpeedTravelTime );
+						"; network change event for link=" + link.getId() +
+						"; new ttime=" + freeSpeedTravelTime);
 				}
 				TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(link);
 				travelTimeInfo.init(freeSpeedTravelTime);
-				travelTimeInfo.checkActiveState();	// ensure that the estimated link travel time is updated
+				travelTimeInfo.checkActiveState();    // ensure that the estimated link travel time is updated
 			}
 		}
 
@@ -397,9 +380,9 @@ public class WithinDayTravelTime implements TravelTime,
 	// Update Link TravelTimes
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-		problem = false ;
+		problem = false;
 
-		now = e.getSimulationTime() ;
+		now = e.getSimulationTime();
 
 		// parallel Execution
 		this.run(e.getSimulationTime());
@@ -410,7 +393,7 @@ public class WithinDayTravelTime implements TravelTime,
 
 	@Override
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-		problem = false ;
+		problem = false;
 
 		/*
 		 * Calling the afterSim Method of the Threads will set their
@@ -464,8 +447,10 @@ public class WithinDayTravelTime implements TravelTime,
 		double freeSpeedTravelTime = Double.MAX_VALUE; // We cache the FreeSpeedTravelTimes
 		double travelTime = Double.MAX_VALUE;
 
-		double dynamicBinSize = 0.0; // size of the time window that is taken into account
+		// size of the time window that is taken into account
+		double dynamicBinSize = 0.0;
 
+		// counters are for debugging purposes (and static!!)
 		static Counter enlarge = new Counter("WithinDayTravelTime: enlarged time bin size: ");
 		static Counter shrink = new Counter("WithinDayTravelTime: shrunk time bin size: ");
 
@@ -481,6 +466,9 @@ public class WithinDayTravelTime implements TravelTime,
 			}
 		}
 
+		// dynamic bin size adjustment:
+		// if tripTime is larger than bin size, double bin size (e.g. tripTime = 70s, bin size = 60s -> bin size = 140s)
+		// if tripTime is less than a third of bin size, shrink bin size to triple trip time (e.g. tripTime = 10s, bin size = 60s -> bin size = 30s)
 		/*package*/ void checkBinSize(double tripTime) {
 			if (tripTime > dynamicBinSize) {
 				dynamicBinSize = tripTime * 2;
@@ -514,8 +502,14 @@ public class WithinDayTravelTime implements TravelTime,
 				updateMeanTravelTimesRunnable.setTime(time);
 			}
 
+			// In general this architecture seams odd, be it works. Not sure why we have the barriers here and not trigger the threads directly. paul, jan '26.
+
+			// The startBarrier is shared with the UpdateMeanTravelTimesRunnables. By reaching this Barrier we trigger them to
+			// start calculating the Mean TravelTimes.
 			this.startBarrier.await();
 
+			// We wait until all UpdateMeanTravelTimesRunnables have reached this Barrier what means they have finished
+			// calculating the Mean TravelTimes.
 			this.endBarrier.await();
 		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
@@ -663,6 +657,7 @@ public class WithinDayTravelTime implements TravelTime,
 			List<TripBin> tripBins = travelTimeInfo.tripBins;
 
 			// first remove old TravelTimes
+			// of course, the time window is a look behind window. For travel time reporting, all travel times between now - dynamicBinSize and now are taken into account. paul, jan '26
 			Iterator<TripBin> iter = tripBins.iterator();
 			while (iter.hasNext()) {
 				TripBin tripBin = iter.next();

@@ -26,6 +26,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -39,9 +40,7 @@ public class ReadFromURLIT {
 	void testReadingFromURLWorks() throws MalformedURLException {
 		Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork() ;
 		MatsimNetworkReader reader = new MatsimNetworkReader(network) ;
-//		reader.parse(new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/matsim/examples/equil/network.xml"));
-		reader.parse( new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/equil/network.xml") ) ;
+		reader.parse(URI.create("https://raw.githubusercontent.com/matsim-org/matsim/main/examples/scenarios/equil/network.xml").toURL());
 		Assertions.assertThat(network.getLinks().size()).isEqualTo(23);
 	}
-
 }

@@ -70,6 +70,10 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 
 	static final String VALUE_TAG = "value";
 
+	static final String ATTRIBUTE_TAG = "attribute";
+
+	static final String ATTRIBUTE_NAME_TAG = "name";
+
 	// ========================================================================
 	// private members
 	// ========================================================================
@@ -192,6 +196,22 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 		} else if(name.equalsIgnoreCase(LANES_TAG) && this.currentEvent != null) {
 			this.currentEvent.setLanesChange(newNetworkChangeType(atts
 					.getValue(CHANGE_TYPE_TAG), atts.getValue(VALUE_TAG)));
+		/*
+		 * attribute changes
+		 */
+		} else if(name.equalsIgnoreCase(ATTRIBUTE_TAG) && this.currentEvent != null) {
+			String attributeName = atts.getValue(ATTRIBUTE_NAME_TAG);
+			if(attributeName != null) {
+				NetworkChangeEvent.ChangeValue changeValue = newNetworkChangeType(atts
+						.getValue(CHANGE_TYPE_TAG), atts.getValue(VALUE_TAG));
+				if(changeValue != null) {
+					NetworkChangeEvent.AttributesChangeValue attributesChangeValue = 
+							new NetworkChangeEvent.AttributesChangeValue(changeValue.getType(), changeValue.getValue(), attributeName);
+					this.currentEvent.addAttributesChange(attributesChangeValue);
+				}
+			} else {
+				log.warn("Attribute name must be specified!");
+			}
 		}
 
 	}

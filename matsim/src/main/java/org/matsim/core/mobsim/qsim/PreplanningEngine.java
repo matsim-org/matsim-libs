@@ -21,17 +21,7 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import static java.util.Comparator.comparing;
-import static org.matsim.core.config.groups.ScoringConfigGroup.createStageActivityType;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -39,21 +29,15 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.core.population.PopulationUtils;
@@ -69,9 +53,12 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
 
-import com.google.inject.Inject;
+import java.util.*;
 
-public final class PreplanningEngine implements MobsimEngine {
+import static java.util.Comparator.comparing;
+import static org.matsim.core.config.groups.ScoringConfigGroup.createStageActivityType;
+
+public final class PreplanningEngine implements DistributedMobsimEngine {
 	// Could implement this as a generalized version of the bdi-abm implementation: can send notifications to agent, and agent can react.  Similar
 	// to the drive-to action. Notifications and corresponding handlers could then be registered.
 
@@ -91,12 +78,12 @@ public final class PreplanningEngine implements MobsimEngine {
 	private final Scenario scenario;
 
 	// (we are in the mobsim, so we don't need to play around with IDs)
-	private final Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new TreeMap<>(comparing(Identifiable::getId ));
+	private final Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new TreeMap<>(comparing(Identifiable::getId));
 	// yyyy not sure about possible race conditions here! kai, feb'19
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 	// (haven't these two points be fixed by using the "comparing"?  kai, apr'24)
 
-	private final Map<MobsimAgent, TripInfo.Request> tripInfoRequestMap = new TreeMap<>(comparing(Identifiable::getId ));
+	private final Map<MobsimAgent, TripInfo.Request> tripInfoRequestMap = new TreeMap<>(comparing(Identifiable::getId));
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 	// (hasn't this point be fixed by using the "comparing"? kai, apr'24)
 
@@ -106,7 +93,8 @@ public final class PreplanningEngine implements MobsimEngine {
 	private InternalInterface internalInterface;
 	private final TimeInterpretation timeInterpretation;
 
-	@Inject PreplanningEngine(TripRouter tripRouter, Scenario scenario, TimeInterpretation timeInterpretation) {
+	@Inject
+	PreplanningEngine(TripRouter tripRouter, Scenario scenario, TimeInterpretation timeInterpretation) {
 		this.tripRouter = tripRouter;
 		this.population = scenario.getPopulation();
 		this.facilities = scenario.getActivityFacilities();
@@ -115,25 +103,26 @@ public final class PreplanningEngine implements MobsimEngine {
 		this.timeInterpretation = timeInterpretation;
 	}
 
-	@Override public void onPrepareSim() {
-		log.warn( "running onPrepareSim");
+	@Override
+	public void beforeMobsim() {
+		log.warn("running onPrepareSim");
 		for (DepartureHandler departureHandler : internalInterface.getDepartureHandlers()) {
 			if (departureHandler instanceof TripInfo.Provider) {
-				String mode = ((TripInfo.Provider)departureHandler).getMode();
+				String mode = ((TripInfo.Provider) departureHandler).getMode();
 				log.warn("registering TripInfo.Provider for mode=" + mode);
-				this.tripInfoProviders.put(mode, (TripInfo.Provider)departureHandler);
+				this.tripInfoProviders.put(mode, (TripInfo.Provider) departureHandler);
 			}
 		}
 	}
 
-	@Override public void afterSim() { }
-
-	@Override public void setInternalInterface(InternalInterface internalInterface) {
-		this.editPlans = new EditPlans(internalInterface.getMobsim(), new EditTrips( tripRouter, scenario, internalInterface, timeInterpretation ) );
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.editPlans = new EditPlans(internalInterface.getMobsim(), new EditTrips(tripRouter, scenario, internalInterface, timeInterpretation));
 		this.internalInterface = internalInterface;
 	}
 
-	@Override public void doSimStep(double time) {
+	@Override
+	public void doSimStep(double time) {
 		//first process requests and then infos --> trips without booking required can be processed in 1 time step
 		//booking confirmation always comes later (e.g. next time step)
 
@@ -148,7 +137,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 			List<TripInfo> allTripInfos = new ArrayList<>();
 			for (TripInfo.Provider provider : tripInfoProviders.values()) {
-				allTripInfos.addAll( provider.getTripInfos( request ) );
+				allTripInfos.addAll(provider.getTripInfos(request));
 			}
 
 			// TODO add info for mode that is in agent plan, if not returned by trip info provider
@@ -157,7 +146,7 @@ public final class PreplanningEngine implements MobsimEngine {
 			// the following method decides, and
 			// * puts it then into the tripInfoUpdatesMap (processed below); or
 			// * if the agent needs to wait for confirmation, the confirming method (currently only in PassengerEngineWithPrebooking) puts it into tripInfoUpdatesMap.
-			decide( mobsimAgent, allTripInfos );
+			decide(mobsimAgent, allTripInfos);
 		}
 		tripInfoRequestMap.clear();
 
@@ -191,7 +180,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		// (I have inlined the above methods since I find this for the time being easier to read.  Can be extracted again at some later point in time . kai, jan'20)
 	}
 
-	public synchronized void notifyChangedTripInformation( MobsimAgent agent, Optional<TripInfo> tripInfoUpdate ) {
+	public synchronized void notifyChangedTripInformation(MobsimAgent agent, Optional<TripInfo> tripInfoUpdate) {
 		// yyyy My IDE complains about "Optional" in method signatures.  kai, jan'20
 		// It looks like it needs to be possible to return an "empty" tripInfoUpdate in order to notify that the "decided" (= selected) trip
 		// option did not work out.  Or, alternatively, none of the providers returned an answer at all.
@@ -199,7 +188,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		tripInfoUpdatesMap.put(agent, tripInfoUpdate);
 	}
 
-	private synchronized void notifyTripInfoNeeded( MobsimAgent agent, TripInfo.Request tripInfoRequest ) {
+	private synchronized void notifyTripInfoNeeded(MobsimAgent agent, TripInfo.Request tripInfoRequest) {
 		tripInfoRequestMap.put(agent, tripInfoRequest);
 	}
 
@@ -221,14 +210,14 @@ public final class PreplanningEngine implements MobsimEngine {
 //					.bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
 			// yyyy can't we really not use the tripInfo handle directly as I had it before?  We may, e.g., have different providers of the same mode.  kai, mar'19
 
-			tripInfo.bookTrip( (MobsimPassengerAgent) agent );
+			tripInfo.bookTrip((MobsimPassengerAgent) agent);
 
 			//to reduce number of possibilities, I would simply assume that notification always comes later
 			//
 			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
 
 			// wait for notification:
-			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
+			((Activity) WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
 //			TripInfoRequestWithActivities tripInfoRequest = (TripInfoRequestWithActivities)tripInfo.getOriginalRequest();
 //			tripInfoRequest.getFromActivity().setEndTime(Double.MAX_VALUE);
 			// There is no guarantee that the activity that is in the tripInfoRequest is still the behavioral object of the agent.  kai, jan'20
@@ -250,27 +239,27 @@ public final class PreplanningEngine implements MobsimEngine {
 		log.warn("---");
 	}
 
-	List<ActivityEngineWithWakeup.AgentEntry> generateWakeups( MobsimAgent agent, double now ) {
+	List<ActivityEngineWithWakeup.AgentEntry> generateWakeups(MobsimAgent agent, double now) {
 		if (!(agent instanceof HasModifiablePlan)) {
 			// (we don't want to treat DvrpAgents, CarrierAgents, TransitVehicleDrivers etc. here)
 			return Collections.emptyList();
 		}
 
-		final Double prebookingOffset_s = PreplanningUtils.getPrebookingOffset_s( ((PlanAgent) agent).getCurrentPlan() );
+		final Double prebookingOffset_s = PreplanningUtils.getPrebookingOffset_s(((PlanAgent) agent).getCurrentPlan());
 
 		if (prebookingOffset_s == null) {
-			log.warn("The " + "prebookingOffset_s" + " is not set in the agent.  No wakeup for prebooking will be generated." );
+			log.warn("The " + "prebookingOffset_s" + " is not set in the agent.  No wakeup for prebooking will be generated.");
 			return Collections.emptyList();
 		}
 
 		List<ActivityEngineWithWakeup.AgentEntry> wakeups = new ArrayList<>();
 
-		for (String mode : new String[] { TransportMode.drt, TransportMode.taxi } ) {
+		for (String mode : new String[]{TransportMode.drt, TransportMode.taxi}) {
 			// (only do the following for drt and taxi yyyy which means it may fail for, say, "drt2".  kai, apr'23)
 
 			// (not doing this for, say, pt, is fine, though.  we could still have pt as fallback mode for drt/taxi.)
 
-			for (Leg drtLeg : EditPlans.findLegsWithModeInFuture(agent, mode )) {
+			for (Leg drtLeg : EditPlans.findLegsWithModeInFuture(agent, mode)) {
 				// (find the corresponding legs)
 
 				final double prebookingTime = drtLeg.getDepartureTime().seconds() - prebookingOffset_s;
@@ -279,10 +268,10 @@ public final class PreplanningEngine implements MobsimEngine {
 
 					// ### the following inserts the preplanLeg (--> preplanTrip??), to be executed at wakeup: ###
 					log.info("generating wakeup entry");
-					wakeups.add(new ActivityEngineWithWakeup.AgentEntry(agent, prebookingTime, (agent1, then) -> preplanLeg(agent1, then, drtLeg )) );
+					wakeups.add(new ActivityEngineWithWakeup.AgentEntry(agent, prebookingTime, (agent1, then) -> preplanLeg(agent1, then, drtLeg)));
 				}
 
-				Activity originActivity = EditTrips.findTripAtPlanElement(agent, drtLeg ).getOriginActivity();
+				Activity originActivity = EditTrips.findTripAtPlanElement(agent, drtLeg).getOriginActivity();
 				if (originActivity.getEndTime().seconds() < now + 2.) {
 					originActivity.setEndTime(now + 2.);
 					WithinDayAgentUtils.resetCaches(agent); // !!!!!!!!
@@ -303,24 +292,24 @@ public final class PreplanningEngine implements MobsimEngine {
 		return wakeups;
 	}
 
-	private void preplanLeg( MobsimAgent agent, double now, Leg leg ) {
+	private void preplanLeg(MobsimAgent agent, double now, Leg leg) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 		// () search for drt trip corresponding to drt leg.  Trick is using our own stage activities (drtStageActivities).
 		// () existing tests pass, but probably it is currently wrong after removing stage activity types
 		// and thereby losing the ability to only consider drtStageActivities as stage activities and nothing else
 		// () I think that this is now fixed.  yyyy But there should also be a test for it.  kai, jan'20
-		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals );
+		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals);
 		Gbl.assertNotNull(drtTrip);
 
-		final double expectedEndTimeOfOriginActivity = timeInterpretation.decideOnActivityEndTime( drtTrip.getOriginActivity(), now ).seconds();
+		final double expectedEndTimeOfOriginActivity = timeInterpretation.decideOnActivityEndTime(drtTrip.getOriginActivity(), now).seconds();
 
 		final TripInfo.Request request = new TripInfoRequestWithActivities.Builder(scenario)
-								 .setFromActivity( drtTrip.getOriginActivity() )
-								 .setToActivity(drtTrip.getDestinationActivity())
-								 .setTime( expectedEndTimeOfOriginActivity )
-								 .setPlannedRoute( leg.getRoute() )
-								 .createRequest();
+			.setFromActivity(drtTrip.getOriginActivity())
+			.setToActivity(drtTrip.getDestinationActivity())
+			.setTime(expectedEndTimeOfOriginActivity)
+			.setPlannedRoute(leg.getRoute())
+			.createRequest();
 
 		//first simulate ActivityEngineWithWakeup and then PreplanningEngine --> decision process
 		//in the same time step
@@ -364,10 +353,10 @@ public final class PreplanningEngine implements MobsimEngine {
 		WithinDayAgentUtils.resetCaches(agent);
 
 		log.warn("agentId=" + agent.getId() + " | newActEndTime=" + inputTrip.getOriginActivity()
-										     .getEndTime()
-										     .seconds());
+			.getEndTime()
+			.seconds());
 
-		final List<PlanElement> result = createDrtTripInclAccessEgress( tripInfo, inputTrip );
+		final List<PlanElement> result = createDrtTripInclAccessEgress(tripInfo, inputTrip);
 
 		TripRouter.insertTrip(plan, inputTrip.getOriginActivity(), result, inputTrip.getDestinationActivity());
 
@@ -381,25 +370,26 @@ public final class PreplanningEngine implements MobsimEngine {
 		log.warn("---");
 
 	}
-	private List<PlanElement> createDrtTripInclAccessEgress( TripInfo tripInfo, TripStructureUtils.Trip inputTrip ){
+
+	private List<PlanElement> createDrtTripInclAccessEgress(TripInfo tripInfo, TripStructureUtils.Trip inputTrip) {
 		// code below currently has taxi hardcoded but this is not necessary IMO.  kai, apr'24
 
 		List<PlanElement> result = new ArrayList<>();
 
 		PopulationFactory pf = population.getFactory();
 		{
-			Facility fromFacility = FacilitiesUtils.toFacility( inputTrip.getOriginActivity(), facilities );
+			Facility fromFacility = FacilitiesUtils.toFacility(inputTrip.getOriginActivity(), facilities);
 			Facility toFacility = tripInfo.getPickupLocation();
 			double departureTime = tripInfo.getExpectedBoardingTime() - 900.; // always depart 15min before pickup
 			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, fromFacility,
-					toFacility, departureTime, null, inputTrip.getTripAttributes() );
+				toFacility, departureTime, null, inputTrip.getTripAttributes());
 			// not sure if this works for walk, but it should ...
 
 			result.addAll(planElements);
 		}
 		{
 			Activity act = pf.createActivityFromLinkId(createStageActivityType(TransportMode.taxi),
-					tripInfo.getPickupLocation().getLinkId() );
+				tripInfo.getPickupLocation().getLinkId());
 			act.setMaximumDuration(0.);
 			result.add(act);
 		}
@@ -407,19 +397,19 @@ public final class PreplanningEngine implements MobsimEngine {
 			Leg leg = pf.createLeg(TransportMode.taxi);
 			result.add(leg);
 			Route route = pf.getRouteFactories()
-					.createRoute(GenericRouteImpl.class, tripInfo.getPickupLocation().getLinkId(),
-							tripInfo.getDropoffLocation().getLinkId() );
+				.createRoute(GenericRouteImpl.class, tripInfo.getPickupLocation().getLinkId(),
+					tripInfo.getDropoffLocation().getLinkId());
 			leg.setRoute(route);
 		}
 		{
 			Activity act = pf.createActivityFromLinkId(createStageActivityType(TransportMode.taxi),
-					tripInfo.getDropoffLocation().getLinkId() );
+				tripInfo.getDropoffLocation().getLinkId());
 			act.setMaximumDuration(0.);
 			result.add(act);
 		}
 		{
 			Facility fromFacility = tripInfo.getDropoffLocation();
-			Facility toFacility = FacilitiesUtils.toFacility( inputTrip.getDestinationActivity(), facilities );
+			Facility toFacility = FacilitiesUtils.toFacility(inputTrip.getDestinationActivity(), facilities);
 			double expectedTravelTime;
 			try {
 				expectedTravelTime = tripInfo.getExpectedTravelTime();
@@ -428,7 +418,7 @@ public final class PreplanningEngine implements MobsimEngine {
 			}
 			double departureTime = tripInfo.getExpectedBoardingTime() + expectedTravelTime;
 			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, fromFacility,
-					toFacility, departureTime, null, inputTrip.getOriginActivity().getAttributes() );
+				toFacility, departureTime, null, inputTrip.getOriginActivity().getAttributes());
 
 			result.addAll(planElements);
 		}

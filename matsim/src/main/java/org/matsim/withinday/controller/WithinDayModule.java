@@ -25,7 +25,7 @@ package org.matsim.withinday.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.inject.Named;
+import com.google.inject.name.Named;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
@@ -51,7 +51,7 @@ public class WithinDayModule extends AbstractModule {
         bind(Mobsim.class).toProvider(WithinDayQSimFactory.class);
         bind(FixedOrderSimulationListener.class).asEagerSingleton();
         bind(WithinDayControlerListener.class).asEagerSingleton();
-        addControlerListenerBinding().to(WithinDayControlerListener.class);
+        addControllerListenerBinding().to(WithinDayControlerListener.class);
         bind(MobsimDataProvider.class).asEagerSingleton();
         bind(ActivityReplanningMap.class).asEagerSingleton();
         bind(LinkReplanningMap.class).asEagerSingleton();

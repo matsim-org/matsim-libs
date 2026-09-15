@@ -2,10 +2,8 @@ package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.DashboardUtils;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.GridMap;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Table;
@@ -26,7 +24,7 @@ public class EmissionsDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Air Pollution";
 		header.description = "Shows the air pollution footprint and its spatial distribution. Shown values are already upscaled from simulated sample size.";
@@ -47,11 +45,11 @@ public class EmissionsDashboard implements Dashboard {
 				viz.height = 12.;
 				viz.addDataset("emissions_per_link_per_m", data.compute(AirPollutionAnalysis.class, "emissions_per_link_per_m.csv"));
 				viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "linkId");
-				viz.display.lineColor.columnName = "CO2_TOTAL [g/m]";
+				viz.display.lineColor.columnName = "NOx [g/m]";
 				viz.display.lineColor.dataset = "emissions_per_link_per_m";
 				viz.display.lineColor.setColorRamp("greenRed", 10, false);
 				viz.display.lineColor.join = "linkId";
-				viz.display.lineWidth.columnName = "CO2_TOTAL [g/m]";
+				viz.display.lineWidth.columnName = "NOx [g/m]";
 				viz.display.lineWidth.scaleFactor = 2000.0;
 				viz.display.lineWidth.dataset = "emissions_per_link_per_m";
 				viz.display.lineWidth.join = "linkId";
@@ -61,20 +59,22 @@ public class EmissionsDashboard implements Dashboard {
 
 		layout.row("second")
 			.el(GridMap.class, (viz, data) -> {
-				viz.title = "CO₂ Emissions";
-				viz.unit = "CO₂ [g]";
+				viz.title = "NOx Emissions";
+				viz.unit = "NOx [g/m]";
 				viz.description = "per day";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
-				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_day.%s", "avro");
+				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_day.%s", "avro")
+					.replace("emissions_grid_per_day", Pollutant.NOx + "_" + "emissions_grid_per_day");
 			});
 
 		layout.row("third")
 			.el(GridMap.class, (viz, data) -> {
-				viz.title = "CO₂ Emissions";
-				viz.unit = "CO₂ [g]";
+				viz.title = "NOx  Emissions";
+				viz.unit = "NOx [g/m]";
 				viz.description = "per hour";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
-				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_hour.%s", "avro");
+				viz.file = data.computeWithPlaceholder(AirPollutionAnalysis.class, "emissions_grid_per_hour.%s", "avro")
+					.replace("emissions_grid_per_hour", Pollutant.NOx + "_" + "emissions_grid_per_hour");
 			});
 
 

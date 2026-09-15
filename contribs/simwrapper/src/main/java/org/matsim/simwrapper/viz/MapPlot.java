@@ -8,11 +8,17 @@ import java.util.Map;
 /**
  * Provide map based plots.
  */
-public final class MapPlot extends Viz {
+public final class MapPlot extends VizMap<MapPlot> {
 
 	private final Map<String, String> datasets = new HashMap<>();
 	public double[] center;
 	public Double zoom;
+
+	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
+
 	public Display display = new Display();
 	public Double minValue;
 	public Double maxValue;
@@ -106,6 +112,10 @@ public final class MapPlot extends Viz {
 
 		public DisplaySettings setColorRamp(String ramp, int steps, boolean reverse) {
 			colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps);
+			return this;
+		}
+		public DisplaySettings setColorRamp(int steps, String breakpoints) {
+			colorRamp = Map.of("steps", steps, "breakpoints", breakpoints);
 			return this;
 		}
 	}

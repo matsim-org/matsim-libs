@@ -29,6 +29,6 @@ public class LegTimesModule extends AbstractModule {
     @Override
     public void install() {
         bind(CalcLegTimes.class).in(Singleton.class);
-        addControlerListenerBinding().to(LegTimesControlerListener.class);
+        addControllerListenerBinding().to(LegTimesControllerListener.class);
     }
 }

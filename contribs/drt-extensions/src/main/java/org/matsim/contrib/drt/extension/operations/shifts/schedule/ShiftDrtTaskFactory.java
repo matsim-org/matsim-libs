@@ -1,6 +1,8 @@
 package org.matsim.contrib.drt.extension.operations.shifts.schedule;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.util.reservation.ReservationManager;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
@@ -13,11 +15,14 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 public interface ShiftDrtTaskFactory extends DrtTaskFactory {
 
     ShiftBreakTask createShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-                                        DrtShiftBreak shiftBreak, OperationFacility facility);
+                                        DrtShiftBreak shiftBreak, Id<OperationFacility> facilityId,
+                                        Id<ReservationManager.Reservation> reservationId);
 
     ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
-                                                  Link link, DrtShift shift, OperationFacility facility);
+                                                  Link link, DrtShift shift, Id<OperationFacility> facilityId,
+                                                  Id<ReservationManager.Reservation> reservationId);
 
     WaitForShiftTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-                                                OperationFacility facility);
+                                                Id<OperationFacility> facilityId,
+                                                Id<ReservationManager.Reservation> reservationId);
 }

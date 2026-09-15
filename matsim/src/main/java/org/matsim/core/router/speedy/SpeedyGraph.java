@@ -1,11 +1,10 @@
 package org.matsim.core.router.speedy;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 
-import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Implements a highly optimized data structure for representing a MATSim network. Optimized to use as little memory as possible, and thus to fit as much memory as possible into CPU caches for high
@@ -17,6 +16,17 @@ import java.util.Arrays;
  * <p>
  * We use simple int-arrays (int[]) to store the data. This should provide fast and thread-safe read-only access, but limits the number of nodes and links in the network to (Integer.MAX_VALUE/2 =
  * 1.073.741.823) nodes and (Integer.MAX_VALUE/6 = 357.913.941) links. I hope that for the foreseeable future, these limits are high enough.
+ * <p>
+ * <h3>Spatial node ordering</h3>
+ * <p>When built via {@link SpeedyGraphBuilder}, nodes are internally renumbered using a
+ * Z-order (Morton) curve so that spatially nearby nodes receive adjacent internal indices.
+ * This dramatically improves CPU cache locality during Dijkstra / A* traversal because the
+ * per-node arrays ({@code data[]}, {@code iterationIds[]}, etc.) in the routing algorithms
+ * are accessed in a pattern that follows the graph's spatial structure.  The reordering is
+ * applied in both the normal and turn-restriction build paths; colored (virtual) nodes
+ * inherit the coordinate of their parent real node and are placed nearby in the ordering.
+ * <p>
+ * Use {@link #getNodeIndex(Node)} to translate a MATSim {@link Node} to its internal index.
  * <p>
  * This class is thread-safe, allowing a single graph to be used by multiple threads.
  *
@@ -54,17 +64,63 @@ public class SpeedyGraph {
     private final int[] linkData;
     private final Link[] links;
     private final Node[] nodes;
-		private final boolean hasTurnRestrictions;
+    private final TurnRestrictionsContext turnRestrictions;
 
-	SpeedyGraph(int[] nodeData, int[] linkData, Node[] nodes, Link[] links, boolean hasTurnRestrictions) {
+    // Maps external MATSim Id.index() → internal (spatially ordered) node index.
+    // null means identity mapping (internal index == Id.index()).
+    private final int[] nodeReorder;
+
+	SpeedyGraph(int[] nodeData, int[] linkData, Node[] nodes, Link[] links,
+				TurnRestrictionsContext turnRestrictions, int[] nodeReorder) {
 		this.nodeData = nodeData;
 		this.linkData = linkData;
 		this.nodes = nodes;
 		this.links = links;
 		this.nodeCount = this.nodes.length;
 		this.linkCount = this.links.length;
-		this.hasTurnRestrictions = hasTurnRestrictions;
+		this.turnRestrictions = turnRestrictions;
+		this.nodeReorder = nodeReorder;
 	}
+
+    /** Returns the number of nodes in this graph. */
+    public int getNodeCount() {
+        return this.nodeCount;
+    }
+
+    /**
+     * Returns the internal (spatially ordered) node index for the given MATSim node.
+     * All routing algorithms must use this method instead of {@code node.getId().index()}.
+     *
+     * @param node a MATSim network node
+     * @return the internal node index, or -1 if the node is not part of this graph
+     */
+    public int getNodeIndex(Node node) {
+        if (nodeReorder != null) {
+            int externalIdx = node.getId().index();
+            if (externalIdx < 0 || externalIdx >= nodeReorder.length) {
+                return -1;
+            }
+            return nodeReorder[externalIdx];
+        }
+        return node.getId().index();
+    }
+
+    /**
+     * Returns the internal (spatially ordered) node index for a raw external index
+     * (e.g. from a {@link org.matsim.core.network.turnRestrictions.TurnRestrictionsContext.ColoredNode}).
+     *
+     * @param externalIdx an external node index (as returned by {@code Id.index()} or {@code ColoredNode.index()})
+     * @return the internal node index, or -1 if unmapped
+     */
+    public int getInternalIndex(int externalIdx) {
+        if (nodeReorder != null) {
+            if (externalIdx < 0 || externalIdx >= nodeReorder.length) {
+                return -1;
+            }
+            return nodeReorder[externalIdx];
+        }
+        return externalIdx;
+    }
 
     public LinkIterator getOutLinkIterator() {
         return new OutLinkIterator(this);
@@ -82,8 +138,8 @@ public class SpeedyGraph {
         return this.nodes[index];
     }
 
-		boolean hasTurnRestrictions() {
-			return this.hasTurnRestrictions;
+    Optional<TurnRestrictionsContext> getTurnRestrictions() {
+			return Optional.ofNullable(this.turnRestrictions);
 		}
 
     public interface LinkIterator {
@@ -102,6 +158,10 @@ public class SpeedyGraph {
 
         double getFreespeedTravelTime();
     }
+
+    // -----------------------------------------------------------------------
+    // Default linked-list iterators (original implementation)
+    // -----------------------------------------------------------------------
 
     private static abstract class AbstractLinkIterator implements LinkIterator {
 

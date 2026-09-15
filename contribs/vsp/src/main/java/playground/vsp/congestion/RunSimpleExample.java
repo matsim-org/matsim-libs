@@ -82,8 +82,8 @@ public class RunSimpleExample {
 		});
 
 		// Define the pricing approach and the congestion implementation.
-//		services.addControlerListener(new AverageCongestionPricingControlerListener( (ScenarioImpl) services.getScenario(), tollHandler ));
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
+//		services.addControllerListener(new AverageCongestionPricingControlerListener( (ScenarioImpl) services.getScenario(), tollHandler ));
+		controler.addControllerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
 
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

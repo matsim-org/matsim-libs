@@ -20,6 +20,8 @@
 
 package org.matsim.pt.transitSchedule.api;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
@@ -44,4 +46,13 @@ public interface Departure extends Identifiable<Departure>, Attributable {
 	 */
 	Id<Vehicle> getVehicleId();
 
+	/**
+	 * @return the list of chained departures. it can not be null and the returned list can not be modified.
+	 */
+	List<ChainedDeparture> getChainedDepartures();
+
+	/**
+	 * Set the {@link ChainedDeparture} that follow after the end of this departure.
+	 */
+	void setChainedDepartures(final List<ChainedDeparture> chainedDepartures);
 }

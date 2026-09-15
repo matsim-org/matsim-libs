@@ -9,6 +9,7 @@ import org.matsim.contribs.discrete_mode_choice.modules.ModeAvailabilityModule;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
@@ -25,6 +26,7 @@ public class DeterminismTest {
 		config.controller().setLastIteration(2);
 		config.controller().setOutputDirectory(outputDirectory);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(scenario);
 		Controler controler = new Controler(scenario);

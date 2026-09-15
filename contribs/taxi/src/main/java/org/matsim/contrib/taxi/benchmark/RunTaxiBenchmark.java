@@ -81,7 +81,7 @@ public class RunTaxiBenchmark {
 						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
 								getter.getModal(ExecutedScheduleCollector.class),
 								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
-				addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
+				addControllerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
 			}
 		});
 		return controler;

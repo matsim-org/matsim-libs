@@ -19,14 +19,11 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -36,7 +33,8 @@ import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
-import com.google.inject.Inject;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * AUX discharging is executed for non-moving vehicles. This is useful for vehicles with idling engines,
@@ -45,8 +43,9 @@ import com.google.inject.Inject;
  * VehicleProvider is responsible to decide if AUX discharging applies to a given vehicle based on information from
  * ActivityStartEvent.
  */
+@DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public final class IdleDischargingHandler
-		implements MobsimAfterSimStepListener, ActivityStartEventHandler, ActivityEndEventHandler, MobsimScopeEventHandler {
+	implements MobsimAfterSimStepListener, ActivityStartEventHandler, ActivityEndEventHandler, MobsimScopeEventHandler {
 	public interface VehicleProvider {
 		/**
 		 * During activities such as stopping at a bus stop or taxi rank, picking up/dropping off passengers etc.
@@ -81,10 +80,10 @@ public final class IdleDischargingHandler
 				ElectricVehicle ev = vl.vehicle;
 				double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(e.getSimulationTime(), auxDischargeTimeStep, vl.linkId);
 				ev.getBattery()
-						.dischargeEnergy(energy, missingEnergy -> eventsManager.processEvent(
-								new MissingEnergyEvent(e.getSimulationTime(), ev.getId(), vl.linkId, missingEnergy)));
+					.dischargeEnergy(energy, missingEnergy -> eventsManager.processEvent(
+						new MissingEnergyEvent(e.getSimulationTime(), ev.getId(), vl.linkId, missingEnergy)));
 				eventsManager.processEvent(
-						new IdlingEnergyConsumptionEvent(e.getSimulationTime(), ev.getId(), vl.linkId, energy, ev.getBattery().getCharge()));
+					new IdlingEnergyConsumptionEvent(e.getSimulationTime(), ev.getId(), vl.linkId, energy, ev.getBattery().getCharge()));
 			}
 		}
 	}

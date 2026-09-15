@@ -37,7 +37,7 @@ public class ActivityHomeFinderConfigGroup extends ComponentConfigGroup {
 	@StringSetter(ACTIVITY_TYPES)
 	public void setActivityTypesAsString(String activityTypes) {
 		this.activityTypes = Arrays.asList(activityTypes.split(",")).stream().map(String::trim)
-				.collect(Collectors.toSet());
+				.filter(s -> !s.isEmpty()).collect(Collectors.toSet());
 	}
 
 	public Collection<String> getActivityTypes() {

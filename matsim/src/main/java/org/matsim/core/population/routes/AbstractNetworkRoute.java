@@ -103,7 +103,7 @@ public abstract class AbstractNetworkRoute implements NetworkRoute, Cloneable {
 		} else {
 			for (int i = 0, n = route.size(); (i < n) && (fromIndex < 0); i++) {
 				if (fromLinkId.equals(route.get(i))) {
-					fromIndex = i+1;
+					fromIndex = i + 1;
 				}
 			}
 			if (fromIndex < 0 && fromLinkId.equals(this.getEndLinkId())) {
@@ -119,7 +119,7 @@ public abstract class AbstractNetworkRoute implements NetworkRoute, Cloneable {
 		} else {
 			for (int i = fromIndex, n = route.size(); (i < n) && (toIndex < 0); i++) {
 				if (fromLinkId.equals(route.get(i))) {
-					fromIndex = i+1; // in case of a loop, cut it short
+					fromIndex = i + 1; // in case of a loop, cut it short
 				}
 				if (toLinkId.equals(route.get(i))) {
 					toIndex = i;
@@ -151,6 +151,9 @@ public abstract class AbstractNetworkRoute implements NetworkRoute, Cloneable {
 		this.vehicleId = vehicleId;
 	}
 
+	/**
+	 * Returns a String representation of the route in form of a sequence of link Ids. The first Id is the start link Id, the last Id is the end link Id.
+	 */
 	@Override
 	public String getRouteDescription() {
 		StringBuilder desc = new StringBuilder(100);

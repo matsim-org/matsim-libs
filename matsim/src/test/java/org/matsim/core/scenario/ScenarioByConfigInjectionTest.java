@@ -36,7 +36,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -179,9 +178,10 @@ public class ScenarioByConfigInjectionTest {
 		final Person person = sc.getPopulation().getFactory().createPerson(Id.createPersonId( 1 ));
 		sc.getPopulation().addPerson( person );
 //		sc.getPopulation().getPersonAttributes().putAttribute( "1" , "stupidAttribute" , new StupidClass() );
-		PopulationUtils.putPersonAttribute( person, "stupidAttribute", new StupidClass() );
+        Object value = new StupidClass();
+        person.getAttributes().putAttribute("stupidAttribute", value);
 
-		person.getAttributes().putAttribute( "otherAttribute" , new StupidClass() );
+        person.getAttributes().putAttribute( "otherAttribute" , new StupidClass() );
 
 		final Plan plan = sc.getPopulation().getFactory().createPlan();
 		person.addPlan( plan );

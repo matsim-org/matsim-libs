@@ -73,7 +73,7 @@ class RunJointDemandDRTExample {
                 configUrl = localConfigFile.toURI().toURL();
             } else {
                 log.info("Starting simulation run with the example config file from GitHub repository");
-                configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/commercialTrafficApplications/"
+                configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/main/contribs/commercialTrafficApplications/"
                         + EXAMPLE_CONFIG);
             }
         }
@@ -117,12 +117,12 @@ class RunJointDemandDRTExample {
         config.replanning().setFractionOfIterationsToDisableInnovation(.8);
         ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
         home.setTypicalDuration(14 * 3600);
-        config.scoring().addActivityParams(home);
+        config.scoring().addDefaultActivityParams(home);
         ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
         work.setTypicalDuration(14 * 3600);
         work.setOpeningTime(8 * 3600);
         work.setClosingTime(8 * 3600);
-        config.scoring().addActivityParams(work);
+        config.scoring().addDefaultActivityParams(work);
         config.controller().setWriteEventsInterval(1);
         config.controller().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandUsingDRTExample");
         config.controller()
@@ -145,9 +145,9 @@ class RunJointDemandDRTExample {
         DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                 drtCfg.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
-        defaultConstraintsSet.maxWaitTime = 2 * 3600;
-		defaultConstraintsSet.maxTravelTimeAlpha = 5;
-		defaultConstraintsSet.maxTravelTimeBeta = 15 * 60;
+        defaultConstraintsSet.setMaxWaitTime(2 * 3600);
+		defaultConstraintsSet.setMaxTravelTimeAlpha(5);
+		defaultConstraintsSet.setMaxTravelTimeBeta(15 * 60);
         drtCfg.setStopDuration(60);
         drtCfg.setVehiclesFile("jointDemand_vehicles.xml");
         multiModeDrtConfigGroup.addParameterSet(drtCfg);

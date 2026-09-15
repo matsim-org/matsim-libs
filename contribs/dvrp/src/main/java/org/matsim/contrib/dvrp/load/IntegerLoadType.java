@@ -10,7 +10,7 @@ import com.google.common.base.Preconditions;
  * @author Tarek Chouaki (tkchouaki), IRT SystemX
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class IntegerLoadType implements DvrpLoadType {
+public final class IntegerLoadType implements DvrpLoadType {
 	private final IntegerLoad EMPTY = new IntegerLoad(0);
 
 	private final String name;

@@ -120,6 +120,7 @@ class ConfigReaderMatsimV2 extends MatsimXmlParser {
 			this.pathStack.removeFirst();
 
 			if ( !this.moduleStack.isEmpty() ) this.moduleStack.getFirst().addParameterSet( head );
+			// ("addParameterSet" checks first if the parameter set is empty)
 		}
 	}
 

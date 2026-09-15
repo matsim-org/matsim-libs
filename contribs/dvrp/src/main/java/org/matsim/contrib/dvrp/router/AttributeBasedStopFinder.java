@@ -18,10 +18,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributable;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * A stop finder which works like ClosestAccessEgressFacilityFinder in that it
@@ -46,13 +46,13 @@ public class AttributeBasedStopFinder implements AccessEgressFacilityFinder {
 	}
 
 	@Override
-	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility,
-			Attributes attributes) {
-		String stopNetwork = Optional.ofNullable((String)attributes.getAttribute(TRIP_STOP_NETWORK_ATTRIBUTE))
+	public Optional<Pair<Facility, Facility>> findFacilities(RoutingRequest request) {
+		String stopNetwork = Optional.ofNullable(
+						(String)request.getAttributes().getAttribute(TRIP_STOP_NETWORK_ATTRIBUTE))
 				.orElse(DEFAULT_STOP_NETWORK);
 		var facilityFinder = Objects.requireNonNull(facilityFinders.get(stopNetwork),
 				() -> "Stop network does not exist: " + stopNetwork);
-		return facilityFinder.findFacilities(fromFacility, toFacility, attributes);
+		return facilityFinder.findFacilities(request);
 	}
 
 	static public <T extends Facility & Attributable> AttributeBasedStopFinder create(double maxDistance,
@@ -101,7 +101,11 @@ public class AttributeBasedStopFinder implements AccessEgressFacilityFinder {
 		return new AttributeBasedStopFinder(facilityFinders);
 	}
 
-	private static Set<String> parseStopNetworks(Attributable facility) {
+	/**
+	 * @return the stop networks the given facility (or link) belongs to, i.e. the comma-separated values of its
+	 * {@value #FACILITY_STOP_NETWORKS_ATTRIBUTE} attribute, or an empty set if the attribute is not set
+	 */
+	public static Set<String> parseStopNetworks(Attributable facility) {
 		String attributeValue = (String)facility.getAttributes().getAttribute(FACILITY_STOP_NETWORKS_ATTRIBUTE);
 
 		if (attributeValue != null) {

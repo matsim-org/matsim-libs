@@ -33,8 +33,8 @@ import java.util.Map;
 /*
  * Wraps a Link into a Facility.
  */
-public final class LinkWrapperFacility implements Facility, Identifiable<ActivityFacility> {
-	
+public final class LinkWrapperFacility implements LinkWrapperFacilityI {
+
 	private final Link wrapped;
 
 	public LinkWrapperFacility(final Link toWrap) {

@@ -21,7 +21,6 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.pt.router.TransitRouter;
 
 import com.google.inject.Provider;
 
@@ -69,7 +68,9 @@ public ChoiceGenerationControler(String[] args) {
     //    controler.setScoringFunctionFactory(
 //            new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(),
 //                    controler.getScenario()));
-    travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), config.travelTimeCalculator());
+    TravelTimeCalculator.Builder travelTimeBuilder = new TravelTimeCalculator.Builder(scenario.getNetwork());
+    travelTimeBuilder.configure(config.travelTimeCalculator());
+    travelTimeCalculator = travelTimeBuilder.build();
 
     EventsManagerImpl eventsManager = new EventsManagerImpl();
     EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
@@ -84,12 +85,12 @@ public ChoiceGenerationControler(String[] args) {
             bindMobsim().toProvider(new Provider<Mobsim>() {
                 @Override
                 public Mobsim get() {
-                    return pSimProvider.createMobsim(controler.getScenario(), controler.getEvents());
+                    return pSimProvider.get();
                 }
             });
         }
     });
-    controler.addControlerListener(this);
+    controler.addControllerListener(this);
 }
     public void run(){
 

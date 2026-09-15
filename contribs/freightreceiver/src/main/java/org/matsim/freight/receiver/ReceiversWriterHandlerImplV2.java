@@ -25,7 +25,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -39,7 +39,7 @@ import java.util.Locale;
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 
 	@Override
-	public void startReceivers(Receivers receivers, BufferedWriter out) throws IOException {
+	public void startReceivers(Receivers receivers, Writer out) throws IOException {
 		out.write("\n<freightReceivers");
 		if(!receivers.getDescription().equalsIgnoreCase("")) {
 			out.write(" desc=\"");
@@ -52,12 +52,12 @@ import java.util.Locale;
 	}
 
 	@Override
-	public void endReceivers(BufferedWriter out) throws IOException {
+	public void endReceivers(Writer out) throws IOException {
 		out.write("\n</freightReceivers>\n");
 	}
 
 	@Override
-	public void startReceiver(Receiver receiver, BufferedWriter out) throws IOException {
+	public void startReceiver(Receiver receiver, Writer out) throws IOException {
 		out.write("\n\t<receiver id=\"");
 		out.write(receiver.getId().toString());
 		out.write("\"");
@@ -75,22 +75,22 @@ import java.util.Locale;
 	}
 
 	@Override
-	public void endReceiver(BufferedWriter out) throws IOException {
+	public void endReceiver(Writer out) throws IOException {
 		out.write("\t</receiver>\n");
 	}
 
 	@Override
-	public void writeSeparator(BufferedWriter out) throws IOException {
+	public void writeSeparator(Writer out) throws IOException {
 		out.write("\n\t<!-- =========================================================================================== -->\n");
 	}
 
 	@Override
-	public void writeGap(BufferedWriter out) throws IOException {
+	public void writeGap(Writer out) throws IOException {
 		out.write("\n");
 	}
 
 	@Override
-	public void startReceiverProduct(ReceiverProduct product, BufferedWriter out) throws IOException {
+	public void startReceiverProduct(ReceiverProduct product, Writer out) throws IOException {
 		out.write("\t\t<product id=\"");
 		out.write(product.getProductType().getId().toString());
 		out.write("\" onHand=\"");
@@ -99,13 +99,13 @@ import java.util.Locale;
 	}
 
 	@Override
-	public void endReceiverProduct(BufferedWriter out) throws IOException {
+	public void endReceiverProduct(Writer out) throws IOException {
 		out.write("\t\t</product>\n");
 
 	}
 
 	@Override
-	public void startReorderPolicy(ReorderPolicy policy, BufferedWriter out) throws IOException {
+	public void startReorderPolicy(ReorderPolicy policy, Writer out) throws IOException {
 		out.write("\t\t\t<reorderPolicy name=\"");
 		out.write(policy.getPolicyName());
 		out.write("\">\n");
@@ -115,12 +115,12 @@ import java.util.Locale;
 	}
 
 	@Override
-	public void endReorderPolicy(BufferedWriter out) throws IOException {
+	public void endReorderPolicy(Writer out) throws IOException {
 		out.write("\t\t\t</reorderPolicy>\n");
 	}
 
 	@Override
-	public void startPlan(ReceiverPlan plan, BufferedWriter out) throws IOException {
+	public void startPlan(ReceiverPlan plan, Writer out) throws IOException {
 		Double score = plan.getScore();
 		String selected = plan.isSelected() ? "yes" : "no";
 
@@ -132,24 +132,24 @@ import java.util.Locale;
 	}
 
 	@Override
-	public void endPlan(BufferedWriter out) throws IOException {
+	public void endPlan(Writer out) throws IOException {
 		out.write("\t\t</plan>\n");
 	}
 
 	@Override
-	public void endOrder(BufferedWriter out) throws IOException {
+	public void endOrder(Writer out) throws IOException {
 		out.write("\t\t\t</order>\n");
 	}
 
 	@Override
-	public void startOrder(ReceiverOrder order, BufferedWriter out) throws IOException {
+	public void startOrder(ReceiverOrder order, Writer out) throws IOException {
 		out.write("\t\t\t<order carrierId=\"");
 		out.write(order.getCarrierId().toString());
 		out.write("\">\n");
 	}
 
 	@Override
-	public void startItem(Order item, BufferedWriter out) throws IOException {
+	public void startItem(Order item, Writer out) throws IOException {
 		out.write("\t\t\t\t<item id=\"");
 		out.write(item.getId().toString());
 		out.write("\" productId=\"");
@@ -163,22 +163,22 @@ import java.util.Locale;
 	}
 
 	@Override
-	public void endItem(BufferedWriter out) throws IOException {
+	public void endItem(Writer out) throws IOException {
 		out.write("/>\n");
 	}
 
 	@Override
-	public void startProducts(BufferedWriter out) throws IOException {
+	public void startProducts(Writer out) throws IOException {
 		out.write("\t<productTypes>\n");
 	}
 
 	@Override
-	public void endProducts(BufferedWriter out) throws IOException {
+	public void endProducts(Writer out) throws IOException {
 		out.write("\t</productTypes>\n");
 	}
 
 	@Override
-	public void startProduct(ProductType productType, BufferedWriter out) throws IOException {
+	public void startProduct(ProductType productType, Writer out) throws IOException {
 		out.write("\t\t<productType id=\"");
 		out.write(productType.getId().toString());
 		out.write("\" originLinkId=\"");
@@ -192,13 +192,13 @@ import java.util.Locale;
 	}
 
 	@Override
-	public void endProduct(BufferedWriter out) throws IOException {
+	public void endProduct(Writer out) throws IOException {
 		out.write("/>\n");
 	}
 
 
 	@Override
-	public void startTimeWindow(TimeWindow window, BufferedWriter out) throws IOException {
+	public void startTimeWindow(TimeWindow window, Writer out) throws IOException {
 		out.write("\t\t\t<timeWindow start=\"");
 		out.write(Time.writeTime(window.getStart(), Time.TIMEFORMAT_HHMMSS));
 		out.write("\" end=\"");
@@ -207,7 +207,7 @@ import java.util.Locale;
 	}
 
 	@Override
-	public void endTimeWindow(BufferedWriter out) throws IOException {
+	public void endTimeWindow(Writer out) throws IOException {
 		out.write("/>\n");
 	}
 

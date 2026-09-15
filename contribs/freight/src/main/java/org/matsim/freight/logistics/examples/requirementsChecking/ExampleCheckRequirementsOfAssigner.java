@@ -232,7 +232,7 @@ class ExampleCheckRequirementsOfAssigner {
 
     // assign the lspShipments to the LSP
     for (LspShipment lspShipment : lspShipments) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {

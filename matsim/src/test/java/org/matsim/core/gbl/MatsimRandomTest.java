@@ -134,4 +134,69 @@ public class MatsimRandomTest {
 			assertEquals(rng1.nextDouble(), rng2.nextDouble(), MatsimTestUtils.EPSILON, "different element at position " + i);
 		}
 	}
+
+	/**
+	 * Tests that getLocalInstance(String) produces reproducible results.
+	 */
+	@Test
+	void testLocalInstanceString_reproducibility() {
+		MatsimRandom.reset(12345L);
+		Random random1 = MatsimRandom.getLocalInstance("drt1:processA");
+
+		MatsimRandom.reset(12345L);
+		Random random2 = MatsimRandom.getLocalInstance("drt1:processA");
+
+		assertEqualRandomNumberGenerators(random1, random2);
+	}
+
+	/**
+	 * Tests that different processIds produce different random sequences.
+	 */
+	@Test
+	void testLocalInstanceString_differentProcessIds() {
+		MatsimRandom.reset(12345L);
+		Random random1 = MatsimRandom.getLocalInstance("drt1:processA");
+		Random random2 = MatsimRandom.getLocalInstance("drt1:processB");
+
+		// Should produce different values
+		double value1 = random1.nextDouble();
+		double value2 = random2.nextDouble();
+		assertTrue(Math.abs(value1 - value2) > MatsimTestUtils.EPSILON, "Different processIds should produce different random sequences");
+	}
+
+	/**
+	 * Tests that order of getLocalInstance(String) calls does not affect results.
+	 */
+	@Test
+	void testLocalInstanceString_orderIndependence() {
+		MatsimRandom.reset(12345L);
+		Random randomA1 = MatsimRandom.getLocalInstance("processA");
+		Random randomB1 = MatsimRandom.getLocalInstance("processB");
+
+		MatsimRandom.reset(12345L);
+		Random randomB2 = MatsimRandom.getLocalInstance("processB"); // Different order!
+		Random randomA2 = MatsimRandom.getLocalInstance("processA");
+
+		// Both processA randoms should be equal regardless of creation order
+		assertEqualRandomNumberGenerators(randomA1, randomA2);
+		// Both processB randoms should be equal regardless of creation order
+		assertEqualRandomNumberGenerators(randomB1, randomB2);
+	}
+
+	/**
+	 * Tests that different global seeds produce different random sequences.
+	 */
+	@Test
+	void testLocalInstanceString_differentGlobalSeeds() {
+		MatsimRandom.reset(12345L);
+		Random random1 = MatsimRandom.getLocalInstance("processA");
+
+		MatsimRandom.reset(54321L);
+		Random random2 = MatsimRandom.getLocalInstance("processA");
+
+		// Should produce different values
+		double value1 = random1.nextDouble();
+		double value2 = random2.nextDouble();
+		assertTrue(Math.abs(value1 - value2) > MatsimTestUtils.EPSILON, "Different global seeds should produce different random sequences");
+	}
 }

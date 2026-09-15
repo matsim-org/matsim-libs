@@ -42,6 +42,7 @@ public final class BicycleTravelDisutilityFactory implements TravelDisutilityFac
 	@Inject Config config;
 	@Inject ScoringConfigGroup cnScoringGroup;
 	@Inject RoutingConfigGroup routingConfigGroup;
+	@Inject BicycleParams bicycleParams;
 	private static int normalisationWrnCnt = 0;
 
 	/* package-private */ BicycleTravelDisutilityFactory(){
@@ -61,6 +62,7 @@ public final class BicycleTravelDisutilityFactory implements TravelDisutilityFac
 				LOG.info(" sigma: " + sigma + "; resulting normalization: " + normalization);
 			}
 		}
-		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup, routingConfigGroup, timeCalculator, normalization);
+
+		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup, routingConfigGroup, timeCalculator, normalization, bicycleParams);
 	}
 }

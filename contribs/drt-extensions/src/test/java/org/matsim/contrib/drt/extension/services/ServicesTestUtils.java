@@ -2,7 +2,6 @@ package org.matsim.contrib.drt.extension.services;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
@@ -53,11 +52,11 @@ public class ServicesTestUtils {
                 drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                     .addOrGetDefaultDrtOptimizationConstraintsSet();
 		drtConfigGroup.setStopDuration(30.);
-		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
-		defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
-		defaultConstraintsSet.maxWaitTime = 600.;
-		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-		defaultConstraintsSet.maxWalkDistance = 1000.;
+		defaultConstraintsSet.setMaxTravelTimeAlpha(1.5);
+		defaultConstraintsSet.setMaxTravelTimeBeta(10. * 60.);
+		defaultConstraintsSet.setMaxWaitTime(600.);
+		defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
+		defaultConstraintsSet.setMaxWalkDistance(1000.);
 		drtConfigGroup.setUseModeFilteredSubnetwork(false);
 		drtConfigGroup.setVehiclesFile(fleetFile);
 		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
@@ -74,14 +73,13 @@ public class ServicesTestUtils {
 		strategyParams.setTargetAlpha(0.3);
 		strategyParams.setTargetBeta(0.3);
 
-		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
+		RebalancingParams rebalancingParams = drtConfigGroup.getRebalancingParams().get();
+		rebalancingParams.addParameterSet(strategyParams);
 
-		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
-		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rebalancingParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
 		zoneParams.setCellSize(500.);
-		drtZoneSystemParams.addParameterSet(zoneParams);
-		drtZoneSystemParams.setTargetLinkSelection(DrtZoneSystemParams.TargetLinkSelection.mostCentral);
-		drtConfigGroup.addParameterSet(drtZoneSystemParams);
+		rebalancingParams.addParameterSet(zoneParams);
+		rebalancingParams.setTargetLinkSelection(RebalancingParams.TargetLinkSelection.mostCentral);
 
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 
@@ -98,9 +96,9 @@ public class ServicesTestUtils {
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
 		ScoringConfigGroup.ModeParams scoreParams = new ScoringConfigGroup.ModeParams("drt");
-		config.scoring().addModeParams(scoreParams);
+		config.scoring().addDefaultModeParams(scoreParams);
 		ScoringConfigGroup.ModeParams scoreParams2 = new ScoringConfigGroup.ModeParams("walk");
-		config.scoring().addModeParams(scoreParams2);
+		config.scoring().addDefaultModeParams(scoreParams2);
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
@@ -119,11 +117,11 @@ public class ServicesTestUtils {
 		final ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(2 * 3600);
 
-		config.scoring().addActivityParams(home);
-		config.scoring().addActivityParams(other);
-		config.scoring().addActivityParams(education);
-		config.scoring().addActivityParams(shopping);
-		config.scoring().addActivityParams(work);
+		config.scoring().addDefaultActivityParams(home);
+		config.scoring().addDefaultActivityParams(other);
+		config.scoring().addDefaultActivityParams(education);
+		config.scoring().addDefaultActivityParams(shopping);
+		config.scoring().addDefaultActivityParams(work);
 
 		final ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 		stratSets.setWeight(1);

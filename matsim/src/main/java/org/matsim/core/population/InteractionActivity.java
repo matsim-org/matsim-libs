@@ -35,11 +35,15 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
  * Since these values are final, we do not need to store them and therefore we can save quite some memory.
  */
 /*package*/ final class InteractionActivity implements Activity {
+	// yyyy Did anybody measure if this is really worth the effort?  Even all String and Id objects are re-used from elsewhere, we
+	// end up having four references anyways.  Adding endTime and duration makes this only two more (at least as long as they are
+	// undefined).  And we need at least duration for modelling purposes.  And the same goes with Attributes ... if someone wants to
+	// attach Attributes for modelling purposes, why disallow that?  kai, nov'25
 
 	private static final Attributes EMPTY_ATTRIBUTES = new LazyAllocationAttributes(attributes -> {
 		throw new RuntimeException("interaction activities cannot have attributes.");
 	}, () -> null);
-	
+
 	private String type;
 	private Coord coord = null;
 	private Id<Link> linkId = null;

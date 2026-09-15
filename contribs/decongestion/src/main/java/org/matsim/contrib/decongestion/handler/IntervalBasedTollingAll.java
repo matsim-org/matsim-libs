@@ -19,30 +19,40 @@
 
 package org.matsim.contrib.decongestion.handler;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import com.google.inject.Inject;
 
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Throws agent money events for the tolled links and time bins.
- * 
+ *
  * @author ikaddoura
  */
 
-public class IntervalBasedTollingAll implements LinkLeaveEventHandler, IntervalBasedTolling {
+public class IntervalBasedTollingAll implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler, LinkLeaveEventHandler, IntervalBasedTolling {
 
 	@Inject
 	private EventsManager eventsManager;
-	
+
 	@Inject
 	private DecongestionInfo decongestionInfo;
-	
+
 	private double totalTollPayments;
+	private final Map<Id<Vehicle>, Double> lastLinkEnterTime = new HashMap<>();
 
 	@Override
 	public void reset(int iteration) {
@@ -52,15 +62,15 @@ public class IntervalBasedTollingAll implements LinkLeaveEventHandler, IntervalB
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (!decongestionInfo.getTransitVehicleIDs().contains(event.getVehicleId()) && decongestionInfo.getlinkInfos().get(event.getLinkId()) != null) {
-						
-			int currentTimeBin = (int) (event.getTime() / this.decongestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-			
+
+			int currentTimeBin = (int) (lastLinkEnterTime.get(event.getVehicleId()) / this.decongestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+
 			if (decongestionInfo.getlinkInfos().get(event.getLinkId()).getTime2toll().get(currentTimeBin) != null) {
 				double toll = decongestionInfo.getlinkInfos().get(event.getLinkId()).getTime2toll().get(currentTimeBin);
-				this.eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), this.decongestionInfo.getVehicleId2personId().get(event.getVehicleId()), -1. * toll, "congestionPricing", null));
+				this.eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), this.decongestionInfo.getVehicleId2personId().get(event.getVehicleId()), -1. * toll, "congestionPricing", null, null));
 //				this.eventsManager.processEvent(new PersonLinkMoneyEvent(event.getTime(), this.decongestionInfo.getVehicleId2personId().get(event.getVehicleId()), event.getLinkId(), -1. * toll, event.getTime(), "congestion"));
 				this.totalTollPayments = this.totalTollPayments + toll;
-			}		
+			}
 		}
 	}
 
@@ -69,5 +79,13 @@ public class IntervalBasedTollingAll implements LinkLeaveEventHandler, IntervalB
 		return totalTollPayments;
 	}
 
-}
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		lastLinkEnterTime.put(event.getVehicleId(),event.getTime());
+	}
 
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		lastLinkEnterTime.put(event.getVehicleId(),event.getTime());
+	}
+}

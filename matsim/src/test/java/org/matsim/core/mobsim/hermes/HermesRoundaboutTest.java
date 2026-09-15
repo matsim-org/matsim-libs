@@ -98,11 +98,11 @@ public class HermesRoundaboutTest {
 
 		final ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("home");
 		homeParams.setTypicalDuration(1);
-		config.scoring().addActivityParams(homeParams);
+		config.scoring().addDefaultActivityParams(homeParams);
 
 		final ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work");
 		workParams.setTypicalDuration(1);
-		config.scoring().addActivityParams(workParams);
+		config.scoring().addDefaultActivityParams(workParams);
 
 		ReplanningConfigGroup.StrategySettings replanning = new ReplanningConfigGroup.StrategySettings();
 		replanning.setStrategyName("ReRoute");
@@ -146,7 +146,7 @@ public class HermesRoundaboutTest {
 					vehicle = VehicleUtils.createVehicle(Id.createVehicleId(p.getId()), car);
 				}
 				scenario.getVehicles().addVehicle(vehicle);
-				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(TransportMode.car, vehicle.getId()));
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes( p, Map.of(TransportMode.car, vehicle.getId() ) );
 			}
 			a++;
 		}

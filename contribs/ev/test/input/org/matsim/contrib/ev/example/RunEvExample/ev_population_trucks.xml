@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">
+
+<population>
+
+
+    <!-- ====================================================================== -->
+
+    <person id="0">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"0_car","truck":"0_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:20:05">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="1">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"1_car","truck":"1_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:39:30">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="10">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"10_car","truck":"10_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:55:50">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="11">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"11_car","truck":"11_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:21:41">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="12">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"12_car","truck":"12_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:00:41">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="13">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"13_car","truck":"13_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:11:48">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="14">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"14_car","truck":"14_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:05:02">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="2">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"2_car","truck":"2_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:27:02">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="3">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"3_car","truck":"3_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:42:51">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="4">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"4_car","truck":"4_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:32:05">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="5">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"5_car","truck":"5_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:53:17">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="6">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"6_car","truck":"6_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:40:55">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="7">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"7_car","truck":"7_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:26:54">
+            </activity>
+            <leg mode="truck">
+            <leg mode="car">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="8">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"8_car","truck":"8_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:42:31">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+    <person id="9">
+		<attributes>
+			<attribute name="vehicles" class="org.matsim.vehicles.PersonVehicles">{"car":"9_car","truck":"9_truck"}</attribute>
+		</attributes>
+        <plan selected="yes">
+            <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:08:01">
+            </activity>
+            <leg mode="truck">
+            </leg>
+            <activity type="h" x="468532.721161525" y="5728751.474117422">
+            </activity>
+        </plan>
+
+    </person>
+
+    <!-- ====================================================================== -->
+
+</population>

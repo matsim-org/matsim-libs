@@ -23,6 +23,7 @@ package org.matsim.core.network.algorithms.intersectionSimplifier;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.Assertions;
@@ -30,11 +31,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.Cluster;
 import org.matsim.core.network.io.NetworkWriter;
@@ -156,7 +157,7 @@ public class IntersectionSimplifierTest {
 		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network1.xml");
 
-		new NetworkCleaner().run(simpleNetwork);
+		NetworkUtils.cleanNetwork(simpleNetwork, Set.of(TransportMode.car));
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network2.xml");
 
 		Assertions.assertEquals(18L, simpleNetwork.getNodes().size(), "Wrong number of nodes.");
@@ -194,7 +195,7 @@ public class IntersectionSimplifierTest {
 		nct.run(simpleNetwork);
 		NetworkSimplifier ns = new NetworkSimplifier();
 		ns.run(simpleNetwork);
-		new NetworkCleaner().run(simpleNetwork);
+		NetworkUtils.cleanNetwork(simpleNetwork, Set.of(TransportMode.car));
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network.xml");
 
 		Assertions.assertEquals(12L, simpleNetwork.getNodes().size(), "Wrong number of nodes.");

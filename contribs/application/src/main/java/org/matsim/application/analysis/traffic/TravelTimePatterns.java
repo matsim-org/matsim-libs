@@ -23,7 +23,6 @@ import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsLayer;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -238,6 +237,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 			 */
 
 			Set<String> written = new HashSet<>();
+			Set<String> allModes = new HashSet<>();
 
 			for (CSVRecord record : attrs.getRecords()) {
 
@@ -260,6 +260,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 				Set<String> modes = HereMapsLayer.VehicleType.parse(Integer.parseInt(record.get("VEHICLE_TYPES"))).stream()
 						.map(Object::toString).collect(Collectors.toSet());
+				allModes.addAll(modes);
 
 				// create links for both directions
 				if (t.equals("B")) {
@@ -322,7 +323,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 			}
 
-			new NetworkCleaner().run(network);
+			NetworkUtils.cleanNetwork(network, allModes);
 
 			log.info("Writing network to {}", networkOutput);
 

@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 
 import java.util.Collections;
 import java.util.Set;
@@ -32,16 +31,16 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Defines the share of agents that should be explicitly assigned in the QSim. " +
 				 "Values between (0,1]")
 	@Positive
-	public double sampleFactor = 1.; // TODO: sample factors by mode?
+	private double sampleFactor = 1.; // TODO: sample factors by mode?
 
 	@Parameter
 	@Comment("Defines the mods that will be considered for the FISS. Defaults to {car}")
 	@NotNull
-	public Set<String> sampledModes = Collections.singleton(TransportMode.car);
+	private Set<String> sampledModes = Collections.singleton(TransportMode.car);
 
 	@Parameter
 	@Comment("Disable FISS in the last iteration to get events of all agents. May be required for post-processing")
-	public boolean switchOffFISSLastIteration = true;
+	private boolean switchOffFISSLastIteration = true;
 
 	public FISSConfigGroup() {
 		super(GROUP_NAME);
@@ -51,23 +50,23 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
 		super.checkConsistency( config );
 
 		switch( config.qsim().getVehicleBehavior() ){
-			case teleport -> {
+			case teleport, wait -> {
 			}
 			default -> {
-				throw new RuntimeException( "FISS only works together with vehicle behavior=teleport.  See code for more info." );
-				// This was previously implemented such that it also ran through with other settings.  However, it would teleport the
-				// vehicle immediately to its destination, thus leading to a faulty physical modelling of "wait" or "exception".   I
-				// can't say if a possibly waiting agent would wait for the driver of the vehicle, or for the vehicle itself; this
-				// would need to be checked.  kai, feb'25
+				throw new RuntimeException( "FISS only works together with vehicle behavior teleport or wait." );
 			}
 		}
 
-		if( !config.qsim().getVehiclesSource().equals( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData ) ){
-			throw new IllegalArgumentException( "For the time being, FISS only works with mode vehicle types from vehicles data, please check config!" );
-			// reason is that FISS changes the PCE in the mode vehicles.
+		switch (config.qsim().getVehiclesSource()) {
+			case modeVehicleTypesFromVehiclesData, fromVehiclesData -> {
+			}
+			default -> {
+				throw new IllegalArgumentException(
+						"FISS only works with modeVehicleTypesFromVehiclesData or fromVehiclesData, please check config!");
+			}
 		}
 
-		for( String sampledMode : sampledModes ){
+		for( String sampledMode : getSampledModes()){
 			if( !config.qsim().getMainModes().contains( sampledMode ) ){
 				final String message = sampledMode + " is not a qsim mode, it cannot apply FISS, please remove that mode from the list of qsim modes";
 				LOG.fatal( message );
@@ -76,5 +75,30 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
 		}
 
 
+	}
+
+	@Positive
+	public double getSampleFactor() {
+		return sampleFactor;
+	}
+
+	public void setSampleFactor(@Positive double sampleFactor) {
+		this.sampleFactor = sampleFactor;
+	}
+
+	public @NotNull Set<String> getSampledModes() {
+		return sampledModes;
+	}
+
+	public void setSampledModes(@NotNull Set<String> sampledModes) {
+		this.sampledModes = sampledModes;
+	}
+
+	public boolean isSwitchOffFISSLastIteration() {
+		return switchOffFISSLastIteration;
+	}
+
+	public void setSwitchOffFISSLastIteration(boolean switchOffFISSLastIteration) {
+		this.switchOffFISSLastIteration = switchOffFISSLastIteration;
 	}
 }

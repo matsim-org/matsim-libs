@@ -77,22 +77,6 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 		this.transactionPartner = transactionPartner;
 		this.reference = reference;
 	}
-	/**
-	 * @deprecated -- add "purpose" and "transactionPartner" and "reference"
-	 */
-	@Deprecated // add "purpose" and "transactionPartner" and "reference"
-	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount) {
-		this( time, agentId, amount, null, null, null);
-	}
-
-	/**
-	 * @deprecated -- add "reference"
-	 */
-	@Deprecated // add "reference"
-	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose,
-							final String transactionPartner) {
-		this(time, agentId, amount, purpose, transactionPartner, null);
-	}
 
 	@Override
 	public Id<Person> getPersonId() {

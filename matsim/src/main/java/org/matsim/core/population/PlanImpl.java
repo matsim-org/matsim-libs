@@ -20,29 +20,25 @@
 
 package org.matsim.core.population;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.replanning.inheritance.PlanInheritanceModule;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /* deliberately package */  final class PlanImpl implements Plan {
 
-	private Id<Plan> id=  null;
+	private Id<Plan> id = null;
 
-	private ArrayList<PlanElement> actsLegs = new ArrayList<>();
+	private final List<PlanElement> actsLegs;
 
 	private Double score = null;
 	private Person person = null;
@@ -57,11 +53,17 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	private final Attributes attributes = new AttributesImpl();
 
 	@Override
-	public final Attributes getAttributes() {
+	public Attributes getAttributes() {
 		return this.attributes;
 	}
 
-	/* package */ PlanImpl() {}
+	PlanImpl() {
+		this.actsLegs = new ArrayList<>();
+	}
+
+	PlanImpl(List<PlanElement> fromElements) {
+		this.actsLegs = fromElements;
+	}
 
 //	@Override
 //	public final Activity createAndAddActivity(final String type1) {
@@ -71,7 +73,6 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 //		this.addActivity(a) ;
 //		return a;
 //	}
-
 
 
 	//////////////////////////////////////////////////////////////////////
@@ -97,7 +98,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public final Person getPerson() {
+	public Person getPerson() {
 		return this.person;
 	}
 
@@ -107,7 +108,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	}
 
 	@Override
-	public final Double getScore() {
+	public Double getScore() {
 		return this.score;
 	}
 
@@ -116,23 +117,23 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 		this.score = score;
 	}
 
-    @Override
+	@Override
 	public String getType() {
 		return this.type;
 	}
 
-    @Override
+	@Override
 	public void setType(final String type) {
 		this.type = type;
 	}
 
 	@Override
 	public Id<Plan> getId() {
-		if(this.id!=null)
+		if (this.id != null)
 			return this.id;
 		else {
-			if(this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID)!=null)
-				return Id.create(this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID).toString(),Plan.class);
+			if (this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID) != null)
+				return Id.create(this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID).toString(), Plan.class);
 			else return null;
 		}
 
@@ -165,47 +166,46 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	}
 
 	@Override
-	public final List<PlanElement> getPlanElements() {
+	public List<PlanElement> getPlanElements() {
 		return this.actsLegs;
 	}
 
 	@Override
-	public final void addLeg(final Leg leg) {
+	public void addLeg(final Leg leg) {
 		this.actsLegs.add(leg);
 	}
 
 	@Override
-	public final void addActivity(final Activity act) {
+	public void addActivity(final Activity act) {
 		this.actsLegs.add(act);
 	}
 
 	@Override
-	public final String toString() {
+	public String toString() {
 
 		String scoreString = "undefined";
 		if (this.getScore() != null) {
 			scoreString = this.getScore().toString();
 		}
-		String personIdString = "undefined" ;
-		if ( this.getPerson() != null ) {
-			personIdString = this.getPerson().getId().toString() ;
+		String personIdString = "undefined";
+		if (this.getPerson() != null) {
+			personIdString = this.getPerson().getId().toString();
 		}
 
 		return "[score=" + scoreString + "]" +
 //				"[selected=" + PersonUtils.isSelected(this) + "]" +
-				"[nof_acts_legs=" + getPlanElements().size() + "]" +
-				"[type=" + this.type + "]" +
-				"[personId=" + personIdString + "]" ;
+			"[nof_acts_legs=" + getPlanElements().size() + "]" +
+			"[type=" + this.type + "]" +
+			"[personId=" + personIdString + "]";
 	}
 
 	@Override
-	public final Map<String, Object> getCustomAttributes() {
+	public Map<String, Object> getCustomAttributes() {
 		if (this.customizableDelegate == null) {
 			this.customizableDelegate = CustomizableUtils.createCustomizable();
 		}
 		return this.customizableDelegate.getCustomAttributes();
 	}
-
 
 
 //	public final void setLocked() {

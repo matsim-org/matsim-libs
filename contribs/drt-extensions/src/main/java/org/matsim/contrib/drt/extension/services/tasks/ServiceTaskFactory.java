@@ -29,5 +29,5 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
  * @author steffenaxer
  */
 public interface ServiceTaskFactory extends DrtTaskFactory {
-	DrtServiceTask createServiceTask(Id<DrtService> drtServiceId, double beginTime, double endTime, Link link, OperationFacility operationFacility);
+	DrtServiceTask createServiceTask(Id<DrtService> drtServiceId, double beginTime, double endTime, Link link, OperationFacility facility);
 }

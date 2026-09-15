@@ -42,7 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;

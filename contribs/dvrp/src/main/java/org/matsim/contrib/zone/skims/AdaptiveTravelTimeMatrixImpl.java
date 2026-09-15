@@ -43,7 +43,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 	private final Map<Zone, Node> centralNodes;
 	private final int numberOfBins;
 	private final DvrpTravelTimeMatrixParams params;
-	private final Map<SparseTravelTimeKey, Double> sparseTravelTimeCache = new ConcurrentHashMap<>();
+	private final Map<Long, Double> sparseTravelTimeCache = new ConcurrentHashMap<>();
 
 	public AdaptiveTravelTimeMatrixImpl(double maxTime, Network dvrpNetwork, ZoneSystem zoneSystem, DvrpTravelTimeMatrixParams params,
 										TravelTimeMatrix freeSpeedMatrix, double alpha) {
@@ -52,14 +52,12 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 		this.gridSystem = zoneSystem;
 		this.centralNodes = ZoneSystemUtils.computeMostCentralNodes(dvrpNetwork.getNodes().values(), this.gridSystem);
 		this.timeDependentMatrix = IntStream.range(0, numberOfBins).mapToObj(i -> new Matrix(centralNodes.keySet()))
-				.toList();
+			.toList();
 		this.params = params;
 		this.initializeRegularMatrix(freeSpeedMatrix);
 		this.initializeSparseTravelTimeCache(freeSpeedMatrix);
 	}
 
-	record SparseTravelTimeKey(Node fromNode, Node toNode, double timeBin) {
-	}
 
 	int numberOfBins(double maxTime) {
 		return (int) (maxTime / TIME_INTERVAL);
@@ -75,8 +73,8 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 					Node originNode = originZoneEntry.getValue();
 					Node destinationNode = destinationZoneEntry.getValue();
 					if (DistanceUtils.calculateSquaredDistance(originNode.getCoord(),
-							destinationNode.getCoord()) < (params.getMaxNeighborDistance() * params.getMaxNeighborDistance())) {
-						SparseTravelTimeKey key = getSparseTravelTimeKey(originNode, destinationNode, bin);
+						destinationNode.getCoord()) < (params.getMaxNeighborDistance() * params.getMaxNeighborDistance())) {
+						long key = getSparseTravelTimeKey(originNode, destinationNode, bin);
 						double freeSpeedTravelTime = freeSpeedMatrix.getTravelTime(originNode, destinationNode, Double.NaN);
 						this.sparseTravelTimeCache.computeIfAbsent(key, k -> freeSpeedTravelTime);
 					}
@@ -85,9 +83,10 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 		}
 	}
 
-	SparseTravelTimeKey getSparseTravelTimeKey(Node originNode, Node destinationNode, int bin) {
-		return new SparseTravelTimeKey(originNode, destinationNode, bin);
+	long getSparseTravelTimeKey(Node fromNode, Node toNode, int bin) {
+		return KeyUtils.getKey(fromNode.getId().index(), toNode.getId().index(), bin);
 	}
+
 
 	// Matrix needs to be filled otherwise we have -1 exceptions
 	// We fill the matrix with already calculated free speed travel times
@@ -100,7 +99,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 					Node destinationNode = destinationZoneEntry.getValue();
 					double freeSpeedTravelTime = freeSpeedMatrix.getTravelTime(originNode, destinationNode, Double.NaN);
 					this.timeDependentMatrix.get(bin).set(originZoneEntry.getKey(), destinationZoneEntry.getKey(),
-							freeSpeedTravelTime);
+						freeSpeedTravelTime);
 				}
 			});
 		}
@@ -123,20 +122,19 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 	@Override
 	public void setTravelTime(Node fromNode, Node toNode, double routeEstimate, double departureTime) {
 		int bin = this.getBin(departureTime);
-		SparseTravelTimeKey key = this.getSparseTravelTimeKey(fromNode, toNode, bin);
 		Double sparseValue = this.sparseTravelTimeCache.get(this.getSparseTravelTimeKey(fromNode, toNode, bin));
 
 		// Update sparseTravelTimeCache
 		if (sparseValue != null) {
 			double value = getUpdatedValue(sparseValue, routeEstimate, this.alpha);
-			this.sparseTravelTimeCache.put(key, value);
+			this.sparseTravelTimeCache.put(this.getSparseTravelTimeKey(fromNode, toNode, bin), value);
 
 			// Update regular matrix for long distances
 		} else {
 			double currentTravelTimeEstimate = this.getTravelTime(fromNode, toNode, departureTime);
 			double value = getUpdatedValue(currentTravelTimeEstimate, routeEstimate, this.alpha);
 			this.timeDependentMatrix.get(bin).set(this.gridSystem.getZoneForNodeId(fromNode.getId()).orElseThrow(), this.gridSystem.getZoneForNodeId(toNode.getId()).orElseThrow(),
-					value);
+				value);
 		}
 
 	}
@@ -144,5 +142,27 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 	static double getUpdatedValue(double currentValue, double newValue, double alpha) {
 		return currentValue * (1 - alpha) + alpha * newValue;
 	}
+
+
+	public static class KeyUtils {
+
+		public static long getKey(int fromIndex, int toIndex, int timeBin)
+		{
+			return (((long) timeBin) << 40) | (((long) fromIndex & 0xFFFFF) << 20) | ((long) toIndex & 0xFFFFF);
+		}
+
+		public static int getFromIndex(long key) {
+			return (int) ((key >> 20) & 0xFFFFF);
+		}
+
+		public static  int getToIndex(long key) {
+			return (int) (key & 0xFFFFF);
+		}
+
+		public static int getTimeBin(long key) {
+			return (int) ((key >> 40) & 0xFFFFFF);
+		}
+	}
+
 
 }

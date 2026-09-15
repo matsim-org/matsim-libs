@@ -2,7 +2,7 @@
 [![deploy-weekly](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-weekly.yaml/badge.svg "weekly release")](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-weekly.yaml)
 [![full-integration](https://github.com/matsim-org/matsim-libs/actions/workflows/full-integration.yaml/badge.svg "daily release-like build")](https://github.com/matsim-org/matsim-libs/actions/workflows/full-integration.yaml)
 [![weekly-code-coverage](https://github.com/matsim-org/matsim-libs/actions/workflows/code-coverage.yaml/badge.svg "matsim module only")](https://github.com/matsim-org/matsim-libs/actions/workflows/code-coverage.yaml)
-[![codecov - matsim only](https://codecov.io/gh/matsim-org/matsim-libs/branch/master/graph/badge.svg?token=3p7uJdHdnd "matsim module only")](https://codecov.io/gh/matsim-org/matsim-libs)
+[![codecov - matsim only](https://codecov.io/gh/matsim-org/matsim-libs/branch/main/graph/badge.svg?token=3p7uJdHdnd&component=core "matsim module only")](https://codecov.io/gh/matsim-org/matsim-libs)
 
 ## Overview
 

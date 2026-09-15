@@ -9,7 +9,8 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 class VehicleTracker implements Serializable {
     public FullDeparture getFullDeparture() {
@@ -51,6 +52,8 @@ class VehicleTracker implements Serializable {
     }
 
     public void registerDeparture(VehicleDepartsAtFacilityEvent event) {
+        //a departure without a preceding arrival has no dwell event to complete
+        if (lastDwellEvent == null) return;
         lastDwellEvent.setDepartureTime(event.getTime());
         lastDwellEvent.setOccupancyAtDeparture(getOccupancy());
     }

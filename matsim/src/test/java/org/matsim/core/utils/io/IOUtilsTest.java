@@ -42,7 +42,7 @@ import java.nio.file.Paths;
  */
 public class IOUtilsTest {
 
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void testInitOutputDirLogging() throws IOException {
@@ -198,7 +198,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	void testGetBufferedWriter_append_gzipped() throws IOException {
+	void testGetBufferedWriter_append_gzipped() {
 		assertThrows(UncheckedIOException.class, () -> {
 			String filename = this.utils.getOutputDirectory() + "test.txt.gz";
 			URL url = IOUtils.getFileUrl(filename);
@@ -221,7 +221,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	void testGetBufferedWriter_append_lz4() throws IOException {
+	void testGetBufferedWriter_append_lz4() {
 		assertThrows(UncheckedIOException.class, () -> {
 			String filename = this.utils.getOutputDirectory() + "test.txt.lz4";
 			URL url = IOUtils.getFileUrl(filename);
@@ -247,7 +247,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	void testGetBufferedWriter_append_bz2() throws IOException {
+	void testGetBufferedWriter_append_bz2() {
 		assertThrows(UncheckedIOException.class, () -> {
 			String filename = this.utils.getOutputDirectory() + "test.txt.bz2";
 			URL url = IOUtils.getFileUrl(filename);
@@ -266,7 +266,7 @@ public class IOUtilsTest {
 		writer.write("12345678901234567890123456789012345678901234567890");
 		writer.close();
 		File file = new File(filename);
-		Assertions.assertTrue(file.length() == 51, "compressed file should be equal 51 bytes, but is " + file.length());
+		Assertions.assertEquals(51, file.length(), "compressed file should be equal 51 bytes, but is " + file.length());
 	}
 
 	@Test
@@ -293,6 +293,32 @@ public class IOUtilsTest {
 		writer.close();
 		File file = new File(filename);
 		Assertions.assertEquals(28, file.length(), "compressed file should be equal 28 bytes, but is " + file.length());
+	}
+
+	@Test
+	void testGetBufferedWriter_append_zip() {
+		assertThrows(UncheckedIOException.class, () -> {
+			String filename = this.utils.getOutputDirectory() + "test.txt.zip";
+			URL url = IOUtils.getFileUrl(filename);
+			BufferedWriter writer = IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+			writer.write("aaa");
+			writer.close();
+			IOUtils.getBufferedWriter(url, IOUtils.CHARSET_UTF8, true);
+		});
+	}
+
+	@Test
+	void testGetBufferedWriter_zip() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "test.txt.zip";
+		URL url = IOUtils.getFileUrl(filename);
+		BufferedWriter writer = IOUtils.getBufferedWriter(url);
+		writer.write("12345678901234567890123456789012345678901234567890");
+		writer.close();
+		File file = new File(filename);
+		Assertions.assertTrue(file.exists());
+
+		String content = IOUtils.getBufferedReader(url).readLine();
+		Assertions.assertEquals("12345678901234567890123456789012345678901234567890", content);
 	}
 
 	@Test
@@ -362,6 +388,19 @@ public class IOUtilsTest {
 	@Test
 	void testGetInputStream_UTFwithBOM_zst() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.zst";
+		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
+		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+		out.write("ABCdef".getBytes());
+		out.close();
+
+		InputStream in = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
+		Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		in.close();
+	}
+
+	@Test
+	void testGetInputStream_UTFwithBOM_zip() throws IOException {
+		String filename = utils.getOutputDirectory() + "test.txt.zip";
 		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
 		out.write("ABCdef".getBytes());
@@ -526,6 +565,31 @@ public class IOUtilsTest {
 		}
 	}
 
+	@Test
+	void testGetBufferedReader_UTFwithBOM_zip() throws IOException {
+		String filename = utils.getOutputDirectory() + "test.txt.zip";
+		OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false);
+		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+		out.write("ABCdef".getBytes());
+		out.close();
+
+		{
+			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename));
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_UTF8);
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(filename), IOUtils.CHARSET_WINDOWS_ISO88591);
+			Assertions.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+	}
+
 	/**
 	 * Based on a report from a user on the mailing list that he has problems creating files with '+' in the filename.
 	 *
@@ -547,16 +611,16 @@ public class IOUtilsTest {
 	@Test
 	void testNewUrl() throws MalformedURLException {
 		URL context = Paths.get("").toUri().toURL();
-		System.out.println(context.toString());
+		System.out.println(context);
 		URL url = IOUtils.extendUrl(context, "C:\\windows\\directory\\filename.txt");
-		System.out.println(url.toString());
+		System.out.println(url);
 	}
 
 	@Test
 	void testResolveFileOrResource() throws URISyntaxException, IOException {
 
 		File jarFile = new File("test/input/org/matsim/core/utils/io/IOUtils/testfile.jar");
-		String jarUrlString = "file:" + jarFile.getAbsolutePath(); // URLs require absolute paths
+		String jarUrlString = jarFile.toURI().toString(); // URLs require absolute paths
 		String fileUrlString = "jar:" + jarUrlString + "!/the_file.txt";
 
 		URL url = IOUtils.resolveFileOrResource(fileUrlString);
@@ -572,7 +636,7 @@ public class IOUtilsTest {
 	void testResolveFileOrResource_withWhitespace() throws URISyntaxException, IOException {
 
 		File jarFile = new File("test/input/org/matsim/core/utils/io/IOUtils/test directory/testfile.jar");
-		String fileUrlString = "jar:" + jarFile.toURI().toString() + "!/the_file.txt";
+		String fileUrlString = "jar:" + jarFile.toURI() + "!/the_file.txt";
 		Assertions.assertTrue(fileUrlString.contains("test%20directory")); // just make sure the space is correctly URL-encoded
 
 		URL url = IOUtils.resolveFileOrResource(fileUrlString);

@@ -37,7 +37,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.controler.ControlerListenerManagerImpl;
+import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripStructureUtils;
@@ -59,14 +59,14 @@ public class ScoringFunctionsForPopulationStressIT {
 			Id<Person> personId = Id.createPersonId(1);
 			scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
 			EventsManager events = EventsUtils.createEventsManager(config);
-			ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
+			ControllerListenerManagerImpl controllerListenerManager = new ControllerListenerManagerImpl();
 			ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
-			EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
+			EventsToActivities e2acts = new EventsToActivities(controllerListenerManager);
 			EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
 			EventsToLegsAndActivities e2legsActs = new EventsToLegsAndActivities(e2legs, e2acts);
 			events.addHandler(e2legsActs);
 			ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
-					controlerListenerManager,
+					controllerListenerManager,
 					events,
 					e2acts,
 					e2legs,
@@ -74,8 +74,8 @@ public class ScoringFunctionsForPopulationStressIT {
 					throwingScoringFunctionFactory,
 					config
 			);
-			controlerListenerManager.fireControlerIterationStartsEvent(0, false);
-			events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator"));
+			controllerListenerManager.fireControllerIterationStartsEvent(0, false);
+			events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator", null));
 			scoringFunctionsForPopulation.finishScoringFunctions();
 		});
 	}
@@ -149,16 +149,16 @@ public class ScoringFunctionsForPopulationStressIT {
 	private void work(Config config) {
 		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
-		config.scoring().addActivityParams(work);
+		config.scoring().addDefaultActivityParams(work);
 		ScoringConfigGroup.ModeParams car = new ScoringConfigGroup.ModeParams("car");
 		car.setMarginalUtilityOfTraveling(0.0);
 		car.setMarginalUtilityOfDistance(0.0);
 		car.setConstant(-1.0);
-		config.scoring().addModeParams(car);
+		config.scoring().addDefaultModeParams(car);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
-		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
+		ControllerListenerManagerImpl controllerListenerManager = new ControllerListenerManagerImpl();
 		EventsManager events = EventsUtils.createEventsManager(config);
 		ScoringFunctionFactory scoringFunctionFactory = new ScoringFunctionFactory() {
 			ScoringFunctionFactory delegate = new CharyparNagelScoringFunctionFactory(scenario);
@@ -213,11 +213,11 @@ public class ScoringFunctionsForPopulationStressIT {
 				};
 			}
 		};
-		EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
+		EventsToActivities e2acts = new EventsToActivities(controllerListenerManager);
 		EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
 
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
-				controlerListenerManager,
+				controllerListenerManager,
 				events,
 				e2acts,
 				e2legs,
@@ -225,7 +225,7 @@ public class ScoringFunctionsForPopulationStressIT {
 				scoringFunctionFactory,
 				config
 		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
+		controllerListenerManager.fireControllerIterationStartsEvent(0, false);
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
 			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator", null));
@@ -260,12 +260,12 @@ public class ScoringFunctionsForPopulationStressIT {
 		config.eventsManager().setSynchronizeOnSimSteps(false);
 		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
-		config.scoring().addActivityParams(work);
+		config.scoring().addDefaultActivityParams(work);
 		ScoringConfigGroup.ModeParams car = new ScoringConfigGroup.ModeParams("car");
 		car.setMarginalUtilityOfTraveling(0.0);
 		car.setMarginalUtilityOfDistance(0.0);
 		car.setConstant(-1.0);
-		config.scoring().addModeParams(car);
+		config.scoring().addDefaultModeParams(car);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
@@ -364,21 +364,21 @@ public class ScoringFunctionsForPopulationStressIT {
 				};
 			}
 		};
-		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
+		ControllerListenerManagerImpl controllerListenerManager = new ControllerListenerManagerImpl();
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
-				controlerListenerManager,
+				controllerListenerManager,
 				events,
-				new EventsToActivities(controlerListenerManager),
+				new EventsToActivities(controllerListenerManager),
 				new EventsToLegs(scenario.getNetwork()),
 				scenario.getPopulation(),
 				scoringFunctionFactory,
 				config
 		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
+		controllerListenerManager.fireControllerIterationStartsEvent(0, false);
 		int MAX = 10;
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
-			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator"));
+			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator", null));
 			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car", "car"));

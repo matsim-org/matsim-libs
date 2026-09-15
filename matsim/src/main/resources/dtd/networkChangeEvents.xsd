@@ -24,8 +24,9 @@
   <xs:sequence>
     <xs:element name="link" type="idRefType" minOccurs="1" maxOccurs="unbounded"/>
     <xs:element name="flowCapacity" type="changeType" minOccurs="0" maxOccurs="1"/>
-		<xs:element name="freespeed" type="changeType" minOccurs="0" maxOccurs="1"/>
-		<xs:element name="lanes" type="changeType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="freespeed" type="changeType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="lanes" type="changeType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="attribute" type="attributeChangeType" minOccurs="0" maxOccurs="unbounded"/>
   </xs:sequence>
   <xs:attribute name="startTime" type="matsimFormattedTimeAttributeType" use="required"/>
 </xs:complexType>
@@ -41,6 +42,20 @@
 		</xs:simpleType>
 	</xs:attribute>
 	<xs:attribute name="value" type="xs:double" use="required" />
+</xs:complexType>
+
+<xs:complexType name="attributeChangeType">
+    <xs:attribute type="xs:string" name="name" use="required"/>
+    <xs:attribute name="type">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="absolute" />
+                <xs:enumeration value="scaleFactor" />
+                <xs:enumeration value="offset" />
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="value" type="xs:double" use="required" />
 </xs:complexType>
 
 </xs:schema>

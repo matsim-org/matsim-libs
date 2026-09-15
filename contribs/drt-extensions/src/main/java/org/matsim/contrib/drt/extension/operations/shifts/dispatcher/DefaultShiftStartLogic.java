@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.schedule.Task;
  * @author nkuehnel / MOIA
  */
 public class DefaultShiftStartLogic implements ShiftStartLogic {
+
 	@Override
 	public boolean shiftStarts(DrtShiftDispatcher.ShiftEntry peek) {
 		// old shift hasn't ended yet
@@ -49,7 +50,7 @@ public class DefaultShiftStartLogic implements ShiftStartLogic {
 			//check if optional location requirement is met
 			if(peek.shift().getOperationFacilityId().isPresent()) {
 				Id<OperationFacility> operationFacilityId = peek.shift().getOperationFacilityId().get();
-				Verify.verify((operationFacilityId.equals(((WaitForShiftTask) currentTask).getFacility().getId())),
+				Verify.verify((operationFacilityId.equals(((WaitForShiftTask) currentTask).getFacilityId())),
 						"Vehicle and shift start locations do not match.");
 			}
 			return true;
@@ -57,4 +58,5 @@ public class DefaultShiftStartLogic implements ShiftStartLogic {
 			return false;
 		}
 	}
+
 }

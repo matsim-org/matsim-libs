@@ -32,8 +32,10 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControllerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -50,13 +52,18 @@ public class ReRoutingIT {
 
 	private Scenario loadScenario() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() +"config.xml");
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
+		// (this is a local config!  It then recruits some files from the test scenarios.)
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
 		config.plans().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "plans_hwh_1pct.xml.gz").toString());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.qsim().setTimeStepSize(10.0);
 		config.qsim().setStuckTime(100.0);
 		config.qsim().setRemoveStuckVehicles(true);
 		config.controller().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controller().setLastIteration(1);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		/* linear interpolate the into time bins aggregated travel time data to avoid artifacts at the boundaries of time bins:
 		 * e.g. a first time bin with aggregated travel time of 90 seconds and a second time bin with 45 seconds; time bin size 60;
 		 * i.e. consolidateData-method in TravelTimeCalculator will accept this difference; imagine an requested route starting 2
@@ -66,6 +73,9 @@ public class ReRoutingIT {
 		 * contain this artifacts). theresa, sep'17
 		 * */
 		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
+
+		config.global().setRelativeToleranceForSampleSizeFactors( 10. );
+		// (the config has flow cap 0.1 but storage cap 1.0.  I did not want to try if this is instrumental for the results.  kai, feb'26)
 
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
@@ -81,6 +91,7 @@ public class ReRoutingIT {
 	void testReRoutingDijkstra() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
+		scenario.getConfig().routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
@@ -92,6 +103,7 @@ public class ReRoutingIT {
 	void testReRoutingAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
+		scenario.getConfig().routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
@@ -103,11 +115,25 @@ public class ReRoutingIT {
 	void testReRoutingSpeedyALT() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.SpeedyALT);
+		scenario.getConfig().routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate("plans_speedyALT.xml.gz");
+	}
+
+	@Test
+	void testReRoutingCH() throws MalformedURLException {
+		Scenario scenario = this.loadScenario();
+		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.CHRouter);
+		scenario.getConfig().routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
+		scenario.getConfig().global().setNumberOfThreads(2);
+		Controler controler = new Controler(scenario);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.run();
+		this.evaluate("plans_CH.xml.gz");
 	}
 
 	private void evaluate() throws MalformedURLException {

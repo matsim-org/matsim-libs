@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -102,7 +102,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.firstIteration) {
 			// create the output folder for this module
-			String outFilename = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + PAnalysisManager.class.getSimpleName() + "/";
+			String outFilename = event.getServices().getControllerIO().getOutputPath() + PConstants.statsOutputFolder + PAnalysisManager.class.getSimpleName() + "/";
 			new File(outFilename).mkdir();
 
 			// create one output stream for each analysis

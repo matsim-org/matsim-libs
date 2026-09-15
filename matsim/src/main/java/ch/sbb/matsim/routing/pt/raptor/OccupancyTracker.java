@@ -60,7 +60,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 /**
  * Collects various data related to public transport during the execution of the plans (=during mobsim).

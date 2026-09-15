@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -130,6 +131,7 @@ public class ActivityFacilitiesSourceTest {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile(null);
 		config.controller().setLastIteration(0);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		switch (facilitiesSource) {
 			case fromFile:

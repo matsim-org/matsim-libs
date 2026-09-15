@@ -12,21 +12,26 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.StartOrStop;
 import org.matsim.vehicles.VehicleType;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
+import static java.lang.String.join;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.PURPOSE;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.SUBPOPULATION;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.getObjectiveFunction;
-import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.makeTrafficVolumeKey;
+import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.makeTrafficVolumeKey;
 
-public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implements IntegrateExistingTrafficToSmallScaleCommercial {
+class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implements IntegrateExistingTrafficToSmallScaleCommercial {
 	private static final Logger log = LogManager.getLogger(DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class);
 
 	/**
@@ -40,42 +45,32 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 	 * @param stopZone                          end zone
 	 */
 	protected static void reduceVolumeForThisExistingJobElement(
-		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
-		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop, String modeORvehType,
+		Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
+		Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop, String modeORvehType,
 		Integer purpose, String startZone, String stopZone) {
 
 		if (startZone == null && stopZone == null)
 			throw new IllegalArgumentException();
 
-		TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey_start = makeTrafficVolumeKey(startZone, modeORvehType);
-		TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey_stop = makeTrafficVolumeKey(stopZone, modeORvehType);
+		TrafficVolumesGenerator.TrafficVolumeKey trafficVolumeKey_start = makeTrafficVolumeKey(startZone, modeORvehType );
+		TrafficVolumesGenerator.TrafficVolumeKey trafficVolumeKey_stop = makeTrafficVolumeKey(stopZone, modeORvehType );
 		Object2DoubleMap<Integer> startVolume = trafficVolumePerTypeAndZone_start.get(trafficVolumeKey_start);
 		Object2DoubleMap<Integer> stopVolume = trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey_stop);
 
 		if (startVolume != null && startVolume.getDouble(purpose) == 0)
-			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_start, modeORvehType, purpose, "Start", trafficVolumeKey_start.getZone());
+			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_start, modeORvehType, purpose, StartOrStop.start, trafficVolumeKey_start.zone() );
 		else if (startVolume != null)
 			startVolume.mergeDouble(purpose, -1, Double::sum);
 		if (stopVolume != null && stopVolume.getDouble(purpose) == 0)
-			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, "Stop", trafficVolumeKey_stop.getZone());
+			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, StartOrStop.stop, trafficVolumeKey_stop.zone() );
 		else if (stopVolume != null)
 			stopVolume.mergeDouble(purpose, -1, Double::sum);
 	}
 
-	protected static String findZoneOfLink(Map<String, Map<Id<Link>, Link>> linksPerZone, Id<Link> linkId) {
-		AtomicReference<String> resultingZone = new AtomicReference<>();
-
-		linksPerZone.forEach( (zone, links) -> {
-			if (links.containsKey(linkId)) {
-				resultingZone.set(zone);
-			}
-		});
-		if (resultingZone.get() == null) {
-			return null;
-		}
-		return resultingZone. get();
+	private String findZoneOfLink(Scenario scenario, ShpOptions.Index indexZones, Id<Link> linkId) {
+		Link link = scenario.getNetwork().getLinks().get(linkId);
+		return indexZones.query(link.getCoord());
 	}
-
 	/**
 	 * Finds zone with demand and reduces this demand by 1.
 	 *
@@ -86,18 +81,18 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 	 * @param originalZone                zone with volume of 0, although a volume of an existing model exists
 	 */
 	private static void reduceVolumeForOtherArea(
-		Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone, String modeORvehType,
-		Integer purpose, String volumeType, String originalZone) {
-		ArrayList<TrafficVolumeGeneration.TrafficVolumeKey> shuffledKeys = new ArrayList<>(
+		Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone, String modeORvehType,
+		Integer purpose, StartOrStop volumeType, String originalZone ) {
+		ArrayList<TrafficVolumesGenerator.TrafficVolumeKey> shuffledKeys = new ArrayList<>(
 			trafficVolumePerTypeAndZone.keySet());
 		Collections.shuffle(shuffledKeys, MatsimRandom.getRandom());
-		for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : shuffledKeys) {
-			if (trafficVolumeKey.getModeORvehType().equals(modeORvehType)
+		for ( TrafficVolumesGenerator.TrafficVolumeKey trafficVolumeKey : shuffledKeys) {
+			if (trafficVolumeKey.modeORvehType().equals(modeORvehType)
 				&& trafficVolumePerTypeAndZone.get(trafficVolumeKey).getDouble(purpose) > 0) {
 				trafficVolumePerTypeAndZone.get(trafficVolumeKey).mergeDouble(purpose, -1, Double::sum);
 				log.warn(
 					"{}-Volume of zone {} (mode '{}', purpose '{}') was reduced because the volume for the zone {}, where an existing model has a demand, has a generated demand of 0.",
-					volumeType, trafficVolumeKey.getZone(), modeORvehType, purpose, originalZone);
+					volumeType, trafficVolumeKey.zone(), modeORvehType, purpose, originalZone);
 				break;
 			}
 		}
@@ -112,15 +107,15 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 	 *
 	 * @param scenario       the scenario
 	 * @param sampleScenario the sample size of the scenario
-	 * @param linksPerZone   the links per zone
+	 * @param indexZones   the links per zone
 	 */
 	@Override
 	public void readExistingCarriersFromFolder(Scenario scenario, double sampleScenario,
-											   Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception {
+											   ShpOptions.Index indexZones) throws Exception {
 		Path existingModelsFolder = Path.of(scenario.getConfig().getContext().toURI()).getParent().resolve("existingModels");
 		String locationOfExistingModels = existingModelsFolder.resolve("existingModels.csv").toString();
 		CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
-			.setSkipHeaderRecord(true).build().parse(IOUtils.getBufferedReader(locationOfExistingModels));
+			.setSkipHeaderRecord(true).get().parse(IOUtils.getBufferedReader(locationOfExistingModels));
 		for (CSVRecord record : parse) {
 			String modelName = record.get("model");
 			double sampleSizeExistingScenario = Double.parseDouble(record.get("sampleSize"));
@@ -293,13 +288,16 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 			}
 			carrierToRemove.forEach(carrier -> carriers.getCarriers().remove(carrier.getId()));
 			CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().putAll(usedVehicleTypes.getVehicleTypes());
-
+			usedVehicleTypes.getVehicleTypes().forEach((addedVehicleId, addedVehicleType) -> {
+				if (!scenario.getVehicles().getVehicleTypes().containsKey(addedVehicleId))
+					scenario.getVehicles().addVehicleType(addedVehicleType);
+			});
 			carriers.getCarriers().values().forEach(carrier -> {
 				Carrier newCarrier = CarriersUtils
 					.createCarrier(Id.create(modelName + "_" + carrier.getId().toString(), Carrier.class));
-				newCarrier.getAttributes().putAttribute("subpopulation", modelTrafficType);
+				newCarrier.getAttributes().putAttribute( SUBPOPULATION, modelTrafficType);
 				if (modelPurpose != null)
-					newCarrier.getAttributes().putAttribute("purpose", modelPurpose);
+					newCarrier.getAttributes().putAttribute( PURPOSE, modelPurpose);
 				newCarrier.getAttributes().putAttribute("existingModel", modelName);
 				newCarrier.getAttributes().putAttribute("networkMode", modelMode);
 				if (vehicleType != null)
@@ -316,12 +314,12 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 
 					List<String> startAreas = new ArrayList<>();
 					for (ScheduledTour tour : newCarrier.getSelectedPlan().getScheduledTours()) {
-						String tourStartZone = findZoneOfLink(linksPerZone, tour.getTour().getStartLinkId());
+						String tourStartZone = findZoneOfLink(scenario, indexZones, tour.getTour().getStartLinkId());
 						if (!startAreas.contains(tourStartZone))
 							startAreas.add(tourStartZone);
 					}
-					newCarrier.getAttributes().putAttribute("tourStartArea",
-						String.join(";", startAreas));
+					newCarrier.getAttributes().putAttribute( TOUR_START_AREA,
+						join( ";", startAreas ) );
 
 					CarriersUtils.setJspritIterations(newCarrier, 0);
 					// recalculate score for selectedPlan
@@ -342,26 +340,26 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 	}
 
 	@Override
-	public void reduceDemandBasedOnExistingCarriers(Scenario scenario, Map<String, Map<Id<Link>, Link>> linksPerZone,
-													String smallScaleCommercialTrafficType,
-													Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
-													Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
+	public void reduceDemandBasedOnExistingCarriers(Scenario scenario, ShpOptions.Index indexZones,
+													GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment,
+													Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
+													Map<TrafficVolumesGenerator.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop ) {
 		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
-			if (!carrier.getAttributes().getAsMap().containsKey("subpopulation")
-				|| !carrier.getAttributes().getAttribute("subpopulation").equals(smallScaleCommercialTrafficType))
+			if (!carrier.getAttributes().getAsMap().containsKey( SUBPOPULATION )
+				|| !carrier.getAttributes().getAttribute( SUBPOPULATION ).equals( smallScaleCommercialTrafficSegment.toString() ))
 				continue;
 			String modeORvehType;
-			if (smallScaleCommercialTrafficType.equals("goodsTraffic"))
+			if ( smallScaleCommercialTrafficSegment.equals( GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.goodsTraffic ))
 				modeORvehType = (String) carrier.getAttributes().getAttribute("vehicleType");
 			else
 				modeORvehType = "total";
-			Integer purpose = (Integer) carrier.getAttributes().getAttribute("purpose");
+			Integer purpose = (Integer) carrier.getAttributes().getAttribute( PURPOSE );
 			if (carrier.getSelectedPlan() != null) {
 				for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
-					String startZone = findZoneOfLink(linksPerZone, tour.getTour().getStartLinkId());
+					String startZone = findZoneOfLink(scenario, indexZones, tour.getTour().getStartLinkId());
 					for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
 						if (tourElement instanceof Tour.ServiceActivity service) {
-							String stopZone = findZoneOfLink(linksPerZone, service.getLocation());
+							String stopZone = findZoneOfLink(scenario, indexZones, service.getLocation());
 							try {
 								reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 									trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -372,8 +370,8 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 							}
 						}
 						if (tourElement instanceof Tour.Pickup pickup) {
-							startZone = findZoneOfLink(linksPerZone, pickup.getShipment().getPickupLinkId());
-							String stopZone = findZoneOfLink(linksPerZone, pickup.getShipment().getDeliveryLinkId());
+							startZone = findZoneOfLink(scenario, indexZones, pickup.getShipment().getPickupLinkId());
+							String stopZone = findZoneOfLink(scenario, indexZones, pickup.getShipment().getDeliveryLinkId());
 							try {
 								reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 									trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -390,12 +388,12 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 					List<String> possibleStartAreas = new ArrayList<>();
 					for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 						possibleStartAreas
-							.add(findZoneOfLink(linksPerZone, vehicle.getLinkId()));
+							.add(findZoneOfLink(scenario, indexZones, vehicle.getLinkId()));
 					}
 					for (CarrierService service : carrier.getServices().values()) {
 						String startZone = (String) possibleStartAreas.toArray()[MatsimRandom.getRandom()
 							.nextInt(possibleStartAreas.size())];
-						String stopZone = findZoneOfLink(linksPerZone, service.getServiceLinkId());
+						String stopZone = findZoneOfLink(scenario, indexZones, service.getServiceLinkId());
 						try {
 							reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 								trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -407,8 +405,8 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 					}
 				} else if (!carrier.getShipments().isEmpty()) {
 					for (CarrierShipment shipment : carrier.getShipments().values()) {
-						String startZone = findZoneOfLink(linksPerZone, shipment.getPickupLinkId());
-						String stopZone = findZoneOfLink(linksPerZone, shipment.getDeliveryLinkId());
+						String startZone = findZoneOfLink(scenario, indexZones, shipment.getPickupLinkId());
+						String stopZone = findZoneOfLink(scenario, indexZones, shipment.getDeliveryLinkId());
 						try {
 							reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 								trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -422,5 +420,4 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 			}
 		}
 	}
-
 }

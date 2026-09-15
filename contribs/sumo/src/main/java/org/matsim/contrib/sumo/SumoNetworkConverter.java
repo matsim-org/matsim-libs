@@ -1,6 +1,8 @@
 package org.matsim.contrib.sumo;
 
-import com.google.common.collect.Sets;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -14,23 +16,31 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.osm.networkReader.OsmTags;
-import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
+
+import com.google.common.collect.Sets;
+
 import picocli.CommandLine;
 
-import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -61,14 +71,18 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	@CommandLine.Option(names = "--lane-restrictions", description = "Define how restricted lanes are handled: ${COMPLETION-CANDIDATES}", defaultValue = "IGNORE")
 	private LaneRestriction laneRestriction = LaneRestriction.IGNORE;
 
+	@CommandLine.Option(names = "--turn-restrictions", description = "Ignore turn restrictions for specified modes.", defaultValue = "ADD_TURN_RESTRICTIONS")
+	private TurnRestriction turnRestrictionHandling;
+
 	private SumoNetworkConverter(List<Path> input, Path output, String fromCRS, String toCRS, double freeSpeedFactor,
-								 LaneRestriction laneRestriction) {
+								 LaneRestriction laneRestriction, TurnRestriction turnRestriction) {
 		this.input = input;
 		this.output = output;
 		this.fromCRS = fromCRS;
 		this.toCRS = toCRS;
 		this.freeSpeedFactor = freeSpeedFactor;
 		this.laneRestriction = laneRestriction;
+		this.turnRestrictionHandling = turnRestriction;
 	}
 
 	private SumoNetworkConverter() {
@@ -83,7 +97,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	 * @param toCRS   desired coordinate system of network
 	 */
 	public static SumoNetworkConverter newInstance(List<Path> input, Path output, String fromCRS, String toCRS) {
-		return new SumoNetworkConverter(input, output, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR, LaneRestriction.IGNORE);
+		return new SumoNetworkConverter(input, output, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR, LaneRestriction.IGNORE, TurnRestriction.ADD_TURN_RESTRICTIONS);
 	}
 
 
@@ -93,7 +107,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	 * @see #newInstance(List, Path, String, String, double)
 	 */
 	public static SumoNetworkConverter newInstance(List<Path> input, Path output, String inputCRS, String targetCRS, double freeSpeedFactor) {
-		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, LaneRestriction.IGNORE);
+		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, LaneRestriction.IGNORE, TurnRestriction.ADD_TURN_RESTRICTIONS);
 	}
 
 	/**
@@ -102,8 +116,8 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	 * @see #newInstance(List, Path, String, String, double)
 	 */
 	public static SumoNetworkConverter newInstance(List<Path> input, Path output, String inputCRS, String targetCRS,
-												   double freeSpeedFactor, LaneRestriction laneRestriction) {
-		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, laneRestriction);
+												   double freeSpeedFactor, LaneRestriction laneRestriction, TurnRestriction turnRestriction) {
+		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, laneRestriction, turnRestriction);
 	}
 
 	/**
@@ -335,55 +349,61 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		}
 
 		// clean up network
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network,
+				Set.of(TransportMode.car, TransportMode.ride, TransportMode.bike,
+						TransportMode.truck));
 
 		Set<Id<Link>> ignored = new HashSet<>();
 
 		// map of link and source link that are restricted
 		Map<Id<Link>, Set<Id<Link>>> restrictions = new HashMap<>();
 
-		for (Map.Entry<String, List<SumoNetworkHandler.Connection>> kv : sumoHandler.connections.entrySet()) {
+		if (turnRestrictionHandling == TurnRestriction.ADD_TURN_RESTRICTIONS) {
+			for (Map.Entry<String, List<SumoNetworkHandler.Connection>> kv : sumoHandler.connections.entrySet()) {
 
-			Link link = network.getLinks().get(Id.createLinkId(kv.getKey()));
+				Link link = network.getLinks().get(Id.createLinkId(kv.getKey()));
 
-			if (link != null) {
-				Set<Id<Link>> outLinks = link.getToNode().getOutLinks().keySet();
-				Set<Id<Link>> allowed = kv.getValue().stream().map(c -> Id.createLinkId(c.to)).collect(Collectors.toSet());
+				if (link != null) {
+					Set<Id<Link>> outLinks = link.getToNode().getOutLinks().keySet();
+					Set<Id<Link>> allowed = kv.getValue().stream().map(c -> Id.createLinkId(c.to)).collect(Collectors.toSet());
 
-				// Disallowed link ids
-				Sets.SetView<Id<Link>> dis = Sets.difference(outLinks, allowed);
+					// Disallowed link ids
+					Sets.SetView<Id<Link>> dis = Sets.difference(outLinks, allowed);
 
-				if (outLinks.size() == dis.size()) {
-					ignored.add(link.getId());
-					continue;
-				}
-
-				if (!dis.isEmpty()) {
-					DisallowedNextLinks disallowed = new DisallowedNextLinks();
-					for (Id<Link> id : dis) {
-
-						Set<Id<Link>> restricted = restrictions.computeIfAbsent(id, (k) -> new HashSet<>());
-
-						Link targetLink = network.getLinks().get(id);
-						Map<Id<Link>, ? extends Link> turnLinks = targetLink.getFromNode().getOutLinks();
-
-						// Ensure that a link is always reachable from at least one other link
-						if (turnLinks.size() - 1 <= restricted.size()) {
-							ignored.add(id);
-							continue;
-						}
-
-						restricted.add(link.getId());
-						disallowed.addDisallowedLinkSequence(TransportMode.car, List.of(id));
+					if (outLinks.size() == dis.size()) {
+						ignored.add(link.getId());
+						continue;
 					}
 
-					NetworkUtils.setDisallowedNextLinks(link, disallowed);
+					if (!dis.isEmpty()) {
+						DisallowedNextLinks disallowed = new DisallowedNextLinks();
+						for (Id<Link> id : dis) {
+
+							Set<Id<Link>> restricted = restrictions.computeIfAbsent(id, (k) -> new HashSet<>());
+
+							Link targetLink = network.getLinks().get(id);
+							Map<Id<Link>, ? extends Link> turnLinks = targetLink.getFromNode().getOutLinks();
+
+							// Ensure that a link is always reachable from at least one other link
+							if (turnLinks.size() - 1 <= restricted.size()) {
+								ignored.add(id);
+								continue;
+							}
+
+							restricted.add(link.getId());
+							disallowed.addDisallowedLinkSequence(TransportMode.car, List.of(id));
+						}
+
+						NetworkUtils.setDisallowedNextLinks(link, disallowed);
+					}
 				}
 			}
 		}
 
 		// clean again (possibly with turn restrictions)
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network,
+				Set.of(TransportMode.car, TransportMode.ride, TransportMode.bike,
+						TransportMode.truck));
 
 		if (!ignored.isEmpty()) {
 			log.warn("Ignored turn restrictions for {} links with no connections: {}", ignored.size(), ignored);
@@ -441,6 +461,13 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	 */
 	public enum LaneRestriction {
 		IGNORE, REDUCE_CAR_LANES
+	}
+
+	/**
+	 * How turn restrictions should be handled.
+	 */
+	public enum TurnRestriction {
+		IGNORE_TURN_RESTRICTIONS, ADD_TURN_RESTRICTIONS
 	}
 
 }

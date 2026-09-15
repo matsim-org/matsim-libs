@@ -51,7 +51,7 @@ public class JointVehiclesModule extends AbstractModule {
 		// For convenience
 		bind( VehicleRessources.class ).toProvider( new ScenarioElementProvider<VehicleRessources>( VehicleRessources.ELEMENT_NAME ) );
 
-		addControlerListenerBinding().toInstance(
+		addControllerListenerBinding().toInstance(
 			new AbstractPrepareForSimListener() {
 				@Inject JointPlans jointPlans;
 				@Inject VehicleRessources vehicles;
@@ -73,9 +73,9 @@ public class JointVehiclesModule extends AbstractModule {
 
 			} );
 
-		addControlerListenerBinding().to( VehicleAllocationConsistencyChecker.class );
+		addControllerListenerBinding().to( VehicleAllocationConsistencyChecker.class );
 
-		bind( PlanRoutingAlgorithmFactory.class ).toProvider( 
+		bind( PlanRoutingAlgorithmFactory.class ).toProvider(
 				new Provider<PlanRoutingAlgorithmFactory>() {
 					@Inject Scenario sc;
 					@Inject TimeInterpretation timeInterpretation;

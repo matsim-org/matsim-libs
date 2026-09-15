@@ -73,7 +73,13 @@ public class SwissRailRaptorModule extends AbstractModule {
 
             bind(RaptorIntermodalAccessEgress.class).to(DefaultRaptorIntermodalAccessEgress.class);
             bind(RaptorInVehicleCostCalculator.class).to(DefaultRaptorInVehicleCostCalculator.class);
-            bind(RaptorTransferCostCalculator.class).to(DefaultRaptorTransferCostCalculator.class);
+            
+            if (srrConfig.getModeToModeTransferPenaltyParameterSets().isEmpty()) {
+                bind(RaptorTransferCostCalculator.class).to(DefaultRaptorTransferCostCalculator.class);
+            } else {
+                bind(ModeSpecificTransferCostCalculator.PenaltySupplier.class).toInstance(new ModeSpecificTransferCostCalculator.DefaultPenaltySupplier());
+                bind(RaptorTransferCostCalculator.class).to(ModeSpecificTransferCostCalculator.class);
+            }
         }
 
     }

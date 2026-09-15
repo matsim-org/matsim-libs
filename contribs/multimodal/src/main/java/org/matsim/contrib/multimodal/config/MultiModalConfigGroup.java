@@ -28,12 +28,12 @@ import org.matsim.core.config.ConfigGroup;
 public class MultiModalConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "multimodal";
-	
+
 	private static final String MULTI_MODAL_SIMULATION_ENABLED = "multiModalSimulationEnabled";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String SIMULATED_MODES = "simulatedModes";
 	private static final String INPUT_SLOPE_INFORMATION_FILE = "inputSlopeInformationFile";
-	
+
 	// to be removed...
 	private static final String CREATE_MULTI_MODAL_NETWORK = "createMultiModalNetwork";
 	private static final String CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES  = "cuttoffValueForNonCarModes";
@@ -42,7 +42,7 @@ public class MultiModalConfigGroup extends ConfigGroup {
 
 	private boolean multiModalSimulationEnabled = false;
 	private int numberOfThreads = 1;
-	private String simulatedModes = "bike,walk"; 
+	private String simulatedModes = "bike,walk";
 	private String slopeInformationFile = null;
 
 	// set default walk speed; according to Weidmann 1.34 [m/s]
@@ -61,7 +61,7 @@ public class MultiModalConfigGroup extends ConfigGroup {
 	public final void addParam(final String key, final String value) {
 		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
 		if ( "null".equalsIgnoreCase( value ) ) return;
-		
+
 		if (MULTI_MODAL_SIMULATION_ENABLED.equals(key)) {
 			setMultiModalSimulationEnabled(Boolean.parseBoolean(value.trim()));
 		} else if (NUMBER_OF_THREADS.equals(key)) {
@@ -82,7 +82,7 @@ public class MultiModalConfigGroup extends ConfigGroup {
 			throw new IllegalArgumentException(key);
 		}
 	}
-	
+
 	@Override
 	public final String getValue(final String key) {
 		if (MULTI_MODAL_SIMULATION_ENABLED.equals(key)) {
@@ -109,16 +109,16 @@ public class MultiModalConfigGroup extends ConfigGroup {
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<>();
-		map.put(MULTI_MODAL_SIMULATION_ENABLED, getValue(MULTI_MODAL_SIMULATION_ENABLED));
-		map.put(NUMBER_OF_THREADS, getValue(NUMBER_OF_THREADS));
-		map.put(SIMULATED_MODES, getValue(SIMULATED_MODES));
-		map.put(INPUT_SLOPE_INFORMATION_FILE, getValue(INPUT_SLOPE_INFORMATION_FILE));
-		map.put(CREATE_MULTI_MODAL_NETWORK, getValue(CREATE_MULTI_MODAL_NETWORK));
-		map.put(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES, getValue(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES));
-		map.put(DROP_NON_CAR_ROUTES, getValue(DROP_NON_CAR_ROUTES));
+		map.put(MULTI_MODAL_SIMULATION_ENABLED, Boolean.toString(this.multiModalSimulationEnabled));
+		map.put(NUMBER_OF_THREADS, Integer.toString(getNumberOfThreads()));
+		map.put(SIMULATED_MODES, getSimulatedModes());
+		map.put(INPUT_SLOPE_INFORMATION_FILE, getSlopeInformationFile());
+		map.put(CREATE_MULTI_MODAL_NETWORK, Boolean.toString(isCreateMultiModalNetwork()));
+		map.put(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES, Double.toString(getCutoffValueForNonCarModes()));
+		map.put(DROP_NON_CAR_ROUTES, Boolean.toString(isDropNonCarRoutes()));
 		return map;
 	}
-	
+
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -131,7 +131,7 @@ public class MultiModalConfigGroup extends ConfigGroup {
 		map.put(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES, "Only used if createMultiModalNetwork is enabled (set value in m/s).");
 		return map;
 	}
-	
+
 	/* direct access */
 	public void setMultiModalSimulationEnabled(final boolean enabled) {
 		this.multiModalSimulationEnabled = enabled;
@@ -140,7 +140,7 @@ public class MultiModalConfigGroup extends ConfigGroup {
 	public boolean isMultiModalSimulationEnabled() {
 		return this.multiModalSimulationEnabled;
 	}
-	
+
 	public void setNumberOfThreads(final int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
 	}
@@ -163,11 +163,11 @@ public class MultiModalConfigGroup extends ConfigGroup {
 	void setSlopeInformationFile(String file) {
 		this.slopeInformationFile = file;
 	}
-	
+
 	public String getSlopeInformationFile() {
 		return this.slopeInformationFile;
 	}
-	
+
 	public void setCreateMultiModalNetwork(final boolean enabled) {
 		this.createMultiModalNetwork = enabled;
 	}
@@ -175,7 +175,7 @@ public class MultiModalConfigGroup extends ConfigGroup {
 	public boolean isCreateMultiModalNetwork() {
 		return this.createMultiModalNetwork;
 	}
-	
+
 	public void setCutoffValueForNonCarModes(final double cutoffValue) {
 		this.cuttoffValueForNonMotorizedModes = cutoffValue;
 	}
@@ -183,7 +183,7 @@ public class MultiModalConfigGroup extends ConfigGroup {
 	public double getCutoffValueForNonCarModes() {
 		return this.cuttoffValueForNonMotorizedModes;
 	}
-	
+
 	public void setDropNonCarRoutes(final boolean enabled) {
 		this.dropNonCarRoutes = enabled;
 	}
@@ -191,7 +191,7 @@ public class MultiModalConfigGroup extends ConfigGroup {
 	public boolean isDropNonCarRoutes() {
 		return this.dropNonCarRoutes;
 	}
-	
+
 	void setEnsureActivityReachability(final boolean enabled) {
 		this.ensureActivityReachability = enabled;
 	}

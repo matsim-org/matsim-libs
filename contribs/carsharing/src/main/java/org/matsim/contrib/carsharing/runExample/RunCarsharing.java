@@ -3,9 +3,7 @@ package org.matsim.contrib.carsharing.runExample;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
@@ -63,7 +61,7 @@ public class RunCarsharing {
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.loadConfig(args[0]);
 
-		if (Integer.parseInt(config.getModule("qsim").getValue("numberOfThreads")) > 1)
+		if (config.qsim().getNumberOfThreads() > 1)
 			LogManager.getLogger("org.matsim.core.controler").warn(
 					"Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
 
@@ -167,8 +165,8 @@ public class RunCarsharing {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().toInstance(carsharingListener);
-				addControlerListenerBinding().to(CarsharingManagerNew.class);
+				addControllerListenerBinding().toInstance(carsharingListener);
+				addControllerListenerBinding().to(CarsharingManagerNew.class);
 				// bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
 				addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
 				addEventHandlerBinding().to(DemandHandler.class);

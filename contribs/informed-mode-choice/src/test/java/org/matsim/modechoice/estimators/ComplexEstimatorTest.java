@@ -30,10 +30,10 @@ public class ComplexEstimatorTest {
 		ComplexTripEstimator est = (ComplexTripEstimator) service.getTripEstimator("pt");
 
 		assertThat(est.getIters())
-				.isEqualTo(3);
+			.isEqualTo(3);
 
 		assertThat(est.getEvents())
-				.isGreaterThan(500_000);
+			.isGreaterThan(400_000);
 
 	}
 

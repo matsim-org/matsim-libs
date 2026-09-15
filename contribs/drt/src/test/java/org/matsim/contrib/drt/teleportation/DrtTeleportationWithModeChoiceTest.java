@@ -57,7 +57,7 @@ public class DrtTeleportationWithModeChoiceTest {
 		ScoringConfigGroup.ModeParams bikeModeParams = new ScoringConfigGroup.ModeParams(TransportMode.bike);
 		bikeModeParams.setConstant(1.);
 		bikeModeParams.setMarginalUtilityOfTraveling(-6.);
-		config.scoring().addModeParams(bikeModeParams);
+		config.scoring().addDefaultModeParams(bikeModeParams);
 		// Update change mode
 		config.changeMode().setModes(new String[]{TransportMode.drt, TransportMode.bike});
 
@@ -72,8 +72,7 @@ public class DrtTeleportationWithModeChoiceTest {
 			@Override
 			public void install() {
 				bindModal(DrtEstimator.class).toProvider(modalProvider(getter -> new
-					EuclideanDistanceBasedDrtEstimator(getter.getModal(Network.class), 2.0, 0.1577493,
-					103.0972273, 120, 0.3, -0.1, 0.28)));
+					EuclideanDistanceBasedDrtEstimator.Builder(getter.getModal(Network.class), 2.0).build()));
 			}
 		});
 

@@ -20,6 +20,10 @@
 package ch.sbb.matsim.mobsim.qsim.pt;
 
 import java.util.Set;
+
+import ch.sbb.matsim.config.SBBTransitConfigGroup;
+import com.google.inject.Inject;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
@@ -35,6 +39,11 @@ public class SBBTransitDriverAgentFactory implements TransitDriverAgentFactory {
 
     private final Set<String> deterministicModes;
 
+	@Inject
+	SBBTransitDriverAgentFactory(SBBTransitConfigGroup config) {
+		deterministicModes = config.getDeterministicServiceModes();
+	}
+
     SBBTransitDriverAgentFactory(Set<String> deterministicModes) {
         this.deterministicModes = deterministicModes;
     }
@@ -47,5 +56,18 @@ public class SBBTransitDriverAgentFactory implements TransitDriverAgentFactory {
         }
         return new TransitDriverAgentImpl(umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
     }
+
+	@Override
+	public AbstractTransitDriverAgent createTransitDriverFromMessage(Message message, Umlauf umlauf, InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker){
+
+		var mode = umlauf.getUmlaufStuecke().getFirst().getRoute().getTransportMode();
+		if (this.deterministicModes.contains(mode) && message instanceof SBBTransitDriverAgent.SBBTransitDriverMessage stdm) {
+			return new SBBTransitDriverAgent(stdm, umlauf, mode, transitStopAgentTracker, internalInterface);
+		} else if (message instanceof TransitDriverAgentImpl.TransitDriverMessage tdm) {
+			return new TransitDriverAgentImpl(tdm, umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
+		} else {
+			throw new IllegalArgumentException("SBBTransitDriverAgentFactory only supports SBBTransitDriverAgent and TransitDriverAgentImpl messages but was passed: " + message.getClass().getName());
+		}
+	}
 
 }

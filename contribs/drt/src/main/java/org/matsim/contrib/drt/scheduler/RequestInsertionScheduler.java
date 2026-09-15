@@ -23,10 +23,12 @@ package org.matsim.contrib.drt.scheduler;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
+@NodeSingleton
 public interface RequestInsertionScheduler {
 	class PickupDropoffTaskPair {
 		public final DrtStopTask pickupTask;

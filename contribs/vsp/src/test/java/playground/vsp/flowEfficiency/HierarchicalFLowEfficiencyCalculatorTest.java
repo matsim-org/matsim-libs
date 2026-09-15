@@ -120,6 +120,7 @@ public class HierarchicalFLowEfficiencyCalculatorTest {
 		dvrpVehType.setLength(7.5);
 		dvrpVehType.setFlowEfficiencyFactor(1d);
 		dvrpVehType.setMaximumVelocity(999);
+		dvrpVehType.setNetworkMode(TransportMode.drt);
 		scenario.getVehicles().addVehicleType(dvrpVehType);
 
 		Controler controler = new Controler(scenario);

@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
 /**
@@ -33,4 +34,8 @@ public interface Request extends Identifiable<Request> {
 	 * @return time at which the request was submitted
 	 */
 	double getSubmissionTime();
+
+	static Id<Request> id(String id) {
+		return Id.create(id, Request.class);
+	}
 }

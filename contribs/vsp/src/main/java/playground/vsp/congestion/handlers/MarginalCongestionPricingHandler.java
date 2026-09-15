@@ -59,7 +59,7 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 	public MarginalCongestionPricingHandler(EventsManager eventsManager, Scenario scenario, double factor) {
 		this.events = eventsManager;
 		this.scenario = scenario;
-		this.vtts_car = (this.scenario.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().scoring().getPerforming_utils_hr()) / this.scenario.getConfig().scoring().getMarginalUtilityOfMoney();
+		this.vtts_car = (this.scenario.getConfig().scoring().getDefaultModeParams().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().scoring().getDefaultPerforming_utils_hr()) / this.scenario.getConfig().scoring().getDefaultMarginalUtilityOfMoney();
 		this.factor = factor;
 
 		log.info("Using the toll factor " + factor);
@@ -78,7 +78,7 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 		double amount = this.factor * event.getDelay() / 3600 * this.vtts_car;
 		this.amountSum = this.amountSum + amount;
 
-		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount, "congestionPricing", null);
+		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount, "congestionPricing", null, null);
 		this.events.processEvent(moneyEvent);
 
 		PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(event.getTime(), event.getCausingAgentId(), event.getLinkId(), amount, event.getEmergenceTime(), "congestion");

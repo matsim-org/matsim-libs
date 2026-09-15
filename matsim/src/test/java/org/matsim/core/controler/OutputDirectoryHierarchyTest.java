@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -39,8 +38,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author thibautd
@@ -179,7 +176,7 @@ public class OutputDirectoryHierarchyTest {
 		Controler controller = new Controler(scenario);
 		controller.run();
 
-		String matsimTempDir = controller.getControlerIO().getTempPath();
+		String matsimTempDir = controller.getControllerIO().getTempPath();
 		Assertions.assertEquals(javaTempDir, matsimTempDir);
 	}
 

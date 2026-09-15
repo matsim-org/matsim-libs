@@ -27,7 +27,7 @@ public class TransportPlanningMainModeIdentifierTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void testIterationTravelStatsControlerListener() {
+	void testIterationTravelStatsControllerListener() {
 
 		modeHierarchy.add(TransportMode.non_network_walk);
 		modeHierarchy.add("undefined");
@@ -40,7 +40,7 @@ public class TransportPlanningMainModeIdentifierTest {
 		modeHierarchy.add(TransportMode.ride);
 		modeHierarchy.add(TransportMode.car);
 
-		ArrayList<Plan> plansList = new ArrayList<Plan>();
+		ArrayList<Plan> plansList = new ArrayList<>();
 		Plans plans = new Plans();
 
 		/****************************

@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -159,9 +159,9 @@ public class DrtEventSequenceCollector
 		}
 
 		public boolean isCompleted() {
-			return submitted.getPersonIds().stream().allMatch(personId -> { 
+			return submitted.getPersonIds().stream().allMatch(personId -> {
 				var events = personEvents.get(personId);
-				return events != null && personEvents.get(personId).droppedOff != null; 
+				return events != null && personEvents.get(personId).droppedOff != null;
 			});
 		}
 	}

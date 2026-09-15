@@ -24,10 +24,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -35,6 +36,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.ByteArrayInputStream;
+import java.util.Set;
 
 /**
  * @author mrieser
@@ -57,7 +59,7 @@ public class OsmNetworkReaderTest {
 		Assertions.assertEquals(399, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(872, net.getLinks().size(), "number of links is wrong.");
 
-		new NetworkCleaner().run(net);
+		NetworkUtils.cleanNetwork(net, Set.of(TransportMode.car));
 		Assertions.assertEquals(344, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(794, net.getLinks().size(), "number of links is wrong.");
 	}
@@ -78,7 +80,7 @@ public class OsmNetworkReaderTest {
 		Assertions.assertEquals(1844, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(3535, net.getLinks().size(), "number of links is wrong.");
 
-		new NetworkCleaner().run(net);
+		NetworkUtils.cleanNetwork(net, Set.of(TransportMode.car));
 		Assertions.assertEquals(1561, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(3168, net.getLinks().size(), "number of links is wrong.");
 	}
@@ -100,7 +102,7 @@ public class OsmNetworkReaderTest {
 		Assertions.assertEquals(1844, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(3535, net.getLinks().size(), "number of links is wrong.");
 
-		new NetworkCleaner().run(net);
+		NetworkUtils.cleanNetwork(net, Set.of(TransportMode.car));
 		Assertions.assertEquals(1561, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(3168, net.getLinks().size(), "number of links is wrong.");
 	}
@@ -121,7 +123,7 @@ public class OsmNetworkReaderTest {
 
 		Assertions.assertEquals(67, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(122, net.getLinks().size(), "number of links is wrong.");
-		new NetworkCleaner().run(net);
+		NetworkUtils.cleanNetwork(net, Set.of(TransportMode.car));
 		Assertions.assertEquals(57, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(114, net.getLinks().size(), "number of links is wrong.");
 	}
@@ -142,7 +144,7 @@ public class OsmNetworkReaderTest {
 
 		Assertions.assertEquals(67, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(122, net.getLinks().size(), "number of links is wrong.");
-		new NetworkCleaner().run(net);
+		NetworkUtils.cleanNetwork(net, Set.of(TransportMode.car));
 		Assertions.assertEquals(57, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(114, net.getLinks().size(), "number of links is wrong.");
 	}
@@ -163,7 +165,7 @@ public class OsmNetworkReaderTest {
 
 		Assertions.assertEquals(769, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(1016, net.getLinks().size(), "number of links is wrong.");
-		new NetworkCleaner().run(net);
+		NetworkUtils.cleanNetwork(net, Set.of(TransportMode.car));
 		Assertions.assertEquals(441, net.getNodes().size(), "number of nodes is wrong.");
 		Assertions.assertEquals(841, net.getLinks().size(), "number of links is wrong.");
 	}

@@ -20,10 +20,10 @@ class DrtConfigGroupTest {
 		// get DrtOptimizationConstraintsParams
 		DrtOptimizationConstraintsSet params = drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 
-		Assertions.assertEquals(DrtOptimizationConstraintsSet.DEFAULT_PARAMS_NAME, params.name);
+		Assertions.assertEquals(DrtOptimizationConstraintsSet.DEFAULT_PARAMS_NAME, params.getConstraintSetName());
 		Assertions.assertThrows(VerifyException.class, () -> drtConfig.checkConsistency(config));
 		drtConfig.setStopDuration(0);
-		params.maxWaitTime = drtConfig.getStopDuration();
+		params.setMaxWaitTime(drtConfig.getStopDuration());
 		Assertions.assertDoesNotThrow(() -> drtConfig.checkConsistency(config));
 	}
 
@@ -35,7 +35,7 @@ class DrtConfigGroupTest {
 
 		// add second DrtOptimizationConstraintsParams
 		DrtOptimizationConstraintsSet params = new DrtOptimizationConstraintsSetImpl();
-		params.name = "test";
+		params.setConstraintSetName("test");
 
 		DrtOptimizationConstraintsParams optimizationConstraintsParams = drtConfig.addOrGetDrtOptimizationConstraintsParams();
 		optimizationConstraintsParams.addParameterSet(params);
@@ -47,8 +47,8 @@ class DrtConfigGroupTest {
 		Assertions.assertEquals(2, optimizationConstraintsParams.getDrtOptimizationConstraintsSets().size());
 
 		drtConfig.setStopDuration(0);
-		params.maxWaitTime = drtConfig.getStopDuration();
-		defaultConstraints.maxWaitTime = drtConfig.getStopDuration();
+		params.setMaxWaitTime(drtConfig.getStopDuration());
+		defaultConstraints.setMaxWaitTime(drtConfig.getStopDuration());
 
 		Assertions.assertDoesNotThrow(() -> drtConfig.checkConsistency(config));
 	}

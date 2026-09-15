@@ -37,6 +37,6 @@ public class IterationTravelStatsModule extends AbstractModule {
 		bind(ActivityWriter.class);
 		bind(PersonWriter.class);
 		bind(TripsAndLegsWriter.class);
-		addControlerListenerBinding().to(IterationTravelStatsControlerListener.class);
+		addControllerListenerBinding().to(IterationTravelStatsControllerListener.class);
 	}
 }

@@ -28,17 +28,17 @@
 
 			<param name="vehiclesFile" value="vehicles-10-cap-4.xml"/>
 			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
-
-			<parameterset type="zonalSystem">
-				<parameterset type="SquareGridZoneSystem" >
-					<param name="cellSize" value="500"/>
-				</parameterset>
+			<parameterset type="SquareGridZoneSystem" >
+				<param name="cellSize" value="500"/>
 			</parameterset>
 
 			<parameterset type="rebalancing">
 				<parameterset type="minCostFlowRebalancingStrategy">
 					<param name="targetAlpha" value="0.5"/>
 					<param name="targetBeta" value="0.5"/>
+				</parameterset>
+				<parameterset type="SquareGridZoneSystem" >
+					<param name="cellSize" value="500"/>
 				</parameterset>
 			</parameterset>
 		</parameterset>
@@ -72,9 +72,28 @@
 	</module>
 
 	<module name="scoring">
-		<param name="activityType_0" value="dummy"/>
-		<param name="activityTypicalDuration_0" value="24:00:00"/>
-		<param name="traveling_drt" value="-6"/>
+		<parameterset type="scoringParameters">
+			<parameterset type="modeParams">
+				<param name="mode" value="car"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="pt"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="walk"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="drt"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6"/>
+			</parameterset>
+			<parameterset type="activityParams">
+				<param name="activityType" value="dummy"/>
+				<param name="typicalDuration" value="24:00:00"/>
+			</parameterset>
+		</parameterset>
 	</module>
 
 	<module name="replanning">

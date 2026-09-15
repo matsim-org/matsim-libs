@@ -128,7 +128,7 @@ public final class EventsConverterXML extends MatsimXmlParser{
 					final Id<Link> linkId = Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class);
 					assert linkId != null;
 					vehicleId = driverToVeh.get(personId);
-					assert vehicleId != null;
+					assert vehicleId != null : "vehicleId is null for personId: " + personId;
 					this.events.processEvent(new LinkLeaveEvent(time, vehicleId, linkId));
 				} else {
 					// the event already contains the vehicle id and can be processed normally

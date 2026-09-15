@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -40,7 +41,7 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 /**
  * Tests that the re-planning process of MATSim generates the same results every time, even when
@@ -70,7 +71,7 @@ public class DeterministicMultithreadedReplanningIT {
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
-
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		{
 			StrategyManager strategyManager = new StrategyManager();
@@ -117,6 +118,7 @@ public class DeterministicMultithreadedReplanningIT {
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		{
 			// setup run1
@@ -174,6 +176,7 @@ public class DeterministicMultithreadedReplanningIT {
 		config.controller().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
 		config.plans().setInputFile(IOUtils.extendUrl(testUtils.classInputResourcePath(), "plans1.xml").toString());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		{
 			// setup run1
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
@@ -225,6 +228,7 @@ public class DeterministicMultithreadedReplanningIT {
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		{
 			// setup run1

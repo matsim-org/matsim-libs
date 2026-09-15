@@ -1,9 +1,10 @@
 package org.matsim.contrib.drt.estimator.impl;
 
-import org.checkerframework.checker.units.qual.C;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.acceptance_estimation.RejectionRateEstimator;
+import org.matsim.contrib.drt.estimator.impl.acceptance_estimation.UniformRejectionEstimator;
 import org.matsim.contrib.drt.estimator.impl.distribution.DistributionGenerator;
 import org.matsim.contrib.drt.estimator.impl.distribution.LogNormalDistributionGenerator;
 import org.matsim.contrib.drt.estimator.impl.distribution.NoDistribution;
@@ -23,6 +24,7 @@ public final class DirectTripBasedDrtEstimator implements DrtEstimator {
 	private final WaitingTimeEstimator waitingTimeEstimator;
 	private final DistributionGenerator waitingTimeDistributionGenerator;
 	private final DistributionGenerator rideTimeDistributionGenerator;
+	private final RejectionRateEstimator rejectionRateEstimator;
 
 	public static class Builder {
 		// Initialize with default estimation
@@ -30,6 +32,7 @@ public final class DirectTripBasedDrtEstimator implements DrtEstimator {
 		private WaitingTimeEstimator waitingTimeEstimator = new ConstantWaitingTimeEstimator(300);
 		private DistributionGenerator waitingTimeDistributionGenerator = new NoDistribution();
 		private DistributionGenerator rideTimeDistributionGenerator = new NoDistribution();
+		private RejectionRateEstimator rejectionRateEstimator = new UniformRejectionEstimator(0.);
 
 		public Builder setRideDurationEstimator(RideDurationEstimator rideDurationEstimator) {
 			this.rideDurationEstimator = rideDurationEstimator;
@@ -51,59 +54,26 @@ public final class DirectTripBasedDrtEstimator implements DrtEstimator {
 			return this;
 		}
 
+		public Builder setRejectionRateEstimator(RejectionRateEstimator rejectionRateEstimator) {
+			this.rejectionRateEstimator = rejectionRateEstimator;
+			return this;
+		}
+
 		public DirectTripBasedDrtEstimator build() {
-			return new DirectTripBasedDrtEstimator(rideDurationEstimator, waitingTimeEstimator, rideTimeDistributionGenerator, waitingTimeDistributionGenerator);
+			return new DirectTripBasedDrtEstimator(rideDurationEstimator, waitingTimeEstimator, rideTimeDistributionGenerator,
+				waitingTimeDistributionGenerator, rejectionRateEstimator);
 		}
 
 	}
 
 	public DirectTripBasedDrtEstimator(RideDurationEstimator rideDurationEstimator, WaitingTimeEstimator waitingTimeEstimator,
-									   DistributionGenerator rideTimeDistribution, DistributionGenerator waitTimeDistribution) {
+									   DistributionGenerator rideTimeDistribution, DistributionGenerator waitTimeDistribution,
+									   RejectionRateEstimator rejectionRateEstimator) {
 		this.rideDurationEstimator = rideDurationEstimator;
 		this.waitingTimeEstimator = waitingTimeEstimator;
 		this.rideTimeDistributionGenerator = rideTimeDistribution;
 		this.waitingTimeDistributionGenerator = waitTimeDistribution;
-	}
-
-	/**
-	 * Example DRT estimator based on the normal distributed ride time and waiting time
-	 * @param estRideTimeAlpha typical ride duration = alpha * direct ride time + beta, alpha is specified here
-	 * @param estRideTimeBeta typical ride duration = alpha * direct ride time + beta, beta is specified here
-	 * @param rideTimeStd standard deviation of ride duration (normalized to 1)
-	 * @param estMeanWaitTime estimated waiting time (i.e., mean wait time)
-	 * @param waitTimeStd standard deviation of waiting time (normalized to 1)
-	 * @return NetworkBasedDrtEstimator
-	 */
-	public static DirectTripBasedDrtEstimator normalDistributedNetworkBasedDrtEstimator(double estRideTimeAlpha, double estRideTimeBeta,
-																						double rideTimeStd, double estMeanWaitTime,
-																						double waitTimeStd) {
-		return new Builder()
-			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(estMeanWaitTime))
-			.setRideDurationEstimator(new ConstantRideDurationEstimator(estRideTimeAlpha, estRideTimeBeta))
-			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, waitTimeStd))
-			.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, rideTimeStd))
-			.build();
-	}
-
-	/**
-	 * Example DRT estimator based on the log-normal distributed ride time and normal distributed waiting time
-	 * @param estRideTimeAlpha typical ride duration = alpha * direct ride time + beta, alpha is specified here
-	 * @param estRideTimeBeta typical ride duration = alpha * direct ride time + beta, beta is specified here
-	 * @param mu log-normal distribution parameter for ride duration (normalized to typical ride duration)
-	 * @param sigma log-normal distribution parameter for ride duration (normalized to typical ride duration)
-	 * @param estMeanWaitTime estimated waiting time (i.e., mean wait time)
-	 * @param waitTimeStd standard deviation of waiting time (normalized to 1)
-	 * @return NetworkBasedDrtEstimator
-	 */
-	public static DirectTripBasedDrtEstimator mixDistributedNetworkBasedDrtEstimator(double estRideTimeAlpha, double estRideTimeBeta,
-																					 double mu, double sigma, double estMeanWaitTime,
-																					 double waitTimeStd) {
-		return new Builder()
-			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(estMeanWaitTime))
-			.setRideDurationEstimator(new ConstantRideDurationEstimator(estRideTimeAlpha, estRideTimeBeta))
-			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, waitTimeStd))
-			.setRideDurationDistributionGenerator(new LogNormalDistributionGenerator(2, mu, sigma))
-			.build();
+		this.rejectionRateEstimator = rejectionRateEstimator;
 	}
 
 	@Override
@@ -121,10 +91,57 @@ public final class DirectTripBasedDrtEstimator implements DrtEstimator {
 		double detourRandomFactor = rideTimeDistributionGenerator.generateRandomValue();
 		double estimatedRideDuration = detourRandomFactor * typicalRideDuration;
 		double estimatedRideDistance = detourRandomFactor * typicalRideDistance;
+		double rejectionRate = rejectionRateEstimator.getEstimatedProbabilityOfRejection(fromLinkId, toLinkId, departureTime);
 
-		double acceptanceRate = 1.0;
+		return new Estimate(estimatedRideDistance, estimatedRideDuration, estimatedWaitingTime, rejectionRate);
+	}
 
-		return new Estimate(estimatedRideDistance, estimatedRideDuration, estimatedWaitingTime, acceptanceRate);
+	// Examples
+	/**
+	 * Example DRT estimator based on the normal distributed ride time and waiting time
+	 *
+	 * @param estRideTimeAlpha typical ride duration = alpha * direct ride time + beta, alpha is specified here
+	 * @param estRideTimeBeta  typical ride duration = alpha * direct ride time + beta, beta is specified here
+	 * @param rideTimeStd      standard deviation of ride duration (normalized to 1)
+	 * @param estMeanWaitTime  estimated waiting time (i.e., mean wait time)
+	 * @param waitTimeStd      standard deviation of waiting time (normalized to 1)
+	 * @param probabilityOfRejection probability of a request to be rejected, here we use the UniformRejectionEstimator
+	 * @return NetworkBasedDrtEstimator
+	 */
+	public static DirectTripBasedDrtEstimator normalDistributedNetworkBasedDrtEstimator(double estRideTimeAlpha, double estRideTimeBeta,
+																						double rideTimeStd, double estMeanWaitTime,
+																						double waitTimeStd, double probabilityOfRejection) {
+		return new Builder()
+			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(estMeanWaitTime))
+			.setRideDurationEstimator(new ConstantRideDurationEstimator(estRideTimeAlpha, estRideTimeBeta))
+			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, waitTimeStd))
+			.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, rideTimeStd))
+			.setRejectionRateEstimator(new UniformRejectionEstimator(probabilityOfRejection))
+			.build();
+	}
+
+	/**
+	 * Example DRT estimator based on the log-normal distributed ride time and normal distributed waiting time
+	 *
+	 * @param estRideTimeAlpha typical ride duration = alpha * direct ride time + beta, alpha is specified here
+	 * @param estRideTimeBeta  typical ride duration = alpha * direct ride time + beta, beta is specified here
+	 * @param mu               log-normal distribution parameter for ride duration (normalized to typical ride duration)
+	 * @param sigma            log-normal distribution parameter for ride duration (normalized to typical ride duration)
+	 * @param estMeanWaitTime  estimated waiting time (i.e., mean wait time)
+	 * @param waitTimeStd      standard deviation of waiting time (normalized to 1)
+	 * @param probabilityOfRejection probability of a request to be rejected, here we use the UniformRejectionEstimator
+	 * @return NetworkBasedDrtEstimator
+	 */
+	public static DirectTripBasedDrtEstimator mixDistributedNetworkBasedDrtEstimator(double estRideTimeAlpha, double estRideTimeBeta,
+																					 double mu, double sigma, double estMeanWaitTime,
+																					 double waitTimeStd, double probabilityOfRejection) {
+		return new Builder()
+			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(estMeanWaitTime))
+			.setRideDurationEstimator(new ConstantRideDurationEstimator(estRideTimeAlpha, estRideTimeBeta))
+			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, waitTimeStd))
+			.setRideDurationDistributionGenerator(new LogNormalDistributionGenerator(2, mu, sigma))
+			.setRejectionRateEstimator(new UniformRejectionEstimator(probabilityOfRejection))
+			.build();
 	}
 
 }

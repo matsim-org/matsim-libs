@@ -26,6 +26,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.hermes.HermesTest.LinkEnterEventCollector;
@@ -1012,6 +1013,7 @@ public class HermesTransitTest {
 		public Fixture() {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = this.scenario.getConfig();
+			this.config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 
 			/* build network */

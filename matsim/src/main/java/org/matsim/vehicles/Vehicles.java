@@ -46,4 +46,13 @@ public interface Vehicles extends MatsimToplevelContainer {
 	public void addVehicleType(final VehicleType type);
 
 	public void removeVehicleType(final Id<VehicleType> vehicleTypeId);
+
+	/**
+	 * convenience method
+	 */
+	default public VehicleType addModeVehicleType( final String mode ) {
+		VehicleType vehicleType = this.getFactory().createVehicleType( Id.createVehicleTypeId( mode ) ).setNetworkMode( mode );
+		this.addVehicleType( vehicleType );
+		return vehicleType;
+	}
 }

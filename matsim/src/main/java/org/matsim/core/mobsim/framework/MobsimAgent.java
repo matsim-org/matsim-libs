@@ -40,80 +40,81 @@ import org.matsim.facilities.Facility;
  */
 public interface MobsimAgent extends NetworkAgent, Identifiable<Person> {
 
-    public enum State {
-        ACTIVITY, LEG, ABORT
-    }
+	enum State {
+		ACTIVITY, LEG, ABORT
+	}
 
-    /**
-     * The method through which the agent announces state changes.  For example, when a leg ends, the agent is "in limbo".  When it sets its
-     * state to "ACTIVITY", then when returning to the main engine, that engine will ask the agent about its state and then insert it into
-     * the correct queue.
-     * <p></p>
-     * Design comments/questions:<ul>
-     * <li> Should this be renamed into "get<i>CurrentOrNext</i>State"?
-     * </ul>
-     */
-    State getState();
+	/**
+	 * The method through which the agent announces state changes.  For example, when a leg ends, the agent is "in limbo".  When it sets its
+	 * state to "ACTIVITY", then when returning to the main engine, that engine will ask the agent about its state and then insert it into
+	 * the correct queue.
+	 * <p></p>
+	 * Design comments/questions:<ul>
+	 * <li> Should this be renamed into "get<i>CurrentOrNext</i>State"?
+	 * </ul>
+	 */
+	State getState();
 
-    /**
-     * The time the agent wants to depart from an Activity. If the agent is currently driving,
-     * the return value cannot be interpreted (e.g. it is not defined if it is the departure time
-     * from the previous activity, or from the next one).
-     * <p></p>
-     * There is no corresponding setter, as the implementation should set the corresponding time internally, e.g. in endLegAndComputeNextState() .
-     *
-     * @return the time when the agent wants to depart from an activity.
-     */
-    public double getActivityEndTime();
+	/**
+	 * The time the agent wants to depart from an Activity. If the agent is currently driving,
+	 * the return value cannot be interpreted (e.g. it is not defined if it is the departure time
+	 * from the previous activity, or from the next one).
+	 * <p></p>
+	 * There is no corresponding setter, as the implementation should set the corresponding time internally, e.g. in endLegAndComputeNextState() .
+	 *
+	 * @return the time when the agent wants to depart from an activity.
+	 */
+	double getActivityEndTime();
 
-    /**
-     * Informs the agent that the activity has ended.  The agent is responsible for what comes next.
-     *
-     * @param now
-     */
-    public void endActivityAndComputeNextState(final double now);
+	/**
+	 * Informs the agent that the activity has ended.  The agent is responsible for what comes next.
+	 *
+	 * @param now
+	 */
+	void endActivityAndComputeNextState(final double now);
 
-    /**
-     * Informs the agent that the leg has ended.  The agent is responsible for what comes next.
-     *
-     * @param now the current time in the simulation
-     */
-    public void endLegAndComputeNextState(final double now);
+	/**
+	 * Informs the agent that the leg has ended.  The agent is responsible for what comes next.
+	 *
+	 * @param now the current time in the simulation
+	 */
+	void endLegAndComputeNextState(final double now);
 
-    /**
-     * This is another method besides endLeg... and endActivity... .  Seems to be necessary to abort agents
-     * in states where they should not be.  They should then either set their internal state to abort, or try to recover
-     * if possible.  If neither is done, an infinite loop may result.  kai, feb'12
-     * <p></p>
-     * With respect to "recovery": Possible states (may'14) are LEG and ACTIVITY.  I cannot say what the consistency requirements here are
-     * (e.g. if the agent can only start an activity on the link from where the abort is called).
-     */
-    public void setStateToAbort(final double now);
+	/**
+	 * This is another method besides endLeg... and endActivity... .  Seems to be necessary to abort agents
+	 * in states where they should not be.  They should then either set their internal state to abort, or try to recover
+	 * if possible.  If neither is done, an infinite loop may result.  kai, feb'12
+	 * <p></p>
+	 * With respect to "recovery": Possible states (may'14) are LEG and ACTIVITY.  I cannot say what the consistency requirements here are
+	 * (e.g. if the agent can only start an activity on the link from where the abort is called).
+	 */
+	void setStateToAbort(final double now);
 
-    /**
-     * This returns the expected travel time of a leg that was just started.  There is no crystal-clear design requirement for this;
-     * it is probably used by the TeleportationEngine to obtain the duration of the leg; it is probably ignored by all other modes.
-     * One can probably return "null" if one wants an exception when this is passed to the teleportation engine, or "1"(sec) if
-     * one wants some default behavior.
-     * @return
-     */
-    public OptionalTime getExpectedTravelTime();
+	/**
+	 * This returns the expected travel time of a leg that was just started.  There is no crystal-clear design requirement for this;
+	 * it is probably used by the TeleportationEngine to obtain the duration of the leg; it is probably ignored by all other modes.
+	 * One can probably return "null" if one wants an exception when this is passed to the teleportation engine, or "1"(sec) if
+	 * one wants some default behavior.
+	 *
+	 * @return
+	 */
+	OptionalTime getExpectedTravelTime();
 
-    /**
-     * This returns the expected travel distance of a leg that was just started.
-     */
-    public Double getExpectedTravelDistance();
+	/**
+	 * This returns the expected travel distance of a leg that was just started.
+	 */
+	Double getExpectedTravelDistance();
 
-    /**
-     * Design thoughts:<ul>
-     * <li>There needs to be some method that tells the agent that a teleportation has happened, similar to "moveOverNode".
-     * Could be separated out to a "teleportation" agent, but can as well leave it here. Also used by transit and by
-     * taxicabs.  kai, nov'10
-     * </ul>
-     */
-    public void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId);
+	/**
+	 * Design thoughts:<ul>
+	 * <li>There needs to be some method that tells the agent that a teleportation has happened, similar to "moveOverNode".
+	 * Could be separated out to a "teleportation" agent, but can as well leave it here. Also used by transit and by
+	 * taxicabs.  kai, nov'10
+	 * </ul>
+	 */
+	void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId);
 
-    public Facility getCurrentFacility() ;
-    
-    public Facility getDestinationFacility() ;
+	Facility getCurrentFacility();
+
+	Facility getDestinationFacility();
 }

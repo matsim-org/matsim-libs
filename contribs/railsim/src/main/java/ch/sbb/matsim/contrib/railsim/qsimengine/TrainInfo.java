@@ -33,7 +33,8 @@ public record TrainInfo(
 	double maxVelocity,
 	double acceleration,
 	double deceleration,
-	double maxDeceleration
+	double maxDeceleration,
+	double reversible
 ) {
 
 	TrainInfo(VehicleType vehicle, RailsimConfigGroup config) {
@@ -43,7 +44,8 @@ public record TrainInfo(
 			vehicle.getMaximumVelocity(),
 			RailsimUtils.getTrainAcceleration(vehicle, config),
 			RailsimUtils.getTrainDeceleration(vehicle, config),
-			RailsimUtils.getTrainDeceleration(vehicle, config)
+			RailsimUtils.getTrainDeceleration(vehicle, config),
+			RailsimUtils.getTrainReversible(vehicle).orElse(-1)
 		);
 	}
 

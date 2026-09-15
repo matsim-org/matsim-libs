@@ -24,9 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +33,6 @@ import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
@@ -58,6 +55,7 @@ import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.mobsim.hermes.HermesConfigGroup;
 import org.matsim.core.replanning.annealing.ReplanningAnnealerConfigGroup;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
@@ -101,6 +99,7 @@ public final class Config implements MatsimExtensionPoint {
 	// ////////////////////////////////////////////////////////////////////
 
 	public Config() {
+		// yy IMO this should become package-protected so that user code would only use the ConfigUtils methods. kai, feb'26
 		try {
 			URL currentDir = Paths.get("").toUri().toURL();
 			setContext(currentDir);
@@ -115,6 +114,8 @@ public final class Config implements MatsimExtensionPoint {
 	 * configuration from file.
 	 */
 	public void addCoreModules() {
+		// yy IMO this should become package-protected.
+
 		this.modules.put(GlobalConfigGroup.GROUP_NAME, new GlobalConfigGroup());
 
 		this.modules.put(ControllerConfigGroup.GROUP_NAME, new ControllerConfigGroup());
@@ -146,7 +147,6 @@ public final class Config implements MatsimExtensionPoint {
 
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, new VspExperimentalConfigGroup());
 
-
 		this.modules.put(TransitConfigGroup.GROUP_NAME, new TransitConfigGroup());
 
 		this.modules.put(LinkStatsConfigGroup.GROUP_NAME, new LinkStatsConfigGroup());
@@ -159,10 +159,9 @@ public final class Config implements MatsimExtensionPoint {
 
 		this.modules.put(ChangeModeConfigGroup.CONFIG_MODULE, new ChangeModeConfigGroup());
 
-		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, new ChangeLegModeConfigGroup());
-		// only to provide error messages. kai, may'16
-
 		this.modules.put(HermesConfigGroup.NAME, new HermesConfigGroup());
+
+		this.modules.put(DSimConfigGroup.CONFIG_MODULE_NAME, new DSimConfigGroup());
 
 		this.modules.put(ReplanningAnnealerConfigGroup.GROUP_NAME, new ReplanningAnnealerConfigGroup());
 
@@ -208,6 +207,8 @@ public final class Config implements MatsimExtensionPoint {
 	 *             if a config-group with the specified name already exists.
 	 */
 	public final ConfigGroup createModule(final String name) {
+		// yy should be named createAndAdd ... we said that we would not want creational methods that do the registration as a side effect.  kai, feb'26
+
 		if (this.modules.containsKey(name)) {
 			throw new IllegalArgumentException("Module " + name + " exists already.");
 		}
@@ -241,7 +242,7 @@ public final class Config implements MatsimExtensionPoint {
 			// (3) this is the corresponding test: m is general, module is specialized:
 			if (m.getClass() == ConfigGroup.class && specializedConfigModule.getClass() != ConfigGroup.class) {
 				// (4) go through everything in m (from parsing) and add it to module:
-				copyTo(m, specializedConfigModule);
+				ConfigUtils.copyFromTo(m, specializedConfigModule );
 
 				// (5) register the resulting module under "name" (which will over-write m):
 				this.modules.put(name, specializedConfigModule);
@@ -250,20 +251,6 @@ public final class Config implements MatsimExtensionPoint {
 			}
 		}
 		this.modules.put(name, specializedConfigModule);
-	}
-
-	private static void copyTo(ConfigGroup source, ConfigGroup destination) {
-		for (Map.Entry<String, String> e : source.getParams().entrySet()) {
-			destination.addParam(e.getKey(), e.getValue());
-		}
-
-		for (Collection<? extends ConfigGroup> sourceSets : source.getParameterSets().values()) {
-			for (ConfigGroup sourceSet : sourceSets) {
-				ConfigGroup destinationSet = destination.createParameterSet(sourceSet.getName());
-				copyTo(sourceSet, destinationSet);
-				destination.addParameterSet(destinationSet);
-			}
-		}
 	}
 
 	/**
@@ -302,60 +289,6 @@ public final class Config implements MatsimExtensionPoint {
 		return this.modules.get(moduleName);
 	}
 
-	/**
-	 * Returns the requested parameter. If the module or parameter is not known,
-	 * an error is logged and an IllegalArgumentException is thrown.
-	 *
-	 * @param moduleName
-	 * @param paramName
-	 * @return the requested parameter
-	 *
-	 * @throws IllegalArgumentException
-	 *             if the module or parameter does not exist
-	 * @see #findParam(String, String)
-	 */
-	@Deprecated // use "typed" config group instead
-	public final String getParam(final String moduleName, final String paramName) {
-		ConfigGroup m = this.modules.get(moduleName);
-		if (m == null) {
-			log.error("Module \"" + moduleName + "\" is not known.");
-			throw new IllegalArgumentException("Module \"" + moduleName + "\" is not known.");
-		}
-		String str = m.getValue(paramName);
-		if (str == null) {
-			String message = "Parameter \"" + paramName + "\" of module \"" + moduleName + "\" is not known";
-			log.error(message);
-			throw new IllegalArgumentException(message);
-		}
-		return str;
-	}
-
-	/**
-	 * Returns the value of the specified parameter if it exists, or
-	 * <code>null</code> otherwise.
-	 *
-	 * @param moduleName
-	 *            name of the config-module
-	 * @param paramName
-	 *            name of parameter in the specified module
-	 * @return value of the parameter if it exists, <code>null</code> otherwise
-	 *
-	 * @see #getParam(String, String)
-	 */
-	@Deprecated // use "typed" config group instead
-	public final String findParam(final String moduleName, final String paramName) {
-		ConfigGroup m = this.modules.get(moduleName);
-		if (m == null) {
-			return null;
-		}
-		try {
-			String str = m.getValue(paramName);
-			return str;
-		} catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
-
 	// ////////////////////////////////////////////////////////////////////
 	// print methods
 	// ////////////////////////////////////////////////////////////////////
@@ -363,29 +296,6 @@ public final class Config implements MatsimExtensionPoint {
 	@Override
 	public final String toString() {
 		return "[nof_modules=" + this.modules.size() + "]";
-	}
-
-	// ////////////////////////////////////////////////////////////////////
-	// is used for using Config without a config-file given
-	// ////////////////////////////////////////////////////////////////////
-	/**
-	 * Sets the parameter <code>paramName</code> in the module/config-group
-	 * <code>moduleName</code> to the specified value. If there is no
-	 * config-group with the specified name, a new group will be created.
-	 *
-	 * @param moduleName
-	 * @param paramName
-	 * @param value
-	 */
-	@Deprecated // use "typed" config group instead
-	public final void setParam(final String moduleName, final String paramName, final String value) {
-		checkIfLocked();
-		ConfigGroup m = this.modules.get(moduleName);
-		if (m == null) {
-			m = createModule(moduleName);
-			log.info("module \"" + moduleName + "\" added.");
-		}
-		m.addParam(paramName, value);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -480,6 +390,10 @@ public final class Config implements MatsimExtensionPoint {
 		return (HermesConfigGroup) this.getModule(HermesConfigGroup.NAME);
 	}
 
+	public DSimConfigGroup dsim() {
+		return (DSimConfigGroup) this.getModule(DSimConfigGroup.CONFIG_MODULE_NAME);
+	}
+
 	public ReplanningAnnealerConfigGroup replanningAnnealer() {
 		return (ReplanningAnnealerConfigGroup) this.getModule(ReplanningAnnealerConfigGroup.GROUP_NAME);
 	}
@@ -553,4 +467,5 @@ public final class Config implements MatsimExtensionPoint {
 	public URL getContext() {
 		return context;
 	}
+
 }

@@ -30,7 +30,7 @@ package org.matsim.contrib.dvrp.load;
  * 
  * @author Tarek Chouaki (tkchouaki), IRT SystemX
  */
-public interface DvrpLoad {
+public interface DvrpLoad extends Comparable<DvrpLoad> {
 	/**
 	 * @param other : Another DvrpVehicleLoad of the same implementation as the
 	 *              current one.

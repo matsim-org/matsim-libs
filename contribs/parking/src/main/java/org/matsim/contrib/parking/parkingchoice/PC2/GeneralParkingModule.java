@@ -18,7 +18,7 @@ public class GeneralParkingModule implements StartupListener, BeforeMobsimListen
 
 	public GeneralParkingModule(Controler controler){
 		this.controler = controler ;
-		controler.addControlerListener(this);
+		controler.addControllerListener(this);
 	}
 
 	@Override public void notifyStartup(StartupEvent event) {

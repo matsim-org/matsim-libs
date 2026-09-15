@@ -23,7 +23,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 public class SelectRandom implements Provider<PlanStrategy> {
 

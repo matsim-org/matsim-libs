@@ -59,7 +59,7 @@
 		</link>
 		<link id="X" from="X0" to="X1" length="500.0" freespeed="2.77" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
 		<link id="X1_A" from="X1" to="A" length="2462.214450449026" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">

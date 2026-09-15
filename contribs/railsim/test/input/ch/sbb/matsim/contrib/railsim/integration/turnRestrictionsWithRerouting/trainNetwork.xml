@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+	<nodes>
+		<node id="1" x="0" y="0.0"/>
+		<node id="2" x="500" y="0.0"/>
+		<node id="3" x="2500" y="0.0"/>
+		<node id="4" x="3000" y="0.0"/>
+		<node id="5" x="5000" y="0.0"/>
+		<node id="6" x="5500" y="0.0"/>
+		<node id="7" x="2450" y="25.0"/>
+		<node id="8" x="2950" y="25"/>
+	</nodes>
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="1" from="1" to="2" length="500" freespeed="30.5556" capacity="1000.0" permlanes="1.0" modes="rail" oneway="1"/>
+		<link id="2" from="2" to="3" length="2000" freespeed="44.444" capacity="1000.0" permlanes="1.0" modes="rail" oneway="1">
+			<attributes>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+				<attribute name="disallowedNextLinks" class="org.matsim.core.network.turnRestrictions.DisallowedNextLinks">{"rail":[["6"]]}</attribute>
+			</attributes>
+		</link>
+		<link id="3" from="3" to="4" length="500" freespeed="30.5556" capacity="1000.0" permlanes="1.0" modes="rail" oneway="1"/>
+		<link id="4" from="4" to="5" length="2000" freespeed="44.444" capacity="1000.0" permlanes="1.0" modes="rail" oneway="1">
+			<attributes>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="5" from="5" to="6" length="500" freespeed="30.5556" capacity="1000.0" permlanes="1.0" modes="rail" oneway="1"/>
+		<link id="6" from="3" to="7" length="55" freespeed="30.5556" capacity="1000.0" permlanes="1.0" modes="rail" oneway="1"/>
+		<link id="7" from="7" to="8" length="500" freespeed="30.5556" capacity="1000.0" permlanes="1.0" modes="rail" oneway="1"/>
+		<link id="8" from="8" to="4" length="55" freespeed="30.5556" capacity="1000.0" permlanes="1.0" modes="rail" oneway="1"/>
+		<link id="stop_loop_1" from="1" to="1" length="1.0" freespeed="30.5556" capacity="1000.0" permlanes="1.0" modes="rail" oneway="1"/>
+		<link id="stop_loop_6" from="6" to="6" length="1.0" freespeed="30.5556" capacity="1000.0" permlanes="1.0" modes="rail" oneway="1"/>
+	</links>
+</network>

@@ -38,7 +38,8 @@ public class RailsimLinkStateChangeEventMapper implements MatsimEventsReader.Cus
 			event.getTime(),
 			asId(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_LINK), Link.class),
 			asId(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
-			ResourceState.valueOf(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_STATE))
+			ResourceState.valueOf(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_STATE)),
+			Boolean.parseBoolean(attributes.getOrDefault(RailsimLinkStateChangeEvent.ATTRIBUTE_DLA, "false"))
 		);
 	}
 

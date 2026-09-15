@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.run;
 
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
+import org.matsim.contrib.drt.optimizer.distributed.DistributedDrtSupportModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.MainModeIdentifier;
@@ -42,6 +43,10 @@ public final class MultiModeDrtModule extends AbstractModule {
 			install(new DrtModeModule(drtCfg));
 			installQSimModule(new DrtModeQSimModule(drtCfg));
 			install(new DrtModeAnalysisModule(drtCfg));
+		}
+
+		if (getSimulationContext().isDistributed()) {
+			install(new DistributedDrtSupportModule());
 		}
 
 		bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));

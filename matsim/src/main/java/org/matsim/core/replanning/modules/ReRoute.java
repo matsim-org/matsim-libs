@@ -29,7 +29,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 /**
  * Uses the routing algorithm provided by the {@linkplain Controler} for

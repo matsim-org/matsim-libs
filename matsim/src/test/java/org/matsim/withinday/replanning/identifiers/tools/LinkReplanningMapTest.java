@@ -22,7 +22,7 @@ package org.matsim.withinday.replanning.identifiers.tools;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;

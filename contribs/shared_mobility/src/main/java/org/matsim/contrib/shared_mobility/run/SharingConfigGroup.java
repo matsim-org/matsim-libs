@@ -9,7 +9,9 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup.ServiceScheme;
+import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -38,11 +40,34 @@ public class SharingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@Override
+	public ConfigGroup createParameterSet(final String type) {
+		switch (type) {
+			case SharingServiceConfigGroup.GROUP_NAME:
+				return new SharingServiceConfigGroup();
+			default:
+				throw new IllegalArgumentException(type);
+		}
+	}
+
+	@Override
+	protected void checkParameterSet(final ConfigGroup module) {
+		switch (module.getName()) {
+			case SharingServiceConfigGroup.GROUP_NAME:
+				if (!(module instanceof SharingServiceConfigGroup)) {
+					throw new RuntimeException("unexpected class for module " + module);
+				}
+				break;
+			default:
+				throw new IllegalArgumentException(module.getName());
+		}
+	}
+
+	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 		new BeanValidationConfigConsistencyChecker().checkConsistency(config);
 
-		Set<String> serviceIds = new HashSet<>();
+		Set<Id<SharingService>> serviceIds = new HashSet<>();
 
 		for (SharingServiceConfigGroup serviceConfig : getServices()) {
 			// Avoid duplicate IDs

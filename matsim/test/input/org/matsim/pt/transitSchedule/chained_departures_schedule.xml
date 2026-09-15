@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+	<attributes>
+		<attribute name="endDate" class="java.lang.String">2024-11-19</attribute>
+		<attribute name="startDate" class="java.lang.String">2024-11-19</attribute>
+	</attributes>
+
+	<transitStops>
+		<stopFacility id="221075_bus" x="0" y="0" />
+		<stopFacility id="90277_bus" x="0" y="0" />
+		<stopFacility id="196643_bus" x="0" y="0" />
+		<stopFacility id="206564_bus" x="0" y="0" />
+	</transitStops>
+
+	<transitLine id="line1" name="Line">
+		<attributes>
+			<attribute name="gtfs_agency_id" class="java.lang.String">482</attribute>
+			<attribute name="gtfs_route_short_name" class="java.lang.String">842</attribute>
+			<attribute name="gtfs_route_type" class="java.lang.String">3</attribute>
+		</attributes>
+
+		<transitRoute id="line1_r1">
+			<attributes>
+				<attribute name="simple_route_type" class="java.lang.String">bus</attribute>
+			</attributes>
+
+			<transportMode>bus</transportMode>
+
+			<routeProfile>
+				<stop refId="221075_bus" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="90277_bus" arrivalOffset="00:02:00" departureOffset="00:02:00" awaitDeparture="true"/>
+				<stop refId="196643_bus" arrivalOffset="00:04:00" departureOffset="00:04:00" awaitDeparture="true"/>
+				<stop refId="221075_bus" arrivalOffset="00:06:00" departureOffset="00:06:00" awaitDeparture="true"/>
+			</routeProfile>
+
+			<route>
+				<link refId="pt_221075_bus"/>
+				<link refId="pt_221075_bus-pt_90277_bus"/>
+				<link refId="pt_90277_bus"/>
+				<link refId="pt_90277_bus-pt_196643_bus"/>
+				<link refId="pt_196643_bus"/>
+			</route>
+
+			<departures>
+				<departure id="d1" departureTime="09:24:00" vehicleRefId="pt_842---32640_0_0">
+
+					<chainedDeparture toDeparture="d2"/>
+				</departure>
+
+				<departure id="d2" departureTime="10:24:00" vehicleRefId="pt_842---32640_0_0"/>
+				<departure id="d3" departureTime="10:24:00" vehicleRefId="pt_842---32640_0_0"/>
+
+			</departures>
+
+		</transitRoute>
+
+	</transitLine>
+
+	<transitLine id="line2" name="Line">
+		<attributes>
+			<attribute name="gtfs_agency_id" class="java.lang.String">482</attribute>
+			<attribute name="gtfs_route_short_name" class="java.lang.String">842</attribute>
+			<attribute name="gtfs_route_type" class="java.lang.String">3</attribute>
+		</attributes>
+
+		<transitRoute id="line2_r1">
+			<attributes>
+				<attribute name="simple_route_type" class="java.lang.String">bus</attribute>
+			</attributes>
+
+			<transportMode>bus</transportMode>
+
+			<routeProfile>
+				<stop refId="221075_bus" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="90277_bus" arrivalOffset="00:02:00" departureOffset="00:02:00" awaitDeparture="true"/>
+				<stop refId="196643_bus" arrivalOffset="00:04:00" departureOffset="00:04:00" awaitDeparture="true"/>
+				<stop refId="221075_bus" arrivalOffset="00:06:00" departureOffset="00:06:00" awaitDeparture="true"/>
+			</routeProfile>
+
+			<route>
+				<link refId="pt_221075_bus"/>
+				<link refId="pt_221075_bus-pt_90277_bus"/>
+				<link refId="pt_90277_bus"/>
+				<link refId="pt_90277_bus-pt_196643_bus"/>
+				<link refId="pt_196643_bus"/>
+			</route>
+
+			<departures>
+				<departure id="d1" departureTime="09:14:00" vehicleRefId="pt_842---32640_0_0">
+
+					<chainedDeparture toTransitLine="line1" toTransitRoute="line1_r1" toDeparture="d2"/>
+					<chainedDeparture toTransitLine="line1" toTransitRoute="line1_r1" toDeparture="d3"/>
+				</departure>
+			</departures>
+
+		</transitRoute>
+
+	</transitLine>
+
+</transitSchedule>

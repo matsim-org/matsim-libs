@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.ParkingSearchUtils;
 import org.matsim.contrib.parking.parkingsearch.events.*;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
@@ -45,10 +45,10 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		this.currentPlannedLeg = currentPlannedLeg;
 		this.plan = plan;
 		this.planIndexNextActivity = planIndexNextActivity;
-		if (ParkingUtils.checkIfActivityHasNoParking(followingActivity)) {
+		if (ParkingSearchUtils.checkIfActivityHasNoParking(followingActivity)) {
 			parkingAtEndOfLeg = false;
 		}
-		if (ParkingUtils.checkIfActivityHasPassengerInteraction(followingActivity)) {
+		if (ParkingSearchUtils.checkIfActivityHasPassengerInteraction(followingActivity)) {
 			passangerInteractionAtParkingFacilityAtEndOfLeg = true;
 		}
 	}
@@ -191,8 +191,8 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 	//yyyy I assume, the vehicle is removed from the link's queue and thus waiting for parking does not influence the behaviour of the mobsim?
 	// Does this make sense? paul, nov'24
 	private void createWaitingActivityUntilPassengerInteractionIsPossible(Id<Link> newLinkId, Id<Vehicle> vehicleId, double now) {
-		Activity waitingActivity = PopulationUtils.createActivityFromLinkId(ParkingUtils.WaitingForParkingActivityType, newLinkId);
-		ParkingUtils.setNoParkingForActivity(waitingActivity);
+		Activity waitingActivity = PopulationUtils.createActivityFromLinkId(ParkingSearchUtils.WaitingForParkingActivityType, newLinkId);
+		ParkingSearchUtils.setNoParkingForActivity(waitingActivity);
 		plan.getPlanElements().add(planIndexNextActivity, waitingActivity);
 		hasFoundParking = true;
 		((FacilityBasedParkingManager) parkingManager).addVehicleForWaitingForParking(newLinkId, vehicleId, now);

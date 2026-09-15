@@ -65,7 +65,7 @@ class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		if (!this.usingIndividualScoringParameters) {
 			Config config = this.scenario.getConfig();
 			String subPopulationAttributeName = null;
-			this.nonPersonalizedScoringParameters = new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParameters(subPopulationAttributeName), config.scenario()).build();
+			this.nonPersonalizedScoringParameters = new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParametersOrDefault(subPopulationAttributeName), config.scenario()).build();
 		}
 	}
 
@@ -80,16 +80,17 @@ class DCScoringFunctionFactory implements ScoringFunctionFactory {
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(this.lcContext.getParams()));
 			// forgetting the previous line (which we did at some point) is not picked up by any test within the locationchoice contrib. kai, oct'14
 		} else {
-			scoringFunction = new DCActivityScoringFunction(person.getSelectedPlan(), this.lcContext);
+//			scoringFunction = new DCActivityScoringFunction(person.getSelectedPlan(), this.lcContext);
+			throw new RuntimeException("this execution path is no longer possible because it relied on too old infrastructure upstream");
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 
 		if (this.usingIndividualScoringParameters) {
 			ScoringParameters scoringParameters = new ScoringParameters.Builder(this.scenario, person ).build();
-			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(scoringParameters, this.scenario.getNetwork(), this.scenario.getConfig().transit().getTransitModes()));
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(scoringParameters, this.scenario.getConfig().transit().getTransitModes()));
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(scoringParameters));
 		} else {
-			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.nonPersonalizedScoringParameters, this.scenario.getNetwork(), this.scenario.getConfig().transit().getTransitModes()));
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.nonPersonalizedScoringParameters, this.scenario.getConfig().transit().getTransitModes()));
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(this.nonPersonalizedScoringParameters));
 		}
 

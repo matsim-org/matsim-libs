@@ -19,12 +19,14 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.network;
+package org.matsim.core.network;
 
 import org.matsim.api.core.v01.network.Link;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * An optimized data structure to answer nearest-neighbor queries for links in a
@@ -41,7 +43,7 @@ import java.util.List;
  * </p>
  * After having looked at the code for 5 min, I cannot, however, tell if this is
  * exactly what the code is doing, and if so, which version. kai, jul'12
- *
+ * <p>
  * The implementation splits nodes whenever a node contains more than one link
  * of which at least one can be assigned to a child node. According to the
  * description above, the leaf nodes would always be empty. This implementation
@@ -90,6 +92,11 @@ public final class LinkQuadTree {
 		return this.top.maxY;
 	}
 
+
+	public Collection<Link> getDisk(final double x, final double y, final double distance) {
+		return this.top.getDisk(x, y, distance, new ArrayList<>()).stream().map(w -> w.link).collect(Collectors.toList());
+	}
+
 	private static class QuadTreeNode {
 
 //		private final static int NO_CHILD = -1;
@@ -97,12 +104,12 @@ public final class LinkQuadTree {
 //		private final static int CHILD_NE = 1;
 //		private final static int CHILD_SE = 2;
 //		private final static int CHILD_SW = 3;
-		
-		private enum ChildPosition {CHILD_NW, CHILD_NE, CHILD_SE, CHILD_SW,NO_CHILD }
+
+		private enum ChildPosition {CHILD_NW, CHILD_NE, CHILD_SE, CHILD_SW, NO_CHILD}
 
 		// I replaced the "int" by an enum since I find it easier to read, and I needed/wanted to understand the code.  If this causes
 		// computational performance losses, we need to change it back.  kai, sep'16
-		
+
 		public final double minX;
 		public final double minY;
 		public final double maxX;
@@ -163,7 +170,7 @@ public final class LinkQuadTree {
 		 */
 		public LinkWrapper getNearest(final double x, final double y, final MutableDouble bestDistanceIndicator) {
 			LinkWrapper closest = null;
-			
+
 			// go through all links in current quadtree node (= box):
 			for (LinkWrapper w : this.links) {
 				double tmp = calcLineSegmentDistanceIndicator(x, y, w.link);
@@ -172,42 +179,97 @@ public final class LinkQuadTree {
 					closest = w;
 				}
 			}
-			
-			// if we have child nodes (= child boxes) ...
-			if (this.children != null) { 
 
-				// ... find the correct one ...
-				ChildPosition childPos = this.getChildPosition(x, y); 
+			// if we have no child nodes (= child boxes), return closest ...
+			if (this.children == null) {
+				return closest;
+			}
 
-				if (childPos != ChildPosition.NO_CHILD) {
-					// (not sure we can have children, but none in the correct "direction"; depends on exact behavior of "split")
-					
-					// Find child in correct "direction" and do recursive call:
-					LinkWrapper tmp = this.children[childPos.ordinal()].getNearest(x, y, bestDistanceIndicator);
+			// otherwise, find the correct one ...
+			ChildPosition childPos = this.getChildPosition(x, y);
+
+			if (childPos == ChildPosition.NO_CHILD) {
+				throw new RuntimeException("should never get here since (x,y) has to be _somewhere_ with respect to current Node.");
+			}
+
+			// (not sure we can have children, but none in the correct "direction"; depends on exact behavior of "split")
+
+			// Find child in correct "direction" and do recursive call:
+			LinkWrapper tmp = this.children[childPos.ordinal()].getNearest(x, y, bestDistanceIndicator);
+			if (tmp != null) {
+				closest = tmp;
+			}
+
+			// now also go through all _other_ children ...
+			for (ChildPosition c : ChildPosition.values()) {
+				//skip already visited children
+				if (c == childPos || c == ChildPosition.NO_CHILD) {
+					continue;
+				}
+
+				QuadTreeNode child = this.children[c.ordinal()];
+
+				// For those other children, check if their bounding box is so close that we also need to look at them:
+				if (child.calcDistanceIndicator(x, y) < bestDistanceIndicator.value) {
+
+					// Only if the answer is yes, do a recursive call for actual LinkWrapper instances:
+					tmp = child.getNearest(x, y, bestDistanceIndicator);
 					if (tmp != null) {
 						closest = tmp;
-					}
-
-					// now also go through all _other_ children ...
-					for ( ChildPosition c : ChildPosition.values() ) {
-						if (c != childPos && c != ChildPosition.NO_CHILD ) {
-							QuadTreeNode child = this.children[c.ordinal()];
-							
-							// For those other children, check if their bounding box is so close that we also need to look at them:
-							if (child.calcDistanceIndicator(x, y) < bestDistanceIndicator.value) {
-								
-								// Only if the answer is yes, do a recursive call for actual LinkWrapper instances:
-								tmp = child.getNearest(x, y, bestDistanceIndicator);
-								if (tmp != null) {
-									closest = tmp;
-								}
-							}
-						}
 					}
 				}
 			}
 
 			return closest;
+		}
+
+		/**
+		 * Very similar to getNearest(), but returns all links within a given distance.
+		 *
+		 * @return Collection of LinkWrapper instances that are within distance of (x,y). Considers
+		 */
+		public Collection<LinkWrapper> getDisk(final double x, final double y, final double distance, Collection<LinkWrapper> result) {
+			// go through all links in current quadtree node (= box):
+			for (LinkWrapper w : this.links) {
+				double tmp = Math.sqrt(calcLineSegmentDistanceIndicator(x, y, w.link));
+				if (tmp <= distance) {
+					result.add(w);
+				}
+			}
+
+			// if we have no child nodes (= child boxes), return current result ...
+			if (this.children == null) {
+				return result;
+			}
+
+			// otherwise, find the correct one ...
+			ChildPosition childPos = this.getChildPosition(x, y);
+
+			if (childPos == ChildPosition.NO_CHILD) {
+				throw new RuntimeException("should never get here since (x,y) has to be _somewhere_ with respect to current Node.");
+			}
+
+			// Find child in correct "direction" and do recursive call:
+			this.children[childPos.ordinal()].getDisk(x, y, distance, result);
+
+			// now also go through all _other_ children ...
+			for (ChildPosition c : ChildPosition.values()) {
+				//skip already visited children
+				if (c == childPos || c == ChildPosition.NO_CHILD) {
+					continue;
+				}
+
+				QuadTreeNode child = this.children[c.ordinal()];
+
+				// For those other children, check if their bounding box is so close that we also need to look at them:
+				if (Math.sqrt(child.calcDistanceIndicator(x, y)) <= distance) {
+
+					// Only if the answer is yes, do a recursive call for actual LinkWrapper instances:
+					child.getDisk(x, y, distance, result);
+				}
+			}
+
+			return result;
 		}
 
 		private void split() {
@@ -276,7 +338,7 @@ public final class LinkQuadTree {
 				return ChildPosition.CHILD_SE;
 			}
 //			if (x < centerX && y < centerY) { // this should now always be true
-				return ChildPosition.CHILD_SW;
+			return ChildPosition.CHILD_SW;
 //			}
 //			throw new RuntimeException("should never get here since (x,y) has to be _somewhere_ with respect to centerX and centerY") ;
 		}
@@ -305,12 +367,13 @@ public final class LinkQuadTree {
 				distanceY = Math.min(Math.abs(this.minY - y), Math.abs(this.maxY - y));
 			}
 
-			return distanceX * distanceX + distanceY * distanceY; 
+			return distanceX * distanceX + distanceY * distanceY;
 			// (no Math.sqrt(), as it's only used to compare to each other, thus distance "indicator")
 		}
 
 	}
 
+	// This is a helper method to calculate the square distance of a point to a link. Chooses the closest point on the link.
 	private static double calcLineSegmentDistanceIndicator(final double x, final double y, final Link link) {
 
 		double fx = link.getFromNode().getCoord().getX();
@@ -323,7 +386,9 @@ public final class LinkQuadTree {
 			return calcDistanceIndicator(fx, fy, x, y);
 		}
 
-		double u = ((x - fx)*lineDX + (y - fy)*lineDY) / (lineDX*lineDX + lineDY*lineDY);
+		// project (x | y) onto the line segment
+		// values of u indicate the position of the projection on the line segment
+		double u = ((x - fx) * lineDX + (y - fy) * lineDY) / (lineDX * lineDX + lineDY * lineDY);
 
 		if (u <= 0) {
 			// (x | y) is not on the line segment, but before lineFrom
@@ -333,14 +398,15 @@ public final class LinkQuadTree {
 			// (x | y) is not on the line segment, but after lineTo
 			return calcDistanceIndicator(fx + lineDX, fy + lineDY, x, y);
 		}
-		return calcDistanceIndicator(fx + u*lineDX, fy + u*lineDY, x, y);
 
+		// (x | y) is on the line segment
+		return calcDistanceIndicator(fx + u * lineDX, fy + u * lineDY, x, y);
 	}
 
 	private static double calcDistanceIndicator(final double fromX, final double fromY, final double toX, final double toY) {
 		double xDiff = toX - fromX;
 		double yDiff = toY - fromY;
-		return (xDiff*xDiff) + (yDiff*yDiff); 
+		return (xDiff * xDiff) + (yDiff * yDiff);
 		// (no Math.sqrt(), as it's only used to compare to each other, thus distance "indicator")
 	}
 
@@ -361,15 +427,15 @@ public final class LinkQuadTree {
 
 			if (fx == tx) {
 				// enforce minimal extent
-				this.minX = fx - Math.abs(fx)*1e-8; // make it adaptive within the number of significant digits
-				this.maxX = fx + Math.abs(fx)*1e-8; // make it adaptive within the number of significant digits
+				this.minX = fx - Math.abs(fx) * 1e-8; // make it adaptive within the number of significant digits
+				this.maxX = fx + Math.abs(fx) * 1e-8; // make it adaptive within the number of significant digits
 			} else {
 				this.minX = Math.min(fx, tx);
 				this.maxX = Math.max(fx, tx);
 			}
 			if (fy == ty) {
-				this.minY = fy - Math.abs(fy)*1e-8; // make it adaptive within the number of significant digits
-				this.maxY = fy + Math.abs(fy)*1e-8; // make it adaptive within the number of significant digits
+				this.minY = fy - Math.abs(fy) * 1e-8; // make it adaptive within the number of significant digits
+				this.maxY = fy + Math.abs(fy) * 1e-8; // make it adaptive within the number of significant digits
 			} else {
 				this.minY = Math.min(fy, ty);
 				this.maxY = Math.max(fy, ty);

@@ -17,7 +17,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
@@ -32,7 +32,6 @@ import org.matsim.modechoice.estimators.*;
 import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.testcases.MatsimTestUtils;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
@@ -59,7 +58,7 @@ public class TopKMinMaxTest {
 	private TripRouter router;
 
 	@Mock
-	private ControlerListenerManager cl;
+	private ControllerListenerManager cl;
 
 	@Mock
 	private EventsManager em;
@@ -183,7 +182,7 @@ public class TopKMinMaxTest {
 			PopulationFactory f = PopulationUtils.getFactory();
 			bind(Config.class).toInstance(config);
 			bind(EventsManager.class).toInstance(em);
-			bind(ControlerListenerManager.class).toInstance(cl);
+			bind(ControllerListenerManager.class).toInstance(cl);
 			bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(config));
 
 			bind(TimeInterpretation.class).toInstance(TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes, 0));
@@ -240,7 +239,8 @@ public class TopKMinMaxTest {
 
 			tripBinder.addBinding(TransportMode.car).toInstance(new CarTripEstimator());
 
-			ScoringParameters.Builder scoring = new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParameters("person"), Map.of(), config.scenario());
+			ScoringParameters.Builder scoring = new ScoringParameters.Builder(config.scoring(),
+				config.scoring().getScoringParametersOrDefault("person"), Map.of(), config.scenario());
 
 			bind(ScoringParametersForPerson.class).toInstance(person -> scoring.build());
 			bind(InformedModeChoiceConfigGroup.class).toInstance(ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class));

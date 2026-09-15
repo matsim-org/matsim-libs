@@ -37,7 +37,7 @@ public class ModeAvailabilityConfigGroup extends ComponentConfigGroup {
 	@StringSetter(AVAILABLE_MODES)
 	public void setAvailableModesAsString(String constrainedModes) {
 		this.availableModes = Arrays.asList(constrainedModes.split(",")).stream().map(String::trim)
-				.collect(Collectors.toSet());
+				.filter(s -> !s.isEmpty()).collect(Collectors.toSet());
 	}
 
 	@StringGetter(AVAILABLE_MODES)

@@ -5,6 +5,8 @@ import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
+import org.matsim.simwrapper.viz.FlowMap;
 import org.matsim.simwrapper.viz.TransitViewer;
 
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ public class PublicTransitDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Public Transit";
 		header.tab = "PT";
@@ -46,6 +48,21 @@ public class PublicTransitDashboard implements Dashboard {
 
 			if (!customRouteTypes.isEmpty())
 				viz.customRouteTypes = customRouteTypes;
+		});
+
+		layout.row("flowmap").el(FlowMap.class, (viz, data) -> {
+			viz.title = "Flow Map";
+			viz.description = "Visualize the flows of different metrics";
+			FlowMap.Metrics metrics = new FlowMap.Metrics();
+			metrics.setZoom(9.5);
+			metrics.setLabel("headway metric");
+			metrics.setDataset("analysis/pt/pt_headway_per_stop_area_pair_and_hour.csv");
+			metrics.setOrigin("stopAreaOrStop");
+			metrics.setDestination("stopAreaOrStopNext");
+			metrics.setFlow("meanHeadway");
+			metrics.setColorScheme("BurgYl");
+			metrics.setValueTransform(FlowMap.Metrics.ValueTransform.INVERSE);
+			viz.metrics.add(metrics);
 		});
 	}
 }

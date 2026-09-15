@@ -20,12 +20,11 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
-import java.util.Optional;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
-import org.matsim.contrib.dvrp.load.DvrpLoadFromFleet;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -38,12 +37,12 @@ public class FleetReader extends MatsimXmlParser {
 	private static final int DEFAULT_CAPACITY = 1;
 
 	private final FleetSpecification fleet;
-	private final DvrpLoadFromFleet dvrpVehicleLoadCreator;
+	private final DvrpLoadType loadType;
 
-	public FleetReader(FleetSpecification fleet, DvrpLoadFromFleet dvrpVehicleLoadCreator) {
+	public FleetReader(FleetSpecification fleet, DvrpLoadType loadType) {
 		super(ValidationType.DTD_ONLY);
 		this.fleet = fleet;
-		this.dvrpVehicleLoadCreator = dvrpVehicleLoadCreator;
+		this.loadType = loadType;
 	}
 
 	@Override
@@ -62,18 +61,13 @@ public class FleetReader extends MatsimXmlParser {
 		return ImmutableDvrpVehicleSpecification.newBuilder()
 				.id(vehicleId)
 				.startLinkId(Id.createLinkId(atts.getValue("start_link")))
-				.capacity(getCapacity(atts.getValue("capacity"), vehicleId, this.dvrpVehicleLoadCreator))
+				.capacity(getCapacity(atts.getValue("capacity")))
 				.serviceBeginTime(Double.parseDouble(atts.getValue("t_0")))
 				.serviceEndTime(Double.parseDouble(atts.getValue("t_1")))
 				.build();
 	}
 
-	private static DvrpLoad getCapacity(String capacityAttribute, Id<DvrpVehicle> vehicleId, DvrpLoadFromFleet dvrpVehicleLoadCreator) {
-		double capacity = Double.parseDouble(Optional.ofNullable(capacityAttribute).orElse(DEFAULT_CAPACITY + ""));
-		if ((int)capacity != capacity) {
-			//for backwards compatibility: use double when reading files (capacity used to be double)
-			throw new IllegalArgumentException("capacity must be an integer value");
-		}
-		return dvrpVehicleLoadCreator.getDvrpVehicleLoad((int)capacity, vehicleId);
+	private DvrpLoad getCapacity(String val) {
+		return loadType.deserialize(val == null ? String.valueOf(DEFAULT_CAPACITY) : val);
 	}
 }

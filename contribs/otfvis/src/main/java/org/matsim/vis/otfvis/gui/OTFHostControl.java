@@ -145,6 +145,16 @@ public class OTFHostControl implements GLEventListener {
 
 	}
 
+	/**
+	 * This function triggers indirectly a redraw of the viz by setting the time of the simulation.
+	 *
+	 * In case of {@link org.matsim.vis.otfvis.OnTheFlyServer}, the following happens:
+	 * If synchronized, it triggers a run of the next mobsim step.
+	 * If not synchronized, it just receives the time of the mobsim.
+	 *
+	 * See {@link org.matsim.vis.otfvis.OnTheFlyServer} for further comments. The synchronization magic happens in {@link org.matsim.core.mobsim.framework.PlayPauseSimulationControl}.
+	 * paul, nov'25
+	 */
 	@Override
 	public void display(GLAutoDrawable glAutoDrawable) {
 		int delay = OTFClientControl.getInstance().getOTFVisConfig().getDelay_ms();
@@ -155,12 +165,14 @@ public class OTFHostControl implements GLEventListener {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				//forwards request to the play and pause control if server is OnTheFlyServer
 				server.requestNewTime(getSimTime() + 1);
 				if (simTime.getValue() >= loopEnd) {
 					server.requestNewTime(loopStart);
 					simTime.setValue(server.getLocalTime());
 				}
 			}
+			// simTime is the input field of the time in OTFViz; if simTime is changed, the viz is redrawn
 			simTime.setValue(server.getLocalTime());
 			if (server.isFinished()) {
 				animator.stop();

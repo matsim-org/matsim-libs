@@ -28,7 +28,7 @@ import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Map;
 
 /**
@@ -62,7 +62,7 @@ public class IndividualRaptorParametersForPerson implements RaptorParametersForP
 
 		ScoringConfigGroup pcsConfig = config.scoring();
 
-		for (Map.Entry<String, ScoringConfigGroup.ModeParams> e : pcsConfig.getModes().entrySet()) {
+		for (Map.Entry<String, ScoringConfigGroup.ModeParams> e : pcsConfig.getDefaultModeParams().entrySet()) {
 			String mode = e.getKey();
 			ModeUtilityParameters modeParams = scoringParameters.modeParams.get(mode);
 

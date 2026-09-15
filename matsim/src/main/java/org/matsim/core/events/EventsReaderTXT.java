@@ -20,6 +20,7 @@ package org.matsim.core.events;
  * *********************************************************************** */
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -63,15 +64,15 @@ public final class EventsReaderTXT {
 			if (typeIndex == ActivityEnd.ordinal()) {
 				e = new ActivityEndEvent(time, Id.createPersonId(vehicleId), linkId, null, null, null);
 			} else if (typeIndex == PersonDeparture.ordinal()) {
-				e = new PersonDepartureEvent(time, Id.createPersonId(vehicleId), linkId, "car", "car");
+				e = new PersonDepartureEvent(time, Id.createPersonId(vehicleId), linkId, TransportMode.car, TransportMode.car );
 			} else if (typeIndex == VehicleEntersTraffic.ordinal()) {
-				e = new VehicleEntersTrafficEvent(time, Id.createPersonId(vehicleId), linkId, vehicleId, "car", 0);
+				e = new VehicleEntersTrafficEvent(time, Id.createPersonId(vehicleId), linkId, vehicleId, TransportMode.car, 0);
 			} else if (typeIndex == LinkLeave.ordinal()) {
 				e = new LinkLeaveEvent(time, vehicleId, linkId);
 			} else if (typeIndex == LinkEnter.ordinal()) {
 				e = new LinkEnterEvent(time, vehicleId, linkId);
 			} else if (typeIndex == PersonArrival.ordinal()) {
-				e = new PersonArrivalEvent(time, Id.createPersonId(vehicleId), linkId, "car");
+				e = new PersonArrivalEvent(time, Id.createPersonId(vehicleId), linkId, TransportMode.car );
 			} else if (typeIndex == ActivityStart.ordinal()) {
 				e = new ActivityStartEvent(time, Id.createPersonId(vehicleId), linkId, null, null, null );
 			} else {

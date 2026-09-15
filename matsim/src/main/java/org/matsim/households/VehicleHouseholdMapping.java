@@ -21,7 +21,7 @@ package org.matsim.households;
 
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -29,7 +29,7 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * Tiny helper to get the household associated with a vehicle's id.
- * 
+ *
  * @author dgrether
  *
  */

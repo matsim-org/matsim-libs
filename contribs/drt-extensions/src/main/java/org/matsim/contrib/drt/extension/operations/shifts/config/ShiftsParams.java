@@ -49,9 +49,18 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 	private double shiftEndRescheduleLookAhead = 1800;
 
 	@Parameter
+	@Comment("Time before earliest start of a shift break in which the shift break is updated in [seconds]")
+	private double shiftBreakUpdateLookAhead = 1800;
+
+	@Parameter
 	@Comment("Time interval for periodic check of shift end re-scheduling for shifts ending within the " +
 			"'shiftEndRescheduleLookAhead' in [seconds]")
 	private double updateShiftEndInterval = 60 * 3;
+
+	@Parameter
+	@Comment("Time interval for periodic check of shift break re-scheduling for shift breaks starting within the " +
+			"'shiftBreakUpdateLookAhead' in [seconds]")
+	private double updateShiftBreakInterval = 60 * 3;
 
 	@Parameter
 	@Comment("set to true if shifts can start and end at in field operational facilities," +
@@ -154,12 +163,28 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 		this.shiftEndRescheduleLookAhead = shiftEndRescheduleLookAhead;
 	}
 
+	public double getShiftBreakUpdateLookAhead() {
+		return shiftBreakUpdateLookAhead;
+	}
+
+	public void setShiftBreakUpdateLookAhead(double shiftBreakUpdateLookAhead) {
+		this.shiftBreakUpdateLookAhead = shiftBreakUpdateLookAhead;
+	}
+
 	public double getUpdateShiftEndInterval() {
 		return updateShiftEndInterval;
 	}
 
 	public void setUpdateShiftEndInterval(double updateShiftEndInterval) {
 		this.updateShiftEndInterval = updateShiftEndInterval;
+	}
+
+	public double getUpdateShiftBreakInterval() {
+		return updateShiftBreakInterval;
+	}
+
+	public void setUpdateShiftBreakInterval(double updateShiftBreakInterval) {
+		this.updateShiftBreakInterval = updateShiftBreakInterval;
 	}
 
 	public boolean isAllowInFieldChangeover() {

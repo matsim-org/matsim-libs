@@ -31,6 +31,6 @@ public class PtStop2StopAnalysisModule extends AbstractModule {
     @Override
     public void install() {
         bind(PtStop2StopAnalysisControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(PtStop2StopAnalysisControlerListener.class);
+        addControllerListenerBinding().to(PtStop2StopAnalysisControlerListener.class);
     }
 }

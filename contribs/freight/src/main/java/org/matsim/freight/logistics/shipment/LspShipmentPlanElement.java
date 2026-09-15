@@ -21,6 +21,7 @@
 package org.matsim.freight.logistics.shipment;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
@@ -45,4 +46,6 @@ public interface LspShipmentPlanElement {
 	double getStartTime();
 
 	double getEndTime();
+
+	Id<Link> getLinkId();
 }

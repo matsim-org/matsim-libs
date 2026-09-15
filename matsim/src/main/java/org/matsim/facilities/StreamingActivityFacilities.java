@@ -1,7 +1,6 @@
 package org.matsim.facilities;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.Map;
@@ -45,11 +44,6 @@ public class StreamingActivityFacilities implements ActivityFacilities {
     @Override
     public void addActivityFacility(ActivityFacility facility) {
         this.consumer.accept(facility);
-    }
-
-    @Override
-    public FailingObjectAttributes getFacilityAttributes() {
-        return FailingObjectAttributes.createFacilitiesAttributes();
     }
 
     @Override

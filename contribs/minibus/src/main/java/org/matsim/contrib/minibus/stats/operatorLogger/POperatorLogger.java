@@ -25,7 +25,7 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -78,7 +78,7 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 
 		if(this.pConfig.getLogOperators()){
 			log.info("enabled");
-			this.pOperatorLoggerWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename(FILESUFFIX));
+			this.pOperatorLoggerWriter = IOUtils.getBufferedWriter(controler.getControllerIO().getOutputFilename(FILESUFFIX));
 			try {
 				this.pOperatorLoggerWriter.write(LogElement.getHeaderLine());
 			} catch (IOException e) {

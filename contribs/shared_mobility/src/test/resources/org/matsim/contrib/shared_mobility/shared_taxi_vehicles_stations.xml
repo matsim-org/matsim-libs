@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE service SYSTEM "../dtd/sharing_service_v1.dtd">
+<!DOCTYPE service SYSTEM "src/main/resources/dtd/sharing_service_v1.dtd">
 <service>
 	<stations>
 		<station id="1" link="55_2" capacity="4" />

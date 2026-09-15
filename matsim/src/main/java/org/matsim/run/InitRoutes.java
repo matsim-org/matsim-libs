@@ -23,6 +23,7 @@ package org.matsim.run;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -146,8 +147,8 @@ public class InitRoutes {
 				public void install() {
 				install(new ScenarioByInstanceModule(scenario));
 				install(new TimeInterpretationModule());
-				addTravelTimeBinding("car").toInstance(timeCostCalc);
-				addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
+				addTravelTimeBinding( TransportMode.car ).toInstance(timeCostCalc );
+				addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(new TravelDisutilityFactory() {
 					@Override
 					public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 						return timeCostCalc;

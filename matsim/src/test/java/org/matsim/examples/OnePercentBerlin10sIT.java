@@ -29,7 +29,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -54,6 +56,8 @@ public class OnePercentBerlin10sIT {
 	@Test
 	void testOnePercent10sQSim() {
 		Config config = utils.loadConfig((String)null);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		// input files are in the main directory in the resource path!
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
@@ -69,6 +73,7 @@ public class OnePercentBerlin10sIT {
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10.0);
 		config.scoring().setLearningRate(1.0);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 
@@ -102,6 +107,8 @@ public class OnePercentBerlin10sIT {
 	@Test
 	void testOnePercent10sQSimTryEndTimeThenDuration() {
 		Config config = utils.loadConfig((String)null);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
@@ -117,6 +124,7 @@ public class OnePercentBerlin10sIT {
 		config.scoring().setLearningRate(1.0);
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

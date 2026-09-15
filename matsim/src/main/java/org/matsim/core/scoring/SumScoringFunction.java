@@ -19,22 +19,24 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scoring;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.matsim.core.scoring;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.TripStructureUtils.Trip;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class SumScoringFunction implements ScoringFunction {
 
 	public interface BasicScoring {
 		void finish();
+
 		double getScore();
 
 		/**
@@ -46,7 +48,9 @@ public final class SumScoringFunction implements ScoringFunction {
 
 	public interface ActivityScoring extends BasicScoring {
 		void handleFirstActivity(final Activity act);
+
 		void handleActivity(final Activity act);
+
 		void handleLastActivity(final Activity act);
 	}
 
@@ -54,8 +58,8 @@ public final class SumScoringFunction implements ScoringFunction {
 		void handleLeg(final Leg leg);
 	}
 
-	public interface TripScoring extends BasicScoring{
-		void handleTrip(final Trip trip) ;
+	public interface TripScoring extends BasicScoring {
+		void handleTrip(final Trip trip);
 	}
 
 	public interface MoneyScoring extends BasicScoring {
@@ -80,12 +84,15 @@ public final class SumScoringFunction implements ScoringFunction {
 	 * were tested.)
 	 *
 	 * @author nagel
+	 * @deprecated This interface will be removed in a future release, together with {@link ScoringFunction#handleEvent(Event)}. Scoring functions that
+	 * really need to gather information using Mobsim-Events must register as a regular event handler with the simulation's {@link EventsManager}.
 	 */
+	@Deprecated(forRemoval = true, since = "2026.0")
 	public interface ArbitraryEventScoring extends BasicScoring {
-		void handleEvent( final Event event ) ;
+		void handleEvent(final Event event);
 	}
 
-	private static final  Logger log = LogManager.getLogger(SumScoringFunction.class);
+	private static final Logger log = LogManager.getLogger(SumScoringFunction.class);
 
 	private final List<BasicScoring> basicScoringFunctions = new ArrayList<>();
 	private final List<ActivityScoring> activityScoringFunctions = new ArrayList<>();
@@ -94,7 +101,7 @@ public final class SumScoringFunction implements ScoringFunction {
 	private final List<LegScoring> legScoringFunctions = new ArrayList<>();
 	private final List<TripScoring> tripScoringFunctions = new ArrayList<>();
 	private final List<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<>();
-	private final List<ArbitraryEventScoring> arbitraryEventScoringFunctions = new ArrayList<>() ;
+	private final List<ArbitraryEventScoring> arbitraryEventScoringFunctions = new ArrayList<>();
 
 	@Override
 	public final void handleActivity(Activity activity) {
@@ -112,7 +119,7 @@ public final class SumScoringFunction implements ScoringFunction {
 			}
 		} else {
 			throw new RuntimeException(
-					"Trying to score an activity without start or end time. Should not happen. Activity=" + activity);
+				"Trying to score an activity without start or end time. Should not happen. Activity=" + activity);
 		}
 	}
 
@@ -154,7 +161,7 @@ public final class SumScoringFunction implements ScoringFunction {
 	@Override
 	public void handleEvent(Event event) {
 		for (ArbitraryEventScoring eventScoringFunction : this.arbitraryEventScoringFunctions) {
-			eventScoringFunction.handleEvent(event) ;
+			eventScoringFunction.handleEvent(event);
 		}
 	}
 
@@ -176,10 +183,10 @@ public final class SumScoringFunction implements ScoringFunction {
 			if (log.isTraceEnabled()) {
 				log.trace("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is: " + contribution);
 			}
-			if ( Double.isNaN( contribution ) ) {
+			if (Double.isNaN(contribution)) {
 				// I consider this dangerous enough to justify a crash. If somebody has strong arguments for NaN scores,
 				// one might change this to "log.error(...)". td june 15
-				throw new RuntimeException( "Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is NaN! Behavior with NaN scores is undefined." );
+				throw new RuntimeException("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is NaN! Behavior with NaN scores is undefined.");
 			}
 			score += contribution;
 		}

@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
+import org.matsim.core.network.NetworkUtils;
 
 /**
  * Ensures that each link in the network can be reached by any other link.
@@ -42,9 +43,11 @@ import org.matsim.core.api.internal.NetworkRunnable;
  * Nodes with no incoming or outgoing links are removed as well from the
  * network.
  *
+ * @deprecated Use {@link NetworkUtils#cleanNetwork(Network, Set)}
  * @author mrieser
  * @author balmermi
  */
+@Deprecated(since = "2025.0-SNAPSHOT")
 public final class NetworkCleaner implements NetworkRunnable {
 
 	private static final Logger log = LogManager.getLogger(NetworkCleaner.class);
@@ -62,10 +65,10 @@ public final class NetworkCleaner implements NetworkRunnable {
 
 		final Map<Node, DoubleFlagRole> nodeRoles = new HashMap<>(network.getNodes().size());
 
-		ArrayList<Node> pendingForward = new ArrayList<>();
-		ArrayList<Node> pendingBackward = new ArrayList<>();
+		List<Node> pendingForward = new ArrayList<>();
+		List<Node> pendingBackward = new ArrayList<>();
 
-		TreeMap<Id<Node>, Node> clusterNodes = new TreeMap<>();
+		Map<Id<Node>, Node> clusterNodes = new TreeMap<>();
 		clusterNodes.put(startNode.getId(), startNode);
 		DoubleFlagRole r = getDoubleFlag(startNode, nodeRoles);
 		r.forwardFlag = true;

@@ -56,7 +56,7 @@ final class FixedBlockResource implements RailResourceInternal {
 	/**
 	 * Maximum number of reservations.
 	 */
-	private final int capacity;
+	private int capacity;
 
 	FixedBlockResource(Id<RailResource> id, List<RailLink> links) {
 		this.id = id;
@@ -129,6 +129,18 @@ final class FixedBlockResource implements RailResourceInternal {
 		return samePresent ? reservations.size() < capacity - 1 : reservations.size() < capacity;
 	}
 
+	@Override
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+
+		// Create new arrays with new capacity if necessary
+		for (RailLink link : links) {
+			MobsimDriverAgent[] tracks = this.tracks.get(link);
+			if (tracks.length < capacity) {
+				this.tracks.put(link, Arrays.copyOf(tracks, capacity));
+			}
+		}
+	}
 
 	@Override
 	public double getReservedDist(RailLink link, TrainPosition position) {
@@ -143,7 +155,7 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public double reserve(double time, RailLink link, int track, TrainPosition position) {
+	public double reserve(double time, RailLink link, int track, TrainPosition position, boolean force) {
 
 		if (track >= 0)
 			throw new IllegalArgumentException("Fixed block does not support choosing individual tracks.");
@@ -154,8 +166,14 @@ final class FixedBlockResource implements RailResourceInternal {
 		if (!reservations.containsKey(position.getDriver()))
 			reservations.put(position.getDriver(), link);
 
-		if (reservations.size() > capacity) {
+		if (!force && reservations.size() > capacity) {
 			throw new IllegalStateException("Too many reservations. Capacity needs to be checked before calling reserve.");
+		} else if (force && reservations.size() > capacity) {
+			// Increase the internal array size without increasing capacity
+			MobsimDriverAgent[] tracks = this.tracks.get(link);
+			if (tracks.length < reservations.size()) {
+				this.tracks.put(link, Arrays.copyOf(tracks, reservations.size()));
+			}
 		}
 
 		MobsimDriverAgent[] state = tracks.get(link);
@@ -205,4 +223,11 @@ final class FixedBlockResource implements RailResourceInternal {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "FixedBlockResource{" +
+			"id=" + id +
+			", capacity=" + capacity +
+			'}';
+	}
 }

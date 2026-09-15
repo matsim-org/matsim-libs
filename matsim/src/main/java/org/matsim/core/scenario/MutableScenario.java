@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -30,8 +32,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.*;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.checkers.ScenarioChecker;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.lanes.Lanes;
@@ -53,6 +56,7 @@ public final class MutableScenario implements Scenario, Lockable {
 	private boolean locked = false ;
 
 	private final Map<String, Object> elements = new HashMap<>();
+	private final List<ScenarioChecker> scenarioCheckers = new ArrayList<>();
 
 	//mandatory attributes
 	private final Config config;
@@ -72,13 +76,13 @@ public final class MutableScenario implements Scenario, Lockable {
 		this.config = config;
 		this.network = NetworkUtils.createNetwork(this.config);
 		this.population = PopulationUtils.createPopulation(this.config, this.network);
-		this.facilities = new ActivityFacilitiesImpl();
+		this.facilities = FacilitiesUtils.createActivityFacilities();
 		this.households = new HouseholdsImpl();
 		this.lanes = LanesUtils.createLanesContainer();
 		this.vehicles = VehicleUtils.createVehiclesContainer();
 		this.transitVehicles = VehicleUtils.createVehiclesContainer();
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		
+
 		this.config.network().setLocked();
 	}
 
@@ -173,6 +177,47 @@ public final class MutableScenario implements Scenario, Lockable {
 	}
 
 	@Override
+	public void addScenarioChecker(ScenarioChecker checker) {
+		boolean alreadyExists = false;
+		for (ScenarioChecker consistencyChecker : scenarioCheckers) {
+			if (consistencyChecker.getClass().equals(checker.getClass())) {
+				alreadyExists = true;
+				break;
+			}
+		}
+		if (!alreadyExists) {
+			this.scenarioCheckers.add(checker);
+		} else {
+			log.info("ScenarioChecker with runtime type={} was already added; not adding it a second time",
+				checker.getClass());
+		}
+	}
+
+	@Override
+	public void removeScenarioChecker(ScenarioChecker checker) {
+		scenarioCheckers.remove(checker);
+	}
+
+	@Override
+	public void checkConsistencyBeforeRun() {
+		for (ScenarioChecker checker : scenarioCheckers) {
+			checker.checkConsistencyBeforeRun(this);
+		}
+	}
+
+	@Override
+	public void checkConsistencyAfterRun() {
+		for (ScenarioChecker checker : scenarioCheckers) {
+			checker.checkConsistencyAfterRun(this);
+		}
+	}
+
+	@Override
+	public List<ScenarioChecker> getScenarioCheckers() {
+		return this.scenarioCheckers;
+	}
+
+	@Override
 	public final void setLocked() {
 		this.locked = true ;
 	}
@@ -211,6 +256,10 @@ public final class MutableScenario implements Scenario, Lockable {
 	public final void setLanes( Lanes lanes ) {
 		testForLocked();
 		this.lanes = lanes ;
+	}
+	public final void setVehicles( Vehicles vehicles ) {
+		testForLocked();
+		this.vehicles = vehicles;
 	}
 
 }

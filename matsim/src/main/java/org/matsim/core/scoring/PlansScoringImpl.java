@@ -22,21 +22,24 @@ package org.matsim.core.scoring;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 
 
 /**
- * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
+ * A {@link ControllerListener} that manages the
  * scoring of plans in every iteration. Basically it integrates the
  * {@link org.matsim.core.scoring.ScoringFunctionsForPopulation} with the
  * {@link org.matsim.core.controler.Controler}.
@@ -46,18 +49,36 @@ import org.matsim.core.controler.listener.ScoringListener;
 @Singleton
 final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationEndsListener {
 
-	@Inject private ScoringConfigGroup scoringConfigGroup;
-	@Inject private ControllerConfigGroup controllerConfigGroup;
-	@Inject private Population population;
-	@Inject private OutputDirectoryHierarchy controlerIO;
-	@Inject private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
-	@Inject private ExperiencedPlansService experiencedPlansService;
-	@Inject private NewScoreAssigner newScoreAssigner;
+	@Inject
+	private ScoringConfigGroup scoringConfigGroup;
+	@Inject
+	private ControllerConfigGroup controllerConfigGroup;
+	@Inject
+	private Population population;
+	@Inject
+	private OutputDirectoryHierarchy controlerIO;
+	@Inject
+	private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
+	@Inject
+	private ExperiencedPlansService experiencedPlansService;
+	@Inject
+	private NewScoreAssigner newScoreAssigner;
+	@Inject
+	private ComputeNode computeNode;
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
+
+		// Distributed scoring is handled by DistributedScoringListener
+		if (computeNode.isDistributed())
+			return;
+
 		scoringFunctionsForPopulation.finishScoringFunctions();
-		newScoreAssigner.assignNewScores(event.getIteration(), this.scoringFunctionsForPopulation, this.population);
+
+		for (var person : population.getPersons().values()) {
+			var sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
+			newScoreAssigner.assignNewScore(event.getIteration(), sf, person);
+		}
 	}
 
 	@Override
@@ -65,21 +86,26 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 		this.experiencedPlansService.finishIteration();
 		// (currently sets scores to experienced plans)
 
-		if(scoringConfigGroup.isWriteExperiencedPlans()) {
+		// Only the head node may write this
+		if (!computeNode.isHeadNode())
+			return;
+
+		if (scoringConfigGroup.isWriteExperiencedPlans()) {
 			final int writePlansInterval = controllerConfigGroup.getWritePlansInterval();
 			if (writePlansInterval > 0 && (event.getIteration() % writePlansInterval == 0 || event.isLastIteration())) {
-				this.experiencedPlansService.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml.gz"));
-				this.scoringFunctionsForPopulation.writePartialScores(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans_scores.txt.gz"));
+				this.experiencedPlansService.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), Controler.DefaultFiles.experiencedPlans.getFilename(), controllerConfigGroup.getCompressionType() ) );
+				this.scoringFunctionsForPopulation.writePartialScores(controlerIO.getIterationFilename(event.getIteration(),
+					EXPERIENCED_PLANS_SCORES_TXT, controllerConfigGroup.getCompressionType() ) );
 			}
 		}
-		if (scoringConfigGroup.isMemorizingExperiencedPlans() ) {
-			for ( Person person : this.population.getPersons().values() ) {
-				Plan experiencedPlan = this.experiencedPlansService.getExperiencedPlans().get( person.getId() ) ;
-				if ( experiencedPlan==null ) {
-					throw new RuntimeException("experienced plan is null; I don't think this should happen") ;
+		if (scoringConfigGroup.isMemorizingExperiencedPlans()) {
+			for (Person person : this.population.getPersons().values()) {
+				Plan experiencedPlan = this.experiencedPlansService.getExperiencedPlans().get(person.getId());
+				if (experiencedPlan == null) {
+					throw new RuntimeException("experienced plan is null; I don't think this should happen");
 				}
-				Plan selectedPlan = person.getSelectedPlan() ;
-				selectedPlan.getCustomAttributes().put(ScoringConfigGroup.EXPERIENCED_PLAN_KEY, experiencedPlan ) ;
+				Plan selectedPlan = person.getSelectedPlan();
+				selectedPlan.getCustomAttributes().put(ScoringConfigGroup.EXPERIENCED_PLAN_KEY, experiencedPlan);
 			}
 		}
 	}

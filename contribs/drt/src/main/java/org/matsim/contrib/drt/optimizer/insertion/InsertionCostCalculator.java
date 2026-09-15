@@ -23,10 +23,12 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalc
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 /**
  * @author michalm
  */
+@NodeSingleton
 public interface InsertionCostCalculator {
 	double INFEASIBLE_SOLUTION_COST = Double.POSITIVE_INFINITY;
 

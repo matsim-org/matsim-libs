@@ -6,6 +6,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class DefaultRoutingRequest implements RoutingRequest {
+
+	// attribute for storing a vehicle id that should be used for this routing
+	// request instead of the person's default vehicle
+	public static final String ATTRIBUTE_VEHICLE_ID = "vehicleId";
+
 	private final Attributes attributes;
 
 	private final Facility fromFactility;

@@ -22,8 +22,8 @@ package playground.vsp.cadyts.multiModeCadyts;
 
 import java.io.IOException;
 import java.util.Map;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.supply.SimResults;
 import org.apache.logging.log4j.LogManager;

@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.emissions.scenarioCheckers.Hbefa41ScenarioChecker;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -70,6 +71,10 @@ public final class EmissionModule {
 
 		checkConfigConsistency();
 		checkNetworkConsistency();
+
+//		this implicitly sets the hbefa version to 4.1
+		scenario.addScenarioChecker(new Hbefa41ScenarioChecker());
+		scenario.checkConsistencyBeforeRun();
 
 		createLookupTables();
 		createEmissionHandlers();
@@ -179,6 +184,13 @@ public final class EmissionModule {
 			addPollutantsToMap(coldPollutants, detailedHbefaColdTable.keySet());
 			this.detailedHbefaWarmTable = HbefaTables.loadDetailedWarm(emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(warmPollutants, detailedHbefaWarmTable.keySet());
+		}
+
+		if(emissionConfigGroup.getHbefaConsistencyChecker() == EmissionsConfigGroup.UseHbefaConsistencyChecker.check){
+			logger.info("Checking consistency of hbefa-tables");
+			HbefaConsistencyChecker.checkConsistency(emissionConfigGroup.getDetailedVsAverageLookupBehavior(), avgHbefaWarmTable, detailedHbefaWarmTable, avgHbefaColdTable, detailedHbefaColdTable);
+		} else {
+			logger.warn("Consistency Checker for HBEFA Tables is disabled. Make sure that your HBEFA files are valid!");
 		}
 
 		logger.info("leaving createLookupTables");

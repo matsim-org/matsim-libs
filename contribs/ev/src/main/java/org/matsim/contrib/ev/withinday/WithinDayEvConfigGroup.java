@@ -18,8 +18,16 @@ import jakarta.validation.constraints.PositiveOrZero;
 public class WithinDayEvConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "withinDayEv";
 
-	public static WithinDayEvConfigGroup get(Config config) {
+	public static WithinDayEvConfigGroup get(Config config, boolean create) {
+		if (!config.getModules().containsKey(GROUP_NAME)) {
+			config.addModule(new WithinDayEvConfigGroup());
+		}
+
 		return (WithinDayEvConfigGroup) config.getModules().get(GROUP_NAME);
+	}
+
+	public static WithinDayEvConfigGroup get(Config config) {
+		return get(config, false);
 	}
 
 	public WithinDayEvConfigGroup() {

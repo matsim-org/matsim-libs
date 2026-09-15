@@ -26,6 +26,7 @@ import org.matsim.core.gbl.Gbl;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This class checks if two events files are semantic equivalent. The order of the events does not matter as long as
@@ -38,8 +39,15 @@ public final class EventsFileComparator {
 	private static final Logger log = LogManager.getLogger(EventsFileComparator.class);
 
 	private boolean ignoringCoordinates = false;
+	private double delta = 0;
+
 	public EventsFileComparator setIgnoringCoordinates( boolean ignoringCoordinates ){
 		this.ignoringCoordinates = ignoringCoordinates;
+		return this;
+	}
+
+	public EventsFileComparator setDelta( double delta ){
+		this.delta = delta;
 		return this;
 	}
 
@@ -71,8 +79,9 @@ public final class EventsFileComparator {
 
 		EventsComparator comparator = new EventsComparator( );
 		CyclicBarrier doComparison = new CyclicBarrier(2, comparator);
-		Worker w1 = new Worker(filename1, doComparison, ignoringCoordinates );
-		Worker w2 = new Worker(filename2, doComparison, ignoringCoordinates );
+		AtomicBoolean allWorkersAlive = new AtomicBoolean(true);
+		Worker w1 = new Worker(filename1, doComparison, allWorkersAlive, ignoringCoordinates, delta );
+		Worker w2 = new Worker(filename2, doComparison, allWorkersAlive, ignoringCoordinates, delta );
 		comparator.setWorkers(w1, w2);
 		w1.start();
 		w2.start();

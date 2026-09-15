@@ -32,7 +32,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.TreeMap;
@@ -114,7 +114,7 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
              * point of view than giving each ScoringFunction its own copy of the params.
              */
 
-            ScoringConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
+            ScoringConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParametersOrDefault(subpopulation);
             // (we can set scoring params per subpopulation, so retrieve them as starting point.  kai, apr'22)
 
             // save the activityParams of the subpopulation so we need to build them only once.
@@ -160,7 +160,7 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
             Map<String, String> personalScoringModeConstants = PersonUtils.getModeConstants(person);
             if (personalScoringModeConstants != null) {
                 for (Map.Entry<String, String> entry: personalScoringModeConstants.entrySet()) {
-					ScoringConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModes().get(entry.getKey());
+					ScoringConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModeParams().get(entry.getKey());
 					ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
                     try {
                         modeUtilityParamsBuilder.setConstant(Double.parseDouble(entry.getValue()) +
@@ -172,7 +172,8 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
                     }
 
                     // copy other params from subpopulation config
-                    modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling());
+					// subpopulationModeParams.getMarginalUtilityOfTraveling() is in util/hour, needs conversion to utils/second
+                    modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling() / 3600);
                     modeUtilityParamsBuilder.setMarginalUtilityOfDistance_m(subpopulationModeParams.getMarginalUtilityOfDistance());
                     modeUtilityParamsBuilder.setMonetaryDistanceRate(subpopulationModeParams.getMonetaryDistanceRate());
                     modeUtilityParamsBuilder.setDailyMoneyConstant(subpopulationModeParams.getDailyMonetaryConstant());

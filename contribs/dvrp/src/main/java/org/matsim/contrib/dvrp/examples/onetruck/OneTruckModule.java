@@ -73,6 +73,7 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 
 	private static VehicleType createTruckType() {
 		VehicleType truckType = VehicleUtils.getFactory().createVehicleType(Id.create("truckType", VehicleType.class));
+		truckType.setNetworkMode(TransportMode.truck);
 		truckType.setLength(15.);
 		truckType.setPcuEquivalents(2.5);
 		truckType.getCapacity().setSeats(1);

@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!-- This is a fairly minimal config file; see console or logfile output for more options. -->
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="plans100trips.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="./output/example" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="10" />
+		<param name="eventsFileFormat" value="xml" />
+		<param name="snapshotFormat" value="" />
+	</module>
+
+
+	<module name="qsim">
+		<param name="snapshotperiod" value="00:01:00" />
+	</module>
+
+	<module name="planCalcScore" >
+		<parameterset type="scoringParameters">
+			<parameterset type="modeParams">
+				<param name="mode" value="car"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="pt"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="walk"/>
+			</parameterset>
+
+			<parameterset type="activityParams">
+				<param name="activityType"    value="dummy" /> <!-- home -->
+				<param name="typicalDuration" value="12:00:00" />
+			</parameterset>
+		</parameterset>
+	</module>
+
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ChangeExpBeta"/>
+			<param name="weight" value="0.9"/>
+		</parameterset>
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ReRoute"/>
+			<param name="weight" value="0.1"/>
+		</parameterset>
+
+<!-- 		<param name="ModuleDisableAfterIteration_2" value="50" /> -->
+	</module>
+
+
+</config>

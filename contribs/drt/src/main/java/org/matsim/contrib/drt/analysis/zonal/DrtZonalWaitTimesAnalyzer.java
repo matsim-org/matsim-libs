@@ -74,7 +74,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		String fileName = event.getServices()
-				.getControlerIO()
+				.getControllerIO()
 				.getIterationFilename(event.getIteration(), "waitStats" + "_" + drtCfg.getMode() + "_zonal.csv");
 		write(fileName);
 	}
@@ -171,7 +171,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		Collection<SimpleFeature> features = convertGeometriesToSimpleFeatures(crs);
 		if(!features.isEmpty()) {
 			String fileName = event.getServices()
-				.getControlerIO()
+				.getControllerIO()
 				.getOutputFilename("drt_waitStats" + "_" + drtCfg.getMode() + "_zonal.gpkg");
 			GeoFileWriter.writeGeometries(features, fileName);
 		}

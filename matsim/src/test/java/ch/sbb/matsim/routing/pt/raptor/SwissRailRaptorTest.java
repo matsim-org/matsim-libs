@@ -19,8 +19,15 @@
  * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor.Builder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -54,16 +61,18 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleUtils;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Supplier;
-
-import static org.junit.jupiter.api.Assertions.*;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor.Builder;
 
 /**
  * Most of these tests were copied from org.matsim.pt.router.TransitRouterImplTest
@@ -73,10 +82,14 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class SwissRailRaptorTest {
 
-    private SwissRailRaptor createTransitRouter(TransitSchedule schedule, Config config, Network network) {
+    private SwissRailRaptor createTransitRouter(TransitSchedule schedule, Config config, Network network, Function<SwissRailRaptor.Builder, SwissRailRaptor.Builder> adapter) {
         SwissRailRaptorData data = SwissRailRaptorData.create(schedule, null, RaptorUtils.createStaticConfig(config), network, null);
-        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, config).build();
+        SwissRailRaptor raptor = adapter.apply(new SwissRailRaptor.Builder(data, config)).build();
         return raptor;
+    }
+
+    private SwissRailRaptor createTransitRouter(TransitSchedule schedule, Config config, Network network) {
+        return createTransitRouter(schedule, config, network, builder -> builder);
     }
 
 	@Test
@@ -348,15 +361,16 @@ public class SwissRailRaptorTest {
 		swissRailRaptorConfigGroup.addModeToModeTransferPenalty(trainToShip);
 		swissRailRaptorConfigGroup.addModeToModeTransferPenalty(shipToTrain);
 		swissRailRaptorConfigGroup.setTransferWalkMargin(0);
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
-        TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
+        TransitRouter router = createTransitRouter(f.schedule, f.config, f.network, builder -> {
+            return builder.with(new ModeSpecificTransferCostCalculator());
+        });
 		Coord fromCoord = new Coord(3800, 5100);
 		Coord toCoord = new Coord(16100, 10050);
 		List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600, null));
 		//changing from train to ship is so expensive that direct walk is cheaper
 		assertNull(legs);
 	}
-	
+
 	@Test
 	void testLineChangeWithDifferentTravelTimeUtils() {
         Fixture f = new Fixture();
@@ -366,22 +380,22 @@ public class SwissRailRaptorTest {
 		swissRailRaptorConfigGroup.setTransferWalkMargin(0);
 		RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
         SwissRailRaptorData data = SwissRailRaptorData.create(f.schedule, null, RaptorUtils.createStaticConfig(f.config), f.network, null);
-        TransitRouter router = new SwissRailRaptor.Builder(data, f.config).with(new RaptorParametersForPerson() {	
+        TransitRouter router = new SwissRailRaptor.Builder(data, f.config).with(new RaptorParametersForPerson() {
 			@Override
 			public RaptorParameters getRaptorParameters(Person person) {
 				return raptorParams;
 			}
 		}).build();
-        
+
         // from C to G (see Fixture), competing between red line (express) and blue line (regular)
 		Coord fromCoord = new Coord(12000, 5000);
 		Coord toCoord = new Coord(28000, 5000);
-		
+
 		// default case
 		List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600 - 60.0, null));
 		assertEquals(3, legs.size());
 		assertEquals("red", ((TransitPassengerRoute) ((Leg) legs.get(1)).getRoute()).getLineId().toString());
-		
+
 		// routing by transport mode, same costs, choose red (train) again
 		raptorParams.setUseTransportModeUtilities(true);
 		raptorParams.setMarginalUtilityOfTravelTime_utl_s("train", -1e-3);
@@ -452,7 +466,7 @@ public class SwissRailRaptorTest {
          */
         Fixture f = new Fixture();
         f.init();
-        f.config.scoring().setUtilityOfLineSwitch(0);
+        f.config.scoring().setDefaultUtilityOfLineSwitch(0);
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null));
@@ -467,7 +481,7 @@ public class SwissRailRaptorTest {
 
         Config config = ConfigUtils.createConfig();
         double transferUtility = 300.0 * raptorParams.getMarginalUtilityOfTravelTime_utl_s(TransportMode.pt); // corresponds to 5 minutes transit travel time
-        config.scoring().setUtilityOfLineSwitch(transferUtility);
+        config.scoring().setDefaultUtilityOfLineSwitch(transferUtility);
         raptorParams = RaptorUtils.createParameters(config);
         Assertions.assertEquals(-transferUtility, raptorParams.getTransferPenaltyFixCostPerTransfer(), 0.0);
         router = createTransitRouter(f.schedule, config, f.network);
@@ -491,7 +505,7 @@ public class SwissRailRaptorTest {
          */
         Fixture f = new Fixture();
         f.init();
-        f.config.scoring().setUtilityOfLineSwitch(0);
+        f.config.scoring().setDefaultUtilityOfLineSwitch(0);
         f.config.transitRouter().setAdditionalTransferTime(0);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null));
@@ -958,7 +972,7 @@ public class SwissRailRaptorTest {
         walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
         config.routing().addParameterSet(walkParameters);
 
-        config.scoring().setUtilityOfLineSwitch(-transferFixedCost);
+        config.scoring().setDefaultUtilityOfLineSwitch(-transferFixedCost);
         srrConfig.setTransferPenaltyBaseCost(transferFixedCost);
         srrConfig.setTransferPenaltyCostPerTravelTimeHour(transferRelativeCostFactor);
 
@@ -987,11 +1001,11 @@ public class SwissRailRaptorTest {
 
         ModeParams railParams = new ModeParams("rail");
         railParams.setMarginalUtilityOfTraveling(-6.0);
-        f.config.scoring().addModeParams(railParams);
+        f.config.scoring().addDefaultModeParams(railParams);
 
         ModeParams roadParams = new ModeParams("road");
         roadParams.setMarginalUtilityOfTraveling(-6.0);
-        f.config.scoring().addModeParams(roadParams);
+        f.config.scoring().addDefaultModeParams(roadParams);
 
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord toCoord = new Coord(16100, 10050);
@@ -1049,11 +1063,11 @@ public class SwissRailRaptorTest {
 
             ModeParams railParams = new ModeParams("rail");
             railParams.setMarginalUtilityOfTraveling(-6.0);
-            config.scoring().addModeParams(railParams);
+            config.scoring().addDefaultModeParams(railParams);
 
             ModeParams roadParams = new ModeParams("road");
             roadParams.setMarginalUtilityOfTraveling(-6.0);
-            config.scoring().addModeParams(roadParams);
+            config.scoring().addDefaultModeParams(roadParams);
         }
 
         { // test with similar costs, the red line should still be cheaper
@@ -1081,7 +1095,7 @@ public class SwissRailRaptorTest {
             // (the access/egress legs to red are each 2 meters shorter than to green line, which adds a little additional penalty for the green line, about 0.02)
             ModeParams roadParams = new ModeParams("road");
             roadParams.setMarginalUtilityOfTraveling(2.83);
-            config.scoring().addModeParams(roadParams);
+            config.scoring().addDefaultModeParams(roadParams);
 
             TransitRouter router = createTransitRouter(f.schedule, config, f.network);
             List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0 * 3600 - 5 * 60, null));

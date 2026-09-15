@@ -195,21 +195,21 @@ public class PtAlongALine2Test {
 
 		// === SCORING: ===
 
-		double margUtlTravPt = config.scoring().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+		double margUtlTravPt = config.scoring().getDefaultModeParams().get(TransportMode.pt).getMarginalUtilityOfTraveling();
 		if (drtMode != DrtMode.none) {
 			// (scoring parameters for drt modes)
 			config.scoring()
-					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
+					.addDefaultModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
 			if (drt2) {
 				config.scoring()
-						.addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
+						.addDefaultModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 			if (drt3) {
 				config.scoring()
-						.addModeParams(new ModeParams("drt3").setMarginalUtilityOfTraveling(margUtlTravPt));
+						.addDefaultModeParams(new ModeParams("drt3").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 		}
-		config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
+		config.scoring().addDefaultModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 
 		// === QSIM: ===
 
@@ -233,11 +233,11 @@ public class PtAlongALine2Test {
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
-				defaultConstraintsSet.maxTravelTimeAlpha = 2.0;
-				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
+				defaultConstraintsSet.setMaxTravelTimeAlpha(2.0);
+				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
-				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
-				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				defaultConstraintsSet.setMaxWaitTime(Double.MAX_VALUE);
+				defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -250,11 +250,11 @@ public class PtAlongALine2Test {
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
-				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
-				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
+				defaultConstraintsSet.setMaxTravelTimeAlpha(1.3);
+				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
-				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
-				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				defaultConstraintsSet.setMaxWaitTime(Double.MAX_VALUE);
+				defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -266,11 +266,11 @@ public class PtAlongALine2Test {
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
-				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
-				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
+				defaultConstraintsSet.setMaxTravelTimeAlpha(1.3);
+				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
-				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
-				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				defaultConstraintsSet.setMaxWaitTime(Double.MAX_VALUE);
+				defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -654,14 +654,13 @@ public class PtAlongALine2Test {
 
 		// === SCORING: ===
 		{
-			double margUtlTravPt = config.scoring()
-					.getModes()
+			double margUtlTravPt = config.scoring().getDefaultModeParams()
 					.get(TransportMode.pt)
 					.getMarginalUtilityOfTraveling();
 			config.scoring()
-					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
-			config.scoring().addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
-			config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
+					.addDefaultModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
+			config.scoring().addDefaultModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
+			config.scoring().addDefaultModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 		}
 		// === QSIM: ===
 
@@ -710,7 +709,7 @@ public class PtAlongALine2Test {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.addControlerListenerBinding().toInstance(new IterationEndsListener() {
+				this.addControllerListenerBinding().toInstance(new IterationEndsListener() {
 					@Inject
 					private Population population;
 

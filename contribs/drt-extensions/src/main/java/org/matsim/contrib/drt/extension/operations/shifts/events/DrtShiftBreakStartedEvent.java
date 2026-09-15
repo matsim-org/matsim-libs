@@ -17,13 +17,13 @@ public class DrtShiftBreakStartedEvent extends AbstractShiftEvent {
     private final Id<Link> linkId;
 
     public static final String ATTRIBUTE_LINK = "link";
-    public static final String ATTRIBUTE_SHIFT_ID = "id";
     public static final String ATTRIBUTE_VEHICLE_ID = "vehicle";
 
     public static final String EVENT_TYPE = "DRT shift break started";
 
-    public DrtShiftBreakStartedEvent(double time, String mode, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId, Id<Link> linkId) {
-        super(time, mode, shiftId);
+    public DrtShiftBreakStartedEvent(double time, String mode, Id<DrtShift> shiftId,
+                                     Id<DvrpVehicle> vehicleId, Id<Link> linkId, String shiftType) {
+        super(time, mode, shiftId, shiftType);
         this.vehicleId = vehicleId;
         this.linkId = linkId;
     }

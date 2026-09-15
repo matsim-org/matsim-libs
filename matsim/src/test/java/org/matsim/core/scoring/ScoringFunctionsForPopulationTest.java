@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.ControlerListenerManagerImpl;
+import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
@@ -57,15 +57,15 @@ public class ScoringFunctionsForPopulationTest {
 		Person p = pf.createPerson(personId);
 		population.addPerson(p);
 
-		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
+		ControllerListenerManagerImpl controllerListenerManager = new ControllerListenerManagerImpl();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		EventsToActivities eventsToActivities = new EventsToActivities();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		ScoringFunctionFactory scoringFunctionFactory = agentId -> new RecordingScoringFunction();
 
-		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controlerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
-		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
+		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controllerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
+		controllerListenerManager.fireControllerIterationStartsEvent(0, false);
 		ScoringFunction s = sf.getScoringFunctionForAgent(personId);
 		Assertions.assertEquals(RecordingScoringFunction.class, s.getClass());
 		RecordingScoringFunction rs = (RecordingScoringFunction) s;
@@ -111,15 +111,15 @@ public class ScoringFunctionsForPopulationTest {
 		Person p = pf.createPerson(personId);
 		population.addPerson(p);
 
-		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
+		ControllerListenerManagerImpl controllerListenerManager = new ControllerListenerManagerImpl();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		EventsToActivities eventsToActivities = new EventsToActivities();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		ScoringFunctionFactory scoringFunctionFactory = agentId -> new RecordingScoringFunction();
 
-		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controlerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
-		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
+		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controllerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
+		controllerListenerManager.fireControllerIterationStartsEvent(0, false);
 		ScoringFunction s = sf.getScoringFunctionForAgent(personId);
 
 		eventsManager.initProcessing();

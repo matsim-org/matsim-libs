@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 
 import java.util.List;

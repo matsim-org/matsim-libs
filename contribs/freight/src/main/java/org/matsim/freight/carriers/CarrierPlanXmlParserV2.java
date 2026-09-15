@@ -202,7 +202,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 				String typeId = atts.getValue("typeId");
 				if (typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-				VehicleType vehicleType = this.carrierVehicleTypes.getVehicleTypes().get(Id.create(typeId, VehicleType.class));
+				VehicleType vehicleType = this.carrierVehicleTypes.getVehicleTypes().get(Id.createVehicleTypeId(typeId));
 				if (vehicleType == null) {
 					throw new RuntimeException("vehicleTypeId=" + typeId + " is missing.");
 				}

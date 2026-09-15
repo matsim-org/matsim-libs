@@ -23,7 +23,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;

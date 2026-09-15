@@ -20,25 +20,17 @@
 
 package org.matsim.run;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.File;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -47,6 +39,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Simple test case to ensure that {@link org.matsim.run.InitRoutes} functions properly, e.g. really
@@ -63,7 +59,8 @@ public class InitRoutesTest {
 
 	@Test
 	void testMain() throws Exception {
-		Config config = utils.loadConfig((String)null);
+		Config config = utils.loadConfig((String) null);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		final String NETWORK_FILE = "test/scenarios/equil/network.xml";
 		final String PLANS_FILE_TESTINPUT = utils.getOutputDirectory() + "plans.in.xml";
 		final String PLANS_FILE_TESTOUTPUT = utils.getOutputDirectory() + "plans.out.xml";
@@ -81,7 +78,7 @@ public class InitRoutesTest {
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", Id.create("1", Link.class));
 		a1.setEndTime(3600);
-		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		PopulationUtils.createAndAddLeg(plan, TransportMode.car);
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", Id.create("20", Link.class));
 
 		// write person to file
@@ -96,7 +93,7 @@ public class InitRoutesTest {
 		assertFalse(new File(PLANS_FILE_TESTOUTPUT).exists(), "Output-File should not yet exist.");
 
 		// now run the tested class
-		InitRoutes.main(new String[] {CONFIG_FILE, PLANS_FILE_TESTOUTPUT});
+		InitRoutes.main(new String[]{CONFIG_FILE, PLANS_FILE_TESTOUTPUT});
 
 		// now perform some tests
 		assertTrue(new File(PLANS_FILE_TESTOUTPUT).exists(), "no output generated.");

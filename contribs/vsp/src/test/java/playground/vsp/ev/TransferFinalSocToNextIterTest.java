@@ -59,7 +59,7 @@ public class TransferFinalSocToNextIterTest {
 
 		//controler
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
-		controler.addControlerListener(handler);
+		controler.addControllerListener(handler);
 		controler.run();
 
 		// testInitialEnergyInIter0

@@ -25,7 +25,6 @@ import java.util.Iterator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -55,12 +54,9 @@ public class ConfigV2IOTest {
 		Assertions.assertEquals(outConfig.getModules().keySet(), inConfig.getModules().keySet(), "names of modules differ!");
 
 		for ( String name : outConfig.getModules().keySet() ) {
-			if ( !name.equals( ChangeLegModeConfigGroup.CONFIG_MODULE ) ) {
-				// special case to allow error message.  remove eventually.  kai, may'16
-				assertTheSame(
-						outConfig.getModule( name ),
-						inConfig.getModule( name ) );
-			}
+			assertTheSame(
+					outConfig.getModule( name ),
+					inConfig.getModule( name ) );
 		}
 	}
 

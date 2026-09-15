@@ -12,16 +12,17 @@ public class PrebookingStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		double stopDuration = provider.calcPickupDuration(vehicle, request);
 
 		// pickup duration starts either at the earliest departure time or when stop
 		// beginning is planned
-		return Math.max(request.getEarliestStartTime(), beginTime) + stopDuration;
+		double endTime = Math.max(request.getEarliestStartTime(), beginTime) + stopDuration;
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		double stopDuration = provider.calcPickupDuration(vehicle, request);
 
@@ -36,28 +37,37 @@ public class PrebookingStopTimeCalculator implements StopTimeCalculator {
 
 		// from that point on, we add the stop duration, and we never shrink the stop to
 		// account for other assigned requests
-		return Math.max(stop.getEndTime(), earliestStartTime + stopDuration);
+		double pickupTime = earliestStartTime + stopDuration;
+		double endTime = Math.max(stop.getEndTime(), pickupTime);
+
+		return new Pickup(endTime, pickupTime);
 	}
 
 	@Override
-	public double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		double stopDuration = provider.calcDropoffDuration(vehicle, request);
 
 		// dropoff duration starts at the planned stop begin time
-		return beginTime + stopDuration;
+		double endTime = beginTime + stopDuration;
+		return new Dropoff(endTime, endTime);
 	}
 
 	@Override
-	public double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		double stopDuration = provider.calcDropoffDuration(vehicle, request);
+		// start time
+		double startTime = Math.max(stop.getBeginTime(), insertionTime);
 
-		// first, check when we can start with the dropoff
-		double earliestStartTime = stop.getBeginTime();
-		earliestStartTime = Math.max(earliestStartTime, insertionTime);
-		
-		// second, we add the dropoff
-		return Math.max(stop.getEndTime(), earliestStartTime + stopDuration);
+		// stop may have benen shifted
+		double initialDuration = stop.getEndTime() - stop.getBeginTime();
+		double endTime = Math.max(stop.getEndTime(), initialDuration + startTime);
+
+		// add dropoff
+		double stopDuration = provider.calcDropoffDuration(vehicle, request);
+		double dropoffTime = startTime + stopDuration;
+		endTime = Math.max(endTime, dropoffTime);
+
+		return new Dropoff(endTime, dropoffTime);
 	}
 
 	/**

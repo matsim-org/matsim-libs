@@ -23,8 +23,8 @@ public class SharingAnalysisModule extends AbstractModule {
 		bind(SharingLegCollectorImpl.class).asEagerSingleton();
 		bind(SharingLegCollector.class).to(SharingLegCollectorImpl.class);
 		addEventHandlerBinding().to(SharingLegCollectorImpl.class);
-		addControlerListenerBinding().to(SharingLegCollectorImpl.class);
-		addControlerListenerBinding().to(SharingStatisticsAnalyzer.class);
+		addControllerListenerBinding().to(SharingLegCollectorImpl.class);
+		addControllerListenerBinding().to(SharingStatisticsAnalyzer.class);
 
 		// Install SharingVehicleStatusTimeProfileCollectorProvider for each service
 		for (SharingServiceConfigGroup serviceConfig : sharingConfig.getServices()) {

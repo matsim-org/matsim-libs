@@ -105,7 +105,7 @@ public final class VehicleUtils {
 		out.setDescription(in.getDescription());
 		out.setPcuEquivalents(in.getPcuEquivalents());
 		out.setLength(in.getLength());
-		out.setWidth(in.getLength());
+		out.setWidth(in.getWidth());
 		out.setFlowEfficiencyFactor(in.getFlowEfficiencyFactor());
 		out.setNetworkMode(in.getNetworkMode());
 		// (all the deprecated setters are copied via the attributes!)
@@ -116,7 +116,12 @@ public final class VehicleUtils {
 		AttributesUtils.copyAttributesFromTo(cost, out.getCostInformation());
 
 		VehicleCapacity cap = in.getCapacity();
-		out.getCapacity().setWeightInTons(cap.getWeightInTons()).setSeats(cap.getSeats()).setSeats(cap.getStandingRoom()).setVolumeInCubicMeters(cap.getVolumeInCubicMeters());
+		out.getCapacity()
+				.setWeightInTons(cap.getWeightInTons())
+				.setSeats(cap.getSeats())
+				.setStandingRoom(cap.getStandingRoom())
+				.setVolumeInCubicMeters(cap.getVolumeInCubicMeters())
+				.setOther(cap.getOther());
 		AttributesUtils.copyAttributesFromTo(cap, out.getCapacity());
 
 		AttributesUtils.copyAttributesFromTo(in.getEngineInformation(), out.getEngineInformation());

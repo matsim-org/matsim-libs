@@ -11,12 +11,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
@@ -58,7 +58,7 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 	private EventsManager eventsManager;
 
 	@Inject
-	private ControlerListenerManager controlerListenerManager;
+	private ControllerListenerManager controllerListenerManager;
 
 	@Inject
 	private ScoringParametersForPerson params;
@@ -112,8 +112,8 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 		// also register as controler listener
 		for (Object v : Iterables.concat(legEstimators.values(), tripEstimator.values())) {
-			if (v instanceof ControlerListener ev && !registered.contains(v)) {
-				controlerListenerManager.addControlerListener(ev);
+			if (v instanceof ControllerListener ev && !registered.contains(v)) {
+				controllerListenerManager.addControllerListener(ev);
 				registered.add(v);
 			}
 		}

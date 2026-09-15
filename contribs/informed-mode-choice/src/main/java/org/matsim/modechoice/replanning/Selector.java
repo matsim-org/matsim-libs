@@ -1,6 +1,6 @@
 package org.matsim.modechoice.replanning;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Collection;
 
 interface Selector<T> {

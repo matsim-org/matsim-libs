@@ -35,7 +35,7 @@ import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
@@ -54,25 +54,25 @@ public class SignalAnalysisTool implements SignalGroupStateChangedEventHandler, 
 	private Map<Id<SignalSystem>, Integer> numberOfCyclesPerSystem;
 	private Map<Id<SignalSystem>, Double> sumOfSystemCycleTimes;
 	private Map<Double, Map<Id<SignalGroup>, Double>> summedBygoneSignalGreenTimesPerSecond;
-	
+
 	private Map<Id<SignalGroup>, Double> lastSwitchesToGreen;
 	private Map<Id<SignalGroup>, Double> lastSwitchesToRed;
 	private Map<Id<SignalSystem>, Double> lastCycleStartPerSystem;
-	
+
 	private Map<Id<SignalGroup>, Id<SignalSystem>> signalGroup2signalSystemId;
 	private Map<Id<SignalSystem>, Id<SignalGroup>> firstSignalGroupOfSignalSystem;
 	private double lastActStartTime;
 	private Double firstActEndTime;
-	
+
 	public SignalAnalysisTool() {
 	}
-	
+
 	@Inject
-	public SignalAnalysisTool(EventsManager em, ControlerListenerManager clm) {
+	public SignalAnalysisTool(EventsManager em, ControllerListenerManager clm) {
 		em.addHandler(this);
-		clm.addControlerListener(this);
+		clm.addControllerListener(this);
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
 		totalSignalGreenTime = new HashMap<>();
@@ -90,10 +90,10 @@ public class SignalAnalysisTool implements SignalGroupStateChangedEventHandler, 
 	public void handleEvent(ActivityStartEvent event) {
 		lastActStartTime = event.getTime();
 	}
-	
+
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (firstActEndTime == null) 
+		if (firstActEndTime == null)
 			firstActEndTime = event.getTime();
 	}
 
@@ -102,23 +102,23 @@ public class SignalAnalysisTool implements SignalGroupStateChangedEventHandler, 
 		if (!signalGroup2signalSystemId.containsKey(event.getSignalGroupId())){
 			signalGroup2signalSystemId.put(event.getSignalGroupId(), event.getSignalSystemId());
 		}
-		
+
 		// assumption: there is an SignalGroupStateChangedEvent for every signal group at the first second of the simulation
-		
+
 		switch(event.getNewState()){
 		case RED:
 			// remember red switch
 			lastSwitchesToRed.put(event.getSignalGroupId(), event.getTime());
-			
+
 			Double lastSwitchToGreen = lastSwitchesToGreen.remove(event.getSignalGroupId());
 			doBygoneGreenTimeAnalysis(event, lastSwitchToGreen);
 			break;
 		case GREEN:
 			// remember green switch
 			lastSwitchesToGreen.put(event.getSignalGroupId(), event.getTime());
-			
+
 			doCycleAnalysis(event);
-			
+
 			Double lastSwitchToRed = lastSwitchesToRed.remove(event.getSignalGroupId());
 			doBygoneGreenTimeAnalysis(event, lastSwitchToRed);
 			break;
@@ -154,10 +154,10 @@ public class SignalAnalysisTool implements SignalGroupStateChangedEventHandler, 
 				summedBygoneSignalGreenTimesPerSecond.put(event.getTime(), new HashMap<>());
 			}
 			summedBygoneSignalGreenTimesPerSecond.get(event.getTime()).put(event.getSignalGroupId(), 0.);
-		} 
+		}
 		else {
 			// this is at least the second switch of the signal group.
-			
+
 			int increment = 0; // 0 for green switch (bygone red time)
 			if (event.getNewState().equals(SignalGroupState.RED)){
 				increment = 1; // 1 for red switch (bygone green time)
@@ -201,7 +201,7 @@ public class SignalAnalysisTool implements SignalGroupStateChangedEventHandler, 
 		if (event.getSignalGroupId().equals(firstSignalGroupOfSignalSystem.get(event.getSignalSystemId()))){
 			// increase counter if first signal group of the system gets green
 			numberOfCyclesPerSystem.put(event.getSignalSystemId(), numberOfCyclesPerSystem.get(event.getSignalSystemId()) + 1);
-			
+
 			// add last cycle time except for the first green switch where no last cycle exists
 			if (lastCycleStartPerSystem.containsKey(event.getSignalSystemId())) {
 				addLastSystemCycleTime(event.getSignalSystemId(), event.getTime());
@@ -241,11 +241,11 @@ public class SignalAnalysisTool implements SignalGroupStateChangedEventHandler, 
 		}
 		return avgCycleTimePerSystem;
 	}
-	
+
 	public Map<Double, Map<Id<SignalGroup>, Double>> getSumOfBygoneSignalGreenTime(){
 		return summedBygoneSignalGreenTimesPerSecond;
 	}
-	
+
 	/**
 	 * can be used for fixed cycle times with repeating signal groups per cycle too (e.g. for downstream signal)
 	 * @return

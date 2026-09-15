@@ -3,6 +3,7 @@ package org.matsim.contrib.shared_mobility.service;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.shared_mobility.io.SharingVehicleSpecification;
+import org.matsim.vehicles.Vehicle;
 
 public class SharingVehicle {
 	private final SharingVehicleSpecification specification;
@@ -15,6 +16,10 @@ public class SharingVehicle {
 
 	public Id<SharingVehicle> getId() {
 		return specification.getId();
+	}
+
+	public Id<Vehicle> getVehicleId() {
+		return specification.getVehicleId();
 	}
 
 	public SharingVehicleSpecification getSpecification() {

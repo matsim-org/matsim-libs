@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.*;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 /**
  * @author thomas

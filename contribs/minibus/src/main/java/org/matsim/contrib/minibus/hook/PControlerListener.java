@@ -188,7 +188,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	private void dumpTransitScheduleAndVehicles(MatsimServices controler, int iteration){
 		TransitScheduleWriter writer = new TransitScheduleWriter(controler.getScenario().getTransitSchedule());
 		MatsimVehicleWriter writer2 = new MatsimVehicleWriter(controler.getScenario().getTransitVehicles());
-		writer.writeFile(controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
-		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "transitVehicles.xml.gz"));
+		writer.writeFile(controler.getControllerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
+		writer2.writeFile(controler.getControllerIO().getIterationFilename(iteration, "transitVehicles.xml.gz"));
 	}
 }

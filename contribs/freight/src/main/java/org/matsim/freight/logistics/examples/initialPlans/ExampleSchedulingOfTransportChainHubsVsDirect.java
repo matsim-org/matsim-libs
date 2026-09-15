@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
@@ -102,6 +103,7 @@ import org.matsim.vehicles.VehicleUtils;
         .controller()
         .setOverwriteFileSetting(
             OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+	  config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23
     config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
@@ -126,7 +128,7 @@ import org.matsim.vehicles.VehicleUtils;
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
     for (LspShipment lspShipment : createInitialLSPShipments(scenario.getNetwork())) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
@@ -523,7 +525,7 @@ import org.matsim.vehicles.VehicleUtils;
   }
 
   private static VehicleType createCarrierVehicleType(String vehicleTypeId) {
-    VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(vehicleTypeId, VehicleType.class), TransportMode.car);
+    VehicleType vehicleType = VehicleUtils.createVehicleType(Id.createVehicleTypeId(vehicleTypeId), TransportMode.car);
     vehicleType.getCapacity().setOther(10);
     vehicleType.getCostInformation().setCostsPerMeter(0.0004);
     vehicleType.getCostInformation().setCostsPerSecond(0.38);

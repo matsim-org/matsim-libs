@@ -66,9 +66,28 @@
 	</module>
 
 	<module name="scoring">
-		<param name="activityType_0" value="dummy"/>
-		<param name="activityTypicalDuration_0" value="24:00:00"/>
-		<param name="traveling_taxi" value="-6"/>
+		<parameterset type="scoringParameters">
+			<parameterset type="modeParams">
+				<param name="mode" value="car"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="pt"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="walk"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="0"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="taxi"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6"/>
+			</parameterset>
+			<parameterset type="activityParams">
+				<param name="activityType" value="dummy"/>
+				<param name="typicalDuration" value="24:00:00"/>
+			</parameterset>
+		</parameterset>
 	</module>
 
 	<module name="replanning">

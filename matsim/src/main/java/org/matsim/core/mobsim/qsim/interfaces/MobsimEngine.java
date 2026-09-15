@@ -26,25 +26,27 @@ import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 /**
  * Design thoughs:<ul>
- * <li> This is an engine that is plugged into the Mobsim.  Thus the name. 
+ * <li> This is an engine that is plugged into the Mobsim.  Thus the name.
  * <li> The main difference between a MobsimEngine and, say, a {@link MobsimBeforeSimStepListener}, is that the MobsimEngine obtains
  * the {@link InternalInterface}, whose main functionality is arrangeNextAgentState, i.e. it allows to move the agents forward.
  * </ul>
- * 
+ *
  * @author dgrether, nagel
  */
-public interface MobsimEngine extends Steppable, QSimComponent {
+public interface MobsimEngine extends Steppable, BeforeMobsim, AfterMobsim, QSimComponent {
 
-  /**
-   * called in a predefined Order when the simulation is started
-   */
-  void onPrepareSim();
- 
-  /**
-   * Do some clean up.
-   */
-  void afterSim();
-  
-  void setInternalInterface(InternalInterface internalInterface);
+	/**
+	 * called in a predefined Order when the simulation is started
+	 */
+	@Override
+	default void beforeMobsim() {}
+
+	/**
+	 * Do some clean up.
+	 */
+	@Override
+	default void afterMobsim() {}
+
+	void setInternalInterface(InternalInterface internalInterface);
 
 }

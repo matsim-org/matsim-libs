@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="A" x="0" y="0" linkRefId="stop_loop_1" name="A" isBlocking="false"/>
+		<stopFacility id="B" x="3000" y="0.0" linkRefId="3" name="C" isBlocking="false"/>
+		<stopFacility id="C" x="5500" y="0.0" linkRefId="stop_loop_6" name="B" isBlocking="false"/>
+	</transitStops>
+	<transitLine id="line">
+		<transitRoute id="stop">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="A" departureOffset="00:00:00" arrivalOffset="00:00:00" awaitDeparture="true"/>
+				<!-- Train remains at stop B until end of day -->
+				<stop refId="B" departureOffset="24:00:00" arrivalOffset="24:00:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="stop_loop_1"/>
+				<link refId="1"/>
+				<link refId="2"/>
+				<link refId="3"/>
+			</route>
+			<departures>
+				<departure id="dep_1" departureTime="00:00:00" vehicleRefId="pt_1_veh_1"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="pass">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="A" departureOffset="00:00:00" arrivalOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="C" departureOffset="00:05:00" arrivalOffset="00:05:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="stop_loop_1"/>
+				<link refId="1"/>
+				<link refId="2"/>
+				<link refId="3"/>
+				<link refId="4"/>
+				<link refId="5"/>
+				<link refId="stop_loop_6"/>
+			</route>
+			<departures>
+				<departure id="dep_1" departureTime="00:01:00" vehicleRefId="pt_1_veh_2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

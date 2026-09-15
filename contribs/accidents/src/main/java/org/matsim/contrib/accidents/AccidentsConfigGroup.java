@@ -22,7 +22,7 @@ package org.matsim.contrib.accidents;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * 
+ *
  * @author ikaddoura
  */
 
@@ -30,20 +30,17 @@ public final class AccidentsConfigGroup extends ReflectiveConfigGroup {
 	// needs to be public because of reflection-based annotations
 
 	public static final String GROUP_NAME = "accidents" ;
-	
-	public static final String BVWP_ROAD_TYPE_ATTRIBUTE_NAME = "bvwpRoadType";
 
 	public AccidentsConfigGroup() {
 		super(GROUP_NAME);
 	}
-	
+
 	private boolean enableAccidentsModule = true;
-	private final String accidentsComputationMethodAttributeName = "accidentsComputationMethod";
-	
+
 	private double scaleFactor = 10.;
-		
+
 	private AccidentsComputationMethod accidentsComputationMethod = AccidentsComputationMethod.BVWP;
-				
+
 	@StringGetter( "enableAccidentsModule" )
 	public boolean isEnableAccidentsModule() {
 		return enableAccidentsModule;
@@ -64,6 +61,9 @@ public final class AccidentsConfigGroup extends ReflectiveConfigGroup {
 		this.scaleFactor = scaleFactor;
 	}
 
+	// ---
+
+	public enum AccidentsComputationMethod {BVWP}
 	@StringGetter( "accidentsComputationMethod" )
 	public AccidentsComputationMethod getAccidentsComputationMethod() {
 		return accidentsComputationMethod;
@@ -73,16 +73,21 @@ public final class AccidentsConfigGroup extends ReflectiveConfigGroup {
 	public void AccidentsComputationMethod(AccidentsComputationMethod accidentsComputationMethod) {
 		this.accidentsComputationMethod = accidentsComputationMethod;
 	}
-	
-	// yyyyyy this implies that you can change the accidents computation method PER LINK.  Is that what you want?  kai, sep'19
-	public String getAccidentsComputationMethodAttributeName() {
-		return accidentsComputationMethodAttributeName;
+
+	// ---
+	public enum ErrorHandling{ abort, returnZeroAccidentCost, returnFallbackAccidentCost}
+
+	private ErrorHandling errorHandling = ErrorHandling.abort;
+
+	@StringSetter("errorHandling")
+	public void setErrorHandling ( ErrorHandling errorHandling ) {
+		this.errorHandling = errorHandling;
+	}
+	@StringGetter( "errorHandling" )
+	public ErrorHandling getErrorHandling( ) {
+		return this.errorHandling;
 	}
 
-	/**
-	* @author mmayobre
-	*/
 
-	public enum AccidentsComputationMethod {BVWP}
 }
 

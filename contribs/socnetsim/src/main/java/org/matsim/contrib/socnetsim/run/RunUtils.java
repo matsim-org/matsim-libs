@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * 
+ *
  * RunUtils.java
  *                                                                         *
  * *********************************************************************** *
@@ -57,14 +57,14 @@ public class RunUtils {
 //		algo.putEstimator(
 //				TransportMode.transit_walk,
 //				new DistanceFillerAlgorithm.CrowFlyEstimator(
-//					controller.getRegistry().getScenario().getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.transit_walk ).getBeelineDistanceFactor(), 
+//					controller.getRegistry().getScenario().getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.transit_walk ).getBeelineDistanceFactor(),
 //					controller.getRegistry().getScenario().getNetwork() ) );
 //
 //		// this is done by the routing module, but not at import
 //		algo.putEstimator(
 //				TransportMode.walk,
 //				new DistanceFillerAlgorithm.CrowFlyEstimator(
-//					controller.getRegistry().getScenario().getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor(), 
+//					controller.getRegistry().getScenario().getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor(),
 //					controller.getRegistry().getScenario().getNetwork() ) );
 //
 //		algo.putEstimator(
@@ -75,7 +75,7 @@ public class RunUtils {
 //					1.5,
 //					controller.getRegistry().getScenario().getNetwork() ) );
 //
-//		controller.addControlerListener(
+//		controller.addControllerListener(
 //				new BeforeMobsimListener() {
 //					@Override
 //					public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
@@ -137,13 +137,13 @@ public class RunUtils {
 //		if ( analysis.isDumpGroupSizes() ) {
 //			final ReplanningStatsDumper replanningStats = new ReplanningStatsDumper( controller.getControlerIO().getOutputFilename( "replanningGroups.dat" ) );
 //			repl.getStrategyManager().addListener( replanningStats );
-//			controller.addControlerListener( replanningStats );
+//			controller.addControllerListener( replanningStats );
 //		}
 //
 //		if ( analysis.isDumpAllocation() ) {
 //			final ReplanningAllocationDumper replanningStats = new ReplanningAllocationDumper( controller.getControlerIO().getOutputFilename( "replanningAllocations.dat" ) );
 //			repl.getStrategyManager().addListener( replanningStats );
-//			controller.addControlerListener( replanningStats );
+//			controller.addControllerListener( replanningStats );
 //		}
 //
 //		return controller;
@@ -172,7 +172,7 @@ public class RunUtils {
 		connectLocations( scenario );
 		return scenario;
 	}
-	
+
 	public static void enrichScenario(final Scenario scenario) {
 		final Config config = scenario.getConfig();
 		final GroupReplanningConfigGroup weights =  (GroupReplanningConfigGroup)
@@ -196,7 +196,7 @@ public class RunUtils {
 			}
 		}
 	}
-	
+
 	public static void connectLocations(final Scenario scenario) {
 		if ( scenario.getActivityFacilities() != null ) {
 			new WorldConnectLocations( scenario.getConfig() ).connectFacilitiesWithLinks(

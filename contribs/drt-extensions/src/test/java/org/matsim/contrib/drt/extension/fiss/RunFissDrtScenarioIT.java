@@ -1,16 +1,15 @@
 package org.matsim.contrib.drt.extension.fiss;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
@@ -27,11 +26,14 @@ import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
@@ -39,20 +41,88 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.matsim.core.config.groups.ReplanningConfigGroup.*;
-import static org.matsim.core.config.groups.ScoringConfigGroup.*;
+import static org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import static org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import static org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 
 public class RunFissDrtScenarioIT {
-	private static final Logger LOG = LogManager.getLogger( RunFissDrtScenarioIT.class );
 
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test void test() {
 
+		Config config = createDrtScenarioConfig();
+
+		final Controler controler = DrtOperationsControlerCreator.createControler(config, false);
+		configureFiss(controler, config);
+
+		// for testing:
+		LinkCounter linkCounter = new LinkCounter();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(linkCounter);
+			}
+		});
+
+		controler.run();
+		{
+			String expected = utils.getInputDirectory() + "0.events.xml.gz";
+			String actual = utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz";
+			ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
+			assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
+		}
+		{
+			String expected = utils.getInputDirectory() + "output_events.xml.gz";
+			String actual = utils.getOutputDirectory() + "output_events.xml.gz";
+			ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
+			assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
+		}
+		Assertions.assertEquals(20000, linkCounter.getLinkLeaveCount(), 2000);// yy why a delta of 2000? kai, jan'25
+
+	}
+
+	/**
+	 * Same as {@link #test()} but with
+	 * {@link QSimConfigGroup.VehicleBehavior#wait}.
+	 * Verifies that FISS correctly teleports vehicles alongside agents so that no
+	 * agent gets stuck
+	 * waiting for a vehicle that never arrives.
+	 */
+	@Test
+	void testWithVehicleBehaviorWait() {
+
+		Config config = createDrtScenarioConfig();
+		config.qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
+
+		final Controler controler = DrtOperationsControlerCreator.createControler(config, false);
+		configureFiss(controler, config);
+
+		StuckCounter stuckCounter = new StuckCounter();
+		LinkCounter linkCounter = new LinkCounter();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(linkCounter);
+				addEventHandlerBinding().toInstance(stuckCounter);
+			}
+		});
+
+		controler.run();
+
+		assertEquals(0, stuckCounter.getStuckCount(),
+				"No agents should get stuck with VehicleBehavior.wait + FISS vehicle teleportation");
+		Assertions.assertEquals(20000, linkCounter.getLinkLeaveCount(), 2000);
+	}
+
+	// ==================== Helper methods ====================
+
+	private Config createDrtScenarioConfig() {
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
 
 		String fleetFile = "holzkirchenFleet.xml";
@@ -67,13 +137,13 @@ public class RunFissDrtScenarioIT {
 		drtConfigGroup.setMode(TransportMode.drt);
 		drtConfigGroup.setStopDuration(30.);
 		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
-                drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-                        .addOrGetDefaultDrtOptimizationConstraintsSet();
-		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
-		defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
-		defaultConstraintsSet.maxWaitTime = 600.;
-		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-		defaultConstraintsSet.maxWalkDistance = 1000.;
+				drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.setMaxTravelTimeAlpha(1.5);
+		defaultConstraintsSet.setMaxTravelTimeBeta(10. * 60.);
+		defaultConstraintsSet.setMaxWaitTime(600.);
+		defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
+		defaultConstraintsSet.setMaxWalkDistance(1000.);
 		drtConfigGroup.setUseModeFilteredSubnetwork(false);
 		drtConfigGroup.setVehiclesFile(fleetFile);
 		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
@@ -90,27 +160,27 @@ public class RunFissDrtScenarioIT {
 		strategyParams.setTargetAlpha(0.3);
 		strategyParams.setTargetBeta(0.3);
 
-		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
+		RebalancingParams rebalancingParams = drtConfigGroup.getRebalancingParams().get();
+		rebalancingParams.addParameterSet(strategyParams);
 
-		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
-		SquareGridZoneSystemParams zoneSystemParams = (SquareGridZoneSystemParams) drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		SquareGridZoneSystemParams zoneSystemParams = (SquareGridZoneSystemParams) rebalancingParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
 		zoneSystemParams.setCellSize(500.);
-		drtZoneSystemParams.addParameterSet(zoneSystemParams);
-		drtZoneSystemParams.setTargetLinkSelection(DrtZoneSystemParams.TargetLinkSelection.mostCentral);
-		drtConfigGroup.addParameterSet(drtZoneSystemParams);
+		rebalancingParams.addParameterSet(zoneSystemParams);
+		rebalancingParams.setTargetLinkSelection(RebalancingParams.TargetLinkSelection.mostCentral);
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
 		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup, dvrpConfigGroup);
+		Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup, dvrpConfigGroup);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
 
 		Set<String> modes = new HashSet<>();
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
-		config.scoring().addModeParams( new ModeParams("drt") );
-		config.scoring().addModeParams( new ModeParams("walk") );
+		config.scoring().addDefaultModeParams(new ModeParams("drt"));
+		config.scoring().addDefaultModeParams(new ModeParams("walk"));
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
@@ -121,19 +191,20 @@ public class RunFissDrtScenarioIT {
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
 
-		config.scoring().addActivityParams( new ActivityParams("home").setTypicalDuration(8 * 3600 ) );
-		config.scoring().addActivityParams( new ActivityParams("other").setTypicalDuration(4 * 3600 ) );
-		config.scoring().addActivityParams( new ActivityParams("education").setTypicalDuration(6 * 3600 ) );
-		config.scoring().addActivityParams( new ActivityParams("shopping").setTypicalDuration(2 * 3600 ) );
-		config.scoring().addActivityParams( new ActivityParams("work").setTypicalDuration(2 * 3600 ) );
+		config.scoring().addDefaultActivityParams(new ActivityParams("home").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("other").setTypicalDuration(4 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("education").setTypicalDuration(6 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("shopping").setTypicalDuration(2 * 3600));
+		config.scoring().addDefaultActivityParams(new ActivityParams("work").setTypicalDuration(2 * 3600));
 
-		config.replanning().addStrategySettings( new StrategySettings().setStrategyName("ChangeExpBeta" ).setWeight(1 ) );
+		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1));
 
 		config.controller().setLastIteration(1);
 		config.controller().setWriteEventsInterval(1);
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
 		ShiftsParams shiftsParams = (ShiftsParams) operationsParams.createParameterSet(ShiftsParams.SET_NAME);
@@ -147,60 +218,32 @@ public class RunFissDrtScenarioIT {
 		shiftsParams.setShiftEndRelocationArrival(ShiftsParams.ShiftEndRelocationArrival.immediate);
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
-
 		if (!config.qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
 			config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		}
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
-		// ### controler:
-
-		final Controler controler = DrtOperationsControlerCreator.createControler(config, false);
-
-		//FISS part
-		{
-			// FISS config:
-			FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
-			fissConfigGroup.sampleFactor = 0.1;
-			fissConfigGroup.sampledModes = Set.of(TransportMode.car);
-			fissConfigGroup.switchOffFISSLastIteration = true;
-
-			// provide mode vehicle types (in production code, one should set them more diligently):
-			Vehicles vehiclesContainer = controler.getScenario().getVehicles();
-			for( String sampledMode : fissConfigGroup.sampledModes ){
-				vehiclesContainer.addVehicleType( VehicleUtils.createVehicleType( Id.create( sampledMode, VehicleType.class ) ) );
-			}
-
-			// add FISS module:
-			controler.addOverridingModule( new FISSModule() );
-
-		}
-
-		// for testing:
-		LinkCounter linkCounter = new LinkCounter();
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().toInstance(linkCounter);
-			}
-		});
-
-		controler.run();
-		{
-			String expected = utils.getInputDirectory() + "0.events.xml.gz" ;
-			String actual = utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz" ;
-			ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
-			assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
-		}
-		{
-			String expected = utils.getInputDirectory() + "output_events.xml.gz" ;
-			String actual = utils.getOutputDirectory() + "output_events.xml.gz" ;
-			ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
-			assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
-		}
-		Assertions.assertEquals(20000, linkCounter.getLinkLeaveCount(), 2000);// yy why a delta of 2000?  kai, jan'25
-
-
+		return config;
 	}
+
+	private void configureFiss(Controler controler, Config config) {
+		FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
+		fissConfigGroup.setSampleFactor(0.1);
+		fissConfigGroup.setSampledModes(Set.of(TransportMode.car));
+		fissConfigGroup.setSwitchOffFISSLastIteration(true);
+
+		Vehicles vehiclesContainer = controler.getScenario().getVehicles();
+		for (String sampledMode : fissConfigGroup.getSampledModes()) {
+			VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(sampledMode, VehicleType.class));
+			vehicleType.setNetworkMode(sampledMode);
+			vehiclesContainer.addVehicleType(vehicleType);
+		}
+
+		controler.addOverridingModule(new FISSModule());
+	}
+
+	// ==================== Event handlers ====================
 
 	static class LinkCounter implements LinkLeaveEventHandler {
 		private int counts = 0;
@@ -212,6 +255,24 @@ public class RunFissDrtScenarioIT {
 
 		public int getLinkLeaveCount() {
 			return this.counts;
+		}
+	}
+
+	static class StuckCounter implements PersonStuckEventHandler {
+		private int stuckCount = 0;
+
+		@Override
+		public void handleEvent(PersonStuckEvent event) {
+			this.stuckCount++;
+		}
+
+		@Override
+		public void reset(int iteration) {
+			this.stuckCount = 0;
+		}
+
+		public int getStuckCount() {
+			return this.stuckCount;
 		}
 	}
 

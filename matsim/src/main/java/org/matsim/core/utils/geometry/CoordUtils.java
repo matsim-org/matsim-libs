@@ -26,6 +26,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 
+import com.google.common.base.Verify;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.concurrent.atomic.AtomicLong;
@@ -209,6 +211,16 @@ public abstract class CoordUtils {
 		return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
 	}
 
+	public static Coord interpolate(Coord from, Coord to, double rel) {
+		Verify.verify(rel >= 0 && rel <= 1);
+		if (from.hasZ() && to.hasZ()) {
+			return new Coord(
+					from.getX() + rel * (to.getX() - from.getX()),
+					from.getY() + rel * (to.getY() - from.getY()),
+					from.getZ() + rel * (to.getZ() - from.getZ()));
+		}
+		return new Coord(from.getX() + rel * (to.getX() - from.getX()), from.getY() + rel * (to.getY() - from.getY()));
+	}
 
 	/**
 	 * Method should only be used in within this class, and only by

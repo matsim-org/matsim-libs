@@ -40,7 +40,7 @@ public class SharingStatisticsAnalyzer implements IterationEndsListener {
 	}
 
 	void writeAllLeg(String filename) {
-	
+
 		String defaultDelimiter = scenario.getConfig().global().getDefaultDelimiter();
 		String header = String.join(defaultDelimiter, //
 				"personId", //
@@ -74,18 +74,18 @@ public class SharingStatisticsAnalyzer implements IterationEndsListener {
 						Double.toString(sharingLeg.getToCoord().getY())));
 			}
 		}
-		
+
 		writeStringCollection(exportedLeg, header, filename);
 
 	}
 
 	private String getFilename(IterationEndsEvent event, String prefix, String extension) {
-		return matsimServices.getControlerIO().getIterationFilename(event.getIteration(), prefix + "_" + extension);
+		return matsimServices.getControllerIO().getIterationFilename(event.getIteration(), prefix + "_" + extension);
 	}
 
 	private void writeStringCollection(Collection<String> data, String header, String filename)
 	{
-		
+
 		try (BufferedWriter bw = IOUtils.getBufferedWriter(filename)) {
 			bw.write(header);
 			bw.newLine();
@@ -99,5 +99,5 @@ public class SharingStatisticsAnalyzer implements IterationEndsListener {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

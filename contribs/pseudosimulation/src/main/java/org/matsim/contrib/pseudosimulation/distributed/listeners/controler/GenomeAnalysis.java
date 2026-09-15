@@ -13,7 +13,13 @@ import org.matsim.core.utils.io.IOUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by fouriep on 1/30/15.
@@ -32,7 +38,7 @@ public class GenomeAnalysis implements IterationEndsListener {
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        outputPath = event.getServices().getControlerIO().getOutputPath();
+        outputPath = event.getServices().getControllerIO().getOutputPath();
         Map<String, Integer> fullGeneCount = new HashMap<>();
         Map<String, Double> fullGeneScore = new HashMap<>();
         Map<String, Double> fullGeneAltScore = new HashMap<>();

@@ -22,13 +22,9 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Inject;
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -40,7 +36,6 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.FreightActivity;
-import org.matsim.freight.carriers.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -51,7 +46,7 @@ import org.matsim.vehicles.Vehicle;
  * @author stefan
  *
  */
-public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
+public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory {
 
 	/**
 	 *
@@ -63,7 +58,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 	public static class SimpleDriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
 		@SuppressWarnings("unused")
-		private static final  Logger log = LogManager.getLogger( SimpleDriversActivityScoring.class );
+		private static final Logger log = LogManager.getLogger(SimpleDriversActivityScoring.class);
 
 		private double score;
 
@@ -87,21 +82,21 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
 		@Override
 		public void handleActivity(Activity act) {
-			if(act instanceof FreightActivity) {
+			if (act instanceof FreightActivity) {
 				double actStartTime = act.getStartTime().seconds();
 
 				TimeWindow tw = ((FreightActivity) act).getTimeWindow();
-				if(actStartTime > tw.getEnd()){
+				if (actStartTime > tw.getEnd()) {
 					double missedTimeWindowPenalty = 0.01;
-					double penalty_score = (-1)*(actStartTime - tw.getEnd())* missedTimeWindowPenalty;
+					double penalty_score = (-1) * (actStartTime - tw.getEnd()) * missedTimeWindowPenalty;
 					if (!(penalty_score <= 0.0)) throw new AssertionError("penalty score must be negative");
 					score += penalty_score;
 
 				}
 				double timeParameter = 0.008;
-				double actTimeCosts = (act.getEndTime().seconds() -actStartTime)* timeParameter;
+				double actTimeCosts = (act.getEndTime().seconds() - actStartTime) * timeParameter;
 				if (!(actTimeCosts >= 0.0)) throw new AssertionError("actTimeCosts must be positive");
-				score += actTimeCosts*(-1);
+				score += actTimeCosts * (-1);
 			}
 		}
 
@@ -116,7 +111,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
 		private final Carrier carrier;
 
-		public SimpleVehicleEmploymentScoring( Carrier carrier ) {
+		public SimpleVehicleEmploymentScoring(Carrier carrier) {
 			super();
 			this.carrier = carrier;
 		}
@@ -130,10 +125,10 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 		public double getScore() {
 			double score = 0.;
 			CarrierPlan selectedPlan = carrier.getSelectedPlan();
-			if(selectedPlan == null) return 0.;
-			for(ScheduledTour tour : selectedPlan.getScheduledTours()){
-				if(!tour.getTour().getTourElements().isEmpty()){
-					score += (-1)*tour.getVehicle().getType().getCostInformation().getFixedCosts();
+			if (selectedPlan == null) return 0.;
+			for (ScheduledTour tour : selectedPlan.getScheduledTours()) {
+				if (!tour.getTour().getTourElements().isEmpty()) {
+					score += (-1) * tour.getVehicle().getType().getCostInformation().getFixedCosts();
 				}
 			}
 			return score;
@@ -150,20 +145,21 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 	public static class SimpleDriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
 		@SuppressWarnings("unused")
-		private static final  Logger log = LogManager.getLogger( SimpleDriversLegScoring.class );
+		private static final Logger log = LogManager.getLogger(SimpleDriversLegScoring.class);
 
 		private double score = 0.0;
 		private final Network network;
 		private final Carrier carrier;
 
-		public SimpleDriversLegScoring( Carrier carrier, Network network ) {
+		public SimpleDriversLegScoring(Carrier carrier, Network network) {
 			super();
 			this.network = network;
 			this.carrier = carrier;
 		}
 
 		@Override
-		public void finish() { }
+		public void finish() {
+		}
 
 		@Override
 		public double getScore() {
@@ -180,15 +176,15 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
 		@Override
 		public void handleLeg(Leg leg) {
-			if(leg.getRoute() instanceof NetworkRoute nRoute){
+			if (leg.getRoute() instanceof NetworkRoute nRoute) {
 				Id<Vehicle> vehicleId = nRoute.getVehicleId();
 				CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 				Gbl.assertNotNull(vehicle);
 				double distance = 0.0;
-				if(leg.getRoute() instanceof NetworkRoute){
+				if (leg.getRoute() instanceof NetworkRoute) {
 					Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());
 					distance += startLink.getLength();
-					for(Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()){
+					for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 						distance += network.getLinks().get(linkId).getLength();
 
 					}
@@ -196,58 +192,20 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
 				}
 
-				double distanceCosts = distance*getDistanceParameter(vehicle);
+				double distanceCosts = distance * getDistanceParameter(vehicle);
 				if (!(distanceCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
 				score += (-1) * distanceCosts;
-				double timeCosts = leg.getTravelTime().seconds() *getTimeParameter(vehicle);
+				double timeCosts = leg.getTravelTime().seconds() * getTimeParameter(vehicle);
 				if (!(timeCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
 				score += (-1) * timeCosts;
 			}
 		}
 	}
 
-
-	public static class SimpleTollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
-
-		@SuppressWarnings("unused")
-		private static final  Logger log = LogManager.getLogger( SimpleTollScoring.class );
-
-		private double score = 0.;
-		private final Carrier carrier;
-		private final Network network;
-		private final VehicleTypeDependentRoadPricingCalculator roadPricing;
-
-		public SimpleTollScoring( Carrier carrier, Network network, VehicleTypeDependentRoadPricingCalculator roadPricing ) {
-			this.carrier = carrier;
-			this.roadPricing = roadPricing;
-			this.network = network;
-		}
-
-		@Override
-		public void handleEvent(Event event) {
-			if(event instanceof LinkEnterEvent){
-				CarrierVehicle carrierVehicle = CarriersUtils.getCarrierVehicle(carrier, ((LinkEnterEvent) event).getVehicleId());
-				if(carrierVehicle == null) throw new IllegalStateException("carrier vehicle missing");
-				double toll = roadPricing.getTollAmount(carrierVehicle.getType().getId(),network.getLinks().get(((LinkEnterEvent) event).getLinkId() ),event.getTime() );
-				if(toll > 0.) System.out.println("bing: vehicle " + carrierVehicle.getId() + " paid toll " + toll );
-				score += (-1) * toll;
-			}
-		}
-
-		@Override
-		public void finish() {
-
-		}
-
-		@Override
-		public double getScore() {
-			return score;
-		}
-	}
-
 	private final Network network;
 
-	@Inject CarrierScoringFunctionFactoryImpl(Network network) {
+	@Inject
+	CarrierScoringFunctionFactoryImpl(Network network) {
 		super();
 		this.network = network;
 	}
@@ -264,7 +222,6 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 //		sf.addScoringFunction(actScoring);
 		return sf;
 	}
-
 
 
 }

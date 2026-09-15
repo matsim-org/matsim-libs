@@ -14,7 +14,7 @@ public class ShiftSchedules {
 
 	@SuppressWarnings("unchecked")
 	public static Optional<ShiftChangeOverTask> getNextShiftChangeover (Schedule schedule) {
-		int taskIdx = schedule.getStatus() == Schedule.ScheduleStatus.PLANNED ? 0 : schedule.getCurrentTask().getTaskIdx() + 1;
+		int taskIdx = schedule.getStatus() == Schedule.ScheduleStatus.PLANNED ? 0 : schedule.getCurrentTask().getTaskIdx();
 		return ((Stream<ShiftChangeOverTask>) schedule.tasks()
 				.filter(t -> t instanceof ShiftChangeOverTask))
 				.filter(t -> t.getTaskIdx() > taskIdx)

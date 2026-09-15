@@ -79,7 +79,7 @@ public class SetupParking {
 				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
 				bind(ParkingStatsWriter.class);
 				this.install(new ParkingSearchQSimModule());
-				addControlerListenerBinding().to(ParkingSearchManager.class);
+				addControllerListenerBinding().to(ParkingSearchManager.class);
 				bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
 				bind(VehicleTeleportationLogic.class).to(VehicleTeleportationToNearbyParking.class);
 			}

@@ -35,7 +35,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.Facility;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 

@@ -31,7 +31,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import com.google.inject.Inject;
 import org.matsim.core.router.TripRouter;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 /**
  *

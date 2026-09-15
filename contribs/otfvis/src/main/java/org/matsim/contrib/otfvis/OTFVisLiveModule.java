@@ -43,12 +43,12 @@ public class OTFVisLiveModule extends AbstractModule {
 	 * <code>
 	 *         --add-exports java.base/java.lang=ALL-UNNAMED --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.java2d=ALL-UNNAMED
 	 * </code>
-	 * as arguments to the JVM to get around module protection. 
+	 * as arguments to the JVM to get around module protection.
 	 */
 	public OTFVisLiveModule() {
 		// so I can attach javadoc to this. kai, may'24
 	}
-    
+
 	@Override
 	public void install() {
 		this.addMobsimListenerBinding().to( OTFVisMobsimListener.class ) ;
@@ -58,12 +58,12 @@ public class OTFVisLiveModule extends AbstractModule {
 		@Inject Scenario scenario ;
 		@Inject EventsManager events ;
 		@Inject(optional=true) NonPlanAgentQueryHelper nonPlanAgentQueryHelper;
-		@Override 
+		@Override
 		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-			QSim qsim = (QSim) e.getQueueSimulation() ; 
+			QSim qsim = (QSim) e.getQueueSimulation() ;
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim( scenario.getConfig(), scenario, events, qsim, nonPlanAgentQueryHelper);
 			OTFClientLive.run(scenario.getConfig(), server);
 		}
 	}
-	
+
 }

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="stop_A_departure" x="0.0" y="0.0" linkRefId="link_A_to_stop" isBlocking="false" />
+		<stopFacility id="stop_A_arrival" x="0.0" y="0.0" linkRefId="link_A_from_stop" isBlocking="false" />
+		<stopFacility id="stop_M_departure" x="5000.0" y="0.0" linkRefId="link_M_to_stop" isBlocking="false" />
+		<stopFacility id="stop_M_arrival" x="5000.0" y="0.0" linkRefId="link_M_from_stop" isBlocking="false" />
+		<stopFacility id="stop_B_departure" x="10000.0" y="0.0" linkRefId="link_B_to_stop" isBlocking="false" />
+		<stopFacility id="stop_B_arrival" x="10000.0" y="0.0" linkRefId="link_B_from_stop" isBlocking="false" />
+	</transitStops>
+
+	<!-- Transit Line 1: A -> M -> B (Forward Direction) -->
+	<transitLine id="shuttle_line_forward">
+		<transitRoute id="shuttle_route_forward">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="stop_A_departure" departureOffset="00:00:00" arrivalOffset="00:00:00" awaitDeparture="true" />
+				<stop refId="stop_M_departure" departureOffset="00:05:00" arrivalOffset="00:04:30" awaitDeparture="true" />
+				<stop refId="stop_B_departure" departureOffset="00:10:20" arrivalOffset="00:09:30" awaitDeparture="true" />
+			</routeProfile>
+			<route>
+				<link refId="link_A_to_stop" />
+				<link refId="link_AM" />
+				<link refId="link_M_to_stop" />
+				<link refId="link_MB" />
+				<link refId="link_B_to_stop" />
+			</route>
+			<departures>
+				<departure id="dep_forward_1" departureTime="00:00:00" vehicleRefId="train_1" />
+				<departure id="dep_forward_2" departureTime="00:05:00" vehicleRefId="train_2" />
+				<departure id="dep_forward_3" departureTime="00:10:00" vehicleRefId="train_3" />
+				<departure id="dep_forward_4" departureTime="00:15:00" vehicleRefId="train_4" />
+				<departure id="dep_forward_5" departureTime="00:20:00" vehicleRefId="train_1" />
+				<departure id="dep_forward_6" departureTime="00:25:00" vehicleRefId="train_2" />
+				<departure id="dep_forward_7" departureTime="00:30:00" vehicleRefId="train_3" />
+				<departure id="dep_forward_8" departureTime="00:35:00" vehicleRefId="train_4" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+	<!-- Transit Line 2: B -> M -> A (Backward Direction) -->
+	<transitLine id="shuttle_line_backward">
+		<transitRoute id="shuttle_route_backward">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="stop_B_arrival" departureOffset="00:00:00" arrivalOffset="00:00:00" awaitDeparture="true" />
+				<stop refId="stop_M_arrival" departureOffset="00:05:00" arrivalOffset="00:04:30" awaitDeparture="true" />
+				<stop refId="stop_A_arrival" departureOffset="00:10:00" arrivalOffset="00:09:30" awaitDeparture="true" />
+			</routeProfile>
+			<route>
+				<link refId="link_B_from_stop" />
+				<link refId="link_BM" />
+				<link refId="link_M_from_stop" />
+				<link refId="link_MA"/>
+				<link refId="link_A_from_stop"/>
+			</route>
+			<departures>
+				<departure id="dep_backward_1" departureTime="00:10:00" vehicleRefId="train_1" />
+				<departure id="dep_backward_2" departureTime="00:15:00" vehicleRefId="train_2" />
+				<departure id="dep_backward_3" departureTime="00:20:00" vehicleRefId="train_3" />
+				<departure id="dep_backward_4" departureTime="00:25:00" vehicleRefId="train_4" />
+				<departure id="dep_backward_5" departureTime="00:30:00" vehicleRefId="train_1" />
+				<departure id="dep_backward_6" departureTime="00:35:00" vehicleRefId="train_2" />
+				<departure id="dep_backward_7" departureTime="00:40:00" vehicleRefId="train_3" />
+				<departure id="dep_backward_8" departureTime="00:45:00" vehicleRefId="train_4" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

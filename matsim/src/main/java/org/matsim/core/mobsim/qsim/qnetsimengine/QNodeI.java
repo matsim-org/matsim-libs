@@ -31,6 +31,8 @@ interface QNodeI extends NetsimNode {
 
 	boolean doSimStep(double now) ;
 
-	void init() ;
+	void init( QNetwork qNetwork ) ;
+	// this needs to have QNetwork as an argument, since when it is called, the QNetwork constructor has not yet finished, and in consequence the
+	// QNetwork cannot be retrieved in an "official" way.  :-(  kai, jul'25
 
 }

@@ -35,7 +35,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.io.IOUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;

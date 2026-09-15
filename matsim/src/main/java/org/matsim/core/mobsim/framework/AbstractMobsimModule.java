@@ -19,25 +19,30 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.framework;
+package org.matsim.core.mobsim.framework;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+import com.google.inject.util.Modules;
+import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.core.config.Config;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import org.matsim.core.config.Config;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
-import com.google.inject.util.Modules;
-
 public abstract class AbstractMobsimModule extends AbstractModule {
 	private Config config = null;
+	private ComputeNode computeNode = ComputeNode.SINGLE_INSTANCE;
 	private Integer iterationNumber = null;
 	private AbstractMobsimModule parent = null;
 
 	public final void setConfig(Config config) {
 		this.config = Objects.requireNonNull(config);
+	}
+
+	public final void setComputeNode(ComputeNode computeNode) {
+		this.computeNode = computeNode;
 	}
 
 	public final void setIterationNumber(int iterationNumber) {
@@ -58,7 +63,7 @@ public abstract class AbstractMobsimModule extends AbstractModule {
 		}
 
 		throw new IllegalStateException(
-				"No config set. Did you try to use the module outside of the QSim initialization process?");
+			"No config set. Did you try to use the module outside of the QSim initialization process?");
 	}
 
 	protected final int getIterationNumber() {
@@ -71,7 +76,19 @@ public abstract class AbstractMobsimModule extends AbstractModule {
 		}
 
 		throw new IllegalStateException(
-				"No iteration number set. Did you try to use the module outside of the QSim initialization process?");
+			"No iteration number set. Did you try to use the module outside of the QSim initialization process?");
+	}
+
+	public ComputeNode getSimulationNode() {
+		if (computeNode != ComputeNode.SINGLE_INSTANCE) {
+			return computeNode;
+		}
+
+		if (parent != null) {
+			return parent.getSimulationNode();
+		}
+
+		return computeNode;
 	}
 
 	protected final void configure() {
@@ -81,7 +98,7 @@ public abstract class AbstractMobsimModule extends AbstractModule {
 	protected abstract void configureMobsim();
 
 	public static AbstractMobsimModule overrideMobsimModules(Collection<AbstractMobsimModule> base,
-			List<AbstractMobsimModule> overrides) {
+															 List<AbstractMobsimModule> overrides) {
 		Module composite = Modules.override(base).with(overrides);
 
 		AbstractMobsimModule wrapper = new AbstractMobsimModule() {

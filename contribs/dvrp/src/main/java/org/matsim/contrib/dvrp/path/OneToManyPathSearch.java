@@ -30,6 +30,9 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.speedy.LeastCostPathTree;
+import org.matsim.core.router.speedy.ShortestPathTree;
+import org.matsim.core.router.speedy.CHGraph;
+import org.matsim.core.router.speedy.CHLeastCostPathTree;
 import org.matsim.core.router.speedy.SpeedyGraph;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -38,10 +41,27 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 public class OneToManyPathSearch {
-	public static OneToManyPathSearch createSearch(SpeedyGraph graph, IdMap<Node, Node> nodeMap, TravelTime travelTime,
+	public static OneToManyPathSearch createSearch(SpeedyGraph graph, TravelTime travelTime,
 			TravelDisutility travelDisutility, boolean lazyPathCreation) {
-		return new OneToManyPathSearch(nodeMap, new LeastCostPathTree(graph, travelTime, travelDisutility), travelTime,
+		return new OneToManyPathSearch(new LeastCostPathTree(graph, travelTime, travelDisutility), travelTime,
 				lazyPathCreation);
+	}
+
+	/**
+	 * Creates a CH-accelerated one-to-many path search.  Uses the CH overlay
+	 * graph for dramatically faster shortest-path-tree computation compared
+	 * to plain Dijkstra, especially on large networks.
+	 *
+	 * @param chGraph     the CH overlay graph (must be customized with TTFs)
+	 * @param travelTime  time-dependent travel time function
+	 * @param travelDisutility  travel disutility for cost computation
+	 * @param lazyPathCreation  if true, paths are constructed lazily on demand
+	 * @return a CH-based one-to-many path search
+	 */
+	public static OneToManyPathSearch createSearchCH(CHGraph chGraph, TravelTime travelTime,
+			TravelDisutility travelDisutility, boolean lazyPathCreation) {
+		return new OneToManyPathSearch(new CHLeastCostPathTree(chGraph, travelTime, travelDisutility),
+				travelTime, lazyPathCreation);
 	}
 
 	public static class PathData {
@@ -83,14 +103,12 @@ public class OneToManyPathSearch {
 		}
 	}
 
-	private final IdMap<Node, Node> nodeMap;
-	private final LeastCostPathTree dijkstraTree;
+	private final ShortestPathTree dijkstraTree;
 	private final TravelTime travelTime;
 	private final boolean lazyPathCreation;
 
-	private OneToManyPathSearch(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, TravelTime travelTime,
+	private OneToManyPathSearch(ShortestPathTree dijkstraTree, TravelTime travelTime,
 			boolean lazyPathCreation) {
-		this.nodeMap = nodeMap;
 		this.dijkstraTree = dijkstraTree;
 		this.travelTime = travelTime;
 		this.lazyPathCreation = lazyPathCreation;
@@ -102,7 +120,7 @@ public class OneToManyPathSearch {
 
 	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime, boolean forward,
 			double maxTravelTime) {
-		OneToManyPathCalculator pathConstructor = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime,
+		OneToManyPathCalculator pathConstructor = new OneToManyPathCalculator(dijkstraTree, travelTime,
 				forward, fromLink, startTime);
 		pathConstructor.calculateDijkstraTree(toLinks, maxTravelTime);
 		return createPathDataArray(toLinks, pathConstructor);
@@ -115,7 +133,7 @@ public class OneToManyPathSearch {
 
 	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
 			boolean forward, double maxTravelTime) {
-		OneToManyPathCalculator pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, forward,
+		OneToManyPathCalculator pathCalculator = new OneToManyPathCalculator(dijkstraTree, travelTime, forward,
 				fromLink, startTime);
 		pathCalculator.calculateDijkstraTree(toLinks, maxTravelTime);
 		return createPathDataMap(toLinks, pathCalculator);

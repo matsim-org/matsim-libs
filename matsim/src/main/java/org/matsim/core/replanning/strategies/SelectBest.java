@@ -23,7 +23,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 public class SelectBest implements Provider<PlanStrategy> {
 

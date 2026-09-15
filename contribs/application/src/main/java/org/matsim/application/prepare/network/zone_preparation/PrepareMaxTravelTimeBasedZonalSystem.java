@@ -11,7 +11,6 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -53,7 +52,7 @@ public class PrepareMaxTravelTimeBasedZonalSystem implements MATSimAppCommand {
 		}
 
 		// clean the network after the filter process
-		new NetworkCleaner().run(subNetwork);
+		NetworkUtils.cleanNetwork(subNetwork, new HashSet<>(networkModes));
 
 		// perform zone-generation on the subnetwork (zone information will be written directly to the attributes of the links in the subnetwork)
 		MaxTravelTimeBasedZoneGenerator.Builder builder = new MaxTravelTimeBasedZoneGenerator.Builder(subNetwork);

@@ -21,7 +21,6 @@ package org.matsim.contrib.accidents.runExample;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
@@ -31,6 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.accidents.AccidentsConfigGroup;
 import org.matsim.contrib.accidents.AccidentsModule;
+import org.matsim.contrib.accidents.AccidentsNetworkModification;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -45,12 +45,12 @@ import org.matsim.core.utils.io.IOUtils;
 public class RunAccidents {
 	private static final Logger log = LogManager.getLogger(RunAccidents.class);
 
-	public static void main(String[] args) throws IOException {
+	static void main( String[] args ) throws IOException {
 		RunAccidents main = new RunAccidents();
 		main.run();
 	}
 
-	private void run() throws MalformedURLException, IOException {
+	private void run() throws IOException {
 		log.info("Loading scenario...");
 
 		String configFile = "path/to/configFile.xml";
@@ -63,12 +63,11 @@ public class RunAccidents {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// Preprocess network
-		AccidentsNetworkModification networkModification = new AccidentsNetworkModification(scenario);
 
 		String[] tunnelLinks = readCSVFile("tunnelLinksCSVfile");
 		String[] planfreeLinks = readCSVFile("planfreeLinksCSVfile");
 
-		networkModification.setLinkAttributsBasedOnOSMFile("osmlandUseFile", "EPSG:31468" , tunnelLinks, planfreeLinks );
+		new AccidentsNetworkModification(scenario).setLinkAttributesBasedOnOSMFile("osmlandUseFile", "EPSG:31468" , tunnelLinks, planfreeLinks );
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AccidentsModule());

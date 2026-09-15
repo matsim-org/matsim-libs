@@ -49,6 +49,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
 	private boolean isWritingEmissionsEvents = true;
 
+	public enum UseHbefaConsistencyChecker {skip, check}
+	private UseHbefaConsistencyChecker useHbefaConsistencyChecker = UseHbefaConsistencyChecker.check;
+
 	public enum NonScenarioVehicles { ignore, abort }
 	private static final String NON_SCENARIO_VEHICLES = "nonScenarioVehicles";
 	private NonScenarioVehicles nonScenarioVehicles = NonScenarioVehicles.abort;
@@ -137,8 +140,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	 * @param averageFleetWarmEmissionFactorsFile -- {@value #EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT}
 	 */
 	@StringSetter(EMISSION_FACTORS_WARM_FILE_AVERAGE)
-	public void setAverageWarmEmissionFactorsFile(String averageFleetWarmEmissionFactorsFile) {
+	public EmissionsConfigGroup setAverageWarmEmissionFactorsFile(String averageFleetWarmEmissionFactorsFile) {
 		this.averageFleetWarmEmissionFactorsFile = averageFleetWarmEmissionFactorsFile;
+		return this;
 	}
 	@StringGetter(EMISSION_FACTORS_WARM_FILE_AVERAGE)
 	public String getAverageWarmEmissionFactorsFile() {
@@ -154,8 +158,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	 * @param averageFleetColdEmissionFactorsFile -- {@value #EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT}
 	 */
 	@StringSetter(EMISSION_FACTORS_COLD_FILE_AVERAGE)
-	public void setAverageColdEmissionFactorsFile(String averageFleetColdEmissionFactorsFile) {
+	public EmissionsConfigGroup setAverageColdEmissionFactorsFile(String averageFleetColdEmissionFactorsFile) {
 		this.averageFleetColdEmissionFactorsFile = averageFleetColdEmissionFactorsFile;
+		return this;
 	}
 	@StringGetter(EMISSION_FACTORS_COLD_FILE_AVERAGE)
 	public String getAverageColdEmissionFactorsFile() {
@@ -176,8 +181,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	 * @noinspection JavadocReference
 	 */
 	@StringSetter(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR)
-	public void setDetailedVsAverageLookupBehavior(DetailedVsAverageLookupBehavior detailedVsAverageLookupBehavior) {
+	public EmissionsConfigGroup setDetailedVsAverageLookupBehavior(DetailedVsAverageLookupBehavior detailedVsAverageLookupBehavior) {
 		this.detailedVsAverageLookupBehavior = detailedVsAverageLookupBehavior;
+		return this;
 	}
 	@StringGetter(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR)
 	public DetailedVsAverageLookupBehavior getDetailedVsAverageLookupBehavior() {
@@ -189,8 +195,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	 * @param hbefaTableConsistencyCheckingLevel -- {@value #HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL}
 	 */
 	@StringSetter(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL)
-	public void setHbefaTableConsistencyCheckingLevel(HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel) {
+	public EmissionsConfigGroup setHbefaTableConsistencyCheckingLevel(HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel) {
 		this.hbefaTableConsistencyCheckingLevel = hbefaTableConsistencyCheckingLevel;
+		return this;
 	}
 
 	@StringGetter(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL)
@@ -203,8 +210,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	 * @param detailedWarmEmissionFactorsFile -- {@value #EMISSION_FACTORS_WARM_FILE_DETAILED_CMT}
 	 */
 	@StringSetter(EMISSION_FACTORS_WARM_FILE_DETAILED)
-	public void setDetailedWarmEmissionFactorsFile(String detailedWarmEmissionFactorsFile) {
+	public EmissionsConfigGroup setDetailedWarmEmissionFactorsFile(String detailedWarmEmissionFactorsFile) {
 		this.detailedWarmEmissionFactorsFile = detailedWarmEmissionFactorsFile;
+		return this;
 	}
 	@StringGetter(EMISSION_FACTORS_WARM_FILE_DETAILED)
 	public String getDetailedWarmEmissionFactorsFile() {
@@ -219,8 +227,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	 * @param detailedColdEmissionFactorsFile -- {@value #EMISSION_FACTORS_COLD_FILE_DETAILED_CMT}
 	 */
 	@StringSetter(EMISSION_FACTORS_COLD_FILE_DETAILED)
-	public void setDetailedColdEmissionFactorsFile(String detailedColdEmissionFactorsFile) {
+	public EmissionsConfigGroup setDetailedColdEmissionFactorsFile(String detailedColdEmissionFactorsFile) {
 		this.detailedColdEmissionFactorsFile = detailedColdEmissionFactorsFile;
+		return this;
 	}
 	@StringGetter(EMISSION_FACTORS_COLD_FILE_DETAILED)
 	public String getDetailedColdEmissionFactorsFile(){
@@ -249,8 +258,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	// I am now thinking that it would be more expressive to keep this setting, because it makes users aware of the fact that there needs to be something
 	// in the vehicles file.  kai, dec'19
 	@StringSetter(HBEFA_VEHICLE_DESCRIPTION_SOURCE)
-	public void setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource ) {
+	public EmissionsConfigGroup setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource ) {
 		this.hbefaVehicleDescriptionSource = hbefaVehicleDescriptionSource ;
+		return this;
 	}
 	//	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
 	// I am now thinking that it would be more expressive to keep this setting, because it makes users aware of the fact that there needs to be something
@@ -272,8 +282,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	 * @param writingEmissionsEvents -- {@value #WRITING_EMISSIONS_EVENTS_CMT}
 	 */
 	@StringSetter(WRITING_EMISSIONS_EVENTS)
-	public void setWritingEmissionsEvents(boolean writingEmissionsEvents) {
+	public EmissionsConfigGroup setWritingEmissionsEvents(boolean writingEmissionsEvents) {
 		isWritingEmissionsEvents = writingEmissionsEvents;
+		return this;
 	}
 	// ============================================
 	// ============================================
@@ -289,8 +300,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	 * @param handleHighAverageSpeeds -- {@value #HANDLE_HIGH_AVERAGE_SPEEDS_CMT}
 	 */
 	@StringSetter(HANDLE_HIGH_AVERAGE_SPEEDS)
-	public void setHandlesHighAverageSpeeds(boolean handleHighAverageSpeeds) {
+	public EmissionsConfigGroup setHandlesHighAverageSpeeds(boolean handleHighAverageSpeeds) {
 		this.handleHighAverageSpeeds = handleHighAverageSpeeds;
+		return this;
 	}
 	// ============================================
 	// ============================================
@@ -299,8 +311,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 		return nonScenarioVehicles;
 	}
 	@StringSetter(NON_SCENARIO_VEHICLES)
-	public void setNonScenarioVehicles(NonScenarioVehicles nonScenarioVehicles) {
+	public EmissionsConfigGroup setNonScenarioVehicles(NonScenarioVehicles nonScenarioVehicles) {
 		this.nonScenarioVehicles = nonScenarioVehicles;
+		return this;
 	}
 	// ============================================
 	// ============================================
@@ -309,8 +322,18 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 		return emissionsComputationMethod;
 	}
 	@StringSetter(EMISSIONS_COMPUTATION_METHOD)
-	public void setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
+	public EmissionsConfigGroup setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
 		this.emissionsComputationMethod = emissionsComputationMethod;
+		return this;
+	}
+	// ============================================
+	// ============================================
+	public UseHbefaConsistencyChecker getHbefaConsistencyChecker(){
+		return useHbefaConsistencyChecker;
+	}
+	public EmissionsConfigGroup setHbefaConsistencyChecker(UseHbefaConsistencyChecker use){
+		useHbefaConsistencyChecker = use;
+		return this;
 	}
 	// ============================================
 	// ============================================

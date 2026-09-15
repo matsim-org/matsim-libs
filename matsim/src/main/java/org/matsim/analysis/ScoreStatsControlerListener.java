@@ -26,7 +26,7 @@ import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -88,10 +88,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		this.delimiter = globalConfig.getDefaultDelimiter();
 		this.out = IOUtils.getBufferedWriter(controllerIO.getOutputFilename("scorestats.csv"));
 
-		Set<String> subpopulations = population.getPersons().values().stream()
-			.map(PopulationUtils::getSubpopulation)
-			.filter(Objects::nonNull)
-			.collect(Collectors.toSet());
+		Set<String> subpopulations = PopulationUtils.getSubpopulationsOfPopulation(population);
 
 		for (String sub : subpopulations) {
 			this.perSubpop.put(sub, new ScoreHist(new HashMap<>(), IOUtils.getBufferedWriter(controllerIO.getOutputFilename("scorestats_" + sub + ".csv"))));

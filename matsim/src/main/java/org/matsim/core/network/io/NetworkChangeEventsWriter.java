@@ -20,6 +20,9 @@
 
 package org.matsim.core.network.io;
 
+import java.io.IOException;
+import java.util.Collection;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -28,9 +31,6 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-
-import java.io.IOException;
-import java.util.Collection;
 
 
 /**
@@ -69,6 +69,10 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 	private static final String W3_URL = "http://www.w3.org/2001/XMLSchema-instance";
 	
 	private static final String XSD_LOCATION = "http://www.matsim.org/files/dtd/networkChangeEvents.xsd";
+
+	private static final String ATTRIBUTE_TAG = "attribute";
+
+	private static final String ATTRIBUTE_NAME_TAG = "name";
 
 	public void write(String file, Collection<NetworkChangeEvent> events) {
 		log.info("Writing network change events to file: " + file  + "...");
@@ -172,10 +176,59 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 			writeChangeValue(NetworkChangeEventsParser.LANES_TAG, event.getLanesChange());
 		}
 
+		// Write attribute changes
+		for(NetworkChangeEvent.AttributesChangeValue attributesChangeValue : event.getAttributesChanges()) {
+			writeAttributeChangeValue(attributesChangeValue);
+		}
+
 		this.writer.write(TAB);
 		this.writer.write(OPEN_TAG_2);
 		this.writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENT_TAG);
 		this.writer.write(CLOSE_TAG_1);
+	}
+	
+	private void writeAttributeChangeValue(NetworkChangeEvent.AttributesChangeValue attributesChangeValue) throws IOException {
+		this.writer.write(TAB);
+		this.writer.write(TAB);
+		
+		this.writer.write(OPEN_TAG_1);
+		this.writer.write(ATTRIBUTE_TAG);
+		
+		this.writer.write(WHITESPACE);
+		this.writer.write(ATTRIBUTE_NAME_TAG);
+		this.writer.write(EQUALS);
+		this.writer.write(QUOTE);
+		this.writer.write(attributesChangeValue.getAttribute());
+		this.writer.write(QUOTE);
+		
+		this.writer.write(WHITESPACE);
+		this.writer.write(NetworkChangeEventsParser.CHANGE_TYPE_TAG);
+		this.writer.write(EQUALS);
+		this.writer.write(QUOTE);
+		switch( attributesChangeValue.getType() ) {
+		case ABSOLUTE_IN_SI_UNITS:
+			this.writer.write(NetworkChangeEventsParser.ABSOLUTE_VALUE);
+			break;
+		case FACTOR:
+			this.writer.write(NetworkChangeEventsParser.FACTOR_VALUE);
+			break;
+		case OFFSET_IN_SI_UNITS:
+			this.writer.write(NetworkChangeEventsParser.OFFSET_VALUE);
+			break;
+		default:
+			throw new RuntimeException("missing ChangeType") ;
+		}
+		this.writer.write(QUOTE);
+		
+		this.writer.write(WHITESPACE);
+		this.writer.write(NetworkChangeEventsParser.VALUE_TAG);
+		this.writer.write(EQUALS);
+		this.writer.write(QUOTE);
+		this.writer.write(String.valueOf(attributesChangeValue.getValue()));
+		this.writer.write(QUOTE);
+		
+		this.writer.write(CLOSE_TAG_2);
+		this.writer.write(NL);
 	}
 	
 	private void writeChangeValue(String attName, ChangeValue value) throws IOException {

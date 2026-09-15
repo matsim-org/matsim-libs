@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.prebooking.logic.helpers;
 
 import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
@@ -9,6 +10,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 
 import java.util.*;
 
@@ -47,6 +49,13 @@ public class PrebookingQueue implements MobsimBeforeSimStepListener {
 		Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<ScheduledSubmission>> groups = new LinkedHashMap<>();
 		while (!queue.isEmpty() && queue.peek().submissionTime <= time) {
 			var item = queue.poll();
+
+			if(item.agent.getState().equals(MobsimAgent.State.ABORT)
+					|| WithinDayAgentUtils.getCurrentPlanElement(item.agent) instanceof Activity activity
+					&& activity.getEndTime().seconds() == Double.POSITIVE_INFINITY) {
+				continue;
+			}
+
 			Optional<Id<PassengerGroupIdentifier.PassengerGroup>> groupId = groupIdentifier.getGroupId((MobsimPassengerAgent) item.agent);
 			if(groupId.isEmpty()) {
 				prebookingManager.prebook(item.agent(), item.leg(), item.departureTime());

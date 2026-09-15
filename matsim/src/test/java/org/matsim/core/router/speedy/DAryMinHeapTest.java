@@ -68,6 +68,24 @@ public class DAryMinHeapTest {
 	}
 
 	@Test
+	void testIterator() {
+		DAryMinHeap pq = new DAryMinHeap(20, 4);
+
+		pq.insert(2, 4);
+		pq.insert(1, 2);
+		pq.insert(0, 5);
+
+		DAryMinHeap.IntIterator iter = pq.iterator();
+		Assertions.assertTrue(iter.hasNext());
+		Assertions.assertEquals(1, iter.next());
+		Assertions.assertTrue(iter.hasNext());
+		Assertions.assertEquals(2, iter.next());
+		Assertions.assertTrue(iter.hasNext());
+		Assertions.assertEquals(0, iter.next());
+		Assertions.assertFalse(iter.hasNext());
+	}
+
+		@Test
 	void stresstest() {
 		int cnt = 2000;
 		double[] cost = new double[cnt];

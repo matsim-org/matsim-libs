@@ -151,7 +151,7 @@ public class CheckPopulation implements MATSimAppCommand {
 		}
 
 
-		counts.forEach((k, v) -> log.info("\t{}-m: {} ({}%)", k.intValue(), v, Math.round((v * 1000d) / trips.size()) / 10d));
+		counts.forEach((k, v) -> log.info("\t{}-m: {} ({}%)", k, v, Math.round((v * 1000d) / trips.size()) / 10d));
 
 		sep();
 		log.info("Activities:");

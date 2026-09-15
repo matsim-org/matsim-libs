@@ -159,7 +159,7 @@ final class ComplexCircleScheduleProvider implements PRouteProvider {
 			
 			if(lastLinkId != null){
 				links.add(this.net.getLinks().get(lastLinkId));
-				Path path = this.routingAlgo.calcLeastCostPath(this.net.getLinks().get(lastLinkId).getToNode(), this.net.getLinks().get(stop.getLinkId()).getFromNode(), 0.0, null, null);
+				Path path = this.routingAlgo.calcLeastCostPath(this.net.getLinks().get(lastLinkId), this.net.getLinks().get(stop.getLinkId()), 0.0, null, null);
 
 				for (Link link : path.links) {
 					links.add(link);

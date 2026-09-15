@@ -48,9 +48,9 @@ public class CarrierPlanXmlWriterV2_1Test {
 
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(this.testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
-		new CarrierPlanXmlWriterV2_1(carriers).write(this.testUtils.getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
+		new CarrierPlanXmlWriterV2_1(carriers).write(this.testUtils.getOutputDirectory() + "carrierPlansEquilsWritten.xml");
 		carriers.getCarriers().clear();
-		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(this.testUtils.getClassInputDirectory() + "carrierPlansEquilsWritten.xml" );
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(this.testUtils.getOutputDirectory() + "carrierPlansEquilsWritten.xml" );
 		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 	}
 

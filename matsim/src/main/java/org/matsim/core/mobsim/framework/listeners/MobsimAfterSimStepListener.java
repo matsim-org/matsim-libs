@@ -25,6 +25,8 @@ import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 /**
  * This interface can be implemented when a notification is needed after the
  * QueueSimulation has performed a simulation step.
+ * <p/>
+ * When `dsim` is used as mobsim, listeners are notified just before {@link org.matsim.dsim.simulation.SimStepMessage}s are exchanged.
  *
  * @author mrieser
  */

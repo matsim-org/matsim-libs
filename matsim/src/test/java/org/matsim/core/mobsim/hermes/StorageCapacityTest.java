@@ -199,12 +199,12 @@ public class StorageCapacityTest {
 			if (i % 2 == 1) {
 				Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), tractor);
 				scenario.getVehicles().addVehicle(vehicle);
-				VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, Map.of(TransportMode.car, vehicle.getId() ) );
 			}
 			if (i % 2 == 0) {
 				Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
 				scenario.getVehicles().addVehicle(vehicle);
-				VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, Map.of(TransportMode.car, vehicle.getId() ) );
 			}
 		}
 
@@ -278,11 +278,11 @@ public class StorageCapacityTest {
 			scenario.getPopulation().addPerson(person);
 			Vehicle tractorv = VehicleUtils.createVehicle(Id.createVehicleId("truck_" + person.getId().toString()), tractor);
 			scenario.getVehicles().addVehicle(tractorv);
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.truck, tractorv.getId()));
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, Map.of(TransportMode.truck, tractorv.getId() ) );
 
 			Vehicle carv = VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
 			scenario.getVehicles().addVehicle(carv);
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, carv.getId()));
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, Map.of(TransportMode.car, carv.getId() ) );
 
 		}
 

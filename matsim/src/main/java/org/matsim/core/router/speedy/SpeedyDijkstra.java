@@ -1,17 +1,20 @@
 package org.matsim.core.router.speedy;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathUtils;
+import org.matsim.core.router.util.LeastCostPathUtils.NoPathBehavior;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * A very fast implementation of Dijkstra's shortest path algorithm using a {@link SpeedyGraph}
@@ -20,6 +23,8 @@ import java.util.List;
  * @author mrieser / Simunto, sponsored by SBB Swiss Federal Railways
  */
 public class SpeedyDijkstra implements LeastCostPathCalculator {
+
+	private final static Logger LOG = LogManager.getLogger(SpeedyALT.class);
 
 	private final SpeedyGraph graph;
 	private final TravelTime tt;
@@ -66,6 +71,46 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 
 	@Override
 	public Path calcLeastCostPath(Node startNode, Node endNode, double startTime, Person person, Vehicle vehicle) {
+		int startNodeIndex = this.graph.getNodeIndex(startNode);
+		int endNodeIndex = this.graph.getNodeIndex(endNode);
+		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, startTime, person, vehicle, Double.POSITIVE_INFINITY);
+
+		if(path == null) {
+			LOG.warn("No route was found from node " + startNode.getId() + " to node " + endNode.getId() + ". Some possible reasons:");
+			LOG.warn("  * Network is not connected.  Run NetworkCleaner().");
+			LOG.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
+			LOG.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
+			LOG.warn("This will now return null, but it may fail later with a NullPointerException.");
+		}
+		return path;
+	}
+
+
+	public Path calcLeastCostPath(Link fromLink, Link toLink, double starttime, final Person person, final Vehicle vehicle) {
+		return calcLeastCostPath(fromLink, toLink, starttime, person, vehicle, Double.POSITIVE_INFINITY);
+	}
+
+	@Override
+	public Path calcLeastCostPath(Link fromLink, Link toLink, double starttime, final Person person, final Vehicle vehicle, double maxCost) {
+
+		int startNodeIndex = this.graph.getNodeIndex(fromLink.getToNode());
+		int endNodeIndex = this.graph.getNodeIndex(toLink.getFromNode());
+
+		if(graph.getTurnRestrictions().isPresent()) {
+			Map<Id<Link>, TurnRestrictionsContext.ColoredLink> replacedLinks = graph.getTurnRestrictions().get().replacedLinks;
+			if(replacedLinks.containsKey(fromLink.getId())) {
+				startNodeIndex = graph.getInternalIndex(replacedLinks.get(fromLink.getId()).toColoredNode.index());
+			}
+		}
+
+		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, starttime, person, vehicle, maxCost);
+		if(path == null) {
+			LeastCostPathUtils.handleNotFound(noPathBehavior, LOG, fromLink, toLink, person, vehicle);
+		}
+		return path;
+	}
+
+	private Path calcLeastCostPathImpl(int startNodeIndex, int endNodeIndex, double startTime, Person person, Vehicle vehicle, double maxCost) {
 		this.currentIteration++;
 		if (this.currentIteration == Integer.MAX_VALUE) {
 			// reset iteration as we overflow
@@ -73,9 +118,7 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 			this.currentIteration = Integer.MIN_VALUE;
 		}
 
-		boolean hasTurnRestrictions = this.graph.hasTurnRestrictions();
-		int startNodeIndex = startNode.getId().index();
-		int endNodeIndex = endNode.getId().index();
+		boolean hasTurnRestrictions = this.graph.getTurnRestrictions().isPresent();
 
 		this.comingFrom[startNodeIndex] = -1;
 		setData(startNodeIndex, 0, startTime, 0);
@@ -84,13 +127,19 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 		boolean foundEndNode = false;
 
 		while (!this.pq.isEmpty()) {
+			// Bounded-search early termination: once the smallest priority key in the heap
+			// exceeds maxCost, no remaining path through any queued node can be <= maxCost,
+			// because Dijkstra's heap key is the proven shortest cost from the start.
+			if (this.pq.peekCost() > maxCost) {
+				return null;
+			}
 			final int nodeIdx = this.pq.poll();
 			if (nodeIdx == endNodeIndex) {
 				foundEndNode = true;
 				break;
 			}
 			// if turn restrictions are used, we might be on a colored node, so check for the original node
-			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == endNodeIndex) {
+			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == this.graph.getNode(endNodeIndex).getId().index()) {
 				foundEndNode = true;
 				endNodeIndex = nodeIdx;
 				break;
@@ -112,6 +161,14 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 				double travelTime = this.tt.getLinkTravelTime(link, currTime, person, vehicle);
 				double newTime = currTime + travelTime;
 				double newCost = currCost + this.td.getLinkTravelDisutility(link, currTime, person, vehicle);
+
+				// Bounded-search edge-level pruning: skip the successor entirely if its proven
+				// cost already exceeds maxCost. This mirrors the cost-bounded pruning in
+				// CHLeastCostPathTree and reduces heap pressure (fewer inserts and
+				// decreaseKey calls) near the cutoff boundary.
+				if (newCost > maxCost) {
+					continue;
+				}
 
 				if (this.iterationIds[toNode] == this.currentIteration) {
 					// this node was already visited in this route-query
@@ -167,5 +224,11 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 		Collections.reverse(links);
 
 		return new Path(nodes, links, travelTime, travelCost);
+	}
+
+	private NoPathBehavior noPathBehavior = NoPathBehavior.warning;
+
+	public void setNoPathBehavior(NoPathBehavior value) {
+		this.noPathBehavior = value;
 	}
 }

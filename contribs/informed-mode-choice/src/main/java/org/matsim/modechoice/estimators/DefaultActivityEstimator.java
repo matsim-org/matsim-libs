@@ -46,7 +46,7 @@ public class DefaultActivityEstimator implements ActivityEstimator {
 
 	private double estScore(EstimatorContext context, double arrivalTime, double departureTime, Activity act) {
 
-		ActivityUtilityParameters actParams = context.scoring.utilParams.get(act.getType());
+		ActivityUtilityParameters actParams = context.scoring.actParams.get(act.getType() );
 
 		if (!actParams.isScoreAtAll())
 			return 0;

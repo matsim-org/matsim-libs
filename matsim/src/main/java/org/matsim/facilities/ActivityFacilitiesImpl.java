@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -63,15 +62,9 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	@Deprecated // use creational method in FacilitiesUtils instead.  kai, feb'14
-	public ActivityFacilitiesImpl(final String name) {
+	ActivityFacilitiesImpl(final String name) {
 		this.name = name;
 		this.factory = new ActivityFacilitiesFactoryImpl();
-	}
-
-	@Deprecated // use creational method in FacilitiesUtils instead.  kai, feb'14
-	public ActivityFacilitiesImpl() {
-		this(null);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -81,7 +74,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	public final ActivityFacilityImpl createAndAddFacility(final Id<ActivityFacility> id, final Coord center) {
 		return createAndAddFacility(id, center, null);
 	}
-	
+
 	public final ActivityFacilityImpl createAndAddFacility(final Id<ActivityFacility> id, final Coord center, final Id<Link> linkId) {
 		if (this.facilities.containsKey(id)) {
 			throw new IllegalArgumentException("Facility with id=" + id + " already exists.");
@@ -111,12 +104,10 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	@Override
 	public final TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String act_type) {
 		TreeMap<Id<ActivityFacility>, ActivityFacility> facs = new TreeMap<>();
-		Iterator<ActivityFacility> iter = this.facilities.values().iterator();
-		while (iter.hasNext()){
-			ActivityFacility f = iter.next();
+		for (ActivityFacility f : this.facilities.values()) {
 			Map<String, ? extends ActivityOption> a = f.getActivityOptions();
-			if(a.containsKey(act_type)){
-				facs.put(f.getId(),f);
+			if (a.containsKey(act_type)) {
+				facs.put(f.getId(), f);
 			}
 		}
 		return facs;
@@ -143,11 +134,6 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	}
 
 	@Override
-	public FailingObjectAttributes getFacilityAttributes() {
-		return FailingObjectAttributes.createFacilitiesAttributes();
-	}
-	
-	@Override
 	public String toString() {
 		StringBuilder stb = new StringBuilder(200);
 		stb.append(super.toString());
@@ -163,7 +149,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 			stb.append(fac.toString());
 			stb.append("]\n");
 		}
-		
+
 		return stb.toString();
 	}
 
@@ -202,7 +188,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 		this.facilitiesQuadTree = quadTree;
 		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
 	}
-	
+
 
 	/**
 	 * finds the node nearest to <code>coord</code>

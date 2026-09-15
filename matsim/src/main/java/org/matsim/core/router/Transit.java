@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.pt.router.TransitRouter;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class Transit implements Provider<RoutingModule> {
 

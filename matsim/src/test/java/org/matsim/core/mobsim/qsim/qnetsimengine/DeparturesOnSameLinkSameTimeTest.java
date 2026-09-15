@@ -149,13 +149,14 @@ public class DeparturesOnSameLinkSameTimeTest {
 			this.scenario = ScenarioUtils.loadScenario(config);
 			config.qsim().setMainModes(Arrays.asList(travelMode));
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 			//following is necessary for mixed traffic, providing a route was obstructing
 			// the requirement of these which might be all right in some cases. Amit Jan'18
 			config.routing().setNetworkModes(Arrays.asList(travelMode));
 			config.travelTimeCalculator().setAnalyzedModesAsString(travelMode );
 			config.travelTimeCalculator().setSeparateModes(true);
-			config.scoring().getOrCreateModeParams(travelMode);
+			config.scoring().getOrCreateDefaultModeParams(travelMode);
 
 			network = this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
@@ -213,7 +214,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 				population.addPerson(p);
 
 				Id<Vehicle> vehId = Id.createVehicleId(i);
-				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(travelMode, vehId));
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes( p, Map.of(travelMode, vehId ) );
 				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
 				scenario.getVehicles().addVehicle(veh);
 			}

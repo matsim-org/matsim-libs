@@ -47,7 +47,7 @@ public class ServiceAnalysisModule extends AbstractDvrpModeModule {
 				getter.get(QSimConfigGroup.class)))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(DrtServiceProfileCalculator.class));
 
-		addControlerListenerBinding().toProvider(modalProvider(getter -> {
+		addControllerListenerBinding().toProvider(modalProvider(getter -> {
 			MatsimServices matsimServices = getter.get(MatsimServices.class);
 			String mode = drtConfigGroup.getMode();
 			var profileView = new DrtServiceProfileView(getter.getModal(DrtServiceProfileCalculator.class));

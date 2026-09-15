@@ -27,7 +27,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.numbers.gamma.RegularizedGamma;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
@@ -42,8 +47,11 @@ class Worker extends Thread implements BasicEventHandler{
 
 	private final EventsManager eventsManager;
 	private final String eFile;
-	private final CyclicBarrier doComparison;
 	private final boolean ignoringCoordinates;
+	private final double delta;
+
+	private final CyclicBarrier doComparison;
+	private final AtomicBoolean allWorkersAlive;
 
 	private final Map<String,Counter> events = new HashMap<String,Counter>();
 
@@ -51,13 +59,14 @@ class Worker extends Thread implements BasicEventHandler{
 	private volatile boolean finished = false;
 	private volatile int numEvents = 0;
 
-	Worker( String eFile1, final CyclicBarrier doComparison, boolean ignoringCoordinates ) {
+	Worker( String eFile1, final CyclicBarrier doComparison, AtomicBoolean allWorkersAlive, boolean ignoringCoordinates, double delta ) {
 		this.eFile = eFile1;
 		this.doComparison = doComparison;
+		this.allWorkersAlive = allWorkersAlive;
 		this.ignoringCoordinates = ignoringCoordinates;
+		this.delta = delta;
 
 		this.eventsManager = new SingleHandlerEventsManager(this);
-
 	}
 
 	/*package*/ String getEventsFile() {
@@ -69,17 +78,13 @@ class Worker extends Thread implements BasicEventHandler{
 		try {
 			new MatsimEventsReader(this.eventsManager).readFile(this.eFile);
 			this.finished = true;
-			try {
-				this.doComparison.await();
-
-			} catch (InterruptedException e1) {
-				throw new ComparatorInterruptedException(e1);
-			} catch (BrokenBarrierException e1) {
-				throw new ComparatorInterruptedException(e1);
-			}
+			syncWorkers();
 		} catch (ComparatorInterruptedException e1) {
-//			log.info("events-comparator got interrupted", e1);
-			log.info("events-comparator got interrupted");
+				log.error("events-comparator got interrupted");
+		} catch (Throwable t) {
+			allWorkersAlive.set(false);
+			doComparison.reset();
+			throw new RuntimeException(t);
 		}
 	}
 
@@ -102,13 +107,7 @@ class Worker extends Thread implements BasicEventHandler{
 	@Override
 	public void handleEvent(Event event) {
 		if (this.time != event.getTime()) {
-			try {
-				doComparison.await();
-			} catch (InterruptedException e1) {
-				throw new ComparatorInterruptedException(e1);
-			} catch (BrokenBarrierException e1) {
-				throw new ComparatorInterruptedException(e1);
-			}
+			syncWorkers();
 
 			this.events.clear();
 			this.time = event.getTime();
@@ -151,7 +150,7 @@ class Worker extends Thread implements BasicEventHandler{
 
 			tmp.append( key );
 			tmp.append("=");
-			tmp.append(e.getValue());
+			tmp.append(normalizeValue(e.getValue()));
 			strings.add(tmp.toString());
 		}
 		Collections.sort(strings);
@@ -163,6 +162,32 @@ class Worker extends Thread implements BasicEventHandler{
 
 		eventStr.append(" | ") ;
 		return eventStr.toString();
+	}
+
+	private String normalizeValue(String value) {
+		if (delta <= 0) return value;
+		try {
+			double d = Double.parseDouble(value);
+			int places = (int) Math.max(0, -Math.floor(Math.log10(delta)));
+			return String.format("%." + places + "f", d);
+		} catch (NumberFormatException e) {
+			return value;
+		}
+	}
+
+	private void syncWorkers() {
+		if (!allWorkersAlive.get()) {
+			throw new RuntimeException("Some other worker has crashed. Aborting as well.");
+		}
+
+		try {
+			// The above check should have caught crashed workers. Still, we could end up in a situation, where
+			// the other worker crashes after the alive check and then we go into await and be stuck forever.
+			// Since this is used in testing, a fixed timeout should be fine
+			doComparison.await(10, TimeUnit.SECONDS);
+		} catch (BrokenBarrierException | InterruptedException | TimeoutException e) {
+			throw new ComparatorInterruptedException(e);
+		}
 	}
 
 	/**

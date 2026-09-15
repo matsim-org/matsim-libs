@@ -31,7 +31,6 @@ import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.osm.networkReader.OsmBicycleReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -73,6 +72,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	public static void main(String[] args) throws Exception {
 		String inputCRS = "EPSG:4326"; // WGS84
 		String outputCRS = "EPSG:31468"; // DHDN Gauss-Krüger Zone 4
+		String tiffFileCRS = "EPSG:4326"; // WGS84
 //		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/osm/2017-08-29_mitte.osm";
 		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/osm/berlin-latest.osm";
 		String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/input/eu-dem/BerlinEUDEM.tif"; // Berlin EU-DEM
@@ -86,7 +86,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
 		
-		ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, outputCRS);
+		ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, outputCRS, tiffFileCRS);
 
 		BicycleOsmNetworkReaderV2 bicycleNetworkReader = new BicycleOsmNetworkReaderV2(network, ct, elevationDataParser);
 		bicycleNetworkReader.setKeepPaths(true);
@@ -96,7 +96,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		
 		bicycleNetworkReader.stats(network);
 
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network, Set.of("bicycle", TransportMode.bike, TransportMode.car));
 		new NetworkWriter(network).write(outputXML);
 	}
 

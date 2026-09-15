@@ -19,8 +19,11 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -166,5 +169,85 @@ public class RailsimCalcTest {
 		assertThat(RailsimCalc.calcRequiredTime(state, 10000))
 			.isEqualTo(10);
 
+	}
+
+	@Test
+	void testCheckTrainLengthSingleLink() {
+		RailLink link = RailsimTestUtils.createLink(100, 2);
+
+		TrainState state = RailsimTestUtils.createState(
+			RailsimTestUtils.createTrain(100),
+			List.of(),
+			List.of(link),
+			link, 100,
+			link, 0
+		);
+
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+	}
+
+	@Test
+	void testCheckTrainLengthSingleLinkMismatch() {
+		RailLink link = RailsimTestUtils.createLink(100, 2);
+
+		TrainState state = RailsimTestUtils.createState(
+			RailsimTestUtils.createTrain(100),
+			List.of(),
+			List.of(link),
+			link, 99,
+			link, 0
+		);
+
+		assertThat(RailsimCalc.checkTrainLength(state)).isFalse();
+	}
+
+	@Test
+	void testCheckTrainLengthMultiLink() {
+		RailLink l1 = RailsimTestUtils.createLink(50, 2);
+		RailLink l2 = RailsimTestUtils.createLink(70, 2);
+
+		// Tail-end at 30m on l1 => head-end at 30m + 90m = 120m => 70m on l2.
+		TrainState state = RailsimTestUtils.createState(
+			RailsimTestUtils.createTrain(90),
+			List.of(),
+			List.of(l1, l2),
+			l2, 70,
+			l1, 30
+		);
+
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+	}
+
+	@Test
+	void testCheckTrainLengthNegativeTailPosition() {
+		RailLink l1 = RailsimTestUtils.createLink(50, 2);
+
+		// Expected length longer than the current link, so tailPosition becomes negative.
+		TrainState state = RailsimTestUtils.createState(
+			RailsimTestUtils.createTrain(80),
+			List.of(),
+			List.of(l1),
+			l1, 50,
+			l1, -30
+		);
+
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+	}
+
+	@Test
+	void testCheckTrainLengthPreviousRouteTail() {
+		RailLink prev = RailsimTestUtils.createLink(60, 2);
+		RailLink curr = RailsimTestUtils.createLink(40, 2);
+
+		// Tail-end at 20m on previous link => head-end at 70m total => 10m on current link.
+		TrainState state = RailsimTestUtils.createState(
+			RailsimTestUtils.createTrain(50),
+			List.of(prev),
+			List.of(curr),
+			curr, 10,
+			prev, 20
+		);
+
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
 	}
 }

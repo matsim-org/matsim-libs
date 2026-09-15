@@ -28,6 +28,8 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
+import org.matsim.contrib.drt.optimizer.StopWaypointImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
@@ -137,7 +139,7 @@ public class DetourPathDataCacheTest {
 				Arrays.stream(stopLinks).map(this::stop).collect(ImmutableList.toImmutableList()), null, null, 0);
 	}
 
-	private Waypoint.Stop stop(Link link) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(0, 60, link), LOAD_TYPE.getEmptyLoad(), LOAD_TYPE);
+	private StopWaypoint stop(Link link) {
+		return new StopWaypointImpl(new DefaultDrtStopTask(0, 60, link), LOAD_TYPE.getEmptyLoad(), LOAD_TYPE, false);
 	}
 }

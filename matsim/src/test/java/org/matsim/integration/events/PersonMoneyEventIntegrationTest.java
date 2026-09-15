@@ -50,8 +50,8 @@ public class PersonMoneyEventIntegrationTest {
 
 	@Test
 	void testWriteReadXxml() {
-		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, Id.create(1, Person.class), 2.34, "tollRefund", "motorwayOperator");
-		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, Id.create(2, Person.class), -3.45, "toll", "motorwayOperator");
+		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, Id.create(1, Person.class), 2.34, "tollRefund", "motorwayOperator", null);
+		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, Id.create(2, Person.class), -3.45, "toll", "motorwayOperator", null);
 
 		// write some events to file
 

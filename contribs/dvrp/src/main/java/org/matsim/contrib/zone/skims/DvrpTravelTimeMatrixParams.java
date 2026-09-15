@@ -24,6 +24,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
@@ -70,23 +71,10 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 	}
 
 	private void initSingletonParameterSets() {
-
-		//insertion search params (one of: extensive, selective, repeated selective)
-		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
-			() -> zoneSystemParams,
-			params -> zoneSystemParams = (SquareGridZoneSystemParams)params);
-
-		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
-			() -> zoneSystemParams,
-			params -> zoneSystemParams = (GISFileZoneSystemParams)params);
-
-		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
-			() -> zoneSystemParams,
-			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
-
-		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
-			() -> zoneSystemParams,
-			params -> zoneSystemParams = (GeometryFreeZoneSystemParams)params);
+		// matrix zones configuration
+		ZoneSystemUtils.registerDefaultZoneSystems(this::addDefinition,  //
+			(ZoneSystemParams params) -> zoneSystemParams = params, // 
+			() -> zoneSystemParams);
 	}
 
 	@Override

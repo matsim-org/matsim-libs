@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import org.matsim.core.network.NetworkChangeEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,17 @@ import java.util.List;
 public final class RailsimCalc {
 
 	private RailsimCalc() {
+	}
+
+	/**
+	 * Calculate the change as specified by a change event.
+	 */
+	static double calculateChange(NetworkChangeEvent.ChangeValue changeValue, double oldValue) {
+		return switch (changeValue.getType()) {
+			case ABSOLUTE_IN_SI_UNITS -> changeValue.getValue();
+			case FACTOR -> changeValue.getValue() * oldValue;
+			case OFFSET_IN_SI_UNITS -> oldValue + changeValue.getValue();
+		};
 	}
 
 	/**
@@ -105,7 +117,9 @@ public final class RailsimCalc {
 
 		// Distance could be zero, speeds must be already equal then
 		if (FuzzyUtils.equals(dist, 0)) {
-			assert FuzzyUtils.equals(currentSpeed, finalSpeed) : "Current speed must be equal to allowed speed";
+			assert FuzzyUtils.equals(currentSpeed, finalSpeed) :
+				String.format("Current speed must be equal to allowed speed, but was %s != %s", currentSpeed, finalSpeed);
+
 			return new SpeedTarget(finalSpeed, 0);
 		}
 
@@ -203,7 +217,7 @@ public final class RailsimCalc {
 	/**
 	 * Calculate the projected driven distance, based on current position and state.
 	 */
-	public static double projectedDistance(double time,  TrainPosition position) {
+	public static double projectedDistance(double time, TrainPosition position) {
 
 		if (!(position instanceof TrainState state))
 			throw new IllegalArgumentException("Position must be a TrainState.");
@@ -240,6 +254,9 @@ public final class RailsimCalc {
 	 * This method is only valid for fixed block resources.
 	 */
 	public static List<RailLink> calcLinksToBlock(TrainPosition position, RailLink currentLink, double reserveDist) {
+
+		if (position.isStop(currentLink.getLinkId()))
+			return List.of(currentLink);
 
 		List<RailLink> result = new ArrayList<>();
 
@@ -298,6 +315,66 @@ public final class RailsimCalc {
 		}
 
 		return maxSpeed;
+	}
+
+	/**
+	 * Calculates train length and compares against the train definition.
+	 */
+	static boolean checkTrainLength(TrainState state) {
+		if (state == null || state.headLink == null || state.tailLink == null || state.train == null)
+			return false;
+
+		if (!Double.isFinite(state.headPosition) || !Double.isFinite(state.tailPosition))
+			return false;
+
+		double expected = state.train.length();
+		if (!Double.isFinite(expected) || expected < 0)
+			return false;
+
+		// Use previousRoute in case the train spans across a "Umlauf" boundary.
+		List<RailLink> links = new ArrayList<>(state.previousRoute.size() + (state.route == null ? 0 : state.route.size()));
+		links.addAll(state.previousRoute);
+		if (state.route != null)
+			links.addAll(state.route);
+
+		if (links.isEmpty())
+			return false;
+
+		double[] prefix = new double[links.size() + 1];
+		for (int i = 0; i < links.size(); i++) {
+			prefix[i + 1] = prefix[i] + links.get(i).length;
+		}
+
+		List<Integer> tailIdxs = new ArrayList<>();
+		List<Integer> headIdxs = new ArrayList<>();
+		for (int i = 0; i < links.size(); i++) {
+			RailLink link = links.get(i);
+			if (link.getLinkId().equals(state.tailLink))
+				tailIdxs.add(i);
+			if (link.getLinkId().equals(state.headLink))
+				headIdxs.add(i);
+		}
+
+		if (tailIdxs.isEmpty() || headIdxs.isEmpty())
+			return false;
+
+		// Train length is the implied distance from the tail-end to the head-end.
+		for (int tailIdx : tailIdxs) {
+			double tailEndCoord = prefix[tailIdx] + state.tailPosition;
+
+			for (int headIdx : headIdxs) {
+				if (headIdx < tailIdx)
+					continue;
+
+				double headCoord = prefix[headIdx] + state.headPosition;
+				double trainLength = headCoord - tailEndCoord;
+
+				if (FuzzyUtils.equals(trainLength, expected))
+					return true;
+			}
+		}
+
+		return false;
 	}
 
 	record SpeedTarget(double targetSpeed, double decelDist) implements Comparable<SpeedTarget> {

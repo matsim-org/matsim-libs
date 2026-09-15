@@ -48,8 +48,8 @@ public class MultiModalCountsCadytsModule extends AbstractModule {
         bind(Key.get(new TypeLiteral<Map<Id<ModalCountsLinkIdentifier>,ModalCountsLinkIdentifier>>(){})).toInstance(modalLinkContainer);
 
         bind(ModalCountsCadytsContext.class).asEagerSingleton();
-        addControlerListenerBinding().to(ModalCountsCadytsContext.class);
+        addControllerListenerBinding().to(ModalCountsCadytsContext.class);
 
-        addControlerListenerBinding().to(MultiModeCountsControlerListener.class);
+        addControllerListenerBinding().to(MultiModeCountsControlerListener.class);
     }
 }

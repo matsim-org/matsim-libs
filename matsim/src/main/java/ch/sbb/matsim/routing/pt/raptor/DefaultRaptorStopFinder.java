@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

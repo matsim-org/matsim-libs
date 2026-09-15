@@ -7,7 +7,7 @@ import org.matsim.modechoice.ModeOptions;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 
 /**

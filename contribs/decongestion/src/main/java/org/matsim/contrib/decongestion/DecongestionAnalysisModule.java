@@ -30,19 +30,19 @@ import org.matsim.contrib.decongestion.handler.PersonVehicleTracker;
 */
 
 public class DecongestionAnalysisModule extends AbstractModule {
-	
+
 	@Override
 	public void install() {
-				
-		this.bind(DecongestionInfo.class).asEagerSingleton();		
-		
-		this.bind(DelayAnalysis.class).asEagerSingleton();				
+
+		this.bind(DecongestionInfo.class).asEagerSingleton();
+
+		this.bind(DelayAnalysis.class).asEagerSingleton();
 		this.addEventHandlerBinding().to(DelayAnalysis.class);
 
 		this.bind(PersonVehicleTracker.class).asEagerSingleton();
 		this.addEventHandlerBinding().to(PersonVehicleTracker.class);
-		
-		this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
+		this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 	}
 
 }

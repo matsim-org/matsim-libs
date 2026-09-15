@@ -70,6 +70,21 @@ public interface TransitRouteStop {
 	 */
 	public abstract boolean isAwaitDepartureTime();
 
+	/**
+	 * Returns the minimum stop duration in seconds. If not specified, it defaults to zero.
+	 * This is the minimum time a transit vehicle must wait at this stop.
+	 *
+	 * @return the minimum stop duration in seconds
+	 */
+	double getMinimumStopDuration();
+
+	/**
+	 * Sets the minimum stop duration in seconds.
+	 *
+	 * @param minimumStopDuration the minimum stop duration in seconds
+	 */
+	void setMinimumStopDuration(double minimumStopDuration);
+
 	interface Builder<B extends Builder<B>> {
 		Builder<B> stop(TransitStopFacility val);
 
@@ -82,6 +97,8 @@ public interface TransitRouteStop {
 		Builder<B> allowBoarding(boolean val);
 
 		Builder<B> allowAlighting(boolean val);
+
+		Builder<B> minimumStopDuration(double val);
 
 		TransitRouteStop build();
 	}

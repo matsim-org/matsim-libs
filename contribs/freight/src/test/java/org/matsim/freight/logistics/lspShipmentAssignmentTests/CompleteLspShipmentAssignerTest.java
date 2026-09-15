@@ -261,7 +261,7 @@ public class CompleteLspShipmentAssignerTest {
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
-			completeLSP.assignShipmentToLSP(builder.build());
+			completeLSP.assignShipmentToLspPlan(builder.build());
 		}
 	}
 

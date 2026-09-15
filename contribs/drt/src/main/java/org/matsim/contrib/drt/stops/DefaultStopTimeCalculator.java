@@ -23,36 +23,41 @@ public class DefaultStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
-		// stop ends when pickup time has elapsed
-		return beginTime + stopDuration;
+	public Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+		// pickup at the end of the stop
+		double endTime = beginTime + stopDuration;
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		// an additional stop does not change the end time
-		return stop.getEndTime();
+		double endTime = stop.getEndTime();
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override
-	public double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		// stop ends after stopDuration has elapsed (dropoff happens at beginning)
-		return beginTime + stopDuration;
+		// dropoff happens at the beginning
+		return new Dropoff(beginTime + stopDuration, beginTime);
 	}
 
 	@Override
-	public double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		// adding a dropoff does not change the end time, but the whole task may be
 		// shifted due to a previous pickup insertion
-		return Math.max(stop.getEndTime(), insertionTime + stopDuration);
+		double beginTime = Math.max(insertionTime, stop.getBeginTime());
+		double endTime = beginTime + stopDuration;
+		return new Dropoff(endTime, beginTime);
 	}
 
 	@Override
 	public double shiftEndTime(DvrpVehicle vehicle, DrtStopTask stop, double beginTime) {
 		// When shifting, we make sure the new duration is the same as the previous one
-		double stopDuration  = stop.getEndTime() - stop.getBeginTime();
+		double stopDuration = stop.getEndTime() - stop.getBeginTime();
 		return beginTime + stopDuration;
 	}
 }

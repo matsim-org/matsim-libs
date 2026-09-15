@@ -41,7 +41,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 					+ history[INDEX_BEST][idx] + "\n");
 			out.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// Preserve legacy continuation when one iteration cannot be written.
 			e.printStackTrace();
 		}
 		// create chart when data of more than one iteration is available.
@@ -74,7 +74,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 
 
 		chart.addMatsimLogo();
-		chart.saveAsPng(controler.getMATSimControler().getControlerIO().getOutputPath()
+		chart.saveAsPng(controler.getMATSimControler().getControllerIO().getOutputPath()
 				+ "/slaveScoreStats.png", 1200, 800);
 
 	}
@@ -84,6 +84,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 		try {
 			this.out.close();
 		} catch (IOException e) {
+			// Preserve legacy shutdown behavior: report a close failure without masking shutdown.
 			e.printStackTrace();
 		}
 
@@ -91,7 +92,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		String fileName = controler.getMATSimControler().getControlerIO().getOutputPath()
+		String fileName = controler.getMATSimControler().getControllerIO().getOutputPath()
 				+ "/slaveScoreStats.txt";
 		this.out = IOUtils.getBufferedWriter(fileName);
 

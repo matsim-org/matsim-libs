@@ -13,8 +13,6 @@ import java.util.*;
  */
 public class OperationFacilityImpl implements OperationFacility {
 
-    private static final int DEFAULT_CAPACITY = 50;
-
     private final Id<OperationFacility> id;
     private final Id<Link> linkId;
     private final Coord coord;
@@ -22,7 +20,7 @@ public class OperationFacilityImpl implements OperationFacility {
     private final List<Id<Charger>> chargers;
     private final OperationFacilityType type;
 
-    private final Set<Id<DvrpVehicle>> reservedVehicles = new LinkedHashSet<>();
+    private final Set<Id<DvrpVehicle>> registeredVehicles = new LinkedHashSet<>();
 
     public OperationFacilityImpl(Id<OperationFacility> id, Id<Link> linkId, Coord coord, int capacity,
                                  List<Id<Charger>> chargers, OperationFacilityType type) {
@@ -61,13 +59,16 @@ public class OperationFacilityImpl implements OperationFacility {
 
     @Override
     public boolean hasCapacity() {
-        return reservedVehicles.size() < capacity;
+        return registeredVehicles.size() < capacity;
     }
 
     @Override
     public boolean register(Id<DvrpVehicle> id) {
+        if(registeredVehicles.contains(id)) {
+            return true;
+        }
         if(hasCapacity()) {
-            reservedVehicles.add(id);
+            registeredVehicles.add(id);
             return true;
         }
         return false;
@@ -75,7 +76,7 @@ public class OperationFacilityImpl implements OperationFacility {
 
     @Override
     public boolean deregisterVehicle(Id<DvrpVehicle> id) {
-       return reservedVehicles.remove(id);
+       return registeredVehicles.remove(id);
     }
 
     @Override
@@ -90,6 +91,6 @@ public class OperationFacilityImpl implements OperationFacility {
 
     @Override
     public Set<Id<DvrpVehicle>> getRegisteredVehicles() {
-        return Collections.unmodifiableSet(reservedVehicles);
+        return Collections.unmodifiableSet(registeredVehicles);
     }
 }

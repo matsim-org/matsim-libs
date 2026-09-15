@@ -75,7 +75,7 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
 
   @Override
   public void schedule(int bufferTime, LSPPlan lspPlan) {
-    collectionScheduler.scheduleShipments(lspPlan, this, bufferTime);
+    collectionScheduler.scheduleLspShipments(lspPlan, this, bufferTime);
   }
 
   public Carrier getCarrier() {

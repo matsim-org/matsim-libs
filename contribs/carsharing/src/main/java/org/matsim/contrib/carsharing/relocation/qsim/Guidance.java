@@ -39,7 +39,7 @@ public class Guidance {
         Facility startFacility = new LinkWrapperFacility(startLink);
         Facility destinationFacility = new LinkWrapperFacility(destinationLink);
         List<? extends PlanElement> trip = router.calcRoute(mainMode, startFacility, destinationFacility, departureTime, person, new AttributesImpl());
-        Path path = lcpc.calcLeastCostPath(startLink.getToNode(), destinationLink.getFromNode(), now, person, null);
+        Path path = lcpc.calcLeastCostPath(startLink, destinationLink, now, person, null);
         if (path.links.size() == 0)
         	return destinationLink.getId();
         else

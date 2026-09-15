@@ -22,7 +22,6 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.Inject;
 import org.matsim.analysis.IterationTravelStatsModule;
 import org.matsim.analysis.LegHistogramModule;
 import org.matsim.analysis.LegTimesModule;
@@ -30,6 +29,7 @@ import org.matsim.analysis.LinkStatsModule;
 import org.matsim.analysis.ModeStatsModule;
 import org.matsim.analysis.ScoreStatsModule;
 import org.matsim.analysis.VolumesAnalyzerModule;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerModule;
@@ -44,6 +44,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.counts.CountsModule;
+import org.matsim.dsim.DistributedSimulationModule;
 import org.matsim.guice.DependencyGraphModule;
 import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 
@@ -63,7 +64,7 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new StrategyManagerModule());
         install(new TimeInterpretationModule());
         if (getConfig().replanningAnnealer().isActivateAnnealingModule()) {
-            addControlerListenerBinding().to(ReplanningAnnealer.class);
+            addControllerListenerBinding().to(ReplanningAnnealer.class);
         }
 
         // I think that the ones coming here are all for analysis only, and thus not central to the iterations. kai, apr'18
@@ -80,16 +81,21 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new DependencyGraphModule());
         install(new PlanInheritanceModule());
 
+		// Install distributed simulation module if required
+		if (getSimulationContext().isDistributed() || getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.dsim.toString())) {
+			install(new DistributedSimulationModule());
+		}
+
 		// Comment by Tarek Chouaki.
 		// To make sure the cache files used under ChartUtils are located in tmp folder in the output directory
 		// The ImageIO.setCacheDirectory method checks if the provided directory exists so it needs to be created first
 		// Maybe not the best place to but this but since ChartUtils is used by many modules, including default ones,
 		//  the cache needs to be always set correctly.
-		addControlerListenerBinding().toInstance(new StartupListener() {
+		addControllerListenerBinding().toInstance(new StartupListener() {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				ImageIO.setCacheDirectory(new File(event.getServices().getControlerIO().getTempPath()));
+				ImageIO.setCacheDirectory(new File(event.getServices().getControllerIO().getTempPath()));
 			}
 		});
 

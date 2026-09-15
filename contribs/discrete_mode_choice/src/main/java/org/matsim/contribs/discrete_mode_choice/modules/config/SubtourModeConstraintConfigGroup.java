@@ -57,7 +57,7 @@ public class SubtourModeConstraintConfigGroup extends ComponentConfigGroup {
 	@StringSetter(CONSTRAINED_MODES)
 	public void setConstrainedModesAsString(String constrainedModes) {
 		this.constrainedModes = Arrays.asList(constrainedModes.split(",")).stream().map(String::trim)
-				.collect(Collectors.toSet());
+				.filter(s -> !s.isEmpty()).collect(Collectors.toSet());
 	}
 
 	@StringGetter(CONSTRAINED_MODES)

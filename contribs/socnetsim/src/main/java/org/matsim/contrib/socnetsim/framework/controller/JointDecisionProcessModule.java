@@ -66,18 +66,18 @@ public class JointDecisionProcessModule extends AbstractModule {
 		// process as such
 		bind(PlansReplanning.class).to( GroupReplanningListenner.class );
 		bind(PlansScoring.class).to( InternalizingPlansScoring.class );
-		addControlerListenerBinding().to( InternalizingPlansScoring.class );
-		addControlerListenerBinding().to( DumpJointDataAtEnd.class );
+		addControllerListenerBinding().to( InternalizingPlansScoring.class );
+		addControllerListenerBinding().to( DumpJointDataAtEnd.class );
 
 		bind( InternalizationSettings.class ).to( ConfigBasedInternalizationSettings.class );
 
-		addControlerListenerBinding().to(JointPlansDumping.class);
+		addControllerListenerBinding().to(JointPlansDumping.class);
 
 		addEventHandlerBinding().to(CourtesyEventsGenerator.class);
 
 		// consistency
-		addControlerListenerBinding().to(JointPlanCompositionMinimalityChecker.class);
-		addControlerListenerBinding().to(JointPlanSelectionConsistencyChecker.class);
+		addControllerListenerBinding().to(JointPlanCompositionMinimalityChecker.class);
+		addControllerListenerBinding().to(JointPlanSelectionConsistencyChecker.class);
 
 		// default elements
 		bind(GroupIdentifier.class).toInstance(
@@ -89,10 +89,10 @@ public class JointDecisionProcessModule extends AbstractModule {
 						return Collections.<ReplanningGroup>emptyList();
 					}
 				});
-		
+
 		bind(PlanRoutingAlgorithmFactory.class).toProvider(new Provider<PlanRoutingAlgorithmFactory>() {
 			@Inject TimeInterpretation timeInterpretation;
-			
+
 			@Override
 			public PlanRoutingAlgorithmFactory get() {
 				return new PlanRoutingAlgorithmFactory() {
@@ -109,12 +109,12 @@ public class JointDecisionProcessModule extends AbstractModule {
 		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toInstance(new CompositePlanLinkIdentifier());
 		bind( IncompatiblePlansIdentifierFactory.class ).toInstance( new EmptyIncompatiblePlansIdentifierFactory() );
 
-		//addControlerListenerBinding().to( TripModeShares.class );
+		//addControllerListenerBinding().to( TripModeShares.class );
 		//final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
 		//actTypesForAnalysis.addActivityTypes(
 		//		controller.getRegistry().getTripRouterFactory().get().getStageActivityTypes() );
 		//actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-		//controller.addControlerListener(
+		//controller.addControllerListener(
 		//		new TripModeShares(
 		//			graphWriteInterval,
 		//			controller.getControlerIO(),

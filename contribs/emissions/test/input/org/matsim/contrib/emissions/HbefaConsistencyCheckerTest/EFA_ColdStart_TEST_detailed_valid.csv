@@ -1,0 +1,127 @@
+Case;VehCat;Year;TrafficScenario;Component;RoadCat;AmbientCondPattern;Technology;%OfEmConcept;EFA;EFA_weighted;SizeClasse;EmConcept
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NOx;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NOx;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NOx;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NOx;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NOx;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NOx;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NOx;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC_MJ;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC_MJ;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC_MJ;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC_MJ;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC_MJ;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC_MJ;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;FC_MJ;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PN;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PN;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PN;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PN;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PN;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PN;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PN;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(rep);Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(rep);Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(rep);Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(rep);Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(rep);Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(rep);Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(rep);Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(total);Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(total);Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(total);Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(total);Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(total);Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(total);Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2(total);Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NO2;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NO2;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NO2;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NO2;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NO2;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NO2;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NO2;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CH4;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CH4;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CH4;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CH4;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CH4;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CH4;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CH4;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NMHC;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NMHC;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NMHC;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NMHC;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NMHC;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NMHC;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;NMHC;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Pb;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Pb;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Pb;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Pb;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Pb;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Pb;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Pb;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;SO2;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;SO2;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;SO2;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;SO2;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;SO2;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;SO2;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;SO2;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Benzene;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Benzene;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Benzene;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Benzene;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Benzene;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Benzene;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;Benzene;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM2.5;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM2.5;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM2.5;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM2.5;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM2.5;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM2.5;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;PM2.5;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;BC (exhaust);Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;BC (exhaust);Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;BC (exhaust);Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;BC (exhaust);Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;BC (exhaust);Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;BC (exhaust);Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;BC (exhaust);Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2e;Urban;TØ,0-1h,0-1km;petrol (4S);0.512744725;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2e;Urban;TØ,0-1h,0-1km;diesel;0.462841421;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2e;Urban;TØ,0-1h,0-1km;electricity;0.003288374;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2e;Urban;TØ,0-1h,0-1km;bifuel CNG/petrol;0.003857924;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2e;Urban;TØ,0-1h,0-1km;Plug-in Hybrid petrol/electric;0.005743608;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2e;Urban;TØ,0-1h,0-1km;Plug-in Hybrid diesel/electric;0.000142326;0;0;average;average
+2020_detailed_perTechAverage_Bln_carOnly[4.1];pass. car;2020;REF D HB41;CO2e;Urban;TØ,0-1h,0-1km;bifuel LPG/petrol;0.011381645;0;0;average;average

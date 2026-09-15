@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 
 /**
  * Marker interface, allowing to replace the element providing
@@ -28,4 +28,6 @@ import org.matsim.core.controler.listener.ControlerListener;
  *
  * @author thibautd
  */
-public interface PlansScoring extends ControlerListener {}
+public interface PlansScoring extends ControllerListener {
+	String EXPERIENCED_PLANS_SCORES_TXT = "experienced_plans_scores.txt";
+}

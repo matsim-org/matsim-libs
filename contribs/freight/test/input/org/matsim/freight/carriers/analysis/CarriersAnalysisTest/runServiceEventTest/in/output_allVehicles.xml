@@ -18,7 +18,7 @@
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
 
-	<vehicle id="freight_carrier1_veh_carrier_19_heavyVehicle_1" type="heavy"/>
-		
+	<vehicle id="freight_carrier1_veh_carrier_1_heavyVehicle_1" type="heavy"/>
+
 
 </vehicleDefinitions>

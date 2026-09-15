@@ -33,6 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -52,7 +53,6 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.OsmNetworkReader;
@@ -323,7 +323,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 		LOG.info("Start pre-cleaning network before Creation of the Signal plans.");
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car));
 
 
 		for (Link link : network.getLinks().values()) {

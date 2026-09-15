@@ -74,4 +74,16 @@ public class Schedules {
 	public static Stream<DriveTask> driveTasks(Schedule schedule) {
 		return (Stream<DriveTask>)schedule.tasks().filter(t -> t instanceof DriveTask);
 	}
+
+	public static List<? extends Task> getTasksFromCurrentToLast(Schedule schedule) {
+		return getTasksBetween(schedule.getCurrentTask().getTaskIdx(), schedule.getTaskCount() - 1, schedule);
+	}
+
+	public static List<? extends Task> getTasksUntilLast(int taskIndex, Schedule schedule) {
+		return getTasksBetween(taskIndex, schedule.getTaskCount() - 1, schedule);
+	}
+
+	public static List<? extends Task> getTasksBetween(int fromInclusive, int toExclusive, Schedule schedule) {
+		return schedule.getTasks().subList(fromInclusive, toExclusive);
+	}
 }

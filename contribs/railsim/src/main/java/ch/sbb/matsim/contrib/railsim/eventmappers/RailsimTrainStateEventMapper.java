@@ -33,6 +33,11 @@ public class RailsimTrainStateEventMapper implements MatsimEventsReader.CustomEv
 	@Override
 	public RailsimTrainStateEvent apply(GenericEvent event) {
 		var attributes = event.getAttributes();
+
+		double delay = attributes.containsKey(RailsimTrainStateEvent.ATTRIBUTE_DELAY)
+			? Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_DELAY))
+			: Double.NaN;
+
 		return new RailsimTrainStateEvent(
 			event.getTime(),
 			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_EXACT_TIME)),
@@ -43,7 +48,8 @@ public class RailsimTrainStateEventMapper implements MatsimEventsReader.CustomEv
 			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TAIL_POSITION)),
 			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_SPEED)),
 			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_ACCELERATION)),
-			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TARGET_SPEED))
+			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TARGET_SPEED)),
+			delay
 		);
 	}
 

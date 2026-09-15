@@ -133,14 +133,11 @@ public final class VrpAgentLogic implements DynAgentLogic {
 	private DynActivity createBeforeScheduleActivity() {
 		return new IdleDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE, () -> {
 			Schedule s = vehicle.getSchedule();
-			switch (s.getStatus()) {
-				case PLANNED:
-					return s.getBeginTime();
-				case UNPLANNED:
-					return vehicle.getServiceEndTime();
-				default:
-					throw new IllegalStateException("Only PLANNED or UNPLANNED schedules allowed.");
-			}
+			return switch (s.getStatus()) {
+				case PLANNED -> s.getBeginTime();
+				case UNPLANNED -> vehicle.getServiceEndTime();
+				default -> throw new IllegalStateException("Only PLANNED or UNPLANNED schedules allowed. Current status: " + s.getStatus());
+			};
 		});
 	}
 

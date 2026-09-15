@@ -17,7 +17,7 @@ public final class Header {
 	public String description;
 
 	/**
-	 * Enable dashboard to fill the whole screen.
+	 * Fill/stretch dashboard to the full window size instead of scrolling vertically.
 	 */
 	public Boolean fullScreen;
 

@@ -87,7 +87,7 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 		ScoringConfigGroup planCalcScoreCfg = config.scoring();
 		ModeParams modeParams = new ModeParams(TransportMode.car);
 		modeParams.setMonetaryDistanceRate(-0.1);
-		planCalcScoreCfg.addModeParams(modeParams);
+		planCalcScoreCfg.addDefaultModeParams(modeParams);
 		config.routing().setRoutingRandomness( sigma );
 
 		RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config);
@@ -107,6 +107,7 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 		final NetworkRoutingModule routingModule = new NetworkRoutingModule(
 		            TransportMode.car,
 		            f.s.getPopulation().getFactory(),
+		            f.s, 
 		            f.s.getNetwork(),
 		            router);
 		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );

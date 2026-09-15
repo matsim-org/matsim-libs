@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<networkChangeEvents xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd">
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="1"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="2"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="3"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="4"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="5"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="6"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="06:00:00">
+		<link refId="6"/>
+		<freespeed type="absolute" value="5.609327189250286"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="06:15:00">
+		<link refId="6"/>
+		<freespeed type="absolute" value="2.195708312446658"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="06:30:00">
+		<link refId="6"/>
+		<freespeed type="absolute" value="2.0618556701030926"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="24:15:00">
+		<link refId="6"/>
+		<freespeed type="absolute" value="2.5316455696202533"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="24:30:00">
+		<link refId="6"/>
+		<freespeed type="absolute" value="3.278688524590164"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="24:45:00">
+		<link refId="6"/>
+		<freespeed type="absolute" value="4.651162790697675"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="25:00:00">
+		<link refId="6"/>
+		<freespeed type="absolute" value="8.0"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="25:15:00">
+		<link refId="6"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="7"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="8"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="9"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="10"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="11"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="12"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="13"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="14"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="15"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="06:00:00">
+		<link refId="15"/>
+		<freespeed type="absolute" value="5.760355390886197"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="06:15:00">
+		<link refId="15"/>
+		<freespeed type="absolute" value="2.3496306850489237"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="06:30:00">
+		<link refId="15"/>
+		<freespeed type="absolute" value="2.0729684908789388"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="25:30:00">
+		<link refId="15"/>
+		<freespeed type="absolute" value="3.306878306878307"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="25:45:00">
+		<link refId="15"/>
+		<freespeed type="absolute" value="8.169934640522875"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="26:00:00">
+		<link refId="15"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="16"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="17"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="18"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="19"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="06:00:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="1.3227513227513228"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="26:15:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="1.5015015015015014"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="26:30:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="1.7361111111111112"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="26:45:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="2.05761316872428"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="27:00:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="2.525252525252525"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="27:15:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="3.2679738562091503"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="27:30:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="4.62962962962963"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="27:45:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="7.936507936507937"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="28:00:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="27.77777777777778"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="28:15:00">
+		<link refId="20"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="21"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="08:15:00">
+		<link refId="21"/>
+		<freespeed type="absolute" value="27.77777777777778"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="28:15:00">
+		<link refId="21"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="22"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="08:15:00">
+		<link refId="22"/>
+		<freespeed type="absolute" value="27.77777777777778"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="28:30:00">
+		<link refId="22"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="00:00:00">
+		<link refId="23"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="08:30:00">
+		<link refId="23"/>
+		<freespeed type="absolute" value="27.77777777777778"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="28:45:00">
+		<link refId="23"/>
+		<freespeed type="absolute" value="27.78"/>
+	</networkChangeEvent>
+
+</networkChangeEvents>

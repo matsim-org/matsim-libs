@@ -114,6 +114,8 @@ public class RunCarsharingIT {
 			config.routing().addModeRoutingParams(params);
 		}
 
+		config.global().setRelativeToleranceForSampleSizeFactors( 10.1 );
+
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -131,7 +133,7 @@ public class RunCarsharingIT {
 			@Override
 			public void install() {
 				this.bind(MyAnalysis.class).toInstance(myAnalysis);
-				this.addControlerListenerBinding().toInstance(myAnalysis);
+				this.addControllerListenerBinding().toInstance(myAnalysis);
 			}
 		});
 

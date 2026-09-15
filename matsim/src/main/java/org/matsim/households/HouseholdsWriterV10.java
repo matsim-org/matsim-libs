@@ -49,6 +49,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 	private List<Tuple<String, String>> atts = new ArrayList<>();
 	private Households households;
 	private final Map<Class<?>,AttributeConverter<?>> attributeConverters = new HashMap<>();
+	AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 
 	public HouseholdsWriterV10(Households households) {
 		this.households = households;
@@ -60,10 +61,12 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
 		this.attributeConverters.putAll( converters );
+
 	}
 
 	public void writeFile(String filename) throws UncheckedIOException {
 		log.info( Gbl.aboutToWrite( " households", filename ) ) ;
+		attributesWriter.putAttributeConverters(this.attributeConverters);
 		this.openFileAndWritePreamble(filename);
 		this.writeHouseholds(this.households);
 		this.writeEndAndCloseFile();
@@ -119,8 +122,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 			this.writeIncome(h.getIncome());
 		}
 
-		AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
-		attributesWriter.putAttributeConverters(this.attributeConverters);
+
 		try {
 			this.writer.write(NL);
 		} catch (IOException e) {

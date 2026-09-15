@@ -25,7 +25,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 /**
  * @author dgrether
  */
-public interface ScoringListener extends ControlerListener {
+public interface ScoringListener extends ControllerListener {
 
 	/**
 	 * Notifies all observers of the Controler that it is time to do the scoring.

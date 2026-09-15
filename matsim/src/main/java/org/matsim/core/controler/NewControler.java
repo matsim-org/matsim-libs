@@ -18,6 +18,7 @@
 
 package org.matsim.core.controler;
 
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,10 +27,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.corelisteners.*;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 
-import jakarta.inject.Inject;
 import java.util.Set;
 
 class NewControler extends AbstractController implements ControlerI {
@@ -44,23 +44,27 @@ class NewControler extends AbstractController implements ControlerI {
 	private final PlansDumping plansDumping;
 	private final PlansReplanning plansReplanning;
 	private final Provider<Mobsim> mobsimProvider;
-	private final PlansScoring plansScoring;
 	private final TerminationCriterion terminationCriterion;
 	private final DumpDataAtEnd dumpDataAtEnd;
-	private final Set<ControlerListener> controlerListenersDeclaredByModules;
+	private final Set<ControllerListener> controllerListenersDeclaredByModules;
 	private final ControllerConfigGroup controllerConfigGroup;
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
 
+	// DSim does not use PlansScoring but scores agents on the fly during the simulation. Therefore, this dependency is optional and
+	// uses member injection, as this is the way how Guice handles optional bindings.
+	@Inject(optional = true)
+	private PlansScoring plansScoring;
+
 	@Inject
-	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices,
-			 IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling,
-			 PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider,
-			 PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd,
-			 Set<ControlerListener> controlerListenersDeclaredByModules, ControllerConfigGroup controllerConfigGroup,
-			 OutputDirectoryHierarchy outputDirectoryHierarchy
-			, PrepareForMobsim prepareForMobsim
- ) {
-		super(controlerListenerManager, stopWatch, matsimServices);
+	NewControler(Config config, ControllerListenerManagerImpl controllerListenerManager, MatsimServices matsimServices,
+				 IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling,
+				 PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider,
+				 TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd,
+				 Set<ControllerListener> controllerListenersDeclaredByModules, ControllerConfigGroup controllerConfigGroup,
+				 OutputDirectoryHierarchy outputDirectoryHierarchy
+		, PrepareForMobsim prepareForMobsim
+	) {
+		super(controllerListenerManager, stopWatch, matsimServices);
 		this.config = config;
 		this.prepareForMobsim = prepareForMobsim;
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
@@ -69,10 +73,9 @@ class NewControler extends AbstractController implements ControlerI {
 		this.plansDumping = plansDumping;
 		this.plansReplanning = plansReplanning;
 		this.mobsimProvider = mobsimProvider;
-		this.plansScoring = plansScoring;
 		this.terminationCriterion = terminationCriterion;
 		this.dumpDataAtEnd = dumpDataAtEnd;
-		this.controlerListenersDeclaredByModules = controlerListenersDeclaredByModules;
+		this.controllerListenersDeclaredByModules = controllerListenersDeclaredByModules;
 		this.controllerConfigGroup = controllerConfigGroup;
 		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 	}
@@ -95,17 +98,19 @@ class NewControler extends AbstractController implements ControlerI {
 		 * are added to the list.
 		 */
 		if (controllerConfigGroup.getDumpDataAtEnd()) {
-			this.addCoreControlerListener(this.dumpDataAtEnd);
+			this.addCoreControllerListener(this.dumpDataAtEnd);
 		}
 
-		this.addCoreControlerListener(this.plansScoring);
-		this.addCoreControlerListener(this.plansReplanning);
-		this.addCoreControlerListener(this.plansDumping);
-		this.addCoreControlerListener(this.eventsHandling);
+		if (!config.controller().getMobsim().equals("dsim")) {
+			this.addCoreControllerListener(this.plansScoring);
+		}
+		this.addCoreControllerListener(this.plansReplanning);
+		this.addCoreControllerListener(this.plansDumping);
+		this.addCoreControllerListener(this.eventsHandling);
 		// must be last being added (=first being executed)
 
-		for (ControlerListener controlerListener : this.controlerListenersDeclaredByModules) {
-			this.addControlerListener(controlerListener);
+		for (ControllerListener controllerListener : this.controllerListenersDeclaredByModules) {
+			this.addControllerListener(controllerListener);
 		}
 	}
 
@@ -116,7 +121,7 @@ class NewControler extends AbstractController implements ControlerI {
 
 	@Override
 	protected final void prepareForMobsim() {
-		this.prepareForMobsim.run() ;
+		this.prepareForMobsim.run();
 //		this.prepareForSim.run() ;
 	}
 

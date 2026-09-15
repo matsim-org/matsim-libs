@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.noise;
 
@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 
 /**
  * This handler calculates agent money events based on the noise damages an agent may cause (NoiseEventCaused).
- * 
+ *
  * @author ikaddoura
  *
  */
@@ -39,7 +39,7 @@ class NoisePricingHandler implements NoiseEventCausedHandler {
 
 	@Inject
 	private EventsManager events;
-	
+
 	@Inject
 	private NoiseContext noiseContext;
 
@@ -52,14 +52,14 @@ class NoisePricingHandler implements NoiseEventCausedHandler {
 
 	@Override
 	public void handleEvent(NoiseEventCaused event) {
-		
+
 		// negative amount since from here the amount is interpreted as costs
 		double amount = this.noiseContext.getNoiseParams().getNoiseTollFactor() * event.getAmount() * (-1);
 		this.amountSum = this.amountSum + amount;
-		
-		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount, "noisePricing", null);
+
+		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount, "noisePricing", null, null);
 		this.events.processEvent(moneyEvent);
-		
+
 		PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(event.getTime(), event.getCausingAgentId(), event.getLinkId(), amount, event.getLinkEnteringTime(), "noise");
 		this.events.processEvent(linkMoneyEvent);
 	}
@@ -67,5 +67,5 @@ class NoisePricingHandler implements NoiseEventCausedHandler {
 	public double getAmountSum() {
 		return amountSum;
 	}
-	
+
 }

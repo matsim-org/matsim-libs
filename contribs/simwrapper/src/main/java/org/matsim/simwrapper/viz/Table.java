@@ -45,6 +45,11 @@ public class Table extends Viz {
 	 */
 	public Boolean showAllRows;
 
+	/**
+	 * This option defines whether the header of the table should be displayed.
+	 */
+	public Boolean hideHeader;
+
 	public Table() {
 		super("csv");
 	}

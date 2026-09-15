@@ -32,57 +32,57 @@ public class SpeedyGraphTest {
 
         // test out-links node 1
 
-        li.reset(f.node1.getId().index());
+        li.reset(graph.getNodeIndex(f.node1));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link12);
+        assertLink(graph, li, f.link12);
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link13);
+        assertLink(graph, li, f.link13);
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link14);
+        assertLink(graph, li, f.link14);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
         // test out-links node 2
 
-        li.reset(f.node2.getId().index());
+        li.reset(graph.getNodeIndex(f.node2));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link21);
+        assertLink(graph, li, f.link21);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
         // test out-links node 3
 
-        li.reset(f.node3.getId().index());
+        li.reset(graph.getNodeIndex(f.node3));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link34);
+        assertLink(graph, li, f.link34);
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link35);
+        assertLink(graph, li, f.link35);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
         // test out-links node 4
 
-        li.reset(f.node4.getId().index());
+        li.reset(graph.getNodeIndex(f.node4));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link46);
+        assertLink(graph, li, f.link46);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
         // test out-links node 5
 
-        li.reset(f.node5.getId().index());
+        li.reset(graph.getNodeIndex(f.node5));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link56);
+        assertLink(graph, li, f.link56);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
         // test out-links node 6
 
-        li.reset(f.node6.getId().index());
+        li.reset(graph.getNodeIndex(f.node6));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link62);
+        assertLink(graph, li, f.link62);
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link65);
+        assertLink(graph, li, f.link65);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
@@ -92,65 +92,65 @@ public class SpeedyGraphTest {
 
         // test in-links node 1
 
-        li.reset(f.node1.getId().index());
+        li.reset(graph.getNodeIndex(f.node1));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link21);
+        assertLink(graph, li, f.link21);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
         // test in-links node 2
 
-        li.reset(f.node2.getId().index());
+        li.reset(graph.getNodeIndex(f.node2));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link12);
+        assertLink(graph, li, f.link12);
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link62);
+        assertLink(graph, li, f.link62);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
         // test in-links node 3
 
-        li.reset(f.node3.getId().index());
+        li.reset(graph.getNodeIndex(f.node3));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link13);
+        assertLink(graph, li, f.link13);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
         // test in-links node 4
 
-        li.reset(f.node4.getId().index());
+        li.reset(graph.getNodeIndex(f.node4));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link14);
+        assertLink(graph, li, f.link14);
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link34);
+        assertLink(graph, li, f.link34);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
         // test in-links node 5
 
-        li.reset(f.node5.getId().index());
+        li.reset(graph.getNodeIndex(f.node5));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link35);
+        assertLink(graph, li, f.link35);
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link65);
+        assertLink(graph, li, f.link65);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 
         // test in-links node 6
 
-        li.reset(f.node6.getId().index());
+        li.reset(graph.getNodeIndex(f.node6));
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link46);
+        assertLink(graph, li, f.link46);
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link56);
+        assertLink(graph, li, f.link56);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
     }
 
-    private void assertLink(LinkIterator li, Link link) {
+    private void assertLink(SpeedyGraph graph, LinkIterator li, Link link) {
         Assertions.assertEquals(link.getId().index(), li.getLinkIndex());
-        Assertions.assertEquals(link.getFromNode().getId().index(), li.getFromNodeIndex());
-        Assertions.assertEquals(link.getToNode().getId().index(), li.getToNodeIndex());
+        Assertions.assertEquals(graph.getNodeIndex(link.getFromNode()), li.getFromNodeIndex());
+        Assertions.assertEquals(graph.getNodeIndex(link.getToNode()), li.getToNodeIndex());
         Assertions.assertEquals(link.getLength(), li.getLength(), 1e-2);
         Assertions.assertEquals(link.getLength() / link.getFreespeed(), li.getFreespeedTravelTime(), 1e-2);
     }

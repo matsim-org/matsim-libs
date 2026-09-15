@@ -18,21 +18,20 @@
 
 package org.matsim.contrib.drt.scheduler;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
-
+import com.google.inject.Inject;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import com.google.inject.Inject;
-
 /**
  * @author michalm
+ * @author nkuehnel / MOIA added idle criteria
  */
 public class DrtScheduleInquiry implements ScheduleInquiry {
+
 	private final MobsimTimer timer;
 
 	@Inject
@@ -42,13 +41,50 @@ public class DrtScheduleInquiry implements ScheduleInquiry {
 
 	@Override
 	public boolean isIdle(DvrpVehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		if (timer.getTimeOfDay() >= vehicle.getServiceEndTime() || schedule.getStatus() != ScheduleStatus.STARTED) {
+		return isIdle(vehicle, IdleCriteria.none());
+	}
+
+	@Override
+	public boolean isIdle(DvrpVehicle vehicle, IdleCriteria criteria) {
+		final Schedule schedule = vehicle.getSchedule();
+		final double now = timer.getTimeOfDay();
+
+		// Schedule must be started
+		if (schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
 			return false;
 		}
 
-		Task currentTask = schedule.getCurrentTask();
-		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task (because no prebooking)
-				&& STAY.isBaseTypeOf(currentTask);
+		// Must be in a STAY task to be idle
+		final Task current = schedule.getCurrentTask();
+		if (!(current instanceof DrtStayTask)) {
+			return false;
+		}
+
+		// Service must not have ended
+		if (now >= vehicle.getServiceEndTime()) {
+			return false;
+		}
+
+		// Compute elapsed/remaining within the current STAY task
+		final double elapsed = Math.max(0.0, now - current.getBeginTime());
+		final double remaining = Math.max(0.0, current.getEndTime() - now);
+
+		// Require minimum elapsed idle time
+		if (elapsed < criteria.minIdleElapsed()) {
+			return false;
+		}
+
+		// If this is the last task, we consider it idle (no remaining check)
+		final boolean isLastTask = current.getTaskIdx() == schedule.getTaskCount() - 1;
+		if (isLastTask) {
+			return true;
+		}
+
+		// Require minimum remaining idle time
+		if (remaining < criteria.minIdleGapRemaining()) {
+			return false;
+		}
+
+		return true;
 	}
 }

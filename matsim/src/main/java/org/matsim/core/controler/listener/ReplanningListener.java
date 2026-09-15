@@ -25,7 +25,7 @@ import org.matsim.core.controler.events.ReplanningEvent;
 /**
  * @author dgrether
  */
-public interface ReplanningListener extends ControlerListener {
+public interface ReplanningListener extends ControllerListener {
 
 	/**
 	 * Notifies all observers of the Controler that it is time to do the replanning.

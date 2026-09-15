@@ -36,28 +36,28 @@ import java.util.Map;
 
 /**
  * An adaptive traffic light observing the number of vehicles per park-and-ride facility.
- * 
+ *
  * @author ikaddoura
  *
  */
 public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHandler, LinkLeaveEventHandler {
-	
-//	private static final Logger log = LogManager.getLogger(PRAdaptiveCapacityControl.class);
+
+	//	private static final Logger log = LogManager.getLogger(PRAdaptiveCapacityControl.class);
 	private Map<Id, Integer> prId2vehicles = new HashMap<Id, Integer>();
 	private Map<Id, SignalizeableItem> prId2ampel = new HashMap<Id, SignalizeableItem>();
 	private Map<Id<PRFacility>, PRFacility> id2prFacility = new HashMap<>();
-	
+
 	private InternalInterface internalInterface;
-	
+
 	public PRAdaptiveCapacityControl(Map<Id<PRFacility>, PRFacility> id2prFacility) {
 		this.id2prFacility = id2prFacility;
 	}
 
 	@Override
 	public void doSimStep(double time) {
-		
-		for (Id<PRFacility> prId : this.prId2ampel.keySet()){
-			if (this.prId2vehicles.get(prId) >= this.id2prFacility.get(prId).getCapacity()){
+
+		for (Id<PRFacility> prId : this.prId2ampel.keySet()) {
+			if (this.prId2vehicles.get(prId) >= this.id2prFacility.get(prId).getCapacity()) {
 				this.prId2ampel.get(prId).setSignalStateAllTurningMoves(SignalGroupState.RED);
 			} else {
 				this.prId2ampel.get(prId).setSignalStateAllTurningMoves(SignalGroupState.GREEN);
@@ -66,25 +66,21 @@ public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHa
 	}
 
 	@Override
-	public void onPrepareSim() {
+	public void beforeMobsim() {
 
-		for (PRFacility pr : this.id2prFacility.values()){
+		for (PRFacility pr : this.id2prFacility.values()) {
 			this.prId2vehicles.put(pr.getId(), 0);
 
 			Id prLink2in = pr.getPrLink2in();
-			SignalizeableItem ampel = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(prLink2in) ;
+			SignalizeableItem ampel = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(prLink2in);
 			ampel.setSignalized(true);
 			this.prId2ampel.put(pr.getId(), ampel);
 		}
 	}
 
 	@Override
-	public void afterSim() {
-	}
-
-	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;		
+		this.internalInterface = internalInterface;
 	}
 
 	public Netsim getMobsim() {
@@ -99,9 +95,9 @@ public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHa
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		for (PRFacility pr : this.id2prFacility.values()){
+		for (PRFacility pr : this.id2prFacility.values()) {
 			Id id = pr.getPrLink3in();
-			if (id.toString().equals(event.getLinkId().toString())){
+			if (id.toString().equals(event.getLinkId().toString())) {
 //				log.info("Car entered ParkAndRideFacilty: " + id.toString());
 				int vehNr = this.prId2vehicles.get(pr.getId()) + 1;
 				this.prId2vehicles.put(pr.getId(), vehNr);
@@ -111,10 +107,10 @@ public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHa
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		for (PRFacility pr : this.id2prFacility.values()){
+		for (PRFacility pr : this.id2prFacility.values()) {
 			Id id = pr.getPrLink3out();
 
-			if (id.toString().equals(event.getLinkId().toString())){
+			if (id.toString().equals(event.getLinkId().toString())) {
 //				log.info("Car left ParkAndRideFacilty: " + id.toString());
 				int vehNr = this.prId2vehicles.get(pr.getId()) - 1;
 				this.prId2vehicles.put(pr.getId(), vehNr);

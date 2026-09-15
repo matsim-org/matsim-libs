@@ -51,8 +51,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
  */
 class CarEgressWalkChanger implements BeforeMobsimListener {
 	
-	public static final String PENALTY_ATTRIBUTE = "parkingPenalty";
-	
 	private final CarEgressWalkObserver observer;
 	private final AccessEgressFinder egressFinder = new AccessEgressFinder(TransportMode.car);
 	private final Iter0Method iter0Method;
@@ -126,7 +124,7 @@ class CarEgressWalkChanger implements BeforeMobsimListener {
 					setTimes(walkActPair, -penalty);
 				} else {
 					setTimes(walkActPair, penalty);
-					walkActPair.leg.getAttributes().putAttribute(PENALTY_ATTRIBUTE, penalty);
+					walkActPair.leg.getAttributes().putAttribute(ParkingProxyModule.PENALTY_ATTRIBUTE, penalty);
 				}
 			}
 		}
@@ -145,7 +143,7 @@ class CarEgressWalkChanger implements BeforeMobsimListener {
 		int sign = reverse ? -1 : 1;
 		for (Person p : population) {
 			for (LegActPair walkActPair : this.egressFinder.findEgressWalks(p.getSelectedPlan())) {
-				Object penalty = walkActPair.leg.getAttributes().getAttribute(PENALTY_ATTRIBUTE);
+				Object penalty = walkActPair.leg.getAttributes().getAttribute(ParkingProxyModule.PENALTY_ATTRIBUTE);
 				if (penalty == null) {
 					throw new RuntimeException("Leg with departure time " +  walkActPair.leg.getDepartureTime() + " of person " + p.getId().toString() + " has no penalty!");
 				} else {

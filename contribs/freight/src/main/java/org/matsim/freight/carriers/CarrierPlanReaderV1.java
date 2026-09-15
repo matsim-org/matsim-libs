@@ -152,7 +152,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 					typeId = "default";
 				}
 
-				VehicleType vehicleType = carrierVehicleTypes.getVehicleTypes().get( Id.create( typeId, VehicleType.class ) );
+				VehicleType vehicleType = carrierVehicleTypes.getVehicleTypes().get( Id.createVehicleTypeId(typeId) );
 				if ( vehicleType==null ) {
 					throw new RuntimeException( "VehicleTypeId=" + typeId + " is missing" );
 				}

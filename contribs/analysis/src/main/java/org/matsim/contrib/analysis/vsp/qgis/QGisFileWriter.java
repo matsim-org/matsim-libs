@@ -1,7 +1,7 @@
 package org.matsim.contrib.analysis.vsp.qgis;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Paths;
 
 /**
@@ -19,20 +19,20 @@ public class QGisFileWriter {
 		this.writer = writer;
 	}
 	
-	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException{
+	public void writeHeaderAndStartElement(Writer out) throws IOException{
 		
 		out.write("<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>\n");
 		out.write("<qgis projectname=\"" + this.writer.getProjectname() + "\" version=\"" + QGisConstants.currentVersion + "\">\n");
 		
 	}
 	
-	public void writeTitle(BufferedWriter out) throws IOException{
+	public void writeTitle(Writer out) throws IOException{
 		
 		out.write("\t<title>" + this.writer.getTitle() + "</title>\n");
 		
 	}
 	
-	public void writeLayerTreeGroup(BufferedWriter out) throws IOException{
+	public void writeLayerTreeGroup(Writer out) throws IOException{
 		
 		out.write("\t<layer-tree-group expanded=\"1\" checked=\"Qt::Checked\" name=\"\">\n");
 		
@@ -48,7 +48,7 @@ public class QGisFileWriter {
 		
 	}
 	
-	private void writeLayerTreeLayer(BufferedWriter out, QGisLayer layer) throws IOException{
+	private void writeLayerTreeLayer(Writer out, QGisLayer layer) throws IOException{
 		
 		out.write("\t\t<layer-tree-layer expanded=\"1\" checked=\"Qt::Checked\" id=\"" + layer.getId().toString() + "\" name=\"" + layer.getName() + "\">\n");
 		out.write("\t\t\t<customproperties/>\n");
@@ -56,7 +56,7 @@ public class QGisFileWriter {
 		
 	}
 	
-	public void writeMapCanvas(BufferedWriter out) throws IOException{
+	public void writeMapCanvas(Writer out) throws IOException{
 		
 		out.write("\t<mapcanvas>\n");
 		
@@ -77,7 +77,7 @@ public class QGisFileWriter {
 		
 	}
 	
-	private void writeDestinationSrs(BufferedWriter out) throws IOException{
+	private void writeDestinationSrs(Writer out) throws IOException{
 		
 		out.write("\t\t<destinationsrs>\n");
 		
@@ -98,7 +98,7 @@ public class QGisFileWriter {
 		
 	}
 	
-	public void writeLayerTreeCanvas(BufferedWriter out) throws IOException{
+	public void writeLayerTreeCanvas(Writer out) throws IOException{
 		
 		out.write("\t<layer-tree-canvas>\n");
 		
@@ -116,13 +116,13 @@ public class QGisFileWriter {
 		
 	}
 	
-	private void writeItem(BufferedWriter out, QGisLayer layer) throws IOException{
+	private void writeItem(Writer out, QGisLayer layer) throws IOException{
 		
 		out.write("\t\t\t<item>" + layer.getId().toString() + "</item>\n");
 		
 	}
 	
-	public void writeProjectLayers(BufferedWriter out) throws IOException{
+	public void writeProjectLayers(Writer out) throws IOException{
 		
 		out.write("\t<projectlayers layercount=\"" + this.writer.getLayers().size() + "\">\n");
 		
@@ -136,7 +136,7 @@ public class QGisFileWriter {
 		
 	}
 	
-	private void writeMapLayer(BufferedWriter out, QGisLayer layer) throws IOException{
+	private void writeMapLayer(Writer out, QGisLayer layer) throws IOException{
 		
 		if(layer.getType().equals(QGisConstants.layerType.vector)){
 			
@@ -154,7 +154,7 @@ public class QGisFileWriter {
 		
 	}
 	
-	private void writeVectorLayer(BufferedWriter out, QGisLayer layer) throws IOException {
+	private void writeVectorLayer(Writer out, QGisLayer layer) throws IOException {
 		
 		VectorLayer vlayer = (VectorLayer) layer;
 		
@@ -283,7 +283,7 @@ public class QGisFileWriter {
 	
 	}
 
-	private void writeRasterLayer(BufferedWriter out, QGisLayer layer)throws IOException {
+	private void writeRasterLayer(Writer out, QGisLayer layer)throws IOException {
 		
 		RasterLayer rlayer = (RasterLayer) layer;
 		
@@ -352,7 +352,7 @@ public class QGisFileWriter {
 		
 	}
 	
-	private void writeGeometryLayer(BufferedWriter out, VectorLayer layer) throws IOException {
+	private void writeGeometryLayer(Writer out, VectorLayer layer) throws IOException {
 	
 		QGisRenderer qRenderer = layer.getRenderer();
 		
@@ -453,7 +453,7 @@ public class QGisFileWriter {
 		
 	}
 
-	private void writePointLayer(BufferedWriter out, QGisLayer layer, int idx) throws IOException {
+	private void writePointLayer(Writer out, QGisLayer layer, int idx) throws IOException {
 
 		QGisPointSymbolLayer psl = (QGisPointSymbolLayer)layer.getRenderer().getSymbolLayers().get(idx);
 		
@@ -499,7 +499,7 @@ public class QGisFileWriter {
 			
 	}
 
-	private void writeLineLayer(BufferedWriter out, QGisLayer layer, int idx) throws IOException {
+	private void writeLineLayer(Writer out, QGisLayer layer, int idx) throws IOException {
 		
 		QGisLineSymbolLayer lsl = (QGisLineSymbolLayer)layer.getRenderer().getSymbolLayers().get(0);
 		
@@ -534,7 +534,7 @@ public class QGisFileWriter {
 			
 	}
 
-	private void writePolygonLayer(BufferedWriter out, QGisLayer layer, int idx) throws IOException {
+	private void writePolygonLayer(Writer out, QGisLayer layer, int idx) throws IOException {
 
 		QGisPolygonSymbolLayer psl = (QGisPolygonSymbolLayer)layer.getRenderer().getSymbolLayers().get(idx);
 
@@ -574,7 +574,7 @@ public class QGisFileWriter {
 
 	}
 
-	public void writeProperties(BufferedWriter out) throws IOException{
+	public void writeProperties(Writer out) throws IOException{
 		
 		out.write("\t<properties>\n");
 		
@@ -605,7 +605,7 @@ public class QGisFileWriter {
 		
 	}
 
-	public void endFile(BufferedWriter out) throws IOException{
+	public void endFile(Writer out) throws IOException{
 		
 		out.write("</qgis>");
 		

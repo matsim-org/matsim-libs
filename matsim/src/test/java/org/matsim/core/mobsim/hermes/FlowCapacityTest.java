@@ -218,7 +218,7 @@ public class FlowCapacityTest {
 			//every second plan gets a super flowy AV
 			Vehicle vehicle = i % 2 == 1 ? VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), av) : VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
 			f.scenario.getVehicles().addVehicle(vehicle);
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, Map.of(TransportMode.car, vehicle.getId() ) );
 
 		}
 		/* build events */
@@ -285,7 +285,7 @@ public class FlowCapacityTest {
 			//every second plan gets a super flowy AV
 			Vehicle vehicle = i % 2 == 1 ? VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), av) : VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
 			f.scenario.getVehicles().addVehicle(vehicle);
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, Map.of(TransportMode.car, vehicle.getId() ) );
 		}
 		/* build events */
 		EventsManager events = EventsUtils.createEventsManager();
@@ -348,7 +348,7 @@ public class FlowCapacityTest {
 
 			Vehicle vehicle = i % 2 == 1 ? VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), tractor) : VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
 			f.scenario.getVehicles().addVehicle(vehicle);
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, Map.of(TransportMode.car, vehicle.getId() ) );
 
 		}
 		/* build events */

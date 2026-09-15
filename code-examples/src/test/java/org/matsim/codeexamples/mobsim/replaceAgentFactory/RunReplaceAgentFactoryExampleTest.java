@@ -1,0 +1,38 @@
+package org.matsim.codeexamples.mobsim.replaceAgentFactory;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.router.TripRouter;
+import org.matsim.testcases.MatsimTestUtils;
+
+import jakarta.inject.Inject;
+
+public class RunReplaceAgentFactoryExampleTest {
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
+
+	@Test
+	void testMain() {
+		try {
+			final RunReplaceAgentFactoryExample main = new RunReplaceAgentFactoryExample();;
+			final Config config = main.prepareConfig();
+			config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setLastIteration( 2 );
+			config.controller().setOutputDirectory( utils.getOutputDirectory() );
+			
+			main.run() ;
+			
+		} catch (Exception ee) {
+			ee.printStackTrace();
+			Assertions.fail() ;
+		}
+	}
+	
+}

@@ -24,27 +24,11 @@ import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import net.jpountz.lz4.LZ4FrameInputStream;
 import net.jpountz.lz4.LZ4FrameOutputStream;
-import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -59,6 +43,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * This class provides helper methods for input/output in MATSim.
@@ -114,6 +101,7 @@ import java.util.zip.GZIPOutputStream;
  * <li><code>*.lz4</code>: LZ4 compression</li>
  * <li><code>*.bz2</code>: Bzip2 compression</li>
  * <li><code>*.zst</code>: ZStandard compression</li>
+ * <li><code>*.zip</code>: ZIP compression (single entry per archive)</li>
  * </ul>
  *
  * <h2>Encryption</h2>
@@ -156,7 +144,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	private IOUtils() {
 	}
 
-	private enum CompressionType { GZIP, LZ4, BZIP2, ZSTD }
+	private enum CompressionType { GZIP, LZ4, BZIP2, ZSTD, ZIP }
 
 	// Define compressions that can be used.
 	private static final Map<String, CompressionType> COMPRESSION_EXTENSIONS = new TreeMap<>();
@@ -166,9 +154,10 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		COMPRESSION_EXTENSIONS.put("lz4", CompressionType.LZ4);
 		COMPRESSION_EXTENSIONS.put("bz2", CompressionType.BZIP2);
 		COMPRESSION_EXTENSIONS.put("zst", CompressionType.ZSTD);
+		COMPRESSION_EXTENSIONS.put("zip", CompressionType.ZIP);
 	}
 
-	private static int zstdCompressionLevel = 6;
+	private static int zstdCompressionLevel = 3;
 
 	public static void setZstdCompressionLevel(int level) {
 		if (level >= 1) {
@@ -206,10 +195,13 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 */
 	public static URL resolveFileOrResource(String filename) throws UncheckedIOException {
 		try {
-			// I) do not handle URLs
-			if (filename.startsWith("jar:file:") || filename.startsWith("file:") || filename.startsWith( "https:" ) || filename.startsWith( "http:" )) {
-				// looks like an URI
-				return new URL(filename);
+			// I) Generic URI-scheme detection
+			//    matches e.g. "http:", "https:", "jar:file:", "s3:", "hdfs:", "foo+bar:", etc.
+			if (isValidURL(filename)) {
+				// But reject Windows drive-letters (e.g. "C:\...")
+				if (!filename.matches("^[A-Za-z]:[\\\\/].*")) {
+					return new URL(filename);
+				}
 			}
 
 			// II) Replace home identifier
@@ -259,6 +251,18 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		}
 	}
 
+	private static boolean isValidURL(String url) {
+		try {
+			new URL(url).toURI();
+			return true;
+		} catch (MalformedURLException | URISyntaxException e) {
+			if(url.startsWith("s3:")) {
+				logger.warn("S3 URI detected, please check if you properly initialized the AWS contrib startup hook.");
+			}
+			return false;
+		}
+    }
+
 	/**
 	 * Gets the compression of a certain URL by file extension. May return null if
 	 * not compression is assumed.
@@ -300,13 +304,18 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 					case ZSTD:
 						inputStream = new ZstdInputStream(inputStream);
 						break;
+					case ZIP:
+						ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+						zipInputStream.getNextEntry();
+						inputStream = zipInputStream;
+						break;
 				}
 			}
 
 			return new UnicodeInputStream(new BufferedInputStream(inputStream));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (CompressorException | GeneralSecurityException e) {
+		} catch (GeneralSecurityException e) {
 			throw new UncheckedIOException(new IOException(e));
 		}
 	}
@@ -370,13 +379,22 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 					case ZSTD:
 						outputStream = new ZstdOutputStream(outputStream, zstdCompressionLevel);
 						break;
+					case ZIP:
+						ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+						String zipEntryName = file.getName();
+						if (zipEntryName.toLowerCase(Locale.ROOT).endsWith(".zip")) {
+							zipEntryName = zipEntryName.substring(0, zipEntryName.length() - 4);
+						}
+						zipOutputStream.putNextEntry(new ZipEntry(zipEntryName));
+						outputStream = zipOutputStream;
+						break;
 				}
 			}
 
 			return new BufferedOutputStream(outputStream);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (CompressorException | URISyntaxException e) {
+		} catch (URISyntaxException e) {
 			throw new UncheckedIOException(new IOException(e));
 		}
 	}
@@ -522,6 +540,9 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		try {
 			return new URL(context, extension);
 		} catch (MalformedURLException e) {
+			if(extension.startsWith("s3:")) {
+				logger.warn("S3 URI detected, please check if you properly initialized the AWS contrib");
+			}
 			// We cannot construct a URL for some reason (see respective unit test)
 			return getFileUrl(extension);
 		}

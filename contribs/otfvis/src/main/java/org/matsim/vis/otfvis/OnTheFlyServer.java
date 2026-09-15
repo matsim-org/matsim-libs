@@ -52,9 +52,13 @@ import org.matsim.vis.snapshotwriters.*;
  *
  * @author dstrippgen
  *
+ * yyyyy I think this description is outdated since there is the {@link PlayPauseSimulationControl} now. This class synchronizes the mobsim with the OTFViz.
+ * However, the purpose of this class remains the same: It is the connection between the simulation and the GUI elements.
+ *
  */
 public class OnTheFlyServer implements OTFLiveServer {
 
+	// This field is used to synchronize with the mobsim. paul, nov '25
 	private final PlayPauseSimulationControl playPauseSimulationControl;
 
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
@@ -77,7 +81,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 		}
 
 		@Override
-		public Activity getCurrentActivity(MobsimAgent mobsimAgent)	{		    
+		public Activity getCurrentActivity(MobsimAgent mobsimAgent)	{
             if (mobsimAgent == null || mobsimAgent.getState() != MobsimAgent.State.ACTIVITY) {
                 return null;
             }
@@ -123,13 +127,13 @@ public class OnTheFlyServer implements OTFLiveServer {
 		@Override
 		public Scenario getScenario() { return scenario ; }
 	}
-	
+
 	/**
 	 * Used to query MobsimAgents that are not PlanAgents (e.g. DynAgents)
 	 */
 	public interface NonPlanAgentQueryHelper {
 	    Plan getPlan(MobsimAgent mobsimAgent);
-	    
+
 	    Activity getCurrentActivity(MobsimAgent mobsimAgent);
 	}
 
@@ -148,7 +152,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private VisMobsim visMobsim;
 
 	private final CurrentTimeStepView currentTimeStepView = new CurrentTimeStepView();
-	
+
 	private final NonPlanAgentQueryHelper nonPlanAgentQueryHelper;
 
 	private Scenario scenario;

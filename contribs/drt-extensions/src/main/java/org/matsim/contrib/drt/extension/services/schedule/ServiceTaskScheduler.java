@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.extension.services.schedule;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.services.services.params.DrtServiceParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
+import org.matsim.contrib.drt.extension.services.tasks.DrtServiceTask;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 

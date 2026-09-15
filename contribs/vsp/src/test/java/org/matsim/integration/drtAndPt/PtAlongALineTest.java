@@ -114,10 +114,10 @@ public class PtAlongALineTest {
 			DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                     drtConfig.addOrGetDrtOptimizationConstraintsParams()
 							.addOrGetDefaultDrtOptimizationConstraintsSet();
-			defaultConstraintsSet.maxWaitTime = 900.;
-			defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
-			defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
-			defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+			defaultConstraintsSet.setMaxWaitTime(900.);
+			defaultConstraintsSet.setMaxTravelTimeAlpha(1.3);
+			defaultConstraintsSet.setMaxTravelTimeBeta(10. * 60.);
+			defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
@@ -148,12 +148,12 @@ public class PtAlongALineTest {
 
 		{
 			ModeParams modeParams = new ModeParams("drt_A");
-			config.scoring().addModeParams(modeParams);
+			config.scoring().addDefaultModeParams(modeParams);
 		}
 
 		{
 			ModeParams modeParams = new ModeParams("drt_A_walk");
-			config.scoring().addModeParams(modeParams);
+			config.scoring().addDefaultModeParams(modeParams);
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -217,12 +217,12 @@ public class PtAlongALineTest {
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		ModeParams accessWalk = new ModeParams(TransportMode.non_network_walk);
 		accessWalk.setMarginalUtilityOfTraveling(0);
-		config.scoring().addModeParams(accessWalk);
+		config.scoring().addDefaultModeParams(accessWalk);
 
 		// (scoring parameters for drt modes)
 		{
 			ModeParams modeParams = new ModeParams(TransportMode.drt);
-			config.scoring().addModeParams(modeParams);
+			config.scoring().addDefaultModeParams(modeParams);
 		}
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
@@ -255,10 +255,10 @@ public class PtAlongALineTest {
 			DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                     drtConfig.addOrGetDrtOptimizationConstraintsParams()
                             .addOrGetDefaultDrtOptimizationConstraintsSet();
-			defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
-			defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
-			defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
-			defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+			defaultConstraintsSet.setMaxTravelTimeAlpha(1.3);
+			defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
+			defaultConstraintsSet.setMaxWaitTime(Double.MAX_VALUE);
+			defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 			drtConfig.setMode(TransportMode.drt);
 			mm.addParameterSet(drtConfig);
 		}
@@ -353,19 +353,19 @@ public class PtAlongALineTest {
 	private static void configureScoring(Config config) {
 		ModeParams accessWalk = new ModeParams(TransportMode.non_network_walk);
 		accessWalk.setMarginalUtilityOfTraveling(0);
-		config.scoring().addModeParams(accessWalk);
+		config.scoring().addDefaultModeParams(accessWalk);
 
 		ModeParams transitWalk = new ModeParams("transit_walk");
 		transitWalk.setMarginalUtilityOfTraveling(0);
-		config.scoring().addModeParams(transitWalk);
+		config.scoring().addDefaultModeParams(transitWalk);
 
 		ModeParams bike = new ModeParams("bike");
 		bike.setMarginalUtilityOfTraveling(0);
-		config.scoring().addModeParams(bike);
+		config.scoring().addDefaultModeParams(bike);
 
 		ModeParams drt = new ModeParams("drt");
 		drt.setMarginalUtilityOfTraveling(0);
-		config.scoring().addModeParams(drt);
+		config.scoring().addDefaultModeParams(drt);
 	}
 
 	static SwissRailRaptorConfigGroup createRaptorConfigGroup(int radiusWalk, int radiusBike) {

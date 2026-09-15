@@ -25,7 +25,7 @@ import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 /**
  * Removes trips and replaces them by legs.

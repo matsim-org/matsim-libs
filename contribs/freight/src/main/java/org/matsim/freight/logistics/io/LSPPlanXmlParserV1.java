@@ -163,7 +163,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
         String typeId = atts.getValue(TYPE_ID);
         Gbl.assertNotNull(typeId);
         VehicleType vehicleType =
-            VehicleUtils.createVehicleType(Id.create(typeId, VehicleType.class));
+            VehicleUtils.createVehicleType(Id.createVehicleTypeId(typeId));
         Gbl.assertNotNull(vehicleType);
 
         CarrierVehicle.Builder vehicleBuilder =
@@ -238,6 +238,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
         elementIdResourceIdMap.put(logisticChainElementId, resourceId);
       }
+
       case SHIPMENT_PLAN -> {
         shipmentPlanId = atts.getValue(SHIPMENT_ID);
         Gbl.assertNotNull(shipmentPlanId);

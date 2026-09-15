@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonUtils;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 
 /**
@@ -42,7 +42,7 @@ abstract class AbstractPopulationWriterHandler implements PopulationWriterHandle
 	private final static Logger log = LogManager.getLogger(AbstractPopulationWriterHandler.class);
 	
 	@Override
-	public final void writePerson(final Person person, final BufferedWriter writer) throws IOException {
+	public final void writePerson(final Person person, final Writer writer) throws IOException {
 		this.startPerson(person, writer);
 		// travelcards
 		if (PersonUtils.getTravelcards(person) != null) {
@@ -79,28 +79,28 @@ abstract class AbstractPopulationWriterHandler implements PopulationWriterHandle
 		this.writeSeparator(writer);
 	}
 
-	public abstract void startPerson(final Person person, final BufferedWriter out) throws IOException;
+	public abstract void startPerson(final Person person, final Writer out) throws IOException;
 
-	public abstract void endPerson(final BufferedWriter out) throws IOException;
+	public abstract void endPerson(final Writer out) throws IOException;
 
-	public abstract void startTravelCard(final String travelcard, final BufferedWriter out) throws IOException;
+	public abstract void startTravelCard(final String travelcard, final Writer out) throws IOException;
 
-	public abstract void endTravelCard(final BufferedWriter out) throws IOException;
+	public abstract void endTravelCard(final Writer out) throws IOException;
 
-	public abstract void startPlan(final Plan plan, final BufferedWriter out) throws IOException;
+	public abstract void startPlan(final Plan plan, final Writer out) throws IOException;
 
-	public abstract void endPlan(final BufferedWriter out) throws IOException;
+	public abstract void endPlan(final Writer out) throws IOException;
 
-	public abstract void startAct(final Activity act, final BufferedWriter out) throws IOException;
+	public abstract void startAct(final Activity act, final Writer out) throws IOException;
 
-	public abstract void endAct(final BufferedWriter out) throws IOException;
+	public abstract void endAct(final Writer out) throws IOException;
 
-	public abstract void startLeg(final Leg leg, final BufferedWriter out) throws IOException;
+	public abstract void startLeg(final Leg leg, final Writer out) throws IOException;
 
-	public abstract void endLeg(final BufferedWriter out) throws IOException;
+	public abstract void endLeg(final Writer out) throws IOException;
 
-	public abstract void startRoute(final Route route, final BufferedWriter out) throws IOException;
+	public abstract void startRoute(final Route route, final Writer out) throws IOException;
 
-	public abstract void endRoute(final BufferedWriter out) throws IOException;
+	public abstract void endRoute(final Writer out) throws IOException;
 
 }

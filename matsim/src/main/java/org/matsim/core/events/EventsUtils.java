@@ -131,7 +131,11 @@ public final class EventsUtils {
 	}
 
 	public static ComparisonResult compareEventsFiles(String filename1, String filename2) {
-		return EventsFileComparator.compare(filename1, filename2);
+		return compareEventsFiles(filename1, filename2, 1e-9);
+	}
+
+	public static ComparisonResult compareEventsFiles(String filename1, String filename2, double delta) {
+		return new EventsFileComparator().setDelta(delta).runComparison(filename1, filename2);
 	}
 
 }

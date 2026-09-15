@@ -31,8 +31,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class ChangeTripMode implements Provider<PlanStrategy> {
 

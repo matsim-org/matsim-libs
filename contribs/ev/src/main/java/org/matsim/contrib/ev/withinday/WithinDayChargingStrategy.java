@@ -35,7 +35,7 @@ public class WithinDayChargingStrategy implements ChargingStrategy {
         }
 
         Battery battery = ev.getBattery();
-        return maximumSoc * battery.getCapacity() - battery.getCharge();
+        return Math.max(0.0, maximumSoc * battery.getCapacity() - battery.getCharge());
     }
 
     @Override
@@ -45,11 +45,7 @@ public class WithinDayChargingStrategy implements ChargingStrategy {
 
     @Override
     public boolean isChargingCompleted() {
-        if (getMaximumSoc(ev) != null) {
-            return false;
-        } else {
-            return calcRemainingEnergyToCharge() <= 0;
-        }
+        return false;
     }
 
     private Double getMaximumSoc(ElectricVehicle ev) {

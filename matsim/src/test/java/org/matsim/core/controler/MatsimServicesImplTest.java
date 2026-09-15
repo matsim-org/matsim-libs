@@ -49,7 +49,7 @@ import org.matsim.testcases.MatsimTestUtils;
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                addControlerListenerBinding().toInstance(new IterationStartsListener() {
+                addControllerListenerBinding().toInstance(new IterationStartsListener() {
 
 					@Override
 					public void notifyIterationStarts(IterationStartsEvent event) {

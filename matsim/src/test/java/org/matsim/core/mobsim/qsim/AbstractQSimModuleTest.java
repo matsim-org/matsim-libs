@@ -19,11 +19,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim;
+package org.matsim.core.mobsim.qsim;
 
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicLong;
-
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -43,13 +43,12 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicLong;
 
-	public class AbstractQSimModuleTest {
-	 @Test
-	 void testOverrides() {
+public class AbstractQSimModuleTest {
+	@Test
+	void testOverrides() {
 		AbstractQSimModule moduleA = new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
@@ -67,7 +66,7 @@ import com.google.inject.Injector;
 		};
 
 		AbstractQSimModule composite = AbstractQSimModule.overrideQSimModules(Collections.singleton(moduleA),
-				Collections.singletonList(moduleB));
+			Collections.singletonList(moduleB));
 
 		Config config = ConfigUtils.createConfig();
 		composite.setConfig(config);
@@ -80,8 +79,8 @@ import com.google.inject.Injector;
 		Assertions.assertEquals("testBString", injector.getInstance(String.class));
 	}
 
-	 @Test
-	 void testOverrideAgentFactory() {
+	@Test
+	void testOverrideAgentFactory() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
@@ -90,8 +89,8 @@ import com.google.inject.Injector;
 
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		Person person = populationFactory.createPerson(Id.createPersonId("person"));
-		Plan plan =  populationFactory.createPlan();
-		plan.addActivity( populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
+		Plan plan = populationFactory.createPlan();
+		plan.addActivity(populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 
@@ -104,8 +103,8 @@ import com.google.inject.Injector;
 		Assertions.assertTrue(value.get() > 0);
 	}
 
-	 @Test
-	 void testOverrideAgentFactoryTwice() {
+	@Test
+	void testOverrideAgentFactoryTwice() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
@@ -114,8 +113,8 @@ import com.google.inject.Injector;
 
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		Person person = populationFactory.createPerson(Id.createPersonId("person"));
-		Plan plan =  populationFactory.createPlan();
-		plan.addActivity( populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
+		Plan plan = populationFactory.createPlan();
+		plan.addActivity(populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 
@@ -162,8 +161,8 @@ import com.google.inject.Injector;
 		}
 	}
 
-	 @Test
-	 void testAddEngine() {
+	@Test
+	void testAddEngine() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
@@ -196,14 +195,6 @@ import com.google.inject.Injector;
 		@Override
 		public void doSimStep(double time) {
 			called = true;
-		}
-
-		@Override
-		public void onPrepareSim() {
-		}
-
-		@Override
-		public void afterSim() {
 		}
 
 		@Override

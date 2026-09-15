@@ -30,7 +30,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,6 +45,9 @@ import org.matsim.core.gbl.Gbl;
  * When a Time Step of the QSim ends, all Events that have been created
  * in that Time Step are processed before the simulation can go on.
  * This is necessary e.g. when using Within-day Replanning.
+ *
+ * In parallel mode, each thread has its own EventsManager instance. Each EventsHandler is added to exactly one thread.
+ * An Event is passed to the first thread. The first thread passes it to the next thread and then processes them.
  *
  * @author cdobler
  */
