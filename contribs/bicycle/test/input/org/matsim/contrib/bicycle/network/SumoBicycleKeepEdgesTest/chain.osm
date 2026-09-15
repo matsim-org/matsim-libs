@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version="0.6" generator="handmade">
+  <!-- A straight chain of five residential ways. All have identical SUMO attributes, so
+       netconvert would merge the lot; the differences are purely in the bicycle tags.
+
+       1001/2001  identical                      -> no boundary
+       2001/3001  cycleway:right appears         -> boundary FORWARD ONLY
+                                                    (against the way, cycleway:left is
+                                                     unset on both, so they agree)
+       3001/4001  identical                      -> no boundary
+       4001/5001  surface changes                -> boundary in BOTH directions -->
+  <node id="1" lat="51.3100" lon="12.3500"/>
+  <node id="2" lat="51.3100" lon="12.3520"/>
+  <node id="3" lat="51.3100" lon="12.3540"/>
+  <node id="4" lat="51.3100" lon="12.3560"/>
+  <node id="5" lat="51.3100" lon="12.3580"/>
+  <node id="6" lat="51.3100" lon="12.3600"/>
+
+  <way id="1001"><nd ref="1"/><nd ref="2"/>
+    <tag k="highway" v="residential"/><tag k="surface" v="asphalt"/></way>
+
+  <way id="2001"><nd ref="2"/><nd ref="3"/>
+    <tag k="highway" v="residential"/><tag k="surface" v="asphalt"/></way>
+
+  <way id="3001"><nd ref="3"/><nd ref="4"/>
+    <tag k="highway" v="residential"/><tag k="surface" v="asphalt"/>
+    <tag k="cycleway:right" v="lane"/></way>
+
+  <way id="4001"><nd ref="4"/><nd ref="5"/>
+    <tag k="highway" v="residential"/><tag k="surface" v="asphalt"/>
+    <tag k="cycleway:right" v="lane"/></way>
+
+  <way id="5001"><nd ref="5"/><nd ref="6"/>
+    <tag k="highway" v="residential"/><tag k="surface" v="cobblestone"/>
+    <tag k="cycleway:right" v="lane"/></way>
+</osm>
