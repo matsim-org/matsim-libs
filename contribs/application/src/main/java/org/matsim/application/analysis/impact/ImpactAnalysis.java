@@ -41,6 +41,8 @@ public class ImpactAnalysis implements MATSimAppCommand {
 	private int personTrafficDaysPerYear;
 	@CommandLine.Option(names = "--freight-traffic-days-per-year", defaultValue = "302", description = "Annualization factor for freight transport.")
 	private int freightTrafficDaysPerYear;
+	@CommandLine.Option(names = "--marginal-utility-of-money", defaultValue = "1.0", description = "Marginal utility of money used to monetize executed scores.")
+	private double marginalUtilityOfMoney;
 
 	public static void main(String[] args) { new ImpactAnalysis().execute(args); }
 
@@ -59,7 +61,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 		ImpactAnalysisResult reference = referenceRunDirectory == null ? null : reader.read(
 			ApplicationUtils.matchInput("trips.csv", referenceRunDirectory), ApplicationUtils.matchInput("legs.csv", referenceRunDirectory),
 			ApplicationUtils.matchInput("persons.csv", referenceRunDirectory), findEmissions(referenceRunDirectory), referenceScale);
-		new ImpactCsvWriter(modes, vehicleModes, freightModes, personTrafficDaysPerYear, freightTrafficDaysPerYear)
+		new ImpactCsvWriter(modes, vehicleModes, freightModes, personTrafficDaysPerYear, freightTrafficDaysPerYear, marginalUtilityOfMoney)
 			.write(output.getPath("impact.csv"), policy, reference, policyScale, referenceScale);
 		return 0;
 	}
@@ -71,6 +73,8 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			throw new IllegalArgumentException("--reference-sample-size must be in (0, 1].");
 		if (personTrafficDaysPerYear <= 0 || freightTrafficDaysPerYear <= 0)
 			throw new IllegalArgumentException("Annualization factors must be positive.");
+		if (marginalUtilityOfMoney <= 0.)
+			throw new IllegalArgumentException("--marginal-utility-of-money must be positive.");
 	}
 
 	private Path resolveInput(String name) {

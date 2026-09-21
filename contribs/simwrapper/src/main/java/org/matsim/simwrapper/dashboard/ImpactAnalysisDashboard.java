@@ -21,6 +21,7 @@ public class ImpactAnalysisDashboard implements Dashboard {
 
 	private final Collection<String> modes;
 	private final String referenceRunDirectory;
+	private final double marginalUtilityOfMoney;
 
 	/**
 	 * Creates an absolute impact dashboard containing all modes found in the run.
@@ -48,61 +49,61 @@ public class ImpactAnalysisDashboard implements Dashboard {
 	}
 
 	public ImpactAnalysisDashboard(Collection<String> modes, String referenceRunDirectory) {
+		this(modes, referenceRunDirectory, 1.0);
+	}
+
+	public ImpactAnalysisDashboard(Collection<String> modes, String referenceRunDirectory, double marginalUtilityOfMoney) {
 		this.modes = modes;
 		this.referenceRunDirectory = referenceRunDirectory;
+		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 	}
 
 	@Override
 	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
-		// An explicitly supplied path wins. Otherwise the common SimWrapper setting makes the dashboard comparative.
-		String effectiveReference = referenceRunDirectory != null && !referenceRunDirectory.isBlank()
-			? referenceRunDirectory : configGroup.getBaseCase();
-		boolean comparison = effectiveReference != null && !effectiveReference.isBlank();
+		boolean comparison = referenceRunDirectory != null && !referenceRunDirectory.isBlank();
 		header.title = "Impact Analysis";
 		header.description = comparison
 			? "Absolute impacts of the policy case and changes relative to the base case."
 			: "Absolute traffic, physical and environmental impacts of the scenario.";
 
-		String[] args = analysisArgs(effectiveReference);
+		String[] args = analysisArgs(referenceRunDirectory);
 
-		for (String mode : modes == null || modes.isEmpty() ? List.of("car", "truck", "freight", "bike", "pt") : modes)
-			modeTables(layout, args, mode);
-		displayScoreTables(layout, args);
+		layout.row("impact-overview").el(Table.class, (viz, data) -> {
+			data.compute(ImpactAnalysis.class, "impact.csv", args);
+			viz.title = "Traffic, Physical and Environmental Effects";
+			viz.dataset = data.compute(ImpactDashboardTables.class, "impact_overview.csv");
+			viz.style = "topsheet"; viz.enableFilter = false; viz.hideHeader = false; viz.showAllRows = true;
+			viz.height = 15d;
+			viz.alignment = new String[]{"left", "left", "left", "right", "left", "right", "left"};
+		});
 
 	}
 
-	private void displayScoreTables(Layout layout, String[] args) {
-		for (String period : List.of("day", "year")) {
-			layout.row("score-" + period).el(Table.class, (viz, data) -> {
-				data.compute(ImpactAnalysis.class, "impact.csv", args);
-				viz.title = "Score – " + (period.equals("day") ? "per Day" : "per Year");
-				viz.dataset = data.compute(ImpactDashboardTables.class, "impact_scores_" + period + ".csv");
-				viz.style = "topsheet"; viz.enableFilter = false; viz.hideHeader = false; viz.showAllRows = true;
-				viz.alignment = new String[]{"left", "right", "right", "right", "right", "left"};
-			});
-		}
+	private void displayScoreTable(Layout layout, String[] args) {
+		layout.row("score").el(Table.class, (viz, data) -> {
+			data.compute(ImpactAnalysis.class, "impact.csv", args);
+			viz.title = "Score";
+			viz.dataset = data.compute(ImpactDashboardTables.class, "impact_scores.csv");
+			viz.style = "topsheet"; viz.enableFilter = false; viz.hideHeader = false; viz.showAllRows = true;
+			viz.alignment = new String[]{"left", "right", "right", "left"};
+		});
 	}
 
 	private void modeTables(Layout layout, String[] args, String mode) {
 		String label = mode.substring(0, 1).toUpperCase() + mode.substring(1);
-		periodTables(layout, args, mode, label, "day", "per day");
-		periodTables(layout, args, mode, label, "year", "per year");
-	}
-
-	private void periodTables(Layout layout, String[] args, String mode, String label, String period, String periodLabel) {
-		layout.row(mode + "-" + period).el(Table.class, (viz, data) -> {
+		layout.row(mode).el(Table.class, (viz, data) -> {
 			data.compute(ImpactAnalysis.class, "impact.csv", args);
-			viz.title = "Central Traffic / Physical Effects (" + label + ", " + periodLabel + ")";
-			viz.dataset = data.compute(ImpactDashboardTables.class, "impact_general_" + mode + "_" + period + ".csv");
+			viz.title = "Traffic / Physical Effects (" + label + ")";
+			viz.dataset = data.compute(ImpactDashboardTables.class, "impact_general_" + mode + ".csv");
 			viz.style = "topsheet"; viz.enableFilter = false; viz.hideHeader = false; viz.showAllRows = true;
-			viz.width = 0.5d; viz.height = 5d; viz.alignment = new String[]{"left", "right", "right", "right", "left"};
+			viz.width = 0.5d; viz.height = 5d; viz.alignment = new String[]{"left", "right", "right", "left"};
 		}).el(Table.class, (viz, data) -> {
 			data.compute(ImpactAnalysis.class, "impact.csv", args);
-			viz.title = "Change In Exhaust Emissions (" + label + ", " + periodLabel + ")";
-			viz.dataset = data.compute(ImpactDashboardTables.class, "impact_emissions_" + mode + "_" + period + ".csv");
+			viz.title = "Exhaust Emissions (" + label + ")";
+			viz.dataset = data.compute(ImpactDashboardTables.class, "impact_emissions_" + mode + ".csv");
 			viz.style = "topsheet"; viz.enableFilter = false; viz.hideHeader = false; viz.showAllRows = true;
-			viz.width = 0.5d; viz.height = 5d; viz.alignment = new String[]{"left", "right", "right", "right", "left"};
+			viz.width = 0.5d; viz.height = 5d; viz.alignment = new String[]{"left", "right", "right", "left"};
 		});
 	}
 
@@ -153,6 +154,8 @@ public class ImpactAnalysisDashboard implements Dashboard {
 			args.add("--reference-run-directory");
 			args.add(effectiveReference);
 		}
+		args.add("--marginal-utility-of-money");
+		args.add(Double.toString(marginalUtilityOfMoney));
 
 		return args.toArray(new String[0]);
 	}

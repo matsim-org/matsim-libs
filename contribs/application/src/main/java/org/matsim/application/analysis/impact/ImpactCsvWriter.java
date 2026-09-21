@@ -29,14 +29,16 @@ final class ImpactCsvWriter {
 	private final Set<String> freightModes;
 	private final int personDays;
 	private final int freightDays;
+	private final double marginalUtilityOfMoney;
 
 	ImpactCsvWriter(Set<String> configuredModes, Set<String> vehicleModes, Set<String> freightModes,
-			int personDays, int freightDays) {
+			int personDays, int freightDays, double marginalUtilityOfMoney) {
 		this.configuredModes = configuredModes;
 		this.vehicleModes = vehicleModes;
 		this.freightModes = freightModes;
 		this.personDays = personDays;
 		this.freightDays = freightDays;
+		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 	}
 
 	void write(Path output, ImpactAnalysisResult policy, ImpactAnalysisResult reference,
@@ -142,6 +144,12 @@ final class ImpactCsvWriter {
 			policy.scoreSum * personDays, status);
 		values(printer, "Score", "Mittlerer ausgefuehrter Score", "all", "utils/person/year", referenceMean, policyMean, status);
 		values(printer, "Score", "Mittlerer ausgefuehrter Score", "all", "utils/person", referenceMean, policyMean, status);
+		values(printer, "Score", "Monetarisierter ausgefuehrter Score", "all", "monetary units/day",
+			reference == null ? null : reference.scoreSum / marginalUtilityOfMoney,
+			policy.scoreSum / marginalUtilityOfMoney, status);
+		values(printer, "Score", "Monetarisierter ausgefuehrter Score", "all", "monetary units/year",
+			reference == null ? null : reference.scoreSum * personDays / marginalUtilityOfMoney,
+			policy.scoreSum * personDays / marginalUtilityOfMoney, status);
 	}
 
 	private void persons(CSVPrinter printer, ImpactAnalysisResult policy, ImpactAnalysisResult reference,
@@ -207,8 +215,8 @@ final class ImpactCsvWriter {
 			Double reference, Double policy, String status) throws IOException {
 		// Physical deltas always use policy minus reference. A zero reference has no meaningful relative change,
 		// therefore the relative field stays empty instead of emitting infinity or an invented zero.
-		String difference = reference == null || policy == null ? "" : format(reference - policy);
-		String relative = reference == null || policy == null || reference == 0. ? "" : format((reference - policy) / reference);
+		String difference = reference == null || policy == null ? "" : format(policy - reference);
+		String relative = reference == null || policy == null || reference == 0. ? "" : format((policy - reference) / reference);
 		printer.printRecord(section, metric, metric, mode, unit.toLowerCase(Locale.ROOT).contains("/year") || unit.contains("Year") ? "year" : "day", unit,
 			reference == null ? "" : format(reference), policy == null ? "" : format(policy), difference, relative,
 			status, "MATSim standard output");

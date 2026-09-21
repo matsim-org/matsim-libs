@@ -117,9 +117,9 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 					sw.addDashboard(new PublicTransitDashboard());
 				}
 				case impactAnalysis -> {
-					sw.addDashboard(referenceRunDirectory == null
-						? new ImpactAnalysisDashboard()
-						: new ImpactAnalysisDashboard(referenceRunDirectory));
+					String reference = referenceRunDirectory == null
+						? config.global().getBaseCasePathName() : referenceRunDirectory.toString();
+					sw.addDashboard(new ImpactAnalysisDashboard(null, reference, config.scoring().getMarginalUtilityOfMoney()));
 				}
 				case bvwp -> {
 					sw.addDashboard(new BvwpDashboard(Set.of("car"), Set.of("freight", "truck")));

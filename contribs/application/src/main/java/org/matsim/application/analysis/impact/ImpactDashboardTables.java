@@ -29,6 +29,7 @@ import java.util.Map;
 		"impact_freight_trips.csv", "impact_freight_distance.csv", "impact_freight_time.csv",
 		"impact_emissions.csv", "impact_scores.csv", "impact_agents.csv", "impact_methodology.csv",
 		"impact_cost_benefit.csv",
+		"impact_overview.csv",
 		"impact_person_trips_base.csv", "impact_person_trips_policy.csv", "impact_person_trips_difference.csv",
 		"impact_person_distance_base.csv", "impact_person_distance_policy.csv", "impact_person_distance_difference.csv",
 		"impact_person_time_base.csv", "impact_person_time_policy.csv", "impact_person_time_difference.csv",
@@ -56,6 +57,7 @@ import java.util.Map;
 )
 public class ImpactDashboardTables implements MATSimAppCommand {
 	private static final String WORD_JOINER = "\u2060";
+	private static final List<String> DISPLAY_POLLUTANTS = List.of("CO2_TOTAL", "NOx", "CO", "HC", "PM", "SO2");
 
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(ImpactDashboardTables.class);
@@ -70,6 +72,7 @@ public class ImpactDashboardTables implements MATSimAppCommand {
 	public Integer call() throws Exception {
 		List<ImpactRecord> records = read(Path.of(input.getPath(ImpactAnalysis.class, "impact.csv")));
 		writeModeTables(records, output.getPath("impact_person_trips.csv").getParent());
+		writeOverviewTable(records, output.getPath("impact_overview.csv"));
 
 		writePeriodTables(records, "Personenverkehr", "Fahrten", output.getPath("impact_person_trips.csv"));
 		writePeriodTables(records, "Personenverkehr", "Verkehrsleistung Personen", output.getPath("impact_person_distance.csv"));
@@ -80,6 +83,7 @@ public class ImpactDashboardTables implements MATSimAppCommand {
 		writePeriodTables(records, "Emissionen", null, output.getPath("impact_emissions.csv"));
 
 		writeSectionTables(records, "Score", output.getPath("impact_scores.csv"));
+		writeAbsoluteScoreTable(records, output.getPath("impact_scores.csv"));
 		writeScoreTable(records, output.getPath("impact_scores.csv").resolveSibling("impact_scores_day.csv"), "day");
 		writeScoreTable(records, output.getPath("impact_scores.csv").resolveSibling("impact_scores_year.csv"), "year");
 		writeSectionTables(records, "Agentenvergleich", output.getPath("impact_agents.csv"));
@@ -96,6 +100,39 @@ public class ImpactDashboardTables implements MATSimAppCommand {
 		}
 	}
 
+	private void writeAbsoluteScoreTable(List<ImpactRecord> records, Path path) throws IOException {
+		writeAbsoluteTable(records.stream().filter(record -> record.section.equals("Score")).toList(), path, false);
+	}
+
+	private void writeOverviewTable(List<ImpactRecord> records, Path path) throws IOException {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
+			printer.printRecord("Category", "Mode", "Factor", "per Day", "Unit", "per Year", "Unit");
+			for (String mode : List.of("car", "truck", "freight", "bike", "pt")) {
+				List<ImpactRecord> modeRecords = records.stream().filter(record -> record.mode.equals(mode)).toList();
+				writeOverviewRows(printer, "Traffic / Physical Effects", mode,
+					modeRecords.stream().filter(record -> !record.section.equals("Emissionen")).toList(), false);
+			}
+			for (String mode : List.of("car", "truck", "freight", "bike", "pt")) {
+				writeOverviewRows(printer, "Emissions", mode,
+					records.stream().filter(record -> record.mode.equals(mode) && record.section.equals("Emissionen")
+						&& DISPLAY_POLLUTANTS.contains(record.metric)).toList(), true);
+			}
+			writeOverviewRows(printer, "Score", "all",
+				records.stream().filter(record -> record.section.equals("Score")
+					&& !record.metric.equals("Personen mit ausgefuehrtem Score")).toList(), false);
+		}
+	}
+
+	private void writeOverviewRows(CSVPrinter printer, String category, String mode,
+			List<ImpactRecord> records, boolean emissions) throws IOException {
+		Map<String, PeriodValues> rows = absoluteRows(records, emissions);
+		for (Map.Entry<String, PeriodValues> row : rows.entrySet()) {
+			PeriodValues values = row.getValue();
+			printer.printRecord(category, mode, row.getKey(), valueOrPlaceholder(values.day),
+				valueOrPlaceholder(values.dayUnit), valueOrPlaceholder(values.year), valueOrPlaceholder(values.yearUnit));
+		}
+	}
+
 	private void writeModeTables(List<ImpactRecord> records, Path directory) throws IOException {
 		Map<String, List<ImpactRecord>> modes = new LinkedHashMap<>();
 		for (ImpactRecord record : records) {
@@ -104,11 +141,45 @@ public class ImpactDashboardTables implements MATSimAppCommand {
 		}
 		for (Map.Entry<String, List<ImpactRecord>> entry : modes.entrySet()) {
 			String mode = entry.getKey();
+			writeAbsoluteTable(entry.getValue().stream().filter(record -> !record.section.equals("Emissionen")).toList(),
+				directory.resolve("impact_general_" + mode + ".csv"), false);
+			writeAbsoluteTable(entry.getValue().stream().filter(record -> record.section.equals("Emissionen")).toList(),
+				directory.resolve("impact_emissions_" + mode + ".csv"), true);
 			for (String period : List.of("day", "year")) {
 				writeModeTable(entry.getValue(), directory.resolve("impact_general_" + mode + "_" + period + ".csv"), false, period);
 				writeModeTable(entry.getValue(), directory.resolve("impact_emissions_" + mode + "_" + period + ".csv"), true, period);
 			}
 		}
+	}
+
+	private void writeAbsoluteTable(List<ImpactRecord> records, Path path, boolean emissions) throws IOException {
+		Map<String, PeriodValues> rows = absoluteRows(records, emissions);
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
+			printer.printRecord("Factor", "per Day", "per Year", "Unit");
+			for (Map.Entry<String, PeriodValues> row : rows.entrySet()) {
+				PeriodValues values = row.getValue();
+				printer.printRecord(row.getKey(), valueOrPlaceholder(values.day), valueOrPlaceholder(values.year), unitLabel(values));
+			}
+		}
+	}
+
+	private Map<String, PeriodValues> absoluteRows(List<ImpactRecord> records, boolean emissions) {
+		Map<String, PeriodValues> rows = new LinkedHashMap<>();
+		for (ImpactRecord record : records) {
+			String factor = emissions ? pollutantName(record.metric) : factorName(record.metric);
+			if (!emissions && record.section.equals("Score")) factor = scoreFactor(record.metric);
+			if (factor == null) continue;
+			PeriodValues values = rows.computeIfAbsent(factor, ignored -> new PeriodValues());
+			String value = record.scenario.isBlank() ? "–" : formatWithGrouping(record.scenario, emissions ? 3 : 2);
+			if (record.period.equals("day")) {
+				values.day = value;
+				values.dayUnit = englishUnit(record.unit);
+			} else {
+				values.year = value;
+				values.yearUnit = englishUnit(record.unit);
+			}
+		}
+		return rows;
 	}
 
 	private void writeModeTable(List<ImpactRecord> records, Path path, boolean emissions, String period) throws IOException {
@@ -127,19 +198,27 @@ public class ImpactDashboardTables implements MATSimAppCommand {
 	private int factorOrder(String factor) {
 		if (factor == null) return 99;
 		return switch (factor) {
-			case "Vehicle Volume" -> 0;
-			case "Vehicle Operating Times (≤ 50 km)" -> 1;
-			case "Vehicle Operating Times (> 50 km)" -> 2;
-			case "Vehicle Operating Times" -> 3;
-			case "Travel Distance" -> 4;
+			case "Trips" -> 0;
+			case "Person Travel Distance", "Travel Distance" -> 1;
+			case "Person Travel Time", "Travel Time" -> 2;
+			case "Vehicle Volume" -> 3;
+			case "Vehicle Travel Distance" -> 4;
+			case "Vehicle Operating Times (≤ 50 km)" -> 5;
+			case "Vehicle Operating Times (> 50 km)" -> 6;
+			case "Vehicle Operating Times" -> 7;
 			default -> 99;
 		};
 	}
 
 	private String factorName(String metric) {
 		return switch (metric) {
+			case "Fahrten" -> "Trips";
+			case "Verkehrsleistung Personen" -> "Person Travel Distance";
+			case "Reisezeit Personen" -> "Person Travel Time";
+			case "Zurueckgelegte Distanz" -> "Travel Distance";
+			case "Reisezeit" -> "Travel Time";
 			case "Fahrzeugfahrten" -> "Vehicle Volume";
-			case "Fahrzeugverkehrsleistung" -> "Travel Distance";
+			case "Fahrzeugverkehrsleistung" -> "Vehicle Travel Distance";
 		case "Vehicle Operating Times (≤ 50 km)", "Vehicle Operating Times (> 50 km)", "Vehicle Operating Times" -> metric;
 		default -> null;
 		};
@@ -168,6 +247,7 @@ public class ImpactDashboardTables implements MATSimAppCommand {
 			case "Personen mit ausgefuehrtem Score" -> "Persons with executed score";
 			case "Summe ausgefuehrter Score" -> "Total executed score";
 			case "Mittlerer ausgefuehrter Score" -> "Mean executed score";
+			case "Monetarisierter ausgefuehrter Score" -> "Monetized executed score";
 			default -> metric;
 		};
 	}
@@ -287,6 +367,10 @@ public class ImpactDashboardTables implements MATSimAppCommand {
 	private String format(String value, int decimals) {
 		// Keep trailing zeroes in SimWrapper. Its CSV reader otherwise converts the display value back to a number.
 		return String.format(Locale.US, "%." + decimals + "f", Double.parseDouble(value)) + WORD_JOINER;
+	}
+
+	private String formatWithGrouping(String value, int decimals) {
+		return String.format(Locale.US, "%,." + decimals + "f", Double.parseDouble(value)) + WORD_JOINER;
 	}
 
 	private String valueOrPlaceholder(String value) {

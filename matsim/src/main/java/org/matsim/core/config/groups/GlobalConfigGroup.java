@@ -150,14 +150,16 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		return this.relativeToleranceForSampleSizeFactors;
 	}
 	// ---
+	private static final String BASE_CASE_PATH_NAME = "baseCasePathName";
 	private String baseCasePathName;
-//	@StringGetter( "pathToBaseCase" )
+	@StringGetter(BASE_CASE_PATH_NAME)
 	public String getBaseCasePathName() {
 		return baseCasePathName;
 	}
-//	@StringSetter("pathToBaseCase")
-	public void setBaseCasePathName( String str ) {
-		baseCasePathName = str;
+	@StringSetter(BASE_CASE_PATH_NAME)
+	public GlobalConfigGroup setBaseCasePathName(String baseCasePathName) {
+		this.baseCasePathName = baseCasePathName;
+		return this;
 	}
 	// ===
 	@Override protected void checkConsistency( Config config ){

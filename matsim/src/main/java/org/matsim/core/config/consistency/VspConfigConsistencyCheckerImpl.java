@@ -169,6 +169,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			System.out.flush();
 			log.log(lvl, "you are insisting on config v1.  vsp default is using v2.");
 		}
+		if (config.global().getBaseCasePathName() != null && config.global().getBaseCasePathName().isBlank()) {
+			problem = true;
+			System.out.flush();
+			log.log(lvl, "global.baseCasePathName is blank. Omit it for a base case or set it to the output directory of the base case.");
+		}
 		return problem;
 	}
 

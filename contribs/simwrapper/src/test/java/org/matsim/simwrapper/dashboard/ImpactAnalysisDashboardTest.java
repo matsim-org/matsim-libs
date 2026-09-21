@@ -3,6 +3,10 @@ package org.matsim.simwrapper.dashboard;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.simwrapper.Dashboard;
+import org.matsim.simwrapper.DefaultDashboardProvider;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -44,30 +48,27 @@ class ImpactAnalysisDashboardTest {
 		Assertions.assertThat(dashboard)
 			.exists()
 			.content()
-			.contains("title: Wirkungsanalyse")
-			.contains("Absolute Szenariowirkungen")
-			.contains("title: Fahrten")
+			.contains("title: Impact Analysis")
+			.contains("Absolute traffic, physical and environmental impacts of the scenario.")
+			.contains("title: \"Traffic, Physical and Environmental Effects\"")
 			.contains("type: csv")
-			.contains("dataset: analysis/impact/impact_person_trips_base.csv")
-			.contains("dataset: analysis/impact/impact_person_distance_policy.csv")
-			.contains("dataset: analysis/impact/impact_freight_time_difference.csv")
-			.contains("title: Emissionen")
-			.contains("dataset: analysis/impact/impact_emissions_base.csv")
-			.contains("title: Agentenvergleich")
-			.contains("title: Nutzen-Kosten-Analyse");
+			.contains("dataset: analysis/impact/impact_overview.csv")
+			.contains("height: 15.0");
 
-		Assertions.assertThat(runDirectory.resolve("analysis/impact/impact_person_trips_policy.csv"))
+		Assertions.assertThat(runDirectory.resolve("analysis/impact/impact_overview.csv"))
 			.exists()
 			.content()
-			.contains("Modus,Fahrten pro Tag,Fahrten pro Jahr")
-			.contains("car,1\u2060,334\u2060")
-			.doesNotContain("freight");
+			.contains("Category,Mode,Factor,per Day,Unit,per Year,Unit")
+			.contains("Traffic / Physical Effects,car,Trips,1.00\u2060,trips/day,334.00\u2060,trips/year")
+			.contains("Traffic / Physical Effects,freight,Trips,1.00\u2060,trips/day,302.00\u2060,trips/year")
+			.contains("Score,all,Monetized executed score,15.00\u2060,monetary units/day,\"5,010.00\u2060\",monetary units/year")
+			.doesNotContain("Persons with executed score");
 
 		Assertions.assertThat(impact)
 			.exists()
 			.content()
 			.contains("section,metric,component,mode,period,unit,reference,scenario,difference,relative_change,status,source")
-			.contains("Personenverkehr,Reisezeit Personen,Reisezeit Personen,car,year,Mio. Personen-h/a")
+			.contains("Personenverkehr,Reisezeit Personen,Reisezeit Personen,car,year,million person-hours/year")
 			.contains("Score,Summe ausgefuehrter Score")
 			.contains("missing_emissions")
 			.contains("missing_investment_cost");
@@ -100,7 +101,14 @@ class ImpactAnalysisDashboardTest {
 				"""
 		);
 
-		SimWrapper sw = SimWrapper.create().addDashboard(new ImpactAnalysisDashboard(referenceDirectory));
+		Config config = ConfigUtils.createConfig();
+		config.global().setBaseCasePathName(referenceDirectory.toString());
+		SimWrapper sw = SimWrapper.create(config);
+		Dashboard impactDashboard = new DefaultDashboardProvider().getDashboards(config, sw).stream()
+			.filter(ImpactAnalysisDashboard.class::isInstance)
+			.findFirst()
+			.orElseThrow();
+		sw.addDashboard(impactDashboard);
 		sw.generate(scenarioDirectory);
 		sw.run(scenarioDirectory);
 
@@ -109,19 +117,19 @@ class ImpactAnalysisDashboardTest {
 
 		Assertions.assertThat(dashboard)
 			.content()
-			.contains("Szenario und Bezugsfall")
-			.contains("Szenario minus Bezugsfall");
+			.contains("Absolute impacts of the policy case and changes relative to the base")
+			.contains("case.")
+			.contains("dataset: analysis/impact/impact_overview.csv");
 
 		Assertions.assertThat(impact)
 			.content()
-			.contains("Personenverkehr,Verkehrsleistung Personen,Verkehrsleistung Personen,car,year,Mio. Personen-km/a,0.003340,0.002672,-0.000668")
+			.contains("Personenverkehr,Verkehrsleistung Personen,Verkehrsleistung Personen,car,year,million person-km/year,0.003340,0.002672,-0.000668")
 			.contains("Agentenvergleich,Verbleiber")
 			.contains("Agentenvergleich,Mittlere Scoredifferenz gemeinsamer Personen");
 
-		Assertions.assertThat(scenarioDirectory.resolve("analysis/impact/impact_person_distance_policy.csv"))
+		Assertions.assertThat(scenarioDirectory.resolve("analysis/impact/impact_overview.csv"))
 			.content()
-			.contains("Modus,Verkehrsleistung Personen (pkm/Tag),Verkehrsleistung Personen (Mio. pkm/Jahr)")
-			.contains("car,8.000\u2060,0.003\u2060");
+			.contains("Traffic / Physical Effects,car,Person Travel Distance,8.00\u2060,person-km/day,0.00\u2060,mio. person-km/year");
 	}
 
 	private void writeRunInputs(Path runDirectory, String legs, String trips) throws IOException {

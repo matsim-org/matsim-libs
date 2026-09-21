@@ -34,6 +34,7 @@ class ImpactAnalysisTest {
 			"--run-directory", policy.toString(),
 			"--reference-run-directory", reference.toString(),
 			"--sample-size", "0.5",
+			"--marginal-utility-of-money", "2.0",
 			"--output-impact", output.toString()
 		);
 
@@ -42,6 +43,8 @@ class ImpactAnalysisTest {
 			.contains("Nur im Bezugsfall")
 			.contains("Nur im Szenario")
 			.contains("Hochrechnungsfaktor Szenario")
+			.contains("Monetarisierter ausgefuehrter Score,Monetarisierter ausgefuehrter Score,all,day,monetary units/day,20.000000,22.000000")
+			.contains("Monetarisierter ausgefuehrter Score,Monetarisierter ausgefuehrter Score,all,year,monetary units/year,6680.000000,7348.000000")
 			.contains("Mittlere Scoredifferenz gemeinsamer Personen,all,day,utils/Person,0.000000,2.000000,2.000000");
 	}
 

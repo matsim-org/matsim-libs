@@ -22,7 +22,7 @@ public class DefaultDashboardProvider implements DashboardProvider {
 			new OverviewDashboard(Set.copyOf(config.qsim().getMainModes())),
 			new TripDashboard(),
 			new TrafficDashboard(Set.copyOf(config.qsim().getMainModes())),
-			new ImpactAnalysisDashboard()
+			new ImpactAnalysisDashboard(null, config.global().getBaseCasePathName(), config.scoring().getMarginalUtilityOfMoney())
 		));
 
 		if (config.transit().isUseTransit()) {
