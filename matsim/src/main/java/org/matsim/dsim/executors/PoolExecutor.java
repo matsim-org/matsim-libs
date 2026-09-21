@@ -43,7 +43,7 @@ public final class PoolExecutor implements LPExecutor {
 	public PoolExecutor(MessageTypeRegistry registry, DSimConfigGroup config) {
 		this.registry = registry;
 		var size = config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads();
-		Supplier<IdleStrategy> idleStrategyFactory = switch (config.getThreadScheduling()) {
+		Supplier<IdleStrategy> idleStrategyFactory = switch (config.getTaskScheduling()) {
 			case eager -> BusySpinIdleStrategy::new;
 			case backoff -> BackoffIdleStrategy::new;
 		};
