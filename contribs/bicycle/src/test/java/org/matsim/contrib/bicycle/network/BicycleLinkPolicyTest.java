@@ -163,6 +163,23 @@ public class BicycleLinkPolicyTest {
 		assertTrue(link.getAllowedModes().contains(TransportMode.car), "car is kept");
 	}
 
+	/**
+	 * Regression for the drift between the two build paths. This link used to survive
+	 * here as a car-only link, because {@code bicycle=no} was evaluated before
+	 * {@code access} and returned straight after; the SUMO path dropped the same way.
+	 * {@code bicycle=no} is not a permission, so it never lifts the restriction.
+	 *
+	 * @see BicycleAccessRulesTest#accessRestrictedAndBicycleNo_isDropped()
+	 */
+	@Test
+	void accessPrivateAndBicycleNo_isDropped() {
+		Link link = link("1f");
+		link.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
+		policy.apply(link, tags("highway", "service", "access", "private", "bicycle", "no"),
+			OsmWayDirection.FORWARD);
+		assertTrue(link.getAllowedModes().isEmpty(), "bicycle=no does not lift access=private");
+	}
+
 	// =========================================================================
 	// service=parking_aisle drop
 	// =========================================================================
@@ -255,6 +272,22 @@ public class BicycleLinkPolicyTest {
 		Link link = link("1f");
 		DROPS_MINOR.apply(link, tags("highway", "track"), OsmWayDirection.FORWARD);
 		assertTrue(link.getAllowedModes().isEmpty(), "a plain field track goes");
+	}
+
+	/**
+	 * The other half of the same regression: the early return after {@code bicycle=no}
+	 * used to keep this rule from running at all, so the track stayed on the OSM path
+	 * while the SUMO path discarded it. A track with no infrastructure that forbids
+	 * cycling is exactly what the option is meant to remove.
+	 *
+	 * @see BicycleAccessRulesTest#minorWayWithBicycleNo_isDropped()
+	 */
+	@Test
+	void minorWayWithBicycleNo_isDropped() {
+		Link link = link("1f");
+		link.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike));
+		DROPS_MINOR.apply(link, tags("highway", "track", "bicycle", "no"), OsmWayDirection.FORWARD);
+		assertTrue(link.getAllowedModes().isEmpty(), "bicycle=no must not spare an infra-less track");
 	}
 
 	/**

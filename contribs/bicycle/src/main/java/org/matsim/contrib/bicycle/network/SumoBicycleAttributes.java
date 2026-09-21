@@ -65,19 +65,8 @@ import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_AREA;
 import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA;
 import static org.matsim.contrib.bicycle.BicycleUtils.BICYCLE_INFRA_MIXED;
 import static org.matsim.contrib.bicycle.BicycleUtils.OSM_PREFIX;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.ACCESS;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.ACCESS_RESTRICTED;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.BICYCLE;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.DESIGNATED;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.HIGHWAY;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.HW_FOOTWAY;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.HW_PEDESTRIAN;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.NO;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.PRIVATE;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.SERVICE;
 import static org.matsim.contrib.bicycle.network.BicycleOsmTags.SURFACE;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.SV_PARKING_AISLE;
-import static org.matsim.contrib.bicycle.network.BicycleOsmTags.YES;
 
 /**
  * Attaches cycling infrastructure categories, OSM tags and elevation metrics to a
@@ -722,7 +711,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * The access rules, ported from {@link BicycleLinkPolicy}.
+	 * Applies {@link BicycleAccessRules} — the same rule order the Supersonic path uses —
+	 * to a link and counts what it removed.
 	 *
 	 * <p>netconvert covers some of these itself, but not reliably: on real extracts links
 	 * with {@code access=no} and no bicycle override survive (mostly {@code highway=service}),
@@ -733,84 +723,37 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 *
 	 * <p>"Drop" empties the modes and zeroes the capacity; {@code cleanNetwork} prunes
 	 * the link afterwards. On a merged link a single offending way is enough — half a
-	 * parking aisle is not a through route.
+	 * parking aisle is not a through route. The one rule that instead wants ALL ways to
+	 * agree is {@code --drop-ways-without-infra}; {@link BicycleAccessRules} explains why.
+	 * (Measured on Dresden: netconvert merges different highway types into one link
+	 * exactly 6 times in 557 339, and those carry a cycleway and so never classify as
+	 * NONE — but the asymmetry is free, and it keeps the rule honest if netconvert
+	 * settings change.)
 	 */
 	private static void applyRestPolicy(Link link, List<Map<String, String>> ways,
 										BicycleInfraCategory infra, Params params, Stats stats) {
 
-		if (ways.stream().anyMatch(t -> SV_PARKING_AISLE.equals(t.get(SERVICE)))) {
-			drop(link);
-			stats.droppedParkingAisle++;
-			return;
-		}
-
-		if (ways.stream().anyMatch(SumoBicycleAttributes::isAccessRestricted)) {
-			drop(link);
-			stats.droppedRestrictedAccess++;
-			return;
-		}
-
-		if (ways.stream().anyMatch(SumoBicycleAttributes::isFootwayWithoutBikePermission)) {
-			drop(link);
-			stats.droppedFootwayWithoutBike++;
-			return;
-		}
+		BicycleAccessRules.Verdict verdict =
+			BicycleAccessRules.evaluate(ways, infra, params.dropWaysWithoutInfra());
 
 		// bicycle=no forbids cycling but leaves the road open to everything else, so a
 		// highway=primary survives as a car link rather than disappearing.
-		if (ways.stream().anyMatch(t -> NO.equals(t.get(BICYCLE)))
-			&& link.getAllowedModes().contains(TransportMode.bike)) {
+		if (verdict.bikeForbidden() && link.getAllowedModes().contains(TransportMode.bike)) {
 			Set<String> modes = new HashSet<>(link.getAllowedModes());
 			modes.remove(TransportMode.bike);
 			link.setAllowedModes(modes);
 			stats.bikeModeRemoved++;
 		}
 
-		// --drop-ways-without-infra, last so the more specific reasons keep their counters.
-		// Unlike the rules above this one wants ALL ways to be a minor type: a link merged
-		// from a track and a residential road is half a real road, and dropping it on the
-		// strength of the track half would be wrong. (Measured on Dresden: netconvert
-		// merges different highway types into one link exactly 6 times in 557 339, and
-		// those carry a cycleway and so never classify as NONE -- but the asymmetry is
-		// free, and it keeps the rule honest if netconvert settings change.)
-		if (isMinorWayWithoutInfra(ways, infra, params)) {
+		if (verdict.dropped()) {
 			drop(link);
-			stats.droppedMinorWayWithoutInfra++;
+			switch (verdict.dropReason()) {
+				case PARKING_AISLE -> stats.droppedParkingAisle++;
+				case ACCESS_RESTRICTED -> stats.droppedRestrictedAccess++;
+				case FOOTWAY_WITHOUT_BIKE -> stats.droppedFootwayWithoutBike++;
+				case MINOR_WAY_WITHOUT_INFRA -> stats.droppedMinorWayWithoutInfra++;
+			}
 		}
-	}
-
-	/**
-	 * Merged-link variant of {@link BicycleLinkPolicy}'s minor-way rule: here EVERY way
-	 * behind the link must be one of the {@code --drop-ways-without-infra} types, the
-	 * link must have classified as {@code NONE}, and no way may carry a bicycle-specific
-	 * permission. The policy's javadoc explains why the two guard conditions exist.
-	 */
-	private static boolean isMinorWayWithoutInfra(List<Map<String, String>> ways,
-												  BicycleInfraCategory infra, Params params) {
-		if (params.dropWaysWithoutInfra().isEmpty() || infra != BicycleInfraCategory.NONE) return false;
-		if (ways.stream().anyMatch(SumoBicycleAttributes::bicycleExplicitlyAllowed)) return false;
-		return ways.stream().allMatch(t -> params.dropWaysWithoutInfra().contains(t.get(HIGHWAY)));
-	}
-
-	/**
-	 * A restricted general {@code access} without a bicycle-specific permission
-	 * overriding it. Same predicate as {@link BicycleLinkPolicy}.
-	 */
-	private static boolean isAccessRestricted(Map<String, String> tags) {
-		String access = tags.get(ACCESS);
-		boolean restricted = access != null && ACCESS_RESTRICTED.contains(access);
-		return restricted && !bicycleExplicitlyAllowed(tags);
-	}
-
-	private static boolean isFootwayWithoutBikePermission(Map<String, String> tags) {
-		String highway = tags.get(HIGHWAY);
-		return (HW_FOOTWAY.equals(highway) || HW_PEDESTRIAN.equals(highway)) && !bicycleExplicitlyAllowed(tags);
-	}
-
-	/** OSM: the more specific tag wins over the general restriction. */
-	private static boolean bicycleExplicitlyAllowed(Map<String, String> tags) {
-		String bicycle = tags.get(BICYCLE);
-		return YES.equals(bicycle) || DESIGNATED.equals(bicycle);
 	}
 
 	private static void drop(Link link) {
