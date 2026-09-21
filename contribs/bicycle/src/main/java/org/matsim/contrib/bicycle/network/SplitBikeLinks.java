@@ -192,6 +192,13 @@ public class SplitBikeLinks implements MATSimAppCommand {
 	@Override
 	public Integer call() {
 
+		// Resolved before the write below, not after: companion() rejects an --output
+		// that carries no ".xml", and such a path would resolve to the network file
+		// itself -- the geometry CSV would land on top of the network just written.
+		Path geometryOut = linkGeometries != null
+			? SumoBicycleAttributes.companion(output, "-linkGeometries.csv")
+			: null;
+
 		Network network = NetworkUtils.createNetwork();
 		NetworkUtils.readNetwork(network, networkFile.toString());
 		log.info("Read network: {} nodes, {} links", network.getNodes().size(), network.getLinks().size());
@@ -201,9 +208,8 @@ public class SplitBikeLinks implements MATSimAppCommand {
 		new NetworkWriter(network).write(output.toString());
 		log.info("Wrote {} links to {}", network.getLinks().size(), output);
 
-		if (linkGeometries != null) {
-			Path out = SumoBicycleAttributes.companion(output, "-linkGeometries.csv");
-			extendGeometries(linkGeometries, out, pairs);
+		if (geometryOut != null) {
+			extendGeometries(linkGeometries, geometryOut, pairs);
 		}
 
 		return 0;

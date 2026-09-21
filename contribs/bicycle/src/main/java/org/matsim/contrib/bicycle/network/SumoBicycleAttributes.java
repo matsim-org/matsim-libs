@@ -175,6 +175,13 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 
 		demOptions.validate();
 
+		// Up front, before anything is read: companion() rejects an --output that carries
+		// no ".xml", and finding that out after the network is already on disk would mean
+		// finding it out too late.
+		Path geometryOut = companion(output, GEOMETRY_SUFFIX);
+		Path featureIn = companion(networkFile, FEATURE_SUFFIX);
+		Path featureOut = companion(output, FEATURE_SUFFIX);
+
 		Network network = NetworkUtils.readNetwork(networkFile.toString());
 		log.info("Read network: {} nodes, {} links", network.getNodes().size(), network.getLinks().size());
 
@@ -233,8 +240,8 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 		BicycleNetworkOps.logInfraDistribution(network, "in final network");
 
 		new NetworkWriter(network).write(output.toString());
-		writeGeometries(network, sumo, carry.shapes, companion(output, GEOMETRY_SUFFIX));
-		filterFeatures(network, carry.featureSource, companion(networkFile, FEATURE_SUFFIX), companion(output, FEATURE_SUFFIX));
+		writeGeometries(network, sumo, carry.shapes, geometryOut);
+		filterFeatures(network, carry.featureSource, featureIn, featureOut);
 		return 0;
 	}
 
@@ -248,11 +255,28 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 	 * the {@code .xml} stays put, so the companions inherit the network's own compression:
 	 * {@code net.xml.gz} gets {@code net-ft.csv.gz}, a plain {@code net.xml} plain CSVs.
 	 * {@link IOUtils} picks the codec from the extension when reading and writing them.
+	 *
+	 * <p>A name without {@code .xml} is rejected rather than passed through unchanged.
+	 * {@link NetworkWriter} accepts an {@code --output} such as {@code net.gz} without
+	 * complaint, and the companion path derived from it would come back <em>equal to the
+	 * network path</em> — the CSV would be written straight over the network file written
+	 * moments earlier, with nothing to indicate it. Only the last {@code .xml} is swapped,
+	 * so a name that happens to contain the string twice loses only its real extension.
+	 *
+	 * @throws IllegalArgumentException if the file name carries no {@code .xml}
 	 */
 	static Path companion(Path network, String suffix) {
-		String name = network.getFileName().toString().replace(".xml", suffix);
+		String name = network.getFileName().toString();
+		int xml = name.lastIndexOf(".xml");
+		if (xml < 0) {
+			throw new IllegalArgumentException("Cannot derive a companion file name from '" + name
+				+ "': a MATSim network file name has to contain '.xml', optionally followed by a "
+				+ "compression extension such as .gz or .zst. Without it the companion file would "
+				+ "be written over the network itself.");
+		}
+		String companion = name.substring(0, xml) + suffix + name.substring(xml + ".xml".length());
 		Path dir = network.getParent();
-		return dir != null ? dir.resolve(name) : Path.of(name);
+		return dir != null ? dir.resolve(companion) : Path.of(companion);
 	}
 
 	/**

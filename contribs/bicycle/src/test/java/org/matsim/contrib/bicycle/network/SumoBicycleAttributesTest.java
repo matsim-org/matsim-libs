@@ -277,17 +277,41 @@ public class SumoBicycleAttributesTest {
 		Path net = Path.of("in", "dresden.xml.gz");
 
 		// the companions inherit the network's compression, exactly like network-from-sumo:
-		// its .replace(".xml", suffix) leaves a trailing .gz in place
+		// only the ".xml" is swapped, so a trailing .gz stays in place
 		assertEquals(Path.of("in", "dresden-linkGeometries.csv.gz"),
 			SumoBicycleAttributes.companion(net, "-linkGeometries.csv"));
 		assertEquals(Path.of("in", "dresden-ft.csv.gz"),
 			SumoBicycleAttributes.companion(net, "-ft.csv"));
+
+		// .xml.zst is what both commands offer in their --output help
+		assertEquals(Path.of("in", "dresden-ft.csv.zst"),
+			SumoBicycleAttributes.companion(Path.of("in", "dresden.xml.zst"), "-ft.csv"));
 
 		// an uncompressed network gets uncompressed companions
 		assertEquals(Path.of("in", "dresden-linkGeometries.csv"),
 			SumoBicycleAttributes.companion(Path.of("in", "dresden.xml"), "-linkGeometries.csv"));
 		assertEquals(Path.of("in", "dresden-ft.csv"),
 			SumoBicycleAttributes.companion(Path.of("in", "dresden.xml"), "-ft.csv"));
+	}
+
+	/**
+	 * A file name without {@code .xml} used to pass through {@code String.replace}
+	 * unchanged, so the companion path came back <em>equal to the network path</em> and
+	 * the CSV was written over the network written moments earlier. {@code NetworkWriter}
+	 * accepts such an {@code --output} without complaint, so nothing else caught it.
+	 */
+	@Test
+	void rejectsAnOutputNameWithoutXml() {
+		IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+			() -> SumoBicycleAttributes.companion(Path.of("out", "net.gz"), "-ft.csv"));
+		assertTrue(e.getMessage().contains("net.gz"), "the message names the offending file");
+	}
+
+	/** Only the real extension is swapped, not every {@code .xml} the name happens to carry. */
+	@Test
+	void swapsOnlyTheLastXml() {
+		assertEquals(Path.of("in", "net.xml.backup-ft.csv.gz"),
+			SumoBicycleAttributes.companion(Path.of("in", "net.xml.backup.xml.gz"), "-ft.csv"));
 	}
 
 	/**
