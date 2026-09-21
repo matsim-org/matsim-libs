@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -124,9 +126,55 @@ public class ServiceLinkCleanerTest {
 	}
 
 
+	/**
+	 * Why both pipelines have to prune mode-less links <em>before</em> running this
+	 * cleaner.
+	 *
+	 * <p>The access rules only empty a dropped link's modes — the link stays in the
+	 * graph, keeps its {@code type=highway.service} and still joins its two nodes. This
+	 * cleaner knows nothing about modes, so a dropped driveway in the middle of a service
+	 * chain still ties the two halves together and saves both. Once the empty link is
+	 * pruned afterwards, what is left are two dangling stubs that nothing revisits.
+	 *
+	 * <p>Not a defect of this class: deciding what is in the graph is the caller's job.
+	 * The test pins the hazard so the ordering in both pipelines has a reason on record.
+	 */
+	@Test
+	void anEmptiedLinkStillHoldsItsServiceComponentTogether() {
+
+		Network withEmptied = serviceChainBetweenTwoRoads();
+		withEmptied.getLinks().get(Id.createLinkId("x->y")).setAllowedModes(Set.of());
+
+		assertEquals(0, new ServiceLinkCleaner().run(withEmptied),
+			"the emptied link still docks at two roads, so the whole chain looks like a shortcut");
+
+		Network pruned = serviceChainBetweenTwoRoads();
+		pruned.removeLink(Id.createLinkId("x->y"));
+
+		assertEquals(2, new ServiceLinkCleaner().run(pruned),
+			"pruned first, the chain falls into two one-docking-node stubs and both go");
+	}
+
 	// =========================================================================
 	// helpers
 	// =========================================================================
+
+	/** road a->b — service b->x->y->c — road c->d, i.e. a service chain with two docks. */
+	private static Network serviceChainBetweenTwoRoads() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node x = node(net, "x", 200, 0);
+		Node y = node(net, "y", 300, 0);
+		Node c = node(net, "c", 400, 0);
+		Node d = node(net, "d", 500, 0);
+		link(net, a, b, ROAD);
+		link(net, b, x, SERVICE);
+		link(net, x, y, SERVICE);
+		link(net, y, c, SERVICE);
+		link(net, c, d, ROAD);
+		return net;
+	}
 
 	private static Node node(Network net, String id, double x, double y) {
 		Node n = net.getFactory().createNode(Id.createNodeId(id), new Coord(x, y));

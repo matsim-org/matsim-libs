@@ -483,13 +483,24 @@ public class SumoBicycleAttributes implements MATSimAppCommand {
 			stats.classified++;
 		}
 
+		// The rest policy only empties a dropped link's modes; the link is still in the
+		// graph and still carries type=highway.service, and ServiceLinkCleaner knows
+		// nothing about modes. A dropped access=private driveway in the middle of a
+		// service chain would therefore still tie its two halves together and save both
+		// -- and once the empty link goes below, what is left are two dangling stubs the
+		// cleaner no longer looks at. The Supersonic path gets this for free, because its
+		// cleanNetwork runs before its own service cleanup; here a full clean would be a
+		// second per-mode pass over the whole network, which is the expensive part of the
+		// run. Dropping just the empty links is one linear pass and enough.
+		NetworkUtils.removeLinksWithoutModes(network);
+
 		int serviceLinksRemoved = new ServiceLinkCleaner().run(network);
 		log.info("Service-link cleanup removed {} link(s); {} remain.",
 			serviceLinksRemoved, network.getLinks().size());
 
-		// Picks up the links the rest policy emptied as well as anything the service
-		// cleanup disconnected. Before the elevation (and the simplify) on purpose:
-		// what dies here should neither block a merge nor burn elevation samples.
+		// Picks up whatever the service cleanup disconnected. Before the elevation (and
+		// the simplify) on purpose: what dies here should neither block a merge nor burn
+		// elevation samples.
 		//
 		// Every mode the network carries, not just car and bike: cleaning only some of
 		// them leaves the others with pieces outside their own largest component, which
