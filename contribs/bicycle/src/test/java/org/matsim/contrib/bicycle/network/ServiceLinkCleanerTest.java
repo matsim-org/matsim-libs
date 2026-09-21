@@ -156,6 +156,56 @@ public class ServiceLinkCleanerTest {
 	}
 
 	// =========================================================================
+	// compound SUMO types
+	// =========================================================================
+
+	/**
+	 * netconvert joins the SUMO types an edge carries into one id, so a service road that
+	 * buses may use arrives as {@code highway.service|psv}. Measured: 12 such links on
+	 * the NNK sample, 353 on Dresden — where 9 of them are {@code |railway.tram}, which
+	 * carry no rail mode either, just the road modes.
+	 */
+	@Test
+	void aCompoundTypeIsStillService() {
+		Network net = NetworkUtils.createNetwork();
+		Node main1 = node(net, "main1", 0, 0);
+		Node main2 = node(net, "main2", 100, 0);
+		Node dead = node(net, "dead", 100, 100);
+		link(net, main1, main2, ROAD);
+		link(net, main2, dead, "highway.service|psv");
+
+		assertEquals(1, new ServiceLinkCleaner().run(net));
+		assertFalse(net.getLinks().containsKey(Id.createLinkId("main2->dead")),
+			"a psv-tagged service stub is a dead end like any other");
+	}
+
+	/**
+	 * The second, larger half of the same bug: an unrecognised compound type did not just
+	 * escape cleaning, it counted as a <em>road</em> in {@code hasNonServiceIncidentLink}
+	 * and so turned its nodes into docking nodes — keeping the service cul-de-sac hanging
+	 * off it alive as an apparent shortcut between two roads.
+	 */
+	@Test
+	void aCompoundTypeIsNoDockingEvidence() {
+		Network net = NetworkUtils.createNetwork();
+		Node a = node(net, "a", 0, 0);
+		Node b = node(net, "b", 100, 0);
+		Node x = node(net, "x", 200, 0);
+		Node y = node(net, "y", 300, 0);
+		Node z = node(net, "z", 400, 0);
+		link(net, a, b, ROAD);
+		link(net, b, x, SERVICE);
+		link(net, x, y, "highway.service|psv");
+		link(net, y, z, SERVICE);
+
+		// One component of three service links docking at b only -- all of it goes.
+		// Read as a road, the compound link would have made x and y docking nodes, and
+		// b->x would have survived as a "connection" between the road and it.
+		assertEquals(3, new ServiceLinkCleaner().run(net),
+			"the whole cul-de-sac goes, compound link included");
+	}
+
+	// =========================================================================
 	// helpers
 	// =========================================================================
 

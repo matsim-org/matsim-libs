@@ -58,6 +58,9 @@ import java.util.Set;
  */
 public final class ServiceLinkCleaner {
 
+	/** What the SUMO path puts in front of the highway type; the OSM reader writes it bare. */
+	private static final String HIGHWAY_PREFIX = "highway.";
+
 	private final String typeAttribute;
 	private final String serviceValue;
 
@@ -124,7 +127,21 @@ public final class ServiceLinkCleaner {
 	private boolean isService(Link link) {
 		Object type = link.getAttributes().getAttribute(typeAttribute);
 		if (type == null) return false;
-		String s = type.toString().replaceFirst("^highway\\.", "");
+		String s = type.toString();
+
+		// Compound type such as "highway.service|psv": netconvert joins the SUMO types an
+		// edge carries into one id, and the highway type is the first component -- the
+		// same convention SumoNetworkHandler.Type follows for its own highway field.
+		// Without the split these read as neither service nor road: they were never
+		// cleaned, and worse, they counted as non-service evidence in
+		// hasNonServiceIncidentLink and so kept adjacent service components alive.
+		// Measured: 12 such links on the NNK sample, 353 on Dresden.
+		int bar = s.indexOf('|');
+		if (bar >= 0) s = s.substring(0, bar);
+
+		// startsWith/substring rather than replaceFirst, which compiles a Pattern per
+		// call -- this runs once per incident link in the BFS below.
+		if (s.startsWith(HIGHWAY_PREFIX)) s = s.substring(HIGHWAY_PREFIX.length());
 		return serviceValue.equals(s);
 	}
 
