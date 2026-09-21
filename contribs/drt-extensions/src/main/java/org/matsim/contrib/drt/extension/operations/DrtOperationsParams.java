@@ -8,6 +8,7 @@
  */
 package org.matsim.contrib.drt.extension.operations;
 
+import org.matsim.contrib.drt.extension.operations.remoteoperations.config.RemoteGuidanceParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
@@ -27,6 +28,9 @@ public class DrtOperationsParams extends ReflectiveConfigGroupWithConfigurablePa
 	@Nullable
 	private OperationFacilitiesParams operationFacilitiesParams;
 
+	@Nullable
+	private RemoteGuidanceParams remoteGuidanceParams;
+
 	public DrtOperationsParams() {
         super(SET_NAME);
 		initSingletonParameterSets();
@@ -39,6 +43,9 @@ public class DrtOperationsParams extends ReflectiveConfigGroupWithConfigurablePa
 		//operationFacilities (optional)
 		addDefinition(OperationFacilitiesParams.SET_NAME, OperationFacilitiesParams::new, () -> operationFacilitiesParams,
 				params -> operationFacilitiesParams = (OperationFacilitiesParams) params);
+		//remote guidance (optional)
+		addDefinition(RemoteGuidanceParams.SET_NAME, RemoteGuidanceParams::new, () -> remoteGuidanceParams,
+				params -> remoteGuidanceParams = (RemoteGuidanceParams) params);
 	}
 
 	public Optional<ShiftsParams> getShiftsParams() {
@@ -47,5 +54,9 @@ public class DrtOperationsParams extends ReflectiveConfigGroupWithConfigurablePa
 
 	public Optional<OperationFacilitiesParams> getOperationFacilitiesParams() {
 		return Optional.ofNullable(operationFacilitiesParams);
+	}
+
+	public Optional<RemoteGuidanceParams> getRemoteGuidanceParams() {
+		return Optional.ofNullable(remoteGuidanceParams);
 	}
 }

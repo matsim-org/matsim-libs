@@ -55,16 +55,17 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
 		int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
 		boolean createGraphs = createGraphsInterval >0 && event.getIteration() % createGraphsInterval == 0;
 
-		writeAndPlotShiftDurationComparison(shiftDurationXY.getShift2plannedVsActualDuration(),
+		Map<Id<DrtShift>, String> shift2Type = shiftDurationXY.getShift2Type();
+		writeAndPlotShiftDurationComparison(shiftDurationXY.getShift2plannedVsActualDuration(), shift2Type,
                 filename(event, "shiftDurationComparison", ".png"),
                 filename(event, "shiftDurationComparison", ".csv"),
                 createGraphs);
-        writeAndPlotBreakDurationComparison(shiftDurationXY.getShift2plannedVsActualBreakDuration(),
+        writeAndPlotBreakDurationComparison(shiftDurationXY.getShift2plannedVsActualBreakDuration(), shift2Type,
                 filename(event, "shiftBreakDurationComparison", ".png"),
                 filename(event, "shiftBreakDurationComparison", ".csv"),
                 createGraphs);
         writeAndPlotBreakTimesComparison(breakCorridorXY.getShift2plannedVsActualBreakStart(),
-                breakCorridorXY.getShift2plannedVsActualBreakEnd(),
+                breakCorridorXY.getShift2plannedVsActualBreakEnd(), shift2Type,
                 filename(event, "shiftBreakEndTimesComparison", ".png"),
                 filename(event, "shiftBreakEndTimesComparison", ".csv"),
                 createGraphs);
@@ -72,15 +73,17 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
 
     private void writeAndPlotBreakTimesComparison(Map<Id<DrtShift>, Tuple<Double, Double>> shift2plannedVsActualBreakStart,
                                                   Map<Id<DrtShift>, Tuple<Double, Double>> shift2plannedVsActualBreakEnd,
+                                                  Map<Id<DrtShift>, String> shift2Type,
                                                   String pngFile, String csvFile,
                                                   boolean createGraphs) {
         try (var bw = IOUtils.getBufferedWriter(csvFile)) {
             XYSeries times = new XYSeries("breakEndTimes", true, true);
-            bw.append(line("ShiftId", "earliestBreakStart", "latestBreakEnd", "actualStart", "actualEnd"));
+            bw.append(line("ShiftId", "shiftType", "earliestBreakStart", "latestBreakEnd", "actualStart", "actualEnd"));
             for (Map.Entry<Id<DrtShift>, Tuple<Double, Double>> entry: shift2plannedVsActualBreakStart.entrySet()) {
                 final Tuple<Double, Double> breakEndTuple = shift2plannedVsActualBreakEnd.get(entry.getKey());
                 if(breakEndTuple != null) {
-                    bw.append(line(entry.getKey(), entry.getValue().getFirst(), breakEndTuple.getFirst(),
+                    bw.append(line(entry.getKey(), shiftType(shift2Type, entry.getKey()),
+                            entry.getValue().getFirst(), breakEndTuple.getFirst(),
                             entry.getValue().getSecond(), breakEndTuple.getSecond()));
                     times.add(breakEndTuple.getFirst(), breakEndTuple.getSecond());
                 } else {
@@ -99,16 +102,17 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
     }
 
     private void writeAndPlotShiftDurationComparison(Map<Id<DrtShift>, Tuple<Double, Double>> shift2plannedVsActualDuration,
+                                                     Map<Id<DrtShift>, String> shift2Type,
                                                      String plotFilename, String csvFileName, boolean createGraphs) {
         try (var bw = IOUtils.getBufferedWriter(csvFileName)) {
             XYSeries times = new XYSeries("shiftDurations", true, true);
 
-            bw.append(line("ShiftId", "actualDuration", "plannedDuration", "deviate"));
+            bw.append(line("ShiftId", "shiftType", "actualDuration", "plannedDuration", "deviate"));
             for (Map.Entry<Id<DrtShift>, Tuple<Double, Double>> entry: shift2plannedVsActualDuration.entrySet()) {
 
                     double actualDuration = entry.getValue().getSecond();
                     double plannedDuration = entry.getValue().getFirst();
-                    bw.append(line(entry.getKey(), actualDuration, plannedDuration,
+                    bw.append(line(entry.getKey(), shiftType(shift2Type, entry.getKey()), actualDuration, plannedDuration,
                             actualDuration - plannedDuration));
                     times.add(actualDuration, plannedDuration);
 
@@ -125,16 +129,17 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
     }
 
     private void writeAndPlotBreakDurationComparison(Map<Id<DrtShift>, Tuple<Double, Double>> shift2plannedVsActualBreakDuration,
+                                                     Map<Id<DrtShift>, String> shift2Type,
                                                      String plotFilename, String csvFileName, boolean createGraphs) {
         try (var bw = IOUtils.getBufferedWriter(csvFileName)) {
             XYSeries times = new XYSeries("breakDurations", true, true);
 
-            bw.append(line("ShiftId", "actualDuration", "plannedDuration", "deviate"));
+            bw.append(line("ShiftId", "shiftType", "actualDuration", "plannedDuration", "deviate"));
             for (Map.Entry<Id<DrtShift>, Tuple<Double, Double>> entry: shift2plannedVsActualBreakDuration.entrySet()) {
 
                 double actualDuration = entry.getValue().getSecond();
                 double plannedDuration = entry.getValue().getFirst();
-                bw.append(line(entry.getKey(), actualDuration, plannedDuration,
+                bw.append(line(entry.getKey(), shiftType(shift2Type, entry.getKey()), actualDuration, plannedDuration,
                         actualDuration - plannedDuration));
                 times.add(actualDuration, plannedDuration);
 
@@ -153,6 +158,10 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
     private String filename(IterationEndsEvent event, String prefix, String extension) {
         return matsimServices.getControllerIO()
                 .getIterationFilename(event.getIteration(), prefix + "_" + drtConfigGroup.getMode() + extension);
+    }
+
+    private static String shiftType(Map<Id<DrtShift>, String> shift2Type, Id<DrtShift> shiftId) {
+        return shift2Type.getOrDefault(shiftId, "unspecified");
     }
 
 	private String line(Object... cells) {
