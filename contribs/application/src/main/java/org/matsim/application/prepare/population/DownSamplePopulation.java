@@ -8,6 +8,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import picocli.CommandLine;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -64,6 +66,12 @@ public class DownSamplePopulation implements MATSimAppCommand {
                 path = input.toString().replace(orig, String.format("%dpct", Math.round(sampleSize * 100)));
             else
                 path = input.toString().replace(".xml", String.format("-%dpct.xml", Math.round(sampleSize * 100)));
+
+//			if sampleSize is <= 0.1pct, the above returns "0pct". This would lead to overwriting the populations with multiple sample sizes of <= 0.1pct.
+			if (path.contains("0pct")) {
+				String notRounded =  String.valueOf(BigDecimal.valueOf(sampleSize * 100.).setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+				path = path.replace("0pct", String.format("%spct", notRounded));
+			}
 
             log.info("Writing {} sample to {}", sampleSize, path);
 
