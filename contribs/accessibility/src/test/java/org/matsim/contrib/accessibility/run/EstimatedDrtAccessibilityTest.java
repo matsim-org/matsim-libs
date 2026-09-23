@@ -281,15 +281,18 @@ public class EstimatedDrtAccessibilityTest {
 		// @ Measuring point (250,0):
 		// Access Walk: we expect agent to walk 250 to closest DRT stop (back to node 0)
 		// DRT trip is (3000m @ 2.7m/s) * 1.5 for detour factor alpha+ 30 second for detour factor beta  + waiting time of 300 seconds. We assume -12 (=-6 -6) utils/hr.
-		// Distance based disutility is 3000m x -.001 utils/m. (Note: for distance disutility we do not include detours)
+		// Distance based disutility is 3000m x -.001 utils/m * detour factor
+		// 		Note: for distance disutility we *do* include detour. the distance detour factor = rideTimeWithDetour/rideTimeWithoutDetour. Thus, this assumes that the detour factor for distance is analagous to the detour factor for time.
 		// Egress walk should be 400m x 1.3 (beeline factor) and walk speed of 0.83 m/s.
 		{
 			int x = 250;
 			Map<String, Double> accMap = accessibilitiesMap.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(new Coord(x, 0))).map(Map.Entry::getValue).findFirst().get();
 			double accessWalkUtility = 250 * walkBeelineFactor / walkSpeed / 3600 * -12;
 			// Note Method "addLink" in SpeedyGraphBuilder also rounds two 2 decimal places; if we don't do that, the difference exceeds our EPSILON
-			double drtTripTimeUtility = (Math.round(3000 / carSpeed * 100.) * 1.5 / 100. + 30 + drtWaitTime) / 3600 * -12;
-			double drtTripDistanceUtility = 3000 * -.001;
+			double rideTimeWithDetour = Math.round(3000 / carSpeed * 100.) * 1.5 / 100. + 30;
+			double rideTimeWithoutDetour = Math.round(3000 / carSpeed * 100.)/ 100.;
+			double drtTripTimeUtility = (rideTimeWithDetour + drtWaitTime) / 3600 * -12;
+			double drtTripDistanceUtility = 3000 * (rideTimeWithDetour/rideTimeWithoutDetour)*-.001;
 			double drtTripUtility = drtTripTimeUtility + drtTripDistanceUtility;
 			double egressWalkUtility = 400 * walkBeelineFactor / walkSpeed / 3600 * -12;
 
