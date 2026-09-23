@@ -89,7 +89,6 @@ public class EstimatedDrtAccessibilityTest {
 	public static double gapBtwnNodes = 1000.;
 	public double carSpeed = 50/3.6;
 
-
 	String emptyEventsFileName;
 
 	String congestedEventsFileName;
