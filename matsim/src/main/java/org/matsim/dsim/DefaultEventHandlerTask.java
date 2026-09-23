@@ -90,6 +90,7 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 
 	@Override
 	public void beforeExecution() {
+		super.beforeExecution();
 		phase.set(!phase.get());
 	}
 

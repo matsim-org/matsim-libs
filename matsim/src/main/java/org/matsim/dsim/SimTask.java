@@ -62,9 +62,28 @@ public sealed interface SimTask extends Runnable permits LPTask, EventHandlerTas
 	void setTime(double time);
 
 	/**
-	 * Return the runtime of the task.
+	 * Return the runtime of the task, aggregated into bins of {@link #RUNTIME_BIN_SIZE} simulation seconds.
+	 *
+	 * @see #addRuntime(LongList, double, long)
 	 */
 	LongList getRuntime();
+
+	/**
+	 * Size of the time bins in which runtimes are aggregated in simulation seconds.
+	 */
+	int RUNTIME_BIN_SIZE = 10;
+
+	/**
+	 * Add a runtime to the bin of the given simulation time. Bin {@code i} holds the runtimes of all executions at
+	 * simulation times in {@code (RUNTIME_BIN_SIZE * (i - 1), RUNTIME_BIN_SIZE * i]}.
+	 */
+	static void addRuntime(LongList runtimes, double time, long runtime) {
+		int bin = (int) Math.ceil(time / RUNTIME_BIN_SIZE);
+		while (runtimes.size() <= bin) {
+			runtimes.add(0);
+		}
+		runtimes.set(bin, runtimes.getLong(bin) + runtime);
+	}
 
 	/**
 	 * Avg runtime over last few executions.
