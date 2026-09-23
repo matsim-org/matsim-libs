@@ -674,7 +674,8 @@ public final class NetworkUtils {
 //		} else {
 //			throw new RuntimeException( "getType not possible for this implementation of interface Link" ) ;
 //		}
-		return (String) link.getAttributes().getAttribute(TYPE);
+		Object type = link.getAttributes().getAttribute(TYPE);
+		return type == null ? null : type.toString();
 	}
 
 	/**
@@ -722,7 +723,7 @@ public final class NetworkUtils {
 //		} else {
 //			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
 //		}
-		String o = (String) link.getAttributes().getAttribute(ORIGID);
+		Object o = link.getAttributes().getAttribute(ORIGID);
 		return o == null ? null : o.toString();
 	}
 
@@ -742,7 +743,6 @@ public final class NetworkUtils {
 	 */
 	public static Integer getPartition(Attributable obj) {
 		return (Integer) obj.getAttributes().getAttribute(NetworkPartitioning.ATTRIBUTE);
-
 	}
 
 	public static Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,

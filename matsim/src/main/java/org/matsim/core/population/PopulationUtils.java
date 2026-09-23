@@ -59,6 +59,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author nagel, ikaddoura
@@ -68,10 +69,7 @@ public final class PopulationUtils {
 	private static final PopulationFactory populationFactory = createPopulation(
 			new PlansConfigGroup(), null, null).getFactory();
 
-//	/**
-//	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
-//	 */
-//	@Deprecated
+
 	private static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
 
 
@@ -918,6 +916,7 @@ public final class PopulationUtils {
 		for( Plan inPlan : in.getPlans() ){
 			Plan outPlan = getFactory().createPlan();
 			copyFromTo( inPlan, outPlan );
+			out.addPlan(outPlan);
 		}
 	}
 
@@ -1200,6 +1199,19 @@ public final class PopulationUtils {
 	}
 
 	public static Coord decideOnCoordForActivity(Activity act, Scenario sc) {
+		return decideOnCoordForActivity(act, sc.getActivityFacilities(), sc.getNetwork(),
+				sc.getConfig().global().getRelativePositionOfEntryExitOnLink());
+	}
+
+	/**
+	 * Same as {@link #decideOnCoordForActivity(Activity, Scenario)}, for callers that only have the activity
+	 * facilities and network at hand, not a full {@link Scenario}.
+	 *
+	 * @param relativePositionOfEntryExitOnLink see {@link org.matsim.core.config.groups.GlobalConfigGroup#getRelativePositionOfEntryExitOnLink()},
+	 *        only used as a fallback when the activity has neither a facility nor a coordinate
+	 */
+	public static Coord decideOnCoordForActivity(Activity act, ActivityFacilities facilities, Network network,
+			double relativePositionOfEntryExitOnLink) {
 		Id<ActivityFacility> facilityId;
 		try {
 			facilityId = act.getFacilityId();
@@ -1209,7 +1221,7 @@ public final class PopulationUtils {
 		// some people prefer throwing exceptions over using null
 
 		if (facilityId != null) {
-			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get(facilityId);
+			final ActivityFacility facility = facilities.getFacilities().get(facilityId);
 			Gbl.assertNotNull(facility);
 			Gbl.assertNotNull(facility.getCoord());
 			return facility.getCoord();
@@ -1219,13 +1231,12 @@ public final class PopulationUtils {
 			return act.getCoord();
 		}
 
-		Gbl.assertNotNull(sc.getNetwork());
-		Link link = sc.getNetwork().getLinks().get(act.getLinkId());
+		Gbl.assertNotNull(network);
+		Link link = network.getLinks().get(act.getLinkId());
 		Gbl.assertNotNull(link);
 		Coord fromCoord = link.getFromNode().getCoord();
 		Coord toCoord = link.getToNode().getCoord();
-		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink();
-		return CoordUtils.interpolate(fromCoord, toCoord, rel);
+		return CoordUtils.interpolate(fromCoord, toCoord, relativePositionOfEntryExitOnLink);
 	}
 
 	/**
@@ -1323,6 +1334,16 @@ public final class PopulationUtils {
 
 	public static void removeSubpopulation(Person person) {
 		person.getAttributes().removeAttribute(SUBPOPULATION_ATTRIBUTE_NAME);
+	}
+
+	/**
+	 * Returns all non-null subpopulation names used by the population.
+	 */
+	public static Set<String> getSubpopulationsOfPopulation(Population population) {
+		return population.getPersons().values().stream()
+			.map(PopulationUtils::getSubpopulation)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
 	public static Population getOrCreateAllPersons(Scenario scenario) {

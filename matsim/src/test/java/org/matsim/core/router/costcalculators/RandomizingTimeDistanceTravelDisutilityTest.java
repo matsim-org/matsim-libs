@@ -87,7 +87,7 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 		ScoringConfigGroup planCalcScoreCfg = config.scoring();
 		ModeParams modeParams = new ModeParams(TransportMode.car);
 		modeParams.setMonetaryDistanceRate(-0.1);
-		planCalcScoreCfg.addModeParams(modeParams);
+		planCalcScoreCfg.addDefaultModeParams(modeParams);
 		config.routing().setRoutingRandomness( sigma );
 
 		RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config);

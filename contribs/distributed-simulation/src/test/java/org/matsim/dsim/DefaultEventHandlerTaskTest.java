@@ -13,6 +13,8 @@ import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.serialization.ForySerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.core.serialization.SerializationProvider;
 
 import java.util.ArrayList;
@@ -25,7 +27,8 @@ import static org.mockito.Mockito.when;
 
 class DefaultEventHandlerTaskTest {
 
-	private static final SerializationProvider serializer = SerializationProvider.getInstance();
+	private static final SerializationProvider serializer = new ForySerializationProvider(MessageTypeRegistry.getInstance());
+	private static final MessageTypeRegistry registry = MessageTypeRegistry.getInstance();
 
 	@Test
 	public void syncTimeStep() {
@@ -45,10 +48,10 @@ class DefaultEventHandlerTaskTest {
 		var em = mock(DistributedEventsManager.class);
 		when(em.getComputeNode()).thenReturn(computeNode);
 
-		var task1 = new DefaultEventHandlerTask(handler1, 0, 2, em, serializer, null);
+		var task1 = new DefaultEventHandlerTask(handler1, 0, 2, em, registry, null);
 		task1.setBroker(broker);
 		broker.register(task1, 0);
-		var task2 = new DefaultEventHandlerTask(handler2, 1, 2, em, serializer, null);
+		var task2 = new DefaultEventHandlerTask(handler2, 1, 2, em, registry, null);
 		task2.setBroker(broker);
 		broker.register(task2, 1);
 
@@ -104,10 +107,10 @@ class DefaultEventHandlerTaskTest {
 		var em = mock(DistributedEventsManager.class);
 		when(em.getComputeNode()).thenReturn(computeNode);
 
-		var task1 = new DefaultEventHandlerTask(handler1, 0, 2, em, serializer, null);
+		var task1 = new DefaultEventHandlerTask(handler1, 0, 2, em, registry, null);
 		task1.setBroker(broker);
 		broker.register(task1, 0);
-		var task2 = new DefaultEventHandlerTask(handler2, 1, 2, em, serializer, null);
+		var task2 = new DefaultEventHandlerTask(handler2, 1, 2, em, registry, null);
 		task2.setBroker(broker);
 		broker.register(task2, 1);
 

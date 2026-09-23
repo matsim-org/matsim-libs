@@ -38,7 +38,8 @@ public class ParkingCostModule extends AbstractModule {
 			Collection<String> mainModes = switch (getConfig().controller().getMobsim()) {
 				case "qsim" -> getConfig().qsim().getMainModes();
 				case "hermes" -> getConfig().hermes().getMainModes();
-				default -> throw new RuntimeException("ParkingCosts are currently supported for Qsim and Hermes");
+				case "dsim" -> getConfig().dsim().getNetworkModes();
+				default -> throw new RuntimeException("ParkingCosts are currently supported for Qsim, Hermes & Dsim");
 			};
 			for (String mode : parkingCostConfigGroup.getModesWithParkingCosts()) {
 				if (mainModes.contains(mode)) {

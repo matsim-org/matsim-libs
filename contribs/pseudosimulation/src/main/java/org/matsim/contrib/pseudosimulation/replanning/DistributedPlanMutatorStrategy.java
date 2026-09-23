@@ -1,7 +1,6 @@
 package org.matsim.contrib.pseudosimulation.replanning;
 
 import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -10,17 +9,14 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 
-import java.util.Map;
-
-
 /**
  * Created by fouriep on 4/16/15.
  */
 public class DistributedPlanMutatorStrategy implements PlanStrategy {
     private final char gene;
-    String delegateName;
-    PlanCatcher slave;
-    MatsimServices controler;
+    private final String delegateName;
+    private final PlanCatcher slave;
+    private final MatsimServices controler;
     private PlanStrategy delegate;
 
     public DistributedPlanMutatorStrategy(String delegateName, PlanCatcher slave, MatsimServices controler, char gene) {
@@ -35,7 +31,7 @@ public class DistributedPlanMutatorStrategy implements PlanStrategy {
     public void run(HasPlansAndId<Plan, Person> person) {
         delegate.run(person);
         slave.addPlansForPsim(person.getSelectedPlan());
-        //TODO: genometracking
+        // Genome mutation remains disabled here; enabling it would alter plan diagnostics.
     }
 
     @Override

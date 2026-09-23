@@ -245,7 +245,7 @@ public class EstimatedDrtAccessibilityTest {
 
 		Config config = createTestConfig(network);
 
-		config.scoring().getModes().get(TransportMode.drt).setMarginalUtilityOfDistance(-0.001);
+		config.scoring().getDefaultModeParams().get(TransportMode.drt).setMarginalUtilityOfDistance(-0.001);
 
 
 		// Create  Scenario
@@ -315,7 +315,7 @@ public class EstimatedDrtAccessibilityTest {
 
 		Config config = createTestConfig(network);
 
-		config.scoring().getModes().get(TransportMode.drt).setConstant(10);
+		config.scoring().getDefaultModeParams().get(TransportMode.drt).setConstant(10);
 
 
 		// Create  Scenario
@@ -426,7 +426,7 @@ public class EstimatedDrtAccessibilityTest {
 		// DRT
 		// DRT: Scoring Params
 		ScoringConfigGroup.ModeParams drtScoringParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
-		config.scoring().addModeParams(drtScoringParams);
+		config.scoring().addDefaultModeParams(drtScoringParams);
 
 		// DRT: DVRP Config Group
 		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );

@@ -78,7 +78,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 		//FastMultiNodeDijkstraFactory fastMultiNodeDijkstraFactory = new FastMultiNodeDijkstraFactory(true);
 		//this.multiNodePathCalculator = (MultiNodePathCalculator) fastMultiNodeDijkstraFactory.createPathCalculator(network, travelDisutility, travelTime);
 
-		betaWalkTT = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		betaWalkTT = scoringConfigGroup.getDefaultModeParams().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getDefaultPerforming_utils_hr();
 
 		this.walkSpeed_m_s = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
@@ -97,7 +97,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
         	modeSet.add(mode);
 		}
         filter.filter(subNetwork, modeSet);
-        if (subNetwork.getNodes().size() == 0) {
+        if (subNetwork.getNodes().isEmpty()) {
         	throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");
         }
 		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");

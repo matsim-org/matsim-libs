@@ -257,8 +257,8 @@ public class TrafficAnalysis implements MATSimAppCommand {
 
 				row.setDouble("excess_travel_time_index", calc.getLinkExcessTravelTimeIndex(link, startTime, endTime));
 
-				// as km/h
-				row.setDouble("avg_speed", calc.getAvgSpeed(link, startTime, endTime) * 3.6);
+				// Beforehand, the avg_speed was in km/h. That was very confusing. I (paul) set to m/s. paul, jul '26.
+				row.setDouble("avg_speed", calc.getAvgSpeed(link, startTime, endTime));
 
 				double capacity = link.getCapacity() * sample.getSample();
 				row.setDouble("road_capacity_utilization", vol[h] / capacity);

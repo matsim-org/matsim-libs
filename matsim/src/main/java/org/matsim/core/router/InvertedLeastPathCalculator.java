@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.LeastCostPathUtils.NoPathBehavior;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
@@ -107,5 +108,9 @@ class InvertedLeastPathCalculator implements LeastCostPathCalculator {
                     .get(Id.create(invLink.getToNode().getId(), Link.class));
             return linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time, person, vehicle);
         }
+    }
+
+    public void setNoPathBehavior(NoPathBehavior value) {
+        leastCostPathCalculator.setNoPathBehavior(value);
     }
 }

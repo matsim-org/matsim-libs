@@ -87,15 +87,15 @@ public class ReplanningWithConflictsTest {
 
 		ActivityParams genericActivityParams = new ActivityParams("generic");
 		genericActivityParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(genericActivityParams);
+		config.scoring().addDefaultActivityParams(genericActivityParams);
 
 		ModeParams unrestrictedModeParams = new ModeParams("unrestricted_mode");
 		unrestrictedModeParams.setConstant(0.0);
-		config.scoring().addModeParams(unrestrictedModeParams);
+		config.scoring().addDefaultModeParams(unrestrictedModeParams);
 
 		ModeParams restrictedModeParams = new ModeParams("restricted_mode");
 		restrictedModeParams.setConstant(1.0);
-		config.scoring().addModeParams(restrictedModeParams);
+		config.scoring().addDefaultModeParams(restrictedModeParams);
 
 		TeleportedModeParams unrestrictedRoutingParams = new TeleportedModeParams("unrestricted_mode");
 		unrestrictedRoutingParams.setTeleportedModeSpeed(1.0);

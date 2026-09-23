@@ -1,11 +1,14 @@
 package org.matsim.dsim.executors;
 
 import com.google.inject.Inject;
+import org.agrona.concurrent.BackoffIdleStrategy;
+import org.agrona.concurrent.BusySpinIdleStrategy;
+import org.agrona.concurrent.IdleStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.dsim.*;
 
 import java.util.ArrayList;
@@ -14,13 +17,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public final class PoolExecutor implements LPExecutor {
 
 	private static final Logger log = LogManager.getLogger(PoolExecutor.class);
 
-	private final BusyThreadpool executor;
-	private final SerializationProvider serializer;
+	private final DSimThreadpool executor;
+	private final MessageTypeRegistry registry;
 
 	/**
 	 * Executions from the current sim step.
@@ -36,10 +40,14 @@ public final class PoolExecutor implements LPExecutor {
 	private int step;
 
 	@Inject
-	public PoolExecutor(SerializationProvider serializer, DSimConfigGroup config) {
-		this.serializer = serializer;
+	public PoolExecutor(MessageTypeRegistry registry, DSimConfigGroup config) {
+		this.registry = registry;
 		var size = config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads();
-		this.executor = new BusyThreadpool(size);
+		Supplier<IdleStrategy> idleStrategyFactory = switch (config.getTaskScheduling()) {
+			case eager -> BusySpinIdleStrategy::new;
+			case backoff -> BackoffIdleStrategy::new;
+		};
+		this.executor = new DSimThreadpool(size, idleStrategyFactory);
 	}
 
 	/**
@@ -51,7 +59,7 @@ public final class PoolExecutor implements LPExecutor {
 
 	@Override
 	public LPTask register(LP lp, DistributedEventsManager manager, int part) {
-		LPTask task = new LPTask(lp, part, manager, serializer);
+		LPTask task = new LPTask(lp, part, manager, registry);
 		lpTasks.add(task);
 		allTasks.add(task);
 		return task;
@@ -59,7 +67,7 @@ public final class PoolExecutor implements LPExecutor {
 
 	@Override
 	public EventHandlerTask register(EventHandler handler, DistributedEventsManager em, int part, int totalParts, AtomicInteger counter) {
-		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, em, serializer, counter);
+		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, em, registry, counter);
 		eventHandlerTasks.add(task);
 		allTasks.add(task);
 		return task;

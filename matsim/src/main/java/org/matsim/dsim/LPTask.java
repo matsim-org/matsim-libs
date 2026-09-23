@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.core.mobsim.framework.Steppable;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 
 import java.lang.invoke.LambdaConversionException;
 import java.lang.reflect.Method;
@@ -75,13 +75,13 @@ public final class LPTask implements SimTask {
 	 */
 	private final AtomicBoolean phase = new AtomicBoolean(true);
 
-	public LPTask(LP lp, int partition, DistributedEventsManager manager, SerializationProvider serializer) {
+	public LPTask(LP lp, int partition, DistributedEventsManager manager, MessageTypeRegistry registry) {
 		this.lp = lp;
 		this.steppable = lp instanceof Steppable s ? s : null;
 		this.partition = partition;
 		this.manager = manager;
 
-		buildConsumers(serializer);
+		buildConsumers(registry);
 	}
 
 	@Override
@@ -100,14 +100,14 @@ public final class LPTask implements SimTask {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void buildConsumers(SerializationProvider serializer) {
+	private void buildConsumers(MessageTypeRegistry registry) {
 
 		for (Class<?> ifType : lp.getClass().getInterfaces()) {
 			if (MessageProcessor.class.isAssignableFrom(ifType)) {
 				Method[] methods = ifType.getDeclaredMethods();
 
 				Class<?> msgType = methods[0].getParameterTypes()[0];
-				int type = serializer.getType(msgType);
+				int type = registry.getType(msgType);
 
 				try {
 					consumers.put(type, (Consumer<Message>) LambdaUtils.createConsumer(lp, msgType, "process"));

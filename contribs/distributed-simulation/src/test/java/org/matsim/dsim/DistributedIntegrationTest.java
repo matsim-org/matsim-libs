@@ -139,7 +139,7 @@ public class DistributedIntegrationTest {
 
 			Scenario scenario = prepareScenario(local);
 
-			Controler controler = new Controler(scenario, DistributedContext.create(comm, local));
+			Controler controler = new Controler(scenario, DistributedContext.create(comm, local, new org.matsim.core.serialization.ForySerializationProvider(org.matsim.core.serialization.MessageTypeRegistry.getInstance())));
 
 			controler.run();
 

@@ -55,10 +55,15 @@ public class DrtDashboard implements Dashboard {
 			case door2door -> {
 				//TODO potentially show the entire drt network (all drt links have stops)
 			}
-			case serviceAreaBased ->
-//				drtConfigGroup.drtServiceAreaShapeFile can not be null, otherwise simulation crashed, earlier
+			case serviceAreaBased -> {
+//				either drtServiceAreaShapeFile or the service areas of the serviceRegimes is set, otherwise the
+//				simulation crashed earlier
+				String areaFile = drtConfigGroup.getDrtServiceAreaShapeFile() != null ?
+						drtConfigGroup.getDrtServiceAreaShapeFile() :
+						drtConfigGroup.getServiceRegimesParams().orElseThrow().getServiceAreaFile();
 				//this copies the input shape file into the output directory. might not be ideal. but the input file might be anywhere (web, different local partition, ...) and simwrapper might not have access....
-				args.addAll(List.of("--area-file", ConfigGroup.getInputFileURL(matsimConfigContext, drtConfigGroup.getDrtServiceAreaShapeFile()).toString()));
+				args.addAll(List.of("--area-file", ConfigGroup.getInputFileURL(matsimConfigContext, areaFile).toString()));
+			}
 		}
 
 		return data.compute(DrtAnalysisPostProcessing.class, file, args.toArray(new String[0]));

@@ -24,6 +24,8 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -61,11 +63,17 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.PURPOSE;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.SUBPOPULATION;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_ID;
+import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.TOUR_START_AREA;
+
 /**
  * @author Ricardo Ewert
  *
  */
 public class CommercialTrafficIT {
+	private static final Logger log = LogManager.getLogger( CommercialTrafficIT.class );
 
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
@@ -73,7 +81,7 @@ public class CommercialTrafficIT {
 	@Test
 	void testMainRunAndResults() {
 		String pathToConfig = utils.getPackageInputDirectory() + "config_demand.xml";
-		Path pathToDataDistributionToZones = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
+		Path pathToZoneAttributes = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
 		String pathToCommercialFacilities = "commercialFacilities.xml.gz";
 		String output = utils.getOutputDirectory();
 		String sample = "0.1";
@@ -88,25 +96,25 @@ public class CommercialTrafficIT {
 
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
 			pathToConfig,
-			"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
+			"--pathToZoneAttributes", pathToZoneAttributes.toString(),
 			"--pathToCommercialFacilities", pathToCommercialFacilities,
-			"--network", network,
 			"--sample", sample,
 			"--jspritIterations", jspritIterations,
 			"--creationOption", creationOption,
 			"--smallScaleCommercialTrafficType", smallScaleCommercialTrafficType,
-			"--additionalTravelBufferPerIterationInMinutes", "10",
 			"--includeExistingModels",
 			"--zoneShapeFileName", zoneShapeFileName,
 			"--zoneShapeFileNameColumn", zoneShapeFileNameColumn,
 			"--shapeCRS", shapeCRS,
 			"--nameOutputPopulation", resultPopulation,
-			"--pathOutput", output,
 			"--resistanceFactor_commercialPersonTraffic", "0.3",
 			"--resistanceFactor_goodsTraffic", "0.2",
 			"--MATSimIterationsAfterDemandGeneration", "0",
 			"--factorForTravelBufferCalculation", "1.2",
-			"--maxNumberOfLoopsForVRPSolving", "2");
+			"--maxNumberOfLoopsForVRPSolving", "2",
+			"--config:network.inputNetworkFile", network,
+			"--config:controller.outputDirectory", output
+			);
 
 		// test results of complete run before
 		Config config = ConfigUtils.createConfig();
@@ -116,7 +124,7 @@ public class CommercialTrafficIT {
 		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_unsolvedVRP.xml.gz";
 		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_solvedVRP.xml.gz";
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_vehicles.xml.gz");
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_carriersVehicleTypes.xml.gz");
 
 		freightCarriersConfigGroup.setCarriersFile(carriersWOSolutionFileLocation);
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioWOSolution);
@@ -125,10 +133,10 @@ public class CommercialTrafficIT {
 
 		for (Person person : population.getPersons().values()) {
 			Assertions.assertNotNull(person.getSelectedPlan());
-			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("tourStartArea"));
-			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("tourId"));
-			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("subpopulation"));
-			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("purpose"));
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( TOUR_START_AREA ) );
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( TOUR_ID ) );
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( SUBPOPULATION ) );
+			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey( PURPOSE ) );
 
 			for (Plan plan : person.getPlans()) {
 				List<Activity> activities = TripStructureUtils.getActivities(plan, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
@@ -169,7 +177,7 @@ public class CommercialTrafficIT {
 	@Test
 	void testMainRunAndResultsWithCarrierParts() throws IOException {
 		String pathToConfig = utils.getPackageInputDirectory() + "config_demand.xml";
-		Path pathToDataDistributionToZones = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
+		Path pathToZoneAttributes = Path.of(utils.getPackageInputDirectory()).resolve("dataDistributionPerZone.csv");
 		String pathToCommercialFacilities = "commercialFacilities.xml.gz";
 		Path output = Path.of(utils.getOutputDirectory()).resolve("carrierPartsRun");
 		Files.createDirectories(output);
@@ -178,14 +186,12 @@ public class CommercialTrafficIT {
 
 		List<String> commonArgs = new ArrayList<>(List.of(
 			pathToConfig,
-			"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
+			"--pathToZoneAttributes", pathToZoneAttributes.toString(),
 			"--pathToCommercialFacilities", pathToCommercialFacilities,
-			"--network", network,
 			"--sample", "0.1",
 			"--jspritIterations", "2",
 			"--creationOption", "createNewCarrierFile",
 			"--smallScaleCommercialTrafficType", "completeSmallScaleCommercialTraffic",
-			"--additionalTravelBufferPerIterationInMinutes", "10",
 			"--includeExistingModels",
 			"--zoneShapeFileName", zoneShapeFileName,
 			"--zoneShapeFileNameColumn", "name",
@@ -195,12 +201,13 @@ public class CommercialTrafficIT {
 			"--resistanceFactor_goodsTraffic", "0.2",
 			"--MATSimIterationsAfterDemandGeneration", "0",
 			"--factorForTravelBufferCalculation", "1.2",
-			"--maxNumberOfLoopsForVRPSolving", "2"
-		));
+			"--maxNumberOfLoopsForVRPSolving", "2",
+			"--config:network.inputNetworkFile", network
+			));
 
 		// Step 1: Create the shared unsolved carrier file without running jsprit.
 		List<String> initArgs = new ArrayList<>(commonArgs);
-		initArgs.addAll(List.of("--pathOutput", output.toString(), "--createSmallScaleCommercialCarrierFileOnly"));
+		initArgs.addAll(List.of("--config:controller.outputDirectory", output.toString(), "--createSmallScaleCommercialCarrierFileOnly"));
 		new GenerateSmallScaleCommercialTrafficDemand().execute(initArgs.toArray(new String[0]));
 
 		// Step 2: Count all jobs from the shared carrier file as the reference for the part runs.
@@ -222,7 +229,7 @@ public class CommercialTrafficIT {
 			int creationOptionIndex = partArgs.indexOf("--creationOption") + 1;
 			partArgs.set(creationOptionIndex, "useExistingCarrierFileWithoutSolution");
 			partArgs.addAll(List.of(
-				"--pathOutput", output.toString(),
+				"--config:controller.outputDirectory", output.toString(),
 				"--carrierFilePath", sharedCarrierFile.toAbsolutePath().toString(),
 				"--smallScaleCommercialCarrierPartCount", "2",
 				"--smallScaleCommercialCarrierPartIndex", String.valueOf(partIndex)
@@ -243,7 +250,7 @@ public class CommercialTrafficIT {
 		List<String> mergeArgs = new ArrayList<>(commonArgs);
 		mergeArgs.remove("--includeExistingModels");
 		mergeArgs.addAll(List.of(
-			"--pathOutput", output.toString(),
+			"--config:controller.outputDirectory", output.toString(),
 			"--mergeSmallScaleCommercialCarrierParts",
 			"--smallScaleCommercialCarrierPartCount", "2"
 		));

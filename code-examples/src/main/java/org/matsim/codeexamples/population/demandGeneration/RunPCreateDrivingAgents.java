@@ -25,10 +25,10 @@ public class RunPCreateDrivingAgents {
 
 		ActivityParams home = new ActivityParams("home");
 		home.setTypicalDuration(16 * 60 * 60);
-		config.scoring().addActivityParams(home);
+		config.scoring().addDefaultActivityParams(home);
 		ActivityParams work = new ActivityParams("work");
 		work.setTypicalDuration(8 * 60 * 60);
-		config.scoring().addActivityParams(work);
+		config.scoring().addDefaultActivityParams(work);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

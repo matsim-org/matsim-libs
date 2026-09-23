@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -53,24 +53,24 @@ public class LanduseBuildingAnalysis {
 
 	private static final Logger log = LogManager.getLogger(LanduseBuildingAnalysis.class);
 	private static final Joiner JOIN = Joiner.on("\t");
-	static Map<String, Object2DoubleMap<StructuralAttribute>> sumsOfAreasPerZoneAndCategory = new HashMap<>();
+	static Map<String, Object2DoubleMap<ZoneAttribute>> sumsOfAreasPerZoneAndCategory = new HashMap<>();
 
 	/**
 	 * Creates a distribution of the given input data for each zone based on the
 	 * used OSM data.
 	 */
-	public static Map<String, Object2DoubleMap<StructuralAttribute>> createInputDataDistribution(Path outputDataDistributionFile,
-																					Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection,
-																					String usedLanduseConfiguration, Index indexLanduse,
-																					Index indexZones,
-																					Index indexBuildings, Index indexInvestigationAreaRegions,
-																					String shapeFileZoneNameColumn,
-																					Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone,
-																					Path pathToInvestigationAreaData,
-																					String shapeFileBuildingTypeColumn)
+	public static Map<String, Object2DoubleMap<ZoneAttribute>> createInputDataDistribution( Path outputDataDistributionFile,
+	                                                                                        Map<ZoneAttribute, List<String>> landuseCategoriesAndDataConnection,
+	                                                                                        String usedLanduseConfiguration, Index indexLanduse,
+	                                                                                        Index indexZones,
+	                                                                                        Index indexBuildings, Index indexInvestigationAreaRegions,
+	                                                                                        String shapeFileZoneNameColumn,
+	                                                                                        Map<String, Map<ZoneAttribute, List<SimpleFeature>>> buildingsPerZone,
+	                                                                                        Path pathToInvestigationAreaData,
+	                                                                                        String shapeFileBuildingTypeColumn )
 		throws IOException {
 
-		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = new HashMap<>();
+		Map<String, Object2DoubleMap<ZoneAttribute>> resultingDataPerZone = new HashMap<>();
 		Map<String, String> zoneIdRegionConnection = new HashMap<>();
 
 		log.info("New analyze for data distribution is started. The used method is: {}", usedLanduseConfiguration);
@@ -79,7 +79,7 @@ public class LanduseBuildingAnalysis {
 			usedLanduseConfiguration, indexBuildings, landuseCategoriesAndDataConnection,
 			buildingsPerZone, shapeFileZoneNameColumn, zoneIdRegionConnection, shapeFileBuildingTypeColumn);
 
-		Map<String, Map<StructuralAttribute, Integer>> investigationAreaData = new HashMap<>();
+		Map<String, Map<ZoneAttribute, Integer>> investigationAreaData = new HashMap<>();
 		readAreaData(investigationAreaData, pathToInvestigationAreaData);
 
 		createResultingDataForLanduseInZones(landuseCategoriesPerZone, investigationAreaData, resultingDataPerZone,
@@ -98,13 +98,13 @@ public class LanduseBuildingAnalysis {
 	 */
 	private static void createResultingDataForLanduseInZones(
 		Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
-		Map<String, Map<StructuralAttribute, Integer>> investigationAreaData,
-		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone,
-		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection, Map<String, String> zoneIdRegionConnection) {
+		Map<String, Map<ZoneAttribute, Integer>> investigationAreaData,
+		Map<String, Object2DoubleMap<ZoneAttribute>> resultingDataPerZone,
+		Map<ZoneAttribute, List<String>> landuseCategoriesAndDataConnection, Map<String, String> zoneIdRegionConnection ) {
 
-		Map<String, Object2DoubleOpenHashMap<StructuralAttribute>> totalSquareMetersPerCategory = new HashMap<>();
+		Map<String, Object2DoubleOpenHashMap<ZoneAttribute>> totalSquareMetersPerCategory = new HashMap<>();
 		Map<String, Object2DoubleOpenHashMap<String>> totalEmployeesInCategoriesPerZone = new HashMap<>();
-		Map<String, Object2DoubleOpenHashMap<StructuralAttribute>> totalEmployeesPerCategories = new HashMap<>();
+		Map<String, Object2DoubleOpenHashMap<ZoneAttribute>> totalEmployeesPerCategories = new HashMap<>();
 
 		investigationAreaData.keySet()
 				.forEach(c -> totalSquareMetersPerCategory.computeIfAbsent(c, k -> new Object2DoubleOpenHashMap<>()));
@@ -118,7 +118,7 @@ public class LanduseBuildingAnalysis {
 			String regionOfZone = zoneIdRegionConnection.get(zoneId);
 			resultingDataPerZone.put(zoneId, new Object2DoubleOpenHashMap<>());
 			for (String categoryLanduse : landuseCategoriesPerZone.get(zoneId).keySet())
-				for (StructuralAttribute categoryData : landuseCategoriesAndDataConnection.keySet()) {
+				for ( ZoneAttribute categoryData : landuseCategoriesAndDataConnection.keySet()) {
 					resultingDataPerZone.get(zoneId).mergeDouble(categoryData, 0., Double::sum);
 					if (landuseCategoriesAndDataConnection.get(categoryData).contains(categoryLanduse)) {
 						double additionalArea = landuseCategoriesPerZone.get(zoneId).getDouble(categoryLanduse);
@@ -130,18 +130,18 @@ public class LanduseBuildingAnalysis {
 					}
 				}
 		}
-		for (Map.Entry<String, Object2DoubleMap<StructuralAttribute>> entry : resultingDataPerZone.entrySet()) {
+		for (Map.Entry<String, Object2DoubleMap<ZoneAttribute>> entry : resultingDataPerZone.entrySet()) {
 			sumsOfAreasPerZoneAndCategory.put(entry.getKey(), new Object2DoubleOpenHashMap<>(entry.getValue()));
 		}
 		/*
 		 * creates the percentages of each category and zones based on the sum in this
 		 * category
 		 */
-		Map<String, Object2DoubleOpenHashMap<StructuralAttribute>> checkPercentages = new HashMap<>();
+		Map<String, Object2DoubleOpenHashMap<ZoneAttribute>> checkPercentages = new HashMap<>();
 		investigationAreaData.keySet()
 				.forEach(c -> checkPercentages.computeIfAbsent(c, k -> new Object2DoubleOpenHashMap<>()));
 		for (String zoneId : resultingDataPerZone.keySet())
-			for (StructuralAttribute categoryData : resultingDataPerZone.get(zoneId).keySet()) {
+			for ( ZoneAttribute categoryData : resultingDataPerZone.get(zoneId ).keySet()) {
 				String regionOfZone = zoneIdRegionConnection.get(zoneId);
 				double newValue = resultingDataPerZone.get(zoneId).getDouble(categoryData)
 						/ totalSquareMetersPerCategory.get(regionOfZone).getDouble(categoryData);
@@ -152,7 +152,7 @@ public class LanduseBuildingAnalysis {
 			}
 		// tests the result
 		for (String investigationArea : investigationAreaData.keySet()) {
-			for (StructuralAttribute category : checkPercentages.get(investigationArea).keySet())
+			for ( ZoneAttribute category : checkPercentages.get(investigationArea ).keySet())
 				if (Math.abs(1 - checkPercentages.get(investigationArea).getDouble(category)) > 0.01)
 					throw new RuntimeException("Sum of percentages is not 1. For " + category + " the sum is "
 							+ checkPercentages.get(investigationArea).getDouble(category) + "%");
@@ -160,19 +160,19 @@ public class LanduseBuildingAnalysis {
 		// calculates the data per zone and category data
 		for (String zoneId : resultingDataPerZone.keySet()) {
 			String regionOfZone = zoneIdRegionConnection.get(zoneId);
-			for (StructuralAttribute categoryData : resultingDataPerZone.get(zoneId).keySet()) {
+			for ( ZoneAttribute categoryData : resultingDataPerZone.get(zoneId ).keySet()) {
 				double percentageValue = resultingDataPerZone.get(zoneId).getDouble(categoryData);
 				int inputDataForCategory = investigationAreaData.get(regionOfZone).get(categoryData);
 				double resultingNumberPerCategory = percentageValue * inputDataForCategory;
 				resultingDataPerZone.get(zoneId).replace(categoryData, percentageValue, resultingNumberPerCategory);
 				totalEmployeesPerCategories.get(regionOfZone).mergeDouble(categoryData, resultingNumberPerCategory,
 						Double::sum);
-				if (!categoryData.equals(StructuralAttribute.INHABITANTS))
+				if (!categoryData.equals( ZoneAttribute.INHABITANTS ))
 					totalEmployeesInCategoriesPerZone.get(regionOfZone).mergeDouble(zoneId,
 							resultingNumberPerCategory, Double::sum);
 			}
 			if (totalEmployeesInCategoriesPerZone.get(regionOfZone).getDouble(zoneId) != 0)
-				resultingDataPerZone.get(zoneId).mergeDouble(StructuralAttribute.EMPLOYEE,
+				resultingDataPerZone.get(zoneId).mergeDouble( ZoneAttribute.EMPLOYEE,
 					totalEmployeesInCategoriesPerZone.get(regionOfZone).getDouble(zoneId), Double::sum);
 		}
 	}
@@ -183,8 +183,8 @@ public class LanduseBuildingAnalysis {
 	 */
 	private static void createLanduseDistribution(Map<String, Object2DoubleMap<String>> landuseCategoriesPerZone,
 												  Index indexLanduse, Index indexZones, Index indexInvestigationAreaRegions, String usedLanduseConfiguration,
-												  Index indexBuildings, Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection,
-												  Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone,
+												  Index indexBuildings, Map<ZoneAttribute, List<String>> landuseCategoriesAndDataConnection,
+												  Map<String, Map<ZoneAttribute, List<SimpleFeature>>> buildingsPerZone,
 												  String shapeFileZoneNameColumn, Map<String, String> zoneIdRegionConnection,
 												  String shapeFileBuildingTypeColumn) {
 
@@ -217,8 +217,8 @@ public class LanduseBuildingAnalysis {
 				indexLanduse, indexZones, shapeFileBuildingTypeColumn);
 
 			for (String zone : buildingsPerZone.keySet())
-				for (StructuralAttribute category : buildingsPerZone.get(zone).keySet())
-					if (category.equals(StructuralAttribute.EMPLOYEE) || category.equals(StructuralAttribute.INHABITANTS))
+				for ( ZoneAttribute category : buildingsPerZone.get(zone ).keySet())
+					if (category.equals( ZoneAttribute.EMPLOYEE ) || category.equals( ZoneAttribute.INHABITANTS ))
 						for (SimpleFeature building : buildingsPerZone.get(zone).get(category)) {
 							String[] buildingTypes = ((String) building.getAttribute(shapeFileBuildingTypeColumn)).split(";");
 							for (String singleCategoryOfBuilding : buildingTypes) {
@@ -287,7 +287,7 @@ public class LanduseBuildingAnalysis {
 	/**
 	 * Reads the input data for certain areas from the csv file.
 	 */
-	private static void readAreaData(Map<String, Map<StructuralAttribute, Integer>> areaData, Path pathToInvestigationAreaData)
+	private static void readAreaData( Map<String, Map<ZoneAttribute, Integer>> areaData, Path pathToInvestigationAreaData )
 			throws IOException {
 
 		if (!Files.exists(pathToInvestigationAreaData)) {
@@ -297,10 +297,10 @@ public class LanduseBuildingAnalysis {
 			CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).get())) {
 
 			for (CSVRecord record : parser) {
-				Map<StructuralAttribute, Integer> lookUpTable = new HashMap<>();
+				Map<ZoneAttribute, Integer> lookUpTable = new HashMap<>();
 				for (String csvRecord : parser.getHeaderMap().keySet()) {
 					if (parser.getHeaderMap().get(csvRecord) > 0) {
-						Optional<StructuralAttribute> category = StructuralAttribute.fromLabel(csvRecord);
+						Optional<ZoneAttribute> category = ZoneAttribute.fromLabel(csvRecord );
 						if (category.isEmpty()) {
 							throw new RuntimeException("The category " + csvRecord + " is not known. Please check the header of the input data file.");
 						}
@@ -315,10 +315,10 @@ public class LanduseBuildingAnalysis {
 	/**
 	 * Analysis of the building types so that you have the buildings per zone and type.
 	 */
-	static void analyzeBuildingType(List<SimpleFeature> buildingsFeatures,
-									Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone,
-									Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection, Index indexLanduse,
-									Index indexZones, String shapeFileBuildingTypeColumn) {
+	static void analyzeBuildingType( List<SimpleFeature> buildingsFeatures,
+	                                 Map<String, Map<ZoneAttribute, List<SimpleFeature>>> buildingsPerZone,
+	                                 Map<ZoneAttribute, List<String>> landuseCategoriesAndDataConnection, Index indexLanduse,
+	                                 Index indexZones, String shapeFileBuildingTypeColumn) {
 
 		int countOSMObjects = 0;
 		log.info("Analyzing buildings types. This may take some time...");
@@ -328,7 +328,7 @@ public class LanduseBuildingAnalysis {
 				log.info("Investigate Building {} of {} buildings: {} %", countOSMObjects, buildingsFeatures.size(),
 					Math.round((double) countOSMObjects / buildingsFeatures.size() * 100));
 
-			List<StructuralAttribute> categoriesOfBuilding = new ArrayList<>();
+			List<ZoneAttribute> categoriesOfBuilding = new ArrayList<>();
 			String[] buildingTypes;
 			Coord centroidPointOfBuildingPolygon = MGC
 					.point2Coord(((Geometry) singleBuildingFeature.getDefaultGeometry()).getCentroid());
@@ -347,17 +347,17 @@ public class LanduseBuildingAnalysis {
 			singleBuildingFeature.setAttribute(shapeFileBuildingTypeColumn, String.join(";", buildingTypes));
 			boolean isEmployeeCategory = false;
 			for (String singleBuildingType : buildingTypes) {
-				for (StructuralAttribute category : landuseCategoriesAndDataConnection.keySet()) {
+				for ( ZoneAttribute category : landuseCategoriesAndDataConnection.keySet()) {
 					if (landuseCategoriesAndDataConnection.get(category).contains(singleBuildingType)
 							&& !categoriesOfBuilding.contains(category)) {
 						categoriesOfBuilding.add(category);
-						if (category.getLabel().contains(StructuralAttribute.EMPLOYEE.getLabel()))
+						if (category.getLabel().contains( ZoneAttribute.EMPLOYEE.getLabel() ))
 							isEmployeeCategory = true;
 					}
 				}
 			}
 			if (isEmployeeCategory)
-				categoriesOfBuilding.add(StructuralAttribute.EMPLOYEE);
+				categoriesOfBuilding.add( ZoneAttribute.EMPLOYEE );
 
 			categoriesOfBuilding.forEach(c -> buildingsPerZone
 				.computeIfAbsent(singleZone, k -> new HashMap<>())
@@ -370,7 +370,7 @@ public class LanduseBuildingAnalysis {
 	/**
 	 * Writes a csv file with the result of the distribution per zone of the input data.
 	 */
-	private static void writeResultOfDataDistribution(Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone,
+	private static void writeResultOfDataDistribution(Map<String, Object2DoubleMap<ZoneAttribute>> resultingDataPerZone,
 											  Path outputFileInOutputFolder, Map<String, String> zoneIdRegionConnection)
 		throws IOException {
 
@@ -381,17 +381,17 @@ public class LanduseBuildingAnalysis {
 	/**
 	 * Writer of data distribution data.
 	 */
-	private static void writeCSVWithCategoryHeader(Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone,
+	private static void writeCSVWithCategoryHeader(Map<String, Object2DoubleMap<ZoneAttribute>> resultingDataPerZone,
 												   Path outputFileInInputFolder,
 												   Map<String, String> zoneIdRegionConnection) throws MalformedURLException {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileInInputFolder.toUri().toURL(),
 			StandardCharsets.UTF_8, true);
 		try {
 			String[] header = Stream.concat(Stream.of("zoneID", "region"),
-				Stream.of(StructuralAttribute.INHABITANTS, StructuralAttribute.EMPLOYEE, StructuralAttribute.EMPLOYEE_PRIMARY,
-					StructuralAttribute.EMPLOYEE_CONSTRUCTION, StructuralAttribute.EMPLOYEE_SECONDARY, StructuralAttribute.EMPLOYEE_RETAIL,
-					StructuralAttribute.EMPLOYEE_TRAFFIC, StructuralAttribute.EMPLOYEE_TERTIARY).map(StructuralAttribute::getLabel)).toArray(
-				String[]::new);
+				Stream.of( ZoneAttribute.INHABITANTS, ZoneAttribute.EMPLOYEE, ZoneAttribute.EMPLOYEE_PRIMARY,
+					ZoneAttribute.EMPLOYEE_CONSTRUCTION, ZoneAttribute.EMPLOYEE_SECONDARY, ZoneAttribute.EMPLOYEE_RETAIL,
+					ZoneAttribute.EMPLOYEE_TRAFFIC, ZoneAttribute.EMPLOYEE_TERTIARY ).map( ZoneAttribute::getLabel ) ).toArray(
+				String[]::new );
 
 			JOIN.appendTo(writer, header);
 			writer.write("\n");
@@ -401,7 +401,8 @@ public class LanduseBuildingAnalysis {
 				row.add(zoneIdRegionConnection.get(zone));
 				for (String category : header) {
 					if (!category.equals("zoneID") && !category.equals("region"))
-						row.add(String.valueOf((int) Math.round(resultingDataPerZone.get(zone).getDouble(StructuralAttribute.fromLabel(category).get()))));
+						row.add(String.valueOf((int) Math.round(resultingDataPerZone.get(zone).getDouble(
+							ZoneAttribute.fromLabel(category ).get() ) ) ) );
 				}
 				JOIN.appendTo(writer, row);
 				writer.write("\n");
@@ -422,9 +423,10 @@ public class LanduseBuildingAnalysis {
 	 * @param assignedDataType                   the data type of the building
 	 * @return
 	 */
-	static double getShareOfTheBuildingAreaOfTheRelatedAreaOfTheZone(String zone, int area, StructuralAttribute assignedDataType){
-		if (assignedDataType.equals(StructuralAttribute.EMPLOYEE)){
-			double sumOfEmployees = sumsOfAreasPerZoneAndCategory.get(zone).keySet().stream().filter(s -> s.getLabel().contains(StructuralAttribute.EMPLOYEE.getLabel())).mapToInt(s -> (int) sumsOfAreasPerZoneAndCategory.get(zone).getDouble(s)).sum();
+	static double getShareOfTheBuildingAreaOfTheRelatedAreaOfTheZone(String zone, int area, ZoneAttribute assignedDataType ){
+		if (assignedDataType.equals( ZoneAttribute.EMPLOYEE )){
+			double sumOfEmployees = sumsOfAreasPerZoneAndCategory.get(zone).keySet().stream().filter(s -> s.getLabel().contains(
+				ZoneAttribute.EMPLOYEE.getLabel() ) ).mapToInt( s -> (int) sumsOfAreasPerZoneAndCategory.get(zone ).getDouble(s ) ).sum();
 			return area / sumOfEmployees;
 		}
 			return area / sumsOfAreasPerZoneAndCategory.get(zone).getDouble(assignedDataType);

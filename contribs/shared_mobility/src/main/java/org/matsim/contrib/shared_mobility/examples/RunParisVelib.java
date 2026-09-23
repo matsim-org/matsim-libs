@@ -56,9 +56,9 @@ public class RunParisVelib {
 		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
 
 		// We need to add interaction activity types to scoring
-		config.scoring().addActivityParams( new ActivityParams(SharingUtils.PICKUP_ACTIVITY).setScoringThisActivityAtAll(false ) );
-		config.scoring().addActivityParams( new ActivityParams(SharingUtils.DROPOFF_ACTIVITY).setScoringThisActivityAtAll(false ) );
-		config.scoring().addActivityParams( new ActivityParams(SharingUtils.BOOKING_ACTIVITY).setScoringThisActivityAtAll(false ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams(SharingUtils.PICKUP_ACTIVITY).setScoringThisActivityAtAll(false ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams(SharingUtils.DROPOFF_ACTIVITY).setScoringThisActivityAtAll(false ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams(SharingUtils.BOOKING_ACTIVITY).setScoringThisActivityAtAll(false ) );
 
 		{
 			// Remove some standard eqasim config groups

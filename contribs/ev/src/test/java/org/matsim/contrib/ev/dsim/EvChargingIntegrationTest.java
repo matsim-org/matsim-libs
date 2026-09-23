@@ -140,7 +140,7 @@ public class EvChargingIntegrationTest {
 
 					var scenario = createScenario(config, size);
 
-					var ctx = DistributedContext.create(comm, config);
+					var ctx = DistributedContext.create(comm, config, new org.matsim.core.serialization.ForySerializationProvider(org.matsim.core.serialization.MessageTypeRegistry.getInstance()));
 					var controller = new Controler(scenario, ctx);
 					installModules(controller);
 
@@ -189,7 +189,7 @@ public class EvChargingIntegrationTest {
 		var config = EvDSimTestFixture.createConfig(outputDir);
 		var chargingParams = new ScoringConfigGroup.ActivityParams(ChargingActivityEngine.CHARGING_INTERACTION)
 			.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(chargingParams);
+		config.scoring().addDefaultActivityParams(chargingParams);
 		return config;
 	}
 

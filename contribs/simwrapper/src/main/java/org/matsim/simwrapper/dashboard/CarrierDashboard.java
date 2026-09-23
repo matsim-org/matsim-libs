@@ -120,7 +120,7 @@ public class CarrierDashboard implements Dashboard  {
 		});
 
 		layout.row("veh-duration-violin", "Tour Analysis").el(Plotly.class, (viz, data) -> {
-			viz.title = "Duration per Tour [km]";
+			viz.title = "Duration per Tour [h]";
 			viz.description = "different by vehicle types";
 
 			viz.colorRamp = ColorScheme.Viridis;
@@ -137,7 +137,7 @@ public class CarrierDashboard implements Dashboard  {
 		});
 
 		layout.row("veh-costs-violin", "Tour Analysis").el(Plotly.class, (viz, data) -> {
-			viz.title = "Costs per Tour [km]";
+			viz.title = "Costs per Tour [€]";
 			viz.description = "different by vehicle types";
 
 			viz.colorRamp = ColorScheme.Viridis;

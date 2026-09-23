@@ -20,7 +20,9 @@
 package org.matsim.core.network;
 
 import java.util.Arrays;
-import java.util.TreeMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
@@ -51,40 +53,35 @@ implements TimeVariantAttribute
 
 
 	@Override
-	public void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents,
+	public void recalc(NavigableMap<Double, List<NetworkChangeEvent>> changeEvents,
 			ChangeValueGetter valueGetter, double baseValue)
 	{
-		this.aTimes = new double[this.aEvents];
-		this.aValues = new double[this.aEvents];
-		this.aTimes[0] = Double.NEGATIVE_INFINITY;
-		this.aValues[0] = baseValue;
+		// Built locally and only published once validated. getValue() binary-searches aTimes and indexes aValues with
+		// the result, so a partially filled pair of arrays would be read as if it were complete.
+		double[] times = new double[this.aEvents];
+		double[] values = new double[this.aEvents];
+		times[0] = Double.NEGATIVE_INFINITY;
+		values[0] = baseValue;
 
 		int numEvent = 0;
 		if (changeEvents != null) {
 			// go through all change events in chronological sequence:
-			for (NetworkChangeEvent event : changeEvents.values()) {
-				ChangeValue value = valueGetter.getChangeValue(event);
-				if (value != null) {
-					switch( value.getType() ) {
-					case ABSOLUTE_IN_SI_UNITS:
-						// here, we just need to replace the value:
-						this.aValues[++numEvent] = value.getValue();
-						this.aTimes[numEvent] = event.getStartTime();
-						break;
-					case FACTOR: {
-						// there, the change event multiplies what we have so far:
-						double currentValue = this.aValues[numEvent];
-						this.aValues[++numEvent] = currentValue * value.getValue();
-						this.aTimes[numEvent] = event.getStartTime();
-						break; }
-					case OFFSET_IN_SI_UNITS: {
-						double currentValue = this.aValues[numEvent];
-						this.aValues[++numEvent] = currentValue + value.getValue();
-						this.aTimes[numEvent] = event.getStartTime();
-						break; }
-					default:
-						throw new RuntimeException( "unknown ChangeType" ) ;
+			for (Map.Entry<Double, List<NetworkChangeEvent>> entry : changeEvents.entrySet()) {
+				// Several events may share a start time. They all apply, in registration order, but they collapse into
+				// a single (time, value) pair: aTimes must stay strictly increasing for the binary search in getValue.
+				double currentValue = values[numEvent];
+				boolean changedHere = false;
+				for (NetworkChangeEvent event : entry.getValue()) {
+					ChangeValue value = valueGetter.getChangeValue(event);
+					if (value == null) {
+						continue;
 					}
+					currentValue = apply(currentValue, value);
+					changedHere = true;
+				}
+				if (changedHere) {
+					values[++numEvent] = currentValue;
+					times[numEvent] = entry.getKey();
 				}
 			}
 		}
@@ -93,6 +90,20 @@ implements TimeVariantAttribute
 			throw new RuntimeException("Expected number of change events (" + (this.aEvents - 1)
 					+ ") differs from the number of events found (" + numEvent + ")!");
 		}
+
+		this.aTimes = times;
+		this.aValues = values;
+	}
+
+	private static double apply(final double currentValue, final ChangeValue value)
+	{
+		return switch (value.getType()) {
+			// here, we just need to replace the value:
+			case ABSOLUTE_IN_SI_UNITS -> value.getValue();
+			// there, the change event multiplies what we have so far:
+			case FACTOR -> currentValue * value.getValue();
+			case OFFSET_IN_SI_UNITS -> currentValue + value.getValue();
+		};
 	}
 
 

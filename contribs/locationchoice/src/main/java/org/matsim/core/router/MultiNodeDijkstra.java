@@ -33,10 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.DijkstraNodeData;
-import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
@@ -144,7 +141,7 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 					if (minCostNode == null) {
 						if ( log.isTraceEnabled() ) {
 							log.trace("No route was found from node " + fromNode.getId() + " to any of the destination nodes was found.");
-							log.trace( Dijkstra.createInfoMessage( person, vehicle ) );
+							log.trace("Person "+  person.getId() + " vehicle " + vehicle.getId() + " " + fromNode.getId() + " " + toNode.getId());
 							// seems we have no more nodes left, but not yet reached all endNodes...
 							StringBuffer sb = new StringBuffer("\tnot reached destionation nodes: ");
 							for (InitialNode endNode : endNodes.values()) {
@@ -158,7 +155,7 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 					if (searchAllEndNodes && endNodes.size() > 0) {
 						for (InitialNode endNode : endNodes.values()) {
 							log.trace("No route was found from node " + fromNode.getId() + " to destination node " + endNode.node.getId() + ".");
-							log.trace( Dijkstra.createInfoMessage( person, vehicle ) );
+							log.trace("Person "+  person.getId() + " vehicle " + vehicle.getId() + " " + fromNode.getId() + " " + toNode.getId());
 						}
 					}
 

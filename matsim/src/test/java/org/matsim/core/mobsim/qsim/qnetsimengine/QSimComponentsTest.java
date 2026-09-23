@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -46,6 +47,8 @@ public class QSimComponentsTest{
 			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 			config.controller().setLastIteration(0);
 			config.controller().setOutputDirectory(utils.getOutputDirectory());
+			//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 			// remove the module:  (There is also syntax at some intermediate level for this, but I prefer the syntax at config level.  kai, oct'22)
 			QSimComponentsConfigGroup componentsConfig = ConfigUtils.addOrGetModule(config, QSimComponentsConfigGroup.class);

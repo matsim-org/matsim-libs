@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -55,6 +56,8 @@ public class OnePercentBerlin10sIT {
 	@Test
 	void testOnePercent10sQSim() {
 		Config config = utils.loadConfig((String)null);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		// input files are in the main directory in the resource path!
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
@@ -104,6 +107,8 @@ public class OnePercentBerlin10sIT {
 	@Test
 	void testOnePercent10sQSimTryEndTimeThenDuration() {
 		Config config = utils.loadConfig((String)null);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";

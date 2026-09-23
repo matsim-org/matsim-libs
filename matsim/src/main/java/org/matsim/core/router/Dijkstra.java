@@ -35,6 +35,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.priorityqueue.WrappedBinaryMinHeap;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathUtils;
+import org.matsim.core.router.util.LeastCostPathUtils.NoPathBehavior;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -129,6 +131,12 @@ import org.matsim.vehicles.Vehicle;
 	private RouterPriorityQueue<Node> heap = null;
 
 	private String[] modeRestriction = null;
+
+	private NoPathBehavior noPathBehavior = NoPathBehavior.warning;
+
+	public void setNoPathBehavior(NoPathBehavior value) {
+		this.noPathBehavior = value;
+	}
 	
 	/*package*/ Person person = null;
 	/*package*/ Vehicle vehicle = null;
@@ -304,11 +312,7 @@ import org.matsim.vehicles.Vehicle;
 			Node outNode = pendingNodes.poll();
 
 			if (outNode == null) {
-				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + ". " + createInfoMessage( person, vehicle ) + "Some possible reasons:" );
-				log.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(Network network, Set<String> modes)s.") ;
-				log.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
-				log.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
-				log.warn("This will now return null, but it may fail later with a null pointer exception.");
+				LeastCostPathUtils.handleNotFound(noPathBehavior, log, fromNode, toNode, person, vehicle);
 				return null;
 			}
 
@@ -319,22 +323,6 @@ import org.matsim.vehicles.Vehicle;
 			}
 		}
 		return toNode;
-	}
-	static StringBuilder createInfoMessage( Person person, Vehicle vehicle ){
-		StringBuilder strb = new StringBuilder();
-		boolean flag = false ;
-		if ( person != null ) {
-			strb.append( person.getId() );
-			flag = true ;
-		}
-		if ( vehicle !=null ) {
-			strb.append( vehicle.getId() );
-			flag = true;
-		}
-		if ( flag ) {
-			strb.append( ". " );
-		}
-		return strb;
 	}
 
 	/**

@@ -100,19 +100,19 @@ public class RunIT {
 		// We need to add interaction activity types to scoring
 		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
 		pickupParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(pickupParams);
+		config.scoring().addDefaultActivityParams(pickupParams);
 
 		ActivityParams dropoffParams = new ActivityParams(SharingUtils.DROPOFF_ACTIVITY);
 		dropoffParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(dropoffParams);
+		config.scoring().addDefaultActivityParams(dropoffParams);
 
 		ActivityParams bookingParams = new ActivityParams(SharingUtils.BOOKING_ACTIVITY);
 		bookingParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(bookingParams);
+		config.scoring().addDefaultActivityParams(bookingParams);
 
 		// We need to score eScooter (scooter)
 		ModeParams eScooterScoringParams = new ModeParams(serviceConfigScooter.getMode());
-		config.scoring().addModeParams(eScooterScoringParams);
+		config.scoring().addDefaultModeParams(eScooterScoringParams);
 
 		// --------------------------------------------------------------------
 
@@ -316,27 +316,27 @@ public class RunIT {
 		// We need to add interaction activity types to scoring
 		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
 		pickupParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(pickupParams);
+		config.scoring().addDefaultActivityParams(pickupParams);
 
 		ActivityParams dropoffParams = new ActivityParams(SharingUtils.DROPOFF_ACTIVITY);
 		dropoffParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(dropoffParams);
+		config.scoring().addDefaultActivityParams(dropoffParams);
 
 		ActivityParams bookingParams = new ActivityParams(SharingUtils.BOOKING_ACTIVITY);
 		bookingParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(bookingParams);
+		config.scoring().addDefaultActivityParams(bookingParams);
 
 		// We need to score car (mobility)
 		ModeParams carScoringParams = new ModeParams("car");
-		config.scoring().addModeParams(carScoringParams);
+		config.scoring().addDefaultModeParams(carScoringParams);
 
 		// We need to score bike (velib & wheels)
 		ModeParams bikeScoringParams = new ModeParams("bike");
-		config.scoring().addModeParams(bikeScoringParams);
+		config.scoring().addDefaultModeParams(bikeScoringParams);
 
 		// We need to score bike (velib & wheels)
 		ModeParams eScooterScoringParams = new ModeParams(serviceConfigScooter.getMode());
-		config.scoring().addModeParams(eScooterScoringParams);
+		config.scoring().addDefaultModeParams(eScooterScoringParams);
 
 		// --------------------------------------------------------------------
 

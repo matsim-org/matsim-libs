@@ -101,14 +101,14 @@ public class SimulateAndScoreTest {
 		transitActivityParams.setTypicalDuration(120.0);
 
 		config.scoring().setPerforming_utils_hr(0);
-		config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 0);
-		config.scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 0);
-		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 0);
-		config.scoring().getModes().get(TransportMode.car).setMonetaryDistanceRate((double) 10);
-		config.scoring().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 0);
-		config.scoring().addActivityParams(h);
-		config.scoring().addActivityParams(w);
-		config.scoring().addActivityParams(transitActivityParams);
+		config.scoring().getDefaultModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 0);
+		config.scoring().getDefaultModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 0);
+		config.scoring().getDefaultModeParams().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 0);
+		config.scoring().getDefaultModeParams().get(TransportMode.car).setMonetaryDistanceRate((double) 10);
+		config.scoring().getDefaultModeParams().get(TransportMode.pt).setMonetaryDistanceRate((double) 0);
+		config.scoring().addDefaultActivityParams(h);
+		config.scoring().addDefaultActivityParams(w);
+		config.scoring().addDefaultActivityParams(transitActivityParams);
 
 		// ---
 
@@ -291,11 +291,11 @@ public class SimulateAndScoreTest {
 		w.setTypicalDuration(8 * 3600);
 		scenario.getConfig().scoring().setPerforming_utils_hr(0);
 		final double travelingPt = -1.00;
-		scenario.getConfig().scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+		scenario.getConfig().scoring().getDefaultModeParams().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
 		double monetaryDistanceRatePt = -0.001;
-		scenario.getConfig().scoring().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
-		scenario.getConfig().scoring().addActivityParams(h);
-		scenario.getConfig().scoring().addActivityParams(w);
+		scenario.getConfig().scoring().getDefaultModeParams().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
+		scenario.getConfig().scoring().addDefaultActivityParams(h);
+		scenario.getConfig().scoring().addDefaultActivityParams(w);
 		EventsToScore scorer = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);

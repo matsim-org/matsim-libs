@@ -67,6 +67,10 @@ import java.util.concurrent.ExecutionException;
 	+ " *          column titles of the input csv should not be changed. The format of"
 	+ " *          these files are given in the example project. See: TODO", showDefaultValues = true)
 public class BasicCommercialDemandGeneration implements MATSimAppCommand {
+	//  what is now the difference of this (package) here to "smallScaleCommercialTrafficGeneration"?
+	//  Is long-distance demand included (as the name implies)?
+	// --> This package stems from the older/simpler approach, where, for example, one generates the number of elderly who need
+	// help plus the number of services who serve them.  Or KEP.
 
 	private final DemandGenerationSpecification demandGenerationSpecification;
 
@@ -482,7 +486,7 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 		sw.addDashboard(new OverviewDashboard(Set.copyOf(scenario.getConfig().qsim().getMainModes())));
 		sw.addDashboard(new CarrierDashboard("(*.)?output_carriers_withPlans.xml.gz"));
 		controller.addOverridingModule(new SimWrapperModule(sw));
-		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
+		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		return controller;
 	}
 

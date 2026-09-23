@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -27,7 +28,9 @@ public class RunAbcSimpleExampleTest{
 		try{
 			RunAbcSimpleExample.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ).toString()
 				  , "--config:controler.outputDirectory=" + utils.getOutputDirectory()
-				  , "--config:controler.lastIteration=2"
+				  , "--config:controler.lastIteration=2",
+				//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+				"--config:routing.accessEgressConsistencyCheck=disable"
 			} );
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.zst";

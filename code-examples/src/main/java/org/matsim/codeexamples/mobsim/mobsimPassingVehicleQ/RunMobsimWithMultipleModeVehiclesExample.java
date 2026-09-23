@@ -52,7 +52,7 @@ final class RunMobsimWithMultipleModeVehiclesExample {
 			networkModesAsSet.add(mode) ;
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
-			config.scoring().addModeParams( params );
+			config.scoring().addDefaultModeParams( params );
 		}
 		{
 			String mode = "bicycle" ;
@@ -60,7 +60,7 @@ final class RunMobsimWithMultipleModeVehiclesExample {
 			networkModesAsSet.add(mode) ;
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
-			config.scoring().addModeParams( params );
+			config.scoring().addDefaultModeParams( params );
 		}
 		{
 			String mode = "bike" ;
@@ -69,7 +69,7 @@ final class RunMobsimWithMultipleModeVehiclesExample {
 			networkModesAsSet.add(mode) ;
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
-			config.scoring().addModeParams( params );
+			config.scoring().addDefaultModeParams( params );
 		}
 		{
 			String mode = "walk" ;
@@ -78,7 +78,7 @@ final class RunMobsimWithMultipleModeVehiclesExample {
 			networkModesAsSet.add(mode) ;
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
-			config.scoring().addModeParams( params );
+			config.scoring().addDefaultModeParams( params );
 		}
 
 		{

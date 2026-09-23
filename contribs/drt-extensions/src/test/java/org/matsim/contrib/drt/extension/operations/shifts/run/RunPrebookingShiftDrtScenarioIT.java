@@ -218,17 +218,17 @@ public class RunPrebookingShiftDrtScenarioIT {
         config.travelTimeCalculator().setAnalyzedModes(modes);
 
         ScoringConfigGroup.ModeParams scoreParams = new ScoringConfigGroup.ModeParams("drt");
-        config.scoring().addModeParams(scoreParams);
+        config.scoring().addDefaultModeParams(scoreParams);
         ScoringConfigGroup.ModeParams scoreParams2 = new ScoringConfigGroup.ModeParams("walk");
-        config.scoring().addModeParams(scoreParams2);
+        config.scoring().addDefaultModeParams(scoreParams2);
 
         final ScoringConfigGroup.ActivityParams start = new ScoringConfigGroup.ActivityParams("start");
         start.setScoringThisActivityAtAll(false);
         final ScoringConfigGroup.ActivityParams end = new ScoringConfigGroup.ActivityParams("end");
         end.setScoringThisActivityAtAll(false);
 
-        config.scoring().addActivityParams(start);
-        config.scoring().addActivityParams(end);
+        config.scoring().addDefaultActivityParams(start);
+        config.scoring().addDefaultActivityParams(end);
 
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
         config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);

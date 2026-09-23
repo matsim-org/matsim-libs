@@ -59,6 +59,8 @@ public class CommercialTrafficAnalysisEventHandler implements LinkLeaveEventHand
 
 
 	private final HashMap<Id<Vehicle>, String> groupOfRelevantVehicles = new HashMap<>();
+	private final HashMap<Id<Vehicle>, String> groupOfAnalyzedVehicles = new HashMap<>();
+	private final Set<Id<Person>> personsWithAnalyzedTours = new HashSet<>();
 	private final HashMap<Id<Vehicle>, Id<Person>> vehicleIdToPersonId = new HashMap<>();
 
 	private final Map<Integer, Object2DoubleMap<String>> relations = new HashMap<>();
@@ -102,12 +104,20 @@ public class CommercialTrafficAnalysisEventHandler implements LinkLeaveEventHand
 		this.currentTrips_Started_OutsideOrNoSelectedArea.clear();
 		this.tourEndPerPerson.clear();
 		this.tourStartPerPerson.clear();
+		this.groupOfRelevantVehicles.clear();
+		this.groupOfAnalyzedVehicles.clear();
+		this.personsWithAnalyzedTours.clear();
+		this.vehicleIdToPersonId.clear();
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		if (TripStructureUtils.isStageActivityType(event.getActType()))
 			return;
+		Person person = scenario.getPopulation().getPersons().get(event.getPersonId());
+		if (!hasAnalyzedTour(person))
+			return;
+
 		// checks if an investigation area is defined. If yes
 		if (geometryInvestigationArea != null && geometryInvestigationArea.contains(MGC.coord2Point(event.getCoord())))
 			currentTrips_Started_inInvestigationArea.add(event.getPersonId());
@@ -166,6 +176,9 @@ public class CommercialTrafficAnalysisEventHandler implements LinkLeaveEventHand
 			}
 		}
 
+		if (!personsWithAnalyzedTours.contains(event.getPersonId()))
+			return;
+
 		Person person = scenario.getPopulation().getPersons().get(event.getPersonId());
 		String group = getGroupOfSubpopulation(PopulationUtils.getSubpopulation(person));
 		List<Activity> activities = PopulationUtils.getActivities(person.getSelectedPlan(),
@@ -193,21 +206,28 @@ public class CommercialTrafficAnalysisEventHandler implements LinkLeaveEventHand
 		String mode = scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getNetworkMode();
 		Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
 
-		linkVolumesPerMode.computeIfAbsent(event.getLinkId(), (k) -> new Object2DoubleOpenHashMap<>());
-		int factorForSampleOfInput = (int) (1/sampleSize);
-
 		boolean isInInvestigationArea = false;
 		if (geometryInvestigationArea != null)
 			isInInvestigationArea = geometryInvestigationArea.contains(MGC.coord2Point(link.getCoord()));
 		String group = groupOfRelevantVehicles.get(event.getVehicleId());
 
-		// Add the link volume for the specific modes or modelTypes
-		linkVolumesPerMode.get(event.getLinkId()).mergeDouble(group, factorForSampleOfInput, Double::sum);
-		linkVolumesPerMode.get(event.getLinkId()).mergeDouble("allCommercialVehicles", factorForSampleOfInput, Double::sum);
-		linkVolumesPerMode.get(event.getLinkId()).mergeDouble(mode, factorForSampleOfInput, Double::sum);
+		if (isInInvestigationArea || geometryInvestigationArea == null) {
+			linkVolumesPerMode.computeIfAbsent(event.getLinkId(), (k) -> new Object2DoubleOpenHashMap<>());
+			int factorForSampleOfInput = (int) (1/sampleSize);
+			// Add the link volume for the specific modes or modelTypes
+			linkVolumesPerMode.get(event.getLinkId()).mergeDouble(group, factorForSampleOfInput, Double::sum);
+			linkVolumesPerMode.get(event.getLinkId()).mergeDouble("allCommercialVehicles", factorForSampleOfInput, Double::sum);
+			linkVolumesPerMode.get(event.getLinkId()).mergeDouble(mode, factorForSampleOfInput, Double::sum);
+		}
+
+		if (!groupOfAnalyzedVehicles.containsKey(event.getVehicleId()))
+			return;
 
 		String vehicleType = scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getId().toString();
-		travelDistancesPerVehicle.computeIfAbsent(vehicleType, (k) -> new Object2DoubleOpenHashMap<>()).mergeDouble(event.getVehicleId().toString(), link.getLength(), Double::sum);
+		travelDistancesPerVehicle.computeIfPresent(vehicleType, (k, v) -> {
+			v.mergeDouble(event.getVehicleId().toString(), link.getLength(), Double::sum);
+			return v;
+		});
 
 		currentTrip_Distance_perPerson.merge(vehicleIdToPersonId.get(event.getVehicleId()), link.getLength(), Double::sum);
 		if (isInInvestigationArea || geometryInvestigationArea == null) {
@@ -226,12 +246,19 @@ public class CommercialTrafficAnalysisEventHandler implements LinkLeaveEventHand
 
 		if (group.equals(TripAnalysis.ModelType.UNASSIGNED.toString()))
 			return;
-		String vehicleType = scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getId().toString();
-		travelDistancesPerVehicle.computeIfAbsent(vehicleType, (_) -> new Object2DoubleOpenHashMap<>()).mergeDouble(event.getVehicleId().toString(), 0, Double::sum);
-
-		tourStartPerPerson.computeIfAbsent(event.getVehicleId(), (_) -> event.getTime());
-		groupOfRelevantVehicles.computeIfAbsent(event.getVehicleId(), (_) -> group);
+		groupOfRelevantVehicles.computeIfAbsent(event.getVehicleId(), vehicleId -> group);
 		vehicleIdToPersonId.put(event.getVehicleId(), event.getPersonId());
+
+		// Link volumes use all relevant commercial vehicles; this filter only limits tour/person analyses to tours starting in the investigation area.
+		if (!startsInInvestigationArea(person))
+			return;
+
+		groupOfAnalyzedVehicles.computeIfAbsent(event.getVehicleId(), vehicleId -> group);
+		personsWithAnalyzedTours.add(event.getPersonId());
+		String vehicleType = scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getId().toString();
+		travelDistancesPerVehicle.computeIfAbsent(vehicleType, vehicleTypeId -> new Object2DoubleOpenHashMap<>()).mergeDouble(event.getVehicleId().toString(), 0, Double::sum);
+
+		tourStartPerPerson.computeIfAbsent(event.getVehicleId(), vehicleId -> event.getTime());
 	}
 
 	@Override
@@ -257,6 +284,10 @@ public class CommercialTrafficAnalysisEventHandler implements LinkLeaveEventHand
 	}
 	public HashMap<Id<Vehicle>, String> getGroupOfRelevantVehicles() {
 		return groupOfRelevantVehicles;
+	}
+
+	public HashMap<Id<Vehicle>, String> getGroupOfAnalyzedVehicles() {
+		return groupOfAnalyzedVehicles;
 	}
 
 	public Map<Integer, Object2DoubleMap<String>> getRelations() {
@@ -332,5 +363,25 @@ public class CommercialTrafficAnalysisEventHandler implements LinkLeaveEventHand
 		else
 			return TripAnalysis.ModelType.UNASSIGNED.toString();
 	}
-}
 
+	private boolean startsInInvestigationArea(Person person) {
+		if (geometryInvestigationArea == null)
+			return true;
+
+		List<Activity> activities = PopulationUtils.getActivities(person.getSelectedPlan(),
+			TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+
+		if (activities.isEmpty() || activities.getFirst().getCoord() == null)
+			return false;
+
+		return geometryInvestigationArea.contains(MGC.coord2Point(activities.getFirst().getCoord()));
+	}
+
+	private boolean hasAnalyzedTour(Person person) {
+		if (person == null)
+			return false;
+
+		String group = getGroupOfSubpopulation(PopulationUtils.getSubpopulation(person));
+		return !group.equals(TripAnalysis.ModelType.UNASSIGNED.toString()) && startsInInvestigationArea(person);
+	}
+}

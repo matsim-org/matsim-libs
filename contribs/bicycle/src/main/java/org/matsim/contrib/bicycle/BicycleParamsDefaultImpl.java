@@ -48,6 +48,7 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 		// janek may '23
 
 		if (type == null) return 0.85;
+		if (type.equals("cycleway")) return 1.0;
 		if (hasNoCycleway(cyclewaytype)) {
 			return switch (type) {
 				case "trunk" -> 0.05;
