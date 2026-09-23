@@ -249,8 +249,19 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	}
 
 	@Override
-	public void resetTask(int iteration) {
-		this.handler.reset(iteration);
+	public final void resetTask(int iteration) {
+		resetTask(iteration, true);
+	}
+
+	/**
+	 * Reset the task for a new iteration.
+	 *
+	 * @param resetHandler whether {@link EventHandler#reset(int)} should be called. A NODE_CONCURRENT handler is shared
+	 *                     by the tasks of all partitions and only needs to be reset once.
+	 */
+	public void resetTask(int iteration, boolean resetHandler) {
+		if (resetHandler)
+			this.handler.reset(iteration);
 	}
 
 	public final IntSet getSupportedMessages() {
