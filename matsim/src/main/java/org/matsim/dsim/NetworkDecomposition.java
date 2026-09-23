@@ -19,6 +19,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -47,6 +48,32 @@ public class NetworkDecomposition {
 			case bisect -> bisection(network, population, numParts);
 			case metis -> metis(network, population, numParts);
 			// none means don't do anything
+		}
+	}
+
+	/**
+	 * Return the partition of each node, indexed by the node id index. Entries of ids not in the network are -1.
+	 */
+	public static int[] getNodePartitions(Network network) {
+		int size = network.getNodes().keySet().stream().mapToInt(Id::index).max().orElse(-1) + 1;
+		int[] partitions = new int[size];
+		Arrays.fill(partitions, -1);
+		for (Node node : network.getNodes().values()) {
+			partitions[node.getId().index()] = (int) node.getAttributes().getAttribute(PARTITION_ATTR_KEY);
+		}
+		return partitions;
+	}
+
+	/**
+	 * Apply partitions as returned by {@link #getNodePartitions(Network)}. Links are assigned to the partition of their to node.
+	 */
+	public static void setNodePartitions(Network network, int[] partitions) {
+		for (Node node : network.getNodes().values()) {
+			int partition = partitions[node.getId().index()];
+			node.getAttributes().putAttribute(PARTITION_ATTR_KEY, partition);
+			for (var link : node.getInLinks().values()) {
+				link.getAttributes().putAttribute(PARTITION_ATTR_KEY, partition);
+			}
 		}
 	}
 
