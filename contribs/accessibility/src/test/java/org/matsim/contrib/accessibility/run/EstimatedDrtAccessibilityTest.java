@@ -101,7 +101,6 @@ public class EstimatedDrtAccessibilityTest {
 	void prepare() {
 		emptyEventsFileName = utils.getClassInputDirectory() + "output_events.xml.gz";
 		congestedEventsFileName = utils.getClassInputDirectory() + "output_events_congested.xml.gz";
-
 	}
 
 	/**
