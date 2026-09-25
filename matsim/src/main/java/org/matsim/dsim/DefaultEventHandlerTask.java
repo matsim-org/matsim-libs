@@ -90,6 +90,7 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 
 	@Override
 	public void beforeExecution() {
+		super.beforeExecution();
 		phase.set(!phase.get());
 	}
 
@@ -114,8 +115,8 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	}
 
 	@Override
-	public void resetTask(int iteration) {
-		super.resetTask(iteration);
+	public void resetTask(int iteration, boolean resetHandler) {
+		super.resetTask(iteration, resetHandler);
 		this.cleanupState = CleanupState.BEFORE_CLEANUP;
 	}
 

@@ -270,8 +270,8 @@ public final class DSim implements Mobsim {
 							if (runtime == 0)
 								continue;
 
-							// Runtimes are collected as 10% samples currently
-							writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i * 10, runtime));
+							// Runtimes are aggregated into time bins, the step is the end of the bin
+							writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i * SimTask.RUNTIME_BIN_SIZE, runtime));
 						} catch (IOException e) {
 							throw new UncheckedIOException(e);
 						}

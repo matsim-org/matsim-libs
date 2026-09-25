@@ -70,16 +70,23 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 */
 	protected float avgRuntime = 0.0f;
 	/**
-	 * Run time of the last few iterations.
-	 */
-	protected long sumRuntime = 0;
-	/**
 	 * Current simulation time. Needs to be volatile to ensure visibility across threads.
 	 */
 	protected volatile double time;
 
+	/**
+	 * Simulation time at which the task was last scheduled. Async tasks may finish at a later simulation time, but their
+	 * runtime is attributed to this time.
+	 */
+	protected volatile double executionTime;
+
 	public void setTime(double time) {
 		this.time = time;
+	}
+
+	@Override
+	public void beforeExecution() {
+		this.executionTime = time;
 	}
 
 	/**
@@ -249,8 +256,22 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	}
 
 	@Override
-	public void resetTask(int iteration) {
-		this.handler.reset(iteration);
+	public final void resetTask(int iteration) {
+		resetTask(iteration, true);
+	}
+
+	/**
+	 * Reset the task for a new iteration.
+	 *
+	 * @param resetHandler whether {@link EventHandler#reset(int)} should be called. A NODE_CONCURRENT handler is shared
+	 *                     by the tasks of all partitions and only needs to be reset once.
+	 */
+	public void resetTask(int iteration, boolean resetHandler) {
+		if (resetHandler)
+			this.handler.reset(iteration);
+
+		// The task outlives the mobsim, runtimes are only collected for the current iteration
+		this.runtimes.clear();
 	}
 
 	public final IntSet getSupportedMessages() {
@@ -310,20 +331,9 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 * @param t nanoseconds before current step started.
 	 */
 	protected final void storeRuntime(long t) {
-		int s = (int) (time / 10);
-		// Fill with zeros
-		if (runtimes.size() < s)
-			runtimes.addElements(runtimes.size(), new long[s - runtimes.size()]);
-
 		long rt = System.nanoTime() - t;
 		avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
-		sumRuntime += rt;
-
-		// Only add the runtime to the list if the time is a multiple of 10
-		if ((time % 10) == 0) {
-			runtimes.add(sumRuntime);
-			sumRuntime = 0;
-		}
+		SimTask.addRuntime(runtimes, executionTime, rt);
 	}
 
 	@Override
