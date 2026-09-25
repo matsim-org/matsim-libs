@@ -26,7 +26,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.AggregatingEventHandler;
@@ -45,6 +44,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 
 /**
  * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
@@ -86,6 +86,31 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 	 * Volumes per mode indexed by link id index.
 	 */
 	private Map<String, int[]>[] linksPerMode;
+
+	/**
+	 * View on the ids of links with volumes, always reading the current {@link #links} array.
+	 */
+	private final Set<Id<Link>> linkIds = new AbstractSet<>() {
+		@Override
+		public boolean contains(Object o) {
+			int[][] links = VolumesAnalyzer.this.links;
+			return o instanceof Id<?> id && id.index() < links.length && links[id.index()] != null;
+		}
+
+		@Override
+		public Iterator<Id<Link>> iterator() {
+			int[][] links = VolumesAnalyzer.this.links;
+			return IntStream.range(0, links.length)
+				.filter(i -> links[i] != null)
+				.mapToObj(i -> Id.get(i, Link.class))
+				.iterator();
+		}
+
+		@Override
+		public int size() {
+			return (int) Arrays.stream(VolumesAnalyzer.this.links).filter(Objects::nonNull).count();
+		}
+	};
 
 	@Inject
 	VolumesAnalyzer(Network network, EventsManager eventsManager) {
@@ -310,16 +335,11 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 	}
 
 	/**
-	 * @return Set of Strings containing all link ids for which counting-values are available.
+	 * @return Set of Strings containing all link ids for which counting-values are available. The set is a view, so
+	 * lookups are cheap, e.g. within loops over all links.
 	 */
 	public Set<Id<Link>> getLinkIds() {
-		IdSet<Link> ids = new IdSet<>(Link.class);
-		for (int i = 0; i < this.links.length; i++) {
-			if (this.links[i] != null) {
-				ids.add(Id.get(i, Link.class));
-			}
-		}
-		return ids;
+		return this.linkIds;
 	}
 
 	@Override
