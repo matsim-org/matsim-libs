@@ -374,8 +374,10 @@ public final class DistributedEventsManager implements EventsManager {
 
 	@Override
 	public void resetHandlers(int iteration) {
+		// NODE_CONCURRENT handlers are registered with one task per partition, but must only be reset once
+		Set<EventHandler> resetHandlers = Collections.newSetFromMap(new IdentityHashMap<>());
 		for (EventHandlerTask task : tasks) {
-			task.resetTask(iteration);
+			task.resetTask(iteration, resetHandlers.add(task.getHandler()));
 		}
 	}
 

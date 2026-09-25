@@ -2,8 +2,12 @@ package org.matsim.dsim;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -12,6 +16,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -133,6 +138,8 @@ public class DistributedIntegrationTest {
 		var comms = LocalCommunicator.create(size);
 		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
+		VolumesAnalyzer[] analyzers = new VolumesAnalyzer[size];
+
 		DistributedExecution.execute(comms, 600, comm -> {
 			Config local = createScenario();
 			local.dsim().setThreads(1);
@@ -142,6 +149,7 @@ public class DistributedIntegrationTest {
 			Controler controler = new Controler(scenario, DistributedContext.create(comm, local, new org.matsim.core.serialization.ForySerializationProvider(org.matsim.core.serialization.MessageTypeRegistry.getInstance())));
 
 			controler.run();
+			analyzers[comm.getRank()] = controler.getInjector().getInstance(VolumesAnalyzer.class);
 
 			try {
 				comm.close();
@@ -158,6 +166,25 @@ public class DistributedIntegrationTest {
 		String actualEventsPath = utils.getOutputDirectory() + "kelheim-mini.output_events.xml";
 		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath.toString(), actualEventsPath))
 			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
+
+		// volumes are counted on each node and merged after the simulation, all nodes must know the volumes of the whole network
+		VolumesAnalyzer expected = new VolumesAnalyzer(3600, 24 * 3600 - 1, NetworkUtils.createNetwork());
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(expected);
+		EventsUtils.readEvents(events, actualEventsPath);
+
+		assertThat(expected.getLinkIds()).isNotEmpty();
+		for (VolumesAnalyzer analyzer : analyzers) {
+			assertThat(analyzer.getLinkIds()).isEqualTo(expected.getLinkIds());
+			assertThat(analyzer.getModes()).isEqualTo(expected.getModes());
+			for (Id<Link> linkId : expected.getLinkIds()) {
+				assertThat(analyzer.getVolumesForLink(linkId)).as(linkId.toString()).isEqualTo(expected.getVolumesForLink(linkId));
+				// vehicles that entered traffic on the other node must be assigned to their mode as well
+				for (String mode : expected.getModes()) {
+					assertThat(analyzer.getVolumesForLink(linkId, mode)).as(linkId + " " + mode).isEqualTo(expected.getVolumesForLink(linkId, mode));
+				}
+			}
+		}
 
 		// compare populations of distributed simulation and original qsim
 		var actualPopulationPath = outputPath.resolve("kelheim-mini.output_plans.xml");

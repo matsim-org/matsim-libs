@@ -71,6 +71,7 @@ public final class GlobalAsyncEventHandlerTask extends EventHandlerTask {
 
 	@Override
 	public void beforeExecution() {
+		super.beforeExecution();
 
 		while (true) {
 			long state = this.state.get();
