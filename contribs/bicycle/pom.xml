@@ -26,6 +26,12 @@
           <scope>compile</scope>
       </dependency>
       <dependency>
+          <groupId>org.matsim.contrib</groupId>
+          <artifactId>sumo</artifactId>
+          <version>${project.parent.version}</version>
+          <scope>compile</scope>
+      </dependency>
+      <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-api</artifactId>
       </dependency>
@@ -48,6 +54,14 @@
       <dependency>
           <groupId>com.google.inject</groupId>
           <artifactId>guice</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>info.picocli</groupId>
+          <artifactId>picocli</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-csv</artifactId>
       </dependency>
       <dependency>
           <groupId>org.junit.jupiter</groupId>

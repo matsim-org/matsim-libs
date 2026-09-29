@@ -74,6 +74,12 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	@CommandLine.Option(names = "--turn-restrictions", description = "Ignore turn restrictions for specified modes.", defaultValue = "ADD_TURN_RESTRICTIONS")
 	private TurnRestriction turnRestrictionHandling;
 
+	@CommandLine.Option(names = "--keep-cyclable-minor-ways", defaultValue = "false",
+		description = "Also convert footway, pedestrian and track edges, which have no link properties " +
+			"of their own and are otherwise skipped as unknown types. Meant for bicycle networks, where " +
+			"these largely bike-carrying edges are infrastructure rather than detail.")
+	private boolean keepCyclableMinorWays;
+
 	private SumoNetworkConverter(List<Path> input, Path output, String fromCRS, String toCRS, double freeSpeedFactor,
 								 LaneRestriction laneRestriction, TurnRestriction turnRestriction) {
 		this.input = input;
@@ -118,6 +124,15 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	public static SumoNetworkConverter newInstance(List<Path> input, Path output, String inputCRS, String targetCRS,
 												   double freeSpeedFactor, LaneRestriction laneRestriction, TurnRestriction turnRestriction) {
 		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, laneRestriction, turnRestriction);
+	}
+
+	/**
+	 * Also convert footway, pedestrian and track edges. Off by default; the programmatic
+	 * counterpart of {@code --keep-cyclable-minor-ways}.
+	 */
+	public SumoNetworkConverter setKeepCyclableMinorWays(boolean keepCyclableMinorWays) {
+		this.keepCyclableMinorWays = keepCyclableMinorWays;
+		return this;
 	}
 
 	/**
@@ -265,6 +280,18 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
 		// This is for bikes
 		linkProperties.put(OsmTags.CYCLEWAY, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 300, false));
+
+		// These carry bike traffic but have no LinkProperties of their own, so their edges are
+		// dropped ("Skipping unknown link type") — which removes cycling infrastructure, not just
+		// detail: on a city extract they account for roughly a tenth of the network length, and
+		// nearly every footway among them is tagged bicycle=yes. Values follow the neighbours
+		// above: a track is about a service road, a footway or pedestrian area about a path.
+		// Opt-in, so existing scenarios keep getting the exact network they had.
+		if (keepCyclableMinorWays) {
+			linkProperties.put(OsmTags.TRACK, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 450, false));
+			linkProperties.put(OsmTags.FOOTWAY, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 300, false));
+			linkProperties.put(OsmTags.PEDESTRIAN, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 300, false));
+		}
 
 		for (SumoNetworkHandler.Edge edge : sumoHandler.edges.values()) {
 
