@@ -1285,6 +1285,8 @@ public final class PopulationUtils {
 
 	/**
 	 * Create the sample label as a percentage, rounded to four decimal places and without trailing zeros.
+	 *
+	 * @param sampleSize sample between 0 and 1
 	 */
 	public static String getSampleLabel(double sampleSize) {
 		return BigDecimal.valueOf(sampleSize * 100).setScale(4, RoundingMode.HALF_EVEN).stripTrailingZeros().toPlainString() + "pct";
