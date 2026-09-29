@@ -58,6 +58,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1279,6 +1281,15 @@ public final class PopulationUtils {
 			ScenarioUtils.putScale(pop, scale * sampleTo);
 		}
 		log.info("population size after downsampling={}", pop.getPersons().size());
+	}
+
+	/**
+	 * Create the sample label as a percentage, rounded to four decimal places and without trailing zeros.
+	 *
+	 * @param sampleSize sample between 0 and 1
+	 */
+	public static String getSampleLabel(double sampleSize) {
+		return BigDecimal.valueOf(sampleSize * 100).setScale(4, RoundingMode.HALF_EVEN).stripTrailingZeros().toPlainString() + "pct";
 	}
 
 	public static void readPopulation(Population population, String filename) {

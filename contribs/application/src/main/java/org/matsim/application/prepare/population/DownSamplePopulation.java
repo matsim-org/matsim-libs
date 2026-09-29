@@ -61,17 +61,13 @@ public class DownSamplePopulation implements MATSimAppCommand {
             PopulationUtils.sampleDown(population, sample / sampleSize);
             sampleSize = sample;
 
-            String path;
-            if (input.toString().contains(orig))
-                path = input.toString().replace(orig, String.format("%dpct", Math.round(sampleSize * 100)));
-            else
-                path = input.toString().replace(".xml", String.format("-%dpct.xml", Math.round(sampleSize * 100)));
+			String sampleLabel = PopulationUtils.getSampleLabel(sampleSize);
 
-//			if sampleSize is <= 0.1pct, the above returns "0pct". This would lead to overwriting the populations with multiple sample sizes of <= 0.1pct.
-			if (path.contains("0pct")) {
-				String notRounded =  String.valueOf(BigDecimal.valueOf(sampleSize * 100.).setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-				path = path.replace("0pct", String.format("%spct", notRounded));
-			}
+			String path;
+			if (input.toString().contains(orig))
+				path = input.toString().replace(orig, sampleLabel);
+			else
+				path = input.toString().replace(".xml", "-" + sampleLabel + ".xml");
 
             log.info("Writing {} sample to {}", sampleSize, path);
 
