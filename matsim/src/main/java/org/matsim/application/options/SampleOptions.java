@@ -1,8 +1,8 @@
 package org.matsim.application.options;
 
+import org.matsim.core.population.PopulationUtils;
 import picocli.CommandLine;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  */
 public final class SampleOptions {
 
-	private static final Pattern PATTERN = Pattern.compile("\\d+pct");
+	private static final Pattern PATTERN = Pattern.compile("\\d+(?:\\.\\d+)?pct");
 	/**
 	 * Available sample sizes
 	 */
@@ -97,7 +97,7 @@ public final class SampleOptions {
 				double size = sizes[i];
 
 				CommandLine.Model.OptionSpec.Builder arg = CommandLine.Model.OptionSpec.
-					builder("--" + getWithoutTrailingZeros(size) + "pct")
+					builder("--" + PopulationUtils.getSampleLabel(size / 100d))
 					.type(Boolean.class)
 					.order(i)
 					.description("Run scenario with " + size + " pct sample size")
@@ -115,10 +115,6 @@ public final class SampleOptions {
 
 			spec.addArgGroup(group.build());
 		}
-	}
-
-	private static String getWithoutTrailingZeros(double size) {
-		return new BigDecimal(String.valueOf(size)).stripTrailingZeros().toPlainString();
 	}
 
 	/**
@@ -160,7 +156,7 @@ public final class SampleOptions {
 	public String adjustName(String name) {
 		if (!set) return name;
 
-		String postfix = getWithoutTrailingZeros(getSize()) + "pct";
+		String postfix = PopulationUtils.getSampleLabel(getSample());
 
 		return PATTERN.matcher(name).replaceAll(postfix);
 	}
