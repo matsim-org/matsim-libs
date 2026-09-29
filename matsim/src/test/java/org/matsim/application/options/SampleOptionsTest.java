@@ -41,6 +41,15 @@ public class SampleOptionsTest {
 			.isEqualTo(0.5);
 	}
 
+	@Test
+	void defaultSample() {
+		SampleOptions sample = new SampleOptions(10);
+		Assertions.assertThat(sample.getSample()).isEqualTo(0.1);
+		Assertions.assertThat(sample.getSize()).isEqualTo(10);
+		Assertions.assertThat(sample.isSet()).isFalse();
+		Assertions.assertThat(new SampleOptions(0.5).getSample()).isEqualTo(0.005);
+	}
+
 
 	@Test
 	void fixed() {
