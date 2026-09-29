@@ -46,12 +46,12 @@ public final class SampleOptions {
 	 */
 	public SampleOptions(int... sizes) {
 		this.sizes = Arrays.stream(sizes).asDoubleStream().toArray();
-		this.sample = sizes[0];
+		this.sample = sizes[0] / 100d;
 	}
 
 	public SampleOptions(double... sizes) {
 		this.sizes = sizes;
-		this.sample = sizes[0];
+		this.sample = sizes[0] / 100d;
 	}
 
 	/**
