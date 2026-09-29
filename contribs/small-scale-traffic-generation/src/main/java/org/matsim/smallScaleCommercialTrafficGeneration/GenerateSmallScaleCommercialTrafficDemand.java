@@ -368,9 +368,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		validateCarrierPartOptions();
 
 		String modelName = configPath.getParent().getFileName().toString();
-
-		String sampleName = getSampleNameOfOutputFolder(sample);
-
 		/*
 		 * A carrier part ("chunk") run needs two different output concepts:
 		 * - finalOutput points to the shared traffic output folder created by the init step. The shared unsolved carrier
@@ -540,7 +537,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			return 0;
 		}
 		createPlansBasedOnCarrierPlans(scenario,
-			usedSmallScaleCommercialTrafficSegment, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent );
+			usedSmallScaleCommercialTrafficSegment, output, modelName, sample, nameOutputPopulation, numberOfPlanVariantsPerAgent );
 
 		if (MATSimIterationsAfterDemandGeneration != null && MATSimIterationsAfterDemandGeneration >= 0) {
 			matsimIterations = new MATSimIterations(this.sample );
