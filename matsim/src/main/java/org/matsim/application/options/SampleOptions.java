@@ -77,7 +77,7 @@ public final class SampleOptions {
 						if (value == null)
 							return null;
 
-						setSize((double) value);
+						setSample((double) value);
 						return value;
 					}
 				})
@@ -104,7 +104,7 @@ public final class SampleOptions {
 					.setter(new CommandLine.Model.ISetter() {
 						@Override
 						public <T> T set(T value) {
-							setSize(size / 100d);
+							setSample(size / 100d);
 							return value;
 						}
 					})
@@ -142,7 +142,7 @@ public final class SampleOptions {
 		return 1.0 / sample;
 	}
 
-	private void setSize(double sample) {
+	private void setSample(double sample) {
 		this.set = true;
 		this.sample = sample;
 	}
