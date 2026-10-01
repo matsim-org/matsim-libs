@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Provide map based plots.
  */
-public final class MapPlot extends VizMap<MapPlot> {
+public final class SelectLinkAnalysis extends VizMap<SelectLinkAnalysis> {
 
 	private final Map<String, String> datasets = new HashMap<>();
 	public double[] center;
@@ -20,17 +20,13 @@ public final class MapPlot extends VizMap<MapPlot> {
 	public Boolean mapIsIndependent;
 
 	public Display display = new Display();
-	public Double minValue;
-	public Double maxValue;
-	@JsonProperty(required = true)
-	private Object shapes;
 
-	public MapPlot() {
-		super("map");
+	public SelectLinkAnalysis() {
+		super("selectlink");
 	}
 
 	// customize type of map
-	public MapPlot(String name) {
+	public SelectLinkAnalysis(String name) {
 		super(name);
 	}
 
@@ -39,25 +35,9 @@ public final class MapPlot extends VizMap<MapPlot> {
 	}
 
 	/**
-	 * Set the shape url, providing the path.
-	 */
-	public MapPlot setShape(String file) {
-		shapes = file;
-		return this;
-	}
-
-	/**
-	 * Set shape url and join path for dataset.
-	 */
-	public MapPlot setShape(String file, String join) {
-		shapes = Map.of("file", file, "join", join);
-		return this;
-	}
-
-	/**
 	 * Add named dataset to the map. This name can be referenced in the display section.
 	 */
-	public MapPlot addDataset(String name, String file) {
+	public SelectLinkAnalysis addDataset(String name, String file) {
 		datasets.put(name, file);
 		return this;
 	}
