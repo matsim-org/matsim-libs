@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing;
 
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
+import com.google.inject.multibindings.OptionalBinder;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
@@ -38,12 +38,11 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.DrtModePlusOneRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtServiceAreas;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -66,17 +65,14 @@ public class RebalancingModule extends AbstractDvrpModeModule {
 		if (drtCfg.getRebalancingParams().isPresent()) {
 			RebalancingParams rebalancingParams = drtCfg.getRebalancingParams().get();
 
+			// bound in DrtModeRoutingModule, which is installed alongside
+			OptionalBinder.newOptionalBinder(binder(), modalKey(DrtServiceAreas.class));
+
 			modalMapBinder(String.class, ZoneSystem.class).addBinding(REBALANCING_ZONE_SYSTEM).toProvider(modalProvider(getter -> {
 				Network network = getter.getModal(Network.class);
-				Predicate<Zone> zoneFilter;
-				if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
-					List<PreparedGeometry> serviceAreaGeoms = ShpGeometryUtils.loadPreparedGeometries(
-							ConfigGroup.getInputFileURL(this.getConfig().getContext(), this.drtCfg.getDrtServiceAreaShapeFile()));
-					zoneFilter = zone -> serviceAreaGeoms.stream()
-							.anyMatch((serviceArea) -> serviceArea.intersects(zone.getPreparedGeometry().getGeometry()));
-				} else {
-					zoneFilter = zone -> true;
-				}
+				Predicate<Zone> zoneFilter = DrtServiceAreas.servedAreaZoneFilter(getConfig(), drtCfg,
+						getter.getModal(new TypeLiteral<Optional<DrtServiceAreas>>() {
+						}));
 				String crs = getConfig().global().getCoordinateSystem();
 				ZoneSystemParams zoneSystemParams = rebalancingParams.getZoneSystemParams();
 				return ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network, zoneSystemParams, crs, zoneFilter);

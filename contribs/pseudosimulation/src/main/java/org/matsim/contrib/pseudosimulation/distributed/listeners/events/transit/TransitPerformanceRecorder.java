@@ -122,6 +122,8 @@ public class TransitPerformanceRecorder {
         @Override
         public void handleEvent(VehicleArrivesAtFacilityEvent event) {
             VehicleTracker tracker = vehicletrackers.get(event.getVehicleId().toString(),event.getTime());
+            //skip vehicles whose departure has not been announced
+            if (tracker == null) return;
             DwellEvent dwellEvent = tracker.registerArrival(event);
             transitPerformance.addVehicleDwellEventAtStop(tracker.getFullDeparture().getLineId(),tracker.getFullDeparture().getRouteId(),event.getFacilityId(),dwellEvent);
 
@@ -130,6 +132,8 @@ public class TransitPerformanceRecorder {
         @Override
         public void handleEvent(VehicleDepartsAtFacilityEvent event) {
             VehicleTracker tracker = vehicletrackers.get(event.getVehicleId().toString(), event.getTime());
+            //skip vehicles whose departure has not been announced
+            if (tracker == null) return;
             tracker.registerDeparture(event);
 
         }

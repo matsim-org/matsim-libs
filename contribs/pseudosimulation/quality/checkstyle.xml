@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  PSim's initial, deliberately low-noise lint gate. Add rules as violations are
+  fixed; do not remove or weaken rules merely to make the gate pass.
+-->
+<module name="Checker">
+  <property name="charset" value="UTF-8"/>
+
+  <module name="TreeWalker">
+    <module name="AvoidEscapedUnicodeCharacters"/>
+    <module name="EmptyStatement"/>
+    <module name="NoFinalizer"/>
+    <module name="OuterTypeFilename"/>
+  </module>
+</module>

@@ -25,6 +25,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.NonNull;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.GetGenerationRates;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
@@ -42,7 +43,7 @@ import static org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScal
  * @author Ricardo Ewert
  *
  */
-class TrafficVolumesGenerator{
+public class TrafficVolumesGenerator{
 
 	private static final Logger log = LogManager.getLogger( TrafficVolumesGenerator.class );
 	private static final Joiner JOIN = Joiner.on("\t");
@@ -60,16 +61,16 @@ class TrafficVolumesGenerator{
 
 	TrafficVolumesGenerator( SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment ) {
 		// Set generation rates for start potentials
-		generationRatesStart = GetGenerationRates.setGenerationRates( smallScaleCommercialTrafficSegment, "start" );
+		generationRatesStart = GetGenerationRates.setGenerationRates( smallScaleCommercialTrafficSegment, StartOrStop.start );
 
 		// Set generation rates for stop potentials
-		generationRatesStop = GetGenerationRates.setGenerationRates( smallScaleCommercialTrafficSegment, "stop" );
+		generationRatesStop = GetGenerationRates.setGenerationRates( smallScaleCommercialTrafficSegment, StartOrStop.stop );
 
 		// Set commitment rates for start potentials
-		commitmentRatesStart = GetGenerationRates.setCommitmentRates( smallScaleCommercialTrafficSegment, "start" );
+		commitmentRatesStart = GetGenerationRates.setCommitmentRates( smallScaleCommercialTrafficSegment, StartOrStop.start );
 
 		// Set commitment rates for stop potentials
-		commitmentRatesStop = GetGenerationRates.setCommitmentRates( smallScaleCommercialTrafficSegment, "stop" );
+		commitmentRatesStop = GetGenerationRates.setCommitmentRates( smallScaleCommercialTrafficSegment, StartOrStop.stop );
 	}
 
 	/**
@@ -84,16 +85,18 @@ class TrafficVolumesGenerator{
 	 */
 	@NonNull Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolumes(
 		Map<String, Object2DoubleMap<ZoneAttribute>> attributesByZone, Path outputPath, double sample, List<String> modesORvehTypes,
-		SmallScaleCommercialTrafficSegment segment, String startOrStop ) throws MalformedURLException
+		SmallScaleCommercialTrafficSegment segment, StartOrStop startOrStop ) throws MalformedURLException
 	{
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_stop, attributesByZone, startOrStop, sample, modesORvehTypes );
-		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
-		Path outputFile = outputPath.resolve("calculatedData").resolve("TrafficVolume_" + segment + "_" + startOrStop + "PerZone_"+ sampleName + "pt.csv" ); // this should presumably be "pct" instead of "pt"
+		String sampleName = PopulationUtils.getSampleLabel(sample);
+		Path outputFile = outputPath.resolve("calculatedData").resolve("TrafficVolume_" + segment + "_" + startOrStop + "PerZone_"+ sampleName + ".csv" ); // this should presumably be "pct" instead of "pt"
 		writeCSVTrafficVolume(trafficVolume_stop, outputFile);
 		log.info( "Write traffic volume for {} trips per zone in CSV: {}", startOrStop, outputFile );
 		return trafficVolume_stop;
 	}
+
+	public enum StartOrStop { start, stop }
 
 	/**
 	 * Calculates the traffic volume for each zone and purpose.
@@ -107,7 +110,7 @@ class TrafficVolumesGenerator{
 	private void calculateTrafficVolumePerZone(
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
 		Map<String, Object2DoubleMap<ZoneAttribute>> zoneAttributes,
-		String startOrStop,
+		StartOrStop startOrStop,
 		double sample,
 		List<String> modesORvehTypes)
 	{
@@ -116,14 +119,16 @@ class TrafficVolumesGenerator{
 		Map<Integer, Map<ZoneAttribute, Double>> generationRates;
 		Map<String, Map<ZoneAttribute, Double>> commitmentRates;
 
-		if (startOrStop.equals("start")) {
-			generationRates = generationRatesStart;
-			commitmentRates = commitmentRatesStart; // "Bindungsraten" in german.  Presumably to "car"??
-		} else if (startOrStop.equals("stop")) {
-			generationRates = generationRatesStop;
-			commitmentRates = commitmentRatesStop;
-		} else{
-			throw new RuntimeException( "No generation and commitment rates selected. Please check!" );
+		switch( startOrStop ){
+			case start -> {
+				generationRates = generationRatesStart;
+				commitmentRates = commitmentRatesStart; // "Bindungsraten" in german.  Presumably to "car"??
+			}
+			case stop -> {
+				generationRates = generationRatesStop;
+				commitmentRates = commitmentRatesStop;
+			}
+			default -> throw new RuntimeException( "No generation and commitment rates selected. Please check!" );
 		}
 
 		for (String zoneId : zoneAttributes.keySet()) {

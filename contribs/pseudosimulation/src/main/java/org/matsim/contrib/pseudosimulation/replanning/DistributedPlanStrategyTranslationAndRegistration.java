@@ -8,7 +8,18 @@ import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.strategies.*;
+import org.matsim.core.replanning.strategies.ChangeExpBeta;
+import org.matsim.core.replanning.strategies.ChangeSingleTripMode;
+import org.matsim.core.replanning.strategies.ChangeTripMode;
+import org.matsim.core.replanning.strategies.KeepLastSelected;
+import org.matsim.core.replanning.strategies.ReRoute;
+import org.matsim.core.replanning.strategies.SelectBest;
+import org.matsim.core.replanning.strategies.SelectExpBeta;
+import org.matsim.core.replanning.strategies.SelectPathSizeLogit;
+import org.matsim.core.replanning.strategies.SelectRandom;
+import org.matsim.core.replanning.strategies.SubtourModeChoice;
+import org.matsim.core.replanning.strategies.TimeAllocationMutator;
+import org.matsim.core.replanning.strategies.TimeAllocationMutatorReRoute;
 
 import com.google.inject.Provider;
 import java.util.HashMap;
@@ -41,9 +52,9 @@ import java.util.Map;
  */
 public class DistributedPlanStrategyTranslationAndRegistration {
     public static final String SUFFIX = "PSIM";
-    public static Map<String, Class<? extends Provider<PlanStrategy>>> SupportedSelectors = new HashMap<>();
-    public static Map<String, Class<? extends Provider<PlanStrategy>>> SupportedMutators = new HashMap<>();
-    public static Map<String, Character> SupportedMutatorGenes = new HashMap<>();
+    public static final Map<String, Class<? extends Provider<PlanStrategy>>> SupportedSelectors = new HashMap<>();
+    public static final Map<String, Class<? extends Provider<PlanStrategy>>> SupportedMutators = new HashMap<>();
+    public static final Map<String, Character> SupportedMutatorGenes = new HashMap<>();
     public static boolean TrackGenome = false;
 
     private DistributedPlanStrategyTranslationAndRegistration() {
@@ -68,16 +79,16 @@ public class DistributedPlanStrategyTranslationAndRegistration {
         SupportedMutators.put("SubtourModeChoice", SubtourModeChoice.class);
         SupportedMutators.put("ChangeTripMode", ChangeTripMode.class);
 
-        SupportedMutatorGenes.put("ReRoute", new Character('A'));
-        SupportedMutatorGenes.put("TimeAllocationMutator", new Character('B'));
-        SupportedMutatorGenes.put("TimeAllocationMutator_ReRoute", new Character('C'));
-        SupportedMutatorGenes.put("ChangeLegMode", new Character('D'));
-        SupportedMutatorGenes.put("ChangeSingleLegMode", new Character('E'));
-        SupportedMutatorGenes.put("ChangeSingleTripMode", new Character('F'));
-        SupportedMutatorGenes.put("SubtourModeChoice", new Character('G'));
-        SupportedMutatorGenes.put("ChangeTripMode", new Character('H'));
-        SupportedMutatorGenes.put("TripSubtourModeChoice", new Character('J'));
-        SupportedMutatorGenes.put("TransitLocationChoice", new Character('K'));
+        SupportedMutatorGenes.put("ReRoute", 'A');
+        SupportedMutatorGenes.put("TimeAllocationMutator", 'B');
+        SupportedMutatorGenes.put("TimeAllocationMutator_ReRoute", 'C');
+        SupportedMutatorGenes.put("ChangeLegMode", 'D');
+        SupportedMutatorGenes.put("ChangeSingleLegMode", 'E');
+        SupportedMutatorGenes.put("ChangeSingleTripMode", 'F');
+        SupportedMutatorGenes.put("SubtourModeChoice", 'G');
+        SupportedMutatorGenes.put("ChangeTripMode", 'H');
+        SupportedMutatorGenes.put("TripSubtourModeChoice", 'J');
+        SupportedMutatorGenes.put("TransitLocationChoice", 'K');
 
     }
 
@@ -142,8 +153,3 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     }
 }
-
-
-
-
-

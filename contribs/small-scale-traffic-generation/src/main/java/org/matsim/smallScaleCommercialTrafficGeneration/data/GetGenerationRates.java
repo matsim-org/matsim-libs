@@ -2,6 +2,8 @@ package org.matsim.smallScaleCommercialTrafficGeneration.data;
 
 import org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.StartOrStop;
 
 import java.util.*;
 
@@ -29,7 +31,7 @@ public interface GetGenerationRates {
 	 */
 	static Map<Integer, Map<ZoneAttribute, Double>> setGenerationRates(
 		SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment,
-		String generationType ) {
+		StartOrStop generationType ) {
 
 		Map<Integer, Map<ZoneAttribute, Double>> generationRates = new HashMap<>();
 		Map<ZoneAttribute, Double> ratesPerPurpose1 = new EnumMap<>( ZoneAttribute.class);
@@ -41,7 +43,7 @@ public interface GetGenerationRates {
 		if ( SmallScaleCommercialTrafficSegment.commercialPersonTraffic== smallScaleCommercialTrafficSegment ) {
 			// enum does not need equals
 
-			if (generationType.equals("start")) {
+			if (generationType.equals( StartOrStop.start )) {
 
 				ratesPerPurpose1.put( ZoneAttribute.EMPLOYEE_SECONDARY, 0.059 );
 
@@ -58,7 +60,7 @@ public interface GetGenerationRates {
 				ratesPerPurpose5.put( ZoneAttribute.EMPLOYEE, 0.03 );
 				ratesPerPurpose5.put( ZoneAttribute.EMPLOYEE_CONSTRUCTION, 0.29 );
 
-			} else if (generationType.equals("stop")) {
+			} else if (generationType.equals(StartOrStop.stop)) {
 
 				ratesPerPurpose1.put( ZoneAttribute.EMPLOYEE_SECONDARY, 0.02 );
 
@@ -98,7 +100,7 @@ public interface GetGenerationRates {
 		} else if ( SmallScaleCommercialTrafficSegment.goodsTraffic== smallScaleCommercialTrafficSegment ) {
 			// (enum does not need equals)
 
-			if (generationType.equals("start")) {
+			if (generationType.equals(StartOrStop.start)) {
 
 				ratesPerPurpose1.put( ZoneAttribute.EMPLOYEE_SECONDARY, 0.023 );
 
@@ -117,7 +119,7 @@ public interface GetGenerationRates {
 
 				ratesPerPurpose6.put( ZoneAttribute.INHABITANTS, 0.009 );
 
-			} else if (generationType.equals("stop")) {
+			} else if (generationType.equals(StartOrStop.stop)) {
 
 				ratesPerPurpose1.put( ZoneAttribute.EMPLOYEE_SECONDARY, 0.031 );
 
@@ -172,7 +174,7 @@ public interface GetGenerationRates {
 	}
 
 	/**
-	 * Sets the commitment rates based on the IVV 2005 for the goodsTraffic. The
+	 * Sets the commitment rates ("Bindungsraten") based on the IVV 2005 for the goodsTraffic. The
 	 * commitment rate for the commercialPersonTraffic is 1, because mode choice will be
 	 * done in MATSim.
 	 * <br/>
@@ -185,7 +187,7 @@ public interface GetGenerationRates {
 	 */
 		static Map<String, Map<ZoneAttribute, Double>> setCommitmentRates(
 		SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment,
-		String startOrStop )
+		StartOrStop startOrStop )
 	{
 		Map<String, Map<ZoneAttribute, Double>> commitmentRates = new HashMap<>();
 
@@ -228,7 +230,7 @@ public interface GetGenerationRates {
 			Map<ZoneAttribute, Double> ratesPerPurpose6_4 = new EnumMap<>( ZoneAttribute.class);
 			Map<ZoneAttribute, Double> ratesPerPurpose6_5 = new EnumMap<>( ZoneAttribute.class);
 
-			if (startOrStop.equals("start")) {
+			if (startOrStop.equals(StartOrStop.start)) {
 
 				ratesPerPurpose1_1.put( ZoneAttribute.EMPLOYEE, 0.8 );
 				ratesPerPurpose1_1.put( ZoneAttribute.EMPLOYEE_SECONDARY, 0.44 );
@@ -311,7 +313,7 @@ public interface GetGenerationRates {
 
 				ratesPerPurpose6_5.put( ZoneAttribute.INHABITANTS, 0.001 );
 
-			} else if (startOrStop.equals("stop")) {
+			} else if (startOrStop.equals(StartOrStop.stop)) {
 
 				ratesPerPurpose1_1.put( ZoneAttribute.EMPLOYEE_SECONDARY, 0.35 );
 

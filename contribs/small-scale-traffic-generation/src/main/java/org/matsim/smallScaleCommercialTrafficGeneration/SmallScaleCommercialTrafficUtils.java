@@ -92,57 +92,12 @@ public class SmallScaleCommercialTrafficUtils {
 	 * @return indexZones
 	 */
 	public static Index getIndexZones(Path shapeFileZonePath, String shapeCRS, String shapeFileZoneNameColumn) {
+		// (this is used both in "prepare" and in the current package)
 
 		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
 		if (shpZones.readFeatures().getFirst().getAttribute(shapeFileZoneNameColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileZoneNameColumn + "' does not exist in the zones shape file. Please check the input.");
 		return shpZones.createIndex(shapeCRS, shapeFileZoneNameColumn);
-	}
-
-	/**
-	 * Creates and return the Index of the landuse shape.
-	 *
-	 * @param shapeFileLandusePath       	Path to the shape file of the landuse
-     * @param shapeCRS 				 		CRS of the shape file
-     * @param shapeFileLanduseTypeColumn 	Column name of the landuse in the shape file
-     * @return indexLanduse
-	 */
-	 public static Index getIndexLanduse(Path shapeFileLandusePath, String shapeCRS, String shapeFileLanduseTypeColumn) {
-		ShpOptions shpLanduse = new ShpOptions(shapeFileLandusePath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpLanduse.readFeatures().getFirst().getAttribute(shapeFileLanduseTypeColumn) == null)
-			throw new NullPointerException("The column '" + shapeFileLanduseTypeColumn + "' does not exist in the landuse shape file. Please check the input.");
-		return shpLanduse.createIndex(shapeCRS, shapeFileLanduseTypeColumn);
-	}
-
-	/**
-	 * Creates and return the Index of the building shape.
-	 *
-	 * @param shapeFileBuildingsPath      	Path to the shape file of the buildings
-     * @param shapeCRS 				 		CRS of the shape file
-     * @param shapeFileBuildingTypeColumn 	Column name of the building in the shape file
-     * @return indexBuildings
-	 */
-	public static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS, String shapeFileBuildingTypeColumn) {
-		ShpOptions shpBuildings = new ShpOptions(shapeFileBuildingsPath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpBuildings.readFeatures().getFirst().getAttribute(shapeFileBuildingTypeColumn) == null)
-			throw new NullPointerException("The column '" + shapeFileBuildingTypeColumn + "' does not exist in the building shape file. Please check the input.");
-
-		return shpBuildings.createIndex(shapeCRS, shapeFileBuildingTypeColumn);
-	}
-
-	/**
-	 * Creates and return the Index of the regions shapes.
-	 *
-	 * @param shapeFileRegionsPath     Path to the shape file of the regions
-	 * @param shapeCRS                 CRS of the shape file
-	 * @param regionsShapeRegionColumn Column name of the region in the shape file
-	 * @return indexRegions
-	 */
-	public static Index getIndexRegions(Path shapeFileRegionsPath, String shapeCRS, String regionsShapeRegionColumn) {
-		ShpOptions shpRegions = new ShpOptions(shapeFileRegionsPath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpRegions.readFeatures().getFirst().getAttribute(regionsShapeRegionColumn) == null)
-			throw new NullPointerException("The column '" + regionsShapeRegionColumn + "' does not exist in the region shape file. Please check the input.");
-		return shpRegions.createIndex(shapeCRS, regionsShapeRegionColumn);
 	}
 
 	/** Finds the nearest possible link for the building polygon.
@@ -190,8 +145,8 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
-	static void createPlansBasedOnCarrierPlans( Scenario scenario, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment, Path output,
-	                                            String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
+	static void createPlansBasedOnCarrierPlans(Scenario scenario, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment, Path output,
+	                                           String modelName, double sample, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
 
 		Population population = scenario.getPopulation();
 		PopulationFactory popFactory = population.getFactory();
@@ -264,12 +219,13 @@ public class SmallScaleCommercialTrafficUtils {
 		}
 
 		String outputPopulationFile;
+		String sampleName = PopulationUtils.getSampleLabel(sample);
 		if (nameOutputPopulation == null)
 			if ( smallScaleCommercialTrafficSegment.equals(
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.completeSmallScaleCommercialTraffic ))
-				outputPopulationFile = output.toString() + "/" + modelName + "_" + "smallScaleCommercialTraffic" + "_" + sampleName + "pct_plans.xml.gz";
+				outputPopulationFile = output.toString() + "/" + modelName + "_" + "smallScaleCommercialTraffic" + "_" + sampleName + "_plans.xml.gz";
 			else
-				outputPopulationFile = output.toString() + "/" + modelName + "_" + smallScaleCommercialTrafficSegment + "_" + sampleName + "pct_plans.xml.gz";
+				outputPopulationFile = output.toString() + "/" + modelName + "_" + smallScaleCommercialTrafficSegment + "_" + sampleName + "_plans.xml.gz";
 		else
 			outputPopulationFile = output.toString() + "/" + nameOutputPopulation;
 		if (numberOfPlanVariantsPerAgent > 1)
@@ -303,15 +259,6 @@ public class SmallScaleCommercialTrafficUtils {
 				config.scoring().addDefaultModeParams(new ScoringConfigGroup.ModeParams(mode));
 			}
 		});
-	}
-
-	static String getSampleNameOfOutputFolder(double sample) {
-		String sampleName;
-		if ((sample * 100) % 1 == 0)
-			sampleName = String.valueOf((int) (sample * 100));
-		else
-			sampleName = String.valueOf((sample * 100));
-		return sampleName;
 	}
 
 	/**

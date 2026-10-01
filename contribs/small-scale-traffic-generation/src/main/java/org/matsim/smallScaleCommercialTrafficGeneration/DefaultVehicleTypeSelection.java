@@ -5,7 +5,7 @@ import org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommer
 /**
  * Default vehicle type and occupancy selection for small-scale commercial traffic.
  */
-public class DefaultVehicleTypeSelection implements VehicleTypeSelection {
+class DefaultVehicleTypeSelection implements VehicleTypeSelection {
 
 	@Override
 	public VehicleTypeInformation getVehicleTypeInformation(

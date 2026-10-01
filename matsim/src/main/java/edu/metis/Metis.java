@@ -1,11 +1,15 @@
 package edu.metis;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -13,24 +17,95 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class Metis {
 
+	private static final Logger log = LogManager.getLogger(Metis.class);
+
 	private static boolean AVAILABLE;
 
 	static {
+		String library = System.getenv("METIS_LIBRARY");
 		try {
-			if (System.getenv("METIS_LIBRARY") != null) {
-				System.load(System.getenv("METIS_LIBRARY"));
-			} else
+			if (library != null) {
+				System.load(library);
+			} else {
+				library = System.mapLibraryName("metis") + " from java.library.path";
 				System.loadLibrary("metis");
+			}
 
 			AVAILABLE = true;
+			log.info("Loaded METIS library: {}", library);
 		} catch (UnsatisfiedLinkError e) {
 			try {
 				System.load("/opt/homebrew/lib/libmetis.dylib");
 				AVAILABLE = true;
+				log.info("Loaded METIS library: /opt/homebrew/lib/libmetis.dylib");
 			} catch (UnsatisfiedLinkError e2) {
 				AVAILABLE = false;
+				log.warn("METIS library could not be loaded ({}): {}. Set METIS_LIBRARY to the path of a shared libmetis library.",
+					library, e.getMessage());
 			}
 		}
+	}
+
+	/**
+	 * Checks whether the METIS library can be loaded and partitions a small grid graph as smoke test. Exits with a
+	 * non-zero status if METIS is not available or the partitioning is not valid.
+	 * <p>
+	 * Usage: {@code java -cp matsim.jar edu.metis.Metis [parts]}
+	 */
+	public static void main(String[] args) {
+
+		if (!AVAILABLE) {
+			System.err.println("METIS is not available, see the log above for the reason.");
+			System.exit(1);
+		}
+
+		int parts = args.length > 0 ? Integer.parseInt(args[0]) : 4;
+		int n = 100;
+
+		// n x n grid, METIS expects each undirected edge in both directions
+		Graph grid = new Graph() {
+			@Override
+			public int getNumVertices() {
+				return n * n;
+			}
+
+			@Override
+			public int getNumEdges() {
+				return 4 * n * (n - 1);
+			}
+
+			@Override
+			public void getEdges(int vertex, EdgeBuilder builder) {
+				int x = vertex % n;
+				int y = vertex / n;
+				if (x > 0) builder.addEdge(vertex - 1);
+				if (x < n - 1) builder.addEdge(vertex + 1);
+				if (y > 0) builder.addEdge(vertex - n);
+				if (y < n - 1) builder.addEdge(vertex + n);
+			}
+		};
+
+		int[] partitions = partitionGraphKway(grid, parts, MetisOptions.of());
+
+		int[] sizes = new int[parts];
+		for (int p : partitions) {
+			if (p < 0 || p >= parts) {
+				System.err.println("Invalid partition index: " + p);
+				System.exit(1);
+			}
+			sizes[p]++;
+		}
+
+		System.out.println("Partitioned " + n + "x" + n + " grid into " + parts + " parts, sizes: " + Arrays.toString(sizes));
+
+		// METIS allows 3% imbalance by default
+		int max = Arrays.stream(sizes).max().orElseThrow();
+		if (max > 1.05 * n * n / parts) {
+			System.err.println("Partitions are not balanced.");
+			System.exit(1);
+		}
+
+		System.out.println("METIS is working.");
 	}
 
 	/**

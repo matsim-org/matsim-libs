@@ -5,11 +5,12 @@ import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.util.Pair;
 import org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
+import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumesGenerator.StartOrStop;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.GetGenerationRates;
 
 import java.util.*;
 
-public class DefaultOdMatrixEntryInformationProvider implements OdMatrixEntryInformationProvider{
+class DefaultOdMatrixEntryInformationProvider implements OdMatrixEntryInformationProvider{
 	private final VehicleTypeSelection vehicleTypeSelection;
 	private final EnumMap<SmallScaleCommercialTrafficSegment,
 		Map<Integer, Map<ZoneAttribute, Double>>> generationRatesStartByType = new EnumMap<>( SmallScaleCommercialTrafficSegment.class);
@@ -45,13 +46,13 @@ public class DefaultOdMatrixEntryInformationProvider implements OdMatrixEntryInf
 	public OdMatrixEntryInformation getOdMatrixEntryInformation(int purpose, String modeORvehType, SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment ) {
 
 			generationRatesStartByType.computeIfAbsent( smallScaleCommercialTrafficSegment,
-				t -> GetGenerationRates.setGenerationRates(t, "start"));
+				t -> GetGenerationRates.setGenerationRates(t, StartOrStop.start ) );
 			generationRatesStopByType.computeIfAbsent( smallScaleCommercialTrafficSegment,
-				t -> GetGenerationRates.setGenerationRates(t, "stop"));
+				t -> GetGenerationRates.setGenerationRates(t, StartOrStop.stop ) );
 			commitmentRatesStartByType.computeIfAbsent( smallScaleCommercialTrafficSegment,
-				t -> GetGenerationRates.setCommitmentRates(t, "start"));
+				t -> GetGenerationRates.setCommitmentRates(t, StartOrStop.start ) );
 			commitmentRatesStopByType.computeIfAbsent( smallScaleCommercialTrafficSegment,
-				t -> GetGenerationRates.setCommitmentRates(t, "stop"));
+				t -> GetGenerationRates.setCommitmentRates(t, StartOrStop.stop ) );
 
 		OdMatrixEntryInformation information = new OdMatrixEntryInformation();
 

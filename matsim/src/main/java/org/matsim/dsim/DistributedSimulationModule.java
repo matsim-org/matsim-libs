@@ -1,14 +1,20 @@
 package org.matsim.dsim;
 
 import com.google.inject.Binder;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.LPProvider;
 import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.serialization.MessageTypeRegistry;
+import org.matsim.core.serialization.NoopSerializationProvider;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.DSimEventHandlingModule;
 import org.matsim.dsim.executors.LPExecutor;
@@ -18,6 +24,7 @@ import org.matsim.dsim.scoring.BackpackScoringModule;
 
 public class DistributedSimulationModule extends AbstractModule {
 
+	private static final String VOLUMES_ANALYZER_COMPONENT = "VolumesAnalyzer";
 
 	@Override
 	public void install() {
@@ -29,13 +36,21 @@ public class DistributedSimulationModule extends AbstractModule {
 		if (ctx instanceof DistributedContext o) {
 			dtx = o;
 		} else {
-			// Create a distributed contex from the local one if none was given
+			// No distributed context was supplied, so build a single-node one.
 			dtx = DistributedContext.createLocal(new NullCommunicator(), getSimulationContext().getTopology());
 			ctx = dtx;
 		}
 
 		bind(Communicator.class).toInstance(dtx.getComm());
-		bind(SerializationProvider.class).toInstance(dtx.getSerializer());
+		bind(MessageTypeRegistry.class).toInstance(MessageTypeRegistry.getInstance());
+
+		// A multi-node run supplies its own wire codec via DistributedContext.create; a single-node run gets the
+		// no-op provider, since its messages never leave the JVM.
+		if (dtx.getSerializer() != null) {
+			bind(SerializationProvider.class).toInstance(dtx.getSerializer());
+		} else {
+			bind(SerializationProvider.class).to(NoopSerializationProvider.class).in(Singleton.class);
+		}
 
 		bind(MessageBroker.class).in(Singleton.class);
 		bind(DistributedEventsManager.class).in(Singleton.class);
@@ -55,6 +70,22 @@ public class DistributedSimulationModule extends AbstractModule {
 			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(dtx.getComm().getRank()));
 			//TODO think about whether we still need something similar to consolidate experienced plans in the end
 			//addControllerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
+
+			// Vehicles may enter traffic on another node, the volumes analyzer takes their mode when they enter a partition
+			binder().requestInjection(new Object() {
+				@Inject
+				void addToComponents(QSimComponentsConfig components) {
+					if (!components.hasNamedComponent(VOLUMES_ANALYZER_COMPONENT)) {
+						components.addNamedComponent(VOLUMES_ANALYZER_COMPONENT);
+					}
+				}
+			});
+			installQSimModule(new AbstractQSimModule() {
+				@Override
+				protected void configureQSim() {
+					addQSimComponentBinding(VOLUMES_ANALYZER_COMPONENT).to(VolumesAnalyzer.class);
+				}
+			});
 		}
 
 		// Need to define the set binder, in case no other module uses it

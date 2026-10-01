@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!-- Intentional legacy garbage collection in memory-measurement helpers. -->
+  <Match>
+    <Class name="org.matsim.contrib.pseudosimulation.distributed.MemoryUsageCalculator$SystemMemoryRuntime"/>
+    <Bug pattern="DM_GC"/>
+  </Match>
+  <!-- Public extension registries have fixed identities but intentionally mutable contents. -->
+  <Match>
+    <Class name="org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration"/>
+    <Bug pattern="MS_MUTABLE_COLLECTION"/>
+  </Match>
+</FindBugsFilter>

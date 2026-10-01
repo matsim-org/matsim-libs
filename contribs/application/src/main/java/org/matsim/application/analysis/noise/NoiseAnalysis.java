@@ -152,6 +152,8 @@ public class NoiseAnalysis implements MATSimAppCommand {
 			noiseParameters.setScaleFactor(sampleOptions.getUpscaleFactor());
 		}
 
+		// ====
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		String outputFilePath = output.getPath().getParent() == null ? "." : output.getPath().getParent().toString();

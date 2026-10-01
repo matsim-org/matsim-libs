@@ -120,7 +120,7 @@ public class EvDriveDischargingIntegrationTest {
 					EvDSimTestFixture.configureDSim(config, 1 /* 1 partition per node */);
 
 					var scenario = EvDSimTestFixture.createScenario(config, 3);
-					var ctx = DistributedContext.create(comm, config);
+					var ctx = DistributedContext.create(comm, config, new org.matsim.core.serialization.ForySerializationProvider(org.matsim.core.serialization.MessageTypeRegistry.getInstance()));
 					var controller = new Controler(scenario, ctx);
 					EvDSimTestFixture.installEvModules(controller);
 					controller.run();
