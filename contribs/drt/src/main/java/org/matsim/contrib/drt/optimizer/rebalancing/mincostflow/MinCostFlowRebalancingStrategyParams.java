@@ -70,11 +70,14 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 			+ " to set values accordingly.")
 	private TargetCoefficientSource targetCoefficientSource = TargetCoefficientSource.Static;
 
-	public enum ZonalDemandEstimatorType {PreviousIterationDemand, None}
+	public enum ZonalDemandEstimatorType {PreviousIterationDemand, SubmittedDemand, None}
 
 	@Parameter
 	@Comment("Defines the methodology for demand estimation."
-			+ " Can be one of [PreviousIterationDemand, None]. Current default is PreviousIterationDemand")
+			+ " Can be one of [PreviousIterationDemand, SubmittedDemand, None]. Current default is PreviousIterationDemand."
+			+ " 'SubmittedDemand' counts all submitted requests (including rejected ones) by their intended departure"
+			+ " time, so rejected demand stays visible to the rebalancing feedback loop, and returns a rolling window"
+			+ " of length 'demandEstimationPeriod' looking forward from the current time.")
 	@NotNull
 	private ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
 

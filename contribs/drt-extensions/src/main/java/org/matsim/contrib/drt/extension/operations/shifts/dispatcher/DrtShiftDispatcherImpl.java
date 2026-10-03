@@ -31,7 +31,7 @@ import org.matsim.contrib.drt.extension.operations.operationFacilities.*;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.events.*;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalStop;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.FacilityStop;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftSchedules;
@@ -86,6 +86,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     private final ShiftsParams drtShiftParams;
 
     private final ShiftStartLogic shiftStartLogic;
+    private final ShiftEndLogic shiftEndLogic;
     private final AssignShiftToVehicleLogic assignShiftToVehicleLogic;
 
     private final ShiftScheduler shiftScheduler;
@@ -94,7 +95,8 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     public DrtShiftDispatcherImpl(String mode, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
                                   OperationFacilityFinder operationFacilityFinder, ShiftTaskScheduler shiftTaskScheduler,
                                   EventsManager eventsManager, ShiftsParams drtShiftParams,
-                                  ShiftStartLogic shiftStartLogic, AssignShiftToVehicleLogic assignShiftToVehicleLogic,
+                                  ShiftStartLogic shiftStartLogic, ShiftEndLogic shiftEndLogic,
+                                  AssignShiftToVehicleLogic assignShiftToVehicleLogic,
                                   ShiftScheduler shiftScheduler, OperationFacilityReservationManager facilityReservationManager) {
         this.mode = mode;
         this.fleet = fleet;
@@ -105,6 +107,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         this.eventsManager = eventsManager;
         this.drtShiftParams = drtShiftParams;
         this.shiftStartLogic = shiftStartLogic;
+        this.shiftEndLogic = shiftEndLogic;
         this.assignShiftToVehicleLogic = assignShiftToVehicleLogic;
         this.shiftScheduler = shiftScheduler;
         this.facilityReservationManager = facilityReservationManager;
@@ -142,12 +145,12 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     @Override
-    public void startOperationalTask(ShiftDvrpVehicle vehicle, OperationalStop operationalStop) {
-        OperationFacility facility = Objects.requireNonNull(operationFacilities.getFacilities().get(operationalStop.getFacilityId()));
+    public void startOperationalTask(ShiftDvrpVehicle vehicle, FacilityStop facilityStop) {
+        OperationFacility facility = Objects.requireNonNull(operationFacilities.getFacilities().get(facilityStop.getFacilityId()));
 
-        Verify.verify(operationalStop.getReservationId().isPresent(), "Vehicle should have a reservation at this point.");
+        Verify.verify(facilityStop.getReservationId().isPresent(), "Vehicle should have a reservation at this point.");
         Optional<ReservationManager.ReservationInfo<OperationFacility, DvrpVehicle>> reservation = facilityReservationManager
-                .findReservation(facility.getId(), operationalStop.getReservationId().get());
+                .findReservation(facility.getId(), facilityStop.getReservationId().get());
         Verify.verify(reservation.isPresent(), "Reservation is not know at the resource.");
 
         boolean registered = facility.register(vehicle.getId());
@@ -158,9 +161,9 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                     vehicle.getId().toString(), facility.getId(), reservation.get().reservationId()));
         } else {
 
-            if (operationalStop instanceof ShiftChangeOverTask changeover) {
+            if (facilityStop instanceof ShiftChangeOverTask changeover) {
                 endShift(vehicle, changeover.getLink().getId(), changeover.getFacilityId());
-            } else if (operationalStop instanceof ShiftBreakTask shiftBreak) {
+            } else if (facilityStop instanceof ShiftBreakTask shiftBreak) {
                 startBreak(vehicle, shiftBreak.getLink().getId());
             }
 
@@ -170,11 +173,11 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     @Override
-    public void endOperationalTask(ShiftDvrpVehicle vehicle, OperationalStop operationalStop) {
-        if (operationalStop instanceof ShiftBreakTask shiftBreakTask) {
+    public void endOperationalTask(ShiftDvrpVehicle vehicle, FacilityStop facilityStop) {
+        if (facilityStop instanceof ShiftBreakTask shiftBreakTask) {
             endBreak(vehicle, shiftBreakTask);
         }
-        OperationFacility facility = Objects.requireNonNull(operationFacilities.getFacilities().get(operationalStop.getFacilityId()));
+        OperationFacility facility = Objects.requireNonNull(operationFacilities.getFacilities().get(facilityStop.getFacilityId()));
         boolean checkOut = facility.deregisterVehicle(vehicle.getId());
         if (checkOut) {
             eventsManager.processEvent(new OperationFacilityCheckOutEvent(timer.getTimeOfDay(), mode, vehicle.getId(), facility.getId()));
@@ -195,6 +198,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
             }
             logger.info(print.toString());
         }
+         endShiftsEarly(now);
         endShifts(now);
         if (now % (drtShiftParams.getUpdateShiftEndInterval()) == 0) {
             updateShiftEnds(now);
@@ -395,6 +399,82 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         }
     }
 
+    /**
+     * Consults the {@link ShiftEndLogic} for each active shift and pulls the changeover of those it selects forward to
+     * {@code now}, ending them before their scheduled end. Uses attempt-and-defer semantics: if a vehicle cannot be
+     * routed to a hub with free capacity right now, the shift keeps running and can be reconsidered next step. The
+     * default logic ({@link ShiftEndLogic#NEVER}) selects nothing, so this is a no-op for regular (driver) shifts.
+     */
+    private void endShiftsEarly(double now) {
+        final Iterator<ShiftEntry> iterator = this.activeShifts.iterator();
+        while (iterator.hasNext()) {
+            final ShiftEntry active = iterator.next();
+            if (!shiftEndLogic.shiftEndsEarly(active, now)) {
+                continue;
+            }
+            if (endShiftActively(active, now)) {
+                iterator.remove();
+            }
+            // else: could not reserve a hub right now → leave active, retry on a later step (attempt-and-defer)
+        }
+    }
+
+    /**
+     * Ends an active shift before its scheduled end time. The vehicle finishes its committed stops, then routes to a
+     * hub where the pulled-forward changeover happens on arrival. {@code shift.getEndTime()} is never mutated; the
+     * regular {@code endShift()} still fires on facility check-in. The caller is responsible for removing the entry
+     * from {@link #activeShifts} on success.
+     *
+     * @return {@code true} if the shift was scheduled to end early, {@code false} if no hub could be reserved now
+     */
+    private boolean endShiftActively(ShiftEntry endingShift, double now) {
+        if (endingShift.shift().getOperationFacilityId().isPresent()) {
+            // fixed start/end facility: not eligible for discretionary early end
+            return false;
+        }
+
+        ShiftEndAnchor anchor = findShiftEndAnchor(endingShift.vehicle());
+
+        Set<OperationFacilityType> types;
+        if (drtShiftParams.isAllowInFieldChangeover()) {
+            types = Set.of(OperationFacilityType.hub, OperationFacilityType.inField);
+        } else {
+            types = Set.of(OperationFacilityType.hub);
+        }
+        Optional<OperationFacilityFinder.FacilityWithPath> maybeFacility = operationFacilityFinder.findFacilityForTime(
+                anchor.start().link,
+                endingShift.vehicle(),
+                anchor.start().time,
+                endingShift.vehicle().getServiceEndTime(),
+                endingShift.vehicle().getServiceEndTime() - timer.getTimeOfDay(),
+                types);
+
+        if (maybeFacility.isEmpty()) {
+            return false;
+        }
+
+        OperationFacility shiftChangeFacility = maybeFacility.get().operationFacility();
+        Optional<ReservationManager.ReservationInfo<OperationFacility, DvrpVehicle>> reservation =
+                facilityReservationManager.addReservation(shiftChangeFacility, endingShift.vehicle(),
+                        maybeFacility.get().path().getArrivalTime(), endingShift.vehicle().getServiceEndTime());
+        if (reservation.isEmpty()) {
+            return false;
+        }
+
+        // anchor the changeover at "now" (clamped to arrival) instead of the scheduled end → the shift ends on arrival
+        shiftTaskScheduler.updateShiftChange(endingShift.vehicle(), maybeFacility.get().path(),
+                endingShift.shift(), reservation.get(), anchor.lastTask(), now);
+
+        // remove any stale reservation from a previously materialised changeover
+        if (anchor.existingChangeover() != null) {
+            Id<OperationFacility> existingFacilityId = anchor.existingChangeover().getFacilityId();
+            anchor.existingChangeover().getReservationId()
+                    .ifPresent(id -> facilityReservationManager.removeReservation(existingFacilityId, id));
+        }
+
+        return true;
+    }
+
     private void updateShiftEnds(double now) {
         final Iterator<ShiftEntry> endingShiftsIterator = this.endingShifts.iterator();
         while (endingShiftsIterator.hasNext()) {
@@ -413,19 +493,21 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         }
     }
 
-    private void updateShiftEnd(ShiftEntry endingShift) {
+    /**
+     * The point from which a vehicle should be routed to a hub for its shift end, plus the task that anchors the
+     * reroute and the vehicle's currently scheduled changeover (if any). The reroute starts <em>after the last
+     * committed stop</em> so that already-accepted passengers are still served; only if there is no upcoming stop does
+     * it start from the current task (diverting a drive, or leaving from a stop/stay).
+     */
+    private record ShiftEndAnchor(Task lastTask, LinkTimePair start, ShiftChangeOverTask existingChangeover) {}
 
-        if (endingShift.shift().getOperationFacilityId().isPresent()) {
-            //start and end facility are fixed
-            return;
-        }
-
-        final List<? extends Task> tasks = endingShift.vehicle().getSchedule().getTasks();
+    private ShiftEndAnchor findShiftEndAnchor(ShiftDvrpVehicle vehicle) {
+        final List<? extends Task> tasks = vehicle.getSchedule().getTasks();
 
         Task lastTask = null;
         LinkTimePair start = null;
         ShiftChangeOverTask changeOverTask = null;
-        final Task currentTask = endingShift.vehicle().getSchedule().getCurrentTask();
+        final Task currentTask = vehicle.getSchedule().getCurrentTask();
         for (Task task : tasks.subList(currentTask.getTaskIdx(), tasks.size())) {
             if (task instanceof ShiftChangeOverTask) {
                 changeOverTask = (ShiftChangeOverTask) task;
@@ -460,6 +542,20 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                     throw new RuntimeException();
             }
         }
+        return new ShiftEndAnchor(lastTask, start, changeOverTask);
+    }
+
+    private void updateShiftEnd(ShiftEntry endingShift) {
+
+        if (endingShift.shift().getOperationFacilityId().isPresent()) {
+            //start and end facility are fixed
+            return;
+        }
+
+        ShiftEndAnchor anchor = findShiftEndAnchor(endingShift.vehicle());
+        Task lastTask = anchor.lastTask();
+        LinkTimePair start = anchor.start();
+        ShiftChangeOverTask changeOverTask = anchor.existingChangeover();
 
         final Optional<OperationFacilityFinder.FacilityWithPath> maybeFacility;
         Set<OperationFacilityType> types;
@@ -485,7 +581,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                                     maybeFacility.get().path().getArrivalTime(), endingShift.vehicle().getServiceEndTime());
                     if (reservation.isPresent()) {
                         shiftTaskScheduler.updateShiftChange(endingShift.vehicle(), maybeFacility.get().path(),
-                                endingShift.shift(), reservation.get(), lastTask);
+                                endingShift.shift(), reservation.get(), lastTask, endingShift.shift().getEndTime());
 
                         // remove old reservation
                         Optional<Id<ReservationManager.Reservation>> reservationId = changeOverTask.getReservationId();

@@ -8,14 +8,16 @@ import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFacto
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.config.RemoteGuidanceParams;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.optimizer.IncidentAwareVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityReservationManager;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsActionCreator;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsTaskFactory;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskSchedulerImpl;
 import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
@@ -60,22 +62,30 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 				getter -> null)
 		).asEagerSingleton();
 
-		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
-				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0, getter.getModal(DvrpLoadType.class),
-						getter.getModal(StopWaypointFactory.class)),
-                        drtShiftParams.isConsiderUpcomingShiftsForInsertion()))).asEagerSingleton();
+		// when stochastic incidents are enabled, wrap the entry factory so vehicles currently held by an incident are
+		// taken out of the insertion pool entirely (an IncidentHoldTask spliced mid-drive is not a valid insertion
+		// waypoint and would otherwise trip the core scheduler's removeBetween verifier).
+		boolean hasIncidents = drtOperationsParams.getRemoteGuidanceParams()
+				.flatMap(RemoteGuidanceParams::getIncidentParams).isPresent();
+		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> {
+			VehicleEntry.EntryFactory factory = new ShiftVehicleDataEntryFactory(
+					new EDrtVehicleDataEntryFactory(0, getter.getModal(DvrpLoadType.class),
+							getter.getModal(StopWaypointFactory.class)),
+					drtShiftParams.isConsiderUpcomingShiftsForInsertion());
+			return hasIncidents ? new IncidentAwareVehicleDataEntryFactory(factory) : factory;
+		})).asEagerSingleton();
 
 		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->
-						new DrtOperationsTaskFactory(new EDrtTaskFactoryImpl(),
+						new DrtOperationsTaskFactoryImpl(new EDrtTaskFactoryImpl(),
 								getter.getModal(OperationFacilities.class),
 								getter.getModal(OperationFacilityReservationManager.class))))
 				.in(Singleton.class);
-		bindModal(ShiftDrtTaskFactory.class).toProvider(modalProvider(getter -> ((ShiftDrtTaskFactory) getter.getModal(DrtTaskFactory.class))));
+		bindModal(DrtOperationsTaskFactory.class).toProvider(modalProvider(getter -> ((DrtOperationsTaskFactory) getter.getModal(DrtTaskFactory.class))));
 
 		bindModal(ShiftTaskScheduler.class).toProvider(modalProvider(
 				getter -> new ShiftTaskSchedulerImpl(
 						getter.getModal(OperationFacilities.class),
-						getter.getModal(ShiftDrtTaskFactory.class),
+						getter.getModal(DrtOperationsTaskFactory.class),
 						getter.getModal(Network.class),
 						getter.getModal(OperationFacilityReservationManager.class),
 						drtShiftParams,

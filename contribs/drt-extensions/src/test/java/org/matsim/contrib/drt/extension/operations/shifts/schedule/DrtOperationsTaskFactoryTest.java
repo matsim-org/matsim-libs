@@ -47,13 +47,13 @@ public class DrtOperationsTaskFactoryTest {
     @Mock private DrtStopTask drtStopTask;
     @Mock private OperationFacility facility;
     
-    private DrtOperationsTaskFactory taskFactory;
+    private DrtOperationsTaskFactoryImpl taskFactory;
     private final double beginTime = 3600.0;
     private final double endTime = 7200.0;
 
     @BeforeEach
     public void setUp() {
-        taskFactory = new DrtOperationsTaskFactory(drtTaskFactory, operationFacilities, reservationManager);
+        taskFactory = new DrtOperationsTaskFactoryImpl(drtTaskFactory, operationFacilities, reservationManager);
     }
 
     @Test
