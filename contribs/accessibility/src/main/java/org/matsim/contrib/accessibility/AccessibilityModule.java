@@ -212,7 +212,9 @@ public final class AccessibilityModule extends AbstractModule {
 					if (this.drtEstimator.isEmpty()) {
 						throw new RuntimeException("DrtEstimator is not present. Please check your configuration.");
 					}
-					calculator = new EstimatedDrtAccessibilityContributionCalculator(mode,  scenario, map.get(TransportMode.drt),this.tripRouter, this.drtEstimator.get());
+					calculator = new EstimatedDrtAccessibilityContributionCalculator(mode, scenario, map.get(TransportMode.drt),
+						this.tripRouter, this.drtEstimator.get(), acg.isWriteDrtStopPairs()
+							? java.nio.file.Path.of(outputDirectory, "drt_stop_pairs_queried.csv") : null);
 				} else if ( Modes4Accessibility.matrixBasedPt.name().equals( mode ) ) {
 					throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, sep'19") ;
 //						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
