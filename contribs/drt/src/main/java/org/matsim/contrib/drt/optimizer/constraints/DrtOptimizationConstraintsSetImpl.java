@@ -52,7 +52,11 @@ public class DrtOptimizationConstraintsSetImpl extends DrtOptimizationConstraint
     protected void checkConsistency(Config config) {
         super.checkConsistency(config);
         Verify.verify(getMaxAbsoluteDetour() > getMinimumAllowedDetour(), "The minimum allowed detour must" +
-                "be lower than the maximum allowed detour.");
+                " be lower than the maximum allowed detour.");
+        if (!Double.isNaN(maxTravelTimeBeta) && !Double.isNaN(getMaxWaitTime())) {
+            Verify.verify(getMaxTravelTimeBeta() >= getMaxWaitTime(), "The maximum travel time beta must" +
+                    " be at least equal or greater than maximum wait time.");
+        }
     }
 
     @DecimalMin("1.0")

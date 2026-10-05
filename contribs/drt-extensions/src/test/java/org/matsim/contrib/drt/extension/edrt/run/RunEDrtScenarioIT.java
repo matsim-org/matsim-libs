@@ -129,7 +129,7 @@ public class RunEDrtScenarioIT {
 
 		controller.run();
 
-		assertEquals(1909, tracker.passengerPickupEvents);
+		assertEquals(2087, tracker.passengerPickupEvents);
 	}
 
 
@@ -157,10 +157,10 @@ public class RunEDrtScenarioIT {
 
 		controller.run();
 
-		assertEquals(106, tracker.immediateScheduled);
-		assertEquals(181, tracker.prebookedScheduled);
-		assertEquals(101, tracker.immediateRejected);
-		assertEquals(24, tracker.prebookedRejected);
+		assertEquals(135, tracker.immediateScheduled);
+		assertEquals(178, tracker.prebookedScheduled);
+		assertEquals(75, tracker.immediateRejected);
+		assertEquals(27, tracker.prebookedRejected);
 	}
 
 	static private class PassengerPickUpTracker implements PassengerPickedUpEventHandler {

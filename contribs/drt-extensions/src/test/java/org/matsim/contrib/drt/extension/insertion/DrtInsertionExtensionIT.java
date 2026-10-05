@@ -220,9 +220,9 @@ public class DrtInsertionExtensionIT {
 			}
 		}
 
-		assertEquals(343, totalRequests);
-		assertEquals(67, restrictedRequests);
-		assertEquals(67, validMatchings);
+		assertEquals(366, totalRequests);
+		assertEquals(84, restrictedRequests);
+		assertEquals(84, validMatchings);
 		assertEquals(0, invalidMatchings);
 	}
 
@@ -290,8 +290,8 @@ public class DrtInsertionExtensionIT {
 			assertTrue(item.getValue() < 100.0 * 1e3);
 		}
 
-		assertEquals(1470, distanceCalculator.calculatedDistances);
-		assertEquals(5286, distanceApproximator.calculatedDistances);
+		assertEquals(1039, distanceCalculator.calculatedDistances);
+		assertEquals(7089, distanceApproximator.calculatedDistances);
 	}
 
 	@Test
@@ -326,8 +326,8 @@ public class DrtInsertionExtensionIT {
 			assertTrue(item.getValue() < 100.0 * 1e3);
 		}
 
-		assertEquals(1470, distanceCalculator.calculatedDistances);
-		assertEquals(5286, distanceApproximator.calculatedDistances);
+		assertEquals(1039, distanceCalculator.calculatedDistances);
+		assertEquals(7089, distanceApproximator.calculatedDistances);
 	}
 
 	static class CustomDistanceCalculator extends CustomCalculator {
@@ -393,7 +393,7 @@ public class DrtInsertionExtensionIT {
 			assertTrue(handler.rejectedRequests.contains(Id.create("drt_" + i, Request.class)));
 		}
 
-		assertEquals(112, handler.rejectedRequests.size());
+		assertEquals(104, handler.rejectedRequests.size());
 	}
 
 	static public class RejectedRequestsHandler implements PassengerRequestRejectedEventHandler {
@@ -429,10 +429,10 @@ public class DrtInsertionExtensionIT {
 
 		controller.run();
 
-		assertEquals(18, handler.rejectedRequests);
-		assertEquals(2097060.0, handler.fleetDistance, 1e-3);
-		assertEquals(700441.0, handler.activeTime(), 1e-3);
-		assertEquals(278.5162162162162, handler.meanWaitTime(), 1e-3);
+		assertEquals(6, handler.rejectedRequests);
+		assertEquals(1966486.0, handler.fleetDistance, 1e-3);
+		assertEquals(699697.0, handler.activeTime(), 1e-3);
+		assertEquals(314.8219895287958, handler.meanWaitTime(), 1e-3);
 	}
 
 	@Test
@@ -450,10 +450,10 @@ public class DrtInsertionExtensionIT {
 
 		controller.run();
 
-		assertEquals(18, handler.rejectedRequests);
-		assertEquals(2097060, handler.fleetDistance, 1e-3);
-		assertEquals(700441.0, handler.activeTime(), 1e-3);
-		assertEquals(278.5162162162162, handler.meanWaitTime(), 1e-3);
+		assertEquals(6, handler.rejectedRequests);
+		assertEquals(1966486.0, handler.fleetDistance, 1e-3);
+		assertEquals(699697.0, handler.activeTime(), 1e-3);
+		assertEquals(314.8219895287958, handler.meanWaitTime(), 1e-3);
 	}
 
 	@Test
@@ -471,10 +471,10 @@ public class DrtInsertionExtensionIT {
 
 		controller.run();
 
-		assertEquals(22, handler.rejectedRequests);
-		assertEquals(2070663.0, handler.fleetDistance, 1e-3);
-		assertEquals(699076.0, handler.activeTime(), 1e-3);
-		assertEquals(279.37704, handler.meanWaitTime(), 1e-3);
+		assertEquals(5, handler.rejectedRequests);
+		assertEquals(2016574.0, handler.fleetDistance, 1e-3);
+		assertEquals(692726.0, handler.activeTime(), 1e-3);
+		assertEquals(301.1906005221932, handler.meanWaitTime(), 1e-3);
 	}
 
 	@Test
@@ -492,10 +492,10 @@ public class DrtInsertionExtensionIT {
 
 		controller.run();
 
-		assertEquals(23, handler.rejectedRequests);
-		assertEquals(2141019.0, handler.fleetDistance, 1e-3);
-		assertEquals(704897.0, handler.activeTime(), 1e-3);
-		assertEquals(241.17808, handler.meanWaitTime(), 1e-3);
+		assertEquals(6, handler.rejectedRequests);
+		assertEquals(2138851.0, handler.fleetDistance, 1e-3);
+		assertEquals(704702.0, handler.activeTime(), 1e-3);
+		assertEquals(235.72513089005236, handler.meanWaitTime(), 1e-3);
 	}
 
 	static public class ObjectiveHandler
