@@ -150,19 +150,20 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String policyDir="/Users/kainagel/public-svn/matsim/scenarios/countries/de/lausitz/projects/DiTriMo/v2.0/02_drt-case-study/no-pooling-0-fare/output-1-ruhland-bhf_full_plans/";
 
 		// muehlnickel
-		final String baseDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/muehlnickel/u5_ubahn_smq_continued_4711/";
-		final String policyDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/muehlnickel/20251220_222258-U5plus-continued-10pct-4711/";
+//		final String baseDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/muehlnickel/u5_ubahn_smq_continued_4711/";
+//		final String policyDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/muehlnickel/20251220_222258-U5plus-continued-10pct-4711/";
 
-		// ca. 10k wechsler car --> pt
-		// verbl. 0.2 min schneller
+		// bln 7.2 U0
+		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-berlin/v7.2/base-case-ctd/500it";
+		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-berlin/v7.2/policy-case/U0-500it";
 
 		// ===
 
-//		generateExperiencedPlans( baseDir );
-//		generateExperiencedPlans( policyDir );
-//		generateFilteredEventsFile( baseDir );
-//		generateFilteredEventsFile( policyDir );
-		agentWiseComparison( baseDir, policyDir, shpFile );
+		generateExperiencedPlans( baseDir );
+		generateExperiencedPlans( policyDir );
+		generateFilteredEventsFile( baseDir );
+		generateFilteredEventsFile( policyDir );
+//		agentWiseComparison( baseDir, policyDir, shpFile );
 	}
 
 	// ---
