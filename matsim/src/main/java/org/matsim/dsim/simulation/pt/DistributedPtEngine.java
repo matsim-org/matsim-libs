@@ -255,7 +255,7 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 		@Override
 		public int compare(VehicleAtStop o1, VehicleAtStop o2) {
 			var timeResult = timeComparator.compare(o1, o2);
-			if (timeResult != 0) {
+			if (timeResult == 0) {
 				return o1.vehicle().getId().compareTo(o2.vehicle().getId());
 			} else {
 				return timeResult;
