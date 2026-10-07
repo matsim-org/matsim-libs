@@ -196,6 +196,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private double effectiveNumberOfLanesUsedInQsim = Double.POSITIVE_INFINITY;
 
 	private double accumulatedInflowCap = 1.;
+	private double inflowUpdateTime = 0.;
 
 	private final FlowEfficiencyCalculator flowEfficiencyCalculator;
 
@@ -410,13 +411,11 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				* suitable covered by tests. Still, simulation outcome of the Berlin scenario differs a lot when we multiply the flow capacity factor
 				* here (car mode shares go significantly down!). This has to be investigated further! For now, we leave the inflow capacity (unscaled)
 				* as before.
-				* tilmann, theresa + christian, feb+mar'25 */
+				* tilmann, theresa + christian, feb+mar'25
+				* hopefully fixed updateInflowAccumulation() DR 20260710 */
 				final double maxFlowFromFdiag = (context.qsimConfig.getFlowCapFactor() * this.effectiveNumberOfLanes/context.effectiveCellSize)
 					/ ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
 				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() );
-				if (wrnCnt < 10) {
-					log.warn("scaled qsim-inflow");
-				}
 
 				QSimConfigGroup.InflowCapacitySetting inflowCapacitySetting = context.qsimConfig.getInflowCapacitySetting();
 
@@ -585,7 +584,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				this.processArrivalOfHoles();
 				break;
 			case kinematicWaves:
-				this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxInflowUsedInQsim, maxInflowUsedInQsim);
+				this.updateInflowAccumulation();
 				this.processArrivalOfHoles();
 				break;
 			default:
@@ -593,6 +592,24 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 		this.moveQueueToBuffer();
 		return true;
+	}
+
+	/**
+	 * Accumulates the inflow capacity over elapsed time rather than per call, mirroring
+	 * {@link #updateFastFlowAccumulation()}. Needed because doSimStep() is only called while the link is active
+	 * (see isActive()), so a link that falls empty with a negative accumulatedInflowCap would otherwise freeze it
+	 * and refuse all further vehicles from upstream. This only shows up once a single vehicle consumes more than
+	 * maxInflowUsedInQsim, i.e. whenever the inflow capacity is scaled with the flow capacity factor.
+	 */
+	private void updateInflowAccumulation() {
+		double now = context.getSimTimer().getTimeOfDay();
+
+		if (this.inflowUpdateTime < now) {
+			double timeSteps = (now - this.inflowUpdateTime) / context.qsimConfig.getTimeStepSize();
+			this.accumulatedInflowCap = Math.min(this.accumulatedInflowCap + timeSteps * maxInflowUsedInQsim,
+				maxInflowUsedInQsim);
+			this.inflowUpdateTime = now;
+		}
 	}
 
 	private void processArrivalOfHoles() {
@@ -763,6 +780,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			return true;
 		}
 
+		// the link may have been inactive for a while, so catch up on the inflow capacity before looking at it
+		this.updateInflowAccumulation();
+
 		return this.accumulatedInflowCap > 0;
 
 	}
@@ -901,6 +921,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 		holes.clear();
 		this.remainingHolesStorageCapacity = this.storageCapacity;
+		this.accumulatedInflowCap = maxInflowUsedInQsim;
+		this.inflowUpdateTime = 0.;
 	}
 
 	private double getFlowCapacityConsumptionInEquivalents(QVehicle vehicle, QVehicle prevVehicle, Double timeDiff) {
