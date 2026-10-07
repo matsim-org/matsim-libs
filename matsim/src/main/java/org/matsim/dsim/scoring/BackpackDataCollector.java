@@ -9,13 +9,16 @@ import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.dsim.DSimComponentsMessageProcessor;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.dsim.NotifyAgentInsertion;
 import org.matsim.core.mobsim.dsim.NotifyAgentPartitionTransfer;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.AfterMobsim;
 import org.matsim.dsim.simulation.PartitionTransfer;
@@ -28,7 +31,8 @@ import java.util.*;
  * as well as data used for scoring.
  * <p>
  * Each partition in a DSim has one event handler.
- * Agents arriving on a partition are registered with the handler, agents leaving are de-registered.
+ * Agents inserted into the simulation are registered with the handler of their starting partition. Agents arriving on a partition are
+ * registered with the handler, agents leaving are de-registered.
  * Each agent carries a backpack with data that is used for scoring and which contains state, such as in which
  * vehicle an agent is currently in.
  * <p>
@@ -37,11 +41,12 @@ import java.util.*;
  * agents might have left the partition already.
  */
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
-public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEventHandler, NotifyAgentPartitionTransfer, QSimComponent, DSimComponentsMessageProcessor, AfterMobsim {
+public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEventHandler, NotifyAgentInsertion, NotifyAgentPartitionTransfer, QSimComponent, DSimComponentsMessageProcessor, AfterMobsim {
 
 	private final Map<Id<Person>, Backpack> backpackByPerson = new HashMap<>();
 	private final Map<Id<Vehicle>, Set<Backpack>> backpackByVehicle = new HashMap<>();
 	private final Set<Id<Person>> ignoredAgents = new HashSet<>();
+	private final Set<Id<Person>> finishedAgents = new HashSet<>();
 
 	private final PartitionTransfer partitionTransfer;
 	private final Network network;
@@ -78,6 +83,28 @@ public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEven
 		partitionTransfer.collect(message, toPartition);
 	}
 
+	/**
+	 * Creates a backpack for each person of the population, so that persons which never produce events are scored as well. Agents which
+	 * are not part of the population, such as transit drivers, are ignored.
+	 */
+	@Override
+	public void onAgentInserted(DistributedMobsimAgent agent) {
+
+		var id = agent.getId();
+		if (!population.getPersons().containsKey(id)) {
+			ignoredAgents.add(id);
+			return;
+		}
+		if (backpackByPerson.containsKey(id)) return;
+
+		var startPartition = network.getPartitioning().getPartition(agent.getCurrentLinkId());
+		var backpack = new Backpack(id, startPartition, providers);
+		if (agent instanceof PlanAgent pa && pa.getCurrentPlanElement() instanceof Activity act) {
+			backpack.backpackPlan().startWithActivity(act);
+		}
+		backpackByPerson.put(id, backpack);
+	}
+
 	@Override
 	public void onAgentEntersPartition(DistributedMobsimAgent agent) {
 
@@ -111,6 +138,7 @@ public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEven
 		if (!backpackByPerson.containsKey(agentId)) return;
 
 		var backpack = backpackByPerson.remove(agentId);
+		finishedAgents.add(agentId);
 		if (backpack.isInVehicle()) {
 			backpackByVehicle.get(backpack.currentVehicle()).remove(backpack);
 		}
@@ -138,15 +166,19 @@ public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEven
 	@Override
 	public void handleEvent(Event e) {
 
-		// 1. bookeeping which adds things
+		// 0. check registration before any bookkeeping, so that a failing check leaves no inconsistent state behind
 		if (e instanceof TransitDriverStartsEvent tdse) {
 			ignoredAgents.add(tdse.getDriverId());
-		} else if (e instanceof PersonEntersVehicleEvent peve) {
+		}
+		if (e instanceof HasPersonId hpi) {
+			assertRegistered(e, hpi.getPersonId());
+		}
+
+		// 1. bookeeping which adds things
+		if (e instanceof PersonEntersVehicleEvent peve) {
 			bookkeepingPersonEntersVehicle(peve);
 		} else if (e instanceof PersonContinuesInVehicleEvent pcive) {
 			bookkeepingPersonContinuesInVehicle(pcive);
-		} else if (e instanceof ActivityEndEvent aee) {
-			bookkeepingActivityEnd(aee);
 		}
 
 		// 2. take care of all person-related events
@@ -166,23 +198,31 @@ public class BackpackDataCollector implements BasicEventHandler, MobsimScopeEven
 		}
 	}
 
-	private void bookkeepingActivityEnd(ActivityEndEvent aee) {
+	/**
+	 * Adds persons which are not part of the population to the ignored agents. Persons of the population must have a backpack on this
+	 * partition, as their experienced plan and score would be silently incomplete otherwise.
+	 *
+	 * @throws IllegalStateException if a person of the population has no backpack on this partition.
+	 */
+	private void assertRegistered(Event e, Id<Person> id) {
+		// finished persons have legitimately handed in their backpack, e.g. after getting stuck
+		if (ignoredAgents.contains(id) || backpackByPerson.containsKey(id) || finishedAgents.contains(id)) return;
 
-		var id = aee.getPersonId();
-		if (backpackByPerson.containsKey(id) || ignoredAgents.contains(id)) return;
-
-		// if we don't have a backpack yet and the person is not ignored, this is the first activity of that person. Therefore, we must create a new
-		// backpack or add it to the ignored list.
-		//
-		// This favors implicitly registering agents and assumes that an agents starts its simulation with an activity.
-		if (population.getPersons().containsKey(id)) {
-			var startLink = aee.getLinkId();
-			var startPartition = network.getPartitioning().getPartition(startLink);
-			var backpack = new Backpack(id, startPartition, providers);
-			this.backpackByPerson.put(id, backpack);
-		} else {
+		if (!population.getPersons().containsKey(id)) {
 			ignoredAgents.add(id);
+			return;
 		}
+
+		throw new IllegalStateException("""
+			Received event '%s' at time %s for person '%s', but this person has no backpack on this partition. Event: %s
+			Every person in the population gets a backpack when it is inserted into the mobsim (BackpackDataCollector#onAgentInserted) or \
+			when it arrives from another partition (via Backpack.Msg). A missing backpack means this person's experienced plan and score \
+			cannot be computed. Carrying on would leave the person unscored and corrupt scorestats and the experienced plans without any \
+			warning.
+			Likely causes: (1) an agent source puts population agents into the mobsim without calling \
+			InsertableMobsim#insertAgentIntoMobsim; (2) a component produces an event for this person on a partition where the person is \
+			not currently located."""
+			.formatted(e.getEventType(), e.getTime(), id, e));
 	}
 
 	private void bookkeepingPersonEntersVehicle(PersonEntersVehicleEvent peve) {
