@@ -411,9 +411,12 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				* here (car mode shares go significantly down!). This has to be investigated further! For now, we leave the inflow capacity (unscaled)
 				* as before.
 				* tilmann, theresa + christian, feb+mar'25 */
-				final double maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize)
+				final double maxFlowFromFdiag = (context.qsimConfig.getFlowCapFactor() * this.effectiveNumberOfLanes/context.effectiveCellSize)
 					/ ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
 				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() );
+				if (wrnCnt < 10) {
+					log.warn("scaled qsim-inflow");
+				}
 
 				QSimConfigGroup.InflowCapacitySetting inflowCapacitySetting = context.qsimConfig.getInflowCapacitySetting();
 
