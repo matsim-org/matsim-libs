@@ -415,7 +415,13 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				* hopefully fixed updateInflowAccumulation() DR 20260710 */
 				final double maxFlowFromFdiag = (context.qsimConfig.getFlowCapFactor() * this.effectiveNumberOfLanes/context.effectiveCellSize)
 					/ ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
-				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() );
+				/* The number of lanes the fdiag needs in order to support the flow cap from the network file. This is a
+				 * physical, i.e. unscaled, lane count, so the division by the flow cap factor is the counterpart of the
+				 * multiplication above: minimumNumberOfLanesFromFdiag > effectiveNumberOfLanes is then equivalent to
+				 * maxFlowFromFdiag < flowCapacityPerTimeStep. Without it the lane count came out scaled and was compared
+				 * against (and assigned over) the unscaled effectiveNumberOfLanes. dr, oct'26 */
+				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep / context.qsimConfig.getFlowCapFactor()
+					* context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() );
 
 				QSimConfigGroup.InflowCapacitySetting inflowCapacitySetting = context.qsimConfig.getInflowCapacitySetting();
 
@@ -436,7 +442,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 					qLinkInternalInterface.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600 * maxInflowUsedInQsim / context.qsimConfig.getTimeStepSize());
 
 				} else  {
-					if (wrnCnt < 10) { // warnings
+					// the fdiag only restricts the link where it stays below the flow cap from the network file
+					if (maxFlowFromFdiag < flowCapacityPerTimeStep && wrnCnt < 10) { // warnings
 						wrnCnt++;
 						log.warn("max flow from fdiag < flow cap in network file; linkId=" + qLinkInternalInterface.getId() +
 							"; network file flow cap/h=" + 3600. * flowCapacityPerTimeStep / context.qsimConfig.getTimeStepSize() +
@@ -463,7 +470,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 						// write out the modified qsim behavior as link attribute
 						qLinkInternalInterface.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600 * maxInflowUsedInQsim / context.qsimConfig.getTimeStepSize());
 					} else if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
-						this.effectiveNumberOfLanesUsedInQsim = minimumNumberOfLanesFromFdiag;
+						this.effectiveNumberOfLanesUsedInQsim = Math.max(this.effectiveNumberOfLanes, minimumNumberOfLanesFromFdiag);
 						// write out the modified qsim behavior as link attribute
 						qLinkInternalInterface.getLink().getAttributes().putAttribute("effectiveNumberOfLanesUsedInQsim", effectiveNumberOfLanesUsedInQsim);
 					} else {
