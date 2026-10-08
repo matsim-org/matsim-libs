@@ -8,20 +8,25 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.api.core.v01.messages.NetworkPartitionMessage;
 import org.matsim.api.core.v01.messages.ShutDownMessage;
 import org.matsim.api.core.v01.messages.StartUpMessage;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -33,7 +38,8 @@ import java.util.List;
 /**
  * Controller listener running during distributed simulation.
  */
-public class DSimControllerListener implements StartupListener, ShutdownListener, BeforeMobsimListener, IterationEndsListener {
+public class DSimControllerListener implements StartupListener, ShutdownListener, IterationStartsListener, BeforeMobsimListener,
+	IterationEndsListener {
 
 	private static final Logger log = LogManager.getLogger(DSimControllerListener.class);
 
@@ -57,6 +63,11 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 	@Inject
 	private Injector injector;
 
+	/**
+	 * Whether the network has been partitioned already.
+	 */
+	private boolean partitioned = false;
+
 	@Override
 	public double priority() {
 		return PRIORITY;
@@ -64,14 +75,6 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-
-		// Right now every node is required to perform the same partitioning to that results are consistent
-		// TODO: partitioning can be performed on one node only, and then broadcast to all nodes
-		// TODO: one lp provider may want to access partition information of another lp
-		NetworkDecomposition.partition(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig(), topology.getTotalPartitions());
-
-		NetworkPartitioning partitioning = new NetworkPartitioning(computeNode, scenario.getNetwork());
-		scenario.getNetwork().setPartitioning(partitioning);
 
 		StartUpMessage msg = new StartUpMessage(
 			Id.getAllIds(Link.class),
@@ -100,6 +103,47 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 		}
 
 		log.info("Partition #{} contains {} persons", computeNode.getRank(), population.size());
+	}
+
+	/**
+	 * The network is partitioned when the first iteration starts and not at startup, because only then plans have been
+	 * routed by PrepareForSim, and routes are used to weight the partitions.
+	 */
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		if (!partitioned) {
+			partitionNetwork();
+		}
+	}
+
+	private void partitionNetwork() {
+
+		Network network = scenario.getNetwork();
+
+		// Only the head node partitions the network. Routes may differ between nodes, e.g. due to routing randomness,
+		// while all nodes need to use the same partitioning.
+		if (computeNode.isHeadNode()) {
+			NetworkDecomposition.partition(network, scenario.getPopulation(), scenario.getConfig(), topology.getTotalPartitions());
+		}
+
+		DSimConfigGroup dsimConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), DSimConfigGroup.class);
+		if (topology.getNodesCount() > 1 && dsimConfig.getPartitioning() != DSimConfigGroup.Partitioning.none) {
+
+			int[] nodePartitions = computeNode.isHeadNode() ? NetworkDecomposition.getNodePartitions(network) : new int[0];
+			List<NetworkPartitionMessage> all = comm.allGather(new NetworkPartitionMessage(computeNode.getRank(), nodePartitions), -2, serializer);
+
+			if (!computeNode.isHeadNode()) {
+				NetworkPartitionMessage head = all.stream()
+					.filter(m -> m.rank() == 0)
+					.findFirst()
+					.orElseThrow(() -> new IllegalStateException("No network partitioning received from head node."));
+
+				NetworkDecomposition.setNodePartitions(network, head.nodePartitions());
+			}
+		}
+
+		network.setPartitioning(new NetworkPartitioning(computeNode, network));
+		partitioned = true;
 	}
 
 	@Override

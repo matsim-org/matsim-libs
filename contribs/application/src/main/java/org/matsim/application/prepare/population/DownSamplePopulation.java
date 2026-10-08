@@ -8,6 +8,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import picocli.CommandLine;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -59,11 +61,13 @@ public class DownSamplePopulation implements MATSimAppCommand {
             PopulationUtils.sampleDown(population, sample / sampleSize);
             sampleSize = sample;
 
-            String path;
-            if (input.toString().contains(orig))
-                path = input.toString().replace(orig, String.format("%dpct", Math.round(sampleSize * 100)));
-            else
-                path = input.toString().replace(".xml", String.format("-%dpct.xml", Math.round(sampleSize * 100)));
+			String sampleLabel = PopulationUtils.getSampleLabel(sampleSize);
+
+			String path;
+			if (input.toString().contains(orig))
+				path = input.toString().replace(orig, sampleLabel);
+			else
+				path = input.toString().replace(".xml", "-" + sampleLabel + ".xml");
 
             log.info("Writing {} sample to {}", sampleSize, path);
 

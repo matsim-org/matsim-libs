@@ -14,19 +14,19 @@ public class DSimConfigGroupTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void threadSchedulingDefaultsToBackoff() {
-		assertEquals(DSimConfigGroup.ThreadScheduling.backoff, new DSimConfigGroup().getThreadScheduling());
+	void taskSchedulingDefaultsToBackoff() {
+		assertEquals(DSimConfigGroup.TaskScheduling.backoff, new DSimConfigGroup().getTaskScheduling());
 	}
 
 	@Test
-	void threadSchedulingRoundTripsThroughXml() {
+	void taskSchedulingRoundTripsThroughXml() {
 		String filename = utils.getOutputDirectory() + "config.xml";
 
 		Config writeConfig = ConfigUtils.createConfig();
-		writeConfig.dsim().setThreadScheduling(DSimConfigGroup.ThreadScheduling.eager);
+		writeConfig.dsim().setTaskScheduling(DSimConfigGroup.TaskScheduling.eager);
 		ConfigUtils.writeConfig(writeConfig, filename);
 
 		Config readConfig = ConfigUtils.loadConfig(filename);
-		assertEquals(DSimConfigGroup.ThreadScheduling.eager, readConfig.dsim().getThreadScheduling());
+		assertEquals(DSimConfigGroup.TaskScheduling.eager, readConfig.dsim().getTaskScheduling());
 	}
 }
