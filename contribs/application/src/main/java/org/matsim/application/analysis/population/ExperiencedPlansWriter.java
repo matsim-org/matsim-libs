@@ -66,18 +66,19 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 		runId = config.controller().getRunId();
 		String runPrefix = Objects.nonNull(runId) ? runId + "." : "";
 
-		Path eventsPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.events.getFilename() + ".gz");
+		// glob the input reads with a trailing "*" (instead of a hardcoded ".gz") so any compression (gz/lz4/zst) or none is matched; default output is now zst:
+		Path eventsPath = ApplicationUtils.globFile( path, runPrefix + "*output_" + Controler.DefaultFiles.events.getFilename() + "*" );
 		Path experiencedPlansPath = eventsPath.getParent().resolve(runPrefix + "postproc_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
 		// yyyy tendency to replace in the above "output_" by "postproc_". kai, jun'26
 		// --> done in jul'26
 
 		Scenario scenario = new ScenarioUtils.ScenarioBuilder(config)
-			.setNetwork(NetworkUtils.readNetwork(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.network.getFilename() + ".gz").toString()))
-			.setPopulation(PopulationUtils.readPopulation(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.population.getFilename() + ".gz").toString()))
+			.setNetwork(NetworkUtils.readNetwork(ApplicationUtils.globFile( path, runPrefix + "*output_" + Controler.DefaultFiles.network.getFilename() + "*" ).toString()))
+			.setPopulation(PopulationUtils.readPopulation(ApplicationUtils.globFile( path, runPrefix + "*output_" + Controler.DefaultFiles.population.getFilename() + "*" ).toString()))
 			.build();
 
 		if ( config.transit().isUseTransit() ){
-			new TransitScheduleReader( scenario ).readFile( path.resolve( runPrefix + "output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString() );
+			new TransitScheduleReader( scenario ).readFile( ApplicationUtils.globFile( path, runPrefix + "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + "*" ).toString() );
 		}
 
 		config.counts().setInputFile( null );
