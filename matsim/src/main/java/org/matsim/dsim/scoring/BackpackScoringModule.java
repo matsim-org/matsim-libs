@@ -59,6 +59,10 @@ public class BackpackScoringModule extends AbstractModule {
 		// the injector is fully built. Since QSimComponentsConfig is a mutable singleton, this
 		// mutates the shared instance before SimProvider.create() first reads it — adding
 		// COMPONENT_NAME to the active component list so SimProvider picks up BackpackDataCollector.
+		//
+		// The order of components is important: SimProcess calls the afterMobsim hooks in component order. At the moment,
+		// BackpackDataCollector must come last, as it hands in all backpacks in afterMobsim, and engines emit stuck events
+		// in their afterMobsim, which must still reach the backpacks.
 		binder().requestInjection(new Object() {
 			@Inject
 			void addToComponents(QSimComponentsConfig components) {

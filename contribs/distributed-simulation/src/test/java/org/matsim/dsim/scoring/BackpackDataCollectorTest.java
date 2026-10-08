@@ -44,7 +44,6 @@ import static org.mockito.Mockito.*;
 
 class BackpackDataCollectorTest {
 
-
 	@Test
 	void testTeleportation() {
 
@@ -79,7 +78,7 @@ class BackpackDataCollectorTest {
 		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
 		collector.handleEvent(new PersonArrivalEvent(25, pId, link2, "walk"));
 		collector.handleEvent(new ActivityStartEvent(25, pId, link2, null, "work", new Coord(1001, 0)));
-		collector.finishPerson(distAggent.getId());
+		collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());
@@ -169,7 +168,7 @@ class BackpackDataCollectorTest {
 		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
 		collector.handleEvent(new PersonArrivalEvent(25, pId, link2, "walk"));
 		collector.handleEvent(new ActivityStartEvent(25, pId, link2, null, "work", new Coord(1001, 0)));
-		collector.finishPerson(distAggent.getId());
+		collector.afterMobsim();
 
 		var finishedBackpackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(eps, times(1)).addBackpack(finishedBackpackCaptor.capture());
@@ -250,7 +249,7 @@ class BackpackDataCollectorTest {
 		// 4. Arrival at destination
 		collector.handleEvent(new PersonArrivalEvent(135., pId, link2, "pt"));
 		collector.handleEvent(new ActivityStartEvent(135., pId, link2, null, "work", new Coord(1000, 0)));
-		collector.finishPerson(distAgent.getId());
+		collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc).addBackpack(backPackCaptor.capture());
@@ -326,7 +325,7 @@ class BackpackDataCollectorTest {
 
 		collector.handleEvent(new PersonArrivalEvent(130., pId, link3, "car"));
 		collector.handleEvent(new ActivityStartEvent(130., pId, link3, null, "work", new Coord(3000, 0)));
-		collector.finishPerson(distAggent.getId());
+		collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc).addBackpack(backPackCaptor.capture());
@@ -425,8 +424,7 @@ class BackpackDataCollectorTest {
 		collector.handleEvent(new PersonArrivalEvent(130., pId1, link3, "car"));
 		collector.handleEvent(new ActivityStartEvent(130., pId1, link3, null, "work", new Coord(2000, 0)));
 
-		collector.finishPerson(distAgent1.getId());
-		collector.finishPerson(distAgent2.getId());
+		collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc, times(2)).addBackpack(backPackCaptor.capture());
@@ -477,6 +475,10 @@ class BackpackDataCollectorTest {
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(110., pId, link1, "walk", "walk"));
 		collector.handleEvent(new PersonStuckEvent(120., pId, link1, "walk"));
+
+		// backpacks of stuck agents are handed in after the mobsim
+		verify(fbc, never()).addBackpack(any());
+		collector.afterMobsim();
 
 		// Verify scoring and plan collection
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
@@ -640,13 +642,14 @@ class BackpackDataCollectorTest {
 		fixture.collector.onAgentInserted(planAgent(pId, link1, PopulationUtils.createActivityFromLinkId("home", link1)));
 		var stuckEvent = new PersonStuckEvent(0., pId, link1, null);
 		fixture.collector.handleEvent(stuckEvent);
-		// events for finished persons are accepted and the backpack is not handed in twice
-		fixture.collector.handleEvent(new PersonMoneyEvent(10., pId, -10, "toll", "operator", "ref"));
+		// stuck agents keep collecting events until the mobsim finishes
+		var moneyEvent = new PersonMoneyEvent(10., pId, -10, "toll", "operator", "ref");
+		fixture.collector.handleEvent(moneyEvent);
 		fixture.collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fixture.fbc, times(1)).addBackpack(backPackCaptor.capture());
-		assertEquals(List.of(stuckEvent), List.copyOf(backPackCaptor.getValue().events()));
+		assertEquals(List.of(stuckEvent, moneyEvent), List.copyOf(backPackCaptor.getValue().events()));
 	}
 
 	@Test
