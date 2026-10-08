@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
@@ -149,6 +150,58 @@ public class OnePercentBerlin10sIT {
 		assertEquals( ComparisonResult.FILES_ARE_EQUAL,
 				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ),
 				"different event files" );
+
+	}
+
+	@Test
+	void testOnePercent10sQSimKinematicWaves() {
+		Config config = utils.loadConfig((String)null);
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
+		// input files are in the main directory in the resource path!
+		String netFileName = "test/scenarios/berlin/network.xml";
+		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+
+		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
+		String referenceEventsFileName = utils.getInputDirectory() + "events.xml.gz";
+
+		MatsimRandom.reset(7411L);
+
+		config.qsim().setTimeStepSize(10.0);
+		config.qsim().setFlowCapFactor(0.01);
+		config.qsim().setStorageCapFactor(0.04);
+		config.qsim().setRemoveStuckVehicles(false);
+		config.qsim().setStuckTime(10.0);
+		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		config.scoring().setLearningRate(1.0);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
+
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+		new PopulationReader(scenario).readFile(popFileName);
+
+		EventsManager events = EventsUtils.createEventsManager();
+		EventWriterXML writer = new EventWriterXML(eventsFileName);
+		events.addHandler(writer);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		QSim qSim = new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events);
+
+		log.info("START testOnePercent10s SIM");
+		qSim.run();
+		log.info("STOP testOnePercent10s SIM");
+
+		writer.closeFile();
+
+		System.out.println("reffile: " + referenceEventsFileName);
+		assertEquals( ComparisonResult.FILES_ARE_EQUAL,
+			new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ),
+			"different event files" );
 
 	}
 
