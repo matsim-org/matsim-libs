@@ -413,14 +413,19 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				* as before.
 				* tilmann, theresa + christian, feb+mar'25
 				* hopefully fixed updateInflowAccumulation() DR 20260710 */
-				final double maxFlowFromFdiag = (context.qsimConfig.getFlowCapFactor() * this.effectiveNumberOfLanes/context.effectiveCellSize)
+				/* The fdiag formula yields veh/s, but maxInflowUsedInQsim is consumed per time step, just like
+				 * flowCapacityPerTimeStep it is compared against. Hence the multiplication with the time step size. Without
+				 * it the inflow capacity was too small by that factor; this was masked as long as the flow capacity factor
+				 * was missing as well (the two errors pointed in opposite directions). dr, oct'26 */
+				final double maxFlowFromFdiag = (context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor()
+					* this.effectiveNumberOfLanes/context.effectiveCellSize)
 					/ ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
 				/* The number of lanes the fdiag needs in order to support the flow cap from the network file. This is a
-				 * physical, i.e. unscaled, lane count, so the division by the flow cap factor is the counterpart of the
-				 * multiplication above: minimumNumberOfLanesFromFdiag > effectiveNumberOfLanes is then equivalent to
+				 * physical, i.e. unscaled, lane count, so it is derived from the unscaled capacity, which is the counterpart
+				 * of the scaling above: minimumNumberOfLanesFromFdiag > effectiveNumberOfLanes is then equivalent to
 				 * maxFlowFromFdiag < flowCapacityPerTimeStep. Without it the lane count came out scaled and was compared
 				 * against (and assigned over) the unscaled effectiveNumberOfLanes. dr, oct'26 */
-				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep / context.qsimConfig.getFlowCapFactor()
+				final double minimumNumberOfLanesFromFdiag = this.unscaledFlowCapacity_s
 					* context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() );
 
 				QSimConfigGroup.InflowCapacitySetting inflowCapacitySetting = context.qsimConfig.getInflowCapacitySetting();
