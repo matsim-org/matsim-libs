@@ -18,6 +18,16 @@ class BackpackActivity {
 		activity = msg.activity();
 	}
 
+	/**
+	 * Starts with a copy of the type and location of a planned activity. Start and end times are left undefined, as they are only known
+	 * from events.
+	 */
+	BackpackActivity(Activity plannedActivity) {
+		activity = PopulationUtils.createActivityFromLinkId(plannedActivity.getType(), plannedActivity.getLinkId());
+		activity.setFacilityId(plannedActivity.getFacilityId());
+		activity.setCoord(plannedActivity.getCoord());
+	}
+
 	void handleEvent(Event e) {
 		if (e instanceof ActivityStartEvent ase) {
 			activity = PopulationUtils.createActivityFromLinkId(ase.getActType(), ase.getLinkId());

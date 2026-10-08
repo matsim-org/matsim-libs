@@ -5,8 +5,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -14,6 +16,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.pt.PersonEntersPtVehicleEvent;
 import org.matsim.core.mobsim.qsim.pt.PersonLeavesPtVehicleEvent;
 import org.matsim.core.network.NetworkUtils;
@@ -36,12 +39,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class BackpackDataCollectorTest {
-
 
 	@Test
 	void testTeleportation() {
@@ -71,12 +72,13 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
+		insert(collector, distAggent, link1);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(1., pId, link1, "walk", "walk"));
 		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
 		collector.handleEvent(new PersonArrivalEvent(25, pId, link2, "walk"));
 		collector.handleEvent(new ActivityStartEvent(25, pId, link2, null, "work", new Coord(1001, 0)));
-		collector.finishPerson(distAggent.getId());
+		collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());
@@ -144,6 +146,7 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, eps, providers);
 
+		insert(collector, distAggent, link1);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(1., pId, link1, "walk", "walk"));
 
@@ -165,7 +168,7 @@ class BackpackDataCollectorTest {
 		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
 		collector.handleEvent(new PersonArrivalEvent(25, pId, link2, "walk"));
 		collector.handleEvent(new ActivityStartEvent(25, pId, link2, null, "work", new Coord(1001, 0)));
-		collector.finishPerson(distAggent.getId());
+		collector.afterMobsim();
 
 		var finishedBackpackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(eps, times(1)).addBackpack(finishedBackpackCaptor.capture());
@@ -228,6 +231,7 @@ class BackpackDataCollectorTest {
 		collector.handleEvent(new TransitDriverStartsEvent(0.0, driver, transitVehicle, lineId, routeId, Id.create("dep1", Departure.class)));
 
 		// 2. Passenger ends activity and departs
+		insert(collector, distAgent, link1);
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(100., pId, link1, "pt", "pt"));
 
@@ -245,7 +249,7 @@ class BackpackDataCollectorTest {
 		// 4. Arrival at destination
 		collector.handleEvent(new PersonArrivalEvent(135., pId, link2, "pt"));
 		collector.handleEvent(new ActivityStartEvent(135., pId, link2, null, "work", new Coord(1000, 0)));
-		collector.finishPerson(distAgent.getId());
+		collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc).addBackpack(backPackCaptor.capture());
@@ -305,6 +309,7 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
+		insert(collector, distAggent, link1);
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(100., pId, link1, "car", "car"));
 
@@ -320,7 +325,7 @@ class BackpackDataCollectorTest {
 
 		collector.handleEvent(new PersonArrivalEvent(130., pId, link3, "car"));
 		collector.handleEvent(new ActivityStartEvent(130., pId, link3, null, "work", new Coord(3000, 0)));
-		collector.finishPerson(distAggent.getId());
+		collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc).addBackpack(backPackCaptor.capture());
@@ -386,6 +391,9 @@ class BackpackDataCollectorTest {
 
 		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
 
+		insert(collector, distAgent1, link1);
+		insert(collector, distAgent2, link1);
+
 		// Both end activities at l1
 		collector.handleEvent(new ActivityEndEvent(100., pId1, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(100., pId1, link1, "car", "car"));
@@ -416,8 +424,7 @@ class BackpackDataCollectorTest {
 		collector.handleEvent(new PersonArrivalEvent(130., pId1, link3, "car"));
 		collector.handleEvent(new ActivityStartEvent(130., pId1, link3, null, "work", new Coord(2000, 0)));
 
-		collector.finishPerson(distAgent1.getId());
-		collector.finishPerson(distAgent2.getId());
+		collector.afterMobsim();
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc, times(2)).addBackpack(backPackCaptor.capture());
@@ -464,9 +471,14 @@ class BackpackDataCollectorTest {
 		var distAgent = mock(DistributedMobsimAgent.class);
 		when(distAgent.getId()).thenReturn(pId);
 
+		insert(collector, distAgent, link1);
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
 		collector.handleEvent(new PersonDepartureEvent(110., pId, link1, "walk", "walk"));
 		collector.handleEvent(new PersonStuckEvent(120., pId, link1, "walk"));
+
+		// backpacks of stuck agents are handed in after the mobsim
+		verify(fbc, never()).addBackpack(any());
+		collector.afterMobsim();
 
 		// Verify scoring and plan collection
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
@@ -503,6 +515,9 @@ class BackpackDataCollectorTest {
 		providers.put(TransportMode.car, new BackpackNetworkRouteProvider(network));
 
 		var collector = new BackpackDataCollector(messaging, network, pop, fbc, providers);
+
+		insert(collector, ignoredAgent, link1);
+		insert(collector, registeredAgent, link1);
 
 		// make sure the collector doesn't crash when we send it events with the ignored agent.
 		collector.handleEvent(new ActivityEndEvent(100., ignored, link1, null, "home", new Coord(0, 0)));
@@ -558,5 +573,142 @@ class BackpackDataCollectorTest {
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());
 		assertEquals(registered, backPackCaptor.getValue().personId());
+	}
+
+	@Test
+	void testStayHomeAgent() {
+		var pId = Id.createPersonId("p1");
+		var link1 = Id.createLinkId("l1");
+		var fixture = new Fixture(pId);
+
+		var home = PopulationUtils.createActivityFromLinkId("home", link1);
+		home.setCoord(new Coord(0, 0));
+		fixture.collector.onAgentInserted(planAgent(pId, link1, home));
+		fixture.collector.afterMobsim();
+
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
+		verify(fixture.fbc, times(1)).addBackpack(backPackCaptor.capture());
+		var experiencedPlan = backPackCaptor.getValue().experiencedPlan();
+		assertEquals(1, experiencedPlan.getPlanElements().size());
+		var act = (Activity) experiencedPlan.getPlanElements().getFirst();
+		assertEquals("home", act.getType());
+		assertEquals(link1, act.getLinkId());
+		assertEquals(new Coord(0, 0), act.getCoord());
+		assertEquals(OptionalTime.undefined(), act.getStartTime());
+		assertEquals(OptionalTime.undefined(), act.getEndTime());
+	}
+
+	@Test
+	void testStayHomeAgentReceivesMoney() {
+		var pId = Id.createPersonId("p1");
+		var link1 = Id.createLinkId("l1");
+		var fixture = new Fixture(pId);
+
+		fixture.collector.onAgentInserted(planAgent(pId, link1, PopulationUtils.createActivityFromLinkId("home", link1)));
+		var moneyEvent = new PersonMoneyEvent(100., pId, -10, "toll", "operator", "ref");
+		fixture.collector.handleEvent(moneyEvent);
+		fixture.collector.afterMobsim();
+
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
+		verify(fixture.fbc, times(1)).addBackpack(backPackCaptor.capture());
+		assertEquals(List.of(moneyEvent), List.copyOf(backPackCaptor.getValue().events()));
+	}
+
+	@Test
+	void testPlannedActivityIsCompletedByActivityEnd() {
+		var pId = Id.createPersonId("p1");
+		var link1 = Id.createLinkId("l1");
+		var fixture = new Fixture(pId);
+
+		fixture.collector.onAgentInserted(planAgent(pId, link1, PopulationUtils.createActivityFromLinkId("home", link1)));
+		fixture.collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
+		fixture.collector.afterMobsim();
+
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
+		verify(fixture.fbc, times(1)).addBackpack(backPackCaptor.capture());
+		var experiencedPlan = backPackCaptor.getValue().experiencedPlan();
+		assertEquals(1, experiencedPlan.getPlanElements().size());
+		var act = (Activity) experiencedPlan.getPlanElements().getFirst();
+		assertEquals("home", act.getType());
+		assertEquals(100., act.getEndTime().seconds(), 1e-9);
+	}
+
+	@Test
+	void testAbortAtInsertion() {
+		var pId = Id.createPersonId("p1");
+		var link1 = Id.createLinkId("l1");
+		var fixture = new Fixture(pId);
+
+		fixture.collector.onAgentInserted(planAgent(pId, link1, PopulationUtils.createActivityFromLinkId("home", link1)));
+		var stuckEvent = new PersonStuckEvent(0., pId, link1, null);
+		fixture.collector.handleEvent(stuckEvent);
+		// stuck agents keep collecting events until the mobsim finishes
+		var moneyEvent = new PersonMoneyEvent(10., pId, -10, "toll", "operator", "ref");
+		fixture.collector.handleEvent(moneyEvent);
+		fixture.collector.afterMobsim();
+
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
+		verify(fixture.fbc, times(1)).addBackpack(backPackCaptor.capture());
+		assertEquals(List.of(stuckEvent, moneyEvent), List.copyOf(backPackCaptor.getValue().events()));
+	}
+
+	@Test
+	void testEventForUnregisteredPersonThrows() {
+		var pId = Id.createPersonId("p1");
+		var link1 = Id.createLinkId("l1");
+		var fixture = new Fixture(pId);
+
+		var e = assertThrows(IllegalStateException.class,
+			() -> fixture.collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0))));
+		assertTrue(e.getMessage().contains("'p1'"));
+		assertTrue(e.getMessage().contains("'" + ActivityEndEvent.EVENT_TYPE + "'"));
+	}
+
+	@Test
+	void testUnregisteredPersonEntersVehicleThrows() {
+		var pId = Id.createPersonId("p1");
+		var vehicle = Id.createVehicleId("v1");
+		var link1 = Id.createLinkId("l1");
+		var fixture = new Fixture(pId);
+
+		assertThrows(IllegalStateException.class, () -> fixture.collector.handleEvent(new PersonEntersVehicleEvent(100., pId, vehicle)));
+		// the failed event must not have registered anything for the vehicle. Otherwise, dispatching vehicle events would fail.
+		assertDoesNotThrow(() -> fixture.collector.handleEvent(new LinkLeaveEvent(110., vehicle, link1)));
+	}
+
+	private static void insert(BackpackDataCollector collector, DistributedMobsimAgent agent, Id<Link> startLink) {
+		when(agent.getCurrentLinkId()).thenReturn(startLink);
+		collector.onAgentInserted(agent);
+	}
+
+	private static DistributedMobsimAgent planAgent(Id<Person> id, Id<Link> startLink, Activity firstActivity) {
+		var agent = mock(DistributedMobsimAgent.class, withSettings().extraInterfaces(PlanAgent.class));
+		when(agent.getId()).thenReturn(id);
+		when(agent.getCurrentLinkId()).thenReturn(startLink);
+		when(((PlanAgent) agent).getCurrentPlanElement()).thenReturn(firstActivity);
+		return agent;
+	}
+
+	/**
+	 * A collector on a single link network with one person in the population.
+	 */
+	private static class Fixture {
+
+		final FinishedBackpackCollector fbc = mock(FinishedBackpackCollector.class);
+		final BackpackDataCollector collector;
+
+		Fixture(Id<Person> personId) {
+			var pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+			pop.addPerson(pop.getFactory().createPerson(personId));
+			var network = NetworkUtils.createNetwork();
+			var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
+			var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
+			network.addNode(node1);
+			network.addNode(node2);
+			network.addLink(network.getFactory().createLink(Id.createLinkId("l1"), node1, node2));
+			Map<String, BackpackRouteProvider> providers = new HashMap<>();
+			providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
+			collector = new BackpackDataCollector(mock(PartitionTransfer.class), network, pop, fbc, providers);
+		}
 	}
 }
