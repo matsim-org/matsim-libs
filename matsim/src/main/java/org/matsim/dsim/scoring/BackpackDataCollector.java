@@ -133,8 +133,8 @@ public class BackpackDataCollector
 	}
 
 	/**
-	 * This method finishes all backpacks and passes the finished backpacks to the finished backpack collector. This is the terminating method. This
-	 * collector will not clean up its state, as it is expected that a new instance of ScoringDataCollector will be created for the next iteration.
+	 * This method finishes all backpacks and passes the finished backpacks to the finished backpack collector. This is the terminating method. It
+	 * removes all backpacks from this collector, so that events arriving afterwards fail with an exception.
 	 */
 	@Override
 	public void afterMobsim() {
@@ -201,7 +201,8 @@ public class BackpackDataCollector
 			\
 			Likely causes: (1) an agent source puts population agents into the mobsim without calling \
 			InsertableMobsim#insertAgentIntoMobsim; (2) a component produces an event for this person on a partition where the person is \
-			not currently located."""
+			not currently located; (3) a component produces events after BackpackDataCollector#afterMobsim, e.g. because it is registered \
+			after the collector."""
 			.formatted(e.getEventType(), e.getTime(), id));
 	}
 
