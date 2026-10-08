@@ -129,11 +129,9 @@ class SlaveConfigPreparerTest {
 		}
 
 		String outText() {
-			return out.toString(StandardCharsets.UTF_8);
 		}
 
 		String errText() {
-			return err.toString(StandardCharsets.UTF_8);
 		}
 	}
 }

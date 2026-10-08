@@ -13,6 +13,10 @@ import org.matsim.vehicles.Vehicles;
 
 import java.util.Map;
 
+/**
+ * Scores commercial activity time linearly using a marginal utility of time.
+ * Boundary activities contribute only when their start and end can be determined.
+ */
 public class ActivityScoringForCommercialActivities implements SumScoringFunction.ActivityScoring {
 	private static final double INITIAL_SCORE = 0.0;
 
@@ -22,6 +26,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 	private static short firstLastActOpeningTimesWarning = 0;
 
 	private final ScoringParameters params;
+	private final double personSpecificMarginalUtilityOfTime;
 	private final OpeningIntervalCalculator openingIntervalCalculator;
 	private Activity firstActivity;
 
@@ -31,16 +36,27 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 		this(params, new ActivityTypeOpeningIntervalCalculator(params));
 	}
 
+	/**
+	 * Uses a time utility derived from the person's vehicle for performing and waiting.
+	 *
+	 * @param params activity scoring parameters
+	 * @param adjustedMarginalUtilityOfPerforming_s utility per second derived from vehicle time costs
+	 */
+	public ActivityScoringForCommercialActivities(final ScoringParameters params, double adjustedMarginalUtilityOfPerforming_s) {
+		this.params = params;
+		this.openingIntervalCalculator = new ActivityTypeOpeningIntervalCalculator(params);
+		this.personSpecificMarginalUtilityOfTime = adjustedMarginalUtilityOfPerforming_s;
+	}
+
 	public ActivityScoringForCommercialActivities(final ScoringParameters params, final OpeningIntervalCalculator openingIntervalCalculator) {
 		this.params = params;
 		this.openingIntervalCalculator = openingIntervalCalculator;
+		this.personSpecificMarginalUtilityOfTime = params.marginalUtilityOfPerforming_s;
 	}
 
 	@Override
 	public void finish() {
-		if (this.firstActivity != null) {
-			handleMorningActivity();
-		}
+		// Boundary activities are handled when they arrive; no overnight score is deferred.
 	}
 
 	@Override
@@ -60,6 +76,30 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 		out.append("actEarlyDeparture_s=").append(this.score.actEarlyDeparture_s);
 	}
 
+	/**
+	 * Scores a boundary activity only when its time interval is known. A maximum duration
+	 * supplies one missing boundary; without a complete interval, the activity is skipped.
+	 * This can ber assumed as a finish of the work time, so that the rest
+	 */
+	private void scoreIfFullyBounded(Activity act) {
+		OptionalTime startTime = act.getStartTime();
+		OptionalTime endTime = act.getEndTime();
+		OptionalTime maximumDuration = act.getMaximumDuration();
+		if (startTime.isUndefined() && endTime.isDefined() && maximumDuration.isDefined()) {
+			startTime = OptionalTime.defined(endTime.seconds() - maximumDuration.seconds());
+		}
+		if (endTime.isUndefined() && startTime.isDefined() && maximumDuration.isDefined()) {
+			endTime = OptionalTime.defined(startTime.seconds() + maximumDuration.seconds());
+		}
+		if (startTime.isDefined() && endTime.isDefined()) {
+			this.score.add(calcActScore(startTime.seconds(), endTime.seconds(), act));
+		}
+	}
+
+	/**
+	 * Separates performing time from waiting outside opening hours, then applies the
+	 * configured late-arrival and early-departure penalties.
+	 */
 	private Score calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 		ActivityUtilityParameters actParams = this.params.actParams.get(act.getType());
 		if (actParams == null) {
@@ -76,6 +116,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 			double activityStart = arrivalTime;
 			double activityEnd = departureTime;
 
+			// Time outside the opening interval is waiting rather than performing.
 			if (openingTime.isDefined() && arrivalTime < openingTime.seconds()) {
 				activityStart = openingTime.seconds();
 			}
@@ -92,7 +133,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 			if (arrivalTime < activityStart) {
 				double waitTime = activityStart - arrivalTime;
 				tmpScore.actWaiting_s += waitTime;
-				tmpScore.actWaiting_util += this.params.marginalUtilityOfWaiting_s * waitTime;
+				tmpScore.actWaiting_util += this.personSpecificMarginalUtilityOfTime * waitTime;
 			}
 
 			OptionalTime latestStartTime = actParams.getLatestStartTime();
@@ -103,7 +144,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 			}
 
 			tmpScore.actPerforming_s += duration;
-			tmpScore.actPerforming_util += this.params.marginalUtilityOfPerforming_s * duration;
+			tmpScore.actPerforming_util += this.personSpecificMarginalUtilityOfTime * duration;
 
 			OptionalTime earliestEndTime = actParams.getEarliestEndTime();
 			if (earliestEndTime.isDefined() && activityEnd < earliestEndTime.seconds()) {
@@ -115,7 +156,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 			if (activityEnd < departureTime) {
 				double waiting = departureTime - activityEnd;
 				tmpScore.actWaiting_s += waiting;
-				tmpScore.actWaiting_util += this.params.marginalUtilityOfWaiting_s * waiting;
+				tmpScore.actWaiting_util += this.personSpecificMarginalUtilityOfTime * waiting;
 			}
 
 			OptionalTime minimalDuration = actParams.getMinimalDuration();
@@ -180,7 +221,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 	@Override
 	public void handleFirstActivity(Activity act) {
 		assert act != null;
-		this.firstActivity = act;
+		scoreIfFullyBounded(act);
 	}
 
 	@Override
@@ -190,8 +231,7 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 
 	@Override
 	public void handleLastActivity(Activity act) {
-		this.handleOvernightActivity(act);
-		this.firstActivity = null;
+		scoreIfFullyBounded(act);
 	}
 
 	private static final class Score {
