@@ -2,16 +2,10 @@ package org.matsim.core.scoring.functions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-
-import java.util.Map;
 
 /**
  * Scores commercial activity time linearly using a marginal utility of time.
@@ -22,14 +16,9 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 
 	private final Score score = new Score();
 
-	private static int firstLastActWarning = 0;
-	private static short firstLastActOpeningTimesWarning = 0;
-
 	private final ScoringParameters params;
 	private final double personSpecificMarginalUtilityOfTime;
 	private final OpeningIntervalCalculator openingIntervalCalculator;
-	private Activity firstActivity;
-
 	private static final Logger log = LogManager.getLogger(ActivityScoringForCommercialActivities.class);
 
 	public ActivityScoringForCommercialActivities(final ScoringParameters params) {
@@ -167,55 +156,6 @@ public class ActivityScoringForCommercialActivities implements SumScoringFunctio
 			}
 		}
 		return tmpScore;
-	}
-
-	private void handleOvernightActivity(Activity lastActivity) {
-		assert firstActivity != null;
-		assert lastActivity != null;
-
-		if (lastActivity.getType().equals(this.firstActivity.getType()) || this.firstActivity.getType().equals("not specified")) {
-			if (firstLastActOpeningTimesWarning <= 10) {
-				OptionalTime[] openInterval = openingIntervalCalculator.getOpeningInterval(lastActivity);
-				if (openInterval[0].isDefined() || openInterval[1].isDefined()) {
-					log.warn("There are opening or closing times defined for the first and last activity. The correctness of the scoring function can thus not be guaranteed.");
-					log.warn("first activity: {}", firstActivity);
-					log.warn("last activity: {}", lastActivity);
-					if (firstLastActOpeningTimesWarning == 10) {
-						log.warn("Additional warnings of this type are suppressed.");
-					}
-					firstLastActOpeningTimesWarning++;
-				}
-			}
-
-			Score calcActScore = calcActScore(lastActivity.getStartTime().seconds(),
-					this.firstActivity.getEndTime().seconds() + 24 * 3600, lastActivity);
-			this.score.add(calcActScore);
-		} else {
-			if (this.params.scoreActs) {
-				int last = 0;
-				if (firstLastActWarning <= last) {
-					log.warn("The first and the last activity do not have the same type.");
-					log.warn("Will score the first activity from midnight to its end, and the last activity from its start to midnight.");
-					log.warn("Because of the nonlinear function, this is not the same as scoring from start to end.");
-					log.warn("first activity: {}", firstActivity);
-					log.warn("last activity: {}", lastActivity);
-					log.warn("This may also happen when plans are not completed when the simulation ends.");
-					if (firstLastActWarning == last) {
-						log.warn("Additional warnings of this type are suppressed.");
-					}
-					firstLastActWarning++;
-				}
-
-				this.score.add(calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity));
-				this.score.add(calcActScore(lastActivity.getStartTime().seconds(),
-						this.params.simulationPeriodInDays * 24 * 3600, lastActivity));
-			}
-		}
-	}
-
-	private void handleMorningActivity() {
-		assert firstActivity != null;
-		this.score.add(calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity));
 	}
 
 	@Override
