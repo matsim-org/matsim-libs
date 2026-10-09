@@ -18,6 +18,7 @@ public abstract class Viz {
 	public Double height;
 	public Double width;
 	public String backgroundColor;
+	public String network;
 
 	protected Viz(String type) {
 		this.type = type;
