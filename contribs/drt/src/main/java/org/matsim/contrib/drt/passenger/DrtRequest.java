@@ -47,6 +47,8 @@ public class DrtRequest implements PassengerRequest {
 	private final Link toLink;
 	private final DvrpLoad load;
 
+	private final double unsharedRideTime;
+
 	private final DrtRouteConstraints constraints;
 
 	private final double earliestStartTime;
@@ -65,6 +67,7 @@ public class DrtRequest implements PassengerRequest {
 		fromLink = builder.fromLink;
 		toLink = builder.toLink;
 		this.load = builder.load;
+		this.unsharedRideTime = builder.unsharedRideTime;
 	}
 
 	public static Builder newBuilder() {
@@ -82,6 +85,7 @@ public class DrtRequest implements PassengerRequest {
 		builder.earliestDepartureTime = copy.earliestStartTime;
 		builder.constraints = copy.constraints;
 		builder.load = copy.load;
+		builder.unsharedRideTime = copy.unsharedRideTime;
 		return builder;
 	}
 
@@ -138,6 +142,10 @@ public class DrtRequest implements PassengerRequest {
 		return this.load;
 	}
 
+	public double getUnsharedRideTime() {
+		return this.unsharedRideTime;
+	}
+
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
@@ -167,6 +175,8 @@ public class DrtRequest implements PassengerRequest {
 		private Link fromLink;
 		private Link toLink;
 		private DvrpLoad load;
+
+		private double unsharedRideTime;
 
 		private Builder() {
 		}
@@ -213,6 +223,11 @@ public class DrtRequest implements PassengerRequest {
 
 		public Builder load(DvrpLoad load) {
 			this.load = load;
+			return this;
+		}
+
+		public Builder unsharedRideTime(double unsharedRideTime) {
+			this.unsharedRideTime = unsharedRideTime;
 			return this;
 		}
 
