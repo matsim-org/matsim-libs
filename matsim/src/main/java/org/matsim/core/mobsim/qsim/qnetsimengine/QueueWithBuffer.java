@@ -196,6 +196,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private double effectiveNumberOfLanesUsedInQsim = Double.POSITIVE_INFINITY;
 
 	private double accumulatedInflowCap = 1.;
+	// time up to which accumulatedInflowCap has been refilled, see updateInflowAccumulation()
 	private double inflowUpdateTime = 0.;
 
 	private final FlowEfficiencyCalculator flowEfficiencyCalculator;
@@ -405,26 +406,26 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then maxFlowFromFdiag would
 				// also have to be re-computed with each freespeed change. kai, feb'18
 
-				/* We think the maxFlowFromFdiag should be scaled with the flow capacity factor because this scales how much flow can be send/received per time.
-				* It's unit is (veh/m) / (1/ m/s) = (veh/m) / (s/m) = veh/s
-				* Unfortunately, there are no tests failing when we make changes here, i.e. the qsim behavior with kinematic waves seems to be not
-				* suitable covered by tests. Still, simulation outcome of the Berlin scenario differs a lot when we multiply the flow capacity factor
-				* here (car mode shares go significantly down!). This has to be investigated further! For now, we leave the inflow capacity (unscaled)
-				* as before.
-				* tilmann, theresa + christian, feb+mar'25
-				* hopefully fixed updateInflowAccumulation() DR 20260710 */
-				/* The fdiag formula yields veh/s, but maxInflowUsedInQsim is consumed per time step, just like
-				 * flowCapacityPerTimeStep it is compared against. Hence the multiplication with the time step size. Without
-				 * it the inflow capacity was too small by that factor; this was masked as long as the flow capacity factor
-				 * was missing as well (the two errors pointed in opposite directions). dr, oct'26 */
+				/* The fdiag term has unit (veh/m) / (1/ m/s) = (veh/m) / (s/m) = veh/s. But maxInflowUsedInQsim is
+				 * used per time step, like the flowCapacityPerTimeStep it is compared against. So we scale it with
+				 * the time step size. We also scale it with the flow capacity factor, because that factor says how
+				 * much flow may pass per time.
+				 *
+				 * Both factors were missing before, and they pointed in opposite directions, so the error was hard to
+				 * see. The flow capacity factor was added in feb+mar'25 and taken out again, because Berlin car mode
+				 * shares dropped a lot and no test failed (tilmann, theresa + christian). The cause was not the
+				 * scaling but a bug in the inflow accumulation, see updateInflowAccumulation(). That bug is fixed
+				 * now, so both factors are back in. dr, oct'26 */
 				final double maxFlowFromFdiag = (context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor()
 					* this.effectiveNumberOfLanes/context.effectiveCellSize)
 					/ ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
-				/* The number of lanes the fdiag needs in order to support the flow cap from the network file. This is a
-				 * physical, i.e. unscaled, lane count, so it is derived from the unscaled capacity, which is the counterpart
-				 * of the scaling above: minimumNumberOfLanesFromFdiag > effectiveNumberOfLanes is then equivalent to
-				 * maxFlowFromFdiag < flowCapacityPerTimeStep. Without it the lane count came out scaled and was compared
-				 * against (and assigned over) the unscaled effectiveNumberOfLanes. dr, oct'26 */
+				/* How many lanes the fdiag needs to carry the flow cap from the network file. This is a count of real
+				 * lanes, so it must stay unscaled: it is compared with effectiveNumberOfLanes, and under
+				 * NR_OF_LANES_FROM_FDIAG it also replaces that value. We therefore derive it from the unscaled
+				 * capacity. This is the counterpart of the scaling above and makes
+				 * minimumNumberOfLanesFromFdiag > effectiveNumberOfLanes mean the same as
+				 * maxFlowFromFdiag < flowCapacityPerTimeStep. Before, the count came out scaled and was still compared
+				 * with an unscaled lane number. dr, oct'26 */
 				final double minimumNumberOfLanesFromFdiag = this.unscaledFlowCapacity_s
 					* context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() );
 
@@ -447,7 +448,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 					qLinkInternalInterface.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600 * maxInflowUsedInQsim / context.qsimConfig.getTimeStepSize());
 
 				} else  {
-					// the fdiag only restricts the link where it stays below the flow cap from the network file
+					// only warn where the fdiag really is the tighter limit. dr, oct'26
 					if (maxFlowFromFdiag < flowCapacityPerTimeStep && wrnCnt < 10) { // warnings
 						wrnCnt++;
 						log.warn("max flow from fdiag < flow cap in network file; linkId=" + qLinkInternalInterface.getId() +
@@ -475,6 +476,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 						// write out the modified qsim behavior as link attribute
 						qLinkInternalInterface.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600 * maxInflowUsedInQsim / context.qsimConfig.getTimeStepSize());
 					} else if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
+						// the fdiag may only add lanes, never take some away. dr, oct'26
 						this.effectiveNumberOfLanesUsedInQsim = Math.max(this.effectiveNumberOfLanes, minimumNumberOfLanesFromFdiag);
 						// write out the modified qsim behavior as link attribute
 						qLinkInternalInterface.getLink().getAttributes().putAttribute("effectiveNumberOfLanesUsedInQsim", effectiveNumberOfLanesUsedInQsim);
@@ -607,11 +609,15 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	}
 
 	/**
-	 * Accumulates the inflow capacity over elapsed time rather than per call, mirroring
-	 * {@link #updateFastFlowAccumulation()}. Needed because doSimStep() is only called while the link is active
-	 * (see isActive()), so a link that falls empty with a negative accumulatedInflowCap would otherwise freeze it
-	 * and refuse all further vehicles from upstream. This only shows up once a single vehicle consumes more than
-	 * maxInflowUsedInQsim, i.e. whenever the inflow capacity is scaled with the flow capacity factor.
+	 * Refills the inflow capacity by the time that has passed, the same way
+	 * {@link #updateFastFlowAccumulation()} does it for the flow capacity.
+	 * <p>
+	 * Before, the inflow capacity was refilled once per doSimStep() call instead. doSimStep() only runs while the
+	 * link is active (see {@link #isActive()}), and an empty link without holes is not active. So a link that went
+	 * negative on accumulatedInflowCap and then ran empty was never refilled again: it stayed blocked and refused
+	 * every vehicle from upstream for the rest of the simulation. This needs a single vehicle to consume more than
+	 * maxInflowUsedInQsim, which happens as soon as the inflow capacity is scaled with a small flow capacity
+	 * factor. dr, oct'26
 	 */
 	private void updateInflowAccumulation() {
 		double now = context.getSimTimer().getTimeOfDay();
@@ -792,7 +798,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			return true;
 		}
 
-		// the link may have been inactive for a while, so catch up on the inflow capacity before looking at it
+		// the link may have been inactive for a while, so refill the inflow capacity before we look at it
 		this.updateInflowAccumulation();
 
 		return this.accumulatedInflowCap > 0;
