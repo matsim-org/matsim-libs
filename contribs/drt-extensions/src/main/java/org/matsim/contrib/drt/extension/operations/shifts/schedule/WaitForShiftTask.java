@@ -24,7 +24,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
  *
  * @author nkuehnel / MOIA
  */
-public class WaitForShiftTask extends DefaultStayTask implements DrtStopTask, OperationalStop, ETask {
+public class WaitForShiftTask extends DefaultStayTask implements DrtStopTask, FacilityStop, ETask {
 
 	public static final DrtTaskType TYPE = new DrtTaskType("WAIT_FOR_SHIFT", STOP);
 

@@ -21,7 +21,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.fleet.EvShiftDvrpVehic
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftBreakStopWaypoint;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.optimizer.StopWaypoint;
@@ -68,7 +68,7 @@ public class ShiftTaskSchedulerImplTest {
     private Network network;
     private List<Link> links;
 
-    @Mock private ShiftDrtTaskFactory taskFactory;
+    @Mock private DrtOperationsTaskFactory taskFactory;
     @Mock private ChargingInfrastructure chargingInfrastructure;
     @Mock private ChargingStrategy.Factory chargingStrategyFactory;
 

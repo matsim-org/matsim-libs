@@ -48,6 +48,10 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
     private final String runId;
     private boolean headerWritten = false;
     private static final String notAvailableString = "NA";
+    // label used in the per-type breakdown for the combined aggregate over all shift types
+    private static final String COMBINED_TYPE = "all";
+    // label used for shifts without an explicit type
+    private static final String UNSPECIFIED_TYPE = "unspecified";
 
 
     @Inject
@@ -70,6 +74,7 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
 
         ShiftEfficiencyTracker.Record record = shiftEfficiencyTracker.getCurrentRecord();
         writeAndPlotShiftEfficiency(
+                record,
                 record.getRevenueByShift(),
                 record.getRequestsByShift(),
                 record.getFinishedShifts(),
@@ -78,30 +83,49 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
                 filename(event, "shiftEfficiency", ".csv"),
                 createGraphs);
 
-        List<DrtShiftSpecification> finishedShifts = record.finishedShifts()
-                .keySet()
-                .stream()
-                .map(id -> drtShiftsSpecification.get().getShiftSpecifications().get(id))
+        // breakdown by shift type (taken from the shift lifecycle events), with the combined ("all") aggregate kept for
+        // backwards compatibility. Driven entirely from the events, so transient shifts without a persistent
+        // specification (e.g. remote-guidance virtual shifts) are included too.
+        Map<String, List<Id<DrtShift>>> shiftsByType = record.finishedShifts().keySet().stream()
+                .collect(Collectors.groupingBy(id -> record.getShiftTypeById().getOrDefault(id, UNSPECIFIED_TYPE)));
+
+        writeIterationShiftEfficiencyStats(COMBINED_TYPE,
+                summarize(record, record.finishedShifts().keySet()), event.getIteration());
+        for (Map.Entry<String, List<Id<DrtShift>>> entry : shiftsByType.entrySet()) {
+            writeIterationShiftEfficiencyStats(entry.getKey(), summarize(record, entry.getValue()),
+                    event.getIteration());
+        }
+    }
+
+    /**
+     * Computes the aggregated efficiency metrics over the given subset of (finished) shifts.
+     */
+    private String summarize(ShiftEfficiencyTracker.Record record, Collection<Id<DrtShift>> shiftIds) {
+        // driven from the actual (event-based) shift run times rather than the planned specification: honest realised
+        // durations, and works for transient shifts (e.g. remote-guidance virtual shifts) that have no specification.
+        Map<Id<DrtShift>, Double> starts = record.getActualStartByShift();
+        Map<Id<DrtShift>, Double> ends = record.getActualEndByShift();
+        List<Id<DrtShift>> shifts = shiftIds.stream()
+                .filter(id -> starts.containsKey(id) && ends.containsKey(id))
                 .toList();
 
-        double earliestShiftStart = finishedShifts.stream().map(DrtShiftSpecification::getStartTime).mapToDouble(d -> d).min().orElse(Double.NaN);
-        double latestShiftEnd = finishedShifts.stream().map(DrtShiftSpecification::getEndTime).mapToDouble(d -> d).min().orElse(Double.NaN);
+        double earliestShiftStart = shifts.stream().mapToDouble(starts::get).min().orElse(Double.NaN);
+        double latestShiftEnd = shifts.stream().mapToDouble(ends::get).max().orElse(Double.NaN);
 
-        double numberOfShifts = finishedShifts.size();
-        double numberOfShiftHours = finishedShifts.
-                stream()
-                .map(s -> (s.getEndTime() - s.getStartTime()) - (s.getBreak().isPresent() ? s.getBreak().get().getDuration() : 0.))
-                .mapToDouble(d -> d)
+        double numberOfShifts = shifts.size();
+        double numberOfShiftHours = shifts.stream()
+                .mapToDouble(id -> ends.get(id) - starts.get(id))
                 .sum() / 3600.;
 
-        long uniqueVehicles = record.getFinishedShifts().values().stream().distinct().count();
+        long uniqueVehicles = shiftIds.stream().map(id -> record.getFinishedShifts().get(id)).distinct().count();
 
-        double totalRevenue = record.revenueByShift().values().stream().mapToDouble(d -> d).sum();
-        double meanRevenuePerShift = record.revenueByShift().values().stream().mapToDouble(d -> d).average().orElse(Double.NaN);
+        double totalRevenue = shiftIds.stream().mapToDouble(id -> record.revenueByShift().getOrDefault(id, 0.)).sum();
+        double meanRevenuePerShift = shiftIds.stream().mapToDouble(id -> record.revenueByShift().getOrDefault(id, 0.)).average().orElse(Double.NaN);
         double meanRevenuePerShiftHour = totalRevenue / numberOfShiftHours;
 
-        double totalRides = record.getRequestsByShift().values().stream().mapToDouble(List::size).sum();
-        double meanRidesPerShift = record.getRequestsByShift().values().stream().mapToDouble(List::size).average().orElse(Double.NaN);
+        Map<Id<DrtShift>, List<Id<Request>>> requestsByShift = record.getRequestsByShift();
+        double totalRides = shiftIds.stream().mapToDouble(id -> requestsByShift.getOrDefault(id, List.of()).size()).sum();
+        double meanRidesPerShift = shiftIds.stream().mapToDouble(id -> requestsByShift.getOrDefault(id, List.of()).size()).average().orElse(Double.NaN);
         double meanRidesPerShiftHour = totalRides / numberOfShiftHours;
 
         StringJoiner stringJoiner = new StringJoiner(delimiter);
@@ -117,36 +141,43 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
                 .add(meanRidesPerShift + "")
                 .add(meanRidesPerShiftHour + "")
                 .add(totalRides + "");
-        writeIterationShiftEfficiencyStats(stringJoiner.toString(), event.getIteration());
-
+        return stringJoiner.toString();
     }
 
-    private void writeAndPlotShiftEfficiency(Map<Id<DrtShift>, Double> revenuePerShift,
+    private void writeAndPlotShiftEfficiency(ShiftEfficiencyTracker.Record record,
+                                             Map<Id<DrtShift>, Double> revenuePerShift,
                                              Map<Id<DrtShift>, List<Id<Request>>> requestsPerShift,
                                              Map<Id<DrtShift>, Id<DvrpVehicle>> finishedShifts,
                                              String shiftRevenue,
                                              String shiftRidesPerVrh,
                                              String csvFile,
                                              boolean createGraphs) {
+        Map<Id<DrtShift>, Double> starts = record.getActualStartByShift();
+        Map<Id<DrtShift>, Double> ends = record.getActualEndByShift();
+        Map<Id<DrtShift>, String> types = record.getShiftTypeById();
         try (var bw = IOUtils.getBufferedWriter(csvFile)) {
-            bw.append(line("ShiftId", "plannedFrom", "plannedTo", "vehicle", "rides", "revenue", "ridesPerVRH", "revenuePerVRH"));
+            bw.append(line("ShiftId", "shiftType", "actualFrom", "actualTo", "vehicle", "rides", "revenue", "ridesPerVRH", "revenuePerVRH"));
 
             final List<Double> ridesPerVRHList = new ArrayList<>();
             final List<Double> revenuePerVRHList = new ArrayList<>();
 
             for (Map.Entry<Id<DrtShift>, Double> revenuePerShiftEntry : revenuePerShift.entrySet()) {
-                DrtShiftSpecification drtShift = drtShiftsSpecification.get().getShiftSpecifications().get(revenuePerShiftEntry.getKey());
-                int nRequests = requestsPerShift.getOrDefault(revenuePerShiftEntry.getKey(), Collections.EMPTY_LIST).size();
-                double vehicleRevenueHour = drtShift.getEndTime() - drtShift.getStartTime();
-                if (drtShift.getBreak().isPresent()) {
-                    vehicleRevenueHour -= drtShift.getBreak().get().getDuration();
+                Id<DrtShift> shiftId = revenuePerShiftEntry.getKey();
+                // driven from the actual (event-based) run time. Shifts still active at run end have no end time and are
+                // skipped (their vehicle-revenue-hour is undefined). Works for transient shifts without a specification.
+                Double start = starts.get(shiftId);
+                Double end = ends.get(shiftId);
+                if (start == null || end == null) {
+                    continue;
                 }
-                vehicleRevenueHour /= 3600.;
+                int nRequests = requestsPerShift.getOrDefault(shiftId, Collections.EMPTY_LIST).size();
+                double vehicleRevenueHour = (end - start) / 3600.;
                 double ridesPerVRH = nRequests / vehicleRevenueHour;
                 double revenuePerVRH = revenuePerShiftEntry.getValue() / vehicleRevenueHour;
-                Id<DvrpVehicle> dvrpVehicleId = finishedShifts.get(drtShift.getId());
+                Id<DvrpVehicle> dvrpVehicleId = finishedShifts.get(shiftId);
 				if(dvrpVehicleId != null) {
-					bw.append(line(drtShift.getId().toString(), drtShift.getStartTime(), drtShift.getEndTime(),
+					bw.append(line(shiftId.toString(), types.getOrDefault(shiftId, UNSPECIFIED_TYPE),
+							start, end,
 							dvrpVehicleId.toString(), nRequests, revenuePerShiftEntry.getValue(), ridesPerVRH, revenuePerVRH));
 					ridesPerVRHList.add(ridesPerVRH);
 					revenuePerVRHList.add(revenuePerVRH);
@@ -178,7 +209,7 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
         }
     }
 
-    private void writeIterationShiftEfficiencyStats(String summarizeShiftEfficiency, int it) {
+    private void writeIterationShiftEfficiencyStats(String shiftType, String summarizeShiftEfficiency, int it) {
         try (var bw = getAppendingBufferedWriter("drt_shift_efficiency_metrics", ".csv")) {
             if (!headerWritten) {
                 headerWritten = true;
@@ -195,9 +226,9 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
                         .add("meanRidesPerShift")
                         .add("meanRidesPerShiftHour")
                         .add("totalRides");
-                bw.write(line("runId", "iteration", stringJoiner.toString()));
+                bw.write(line("runId", "iteration", "shiftType", stringJoiner.toString()));
             }
-            bw.write(runId + delimiter + it + delimiter + summarizeShiftEfficiency);
+            bw.write(runId + delimiter + it + delimiter + shiftType + delimiter + summarizeShiftEfficiency);
             bw.newLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
