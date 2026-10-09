@@ -10,6 +10,12 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import java.util.Set;
 
+/**
+ * @deprecated Use {@link BicycleNetworkPipeline} instead, which provides the full
+ * end-to-end pipeline including OSM reading, bicycle infrastructure classification,
+ * and bicycle-aware network simplification.
+ */
+@Deprecated
 public class CreateBicycleNetworkWithElevation {
 
 	private static final String inputCRS = "EPSG:4326"; // WGS84 -- Update if needed, but usually OSM is in WGS84

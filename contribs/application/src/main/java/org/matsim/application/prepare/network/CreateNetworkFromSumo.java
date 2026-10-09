@@ -70,6 +70,12 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	@CommandLine.Option(names = "--turn-restrictions", description = "Ignore turn restrictions for specified modes.", defaultValue = "ADD_TURN_RESTRICTIONS")
 	private SumoNetworkConverter.TurnRestriction turnRestrictionHandling;
 
+	@CommandLine.Option(names = "--keep-cyclable-minor-ways", defaultValue = "false",
+		description = "Also convert footway, pedestrian and track edges, which have no link properties " +
+			"of their own and are otherwise skipped as unknown types. Meant for bicycle networks, where " +
+			"these largely bike-carrying edges are infrastructure rather than detail.")
+	private boolean keepCyclableMinorWays;
+
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CreateNetworkFromSumo()).execute(args));
 	}
@@ -77,7 +83,8 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor, laneRestriction, turnRestrictionHandling);
+		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor, laneRestriction, turnRestrictionHandling)
+			.setKeepCyclableMinorWays(keepCyclableMinorWays);
 
 		Network network = NetworkUtils.createNetwork();
 
