@@ -187,12 +187,12 @@ public class SwissRailRaptorData {
 							break;
 						}
 					}
-					int stopFacilityIndex = stopFacilityIndices.computeIfAbsent(routeStop.getStopFacility(), stop -> stopFacilityIndices.size());
+					int stopFacilityIndex = stopFacilityIndices.computeIfAbsent(routeStop.getStopFacility(), _ -> stopFacilityIndices.size());
 					final int thisRouteStopIndex = indexRouteStops;
 					RRouteStop rRouteStop = new RRouteStop(thisRouteStopIndex, routeStop, line, route, mode, indexRoutes, stopFacilityIndex,
 						distanceAlongRoute);
 					routeStops[thisRouteStopIndex] = rRouteStop;
-					routeStopsPerStopFacility.compute(routeStop.getStopFacility(), (stop, currentRouteStops) -> {
+					routeStopsPerStopFacility.compute(routeStop.getStopFacility(), (_, currentRouteStops) -> {
 						if (currentRouteStops == null) {
 							return new int[] { thisRouteStopIndex };
 						}
@@ -214,7 +214,7 @@ public class SwissRailRaptorData {
 							.get(chained.getChainedRouteId());
 						Departure c = otherRoute.getDepartures().get(chained.getChainedDepartureId());
 
-						chainedDeparturesRef.computeIfAbsent(dep, k -> new ArrayList<>()).add(Pair.of(otherRoute, c));
+						chainedDeparturesRef.computeIfAbsent(dep, _ -> new ArrayList<>()).add(Pair.of(otherRoute, c));
 					}
 				}
 
@@ -306,7 +306,7 @@ public class SwissRailRaptorData {
 
 				// we only put the predefined transfer times here, the location-based ones will be calculated
 				// adaptively during routing
-				staticTransferTimes.computeIfAbsent(iterator.getFromStopId(), id -> new HashMap<>())
+				staticTransferTimes.computeIfAbsent(iterator.getFromStopId(), _ -> new HashMap<>())
 					.put(schedule.getFacilities().get(iterator.getToStopId()), iterator.getSeconds());
 			}
 		}
@@ -342,7 +342,7 @@ public class SwissRailRaptorData {
 		for (TransitStopFacility fromStop : routeStopsPerStopFacility.keySet()) {
 			Coord fromCoord = fromStop.getCoord();
 			Collection<TransitStopFacility> nearbyStops = stopsQT.getDisk(fromCoord.getX(), fromCoord.getY(), maxBeelineWalkConnectionDistance);
-			stopToStopsTransfers.computeIfAbsent(fromStop, stop -> new ArrayList<>(5)).addAll(nearbyStops);
+			stopToStopsTransfers.computeIfAbsent(fromStop, _ -> new ArrayList<>(5)).addAll(nearbyStops);
 		}
 
 		// take the transfers from the schedule into account
@@ -353,7 +353,7 @@ public class SwissRailRaptorData {
 			TransitStopFacility fromStop = schedule.getFacilities().get(fromStopId);
 			Id<TransitStopFacility> toStopId = iter.getToStopId();
 			TransitStopFacility toStop = schedule.getFacilities().get(toStopId);
-			List<TransitStopFacility> destinationStops = stopToStopsTransfers.computeIfAbsent(fromStop, stop -> new ArrayList<>(5));
+			List<TransitStopFacility> destinationStops = stopToStopsTransfers.computeIfAbsent(fromStop, _ -> new ArrayList<>(5));
 			if (!destinationStops.contains(toStop)) {
 				destinationStops.add(toStop);
 			}
@@ -393,7 +393,7 @@ public class SwissRailRaptorData {
 						}
 					}
 					RTransfer[] newTransfers = stopTransfers.toArray(new RTransfer[0]);
-					transfers.compute(fromRouteStopIndex, (routeStopIndex, currentTransfers) -> {
+					transfers.compute(fromRouteStopIndex, (_, currentTransfers) -> {
 						if (currentTransfers == null) {
 							return newTransfers;
 						}
@@ -454,13 +454,13 @@ public class SwissRailRaptorData {
 	}
 
 	private static boolean isFirstStopInRoute(RRouteStop routeStop) {
-		TransitRouteStop firstRouteStop = routeStop.route.getStops().get(0);
+		TransitRouteStop firstRouteStop = routeStop.route.getStops().getFirst();
 		return routeStop.routeStop == firstRouteStop;
 	}
 
 	private static boolean isLastStopInRoute(RRouteStop routeStop) {
 		List<TransitRouteStop> routeStops = routeStop.route.getStops();
-		TransitRouteStop lastRouteStop = routeStops.get(routeStops.size() - 1);
+		TransitRouteStop lastRouteStop = routeStops.getLast();
 		return routeStop.routeStop == lastRouteStop;
 	}
 
@@ -591,9 +591,9 @@ public class SwissRailRaptorData {
 	/**
 	 * "Translates" an internally used {@link RTransfer} into a publicly usable {@link Transfer} object.
 	 *
-	 * @param transfer
+	 * @param transfer to which the provider is reset to
 	 * @param provider if provided, the object will be reused and returned, otherwise a new object will be created.
-	 * @return
+	 * @return transferProvider which was passed in as provider
 	 */
 	public CachingTransferProvider getTransferProvider(RTransfer transfer, CachingTransferProvider provider) {
 		CachingTransferProvider transferProvider = provider;
@@ -679,7 +679,7 @@ public class SwissRailRaptorData {
 		// if stopFilterAttribute/stopFilterValue combination exists
 		// we do not have to do anything
 		Map<String, QuadTree<TransitStopFacility>> filteredQTs =
-			this.stopFilterAttribute2Value2StopsQT.computeIfAbsent(stopFilterAttribute, key -> new HashMap<>());
+			this.stopFilterAttribute2Value2StopsQT.computeIfAbsent(stopFilterAttribute, _ -> new HashMap<>());
 		if (filteredQTs.containsKey(stopFilterValue))
 			return;
 
