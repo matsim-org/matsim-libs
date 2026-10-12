@@ -1078,14 +1078,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// * fleetSize is always == FIXED
 		// * fixedNumberOfVehicle(s)PerTypeAndLocation is always == 1
 
-		if (carrierAttributes.smallScaleCommercialTrafficSegment.equals( commercialPersonTraffic ) && carrierAttributes.purpose == 3){
-			thisCarrier.getAttributes().putAttribute( SUBPOPULATION, SubpopulationDefaultNames.SUBPOP_COM_PERSON_SERVICE );
-		} else if (carrierAttributes.smallScaleCommercialTrafficSegment.equals( goodsTraffic ) ){
-			thisCarrier.getAttributes().putAttribute( SUBPOPULATION, SubpopulationDefaultNames.SUBPOP_GOODS );
-		} else{
-			thisCarrier.getAttributes().putAttribute( SUBPOPULATION, SubpopulationDefaultNames.SUBPOP_COM_PERSON );
-		}
-		// yy better use "switch" and throw exception if something unexpected comes in. kai, sep'26
+		String subpopulation = switch (carrierAttributes.smallScaleCommercialTrafficSegment) {
+			case commercialPersonTraffic ->
+				carrierAttributes.purpose == 3 ? SubpopulationDefaultNames.SUBPOP_COM_PERSON_SERVICE : SubpopulationDefaultNames.SUBPOP_COM_PERSON;
+			case goodsTraffic -> SubpopulationDefaultNames.SUBPOP_GOODS;
+			default -> throw new IllegalArgumentException(
+				"Unexpected smallScaleCommercialTrafficSegment: " + carrierAttributes.smallScaleCommercialTrafficSegment);
+		};
+		thisCarrier.getAttributes().putAttribute(SUBPOPULATION, subpopulation);
 
 		thisCarrier.getAttributes().putAttribute( PURPOSE, carrierAttributes.purpose);
 		thisCarrier.getAttributes().putAttribute( TOUR_START_AREA, carrierAttributes.startZone );
