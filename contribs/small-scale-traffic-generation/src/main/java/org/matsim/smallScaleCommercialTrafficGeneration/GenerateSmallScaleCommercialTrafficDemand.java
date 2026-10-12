@@ -1104,6 +1104,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// not be enough for situations where services are relatively short compared to travel.
 		// * generate a sufficient number of vehicles so that the tour duration is covered.
 
+		// we create vehicles until the sum of the max tour durations of all vehicles is larger than the sum of the service durations of all jobs (including the factor for travel buffer calculation)
 		while (sumMaxTourDurationsOfVehicles <= sumServiceDurationsJobs) {
 			TourStartAndDuration t = tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficSegment ).sample();
 			tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficSegment ).sample(2 );
