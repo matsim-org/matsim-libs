@@ -180,7 +180,7 @@
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.22.1</version>
+				<version>1.23.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -258,7 +258,7 @@
 			<dependency>
 				<groupId>org.codehaus.woodstox</groupId>
 				<artifactId>stax2-api</artifactId>
-				<version>4.3.1</version>
+				<version>4.3.2</version>
 			</dependency>
 
 			<dependency>
@@ -421,7 +421,7 @@
 			<dependency>
 				<groupId>io.github.classgraph</groupId>
 				<artifactId>classgraph</artifactId>
-				<version>4.8.196</version>
+				<version>4.8.197</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.fory</groupId>
