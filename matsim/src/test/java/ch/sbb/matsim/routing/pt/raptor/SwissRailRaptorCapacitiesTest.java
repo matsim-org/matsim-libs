@@ -50,13 +50,7 @@ import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.TransitPassengerRoute;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
@@ -78,21 +72,22 @@ public class SwissRailRaptorCapacitiesTest {
 		OccupancyData occupancyData = new OccupancyData();
 
 		SwissRailRaptorData raptorData = SwissRailRaptorData.create(
-				f.scenario.getTransitSchedule(), null,
-				RaptorUtils.createStaticConfig(f.config),
-				f.scenario.getNetwork(),
-				occupancyData);
+			f.scenario.getTransitSchedule(), null,
+			RaptorUtils.createStaticConfig(f.config),
+			f.scenario.getNetwork(),
+			occupancyData);
 
 		SwissRailRaptor raptor = new SwissRailRaptor.Builder(raptorData, f.config).build();
 
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));
 		Facility toFacility = new FakeFacility(new Coord(7100, 1100), Id.create("cd", Link.class));
 
-		List<? extends PlanElement> route1 = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
+		List<? extends PlanElement> route1 = raptor.calcRoute(
+			DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
 		Assertions.assertNotNull(route1);
 		System.out.println("uncongested route:");
 		for (PlanElement leg : route1) {
-			System.out.println(leg.toString() + "  > " + ((Leg)leg).getRoute().getRouteDescription());
+			System.out.println(leg.toString() + "  > " + ((Leg) leg).getRoute().getRouteDescription());
 		}
 		Assertions.assertEquals(3, route1.size());
 
@@ -112,13 +107,14 @@ public class SwissRailRaptorCapacitiesTest {
 		SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(f.config, SwissRailRaptorConfigGroup.class);
 		srrConfig.setUseCapacityConstraints(true);
 		occupancyData = new OccupancyData();
-		OccupancyTracker tracker = new OccupancyTracker(occupancyData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), EventsUtils.createEventsManager(), new SubpopulationScoringParameters(f.scenario));
+		OccupancyTracker tracker = new OccupancyTracker(occupancyData, f.scenario, new DefaultRaptorInVehicleCostCalculator(),
+			EventsUtils.createEventsManager(), new SubpopulationScoringParameters(f.scenario));
 
 		raptorData = SwissRailRaptorData.create(
-				f.scenario.getTransitSchedule(), null,
-				RaptorUtils.createStaticConfig(f.config),
-				f.scenario.getNetwork(),
-				occupancyData);
+			f.scenario.getTransitSchedule(), null,
+			RaptorUtils.createStaticConfig(f.config),
+			f.scenario.getNetwork(),
+			occupancyData);
 
 		raptor = new SwissRailRaptor.Builder(raptorData, f.config).build();
 
@@ -190,12 +186,14 @@ public class SwissRailRaptorCapacitiesTest {
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:20:25"), person8, vehicle3));
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:20:25"), person9, vehicle3));
 		tracker.handleEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:20:30"), vehicle3, f.stopAId, 0));
+		tracker.cleanupAfterMobsim(0);
 
-		List<? extends PlanElement> route2 = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
+		List<? extends PlanElement> route2 = raptor.calcRoute(
+			DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
 		Assertions.assertNotNull(route2);
 		System.out.println("congested route:");
 		for (PlanElement leg : route2) {
-			System.out.println(leg.toString() + "  > " + ((Leg)leg).getRoute().getRouteDescription());
+			System.out.println(leg.toString() + "  > " + ((Leg) leg).getRoute().getRouteDescription());
 		}
 		Assertions.assertEquals(3, route2.size());
 
@@ -290,7 +288,7 @@ public class SwissRailRaptorCapacitiesTest {
 				fastStops.add(sf.createTransitRouteStopBuilder(this.stopC).arrivalOffset(10 * 60 - 30).departureOffset(10 * 60).build());
 				fastStops.add(sf.createTransitRouteStopBuilder(this.stopD).arrivalOffset(15 * 60 - 30).build());
 
-				NetworkRoute route = RouteUtils.createNetworkRoute(List.of(linkAA.getId(), linkAB.getId(), linkBC.getId(), linkCD.getId()), network);
+				NetworkRoute route = RouteUtils.createNetworkRoute(List.of(linkAA.getId(), linkAB.getId(), linkBC.getId(), linkCD.getId()));
 
 				TransitRoute fastRoute = sf.createTransitRoute(this.fastRouteId, route, fastStops, "bus");
 				fastLine.addRoute(fastRoute);
@@ -309,7 +307,7 @@ public class SwissRailRaptorCapacitiesTest {
 				slowStops.add(sf.createTransitRouteStopBuilder(this.stopC).arrivalOffset(14 * 60 - 30).departureOffset(14 * 60).build());
 				slowStops.add(sf.createTransitRouteStopBuilder(this.stopD).arrivalOffset(21 * 60 - 30).build());
 
-				NetworkRoute route = RouteUtils.createNetworkRoute(List.of(linkAA.getId(), linkAB.getId(), linkBC.getId(), linkCD.getId()), network);
+				NetworkRoute route = RouteUtils.createNetworkRoute(List.of(linkAA.getId(), linkAB.getId(), linkBC.getId(), linkCD.getId()));
 
 				TransitRoute slowRoute = sf.createTransitRoute(this.slowRouteId, route, slowStops, "bus");
 				slowLine.addRoute(slowRoute);

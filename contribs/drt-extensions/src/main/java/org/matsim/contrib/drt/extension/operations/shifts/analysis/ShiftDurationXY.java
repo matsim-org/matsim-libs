@@ -29,6 +29,8 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
 
     private final IdMap<DrtShift, Tuple<Double,Double>> shift2plannedVsActualDuration = new IdMap<>(DrtShift.class);
     private final IdMap<DrtShift, Tuple<Double,Double>> shift2plannedVsActualBreakDuration = new IdMap<>(DrtShift.class);
+    // shift type per shift id, as carried by the shift events (empty optional if untyped)
+    private final IdMap<DrtShift, String> shift2Type = new IdMap<>(DrtShift.class);
 
     private final String mode;
 
@@ -45,6 +47,7 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
     public void handleEvent(final DrtShiftStartedEvent event) {
         if (event.getMode().equals(mode)) {
             shift2StartTime.put(event.getShiftId(), event.getTime());
+            event.getShiftType().ifPresent(type -> shift2Type.put(event.getShiftId(), type));
         }
     }
 
@@ -89,6 +92,14 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
 		this.shift2plannedVsActualBreakDuration.clear();
         this.shift2StartTime.clear();
 		this.shift2BreakStartTime.clear();
+		this.shift2Type.clear();
+    }
+
+    /**
+     * @return the shift type per shift id as observed from the shift events (untyped shifts are absent)
+     */
+    public Map<Id<DrtShift>, String> getShift2Type() {
+        return shift2Type;
     }
 
     /**

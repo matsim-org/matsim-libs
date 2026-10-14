@@ -31,13 +31,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author mrieser / Simunto GmbH
@@ -49,7 +43,7 @@ public class OccupancyData {
 	final IdMap<TransitLine, LineData> lineData = new IdMap<>(TransitLine.class);
 	final Map<Id<Vehicle>, VehicleData> vehicleData = new HashMap<>();
 	final Map<Id<Person>, PassengerData> paxData = new HashMap<>();
-	private CacheData cache = null;
+	private volatile CacheData cache = null;
 
 	public void reset() {
 		LOG.info("[SwissRailRaptor] Resetting ExecutionData");
@@ -59,7 +53,17 @@ public class OccupancyData {
 		this.cache = null;
 	}
 
-	public DepartureData getNextAvailableDeparture(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute, Id<TransitStopFacility> stopFacility, double time) {
+	/**
+	 * Replaces the occupancy data per transit line with the given data and invalidates the query cache.
+	 */
+	void replaceLineData(IdMap<TransitLine, LineData> lineData) {
+		this.lineData.clear();
+		this.lineData.putAll(lineData);
+		this.cache = null;
+	}
+
+	public DepartureData getNextAvailableDeparture(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute, Id<TransitStopFacility> stopFacility,
+												   double time) {
 		LineData line = this.lineData.get(transitLine);
 		if (line == null) {
 			return null;
@@ -90,7 +94,8 @@ public class OccupancyData {
 		return null;
 	}
 
-	public DepartureData getDepartureData(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute, Id<TransitStopFacility> stopFacility, Id<Departure> departure) {
+	public DepartureData getDepartureData(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute, Id<TransitStopFacility> stopFacility,
+										  Id<Departure> departure) {
 		LineData line = this.lineData.get(transitLine);
 		if (line == null) {
 			return null;
@@ -119,17 +124,17 @@ public class OccupancyData {
 		return line.routeData.get(transitRoute);
 	}
 
-//	public Vehicle getVehicle(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute, Id<Departure> departure) {
-//		LineData line = this.lineData.get(transitLine);
-//		if (line == null) {
-//			return null;
-//		}
-//		RouteData route = line.routeData.get(transitRoute);
-//		if (route == null) {
-//			return null;
-//		}
-//		return route.vehicles.get(departure);
-//	}
+	//	public Vehicle getVehicle(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute, Id<Departure> departure) {
+	//		LineData line = this.lineData.get(transitLine);
+	//		if (line == null) {
+	//			return null;
+	//		}
+	//		RouteData route = line.routeData.get(transitRoute);
+	//		if (route == null) {
+	//			return null;
+	//		}
+	//		return route.vehicles.get(departure);
+	//	}
 
 	public int getNextAvailableDeparture(SwissRailRaptorData data, SwissRailRaptorData.RRouteStop routeStop, double time) {
 		CacheData cache = getCache(data);
@@ -181,7 +186,6 @@ public class OccupancyData {
 			RouteData routeData = lineData == null ? null : lineData.routeData.get(routeStop.route.getId());
 			StopData stopData = routeData == null ? null : routeData.stopData.get(routeStop.routeStop.getStopFacility().getId());
 
-
 			List<Departure> origDepartures = new ArrayList<>(routeStop.route.getDepartures().values());
 			origDepartures.sort(Comparator.comparingDouble(Departure::getDepartureTime));
 
@@ -217,7 +221,7 @@ public class OccupancyData {
 		Map<Id<TransitRoute>, RouteData> routeData = new HashMap<>();
 	}
 
-	static class RouteData {
+	public static class RouteData {
 		Map<Id<TransitStopFacility>, StopData> stopData = new HashMap<>();
 		final TransitRoute route;
 
@@ -307,7 +311,7 @@ public class OccupancyData {
 		}
 	}
 
-	static class VehicleData {
+	public static class VehicleData {
 		final Vehicle vehicle;
 		final Id<TransitLine> lineId;
 		final Id<TransitRoute> routeId;
@@ -323,7 +327,7 @@ public class OccupancyData {
 		}
 	}
 
-	static class PassengerData {
+	public static class PassengerData {
 		final Person person;
 		final Map<String, ModeUtilityParameters> modeParams;
 		String mode;

@@ -19,31 +19,19 @@
  * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
-import ch.sbb.matsim.routing.pt.raptor.OccupancyData.LineData;
-import ch.sbb.matsim.routing.pt.raptor.OccupancyData.PassengerData;
-import ch.sbb.matsim.routing.pt.raptor.OccupancyData.RouteData;
-import ch.sbb.matsim.routing.pt.raptor.OccupancyData.StopData;
-import ch.sbb.matsim.routing.pt.raptor.OccupancyData.VehicleData;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.*;
 import ch.sbb.matsim.routing.pt.raptor.RaptorInVehicleCostCalculator.RouteSegmentIterator;
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.MobsimMessageCollector;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.PersonScoreEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -52,28 +40,43 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.events.MobsimScopeEventHandler;
+import org.matsim.core.mobsim.dsim.DSimComponentsMessageProcessor;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.dsim.NotifyVehiclePartitionTransfer;
+import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.qsim.NoopMessageCollector;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.util.*;
 
 /**
- * Collects various data related to public transport during the execution of the plans (=during mobsim).
- * For example, for each departure of a transit vehicle at a stop the latest time an agent can arrive
- * to catch a departure is recorder, as is the vehicle load upon departure at a stop.
+ * Collects various data related to public transport during the execution of the plans (=during mobsim). For example, for each departure of a transit
+ * vehicle at a stop the latest time an agent can arrive to catch a departure is recorder, as is the vehicle load upon departure at a stop.
+ * <p>
+ * The tracker collects into its own data and publishes it to the shared {@link OccupancyData} used by the router after the mobsim. In a distributed
+ * simulation, there is one tracker per partition. The state of transit vehicles and their passengers moves with the vehicle when it changes
+ * partitions, and the trackers exchange their data at the end of the mobsim, so that each tracker publishes the complete data.
  *
  * @author mrieser / Simunto GmbH
  */
-public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+@DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
+public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler,
+	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
+	AggregatingEventHandler<OccupancyTracker.OccupancySyncMessage>, MobsimScopeEventHandler, NotifyVehiclePartitionTransfer,
+	DSimComponentsMessageProcessor, QSimComponent {
+
+	public static final String COMPONENT_NAME = "OccupancyTracker";
 
 	private final static Logger LOG = LogManager.getLogger(OccupancyTracker.class);
 
-	private final OccupancyData data;
+	private final OccupancyData data = new OccupancyData();
+	private final OccupancyData sharedData;
 	private final Scenario scenario;
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 	private final RaptorInVehicleCostCalculator inVehCostCalculator;
@@ -82,26 +85,40 @@ public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaiti
 
 	private final static VehicleData DUMMY_VEHDATA = new VehicleData(null, null, null, null);
 	private final ScoringParametersForPerson scoringParams;
+	private final NetworkPartition partition;
+	private final ComputeNode computeNode;
+	private final MobsimMessageCollector messageCollector;
 
+	/**
+	 * Creates a tracker for a simulation with a single partition, which publishes to the given occupancy data.
+	 */
+	public OccupancyTracker(OccupancyData sharedData, Scenario scenario, RaptorInVehicleCostCalculator inVehCostCalculator, EventsManager events,
+		ScoringParametersForPerson scoringParams) {
+		this(sharedData, scenario, inVehCostCalculator, events, scoringParams, NetworkPartition.SINGLE_INSTANCE, ComputeNode.SINGLE_INSTANCE,
+			new NoopMessageCollector());
+	}
+
+	/**
+	 * Creates a tracker for the given partition, which publishes to the given occupancy data.
+	 */
 	@Inject
-	public OccupancyTracker(OccupancyData data, Scenario scenario, RaptorInVehicleCostCalculator inVehCostCalculator, EventsManager events, ScoringParametersForPerson scoringParams) {
-		this.data = data;
+	public OccupancyTracker(OccupancyData sharedData, Scenario scenario, RaptorInVehicleCostCalculator inVehCostCalculator, EventsManager events,
+		ScoringParametersForPerson scoringParams, NetworkPartition partition, ComputeNode computeNode, MobsimMessageCollector messageCollector) {
+		this.sharedData = sharedData;
 		this.scenario = scenario;
 		this.inVehCostCalculator = inVehCostCalculator;
 		// the default in vehicle cost calculator can be ignored
 		this.useInVehCosts = !inVehCostCalculator.getClass().equals(DefaultRaptorInVehicleCostCalculator.class);
 		this.events = events;
 		this.scoringParams = scoringParams;
+		this.partition = partition;
+		this.computeNode = computeNode;
+		this.messageCollector = messageCollector;
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		PassengerData pd = this.data.paxData.computeIfAbsent(event.getPersonId(), k -> {
-			Person person = this.scenario.getPopulation().getPersons().get(k);
-			Map<String, ModeUtilityParameters> modeParams = this.scoringParams.getScoringParameters(person).modeParams;
-			return new PassengerData(person, modeParams);
-		});
-		pd.mode = event.getLegMode();
+		getOrCreatePassengerData(event.getPersonId()).mode = event.getLegMode();
 	}
 
 	@Override
@@ -109,11 +126,9 @@ public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaiti
 		this.transitDrivers.add(event.getDriverId());
 		// store information about the current service of the transit vehicle
 		Vehicle vehicle = this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId());
-		this.data.vehicleData.put(event.getVehicleId(), new VehicleData(vehicle, event.getTransitLineId(), event.getTransitRouteId(), event.getDepartureId()));
-		LineData line = this.data.lineData.computeIfAbsent(event.getTransitLineId(), id -> new LineData());
-		RouteData route = line.routeData.computeIfAbsent(event.getTransitRouteId(), id -> new RouteData(
-				this.scenario.getTransitSchedule().getTransitLines().get(event.getTransitLineId()).getRoutes().get(event.getTransitRouteId())
-		));
+		this.data.vehicleData.put(event.getVehicleId(),
+			new VehicleData(vehicle, event.getTransitLineId(), event.getTransitRouteId(), event.getDepartureId()));
+		getOrCreateRouteData(event.getTransitLineId(), event.getTransitRouteId());
 	}
 
 	@Override
@@ -129,7 +144,7 @@ public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaiti
 		if (vehData != null) {
 			LineData line = this.data.lineData.get(vehData.lineId);
 			RouteData route = line.routeData.get(vehData.routeId);
-			StopData stop = route.stopData.computeIfAbsent(vehData.stopFacilityId, id -> new StopData());
+			StopData stop = route.stopData.computeIfAbsent(vehData.stopFacilityId, _ -> new StopData());
 			DepartureData dep = stop.getOrCreate(vehData.departureId);
 			dep.vehDepTime = event.getTime();
 			dep.paxCountAtDeparture = vehData.currentPaxCount;
@@ -152,7 +167,7 @@ public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaiti
 			double waitStart = passengerData.waitingStartTime;
 			LineData line = this.data.lineData.get(vehData.lineId);
 			RouteData route = line.routeData.get(vehData.routeId);
-			StopData stop = route.stopData.computeIfAbsent(vehData.stopFacilityId, id -> new StopData());
+			StopData stop = route.stopData.computeIfAbsent(vehData.stopFacilityId, _ -> new StopData());
 			stop.getOrCreate(vehData.departureId).addWaitingPerson(waitStart);
 			passengerData.vehBoardingTime = event.getTime();
 			passengerData.departureId = vehData.departureId;
@@ -170,19 +185,156 @@ public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaiti
 		}
 	}
 
+	/**
+	 * Sends the state of a transit vehicle, its passengers and the data of the stops the vehicle has already served to the partition the vehicle
+	 * moves to. The stop data is needed to compute the in-vehicle costs of the passengers when they alight.
+	 */
 	@Override
-	public void reset(int iteration) {
-		this.data.reset();
-		this.transitDrivers.clear();
+	public void onVehicleLeavesPartition(DistributedMobsimVehicle vehicle, int toPartition) {
+		VehicleData vehData = this.data.vehicleData.remove(vehicle.getId());
+		if (vehData == null) {
+			return;
+		}
+
+		List<PassengerEntry> passengers = new ArrayList<>();
+		for (PassengerAgent passenger : vehicle.getPassengers()) {
+			PassengerData pd = this.data.paxData.remove(passenger.getId());
+			if (pd != null) {
+				passengers.add(
+					new PassengerEntry(passenger.getId(), pd.mode, pd.waitingStartTime, pd.vehBoardingTime, pd.boardingStopId, pd.departureId));
+			}
+		}
+
+		List<DepartureEntry> servedStops = new ArrayList<>();
+		RouteData route = this.data.getRouteData(vehData.lineId, vehData.routeId);
+		for (Map.Entry<Id<TransitStopFacility>, StopData> e : route.stopData.entrySet()) {
+			DepartureData dep = e.getValue().depData.get(vehData.departureId);
+			if (dep != null) {
+				servedStops.add(DepartureEntry.of(vehData.lineId, vehData.routeId, e.getKey(), dep));
+			}
+		}
+
+		this.messageCollector.collect(new VehicleTransferMessage(vehicle.getId(), vehicle.getDriver().getId(), vehData.lineId, vehData.routeId,
+			vehData.departureId, vehData.currentPaxCount, passengers, servedStops), toPartition);
+	}
+
+	@Override
+	public void onVehicleEntersPartition(DistributedMobsimVehicle vehicle) {
+	}
+
+	@Override
+	public Map<Class<? extends Message>, MessageHandler> getMessageHandlers() {
+		return Map.of(VehicleTransferMessage.class, this::handleVehicleTransferMessages);
+	}
+
+	private void handleVehicleTransferMessages(List<Message> messages, double now) {
+		for (Message m : messages) {
+			VehicleTransferMessage msg = (VehicleTransferMessage) m;
+			Vehicle vehicle = this.scenario.getTransitVehicles().getVehicles().get(msg.vehicleId());
+			VehicleData vehData = new VehicleData(vehicle, msg.lineId(), msg.routeId(), msg.departureId());
+			vehData.currentPaxCount = msg.currentPaxCount();
+			this.data.vehicleData.put(msg.vehicleId(), vehData);
+			this.transitDrivers.add(msg.driverId());
+			getOrCreateRouteData(msg.lineId(), msg.routeId());
+
+			for (PassengerEntry p : msg.passengers()) {
+				PassengerData pd = getOrCreatePassengerData(p.personId());
+				pd.mode = p.mode();
+				pd.waitingStartTime = p.waitingStartTime();
+				pd.vehBoardingTime = p.vehBoardingTime();
+				pd.boardingStopId = p.boardingStopId();
+				pd.departureId = p.departureId();
+			}
+			msg.servedStops().forEach(this::merge);
+		}
+	}
+
+	/**
+	 * Returns all departure data collected by this tracker.
+	 */
+	@Override
+	public OccupancySyncMessage send() {
+		List<DepartureEntry> departures = new ArrayList<>();
+		for (Map.Entry<Id<TransitLine>, LineData> line : this.data.lineData.entrySet()) {
+			for (Map.Entry<Id<TransitRoute>, RouteData> route : line.getValue().routeData.entrySet()) {
+				for (Map.Entry<Id<TransitStopFacility>, StopData> stop : route.getValue().stopData.entrySet()) {
+					for (DepartureData dep : stop.getValue().depList) {
+						departures.add(DepartureEntry.of(line.getKey(), route.getKey(), stop.getKey(), dep));
+					}
+				}
+			}
+		}
+		return new OccupancySyncMessage(departures);
+	}
+
+	/**
+	 * Adds the departure data of other trackers. Merging is idempotent, so receiving the own message is harmless.
+	 */
+	@Override
+	public void receive(List<OccupancySyncMessage> messages) {
+		for (OccupancySyncMessage msg : messages) {
+			msg.departures().forEach(this::merge);
+		}
+	}
+
+	/**
+	 * Exchanges data only once, after the mobsim, as the router uses the data only in the next iteration.
+	 */
+	@Override
+	public double getSyncInterval() {
+		return Double.POSITIVE_INFINITY;
+	}
+
+	/**
+	 * Publishes the collected data to the shared occupancy data. All trackers of a compute node hold the same data after the final exchange, so only
+	 * the tracker of the node's first partition publishes.
+	 */
+	@Override
+	public void cleanupAfterMobsim(int iteration) {
+		if (this.partition.getIndex() == this.computeNode.getParts().getInt(0)) {
+			this.sharedData.replaceLineData(this.data.lineData);
+		}
+	}
+
+	private PassengerData getOrCreatePassengerData(Id<Person> personId) {
+		return this.data.paxData.computeIfAbsent(personId, k -> {
+			Person person = this.scenario.getPopulation().getPersons().get(k);
+			Map<String, ModeUtilityParameters> modeParams = this.scoringParams.getScoringParameters(person).modeParams;
+			return new PassengerData(person, modeParams);
+		});
+	}
+
+	private RouteData getOrCreateRouteData(Id<TransitLine> lineId, Id<TransitRoute> routeId) {
+		LineData line = this.data.lineData.computeIfAbsent(lineId, _ -> new LineData());
+		return line.routeData.computeIfAbsent(routeId, _ -> new RouteData(
+			this.scenario.getTransitSchedule().getTransitLines().get(lineId).getRoutes().get(routeId)
+		));
+	}
+
+	/**
+	 * Adds the data of a departure at a stop, unless this tracker has data of the same or a later visit of that stop. Routes may serve a stop more
+	 * than once, and the data of the latest visit wins, as it does with a single tracker.
+	 */
+	private void merge(DepartureEntry entry) {
+		StopData stop = getOrCreateRouteData(entry.lineId(), entry.routeId()).stopData.computeIfAbsent(entry.stopId(), _ -> new StopData());
+		DepartureData existing = stop.depData.get(entry.departureId());
+		if (existing != null && existing.vehDepTime >= entry.vehDepTime()) {
+			return;
+		}
+		stop.sorted = false;
+		DepartureData dep = stop.getOrCreate(entry.departureId());
+		dep.vehDepTime = entry.vehDepTime();
+		dep.paxCountAtDeparture = entry.paxCountAtDeparture();
+		dep.earliestWaitStart = entry.earliestWaitStart();
+		dep.latestWaitStart = entry.latestWaitStart();
 	}
 
 	private void calculateInVehicleCosts(double time, PassengerData passengerData, VehicleData vehData) {
 		Person person = passengerData.person;
 
-		double depTime = this.data.getRouteData(vehData.lineId, vehData.routeId).stopData.get(passengerData.boardingStopId).depData.get(passengerData.departureId).vehDepTime;
-//		double depTime = passengerData.vehBoardingTime;
-		double arrTime = time;
-		double travelTime = arrTime - depTime;
+		double depTime = this.data.getRouteData(vehData.lineId, vehData.routeId).stopData.get(passengerData.boardingStopId).depData.get(
+			passengerData.departureId).vehDepTime;
+		double travelTime = time - depTime;
 
 		ModeUtilityParameters modeParams = passengerData.modeParams.get(passengerData.mode);
 		double margUtil_s = modeParams.marginalUtilityOfTraveling_s;
@@ -193,7 +345,9 @@ public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaiti
 
 		double scoreDiff = capacityScore - defaultScore;
 		if (Double.isNaN(scoreDiff)) {
-			LOG.warn("Getting NaN as score: " + passengerData.person.getId() + " " + vehData.lineId + " " + vehData.routeId + " " + Time.writeTime(time) + " " + depTime + " " + travelTime + " " + defaultScore + " " + capacityScore);
+			LOG.warn(
+				"Getting NaN as score: " + passengerData.person.getId() + " " + vehData.lineId + " " + vehData.routeId + " " + Time.writeTime(time)
+					+ " " + depTime + " " + travelTime + " " + defaultScore + " " + capacityScore);
 		} else {
 			this.events.processEvent(new PersonScoreEvent(time, person.getId(), scoreDiff, "pt-occupancy"));
 		}
@@ -276,6 +430,39 @@ public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaiti
 		public double getTimeOfDay() {
 			return this.currentDepData.vehDepTime;
 		}
+	}
+
+	/**
+	 * The data of one departure at one stop.
+	 */
+	public record DepartureEntry(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, Id<Departure> departureId,
+		double vehDepTime, int paxCountAtDeparture, double earliestWaitStart, double latestWaitStart) {
+
+		static DepartureEntry of(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, DepartureData dep) {
+			return new DepartureEntry(lineId, routeId, stopId, dep.departureId, dep.vehDepTime, dep.paxCountAtDeparture,
+				dep.earliestWaitStart, dep.latestWaitStart);
+		}
+	}
+
+	/**
+	 * The state of a passenger riding in a transit vehicle.
+	 */
+	public record PassengerEntry(Id<Person> personId, String mode, double waitingStartTime, double vehBoardingTime,
+		Id<TransitStopFacility> boardingStopId, Id<Departure> departureId) {
+	}
+
+	/**
+	 * The state of a transit vehicle and its passengers, sent when the vehicle moves to another partition.
+	 */
+	public record VehicleTransferMessage(Id<Vehicle> vehicleId, Id<Person> driverId, Id<TransitLine> lineId, Id<TransitRoute> routeId,
+		Id<Departure> departureId, int currentPaxCount, List<PassengerEntry> passengers,
+		List<DepartureEntry> servedStops) implements Message {
+	}
+
+	/**
+	 * All departure data collected by one tracker, exchanged between trackers after the mobsim.
+	 */
+	public record OccupancySyncMessage(List<DepartureEntry> departures) implements Message {
 	}
 
 }

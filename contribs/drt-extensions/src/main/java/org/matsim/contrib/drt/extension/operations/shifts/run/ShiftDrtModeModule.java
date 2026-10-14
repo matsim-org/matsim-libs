@@ -8,6 +8,12 @@ import com.google.inject.TypeLiteral;
 import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.BusyWindowTracker;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.RejectionRateTracker;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.RemoteGuidanceOperators;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.RemoteGuidanceOperatorState;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.RemoteGuidanceScheduler;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.config.RemoteGuidanceParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.analysis.*;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
@@ -38,6 +44,7 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -94,7 +101,45 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 			new DrtShiftsReader(drtShiftsSpecification).parse(shiftsParams.getShiftInputUrl(getConfig().getContext()));
 		}
 
-		bindModal(ShiftScheduler.class).toProvider(modalProvider(getter -> new DefaultShiftScheduler(drtShiftsSpecification)));
+		if (drtOperationsParams.getRemoteGuidanceParams().isPresent()) {
+			RemoteGuidanceParams remoteGuidanceParams = drtOperationsParams.getRemoteGuidanceParams().get();
+			// authoritative runtime registry of operators and their aggregate capacity; shared by the scheduler (activation
+			// ceiling) and, in the QSim scope, the incident dispatcher + the remote-guidance ShiftEndLogic (deactivation)
+			RemoteGuidanceOperators remoteGuidanceOperators = RemoteGuidanceOperators.fromSpecification(
+					drtShiftsSpecification, remoteGuidanceParams.getOperatorShiftType(),
+					remoteGuidanceParams.getDefaultOperatorCapacity());
+			bindModal(RemoteGuidanceOperators.class).toInstance(remoteGuidanceOperators);
+			// per-run runtime lifecycle of the operators (released / incident-busy / effective end); split out of the
+			// immutable registry so nothing mutable lives on the cross-iteration spec. Re-initialised each iteration in
+			// RemoteGuidanceScheduler.initialSchedule(). A single instance shared by the scheduler (controller scope) and
+			// the QSim-scope IncidentDispatcher, so both see the same release state.
+			bindModal(RemoteGuidanceOperatorState.class).toInstance(
+					new RemoteGuidanceOperatorState(remoteGuidanceOperators));
+			// demand-pressure source for the RejectionRateActivation trigger (opt-in). A single controller-scoped
+			// instance is shared by the scheduler (activation) and the QSim-scope ShiftEndLogic (deactivation) so both
+			// margins read the same recentRejectionRate and the shared activation target stays consistent. When no
+			// rejectionActivation config is present, no tracker is bound and both margins fall back to rate 0.0.
+			remoteGuidanceParams.getRejectionActivationParams().ifPresent(rejectionParams -> {
+				bindModal(RejectionRateTracker.class).toInstance(
+						new RejectionRateTracker(getMode(), rejectionParams.getWindowSize()));
+				addEventHandlerBinding().to(modalKey(RejectionRateTracker.class));
+			});
+			// trailing-window busy smoother shared by both margins (like the rejection tracker above). Always bound: a
+			// window of 0 makes it a pass-through (smoothedBusy == instantaneous busy), so the default is unchanged
+			// behaviour. Not an event handler — it is sampled directly by the two margins each step and self-resets on
+			// the backwards time jump at an iteration boundary.
+			bindModal(BusyWindowTracker.class).toInstance(
+					new BusyWindowTracker(remoteGuidanceParams.getBusyWindowSize()));
+			boolean hasRejectionActivation = remoteGuidanceParams.getRejectionActivationParams().isPresent();
+			bindModal(ShiftScheduler.class).toProvider(modalProvider(getter -> RemoteGuidanceScheduler.create(
+					drtShiftsSpecification, getter.getModal(RemoteGuidanceOperators.class),
+					getter.getModal(RemoteGuidanceOperatorState.class), remoteGuidanceParams,
+					getter.get(EventsManager.class), getMode(), shiftsParams.getChangeoverDuration(),
+					hasRejectionActivation ? getter.getModal(RejectionRateTracker.class) : null,
+					getter.getModal(BusyWindowTracker.class))));
+		} else {
+			bindModal(ShiftScheduler.class).toProvider(modalProvider(getter -> new DefaultShiftScheduler(drtShiftsSpecification)));
+		}
 		bindModal(DrtShiftsSpecification.class).toProvider(modalKey(ShiftScheduler.class));
 
 		bindModal(ShiftDurationXY.class).toProvider(modalProvider(

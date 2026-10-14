@@ -56,10 +56,10 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	private static final Logger log = LogManager.getLogger(ExtractRelevantFreightTrips.class);
 	public static final String GEOGRAPHICAL_TRIP_TYPE = "geographical_Trip_Type";
 	public static final String BOUNDARY = "boundary";
-	public static final String ROUTED_DISTANCE_TO_BOUNDARY = "routedDistanceToBoundary";
-	public static final String ROUTED_TRAVEL_TIME_TO_BOUNDARY = "routedTravelTimeToBoundary";
-	public static final String ROUTED_DISTANCE_FROM_BOUNDARY = "routedDistanceFromBoundary";
-	public static final String ROUTED_TRAVEL_TIME_FROM_BOUNDARY = "routedTravelTimeFromBoundary";
+	public static final String ROUTED_DISTANCE_TO_BOUNDARY = "routedDistanceToBoundary"; // in meters
+	public static final String ROUTED_TRAVEL_TIME_TO_BOUNDARY = "routedTravelTimeToBoundary"; // in seconds
+	public static final String ROUTED_DISTANCE_FROM_BOUNDARY = "routedDistanceFromBoundary"; // in meters
+	public static final String ROUTED_TRAVEL_TIME_FROM_BOUNDARY = "routedTravelTimeFromBoundary"; // in seconds
 	public static final String ORIGINAL_X = "original_x";
 	public static final String ORIGINAL_Y = "original_y";
 	// Same-id links are only trusted if they are also close to the expected boundary coordinate.

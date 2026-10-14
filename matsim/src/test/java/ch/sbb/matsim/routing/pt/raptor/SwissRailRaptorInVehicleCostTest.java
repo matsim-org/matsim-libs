@@ -50,13 +50,7 @@ import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.TransitPassengerRoute;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -109,8 +103,8 @@ public class SwissRailRaptorInVehicleCostTest {
 		runTest(f, new CapacityDependentInVehicleCostCalculator(1.00, 0.2, 0.6, 1.0), f.fastLineId);
 		runTest(f, new CapacityDependentInVehicleCostCalculator(0.66, 0.2, 0.6, 1.0), f.fastLineId);
 		runTest(f, new CapacityDependentInVehicleCostCalculator(0.65, 0.2, 0.6, 1.0), f.slowLineId);
-		runTest(f, new CapacityDependentInVehicleCostCalculator(1.00, 0.2, 0.6, 1.0 + 2*0.48), f.fastLineId);
-		runTest(f, new CapacityDependentInVehicleCostCalculator(1.00, 0.2, 0.6, 1.0 + 2*0.49), f.slowLineId);
+		runTest(f, new CapacityDependentInVehicleCostCalculator(1.00, 0.2, 0.6, 1.0 + 2 * 0.48), f.fastLineId);
+		runTest(f, new CapacityDependentInVehicleCostCalculator(1.00, 0.2, 0.6, 1.0 + 2 * 0.49), f.slowLineId);
 	}
 
 	@Test
@@ -127,26 +121,29 @@ public class SwissRailRaptorInVehicleCostTest {
 
 	private void runTest(Fixture f, RaptorInVehicleCostCalculator inVehCostCalcualtor, Id<TransitLine> expectedTransitLine) {
 		OccupancyData occupancyData = new OccupancyData();
-		OccupancyTracker tracker = new OccupancyTracker(occupancyData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), EventsUtils.createEventsManager(), new SubpopulationScoringParameters(f.scenario));
+		OccupancyTracker tracker = new OccupancyTracker(occupancyData, f.scenario, new DefaultRaptorInVehicleCostCalculator(),
+			EventsUtils.createEventsManager(), new SubpopulationScoringParameters(f.scenario));
 		fillExecutionTracker(f, tracker);
+		tracker.cleanupAfterMobsim(0);
 
 		SwissRailRaptorData raptorData = SwissRailRaptorData.create(
-				f.scenario.getTransitSchedule(), f.scenario.getTransitVehicles(),
-				RaptorUtils.createStaticConfig(f.config),
-				f.scenario.getNetwork(),
-				occupancyData);
+			f.scenario.getTransitSchedule(), f.scenario.getTransitVehicles(),
+			RaptorUtils.createStaticConfig(f.config),
+			f.scenario.getNetwork(),
+			occupancyData);
 
 		SwissRailRaptor raptor = new SwissRailRaptor.Builder(raptorData, f.config).with(inVehCostCalcualtor).build();
 
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));
 		Facility toFacility = new FakeFacility(new Coord(7100, 1100), Id.create("cd", Link.class));
 
-		List<? extends PlanElement> route1 = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
+		List<? extends PlanElement> route1 = raptor.calcRoute(
+			DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
 		Assertions.assertNotNull(route1);
 
 		System.out.println("calculated route:");
 		for (PlanElement leg : route1) {
-			System.out.println(leg.toString() + "  > " + ((Leg)leg).getRoute().getRouteDescription());
+			System.out.println(leg.toString() + "  > " + ((Leg) leg).getRoute().getRouteDescription());
 		}
 
 		Assertions.assertEquals(3, route1.size());
@@ -343,7 +340,7 @@ public class SwissRailRaptorInVehicleCostTest {
 				fastStops.add(sf.createTransitRouteStopBuilder(this.stopC).arrivalOffset(10 * 60 - 30).departureOffset(10 * 60).build());
 				fastStops.add(sf.createTransitRouteStopBuilder(this.stopD).arrivalOffset(15 * 60 - 30).build());
 
-				NetworkRoute route = RouteUtils.createNetworkRoute(List.of(linkAA.getId(), linkAB.getId(), linkBC.getId(), linkCD.getId()), network);
+				NetworkRoute route = RouteUtils.createNetworkRoute(List.of(linkAA.getId(), linkAB.getId(), linkBC.getId(), linkCD.getId()));
 
 				TransitRoute fastRoute = sf.createTransitRoute(this.fastRouteId, route, fastStops, "bus");
 				fastLine.addRoute(fastRoute);
@@ -364,7 +361,7 @@ public class SwissRailRaptorInVehicleCostTest {
 				slowStops.add(sf.createTransitRouteStopBuilder(this.stopC).arrivalOffset(14 * 60 - 30).departureOffset(14 * 60).build());
 				slowStops.add(sf.createTransitRouteStopBuilder(this.stopD).arrivalOffset(21 * 60 - 30).build());
 
-				NetworkRoute route = RouteUtils.createNetworkRoute(List.of(linkAA.getId(), linkAB.getId(), linkBC.getId(), linkCD.getId()), network);
+				NetworkRoute route = RouteUtils.createNetworkRoute(List.of(linkAA.getId(), linkAB.getId(), linkBC.getId(), linkCD.getId()));
 
 				TransitRoute slowRoute = sf.createTransitRoute(this.slowRouteId, route, slowStops, "bus");
 				slowLine.addRoute(slowRoute);
