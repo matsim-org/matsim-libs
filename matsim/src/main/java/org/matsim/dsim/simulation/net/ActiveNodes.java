@@ -9,9 +9,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.Steppable;
 
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Implement the move node logic in the engine. The intersection update touches in and out links
@@ -21,7 +22,15 @@ import java.util.Set;
  */
 public class ActiveNodes implements Steppable {
 
-	private final Set<SimNode> activeNodes = new HashSet<>();
+	/**
+	 * Active nodes are kept ordered by node index, and not in a hash set. The update order matters, because adjacent nodes compete for the
+	 * remaining flow and storage capacity of a shared downstream link within the same time step, so whichever node is updated first gets the
+	 * slot. {@link SimNode} is identified by its id, which has no bearing on the iteration order of a hash set: that order follows
+	 * {@link System#identityHashCode(Object)}, which differs between JVM runs and would make every simulation result irreproducible. Ordering
+	 * by node index is stable across runs and, like the in- and out-link order established in {@link SimNetwork}, independent of the applied
+	 * partitioning.
+	 */
+	private final Set<SimNode> activeNodes = new TreeSet<>(Comparator.comparingInt((SimNode node) -> node.getId().index()));
 	private final EventsManager em;
 
 	@Inject

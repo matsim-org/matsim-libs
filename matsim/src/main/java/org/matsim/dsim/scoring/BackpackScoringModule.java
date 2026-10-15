@@ -24,6 +24,7 @@ import org.matsim.dsim.events.DSimEventHandlerRegistry;
 import org.matsim.dsim.simulation.IterationInformation;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.stream.Stream;
 
 public class BackpackScoringModule extends AbstractModule {
@@ -125,7 +126,12 @@ public class BackpackScoringModule extends AbstractModule {
 		@Override
 		public void notifyScoring(ScoringEvent event) {
 			collector.exchangePlansForScoring();
-			var backpacks = collector.backpacks();
+			// Score in a deterministic order. The collector hands out a concurrent hash set, whose iteration order depends on the identity
+			// hash codes of its entries and therefore differs between runs. Scoring is per agent, but the order in which the scores are
+			// accumulated into the reported averages is not, so an unordered iteration makes scorestats irreproducible.
+			var backpacks = collector.backpacks().stream()
+				.sorted(Comparator.comparingInt(backpack -> backpack.personId().index()))
+				.toList();
 			for (var backpack : backpacks) {
 				scoring.score(backpack);
 			}
