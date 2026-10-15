@@ -3,6 +3,7 @@ package org.matsim.dsim.scoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.vehicles.Vehicle;
@@ -78,6 +79,16 @@ class BackpackPlan {
 		var leg = currentLeg.finishLeg();
 		experiencedPlan.addLeg(leg);
 		currentLeg = null;
+	}
+
+	/**
+	 * Starts the experienced plan with the agent's first planned activity. This way, agents which never end their first activity still
+	 * have an experienced plan.
+	 */
+	void startWithActivity(Activity plannedActivity) {
+		if (currentActivity != null || currentLeg != null || !experiencedPlan.getPlanElements().isEmpty())
+			throw new IllegalStateException("Backpack plan was already started.");
+		currentActivity = new BackpackActivity(plannedActivity);
 	}
 
 	void handleActivityStart(ActivityStartEvent e) {

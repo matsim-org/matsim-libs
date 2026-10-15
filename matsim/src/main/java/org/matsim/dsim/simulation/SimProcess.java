@@ -49,6 +49,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final List<DistributedActivityHandler> activityHandlers = new ArrayList<>();
 
 	// partition-communication-related handlers.
+	private final List<NotifyAgentInsertion> notifyAgentInsertions = new ArrayList<>();
 	private final List<NotifyAgentPartitionTransfer> notifyAgentPartitionTransfers = new ArrayList<>();
 	private final List<NotifyVehiclePartitionTransfer> notifyVehiclePartitionTransfers = new ArrayList<>();
 	private final Int2ObjectMap<List<DSimComponentsMessageProcessor.MessageHandler>> messageHandlers = new Int2ObjectOpenHashMap<>();
@@ -125,6 +126,10 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		if (component instanceof NetworkTrafficEngine n) {
 			this.networkTrafficEngine = n;
+		}
+
+		if (component instanceof NotifyAgentInsertion n) {
+			this.notifyAgentInsertions.add(n);
 		}
 
 		if (component instanceof NotifyAgentPartitionTransfer n) {
@@ -296,6 +301,12 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void insertAgentIntoMobsim(MobsimAgent agent) {
+		// notify before arranging the state, as arranging may already emit events, e.g. a stuck event for aborting agents.
+		if (agent instanceof DistributedMobsimAgent dma) {
+			for (var handler : notifyAgentInsertions) {
+				handler.onAgentInserted(dma);
+			}
+		}
 		arrangeNextAgentState(agent);
 	}
 

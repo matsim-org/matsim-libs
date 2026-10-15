@@ -23,7 +23,11 @@ public final class HbefaUtils {
 	 * are corrected by switching the two values. Vehicle types with non-average values for both
 	 * fields are invalid and cause an {@link IllegalArgumentException}. Vehicle types with a
 	 * missing technology or emission concept are ignored.</p>
+	 *
+	 * @deprecated We do not want to use automagic to correct the following. Please correct it
+	 * upstream in your vehicleTypes.xml or in code.
 	 */
+	@Deprecated
 	public static void checkAndCorrectHbefaTechnologyAndEmissionConcept(Scenario scenario) {
 		checkAndCorrectHbefaTechnologyAndEmissionConcept(scenario.getVehicles());
 	}
@@ -35,7 +39,11 @@ public final class HbefaUtils {
 	 * are corrected by switching the two values. Vehicle types with non-average values for both
 	 * fields are invalid and cause an {@link IllegalArgumentException}. Vehicle types with a
 	 * missing technology or emission concept are ignored.</p>
+	 *
+	 * @deprecated We do not want to use automagic to correct the following. Please correct it
+	 * upstream in your vehicleTypes.xml or in code.
 	 */
+	@Deprecated
 	public static void checkAndCorrectHbefaTechnologyAndEmissionConcept(Vehicles vehicles) {
 		for (VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
 			String technology = VehicleUtils.getHbefaTechnology(vehicleType.getEngineInformation());

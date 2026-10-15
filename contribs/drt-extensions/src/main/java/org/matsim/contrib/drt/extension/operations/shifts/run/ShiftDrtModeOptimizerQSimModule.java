@@ -4,6 +4,16 @@ import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.IncidentDispatcher;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.optimizer.IncidentAwareVehicleDataEntryFactory;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.RemoteGuidanceOperators;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.RemoteGuidanceOperatorState;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.BusyWindowTracker;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.RejectionRateTracker;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.RemoteGuidanceScheduler;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.RemoteGuidanceShiftEndLogic;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.activation.ActivationReconciler;
+import org.matsim.contrib.drt.extension.operations.remoteoperations.config.RemoteGuidanceParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityReservationManager;
@@ -15,8 +25,8 @@ import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicle
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.insertion.ShiftInsertionCostCalculator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsActionCreator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtStayTaskEndTimeCalculator;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsTaskFactory;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftDrtScheduleInquiry;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskSchedulerImpl;
@@ -96,11 +106,51 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 				(new AssignShiftToVehicleLogicImpl(shiftsParams))
 		));
 
+		// deactivation policy: mandatory (driver) shifts never end early; remote guidance recalls vehicles on the
+		// capacityExceeded / idleTimeout triggers
+		if (drtOperationsParams.getRemoteGuidanceParams().isPresent()) {
+			RemoteGuidanceParams rgParams = drtOperationsParams.getRemoteGuidanceParams().get();
+			double idleTimeout = rgParams.getIdleTimeout();
+			double recallLeadTime = rgParams.getRecallLeadTime();
+			boolean hasRejectionActivation = rgParams.getRejectionActivationParams().isPresent();
+			// the deactivation side reads the SAME reconciler policy AND the SAME rejection-rate tracker as the
+			// activation side (RemoteGuidanceScheduler), so both margins share one fleet-sizing target (floor +
+			// responsiveness buffer + demand-driven rejection trigger).
+			ActivationReconciler reconciler = ActivationReconciler.create(rgParams.getActivationPolicy(),
+					rgParams.getMinActiveFleet(), rgParams.getReadyBufferSize(),
+					RemoteGuidanceScheduler.rejectionThreshold(rgParams));
+			bindModal(ShiftEndLogic.class).toProvider(modalProvider(getter -> new RemoteGuidanceShiftEndLogic(
+					getter.getModal(Fleet.class), getter.getModal(RemoteGuidanceOperators.class), idleTimeout,
+					recallLeadTime, reconciler,
+					hasRejectionActivation ? getter.getModal(RejectionRateTracker.class) : null,
+					getter.getModal(BusyWindowTracker.class))));
+		} else {
+			bindModal(ShiftEndLogic.class).toInstance(ShiftEndLogic.NEVER);
+		}
+
+		// stochastic remote-guidance incidents (optional, opt-in via the "incidents" config set): each driving vehicle
+		// may hit an incident (Poisson over VKT) that occupies one operator for a while and holds the vehicle in place.
+		// The dispatcher is both a sim-step listener (a QSim component) AND a link-leave event handler (for VKT
+		// accumulation) — event handlers are NOT QSim components, so it is registered via both seams (cf. EV's
+		// DriveDischargingHandler).
+		drtOperationsParams.getRemoteGuidanceParams()
+				.flatMap(RemoteGuidanceParams::getIncidentParams)
+				.ifPresent(incidentParams -> {
+					addModalComponent(IncidentDispatcher.class, modalProvider(getter -> new IncidentDispatcher(
+							getMode(), incidentParams, getter.getModal(RemoteGuidanceOperators.class),
+							getter.getModal(RemoteGuidanceOperatorState.class), getter.getModal(Fleet.class),
+							getter.get(EventsManager.class), getter.get(MobsimTimer.class),
+							getter.getModal(ScheduleTimingUpdater.class), getter.getModal(Network.class),
+							getter.getModal(TravelTime.class), getter.getModal(DrtOperationsTaskFactory.class))));
+					addMobsimScopeEventHandlerBinding().to(modalKey(IncidentDispatcher.class));
+				});
+
 		bindModal(DrtShiftDispatcher.class).toProvider(modalProvider(
 				getter -> new DrtShiftDispatcherImpl(getMode(), getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
 						getter.getModal(ShiftTaskScheduler.class), getter.get(EventsManager.class),
-						shiftsParams, new DefaultShiftStartLogic(), getter.getModal(AssignShiftToVehicleLogic.class),
+						shiftsParams, new DefaultShiftStartLogic(), getter.getModal(ShiftEndLogic.class),
+						getter.getModal(AssignShiftToVehicleLogic.class),
 						getter.getModal(ShiftScheduler.class), getter.getModal(OperationFacilityReservationManager.class)))
 		).asEagerSingleton();
 
@@ -109,24 +159,31 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 						new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class),
 								drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet()))));
 
+		// when stochastic incidents are enabled, wrap the entry factory so vehicles currently held by an incident are
+		// taken out of the insertion pool entirely (an IncidentHoldTask spliced mid-drive is not a valid insertion
+		// waypoint and would otherwise trip the core scheduler's removeBetween verifier).
+		boolean hasIncidents = drtOperationsParams.getRemoteGuidanceParams()
+				.flatMap(RemoteGuidanceParams::getIncidentParams).isPresent();
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl(loadType, getter.getModal(StopWaypointFactory.class)),
+			VehicleEntry.EntryFactory factory = new ShiftVehicleDataEntryFactory(
+					new VehicleDataEntryFactoryImpl(loadType, getter.getModal(StopWaypointFactory.class)),
 					shiftsParams.isConsiderUpcomingShiftsForInsertion());
+			return hasIncidents ? new IncidentAwareVehicleDataEntryFactory(factory) : factory;
 		}));
 
-		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new DrtOperationsTaskFactory(
+		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new DrtOperationsTaskFactoryImpl(
 				new DrtTaskFactoryImpl(),
 				getter.getModal(OperationFacilities.class),
 				getter.getModal(OperationFacilityReservationManager.class)
 		)));
 
-		bindModal(ShiftDrtTaskFactory.class).toProvider(modalProvider(getter -> ((ShiftDrtTaskFactory) getter.getModal(DrtTaskFactory.class))));
+		bindModal(DrtOperationsTaskFactory.class).toProvider(modalProvider(getter -> ((DrtOperationsTaskFactory) getter.getModal(DrtTaskFactory.class))));
 
 		bindModal(ShiftTaskScheduler.class).toProvider(modalProvider(
 				getter -> new ShiftTaskSchedulerImpl(
 						getter.getModal(OperationFacilities.class),
-						getter.getModal(ShiftDrtTaskFactory.class),
+						getter.getModal(DrtOperationsTaskFactory.class),
 						getter.getModal(Network.class),
 						getter.getModal(OperationFacilityReservationManager.class),
 						shiftsParams,

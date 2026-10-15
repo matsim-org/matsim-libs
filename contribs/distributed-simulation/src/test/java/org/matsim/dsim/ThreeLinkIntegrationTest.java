@@ -2,6 +2,8 @@ package org.matsim.dsim;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.communication.NullCommunicator;
@@ -19,6 +21,7 @@ import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -192,6 +195,56 @@ public class ThreeLinkIntegrationTest {
 				assertNull(person.getSelectedPlan().getScore());
 			}
 		});
+	}
+
+	/**
+	 * A stay-home agent produces no events. It must be scored nevertheless, on the compute node of its starting partition.
+	 */
+	@Test
+	@Order(2)
+	@org.matsim.testcases.DisabledOnGitHubWindowsCI
+	void stayHomeAgentThreeNodes() {
+		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
+		var outputDirectory = utils.getOutputDirectory();
+		var size = 3;
+		var comms = LocalCommunicator.create(size);
+		var stayHomeId = Id.createPersonId("stay-home");
+		var stayHomeScores = new ConcurrentHashMap<Integer, Double>();
+
+		DistributedExecution.execute(comms, 120, comm -> {
+			Config local = ConfigUtils.loadConfig(configPath);
+			local.dsim().setThreads(1);
+			local.controller().setLastIteration(0);
+			local.controller().setOutputDirectory(outputDirectory);
+			local.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+
+			Scenario scenario = ScenarioUtils.loadScenario(local);
+			var factory = scenario.getPopulation().getFactory();
+			var stayHome = factory.createPerson(stayHomeId);
+			var plan = factory.createPlan();
+			var home = factory.createActivityFromLinkId("end", Id.createLinkId("l3"));
+			home.setCoord(new Coord(0, 1200));
+			plan.addActivity(home);
+			stayHome.addPlan(plan);
+			scenario.getPopulation().addPerson(stayHome);
+
+			Controler controler = new Controler(scenario, DistributedContext.create(comm, local, new org.matsim.core.serialization.ForySerializationProvider(org.matsim.core.serialization.MessageTypeRegistry.getInstance())));
+			controler.run();
+
+			try {
+				comm.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+
+			var score = scenario.getPopulation().getPersons().get(stayHomeId).getSelectedPlan().getScore();
+			if (score != null) {
+				stayHomeScores.put(comm.getRank(), score);
+			}
+		});
+
+		assertEquals(1, stayHomeScores.size(), "Stay-home agent must be scored on exactly one compute node: " + stayHomeScores);
+		assertEquals(0.0, stayHomeScores.values().iterator().next(), 1e-9);
 	}
 
 	@Test

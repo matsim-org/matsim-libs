@@ -197,160 +197,15 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 				NetworkBasedTransportCosts transportCosts = createNetworkBasedTransportCosts(scenario, vehicleTypes);
 				Set<Id<Carrier>> carriersWithForcedSingleServiceRedraw = new HashSet<>();
 				for (Carrier nonCompleteSolvedCarrier : nonCompleteSolvedCarriers) {
-					GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes =
-						generator.getCarrierId2carrierAttributes().get(nonCompleteSolvedCarrier.getId());
-
-					// get handeled and unhandled services of the old plan
-					Set<CarrierService> handledServices = nonCompleteSolvedCarrier.getSelectedPlan().getScheduledTours().stream().flatMap(
-						tour -> tour.getTour().getTourElements().stream()).filter(te -> te instanceof Tour.ServiceActivity).map(
-						te -> ((Tour.ServiceActivity) te).getService()).collect(Collectors.toSet());
-					List<CarrierService> unhandledServices = nonCompleteSolvedCarrier.getServices().values().stream().filter(
-						thisService -> !handledServices.contains(thisService)).toList();
-					Set<Id<CarrierService>> unhandledServiceIds = unhandledServices.stream()
-						.map(CarrierService::getId)
-						.collect(Collectors.toSet());
-
-					// get used and unused vehicles of the old plan
-					Set<Id<Vehicle>> usedVehicleIds = nonCompleteSolvedCarrier.getSelectedPlan().getScheduledTours().stream()
-						.map(st -> st.getVehicle().getId())
-						.collect(Collectors.toSet());
-					List<CarrierVehicle> unusedVehicles = nonCompleteSolvedCarrier.getCarrierCapabilities().getCarrierVehicles().values().stream()
-						.filter(v -> !usedVehicleIds.contains(v.getId()))
-						.toList();
-
-					log.info("Carrier '{}': {} unhandled services, {} handled services, {} unused vehicles, {} used vehicles.",
-						nonCompleteSolvedCarrier.getId(), unhandledServices.size(), handledServices.size(), unusedVehicles.size(),
-						usedVehicleIds.size());
-					// Calculate the time deficit of the services compared to the available vehicle tour durations.
-					double sumServiceDurationsWithoutTravelBuffer = nonCompleteSolvedCarrier.getServices().values().stream().mapToDouble(CarrierService::getServiceDuration).sum();
-					double sumServiceDurationsWithBuffer = sumServiceDurationsWithoutTravelBuffer * effectiveTravelBufferFactor;
-					double sumMaxTourDurationsVehicles = nonCompleteSolvedCarrier.getCarrierCapabilities().getCarrierVehicles().values().stream().mapToDouble(DefaultUnhandledServicesSolution::vehicleAvailability).sum();
-					double timeDeficit = sumServiceDurationsWithBuffer - sumMaxTourDurationsVehicles;
-					double timeDeficitWithoutTravelBuffer = sumServiceDurationsWithoutTravelBuffer - sumMaxTourDurationsVehicles;
-
-					// calculate the maximum tour duration of the fleet to check if at least a single unhandled service could fit into the fleet availability
-					double maxAnyVehicleAvailability = maxVehicleAvailability(
-						nonCompleteSolvedCarrier.getCarrierCapabilities().getCarrierVehicles().values());
-					double maxUnhandledServiceDurationWithEffectiveBuffer = unhandledServices.stream()
-						.mapToDouble(service -> service.getServiceDuration() * effectiveTravelBufferFactor)
-						.max().orElse(0);
-					boolean anySingleJobInfeasible = maxUnhandledServiceDurationWithEffectiveBuffer > maxAnyVehicleAvailability;
-
-					// check if the situation is stagnating or even getting worse (more unhandled services than in the last loop iteration) to decide if service durations should be changed in this iteration
-					UnHandledInformation lastLoopInformation = unhandledInformationPerCarrier.get(nonCompleteSolvedCarrier.getId());
-					boolean stagnatingOrWorse = lastLoopInformation != null && unhandledServices.size() >= lastLoopInformation.numberOfUnhandledServices();
-					boolean unhandledServiceSetChanged = lastLoopInformation != null && !unhandledServiceIds.equals(lastLoopInformation.unhandledServiceIds());
-					int previousStagnationVehicleFallbackSets =
-						lastLoopInformation == null ? 0 : lastLoopInformation.stagnationVehicleFallbackSets();
-					int previousStagnationVehicleFallbackSetLimit =
-						lastLoopInformation == null ? 0 : lastLoopInformation.stagnationVehicleFallbackSetLimit();
-					boolean forceRedrawAfterSingleServiceFallback = lastLoopInformation != null
-						&& lastLoopInformation.numberOfUnhandledServices() == 1
-						&& lastLoopInformation.singleServiceVehicleAdded();
-					boolean forceFinalLoopRepair = i == generator.getMaxNumberOfLoopsForVRPSolving()
-						&& !unhandledServices.isEmpty();
-					if (forceRedrawAfterSingleServiceFallback) {
+					CarrierReplanningResult result = repairCarrierBeforeReplanning(nonCompleteSolvedCarrier,
+						unhandledInformationPerCarrier.get(nonCompleteSolvedCarrier.getId()), i,
+						effectiveTravelBufferFactor, transportCosts);
+					addedVehicles += result.addedVehicles();
+					changedServiceDurations += result.changedServiceDurations();
+					unhandledInformationPerCarrier.put(nonCompleteSolvedCarrier.getId(), result.unhandledInformation());
+					if (result.forcedSingleServiceRedraw()) {
 						carriersWithForcedSingleServiceRedraw.add(nonCompleteSolvedCarrier.getId());
 					}
-
-					// A real positive time deficit means the fleet needs more available vehicle time. The growing travel-buffer
-					// factor is intentionally softer: if that factor alone creates the deficit, add at most one vehicle-type set
-					// and only while there are fewer unused vehicles than still-open services. This prevents late loop iterations
-					// from manufacturing many vehicles just to satisfy a conservative buffer estimate.
-					boolean aggregateServiceTimeDeficit = timeDeficitWithoutTravelBuffer > 0;
-					boolean rawTimeBudgetSufficient = !aggregateServiceTimeDeficit;
-
-					// Redraw service durations if an unhandled service is individually too long for the available vehicle windows.
-					// Also redraw when a carrier stagnates, although the raw aggregate time budget is sufficient. This intentionally
-					// ignores the growing travel-buffer factor: otherwise the large late-loop buffer can hide stagnation and the loop
-					// stops repairing carriers even though the actual service time would fit into the available vehicle windows.
-					boolean redrawDueToStagnation = rawTimeBudgetSufficient && stagnatingOrWorse;
-					boolean checkServiceDurationChange = anySingleJobInfeasible || redrawDueToStagnation
-						|| forceRedrawAfterSingleServiceFallback || forceFinalLoopRepair;
-
-					boolean addVehiclesForBufferOnlyDeficit = !aggregateServiceTimeDeficit && timeDeficit > 0
-						&& unusedVehicles.size() < unhandledServices.size();
-
-					// Carriers can also stagnate with unused vehicles even when the aggregate time budget is sufficient.
-					// In those cases the remaining vehicles may be unusable for the last service because of depot or
-					// time-window constraints. Prefer capped normal fallback vehicles over changing service durations,
-					// but keep the number of fallback attempts bounded. If replanning changes which service is unhandled,
-					// allow another bounded set of vehicle attempts for the newly exposed service.
-					int stagnationVehicleFallbackSetLimit = previousStagnationVehicleFallbackSetLimit;
-					int fallbackSetLimitIncrement = Math.max(unhandledServices.size(),
-						lastLoopInformation == null ? unhandledServices.size() : lastLoopInformation.numberOfUnhandledServices());
-					if (checkServiceDurationChange && stagnationVehicleFallbackSetLimit == 0) {
-						stagnationVehicleFallbackSetLimit = fallbackSetLimitIncrement;
-					} else if (checkServiceDurationChange && unhandledServiceSetChanged
-						&& previousStagnationVehicleFallbackSets >= stagnationVehicleFallbackSetLimit) {
-						stagnationVehicleFallbackSetLimit += fallbackSetLimitIncrement;
-					}
-					if ((forceRedrawAfterSingleServiceFallback || forceFinalLoopRepair)
-						&& previousStagnationVehicleFallbackSets >= stagnationVehicleFallbackSetLimit) {
-						stagnationVehicleFallbackSetLimit++;
-					}
-					// The network-based timing already includes the NetworkChangeEvents. Dedicated time-window fallback
-					// vehicles receive a fixed 30-minute slack; the loop-growing factor remains limited to the aggregate fleet repair.
-					List<CarrierService> servicesWithoutUnusedTimeWindow = findServicesWithoutUnusedVehicleTimeWindow(
-						unhandledServices, unusedVehicles, transportCosts);
-					boolean addTimeWindowFallbackBeforeRedraw = checkServiceDurationChange
-						&& !forceRedrawAfterSingleServiceFallback
-						&& previousStagnationVehicleFallbackSets < stagnationVehicleFallbackSetLimit
-						&& !servicesWithoutUnusedTimeWindow.isEmpty();
-					boolean checkAdditionalVehicles = !forceRedrawAfterSingleServiceFallback
-						&& (aggregateServiceTimeDeficit || addVehiclesForBufferOnlyDeficit);
-					int stagnationVehicleFallbackSets = previousStagnationVehicleFallbackSets + (addTimeWindowFallbackBeforeRedraw ? 1 : 0);
-					double vehicleAdditionTargetDuration = aggregateServiceTimeDeficit
-						? sumServiceDurationsWithoutTravelBuffer
-						: sumServiceDurationsWithBuffer;
-					int maxVehicleSetsToAdd = aggregateServiceTimeDeficit ? Integer.MAX_VALUE : 1;
-
-					log.info(
-						"Carrier '{}': deficits buffered/raw={} / {} min, bufferFactor={}, longestOpenServiceWithBuffer={} min, servicesWithoutUnusedVehicle={}, repairs(addVehicles={}, timeWindowFallback={}, redrawDurations={})",
-						nonCompleteSolvedCarrier.getId(),
-						timeDeficit / 60.0, timeDeficitWithoutTravelBuffer / 60.0,
-						effectiveTravelBufferFactor, maxUnhandledServiceDurationWithEffectiveBuffer / 60.,
-						servicesWithoutUnusedTimeWindow.size(),
-						checkAdditionalVehicles, addTimeWindowFallbackBeforeRedraw, checkServiceDurationChange
-					);
-					int addedVehiclesForCarrier = 0;
-					if (checkAdditionalVehicles) {
-						addedVehiclesForCarrier += addAdditionalVehicles( nonCompleteSolvedCarrier, carrierAttributes,
-							unhandledServices, unusedVehicles,
-							handledServices.size(), vehicleAdditionTargetDuration, sumMaxTourDurationsVehicles,
-							effectiveTravelBufferFactor,
-							maxVehicleSetsToAdd );
-					}
-					if (addTimeWindowFallbackBeforeRedraw) {
-						int addedTimeWindowFallbackVehicles = addTimeWindowFallbackVehicles(nonCompleteSolvedCarrier, carrierAttributes,
-							servicesWithoutUnusedTimeWindow, transportCosts, effectiveTravelBufferFactor);
-						addedVehiclesForCarrier += addedTimeWindowFallbackVehicles;
-						if (addedTimeWindowFallbackVehicles == 0){
-							stagnationVehicleFallbackSets = previousStagnationVehicleFallbackSets;
-						}
-					}
-					addedVehicles += addedVehiclesForCarrier;
-					boolean singleServiceVehicleAddedThisLoop = unhandledServices.size() == 1 && addedVehiclesForCarrier > 0;
-
-					// If this loop changed the fleet, let jsprit try the capped fallback vehicles before altering service
-					// durations. If a carrier remains unresolved after adding a vehicle for one open service, redraw all jobs
-					// that are open in the next loop without adding another vehicle; jsprit may have shifted the open set.
-					// A subsequent loop may add a vehicle again, alternating both repair strategies while the carrier stagnates.
-					// In the final loop, apply both repairs to all open services because no alternating follow-up remains.
-					if (checkServiceDurationChange && (addedVehiclesForCarrier == 0 || forceRedrawAfterSingleServiceFallback || forceFinalLoopRepair)){
-						changedServiceDurations += redrawUnhandledServiceDurations( nonCompleteSolvedCarrier,
-							carrierAttributes, unhandledServices,
-							effectiveTravelBufferFactor,
-							redrawDueToStagnation || forceRedrawAfterSingleServiceFallback || forceFinalLoopRepair );
-					} else if (checkServiceDurationChange) {
-						log.info(
-							"Carrier '{}': Deferred service-duration redraw because {} capped fallback vehicle(s) were added in this loop.",
-							nonCompleteSolvedCarrier.getId(), addedVehiclesForCarrier);
-					}
-					unhandledInformationPerCarrier.put(nonCompleteSolvedCarrier.getId(),
-						new UnHandledInformation(unhandledServices.size(), unusedVehicles.size(),
-							stagnationVehicleFallbackSets, stagnationVehicleFallbackSetLimit, unhandledServiceIds,
-							singleServiceVehicleAddedThisLoop));
 				}
 				// (At this point we have gone through all carriers.)
 
@@ -420,6 +275,184 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Applies the default repair strategies to one carrier before the next jsprit run.
+	 *
+	 * @param carrier carrier with unhandled services
+	 * @param lastLoopInformation repair state from the carrier's previous replanning loop, or {@code null}
+	 * @param loopIteration one-based replanning-loop iteration
+	 * @param effectiveTravelBufferFactor travel-buffer factor for this loop
+	 * @param transportCosts network-based transport costs used for time-window feasibility checks
+	 * @return the repair counts and state to aggregate in the enclosing replanning loop
+	 */
+	private CarrierReplanningResult repairCarrierBeforeReplanning(Carrier carrier,
+	                                                             UnHandledInformation lastLoopInformation,
+	                                                             int loopIteration,
+	                                                             double effectiveTravelBufferFactor,
+	                                                             NetworkBasedTransportCosts transportCosts) {
+		GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes =
+			generator.getCarrierId2carrierAttributes().get(carrier.getId());
+
+		// Get handled and unhandled services from the old plan.
+		Set<CarrierService> handledServices = carrier.getSelectedPlan().getScheduledTours().stream()
+			.flatMap(tour -> tour.getTour().getTourElements().stream())
+			.filter(te -> te instanceof Tour.ServiceActivity)
+			.map(te -> ((Tour.ServiceActivity) te).getService())
+			.collect(Collectors.toSet());
+		List<CarrierService> unhandledServices = carrier.getServices().values().stream()
+			.filter(service -> !handledServices.contains(service))
+			.toList();
+		Set<Id<CarrierService>> unhandledServiceIds = unhandledServices.stream()
+			.map(CarrierService::getId)
+			.collect(Collectors.toSet());
+
+		// Get used and unused vehicles from the old plan.
+		Set<Id<Vehicle>> usedVehicleIds = carrier.getSelectedPlan().getScheduledTours().stream()
+			.map(tour -> tour.getVehicle().getId())
+			.collect(Collectors.toSet());
+		List<CarrierVehicle> unusedVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream()
+			.filter(vehicle -> !usedVehicleIds.contains(vehicle.getId()))
+			.toList();
+
+		log.info("Carrier '{}': {} unhandled services, {} handled services, {} unused vehicles, {} used vehicles.",
+			carrier.getId(), unhandledServices.size(), handledServices.size(), unusedVehicles.size(), usedVehicleIds.size());
+
+		// Calculate the time deficit of the services compared to the available vehicle tour durations.
+		double sumServiceDurationsWithoutTravelBuffer = carrier.getServices().values().stream()
+			.mapToDouble(CarrierService::getServiceDuration)
+			.sum();
+		double sumServiceDurationsWithBuffer = sumServiceDurationsWithoutTravelBuffer * effectiveTravelBufferFactor;
+		double sumMaxTourDurationsVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream()
+			.mapToDouble(DefaultUnhandledServicesSolution::vehicleAvailability)
+			.sum();
+		double timeDeficit = sumServiceDurationsWithBuffer - sumMaxTourDurationsVehicles;
+		double timeDeficitWithoutTravelBuffer = sumServiceDurationsWithoutTravelBuffer - sumMaxTourDurationsVehicles;
+
+		// Check whether at least one unhandled service exceeds every available vehicle window.
+		double maxAnyVehicleAvailability = maxVehicleAvailability(
+			carrier.getCarrierCapabilities().getCarrierVehicles().values());
+		double maxUnhandledServiceDurationWithEffectiveBuffer = unhandledServices.stream()
+			.mapToDouble(service -> service.getServiceDuration() * effectiveTravelBufferFactor)
+			.max().orElse(0);
+		boolean anySingleJobInfeasible = maxUnhandledServiceDurationWithEffectiveBuffer > maxAnyVehicleAvailability;
+
+		boolean stagnatingOrWorse = lastLoopInformation != null
+			&& unhandledServices.size() >= lastLoopInformation.numberOfUnhandledServices();
+		boolean unhandledServiceSetChanged = lastLoopInformation != null
+			&& !unhandledServiceIds.equals(lastLoopInformation.unhandledServiceIds());
+		int previousStagnationVehicleFallbackSets =
+			lastLoopInformation == null ? 0 : lastLoopInformation.stagnationVehicleFallbackSets();
+		int previousStagnationVehicleFallbackSetLimit =
+			lastLoopInformation == null ? 0 : lastLoopInformation.stagnationVehicleFallbackSetLimit();
+		boolean forceRedrawAfterSingleServiceFallback = lastLoopInformation != null
+			&& lastLoopInformation.numberOfUnhandledServices() == 1
+			&& lastLoopInformation.singleServiceVehicleAdded();
+		boolean forceFinalLoopRepair = loopIteration == generator.getMaxNumberOfLoopsForVRPSolving()
+			&& !unhandledServices.isEmpty();
+
+		// A real positive time deficit means the fleet needs more available vehicle time. The growing travel-buffer
+		// factor is intentionally softer: if that factor alone creates the deficit, add at most one vehicle-type set
+		// and only while there are fewer unused vehicles than still-open services. This prevents late loop iterations
+		// from manufacturing many vehicles just to satisfy a conservative buffer estimate.
+		boolean aggregateServiceTimeDeficit = timeDeficitWithoutTravelBuffer > 0;
+		boolean rawTimeBudgetSufficient = !aggregateServiceTimeDeficit;
+
+		// Redraw service durations if an unhandled service is individually too long for the available vehicle windows.
+		// Also redraw when a carrier stagnates, although the raw aggregate time budget is sufficient. This intentionally
+		// ignores the growing travel-buffer factor: otherwise the large late-loop buffer can hide stagnation and the loop
+		// stops repairing carriers even though the actual service time would fit into the available vehicle windows.
+		boolean redrawDueToStagnation = rawTimeBudgetSufficient && stagnatingOrWorse;
+		boolean checkServiceDurationChange = anySingleJobInfeasible || redrawDueToStagnation
+			|| forceRedrawAfterSingleServiceFallback || forceFinalLoopRepair;
+
+		boolean addVehiclesForBufferOnlyDeficit = !aggregateServiceTimeDeficit && timeDeficit > 0
+			&& unusedVehicles.size() < unhandledServices.size();
+
+		// Carriers can also stagnate with unused vehicles even when the aggregate time budget is sufficient.
+		// In those cases the remaining vehicles may be unusable for the last service because of depot or
+		// time-window constraints. Prefer capped normal fallback vehicles over changing service durations,
+		// but keep the number of fallback attempts bounded. If replanning changes which service is unhandled,
+		// allow another bounded set of vehicle attempts for the newly exposed service.
+		int stagnationVehicleFallbackSetLimit = previousStagnationVehicleFallbackSetLimit;
+		int fallbackSetLimitIncrement = Math.max(unhandledServices.size(),
+			lastLoopInformation == null ? unhandledServices.size() : lastLoopInformation.numberOfUnhandledServices());
+		if (checkServiceDurationChange && stagnationVehicleFallbackSetLimit == 0) {
+			stagnationVehicleFallbackSetLimit = fallbackSetLimitIncrement;
+		} else if (checkServiceDurationChange && unhandledServiceSetChanged
+			&& previousStagnationVehicleFallbackSets >= stagnationVehicleFallbackSetLimit) {
+			stagnationVehicleFallbackSetLimit += fallbackSetLimitIncrement;
+		}
+		if ((forceRedrawAfterSingleServiceFallback || forceFinalLoopRepair)
+			&& previousStagnationVehicleFallbackSets >= stagnationVehicleFallbackSetLimit) {
+			stagnationVehicleFallbackSetLimit++;
+		}
+
+		// The network-based timing already includes the NetworkChangeEvents. Dedicated time-window fallback
+		// vehicles receive a fixed 30-minute slack; the loop-growing factor remains limited to the aggregate fleet repair.
+		List<CarrierService> servicesWithoutUnusedTimeWindow = findServicesWithoutUnusedVehicleTimeWindow(
+			unhandledServices, unusedVehicles, transportCosts);
+		boolean addTimeWindowFallbackBeforeRedraw = checkServiceDurationChange
+			&& !forceRedrawAfterSingleServiceFallback
+			&& previousStagnationVehicleFallbackSets < stagnationVehicleFallbackSetLimit
+			&& !servicesWithoutUnusedTimeWindow.isEmpty();
+		boolean checkAdditionalVehicles = !forceRedrawAfterSingleServiceFallback
+			&& (aggregateServiceTimeDeficit || addVehiclesForBufferOnlyDeficit);
+		int stagnationVehicleFallbackSets = previousStagnationVehicleFallbackSets
+			+ (addTimeWindowFallbackBeforeRedraw ? 1 : 0);
+		double vehicleAdditionTargetDuration = aggregateServiceTimeDeficit
+			? sumServiceDurationsWithoutTravelBuffer
+			: sumServiceDurationsWithBuffer;
+		int maxVehicleSetsToAdd = aggregateServiceTimeDeficit ? Integer.MAX_VALUE : 1;
+
+		log.info(
+			"Carrier '{}': deficits buffered/raw={} / {} min, bufferFactor={}, longestOpenServiceWithBuffer={} min, servicesWithoutUnusedVehicle={}, repairs(addVehicles={}, timeWindowFallback={}, redrawDurations={})",
+			carrier.getId(),
+			timeDeficit / 60.0, timeDeficitWithoutTravelBuffer / 60.0,
+			effectiveTravelBufferFactor, maxUnhandledServiceDurationWithEffectiveBuffer / 60.,
+			servicesWithoutUnusedTimeWindow.size(),
+			checkAdditionalVehicles, addTimeWindowFallbackBeforeRedraw, checkServiceDurationChange
+		);
+
+		int addedVehicles = 0;
+		if (checkAdditionalVehicles) {
+			addedVehicles += addAdditionalVehicles(carrier, carrierAttributes, unhandledServices, unusedVehicles,
+				handledServices.size(), vehicleAdditionTargetDuration, sumMaxTourDurationsVehicles,
+				effectiveTravelBufferFactor, maxVehicleSetsToAdd);
+		}
+		if (addTimeWindowFallbackBeforeRedraw) {
+			int addedTimeWindowFallbackVehicles = addTimeWindowFallbackVehicles(carrier, carrierAttributes,
+				servicesWithoutUnusedTimeWindow, transportCosts, effectiveTravelBufferFactor);
+			addedVehicles += addedTimeWindowFallbackVehicles;
+			if (addedTimeWindowFallbackVehicles == 0) {
+				stagnationVehicleFallbackSets = previousStagnationVehicleFallbackSets;
+			}
+		}
+		boolean singleServiceVehicleAddedThisLoop = unhandledServices.size() == 1 && addedVehicles > 0;
+
+		// If this loop changed the fleet, let jsprit try the capped fallback vehicles before altering service
+		// durations. If a carrier remains unresolved after adding a vehicle for one open service, redraw all jobs
+		// that are open in the next loop without adding another vehicle; jsprit may have shifted the open set.
+		// A subsequent loop may add a vehicle again, alternating both repair strategies while the carrier stagnates.
+		// In the final loop, apply both repairs to all open services because no alternating follow-up remains.
+		int changedServiceDurations = 0;
+		if (checkServiceDurationChange
+			&& (addedVehicles == 0 || forceRedrawAfterSingleServiceFallback || forceFinalLoopRepair)) {
+			changedServiceDurations = redrawUnhandledServiceDurations(carrier, carrierAttributes, unhandledServices,
+				effectiveTravelBufferFactor,
+				redrawDueToStagnation || forceRedrawAfterSingleServiceFallback || forceFinalLoopRepair);
+		} else if (checkServiceDurationChange) {
+			log.info(
+				"Carrier '{}': Deferred service-duration redraw because {} capped fallback vehicle(s) were added in this loop.",
+				carrier.getId(), addedVehicles);
+		}
+
+		UnHandledInformation unhandledInformation = new UnHandledInformation(unhandledServices.size(),
+			unusedVehicles.size(), stagnationVehicleFallbackSets, stagnationVehicleFallbackSetLimit,
+			unhandledServiceIds, singleServiceVehicleAddedThisLoop);
+		return new CarrierReplanningResult(addedVehicles, changedServiceDurations, unhandledInformation,
+			forceRedrawAfterSingleServiceFallback);
 	}
 
 	/**
@@ -992,6 +1025,18 @@ class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 	                            int stagnationVehicleFallbackSets, int stagnationVehicleFallbackSetLimit,
 	                            Set<Id<CarrierService>> unhandledServiceIds,
 	                            boolean singleServiceVehicleAdded) {}
+
+	/**
+	 * Result of applying the default repair strategies to one carrier in one replanning loop.
+	 *
+	 * @param addedVehicles number of vehicles added for the carrier
+	 * @param changedServiceDurations number of service durations changed for the carrier
+	 * @param unhandledInformation state to retain for the next replanning loop
+	 * @param forcedSingleServiceRedraw whether specialized vehicle additions must be skipped for this carrier
+	 */
+	private record CarrierReplanningResult(int addedVehicles, int changedServiceDurations,
+	                                       UnHandledInformation unhandledInformation,
+	                                       boolean forcedSingleServiceRedraw) {}
 
 	/**
 	 * Extension point for adding specialized vehicles between the default fleet repair and the jsprit rerun.
