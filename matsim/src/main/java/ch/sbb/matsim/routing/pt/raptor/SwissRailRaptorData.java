@@ -211,6 +211,15 @@ public class SwissRailRaptorData {
 					for (ChainedDeparture chained : dep.getChainedDepartures()) {
 						TransitRoute otherRoute = schedule.getTransitLines().get(chained.getChainedTransitLineId()).getRoutes().get(chained.getChainedRouteId());
 						Departure c = otherRoute.getDepartures().get(chained.getChainedDepartureId());
+						TransitRouteStop lastStop = route.getStops().getLast();
+						TransitRouteStop firstStop = otherRoute.getStops().getFirst();
+						double sourceArrivalTime = dep.getDepartureTime() + lastStop.getArrivalOffset().or(lastStop::getDepartureOffset).seconds();
+						double targetDepartureTime = c.getDepartureTime() + firstStop.getDepartureOffset().or(firstStop::getArrivalOffset).seconds();
+						if (targetDepartureTime < sourceArrivalTime) {
+							throw new IllegalArgumentException("Chained departure " + line.getId() + "/" + route.getId() + "/" + dep.getId()
+								+ " -> " + chained.getChainedTransitLineId() + "/" + otherRoute.getId() + "/" + c.getId()
+								+ " departs at " + targetDepartureTime + " before source arrival at " + sourceArrivalTime);
+						}
 
 						chainedDeparturesRef.computeIfAbsent(dep, k -> new ArrayList<>()).add(Pair.of(otherRoute, c));
 					}
