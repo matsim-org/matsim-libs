@@ -127,7 +127,7 @@ public final class GlobalAsyncEventHandlerTask extends EventHandlerTask {
 
 					// If sim and process are equal exit the task
 					if (processCounter == simCounter) {
-						needsSorting = alwaysSorting;
+						needsSorting = false;
 						storeRuntime(t);
 						return;
 					}

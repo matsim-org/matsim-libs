@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.MessageComparator;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.messages.ComputeNode;
@@ -70,11 +69,6 @@ public final class DistributedEventsManager implements EventsManager {
 	 * Stores current context for a thread.
 	 */
 	private final ThreadLocal<AtomicInteger> ctxPartition = ThreadLocal.withInitial(() -> new AtomicInteger(-1));
-
-	/**
-	 * Counts the events each partition produces per time step, see {@link #stampSource(Event)}.
-	 */
-	private final ThreadLocal<SourceCounter> sourceCounter = ThreadLocal.withInitial(SourceCounter::new);
 
 	/**
 	 * Set of other nodes that are waited for during event exchange.
@@ -206,9 +200,6 @@ public final class DistributedEventsManager implements EventsManager {
 
 	private void addTaskForEachPart(EventHandlerTask task, int handlerPartition) {
 		broker.register(task, handlerPartition);
-		// This task is fed by every partition, so the order in which its events arrive is the order the partitions' threads got there.
-		// It has to sort every step, not only when it receives events from another compute node.
-		task.setAlwaysSorting();
 		for (var part : computeNode.getParts()) {
 			addTaskForPart(task, part);
 		}
@@ -356,38 +347,7 @@ public final class DistributedEventsManager implements EventsManager {
 			return;
 		}
 
-		stampSource(e);
 		processInternal(e, e.getType());
-	}
-
-	/**
-	 * Record which partition produced this event, and the position it took among that partition's events of this time step, so that
-	 * handlers fed by several partitions can put the events of a step back into a reproducible order.
-	 * <p>
-	 * The counter lives in a thread local and restarts whenever the time or the partition changes. That is enough: a partition's events of
-	 * one time step are produced by exactly one thread, and the order only ever has to be canonical within a time step, because
-	 * {@link MessageComparator} compares the time first.
-	 */
-	private void stampSource(Event e) {
-		int partition = ctxPartition.get().get();
-		SourceCounter counter = sourceCounter.get();
-
-		if (counter.partition != partition || counter.time != e.getTime()) {
-			counter.partition = partition;
-			counter.time = e.getTime();
-			counter.sequence = 0;
-		}
-
-		e.setSource(partition, counter.sequence++);
-	}
-
-	/**
-	 * Per-thread state of {@link #stampSource(Event)}.
-	 */
-	private static final class SourceCounter {
-		private int partition = -1;
-		private double time = Double.NaN;
-		private int sequence = 0;
 	}
 
 	/**

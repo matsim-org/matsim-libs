@@ -38,36 +38,8 @@ public abstract class Event implements Message {
 
 	private double time;
 
-	/**
-	 * Partition that produced this event, and a counter that increases with every event that partition produces in a time step. Only the
-	 * distributed mobsim sets these, through {@link #setSource(int, int)}; with any other mobsim they stay -1.
-	 * <p>
-	 * They exist so that events which share a time can be put in a reproducible order, see
-	 * {@link org.matsim.api.core.v01.events.MessageComparator}: a handler that is fed by several partitions receives their events in the
-	 * order their threads happen to hand them over, which differs between runs. They are deliberately not part of {@link #getAttributes()},
-	 * so they never reach an events file.
-	 */
-	private int sourcePartition = -1;
-	private int sourceSequence = -1;
-
 	public Event(final double time) {
 		this.time = time;
-	}
-
-	public int getSourcePartition() {
-		return this.sourcePartition;
-	}
-
-	public int getSourceSequence() {
-		return this.sourceSequence;
-	}
-
-	/**
-	 * Record where this event was produced, see {@link #sourcePartition}.
-	 */
-	public void setSource(final int partition, final int sequence) {
-		this.sourcePartition = partition;
-		this.sourceSequence = sequence;
 	}
 
 	public Map<String, String> getAttributes() {
