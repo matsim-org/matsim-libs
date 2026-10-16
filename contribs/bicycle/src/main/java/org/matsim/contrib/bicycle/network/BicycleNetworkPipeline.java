@@ -1,0 +1,749 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package org.matsim.contrib.bicycle.network;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.application.MATSimAppCommand;
+import org.matsim.contrib.bicycle.BicycleUtils;
+import org.matsim.contrib.osm.networkReader.LinkProperties;
+import org.matsim.contrib.osm.networkReader.OsmBicycleReader;
+import org.matsim.contrib.osm.networkReader.SupersonicOsmNetworkReader;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkSimplifier;
+import org.matsim.core.scenario.ProjectionUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Option;
+
+import java.nio.file.Path;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
+
+
+/**
+ * End-to-end pipeline for building a MATSim bicycle network from an OSM file,
+ * enriched with cycling infrastructure classification and DEM-based elevation
+ * metrics.
+ *
+ * <p>Pipeline order, in short: read OSM with {@link OsmBicycleReader} (during the
+ * read, {@link BicycleLinkPolicy} stamps {@code bicycle_infra} and enforces the
+ * access rules, and the DEM puts a Z on the nodes), move the OSM-derived
+ * attributes under {@code osm:}, clean, simplify bicycle-aware — twice, around the
+ * service-link cleanup — mirror the motorised modes, rename the bike mode, attach
+ * the per-link elevation metrics (after the merges on purpose: fewer, longer
+ * links), split the parallel bike links off ({@link SplitBikeLinks}), record the
+ * CRS and write. The package README documents every step; the numbered step
+ * comments in {@link #process} mirror the same order.
+ *
+ * <p>Everything between the OSM read and the final write is the pure network
+ * transformation seam; it lives in {@link #process}, which reads no files and can be
+ * run on a hand-built network.
+ *
+ * <p>TODO: {@code "type"} and {@code "origid"} are the two OSM-derived attributes still
+ * left unprefixed. Both carry semantics other code depends on — {@code type=service} for
+ * {@link ServiceLinkCleaner}, {@code origid} for {@link NetworkSimplifier} merge tracking
+ * — and renaming {@code "type"} to {@code "osm:highway"} would silently break scoring,
+ * because {@code BicycleUtils.WAY_TYPE} has no {@code osm:} fallback (see the README
+ * "Limitations").
+ *
+ * @author smetzler
+ */
+@Command(
+	name = "bicycle-network",
+	description = "Builds a MATSim bicycle network from OSM + DEM elevation data.",
+	showDefaultValues = true,
+	mixinStandardHelpOptions = true
+)
+public class BicycleNetworkPipeline implements MATSimAppCommand {
+
+	private static final Logger log = LogManager.getLogger(BicycleNetworkPipeline.class);
+
+	// ---- option defaults: single source for the @Option annotations below and Params.defaults() ----
+
+	/**
+	 * Mirrors {@link LinkProperties#DEFAULT_FREESPEED_FACTOR}. Kept as a String literal because
+	 * an annotation default has to be a compile-time constant; {@code freeSpeedFactorMatchesReaderDefault}
+	 * pins the two together.
+	 */
+	private static final String DEFAULT_FREE_SPEED_FACTOR = "0.9";
+	private static final String DEFAULT_STORE_ORIGINAL_GEOMETRY = "false";
+
+	// ---- CLI options -----------------------------------------------------------
+
+	@Option(names = "--input", required = true, description = "Path to OSM input file (.osm.pbf)")
+	private Path input;
+
+	@Option(names = "--output", required = true,
+		description = "Path to output network. The compression is chosen from the file extension: "
+			+ ".xml.gz for gzip, .xml.zst for Zstandard (MATSim's newer default), .xml for uncompressed.")
+	private Path output;
+
+	// TODO maybe switch to CrsOptions mixin from matsim-application later.
+	@Option(names = "--crs", required = true, description = "Output CRS (e.g. EPSG:25832)")
+	private String outputCRS;
+
+	@Option(names = "--free-speed-factor",
+		description = "Factor applied to the free speed of urban links to account for traffic lights, "
+			+ "right of way etc. Default: ${DEFAULT-VALUE}. Only links that carry an OSM maxspeed tag "
+			+ "below 51 km/h are affected -- without the tag the speed is derived from the highway type "
+			+ "and the factor does not apply. Lower values yield a slower car network; SUMO-converted "
+			+ "scenarios tend to sit around 0.7.",
+		defaultValue = DEFAULT_FREE_SPEED_FACTOR)
+	private double freeSpeedFactor;
+
+	@Option(names = "--store-original-geometry", negatable = true,
+		description = "Store the true OSM road course in the 'origgeom' link attribute so "
+			+ "links keep their real shape through simplification. Use "
+			+ "--no-store-original-geometry to switch it off. Default: ${DEFAULT-VALUE}.",
+		defaultValue = DEFAULT_STORE_ORIGINAL_GEOMETRY)
+	private boolean storeOriginalGeometry;
+
+	@Mixin
+	private final BicycleBuildOptions buildOptions = new BicycleBuildOptions();
+
+	@Mixin
+	private final DemOptions demOptions = new DemOptions();
+
+
+	// ---- attribute keys --------------------------------------------------------
+
+	// The attribute keys live in BicycleUtils, next to the getters scoring reads them with.
+	private static final String OSM_PREFIX = BicycleUtils.OSM_PREFIX;
+
+	/**
+	 * OSM tag values that {@link OsmBicycleReader} writes verbatim into link
+	 * attributes; these are moved under the "osm:" prefix in step 1b.
+	 *
+	 * <p>Note: "type" and "origid" are intentionally NOT in this list yet --
+	 * see the TODO in the class JavaDoc.
+	 */
+	private static final List<String> OSM_TAG_ATTR_KEYS = List.copyOf(BicycleOsmTags.KEPT_ON_LINKS);
+
+	/**
+	 * Optional raw OSM tags to copy onto links via {@link TagCopier} (with "osm:"
+	 * prefix). Empty by default; populate to forward additional OSM tags that
+	 * {@link OsmBicycleReader} doesn't write itself.
+	 */
+	private static final List<String> TAGS_TO_COPY = List.of();
+
+	/**
+	 * Attribute keys used by the bicycle-aware simplifier to decide if two
+	 * links may merge. If they differ on any of these, keep them separate.
+	 *
+	 * <p>"type" stays unprefixed for now (see TODO above).
+	 */
+	private static final List<String> SIMPLIFY_MATCH_KEYS = List.of(
+		BicycleUtils.BICYCLE_INFRA,
+		// Also a match key, not just carried over: merging a link inside the bicycle
+		// area with one outside would join two differently treated links, and the
+		// merged link could only be wrong about one of them.
+		BicycleUtils.BICYCLE_AREA,
+		NetworkUtils.TYPE,
+		OSM_PREFIX + BicycleUtils.SURFACE,
+		OSM_PREFIX + BicycleUtils.SMOOTHNESS,
+		NetworkUtils.ALLOWED_SPEED
+	);
+
+
+	// ============================================================================
+
+	public static void main(String[] args) {
+		new BicycleNetworkPipeline().execute(args);
+	}
+
+	@Override
+	public Integer call() throws Exception {
+
+		demOptions.validate();
+
+		// The DEM is optional: without it the network is built without elevation metrics.
+		final ElevationDataParser elevationParser =
+			demOptions.isSet() ? demOptions.createParser(outputCRS) : null;
+		if (elevationParser == null) {
+			log.info("No --dem given: building the network without elevation metrics.");
+		}
+
+		var transformation = TransformationFactory.getCoordinateTransformation(
+			TransformationFactory.WGS84, outputCRS);
+
+		var profile = BicycleCountryProfiles.forCode(buildOptions.country());
+		log.info("Using country profile: {}", profile.getClass().getSimpleName());
+		var classifier = new BicycleInfraClassifier(profile);
+		var tagCopier = new TagCopier(TAGS_TO_COPY, OSM_PREFIX);
+
+		var areaMarker = buildOptions.areaMarkerOrNull();
+		if (areaMarker != null) {
+			log.info("Bicycle-area marker '{}': only matching ways get the full bicycle treatment; "
+				+ "other ways keep their modes but get no bicycle detail.", areaMarker);
+		}
+		var dropWaysWithoutInfra = buildOptions.dropWaysWithoutInfra();
+		if (!dropWaysWithoutInfra.isEmpty()) {
+			log.info("Dropping minor ways of type {} where the link classified as NONE and no way "
+				+ "carries bicycle=yes/designated.", dropWaysWithoutInfra);
+		}
+		var policy = new BicycleLinkPolicy(classifier, tagCopier, areaMarker, dropWaysWithoutInfra);
+
+		log.info("Free-speed factor {}: applied to links with a maxspeed tag below 51 km/h; "
+			+ "the allowed_speed attribute keeps the untouched tag value.", freeSpeedFactor);
+
+		// ---- 1. OSM read: stamps node elevations + infra on each new link ----
+		Network network = new OsmBicycleReader.Builder()
+			.setCoordinateTransformation(transformation)
+			.setFreeSpeedFactor(freeSpeedFactor)
+			.setStoreOriginalGeometry(storeOriginalGeometry)
+			.setAfterLinkCreated((link, tags, direction) -> {
+				if (elevationParser != null) {
+					addNodeElevation(link.getFromNode(), elevationParser);
+					addNodeElevation(link.getToNode(), elevationParser);
+				}
+				policy.apply(link, tags, toBicycleDirection(direction));
+			})
+			.build()
+			.read(input.toString());
+		log.info("After OSM read: {} nodes, {} links",
+			network.getNodes().size(), network.getLinks().size());
+		BicycleNetworkOps.logInfraDistribution(network,"after OSM read");
+
+		// ---- 2-7. pure network transformations (no file I/O) -----------------
+		process(network,
+			elevationParser != null ? elevationParser::getElevation : null,
+			new Params(buildOptions.mode(), buildOptions.eleSampleStep(),
+				buildOptions.eleNoiseTolerance(), storeOriginalGeometry,
+				buildOptions.mirrorCarModes(), buildOptions.splitBikeLinks()));
+
+		// ---- 8. write --------------------------------------------------------
+		// Record the CRS the coordinates are actually in. Without it every consumer has
+		// to be told the projection out of band, and --crs is already required here.
+		ProjectionUtils.putCRS(network, outputCRS);
+		new NetworkWriter(network).write(output.toString());
+
+		return 0;
+	}
+
+	/**
+	 * Maps the reader's own direction enum onto the package's reader-neutral
+	 * {@link OsmWayDirection}. This is the only place the two meet: the classifier and
+	 * the policy speak {@link OsmWayDirection} so they can also run on links that never
+	 * saw this reader (e.g. a SUMO-converted network, where the direction comes
+	 * from the sign of the link id).
+	 */
+	private static OsmWayDirection toBicycleDirection(SupersonicOsmNetworkReader.Direction direction) {
+		return direction == SupersonicOsmNetworkReader.Direction.Reverse
+			? OsmWayDirection.REVERSE
+			: OsmWayDirection.FORWARD;
+	}
+
+	/**
+	 * Everything between reading the OSM file and writing the network; the numbered
+	 * step comments below mirror the README's pipeline list.
+	 *
+	 * <p>Performs no file access and reads no CLI state, so it can be exercised on
+	 * a hand-built network with a synthetic
+	 * {@link LinkElevationProfile.ElevationSource} -- e.g. {@code c -> c.getX() * 0.02}
+	 * for a constant 2 % slope. The network is mutated in place.
+	 *
+	 * @param network   the freshly read (or hand-built) network
+	 * @param elevation elevation source sampled for the per-link metrics (step 7),
+	 *                  or {@code null} to skip elevation metrics entirely (no DEM)
+	 * @param params    the non-I/O parameters, decoupled from the picocli fields
+	 */
+	public static void process(Network network,
+							   LinkElevationProfile.ElevationSource elevation,
+							   Params params) {
+
+		// ---- 1b. move OSM-derived attributes under "osm:" prefix ------------
+		int normalized = normalizeOrigIdType(network);
+		int prefixed = prefixOsmAttributes(network);
+		log.info("Normalized {} origid values to String; moved {} OSM attributes under '{}'.",
+			normalized, prefixed, OSM_PREFIX);
+
+		// ---- 1c. repair reversed geometry on synthetic bike-reverse links -----
+		if (params.storeOriginalGeometry()) {
+			int repaired = repairReversedGeometry(network);
+			log.info("Repaired reversed link geometry on {} links.", repaired);
+		}
+
+		// ---- 2. drop isolated components -------------------------------------
+		// It also prunes the links that BicycleLinkPolicy emptied, which shrinks the input of the simplifier below.
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car, TransportMode.bike));
+		log.info("After cleanNetwork: {} nodes, {} links",
+			network.getNodes().size(), network.getLinks().size());
+
+		// ---- 3. bicycle-aware simplification ---------------------------------
+		simplifyUntilStable(network, params.storeOriginalGeometry());
+		log.info("After simplification (1st pass): {} links", network.getLinks().size());
+
+		// ---- 4. remove service dead-ends and hairline branches ---------------
+		int serviceLinksRemoved = new ServiceLinkCleaner().run(network);
+		log.info("After service-link cleanup: {} links ({} removed).",
+			network.getLinks().size(), serviceLinksRemoved);
+
+		// ---- 5. second simplification pass; service cleanup may have created
+		//        new merge candidates -----------------------------------------
+		simplifyUntilStable(network, params.storeOriginalGeometry());
+		log.info("After simplification (2nd pass): {} links", network.getLinks().size());
+
+		// ---- 5b. geometry sanity check --------------------------------------
+		if (params.storeOriginalGeometry()) {
+			logGeometryConsistency(network);
+		}
+
+		// ---- 5c. clean again: the simplifier orphans every node it merges away ----
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car, TransportMode.bike));
+
+		// ---- 5d. mirror the motorised modes onto the car links ---------------
+		// After the last step that changes the link set, so the mirrored modes end up
+		// on exactly the cleaned car links. The reader assigns car and bike only; this
+		// is what makes the network carry the same modes as the SUMO path.
+		BicycleNetworkOps.mirrorCarModes(network, params.mirrorCarModes());
+
+		// ---- 6. rename mode if requested (no-op when --mode bike) -----------
+		BicycleNetworkOps.renameMode(network, TransportMode.bike, params.mode());
+
+		// ---- 7. elevation metrics on the final link set (skipped without a DEM) --
+		// Elevation is part of the full bicycle treatment, so attach it only where
+		// bicycle_infra was set -- i.e. inside the --bike-area-marker area, or on
+		// every link when no marker is configured. Ways outside the area are skipped.
+		if (elevation != null) {
+			int withMetrics = 0;
+			for (Link link : network.getLinks().values()) {
+				if (link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRA) == null) continue;
+				attachElevationMetrics(link, elevation, params.eleSampleStep(), params.eleNoiseTolerance());
+				withMetrics++;
+			}
+			log.info("Attached elevation metrics to {} of {} links (sample step = {} m, noise tolerance = {} m).",
+				withMetrics, network.getLinks().size(), params.eleSampleStep(), params.eleNoiseTolerance());
+		} else {
+			log.info("No elevation source: skipped elevation metrics.");
+		}
+		// ---- 8. split parallel bike links off centerline-tagged infrastructure ----
+		// Last on purpose: after the simplifier (which would merge the twins and tear
+		// the pair references), after the rename (the twins carry the final mode name)
+		// and after the elevation metrics (which the twins inherit as copies).
+		if (params.splitBikeLinks()) {
+			SplitBikeLinks.process(network, params.mode(),
+				Double.parseDouble(SplitBikeLinks.DEFAULT_BIKE_FREESPEED),
+				Double.parseDouble(SplitBikeLinks.DEFAULT_BIKE_CAPACITY));
+		}
+
+		BicycleNetworkOps.logInfraDistribution(network,"in final network");
+	}
+
+	/**
+	 * Non-I/O parameters that {@link #process} needs, decoupled from the picocli
+	 * fields so a test can build them directly.
+	 */
+	public record Params(String mode,
+						 double eleSampleStep,
+						 double eleNoiseTolerance,
+						 boolean storeOriginalGeometry,
+						 Set<String> mirrorCarModes,
+						 boolean splitBikeLinks) {
+
+		/** The pipeline defaults, matching the CLI option defaults. */
+		public static Params defaults() {
+			return new Params(TransportMode.bike,
+				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_SAMPLE_STEP),
+				Double.parseDouble(BicycleBuildOptions.DEFAULT_ELE_NOISE_TOLERANCE),
+				Boolean.parseBoolean(DEFAULT_STORE_ORIGINAL_GEOMETRY), Set.of(), true);
+		}
+
+		public Params withMirrorCarModes(Set<String> modes) {
+			return new Params(mode, eleSampleStep, eleNoiseTolerance, storeOriginalGeometry, modes,
+				splitBikeLinks);
+		}
+
+		public Params withoutSplitBikeLinks() {
+			return new Params(mode, eleSampleStep, eleNoiseTolerance, storeOriginalGeometry,
+				mirrorCarModes, false);
+		}
+	}
+
+
+	// =========================================================================
+	// OSM attribute prefixing
+	// =========================================================================
+
+	/**
+	 * Move OSM-derived attributes (those listed in {@link #OSM_TAG_ATTR_KEYS})
+	 * under the "osm:" prefix to make their provenance explicit and to keep
+	 * them separate from pipeline-internal attributes.
+	 *
+	 * @return the number of attributes moved
+	 */
+	static int prefixOsmAttributes(Network network) {
+		int moved = 0;
+		for (Link link : network.getLinks().values()) {
+			for (String key : OSM_TAG_ATTR_KEYS) {
+				Object value = link.getAttributes().getAttribute(key);
+				if (value != null) {
+					link.getAttributes().putAttribute(OSM_PREFIX + key, value);
+					link.getAttributes().removeAttribute(key);
+					moved++;
+				}
+			}
+		}
+		return moved;
+	}
+
+
+	// =========================================================================
+	// Geometry consistency
+	// =========================================================================
+
+	/**
+	 * Every link's stored geometry has to add up to its own length. A forgotten
+	 * shared node, a reversed part or a dropped segment all break this, and
+	 * nothing else in the pipeline would notice.
+	 *
+	 * <p>Warns rather than throws: the reader currently produces reversed
+	 * geometry on {@code *_bike-reverse} links, so a hard failure here would
+	 * block every build until that is fixed separately.
+	 */
+	private static void logGeometryConsistency(Network network) {
+		int withGeometry = 0;
+		List<Id<Link>> offenders = new ArrayList<>();
+
+		for (Link link : network.getLinks().values()) {
+			List<Node> geometry = NetworkUtils.getOriginalGeometry(link);
+			// size 2 means no stored geometry -- a straight link, nothing to check
+			if (geometry.size() < 3 || link.getLength() <= 0) continue;
+			withGeometry++;
+
+			double drawn = 0;
+			for (int i = 1; i < geometry.size(); i++) {
+				// projected: the end nodes carry a Z from the DEM, the points parsed
+				// from origgeom do not. A 3D distance would compare different things.
+				drawn += CoordUtils.calcProjectedEuclideanDistance(
+					geometry.get(i - 1).getCoord(), geometry.get(i).getCoord());
+			}
+			if (Math.abs(drawn - link.getLength()) / link.getLength() > 0.02) {
+				offenders.add(link.getId());
+			}
+		}
+
+		log.info("Links with stored geometry: {} of {}", withGeometry, network.getLinks().size());
+		if (!offenders.isEmpty()) {
+			log.warn("{} links whose stored geometry does not match their length, e.g. {}",
+				offenders.size(), offenders.subList(0, Math.min(5, offenders.size())));
+		}
+	}
+
+
+	// =========================================================================
+	// Elevation
+	// =========================================================================
+
+	private static void addNodeElevation(Node node, ElevationDataParser parser) {
+		BicycleNetworkOps.addNodeElevation(node, parser);
+	}
+
+	private static void attachElevationMetrics(Link link, LinkElevationProfile.ElevationSource elevation,
+											   double sampleStep, double noiseTolerance) {
+		BicycleNetworkOps.attachElevationMetrics(link,
+			LinkElevationProfile.compute(link, sampleStep, noiseTolerance, elevation));
+	}
+
+
+	// =========================================================================
+	// Reversed geometry repair
+	// =========================================================================
+
+	/**
+	 * Mirrors stored geometry that runs against its own link direction.
+	 *
+	 * <p>{@link OsmBicycleReader} copies every attribute onto its synthetic
+	 * {@code *_bike-reverse} links, geometry included, but those links run the other
+	 * way: their support points end up listed backwards and the link renders as a
+	 * zig-zag. Detection is geometric rather than by link id, so it does not depend
+	 * on the reader's naming and is a no-op once the geometry is correct.
+	 *
+	 * <p>Must run before the first simplification pass. Once two such links are
+	 * merged, the reversal is no longer detectable.
+	 *
+	 * <p>TODO belongs in {@link OsmBicycleReader #createReverseBicycleLink}, where the
+	 * correct order is known rather than inferred.
+	 *
+	 * @return the number of links whose geometry was mirrored
+	 */
+	static int repairReversedGeometry(Network network) {
+		int repaired = 0;
+		for (Link link : network.getLinks().values()) {
+			Object value = link.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM);
+			if (value == null) continue;
+
+			String[] points = value.toString().trim().split("\\s+");
+			// a single support point carries no order to get wrong
+			if (points.length < 2) continue;
+
+			Coord first = parseSupportPoint(points[0]);
+			Coord last = parseSupportPoint(points[points.length - 1]);
+			if (first == null || last == null) continue;
+
+			// projected: the end nodes carry a z from the DEM, the parsed support
+			// points do not. The 3D variant would fall back to 2D anyway, but log a
+			// warning for every link it sees.
+			Coord from = link.getFromNode().getCoord();
+			Coord to = link.getToNode().getCoord();
+			double asIs = CoordUtils.calcProjectedEuclideanDistance(first, from)
+				+ CoordUtils.calcProjectedEuclideanDistance(last, to);
+			double mirrored = CoordUtils.calcProjectedEuclideanDistance(first, to)
+				+ CoordUtils.calcProjectedEuclideanDistance(last, from);
+			if (mirrored >= asIs) continue;
+
+			StringBuilder reversed = new StringBuilder();
+			for (int i = points.length - 1; i >= 0; i--) {
+				reversed.append(points[i]).append(' ');
+			}
+			link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, reversed.toString());
+			repaired++;
+		}
+		return repaired;
+	}
+
+	/** One {@code nodeId,x,y} triple from an origgeom value, or null if malformed. */
+	private static Coord parseSupportPoint(String token) {
+		String[] parts = token.split(",");
+		if (parts.length != 3) return null;
+		try {
+			return new Coord(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+
+	// =========================================================================
+	// Bicycle-aware simplification
+	// =========================================================================
+
+	/**
+	 * NetworkSimplifier sweeps the node collection once per run and never revisits a
+	 * node, so a link that only becomes mergeable through a neighbouring merge is
+	 * left behind -- which of them survive depends on the map order of the nodes,
+	 * not on the data. Repeat until the link count stops falling.
+	 *
+	 * @return the total number of links removed across all passes
+	 */
+	static int simplifyUntilStable(Network network, boolean storeOriginalGeometry) {
+		return simplifyUntilStable(network, storeOriginalGeometry, null);
+	}
+
+	/**
+	 * Variant with an additional transfer consumer, run for every merge on top of the
+	 * bicycle-aware attribute handling. {@code bicycle-attributes} uses it to carry the
+	 * SUMO edge shapes and the feature-row provenance through the merge.
+	 */
+	static int simplifyUntilStable(Network network, boolean storeOriginalGeometry,
+								   BiConsumer<Tuple<Link, Link>, Link> extraTransfer) {
+		int totalRemoved = 0;
+		for (int pass = 1; ; pass++) {
+			int before = network.getLinks().size();
+			simplifyWithBikeInfra(network, storeOriginalGeometry, extraTransfer);
+			int after = network.getLinks().size();
+			log.info("Simplification pass {}: {} -> {} links", pass, before, after);
+			totalRemoved += before - after;
+			if (after == before) return totalRemoved;
+		}
+	}
+
+	/**
+	 * Merges consecutive links via {@link NetworkSimplifier} only when they
+	 * agree on the bicycle-relevant attributes. The default simplifier would
+	 * happily merge across infra changes, losing that information.
+	 */
+	private static void simplifyWithBikeInfra(Network network, boolean storeOriginalGeometry,
+											  BiConsumer<Tuple<Link, Link>, Link> extraTransfer) {
+
+		BiPredicate<Link, Link> attrsMustMatch = (a, b) -> {
+			for (String key : SIMPLIFY_MATCH_KEYS) {
+				if (!Objects.equals(a.getAttributes().getAttribute(key),
+					b.getAttributes().getAttribute(key))) return false;
+			}
+			return true;
+		};
+
+		var simplifier = NetworkSimplifier.createNetworkSimplifier(network);
+		// Merge despite differing link stats, then re-impose everything except the
+		// length-derived capacity boost below. NetworkSimplifier recomputes the stats
+		// when merging: length summed, freespeed as the travel-time preserving mean,
+		// capacity as the minimum, lanes length-weighted. With freespeed and lanes
+		// equal by the predicate, those come out exact.
+		simplifier.setMergeLinkStats(true);
+		simplifier.registerIsMergeablePredicate((a, b) -> attrsMustMatch.test(a, b)
+			&& a.getAllowedModes().equals(b.getAllowedModes())
+			&& a.getNumberOfLanes() == b.getNumberOfLanes()
+			&& sameFreespeed(a, b)
+			&& baseCapacity(a) == baseCapacity(b));
+
+		// When two links merge, carry over the attributes from the first one
+		// (they're identical to the second by construction of the predicate).
+		simplifier.registerTransferAttributesConsumer((inOut, newLink) -> {
+			Link a = inOut.getFirst();
+			Link b = inOut.getSecond();
+
+			// NetworkSimplifier only sets the allowed modes in its mergeLinkStats=false
+			// branch; the branch we use leaves them at LinkImpl's default, which is
+			// {car}. Restore them -- equal on both by the predicate.
+			newLink.setAllowedModes(a.getAllowedModes());
+
+			// NetworkSimplifier takes min(capacity) instead of re-deriving it from the
+			// merged length, so a pair of short links would keep the < 50 m crossing
+			// boost. Re-apply the rule; baseCapacity is equal on both by the predicate.
+			newLink.setCapacity(baseCapacity(a) * (newLink.getLength()
+				< LinkProperties.DEFAULT_ADJUST_CAPACITY_LENGTH ? 2 : 1));
+
+			for (String key : SIMPLIFY_MATCH_KEYS) {
+				Object v = a.getAttributes().getAttribute(key);
+				if (v != null) newLink.getAttributes().putAttribute(key, v);
+			}
+
+			String merged = mergeOrigIds(a.getAttributes().getAttribute("origid"),
+				b.getAttributes().getAttribute("origid"));
+			if (merged != null) newLink.getAttributes().putAttribute("origid", merged);
+
+			if (storeOriginalGeometry) {
+				mergeOrigGeom(a, b, newLink);
+			}
+		});
+
+		if (extraTransfer != null) {
+			simplifier.registerTransferAttributesConsumer(extraTransfer);
+		}
+
+		simplifier.run(network);
+	}
+
+	/**
+	 * The OSM reader stores {@code origid} as {@link Long}, while
+	 * {@link NetworkSimplifier} writes a {@link String} whenever it merges two links.
+	 * Converting once up front gives the attribute a single consistent type in the
+	 * output; without it, unmerged links carry Long and merged links String.
+	 *
+	 * <p>This used to be load-bearing: {@link NetworkUtils#getOrigId} cast the
+	 * attribute to {@link String} and threw on the first merge of a Long-valued
+	 * {@code origid}. It reads the value via {@code toString()} since matsim-libs
+	 * #5107, so only the consistent output type is left as a reason.
+	 *
+	 * @return the number of links whose origid was converted to String
+	 */
+	static int normalizeOrigIdType(Network network) {
+		int converted = 0;
+		for (Link link : network.getLinks().values()) {
+			Object origid = link.getAttributes().getAttribute("origid");
+			if (origid != null && !(origid instanceof String)) {
+				link.getAttributes().putAttribute("origid", origid.toString());
+				converted++;
+			}
+		}
+		return converted;
+	}
+
+	/**
+	 * Concatenates the stored geometries of both merged links. The node where they
+	 * used to meet disappears from the network here, so it has to become a support
+	 * point -- otherwise the merged link cuts the corner at exactly that spot.
+	 * Links without stored geometry contribute nothing but the shared node, which
+	 * is correct: they were straight.
+	 *
+	 * <p>Only the x/y components of the shared node are written. The end nodes
+	 * carry a Z from the DEM, but {@link NetworkUtils#getOriginalGeometry} expects
+	 * exactly three fields per point and throws on a fourth.
+	 */
+	private static void mergeOrigGeom(Link in, Link out, Link merged) {
+		Node shared = in.getToNode();
+		StringBuilder sb = new StringBuilder();
+		appendGeom(sb, in);
+		Coord c = shared.getCoord();
+		sb.append(shared.getId()).append(',').append(c.getX()).append(',').append(c.getY()).append(' ');
+		appendGeom(sb, out);
+		merged.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, sb.toString());
+	}
+
+	private static void appendGeom(StringBuilder sb, Link link) {
+		Object v = link.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM);
+		if (v == null) return;
+		String s = v.toString().trim();
+		if (!s.isEmpty()) sb.append(s).append(' ');
+	}
+
+	/**
+	 * Merge two origid values into a single hyphen-separated string in which
+	 * each way ID appears at most once and original order is preserved. Both
+	 * inputs may themselves already be hyphen-separated multi-IDs from an
+	 * earlier merge.
+	 */
+	static String mergeOrigIds(Object idA, Object idB) {
+		Set<String> seen = new LinkedHashSet<>();
+		addOrigIds(seen, idA);
+		addOrigIds(seen, idB);
+		if (seen.isEmpty()) return null;
+		return String.join("-", seen);
+	}
+
+	private static void addOrigIds(Set<String> acc, Object id) {
+		if (id == null) return;
+		String s = id.toString();
+		if (s.isBlank()) return;
+		for (String part : s.split("-")) {
+			if (!part.isBlank()) acc.add(part);
+		}
+	}
+
+	/**
+	 * Lane capacity without the "might be a crossing" boost that
+	 * {@link LinkProperties#getLaneCapacity} applies below 50 m.
+	 *
+	 * <p>That boost is what blocks most merges: where a crossing way forces an extra
+	 * node, the road is cut into a short stub and a long remainder, and the two end
+	 * up with different capacities although they are the same road. Comparing the
+	 * unboosted value drops the artefact and keeps every real difference.
+	 */
+	static double baseCapacity(Link link) {
+		return link.getLength() < LinkProperties.DEFAULT_ADJUST_CAPACITY_LENGTH
+			? link.getCapacity() / 2
+			: link.getCapacity();
+	}
+
+	/**
+	 * NetworkSimplifier recomputes the freespeed of a merged link as
+	 * {@code (l1 + l2) / (t1 + t2)}, which does not reproduce the input value
+	 * bit-for-bit. After a few merges the parts of one and the same road differ in
+	 * the last decimal, and an exact comparison stops the chain -- the more that has
+	 * been merged, the less merges further. Compare relatively instead; a real speed
+	 * difference is a whole km/h, not an ulp.
+	 */
+	static boolean sameFreespeed(Link a, Link b) {
+		double x = a.getFreespeed(), y = b.getFreespeed();
+		return Math.abs(x - y) <= 1e-9 * Math.max(Math.abs(x), Math.abs(y));
+	}
+}
+

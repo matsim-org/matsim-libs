@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version="0.6" generator="handmade">
+  <!-- A closed ring of nine ways, so dropping the parking aisle and the private road
+       does not cut the rest of the network in two. Way types differ at every boundary
+       except 1001/2001, which are meant to be merged by geometry.remove. -->
+  <node id="1" lat="51.3150" lon="12.3500"/>
+  <node id="2" lat="51.3138" lon="12.3551"/>
+  <node id="3" lat="51.3105" lon="12.3579"/>
+  <node id="4" lat="51.3062" lon="12.3572"/>
+  <node id="5" lat="51.3032" lon="12.3535"/>
+  <node id="6" lat="51.3032" lon="12.3465"/>
+  <node id="7" lat="51.3062" lon="12.3428"/>
+  <node id="8" lat="51.3105" lon="12.3421"/>
+  <node id="9" lat="51.3138" lon="12.3449"/>
+
+  <!-- 1001 + 2001: same type and speed, so netconvert merges them into one edge.
+       They classify differently, which must surface as NEEDS_CLARIFICATION. -->
+  <way id="1001"><nd ref="1"/><nd ref="2"/>
+    <tag k="highway" v="residential"/><tag k="cycleway" v="lane"/><tag k="surface" v="asphalt"/></way>
+  <way id="2001"><nd ref="2"/><nd ref="3"/>
+    <tag k="highway" v="residential"/><tag k="surface" v="asphalt"/></way>
+
+  <!-- access=private: netconvert keeps this fully routable, the command must drop it -->
+  <way id="3001"><nd ref="3"/><nd ref="4"/>
+    <tag k="highway" v="secondary"/><tag k="access" v="private"/></way>
+
+  <!-- parking aisle: netconvert keeps it bike-accessible, the command must drop it -->
+  <way id="4001"><nd ref="4"/><nd ref="5"/>
+    <tag k="highway" v="service"/><tag k="service" v="parking_aisle"/></way>
+
+  <!-- a plain cycleway -->
+  <way id="5001"><nd ref="5"/><nd ref="6"/>
+    <tag k="highway" v="cycleway"/><tag k="surface" v="asphalt"/></way>
+
+  <!-- contraflow: netconvert adds a reverse edge -6001 that only allows bicycle -->
+  <way id="6001"><nd ref="6"/><nd ref="7"/>
+    <tag k="highway" v="tertiary"/><tag k="oneway" v="yes"/><tag k="oneway:bicycle" v="no"/></way>
+
+  <!-- primary without a surface tag: the asphalt fallback must fire -->
+  <way id="7001"><nd ref="7"/><nd ref="8"/>
+    <tag k="highway" v="primary"/></way>
+
+  <!-- shared foot and cycleway -->
+  <way id="8001"><nd ref="8"/><nd ref="9"/>
+    <tag k="highway" v="footway"/><tag k="bicycle" v="yes"/>
+    <tag k="foot" v="designated"/><tag k="segregated" v="no"/></way>
+
+  <!-- closes the ring -->
+  <way id="9001"><nd ref="9"/><nd ref="1"/>
+    <tag k="highway" v="living_street"/></way>
+</osm>
