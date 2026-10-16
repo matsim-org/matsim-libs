@@ -137,6 +137,17 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	}
 
 	/**
+	 * Whether this task has to sort the events of every step, because more than one partition feeds it and their threads therefore decide
+	 * the order in which its events arrive.
+	 */
+	protected volatile boolean alwaysSorting = false;
+
+	public void setAlwaysSorting() {
+		this.alwaysSorting = true;
+		this.needsSorting = true;
+	}
+
+	/**
 	 * Supports direct execution.
 	 */
 	boolean isDirect() {

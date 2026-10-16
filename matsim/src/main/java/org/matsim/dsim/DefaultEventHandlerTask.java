@@ -148,7 +148,7 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 //			dumpEvents(Path.of("event_dump_%s_%.0f.xml".formatted(getName(), time)), messages);
 
 			messages.clear();
-			needsSorting = false;
+			needsSorting = alwaysSorting;
 		} else
 			while ((msg = queue.poll()) != null) {
 				process(msg);
