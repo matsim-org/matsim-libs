@@ -414,14 +414,14 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.18.14</version>
+				<version>1.18.15</version>
 				<scope>test</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>io.github.classgraph</groupId>
 				<artifactId>classgraph</artifactId>
-				<version>4.8.198</version>
+				<version>6.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.fory</groupId>
