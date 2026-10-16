@@ -1,10 +1,13 @@
 package org.matsim.dsim.simulation;
 
 import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
@@ -18,6 +21,27 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import java.util.*;
 
 public class DistributedTeleportationEngine implements DistributedDepartureHandler, DistributedMobsimEngine, TeleportationEngine {
+
+	private static final Logger log = LogManager.getLogger(DistributedTeleportationEngine.class);
+
+	/**
+	 * Diagnostic for the one-step shifts seen in teleported arrivals between two otherwise identical runs. A teleported leg is sent to the
+	 * partition of its destination link, which may be any partition, while {@code SimProcess.waitForOtherParts} only synchronises with the
+	 * network neighbours - so for a target that is not a neighbour, nothing pins down the step in which the message is applied. That only
+	 * changes an arrival when the leg is due within about one step of being handed over, which is what {@code tightSlack} counts.
+	 * <p>
+	 * Counts are logged per partition and iteration, the first few non-neighbour hand-overs in full. Remove once the question is settled.
+	 */
+	private int teleportsLocal;
+	private int teleportsToNeighbor;
+	private int teleportsToNonNeighbor;
+	private int teleportsToNonNeighborTightSlack;
+	private int samplesLogged;
+
+	private static final int MAX_SAMPLES = 10;
+	private static final double TIGHT_SLACK = 2.0;
+
+	private final NetworkPartition partition;
 
 	private final EventsManager em;
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
@@ -34,10 +58,11 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	}
 
 	@Inject
-	DistributedTeleportationEngine(EventsManager em, PartitionTransfer partitionTransfer, AgentSourcesContainer asc) {
+	DistributedTeleportationEngine(EventsManager em, PartitionTransfer partitionTransfer, AgentSourcesContainer asc, NetworkPartition partition) {
 		this.partitionTransfer = partitionTransfer;
 		this.asc = asc;
 		this.em = em;
+		this.partition = partition;
 	}
 
 	@Override
@@ -63,9 +88,11 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		var exitTime = now + travelTime;
 
 		if (partitionTransfer.isLocal(person.getDestinationLinkId())) {
+			teleportsLocal++;
 			personsTeleporting.add(new TeleportationEntry(person, exitTime));
 		} else {
 			var toPartition = partitionTransfer.getPartitionIndex(person.getDestinationLinkId());
+			countHandover(person, toPartition, now, exitTime);
 			internalInterface.notifyAgentLeavesPartition(person, toPartition);
 			partitionTransfer.collect(new TeleportationMessage(person.getClass(), person.toMessage(), exitTime), toPartition);
 		}
@@ -114,8 +141,39 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		}
 	}
 
+	/**
+	 * See {@link #teleportsToNonNeighbor}.
+	 */
+	private void countHandover(DistributedMobsimAgent person, int toPartition, double now, double exitTime) {
+		boolean neighbor = partition.getNeighbors().contains(toPartition);
+		double slack = exitTime - now;
+
+		if (neighbor) {
+			teleportsToNeighbor++;
+			return;
+		}
+
+		teleportsToNonNeighbor++;
+		if (slack <= TIGHT_SLACK)
+			teleportsToNonNeighborTightSlack++;
+
+		if (samplesLogged < MAX_SAMPLES) {
+			samplesLogged++;
+			log.info("teleport hand-over to a non-neighbour partition: agent={} mode={} part {}->{} now={} exitTime={} slack={}s",
+				person.getId(), person.getMode(), partition.getIndex(), toPartition, now, exitTime, slack);
+		}
+	}
+
 	@Override
 	public void afterMobsim() {
+		log.info("teleport hand-overs in partition {}: local={} toNeighbour={} toNonNeighbour={} (of which due within {}s: {})",
+			partition.getIndex(), teleportsLocal, teleportsToNeighbor, teleportsToNonNeighbor, TIGHT_SLACK, teleportsToNonNeighborTightSlack);
+		teleportsLocal = 0;
+		teleportsToNeighbor = 0;
+		teleportsToNonNeighbor = 0;
+		teleportsToNonNeighborTightSlack = 0;
+		samplesLogged = 0;
+
 		for (var entry : personsTeleporting) {
 			var person = entry.person();
 			em.processEvent(new PersonStuckEvent(now, person.getId(), person.getDestinationLinkId(), person.getMode()));
