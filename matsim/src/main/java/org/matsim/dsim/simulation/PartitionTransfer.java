@@ -65,5 +65,15 @@ public class PartitionTransfer implements MobsimMessageCollector {
 
 	public boolean isLocal(Id<Link> linkId) {return partition.containsLink(linkId);}
 
+	/**
+	 * Index of the partition this transfers from.
+	 */
+	public int getIndex() {return partition.getIndex();}
+
+	/**
+	 * Whether this partition synchronises with the given one in every time step, which it does with its network neighbours only.
+	 */
+	public boolean isNeighbor(int partitionIndex) {return partition.getNeighbors().contains(partitionIndex);}
+
 	public int getPartitionIndex(Id<Link> linkId) {return networkPartitioning.getPartition(linkId);}
 }

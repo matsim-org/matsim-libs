@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
@@ -41,8 +40,6 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	private static final int MAX_SAMPLES = 10;
 	private static final double TIGHT_SLACK = 2.0;
 
-	private final NetworkPartition partition;
-
 	private final EventsManager em;
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
 	private final PartitionTransfer partitionTransfer;
@@ -58,11 +55,10 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	}
 
 	@Inject
-	DistributedTeleportationEngine(EventsManager em, PartitionTransfer partitionTransfer, AgentSourcesContainer asc, NetworkPartition partition) {
+	DistributedTeleportationEngine(EventsManager em, PartitionTransfer partitionTransfer, AgentSourcesContainer asc) {
 		this.partitionTransfer = partitionTransfer;
 		this.asc = asc;
 		this.em = em;
-		this.partition = partition;
 	}
 
 	@Override
@@ -145,7 +141,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	 * See {@link #teleportsToNonNeighbor}.
 	 */
 	private void countHandover(DistributedMobsimAgent person, int toPartition, double now, double exitTime) {
-		boolean neighbor = partition.getNeighbors().contains(toPartition);
+		boolean neighbor = partitionTransfer.isNeighbor(toPartition);
 		double slack = exitTime - now;
 
 		if (neighbor) {
@@ -160,14 +156,14 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		if (samplesLogged < MAX_SAMPLES) {
 			samplesLogged++;
 			log.info("teleport hand-over to a non-neighbour partition: agent={} mode={} part {}->{} now={} exitTime={} slack={}s",
-				person.getId(), person.getMode(), partition.getIndex(), toPartition, now, exitTime, slack);
+				person.getId(), person.getMode(), partitionTransfer.getIndex(), toPartition, now, exitTime, slack);
 		}
 	}
 
 	@Override
 	public void afterMobsim() {
 		log.info("teleport hand-overs in partition {}: local={} toNeighbour={} toNonNeighbour={} (of which due within {}s: {})",
-			partition.getIndex(), teleportsLocal, teleportsToNeighbor, teleportsToNonNeighbor, TIGHT_SLACK, teleportsToNonNeighborTightSlack);
+			partitionTransfer.getIndex(), teleportsLocal, teleportsToNeighbor, teleportsToNonNeighbor, TIGHT_SLACK, teleportsToNonNeighborTightSlack);
 		teleportsLocal = 0;
 		teleportsToNeighbor = 0;
 		teleportsToNonNeighbor = 0;
