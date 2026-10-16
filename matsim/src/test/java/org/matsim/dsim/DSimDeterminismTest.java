@@ -75,7 +75,8 @@ class DSimDeterminismTest {
 	 * even when the traffic is. This is a separate defect from the node ordering above and is not fixed; the test documents it.
 	 */
 	@Test
-	@Disabled("known open issue: with dsim.threads > 1 the event order within a time step is not reproducible")
+	@Disabled("known open issue: with dsim.threads > 1 the event order within a time step is not reproducible. Ordering the cross-partition "
+		+ "message delivery did not fix this: the events take their own path through MessageBroker.events and DistributedEventsManager")
 	void twoRunsWithTheSameSeedEmitEventsInTheSameOrder() {
 
 		List<Event> first = run("order1");
