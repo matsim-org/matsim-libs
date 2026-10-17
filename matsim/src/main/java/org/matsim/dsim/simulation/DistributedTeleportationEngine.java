@@ -41,7 +41,17 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	private static final double TIGHT_SLACK = 2.0;
 
 	private final EventsManager em;
-	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
+	/**
+	 * Ordered by exit time, ties broken by the person id. Without the tie-break a {@link PriorityQueue} releases agents that are due in the
+	 * same time step in an order that follows its insertion history rather than the agents, and that history need not be the same in two
+	 * runs: teleportation hand-overs to a partition that is not a network neighbour are not covered by the per-step barrier, so they can be
+	 * applied in a different step. That does not move an arrival, because such a leg is due hours later, but it does change the shape of
+	 * this queue - and the order in which agents are released here decides the order of the departures that follow.
+	 */
+	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(
+		Comparator.comparingDouble(TeleportationEntry::exitTime)
+			.thenComparing(entry -> entry.person().getId())
+	);
 	private final PartitionTransfer partitionTransfer;
 	private final AgentSourcesContainer asc;
 
