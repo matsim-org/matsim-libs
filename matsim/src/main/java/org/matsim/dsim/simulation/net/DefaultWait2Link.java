@@ -1,8 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -14,19 +12,8 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
-import java.util.StringJoiner;
 
 public class DefaultWait2Link implements Wait2Link {
-
-	private static final Logger log = LogManager.getLogger(DefaultWait2Link.class);
-
-	/**
-	 * Diagnostic for two vehicles swapping which of them enters traffic first on one link between two otherwise identical runs. The queue
-	 * per link is a FIFO, so a swap means {@link #accept} was called in a different order or at a different time. Enable with
-	 * {@code -Ddsim.debug.wait2link=<linkId>@<fromSecond>-<toSecond>}, which logs every hand-in and every release on that link in that
-	 * window, together with the queue as it stands. Costs nothing when the property is unset. Remove once the question is settled.
-	 */
-	private final Trace trace = Trace.fromSystemProperty();
 
 	private final Map<Id<Link>, Queue<Waiting>> waitingVehicles = new HashMap<>();
 	private final EventsManager em;
@@ -40,13 +27,9 @@ public class DefaultWait2Link implements Wait2Link {
 
 	@Override
 	public boolean accept(DistributedMobsimVehicle vehicle, SimLink link, double now) {
-		Queue<Waiting> queue = waitingVehicles.computeIfAbsent(link.getId(), _ -> new ArrayDeque<>());
-		queue.add(new Waiting(vehicle, link));
-
-		if (trace != null && trace.covers(link.getId(), now))
-			log.info("wait2link accept  t={} link={} vehicle={} driver={} queue=[{}]",
-				now, link.getId(), vehicle.getId(), vehicle.getDriver().getId(), describe(queue));
-
+		waitingVehicles
+			.computeIfAbsent(link.getId(), _ -> new ArrayDeque<>())
+			.add(new Waiting(vehicle, link));
 		return true;
 	}
 
@@ -62,14 +45,7 @@ public class DefaultWait2Link implements Wait2Link {
 
 				if (moveWaiting(vehicle, link, now)) {
 					q.remove();
-
-					if (trace != null && trace.covers(link.getId(), now))
-						log.info("wait2link release t={} link={} vehicle={} driver={} remaining=[{}]",
-							now, link.getId(), vehicle.getId(), vehicle.getDriver().getId(), describe(q));
 				} else {
-					if (trace != null && trace.covers(link.getId(), now))
-						log.info("wait2link blocked t={} link={} vehicle={} driver={} queue=[{}]",
-							now, link.getId(), vehicle.getId(), vehicle.getDriver().getId(), describe(q));
 					break;
 				}
 			}
@@ -112,42 +88,6 @@ public class DefaultWait2Link implements Wait2Link {
 		}
 	}
 
-	private static String describe(Queue<Waiting> queue) {
-		StringJoiner joiner = new StringJoiner(", ");
-		for (Waiting waiting : queue) {
-			joiner.add(waiting.vehicle().getId().toString());
-		}
-		return joiner.toString();
-	}
-
 	public record Waiting(DistributedMobsimVehicle vehicle, SimLink link) {
-	}
-
-	/**
-	 * Window to trace, see {@link #TRACE}.
-	 */
-	record Trace(String linkId, double from, double to) {
-
-		static final String PROPERTY = "dsim.debug.wait2link";
-
-		static Trace fromSystemProperty() {
-			String value = System.getProperty(PROPERTY);
-			if (value == null || value.isBlank())
-				return null;
-
-			try {
-				String[] linkAndWindow = value.split("@", 2);
-				String[] window = linkAndWindow[1].split("-", 2);
-				Trace trace = new Trace(linkAndWindow[0], Double.parseDouble(window[0]), Double.parseDouble(window[1]));
-				log.info("tracing wait2link on link {} between {} and {}", trace.linkId, trace.from, trace.to);
-				return trace;
-			} catch (RuntimeException e) {
-				throw new IllegalArgumentException("Expected -D%s=<linkId>@<fromSecond>-<toSecond>, got '%s'".formatted(PROPERTY, value), e);
-			}
-		}
-
-		boolean covers(Id<Link> linkId, double now) {
-			return now >= from && now <= to && linkId.toString().equals(this.linkId);
-		}
 	}
 }
