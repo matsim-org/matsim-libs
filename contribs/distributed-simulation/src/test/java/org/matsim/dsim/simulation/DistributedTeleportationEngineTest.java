@@ -21,6 +21,7 @@ import org.mockito.Mockito;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -112,6 +113,62 @@ class DistributedTeleportationEngineTest {
 		var released = ArgumentCaptor.forClass(MobsimAgent.class);
 		verify(internalInterface, times(2)).arrangeNextAgentState(released.capture());
 		return released.getAllValues().stream().map(agent -> agent.getId().toString()).toList();
+	}
+
+	/**
+	 * The diagnostic checksums have to depend on what the engine was given, not on the order it was given it in: they exist to compare two
+	 * runs of the same scenario, in which the hand-over order differs but the exit times must not. See
+	 * {@code DistributedTeleportationEngine#departureChecksum}.
+	 */
+	@Test
+	public void checksumsIgnoreTheOrderTheDeparturesCameIn() {
+
+		var inOrder = checksumsOfTwoDepartures(false, 42);
+		var reversed = checksumsOfTwoDepartures(true, 42);
+
+		assertEquals(inOrder, reversed);
+	}
+
+	/**
+	 * ... and the departure checksum has to notice a changed exit time on a single leg, which is the difference it is there to find. The
+	 * assertion is on the departure checksum alone: the release checksum would differ anyway, because the agent comes out a step later.
+	 */
+	@Test
+	public void theDepartureChecksumChangesWithTheExitTimeOfASingleLeg() {
+
+		var asRouted = checksumsOfTwoDepartures(false, 42).getFirst();
+		var oneSecondLater = checksumsOfTwoDepartures(false, 43).getFirst();
+
+		assertNotEquals(asRouted, oneSecondLater);
+	}
+
+	/**
+	 * Both checksums over two agents due together, one of them with the given travel time. Returns departure and release checksum.
+	 */
+	private static List<Long> checksumsOfTwoDepartures(boolean handInReversed, double travelTimeOfSecond) {
+
+		var em = mock(EventsManager.class);
+		var first = createPerson("one", em);
+		var second = createPerson("two", em);
+		((Leg) second.getCurrentPlan().getPlanElements().getFirst()).setTravelTime(travelTimeOfSecond);
+
+		var messaging = mock(PartitionTransfer.class);
+		when(messaging.isLocal(any())).thenReturn(true);
+		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class));
+		engine.setInternalInterface(mock(InternalInterface.class));
+
+		if (handInReversed) {
+			engine.handleDeparture(10, second, second.getCurrentLinkId());
+			engine.handleDeparture(10, first, first.getCurrentLinkId());
+		} else {
+			engine.handleDeparture(10, first, first.getCurrentLinkId());
+			engine.handleDeparture(10, second, second.getCurrentLinkId());
+		}
+
+		// release both, so that the release checksum is filled too
+		engine.doSimStep(10 + 100);
+
+		return List.of(engine.departureChecksum(), engine.releaseChecksum());
 	}
 
 	@Test

@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
@@ -39,6 +40,22 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 	private static final int MAX_SAMPLES = 10;
 	private static final double TIGHT_SLACK = 2.0;
+
+	/**
+	 * Diagnostic that splits the two possible origins of a teleported arrival landing one step apart in two otherwise identical runs: the
+	 * exit time the departure was given, which comes out of the plan, or the step the queue released it in. The departure checksum covers
+	 * {@code (person, exitTime)} of every teleported departure this partition handled, the release checksum {@code (person, arrivalStep)}
+	 * of every agent it released. Both are sums, so they do not depend on the order the entries were added in, which is the point: they
+	 * compare two runs, not two orders.
+	 * <p>
+	 * Equal departure checksums with differing release checksums put the fault in the release path; differing departure checksums put it
+	 * upstream of the mobsim, in the plan the router wrote. Two longs and two counts per partition and iteration, logged in
+	 * {@link #afterMobsim()}. Remove once the question is settled.
+	 */
+	private long departureChecksum;
+	private long releaseChecksum;
+	private int departuresCounted;
+	private int releasesCounted;
 
 	private final EventsManager em;
 	/**
@@ -93,6 +110,9 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		var travelTime = person.getExpectedTravelTime().seconds();
 		var exitTime = now + travelTime;
 
+		departureChecksum += checksumOf(person.getId(), exitTime);
+		departuresCounted++;
+
 		if (partitionTransfer.isLocal(person.getDestinationLinkId())) {
 			teleportsLocal++;
 			personsTeleporting.add(new TeleportationEntry(person, exitTime));
@@ -136,6 +156,10 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		while (firstPersonReady(now)) {
 			TeleportationEntry entry = personsTeleporting.remove();
 			DistributedMobsimAgent person = entry.person();
+
+			releaseChecksum += checksumOf(person.getId(), now);
+			releasesCounted++;
+
 			person.notifyArrivalOnLinkByNonNetworkMode(person.getDestinationLinkId());
 
 			String mode = person.getMode();
@@ -170,15 +194,44 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		}
 	}
 
+	/**
+	 * See {@link #departureChecksum}. The person id goes in as the hash of its string form rather than as
+	 * {@link org.matsim.api.core.v01.Id#index()}, so that the value does not depend on the order the ids were created in, and the double
+	 * goes in by its bits, so that it is exact. The finalizer is the one from SplitMix64: without it the sum of the terms would lose the
+	 * high bits of what distinguishes two entries.
+	 */
+	private static long checksumOf(Id<Person> person, double value) {
+		long h = (person.toString().hashCode() & 0xFFFFFFFFL) * 0x9E3779B97F4A7C15L + Double.doubleToLongBits(value);
+		h = (h ^ (h >>> 33)) * 0xFF51AFD7ED558CCDL;
+		h = (h ^ (h >>> 33)) * 0xC4CEB9FE1A85EC53L;
+		return h ^ (h >>> 33);
+	}
+
+	/**
+	 * See {@link #departureChecksum}. Package-private for the test.
+	 */
+	long departureChecksum() {return departureChecksum;}
+
+	/**
+	 * See {@link #departureChecksum}. Package-private for the test.
+	 */
+	long releaseChecksum() {return releaseChecksum;}
+
 	@Override
 	public void afterMobsim() {
 		log.info("teleport hand-overs in partition {}: local={} toNeighbour={} toNonNeighbour={} (of which due within {}s: {})",
 			partitionTransfer.getIndex(), teleportsLocal, teleportsToNeighbor, teleportsToNonNeighbor, TIGHT_SLACK, teleportsToNonNeighborTightSlack);
+		log.info("teleport checksums in partition {}: departures={} over {} entries, releases={} over {} entries",
+			partitionTransfer.getIndex(), departureChecksum, departuresCounted, releaseChecksum, releasesCounted);
 		teleportsLocal = 0;
 		teleportsToNeighbor = 0;
 		teleportsToNonNeighbor = 0;
 		teleportsToNonNeighborTightSlack = 0;
 		samplesLogged = 0;
+		departureChecksum = 0;
+		releaseChecksum = 0;
+		departuresCounted = 0;
+		releasesCounted = 0;
 
 		for (var entry : personsTeleporting) {
 			var person = entry.person();
