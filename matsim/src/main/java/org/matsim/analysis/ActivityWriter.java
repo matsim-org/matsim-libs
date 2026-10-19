@@ -5,13 +5,16 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.utils.io.IOUtils;
@@ -26,6 +29,9 @@ public class ActivityWriter {
 
 	@Inject
 	private Config config;
+
+	@Inject
+	Scenario scenario;
 
 	@Inject
 	private ExperiencedPlansService experiencedPlansService;
@@ -48,7 +54,7 @@ public class ActivityWriter {
 																					.setHeader(header).build());
 
 			for (Map.Entry<Id<Person>, Plan> e : experiencedPlansService.getExperiencedPlans().entrySet()) {
-				writeActivitiesPerPerson(e.getKey(), e.getValue(), attributes, csvPrinter);
+				this.writeActivitiesPerPerson(e.getKey(), e.getValue(), attributes, csvPrinter);
 			}
 
 			csvPrinter.close();
@@ -59,7 +65,7 @@ public class ActivityWriter {
 		log.info("...done");
 	}
 
-	private static void writeActivitiesPerPerson(Id<Person> personId, Plan plan, List<String> attributes, CSVPrinter csvPrinter) throws IOException {
+	private void writeActivitiesPerPerson(Id<Person> personId, Plan plan, List<String> attributes, CSVPrinter csvPrinter) throws IOException {
 		int i = 0;
 		for (Activity act : TripStructureUtils.getActivities(plan, TripStructureUtils.StageActivityHandling.ExcludeStageActivities)) {
 
@@ -76,9 +82,10 @@ public class ActivityWriter {
 			line.add(act.getLinkId() != null ? act.getLinkId() : "");
 			line.add(act.getFacilityId() != null ? act.getFacilityId(): "");
 
-			if (act.getCoord() != null) {
-				line.add(act.getCoord().getX());
-				line.add(act.getCoord().getY());
+			Coord coord = PopulationUtils.decideOnCoordForActivity(act, scenario);
+			if (coord != null) {
+				line.add(coord.getX());
+				line.add(coord.getY());
 			} else  {
 				line.add("");
 				line.add("");
