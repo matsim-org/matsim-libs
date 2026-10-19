@@ -46,16 +46,19 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 	private Network network;
 
 	private final ScoringParametersForPerson params;
+	private final TypicalDurationCalculator typicalDurationCalculator;
 
 	public CharyparNagelScoringFunctionFactory(final Scenario sc) {
-		this(sc.getConfig(), new SubpopulationScoringParameters(sc), sc.getNetwork());
+		this(sc.getConfig(), new SubpopulationScoringParameters(sc), sc.getNetwork(),
+			TypicalDurationCalculator.of(sc.getConfig().scoring().getTypicalDurationSource()));
 	}
 
 	@Inject
-	CharyparNagelScoringFunctionFactory(Config config, ScoringParametersForPerson params, Network network) {
+	CharyparNagelScoringFunctionFactory(Config config, ScoringParametersForPerson params, Network network, TypicalDurationCalculator typicalDurationCalculator) {
 		this.config = config;
 		this.params = params;
 		this.network = network;
+		this.typicalDurationCalculator = typicalDurationCalculator;
 	}
 
 	/**
@@ -65,7 +68,7 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 	 * by accumulating them. After the iteration, it is asked for a score value.
 	 * <p>
 	 * Since the factory method gets the Person, it can create a ScoringFunction
-	 * which depends on Person attributes. This implementation does not.
+	 * which depends on Person attributes. This implementation does so only through the {@link TypicalDurationCalculator}.
 	 *
 	 * <li>The fact that you have a person-specific scoring function does not mean that the "creative" modules
 	 * (such as route choice) are person-specific.  This is not a bug but a deliberate design concept in order
@@ -82,7 +85,7 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 		final ScoringParameters parameters = params.getScoringParameters(person);
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(parameters));
+		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(parameters, typicalDurationCalculator, person));
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(parameters, config.transit().getTransitModes()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(parameters));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(parameters));
