@@ -41,6 +41,12 @@ public class CharyparNagelScoringFunctionModule extends AbstractModule {
     public void install() {
         bind(ScoringFunctionFactory.class).to(CharyparNagelScoringFunctionFactory.class);
 
+		ScoringConfigGroup.TypicalDurationSource typicalDurationSource = getConfig().scoring().getTypicalDurationSource();
+		bind(TypicalDurationCalculator.class).toInstance(TypicalDurationCalculator.of(typicalDurationSource));
+		if (typicalDurationSource == ScoringConfigGroup.TypicalDurationSource.personAttribute) {
+			addControllerListenerBinding().to(PersonTypicalDurationsStartupCheck.class).in(Singleton.class);
+		}
+
 		Map<String, ScoringConfigGroup.ScoringParameterSet> scoringParameter = getConfig().scoring().getAllScoringParameterSetsPerSubpopulation();
 
 		boolean tasteVariations = scoringParameter.values().stream().anyMatch(s -> s.getTasteVariationsParams() != null);
