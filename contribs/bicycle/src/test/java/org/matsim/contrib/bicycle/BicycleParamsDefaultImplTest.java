@@ -57,7 +57,7 @@ public class BicycleParamsDefaultImplTest {
 	@Test
 	void testComfortFactors() {
 		List<ObjectDoublePair<String>> surfaces = List.of(ObjectDoublePair.of("paved", 1.0), ObjectDoublePair.of("asphalt", 1.0),
-			ObjectDoublePair.of("concrete:lanes", .95), ObjectDoublePair.of("concrete_plates", .9), ObjectDoublePair.of("concrete:plates", .9),
+			ObjectDoublePair.of("concrete", .95), ObjectDoublePair.of("concrete:lanes", .95), ObjectDoublePair.of("concrete_plates", .9), ObjectDoublePair.of("concrete:plates", .9),
 			ObjectDoublePair.of("fine_gravel", .9), ObjectDoublePair.of("paving_stones", .8), ObjectDoublePair.of("paving_stones:35", .8),
 			ObjectDoublePair.of("paving_stones:30", .8), ObjectDoublePair.of("compacted", .7), ObjectDoublePair.of("unpaved", .6),
 			ObjectDoublePair.of("asphalt;paving_stones:35", .6), ObjectDoublePair.of("bricks", .6), ObjectDoublePair.of("gravel", .6),
@@ -65,7 +65,7 @@ public class BicycleParamsDefaultImplTest {
 			ObjectDoublePair.of("cobblestone:flattened", .5), ObjectDoublePair.of("cobblestone", .4), ObjectDoublePair.of("stone", .4),
 			ObjectDoublePair.of("grass", .4), ObjectDoublePair.of("compressed", .4), ObjectDoublePair.of("paving_stones:3", .4),
 			ObjectDoublePair.of("cobblestone (bad)", .3), ObjectDoublePair.of("dirt", .3), ObjectDoublePair.of("earth", .3),
-			ObjectDoublePair.of("wood", .3), ObjectDoublePair.of("pebblestone", .3), ObjectDoublePair.of("sand", .3), ObjectDoublePair.of("concrete", .1),
+			ObjectDoublePair.of("wood", .3), ObjectDoublePair.of("pebblestone", .3), ObjectDoublePair.of("sand", .3),
 			ObjectDoublePair.of(null, 1.), ObjectDoublePair.of("test:default", .85));
 
 		Link link = createLink(new Coord(0, 0), new Coord(100, 0));
