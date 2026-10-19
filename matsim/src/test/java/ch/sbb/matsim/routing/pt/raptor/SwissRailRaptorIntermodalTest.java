@@ -75,7 +75,7 @@ public class SwissRailRaptorIntermodalTest {
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -167,7 +167,7 @@ public class SwissRailRaptorIntermodalTest {
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
@@ -220,7 +220,7 @@ public class SwissRailRaptorIntermodalTest {
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(-8.0);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -272,7 +272,7 @@ public class SwissRailRaptorIntermodalTest {
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -309,10 +309,10 @@ public class SwissRailRaptorIntermodalTest {
         f.config.scoring().setPerforming_utils_hr(6.0);
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
         ScoringConfigGroup.ModeParams bike = new ScoringConfigGroup.ModeParams("bike");
         bike.setMarginalUtilityOfTraveling(0.0);
-        f.config.scoring().addModeParams(bike);
+        f.config.scoring().addDefaultModeParams(bike);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -404,7 +404,7 @@ public class SwissRailRaptorIntermodalTest {
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -498,11 +498,11 @@ public class SwissRailRaptorIntermodalTest {
 
         // we need to set special values for walk and bike as the defaults are the same for walk, bike and waiting
         // which would result in all options having the same cost in the end.
-        f.config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
+        f.config.scoring().getDefaultModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(-7);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         f.srrConfig.setUseIntermodalAccessEgress(true);
         IntermodalAccessEgressParameterSet walkAccess = new IntermodalAccessEgressParameterSet();
@@ -593,11 +593,11 @@ public class SwissRailRaptorIntermodalTest {
 
         // we need to set special values for walk and bike as the defaults are the same for walk, bike and waiting
         // which would result in all options having the same cost in the end.
-        f.config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
+        f.config.scoring().getDefaultModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(-7);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         f.srrConfig.setUseIntermodalAccessEgress(true);
         IntermodalAccessEgressParameterSet walkAccess = new IntermodalAccessEgressParameterSet();
@@ -934,7 +934,7 @@ public class SwissRailRaptorIntermodalTest {
 
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -1004,7 +1004,7 @@ public class SwissRailRaptorIntermodalTest {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -1125,7 +1125,7 @@ public class SwissRailRaptorIntermodalTest {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
         ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.scoring().addModeParams(walk);
+        f.config.scoring().addDefaultModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -1244,7 +1244,7 @@ public class SwissRailRaptorIntermodalTest {
 				.forEach(stopFacility -> TransitScheduleUtils.setSymmetricStopAccessEgressTime(stopFacility,120.0));
 		ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
 		walk.setMarginalUtilityOfTraveling(0.0);
-		f.config.scoring().addModeParams(walk);
+		f.config.scoring().addDefaultModeParams(walk);
 
 		Map<String, RoutingModule> routingModules = new HashMap<>();
 		routingModules.put(TransportMode.walk,
@@ -1484,7 +1484,7 @@ public class SwissRailRaptorIntermodalTest {
 
             // we need to set special values for walk and bike as the defaults are the same for walk, bike and waiting
             // which would result in all options having the same cost in the end.
-            this.config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
+            this.config.scoring().getDefaultModeParams().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
 
             this.config.transitRouter().setMaxBeelineWalkConnectionDistance(150);
 
@@ -1507,7 +1507,7 @@ public class SwissRailRaptorIntermodalTest {
 			 */
             ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
             walk.setMarginalUtilityOfTraveling(-7);
-            this.config.scoring().addModeParams(walk);
+            this.config.scoring().addDefaultModeParams(walk);
 
             this.srrConfig.setUseIntermodalAccessEgress(true);
             IntermodalAccessEgressParameterSet walkAccess = new IntermodalAccessEgressParameterSet();

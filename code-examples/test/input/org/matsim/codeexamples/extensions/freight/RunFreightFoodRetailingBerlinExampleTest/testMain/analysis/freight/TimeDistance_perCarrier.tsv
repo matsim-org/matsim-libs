@@ -1,0 +1,2 @@
+carrierId	nuOfTours	tourDurations[s]	tourDurations[h]	travelDistances[m]	travelDistances[km]	travelTimes[s]	travelTimes[h]	fixedCosts[EUR]	varCostsTime[EUR]	varCostsDist[EUR]	totalCosts[EUR]
+rewe_DISCOUNTER_TROCKEN	11	192865.0	53.57361111111111	801135.7327369249	801.1357327369249	99919.0	27.755277777777778	906.4700000000001	945.0385	536.3423257797058	2387.8508257797057

@@ -19,6 +19,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -47,6 +48,32 @@ public class NetworkDecomposition {
 			case bisect -> bisection(network, population, numParts);
 			case metis -> metis(network, population, numParts);
 			// none means don't do anything
+		}
+	}
+
+	/**
+	 * Return the partition of each node, indexed by the node id index. Entries of ids not in the network are -1.
+	 */
+	public static int[] getNodePartitions(Network network) {
+		int size = network.getNodes().keySet().stream().mapToInt(Id::index).max().orElse(-1) + 1;
+		int[] partitions = new int[size];
+		Arrays.fill(partitions, -1);
+		for (Node node : network.getNodes().values()) {
+			partitions[node.getId().index()] = (int) node.getAttributes().getAttribute(PARTITION_ATTR_KEY);
+		}
+		return partitions;
+	}
+
+	/**
+	 * Apply partitions as returned by {@link #getNodePartitions(Network)}. Links are assigned to the partition of their to node.
+	 */
+	public static void setNodePartitions(Network network, int[] partitions) {
+		for (Node node : network.getNodes().values()) {
+			int partition = partitions[node.getId().index()];
+			node.getAttributes().putAttribute(PARTITION_ATTR_KEY, partition);
+			for (var link : node.getInLinks().values()) {
+				link.getAttributes().putAttribute(PARTITION_ATTR_KEY, partition);
+			}
 		}
 	}
 
@@ -86,36 +113,71 @@ public class NetworkDecomposition {
 			}
 		}
 
-		Int2ObjectMap<Node> nodes = new Int2ObjectOpenHashMap<>();
-		for (Node node : network.getNodes().values()) {
-			nodes.put(node.getId().index(), node);
+		// METIS requires vertices numbered 0..n-1, id indices may contain gaps
+		List<Node> nodes = new ArrayList<>(network.getNodes().values());
+		Int2IntMap vertexOf = new Int2IntOpenHashMap(nodes.size());
+		for (int i = 0; i < nodes.size(); i++) {
+			vertexOf.put(nodes.get(i).getId().index(), i);
 		}
+
+		// METIS expects an undirected graph without self-loops and multi-edges, and a symmetric adjacency structure.
+		// Links in both directions between two nodes are merged into one edge, weighted with the sum of both links.
+		int[] xadj = new int[nodes.size() + 1];
+		IntArrayList adjncy = new IntArrayList();
+		IntArrayList adjwgt = new IntArrayList();
+		Int2IntMap neighbors = new Int2IntLinkedOpenHashMap();
+
+		for (int i = 0; i < nodes.size(); i++) {
+			Node node = nodes.get(i);
+			neighbors.clear();
+			for (Link link : node.getOutLinks().values()) {
+				if (link.getToNode() != node)
+					neighbors.mergeInt(vertexOf.get(link.getToNode().getId().index()), linkWeights.getOrDefault(link.getId().index(), 1), Integer::sum);
+			}
+			for (Link link : node.getInLinks().values()) {
+				if (link.getFromNode() != node)
+					neighbors.mergeInt(vertexOf.get(link.getFromNode().getId().index()), linkWeights.getOrDefault(link.getId().index(), 1), Integer::sum);
+			}
+
+			xadj[i] = adjncy.size();
+			for (Int2IntMap.Entry e : neighbors.int2IntEntrySet()) {
+				adjncy.add(e.getIntKey());
+				adjwgt.add(e.getIntValue());
+			}
+		}
+		xadj[nodes.size()] = adjncy.size();
+
+		int[] vwgt = new int[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++) {
+			vwgt[i] = nodeWeights.getOrDefault(nodes.get(i).getId().index(), 1);
+		}
+
+		// METIS sums up weights as 32-bit integers, large populations would overflow
+		scaleWeights(vwgt);
+		int[] ewgt = adjwgt.toIntArray();
+		scaleWeights(ewgt);
 
 		Metis.Graph g = new Metis.Graph() {
 			@Override
 			public int getNumVertices() {
-				return network.getNodes().size();
+				return nodes.size();
 			}
 
 			@Override
 			public int getNumEdges() {
-				return network.getLinks().size() * 2;
+				return adjncy.size();
 			}
 
 			@Override
 			public int getVertexComputationWeight(int vertex) {
-				return nodeWeights.getOrDefault(vertex, 1);
+				return vwgt[vertex];
 			}
 
 			@Override
 			public void getEdges(int vertex, Metis.EdgeBuilder builder) {
-				// Graph needs to contain all edges, because it is undirected in metis
-				nodes.get(vertex).getOutLinks().values().forEach(
-					link -> builder.addEdge(link.getToNode().getId().index(), linkWeights.getOrDefault(link.getId().index(), 1))
-				);
-				nodes.get(vertex).getInLinks().values().forEach(
-					link -> builder.addEdge(link.getToNode().getId().index(), linkWeights.getOrDefault(link.getId().index(), 1))
-				);
+				for (int j = xadj[vertex]; j < xadj[vertex + 1]; j++) {
+					builder.addEdge(adjncy.getInt(j), ewgt[j]);
+				}
 			}
 		};
 
@@ -133,6 +195,25 @@ public class NetworkDecomposition {
 			System.err.println("### METIS failed with error, failing back to simple algorithm. ###");
 			e.printStackTrace(System.err);
 			bisection(network, population, numParts);
+		}
+	}
+
+	/**
+	 * Scale weights down proportionally, so that their sum stays well within the 32-bit range used by METIS. Weights stay at least 1.
+	 */
+	static void scaleWeights(int[] weights) {
+		long sum = 0;
+		for (int w : weights) {
+			sum += w;
+		}
+
+		long limit = 1L << 28;
+		if (sum <= limit)
+			return;
+
+		double factor = (double) sum / limit;
+		for (int i = 0; i < weights.length; i++) {
+			weights[i] = Math.max(1, (int) (weights[i] / factor));
 		}
 	}
 

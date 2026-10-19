@@ -19,8 +19,7 @@
 
 package org.matsim.contrib.etaxi.run;
 
-import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
-
+import com.google.inject.Key;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
@@ -31,13 +30,7 @@ import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
-import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector;
-import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.charging.ChargingPower;
-import org.matsim.contrib.ev.charging.ChargingStrategy;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.charging.FixedSpeedCharging;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
@@ -55,7 +48,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Key;
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
 
 /**
  * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel times are
@@ -72,10 +65,10 @@ public class RunETaxiBenchmark {
 	private static final double MAX_SOC = 0.8; // charge up to 80% SOC
 	private static final double TEMPERATURE = 20; // oC
 
-	public static void run(String [] configUrl, int nIterations) {
+	public static void run(String[] configUrl, int nIterations) {
 		Config config = ConfigUtils.loadConfig(configUrl,
-				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
-				new DvrpConfigGroup(), new EvConfigGroup());
+			new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
+			new DvrpConfigGroup(), new EvConfigGroup());
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		createControler(config, nIterations).run();
 	}
@@ -110,15 +103,21 @@ public class RunETaxiBenchmark {
 
 //		controler.configureQSimComponents(
 //				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
-		controler.configureQSimComponents( DvrpQSimComponents.activateModes( mode ) );
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
+
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
+			}
+		});
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
 				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(mode))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_SOC));
 				//TODO switch to VariableSpeedCharging for Nissan
-				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
+				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev.getBattery(), CHARGING_SPEED_FACTOR));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
@@ -127,9 +126,9 @@ public class RunETaxiBenchmark {
 			@Override
 			public void install() {
 				bindModal(TaxiBenchmarkStats.class).toProvider(modalProvider(
-						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
-								getter.getModal(ExecutedScheduleCollector.class),
-								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
+					getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
+						getter.getModal(ExecutedScheduleCollector.class),
+						getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
 				addControllerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
 			}
 		});
@@ -138,9 +137,9 @@ public class RunETaxiBenchmark {
 			@Override
 			public void install() {
 				bindModal(ETaxiBenchmarkStats.class).toProvider(modalProvider(
-						getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
-								getter.get(ChargingEventSequenceCollector.class),
-								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+					getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
+						getter.get(ChargingEventSequenceCollector.class),
+						getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 				addControllerListenerBinding().to(modalKey(ETaxiBenchmarkStats.class));
 			}
 		});

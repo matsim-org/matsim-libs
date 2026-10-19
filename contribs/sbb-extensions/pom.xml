@@ -8,6 +8,26 @@
     <groupId>org.matsim.contrib</groupId>
     <artifactId>sbb-extensions</artifactId>
     <name>sbb-extensions</name>
+
+	<properties>
+		<!-- Required by Aeron (via MessageBroker) when running DSim integration tests. -->
+		<test.jvm.aeron>
+			--add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+		</test.jvm.aeron>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>${test.jvm.aeron} ${argLine}</argLine>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
     <dependencies>
         <dependency>
             <groupId>org.geotools</groupId>
@@ -30,6 +50,14 @@
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
+		<!-- The distributed DSim integration test needs the Fory wire codec from the
+		     distributed-simulation contrib. -->
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>distributed-simulation</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
+		</dependency>
     </dependencies>
 
 </project>

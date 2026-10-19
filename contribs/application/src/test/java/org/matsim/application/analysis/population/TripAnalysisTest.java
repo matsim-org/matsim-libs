@@ -110,8 +110,8 @@ class TripAnalysisTest {
 		CSVPrinter printer = csv.createPrinter(persons);
 
 //		print dummy persons
-		printer.printRecord("person", "executed_score", "first_act_x", "first_act_y", "first_act_type", "age", "carAvail", "home_x", "home_y", "householdIncome", "householdSize",
-			"income", "sex", "sim_ptAbo", "sim_regionType", "subpopulation", "purpose", "tourStartArea", "vehicleTypes");
+		printer.printRecord( "person", "executed_score", "first_act_x", "first_act_y", "first_act_type", "age", "carAvail", "home_x", "home_y", "householdIncome", "householdSize",
+				"income", "sex", "sim_ptAbo", "sim_regionType", "subpopulation", "purpose", "tourStartArea", "vehicleTypes" );
 		printer.printRecord("100", "-130.69951448065348", "369956.19", "5776578.61", "home_49200", "50", "always", "369956.19", "5776578.61", "5", "2", "1159.0", "f", "none", "124", "person", "", "", "");
 		printer.printRecord("100_goodsTraffic", "-130.69951448065348", "369956.19", "5776578.61", "home_49200", "50", "always", "369956.19", "5776578.61", "5", "2", "1159.0", "f", "none", "124", "goodsTraffic", "", "", "");
 		printer.close();

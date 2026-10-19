@@ -47,6 +47,8 @@ import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneS
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3ZoneSystem;
+import org.matsim.contrib.common.zones.systems.grid.h3.HierarchicalH3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.HierarchicalH3ZoneSystem;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.common.zones.util.ZoneFinder;
@@ -100,6 +102,15 @@ public final class ZoneSystemUtils {
 				Preconditions.checkNotNull(((H3GridZoneSystemParams) zoneSystemParams).getH3Resolution());
 				Preconditions.checkNotNull(crs);
 				yield new H3ZoneSystem(crs, ((H3GridZoneSystemParams) zoneSystemParams).getH3Resolution(), network, zoneFilter);
+			}
+			case HierarchicalH3GridZoneSystemParams.SET_NAME -> {
+				HierarchicalH3GridZoneSystemParams params = (HierarchicalH3GridZoneSystemParams) zoneSystemParams;
+				Preconditions.checkNotNull(params.getH3MinResolution());
+				Preconditions.checkNotNull(params.getH3MaxResolution());
+				Preconditions.checkNotNull(params.getMaxNodesPerZone());
+				Preconditions.checkNotNull(crs);
+				yield HierarchicalH3ZoneSystem.withNodeCountCriterion(crs, params.getH3MinResolution(),
+						params.getH3MaxResolution(), params.getMaxNodesPerZone(), network, zoneFilter);
 			}
 			case GeometryFreeZoneSystemParams.SET_NAME -> new GeometryFreeZoneSystem(network);
 			default -> throw new IllegalStateException("Unexpected value: " + zoneSystemParams.getName());
@@ -266,6 +277,10 @@ public final class ZoneSystemUtils {
 		delegate.addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
 				() -> getter.get(),
 				params -> setter.accept((H3GridZoneSystemParams)params));
+
+		delegate.addDefinition(HierarchicalH3GridZoneSystemParams.SET_NAME, HierarchicalH3GridZoneSystemParams::new,
+				() -> getter.get(),
+				params -> setter.accept((HierarchicalH3GridZoneSystemParams)params));
 
 		delegate.addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
 				() -> getter.get(),

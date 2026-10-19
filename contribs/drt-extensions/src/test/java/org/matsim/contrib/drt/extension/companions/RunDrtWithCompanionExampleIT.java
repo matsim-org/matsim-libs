@@ -32,6 +32,7 @@ import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
@@ -62,6 +63,7 @@ public class RunDrtWithCompanionExampleIT {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
 		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), dvrpConfigGroup);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		// Add DrtCompanionParams with some default values into existing Drt configurations
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
@@ -94,6 +96,7 @@ public class RunDrtWithCompanionExampleIT {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
 		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), dvrpConfigGroup);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		// Add DrtCompanionParams with some default values into existing Drt configurations
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);

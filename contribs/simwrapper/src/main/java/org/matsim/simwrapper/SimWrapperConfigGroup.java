@@ -9,6 +9,9 @@ import java.util.*;
 
 /**
  * Config group for the {@link SimWrapperModule}.
+ *
+ * Maybe, we should rename this config group to "AnalysisConfigGroup", because the main purpose of Simwrapper is the creation and display of aggregated analysis files.
+ * This is motivated by the discussion, where to put a path to the base case. matsim hackathon, jun'26.
  */
 public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
@@ -101,7 +104,7 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 		final double flowCapFactor = config.qsim().getFlowCapFactor();
 		final double relativeTolerance = config.global().getRelativeToleranceForSampleSizeFactor();
 		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, this.sampleSize, relativeTolerance ) ) {
-			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
+			throw new RuntimeException("your simwrapper sample size =" + this.getSampleSize() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
 			+ ". Relative tolerance can be set in the global config group.");
 		}
 

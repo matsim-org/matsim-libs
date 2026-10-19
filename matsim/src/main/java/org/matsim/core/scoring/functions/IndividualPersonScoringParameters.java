@@ -83,7 +83,7 @@ public class IndividualPersonScoringParameters implements ScoringParametersForPe
 		return this.cache.computeIfAbsent(person.getId(), id -> {
 
 			String subpopulation = PopulationUtils.getSubpopulation(person);
-			ScoringConfigGroup.ScoringParameterSet scoringParameters = Objects.requireNonNull(basicScoring.getScoringParameters(subpopulation), () -> "No scoring parameters found for subpopulation " + subpopulation);
+			ScoringConfigGroup.ScoringParameterSet scoringParameters = Objects.requireNonNull(basicScoring.getScoringParametersOrDefault(subpopulation), () -> "No scoring parameters found for subpopulation " + subpopulation);
 
 			// For the act utils cache the subpopulation can not be null
 			String subPopKey = subpopulation == null ? "__null__" : subpopulation;

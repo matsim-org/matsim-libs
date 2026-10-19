@@ -73,6 +73,8 @@ public class LogFileAnalysis implements MATSimAppCommand {
 		String last = null;
 
 		LocalDateTime itBegin = null;
+		LocalDateTime jspritBegin = null;
+		LocalDateTime jspritEnd = null;
 
 		try (BufferedReader reader = IOUtils.getBufferedReader(input.getPath())) {
 			String line;
@@ -100,6 +102,11 @@ public class LogFileAnalysis implements MATSimAppCommand {
 							iterations.add(new Iteration(itBegin, parseDate(line)));
 						}
 					}
+					// adds information about computation time of a jsprit run. If the class CarrierUtils.runJsprit is called multiple time, the duration is from the beginning of the first call until the end of the last call.
+					if (jspritBegin == null && line.contains("#### Starting VRP solving with Jsprit"))
+						jspritBegin = parseDate(line);
+					if (line.contains("#### Finished VRP solving with Jsprit for all"))
+						jspritEnd = parseDate(line);
 
 				} catch (Exception e) {
 					log.warn("Error processing line {}", line, e);
@@ -121,7 +128,11 @@ public class LogFileAnalysis implements MATSimAppCommand {
 		if (first != null) {
 			LocalDateTime start = parseDate(first);
 			LocalDateTime end = parseDate(last);
-
+			if (jspritBegin != null &&  jspritEnd != null) {
+				info.put("Jsprit Start", formatter.format(jspritBegin));
+				info.put("Jsprit End", formatter.format(jspritEnd));
+				info.put("Jsprit Duration", DurationFormatUtils.formatDurationWords(Duration.between(jspritBegin, jspritEnd).toMillis(), true, true));
+			}
 			info.put("Start", formatter.format(start));
 			info.put("End", formatter.format(end));
 			info.put("Duration", DurationFormatUtils.formatDurationWords(Duration.between(start, end).toMillis(), true, true));

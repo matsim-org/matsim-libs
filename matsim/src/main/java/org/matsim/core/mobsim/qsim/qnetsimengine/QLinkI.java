@@ -103,6 +103,13 @@ public interface QLinkI extends NetsimLink, TimeVariantLink {
 	 * this is for driver agents who want to depart but their car is not (yet) there.  Subject to design change.
 	 */
 	void registerDriverAgentWaitingForCar(final MobsimDriverAgent agent) ;
+
+	/**
+	 * Notify waiting drivers/passengers that a vehicle has become available.  This is the counterpart to
+	 * {@link #registerDriverAgentWaitingForCar(MobsimDriverAgent)}: after a driverless vehicle is parked via
+	 * {@link #addParkedVehicle(MobsimVehicle)}, call this to wake up any agent waiting for it.
+	 */
+	void makeVehicleAvailableToNextDriver(QVehicle vehicle) ;
 	
 	/**
 	 * this is for driver agents who want to depart but not all passengers are (yet) there.  Subject to design change.

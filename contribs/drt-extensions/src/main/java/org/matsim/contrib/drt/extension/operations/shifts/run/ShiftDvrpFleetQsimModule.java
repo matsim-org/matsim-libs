@@ -37,18 +37,18 @@ public class ShiftDvrpFleetQsimModule extends AbstractDvrpModeQSimModule {
 				Network network = getModalInstance(Network.class);
 
 				return Fleets.createCustomFleet(fleetSpecification,
-                        s -> {
-                            DefaultShiftDvrpVehicle shiftDvrpVehicle =
-                                    new DefaultShiftDvrpVehicle(new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId())));
+					s -> {
+						DefaultShiftDvrpVehicle shiftDvrpVehicle =
+							new DefaultShiftDvrpVehicle(new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId())));
 
-                            if (evFleet != null) {
-                                Id<Vehicle> id = Id.create(s.getId(), Vehicle.class);
-                                if (evFleet.getElectricVehicles().containsKey(id)) {
-                                    return new EvShiftDvrpVehicle(shiftDvrpVehicle, evFleet.getElectricVehicles().get(id));
-                                }
-                            }
-                            return shiftDvrpVehicle;
-                        });
+						if (evFleet != null) {
+							Id<Vehicle> id = Id.create(s.getId(), Vehicle.class);
+							if (evFleet.hasVehicle(id)) {
+								return new EvShiftDvrpVehicle(shiftDvrpVehicle, evFleet.getVehicle(id));
+							}
+						}
+						return shiftDvrpVehicle;
+					});
 			}
 		}).asEagerSingleton();
 	}

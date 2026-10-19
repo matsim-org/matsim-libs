@@ -73,16 +73,30 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 		Map<String,String> map = super.getComments();
 		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for " +
 				"the router") ;
+		// (ok)
+
 		map.put(MAX_TIME, "The lenght (in sec) of the time period that is splited into time bins; an additional time bin is created " +
 				"to aggregate all travel times collected after maxTime") ;
+		// (ok)
+
 		map.put(TRAVEL_TIME_GETTER, "How to deal with link entry times at different positions during the time bin. Currently " +
 				"supported: average, linearinterpolation");
+		// (ok)
+
 		map.put(TRAVEL_TIME_AGGREGATOR, "How to deal with congested time bins that have no link entry events. `optimistic' " +
 				"assumes free speed (too optimistic); 'experimental_LastMile' is experimental and probably too pessimistic.") ;
-		map.put(ANALYZEDMODES, "(only for backwards compatibility; only used if " + SEPARATEMODES + "==false && + " + FILTERMODES + "==true)  Transport modes that will be " +
-							 "respected by the travel time collector. 'car' is default which includes also buses from the pt simulation module.");
-		map.put(FILTERMODES, "(only for backwards compatiblity; only used if " + SEPARATEMODES + "==false)  Only modes included in analyzedModes are included." ) ;
+		// (ok)
+
 		map.put(SEPARATEMODES, "(only for backwards compatibility) If false, link travel times are measured and aggregated over all vehicles using the link." ) ;
+		// (so normally this should be "true")
+
+		map.put(FILTERMODES, "(only for backwards compatiblity)  Only modes included in analyzedModes are included." ) ;
+		// (so normally this is ignored)
+
+		map.put(ANALYZEDMODES, "(only for backwards compatibility; only used if " + FILTERMODES + "==true)  Transport modes that will be " +
+							 "respected by the travel time collector. 'car' is default which includes also buses from the pt simulation module.");
+		// (so normally this is ignored)
+
 		return map;
 	}
 
@@ -156,12 +170,13 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public void setCalculateLinkToLinkTravelTimes( final boolean calculateLinkToLinkTravelTimes) {
 		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
 	}
+
 	// ---
+
 	@StringGetter( FILTERMODES )
 	public boolean isFilterModes() {
 		return this.filterModes;
 	}
-
 	@StringSetter( FILTERMODES )
 	public void setFilterModes(final boolean filterModes) {
 		this.filterModes = filterModes;
@@ -174,12 +189,8 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public Set<String> getAnalyzedModes(){
 		return analyzedModes;
 	}
-
 	@StringSetter( ANALYZEDMODES )
 	public void setAnalyzedModesAsString( final String analyzedModes ) {
-
-//		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
-		// lower case is confusing here because at other places (qsimConfigGroup, planCalcRoute), it takes mode string as it is. Amit Aug'17
 		this.analyzedModes = CollectionUtils.stringToSet( analyzedModes ) ;
 	}
 	public void setAnalyzedModes( final Set<String> analyzedModes ) {
@@ -190,7 +201,6 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public boolean getSeparateModes() {
 		return this.separateModes;
 	}
-
 	@StringSetter(SEPARATEMODES)
 	public void setSeparateModes(boolean separateModes) {
 		this.separateModes = separateModes;

@@ -1,6 +1,6 @@
 package org.matsim.smallScaleCommercialTrafficGeneration.prepare;
 
-import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
 
 import java.util.*;
 
@@ -12,30 +12,30 @@ import java.util.*;
 public class LanduseDataConnectionCreatorForOSM_Data implements LanduseDataConnectionCreator {
 
 	@Override
-	public Map<StructuralAttribute, List<String>> createLanduseDataConnection() {
-		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = new EnumMap<>(StructuralAttribute.class);
+	public Map<ZoneAttribute, List<String>> createLanduseDataConnection() {
+		Map<ZoneAttribute, List<String>> landuseCategoriesAndDataConnection = new EnumMap<>( ZoneAttribute.class);
 
 		landuseCategoriesAndDataConnection.put(
-			StructuralAttribute.INHABITANTS,
+			ZoneAttribute.INHABITANTS,
 			new ArrayList<>(Arrays.asList("residential", "apartments", "dormitory", "dwelling_house", "house",
 				"retirement_home", "semidetached_house", "detached")));
 		landuseCategoriesAndDataConnection.put(
-			StructuralAttribute.EMPLOYEE_PRIMARY,
+			ZoneAttribute.EMPLOYEE_PRIMARY,
 			new ArrayList<>(Arrays.asList("farmyard", "farmland", "farm", "farm_auxiliary", "greenhouse", "agricultural")));
 		landuseCategoriesAndDataConnection.put(
-			StructuralAttribute.EMPLOYEE_CONSTRUCTION,
+			ZoneAttribute.EMPLOYEE_CONSTRUCTION,
 			new ArrayList<>(List.of("construction")));
 		landuseCategoriesAndDataConnection.put(
-			StructuralAttribute.EMPLOYEE_SECONDARY,
+			ZoneAttribute.EMPLOYEE_SECONDARY,
 			new ArrayList<>(Arrays.asList("industrial", "factory", "manufacture", "bakehouse")));
 		landuseCategoriesAndDataConnection.put(
-			StructuralAttribute.EMPLOYEE_RETAIL,
+			ZoneAttribute.EMPLOYEE_RETAIL,
 			new ArrayList<>(Arrays.asList("retail", "kiosk", "mall", "shop", "supermarket")));
 		landuseCategoriesAndDataConnection.put(
-			StructuralAttribute.EMPLOYEE_TRAFFIC,
+			ZoneAttribute.EMPLOYEE_TRAFFIC,
 			new ArrayList<>(Arrays.asList("commercial", "post_office", "storage", "storage_tank", "warehouse")));
 		landuseCategoriesAndDataConnection.put(
-			StructuralAttribute.EMPLOYEE_TERTIARY,
+			ZoneAttribute.EMPLOYEE_TERTIARY,
 			new ArrayList<>(Arrays.asList("commercial", "embassy", "foundation", "government", "office", "townhall")));
 		return landuseCategoriesAndDataConnection;
 	}

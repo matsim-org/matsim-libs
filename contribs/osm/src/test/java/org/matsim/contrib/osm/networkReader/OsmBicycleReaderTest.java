@@ -58,7 +58,7 @@ public class OsmBicycleReaderTest {
 		assertPresentAndEqual(link, OsmTags.SURFACE, surface);
 		assertPresentAndEqual(link, OsmTags.SMOOTHNESS, smoothness);
 		assertPresentAndEqual(link, OsmTags.CYCLEWAY, cycleway);
-		assertPresentAndEqual(link, TransportMode.bike, restrictions);
+		assertPresentAndEqual(link, OsmTags.BICYCLE, restrictions);
 	}
 
 	@Test

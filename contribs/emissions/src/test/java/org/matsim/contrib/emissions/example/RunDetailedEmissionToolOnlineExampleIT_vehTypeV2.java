@@ -18,15 +18,21 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
+import com.google.inject.CreationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.contrib.emissions.utils.TestUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -34,6 +40,9 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2 {
+
+	Logger log = LogManager.getLogger(RunDetailedEmissionToolOnlineExampleIT_vehTypeV2.class);
+
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
@@ -46,7 +55,7 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2 {
 	final void testDetailed_vehTypeV2() {
 		boolean gotAnException = false ;
 		try {
-			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
+			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig(new String[] {IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "testv2_Vehv2/config_detailed.xml").toString()} ) ;
 			config.controller().setOutputDirectory( utils.getOutputDirectory() );
 			config.controller().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
@@ -54,8 +63,12 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2 {
 
             Scenario scenario = ScenarioUtils.loadScenario(config);
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
-		} catch (Exception ee ) {
+		} catch (CreationException ignored ) {
 			gotAnException = true ;
+		} catch (Exception e){
+			log.error("Got an unexpected error!");
+			log.error(e);
+			Assertions.fail("Got an unexpected error " + e.getClass().getName());
 		}
 		Assertions.assertTrue( gotAnException );
 	}

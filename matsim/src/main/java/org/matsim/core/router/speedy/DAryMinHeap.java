@@ -110,6 +110,18 @@ class DAryMinHeap {
 		return this.heap[0];
 	}
 
+	/**
+	 * Returns the cost (priority key) of the element at the root of the heap
+	 * without removing it. Used by bounded shortest-path searches to abort
+	 * exploration as soon as the next-best candidate cost exceeds a cutoff.
+	 */
+	double peekCost() {
+		if (this.size == 0) {
+			throw new NoSuchElementException("heap is empty");
+		}
+		return this.cost[0];
+	}
+
 	public boolean remove(int node) {
 		int i = this.pos[node];
 		if (i < 0) {

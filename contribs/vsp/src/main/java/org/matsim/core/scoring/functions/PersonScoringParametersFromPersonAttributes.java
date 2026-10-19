@@ -114,7 +114,7 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
              * point of view than giving each ScoringFunction its own copy of the params.
              */
 
-            ScoringConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
+            ScoringConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParametersOrDefault(subpopulation);
             // (we can set scoring params per subpopulation, so retrieve them as starting point.  kai, apr'22)
 
             // save the activityParams of the subpopulation so we need to build them only once.
@@ -160,7 +160,7 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
             Map<String, String> personalScoringModeConstants = PersonUtils.getModeConstants(person);
             if (personalScoringModeConstants != null) {
                 for (Map.Entry<String, String> entry: personalScoringModeConstants.entrySet()) {
-					ScoringConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModes().get(entry.getKey());
+					ScoringConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModeParams().get(entry.getKey());
 					ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
                     try {
                         modeUtilityParamsBuilder.setConstant(Double.parseDouble(entry.getValue()) +

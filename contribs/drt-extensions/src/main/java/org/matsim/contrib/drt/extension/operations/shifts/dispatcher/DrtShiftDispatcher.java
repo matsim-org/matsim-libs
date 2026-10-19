@@ -20,7 +20,7 @@
 package org.matsim.contrib.drt.extension.operations.shifts.dispatcher;
 
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalStop;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.FacilityStop;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 
 /**
@@ -34,8 +34,8 @@ public interface DrtShiftDispatcher {
 
     void dispatch(double timeStep);
 
-    void startOperationalTask(ShiftDvrpVehicle vehicle, OperationalStop operationalStop);
+    void startOperationalTask(ShiftDvrpVehicle vehicle, FacilityStop facilityStop);
 
-    void endOperationalTask(ShiftDvrpVehicle vehicle, OperationalStop operationalStop);
+    void endOperationalTask(ShiftDvrpVehicle vehicle, FacilityStop facilityStop);
 
 }

@@ -70,11 +70,14 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 			+ " to set values accordingly.")
 	private TargetCoefficientSource targetCoefficientSource = TargetCoefficientSource.Static;
 
-	public enum ZonalDemandEstimatorType {PreviousIterationDemand, None}
+	public enum ZonalDemandEstimatorType {PreviousIterationDemand, SubmittedDemand, None}
 
 	@Parameter
 	@Comment("Defines the methodology for demand estimation."
-			+ " Can be one of [PreviousIterationDemand, None]. Current default is PreviousIterationDemand")
+			+ " Can be one of [PreviousIterationDemand, SubmittedDemand, None]. Current default is PreviousIterationDemand."
+			+ " 'SubmittedDemand' counts all submitted requests (including rejected ones) by their intended departure"
+			+ " time, so rejected demand stays visible to the rebalancing feedback loop, and returns a rolling window"
+			+ " of length 'demandEstimationPeriod' looking forward from the current time.")
 	@NotNull
 	private ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
 
@@ -84,6 +87,18 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 			+ " Default value is 1800 s.")
 	@PositiveOrZero
 	private int demandEstimationPeriod = 1800;
+
+	@Parameter
+	@Comment("Maximum straight-line distance [m] between the origin and the destination zone of a relocation."
+			+ " Longer relocations are not considered at all, which both prunes the transport problem (its runtime grows"
+			+ " superlinearly in the number of zones, and long-distance arcs make up the bulk of the graph in large"
+			+ " service areas) and avoids committing vehicles to relocations they cannot finish within one"
+			+ " 'interval': a vehicle en route is not idle, so it cannot be re-targeted by the next rebalancing call."
+			+ " As a rule of thumb, keep it below what a vehicle can drive within 'interval'."
+			+ " Note that a zone whose deficit has no surplus zone within this distance simply stays unserved."
+			+ " Default value is Infinity, i.e. no limit.")
+	@PositiveOrZero
+	private double maxRelocationDistance = Double.POSITIVE_INFINITY;
 
 	public MinCostFlowRebalancingStrategyParams() {
 		super(SET_NAME);
@@ -138,5 +153,14 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 
 	public void setDemandEstimationPeriod(@PositiveOrZero int demandEstimationPeriod) {
 		this.demandEstimationPeriod = demandEstimationPeriod;
+	}
+
+	@PositiveOrZero
+	public double getMaxRelocationDistance() {
+		return maxRelocationDistance;
+	}
+
+	public void setMaxRelocationDistance(@PositiveOrZero double maxRelocationDistance) {
+		this.maxRelocationDistance = maxRelocationDistance;
 	}
 }

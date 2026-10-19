@@ -33,7 +33,6 @@ import tech.tablesaw.plotly.components.Figure;
 import tech.tablesaw.plotly.components.Layout;
 import tech.tablesaw.plotly.traces.HistogramTrace;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.List;
@@ -42,6 +41,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static java.lang.Math.exp;
+import static org.matsim.application.ApplicationUtils.globFile;
 import static tech.tablesaw.aggregate.AggregateFunctions.*;
 
 @CommandLine.Command(name = "run-vtts-analysis", description = "")
@@ -72,17 +72,11 @@ public class AddVttsEtcToActivities implements MATSimAppCommand {
 		String runPrefix = Objects.nonNull(runId ) ? runId + "." : "";
 		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename() );
 
-		Path eventsPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.events.getFilename() + ".gz");
+		Path eventsPath = globFile( path, runPrefix + "*output_" + Controler.DefaultFiles.events.getFilename() + "*" );
+		// (trailing "*" instead of a hardcoded ".gz"/".zst" so any compression (gz/lz4/zst) or none is matched)
 //		if ( prefix!=null ){
 //			eventsPath = ApplicationUtils.globFile( path, "*" + prefix + "output_events_filtered.xml.gz" );
 //		}
-
-		Path populationFilename = path.resolve( runPrefix + "postproc_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz" );
-		if ( !Files.exists( populationFilename ) ){
-			populationFilename = path.resolve( runPrefix + "output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz" );
-		}
-
-		// ---
 
 		Config config = ConfigUtils.loadConfig(configPath.toString());
 		config.eventsManager().setNumberOfThreads(numberOfThreads);
@@ -104,9 +98,17 @@ public class AddVttsEtcToActivities implements MATSimAppCommand {
 
 		// ---
 
+		// prefer the postproc_ experienced plans, fall back to output_; match any (or no) compression suffix:
+		Path populationFilename;
+		try {
+			populationFilename = globFile( path, runPrefix + "*postproc_" + Controler.DefaultFiles.experiencedPlans.getFilename() + "*" );
+		} catch ( IllegalStateException e ) {
+			populationFilename = globFile( path, runPrefix + "*output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + "*" );
+		}
+
 		Scenario scenario = new ScenarioUtils.ScenarioBuilder(config)
 //								.setNetwork(NetworkUtils.readNetwork(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.network.getFilename() + ".gz").toString()))
-								.setPopulation(PopulationUtils.readPopulation( populationFilename.toString() ) )
+								.setPopulation(PopulationUtils.readPopulation( populationFilename.toString() ))
 								.build();
 
 //		new TransitScheduleReader(scenario).readFile(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz").toString());

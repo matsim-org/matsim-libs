@@ -20,8 +20,6 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -35,23 +33,19 @@ import javax.swing.event.EventListenerList;
 
 public final class MobsimListenerManager implements MatsimManager {
 
-	private final static Logger log = LogManager.getLogger(MobsimListenerManager.class);
-
 	private final Mobsim sim;
 
 	private final EventListenerList listenerList = new EventListenerList();
 
-	public MobsimListenerManager(Mobsim sim){
+	public MobsimListenerManager(Mobsim sim) {
 		this.sim = sim;
 	}
 
 	@SuppressWarnings("unchecked")
 	public void addQueueSimulationListener(final MobsimListener l) {
-		log.info("calling addQueueSimulationListener");
 		for (Class interfaceClass : ClassUtils.getAllTypes(l.getClass())) {
 			if (MobsimListener.class.isAssignableFrom(interfaceClass)) {
 				this.listenerList.add(interfaceClass, l);
-				log.info("  assigned class " + MobsimListener.class.getName() + " to interface " + interfaceClass.getName());
 			}
 		}
 	}
@@ -71,9 +65,9 @@ public final class MobsimListenerManager implements MatsimManager {
 	public void fireQueueSimulationInitializedEvent() {
 		MobsimInitializedEvent<Mobsim> event = new MobsimInitializedEvent<>(sim);
 		MobsimInitializedListener[] listener = this.listenerList.getListeners(MobsimInitializedListener.class);
-        for (MobsimInitializedListener aListener : listener) {
-            aListener.notifyMobsimInitialized(event);
-        }
+		for (MobsimInitializedListener aListener : listener) {
+			aListener.notifyMobsimInitialized(event);
+		}
 	}
 
 	/**
@@ -84,28 +78,28 @@ public final class MobsimListenerManager implements MatsimManager {
 	public void fireQueueSimulationAfterSimStepEvent(final double simTime) {
 		MobsimAfterSimStepEvent<Mobsim> event = new MobsimAfterSimStepEvent<>(sim, simTime);
 		MobsimAfterSimStepListener[] listener = this.listenerList.getListeners(MobsimAfterSimStepListener.class);
-        for (MobsimAfterSimStepListener aListener : listener) {
-            aListener.notifyMobsimAfterSimStep(event);
-        }
+		for (MobsimAfterSimStepListener aListener : listener) {
+			aListener.notifyMobsimAfterSimStep(event);
+		}
 	}
 
 	/**
 	 * Creates the event and notifies all listeners
 	 */
-	public void fireQueueSimulationBeforeCleanupEvent(){
+	public void fireQueueSimulationBeforeCleanupEvent() {
 		MobsimBeforeCleanupEvent<Mobsim> event = new MobsimBeforeCleanupEvent<>(this.sim);
 		MobsimBeforeCleanupListener[] listener = this.listenerList.getListeners(MobsimBeforeCleanupListener.class);
-        for (MobsimBeforeCleanupListener aListener : listener) {
-            aListener.notifyMobsimBeforeCleanup(event);
-        }
+		for (MobsimBeforeCleanupListener aListener : listener) {
+			aListener.notifyMobsimBeforeCleanup(event);
+		}
 	}
 
 	public void fireQueueSimulationBeforeSimStepEvent(double time) {
 		MobsimBeforeSimStepEvent<Mobsim> event = new MobsimBeforeSimStepEvent<>(sim, time);
 		MobsimBeforeSimStepListener[] listener = this.listenerList.getListeners(MobsimBeforeSimStepListener.class);
-        for (MobsimBeforeSimStepListener aListener : listener) {
-            aListener.notifyMobsimBeforeSimStep(event);
-        }
+		for (MobsimBeforeSimStepListener aListener : listener) {
+			aListener.notifyMobsimBeforeSimStep(event);
+		}
 	}
 
 }

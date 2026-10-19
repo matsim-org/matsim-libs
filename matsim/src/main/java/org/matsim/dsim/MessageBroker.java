@@ -11,7 +11,6 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.HdrHistogram.Histogram;
 import org.agrona.BitUtil;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
-import org.apache.fory.memory.MemoryBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
@@ -24,6 +23,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.MessageConsumer;
 import org.matsim.core.communication.MessageReceiver;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.core.serialization.SerializationProvider;
 
 import java.io.IOException;
@@ -250,7 +250,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	@SuppressWarnings("unchecked")
 	public <T extends Message> void receiveNodeMessages(Class<T> type, Consumer<T> consumer) {
 
-		int t = serialization.getType(type);
+		int t = MessageTypeRegistry.getInstance().getType(type);
 		Queue<Message> messages = nodesMessages.get(t);
 		if (messages != null) {
 			Message msg;
@@ -453,10 +453,10 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 		int length = data.limit();
 
-		MemoryBuffer in = MemoryBuffer.fromByteBuffer(data);
-		int tag = in.readInt32();
-		int sender = in.readInt32();
-		int receiver = in.readInt32();
+		data.order(ByteOrder.LITTLE_ENDIAN);
+		int tag = data.getInt();
+		int sender = data.getInt();
+		int receiver = data.getInt();
 
 		// Ignore messages that are not for this rank
 		// This might happen depending on the underlying communicator
@@ -474,12 +474,12 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			log.error("#{} Message covered partitions: {}", getRank(), topology.getNodeByIndex(sender).getParts());
 			log.error("#{} Message contents:", getRank());
 
-			while (in.readerIndex() < length) {
-				int partition = in.readInt32();
-				int type = in.readInt32();
-				int _ = in.readInt32();
+			while (data.position() < length) {
+				int partition = data.getInt();
+				int type = data.getInt();
+				int _ = data.getInt();
 
-				var msg = serialization.deserialize(in, type);
+				var msg = serialization.deserialize(data, type);
 				log.error("#{}: {}", partition, msg.toString());
 			}
 			log.error("#{} End of message contents", getRank());
@@ -490,17 +490,18 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		// in any case, we allow messages from the future and store them for later.
 		if (tag > seq || tag < 0) {
 			log.trace("#{} on seq {} received ahead msg from #{} for seq {}", comm.getRank(), seq, sender, tag);
+			data.rewind();
 			aheadMsgs.add(clone(data));
 			return;
 		}
 
 		// the standard case is that we have messages for the current time. Deserialize and dispatch them to message processors.
-		while (in.readerIndex() < length) {
-			int partition = in.readInt32();
-			int type = in.readInt32();
-			int _ = in.readInt32();
+		while (data.position() < length) {
+			int partition = data.getInt();
+			int type = data.getInt();
+			int _ = data.getInt();
 
-			Message msg = serialization.deserialize(in, type);
+			Message msg = serialization.deserialize(data, type);
 			log.trace("#{} at t:{} received from {}: {}", getRank(), timeFrom(seq), sender, msg);
 
 			if (partition == NODE_MESSAGE) {

@@ -77,7 +77,8 @@ public final class DvrpModule extends AbstractModule {
 
 		install(dvrpTravelTimeEstimationModule);
 
-		MapBinder.newMapBinder(binder(), String.class, ZoneSystem.class).addBinding(TT_MATRIX_ZONE_SYSTEM).toProvider(new com.google.inject.Provider<>() {
+		MapBinder.newMapBinder(binder(), String.class, ZoneSystem.class).permitDuplicates().addBinding(TT_MATRIX_ZONE_SYSTEM).toProvider(new com.google.inject.Provider<>() {
+			// yy I introduced "permitDuplicates" because I have some older code from Chengqi that otherwise I cannot get to run.  But it might not be the correct setting. kai, may'26
 
             @Inject
             private Network network;

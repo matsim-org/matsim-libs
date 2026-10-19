@@ -67,21 +67,18 @@ class BicycleTravelDisutility implements TravelDisutility {
 	private double logNormalRndUserDef;
 	private Person prevPerson;
 
-//	private static final String DEBUG_LINK_1 = "7377141650001f";
-//	private static final String DEBUG_LINK_2 = "8279290470004f";
-
 
 	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, ScoringConfigGroup cnScoringGroup,
-							RoutingConfigGroup routingConfigGroup, TravelTime timeCalculator, double normalization, BicycleParams bicycleParams) {
-		final ScoringConfigGroup.ModeParams bicycleModeParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
+													RoutingConfigGroup routingConfigGroup, TravelTime timeCalculator, double normalization, BicycleParams bicycleParams) {
+		final ScoringConfigGroup.ModeParams bicycleModeParams = cnScoringGroup.getDefaultModeParams().get(bicycleConfigGroup.getBicycleMode());
 		if (bicycleModeParams == null) {
-			throw new NullPointerException("Mode " + bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
+			throw new NullPointerException("Mode " + bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getDefaultModeParams().keySet());
 		}
 
 		this.bicycleParams = bicycleParams;
-		this.marginalCostOfDistance_m = -(bicycleModeParams.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney())
-			- bicycleModeParams.getMarginalUtilityOfDistance();
-		this.marginalCostOfTime_s = -(bicycleModeParams.getMarginalUtilityOfTraveling() / 3600.0) + cnScoringGroup.getPerforming_utils_hr() / 3600.0;
+		this.marginalCostOfDistance_m = -(bicycleModeParams.getMonetaryDistanceRate() * cnScoringGroup.getDefaultMarginalUtilityOfMoney())
+				- bicycleModeParams.getMarginalUtilityOfDistance();
+		this.marginalCostOfTime_s = -(bicycleModeParams.getMarginalUtilityOfTraveling() / 3600.0) + cnScoringGroup.getDefaultPerforming_utils_hr() / 3600.0;
 
 		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());
 		this.marginalCostOfComfort_m = -(bicycleConfigGroup.getMarginalUtilityOfComfort_m());
@@ -166,20 +163,6 @@ class BicycleTravelDisutility implements TravelDisutility {
 		double gradientFactor = bicycleParams.getGradient_pct(link);
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 
-
-//		if (link.getId().toString().equals(DEBUG_LINK_1) ||
-//			link.getId().toString().equals(DEBUG_LINK_2)) {
-//
-//			System.out.println("---- DEBUG COSTS ----");
-//			System.out.println("link=" + link.getId() + " type=" + type + " infra=" + bicycleInfraType);
-//			System.out.println("ttD=" + travelTimeDisutility);
-//			System.out.println("distD=" + distanceDisutility);
-//			System.out.println("infraFactor=" + infrastructureFactor);
-//			System.out.println("infraD=" + infrastructureDisutility);
-//			System.out.println("total(disutility w/o rnd)=" +
-//				(travelTimeDisutility + distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility));
-//			System.out.println("---------------------");
-//		}
 
 //		LOG.warn("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
 //				+ comfortFactor	+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradientFactor);

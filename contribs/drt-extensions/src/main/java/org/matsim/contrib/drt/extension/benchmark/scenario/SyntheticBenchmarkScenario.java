@@ -231,7 +231,7 @@ public class SyntheticBenchmarkScenario {
 			config.replanning().clearStrategySettings();
 			config.global().setNumberOfThreads(6);
 			config.controller().setRoutingAlgorithmType(CHRouter);
-			config.scoring().addModeParams(new ScoringConfigGroup.ModeParams("drt"));
+			config.scoring().addDefaultModeParams(new ScoringConfigGroup.ModeParams("drt"));
 			config.global().setNumberOfThreads(Runtime.getRuntime().availableProcessors());
 
 			return config;

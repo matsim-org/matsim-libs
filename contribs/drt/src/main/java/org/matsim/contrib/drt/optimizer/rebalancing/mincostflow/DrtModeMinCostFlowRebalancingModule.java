@@ -28,6 +28,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDrtDemandEstimator;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.SubmittedDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -123,7 +124,8 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 				bindModal(ZonalRelocationCalculator.class).toProvider(modalProvider(
 						getter -> new AggregatedMinCostRelocationCalculator(
-								getter.getModal(DrtZoneTargetLinkSelector.class)))).asEagerSingleton();
+								getter.getModal(DrtZoneTargetLinkSelector.class),
+								strategyParams.getMaxRelocationDistance()))).asEagerSingleton();
 			}
 		});
 
@@ -139,6 +141,18 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				addEventHandlerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				addControllerListenerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
+				break;
+
+			case SubmittedDemand:
+				bindModal(SubmittedDemandEstimator.class).toProvider(modalProvider(
+						getter -> {
+							ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {})
+									.get(REBALANCING_ZONE_SYSTEM).get();
+                            return new SubmittedDemandEstimator(zoneSystem, drtCfg);
+                        })).asEagerSingleton();
+				bindModal(ZonalDemandEstimator.class).to(modalKey(SubmittedDemandEstimator.class));
+				addEventHandlerBinding().to(modalKey(SubmittedDemandEstimator.class));
+				addControllerListenerBinding().to(modalKey(SubmittedDemandEstimator.class));
 				break;
 
 			case None:

@@ -149,12 +149,12 @@ public class ScoringFunctionsForPopulationStressIT {
 	private void work(Config config) {
 		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
-		config.scoring().addActivityParams(work);
+		config.scoring().addDefaultActivityParams(work);
 		ScoringConfigGroup.ModeParams car = new ScoringConfigGroup.ModeParams("car");
 		car.setMarginalUtilityOfTraveling(0.0);
 		car.setMarginalUtilityOfDistance(0.0);
 		car.setConstant(-1.0);
-		config.scoring().addModeParams(car);
+		config.scoring().addDefaultModeParams(car);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
@@ -260,12 +260,12 @@ public class ScoringFunctionsForPopulationStressIT {
 		config.eventsManager().setSynchronizeOnSimSteps(false);
 		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
-		config.scoring().addActivityParams(work);
+		config.scoring().addDefaultActivityParams(work);
 		ScoringConfigGroup.ModeParams car = new ScoringConfigGroup.ModeParams("car");
 		car.setMarginalUtilityOfTraveling(0.0);
 		car.setMarginalUtilityOfDistance(0.0);
 		car.setConstant(-1.0);
-		config.scoring().addModeParams(car);
+		config.scoring().addDefaultModeParams(car);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));

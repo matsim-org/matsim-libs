@@ -220,7 +220,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 			ActivityParams activityParams = new ActivityParams("A");
 			activityParams.setTypicalDuration(100.0);
-			config.scoring().addActivityParams(activityParams);
+			config.scoring().addDefaultActivityParams(activityParams);
 
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			Network network = scenario.getNetwork();

@@ -19,8 +19,7 @@
 
 package org.matsim.contrib.etaxi.run;
 
-import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
-
+import com.google.inject.Key;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -28,12 +27,7 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
-import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.charging.ChargingPower;
-import org.matsim.contrib.ev.charging.ChargingStrategy;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.charging.FixedSpeedCharging;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
@@ -44,6 +38,7 @@ import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -51,20 +46,22 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.inject.Key;
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
 
 public class RunETaxiScenario {
 	private static final double CHARGING_SPEED_FACTOR = 1.5; // > 1 in this example
 	private static final double MAX_SOC = 0.8; // charge up to 80% SOC
 	private static final double TEMPERATURE = 20; // oC
 
-	public static void run(String [] args, boolean otfvis) {
+	public static void run(String[] args, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(args,
-				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
-				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup());
+			new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
+			new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup());
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
+
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 		createControler(config, otfvis).run();
 	}
@@ -93,14 +90,20 @@ public class RunETaxiScenario {
 
 //		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
 //				multiModeTaxiConfig.modes().collect(toList())));
-		controler.configureQSimComponents( DvrpQSimComponents.activateModes( multiModeTaxiConfig.modes().toArray(String[]::new ) ) );
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(multiModeTaxiConfig.modes().toArray(String[]::new)));
+
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
+			}
+		});
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
 				//TODO switch to VariableSpeedCharging for Nissan
-				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
+				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev.getBattery(), CHARGING_SPEED_FACTOR));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 
 				for (TaxiConfigGroup taxiCfg : multiModeTaxiConfig.getModalElements()) {

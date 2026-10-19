@@ -2,8 +2,12 @@ package org.matsim.dsim;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -12,12 +16,14 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.testcases.utils.DistributedExecution;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.io.IOException;
@@ -26,8 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,9 +95,8 @@ public class DistributedIntegrationTest {
 	}
 
 	/**
-	 * This test is disabled. The DSim calculates travel times different from the QSim. Therefore events and scores
-	 * are not equal and there is no point in comparing it. Keep the test around though, because it is sometimes handy
-	 * for comparing with existing features.
+	 * This test is disabled. The DSim calculates travel times different from the QSim. Therefore events and scores are not equal and there is no
+	 * point in comparing it. Keep the test around though, because it is sometimes handy for comparing with existing features.
 	 */
 	@Test
 	@Order(1)
@@ -128,38 +131,32 @@ public class DistributedIntegrationTest {
 	 */
 	@Test
 	@Order(3)
-	@DisabledOnGitHubWindowsCI
-	void runDistributed() throws ExecutionException, InterruptedException, TimeoutException, IOException {
+	@org.matsim.testcases.DisabledOnGitHubWindowsCI
+	void runDistributed() throws IOException {
 
 		int size = 2;
 		var comms = LocalCommunicator.create(size);
 		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
-		try (var pool = Executors.newFixedThreadPool(size)) {
-			var futures = comms.stream()
-				.map(comm -> pool.submit(() -> {
+		VolumesAnalyzer[] analyzers = new VolumesAnalyzer[size];
 
-					Config local = createScenario();
-					local.dsim().setThreads(1);
+		DistributedExecution.execute(comms, 600, comm -> {
+			Config local = createScenario();
+			local.dsim().setThreads(1);
 
-					Scenario scenario = prepareScenario(local);
+			Scenario scenario = prepareScenario(local);
 
-					Controler controler = new Controler(scenario, DistributedContext.create(comm, local));
+			Controler controler = new Controler(scenario, DistributedContext.create(comm, local, new org.matsim.core.serialization.ForySerializationProvider(org.matsim.core.serialization.MessageTypeRegistry.getInstance())));
 
-					controler.run();
+			controler.run();
+			analyzers[comm.getRank()] = controler.getInjector().getInstance(VolumesAnalyzer.class);
 
-					try {
-						comm.close();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}))
-				.toList();
-
-			for (var f : futures) {
-				f.get(2, TimeUnit.MINUTES);
+			try {
+				comm.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-		}
+		});
 
 		Path outputPath = Path.of(utils.getOutputDirectory());
 
@@ -169,6 +166,25 @@ public class DistributedIntegrationTest {
 		String actualEventsPath = utils.getOutputDirectory() + "kelheim-mini.output_events.xml";
 		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath.toString(), actualEventsPath))
 			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
+
+		// volumes are counted on each node and merged after the simulation, all nodes must know the volumes of the whole network
+		VolumesAnalyzer expected = new VolumesAnalyzer(3600, 24 * 3600 - 1, NetworkUtils.createNetwork());
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(expected);
+		EventsUtils.readEvents(events, actualEventsPath);
+
+		assertThat(expected.getLinkIds()).isNotEmpty();
+		for (VolumesAnalyzer analyzer : analyzers) {
+			assertThat(analyzer.getLinkIds()).isEqualTo(expected.getLinkIds());
+			assertThat(analyzer.getModes()).isEqualTo(expected.getModes());
+			for (Id<Link> linkId : expected.getLinkIds()) {
+				assertThat(analyzer.getVolumesForLink(linkId)).as(linkId.toString()).isEqualTo(expected.getVolumesForLink(linkId));
+				// vehicles that entered traffic on the other node must be assigned to their mode as well
+				for (String mode : expected.getModes()) {
+					assertThat(analyzer.getVolumesForLink(linkId, mode)).as(linkId + " " + mode).isEqualTo(expected.getVolumesForLink(linkId, mode));
+				}
+			}
+		}
 
 		// compare populations of distributed simulation and original qsim
 		var actualPopulationPath = outputPath.resolve("kelheim-mini.output_plans.xml");

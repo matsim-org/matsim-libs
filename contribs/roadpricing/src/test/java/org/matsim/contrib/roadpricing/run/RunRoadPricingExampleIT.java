@@ -13,7 +13,9 @@ public class RunRoadPricingExampleIT {
 	@Test
 	void testRunToadPricingExample() {
 		String[] args = new String[]{TEST_CONFIG
-				, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
+				, "--config:controler.outputDirectory=" + utils.getOutputDirectory(),
+			//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+			"--config:routing.accessEgressConsistencyCheck=disable"
 		};
 		try {
 			RunRoadPricingExample.main(args);

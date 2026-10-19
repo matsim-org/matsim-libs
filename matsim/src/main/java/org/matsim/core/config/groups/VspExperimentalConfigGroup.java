@@ -118,7 +118,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		this.isUsingOpportunityCostOfTimeForLocationChoice = isUsingOpportunityCostOfTimeForLocationChoice;
 	}
 	// ---
-	public enum CheckingOfMarginalUtilityOfTravellng { allZero, none }
+	public enum CheckingOfMarginalUtilityOfTravellng { allZero, allZeroExceptBikeAndRide, none }
 
 	private CheckingOfMarginalUtilityOfTravellng checkingOfMarginalUtilityOfTravellng = CheckingOfMarginalUtilityOfTravellng.allZero;
 	public CheckingOfMarginalUtilityOfTravellng getCheckingOfMarginalUtilityOfTravellng(){

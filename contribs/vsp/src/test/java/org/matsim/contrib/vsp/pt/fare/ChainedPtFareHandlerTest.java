@@ -181,8 +181,8 @@ public class ChainedPtFareHandlerTest {
 		ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work");
 		homeParams.setTypicalDuration(8 * 3600.);
 		workParams.setTypicalDuration(8 * 3600.);
-		scoring.addActivityParams(homeParams);
-		scoring.addActivityParams(workParams);
+		scoring.addDefaultActivityParams(homeParams);
+		scoring.addDefaultActivityParams(workParams);
 		return config;
 	}
 

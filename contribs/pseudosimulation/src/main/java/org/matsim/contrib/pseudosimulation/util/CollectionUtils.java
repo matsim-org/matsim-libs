@@ -43,9 +43,8 @@ public class CollectionUtils {
      * @return a list of arrays
      */
     public static <T> List<T[]> split(T[] array, int n) {
-        Class theClass = array[0].getClass();
+        Class<?> componentType = array[0].getClass();
         if (array.length >= n) {
-            @SuppressWarnings("unchecked")
             List<T[]> out = new ArrayList<>();
             int minSegmentSize = (int) Math.floor(array.length / (double) n);
 
@@ -54,7 +53,7 @@ public class CollectionUtils {
 
             for (int i = 0; i < n - 1; i++) {
                 int segmentSize = stop - start;
-                T[] segment = (T[]) Array.newInstance(theClass,segmentSize);
+                T[] segment = newArray(componentType, segmentSize);
                 int j=0;
                 for (int k = start; k < stop; k++) {
                     segment[j] = array[k];
@@ -67,7 +66,7 @@ public class CollectionUtils {
 
             int segmentSize = array.length - start;
             stop = start + segmentSize;
-            T[] segment = (T[]) Array.newInstance(theClass,segmentSize);
+            T[] segment = newArray(componentType, segmentSize);
             int j=0;
             for (int k = start; k < stop; k++) {
                 segment[j] = array[k];
@@ -84,8 +83,7 @@ public class CollectionUtils {
 
     public static <T> List<T>[] split(Collection<T> set, int n) {
         if (set.size() >= n) {
-            @SuppressWarnings("unchecked")
-            List<T>[] arrays = new List[n];
+            List<T>[] arrays = newListArray(n);
             int minSegmentSize = (int) Math.floor(set.size() / (double) n);
 
             int start = 0;
@@ -126,8 +124,7 @@ public class CollectionUtils {
      */
     public static <T> List<T>[] split(Collection<T> set, double[] weights) {
         if (set.size() >= weights.length) {
-            @SuppressWarnings("unchecked")
-            List<T>[] arrays = new List[weights.length];
+            List<T>[] arrays = newListArray(weights.length);
 
             double totalweight = 0.0;
             for (double w : weights)
@@ -165,6 +162,18 @@ public class CollectionUtils {
             doubleWeights[i] = weights[i];
         }
         return split(set,doubleWeights);
+    }
+
+    /** Java cannot directly create arrays whose component type is generic. */
+    @SuppressWarnings("unchecked")
+    private static <T> T[] newArray(Class<?> componentType, int length) {
+        return (T[]) Array.newInstance(componentType, length);
+    }
+
+    /** The runtime component type is deliberately {@code List}, as in the legacy implementation. */
+    @SuppressWarnings("unchecked")
+    private static <T> List<T>[] newListArray(int length) {
+        return (List<T>[]) new List<?>[length];
     }
 
     public static void main(String[] args) {

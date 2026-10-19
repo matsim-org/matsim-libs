@@ -2,13 +2,13 @@ package org.matsim.contrib.drt.extension.operations.shifts.fleet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Queue;
@@ -20,7 +20,7 @@ public class EvShiftDvrpVehicle extends EvDvrpVehicle implements ShiftDvrpVehicl
 
 	static EvShiftDvrpVehicle create(DvrpVehicle vehicle, ElectricFleet evFleet) {
 		return new EvShiftDvrpVehicle(new DefaultShiftDvrpVehicle(vehicle),
-				evFleet.getElectricVehicles().get(Id.create(vehicle.getId(), Vehicle.class)));
+			evFleet.getVehicle(Id.create(vehicle.getId(), Vehicle.class)));
 	}
 
 	private final ShiftDvrpVehicle vehicle;

@@ -27,3 +27,6 @@ output/
 .profileconfig.json
 
 *.zip
+# local-only scratch / editor files
+tmp.typ
+.mcp.json

@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModes;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup;
@@ -133,6 +134,11 @@ public class SharingUtils {
 		} else {
 			VehicleType vehicleType = getOrCreateAndAddVehicleType(serviceConfig, vehicles);
 			routingVehicle = vehicles.getFactory().createVehicle(routingVehicleId, vehicleType);
+			// If the vehicle type is electric, set a default initialSoc so that
+			// GlobalElectricFleet can process this dummy vehicle without NPE.
+			if (ElectricFleetUtils.isElectricVehicleType(vehicleType)) {
+				ElectricFleetUtils.setInitialSoc(routingVehicle, 1.0);
+			}
 			vehicles.addVehicle(routingVehicle);
 		}
 		return routingVehicle;

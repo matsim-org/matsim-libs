@@ -68,7 +68,7 @@ public final class Activities{
 
 				int durationBinFirst = getDurationBin(durationFirst);
 
-				first.setType(String.format("%s_%d", SnzActivities.createMorningActivityType(typeFirst ), durationBinFirst ) );
+				first.setType(String.format("%s_%d", org.matsim.contrib.common.conventions.vsp.SnzActivities.createMorningActivityType(typeFirst ), durationBinFirst ) );
 
 	//			act types of first and last act the same
 				if (orginalTimeBinFirst != orginalTimeBinLast) {
@@ -77,7 +77,7 @@ public final class Activities{
 				}
 				double durationLast = orginalTimeBinLast - durationFirst;
 
-				last.setType(String.format("%s_%d", SnzActivities.createEveningActivityType(typeLast ), getDurationBin(durationLast ) ) );
+				last.setType(String.format("%s_%d", org.matsim.contrib.common.conventions.vsp.SnzActivities.createEveningActivityType(typeLast ), getDurationBin(durationLast ) ) );
 				last.setMaximumDuration(durationLast);
 				last.setEndTimeUndefined();
 				last.setStartTimeUndefined();

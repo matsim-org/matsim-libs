@@ -3,7 +3,7 @@ package org.matsim.dsim.executors;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.LP;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.dsim.*;
 
 import java.util.ArrayList;
@@ -16,25 +16,25 @@ import java.util.function.Consumer;
  */
 public final class SingleExecutor implements LPExecutor {
 
-	private final SerializationProvider serializer;
+	private final MessageTypeRegistry registry;
 
 	private final List<SimTask> tasks = new ArrayList<>();
 
 	@Inject
-	public SingleExecutor(SerializationProvider serializer) {
-		this.serializer = serializer;
+	public SingleExecutor(MessageTypeRegistry registry) {
+		this.registry = registry;
 	}
 
 	@Override
 	public LPTask register(LP lp, DistributedEventsManager manager, int part) {
-		LPTask task = new LPTask(lp, part, manager, serializer);
+		LPTask task = new LPTask(lp, part, manager, registry);
 		tasks.add(task);
 		return task;
 	}
 
 	@Override
 	public EventHandlerTask register(EventHandler handler, DistributedEventsManager em, int part, int totalParts, AtomicInteger counter) {
-		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, em, serializer, counter);
+		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, em, registry, counter);
 		tasks.add(task);
 		return task;
 	}

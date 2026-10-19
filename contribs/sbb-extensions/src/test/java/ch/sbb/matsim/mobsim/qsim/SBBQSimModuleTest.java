@@ -56,22 +56,24 @@ public class SBBQSimModuleTest {
 	// https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
 	@Test
 	void testIntegration() {
-		String xmlConfig = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-			"<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
-			"<config>\n" +
-			"\t<module name=\"controler\" >\n" +
-			"\t\t<param name=\"createGraphs\" value=\"false\" />\n" +
-			"\t\t<param name=\"dumpDataAtEnd\" value=\"false\" />\n" +
-			"\t\t<param name=\"lastIteration\" value=\"0\" />\n" +
-			"\t</module>\n" +
-			"\t<module name=\"SBBPt\" >\n" +
-			"\t\t<param name=\"deterministicServiceModes\" value=\"train,metro\" />\n" +
-			"\t\t<param name=\"createLinkEventsInterval\" value=\"10\" />\n" +
-			"\t</module>\n" +
-			"</config>";
+		String xmlConfig = """
+			<?xml version="1.0" encoding="UTF-8"?>
+			<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+			<config>
+			\t<module name="controler" >
+			\t\t<param name="createGraphs" value="false" />
+			\t\t<param name="dumpDataAtEnd" value="false" />
+			\t\t<param name="lastIteration" value="0" />
+			\t</module>
+			\t<module name="SBBPt" >
+			\t\t<param name="deterministicServiceModes" value="train,metro" />
+			\t\t<param name="createLinkEventsInterval" value="10" />
+			\t</module>
+			</config>""";
 
 		Config config = ConfigUtils.createConfig();
 		new ConfigReader(config).parse(new ByteArrayInputStream(xmlConfig.getBytes(StandardCharsets.UTF_8)));
+		ConfigUtils.addOrGetModule(config, SBBTransitConfigGroup.class);
 		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Controler controler = new Controler(scenario);
@@ -97,7 +99,7 @@ public class SBBQSimModuleTest {
 
 		// this test mostly checks that no exception occurred
 
-		Assertions.assertTrue(config.getModules().get(SBBTransitConfigGroup.GROUP_NAME) instanceof SBBTransitConfigGroup);
+		Assertions.assertInstanceOf(SBBTransitConfigGroup.class, config.getModules().get(SBBTransitConfigGroup.GROUP_NAME));
 	}
 
 }

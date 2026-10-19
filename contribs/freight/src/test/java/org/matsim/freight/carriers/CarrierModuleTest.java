@@ -55,10 +55,10 @@ public class CarrierModuleTest {
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("w");
         workParams.setTypicalDuration(60 * 60 * 8);
-        config.scoring().addActivityParams(workParams);
+        config.scoring().addDefaultActivityParams(workParams);
         ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("h");
         homeParams.setTypicalDuration(16 * 60 * 60);
-        config.scoring().addActivityParams(homeParams);
+        config.scoring().addDefaultActivityParams(homeParams);
         config.global().setCoordinateSystem("EPSG:32632");
         config.controller().setFirstIteration(0);
         config.controller().setLastIteration(0);

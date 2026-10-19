@@ -38,7 +38,6 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author jbischoff
@@ -48,8 +47,15 @@ public class DvrpRoutingModule implements RoutingModule {
 	private static final Logger logger = LogManager.getLogger(DvrpRoutingModule.class);
 
 	public interface AccessEgressFacilityFinder {
-		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility,
-				Attributes tripAttributes);
+		/**
+		 * Finds the access and egress facilities (e.g. stops) to be used for the given routing request, or an empty
+		 * {@link Optional} if the request cannot be served (e.g. because no facility is close enough, or because the
+		 * service is not available at the requested departure time).
+		 * <p>
+		 * The whole {@link RoutingRequest} is passed such that implementations may take the departure time, the person
+		 * and the trip attributes into account.
+		 */
+		Optional<Pair<Facility, Facility>> findFacilities(RoutingRequest request);
 	}
 
 	private final AccessEgressFacilityFinder stopFinder;
@@ -71,14 +77,12 @@ public class DvrpRoutingModule implements RoutingModule {
 
 	@Override
 	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-		final Facility fromFacility = request.getFromFacility();
-		final Facility toFacility = request.getToFacility();
+		final Facility fromFacility = Objects.requireNonNull(request.getFromFacility(), "fromFacility is null");
+		final Facility toFacility = Objects.requireNonNull(request.getToFacility(), "toFacility is null");
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
 
-		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
-				Objects.requireNonNull(fromFacility, "fromFacility is null"),
-				Objects.requireNonNull(toFacility, "toFacility is null"), request.getAttributes());
+		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(request);
 		if (stops.isEmpty()) {
 			logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually "
 					+ TransportMode.walk

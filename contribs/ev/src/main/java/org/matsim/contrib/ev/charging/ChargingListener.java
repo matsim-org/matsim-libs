@@ -32,4 +32,6 @@ public interface ChargingListener {
 
 	default void notifyChargingEnded(ElectricVehicle ev, double now) {
 	}
+
+	default void notifyVehicleQuitChargerQueue(ElectricVehicle ev, double now) {}
 }

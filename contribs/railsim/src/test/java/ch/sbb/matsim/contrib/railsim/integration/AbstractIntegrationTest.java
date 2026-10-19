@@ -58,8 +58,8 @@ abstract class AbstractIntegrationTest {
 		if (new File(scenarioDir, "population.xml").exists()) {
 			config.plans().setInputFile("./population.xml");
 
-			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
-			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
+			config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
+			config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 		}
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());

@@ -225,6 +225,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		public Fixture() {
 			Config config = ConfigUtils.createConfig();
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 			this.scenario = ScenarioUtils.createScenario(config);
 
 			Id<Node>[] nodeIds = new Id[5];

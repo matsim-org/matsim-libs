@@ -146,7 +146,7 @@ public final class ShpOptions {
 
 			// Zip files will only work with local files
 			URI uri;
-			try (ZipInputStream zip = new ZipInputStream(IOUtils.getInputStream(url))) {
+			try (ZipInputStream zip = new ZipInputStream(url.openStream())) {
 
 				ZipEntry entry;
 				while ((entry = zip.getNextEntry()) != null) {

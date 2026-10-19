@@ -21,6 +21,11 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 
 	public enum Partitioning {none, bisect, metis}
 
+	/**
+	 * Idle strategy used by the DSim worker threads while they wait for the next simulation task.
+	 */
+	public enum TaskScheduling {eager, backoff}
+
 	public final static String CONFIG_MODULE_NAME = "dsim";
 
 	@Parameter
@@ -45,6 +50,18 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 
 	public void setThreads(int threads) {
 		this.threads = threads;
+	}
+
+	@Parameter
+	@Comment("Idle strategy for DSim worker threads (only relevant when dsim.threads > 1). 'eager' busy-spins for lowest latency but needs a free CPU core per thread; 'backoff' progressively yields/parks idle threads and is safe when threads oversubscribe cores. Options: [eager, backoff], default: 'backoff'")
+	private TaskScheduling taskScheduling = TaskScheduling.backoff;
+
+	public TaskScheduling getTaskScheduling() {
+		return taskScheduling;
+	}
+
+	public void setTaskScheduling(TaskScheduling taskScheduling) {
+		this.taskScheduling = taskScheduling;
 	}
 
 	@Parameter

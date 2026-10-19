@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.application.MATSimApplication;
 import org.matsim.application.analysis.population.TripAnalysis;
-import org.matsim.contrib.vsp.scenario.SnzActivities;
+import org.matsim.contrib.common.conventions.vsp.SnzActivities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -53,7 +53,7 @@ public class TestScenario extends MATSimApplication {
 	@Override
 	protected Config prepareConfig(Config config) {
 
-		SnzActivities.addScoringParams(config);
+		SnzActivities.addScoringParams(config );
 
 		return config;
 	}

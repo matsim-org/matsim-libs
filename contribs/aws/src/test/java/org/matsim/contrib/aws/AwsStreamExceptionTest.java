@@ -7,24 +7,28 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 
 public class AwsStreamExceptionTest {
 
-    private final static String TEST_S3_URI = "s3://...";
-
+    private final static String TEST_S3_URI = "s3://nonexistent-bucket/nonexistent-key.xml";
 
     @RegisterExtension
     private MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
-    void testAWSException() {
-        Assertions.assertThrows(RuntimeException.class, AwsStartupHook::registerS3UrlHandler);
+    void testSpiProviderIsRegistered() {
+        // With the SPI provider on the classpath, s3:// URLs should be parseable
+        Assertions.assertDoesNotThrow(() -> new URL(TEST_S3_URI));
     }
 
     @Test
-    void testWithoutRegistration() {
-        Assertions.assertThrows(MalformedURLException.class, () -> new MatsimNetworkReader(NetworkUtils.createNetwork()).readURL(new URL(TEST_S3_URI)));
+    void testInvalidBucketThrows() {
+        // Connecting to a non-existent bucket should throw when trying to read
+        Assertions.assertThrows(Exception.class, () -> {
+            URL url = new URL(TEST_S3_URI);
+            url.openStream();
+        });
     }
 }

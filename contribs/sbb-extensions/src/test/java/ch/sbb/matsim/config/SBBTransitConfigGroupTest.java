@@ -23,6 +23,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
@@ -59,4 +62,35 @@ public class SBBTransitConfigGroupTest {
         Assertions.assertTrue(ptConfig2.getDeterministicServiceModes().contains("schienenfahrzeug"));
         Assertions.assertEquals(4, ptConfig2.getCreateLinkEventsInterval());
     }
+	@Test
+	void testConsistencyChecker(){
+		SBBTransitConfigGroup sbbTransitConfigGroup = new SBBTransitConfigGroup();
+		Config config = ConfigUtils.createConfig(sbbTransitConfigGroup);
+		config.qsim().setMainModes(List.of(("car")));
+		sbbTransitConfigGroup.setDeterministicServiceModes(Set.of("train"));
+		config.controller().setMobsim("qsim");
+		sbbTransitConfigGroup.checkConsistency(config);
+	}
+
+	@Test
+	void testConsistencyCheckerFailsMainMode(){
+		SBBTransitConfigGroup sbbTransitConfigGroup = new SBBTransitConfigGroup();
+		Config config = ConfigUtils.createConfig(sbbTransitConfigGroup);
+		config.qsim().setMainModes(List.of("train"));
+		config.controller().setMobsim("qsim");
+		config.transit().setTransitModes(Set.of("rail"));
+		sbbTransitConfigGroup.setDeterministicServiceModes(Set.of("train"));
+		Assertions.assertThrows(RuntimeException.class, () -> sbbTransitConfigGroup.checkConsistency(config));
+
+	}
+	@Test
+	void testConsistencyCheckerFailsPtMode(){
+		SBBTransitConfigGroup sbbTransitConfigGroup = new SBBTransitConfigGroup();
+		Config config = ConfigUtils.createConfig(sbbTransitConfigGroup);
+		config.controller().setMobsim("qsim");
+		config.transit().setTransitModes(Set.of("train"));
+		sbbTransitConfigGroup.setDeterministicServiceModes(Set.of("train"));
+		Assertions.assertThrows(RuntimeException.class, () -> sbbTransitConfigGroup.checkConsistency(config));
+
+	}
 }

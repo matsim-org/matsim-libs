@@ -105,6 +105,7 @@ public class CalculateSkimMatrices {
     public static final String PT_TRAINSHARE_BYDISTANCE_FILENAME = "pt_train_distance_shares.csv.gz";
     public static final String PT_TRAINSHARE_BYTIME_FILENAME = "pt_train_traveltime_shares.csv.gz";
     public static final String PT_TRANSFERCOUNTS_FILENAME = "pt_transfer_counts.csv.gz";
+    public static final String PT_TRANSFERWAITTIMES_FILENAME = "pt_transferwaittimes.csv.gz";
     public static final String BEELINE_DISTANCE_FILENAME = "beeline_distances.csv.gz";
     public static final String ZONE_LOCATIONS_FILENAME = "zone_coordinates.csv";
     private static final Logger log = LogManager.getLogger(CalculateSkimMatrices.class);
@@ -497,6 +498,7 @@ public class CalculateSkimMatrices {
         FloatMatrixIO.writeAsCSV(matrices.transferCountMatrix, outputDirectory + "/" + prefix + PT_TRANSFERCOUNTS_FILENAME);
         FloatMatrixIO.writeAsCSV(matrices.trainTravelTimeShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYTIME_FILENAME);
         FloatMatrixIO.writeAsCSV(matrices.trainDistanceShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYDISTANCE_FILENAME);
+        FloatMatrixIO.writeAsCSV(matrices.transferWaitTimeMatrix, outputDirectory + "/" + prefix + PT_TRANSFERWAITTIMES_FILENAME);
     }
 
     public final PTSkimMatrices.PtIndicators<String> calculatePTMatrices(String networkFilename,

@@ -110,7 +110,7 @@ public class ScoringParameters implements MatsimParameters {
 				final Person person ) {
 			this(
 					scenario.getConfig().scoring(),
-					scenario.getConfig().scoring().getScoringParameters( PopulationUtils.getSubpopulation( person ) ),
+					scenario.getConfig().scoring().getScoringParametersOrDefault( PopulationUtils.getSubpopulation( person ) ),
 					scenario.getConfig().scenario() );
 		}
 
@@ -148,7 +148,7 @@ public class ScoringParameters implements MatsimParameters {
 			}
 
 			modeParams = new TreeMap<>() ;
-			Map<String, ScoringConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
+			Map<String, ScoringConfigGroup.ModeParams> modes = scoringParameterSet.getModeParams();
 			double worstMarginalUtilityOfTraveling_s = 0.0;
 			for (Map.Entry<String, ScoringConfigGroup.ModeParams> mode : modes.entrySet()) {
 				String modeName = mode.getKey();
@@ -199,7 +199,7 @@ public class ScoringParameters implements MatsimParameters {
 			utilParams = activityParams;
 
 			modeParams = new TreeMap<>() ;
-			Map<String, ScoringConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
+			Map<String, ScoringConfigGroup.ModeParams> modes = scoringParameterSet.getModeParams();
 			double worstMarginalUtilityOfTraveling_s = 0.0;
 			for (Map.Entry<String, ScoringConfigGroup.ModeParams> mode : modes.entrySet()) {
 				String modeName = mode.getKey();

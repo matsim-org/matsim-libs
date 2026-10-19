@@ -70,6 +70,7 @@ public class TransitControlerIntegrationTest {
 	void testTransitRouteCopy() {
 		Config config = utils.loadConfig((String)null);
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.transit().setUseTransit(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
@@ -145,10 +146,10 @@ public class TransitControlerIntegrationTest {
 
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(16.0*3600);
-		config.scoring().addActivityParams(params);
+		config.scoring().addDefaultActivityParams(params);
 		params = new ActivityParams("w");
 		params.setTypicalDuration(8.0*3600);
-		config.scoring().addActivityParams(params);
+		config.scoring().addDefaultActivityParams(params);
 
 		StrategySettings tam = new StrategySettings(Id.create(1, StrategySettings.class));
 		tam.setStrategyName("TimeAllocationMutator");

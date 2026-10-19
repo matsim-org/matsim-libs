@@ -1,11 +1,11 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.run;
 
+import com.google.inject.Key;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
-
 import org.matsim.contrib.drt.extension.operations.EDrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
@@ -25,15 +25,14 @@ import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.examples.ExamplesUtils;
-
-import com.google.inject.Key;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -49,31 +48,31 @@ public class RunEShiftDrtScenarioIT {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
 
-		String fleetFile =  "holzkirchenFleet.xml";
-		String plansFile =  "holzkirchenPlans.xml.gz";
-		String networkFile =  "holzkirchenNetwork.xml.gz";
-		String opFacilitiesFile =  "holzkirchenOperationFacilities.xml";
-		String shiftsFile =  "holzkirchenShifts.xml";
-		String chargersFile =  "holzkirchenChargers.xml";
-		String evsFile =  "holzkirchenElectricFleet.xml";
+		String fleetFile = "holzkirchenFleet.xml";
+		String plansFile = "holzkirchenPlans.xml.gz";
+		String networkFile = "holzkirchenNetwork.xml.gz";
+		String opFacilitiesFile = "holzkirchenOperationFacilities.xml";
+		String shiftsFile = "holzkirchenShifts.xml";
+		String chargersFile = "holzkirchenChargers.xml";
+		String evsFile = "holzkirchenElectricFleet.xml";
 
 		DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.setMode(TransportMode.drt);
 		DrtOptimizationConstraintsSetImpl constraintsSet =
-                drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-                        .addOrGetDefaultDrtOptimizationConstraintsSet();
+			drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+				.addOrGetDefaultDrtOptimizationConstraintsSet();
 		constraintsSet.setMaxTravelTimeAlpha(1.5);
-        constraintsSet.setMaxTravelTimeBeta(10. * 60.);
+		constraintsSet.setMaxTravelTimeBeta(10. * 60.);
 		drtConfigGroup.setStopDuration(30.);
-        constraintsSet.setMaxWaitTime(600.);
-        constraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
+		constraintsSet.setMaxWaitTime(600.);
+		constraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
 		drtConfigGroup.setUseModeFilteredSubnetwork(false);
 		drtConfigGroup.setVehiclesFile(fleetFile);
 		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
 		drtConfigGroup.setPlotDetailedCustomerStats(true);
-        constraintsSet.setMaxWalkDistance(1000.);
+		constraintsSet.setMaxWalkDistance(1000.);
 		drtConfigGroup.setIdleVehiclesReturnToDepots(false);
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -111,9 +110,9 @@ public class RunEShiftDrtScenarioIT {
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
 		ScoringConfigGroup.ModeParams scoreParams = new ScoringConfigGroup.ModeParams("drt");
-		config.scoring().addModeParams(scoreParams);
+		config.scoring().addDefaultModeParams(scoreParams);
 		ScoringConfigGroup.ModeParams scoreParams2 = new ScoringConfigGroup.ModeParams("walk");
-		config.scoring().addModeParams(scoreParams2);
+		config.scoring().addDefaultModeParams(scoreParams2);
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
@@ -133,11 +132,11 @@ public class RunEShiftDrtScenarioIT {
 		final ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(2 * 3600);
 
-		config.scoring().addActivityParams(home);
-		config.scoring().addActivityParams(other);
-		config.scoring().addActivityParams(education);
-		config.scoring().addActivityParams(shopping);
-		config.scoring().addActivityParams(work);
+		config.scoring().addDefaultActivityParams(home);
+		config.scoring().addDefaultActivityParams(other);
+		config.scoring().addDefaultActivityParams(education);
+		config.scoring().addDefaultActivityParams(shopping);
+		config.scoring().addDefaultActivityParams(work);
 
 		final ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 		stratSets.setWeight(1);
@@ -178,12 +177,18 @@ public class RunEShiftDrtScenarioIT {
 
 		final Controler controler = EDrtOperationsControlerCreator.createControler(config, false);
 
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
+			}
+		});
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
 				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtConfigGroup.getMode()))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
-				bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
+				bind(ChargingPower.Factory.class).toInstance(ev -> new FastThenSlowCharging(ev.getBattery()));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});

@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.EventSource;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.dsim.events.AggregateFromAll;
 import org.matsim.dsim.events.EventMessagingPattern;
 
@@ -52,7 +52,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 */
 	protected final Int2ObjectMap<EventSource> eventSources = new Int2ObjectOpenHashMap<>();
 
-	protected final SerializationProvider serializer;
+	protected final MessageTypeRegistry registry;
 
 	/**
 	 * Runtimes of each iteration.
@@ -70,16 +70,23 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 */
 	protected float avgRuntime = 0.0f;
 	/**
-	 * Run time of the last few iterations.
-	 */
-	protected long sumRuntime = 0;
-	/**
 	 * Current simulation time. Needs to be volatile to ensure visibility across threads.
 	 */
 	protected volatile double time;
 
+	/**
+	 * Simulation time at which the task was last scheduled. Async tasks may finish at a later simulation time, but their
+	 * runtime is attributed to this time.
+	 */
+	protected volatile double executionTime;
+
 	public void setTime(double time) {
 		this.time = time;
+	}
+
+	@Override
+	public void beforeExecution() {
+		this.executionTime = time;
 	}
 
 	/**
@@ -105,11 +112,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		this.future = future;
 	}
 
-	public EventHandlerTask(EventHandler handler, int partition, boolean async, SerializationProvider serializer) {
+	public EventHandlerTask(EventHandler handler, int partition, boolean async, MessageTypeRegistry registry) {
 		this.handler = handler;
 		this.partition = partition;
 		this.async = async;
-		this.serializer = serializer;
+		this.registry = registry;
 	}
 
 	@Override
@@ -143,7 +150,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	}
 
 	@SuppressWarnings("unchecked")
-	protected EventMessagingPattern<?> buildConsumers(SerializationProvider serializer, boolean isDistributed) {
+	protected EventMessagingPattern<?> buildConsumers(MessageTypeRegistry registry, boolean isDistributed) {
 
 		DistributedEventHandler distributed = handler.getClass().getAnnotation(DistributedEventHandler.class);
 		boolean node = distributed != null && distributed.value() == DistributedMode.NODE;
@@ -169,7 +176,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 				Consumer<Message> consumer = createConsumer(handler, msgClass, target);
 
 				// register this handler for the given message and all its subtypes.
-				for (var type : serializer.getAssignableTypes(msgClass)) {
+				for (var type : registry.getAssignableTypes(msgClass)) {
 					consumers.put(type, consumer);
 				}
 
@@ -178,7 +185,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 					if (consumerMethod.isAnnotationPresent(EventsFrom.class)) {
 						source = consumerMethod.getAnnotation(EventsFrom.class).value();
 					}
-					var msgType = serializer.getType(msgClass);
+					var msgType = registry.getType(msgClass);
 					eventSources.put(msgType, source);
 				}
 			}
@@ -201,7 +208,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		if (handler instanceof AggregatingEventHandler<?>) {
 			AggregateFromAll<Message> h = new AggregateFromAll<>();
 			Method m = getHandlerSendMethod(handler);
-			int type = serializer.getType(m.getReturnType());
+			int type = registry.getType(m.getReturnType());
 			consumers.put(type, h);
 			return h;
 		}
@@ -249,8 +256,22 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	}
 
 	@Override
-	public void resetTask(int iteration) {
-		this.handler.reset(iteration);
+	public final void resetTask(int iteration) {
+		resetTask(iteration, true);
+	}
+
+	/**
+	 * Reset the task for a new iteration.
+	 *
+	 * @param resetHandler whether {@link EventHandler#reset(int)} should be called. A NODE_CONCURRENT handler is shared
+	 *                     by the tasks of all partitions and only needs to be reset once.
+	 */
+	public void resetTask(int iteration, boolean resetHandler) {
+		if (resetHandler)
+			this.handler.reset(iteration);
+
+		// The task outlives the mobsim, runtimes are only collected for the current iteration
+		this.runtimes.clear();
 	}
 
 	public final IntSet getSupportedMessages() {
@@ -310,20 +331,9 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 * @param t nanoseconds before current step started.
 	 */
 	protected final void storeRuntime(long t) {
-		int s = (int) (time / 10);
-		// Fill with zeros
-		if (runtimes.size() < s)
-			runtimes.addElements(runtimes.size(), new long[s - runtimes.size()]);
-
 		long rt = System.nanoTime() - t;
 		avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
-		sumRuntime += rt;
-
-		// Only add the runtime to the list if the time is a multiple of 10
-		if ((time % 10) == 0) {
-			runtimes.add(sumRuntime);
-			sumRuntime = 0;
-		}
+		SimTask.addRuntime(runtimes, executionTime, rt);
 	}
 
 	@Override

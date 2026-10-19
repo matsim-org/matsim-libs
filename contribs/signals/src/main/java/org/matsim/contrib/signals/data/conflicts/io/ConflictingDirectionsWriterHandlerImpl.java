@@ -20,8 +20,8 @@
  */
 package org.matsim.contrib.signals.data.conflicts.io;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -37,23 +37,23 @@ import org.matsim.contrib.signals.model.SignalSystem;
 final class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirectionsWriterHandler {
 
 	@Override
-	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {
+	public void writeHeaderAndStartElement(Writer out) throws IOException {
 		out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 //		out.write("<!DOCTYPE conflictData SYSTEM \"" + MatsimXmlWriter.DEFAULT_DTD_LOCATION + "conflictData.dtd\">\n\n");
 	}
 
 	@Override
-	public void startConflictData(BufferedWriter out) throws IOException {
+	public void startConflictData(Writer out) throws IOException {
 		out.write("<conflictData>\n\n");
 	}
 
 	@Override
-	public void endConflictData(BufferedWriter out) throws IOException {
+	public void endConflictData(Writer out) throws IOException {
 		out.write("</conflictData>\n");
 	}
 
 	@Override
-	public void writeIntersections(ConflictData conflictData, BufferedWriter out) throws IOException {
+	public void writeIntersections(ConflictData conflictData, Writer out) throws IOException {
 		for (IntersectionDirections conflictingDirections : conflictData.getConflictsPerSignalSystem().values()) {
 			this.startIntersection(conflictingDirections.getNodeId(), conflictingDirections.getSignalSystemId(), out);
 			for (Direction direction : conflictingDirections.getDirections().values()) {
@@ -63,21 +63,21 @@ final class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirecti
 		}
 	}
 
-	private void startIntersection(Id<Node> nodeId, Id<SignalSystem> systemId, BufferedWriter out) throws IOException {
+	private void startIntersection(Id<Node> nodeId, Id<SignalSystem> systemId, Writer out) throws IOException {
 		out.write("\t<intersection");
 		out.write(" nodeId=\"" + nodeId + "\"");
 		out.write(" signalSystemId=\"" + systemId + "\"");
 		out.write(" >\n");
 	}
 
-	private void endIntersection(BufferedWriter out) throws IOException {
+	private void endIntersection(Writer out) throws IOException {
 		out.write("\t</intersection>\n");
 		this.writeSeparator(out);
 		out.flush();
 	}
 
 	@Override
-	public void writeDirection(Direction direction, BufferedWriter out) throws IOException {
+	public void writeDirection(Direction direction, Writer out) throws IOException {
 		this.startDirection(direction, out);
 		
 		this.startTag(ConflictingDirectionsReader.CONFLICTING_DIRECTIONS, out);
@@ -99,7 +99,7 @@ final class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirecti
 		this.endDirection(out);
 	}
 
-	private void startDirection(Direction direction, BufferedWriter out) throws IOException {
+	private void startDirection(Direction direction, Writer out) throws IOException {
 		out.write("\t\t<direction");
 		out.write(" id=\"" + direction.getId() + "\"");
 		out.write(" fromLinkId=\"" + direction.getFromLink() + "\"");
@@ -107,26 +107,26 @@ final class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirecti
 		out.write(" >\n");
 	}
 
-	private void endDirection(BufferedWriter out) throws IOException {
+	private void endDirection(Writer out) throws IOException {
 		out.write("\t\t</direction>\n\n");
 	}
 	
-	private void startTag(String tagName, BufferedWriter out) throws IOException {
+	private void startTag(String tagName, Writer out) throws IOException {
 		out.write("\t\t\t<"+tagName+">");
 	}
 	
-	private void endTag(String tagName, BufferedWriter out) throws IOException {
+	private void endTag(String tagName, Writer out) throws IOException {
 		out.write(" </"+tagName+">\n");
 	}
 	
-	private void writeListOfDirections(List<Id<Direction>> directionList, BufferedWriter out) throws IOException {
+	private void writeListOfDirections(List<Id<Direction>> directionList, Writer out) throws IOException {
 		for (Id<Direction> directionId : directionList) {
 			out.write(" " + directionId);
 		}
 	}
 
 	@Override
-	public void writeSeparator(BufferedWriter out) throws IOException {
+	public void writeSeparator(Writer out) throws IOException {
 		out.write("<!-- ====================================================================== -->\n\n");
 	}
 

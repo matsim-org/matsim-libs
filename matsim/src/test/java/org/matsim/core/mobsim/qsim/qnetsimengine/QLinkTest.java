@@ -19,11 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -38,11 +33,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -68,6 +59,11 @@ import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -546,6 +542,7 @@ public final class QLinkTest {
 		scenario.getConfig().qsim().setStuckTime(100);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 		scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		scenario.getConfig().routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		MatsimRandom.reset(4711); // yyyyyy !!!!!!
 		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
@@ -626,6 +623,7 @@ public final class QLinkTest {
 			this.scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 			this.scenario.getConfig().qsim().setUsingFastCapacityUpdate(usingFastCapacityUpdate);
 			this.scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			this.scenario.getConfig().routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 			Network network = (Network) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);

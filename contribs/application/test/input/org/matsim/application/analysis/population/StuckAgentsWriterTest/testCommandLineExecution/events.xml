@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<events version="1.0">
+	<event time="7200.0" type="stuckAndAbort" person="person1" link="link123" legMode="car" />
+	<event time="14400.0" type="stuckAndAbort" person="person2" link="link456" legMode="pt" />
+</events>

@@ -161,7 +161,7 @@ public final class CarrierModule extends AbstractModule {
 		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(controllerIO.getOutputFilename("output_carriersVehicleTypes.xml" + compression));
 		if (!carriers.getCarriers().isEmpty() && config.controller().getDumpDataAtEnd()) {
 			CarriersAnalysis carriersAnalysis = new CarriersAnalysis(controllerIO.getOutputPath());
-			carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
+			carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersStatsAndDetailedTourAnalysisBasedOnEvents);
 			carriers.getCarriers().values().forEach(carrier -> carrier.getAttributes().removeAttribute("jspritComputationTime")); // remove jspritComputationTime because it is written to the carrier analysis output and this value is not deterministic which fails the test
 			CarriersUtils.writeCarriers(carriers, controllerIO.getOutputFilename("output_carriers.xml" + compression));
 		}

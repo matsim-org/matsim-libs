@@ -20,8 +20,8 @@
  */
 package org.matsim.contrib.signals.data.conflicts.io;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Writer;
 
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
 import org.matsim.contrib.signals.data.conflicts.Direction;
@@ -31,28 +31,28 @@ import org.matsim.contrib.signals.data.conflicts.Direction;
  */
 public interface ConflictingDirectionsWriterHandler {
 	
-	public void writeHeaderAndStartElement(final BufferedWriter out) throws IOException;
+	public void writeHeaderAndStartElement(final Writer out) throws IOException;
 
 	//////////////////////////////////////////////////////////////////////
 	// <conflictData ... > ... </conflictData>
 	//////////////////////////////////////////////////////////////////////
-	public void startConflictData(final BufferedWriter out) throws IOException;	
+	public void startConflictData(final Writer out) throws IOException;	
 	
-	public void endConflictData(final BufferedWriter out) throws IOException;
+	public void endConflictData(final Writer out) throws IOException;
 
 	//////////////////////////////////////////////////////////////////////
 	// <signalSystem ... > ... </signalSystem>
 	//////////////////////////////////////////////////////////////////////
 
-	public void writeIntersections(final ConflictData conflictData, final BufferedWriter out) throws IOException;
+	public void writeIntersections(final ConflictData conflictData, final Writer out) throws IOException;
 
 	//////////////////////////////////////////////////////////////////////
 	// <direction ... > ... </direction>
 	//////////////////////////////////////////////////////////////////////
 
-	public void writeDirection(final Direction direction, final BufferedWriter out) throws IOException;
+	public void writeDirection(final Direction direction, final Writer out) throws IOException;
 	
 	
-	public void writeSeparator(final BufferedWriter out) throws IOException;
+	public void writeSeparator(final Writer out) throws IOException;
 	
 }

@@ -1,7 +1,7 @@
 package playground.vsp.analysis.modules.networkAnalysis.utils;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -133,15 +133,15 @@ public class QGisProjectFileWriter extends MatsimXmlWriter implements MatsimWrit
 		private SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		private Date now = new Date();
 		
-		public void endDocument(BufferedWriter out) throws IOException{
+		public void endDocument(Writer out) throws IOException{
 			out.write("</qgis>");
 		}
 		
-		public void startLegend(final BufferedWriter out) throws IOException{
+		public void startLegend(final Writer out) throws IOException{
 			out.write("\t<legend updateDrawingOrder=\"true\">\n");
 		}
 		
-		public void writeLegendLayer(BufferedWriter out, String key) throws IOException {
+		public void writeLegendLayer(Writer out, String key) throws IOException {
 			String id = key+this.df.format(this.now);
 			out.write("\t\t<legendlayer drawingOrder=\"-1\" open=\"false\" checked=\"Qt::Checked\" name=\""+key+"\" showFeatureCount=\"0\">\n");
 			out.write("\t\t\t<filegroup open=\"true\" hidden=\"false\">\n");
@@ -150,15 +150,15 @@ public class QGisProjectFileWriter extends MatsimXmlWriter implements MatsimWrit
 			out.write("\t\t</legendlayer>\n");
 		}
 
-		public void endLegend(final BufferedWriter out) throws IOException{
+		public void endLegend(final Writer out) throws IOException{
 			out.write("\t</legend>\n");
 		}
 		
-		public void startProjectLayers(final BufferedWriter out, int size) throws IOException{
+		public void startProjectLayers(final Writer out, int size) throws IOException{
 			out.write("\t<projectlayers layercount=\""+size+"\">\n");
 		}
 		
-		public void writeProjectLayer(final BufferedWriter out, String key, String geometry, String clazz, String type) throws IOException{
+		public void writeProjectLayer(final Writer out, String key, String geometry, String clazz, String type) throws IOException{
 			
 			String id = key+this.df.format(this.now);
 			
@@ -206,7 +206,7 @@ public class QGisProjectFileWriter extends MatsimXmlWriter implements MatsimWrit
 			}
 		}
 		
-		private void writePolygonLayer(BufferedWriter out, String key,
+		private void writePolygonLayer(Writer out, String key,
 				String geometry, String clazz, String type, String id) throws IOException {
 			
 			out.write("\t\t<maplayer minimumScale=\"0\" maximumScale=\"1e+08\" geometry=\""+geometry+"\" type=\"vector\"" +
@@ -245,7 +245,7 @@ public class QGisProjectFileWriter extends MatsimXmlWriter implements MatsimWrit
 			
 		}
 
-		private void writeNodeTypesLayer(BufferedWriter out, String key, String geometry, String clazz, String type, String id) throws IOException {
+		private void writeNodeTypesLayer(Writer out, String key, String geometry, String clazz, String type, String id) throws IOException {
 			
 			out.write("\t\t<maplayer minimumScale=\"0\" maximumScale=\"1e+08\" geometry=\""+geometry+"\" type =\"vector\"" +
 					" hasScaleBasedVisibilityFlag=\"0\">\n");
@@ -313,11 +313,11 @@ public class QGisProjectFileWriter extends MatsimXmlWriter implements MatsimWrit
 			out.write("\t\t</maplayer>\n");
 		}
 
-		public void endProjectLayers(BufferedWriter out) throws IOException{
+		public void endProjectLayers(Writer out) throws IOException{
 			out.write("\t</projectlayers>\n");
 		}
 		
-		public void writeProperties(BufferedWriter out) throws IOException{
+		public void writeProperties(Writer out) throws IOException{
 			out.write("\t<properties>\n");
 			out.write("\t\t<Paths>\n");
 			out.write("\t\t\t<Absolute type=\"bool\">false</Absolute>\n");

@@ -1,12 +1,9 @@
 package org.matsim.contrib.ev.reservation;
 
-import org.matsim.contrib.common.util.reservation.ReservationManager.ReservationInfo;
+import com.google.inject.Inject;
 import org.matsim.contrib.ev.charging.ChargingLogic.ChargingVehicle;
 import org.matsim.contrib.ev.charging.ChargingPriority;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
-
-import java.util.Optional;
 
 /**
  * This is an implementation of a charging priority which is backed by the
@@ -17,51 +14,54 @@ import java.util.Optional;
  * is successful, the vehicle can start charging. In all other cases, the
  * vehicle will stay in the queue until it is removed manually or a successful
  * reservation can be made at a future time.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class ReservationBasedChargingPriority implements ChargingPriority {
-    private final ChargerReservationManager manager;
-    private final ChargerSpecification charger;
 
-    public ReservationBasedChargingPriority(ChargerReservationManager manager, ChargerSpecification charger) {
-        this.charger = charger;
-        this.manager = manager;
-    }
+	private final DistributedChargerReservationManager manager;
+	private final ChargerSpecification charger;
 
-    @Override
-    public boolean requestPlugNext(ChargingVehicle cv, double now) {
-        Optional<ReservationInfo<ChargerSpecification, ElectricVehicle>> reservation = manager.findReservation(charger, cv.ev(), now);
+	public ReservationBasedChargingPriority(DistributedChargerReservationManager manager, ChargerSpecification charger) {
+		this.charger = charger;
+		this.manager = manager;
+	}
 
-        if (reservation.isPresent()) {
-            // vehicle has a reservation, can be plugged right away, consume reservation
-            manager.removeReservation(reservation.get().resource().getId(), reservation.get().reservationId());
-            return true;
-        }
+	@Override
+	public boolean requestPlugNext(ChargingVehicle cv, double now) {
 
-        double endTime = cv.strategy().calcRemainingTimeToCharge() + now;
-        reservation = manager.addReservation(charger, cv.ev(), now, endTime);
+		var reservation = manager.findReservation(charger.getId(), cv.ev().getId(), now);
 
-        if (reservation.isPresent()) {
-            // vehicle did not have a reservation, but managed to create one on the fly,
-            // consume it directly
-            manager.removeReservation(reservation.get().resource().getId(), reservation.get().reservationId());
-            return true;
-        }
+		if (reservation.isPresent()) {
+			// vehicle has a reservation, can be plugged right away, consume reservation
+			manager.removeReservation(reservation.get().reservationId(), reservation.get().resource());
+			return true;
+		}
 
-        return false;
-    }
+		double endTime = cv.strategy().calcRemainingTimeToCharge() + now;
+		var onTheFlyReservation = manager.addLocalReservation(charger.getId(), cv.ev().getId(), now, endTime);
 
-    static public class Factory implements ChargingPriority.Factory {
-        private final ChargerReservationManager reservationManager;
+		if (onTheFlyReservation.isPresent()) {
+			// vehicle did not have a reservation, but managed to create one on the fly,
+			// consume it directly
+			manager.removeReservation(onTheFlyReservation.get().reservationId(), onTheFlyReservation.get().resource());
+			return true;
+		}
 
-        public Factory(ChargerReservationManager reservationManager) {
-            this.reservationManager = reservationManager;
-        }
+		return false;
+	}
 
-        @Override
-        public ChargingPriority create(ChargerSpecification charger) {
-            return new ReservationBasedChargingPriority(reservationManager, charger);
-        }
-    }
+	static public class Factory implements ChargingPriority.Factory {
+		private final DistributedChargerReservationManager reservationManager;
+
+		@Inject
+		public Factory(DistributedChargerReservationManager reservationManager) {
+			this.reservationManager = reservationManager;
+		}
+
+		@Override
+		public ChargingPriority create(ChargerSpecification charger) {
+			return new ReservationBasedChargingPriority(reservationManager, charger);
+		}
+	}
 }

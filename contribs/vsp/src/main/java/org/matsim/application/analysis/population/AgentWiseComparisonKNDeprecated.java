@@ -97,8 +97,8 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 				double addtlTravelScore = 0.;
 				boolean haveAddedFirstPtAscOfTrip = false;
 				for( Leg leg : trip.getLegsOnly() ){
-					final ScoringConfigGroup.ScoringParameterSet subpopScoringParams = config.scoring().getScoringParameters( PopulationUtils.getSubpopulation( person ) );
-					final ScoringConfigGroup.ModeParams modeParams = subpopScoringParams.getModes().get( leg.getMode() );
+					final ScoringConfigGroup.ScoringParameterSet subpopScoringParams = config.scoring().getScoringParametersOrDefault( PopulationUtils.getSubpopulation( person ) );
+					final ScoringConfigGroup.ModeParams modeParams = subpopScoringParams.getModeParams().get( leg.getMode() );
 
 					// ttime:
 					tripTtime += leg.getTravelTime().seconds();

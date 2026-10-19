@@ -90,6 +90,34 @@ class EndOfDayScoringTest {
 		assertEquals(-10, scoringFunction.money);
 	}
 
+	@Test
+	void stayHome() {
+
+		var personId = Id.createPersonId("p1");
+		var population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		population.addPerson(population.getFactory().createPerson(personId));
+
+		var backpack = new Backpack(personId, 0, new HashMap<>());
+		backpack.backpackPlan().startWithActivity(PopulationUtils.createActivityFromLinkId("home", Id.createLinkId("l1")));
+		backpack.addSpecialScoringEvent(new PersonMoneyEvent(10, personId, -10, "pay", "partner", "ref"));
+		var plan = backpack.backpackPlan().finishPlan();
+
+		var scoringFunction = new TestScoringFunction();
+		var assigned = new ArrayList<Id<?>>();
+		NewScoreAssigner newScoreAssigner = (_, _, p) -> assigned.add(p.getId());
+		var eods = new EndOfDayScoring(population, _ -> scoringFunction, newScoreAssigner, new IterationInformation());
+		eods.score(new FinishedBackpack(personId, 0, backpack.specialScoringEvents(), plan));
+
+		// a single activity is not a trip, so only the special scoring events contribute to the score
+		assertEquals(1, plan.getPlanElements().size());
+		assertTrue(scoringFunction.activities.isEmpty());
+		assertTrue(scoringFunction.legs.isEmpty());
+		assertTrue(scoringFunction.trips.isEmpty());
+		assertEquals(-10, scoringFunction.money);
+		assertTrue(scoringFunction.isFinished);
+		assertEquals(List.of(personId), assigned);
+	}
+
 	private static class TestScoringFunction implements ScoringFunction {
 
 		final List<Activity> activities = new ArrayList<>();

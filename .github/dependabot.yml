@@ -1,7 +1,7 @@
 version: 2
 updates:
   # All Maven dependencies checked daily.
-  # - "all-dependencies" bundles everything into one grouped PR (without a group,
+  # - "bag-of-cats" bundles everything into one grouped PR (without a group,
   #   Dependabot opens one PR per dependency).
   # - Fory is excluded from the group so each artifact gets its own individual
   #   PR — it is fast-moving with frequent breaking changes that benefit from
@@ -11,9 +11,9 @@ updates:
     schedule:
       interval: "daily"
     groups:
-      all-dependencies:
-        patterns: ["*"]
-        exclude-patterns: ["org.apache.fory:*"]
+      bag-of-cats:
+        patterns: [ "*" ]
+        exclude-patterns: [ "org.apache.fory:*" ]
 
   # GitHub Actions dependencies bundled into a single daily PR.
   # The group is required to bundle updates — without it, each action gets its own PR.
@@ -23,4 +23,4 @@ updates:
       interval: "daily"
     groups:
       github-actions:
-        patterns: ["*"]
+        patterns: [ "*" ]

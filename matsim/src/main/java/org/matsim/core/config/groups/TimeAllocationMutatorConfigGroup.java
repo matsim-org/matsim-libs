@@ -52,7 +52,8 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 	private static final String MUTATION_RANGE_STEP = "mutationRangeStep";
 	private static final String MUTATION_RANGE = "mutationRange";
 	private double mutationRange = 1800.0;
-	private double latestActivityEndTime = 24*3600.0;
+//	private double latestActivityEndTime = 24*3600.0;
+	private double latestActivityEndTime = Double.POSITIVE_INFINITY;
 	private boolean mutateAroundInitialEndTimeOnly = false;
 	private double mutationRangeStep = 1.0;
 

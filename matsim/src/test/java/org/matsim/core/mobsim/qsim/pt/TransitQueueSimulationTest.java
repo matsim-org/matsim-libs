@@ -314,6 +314,7 @@ public class TransitQueueSimulationTest {
 			// setup: config
 			final Config config = ConfigUtils.createConfig();
 			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 			config.transit().setUseTransit(true);
 
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);

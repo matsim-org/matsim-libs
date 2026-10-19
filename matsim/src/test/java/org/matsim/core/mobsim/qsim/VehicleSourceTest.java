@@ -96,6 +96,7 @@ public class VehicleSourceTest {
 
 		Config config = scenario.getConfig();
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		config.qsim().setFlowCapFactor(1.0);
 		config.qsim().setStorageCapFactor(1.0);
 		config.qsim().setMainModes(Arrays.asList(transportModes));
@@ -113,8 +114,8 @@ public class VehicleSourceTest {
 		config.controller().setCreateGraphs(false);
 		config.controller().setDumpDataAtEnd(false);
 
-		config.scoring().addActivityParams( new ActivityParams("h").setTypicalDuration(1. * 3600. ) );
-		config.scoring().addActivityParams( new ActivityParams("w").setTypicalDuration(1. * 3600. ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams("h").setTypicalDuration(1. * 3600. ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams("w").setTypicalDuration(1. * 3600. ) );
 
 		final Controler cont = new Controler(scenario);
 		cont.getConfig().controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

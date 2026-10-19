@@ -1,0 +1,47 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+/bin/*.jar
+/target/*.jar
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+/target/
+/bin/
+
+# various erratic outputs created by matsim that we don't want to commit:
+/pop.xml.gz
+/test/output/
+/output/
+melun_prebooking_output
+
+
+# IntelliJ Files
+*.iml
+.idea
+
+# eclipse files
+.classpath
+.settings
+.project
+.DS_Store
+
+# maven build files
+/dependency-reduced-pom.xml

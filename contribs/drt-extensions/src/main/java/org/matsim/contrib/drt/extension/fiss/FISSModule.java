@@ -5,13 +5,11 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandlerDefaultImpl;
@@ -36,14 +34,13 @@ public class FISSModule extends AbstractModule {
 				Vehicles vehiclesContainer = scenario.getVehicles();
 
 				for (String sampledMode : fissConfigGroup.getSampledModes()) {
-
-					final Id<VehicleType> vehicleTypeId = Id.create(sampledMode, VehicleType.class);
-					VehicleType vehicleType = vehiclesContainer.getVehicleTypes().get(vehicleTypeId);
-					Gbl.assertNotNull(vehicleType, "you are using mode vehicle types, but have not provided a vehicle type for mode=" + sampledMode);
-
-					final double pcu = vehicleType.getPcuEquivalents() / fissConfigGroup.getSampleFactor();
-					LOG.info("Set pcuEquivalent of vehicleType '{}' to {}", vehicleTypeId, pcu);
-					vehicleType.setPcuEquivalents(pcu);
+					for (VehicleType vehicleType : vehiclesContainer.getVehicleTypes().values()) {
+						if (vehicleType.hasNetworkMode() && vehicleType.getNetworkMode().equals(sampledMode)) {
+							final double pcu = vehicleType.getPcuEquivalents() / fissConfigGroup.getSampleFactor();
+							LOG.info("Set pcuEquivalent of vehicleType '{}' to {}", vehicleType.getId(), pcu);
+							vehicleType.setPcuEquivalents(pcu);
+						}
+					}
 				}
 
 			}

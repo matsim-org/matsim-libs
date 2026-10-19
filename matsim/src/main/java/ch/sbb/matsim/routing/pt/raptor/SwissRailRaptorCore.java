@@ -30,6 +30,7 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RTransfer;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.Facility;
@@ -55,14 +56,15 @@ public class SwissRailRaptorCore {
     private final double[] egressCostsPerRouteStop;
     private final double[] leastArrivalCostAtRouteStop;
     private final double[] leastArrivalCostAtStop;
-    private final BitSet improvedRouteStopIndices;
-    private final BitSet reachedRouteStopIndices;
-    private final BitSet improvedStops;
-    private final BitSet destinationRouteStopIndices;
+    private final FixedBitSet improvedRouteStopIndices;
+    private final FixedBitSet improvedStops;
+    private final FixedBitSet destinationRouteStopIndices;
     private double bestArrivalCost = Double.POSITIVE_INFINITY;
     private final PathElement[] arrivalPathPerStop;
     private final PathElement[] tmpArrivalPathPerStop; // only used to ensure parallel update
-    private final BitSet tmpImprovedStops; // only used to ensure parallel update
+    private final FixedBitSet tmpImprovedStops; // only used to ensure parallel update
+    private final FixedBitSet scratchRouteStopBits;
+    private final FixedBitSet scratchStopBits;
     private final boolean useCapacityConstraints;
     private final boolean useAdaptiveTransferCalculation;
     private final RaptorInVehicleCostCalculator inVehicleCostCalculator;
@@ -77,13 +79,14 @@ public class SwissRailRaptorCore {
         this.egressCostsPerRouteStop = new double[data.countRouteStops];
         this.leastArrivalCostAtRouteStop = new double[data.countRouteStops];
         this.leastArrivalCostAtStop = new double[data.countStops];
-        this.improvedRouteStopIndices = new BitSet(this.data.countRouteStops);
-        this.reachedRouteStopIndices = new BitSet(this.data.countRouteStops);
-        this.destinationRouteStopIndices = new BitSet(this.data.countRouteStops);
-        this.improvedStops = new BitSet(this.data.countStops);
+        this.improvedRouteStopIndices = new FixedBitSet(this.data.countRouteStops);
+        this.destinationRouteStopIndices = new FixedBitSet(this.data.countRouteStops);
+        this.improvedStops = new FixedBitSet(this.data.countStops);
+        this.scratchRouteStopBits = new FixedBitSet(this.data.countRouteStops);
+        this.scratchStopBits = new FixedBitSet(this.data.countStops);
         this.arrivalPathPerStop = new PathElement[this.data.countStops];
         this.tmpArrivalPathPerStop = new PathElement[this.data.countStops];
-        this.tmpImprovedStops = new BitSet(this.data.countStops);
+        this.tmpImprovedStops = new FixedBitSet(this.data.countStops);
         this.useCapacityConstraints = this.data.config.isUseCapacityConstraints();
         this.useAdaptiveTransferCalculation = this.data.config.getTransferCalculation().equals(RaptorTransferCalculation.Adaptive);
         this.inVehicleCostCalculator = inVehicleCostCalculator;
@@ -99,8 +102,9 @@ public class SwissRailRaptorCore {
         Arrays.fill(this.leastArrivalCostAtStop, Double.POSITIVE_INFINITY);
         this.improvedStops.clear();
         this.improvedRouteStopIndices.clear();
-        this.reachedRouteStopIndices.clear();
         this.destinationRouteStopIndices.clear();
+        this.scratchRouteStopBits.clear();
+        this.scratchStopBits.clear();
         this.bestArrivalCost = Double.POSITIVE_INFINITY;
     }
 
@@ -137,6 +141,7 @@ public class SwissRailRaptorCore {
         }
 
         // same as (*) for access stops:
+		// As a result of the following for-loop, initialStops should contain the lowest cost access mode per TransitStopFacility. gleich july'26
         Map<TransitStopFacility, InitialStop> initialStops = new LinkedHashMap<>();
         for (InitialStop accessStop : accessStops) {
             InitialStop alternative = initialStops.get(accessStop.stop);
@@ -145,6 +150,14 @@ public class SwissRailRaptorCore {
             }
         }
 
+		/*
+		 * The following for-loop explores all TransitRoutes (technically TransitRouteStops) from all initialStops, but does not explore transfers to
+		 * other TransitRoutes, yet. If walking to stop A and taking a bus to stop B is cheaper than directly walking to stop B, than this for-loop
+		 * should find that.
+		 * As a result arrivalPathPerStop should contain the lowest cost path per TransitStopFacility for all TransitStopFacilities that coincide
+		 * with a InitialStop or are reachable from a InitialStop without transfer.
+		 * gleich july'26
+		 */
         boolean hasIntermodalAccess = false;
         // go through initial stops ...
         for (InitialStop stop : initialStops.values()) {
@@ -237,13 +250,24 @@ public class SwissRailRaptorCore {
             // handleTransfers clears improvedRouteStopIndices, which is correct during rounds
             // but it loses the initial route stop indices directly after initialization.
             // so keep a copy and restore it
-            BitSet initialRouteStopIndices = new BitSet();
-            initialRouteStopIndices.or(this.improvedRouteStopIndices);
+            this.scratchRouteStopBits.copyFrom(this.improvedRouteStopIndices);
 
             handleTransfers(true, parameters, transferProvider);
-            this.improvedRouteStopIndices.or(initialRouteStopIndices);
+            this.improvedRouteStopIndices.or(this.scratchRouteStopBits);
+            this.scratchRouteStopBits.clear();
         }
 
+		/*
+		 * The following for-loop explores transfers to other TransitRoutes and checks whether destinationStops have been reached.
+		 *
+		 * findLeastCostArrival iterates over all destination stops and checks whether those were already reached, i.e. arrivalPathPerStop!=null.
+		 * It first clears improvedStops. Then exploreRoute() checks whether a cheaper path could be found to a TransitStopFacility and sets
+		 * improvedStops.
+		 * If no destinationStop has been reached it returns null as leastCostPath.
+		 *
+		 * handleTransfers goes through all improvesStops and explores transfers at those TransitStopFacilities.
+		 * gleich july'26
+		 */
         int allowedTransfersLeft = maxTransfersAfterFirstArrival;
         // the main loop
         for (int k = 0; k <= maxTransfers; k++) {
@@ -503,8 +527,7 @@ public class SwissRailRaptorCore {
         reset();
 
         CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
-        BitSet initialRouteStopIndices = new BitSet();
-        BitSet initialStopIndices = new BitSet();
+        boolean hasInitialBits = true;
         for (InitialStop stop : startStops) {
             int[] routeStopIndices = this.data.routeStopsPerStopFacility.get(stop.stop);
             for (int routeStopIndex : routeStopIndices) {
@@ -536,8 +559,8 @@ public class SwissRailRaptorCore {
 								this.leastArrivalCostAtStop[toRouteStop.stopFacilityIndex] = arrivalCost;
 								this.improvedRouteStopIndices.set(routeStopIndex);
 								// this is special: make sure we can transfer even at the start stop
-								initialRouteStopIndices.set(routeStopIndex);
-								initialStopIndices.set(toRouteStop.stopFacilityIndex);
+								this.scratchRouteStopBits.set(routeStopIndex);
+								this.scratchStopBits.set(toRouteStop.stopFacilityIndex);
 							}
             }
         }
@@ -556,11 +579,12 @@ public class SwissRailRaptorCore {
                 break;
             }
 
-            if (initialRouteStopIndices != null) {
-                this.improvedRouteStopIndices.or(initialRouteStopIndices);
-                this.improvedStops.or(initialStopIndices);
-                initialRouteStopIndices = null;
-                initialStopIndices = null;
+            if (hasInitialBits) {
+                this.improvedRouteStopIndices.or(this.scratchRouteStopBits);
+                this.improvedStops.or(this.scratchStopBits);
+                this.scratchRouteStopBits.clear();
+                this.scratchStopBits.clear();
+                hasInitialBits = false;
             }
 
             if (transfers > maxTransfers) {
@@ -593,12 +617,11 @@ public class SwissRailRaptorCore {
 				}
 
         // collect information for each stop
-        Map<Id<TransitStopFacility>, TravelInfo> result = new HashMap<>();
-        for (Map.Entry<TransitStopFacility, Integer> e : this.data.stopFacilityIndices.entrySet()) {
-            TransitStopFacility stop = e.getKey();
-            int index = e.getValue();
+        Map<Id<TransitStopFacility>, TravelInfo> result = new IdMap<>(TransitStopFacility.class, this.data.countStops);
+        for (int index = 0; index < this.data.countStops; index++) {
             PathElement destination = this.arrivalPathPerStop[index];
             if (destination != null) {
+                TransitStopFacility stop = this.data.stopFacilities[index];
                 TravelInfo ti = getTravelInfo(destination, parameters);
                 result.put(stop.getId(), ti);
             }
@@ -653,7 +676,6 @@ public class SwissRailRaptorCore {
 
     private void exploreRoutes(RaptorParameters parameters, Person person, CachingTransferProvider transferProvider) {
         this.improvedStops.clear();
-        this.reachedRouteStopIndices.clear();
 
         MutableInt routeIndex = new MutableInt(-1);
         for (int firstRouteStopIndex = this.improvedRouteStopIndices.nextSetBit(0); firstRouteStopIndex >= 0; firstRouteStopIndex = this.improvedRouteStopIndices.nextSetBit(firstRouteStopIndex+1)) {
@@ -1119,6 +1141,65 @@ public class SwissRailRaptorCore {
         }
     }
 
+    /**
+     * Lightweight replacement for {@link java.util.BitSet} that avoids the
+     * {@code expandTo}/{@code wordsInUse} bookkeeping overhead on every {@code set()} call.
+     * The backing {@code long[]} is pre-allocated to its full size and never grows.
+     */
+    private static final class FixedBitSet {
+        final long[] words;
+
+        FixedBitSet(int nbits) {
+            this.words = new long[Math.max(1, (nbits + 63) >>> 6)];
+        }
+
+        void set(int index) {
+            words[index >>> 6] |= 1L << index;
+        }
+
+        boolean get(int index) {
+            return (words[index >>> 6] & (1L << index)) != 0;
+        }
+
+        void clear(int index) {
+            words[index >>> 6] &= ~(1L << index);
+        }
+
+        void clear() {
+            Arrays.fill(words, 0L);
+        }
+
+        boolean isEmpty() {
+            for (long w : words) {
+                if (w != 0) return false;
+            }
+            return true;
+        }
+
+        int nextSetBit(int fromIndex) {
+            int u = fromIndex >>> 6;
+            if (u >= words.length) return -1;
+            long word = words[u] & (-1L << fromIndex);
+            while (true) {
+                if (word != 0) return (u << 6) + Long.numberOfTrailingZeros(word);
+                if (++u == words.length) return -1;
+                word = words[u];
+            }
+        }
+
+        void or(FixedBitSet other) {
+            long[] otherWords = other.words;
+            int len = Math.min(words.length, otherWords.length);
+            for (int i = 0; i < len; i++) {
+                words[i] |= otherWords[i];
+            }
+        }
+
+        void copyFrom(FixedBitSet other) {
+            System.arraycopy(other.words, 0, words, 0, Math.min(words.length, other.words.length));
+        }
+    }
+
     public static final class TravelInfo {
         public final Id<TransitStopFacility> departureStop;
         public final int transferCount;
@@ -1141,6 +1222,8 @@ public class SwissRailRaptorCore {
         /** the costs an agent accumulates due to waiting at the first stop until the first pt vehicle departs. */
         public final double waitingCost;
 
+        public final boolean isWalkOnly;
+
         private final PathElement destinationPath;
 
         TravelInfo(Id<TransitStopFacility> departureStop, double departureTime, double arrivalTime, double travelCost, double accessTime, double accessCost, int transferCount, double waitingTime, double waitingCost, PathElement destinationPath) {
@@ -1155,6 +1238,7 @@ public class SwissRailRaptorCore {
             this.waitingTime = waitingTime;
             this.waitingCost = waitingCost;
             this.destinationPath = destinationPath;
+            this.isWalkOnly = computeWalkOnly(destinationPath);
         }
 
         public RaptorRoute getRaptorRoute() {
@@ -1168,11 +1252,11 @@ public class SwissRailRaptorCore {
             return createRaptorRoute(fromFacility, toFacility, this.destinationPath, firstPath.arrivalTime);
         }
 
-        public boolean isWalkOnly() {
-            if (this.destinationPath.comingFrom == null) {
+        private static boolean computeWalkOnly(PathElement destinationPath) {
+            if (destinationPath.comingFrom == null) {
                 return true;
             }
-            PathElement pe = this.destinationPath;
+            PathElement pe = destinationPath;
             while (pe != null) {
                 if (!pe.isTransfer) {
                     return false;

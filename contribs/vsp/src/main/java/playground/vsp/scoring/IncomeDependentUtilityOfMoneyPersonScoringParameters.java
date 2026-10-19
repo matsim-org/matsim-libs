@@ -112,7 +112,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
              * point of view than giving each ScoringFunction its own copy of the params.
              */
 
-            ScoringConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
+            ScoringConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParametersOrDefault(subpopulation);
             // (we can set scoring params per subpopulation, so retrieve them as starting point.  kai, apr'22)
 
             // save the activityParams of the subpopulation so we need to build them only once.

@@ -1,0 +1,2 @@
+carrierId	nuOfTours	tourDurations[s]	tourDurations[h]	travelDistances[m]	travelDistances[km]	travelTimes[s]	travelTimes[h]	fixedCosts[EUR]	varCostsTime[EUR]	varCostsDist[EUR]	totalCosts[EUR]
+carrier1	1	6870.0	1.9083333333333334	40000.0	40.0	5360.0	1.488888888888889	130.0	54.96	30.799999999999997	215.76

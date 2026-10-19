@@ -48,18 +48,18 @@ class TasteVariationsConfigParameterSetTest {
 		ScoringConfigGroup scoringConfig = new ScoringConfigGroup();
 
 		// Initially there should be no taste variations
-		assertThat(scoringConfig.getScoringParameters(null).getTasteVariationsParams())
+		assertThat(scoringConfig.getScoringParametersOrDefault(null).getTasteVariationsParams())
 				.as("Initial taste variations")
 				.isNull();
 
 		// Test getOrAddTasteVariationsParams
-		TasteVariationsConfigParameterSet params = scoringConfig.getScoringParameters(null).getOCreateTasteVariationsParams();
+		TasteVariationsConfigParameterSet params = scoringConfig.getScoringParametersOrDefault(null).getOCreateTasteVariationsParams();
 		assertThat(params).as("Created taste variations").isNotNull();
 		assertThat(params.getIncomeExponent()).as("Default income exponent").isZero();
 		assertThat(params.getVariationsOf()).as("Initial variations").isEmpty();
 
 		// Verify the same instance is returned on second call
-		TasteVariationsConfigParameterSet params2 = scoringConfig.getScoringParameters(null).getOCreateTasteVariationsParams();
+		TasteVariationsConfigParameterSet params2 = scoringConfig.getScoringParametersOrDefault(null).getOCreateTasteVariationsParams();
 		assertThat(params2).as("Retrieved taste variations").isSameAs(params);
 
 		// Test modifying the params
@@ -67,7 +67,7 @@ class TasteVariationsConfigParameterSetTest {
 		params.setVariationsOf(Set.of(ModeUtilityParameters.Type.constant));
 
 		// Verify we get the modified params
-		TasteVariationsConfigParameterSet retrieved = scoringConfig.getScoringParameters(null).getTasteVariationsParams();
+		TasteVariationsConfigParameterSet retrieved = scoringConfig.getScoringParametersOrDefault(null).getTasteVariationsParams();
 		assertThat(retrieved.getIncomeExponent()).as("Modified income exponent").isEqualTo(2.5);
 		assertThat(retrieved.getVariationsOf())
 				.as("Modified variations")
@@ -77,9 +77,9 @@ class TasteVariationsConfigParameterSetTest {
 		// Test setting a new instance
 		TasteVariationsConfigParameterSet newParams = new TasteVariationsConfigParameterSet();
 		newParams.setIncomeExponent(3.5);
-		scoringConfig.getScoringParameters(null).setTasteVariationsParams(newParams);
+		scoringConfig.getScoringParametersOrDefault(null).setTasteVariationsParams(newParams);
 
-		retrieved = scoringConfig.getScoringParameters(null).getTasteVariationsParams();
+		retrieved = scoringConfig.getScoringParametersOrDefault(null).getTasteVariationsParams();
 		assertThat(retrieved.getIncomeExponent()).as("New income exponent").isEqualTo(3.5);
 		assertThat(retrieved.getVariationsOf()).as("New variations").isEmpty();
 	}
@@ -92,7 +92,7 @@ class TasteVariationsConfigParameterSetTest {
 		Config config = ConfigUtils.createConfig();
 		ScoringConfigGroup scoringConfig = config.scoring();
 
-		TasteVariationsConfigParameterSet tasteParams = scoringConfig.getScoringParameters(null).getOCreateTasteVariationsParams();
+		TasteVariationsConfigParameterSet tasteParams = scoringConfig.getScoringParametersOrDefault(null).getOCreateTasteVariationsParams();
 		tasteParams.setIncomeExponent(2.0);
 		tasteParams.setVariationsOf(Set.of(ModeUtilityParameters.Type.constant, ModeUtilityParameters.Type.dailyUtilityConstant));
 
@@ -104,7 +104,7 @@ class TasteVariationsConfigParameterSetTest {
 		new ConfigReader(readConfig).readFile(outFile);
 
 		// Verify the taste variations were correctly read
-		TasteVariationsConfigParameterSet readParams = readConfig.scoring().getScoringParameters(null).getTasteVariationsParams();
+		TasteVariationsConfigParameterSet readParams = readConfig.scoring().getScoringParametersOrDefault(null).getTasteVariationsParams();
 		assertThat(readParams).as("Read taste variations").isNotNull();
 		assertThat(readParams.getIncomeExponent()).as("Read income exponent").isEqualTo(2.0);
 		assertThat(readParams.getVariationsOf())
@@ -120,14 +120,14 @@ class TasteVariationsConfigParameterSetTest {
 		TasteVariationsConfigParameterSet subPopParams = scoringConfig.getOrCreateScoringParameters("subpop1").getOCreateTasteVariationsParams();
 		subPopParams.setIncomeExponent(2.0);
 
-		assertThat(scoringConfig.getScoringParameters("subpop1").getTasteVariationsParams().getIncomeExponent())
+		assertThat(scoringConfig.getExplicitScoringParameterSetsPerSubpopulation().get("subpop1").getTasteVariationsParams().getIncomeExponent())
 				.as("Subpopulation income exponent")
 				.isEqualTo(2.0);
 	}
 
 	@Test
 	void testMultipleTasteVariationSetsError() {
-		ScoringConfigGroup.ScoringParameterSet scoringParams = new ScoringConfigGroup().getScoringParameters(null);
+		ScoringConfigGroup.ScoringParameterSet scoringParams = new ScoringConfigGroup().getScoringParametersOrDefault(null);
 
 		// Add the first taste variations parameter set through the proper API
 		scoringParams.getOCreateTasteVariationsParams();

@@ -368,7 +368,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 			iPlanElement.previousIndex() + 1,
 			getNextLinkIndex(),
 			getStopIndex(),
-			nextStop == null,
+			stops == null || stopIndex >= stops.size(),
 			state,
 			departureTime
 		);

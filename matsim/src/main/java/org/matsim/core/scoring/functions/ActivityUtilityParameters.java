@@ -166,6 +166,8 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 		public ActivityUtilityParameters build() {
 			ActivityUtilityParameters params = new ActivityUtilityParameters(this.type) ;
 			params.scoreAtAll = this.scoreAtAll;
+			params.priority = this.priority;
+			params.zeroUtilityComputation = this.zeroUtilityComputation;
 			this.typicalDuration_s.ifDefined( duration -> params.typicalDuration_s = duration ) ;
 			this.typicalDuration_s.ifDefined( duration -> params.zeroUtilityDuration_h = this.zeroUtilityComputation.computeZeroUtilityDuration_s(priority, duration ) / 3600. );
 			// (I think that the only way in which the typical duration can be undefined is if the activity is not scored at all.  Maybe change the condition. kai, may'22)
@@ -186,6 +188,8 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 
 	private final String type;
 	private double typicalDuration_s = 0;
+	private double priority = 1.;
+	private ZeroUtilityComputation zeroUtilityComputation = new SameRelativeScore();
 
 	/**
 	 * 	"duration at which the [performance] utility starts to be positive"
@@ -222,6 +226,16 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 
 	public final double getZeroUtilityDuration_h() {
 		return this.zeroUtilityDuration_h;
+	}
+
+	/**
+	 * The zero-utility duration (in hours) that belongs to the given typical duration, using the same
+	 * {@link ZeroUtilityComputation} and priority that produced {@link #getZeroUtilityDuration_h()} from
+	 * {@link #getTypicalDuration()}.  Use this when the typical duration of an individual activity deviates from the
+	 * typical duration of its activity type, so that the scoring curve stays self-consistent.
+	 */
+	public final double computeZeroUtilityDuration_h(double typicalDuration_s) {
+		return this.zeroUtilityComputation.computeZeroUtilityDuration_s(this.priority, typicalDuration_s) / 3600.;
 	}
 
 	public final OptionalTime getMinimalDuration() {

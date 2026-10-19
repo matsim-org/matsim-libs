@@ -2,6 +2,7 @@ package org.matsim.dsim.simulation;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.MobsimMessageCollector;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -24,6 +25,7 @@ public class DSimComponentsModule extends AbstractQSimModule {
 	protected void configureQSim() {
 
 		bind(PartitionTransfer.class).in(Singleton.class);
+		bind(MobsimMessageCollector.class).to(PartitionTransfer.class);
 		bind(AgentSourcesContainer.class).in(Singleton.class);
 
 		bind(TeleportationEngine.class).to(DistributedTeleportationEngine.class).in(Singleton.class);

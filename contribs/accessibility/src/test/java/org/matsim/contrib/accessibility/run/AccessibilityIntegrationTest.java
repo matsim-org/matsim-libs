@@ -132,7 +132,7 @@ public class AccessibilityIntegrationTest {
 		acg.setUseParallelization(false);
 
 		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
-		config.scoring().addModeParams(ptParams);
+		config.scoring().addDefaultModeParams(ptParams);
 
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class) ;
 
@@ -409,7 +409,7 @@ public class AccessibilityIntegrationTest {
 		config.transit().setVehiclesFile(utils.getClassInputDirectory() + "vehicles.xml");
 
 		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
-		config.scoring().addModeParams(ptParams);
+		config.scoring().addDefaultModeParams(ptParams);
 
 		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
 		mbConfig.setPtStopsInputFile(utils.getClassInputDirectory() + "ptStops.csv");

@@ -86,8 +86,8 @@ public class FacilitiesFromPopulationTest {
 		ActivityParams workParams = new ActivityParams("work");
 		workParams.setOpeningTime(7*3600);
 		workParams.setClosingTime(19*3600);
-		config.addActivityParams(homeParams);
-		config.addActivityParams(workParams);
+		config.addDefaultActivityParams(homeParams);
+		config.addDefaultActivityParams(workParams);
 		generator.assignOpeningTimes( config );
 		generator.run(f.scenario.getPopulation());
 

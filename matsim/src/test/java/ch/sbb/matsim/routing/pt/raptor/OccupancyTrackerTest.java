@@ -38,15 +38,11 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author mrieser / Simunto GmbH
@@ -59,11 +55,14 @@ public class OccupancyTrackerTest {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		OccupancyData occData = new OccupancyData();
-		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events, new SubpopulationScoringParameters(f.scenario));
+		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events,
+			new SubpopulationScoringParameters(f.scenario));
 		events.addHandler(tracker);
 
 		events.initProcessing();
 		f.generateEvents_regular(events);
+
+		tracker.cleanupAfterMobsim(0);
 
 		DepartureData data;
 		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:45:00")); // before there is any vehicle
@@ -139,12 +138,15 @@ public class OccupancyTrackerTest {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		OccupancyData occData = new OccupancyData();
-		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events, new SubpopulationScoringParameters(f.scenario));
+		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events,
+			new SubpopulationScoringParameters(f.scenario));
 		events.addHandler(tracker);
 
 		events.initProcessing();
 		f.generateEvents_WithBusAtStop(events);
 		events.finishProcessing();
+
+		tracker.cleanupAfterMobsim(0);
 
 		DepartureData data;
 		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:45:00")); // before there is any vehicle
@@ -208,12 +210,15 @@ public class OccupancyTrackerTest {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		OccupancyData occData = new OccupancyData();
-		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events, new SubpopulationScoringParameters(f.scenario));
+		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events,
+			new SubpopulationScoringParameters(f.scenario));
 		events.addHandler(tracker);
 
 		events.initProcessing();
 		f.generateEvents_NoPax(events);
 		events.finishProcessing();
+
+		tracker.cleanupAfterMobsim(0);
 
 		DepartureData data;
 		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:45:00")); // before there is any vehicle
@@ -273,12 +278,15 @@ public class OccupancyTrackerTest {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		OccupancyData occData = new OccupancyData();
-		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events, new SubpopulationScoringParameters(f.scenario));
+		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events,
+			new SubpopulationScoringParameters(f.scenario));
 		events.addHandler(tracker);
 
 		events.initProcessing();
 		f.generateEvents_SinglePax(events);
 		events.finishProcessing();
+
+		tracker.cleanupAfterMobsim(0);
 
 		DepartureData data;
 		data = occData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:45:00")); // before there is any vehicle
@@ -330,12 +338,15 @@ public class OccupancyTrackerTest {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		OccupancyData occData = new OccupancyData();
-		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events, new SubpopulationScoringParameters(f.scenario));
+		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events,
+			new SubpopulationScoringParameters(f.scenario));
 		events.addHandler(tracker);
 
 		events.initProcessing();
 		f.generateEvents_regular(events);
 		events.finishProcessing();
+
+		tracker.cleanupAfterMobsim(0);
 
 		DepartureData data;
 		data = occData.getDepartureData(f.line1, f.route1, f.stop1, f.dep0);
@@ -355,6 +366,67 @@ public class OccupancyTrackerTest {
 
 		data = occData.getDepartureData(f.line1, f.route1, f.stop1, f.dep5);
 		Assertions.assertEquals(1, data.paxCountAtDeparture);
+	}
+
+	@Test
+	void testExchangeBetweenTrackers() {
+		Fixture f = new Fixture();
+
+		EventsManager events = EventsUtils.createEventsManager();
+		OccupancyData sourceData = new OccupancyData();
+		OccupancyTracker source = new OccupancyTracker(sourceData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), events,
+			new SubpopulationScoringParameters(f.scenario));
+		events.addHandler(source);
+
+		events.initProcessing();
+		f.generateEvents_regular(events);
+		events.finishProcessing();
+
+		OccupancyData targetData = new OccupancyData();
+		OccupancyTracker target = new OccupancyTracker(targetData, f.scenario, new DefaultRaptorInVehicleCostCalculator(),
+			EventsUtils.createEventsManager(), new SubpopulationScoringParameters(f.scenario));
+
+		OccupancyTracker.OccupancySyncMessage msg = source.send();
+		// a tracker also receives its own message, which must not change its data
+		source.receive(List.of(msg));
+		target.receive(List.of(msg, msg));
+		source.cleanupAfterMobsim(0);
+		target.cleanupAfterMobsim(0);
+
+		for (Id<Departure> depId : List.of(f.dep0, f.dep1, f.dep2, f.dep3, f.dep4)) {
+			DepartureData expected = sourceData.getDepartureData(f.line1, f.route1, f.stop1, depId);
+			DepartureData actual = targetData.getDepartureData(f.line1, f.route1, f.stop1, depId);
+			Assertions.assertEquals(expected.vehDepTime, actual.vehDepTime);
+			Assertions.assertEquals(expected.paxCountAtDeparture, actual.paxCountAtDeparture);
+			Assertions.assertEquals(expected.earliestWaitStart, actual.earliestWaitStart);
+			Assertions.assertEquals(expected.latestWaitStart, actual.latestWaitStart);
+		}
+		Assertions.assertEquals(
+			sourceData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:05:00")).departureId,
+			targetData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:05:00")).departureId);
+	}
+
+	@Test
+	void testExchangeKeepsLatestVisitOfStop() {
+		Fixture f = new Fixture();
+
+		OccupancyData occData = new OccupancyData();
+		OccupancyTracker tracker = new OccupancyTracker(occData, f.scenario, new DefaultRaptorInVehicleCostCalculator(),
+			EventsUtils.createEventsManager(), new SubpopulationScoringParameters(f.scenario));
+
+		// a route may serve a stop twice. Copies of the first visit must not replace the data of the second visit.
+		var firstVisit = new OccupancyTracker.DepartureEntry(f.line1, f.route1, f.stop1, f.dep0, 100, 1, 50, 90);
+		var secondVisit = new OccupancyTracker.DepartureEntry(f.line1, f.route1, f.stop1, f.dep0, 400, 3, 50, 390);
+		tracker.receive(List.of(
+			new OccupancyTracker.OccupancySyncMessage(List.of(firstVisit)),
+			new OccupancyTracker.OccupancySyncMessage(List.of(secondVisit)),
+			new OccupancyTracker.OccupancySyncMessage(List.of(firstVisit))));
+		tracker.cleanupAfterMobsim(0);
+
+		DepartureData data = occData.getDepartureData(f.line1, f.route1, f.stop1, f.dep0);
+		Assertions.assertEquals(400, data.vehDepTime);
+		Assertions.assertEquals(3, data.paxCountAtDeparture);
+		Assertions.assertEquals(390, data.latestWaitStart);
 	}
 
 	private static class Fixture {
@@ -408,8 +480,7 @@ public class OccupancyTrackerTest {
 		}
 
 		/**
-		 * generates events for 7 vehicles serving stop1 with 8 passengers.
-		 * all vehicles leave stop1, no vehicle is located at a stop.
+		 * generates events for 7 vehicles serving stop1 with 8 passengers. all vehicles leave stop1, no vehicle is located at a stop.
 		 */
 		public void generateEvents_regular(EventsManager events) {
 
@@ -430,12 +501,18 @@ public class OccupancyTrackerTest {
 
 			Id<Link> linkId = Id.create("1", Link.class);
 
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:55:00"), this.driver4, this.veh4, this.line1, this.route1, this.dep4));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:59:00"), this.driver5, this.veh5, this.line1, this.route1, this.dep5));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:55:00"), this.driver4, this.veh4, this.line1, this.route1, this.dep4));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:59:00"), this.driver5, this.veh5, this.line1, this.route1, this.dep5));
 
 			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:00:00"), this.veh0, this.stop1, 0.0));
 			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:00:30"), this.veh0, this.stop1, 0.0));
@@ -485,8 +562,8 @@ public class OccupancyTrackerTest {
 		}
 
 		/**
-		 * generates events for 4 vehicles serving stop1 with 2 passengers.
-		 * vehicles 0-2 leave stop1, but vehicle 3 is currently at stop1 and does not leave it.
+		 * generates events for 4 vehicles serving stop1 with 2 passengers. vehicles 0-2 leave stop1, but vehicle 3 is currently at stop1 and does not
+		 * leave it.
 		 */
 		public void generateEvents_WithBusAtStop(EventsManager events) {
 
@@ -507,10 +584,14 @@ public class OccupancyTrackerTest {
 
 			Id<Link> linkId = Id.create("1", Link.class);
 
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
 
 			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:00:00"), this.veh0, this.stop1, 0.0));
 			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:00:30"), this.veh0, this.stop1, 0.0));
@@ -533,8 +614,8 @@ public class OccupancyTrackerTest {
 		}
 
 		/**
-		 * generates events for 5 vehicles serving stop1, but there are no passengers.
-		 * vehicles 0-3 leave stop1, but vehicle 4 is currently at stop1 and does not leave it.
+		 * generates events for 5 vehicles serving stop1, but there are no passengers. vehicles 0-3 leave stop1, but vehicle 4 is currently at stop1
+		 * and does not leave it.
 		 */
 		public void generateEvents_NoPax(EventsManager events) {
 
@@ -553,10 +634,14 @@ public class OccupancyTrackerTest {
 			 *                  |         |         |
 			 */
 
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
 
 			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:00:00"), this.veh0, this.stop1, 0.0));
 			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:00:30"), this.veh0, this.stop1, 0.0));
@@ -571,8 +656,8 @@ public class OccupancyTrackerTest {
 		}
 
 		/**
-		 * generates events for 5 vehicles serving stop1, but there are no passengers.
-		 * vehicles 0-3 leave stop1, but vehicle 4 is currently at stop1 and does not leave it.
+		 * generates events for 5 vehicles serving stop1, but there are no passengers. vehicles 0-3 leave stop1, but vehicle 4 is currently at stop1
+		 * and does not leave it.
 		 */
 		public void generateEvents_SinglePax(EventsManager events) {
 
@@ -593,11 +678,16 @@ public class OccupancyTrackerTest {
 
 			Id<Link> linkId = Id.create("1", Link.class);
 
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
-			events.processEvent(new TransitDriverStartsEvent(Time.parseTime("06:59:00"), this.driver4, this.veh4, this.line1, this.route1, this.dep4));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:20:00"), this.driver0, this.veh0, this.line1, this.route1, this.dep0));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:30:00"), this.driver1, this.veh1, this.line1, this.route1, this.dep1));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:40:00"), this.driver2, this.veh2, this.line1, this.route1, this.dep2));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:50:00"), this.driver3, this.veh3, this.line1, this.route1, this.dep3));
+			events.processEvent(
+				new TransitDriverStartsEvent(Time.parseTime("06:59:00"), this.driver4, this.veh4, this.line1, this.route1, this.dep4));
 
 			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:00:00"), this.veh0, this.stop1, 0.0));
 			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:00:10"), this.veh0, this.stop1, 0.0));

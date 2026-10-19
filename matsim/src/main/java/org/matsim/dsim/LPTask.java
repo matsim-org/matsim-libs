@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.core.mobsim.framework.Steppable;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 
 import java.lang.invoke.LambdaConversionException;
 import java.lang.reflect.Method;
@@ -56,11 +56,6 @@ public final class LPTask implements SimTask {
 	private float avgRuntime = 0.0f;
 
 	/**
-	 * Run time of the last few iterations.
-	 */
-	private long sumRuntime = 0;
-
-	/**
 	 * Indicates whether the LP has been initialized.
 	 */
 	private boolean initialized = false;
@@ -75,13 +70,13 @@ public final class LPTask implements SimTask {
 	 */
 	private final AtomicBoolean phase = new AtomicBoolean(true);
 
-	public LPTask(LP lp, int partition, DistributedEventsManager manager, SerializationProvider serializer) {
+	public LPTask(LP lp, int partition, DistributedEventsManager manager, MessageTypeRegistry registry) {
 		this.lp = lp;
 		this.steppable = lp instanceof Steppable s ? s : null;
 		this.partition = partition;
 		this.manager = manager;
 
-		buildConsumers(serializer);
+		buildConsumers(registry);
 	}
 
 	@Override
@@ -100,14 +95,14 @@ public final class LPTask implements SimTask {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void buildConsumers(SerializationProvider serializer) {
+	private void buildConsumers(MessageTypeRegistry registry) {
 
 		for (Class<?> ifType : lp.getClass().getInterfaces()) {
 			if (MessageProcessor.class.isAssignableFrom(ifType)) {
 				Method[] methods = ifType.getDeclaredMethods();
 
 				Class<?> msgType = methods[0].getParameterTypes()[0];
-				int type = serializer.getType(msgType);
+				int type = registry.getType(msgType);
 
 				try {
 					consumers.put(type, (Consumer<Message>) LambdaUtils.createConsumer(lp, msgType, "process"));
@@ -187,13 +182,7 @@ public final class LPTask implements SimTask {
 
 		long rt = System.nanoTime() - t;
 		avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
-		sumRuntime += rt;
-
-		// Only add the runtime to the list if the time is a multiple of 10
-		if ((time % 10) == 0) {
-			runtimes.add(sumRuntime);
-			sumRuntime = 0;
-		}
+		SimTask.addRuntime(runtimes, time, rt);
 	}
 
 	@Override

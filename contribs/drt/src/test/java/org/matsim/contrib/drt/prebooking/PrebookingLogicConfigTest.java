@@ -389,11 +389,11 @@ public class PrebookingLogicConfigTest {
 		config.qsim().setSimEndtimeInterpretation(EndtimeInterpretation.onlyUseEndtime);
 
 		for (String mode : new String[] { "drtA", "drtB" }) {
-			config.scoring().addModeParams(new ModeParams(mode));
+			config.scoring().addDefaultModeParams(new ModeParams(mode));
 		}
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setScoringThisActivityAtAll(false);
-		config.scoring().addActivityParams(genericParams);
+		config.scoring().addDefaultActivityParams(genericParams);
 
 		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
 		DvrpTravelTimeMatrixParams matrixParams = dvrpConfig.getTravelTimeMatrixParams();

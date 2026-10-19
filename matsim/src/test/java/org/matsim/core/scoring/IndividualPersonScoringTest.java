@@ -55,7 +55,7 @@ public class IndividualPersonScoringTest {
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
         // Enable individual person scoring
-        ScoringConfigGroup.ScoringParameterSet scoringParams = config.scoring().getScoringParameters(null);
+        ScoringConfigGroup.ScoringParameterSet scoringParams = config.scoring().getScoringParametersOrDefault(null);
         TasteVariationsConfigParameterSet tasteVariationsParams = new TasteVariationsConfigParameterSet();
 
         // Enable taste variations for mode constants and marginal utility of traveling

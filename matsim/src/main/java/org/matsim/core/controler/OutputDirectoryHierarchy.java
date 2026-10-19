@@ -216,6 +216,7 @@ public final class OutputDirectoryHierarchy {
 		}
 		return getOutputFilename(Controler.INPUT_PREFIX + file.filename + compression.fileEnding);
 	}
+
 	public String getOutputFilename(Controler.DefaultFiles file, ControllerConfigGroup.CompressionType compression) {
 		if (compression == null) {
 			return getOutputFilename(Controler.OUTPUT_PREFIX + file.filename);
@@ -272,14 +273,9 @@ public final class OutputDirectoryHierarchy {
 						// the directory is not empty, we do not overwrite any
 						// files!
 						throw new RuntimeException(
-							"The output directory " + outputPath
-								+ " (full path: "
-								+ outputDir.getAbsolutePath()
-								+ ")"
-								+ " already exists and is not empty!"
-								+ " Please either delete or empty the directory or"
-								+ " configure the services via setOverwriteFileSetting()"
-								+ " or the \"overwriteFiles\" parameter of the \"services\" config group.");
+							"The output directory " + outputPath + " (full path: " + outputDir.getAbsolutePath() + ") already exists and is not empty!"
+								+ " Please either delete or empty the directory or set the \"config:controller.overwriteFiles\" parameter to one of: "
+								+ "\"deleteDirectoryIfExists\", \"overwriteExistingFiles\"");
 					case overwriteExistingFiles:
 						// log a warning, even if at the time the user sees it,
 						// it is too late to change his mind...

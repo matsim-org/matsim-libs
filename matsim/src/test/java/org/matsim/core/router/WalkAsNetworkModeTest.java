@@ -153,8 +153,8 @@ public class WalkAsNetworkModeTest {
 		config.routing().clearTeleportedModeParams();
 		config.routing().addTeleportedModeParams(new RoutingConfigGroup.TeleportedModeParams(TransportMode.non_network_walk).setTeleportedModeSpeed(1.4));
 
-		config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(TransportMode.walk).setConstant(0).setMarginalUtilityOfTraveling(0));
-		config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(TransportMode.non_network_walk).setConstant(0).setMarginalUtilityOfTraveling(0));
+		config.scoring().addDefaultModeParams(new ScoringConfigGroup.ModeParams(TransportMode.walk).setConstant(0).setMarginalUtilityOfTraveling(0));
+		config.scoring().addDefaultModeParams(new ScoringConfigGroup.ModeParams(TransportMode.non_network_walk).setConstant(0).setMarginalUtilityOfTraveling(0));
 
 		config.global().setNumberOfThreads(1);
 		return config;

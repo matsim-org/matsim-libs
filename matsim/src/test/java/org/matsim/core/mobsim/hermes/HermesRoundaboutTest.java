@@ -98,11 +98,11 @@ public class HermesRoundaboutTest {
 
 		final ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("home");
 		homeParams.setTypicalDuration(1);
-		config.scoring().addActivityParams(homeParams);
+		config.scoring().addDefaultActivityParams(homeParams);
 
 		final ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work");
 		workParams.setTypicalDuration(1);
-		config.scoring().addActivityParams(workParams);
+		config.scoring().addDefaultActivityParams(workParams);
 
 		ReplanningConfigGroup.StrategySettings replanning = new ReplanningConfigGroup.StrategySettings();
 		replanning.setStrategyName("ReRoute");

@@ -43,6 +43,7 @@ import picocli.CommandLine;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -328,47 +329,52 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		if (crs == null)
 			crs = config.global().getCoordinateSystem();
 
-		XYTData avroData = new XYTData();
-		avroData.setCrs(crs);
-
 		Map<Pollutant, Raster> rasterMap = FastEmissionGridAnalyzer.processHandlerEmissions(emissionsEventHandler.getLink2pollutants(), network, gridSize, 20);
 		List<Integer> xLength = rasterMap.values().stream().map(Raster::getXLength).distinct().toList();
 		List<Integer> yLength = rasterMap.values().stream().map(Raster::getYLength).distinct().toList();
 		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
 
-		List<Float> xCoords = new ArrayList<>();
-		List<Float> yCoords = new ArrayList<>();
-		Map<CharSequence, List<Float>> values = new HashMap<>();
-		List<Float> valuesList = new ArrayList<>();
-		List<Integer> times = new ArrayList<>();
+		for (Pollutant pollutant : Pollutant.values()) {
+			XYTData avroData = new XYTData();
+			avroData.setCrs(crs);
 
-		times.add(0);
+			List<Float> xCoords = new ArrayList<>();
+			List<Float> yCoords = new ArrayList<>();
+			Map<CharSequence, List<Float>> values = new HashMap<>();
+			List<Float> valuesList = new ArrayList<>();
+			List<Integer> times = new ArrayList<>();
 
-		for (int xi = 0; xi < xLength.get(0); xi++) {
-			for (int yi = 0; yi < yLength.get(0); yi++) {
-				Coord coord = raster.getCoordForIndex(xi, yi);
-				double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
-				if (xi == 0) yCoords.add((float) coord.getY());
-				if (yi == 0) xCoords.add((float) coord.getX());
-				valuesList.add((float) value);
+			times.add(0);
+
+			for (int xi = 0; xi < xLength.get(0); xi++) {
+				for (int yi = 0; yi < yLength.get(0); yi++) {
+					Coord coord = raster.getCoordForIndex(xi, yi);
+					double value = rasterMap.get(pollutant).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
+					if (xi == 0) yCoords.add((float) coord.getY());
+					if (yi == 0) xCoords.add((float) coord.getX());
+					valuesList.add((float) value);
+				}
 			}
-		}
 
 
-		values.put(String.valueOf(Pollutant.CO2_TOTAL), valuesList);
+			values.put(String.valueOf(pollutant), valuesList);
 
-		avroData.setYCoords(yCoords);
-		avroData.setXCoords(xCoords);
-		avroData.setData(values);
-		avroData.setTimestamps(times);
+			avroData.setYCoords(yCoords);
+			avroData.setXCoords(xCoords);
+			avroData.setData(values);
+			avroData.setTimestamps(times);
 
-		DatumWriter<XYTData> datumWriter = new SpecificDatumWriter<>(XYTData.class);
-		try (DataFileWriter<XYTData> dataFileWriter = new DataFileWriter<>(datumWriter)) {
-			dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
-			dataFileWriter.create(avroData.getSchema(), IOUtils.getOutputStream(IOUtils.getFileUrl(output.getPath("emissions_grid_per_day.%s", "avro").toString()), false));
-			dataFileWriter.append(avroData);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			DatumWriter<XYTData> datumWriter = new SpecificDatumWriter<>(XYTData.class);
+			try (DataFileWriter<XYTData> dataFileWriter = new DataFileWriter<>(datumWriter)) {
+				dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
+				String fileName = output.getPath("emissions_grid_per_day.%s", "avro").toString();
+				fileName = fileName.replace("emissions_grid_per_day", pollutant + "_" + "emissions_grid_per_day");
+				dataFileWriter.create(avroData.getSchema(), IOUtils.getOutputStream(IOUtils.getFileUrl(fileName), false));
+				dataFileWriter.append(avroData);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+
 		}
 	}
 
@@ -385,7 +391,10 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
 
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_grid_per_day.%s", "csv")),
+		String fileName = output.getPath("emissions_grid_per_day.%s", "csv").toString();
+		fileName = fileName.replace("emissions_grid_per_day", Pollutant.CO2_TOTAL + "_" + "emissions_grid_per_day");
+
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(Path.of(fileName)),
 			CSVFormat.DEFAULT.builder().setCommentMarker('#').build())) {
 
 			String crs = ProjectionUtils.getCRS(network);
@@ -441,7 +450,10 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		Raster raster = firstBin.values().stream().findFirst().orElseThrow();
 
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("emissions_grid_per_hour.%s", "csv").toString()),
+		String fileName = output.getPath("emissions_grid_per_hour.%s", "csv").toString();
+		fileName = fileName.replace("emissions_grid_per_hour", Pollutant.CO2_TOTAL + "_" + "emissions_grid_per_hour");
+
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(fileName),
 			CSVFormat.DEFAULT.builder().setCommentMarker('#').build())) {
 
 			String crs = ProjectionUtils.getCRS(network);
@@ -499,55 +511,59 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		if (crs == null)
 			crs = config.global().getCoordinateSystem();
 
-		XYTData avroData = new XYTData();
-		avroData.setCrs(crs);
-
 		Map<Pollutant, Raster> rasterMap = FastEmissionGridAnalyzer.processHandlerEmissions(emissionsEventHandler.getLink2pollutants(), network, gridSize, 20);
 		List<Integer> xLength = rasterMap.values().stream().map(Raster::getXLength).distinct().toList();
 		List<Integer> yLength = rasterMap.values().stream().map(Raster::getYLength).distinct().toList();
 		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
 
-		List<Float> xCoords = new ArrayList<>();
-		List<Float> yCoords = new ArrayList<>();
-		Map<CharSequence, List<Float>> values = new HashMap<>();
-		List<Float> valuesList = new ArrayList<>();
-		List<Integer> times = new ArrayList<>();
+		for (Pollutant pollutant : Pollutant.values()) {
+			XYTData avroData = new XYTData();
+			avroData.setCrs(crs);
 
-		for (TimeBinMap.TimeBin<Map<Pollutant, Raster>> timeBin : timeBinMap.getTimeBins()) {
+			List<Float> xCoords = new ArrayList<>();
+			List<Float> yCoords = new ArrayList<>();
+			Map<CharSequence, List<Float>> values = new HashMap<>();
+			List<Float> valuesList = new ArrayList<>();
+			List<Integer> times = new ArrayList<>();
 
-			boolean isFirst = times.isEmpty();
+			for (TimeBinMap.TimeBin<Map<Pollutant, Raster>> timeBin : timeBinMap.getTimeBins()) {
 
-			times.add((int) timeBin.getStartTime());
+				boolean isFirst = times.isEmpty();
 
-			for (int xi = 0; xi < xLength.get(0); xi++) {
-				for (int yi = 0; yi < yLength.get(0); yi++) {
-					Coord coord = raster.getCoordForIndex(xi, yi);
+				times.add((int) timeBin.getStartTime());
 
-					if (xi == 0 && isFirst)
-						yCoords.add((float) coord.getY());
-					if (yi == 0 && isFirst)
-						xCoords.add((float) coord.getX());
+				for (int xi = 0; xi < xLength.get(0); xi++) {
+					for (int yi = 0; yi < yLength.get(0); yi++) {
+						Coord coord = raster.getCoordForIndex(xi, yi);
 
-					double value = timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
-					valuesList.add((float) value);
+						if (xi == 0 && isFirst)
+							yCoords.add((float) coord.getY());
+						if (yi == 0 && isFirst)
+							xCoords.add((float) coord.getX());
+
+						double value = timeBin.getValue().get(pollutant).getValueByIndex(xi, yi) * sample.getUpscaleFactor();
+						valuesList.add((float) value);
+					}
 				}
 			}
-		}
 
-		values.put(String.valueOf(Pollutant.CO2_TOTAL), valuesList);
+			values.put(String.valueOf(pollutant), valuesList);
 
-		avroData.setYCoords(yCoords);
-		avroData.setXCoords(xCoords);
-		avroData.setData(values);
-		avroData.setTimestamps(times);
+			avroData.setYCoords(yCoords);
+			avroData.setXCoords(xCoords);
+			avroData.setData(values);
+			avroData.setTimestamps(times);
 
-		DatumWriter<XYTData> datumWriter = new SpecificDatumWriter<>(XYTData.class);
-		try (DataFileWriter<XYTData> dataFileWriter = new DataFileWriter<>(datumWriter)) {
-			dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
-			dataFileWriter.create(avroData.getSchema(), IOUtils.getOutputStream(IOUtils.getFileUrl(output.getPath("emissions_grid_per_hour.%s", "avro").toString()), false));
-			dataFileWriter.append(avroData);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			DatumWriter<XYTData> datumWriter = new SpecificDatumWriter<>(XYTData.class);
+			try (DataFileWriter<XYTData> dataFileWriter = new DataFileWriter<>(datumWriter)) {
+				dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
+				String fileName = output.getPath("emissions_grid_per_hour.%s", "avro").toString();
+				fileName = fileName.replace("emissions_grid_per_hour", pollutant + "_" + "emissions_grid_per_hour");
+				dataFileWriter.create(avroData.getSchema(), IOUtils.getOutputStream(IOUtils.getFileUrl(fileName), false));
+				dataFileWriter.append(avroData);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
 		}
 	}
 

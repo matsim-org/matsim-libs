@@ -101,12 +101,12 @@ class RunJointDemandCarToggleJspritExample {
         config.replanning().setFractionOfIterationsToDisableInnovation(.8);
         ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
         home.setTypicalDuration(14 * 3600);
-        config.scoring().addActivityParams(home);
+        config.scoring().addDefaultActivityParams(home);
         ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
         work.setTypicalDuration(14 * 3600);
         work.setOpeningTime(8 * 3600);
         work.setClosingTime(8 * 3600);
-        config.scoring().addActivityParams(work);
+        config.scoring().addDefaultActivityParams(work);
         config.controller().setWriteEventsInterval(5);
         config.controller().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandCarToggleJspritExample");
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

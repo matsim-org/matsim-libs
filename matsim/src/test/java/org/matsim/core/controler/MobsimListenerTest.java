@@ -24,6 +24,7 @@ package org.matsim.core.controler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.testcases.MatsimTestUtils;
@@ -40,6 +41,8 @@ public class MobsimListenerTest {
 	@Test
 	void testRunMobsim_listenerTransient() {
         Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail. paul, jul'26
+		cfg.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
         cfg.controller().setLastIteration(1);
         cfg.controller().setWritePlansInterval(0);
         final Controler c = new Controler(cfg);

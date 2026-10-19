@@ -19,57 +19,61 @@
 
 package org.matsim.contrib.ev.stats;
 
-import static java.util.stream.Collectors.*;
-import static org.matsim.contrib.common.timeprofile.TimeProfileCollector.ProfileCalculator;
-
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.vehicles.Vehicles;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
+import static org.matsim.contrib.common.timeprofile.TimeProfileCollector.ProfileCalculator;
 
 public class VehicleTypeAggregatedChargeTimeProfileCollectorProvider implements Provider<MobsimListener> {
 	private final ElectricFleet evFleet;
+	private final Vehicles vehicles;
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public VehicleTypeAggregatedChargeTimeProfileCollectorProvider(ElectricFleet evFleet, MatsimServices matsimServices) {
+	public VehicleTypeAggregatedChargeTimeProfileCollectorProvider(ElectricFleet evFleet, Vehicles vehicles, MatsimServices matsimServices) {
 		this.evFleet = evFleet;
+		this.vehicles = vehicles;
 		this.matsimServices = matsimServices;
 	}
 
 	@Override
 	public MobsimListener get() {
 		final String ALL_VEHICLES_ID = "all vehicles";
-		var vehicleTypes = evFleet.getElectricVehicles()
-				.values()
-				.stream()
-				.map(ev -> ev.getVehicleSpecification().getMatsimVehicle().getType().getId() + "")
-				.collect(Collectors.toCollection(LinkedHashSet::new));
+		var evs = vehicles.getVehicles().values().stream()
+			.filter(v -> evFleet.hasVehicle(v.getId()))
+			.map(v -> evFleet.getVehicle(v.getId()))
+			.toList();
+
+		var vehicleTypes = evs
+			.stream()
+			.map(ev -> ev.getVehicleSpecification().getMatsimVehicle().getType().getId() + "")
+			.collect(Collectors.toCollection(LinkedHashSet::new));
 		vehicleTypes.add(ALL_VEHICLES_ID);
 
 		var header = ImmutableList.copyOf(vehicleTypes);
 		ProfileCalculator calculator = () -> {
-			Map<String, Double> averageSocByType = evFleet.getElectricVehicles()
-					.values()
-					.stream()
-					.collect(groupingBy(ev -> ev.getVehicleSpecification().getMatsimVehicle().getType().getId() + "",
-							mapping(ev -> EvUnits.J_to_kWh(ev.getBattery().getCharge()), averagingDouble(c -> c))));
-			double averageSoc = evFleet.getElectricVehicles()
-					.values()
-					.stream()
-					.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getCharge()))
-					.average()
-					.orElse(Double.NaN);// when no vehicle in the fleet, return NaN
+			Map<String, Double> averageSocByType = evs
+				.stream()
+				.collect(groupingBy(ev -> ev.getVehicleSpecification().getMatsimVehicle().getType().getId() + "",
+					mapping(ev -> EvUnits.J_to_kWh(ev.getBattery().getCharge()), averagingDouble(c -> c))));
+			double averageSoc = evs
+				.stream()
+				.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getCharge()))
+				.average()
+				.orElse(Double.NaN);// when no vehicle in the fleet, return NaN
 			averageSocByType.put(ALL_VEHICLES_ID, averageSoc);
 			return ImmutableMap.copyOf(averageSocByType);
 		};

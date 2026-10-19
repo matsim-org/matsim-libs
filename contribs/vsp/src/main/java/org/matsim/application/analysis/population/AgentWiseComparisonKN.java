@@ -164,7 +164,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		new AgentWiseComparisonKN().execute( args );
 	}
 	private static void generateFilteredEventsFile( String baseDir ){
-		String inFileName = globFile( Path.of( baseDir ),  "*output_" + DefaultFiles.events.getFilename() + ".gz" ).toString();
+		String inFileName = globFile( Path.of( baseDir ),  "*output_" + DefaultFiles.events.getFilename() + "*" ).toString();
+		// (trailing "*" instead of ".gz" so that any compression (gz/lz4/zst) or no compression is matched; kn's default output is now zst)
 		String outFileName = baseDir + "/" + onlyMoneyAndStuck+"output_events_filtered.xml.gz";
 		// (yy Das lässt die runId weg.)
 
@@ -205,10 +206,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		List<String> eventsFilePatterns = new ArrayList<>();
 		if( !prefixList.isEmpty() ){
 			for( String prefix : prefixList ){
-				eventsFilePatterns.add( "*" + prefix + "output_events_filtered.xml.gz" );
+				eventsFilePatterns.add( "*" + prefix + "output_events_filtered.xml*" );
 			}
 		} else{
-			eventsFilePatterns.add( "*output_events.xml.gz" );
+			eventsFilePatterns.add( "*output_events.xml*" );
 		}
 
 		// ############################
@@ -360,8 +361,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 				boolean haveAddedFirstPtAscOfTrip = false;
 				for( Leg leg : trip.getLegsOnly() ){
-					final ScoringParameterSet subpopScoringParams = config.scoring().getScoringParameters( PopulationUtils.getSubpopulation( person ) );
-					final ModeParams modeParams = subpopScoringParams.getModes().get( leg.getMode() );
+					final ScoringParameterSet subpopScoringParams = config.scoring().getScoringParametersOrDefault( PopulationUtils.getSubpopulation( person ) );
+					final ModeParams modeParams = subpopScoringParams.getModeParams().get( leg.getMode() );
 
 					// ttime:
 					sumTtimes += leg.getTravelTime().seconds();

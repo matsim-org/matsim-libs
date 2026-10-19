@@ -68,7 +68,7 @@ public class TeleportationEngineWDistanceCheckTest {
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		ActivityParams params = new ActivityParams("dummy" ) ;
-		config.scoring().addActivityParams(params);
+		config.scoring().addDefaultActivityParams(params);
 		params.setScoringThisActivityAtAll(false);
 
 		StrategySettings stratSets = new StrategySettings() ;

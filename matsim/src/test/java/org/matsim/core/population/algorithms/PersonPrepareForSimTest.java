@@ -489,6 +489,7 @@ public class PersonPrepareForSimTest {
 		// set config, such that inconsistency is ignored
 		Config config = ConfigUtils.createConfig();
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
 
@@ -563,5 +564,75 @@ public class PersonPrepareForSimTest {
 			net.addLink(link1);
 			net.addLink(l2);
 		}
+	}
+
+	@Test
+	void testSingleLegTripCustomTeleportedMode_consistencyCheckIgnored() {
+		Config config = ConfigUtils.createConfig();
+		// Set consistency check to abort to strictly test if our mode is successfully ignored
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.abortOnInconsistency);
+
+		// Add a custom mode (e.g. "ride") to the teleported modes
+		config.routing().addTeleportedModeParams(new RoutingConfigGroup.TeleportedModeParams("ride"));
+
+		Scenario sc = ScenarioUtils.createScenario(config);
+		createAndAddNetwork(sc);
+		Population pop = sc.getPopulation();
+
+		PopulationFactory pf = pop.getFactory();
+		Person person = pf.createPerson(Id.create("teleported_agent", Person.class));
+		Plan plan = pf.createPlan();
+
+		Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+		plan.addActivity(activity1);
+
+		// Create a single leg trip with the custom teleported mode
+		Leg leg = pf.createLeg("ride");
+		TripStructureUtils.setRoutingMode(leg, "ride");
+		plan.addLeg(leg);
+
+		Activity activity2 = pf.createActivityFromCoord("w", new Coord((double) 1900, -10));
+		plan.addActivity(activity2);
+
+		person.addPlan(plan);
+		pop.addPerson(person);
+		Assertions.assertDoesNotThrow(() -> new PersonPrepareForSim(new DummyRouter(), sc).run(person),
+			"PersonPrepareForSim should ignore single-leg trips for configured teleported modes.");
+	}
+
+	@Test
+	void testSingleLegTripMainMode_consistencyCheckTriggers() {
+		Config config = ConfigUtils.createConfig();
+		// Set consistency check to abort
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.abortOnInconsistency);
+
+		Scenario sc = ScenarioUtils.createScenario(config);
+		createAndAddNetwork(sc);
+		Population pop = sc.getPopulation();
+
+		PopulationFactory pf = pop.getFactory();
+		Person person = pf.createPerson(Id.create("car_agent", Person.class));
+		Plan plan = pf.createPlan();
+
+		Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+		plan.addActivity(activity1);
+
+		// "car" is a main mode. A single leg "car" trip without access/egress should trigger the check.
+		Leg leg = pf.createLeg(TransportMode.car);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.car);
+		plan.addLeg(leg);
+
+		Activity activity2 = pf.createActivityFromCoord("w", new Coord((double) 1900, -10));
+		plan.addActivity(activity2);
+
+		person.addPlan(plan);
+		pop.addPerson(person);
+
+		// This should throw an exception because 'car' is a main mode and has no access/egress legs.
+		Exception exception = Assertions.assertThrows(RuntimeException.class,
+			() -> new PersonPrepareForSim(new DummyRouter(), sc).run(person));
+
+		Assertions.assertTrue(exception.getMessage().contains("trip with no access/egress leg"),
+			"The exception message should mention the missing access/egress legs.");
 	}
 }

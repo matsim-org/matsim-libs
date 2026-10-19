@@ -57,14 +57,12 @@ import java.util.*;
  *     <li>avgCarOccupancyDuringBicycleTraversal: average car occupancy on the same link during the bicycle traversal</li>
  * </ul>
  *
- * @author dziemke, vizsim
+ * @author dziemke, smetzler
  */
 class BicycleScoreEventsCreator implements
 //		SumScoringFunction.LegScoring, SumScoringFunction.ArbitraryEventScoring
-	VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler {
-// -----------------------------------------------------------------------------
-// Historical note
-// -----------------------------------------------------------------------------
+		VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,VehicleLeavesTrafficEventHandler
+{
 // yyyy The car interaction is still somewhat primitive -- a vehicle leaving a link gets a penalty that is multiplied with the number of cars that
 // are on the link at that moment.  Evidently, this could be improved, by counting the cars that actually overtake the bicycle.  Not very difficult
 // ...
@@ -129,6 +127,8 @@ class BicycleScoreEventsCreator implements
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
+		if (event.getLinkId().toString().startsWith("pt_")) return;
+
 		// 1. Track vehicle and first link for bicycleAdditionalLinkScore.
 		vehicle2driver.handleEvent(event);
 
@@ -165,8 +165,10 @@ class BicycleScoreEventsCreator implements
 		}
 	}
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
+	@Override public void handleEvent( LinkEnterEvent event ) {
+
+		if (event.getLinkId().toString().startsWith("pt_")) return;
+
 		if (this.bicycleConfig.isMotorizedInteraction()) {
 			String mode = this.modeFromVehicle.get(event.getVehicleId());
 			if (mode == null) {
@@ -198,56 +200,48 @@ class BicycleScoreEventsCreator implements
 		}
 	}
 
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		String mode = this.modeFromVehicle.get(event.getVehicleId());
+	@Override public void handleEvent( LinkLeaveEvent event ){
+		if (event.getLinkId().toString().startsWith("pt_")) return;
 
-		if (this.bicycleConfig.isCarCountOnBicycleLeaveLink() && mode != null) {
-			// 1. carCountOnBicycleLeaveLink: decrement link occupancy.
-			// dec count by one:
-			numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
-			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
-			Gbl.assertIf(map.merge(event.getLinkId(), -1., Double::sum) >= 0.);
-		}
+		if (this.bicycleConfig.isMotorizedInteraction()) {
+				// dec count by one:
+				String mode = this.modeFromVehicle.get(event.getVehicleId());
+				numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
+				Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
+				Gbl.assertIf(map.merge(event.getLinkId(), -1., Double::sum) >= 0);
+			}
 
-		if (this.bicycleConfig.isAvgCarOccupancyDuringBicycleTraversal() && TransportMode.car.equals(mode)) {
-			// 1b. avgCarOccupancyDuringBicycleTraversal: update exposure before changing car occupancy.
-			updateBikeExposureOnLink(event.getLinkId(), event.getTime());
-			decrementVehicleCountOnLink(TransportMode.car, event.getLinkId());
-		}
+			if (vehicle2driver.getDriverOfVehicle(event.getVehicleId()) != null) {
+				double amount = additionalBicycleLinkScore.computeLinkBasedScore(network.getLinks().get(event.getLinkId()),
+					event.getVehicleId(), this.bicycleMode);
 
-		if (vehicle2driver.getDriverOfVehicle(event.getVehicleId()) != null) {
-			// 2. bicycleAdditionalLinkScore: emit score for static bicycle link attributes.
-			double amount = additionalBicycleLinkScore.computeLinkBasedScore(network.getLinks().get(event.getLinkId()),
-				event.getVehicleId(), this.bicycleMode);
-
-			// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.
+				// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.
 //			it would be more straight forward to do the mode check here,
 //			but we do not have the Vehicles Object in this class, which we need to retrieve the mode
 //			of the current vehicle. -sm0925
-			if (!Double.isNaN(amount)) {
-				final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle(event.getVehicleId());
-				Gbl.assertNotNull(driverOfVehicle);
-				this.eventsManager.processEvent(new PersonScoreEvent(event.getTime(), driverOfVehicle, amount, BICYCLE_ADDITIONAL_LINK_SCORE));
+				if (!Double.isNaN(amount)) {
+					final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle(event.getVehicleId());
+					Gbl.assertNotNull(driverOfVehicle);
+					this.eventsManager.processEvent(new PersonScoreEvent(event.getTime(), driverOfVehicle, amount, BICYCLE_ADDITIONAL_LINK_SCORE));
 
-				if (this.bicycleConfig.isCarCountOnBicycleLeaveLink()) {
-					// 3. bicycleMotorizedInteractionScore: emit carCountOnBicycleLeaveLink.
-					// yyyy this is the place where instead a data structure would need to be build that counts interaction with every car
-					// that entered the link after the bicycle, and left it before.  kai, jul'23
-					var carCounts = this.numberOfVehiclesOnLinkByMode.get(TransportMode.car);
-					if (carCounts != null) {
-						double interactionAmount =
-							MARGINAL_UTILITY_OF_CAR_COUNT_ON_BICYCLE_LEAVE_LINK * carCounts.getOrDefault(event.getLinkId(), 0.);
-						if (interactionAmount != 0.) {
-							this.eventsManager.processEvent(
-								new PersonScoreEvent(event.getTime(), driverOfVehicle, interactionAmount, BICYCLE_MOTORIZED_INTERACTION_SCORE));
+					if (this.bicycleConfig.isCarCountOnBicycleLeaveLink()) {
+						// 3. bicycleMotorizedInteractionScore: emit carCountOnBicycleLeaveLink.
+						// yyyy this is the place where instead a data structure would need to be build that counts interaction with every car
+						// that entered the link after the bicycle, and left it before.  kai, jul'23
+						var carCounts = this.numberOfVehiclesOnLinkByMode.get(TransportMode.car);
+						if (carCounts != null) {
+							double interactionAmount =
+								MARGINAL_UTILITY_OF_CAR_COUNT_ON_BICYCLE_LEAVE_LINK * carCounts.getOrDefault(event.getLinkId(), 0.);
+							if (interactionAmount != 0.) {
+								this.eventsManager.processEvent(
+									new PersonScoreEvent(event.getTime(), driverOfVehicle, interactionAmount, BICYCLE_MOTORIZED_INTERACTION_SCORE));
+							}
 						}
 					}
 				}
+			} else {
+				log.warn("no driver found for vehicleId={}; not clear why this could happen", event.getVehicleId());
 			}
-		} else {
-			log.warn("no driver found for vehicleId=" + event.getVehicleId() + "; not clear why this could happen");
-		}
 
 		if (this.bicycleConfig.isCarsPassedBicycleOnLink()) {
 			// 4. bicycleMotorizedInteractionScore: evaluate carsPassedBicycleOnLink.
@@ -260,8 +254,8 @@ class BicycleScoreEventsCreator implements
 		}
 	}
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
+	@Override public void handleEvent( VehicleLeavesTrafficEvent event ){
+		if (event.getLinkId().toString().startsWith("pt_")) return;
 		String mode = this.modeFromVehicle.get(event.getVehicleId());
 
 		if (this.bicycleConfig.isCarCountOnBicycleLeaveLink() && mode != null) {
@@ -327,7 +321,6 @@ class BicycleScoreEventsCreator implements
 		cleanupBikeExposureState(event.getVehicleId());
 		this.currentLinkEnterInfoByVehicle.remove(event.getVehicleId());
 	}
-
 	private void registerBikeExposureEnter(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		cleanupBikeExposureState(vehicleId);
 		this.bikeExposureInfoByVehicle.put(vehicleId, new BikeExposureInfo(linkId, time, time, 0.));

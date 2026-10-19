@@ -93,7 +93,7 @@ public final class TravelTimeCalculator implements AggregatingEventHandler<Trave
 	/**
 	 * These have been received from other partitions and will not be sent out,
 	 */
-	private final IdSet<Link> receivedIds = new IdSet(Link.class);
+	private final IdSet<Link> receivedIds = new IdSet<>(Link.class);
 
 	@Inject
 	private QSimConfigGroup qsimConfig;
@@ -106,7 +106,7 @@ public final class TravelTimeCalculator implements AggregatingEventHandler<Trave
 		return calculator;
 	}
 
-	private static TravelTimeCalculator configure(TravelTimeCalculator calculator, TravelTimeCalculatorConfigGroup config, Network network) {
+	private static void configure( TravelTimeCalculator calculator, TravelTimeCalculatorConfigGroup config, Network network ) {
 		// This should be replaced by a builder if we need the functionality.  kai/mads, feb'19
 
 		switch (config.getTravelTimeGetterType()) {
@@ -119,14 +119,13 @@ public final class TravelTimeCalculator implements AggregatingEventHandler<Trave
 			default:
 				throw new RuntimeException(config.getTravelTimeGetterType() + " is unknown!");
 		}
-		return calculator;
 	}
 
 	@Deprecated // user builder instead.  kai, feb'19
 	@Inject
-		// yyyy why is this needed?  In general, this class is NOT injected, but explicitly constructed in TravelTimeCalculatorModule.  kai, feb'19
 	TravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, EventsManager eventsManager, Network network) {
-		// this injected constructor is not used when getSeparateModes is true
+		// this injected constructor is used when getSeparateModes is false
+		// --> one of these places where one needs to have the mode
 		this(network, ttconfigGroup.getTraveltimeBinSize(), ttconfigGroup.getMaxTime(), ttconfigGroup.isCalculateLinkTravelTimes(),
 			ttconfigGroup.isCalculateLinkToLinkTravelTimes(), ttconfigGroup.isFilterModes(), CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModesAsString()));
 		eventsManager.addHandler(this);
@@ -192,6 +191,7 @@ public final class TravelTimeCalculator implements AggregatingEventHandler<Trave
 
 	public final static class Builder {
 		// The idea here is that the config group will NOT be passed into this object any more. kai, feb'19
+		// --> But how is this supposed to work?  We could at best try to not pass it into TravelTimeCalculator.
 
 		private final Network network;
 		private double timeslice = 900;

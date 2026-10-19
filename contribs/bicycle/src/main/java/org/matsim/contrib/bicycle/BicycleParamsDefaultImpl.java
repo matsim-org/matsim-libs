@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import static org.matsim.contrib.bicycle.BicycleLinkSpeedCalculatorDefaultImpl.hasNotAttribute;
 
-
 public class BicycleParamsDefaultImpl implements BicycleParams {
 
 	// At first glance it seems like this method could be combined with method computeSurfaceFactor,
@@ -23,10 +22,9 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 
 		if (surface == null) return 1.0;
 
-		// TODO concret vs concrete:lanes
 		return switch (surface) {
 			case "paved", "asphalt" -> 1.0;
-			case "concrete:lanes" -> .95;
+			case "concrete", "concrete:lanes" -> .95;
 			case "concrete_plates", "concrete:plates", "fine_gravel" -> .9;
 			case "paving_stones", "paving_stones:35", "paving_stones:30" -> .8;
 			case "compacted" -> .7;
@@ -34,11 +32,9 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 			case "sett", "cobblestone;flattened", "cobblestone:flattened" -> .5;
 			case "cobblestone", "stone", "grass", "compressed", "paving_stones:3" -> .4;
 			case "cobblestone (bad)", "dirt", "earth", "wood", "pebblestone", "sand" -> .3;
-			case "concrete" -> .1;
 			default -> .85;
 		};
 	}
-
 
 	@Override
 	public double getInfrastructureFactor(String type, String infrastructureValue,
@@ -52,7 +48,7 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 
 	private double getInfrastructureFactorForCycleway(String type, String cyclewayType) {
 		if (type == null) return 0.85;
-
+		if (type.equals("cycleway")) return 1.0;
 		if (hasNoCycleway(cyclewayType)) {
 			return switch (type) {
 				case "trunk" -> 0.05;
@@ -133,7 +129,9 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 		};
 	}
 
-	// TODO Simon: use smoothness and surface as fallback, also mak sure to use the bicycle smoothness/surface when we have some infrasturture
+	// TODO Simon:
+	//  * use smoothness and surface as fallback,
+	//  * make sure to use the bicycle smoothness/surface when we have some separate infrasturture (cycleway:right=track and cycleway:right:surface=paving_stones)
 	@Override
 	public double computeSurfaceFactor(Link link, BicycleUtils.BicycleInfraAttribute attr) {
 		if (hasNotAttribute(link, BicycleUtils.WAY_TYPE)

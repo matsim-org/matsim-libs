@@ -8,6 +8,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -27,7 +28,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 import picocli.CommandLine;
 
 import java.io.IOException;
@@ -126,7 +129,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		createTravelDistancesShares(linkDemandEventHandler);
 		createLinkVolumeAnalysis(scenario, linkDemandEventHandler);
 		createRelationsAnalysis(linkDemandEventHandler);
-		createAnalysisPerVehicle(linkDemandEventHandler);
+		createAnalysisPerVehicle(linkDemandEventHandler, scenario);
 		createActivityAnalysis(scenario);
 
 		log.info("Done");
@@ -139,6 +142,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("activities.csv")), CSVFormat.DEFAULT)) {
 			HashMap<String, List<ActivityInformation>> activityToPersonMap = new HashMap<>();
 			List<String> activityDurationLabels = AnalysisUtils.createGroupLabels(activityDurationGroups);
+			Geometry geometryInvestigationArea = shp.isDefined() ? shp.getGeometry() : null;
 
 			printer.print("personId");
 			printer.print("groupOfSubpopulation");
@@ -166,6 +170,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				if (groupOfPerson != null) {
 					List<Activity> activities = TripStructureUtils.getActivities(person.getSelectedPlan(),
 						TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+					if (!startsInInvestigationArea(activities, geometryInvestigationArea))
+						continue;
 					// skip first and last activity
 					for (int i = 1; i <= activities.size() - 2; i++) {
 						Activity activity = activities.get(i);
@@ -203,9 +209,19 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		}
 	}
 
+	private boolean startsInInvestigationArea(List<Activity> activities, Geometry geometryInvestigationArea) {
+		if (geometryInvestigationArea == null)
+			return true;
+
+		if (activities.isEmpty() || activities.getFirst().getCoord() == null)
+			return false;
+
+		return geometryInvestigationArea.contains(MGC.coord2Point(activities.getFirst().getCoord()));
+	}
+
 	private void createGeneralTravelDataAnalysis(CommercialTrafficAnalysisEventHandler linkDemandEventHandler, Scenario scenario) {
 
-		HashMap<Id<Vehicle>, String> groupOfVehicles = linkDemandEventHandler.getGroupOfRelevantVehicles();
+		HashMap<Id<Vehicle>, String> groupOfVehicles = linkDemandEventHandler.getGroupOfAnalyzedVehicles();
 		Map<String, List<Id<Vehicle>>> vehiclesPerGroup = groupOfVehicles.entrySet().stream()
 			.collect(Collectors.groupingBy(
 				Map.Entry::getValue,
@@ -369,13 +385,13 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return filteredList;
 	}
 
-	private void createAnalysisPerVehicle(CommercialTrafficAnalysisEventHandler linkDemandEventHandler) {
+	private void createAnalysisPerVehicle(CommercialTrafficAnalysisEventHandler linkDemandEventHandler, Scenario scenario) {
 		HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle = linkDemandEventHandler.getTravelDistancesPerVehicle();
-		HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation = linkDemandEventHandler.getGroupOfRelevantVehicles();
+		HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation = linkDemandEventHandler.getGroupOfAnalyzedVehicles();
 		HashMap<Id<Vehicle>, Double> tourDurations = linkDemandEventHandler.getTourDurationPerVehicle();
 		HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId = linkDemandEventHandler.getVehicleIdToPersonId();
 		Object2IntOpenHashMap<Id<Person>> jobsPerPerson = linkDemandEventHandler.getNumberOfJobsPerPerson();
-		Map<String, Integer> maxDistanceWithDepotChargingInKilometers = createBatterieCapacitiesPerVehicleType();
+		Map<String, Integer> maxDistanceWithDepotChargingInKilometers = createBatterieCapacitiesPerVehicleType(scenario);
 		List<String> distanceLabels = AnalysisUtils.createGroupLabels(distGroups);
 		List<String> tourDurationLabels = AnalysisUtils.createGroupLabels(tourDurationGroups);
 		List<String> numberOfJobsLabels = AnalysisUtils.createGroupLabels(numberOfJobsGroups);
@@ -430,7 +446,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 							printer.print(String.valueOf(
 								Math.round(traveledDistanceInKm / (maxDistanceWithDepotChargingInKilometers.get(vehicleType)) * 100) / 100.0));
 						} else {
-							log.warn("Vehicle type {} not found in maxDistanceWithDepotChargingInKilometers map. Set to NaN", vehicleType);
 							printer.print(Double.NaN);
 							printer.print(Double.NaN);
 						}
@@ -550,25 +565,18 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	}
 
 	@NotNull
-	private Map<String, Integer> createBatterieCapacitiesPerVehicleType() {
+	private Map<String, Integer> createBatterieCapacitiesPerVehicleType(Scenario scenario) {
 		Map<String, Integer> maxDistanceWithDepotChargingInKilometers = new HashMap<>();
 
-		// Fahrzeugtyp und zugehörige maximale Reichweite (in Kilometern)
-		maxDistanceWithDepotChargingInKilometers.put("golf1.4", 200);
-		maxDistanceWithDepotChargingInKilometers.put("car", 200);
-		maxDistanceWithDepotChargingInKilometers.put("vwCaddy", 120); // https://www.vw-nutzfahrzeuge.at/caddy/caddy/ehybrid
-		maxDistanceWithDepotChargingInKilometers.put("mercedes313_parcel",
-			440); //https://www.adac.de/rund-ums-fahrzeug/autokatalog/marken-modelle/mercedes-benz/esprinter/
-		maxDistanceWithDepotChargingInKilometers.put("mercedes313", 440);
-		maxDistanceWithDepotChargingInKilometers.put("light8t", 174);
-		maxDistanceWithDepotChargingInKilometers.put("truck8t", 174);
-		maxDistanceWithDepotChargingInKilometers.put("medium18t", 395);
-		maxDistanceWithDepotChargingInKilometers.put("medium18t_parcel", 395);
-		maxDistanceWithDepotChargingInKilometers.put("truck18t", 395);
-		maxDistanceWithDepotChargingInKilometers.put("waste_collection_diesel", 280);
-		maxDistanceWithDepotChargingInKilometers.put("heavy40t", 416);
-		maxDistanceWithDepotChargingInKilometers.put("heavy", 416);
-		maxDistanceWithDepotChargingInKilometers.put("truck40t", 416);
+		// if parameters are set, use them, otherwise use default values based on typical vehicle types
+		scenario.getVehicles().getVehicleTypes().forEach((id, vehicleType) -> {
+			Double capacity = VehicleUtils.getEnergyCapacity(vehicleType.getEngineInformation());
+			Double consumptionPerMeter = VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType.getEngineInformation());
+			if (capacity != null && consumptionPerMeter != null && consumptionPerMeter > 0) {
+				int maxDistanceKm = (int) (capacity / (consumptionPerMeter * 1000));
+				maxDistanceWithDepotChargingInKilometers.putIfAbsent(id.toString(),	maxDistanceKm);
+			}
+		});
 		return maxDistanceWithDepotChargingInKilometers;
 	}
 

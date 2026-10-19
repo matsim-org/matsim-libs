@@ -20,7 +20,7 @@
 
 package org.matsim.matrices;
 
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.IOException;
 
 /*package*/ class MatricesWriterHandlerImplV1 implements MatricesWriterHandler {
@@ -40,7 +40,7 @@ import java.io.IOException;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startMatrices(final Matrices matrices, final BufferedWriter out) throws IOException {
+	public void startMatrices(final Matrices matrices, final Writer out) throws IOException {
 		out.write("<matrices");
 		if (matrices.getName() != null) {
 			out.write(" name=\"" + matrices.getName() + "\"");
@@ -49,7 +49,7 @@ import java.io.IOException;
 	}
 
 	@Override
-	public void endMatrices(final BufferedWriter out) throws IOException {
+	public void endMatrices(final Writer out) throws IOException {
 		out.write("</matrices>\n");
 	}
 
@@ -58,7 +58,7 @@ import java.io.IOException;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startMatrix(final Matrix matrix, final BufferedWriter out) throws IOException {
+	public void startMatrix(final Matrix matrix, final Writer out) throws IOException {
 		out.write("\t<matrix");
 		out.write(" id=\"" + matrix.getId() + "\"");
 
@@ -69,7 +69,7 @@ import java.io.IOException;
 	}
 
 	@Override
-	public void endMatrix(final BufferedWriter out) throws IOException {
+	public void endMatrix(final Writer out) throws IOException {
 		out.write("\t</matrix>\n\n");
 	}
 
@@ -78,7 +78,7 @@ import java.io.IOException;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startEntry(final Entry entry, final BufferedWriter out) throws IOException {
+	public void startEntry(final Entry entry, final Writer out) throws IOException {
 		out.write("\t\t<entry");
 		out.write(" from_id=\"" + entry.getFromLocation() + "\"");
 		out.write(" to_id=\"" + entry.getToLocation() + "\"");
@@ -87,7 +87,7 @@ import java.io.IOException;
 	}
 
 	@Override
-	public void endEntry(final BufferedWriter out) throws IOException {
+	public void endEntry(final Writer out) throws IOException {
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ import java.io.IOException;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void writeSeparator(final BufferedWriter out) throws IOException {
+	public void writeSeparator(final Writer out) throws IOException {
 		out.write("<!-- =================================================" +
 							"===================== -->\n\n");
 	}

@@ -6,7 +6,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.pseudosimulation.distributed.plans.PlanGenome;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by fouriep on 12/10/14.

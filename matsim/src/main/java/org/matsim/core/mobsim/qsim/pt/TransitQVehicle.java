@@ -32,7 +32,6 @@ import org.matsim.vehicles.VehicleCapacity;
 
 import java.util.Collection;
 
-
 public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle {
 
 	private TransitStopHandler stopHandler;
@@ -42,9 +41,6 @@ public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle
 		baseVehicle = new QVehicleImpl(basicVehicle);
 
 		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
-		if (capacity == null) {
-			throw new NullPointerException("No capacity set in vehicle type.");
-		}
 		// New default is that vehicle is created with capacity. Initial values are 1 seat for the driver and no standing room {@link org.matsim.vehicles.VehicleCapacity} (sep 19, KMT)
 		// PT does not count the driver, so only warn if there is indeed no real capacity (mar 21, mrieser)
 		if (capacity.getSeats() == 0 && capacity.getStandingRoom() == 0) {
@@ -160,6 +156,6 @@ public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle
 		return new Msg(baseMessage, handler);
 	}
 
-	record Msg(Message baseMessage, Message handlerMessage) implements Message {
+	public record Msg(Message baseMessage, Message handlerMessage) implements Message {
 	}
 }

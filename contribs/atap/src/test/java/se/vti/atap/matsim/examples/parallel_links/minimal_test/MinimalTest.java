@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup.NetworkRouteConsistencyCheck;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -79,6 +80,7 @@ public class MinimalTest {
 			config.qsim().setStuckTime(Double.POSITIVE_INFINITY);
 			config.addModule(new EmulationConfigGroup());
 			config.routing().setNetworkRouteConsistencyCheck(NetworkRouteConsistencyCheck.disable);
+			config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 
 			ATAPConfigGroup atapConfig = new ATAPConfigGroup();
 			atapConfig.setReplannerIdentifier(ReplannerIdentifierType.ATAP_EXACT_DISTANCE);

@@ -96,10 +96,10 @@ public class TestPositionEmissionModule {
 
         final ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("home")
                 .setTypicalDuration(20);
-        config.scoring().addActivityParams(homeParams);
+        config.scoring().addDefaultActivityParams(homeParams);
         final ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work")
                 .setTypicalDuration(20);
-        config.scoring().addActivityParams(workParams);
+        config.scoring().addDefaultActivityParams(workParams);
 
         var strategy = new ReplanningConfigGroup.StrategySettings();
         strategy.setStrategyName("ChangeExpBeta");

@@ -133,9 +133,9 @@ public class ScenarioCreator {
 		config.qsim().setTrafficDynamics(TrafficDynamics.queue);
 		config.replanning()
 				.addStrategySettings(new StrategySettings().setStrategyName(DefaultStrategy.ReRoute).setWeight(1.0));
-		config.scoring().addActivityParams(new ActivityParams("start").setScoringThisActivityAtAll(false));
-		config.scoring().addActivityParams(new ActivityParams("end").setScoringThisActivityAtAll(false));
-		config.scoring().addModeParams(new ModeParams(TransportMode.car).setMarginalUtilityOfTraveling(-1.0));
+		config.scoring().addDefaultActivityParams(new ActivityParams("start").setScoringThisActivityAtAll(false));
+		config.scoring().addDefaultActivityParams(new ActivityParams("end").setScoringThisActivityAtAll(false));
+		config.scoring().addDefaultModeParams(new ModeParams(TransportMode.car).setMarginalUtilityOfTraveling(-1.0));
 		return config;
 	}
 

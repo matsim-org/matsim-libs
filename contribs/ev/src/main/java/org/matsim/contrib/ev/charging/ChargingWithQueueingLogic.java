@@ -19,21 +19,15 @@
 
 package org.matsim.contrib.ev.charging;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ChargingWithQueueingLogic implements ChargingLogic {
 	protected final ChargerSpecification charger;
@@ -46,7 +40,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	private final Queue<ChargingVehicle> arrivingVehicles = new LinkedBlockingQueue<>();
 	private final Map<Id<Vehicle>, ChargingListener> listeners = new LinkedHashMap<>();
 
-	public ChargingWithQueueingLogic(ChargerSpecification charger,  EventsManager eventsManager, ChargingPriority priority, ChargerPower chargerPower) {
+	public ChargingWithQueueingLogic(ChargerSpecification charger, EventsManager eventsManager, ChargingPriority priority, ChargerPower chargerPower) {
 		this.charger = Objects.requireNonNull(charger);
 		this.eventsManager = Objects.requireNonNull(eventsManager);
 		this.priority = priority;
@@ -56,9 +50,9 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	@Override
 	public void chargeVehicles(double chargePeriod, double now) {
 		Iterator<ChargingVehicle> cvIter = pluggedVehicles.values().iterator();
-		
+
 		chargerPower.update(now);
-		
+
 		while (cvIter.hasNext()) {
 			ChargingVehicle cv = cvIter.next();
 
@@ -70,7 +64,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 			// maximum power with which the vehicle can charge
 			double chargingPower = cv.ev().getChargingPower().calcChargingPower(charger);
-			
+
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
 			double chargedEnergy = chargingPower * chargePeriod;
@@ -89,7 +83,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 			eventsManager.processEvent(new EnergyChargedEvent(now, charger.getId(), cv.ev().getId(), chargedEnergy, updatedCharge));
 			chargerPower.consumeEnergy(chargedEnergy);
-			
+
 			if (cv.strategy().isChargingCompleted()) {
 				cvIter.remove();
 				eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), cv.ev().getId(), cv.ev().getBattery().getCharge()));
@@ -106,9 +100,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			}
 		}
 
-		var arrivingVehiclesIter = arrivingVehicles.iterator();
-		while (arrivingVehiclesIter.hasNext()) {
-			var cv = arrivingVehiclesIter.next();
+		for (ChargingVehicle cv : arrivingVehicles) {
 			if (pluggedVehicles.size() >= charger.getPlugCount() || !plugVehicle(cv, now)) {
 				queueVehicle(cv, now);
 			}
@@ -150,6 +142,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 				if (queuedVehicle.ev() == ev) {
 					queuedVehiclesIter.remove();
 					eventsManager.processEvent(new QuitQueueAtChargerEvent(now, charger.getId(), ev.getId()));
+					listeners.remove(ev.getId()).notifyVehicleQuitChargerQueue(ev, now);
 					return; // found the vehicle
 				}
 			}
@@ -202,6 +195,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 		private final ChargingPriority.Factory chargingPriorityFactory;
 		private final ChargerPower.Factory chargerPowerFactory;
 
+		@Inject
 		public Factory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
 			this.eventsManager = eventsManager;
 			this.chargingPriorityFactory = chargingPriorityFactory;
@@ -210,7 +204,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 		@Override
 		public ChargingLogic create(ChargerSpecification charger) {
-			return new ChargingWithQueueingLogic(charger,  eventsManager, chargingPriorityFactory.create(charger), chargerPowerFactory.create(charger));
+			return new ChargingWithQueueingLogic(charger, eventsManager, chargingPriorityFactory.create(charger), chargerPowerFactory.create(charger));
 		}
 	}
 }

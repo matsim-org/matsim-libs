@@ -115,8 +115,8 @@ public final class RaptorUtils {
         raptorParams.setMarginalUtilityOfWaitingPt_utl_s(trConfig.getMarginalUtilityOfWaitingPt_utl_s());
 
         ScoringConfigGroup pcsConfig = config.scoring();
-        double marginalUtilityPerforming = pcsConfig.getPerforming_utils_hr() / 3600.0;
-        for (Map.Entry<String, ScoringConfigGroup.ModeParams> e : pcsConfig.getModes().entrySet()) {
+        double marginalUtilityPerforming = pcsConfig.getDefaultPerforming_utils_hr() / 3600.0;
+        for (Map.Entry<String, ScoringConfigGroup.ModeParams> e : pcsConfig.getDefaultModeParams().entrySet()) {
             String mode = e.getKey();
             ScoringConfigGroup.ModeParams modeParams = e.getValue();
             double marginalUtility_utl_s = modeParams.getMarginalUtilityOfTraveling()/3600.0 - marginalUtilityPerforming;

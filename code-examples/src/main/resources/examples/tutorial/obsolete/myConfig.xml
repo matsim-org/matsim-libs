@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="05:55:00" />
+		<param name="endTime" value="08:00:00" />
+	</module>
+
+	<module name="planCalcScore" >
+		<param name="BrainExpBeta" value="2.0" />
+		<param name="PathSizeLogitBeta" value="1.0" />
+		<param name="activityClosingTime_0" value="undefined" />
+		<param name="activityClosingTime_1" value="undefined" />
+		<param name="activityEarliestEndTime_0" value="undefined" />
+		<param name="activityEarliestEndTime_1" value="undefined" />
+		<param name="activityLatestStartTime_0" value="undefined" />
+		<param name="activityLatestStartTime_1" value="09:00:00" />
+		<param name="activityMinimalDuration_0" value="undefined" />
+		<param name="activityMinimalDuration_1" value="undefined" />
+		<param name="activityOpeningTime_0" value="undefined" />
+		<param name="activityOpeningTime_1" value="07:00:00" />
+		<param name="activityPriority_0" value="1.0" />
+		<param name="activityPriority_1" value="1.0" />
+		<param name="activityType_0" value="h" />
+		<param name="activityType_1" value="w" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="earlyDeparture" value="-0.0" />
+		<param name="lateArrival" value="-18.0" />
+		<param name="learningRate" value="1.0" />
+		<param name="marginalUtlOfDistance" value="0.0" />
+		<param name="performing" value="6.0" />
+		<param name="traveling" value="-6.0" />
+		<param name="travelingPt" value="-4.942" />
+		<param name="travelingWalk" value="-6.0" />
+		<param name="waiting" value="-0.0" />
+	</module>
+
+
+</config>

@@ -103,10 +103,10 @@ public class RunBicycleExample {
 		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(0.8));
 		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ReRoute").setWeight(0.2));
 
-		config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(12 * 60 * 60));
-		config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 60 * 60));
+		config.scoring().addDefaultActivityParams( new ActivityParams("home").setTypicalDuration(12*60*60 ) );
+		config.scoring().addDefaultActivityParams( new ActivityParams("work").setTypicalDuration(8*60*60 ) );
 
-		config.scoring().addModeParams(new ModeParams("bicycle").setConstant(0.).setMarginalUtilityOfDistance(-0.0004).setMarginalUtilityOfTraveling(-6.0).setMonetaryDistanceRate(0.));
+		config.scoring().addDefaultModeParams( new ModeParams("bicycle").setConstant(0. ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(-6.0 ).setMonetaryDistanceRate(0. ) );
 
 		config.routing().setNetworkModes(mainModeList);
 	}
@@ -137,7 +137,6 @@ public class RunBicycleExample {
 
 		controler.run();
 	}
-
 	public void runWithOwnScoring(Config config, boolean considerMotorizedInteraction) {
 		config.global().setNumberOfThreads(1);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -156,8 +155,8 @@ public class RunBicycleExample {
 
 		// now put hte mode vehicles into the vehicles data:
 		final VehiclesFactory vf = VehicleUtils.getFactory();
-		scenario.getVehicles().addVehicleType(vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class)));
-		scenario.getVehicles().addVehicleType(vf.createVehicleType(Id.create("bicycle", VehicleType.class)).setMaximumVelocity(4.16666666).setPcuEquivalents(0.25));
+		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class ) ) );
+		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create("bicycle", VehicleType.class ) ).setMaximumVelocity(4.16666666 ).setPcuEquivalents(0.25 ) );
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new BicycleModule());

@@ -57,7 +57,7 @@ public class DrtTeleportationWithModeChoiceTest {
 		ScoringConfigGroup.ModeParams bikeModeParams = new ScoringConfigGroup.ModeParams(TransportMode.bike);
 		bikeModeParams.setConstant(1.);
 		bikeModeParams.setMarginalUtilityOfTraveling(-6.);
-		config.scoring().addModeParams(bikeModeParams);
+		config.scoring().addDefaultModeParams(bikeModeParams);
 		// Update change mode
 		config.changeMode().setModes(new String[]{TransportMode.drt, TransportMode.bike});
 

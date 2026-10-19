@@ -12,6 +12,10 @@ import java.util.Set;
  */
 public final class TasteVariationsConfigParameterSet extends ReflectiveConfigGroup {
 
+	// Other than AdvancedScoring (currently in the matsim-berlin repo),this here does NOT need a switch of type
+	// "isUsingTasteVariations".  Since it is simply always there, but the default settings are "incomeExponent=0" (i.e. no
+	// income dependency) and "variationsOf=emptySet" (i.e. no taste variations).
+
 	/**
 	 * The name of the config group.
 	 */
@@ -19,7 +23,7 @@ public final class TasteVariationsConfigParameterSet extends ReflectiveConfigGro
 
 	@Parameter
 	@PositiveOrZero
-	@Comment("Exponent for income dependent scoring. Exponent for (global_income / personal_income) ** x. Default is 0, which disables it.")
+	@Comment("Exponent for income dependent scoring. Exponent for (average_income / personal_income) ** x. Default is x=0, which disables it.")
 	private double incomeExponent = 0;
 
 	@Parameter

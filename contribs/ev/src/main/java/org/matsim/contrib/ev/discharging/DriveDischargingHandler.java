@@ -22,17 +22,15 @@ package org.matsim.contrib.ev.discharging;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.vehicles.Vehicle;
 
@@ -46,8 +44,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * calculating the drive-related energy consumption. However, the time spent on the first link is used by the time-based
  * idle discharge process (see {@link IdleDischargingHandler}).
  */
+@DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class DriveDischargingHandler
-	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler, MobsimEngine {
+	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler, DistributedMobsimEngine {
 
 	private static class EvDrive {
 		private final Id<Vehicle> vehicleId;
@@ -67,7 +66,7 @@ public class DriveDischargingHandler
 
 	private final Network network;
 	private final EventsManager eventsManager;
-	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
+	private final ElectricFleet fleet;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
 
 	private final Queue<VehicleEntersTrafficEvent> trafficEnterEvents = new ConcurrentLinkedQueue<>();
@@ -77,21 +76,21 @@ public class DriveDischargingHandler
 	private final Netsim netsim;
 
 	@Inject
-	DriveDischargingHandler(Netsim netsim, ElectricFleet data, Network network, EventsManager eventsManager) {
+	DriveDischargingHandler(Netsim netsim, ElectricFleet fleet, Network network, EventsManager eventsManager) {
 		this.netsim = netsim;
 		this.network = network;
 		this.eventsManager = eventsManager;
-		eVehicles = data.getElectricVehicles();
-		evDrives = new ConcurrentHashMap<>(eVehicles.size() / 10);
+		this.fleet = fleet;
+		evDrives = new ConcurrentHashMap<>();
 	}
 
-	private ElectricVehicle getElectricVehicle(Id<Vehicle> vehicleId) {
-		return eVehicles.get(vehicleId);
-	}
+//	private ElectricVehicle getElectricVehicle(Id<Vehicle> vehicleId) {
+//		return electricFleet.getVehicle(vehicleId);
+//	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			trafficEnterEvents.add(event);
 		}
@@ -99,7 +98,7 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			linkLeaveEvents.add(event);
 		}
@@ -107,7 +106,7 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		if (getElectricVehicle(event.getVehicleId()) != null) {
+		if (fleet.getVehicle(event.getVehicleId()) != null) {
 			// handle only evs
 			trafficLeaveEvents.add(event);
 		}
@@ -115,10 +114,8 @@ public class DriveDischargingHandler
 
 	@Override
 	public void afterMobsim() {
-		// process remaining events
-		// pass time + 1, because we delay the processing of events during the mobsim. Yet, afterMobsim is called with the last time step of the mobsim
-		// when passing the last timestep no events will be processed, as the logic waits for the next timestep.
-		doSimStep(this.netsim.getSimTimer().getTimeOfDay() + 1);
+		// Process all remaining queued events. No cutoff is needed once mobsim has finished producing events.
+		drainQueuedEvents(Double.POSITIVE_INFINITY, this.netsim.getSimTimer().getTimeOfDay());
 	}
 
 	@Override
@@ -127,34 +124,38 @@ public class DriveDischargingHandler
 
 	@Override
 	public void doSimStep(double time) {
+		drainQueuedEvents(time, time);
+	}
+
+	private void drainQueuedEvents(double cutoffExclusive, double outputTime) {
 		while (!trafficEnterEvents.isEmpty()) {
 			var event = trafficEnterEvents.peek();
 
-			if (event.getTime() == time) {
+			if (event.getTime() >= cutoffExclusive) {
 				break; // see below
 			}
 
-			ElectricVehicle ev = getElectricVehicle(event.getVehicleId());
+			ElectricVehicle ev = fleet.getVehicle(event.getVehicleId());
 			evDrives.put(ev.getId(), new EvDrive(ev.getId(), ev));
 			trafficEnterEvents.remove();
 		}
 
-		handleQueuedEvents(linkLeaveEvents, time, false);
-		handleQueuedEvents(trafficLeaveEvents, time, true);
+		handleQueuedEvents(linkLeaveEvents, cutoffExclusive, outputTime, false);
+		handleQueuedEvents(trafficLeaveEvents, cutoffExclusive, outputTime, true);
 	}
 
-	private <E extends Event & HasVehicleId & HasLinkId> void handleQueuedEvents(Queue<E> queue, double time, boolean leftTraffic) {
+	private <E extends Event & HasVehicleId & HasLinkId> void handleQueuedEvents(Queue<E> queue, double cutoffExclusive, double outputTime, boolean leftTraffic) {
 		// We want to process events in the main thread (instead of the event handling threads).
 		// This is to eliminate race conditions, where the battery is read/modified by many threads without proper synchronisation
 		while (!queue.isEmpty()) {
 			var event = queue.peek();
-			if (event.getTime() == time) {
+			if (event.getTime() >= cutoffExclusive) {
 				// There is a potential race condition wrt processing events between doSimStep() and handleEvent().
 				// To ensure a deterministic behaviour, we only process events from the previous time step.
 				break;
 			}
 
-			var evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), time);
+			var evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime(), outputTime);
 			if (leftTraffic) {
 				evDrives.remove(evDrive.vehicleId);
 			} else {

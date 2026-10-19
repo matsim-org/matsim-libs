@@ -20,12 +20,13 @@
 
 package org.matsim.core.population.routes;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 
 /**
@@ -34,21 +35,21 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser
  */
-public interface NetworkRoute extends Route {
+public interface NetworkRoute extends Route, HasVehicleId {
 
-	public void setLinkIds(final Id<Link> startLinkId, final List<Id<Link>> linkIds, final Id<Link> endLinkId);
-
-	/**Design thoughts:<ul>
-	 * <li> yyyy It this general cost or monetary cost?  kai/benjamin, jun'11
-	 * </ul>
-	 */
-	public void setTravelCost(final double travelCost);
+	void setLinkIds(final Id<Link> startLinkId, final List<Id<Link>> linkIds, final Id<Link> endLinkId);
 
 	/**Design thoughts:<ul>
 	 * <li> yyyy It this general cost or monetary cost?  kai/benjamin, jun'11
 	 * </ul>
 	 */
-	public double getTravelCost();
+	void setTravelCost(final double travelCost);
+
+	/**Design thoughts:<ul>
+	 * <li> yyyy It this general cost or monetary cost?  kai/benjamin, jun'11
+	 * </ul>
+	 */
+	double getTravelCost();
 
 	/**
 	 * Returns the list of link ids that build the route. The links where the route
@@ -56,35 +57,33 @@ public interface NetworkRoute extends Route {
 	 * included in the list (note that they are in getStartLinkId() and getEndLinkId() of the Route super-interface).
 	 * @return a list containing the link ids the agents plans to travel along
 	 */
-	public List<Id<Link>> getLinkIds();
+	List<Id<Link>> getLinkIds();
 
 	/**
 	 * This method returns a new Route object with the subroute of this, using fromLinkId as the
 	 * subroute's startLink, toLinkId as the subroute's endLink, and the links in between fromLinkId
 	 * and toLinkIds set as the route's link
-	 * @param fromLinkId
-	 * @param toLinkId
+	 *
 	 * @return subroute of this route starting at fromLinkId and ending at toLinkId
 	 */
-	public NetworkRoute getSubRoute(final Id<Link> fromLinkId, final Id<Link> toLinkId);
+	NetworkRoute getSubRoute(final Id<Link> fromLinkId, final Id<Link> toLinkId);
 	// yyyy my intuition is that this should be removed from the API (and replaced by a static method in RouteUtils). kai, oct'17
 
 	/**
 	 * Sets the id of the vehicle that should be used to drive along this route.
-	 *
-	 * @param vehicleId
 	 */
-	public abstract void setVehicleId(final Id<Vehicle> vehicleId);
+	void setVehicleId(final Id<Vehicle> vehicleId);
 
 	/**
 	 * @return the id of the vehicle that should be used to drive along this route.
 	 */
-	public abstract Id<Vehicle> getVehicleId();
+	@Override
+	Id<Vehicle> getVehicleId();
 	// Does it really make sense to couple the vehicle to the route?  I would have coupled it to the leg.  kai, aug'10
 	// Well, I guess now it belongs to the route. :-)  kai, aug'10
 
 	@Override
-	public NetworkRoute clone();
+	NetworkRoute clone();
 	// to get the correct interface type.  kai, sep'17
 
 }

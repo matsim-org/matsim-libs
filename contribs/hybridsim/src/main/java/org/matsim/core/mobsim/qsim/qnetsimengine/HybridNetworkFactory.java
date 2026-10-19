@@ -31,7 +31,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
@@ -80,9 +79,9 @@ public final class HybridNetworkFactory implements QNetworkFactory {
 		if (link.getAllowedModes().contains("2ext")) {
 			LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
 			VehicleHandler vehicleHandler = new org.matsim.core.mobsim.qsim.qnetsimengine.DefaultVehicleHandler();
-			ParkingSearchTimeCalculator parkingSearchTimeCalculator = new DefaultParkingSearchTime();
+			ArrivalTimeCalculator arrivalTimeCalculator = new DefaultArrivalTime();
 			// yyyyyy I don't think that this would have been set correctly before I refactored this.  kai, feb'18
-			return new QSimExternalTransitionLink(link, this.externalEngine, context, netsimEngine, queueNode, linkSpeedCalculator, vehicleHandler, parkingSearchTimeCalculator);
+			return new QSimExternalTransitionLink(link, this.externalEngine, context, netsimEngine, queueNode, linkSpeedCalculator, vehicleHandler, arrivalTimeCalculator);
 		}
 //		QLinkImpl ret = new QLinkImpl(link, network, queueNode, linkSpeedCalculator);
 		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine);

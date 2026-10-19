@@ -107,8 +107,8 @@ public class MatrixBasedPtRouterIT {
 		config.plans().setInputFile(path+"plans.xml");
 
 		//add home and work activity to plansCalcScoreConfigGroup
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(43200));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(28800));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(43200));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(28800));
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		BoundingBox nbb = BoundingBox.createBoundingBox(network);

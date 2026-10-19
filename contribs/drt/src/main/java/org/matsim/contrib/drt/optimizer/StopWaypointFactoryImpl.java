@@ -14,6 +14,8 @@ public class StopWaypointFactoryImpl implements StopWaypointFactory {
     private final boolean scheduleWaitBeforeDrive;
 
     public StopWaypointFactoryImpl(DvrpLoadType loadType, boolean scheduleWaitBeforeDrive) {
+		// TODO Could you please document the meaning of parameter scheduleWaitBeforeDrive? Thanks, kai, may'26
+
         this.loadType = loadType;
         this.scheduleWaitBeforeDrive = scheduleWaitBeforeDrive;
     }

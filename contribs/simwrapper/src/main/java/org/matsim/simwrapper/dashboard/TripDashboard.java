@@ -541,6 +541,20 @@ public class TripDashboard implements Dashboard {
 			createDistancePlot(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args, resolvedArgsCache);
 			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args, resolvedArgsCache);
 		}
+		createComments(layout, rowSuffix, tabTitle);
+	}
+
+	private void createComments(Layout layout, String rowSuffix, String tabTitle) {
+		layout.row("info" + rowSuffix, tabTitle).el(TextBlock.class, (viz, data) -> {
+			viz.backgroundColor = "transparent";
+			viz.content = """
+				### Notes
+				- The distance distributions from MATSim come from trips.csv, and there they come from experienced_plans, and they use whatever is encoded in the leg.
+				- The distance distributions from "ref" are generated upstream by some python script.
+				  - For SrV, they use so-called 'GIS_LAENGE'.  That uses the routing distance from HERE api by mode; for PT they actually use the car routing distance (not documented).  We do not know if the car routing distances are congested or not.
+				  - For MiD, they use so-called 'wegkm'.   It is not documented if this distance is reported by the participants or calculted under defined conditions.
+				""";
+		});
 	}
 
 	private void createArrivalsAndDepartures(Layout layout, String rowSuffix, String tabTitle, String finalTab, String[] args, AtomicReference<String[]> resolvedArgsCache) {

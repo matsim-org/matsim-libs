@@ -52,9 +52,9 @@ class CreateUrbanEVTestScenario {
 		config.routing().setAccessEgressType( RoutingConfigGroup.AccessEgressType.none );
 
 		//register charging interaction activities for car
-		config.scoring().addActivityParams(
+		config.scoring().addDefaultActivityParams(
 				new ScoringConfigGroup.ActivityParams( TransportMode.car + UrbanEVModule.PLUGOUT_INTERACTION).setScoringThisActivityAtAll(false ) );
-		config.scoring().addActivityParams(
+		config.scoring().addDefaultActivityParams(
 				new ScoringConfigGroup.ActivityParams( TransportMode.car + UrbanEVModule.PLUGIN_INTERACTION).setScoringThisActivityAtAll( false ) );
 		config.network().setInputFile("1pctNetwork.xml");
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -63,7 +63,8 @@ class CreateUrbanEVTestScenario {
 		//set VehicleSource
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 		config.qsim().setEndTime(20*3600);
-
+		//This is needed because the plans don't contain access/egress legs. The test would otherwise fail.
+		config.routing().setAccessEgressConsistencyCheck(RoutingConfigGroup.AccessEgressConsistencyCheck.disable);
 		//load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

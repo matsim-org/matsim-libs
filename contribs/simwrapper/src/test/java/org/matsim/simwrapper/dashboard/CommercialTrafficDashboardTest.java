@@ -166,15 +166,15 @@ public class CommercialTrafficDashboardTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.global().setCoordinateSystem(TransformationFactory.EPSG4326);
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("commercial_start").setTypicalDuration(30 * 60));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(30 * 60));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("commercial_end").setTypicalDuration(30 * 60));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("service").setTypicalDuration(30 * 60));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("pickup").setTypicalDuration(30 * 60));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("delivery").setTypicalDuration(30 * 60));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("longDistance_start").setTypicalDuration(30 * 60));
-		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("longDistance_end").setTypicalDuration(30 * 60));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("commercial_start").setTypicalDuration(30 * 60));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(30 * 60));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("commercial_end").setTypicalDuration(30 * 60));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("service").setTypicalDuration(30 * 60));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("pickup").setTypicalDuration(30 * 60));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("delivery").setTypicalDuration(30 * 60));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("longDistance_start").setTypicalDuration(30 * 60));
+		config.scoring().addDefaultActivityParams(new ScoringConfigGroup.ActivityParams("longDistance_end").setTypicalDuration(30 * 60));
 
 		List<String> commercialPersonTraffic = List.of("commercialPersonTraffic", "commercialPersonTraffic_service", "goodsTraffic");
 		commercialPersonTraffic.forEach(subpopulation -> {
@@ -190,7 +190,7 @@ public class CommercialTrafficDashboardTest {
 
 		modes.forEach(mode -> {
 			ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
-			config.scoring().addModeParams(thisModeParams);
+			config.scoring().addDefaultModeParams(thisModeParams);
 		});
 
 		Set<String> qsimModes = new HashSet<>(config.qsim().getMainModes());
@@ -255,7 +255,10 @@ public class CommercialTrafficDashboardTest {
 		String center = coord.getX() + "," + coord.getY();
 		SimWrapper sw = SimWrapper.create(scenario.getConfig());
 		sw.getConfigGroup().defaultParams().setShp("shp/testRegions.shp");
-		sw.getConfigGroup().setSampleSize(0.1);
+
+//		sw.getConfigGroup().setSampleSize(0.1); // why?  flowCapFactor is 1.0
+		sw.getConfigGroup().setSampleSize( config.qsim().getFlowCapFactor() );
+
 		sw.getConfigGroup().defaultParams().setMapCenter(center);
 		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
 		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);

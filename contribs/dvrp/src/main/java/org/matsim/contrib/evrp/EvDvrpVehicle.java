@@ -28,7 +28,6 @@ import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.vehicles.Vehicle;
 
 /**
  * @author michalm
@@ -36,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
 public class EvDvrpVehicle implements DvrpVehicle {
 	static EvDvrpVehicle create(DvrpVehicle vehicle, ElectricFleet evFleet) {
 		return new EvDvrpVehicle(vehicle,
-				evFleet.getElectricVehicles().get(Id.create(vehicle.getId(), Vehicle.class)));
+			evFleet.getVehicle(Id.createVehicleId(vehicle.getId())));
 	}
 
 	private final DvrpVehicle vehicle;

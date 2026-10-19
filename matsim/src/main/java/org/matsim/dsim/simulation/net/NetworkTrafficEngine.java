@@ -41,7 +41,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Inject
 	public NetworkTrafficEngine(AgentSourcesContainer asc, SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks,
-								ParkedVehicles parkedVehicles, Wait2Link wait2Link, EventsManager em) {
+		ParkedVehicles parkedVehicles, Wait2Link wait2Link, EventsManager em) {
 		this.asc = asc;
 		this.em = em;
 		this.wait2Link = wait2Link;
@@ -113,6 +113,9 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		for (SimLink link : simNetwork.getLinks().values()) {
 			for (var veh : link.removeAllVehicles()) {
 				em.processEvent(new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLinkId(), veh.getDriver().getMode()));
+				for (var passenger : veh.getPassengers()) {
+					em.processEvent(new PersonStuckEvent(now, passenger.getId(), veh.getCurrentLinkId(), veh.getDriver().getMode()));
+				}
 			}
 		}
 	}

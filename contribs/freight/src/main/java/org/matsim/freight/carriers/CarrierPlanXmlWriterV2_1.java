@@ -24,9 +24,9 @@ package org.matsim.freight.carriers;
 import static org.matsim.freight.carriers.CarrierConstants.*;
 
 import com.google.inject.Inject;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -111,7 +111,7 @@ import org.matsim.vehicles.VehicleType;
 		this.writeStartTag(CARRIERS, atts);
 	}
 
-	private void startCarrier(Carrier carrier, BufferedWriter writer) {
+	private void startCarrier(Carrier carrier, Writer writer) {
 		this.writeStartTag(CARRIER, List.of(
 				createTuple(ID, carrier.getId().toString())), false, true
 		);
@@ -140,7 +140,7 @@ import org.matsim.vehicles.VehicleType;
 		this.writeEndTag(CAPABILITIES);
 	}
 
-	private void writeShipments(Carrier carrier, BufferedWriter writer) {
+	private void writeShipments(Carrier carrier, Writer writer) {
 		if(carrier.getShipments().isEmpty()) return;
 		this.writeStartTag(SHIPMENTS, null);
 		for (CarrierShipment s : carrier.getShipments().values()) {
@@ -171,7 +171,7 @@ import org.matsim.vehicles.VehicleType;
 		);
 	}
 
-	private void writeServices(Carrier carrier, BufferedWriter writer) {
+	private void writeServices(Carrier carrier, Writer writer) {
 		if(carrier.getServices().isEmpty()) return;
 		this.writeStartTag(SERVICES, null);
 		for (CarrierService s : carrier.getServices().values()) {
@@ -202,7 +202,7 @@ import org.matsim.vehicles.VehicleType;
 		return Time.writeTime(time);
 	}
 
-	private void writePlans(Carrier carrier, BufferedWriter writer)
+	private void writePlans(Carrier carrier, Writer writer)
 			throws IOException {
 		if (carrier.getSelectedPlan() == null) {
 			return;

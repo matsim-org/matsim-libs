@@ -41,25 +41,15 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.inject.Key.get;
 
-
 public final class DSim implements Mobsim {
 
 	private static final Logger log = LogManager.getLogger(DSim.class);
 
 	private final Injector injector;
-	private final Communicator comm;
-	private final MessageBroker broker;
-	private final Set<LPProvider> lps;
-	private final MobsimTimer timer;
 
 	@Inject
 	public DSim(Injector injector) {
 		this.injector = injector;
-		this.comm = injector.getInstance(Communicator.class);
-		this.broker = injector.getInstance(MessageBroker.class);
-		this.lps = injector.getInstance(get(new TypeLiteral<>() {
-		}));
-		this.timer = new MobsimTimer();
 	}
 
 	private static double round(double v) {
@@ -72,10 +62,15 @@ public final class DSim implements Mobsim {
 	@Override
 	public void run() {
 
+		Communicator comm = injector.getInstance(Communicator.class);
+		MessageBroker broker = injector.getInstance(MessageBroker.class);
+		Set<LPProvider> lps = injector.getInstance(get(new TypeLiteral<>() {
+		}));
 		ComputeNode computeNode = injector.getInstance(ComputeNode.class);
 		Topology topology = injector.getInstance(Topology.class);
 		Config config = injector.getInstance(Config.class);
 		DSimConfigGroup dsimConfig = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
+		var timer = new MobsimTimer();
 
 		LPExecutor executor = injector.getInstance(LPExecutor.class);
 		DistributedEventsManager manager = (DistributedEventsManager) injector.getInstance(EventsManager.class);
@@ -161,7 +156,7 @@ public final class DSim implements Mobsim {
 			try {
 				executor.doSimStep(time);
 			} catch (Throwable e) {
-				log.error("Error in simulation step: %.2fs".formatted(time), e);
+				log.error(() -> "Error in simulation step: %.2fs".formatted(timer.getTimeOfDay()), e);
 				throw e;
 			}
 
@@ -238,7 +233,7 @@ public final class DSim implements Mobsim {
 	}
 
 	private void writeRuntimes(ComputeNode node, Histogram simulation, Histogram broker, Histogram sizes, LPExecutor executor,
-							   long overallRuntime, long beforeListener, long afterListener, long syncStep) {
+		long overallRuntime, long beforeListener, long afterListener, long syncStep) {
 
 		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
 
@@ -275,8 +270,8 @@ public final class DSim implements Mobsim {
 							if (runtime == 0)
 								continue;
 
-							// Runtimes are collected as 10% samples currently
-							writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i * 10, runtime));
+							// Runtimes are aggregated into time bins, the step is the end of the bin
+							writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i * SimTask.RUNTIME_BIN_SIZE, runtime));
 						} catch (IOException e) {
 							throw new UncheckedIOException(e);
 						}

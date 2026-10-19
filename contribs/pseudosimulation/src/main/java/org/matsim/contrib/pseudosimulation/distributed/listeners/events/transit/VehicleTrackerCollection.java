@@ -1,7 +1,6 @@
 package org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,15 +23,15 @@ public class VehicleTrackerCollection {
         treeMap.put(time, tracker);
     }
 
+    /**
+     * Returns the tracker for the vehicle's most recent departure at or before the given time.
+     * A vehicle that serves several departures in a day has one tracker per departure, so
+     * scanning the map in ascending key order would attribute the whole day to the first one.
+     */
     public VehicleTracker get(String vehicleId, double time) {
         TreeMap<Double, VehicleTracker> treeMap = trackers.get(vehicleId);
         if (treeMap == null) return null;
-        Iterator<Map.Entry<Double, VehicleTracker>> iterator = treeMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Double, VehicleTracker> entry = iterator.next();
-            if (time >= entry.getKey())
-                return entry.getValue();
-        }
-        return null;
+        Map.Entry<Double, VehicleTracker> entry = treeMap.floorEntry(time);
+        return entry == null ? null : entry.getValue();
     }
 }
