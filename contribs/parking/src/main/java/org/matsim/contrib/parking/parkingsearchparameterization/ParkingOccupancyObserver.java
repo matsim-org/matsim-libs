@@ -15,7 +15,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.utils.io.IOUtils;
@@ -28,8 +27,10 @@ import java.util.Map;
 /**
  * Tracks link-level parking occupancy during the mobsim and exposes capacity/occupancy
  * snapshots for parking search time calculation.
+ * One instance is used for the whole run (see {@link ParkingSearchParameterizationModule}). Its state is re-initialized before
+ * each mobsim in {@link #notifyBeforeMobsim(BeforeMobsimEvent)}.
  */
-public class ParkingOccupancyObserver implements MobsimScopeEventHandler, VehicleEntersTrafficEventHandler, VehicleEndsParkingSearchEventHandler, BeforeMobsimListener, MobsimBeforeSimStepListener {
+public class ParkingOccupancyObserver implements VehicleEntersTrafficEventHandler, VehicleEndsParkingSearchEventHandler, BeforeMobsimListener, MobsimBeforeSimStepListener {
 	private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ParkingOccupancyObserver.class);
 
 	private ParkingCapacityInitializer parkingCapacityInitializer;
