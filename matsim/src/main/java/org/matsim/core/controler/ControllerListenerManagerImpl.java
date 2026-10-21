@@ -23,7 +23,6 @@ import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.utils.misc.ClassUtils;
@@ -114,7 +113,7 @@ public final class ControllerListenerManagerImpl implements ControllerListenerMa
 		StartupListener[] listener = this.coreListenerList.getListeners(StartupListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
 		if (controller != null)
-			new ConfigWriter(controller.getConfig()).write(controller.getControllerIO().getOutputFilename(Controler.DefaultFiles.config, ControllerConfigGroup.CompressionType.none).replace(".xml", "_initial.xml"));
+			new ConfigWriter(controller.getConfig()).write(controller.getControllerIO().getOutputFilenameWithOutputPrefix(Controler.DefaultFiles.config.getFilename().replace(".xml", "_initial.xml")));
 		for (StartupListener aListener : listener) {
             log.info("calling notifyStartup on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyStartup(event);
