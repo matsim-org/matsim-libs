@@ -35,6 +35,12 @@ public final class BicycleUtils {
 	static final String WAY_TYPE = "type";
 	/*package*/ static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 
+	/**
+	 * Prefix under which newer network-building tools store raw OSM tag values on links,
+	 * e.g. {@code osm:surface} instead of {@code surface}.
+	 */
+	public static final String OSM_PREFIX = "osm:";
+
 	public enum BicycleInfraAttribute {
 		cycleway, bicycle_infra
 		// Namen klein, damit existierende XMLs unverändert lesbar bleiben
@@ -51,6 +57,10 @@ public final class BicycleUtils {
 //		return value == null ? null : value.toString();
 //	}
 	public static String getBicycleInfrastructureValue(Link link, BicycleInfraAttribute attr) {
+		if (attr == BicycleInfraAttribute.cycleway) {
+			// a raw OSM tag, so it may also sit under the osm: prefix; bicycle_infra is derived and never does
+			return getCyclewaytype(link);
+		}
 		Object value = link.getAttributes().getAttribute(attr.name());
 		return value == null ? null : value.toString();
 	}
@@ -58,11 +68,28 @@ public final class BicycleUtils {
 
 	// legacy use; "cycleway" is deprecated
 	public static String getCyclewaytype(Link link) {
-		return (String) link.getAttributes().getAttribute(BicycleInfraAttribute.cycleway.name());
+		return getStringAttribute(link, BicycleInfraAttribute.cycleway.name());
 	}
 
 	public static String getSurface(Link link) {
-		return (String) link.getAttributes().getAttribute(SURFACE);
+		return getStringAttribute(link, SURFACE);
+	}
+
+	public static String getSmoothness(Link link) {
+		return getStringAttribute(link, SMOOTHNESS);
+	}
+
+	/**
+	 * Reads a link attribute that may sit under its plain OSM key (as {@code OsmBicycleReader}
+	 * writes it) or under the {@link #OSM_PREFIX} (as newer network-building tools write it),
+	 * so networks from either source score the same. The plain key wins.
+	 */
+	private static String getStringAttribute(Link link, String key) {
+		Object value = link.getAttributes().getAttribute(key);
+		if (value == null) {
+			value = link.getAttributes().getAttribute(OSM_PREFIX + key);
+		}
+		return (String) value;
 	}
 
 	// ===

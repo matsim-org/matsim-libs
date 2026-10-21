@@ -2,8 +2,6 @@ package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.network.Link;
 
-import java.util.Objects;
-
 import static org.matsim.contrib.bicycle.BicycleLinkSpeedCalculatorDefaultImpl.hasNotAttribute;
 
 public class BicycleParamsDefaultImpl implements BicycleParams {
@@ -134,16 +132,17 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 	//  * make sure to use the bicycle smoothness/surface when we have some separate infrasturture (cycleway:right=track and cycleway:right:surface=paving_stones)
 	@Override
 	public double computeSurfaceFactor(Link link, BicycleUtils.BicycleInfraAttribute attr) {
+		// through the getter, which also finds the osm:-prefixed variant of the attribute
+		String surface = BicycleUtils.getSurface(link);
 		if (hasNotAttribute(link, BicycleUtils.WAY_TYPE)
 			|| isDedicatedBicycleInfrastructure(link, attr)
-			|| hasNotAttribute(link, BicycleUtils.SURFACE)
+			|| surface == null
 		) {
 			return 1.0;
 		}
 
 		//so, the link is NOT a cycleway, and has a surface attribute
-		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
-		switch (Objects.requireNonNull(surface)) {
+		switch (surface) {
 			case "paved":
 			case "asphalt":
 				return 1.0;
