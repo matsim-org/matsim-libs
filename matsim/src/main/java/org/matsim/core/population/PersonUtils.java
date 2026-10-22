@@ -207,6 +207,76 @@ public final class PersonUtils {
 	}
 
 	/**
+	 * Person attribute holding the typical durations of the person's main activities (stage activities excluded), in
+	 * the order of the plan: {@code home_morning=24944;work=29550;home_evening=41206}, in seconds.  The n-th entry
+	 * belongs to the n-th main activity; types may repeat, and are there so that the pairing of activities and entries
+	 * can be checked.  All plans of the person are assumed to share the sequence of main activities.  A plain String,
+	 * like {@link #getModeTasteVariations}, because writers with the default attribute converters drop other classes.
+	 *
+	 * @see org.matsim.core.scoring.functions.PersonAttributeTypicalDurationCalculator
+	 */
+	public static final String TYPICAL_DURATIONS = "typicalDurations";
+
+	/**
+	 * One entry of the {@value #TYPICAL_DURATIONS} attribute: a main activity's type and its typical duration in seconds.
+	 */
+	public record TypicalDuration(String type, double seconds) {
+		public TypicalDuration {
+			if (type.contains(";") || type.contains("=")) {
+				throw new IllegalArgumentException("Activity type " + type + " contains ';' or '=', which the encoding uses as separators.");
+			}
+		}
+	}
+
+	/**
+	 * The typical durations of the person's main activities in plan order, or null if the person has none.
+	 *
+	 * @see #TYPICAL_DURATIONS
+	 */
+	public static List<TypicalDuration> getTypicalDurations(Person person) {
+		Object value = person.getAttributes().getAttribute(TYPICAL_DURATIONS);
+		return value == null ? null : parseTypicalDurations(value.toString());
+	}
+
+	/**
+	 * Sets the typical durations of the person's main activities, in plan order; null removes them.
+	 *
+	 * @see #TYPICAL_DURATIONS
+	 */
+	public static void setTypicalDurations(Person person, List<TypicalDuration> typicalDurations) {
+		if (typicalDurations == null) {
+			person.getAttributes().removeAttribute(TYPICAL_DURATIONS);
+		} else {
+			person.getAttributes().putAttribute(TYPICAL_DURATIONS, formatTypicalDurations(typicalDurations));
+		}
+	}
+
+	static String formatTypicalDurations(List<TypicalDuration> typicalDurations) {
+		StringJoiner joiner = new StringJoiner(";");
+		for (TypicalDuration typicalDuration : typicalDurations) {
+			double s = typicalDuration.seconds();
+			String seconds = s == Math.rint(s) && Math.abs(s) < 1e15 ? Long.toString((long) s) : Double.toString(s);
+			joiner.add(typicalDuration.type() + "=" + seconds);
+		}
+		return joiner.toString();
+	}
+
+	static List<TypicalDuration> parseTypicalDurations(String value) {
+		List<TypicalDuration> typicalDurations = new ArrayList<>();
+		if (value.isBlank()) {
+			return typicalDurations;
+		}
+		for (String pair : value.split(";")) {
+			int eq = pair.lastIndexOf('=');
+			if (eq < 0) {
+				throw new IllegalArgumentException("Malformed " + TYPICAL_DURATIONS + " entry '" + pair + "' in '" + value + "'; expected type=seconds.");
+			}
+			typicalDurations.add(new TypicalDuration(pair.substring(0, eq).trim(), Double.parseDouble(pair.substring(eq + 1).trim())));
+		}
+		return typicalDurations;
+	}
+
+	/**
 	 * convenience method for often used demographic attribute
 	 */
 	public static boolean hasLicense(Person person) {

@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -37,16 +38,17 @@ import java.util.List;
  * <p>
  * Optionally, the typical duration can be resolved per individual activity (instead of per activity type) via a
  * {@link TypicalDurationCalculator}, e.g. from an activity attribute
- * ({@link ActivityAttributeTypicalDurationCalculator}).  Note that during a simulation the activities handed to
+ * ({@link ActivityAttributeTypicalDurationCalculator}) or from a person attribute
+ * ({@link PersonAttributeTypicalDurationCalculator}).  Note that during a simulation the activities handed to
  * this class are reconstructed from events ({@link org.matsim.core.scoring.EventsToActivities}) and carry no
  * attributes.  When constructed with the {@link Person}, this class therefore aligns the handed activities with
- * the main (non-stage) activities of the person's selected plan and resolves per-activity typical durations from
- * the plan activities, while all times still come from the handed ones.  The plan is resolved lazily at the first
+ * the main (non-stage) activities of the person's selected plan and hands the plan activities and their positions to
+ * the calculator, while all times still come from the handed ones.  The plan is resolved lazily at the first
  * scoring callback, i.e. after replanning; scoring functions may be created before replanning (see
  * {@code ControllerConfigGroup#getEventTypeToCreateScoringFunctions()}), when the selected plan is not yet the
  * plan that will be executed.  If the handed activity sequence diverges from the plan (e.g. with within-day
- * replanning), the alignment is abandoned with a warning and the affected activities are scored against their
- * type's config parameters, as without the calculator.
+ * replanning), the alignment is abandoned with a warning and the affected activities are handed to the calculator
+ * unaligned.  With the default {@link ActivityTypeTypicalDurationCalculator}, there is nothing to align.
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
@@ -63,15 +65,16 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 	private final OpeningIntervalCalculator openingIntervalCalculator;
 	private final TypicalDurationCalculator typicalDurationCalculator;
 
-	/** Owner of the plan whose main activities per-activity parameters are resolved from; null means the handed activities are used directly. */
+	/** Owner of the plan whose main activities per-activity parameters are resolved from; may be null. */
 	private final Person person;
+	/** Whether the handed activities are paired with the main activities of {@link #person}'s selected plan. */
+	private boolean aligningWithPlan;
 	private List<Activity> planActivities;
 	private int planActivityIndex = 0;
-	private boolean planAlignmentBroken = false;
 
 	private Activity firstActivity;
-	/** Source for per-activity parameters aligned with {@link #firstActivity}; the first activity is only scored at {@link #finish()}. */
-	private Activity firstActivitySource;
+	/** Main-activity index of {@link #firstActivity}; the first activity is only scored at {@link #finish()}. */
+	private int firstActivityIndex = TypicalDurationCalculator.UNALIGNED;
 
 	private static final Logger log = LogManager.getLogger(CharyparNagelActivityScoring.class);
 
@@ -80,7 +83,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 	}
 
 	public CharyparNagelActivityScoring(final ScoringParameters params, final OpeningIntervalCalculator openingIntervalCalculator) {
-		this(params, openingIntervalCalculator, act -> OptionalTime.undefined(), null);
+		this(params, openingIntervalCalculator, new ActivityTypeTypicalDurationCalculator(), null);
 	}
 
 	public CharyparNagelActivityScoring(final ScoringParameters params, final TypicalDurationCalculator typicalDurationCalculator, final Person person) {
@@ -96,41 +99,45 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 		this.openingIntervalCalculator = openingIntervalCalculator;
 		this.typicalDurationCalculator = typicalDurationCalculator;
 		this.person = person;
+		this.aligningWithPlan = person != null && !(typicalDurationCalculator instanceof ActivityTypeTypicalDurationCalculator);
 	}
 
 	/**
-	 * The activity from which per-activity parameters are resolved for a handed activity: the aligned main activity
-	 * of the selected plan when a person was given, otherwise the handed activity itself.  Stage activities bypass
-	 * the alignment on both sides: their count varies with routing, and they are not really scored.  On a type
-	 * mismatch (or more handed main activities than the plan contains) the alignment is abandoned with a warning and
-	 * scoring falls back to the handed activities.
+	 * The position of a handed activity among the main activities of the selected plan, or
+	 * {@link TypicalDurationCalculator#UNALIGNED} if there is no plan to align with.  Stage activities bypass the
+	 * alignment on both sides: their count varies with routing, and they are not really scored.  On a type mismatch
+	 * (or more handed main activities than the plan contains) the alignment is abandoned with a warning.
 	 */
-	private Activity resolveActivitySource(Activity handed) {
-		if (this.person == null || this.planAlignmentBroken || StageActivityTypeIdentifier.isStageActivity(handed.getType())) {
-			return handed;
+	private int alignWithPlan(Activity handed) {
+		if (!this.aligningWithPlan || StageActivityTypeIdentifier.isStageActivity(handed.getType())) {
+			return TypicalDurationCalculator.UNALIGNED;
 		}
 		if (this.planActivities == null) {
 			// lazily: at the first callback we are past replanning, so this is the executed plan
-			this.planActivities = TripStructureUtils.getActivities(this.person.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+			Plan selectedPlan = this.person.getSelectedPlan();
+			if (selectedPlan == null) {
+				this.aligningWithPlan = false;
+				return TypicalDurationCalculator.UNALIGNED;
+			}
+			this.planActivities = TripStructureUtils.getActivities(selectedPlan, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
 		}
 		if (this.planActivityIndex >= this.planActivities.size()) {
 			warnPlanAlignmentBroken(handed, "more main activities than the selected plan contains");
-			return handed;
+			return TypicalDurationCalculator.UNALIGNED;
 		}
 		Activity planned = this.planActivities.get(this.planActivityIndex);
 		if (!planned.getType().equals(handed.getType())) {
 			warnPlanAlignmentBroken(handed, "activity type " + handed.getType() + " does not match plan activity type " + planned.getType() + " at main-activity index " + this.planActivityIndex);
-			return handed;
+			return TypicalDurationCalculator.UNALIGNED;
 		}
-		this.planActivityIndex++;
-		return planned;
+		return this.planActivityIndex++;
 	}
 
 	private void warnPlanAlignmentBroken(Activity handed, String reason) {
-		this.planAlignmentBroken = true;
+		this.aligningWithPlan = false;
 		if (planAlignmentWarning <= 10) {
 			log.warn("Cannot align the activities of person {} with the main activities of the selected plan: {}. "
-					+ "Falling back to per-activity-type scoring parameters for this person's remaining activities (activity: {}).",
+					+ "This person's remaining activities are handed to the typical duration calculator unaligned (activity: {}).",
 					this.person.getId(), reason, handed);
 			if (planAlignmentWarning == 10) {
 				log.warn("Additional warnings of this type are suppressed.");
@@ -166,7 +173,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 		out.append("actEarlyDeparture_s=").append(this.score.actEarlyDeparture_s);
 	}
 
-	private Score calcActScore(final double arrivalTime, final double departureTime, final Activity act, final Activity activitySource) {
+	private Score calcActScore(final double arrivalTime, final double departureTime, final Activity act, final int mainActivityIndex) {
 
 		ActivityUtilityParameters actParams = this.params.actParams.get(act.getType() );
 		if (actParams == null) {
@@ -247,7 +254,8 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			// (why is duration >=1?  Also, the computations below would allow for duration <= 0.  kai, nov'25)
 			double typicalDuration;
 			double zeroUtilityDuration_h;
-			OptionalTime typicalDurationOverride = this.typicalDurationCalculator.getTypicalDuration(activitySource);
+			Activity activitySource = mainActivityIndex == TypicalDurationCalculator.UNALIGNED ? act : this.planActivities.get(mainActivityIndex);
+			OptionalTime typicalDurationOverride = this.typicalDurationCalculator.getTypicalDuration(this.person, activitySource, mainActivityIndex);
 			if (typicalDurationOverride.isDefined()) {
 				typicalDuration = typicalDurationOverride.seconds();
 				zeroUtilityDuration_h = actParams.computeZeroUtilityDuration_h(typicalDuration);
@@ -335,7 +343,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 		return tmpScore;
 	}
 
-	private void handleOvernightActivity(Activity lastActivity, Activity lastActivitySource) {
+	private void handleOvernightActivity(Activity lastActivity, int lastActivityIndex) {
 		assert firstActivity != null;
 		assert lastActivity != null;
 
@@ -360,7 +368,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			}
 
 			Score calcActScore = calcActScore(lastActivity.getStartTime().seconds(),
-					this.firstActivity.getEndTime().seconds() + 24 * 3600, lastActivity, lastActivitySource);
+					this.firstActivity.getEndTime().seconds() + 24 * 3600, lastActivity, lastActivityIndex);
 			this.score.add(calcActScore); // SCENARIO_DURATION
 		} else {
 			// the first Act and the last Act have NOT the same type:
@@ -380,10 +388,10 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 				}
 
 				// score first activity
-				this.score.add(calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity, firstActivitySource));
+				this.score.add(calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity, firstActivityIndex));
 				// score last activity
 				this.score.add(calcActScore(lastActivity.getStartTime().seconds(),
-						this.params.simulationPeriodInDays * 24 * 3600, lastActivity, lastActivitySource));
+						this.params.simulationPeriodInDays * 24 * 3600, lastActivity, lastActivityIndex));
 			}
 		}
 	}
@@ -391,24 +399,24 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 	private void handleMorningActivity() {
 		assert firstActivity != null;
 		// score first activity
-		this.score.add(calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity, firstActivitySource));
+		this.score.add(calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity, firstActivityIndex));
 	}
 
 	@Override
 	public void handleFirstActivity(Activity act) {
 		assert act != null;
 		this.firstActivity = act;
-		this.firstActivitySource = resolveActivitySource(act);
+		this.firstActivityIndex = alignWithPlan(act);
 	}
 
 	@Override
 	public void handleActivity(Activity act) {
-		this.score.add(calcActScore(act.getStartTime().seconds(), act.getEndTime().seconds(), act, resolveActivitySource(act)));
+		this.score.add(calcActScore(act.getStartTime().seconds(), act.getEndTime().seconds(), act, alignWithPlan(act)));
 	}
 
 	@Override
 	public void handleLastActivity(Activity act) {
-		this.handleOvernightActivity(act, resolveActivitySource(act));
+		this.handleOvernightActivity(act, alignWithPlan(act));
 		this.firstActivity = null;
 	}
 
