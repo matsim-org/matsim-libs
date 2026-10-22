@@ -14,6 +14,9 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -24,6 +27,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class SwissRailRaptorChainedDepartureTest {
 
@@ -87,6 +91,23 @@ public class SwissRailRaptorChainedDepartureTest {
 		assertThat(connections)
 			.containsEntry(bern, new Result(20520.0, 26760, 0));
 
+	}
+
+	@Test
+	void rejectsChainedDepartureBeforeSourceArrival() {
+		var schedule = scenario.getTransitSchedule();
+		var sourceRoute = schedule.getTransitLines().get(Id.create("l103", TransitLine.class))
+			.getRoutes().get(Id.create("r104", TransitRoute.class));
+		var sourceDeparture = sourceRoute.getDepartures().get(Id.create("351584", Departure.class));
+		// This departure arrives at 24:41, while the target departs at 07:45.
+		sourceDeparture.setChainedDepartures(List.of(schedule.getFactory().createChainedDeparture(
+			Id.create("l106", TransitLine.class), Id.create("r107", TransitRoute.class), Id.create("351661", Departure.class))));
+
+		var raptorConfig = RaptorUtils.createStaticConfig(scenario.getConfig());
+		assertThatThrownBy(() -> SwissRailRaptorData.create(schedule, null, raptorConfig, scenario.getNetwork(), null))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessageContaining("l103/r104/351584 -> l106/r107/351661")
+			.hasMessageContaining("before source arrival");
 	}
 
 	@Test
