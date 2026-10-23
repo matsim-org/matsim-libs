@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="1" x="10.0" y="145.0" linkRefId="1" isBlocking="false"/>
+		<stopFacility id="10" x="120.0" y="55.0" linkRefId="10" isBlocking="false"/>
+		<stopFacility id="11" x="155.0" y="100.0" linkRefId="11" isBlocking="false"/>
+		<stopFacility id="12" x="155.0" y="100.0" linkRefId="12" isBlocking="false"/>
+		<stopFacility id="13" x="155.0" y="190.0" linkRefId="13" isBlocking="false"/>
+		<stopFacility id="14" x="155.0" y="190.0" linkRefId="14" isBlocking="false"/>
+		<stopFacility id="15" x="155.0" y="10.0" linkRefId="15" isBlocking="false"/>
+		<stopFacility id="16" x="155.0" y="10.0" linkRefId="16" isBlocking="false"/>
+		<stopFacility id="2" x="10.0" y="145.0" linkRefId="2" isBlocking="false"/>
+		<stopFacility id="3" x="10.0" y="55.0" linkRefId="3" isBlocking="false"/>
+		<stopFacility id="4" x="10.0" y="55.0" linkRefId="4" isBlocking="false"/>
+		<stopFacility id="5" x="65.0" y="100.0" linkRefId="5" isBlocking="false"/>
+		<stopFacility id="6" x="65.0" y="100.0" linkRefId="6" isBlocking="false"/>
+		<stopFacility id="7" x="120.0" y="145.0" linkRefId="7" isBlocking="false"/>
+		<stopFacility id="8" x="120.0" y="145.0" linkRefId="8" isBlocking="false"/>
+		<stopFacility id="9" x="120.0" y="55.0" linkRefId="9" isBlocking="false"/>
+	</transitStops>
+</transitSchedule>

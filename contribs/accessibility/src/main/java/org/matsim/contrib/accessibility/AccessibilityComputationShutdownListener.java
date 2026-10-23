@@ -50,16 +50,16 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 	private static final Logger LOG = LogManager.getLogger(AccessibilityComputationShutdownListener.class);
 
     private final ActivityFacilities measuringPoints;
-	private ActivityFacilities opportunities;
+	private final ActivityFacilities opportunities;
 
-	private String outputDirectory;
+	private final String outputDirectory;
 
 	private final Map<String, AccessibilityContributionCalculator> calculators = new LinkedHashMap<>();
 	private AccessibilityAggregator accessibilityAggregator;
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
-	private Config config;
-	private AccessibilityConfigGroup acg;
+	private final Config config;
+	private final AccessibilityConfigGroup acg;
 	private final ScoringConfigGroup cnScoringGroup;
 
 
@@ -129,10 +129,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 				Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedOrigins = calculator.getAggregatedMeasurePoints();
 				Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities = calculator.getAgregatedOpportunities();
 
-				Collection<Id<? extends BasicLocation>> aggregatedOriginIds = new LinkedList<>();
-				for (Id<? extends BasicLocation> nodeId : aggregatedOrigins.keySet()) {
-					aggregatedOriginIds.add(nodeId);
-				}
+				Collection<Id<? extends BasicLocation>> aggregatedOriginIds = new LinkedList<>(aggregatedOrigins.keySet());
 
 				LOG.info("Iterating over all aggregated measuring points...");
 
@@ -163,9 +160,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 						for (Future<Void> future : futures) {
 							future.get();
 						}
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					} catch (ExecutionException e) {
+					} catch (InterruptedException | ExecutionException e) {
 						throw new RuntimeException(e);
 					}
 					service.shutdown();
@@ -176,6 +171,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 				}
 
 			}
+			calculators.get(mode).finish();
 			for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 				zoneDataExchangeInterface.finish();
 			}
