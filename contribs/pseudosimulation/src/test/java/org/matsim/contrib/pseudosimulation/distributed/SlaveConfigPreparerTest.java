@@ -129,11 +129,15 @@ class SlaveConfigPreparerTest {
 		}
 
 		String outText() {
-			return out.toString(StandardCharsets.UTF_8);
+			return normalizeLineEndings(out.toString(StandardCharsets.UTF_8));
 		}
 
 		String errText() {
-			return err.toString(StandardCharsets.UTF_8);
+			return normalizeLineEndings(err.toString(StandardCharsets.UTF_8));
+		}
+
+		private static String normalizeLineEndings(String text) {
+			return text.replace("\r\n", "\n").replace('\r', '\n');
 		}
 	}
 }

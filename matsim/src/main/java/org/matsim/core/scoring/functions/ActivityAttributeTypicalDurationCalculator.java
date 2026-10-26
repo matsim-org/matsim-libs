@@ -1,6 +1,7 @@
 package org.matsim.core.scoring.functions;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.utils.misc.OptionalTime;
 
@@ -9,11 +10,11 @@ import org.matsim.core.utils.misc.OptionalTime;
  * itself, so that every activity can carry its own typical duration instead of encoding it in the activity type
  * (e.g. one config activity type per duration bin, {@code home_30}, {@code home_60}, ...).  Activities without the
  * attribute (or with a non-positive value) fall back to the typical duration of their activity type from the
- * scoring config.
+ * scoring config.  Selected by {@link ScoringConfigGroup.TypicalDurationSource#activityAttribute}.
  * <p>
  * Note that the activities handed to the scoring during a simulation are reconstructed from events and carry no
- * attributes; pass the {@link org.matsim.api.core.v01.population.Person} to
- * {@link CharyparNagelActivityScoring} so that the attributes are read from the selected plan.
+ * attributes; pass the {@link Person} to {@link CharyparNagelActivityScoring} so that the attributes are read from
+ * the selected plan.
  */
 public final class ActivityAttributeTypicalDurationCalculator implements TypicalDurationCalculator {
 
@@ -24,7 +25,7 @@ public final class ActivityAttributeTypicalDurationCalculator implements Typical
 	public static final String TYPICAL_DURATION_ATTRIBUTE = ScoringConfigGroup.ActivityParams.TYPICAL_DURATION;
 
 	@Override
-	public OptionalTime getTypicalDuration(Activity act) {
+	public OptionalTime getTypicalDuration(Person person, Activity act, int mainActivityIndex) {
 		Object value = act.getAttributes().getAttribute(TYPICAL_DURATION_ATTRIBUTE);
 		if (value instanceof Number number && number.doubleValue() > 0) {
 			return OptionalTime.defined(number.doubleValue());

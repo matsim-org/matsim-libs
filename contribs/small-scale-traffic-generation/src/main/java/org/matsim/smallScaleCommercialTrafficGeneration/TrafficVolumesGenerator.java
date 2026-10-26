@@ -25,6 +25,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.NonNull;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.GetGenerationRates;
 import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.ZoneAttribute;
@@ -88,8 +89,8 @@ public class TrafficVolumesGenerator{
 	{
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_stop, attributesByZone, startOrStop, sample, modesORvehTypes );
-		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
-		Path outputFile = outputPath.resolve("calculatedData").resolve("TrafficVolume_" + segment + "_" + startOrStop + "PerZone_"+ sampleName + "pt.csv" ); // this should presumably be "pct" instead of "pt"
+		String sampleName = PopulationUtils.getSampleLabel(sample);
+		Path outputFile = outputPath.resolve("calculatedData").resolve("TrafficVolume_" + segment + "_" + startOrStop + "PerZone_"+ sampleName + ".csv" ); // this should presumably be "pct" instead of "pt"
 		writeCSVTrafficVolume(trafficVolume_stop, outputFile);
 		log.info( "Write traffic volume for {} trips per zone in CSV: {}", startOrStop, outputFile );
 		return trafficVolume_stop;

@@ -10,10 +10,14 @@ import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.core.mobsim.framework.Steppable;
-import org.matsim.core.serialization.SerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
+import org.matsim.dsim.simulation.SimStepMessage;
 
 import java.lang.invoke.LambdaConversionException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -35,10 +39,30 @@ public final class LPTask implements SimTask {
 	private final DistributedEventsManager manager;
 
 	/**
+	 * Order in which the messages of one time step are processed. The buffer below is filled by the other partitions' threads, so the order
+	 * in which they arrive is thread timing and differs between runs - and that order decides outcomes, because processing a
+	 * {@link SimStepMessage} is what hands vehicles over to this partition's links: two vehicles handed to the same link in the same time
+	 * step take their positions in its queue in the order their batches are processed.
+	 * <p>
+	 * Ordering by sending partition and then by message type is canonical: each sender contributes at most one {@link SimStepMessage} per
+	 * type and time step, and the messages inside a batch are already in the order the sender collected them. The sort is stable, so any
+	 * message that does not carry a sender keeps its arrival position relative to its equals.
+	 */
+	private static final Comparator<Message> DELIVERY_ORDER = Comparator
+		.comparingInt((Message msg) -> msg instanceof SimStepMessage batch ? batch.sender() : Integer.MIN_VALUE)
+		.thenComparingInt(Message::getType);
+
+	/**
 	 * Buffer holding incoming messages. These are switched between iterations.
 	 */
 	private final ManyToOneConcurrentLinkedQueue<Message> queueOdd = new ManyToOneConcurrentLinkedQueue<>();
 	private final ManyToOneConcurrentLinkedQueue<Message> queueEven = new ManyToOneConcurrentLinkedQueue<>();
+
+	/**
+	 * The messages of the current time step, drained from the buffer so that they can be ordered before processing. Only ever touched by
+	 * the thread executing this task, and reused to keep the step loop free of allocations.
+	 */
+	private final List<Message> incoming = new ArrayList<>();
 
 	/**
 	 * This maps the messages types to corresponding function on the LP used for processing.
@@ -56,11 +80,6 @@ public final class LPTask implements SimTask {
 	private float avgRuntime = 0.0f;
 
 	/**
-	 * Run time of the last few iterations.
-	 */
-	private long sumRuntime = 0;
-
-	/**
 	 * Indicates whether the LP has been initialized.
 	 */
 	private boolean initialized = false;
@@ -75,13 +94,13 @@ public final class LPTask implements SimTask {
 	 */
 	private final AtomicBoolean phase = new AtomicBoolean(true);
 
-	public LPTask(LP lp, int partition, DistributedEventsManager manager, SerializationProvider serializer) {
+	public LPTask(LP lp, int partition, DistributedEventsManager manager, MessageTypeRegistry registry) {
 		this.lp = lp;
 		this.steppable = lp instanceof Steppable s ? s : null;
 		this.partition = partition;
 		this.manager = manager;
 
-		buildConsumers(serializer);
+		buildConsumers(registry);
 	}
 
 	@Override
@@ -100,14 +119,14 @@ public final class LPTask implements SimTask {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void buildConsumers(SerializationProvider serializer) {
+	private void buildConsumers(MessageTypeRegistry registry) {
 
 		for (Class<?> ifType : lp.getClass().getInterfaces()) {
 			if (MessageProcessor.class.isAssignableFrom(ifType)) {
 				Method[] methods = ifType.getDeclaredMethods();
 
 				Class<?> msgType = methods[0].getParameterTypes()[0];
-				int type = serializer.getType(msgType);
+				int type = registry.getType(msgType);
 
 				try {
 					consumers.put(type, (Consumer<Message>) LambdaUtils.createConsumer(lp, msgType, "process"));
@@ -172,8 +191,17 @@ public final class LPTask implements SimTask {
 
 		Message msg;
 		while ((msg = queue.poll()) != null) {
-			process(msg);
+			incoming.add(msg);
 		}
+
+		if (incoming.size() > 1) {
+			incoming.sort(DELIVERY_ORDER);
+		}
+
+		for (Message incomingMsg : incoming) {
+			process(incomingMsg);
+		}
+		incoming.clear();
 
 		if (!initialized) {
 			lp.onPrepareSim();
@@ -187,13 +215,7 @@ public final class LPTask implements SimTask {
 
 		long rt = System.nanoTime() - t;
 		avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
-		sumRuntime += rt;
-
-		// Only add the runtime to the list if the time is a multiple of 10
-		if ((time % 10) == 0) {
-			runtimes.add(sumRuntime);
-			sumRuntime = 0;
-		}
+		SimTask.addRuntime(runtimes, time, rt);
 	}
 
 	@Override

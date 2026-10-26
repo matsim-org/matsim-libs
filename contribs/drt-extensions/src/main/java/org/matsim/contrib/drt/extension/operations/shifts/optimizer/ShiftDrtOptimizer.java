@@ -2,7 +2,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.optimizer;
 
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalStop;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.FacilityStop;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -38,16 +38,16 @@ public class ShiftDrtOptimizer implements DrtOptimizer, MobsimInitializedListene
         if (schedule.getStatus() == Schedule.ScheduleStatus.STARTED) {
             Task currentTask = schedule.getCurrentTask();
             if (currentTask != null) {
-                if (currentTask instanceof OperationalStop opStop) {
-                    dispatcher.endOperationalTask((ShiftDvrpVehicle) vehicle, opStop);
+                if (currentTask instanceof FacilityStop facilityStop) {
+                    dispatcher.endOperationalTask((ShiftDvrpVehicle) vehicle, facilityStop);
                 }
             }
         }
 
         final Task nextTask = schedule.nextTask();
 
-        if (nextTask instanceof OperationalStop opStop) {
-            dispatcher.startOperationalTask((ShiftDvrpVehicle) vehicle, opStop);
+        if (nextTask instanceof FacilityStop facilityStop) {
+            dispatcher.startOperationalTask((ShiftDvrpVehicle) vehicle, facilityStop);
         }
     }
 

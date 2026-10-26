@@ -322,7 +322,7 @@ public class DecongestionPricingTestIT {
 		System.err.println( tt1 );
 
 		Assertions.assertEquals(179.985, tt0a, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
-		Assertions.assertEquals(353.717, tt0b, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
+		Assertions.assertEquals(348.58, tt0b, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 		Assertions.assertEquals(179.985, tt0c, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 		Assertions.assertEquals(180.0, tt1, MatsimTestUtils.EPSILON, "Wrong travel time. The run output seems to have changed.");
 
@@ -613,7 +613,7 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index) ;
-		Assertions.assertEquals(-12062.205868703717, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The run output seems to have changed.");
+		Assertions.assertEquals(-10968.318061203712, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The run output seems to have changed.");
 
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
 		Assertions.assertEquals(9.200000000000017, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON, "Wrong toll in time bin 61.");
@@ -673,7 +673,7 @@ public class DecongestionPricingTestIT {
 
 		final int index = config.controller().getLastIteration() - config.controller().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get( index ) ;
-		Assertions.assertEquals(-55.219344907407525, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The run output seems to have changed.");
+		Assertions.assertEquals(-55.2171226851853, avgScore, MatsimTestUtils.EPSILON, "Wrong average executed score. The run output seems to have changed.");
 
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
 		Assertions.assertEquals(13., info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON, "Wrong toll in time bin 61.");

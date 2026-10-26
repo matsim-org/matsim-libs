@@ -43,12 +43,22 @@ public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
 
     private Map<Id<DrtShift>, Id<DvrpVehicle>> finishedShifts;
     private final Map<Id<DvrpVehicle>, Id<DrtShift>> activeShifts = new HashMap<>();
+    // start time and shift type captured from the started event, so the analysis can be driven purely from the shift
+    // lifecycle events (actual run time = ended − started, type from the event) without resolving the shift
+    // specification. This is both more honest (actual vs. planned duration) and works for transient shifts that have no
+    // persistent specification (e.g. remote-guidance virtual shifts).
+    private Map<Id<DrtShift>, Double> actualStartByShift;
+    private Map<Id<DrtShift>, Double> actualEndByShift;
+    private Map<Id<DrtShift>, String> shiftTypeById;
 
 	private Record currentRecord;
 
 	public record Record(Map<Id<DrtShift>, Double> revenueByShift,
 								Map<Id<Request>, Id<DrtShift>> shiftByRequest,
-								Map<Id<DrtShift>, Id<DvrpVehicle>> finishedShifts){
+								Map<Id<DrtShift>, Id<DvrpVehicle>> finishedShifts,
+								Map<Id<DrtShift>, Double> actualStartByShift,
+								Map<Id<DrtShift>, Double> actualEndByShift,
+								Map<Id<DrtShift>, String> shiftTypeById){
 		public Map<Id<DrtShift>, Double> getRevenueByShift() {
 			return revenueByShift;
 		}
@@ -62,6 +72,21 @@ public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
 		public Map<Id<DrtShift>, Id<DvrpVehicle>> getFinishedShifts() {
 			return finishedShifts;
 		}
+
+		/** Actual shift start time in [s] (from the started event), per finished shift. */
+		public Map<Id<DrtShift>, Double> getActualStartByShift() {
+			return actualStartByShift;
+		}
+
+		/** Actual shift end time in [s] (from the ended event), per finished shift. */
+		public Map<Id<DrtShift>, Double> getActualEndByShift() {
+			return actualEndByShift;
+		}
+
+		/** Shift type per finished shift, taken from the shift lifecycle events (no specification lookup). */
+		public Map<Id<DrtShift>, String> getShiftTypeById() {
+			return shiftTypeById;
+		}
 	}
 
 	public ShiftEfficiencyTracker(String mode) {
@@ -69,7 +94,10 @@ public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
         this.revenueByShift = new HashMap<>();
 		this.shiftByRequest = new HashMap<>();
 		this.finishedShifts = new HashMap<>();
-		this.currentRecord = new Record(revenueByShift, shiftByRequest, finishedShifts);
+		this.actualStartByShift = new HashMap<>();
+		this.actualEndByShift = new HashMap<>();
+		this.shiftTypeById = new HashMap<>();
+		this.currentRecord = new Record(revenueByShift, shiftByRequest, finishedShifts, actualStartByShift, actualEndByShift, shiftTypeById);
 	}
 
     @Override
@@ -102,6 +130,8 @@ public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
                 throw new RuntimeException("Vehicle is already registered for another shift");
             }
             activeShifts.put(event.getVehicleId(), event.getShiftId());
+            actualStartByShift.put(event.getShiftId(), event.getTime());
+            event.getShiftType().ifPresent(type -> shiftTypeById.put(event.getShiftId(), type));
         }
     }
 
@@ -110,6 +140,9 @@ public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
         if(event.getMode().equals(mode)) {
             activeShifts.remove(event.getVehicleId());
             finishedShifts.put(event.getShiftId(), event.getVehicleId());
+            actualEndByShift.put(event.getShiftId(), event.getTime());
+            // fall back to the ended event's type if the started event carried none (types should match)
+            event.getShiftType().ifPresent(type -> shiftTypeById.putIfAbsent(event.getShiftId(), type));
         }
     }
 
@@ -118,7 +151,10 @@ public final class ShiftEfficiencyTracker implements PersonMoneyEventHandler,
         this.revenueByShift = new HashMap<>();
         this.shiftByRequest = new HashMap<>();
         this.finishedShifts = new HashMap<>();
-		this.currentRecord = new Record(revenueByShift, shiftByRequest, finishedShifts);
+        this.actualStartByShift = new HashMap<>();
+        this.actualEndByShift = new HashMap<>();
+        this.shiftTypeById = new HashMap<>();
+		this.currentRecord = new Record(revenueByShift, shiftByRequest, finishedShifts, actualStartByShift, actualEndByShift, shiftTypeById);
         this.activeShifts.clear();
     }
 

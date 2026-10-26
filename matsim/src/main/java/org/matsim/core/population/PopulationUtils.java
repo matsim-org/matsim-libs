@@ -58,6 +58,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1199,6 +1201,19 @@ public final class PopulationUtils {
 	}
 
 	public static Coord decideOnCoordForActivity(Activity act, Scenario sc) {
+		return decideOnCoordForActivity(act, sc.getActivityFacilities(), sc.getNetwork(),
+				sc.getConfig().global().getRelativePositionOfEntryExitOnLink());
+	}
+
+	/**
+	 * Same as {@link #decideOnCoordForActivity(Activity, Scenario)}, for callers that only have the activity
+	 * facilities and network at hand, not a full {@link Scenario}.
+	 *
+	 * @param relativePositionOfEntryExitOnLink see {@link org.matsim.core.config.groups.GlobalConfigGroup#getRelativePositionOfEntryExitOnLink()},
+	 *        only used as a fallback when the activity has neither a facility nor a coordinate
+	 */
+	public static Coord decideOnCoordForActivity(Activity act, ActivityFacilities facilities, Network network,
+			double relativePositionOfEntryExitOnLink) {
 		Id<ActivityFacility> facilityId;
 		try {
 			facilityId = act.getFacilityId();
@@ -1208,7 +1223,7 @@ public final class PopulationUtils {
 		// some people prefer throwing exceptions over using null
 
 		if (facilityId != null) {
-			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get(facilityId);
+			final ActivityFacility facility = facilities.getFacilities().get(facilityId);
 			Gbl.assertNotNull(facility);
 			Gbl.assertNotNull(facility.getCoord());
 			return facility.getCoord();
@@ -1218,13 +1233,12 @@ public final class PopulationUtils {
 			return act.getCoord();
 		}
 
-		Gbl.assertNotNull(sc.getNetwork());
-		Link link = sc.getNetwork().getLinks().get(act.getLinkId());
+		Gbl.assertNotNull(network);
+		Link link = network.getLinks().get(act.getLinkId());
 		Gbl.assertNotNull(link);
 		Coord fromCoord = link.getFromNode().getCoord();
 		Coord toCoord = link.getToNode().getCoord();
-		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink();
-		return CoordUtils.interpolate(fromCoord, toCoord, rel);
+		return CoordUtils.interpolate(fromCoord, toCoord, relativePositionOfEntryExitOnLink);
 	}
 
 	/**
@@ -1267,6 +1281,15 @@ public final class PopulationUtils {
 			ScenarioUtils.putScale(pop, scale * sampleTo);
 		}
 		log.info("population size after downsampling={}", pop.getPersons().size());
+	}
+
+	/**
+	 * Create the sample label as a percentage, rounded to four decimal places and without trailing zeros.
+	 *
+	 * @param sampleSize sample between 0 and 1
+	 */
+	public static String getSampleLabel(double sampleSize) {
+		return BigDecimal.valueOf(sampleSize * 100).setScale(4, RoundingMode.HALF_EVEN).stripTrailingZeros().toPlainString() + "pct";
 	}
 
 	public static void readPopulation(Population population, String filename) {

@@ -12,7 +12,7 @@
 	<name>vsp</name>
 
 	<properties>
-		<javafx.version>26.0.2</javafx.version>
+		<javafx.version>27</javafx.version>
 	</properties>
 
 	<repositories>
@@ -191,7 +191,7 @@
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>graphhopper-core</artifactId>
-			<version>11.0</version>
+			<version>11.1</version>
 		</dependency>
 		<!-- Enforce version -->
 		<dependency>
@@ -289,7 +289,7 @@
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>graphhopper-web-api</artifactId>
-			<version>11.0</version>
+			<version>11.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.locationtech.jts</groupId>

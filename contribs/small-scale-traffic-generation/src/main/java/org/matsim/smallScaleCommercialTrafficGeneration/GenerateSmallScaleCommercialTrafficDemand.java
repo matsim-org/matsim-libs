@@ -368,9 +368,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		validateCarrierPartOptions();
 
 		String modelName = configPath.getParent().getFileName().toString();
-
-		String sampleName = getSampleNameOfOutputFolder(sample);
-
 		/*
 		 * A carrier part ("chunk") run needs two different output concepts:
 		 * - finalOutput points to the shared traffic output folder created by the init step. The shared unsolved carrier
@@ -540,7 +537,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			return 0;
 		}
 		createPlansBasedOnCarrierPlans(scenario,
-			usedSmallScaleCommercialTrafficSegment, output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent );
+			usedSmallScaleCommercialTrafficSegment, output, modelName, sample, nameOutputPopulation, numberOfPlanVariantsPerAgent );
 
 		if (MATSimIterationsAfterDemandGeneration != null && MATSimIterationsAfterDemandGeneration >= 0) {
 			matsimIterations = new MATSimIterations(this.sample );
@@ -1081,14 +1078,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// * fleetSize is always == FIXED
 		// * fixedNumberOfVehicle(s)PerTypeAndLocation is always == 1
 
-		if (carrierAttributes.smallScaleCommercialTrafficSegment.equals( commercialPersonTraffic ) && carrierAttributes.purpose == 3){
-			thisCarrier.getAttributes().putAttribute( SUBPOPULATION, SubpopulationDefaultNames.SUBPOP_COM_PERSON_SERVICE );
-		} else if (carrierAttributes.smallScaleCommercialTrafficSegment.equals( goodsTraffic ) ){
-			thisCarrier.getAttributes().putAttribute( SUBPOPULATION, SubpopulationDefaultNames.SUBPOP_GOODS );
-		} else{
-			thisCarrier.getAttributes().putAttribute( SUBPOPULATION, SubpopulationDefaultNames.SUBPOP_COM_PERSON );
-		}
-		// yy better use "switch" and throw exception if something unexpected comes in. kai, sep'26
+		String subpopulation = switch (carrierAttributes.smallScaleCommercialTrafficSegment) {
+			case commercialPersonTraffic ->
+				carrierAttributes.purpose == 3 ? SubpopulationDefaultNames.SUBPOP_COM_PERSON_SERVICE : SubpopulationDefaultNames.SUBPOP_COM_PERSON;
+			case goodsTraffic -> SubpopulationDefaultNames.SUBPOP_GOODS;
+			default -> throw new IllegalArgumentException(
+				"Unexpected smallScaleCommercialTrafficSegment: " + carrierAttributes.smallScaleCommercialTrafficSegment);
+		};
+		thisCarrier.getAttributes().putAttribute(SUBPOPULATION, subpopulation);
 
 		thisCarrier.getAttributes().putAttribute( PURPOSE, carrierAttributes.purpose);
 		thisCarrier.getAttributes().putAttribute( TOUR_START_AREA, carrierAttributes.startZone );
@@ -1107,6 +1104,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// not be enough for situations where services are relatively short compared to travel.
 		// * generate a sufficient number of vehicles so that the tour duration is covered.
 
+		// we create vehicles until the sum of the max tour durations of all vehicles is larger than the sum of the service durations of all jobs (including the factor for travel buffer calculation)
 		while (sumMaxTourDurationsOfVehicles <= sumServiceDurationsJobs) {
 			TourStartAndDuration t = tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficSegment ).sample();
 			tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficSegment ).sample(2 );

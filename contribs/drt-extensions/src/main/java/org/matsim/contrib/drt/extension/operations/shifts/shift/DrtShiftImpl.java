@@ -23,11 +23,19 @@ public class DrtShiftImpl implements DrtShift {
 
     private final DrtShiftBreak shiftBreak;
 
+    private final boolean committedEnd;
+
     private boolean started = false;
     private boolean ended = false;
 
     public DrtShiftImpl(Id<DrtShift> id, double start, double end, Id<OperationFacility> operationFacilityId,
                         Id<DvrpVehicle> designatedVehicleId, DrtShiftBreak shiftBreak, String type) {
+        this(id, start, end, operationFacilityId, designatedVehicleId, shiftBreak, type, true);
+    }
+
+    public DrtShiftImpl(Id<DrtShift> id, double start, double end, Id<OperationFacility> operationFacilityId,
+                        Id<DvrpVehicle> designatedVehicleId, DrtShiftBreak shiftBreak, String type,
+                        boolean committedEnd) {
         this.id = id;
         this.start = start;
         this.end = end;
@@ -35,6 +43,7 @@ public class DrtShiftImpl implements DrtShift {
         this.designatedVehicleId = designatedVehicleId;
         this.shiftBreak = shiftBreak;
         this.type = type;
+        this.committedEnd = committedEnd;
     }
 
     @Override
@@ -60,6 +69,11 @@ public class DrtShiftImpl implements DrtShift {
     @Override
     public Optional<String> getShiftType() {
         return Optional.ofNullable(type);
+    }
+
+    @Override
+    public boolean hasCommittedEnd() {
+        return committedEnd;
     }
 
     @Override

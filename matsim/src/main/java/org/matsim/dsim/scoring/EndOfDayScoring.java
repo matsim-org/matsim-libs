@@ -1,8 +1,6 @@
 package org.matsim.dsim.scoring;
 
 import com.google.inject.Inject;
-import org.apache.fory.logging.Logger;
-import org.apache.fory.logging.LoggerFactory;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -28,8 +26,6 @@ import org.matsim.dsim.utils.CountedWarning;
  * After finishing the scoring function, {@link NewScoreAssigner#assignNewScore} is called.
  */
 public class EndOfDayScoring {
-
-	private static final Logger log = LoggerFactory.getLogger(EndOfDayScoring.class);
 
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final Population population;

@@ -554,6 +554,10 @@ import org.matsim.testcases.MatsimTestUtils;
 				1e-7,
 				"wrong pathSizeLogitBeta "+msg );
 		Assertions.assertEquals(
+				initialGroup.getTypicalDurationSource(),
+				inputConfigGroup.getTypicalDurationSource(),
+				"wrong typicalDurationSource "+msg );
+		Assertions.assertEquals(
 				initialGroup.getDefaultPerforming_utils_hr(),
 				inputConfigGroup.getDefaultPerforming_utils_hr(),
 				1e-7,
@@ -718,6 +722,7 @@ import org.matsim.testcases.MatsimTestUtils;
 		group.getDefaultModeParams().get(TransportMode.car).setMonetaryDistanceRate(240358);
 		group.getDefaultModeParams().get(TransportMode.pt).setMonetaryDistanceRate(9835);
 		group.setPathSizeLogitBeta( 8 );
+		group.setTypicalDurationSource( ScoringConfigGroup.TypicalDurationSource.personAttribute );
 		group.setDefaultPerforming_utils_hr( 678 );
 		group.setDefaultUtilityOfLineSwitch( 396 );
 		group.getDefaultModeParams().get(TransportMode.car).setMarginalUtilityOfTraveling(246);

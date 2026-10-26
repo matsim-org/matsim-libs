@@ -215,7 +215,7 @@ class DSimThreadpool {
 
 	/**
 	 * Unparks all workers. The pool awaits tasks after this. Internally,
-	 * it uses the supplied {@link IdleStrategy} to await new tasks, in case of {@link DSimConfigGroup.ThreadScheduling#eager}
+	 * it uses the supplied {@link IdleStrategy} to await new tasks, in case of {@link DSimConfigGroup.TaskScheduling#eager}
 	 * this will cause high CPU load.
 	 */
 	public void resume() {

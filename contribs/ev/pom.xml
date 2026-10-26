@@ -109,16 +109,12 @@
 			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- DSim integration tests need Fory serialization at runtime (used by
-		     DistributedContext / SerializationProvider in the core matsim jar). -->
+		<!-- The DSim integration tests run EV across several ranks, which needs the Fory wire codec
+		     from the distributed-simulation contrib. -->
 		<dependency>
-			<groupId>org.apache.fory</groupId>
-			<artifactId>fory-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.fory</groupId>
-			<artifactId>fory-format</artifactId>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>distributed-simulation</artifactId>
+			<version>${project.parent.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

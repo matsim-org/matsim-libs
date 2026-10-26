@@ -9,6 +9,8 @@ import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.serialization.ForySerializationProvider;
+import org.matsim.core.serialization.MessageTypeRegistry;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
@@ -110,7 +112,8 @@ public class RunDistributedSim implements Callable<Integer> {
 
 		Scenario s = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler(s, DistributedContext.create(comm, config));
+		Controler controler = new Controler(s, DistributedContext.create(comm, config,
+			new ForySerializationProvider(MessageTypeRegistry.getInstance())));
 
 		controler.getInjector();
 		// Removes check after injector has been created, just a workaround to avoid exceptions

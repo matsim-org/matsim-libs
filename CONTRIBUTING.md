@@ -121,6 +121,21 @@ Or build without tests during development:
 mvn package -DskipTests
 ```
 
+### Platform-independent tests
+
+Tests should run successfully on all supported platforms (Linux, macOS, and Windows). Avoid assertions that depend on platform-specific behavior such as line endings, file separators, path separators, or default character encodings. 
+The standard test suite is run on Linux, but a nightly Windows build is also conducted.
+
+Prefer platform-independent APIs such as:
+
+* `System.lineSeparator()` instead of hardcoded `"\n"` or `"\r\n"`
+* `java.nio.file.Path` and `Path.of(...)` instead of hardcoded path separators
+* Explicit character encodings (for example `StandardCharsets.UTF_8`) instead of platform defaults
+
+Always close files, streams, channels, and other resources (preferably using try-with-resources). Some operating systems, particularly Windows, prevent modifying or deleting files while they are still open, which can lead to tests that pass on Linux or macOS but fail on Windows, especially when running the full test suite.
+
+If platform-specific output cannot be avoided, normalize it before asserting expected values.
+
 ---
 
 # Submitting Changes
@@ -138,6 +153,30 @@ A good pull request should:
 * Reference any related issue(s).
 * Include screenshots or benchmarks if applicable.
 
+We are using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), so that we are able to auto generate a changelog. The format is described below:
+
+## Title
+`<type>[optional scope]: <description>` e.g.: fix(QSim): Correctly calculate travel times on links
+
+Available types:
+ - feat: A new feature
+ - fix: A bug fix
+ - docs: Documentation only changes
+ - style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+ - refactor: A code change that neither fixes a bug nor adds a feature
+ - perf: A code change that improves performance
+ - test: Adding missing tests or correcting existing tests
+ - build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+ - ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+ - chore: Other changes that don't modify src or test files
+ - revert: Reverts a previous commit
+
+## Body
+Optionally, describe the change in more detail.
+
+If the PR introduces a breaking change write: BREAKING CHANGE at the bottom of the message
+
+  
 ---
 
 # Commit Messages

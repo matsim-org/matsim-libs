@@ -145,8 +145,8 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
-	static void createPlansBasedOnCarrierPlans( Scenario scenario, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment, Path output,
-	                                            String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
+	static void createPlansBasedOnCarrierPlans(Scenario scenario, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment smallScaleCommercialTrafficSegment, Path output,
+	                                           String modelName, double sample, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
 
 		Population population = scenario.getPopulation();
 		PopulationFactory popFactory = population.getFactory();
@@ -219,12 +219,13 @@ public class SmallScaleCommercialTrafficUtils {
 		}
 
 		String outputPopulationFile;
+		String sampleName = PopulationUtils.getSampleLabel(sample);
 		if (nameOutputPopulation == null)
 			if ( smallScaleCommercialTrafficSegment.equals(
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficSegment.completeSmallScaleCommercialTraffic ))
-				outputPopulationFile = output.toString() + "/" + modelName + "_" + "smallScaleCommercialTraffic" + "_" + sampleName + "pct_plans.xml.gz";
+				outputPopulationFile = output.toString() + "/" + modelName + "_" + "smallScaleCommercialTraffic" + "_" + sampleName + "_plans.xml.gz";
 			else
-				outputPopulationFile = output.toString() + "/" + modelName + "_" + smallScaleCommercialTrafficSegment + "_" + sampleName + "pct_plans.xml.gz";
+				outputPopulationFile = output.toString() + "/" + modelName + "_" + smallScaleCommercialTrafficSegment + "_" + sampleName + "_plans.xml.gz";
 		else
 			outputPopulationFile = output.toString() + "/" + nameOutputPopulation;
 		if (numberOfPlanVariantsPerAgent > 1)
@@ -258,15 +259,6 @@ public class SmallScaleCommercialTrafficUtils {
 				config.scoring().addDefaultModeParams(new ScoringConfigGroup.ModeParams(mode));
 			}
 		});
-	}
-
-	static String getSampleNameOfOutputFolder(double sample) {
-		String sampleName;
-		if ((sample * 100) % 1 == 0)
-			sampleName = String.valueOf((int) (sample * 100));
-		else
-			sampleName = String.valueOf((sample * 100));
-		return sampleName;
 	}
 
 	/**

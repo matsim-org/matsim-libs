@@ -10,9 +10,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.misc.OptionalTime;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Tests for the per-activity typical duration ({@link TypicalDurationCalculator}) in
@@ -215,5 +221,84 @@ public class CharyparNagelActivityScoringTypicalDurationTest {
 		stock.finish();
 
 		assertEquals(stock.getScore(), diverged.getScore(), 1e-9);
+	}
+
+	private record Call(Person person, Activity act, int mainActivityIndex) {
+	}
+
+	/** A calculator that records what it is handed, and leaves the typical durations to the config. */
+	private static TypicalDurationCalculator recording(List<Call> calls) {
+		return (person, act, mainActivityIndex) -> {
+			calls.add(new Call(person, act, mainActivityIndex));
+			return OptionalTime.undefined();
+		};
+	}
+
+	private static void assertCall(Call call, Person person, Activity act, int mainActivityIndex) {
+		assertSame(person, call.person());
+		assertSame(act, call.act());
+		assertEquals(mainActivityIndex, call.mainActivityIndex());
+	}
+
+	/**
+	 * The calculator gets the person, the plan's own activity and its position among the main activities, in the
+	 * order in which the activities are scored: the first one only at the end of the day.
+	 */
+	@Test
+	void calculatorGetsThePlanActivitiesAndTheirPositions() {
+		Config config = config();
+		Person person = person(plan());
+		List<Activity> planned = TripStructureUtils.getActivities(person.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+		List<Call> calls = new ArrayList<>();
+
+		CharyparNagelActivityScoring scoring = new CharyparNagelActivityScoring(params(config), recording(calls), person);
+		scoring.handleFirstActivity(bare("home", null, 28800.));
+		scoring.handleActivity(bare("pt interaction", 29000., 29000.));
+		scoring.handleActivity(bare("work", 30600., 59400.));
+		scoring.handleLastActivity(bare("home_evening", 61200., null));
+		scoring.finish();
+
+		assertEquals(3, calls.size());
+		assertCall(calls.get(0), person, planned.get(1), 1);
+		assertCall(calls.get(1), person, planned.get(0), 0);
+		assertCall(calls.get(2), person, planned.get(2), 2);
+	}
+
+	/** A wrap-around day is scored once, as its last activity. */
+	@Test
+	void wrapAroundDayIsScoredAsTheLastActivity() {
+		Config config = config();
+		Plan plan = PopulationUtils.createPlan();
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0., 0.)).setEndTime(28800.);
+		PopulationUtils.createAndAddLeg(plan, "car");
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(1., 0.)).setEndTime(59400.);
+		PopulationUtils.createAndAddLeg(plan, "car");
+		Activity lastHome = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0., 0.));
+		Person person = person(plan);
+		List<Call> calls = new ArrayList<>();
+
+		CharyparNagelActivityScoring scoring = new CharyparNagelActivityScoring(params(config), recording(calls), person);
+		scoring.handleFirstActivity(bare("home", null, 28800.));
+		scoring.handleActivity(bare("work", 30600., 59400.));
+		scoring.handleLastActivity(bare("home", 61200., null));
+		scoring.finish();
+
+		assertEquals(2, calls.size());
+		assertCall(calls.get(0), person, (Activity) plan.getPlanElements().get(2), 1);
+		assertCall(calls.get(1), person, lastHome, 2);
+	}
+
+	/** Without a selected plan, there is nothing to align with: scored as without the person. */
+	@Test
+	void personWithoutPlanIsScoredUnaligned() {
+		Config config = config();
+		Person planless = PopulationUtils.getFactory().createPerson(Id.createPersonId("planless"));
+		double stock = score(new CharyparNagelActivityScoring(params(config)), 30600., 59400.);
+		assertEquals(stock, score(new CharyparNagelActivityScoring(params(config), new ActivityTypeTypicalDurationCalculator(), planless), 30600., 59400.), 1e-9);
+		assertEquals(stock, score(attributeScoring(config, planless), 30600., 59400.), 1e-9);
+
+		List<Call> calls = new ArrayList<>();
+		score(new CharyparNagelActivityScoring(params(config), recording(calls), planless), 30600., 59400.);
+		calls.forEach(call -> assertEquals(TypicalDurationCalculator.UNALIGNED, call.mainActivityIndex()));
 	}
 }
