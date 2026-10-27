@@ -92,7 +92,8 @@ public class AdaptivePrebookingLogic implements PrebookingLogic, ActivityStartEv
 						// only book legs that are not already prebooked
 
 						// the queue only accepts future submissions, so the earliest option is the next time step
-						double submissionTime = Math.max(Math.nextUp(event.getTime()), departureTime - submissionSlack);
+						double nextTimeStep = event.getTime() + qsim.getSimTimer().getSimTimestepSize();
+						double submissionTime = Math.max(nextTimeStep, departureTime - submissionSlack);
 						if (submissionTime < departureTime) {
 							prebookingQueue.schedule(submissionTime, agent, leg, departureTime);
 						}
