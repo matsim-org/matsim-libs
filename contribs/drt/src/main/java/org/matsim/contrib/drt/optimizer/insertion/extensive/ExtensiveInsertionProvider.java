@@ -72,7 +72,7 @@ class ExtensiveInsertionProvider {
 				//generate feasible insertions (wrt occupancy limits) with admissible detour times
 				.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
 				//optimistic pre-filtering wrt admissible cost function
-				.filter(i -> admissibleCostCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)
+				.filter(i -> admissibleCostCalculator.calculate(i.insertion.getRequest(), i.insertion, i.detourTimeInfo)
 						< INFEASIBLE_SOLUTION_COST)
 				//collect
 				.collect(Collectors.toList())).join();

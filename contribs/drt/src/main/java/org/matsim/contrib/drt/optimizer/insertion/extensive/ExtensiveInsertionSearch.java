@@ -59,7 +59,7 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 		return bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
 			var insertionDetourData = pathData.createInsertionDetourData(i);
 			return new InsertionWithDetourData(i, insertionDetourData,
-				detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, drtRequest));
+				detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, i.getRequest()));
 		}));
 	}
 }

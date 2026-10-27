@@ -35,6 +35,7 @@ import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 
 /**
  * Generates all possible pickup and dropoff insertion point pairs that do not violate the vehicle capacity. In order to
@@ -121,12 +122,14 @@ public class InsertionGenerator {
 		public final InsertionPoint pickup;
 		public final InsertionPoint dropoff;
 		public final DvrpLoad insertedLoad;
+		private final DrtRequest request;
 
 		public Insertion(VehicleEntry vehicleEntry, InsertionPoint pickup, InsertionPoint dropoff, DvrpLoad insertedLoad) {
 			this.vehicleEntry = vehicleEntry;
 			this.pickup = pickup;
 			this.dropoff = dropoff;
 			this.insertedLoad = insertedLoad;
+			this.request = requestOf(pickup, dropoff);
 		}
 
 		public Insertion(DrtRequest request, VehicleEntry vehicleEntry, int pickupIdx, int dropoffIdx) {
@@ -134,6 +137,27 @@ public class InsertionGenerator {
 			pickup = createPickupInsertion(request, vehicleEntry, pickupIdx, pickupIdx == dropoffIdx);
 			dropoff = createDropoffInsertion(request, vehicleEntry, pickup, dropoffIdx);
 			this.insertedLoad = request.getLoad();
+			this.request = request;
+		}
+
+		/**
+		 * The request variant served by this insertion, i.e. the request carried by the pickup and dropoff waypoints.
+		 * It has the same id and passengers as the request for which the insertion search was started, but its links
+		 * and time windows refer to the stops of this insertion. Evaluating or scheduling an insertion should use this
+		 * request rather than the request of the search. Without stop candidates, both are the same object.
+		 *
+		 * @return the request variant, or {@code null} if the insertion points carry no pickup/dropoff waypoints
+		 */
+		public DrtRequest getRequest() {
+			return request;
+		}
+
+		private static DrtRequest requestOf(InsertionPoint pickup, InsertionPoint dropoff) {
+			DrtRequest pickupRequest = pickup != null && pickup.newWaypoint instanceof Waypoint.Pickup p ? p.request : null;
+			DrtRequest dropoffRequest = dropoff != null && dropoff.newWaypoint instanceof Waypoint.Dropoff d ? d.request : null;
+			Preconditions.checkArgument(pickupRequest == null || dropoffRequest == null || pickupRequest == dropoffRequest,
+					"Pickup and dropoff waypoints must carry the same request variant");
+			return pickupRequest != null ? pickupRequest : dropoffRequest;
 		}
 
 		@Override
