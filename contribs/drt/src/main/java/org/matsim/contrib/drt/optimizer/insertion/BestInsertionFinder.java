@@ -59,10 +59,14 @@ public class BestInsertionFinder {
 		this.costCalculator = costCalculator;
 	}
 
+	/**
+	 * Each insertion is evaluated with its own request variant ({@code insertion.getRequest()}), which shares the id of
+	 * {@code drtRequest} but may refer to different stops.
+	 */
 	public Optional<InsertionWithDetourData> findBestInsertion(DrtRequest drtRequest,
 			Stream<InsertionWithDetourData> insertions) {
 		return insertions.map(
-						i -> new InsertionWithCost(i, costCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)))
+						i -> new InsertionWithCost(i, costCalculator.calculate(i.insertion.getRequest(), i.insertion, i.detourTimeInfo)))
 				.filter(iWithCost -> iWithCost.cost < INFEASIBLE_SOLUTION_COST)
 				.min(INSERTION_WITH_COST_COMPARATOR)
 				.map(iWithCost -> iWithCost.insertionWithDetourData);
