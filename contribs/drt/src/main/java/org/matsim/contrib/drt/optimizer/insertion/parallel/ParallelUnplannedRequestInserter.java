@@ -259,7 +259,10 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 
 			eventsManager.processEvent(
 				new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerIds(), vehicle.getId(),
-					expectedPickupTime, expectedDropoffTime));
+					expectedPickupTime, expectedDropoffTime,
+					// chosen stops are reported only if they differ from the submitted request (stop selection)
+					stopRequest.getFromLink() != req.getFromLink() ? stopRequest.getFromLink().getId() : null,
+					stopRequest.getToLink() != req.getToLink() ? stopRequest.getToLink().getId() : null));
 			return Optional.of(vehicle);
 		} else {
 			retryOrReject(req, now, OFFER_REJECTED_CAUSE);

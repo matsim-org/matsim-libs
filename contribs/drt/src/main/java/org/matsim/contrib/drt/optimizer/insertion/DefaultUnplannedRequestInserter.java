@@ -164,7 +164,10 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 				eventsManager.processEvent(
 					new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerIds(), vehicle.getId(),
-						expectedPickupTime, expectedDropoffTime));
+						expectedPickupTime, expectedDropoffTime,
+						// chosen stops are reported only if they differ from the submitted request (stop selection)
+						stopRequest.getFromLink() != req.getFromLink() ? stopRequest.getFromLink().getId() : null,
+						stopRequest.getToLink() != req.getToLink() ? stopRequest.getToLink().getId() : null));
 			} else {
 				retryOrReject(req, now, OFFER_REJECTED_CAUSE);
 			}

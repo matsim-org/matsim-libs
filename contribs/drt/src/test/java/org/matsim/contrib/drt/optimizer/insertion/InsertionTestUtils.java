@@ -23,6 +23,16 @@ public final class InsertionTestUtils {
 		return new InsertionGenerator.Insertion(vehicleEntry, pickup, dropoff, load);
 	}
 
+	/**
+	 * Creates an insertion serving the given request variant (with its walking durations and index).
+	 */
+	public static InsertionGenerator.Insertion insertionFor(RequestVariant variant, VehicleEntry vehicleEntry,
+			int pickupIdx, int dropoffIdx, DvrpLoad load) {
+		var pickup = new InsertionGenerator.InsertionPoint(pickupIdx, null, new Waypoint.Pickup(variant.request()), null);
+		var dropoff = new InsertionGenerator.InsertionPoint(dropoffIdx, null, new Waypoint.Dropoff(variant.request()), null);
+		return new InsertionGenerator.Insertion(variant, vehicleEntry, pickup, dropoff, load);
+	}
+
 	public static InsertionGenerator.Insertion insertionFor(DrtRequest request, VehicleEntry vehicleEntry,
 			DvrpLoad load) {
 		return insertionFor(request, vehicleEntry, -1, -1, load);

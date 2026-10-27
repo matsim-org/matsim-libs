@@ -42,6 +42,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionTestUtils;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
+import org.matsim.contrib.drt.optimizer.insertion.RequestVariants;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 import org.matsim.contrib.dvrp.load.IntegerLoadType;
@@ -60,7 +61,7 @@ public class ExtensiveInsertionProviderTest {
 	void getInsertions_noInsertionsGenerated() {
 		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(new DefaultStopTimeCalculator(120), null),
 				rule.forkJoinPool);
-		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
+		assertThat(insertionProvider.getInsertions(DrtRequest.newBuilder().build(), List.of())).isEmpty();
 	}
 
 	@Test
@@ -85,7 +86,7 @@ public class ExtensiveInsertionProviderTest {
 		var feasibleInsertion = InsertionTestUtils.insertionFor(request, vehicleEntry, loadType.fromInt(1));
 		var infeasibleInsertion = InsertionTestUtils.insertionFor(request, vehicleEntry, loadType.fromInt(1));
 		var insertionGenerator = mock(InsertionGenerator.class);
-		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry)))//
+		when(insertionGenerator.generateInsertions(eq(RequestVariants.of(request)), eq(vehicleEntry)))//
 				.thenReturn(List.of(insertionWithDetourData(feasibleInsertion),
 						insertionWithDetourData(infeasibleInsertion)));
 

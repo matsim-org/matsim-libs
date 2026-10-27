@@ -138,6 +138,24 @@ public class BestInsertionFinderTest {
 		assertThat(findBestInsertion(insertion)).hasValue(insertion);
 	}
 
+	@Test
+	void twoEqualInsertions_sameVehicleAndIndices_chooseVariantWithLessWalking() {
+		var farVariant = new RequestVariant(mock(DrtRequest.class), 300, 0, 1);
+		var nearVariant = new RequestVariant(mock(DrtRequest.class), 30, 0, 2);
+
+		var vehicle = mock(DvrpVehicle.class);
+		when(vehicle.getId()).thenReturn(Id.create("v1", DvrpVehicle.class));
+		var vehicleEntry = new VehicleEntry(vehicle, null, null, null, null, 0);
+		var farInsertion = new InsertionWithDetourData(
+				InsertionTestUtils.insertionFor(farVariant, vehicleEntry, 0, 0, loadType.fromInt(1)), null, null);
+		var nearInsertion = new InsertionWithDetourData(
+				InsertionTestUtils.insertionFor(nearVariant, vehicleEntry, 0, 0, loadType.fromInt(1)), null, null);
+		when(insertionCostCalculator.calculate(any(), any(), any())).thenReturn(123.);
+
+		assertThat(findBestInsertion(farInsertion, nearInsertion)).hasValue(nearInsertion);
+		assertThat(findBestInsertion(nearInsertion, farInsertion)).hasValue(nearInsertion);
+	}
+
 	@SafeVarargs
 	private Optional<InsertionWithDetourData> findBestInsertion(InsertionWithDetourData... insertions) {
 		return bestInsertionFinder.findBestInsertion(request, Arrays.stream(insertions));

@@ -304,6 +304,9 @@ public class DefaultUnplannedRequestInserterTest {
 				PassengerRequestScheduledEvent.class);
 		verify(eventsManager, times(1)).processEvent(captor.capture());
 		assertThat(captor.getValue().getRequestId()).isEqualTo(request1.getId());
+		// the chosen pickup stop differs from the submitted request and is reported; the dropoff stop does not
+		assertThat(captor.getValue().getPickupLinkId()).contains(Id.createLinkId("stopA"));
+		assertThat(captor.getValue().getDropoffLinkId()).isEmpty();
 	}
 
 	private Collection<DrtRequest> requests(DrtRequest... requests) {
