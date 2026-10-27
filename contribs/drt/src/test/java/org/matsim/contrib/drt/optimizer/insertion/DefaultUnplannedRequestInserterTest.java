@@ -253,7 +253,8 @@ public class DefaultUnplannedRequestInserterTest {
 		verify(eventsManager, times(1)).processEvent(captor.capture());
 		assertThat(captor.getValue()).isEqualToComparingFieldByField(
 				new PassengerRequestScheduledEvent(now, mode, request1.getId(), request1.getPassengerIds(),
-						vehicle1.getId(), pickupEndTime, dropoffBeginTime));
+						vehicle1.getId(), pickupEndTime, dropoffBeginTime, request1.getFromLink().getId(),
+						request1.getToLink().getId()));
 
 		//vehicle entry was created twice:
 		// 1 - via constructing vehicle entries (before scheduling)
@@ -304,9 +305,9 @@ public class DefaultUnplannedRequestInserterTest {
 				PassengerRequestScheduledEvent.class);
 		verify(eventsManager, times(1)).processEvent(captor.capture());
 		assertThat(captor.getValue().getRequestId()).isEqualTo(request1.getId());
-		// the chosen pickup stop differs from the submitted request and is reported; the dropoff stop does not
+		// the scheduled stops are reported: pickup at the variant's stop, dropoff unchanged
 		assertThat(captor.getValue().getPickupLinkId()).contains(Id.createLinkId("stopA"));
-		assertThat(captor.getValue().getDropoffLinkId()).isEmpty();
+		assertThat(captor.getValue().getDropoffLinkId()).contains(request1.getToLink().getId());
 	}
 
 	private Collection<DrtRequest> requests(DrtRequest... requests) {

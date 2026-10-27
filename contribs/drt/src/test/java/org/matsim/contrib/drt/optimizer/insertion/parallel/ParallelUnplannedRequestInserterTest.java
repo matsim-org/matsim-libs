@@ -270,7 +270,8 @@ public class ParallelUnplannedRequestInserterTest {
 		verify(eventsManager, times(1)).processEvent(captor.capture());
 		assertThat(captor.getValue()).isEqualToComparingFieldByField(
 				new PassengerRequestScheduledEvent(processTime, mode, request1.getId(), request1.getPassengerIds(),
-						vehicle1.getId(), pickupEndTime, dropoffBeginTime));
+						vehicle1.getId(), pickupEndTime, dropoffBeginTime, request1.getFromLink().getId(),
+						request1.getToLink().getId()));
 
 		//vehicle entry was created at least once
 		assertThat(createEntryCounter.getValue()).isGreaterThanOrEqualTo(1);

@@ -47,7 +47,7 @@ public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEven
 	private final double pickupTime;
 	private final double dropoffTime;
 
-	// only set if the scheduled stops differ from the from/to links of the submitted request (stop selection)
+	// scheduled pickup/dropoff links; null if not reported (modes without stop selection, older event files)
 	private final Id<Link> pickupLinkId;
 	private final Id<Link> dropoffLinkId;
 
@@ -60,8 +60,9 @@ public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEven
 	}
 
 	/**
-	 * An event processed upon request submission, with the pickup and dropoff links chosen by the optimizer. Pass
-	 * {@code null} links if they are the from/to links of the submitted request; they are then not written.
+	 * An event processed upon request submission, with the scheduled pickup and dropoff links. These may differ from
+	 * the from/to links of the submitted request if the optimizer selects the stops. {@code null} links are not
+	 * written.
 	 */
 	public PassengerRequestScheduledEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds,
 			Id<DvrpVehicle> vehicleId, double pickupTime, double dropoffTime, Id<Link> pickupLinkId,
@@ -101,14 +102,14 @@ public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEven
 	}
 
 	/**
-	 * @return pickup link chosen by the optimizer, or empty if it is the from link of the submitted request
+	 * @return scheduled pickup link, or empty if not reported (e.g. other modes or older event files)
 	 */
 	public final Optional<Id<Link>> getPickupLinkId() {
 		return Optional.ofNullable(pickupLinkId);
 	}
 
 	/**
-	 * @return dropoff link chosen by the optimizer, or empty if it is the to link of the submitted request
+	 * @return scheduled dropoff link, or empty if not reported (e.g. other modes or older event files)
 	 */
 	public final Optional<Id<Link>> getDropoffLinkId() {
 		return Optional.ofNullable(dropoffLinkId);
