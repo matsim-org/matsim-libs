@@ -63,6 +63,9 @@ public class AdaptivePrebookingLogic implements PrebookingLogic, ActivityStartEv
 		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 		timeTracker.setTime(event.getTime());
 
+		// the departure happens at the end of the ongoing activity, not at its start
+		timeTracker.addElement(plan.getPlanElements().get(planElementIndex));
+
 		/*
 		 * Now we starting to traverse the remaining plan to see if we find a DRT leg
 		 * that comes after the currently started activity. If so, we prebook it with
@@ -88,8 +91,9 @@ public class AdaptivePrebookingLogic implements PrebookingLogic, ActivityStartEv
 					if (prebookingManager.getRequestId(leg) == null) {
 						// only book legs that are not already prebooked
 
-						double submissionTime = Math.max(event.getTime(), departureTime - submissionSlack);
-						if (submissionTime > departureTime) {
+						// the queue only accepts future submissions, so the earliest option is the next time step
+						double submissionTime = Math.max(Math.nextUp(event.getTime()), departureTime - submissionSlack);
+						if (submissionTime < departureTime) {
 							prebookingQueue.schedule(submissionTime, agent, leg, departureTime);
 						}
 					}
