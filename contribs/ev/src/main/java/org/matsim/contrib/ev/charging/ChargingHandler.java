@@ -42,8 +42,9 @@ public class ChargingHandler implements MobsimAfterSimStepListener {
 
 	@Override
 	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
-		if ((e.getSimulationTime() + 1) % chargeTimeStep == 0) {
+		if (e.getSimulationTime() % chargeTimeStep == 0) {
 			for (Charger c : chargers) {
+				// issues charging of the vehicles in the interval [now, now + time step]
 				c.getLogic().chargeVehicles(chargeTimeStep, e.getSimulationTime());
 			}
 		}
