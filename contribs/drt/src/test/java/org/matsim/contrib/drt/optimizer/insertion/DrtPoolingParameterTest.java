@@ -144,7 +144,7 @@ public class DrtPoolingParameterTest {
 	 */
 	@Test
 	void testBetaNoVehicles() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000, 1.0, 0.);
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(60, 1.0, 60);
 
 		Assertions.assertEquals(0, handler.getVehRequestCount().size(), "There should only be zero vehicles used");
 
@@ -156,7 +156,7 @@ public class DrtPoolingParameterTest {
 	 */
 	@Test
 	void testBetaTwoVehiclesForTwoAgents() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000, 1.0, 150);
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(150, 1.0, 150);
 
 		Assertions.assertEquals(2, handler.getVehRequestCount().size(), "There should two vehicle used");
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
@@ -177,7 +177,7 @@ public class DrtPoolingParameterTest {
 	 */
 	@Test
 	void testBetaTwoVehiclesForFourAgents() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000, 1.0, 250);
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(250, 1.0, 250);
 
 		Assertions.assertEquals(2, handler.getVehRequestCount().size(), "There should two vehicle used");
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
@@ -197,7 +197,7 @@ public class DrtPoolingParameterTest {
 	 */
 	@Test
 	void testBetaOneVehicleForFourAgents() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000, 1.0, 400);
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(400, 1.0, 400);
 
 		Assertions.assertEquals(1, handler.getVehRequestCount().size(), "There should only be one vehicle used");
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);

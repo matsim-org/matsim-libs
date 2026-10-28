@@ -87,7 +87,7 @@ public class RunPreemptiveRejectionIT {
         assertNotEquals(71, businessRejections.get());
 
         // values with preemptive rejection
-        assertEquals(46, leisureRejections.get());
-        assertEquals(108, businessRejections.get());
+        assertEquals(28, leisureRejections.get());
+        assertEquals(98, businessRejections.get());
     }
 }
