@@ -48,7 +48,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	}
 
 	@Override
-	public void chargeVehicles(double chargePeriod, double now) {
+	public void chargeVehicles(double chargeTimeStep, double now) {
 		Iterator<ChargingVehicle> cvIter = pluggedVehicles.values().iterator();
 
 		chargerPower.update(now);
@@ -67,7 +67,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
-			double chargedEnergy = chargingPower * chargePeriod;
+			double chargedEnergy = chargingPower * chargeTimeStep;
 
 			// limited by requested energy
 			chargedEnergy = Math.min(chargedEnergy, requestedEnergy);
