@@ -31,6 +31,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +54,8 @@ public class DrtRequest implements PassengerRequest {
 	private final double latestStartTime;
 	private final double latestArrivalTime;
 
+	private final DrtStopCandidates stopCandidates;
+
 	private DrtRequest(Builder builder) {
 		id = builder.id;
 		submissionTime = builder.submissionTime;
@@ -65,6 +68,7 @@ public class DrtRequest implements PassengerRequest {
 		fromLink = builder.fromLink;
 		toLink = builder.toLink;
 		this.load = builder.load;
+		this.stopCandidates = builder.stopCandidates;
 	}
 
 	public static Builder newBuilder() {
@@ -82,6 +86,7 @@ public class DrtRequest implements PassengerRequest {
 		builder.earliestDepartureTime = copy.earliestStartTime;
 		builder.constraints = copy.constraints;
 		builder.load = copy.load;
+		builder.stopCandidates = copy.stopCandidates;
 		return builder;
 	}
 
@@ -138,6 +143,13 @@ public class DrtRequest implements PassengerRequest {
 		return this.load;
 	}
 
+	/**
+	 * @return alternative pickup/dropoff stops the passenger accepts, if any
+	 */
+	public Optional<DrtStopCandidates> getStopCandidates() {
+		return Optional.ofNullable(stopCandidates);
+	}
+
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
@@ -167,8 +179,14 @@ public class DrtRequest implements PassengerRequest {
 		private Link fromLink;
 		private Link toLink;
 		private DvrpLoad load;
+		private DrtStopCandidates stopCandidates;
 
 		private Builder() {
+		}
+
+		public Builder stopCandidates(DrtStopCandidates val) {
+			stopCandidates = val;
+			return this;
 		}
 
 		public Builder id(Id<Request> val) {

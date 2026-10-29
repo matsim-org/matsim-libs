@@ -22,7 +22,12 @@
 package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.*;
@@ -55,11 +60,25 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 			return Optional.empty();
 		}
 
-		DetourPathDataCache pathData = detourPathCalculator.calculatePaths(drtRequest, insertions);
+		var pathDataByVariant = calculatePathsPerVariant(detourPathCalculator, insertions);
 		return bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
-			var insertionDetourData = pathData.createInsertionDetourData(i);
+			var insertionDetourData = pathDataByVariant.get(i.getRequest()).createInsertionDetourData(i);
 			return new InsertionWithDetourData(i, insertionDetourData,
-				detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, drtRequest));
+				detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, i.getRequest()));
 		}));
+	}
+
+	/**
+	 * Paths are calculated per request variant, because variants differ in their pickup and dropoff links.
+	 */
+	static Map<DrtRequest, DetourPathDataCache> calculatePathsPerVariant(
+			MultiInsertionDetourPathCalculator detourPathCalculator, List<InsertionGenerator.Insertion> insertions) {
+		Map<DrtRequest, List<InsertionGenerator.Insertion>> insertionsByVariant = insertions.stream()
+				.collect(Collectors.groupingBy(InsertionGenerator.Insertion::getRequest, LinkedHashMap::new,
+						Collectors.toList()));
+		Map<DrtRequest, DetourPathDataCache> pathDataByVariant = new HashMap<>();
+		insertionsByVariant.forEach((variant, variantInsertions) -> pathDataByVariant.put(variant,
+				detourPathCalculator.calculatePaths(variant, variantInsertions)));
+		return pathDataByVariant;
 	}
 }

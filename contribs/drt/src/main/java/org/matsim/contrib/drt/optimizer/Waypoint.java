@@ -141,6 +141,10 @@ public interface Waypoint {
 		}
 	}
 
+	/**
+	 * A pickup to be inserted. The carried request defines the pickup link and time window. It may be a variant of the
+	 * request of the insertion search (same id, different stop), see {@code InsertionGenerator.Insertion#getRequest()}.
+	 */
 	class Pickup implements Waypoint {
 		public final DrtRequest request;
 
@@ -174,6 +178,9 @@ public interface Waypoint {
 		}
 	}
 
+	/**
+	 * A dropoff to be inserted. The carried request defines the dropoff link and time window, see {@link Pickup}.
+	 */
 	class Dropoff implements Waypoint {
 		public final DrtRequest request;
 

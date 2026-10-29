@@ -221,7 +221,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		DrtInsertionSearch insertionSearch = (drtRequest, vEntries) -> drtRequest == request1 ?
 				Optional.of(new InsertionWithDetourData(
-						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null, loadType.fromInt(1)), null,
+						InsertionTestUtils.insertionFor(drtRequest, vEntries.iterator().next(), loadType.fromInt(1)), null,
 						new InsertionDetourTimeCalculator.DetourTimeInfo(
 								mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 								mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class)))) :
@@ -253,12 +253,61 @@ public class DefaultUnplannedRequestInserterTest {
 		verify(eventsManager, times(1)).processEvent(captor.capture());
 		assertThat(captor.getValue()).isEqualToComparingFieldByField(
 				new PassengerRequestScheduledEvent(now, mode, request1.getId(), request1.getPassengerIds(),
-						vehicle1.getId(), pickupEndTime, dropoffBeginTime));
+						vehicle1.getId(), pickupEndTime, dropoffBeginTime, request1.getFromLink().getId(),
+						request1.getToLink().getId()));
 
 		//vehicle entry was created twice:
 		// 1 - via constructing vehicle entries (before scheduling)
 		// 2 - via updating vehicle entries (after scheduling)
 		assertThat(createEntryCounter.getValue()).isEqualTo(2);
+	}
+
+	@Test
+	void acceptedRequest_usesRequestVariantOfInsertion() {
+		/*-
+		 * The insertion serves a variant of request1 (same id, other pickup stop). The offer and the scheduled tasks must
+		 * refer to the variant, the event to the id of request1.
+		 */
+		var vehicle1 = vehicle("1");
+		var fleet = fleet(vehicle1);
+		var unplannedRequests = requests(request1);
+		double now = 15;
+
+		var vehicle1Entry = new VehicleEntry(vehicle1, null, null, null, null, 0);
+		VehicleEntry.EntryFactory entryFactory = (vehicle, currentTime) -> vehicle1Entry;
+
+		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
+				new DrtRequestInsertionRetryParams());//retry OFF, empty queue
+
+		DrtRequest variant = DrtRequest.newBuilder(request1).fromLink(link("stopA")).build();
+		DrtInsertionSearch insertionSearch = (drtRequest, vEntries) -> Optional.of(new InsertionWithDetourData(
+				InsertionTestUtils.insertionFor(variant, vEntries.iterator().next(), loadType.fromInt(1)), null,
+				new InsertionDetourTimeCalculator.DetourTimeInfo(
+						mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
+						mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class))));
+
+		var scheduledRequests = new ArrayList<AcceptedDrtRequest>();
+		RequestInsertionScheduler insertionScheduler = (request, insertion) -> {
+			scheduledRequests.add(request);
+			var pickupTask = new DefaultDrtStopTask(now + 10, now + 20, request.getFromLink());
+			var dropoffTask = new DefaultDrtStopTask(now + 40, now + 50, request.getToLink());
+			return new PickupDropoffTaskPair(pickupTask, dropoffTask);
+		};
+
+		newInserter(fleet, now, entryFactory, retryQueue, insertionSearch,
+				insertionScheduler).scheduleUnplannedRequests(unplannedRequests);
+
+		assertThat(scheduledRequests).hasSize(1);
+		assertThat(scheduledRequests.getFirst().getRequest()).isSameAs(variant);
+		assertThat(scheduledRequests.getFirst().getFromLink().getId()).isEqualTo(Id.createLinkId("stopA"));
+
+		ArgumentCaptor<PassengerRequestScheduledEvent> captor = ArgumentCaptor.forClass(
+				PassengerRequestScheduledEvent.class);
+		verify(eventsManager, times(1)).processEvent(captor.capture());
+		assertThat(captor.getValue().getRequestId()).isEqualTo(request1.getId());
+		// the scheduled stops are reported: pickup at the variant's stop, dropoff unchanged
+		assertThat(captor.getValue().getPickupLinkId()).contains(Id.createLinkId("stopA"));
+		assertThat(captor.getValue().getDropoffLinkId()).contains(request1.getToLink().getId());
 	}
 
 	private Collection<DrtRequest> requests(DrtRequest... requests) {

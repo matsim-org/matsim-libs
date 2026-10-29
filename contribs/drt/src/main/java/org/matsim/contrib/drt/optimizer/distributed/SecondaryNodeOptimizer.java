@@ -74,6 +74,10 @@ public class SecondaryNodeOptimizer implements DrtOptimizer, MobsimAfterSimStepL
 	}
 
 	private Message toMessage(DrtRequest request) {
+		if (request.getStopCandidates().isPresent()) {
+			throw new UnsupportedOperationException(
+				"Stop candidates are not supported in distributed mode (request " + request.getId() + ")");
+		}
 		return new RequestMessage(
 			request.getId(),
 			request.getSubmissionTime(),
