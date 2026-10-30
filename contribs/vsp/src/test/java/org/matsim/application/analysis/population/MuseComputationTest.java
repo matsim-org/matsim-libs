@@ -7,14 +7,20 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.ActivityAttributeTypicalDurationCalculator;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.matsim.application.analysis.population.AddVttsEtcToActivities.getMUSE_h;
-import static org.matsim.application.analysis.population.KNTestFixture.*;
+import static org.matsim.application.analysis.population.kn.AddVttsEtcToActivities.getMUSE_h;
+import static org.matsim.application.analysis.population.kn.KNTestFixture.*;
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
 /**
- * Characterization tests for the existing KN MUSE computation, before refactoring it.
+ * KN MUSE characterization tests retained as the refactoring baseline, plus scorer-lifecycle tests.
  *
  * <p>MUSE is the activity score gained by starting one second earlier, scaled to score/hour.
  * These tests compare the existing production calculation with independent expected values;
@@ -153,5 +159,87 @@ class MuseComputationTest {
 		// No destination is evaluated, so the current mean calculation divides zero by zero.
 		// This captures observed behavior; it does not endorse NaN as the future reporting policy.
 		assertTrue(Double.isNaN(getMUSE_h(plan)));
+	}
+
+	/** Records the original KN callback sequence, including scorer reuse and deferred morning scoring. */
+	@Test
+	void preservesTheOriginalKnScoringSequence() {
+		var scenario = scenario();
+		var person = person(scenario, "person", 2000, true);
+		List<List<String>> sequences = new ArrayList<>();
+		List<List<Double>> destinationStarts = new ArrayList<>();
+		ScoringFunctionFactory factory = ignored -> {
+			List<String> sequence = new ArrayList<>();
+			List<Double> starts = new ArrayList<>();
+			sequences.add(sequence);
+			destinationStarts.add(starts);
+			SumScoringFunction scoring = new SumScoringFunction();
+			scoring.addScoringFunction(new SumScoringFunction.ActivityScoring() {
+				private double score;
+
+				@Override public void handleFirstActivity(Activity activity) {
+					sequence.add("first:" + activity.getType());
+				}
+				@Override public void handleActivity(Activity activity) {
+					sequence.add(activity.getType());
+					starts.add(activity.getStartTime().seconds());
+					score -= activity.getStartTime().seconds() * 12 / HOUR;
+				}
+				@Override public void handleLastActivity(Activity activity) { handleActivity(activity); }
+				@Override public void finish() { sequence.add("finish"); }
+				@Override public double getScore() { return score; }
+			});
+			return scoring;
+		};
+
+		muse(scenario, factory).computeMuseForAllActs(person.getSelectedPlan());
+
+		// Two scorers are reused for all destinations. Morning home is delivered only just before
+		// evening home; each destination is followed by finish(), as in the original KN calculation.
+		assertEquals(2, sequences.size());
+		sequences.forEach(sequence -> assertEquals(
+			List.of("work", "finish", "shop", "finish", "first:home", "home", "finish"), sequence));
+		assertEquals(List.of(9 * HOUR, 18 * HOUR, 20 * HOUR), destinationStarts.get(0));
+		assertEquals(List.of(9 * HOUR - 1, 18 * HOUR - 1, 20 * HOUR - 1), destinationStarts.get(1));
+		assertEquals(12, getMUSE_h(person.getSelectedPlan()), TOLERANCE);
+	}
+
+	@Test
+	void acceptsAnExperiencedPlanWithoutChangingItsPersonBackpointer() {
+		var scenario = scenario();
+		var person = person(scenario, "person", 2000, false);
+		var selected = person.getSelectedPlan();
+		var experienced = PopulationUtils.createPlan();
+		PopulationUtils.copyFromTo(selected, experienced, true);
+
+		muse(scenario).computeMuseForAllActs(person, experienced);
+
+		assertNull(experienced.getPerson());
+		assertSame(selected, person.getSelectedPlan());
+		assertEquals((marginal(8, 8) + marginal(16, 14)) / 2, getMUSE_h(experienced), TOLERANCE);
+	}
+
+	/** Activity copies must retain attributes used by scorers compatible with the KN sequence. */
+	@Test
+	void preservesAttributesUsedByCustomActivityScoring() {
+		var scenario = scenario();
+		var person = person(scenario, "person", 2000, false);
+		var activities = TripStructureUtils.getActivities(person.getSelectedPlan(), ExcludeStageActivities);
+		activities.get(1).getAttributes().putAttribute(ActivityAttributeTypicalDurationCalculator.TYPICAL_DURATION_ATTRIBUTE, 4 * HOUR);
+		var parameters = new SubpopulationScoringParameters(scenario);
+		ScoringFunctionFactory factory = agent -> {
+			SumScoringFunction scoring = new SumScoringFunction();
+			// Read attributes directly from the handed activities. KN's deferred morning callback
+			// does not support scorers that require alignment with the selected plan's activity order.
+			scoring.addScoringFunction(new CharyparNagelActivityScoring(parameters.getScoringParameters(agent),
+				new ActivityAttributeTypicalDurationCalculator(), null));
+			return scoring;
+		};
+
+		muse(scenario, factory).computeMuseForAllActs(person.getSelectedPlan());
+
+		// Config says 8 hours, but this scorer uses the activity's 4-hour typical duration.
+		assertEquals(marginal(4, 8), getMUSE_h(activities.get(1)), TOLERANCE);
+		assertEquals(marginal(16, 14), getMUSE_h(activities.getLast()), TOLERANCE);
 	}
 }

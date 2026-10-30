@@ -1,4 +1,4 @@
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
 
 import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
@@ -19,9 +19,9 @@ import org.matsim.facilities.Facility;
 import java.util.List;
 
 import static org.matsim.api.core.v01.TransportMode.pt;
-import static org.matsim.application.analysis.population.AddVttsEtcToActivities.getMUSE_h;
-import static org.matsim.application.analysis.population.AgentWiseComparisonKNUtils.MUTTS_AV;
-import static org.matsim.application.analysis.population.AgentWiseComparisonKNUtils.isTestPerson;
+import static org.matsim.application.analysis.population.kn.AddVttsEtcToActivities.getMUSE_h;
+import static org.matsim.application.analysis.population.kn.AgentWiseComparisonKNUtils.MUTTS_AV;
+import static org.matsim.application.analysis.population.kn.AgentWiseComparisonKNUtils.isTestPerson;
 
 class AgentWiseRuleOfHalfComputation{
 	private static final Logger log = LogManager.getLogger( AgentWiseRuleOfHalfComputation.class );

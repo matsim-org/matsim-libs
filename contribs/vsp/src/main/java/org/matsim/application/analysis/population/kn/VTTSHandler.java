@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -63,6 +63,7 @@ import java.util.function.Function;
  * @author ikaddoura
  *
  */
+@Deprecated(since = "2027.0", forRemoval = false)
 public final class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, TransitDriverStartsEventHandler {
 	// the constructor is package-private so having the class public final is ok. kai, nov'25
 

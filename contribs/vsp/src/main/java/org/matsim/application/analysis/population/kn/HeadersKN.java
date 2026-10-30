@@ -1,4 +1,4 @@
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
 
 // These are "excel" column headers so we use: (1) no spaces; (2) underscores instead of camel case.
 class HeadersKN{

@@ -1,4 +1,4 @@
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,11 +21,13 @@ import tech.tablesaw.io.csv.CsvWriteOptions;
 
 import java.util.*;
 
-import static org.matsim.application.analysis.population.AddVttsEtcToActivities.getMUSE_h;
-import static org.matsim.application.analysis.population.AddVttsEtcToActivities.getMUTTS_h;
-import static org.matsim.application.analysis.population.AgentWiseComparisonKNUtils.formatTable;
-import static org.matsim.application.analysis.population.HeadersKN.*;
+import static org.matsim.application.analysis.population.kn.AddVttsEtcToActivities.getMUSE_h;
+import static org.matsim.application.analysis.population.kn.AddVttsEtcToActivities.getMUTTS_h;
+import static org.matsim.application.analysis.population.kn.AgentWiseComparisonKNUtils.formatTable;
+import static org.matsim.application.analysis.population.kn.HeadersKN.*;
 
+/** @deprecated Superseded comparison retained for reference. */
+@Deprecated(since = "2027.0", forRemoval = false)
 class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 	private static final Logger log = LogManager.getLogger( AgentWiseComparisonKNDeprecated.class );
 
