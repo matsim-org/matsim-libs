@@ -1,6 +1,5 @@
 package org.matsim.contrib.parking.parkingsearchparameterization;
 
-import com.google.inject.Singleton;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -25,9 +24,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ConstantArrivalTime;
 import org.matsim.core.network.kernel.ConstantKernelDistance;
-import org.matsim.core.network.kernel.DefaultKernelFunction;
-import org.matsim.core.network.kernel.KernelDistance;
-import org.matsim.core.network.kernel.NetworkKernelFunction;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -136,27 +132,11 @@ public class ParkingTest {
 
 		TestEventHandler testEventHandler = new TestEventHandler(starts, ends);
 
-		controller.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				addQSimComponentBinding("ParkingOccupancyOberserver").to(ParkingOccupancyObserver.class);
-				addMobsimScopeEventHandlerBinding().to(ParkingOccupancyObserver.class);
-				addVehicleHandlerBinding().to(ParkingVehicleHandler.class);
-				bind(ParkingOccupancyObservingSearchTimeCalculator.class).in(Singleton.class);
-				addParkingSearchTimeCalculatorBinding().to(ParkingOccupancyObservingSearchTimeCalculator.class);
-			}
-		});
+		controller.addOverridingModule(new ParkingSearchParameterizationModule(new BellochePenaltyFunction(2, -6), new ConstantKernelDistance(100))
+			.setParkingCapacityInitializer(ZeroParkingCapacityInitializer.class));
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ParkingOccupancyObserver.class).in(Singleton.class);
-				bind(ParkingCapacityInitializer.class).to(ZeroParkingCapacityInitializer.class);
-				bind(NetworkKernelFunction.class).to(DefaultKernelFunction.class);
-				bind(KernelDistance.class).toInstance(new ConstantKernelDistance(100));
-				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(2, -6));
-
-				addControllerListenerBinding().to(ParkingOccupancyObserver.class);
-				addMobsimListenerBinding().to(ParkingOccupancyObserver.class);
 				addEventHandlerBinding().toInstance(testEventHandler);
 				addControllerListenerBinding().to(DumpParkingDataAtEnd.class);
 			}
@@ -213,28 +193,12 @@ public class ParkingTest {
 
 		TestEventHandler testEventHandler = new TestEventHandler(starts, ends);
 
-		controller.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				addMobsimScopeEventHandlerBinding().to(ParkingOccupancyObserver.class);
-				addVehicleHandlerBinding().to(ParkingVehicleHandler.class);
-				bind(ParkingOccupancyObservingSearchTimeCalculator.class).in(Singleton.class);
-				addParkingSearchTimeCalculatorBinding().to(ParkingOccupancyObservingSearchTimeCalculator.class);
-			}
-		});
+		//kernel distance changed to 3000, beta changed to -10
+		controller.addOverridingModule(new ParkingSearchParameterizationModule(new BellochePenaltyFunction(2, -10), new ConstantKernelDistance(3000))
+			.setParkingCapacityInitializer(ZeroParkingCapacityInitializer.class));
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ParkingOccupancyObserver.class).in(Singleton.class);
-				bind(ParkingCapacityInitializer.class).to(ZeroParkingCapacityInitializer.class);
-				bind(NetworkKernelFunction.class).to(DefaultKernelFunction.class);
-				//changed to 1000
-				bind(KernelDistance.class).toInstance(new ConstantKernelDistance(3000));
-				//changed to beta=-10
-				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(2, -10));
-
-				addControllerListenerBinding().to(ParkingOccupancyObserver.class);
-				addMobsimListenerBinding().to(ParkingOccupancyObserver.class);
 				addEventHandlerBinding().toInstance(testEventHandler);
 				addControllerListenerBinding().to(DumpParkingDataAtEnd.class);
 			}
