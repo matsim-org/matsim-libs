@@ -50,7 +50,8 @@ public final class MarginalSumScoringFunction {
 	/**
 	 * @param activityScoringFactory creates the activity scoring used for the marginal computations, so that scoring
 	 *   variants other than the stock {@link CharyparNagelActivityScoring} can be used (e.g. one with a
-	 *   {@link org.matsim.core.scoring.functions.TypicalDurationCalculator}).  A fresh instance is obtained for every
+	 *   {@link org.matsim.core.scoring.functions.TypicalDurationCalculator} that returns typical durations resolved
+	 *   beforehand, as {@link VTTSHandler} does).  A fresh instance is obtained for every
 	 *   computation, so stateful implementations are fine.  Implementations must read everything they need off the
 	 *   handed activities themselves; each computation only handles a single activity (or a morning/evening pair),
 	 *   never a person's full daily activity sequence.

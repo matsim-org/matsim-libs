@@ -30,6 +30,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -83,6 +84,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch";
 
 	private static final String WRITE_SCORE_EXPLANATIONS = "writeScoreExplanations";
+
+	private static final String TYPICAL_DURATION_SOURCE = "typicalDurationSource";
 
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
 
@@ -439,6 +442,16 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 		map.put(WRITE_SCORE_EXPLANATIONS,
 			"Write detailed score composition into plan attributes after execution.");
+
+		map.put(TYPICAL_DURATION_SOURCE,
+			"Where the activity scoring takes the typical duration of an activity from. " + TypicalDurationSource.activityParams
+				+ ": from the activityParams of its type (default). " + TypicalDurationSource.activityAttribute
+				+ ": from the activity's own '" + ActivityParams.TYPICAL_DURATION + "' attribute in the plans file, in seconds. "
+				+ TypicalDurationSource.personAttribute + ": from the person's '" + PersonUtils.TYPICAL_DURATIONS
+				+ "' attribute, 'type=seconds;type=seconds;...' for the main activities of the plan in their order. "
+				+ "Activities without a value are scored against the typical duration of their type; a person attribute that "
+				+ "does not fit the plan aborts the run. Code can bind its own TypicalDurationCalculator instead. "
+				+ "Possible values: " + Arrays.toString(TypicalDurationSource.values()));
 
 		return map;
 	}
@@ -869,6 +882,19 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		@Deprecated uniform, relative
 	}
 
+	/**
+	 * Where the activity scoring takes the typical duration of an individual activity from; see
+	 * {@link org.matsim.core.scoring.functions.TypicalDurationCalculator}.
+	 */
+	public enum TypicalDurationSource {
+		/** The typical duration of the activity's type, from its {@link ActivityParams}. */
+		activityParams,
+		/** The activity's own {@value ActivityParams#TYPICAL_DURATION} attribute, in seconds. */
+		activityAttribute,
+		/** The person's {@value PersonUtils#TYPICAL_DURATIONS} attribute, one value per main activity of the plan. */
+		personAttribute
+	}
+
 	/* parameter set handling */
 	@Override
 	public ConfigGroup createParameterSet(final String type) {
@@ -1164,6 +1190,14 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	public void setWriteExperiencedPlans(boolean writeExperiencedPlans) {
 		delegate.setWriteExperiencedPlans(writeExperiencedPlans);
+	}
+
+	public TypicalDurationSource getTypicalDurationSource() {
+		return delegate.getTypicalDurationSource();
+	}
+
+	public void setTypicalDurationSource(TypicalDurationSource typicalDurationSource) {
+		delegate.setTypicalDurationSource(typicalDurationSource);
 	}
 
 	/**
@@ -2072,6 +2106,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 		private boolean explainScores = false;
 
+		private TypicalDurationSource typicalDurationSource = TypicalDurationSource.activityParams;
+
 		@StringGetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
 		public Double getFractionOfIterationsToStartScoreMSA() {
 			return fractionOfIterationsToStartScoreMSA;
@@ -2154,6 +2190,17 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		@StringGetter(WRITE_SCORE_EXPLANATIONS)
 		public boolean isWriteScoreExplanations() {
 			return explainScores;
+		}
+
+		@StringGetter(TYPICAL_DURATION_SOURCE)
+		public TypicalDurationSource getTypicalDurationSource() {
+			return typicalDurationSource;
+		}
+
+		@StringSetter(TYPICAL_DURATION_SOURCE)
+		public void setTypicalDurationSource(TypicalDurationSource typicalDurationSource) {
+			testForLocked();
+			this.typicalDurationSource = typicalDurationSource;
 		}
 	}
 }

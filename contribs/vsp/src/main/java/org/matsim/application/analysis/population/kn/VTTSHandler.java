@@ -41,18 +41,17 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.TypicalDurationCalculator;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
 import java.util.*;
-import java.util.function.Function;
 
 
 /**
@@ -89,13 +88,12 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		String firstActivityType ;
 
 		// The activities handed to the scoring below are reconstructed from the events and carry no attributes.  So we
-		// align them with the main (non-stage) activities of the person's selected plan and copy the plan activities'
-		// attributes over, so that scoring variants which read per-activity parameters off the activity (e.g. a
-		// per-activity typical duration) see the same values as in the simulated run.
+		// align them with the main (non-stage) activities of the person's selected plan, and resolve their typical
+		// durations from the plan activities and their positions, as the scoring of the simulated run does.
 		List<Activity> planActivities;
 		int nextPlanActivityIndex = 1;
-		Activity firstPlanActivity;
-		Activity currentPlanActivity;
+		int firstPlanActivityIndex = TypicalDurationCalculator.UNALIGNED;
+		int currentPlanActivityIndex = TypicalDurationCalculator.UNALIGNED;
 	}
 	private final Map<Id<Person>,SimData> simDataMap = new HashMap<>();
 
@@ -116,28 +114,23 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 
 	private final ScoringParametersForPerson scoringParametersForPerson;
 
-	/** Creates the activity scoring the marginal computations use; null means the stock Charypar-Nagel activity scoring. */
-	private final Function<ScoringParameters, SumScoringFunction.ActivityScoring> activityScoringFactory;
-
-
-	@Inject VTTSHandler( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson ) {
-		this( scenario, scoringParametersForPerson, null );
-	}
+	/** Resolves the typical durations of the activities, as in the scoring of the run. */
+	private final TypicalDurationCalculator typicalDurationCalculator;
 
 	/**
-	 * @param activityScoringFactory creates the activity scoring used for the marginal computations, so that scoring
-	 *   variants other than the stock Charypar-Nagel activity scoring can be used (e.g. one with a
-	 *   {@link org.matsim.core.scoring.functions.TypicalDurationCalculator}); null means the stock scoring.  The
-	 *   activities handed to it carry the attributes of the corresponding selected-plan activities, so implementations
-	 *   must read per-activity parameters off the handed activities themselves (do not pass a person).
+	 * Resolves the typical durations of the activities as configured ({@link ScoringConfigGroup#getTypicalDurationSource()}),
+	 * e.g. for an analysis of a run's output.
 	 */
-	public VTTSHandler( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson,
-			Function<ScoringParameters, SumScoringFunction.ActivityScoring> activityScoringFactory ) {
+	VTTSHandler( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson ) {
+		this( scenario, scoringParametersForPerson, TypicalDurationCalculator.of( scenario.getConfig().scoring().getTypicalDurationSource() ) );
+	}
+
+	@Inject VTTSHandler( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson, TypicalDurationCalculator typicalDurationCalculator ) {
 		// yyyy it would (presumably) be much better to pull the scoring function from injection.  Rather than self-constructing the
 		// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.
 		// Which we almost surely do not have (e.g. bicycle scoring addition, bus penalty addition, ...).  Also see a similar comment further
 		// down, where the local scoring fct is constructed.  kai, gr, jul'25
-		this.activityScoringFactory = activityScoringFactory;
+		this.typicalDurationCalculator = typicalDurationCalculator;
 
 		if (scenario.getConfig().scoring().getDefaultMarginalUtilityOfMoney() == 0.) {
 			log.warn("The marginal utility of money must not be 0.0. The VTTS is computed in Money per Time.");
@@ -229,42 +222,54 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		SimData simData = simDataMap.get( personId );
 		simData.currentActivityStartTime = event.getTime();
 		simData.currentActivityType = event.getActType();
-		simData.currentPlanActivity = planActivity( personId, simData, simData.nextPlanActivityIndex++, event.getActType() );
+		simData.currentPlanActivityIndex = alignWithPlan( personId, simData, simData.nextPlanActivityIndex++, event.getActType() );
 	}
 
 	private static int planAlignmentWarnCnt = 0;
 
 	/**
-	 * The main activity of the person's selected plan at the given index, as the source of per-activity scoring
-	 * parameters (attributes) for the activity observed in the events; null (i.e. no attributes, scoring falls back
-	 * to the activity type's config parameters) if the observed activity cannot be aligned with the plan.
+	 * The given index if the activity observed in the events is the main activity of the person's selected plan at
+	 * that index, otherwise {@link TypicalDurationCalculator#UNALIGNED}.
 	 */
-	private Activity planActivity( Id<Person> personId, SimData simData, int index, String actType ) {
+	private int alignWithPlan( Id<Person> personId, SimData simData, int index, String actType ) {
 		if ( simData.planActivities == null ) {
 			Person person = this.scenario.getPopulation().getPersons().get( personId );
 			if ( person == null || person.getSelectedPlan() == null ) {
-				return null;
+				return TypicalDurationCalculator.UNALIGNED;
 			}
 			simData.planActivities = TripStructureUtils.getActivities( person.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities );
 		}
 		if ( index < simData.planActivities.size() && simData.planActivities.get( index ).getType().equals( actType ) ) {
-			return simData.planActivities.get( index );
+			return index;
 		}
 		if ( planAlignmentWarnCnt < 10 ) {
 			planAlignmentWarnCnt++;
 			log.warn( "Cannot align activity (type={}) of person {} with main activity # {} of the selected plan; "
-					+ "scoring this activity without the plan activity's attributes.", actType, personId, index );
+					+ "resolving its typical duration without the plan activity.", actType, personId, index );
 			if ( planAlignmentWarnCnt == 10 ) {
 				log.warn( Gbl.FUTURE_SUPPRESSED );
 			}
 		}
-		return null;
+		return TypicalDurationCalculator.UNALIGNED;
 	}
 
-	private static void copyPlanAttributes( Activity planActivity, Activity to ) {
-		if ( planActivity != null ) {
-			AttributesUtils.copyAttributesFromTo( planActivity, to );
+	/**
+	 * The typical duration of an activity observed in the events, as the scoring of the run resolves it: from the plan
+	 * activity it is aligned with, if any.
+	 */
+	private OptionalTime typicalDuration( Person person, SimData simData, int planActivityIndex, Activity observed ) {
+		if ( planActivityIndex == TypicalDurationCalculator.UNALIGNED ) {
+			return this.typicalDurationCalculator.getTypicalDuration( person, observed, TypicalDurationCalculator.UNALIGNED );
 		}
+		return this.typicalDurationCalculator.getTypicalDuration( person, simData.planActivities.get( planActivityIndex ), planActivityIndex );
+	}
+
+	/**
+	 * The marginal computations score single activities (or a morning/evening pair) without the person, so they get
+	 * the typical durations resolved beforehand.
+	 */
+	private static MarginalSumScoringFunction marginalSumScoringFunction( ScoringParameters scoringParameters, TypicalDurationCalculator resolved ) {
+		return new MarginalSumScoringFunction( scoringParameters, () -> new CharyparNagelActivityScoring( scoringParameters, resolved, null ) );
 	}
 
 	@Override
@@ -285,7 +290,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 			simData = new SimData();
 			simData.firstActivityEndTime = event.getTime();
 			simData.firstActivityType = event.getActType();
-			simData.firstPlanActivity = planActivity( personId, simData, 0, event.getActType() );
+			simData.firstPlanActivityIndex = alignWithPlan( personId, simData, 0, event.getActType() );
 			simDataMap.put( personId, simData );
 		} else {
 			// this is NOT the first activity ...
@@ -295,7 +300,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 
 			simData.currentActivityType = null;
 			simData.currentActivityStartTime = Double.NaN;
-			simData.currentPlanActivity = null;
+			simData.currentPlanActivityIndex = TypicalDurationCalculator.UNALIGNED;
 
 			this.departedPersonIds.remove( personId );
 		}
@@ -377,28 +382,28 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 
 			final ScoringParameters scoringParameters =
 							new ScoringParameters.Builder( scoringConfigGroup, scoringConfigGroup.getScoringParametersOrDefault( subpop ), scenario.getConfig().scenario() ).build();
-			final MarginalSumScoringFunction marginalSumScoringFunction = this.activityScoringFactory == null ?
-							new MarginalSumScoringFunction( scoringParameters ) :
-							new MarginalSumScoringFunction( scoringParameters, () -> this.activityScoringFactory.apply( scoringParameters ) );
 			// yyyy it would (presumably) be much better to pull the scoring function from injection.  Rather than self-constructing the
 			// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.
 			// Which we almost surely do not have (e.g. bicycle scoring addition, bus penalty addition, ...).  kai, gr, jul'25
 
 			MarginalSumScoringFunction.Scores scores = null;
+			final OptionalTime typicalDuration;
 			if( activityEndTime.isUndefined() ){
 				// The end time is undefined...
 
 				// ... now handle the first and last OR overnight activity. This is figured out by the scoring function itself (depending on the activity types).
 
 				Activity activityMorning = PopulationUtils.createActivityFromLinkId( simData.firstActivityType, null );
-				copyPlanAttributes( simData.firstPlanActivity, activityMorning );
 				activityMorning.setEndTime( simData.firstActivityEndTime );
 
 				Activity activityEvening = PopulationUtils.createActivityFromLinkId( simData.currentActivityType, null );
-				copyPlanAttributes( simData.currentPlanActivity, activityEvening );
 				activityEvening.setStartTime( simData.currentActivityStartTime );
 
-				scores = marginalSumScoringFunction.getOvernightActivityDelayDisutility( activityMorning, activityEvening, 1.0 );
+				final OptionalTime morningTypicalDuration = typicalDuration( person, simData, simData.firstPlanActivityIndex, activityMorning );
+				typicalDuration = typicalDuration( person, simData, simData.currentPlanActivityIndex, activityEvening );
+				// a pair of the same type is scored as one activity, with the evening activity's typical duration, as in the run
+				TypicalDurationCalculator resolved = ( p, act, index ) -> act.getType().equals( activityEvening.getType() ) ? typicalDuration : morningTypicalDuration;
+				scores = marginalSumScoringFunction( scoringParameters, resolved ).getOvernightActivityDelayDisutility( activityMorning, activityEvening, 1.0 );
 				activityDelayDisutility_h = 3600. * scores.deltaScore();
 
 				simData.trips.getLast().actDur_h = (simData.firstActivityEndTime + 3600.*24 - simData.currentActivityStartTime)/3600. ;
@@ -407,15 +412,16 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 				// The activity has an end time indicating a 'normal' activity.
 
 				Activity activity = PopulationUtils.createActivityFromLinkId( simData.currentActivityType, null );
-				copyPlanAttributes( simData.currentPlanActivity, activity );
 				activity.setStartTime( simData.currentActivityStartTime );
 				activity.setEndTime( activityEndTime.seconds() );
-				scores = marginalSumScoringFunction.getNormalActivityDelayDisutility( personId, activity, 1.0 );
+				typicalDuration = typicalDuration( person, simData, simData.currentPlanActivityIndex, activity );
+				scores = marginalSumScoringFunction( scoringParameters, ( p, act, index ) -> typicalDuration ).getNormalActivityDelayDisutility( personId, activity, 1.0 );
 				activityDelayDisutility_h = 3600. * scores.deltaScore();
 				simData.trips.getLast().actDur_h = (activityEndTime.seconds() - simData.currentActivityStartTime)/3600. ;
 
 			}
 			simData.trips.getLast().actScore = scores.scoreNormal();
+			simData.trips.getLast().actTypDur_h = typicalDuration.orElse( scoringParameters.actParams.get( simData.currentActivityType ).getTypicalDuration() ) / 3600. ;
 		}
 
 		// Calculate the agent's trip delay disutility.
@@ -449,7 +455,6 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		simData.trips.getLast().VTTSh = mUTTS_h / marginalUtilityOfMoney;
 
 		simData.trips.getLast().actType = simData.currentActivityType;
-		simData.trips.getLast().actTypDur_h = scoringConfigGroup.getDefaultActivityParams( simData.currentActivityType ).getTypicalDuration().seconds() / 3600. ;
 
 	}
 	private static double handleIncompletePlan( Id<Person> personId, double performing_utils_hr ){
