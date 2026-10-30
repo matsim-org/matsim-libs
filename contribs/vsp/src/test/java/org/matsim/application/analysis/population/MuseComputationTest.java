@@ -1,8 +1,12 @@
 package org.matsim.application.analysis.population;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -129,8 +133,8 @@ class MuseComputationTest {
 				@Override public void handleFirstActivity(Activity activity) { }
 				@Override public void handleActivity(Activity activity) { score -= activity.getStartTime().seconds() * rate / HOUR; }
 				@Override public void handleLastActivity(Activity activity) { handleActivity(activity); }
-				// A no-op finish supports KN's current repeated calls. This test does not establish
-				// compatibility with custom scorers that require a different scoring lifecycle.
+				// Scores are available as soon as activities are handled. No finalization is needed
+				// for this test scorer's linear utility.
 				@Override public void finish() { }
 				@Override public double getScore() { return score; }
 			});
@@ -161,9 +165,9 @@ class MuseComputationTest {
 		assertTrue(Double.isNaN(getMUSE_h(plan)));
 	}
 
-	/** Records the original KN callback sequence, including scorer reuse and deferred morning scoring. */
+	/** Keeps KN's two cumulative scorers, with chronological callbacks and one final finish. */
 	@Test
-	void preservesTheOriginalKnScoringSequence() {
+	void usesTwoScorersInPlanOrderAndFinishesAtTheEnd() {
 		var scenario = scenario();
 		var person = person(scenario, "person", 2000, true);
 		List<List<String>> sequences = new ArrayList<>();
@@ -194,11 +198,11 @@ class MuseComputationTest {
 
 		muse(scenario, factory).computeMuseForAllActs(person.getSelectedPlan());
 
-		// Two scorers are reused for all destinations. Morning home is delivered only just before
-		// evening home; each destination is followed by finish(), as in the original KN calculation.
+		// Deliver morning home before work so scorers can align callbacks with the selected plan.
+		// Finish only after evening home: finishing earlier would finalize an incomplete day.
 		assertEquals(2, sequences.size());
 		sequences.forEach(sequence -> assertEquals(
-			List.of("work", "finish", "shop", "finish", "first:home", "home", "finish"), sequence));
+			List.of("first:home", "work", "shop", "home", "finish"), sequence));
 		assertEquals(List.of(9 * HOUR, 18 * HOUR, 20 * HOUR), destinationStarts.get(0));
 		assertEquals(List.of(9 * HOUR - 1, 18 * HOUR - 1, 20 * HOUR - 1), destinationStarts.get(1));
 		assertEquals(12, getMUSE_h(person.getSelectedPlan()), TOLERANCE);
@@ -219,7 +223,42 @@ class MuseComputationTest {
 		assertEquals((marginal(8, 8) + marginal(16, 14)) / 2, getMUSE_h(experienced), TOLERANCE);
 	}
 
-	/** Activity copies must retain attributes used by scorers compatible with the KN sequence. */
+	/** Reproduces Berlin's person-based duration scoring on a detached experienced plan. */
+	@ParameterizedTest
+	@CsvSource({"home, 16, 14", "work, 2, 6"})
+	void usesPersonTypicalDurationsInSelectedPlanOrder(String lastType, double lastTypicalHours, double lastDurationHours) {
+		var scenario = scenario();
+		scenario.getConfig().scoring().setTypicalDurationSource(ScoringConfigGroup.TypicalDurationSource.personAttribute);
+		var person = person(scenario, "person", 2000, false);
+		var selected = person.getSelectedPlan();
+		TripStructureUtils.getActivities(selected, ExcludeStageActivities).getLast().setType(lastType);
+		// The scorer looks these up by main-activity index, including morning home. Config still
+		// says 8 hours for work; the person's 4-hour value must be used for both score variants.
+		// When the final activity is also work, its separate 2-hour typical duration checks that
+		// values are resolved by position, not just by activity type. There is no evening home.
+		PersonUtils.setTypicalDurations(person, List.of(
+			new PersonUtils.TypicalDuration("home", 16 * HOUR),
+			new PersonUtils.TypicalDuration("work", 4 * HOUR),
+			new PersonUtils.TypicalDuration(lastType, lastTypicalHours * HOUR)));
+		var experienced = PopulationUtils.createPlan();
+		PopulationUtils.copyFromTo(selected, experienced, true);
+		var activities = TripStructureUtils.getActivities(experienced, ExcludeStageActivities);
+
+		// Use the real scoring factory, as the controller does. Sending work before morning home
+		// used to throw because work could not be matched to entry zero of typicalDurations.
+		muse(scenario).computeMuseForAllActs(person, experienced);
+
+		double lastMuse = marginal(lastTypicalHours, lastDurationHours);
+		assertEquals(marginal(4, 8), getMUSE_h(activities.get(1)), TOLERANCE);
+		assertEquals(lastMuse, getMUSE_h(activities.getLast()), TOLERANCE);
+		assertEquals((marginal(4, 8) + lastMuse) / 2, getMUSE_h(experienced), TOLERANCE);
+		assertNull(getMUSE_h(activities.getFirst()));
+		assertNull(getMUSE_h(selected));
+		assertSame(selected, person.getSelectedPlan());
+		assertNull(experienced.getPerson());
+	}
+
+	/** Activity copies must retain attributes used by the scenario's activity scorer. */
 	@Test
 	void preservesAttributesUsedByCustomActivityScoring() {
 		var scenario = scenario();
@@ -229,8 +268,8 @@ class MuseComputationTest {
 		var parameters = new SubpopulationScoringParameters(scenario);
 		ScoringFunctionFactory factory = agent -> {
 			SumScoringFunction scoring = new SumScoringFunction();
-			// Read attributes directly from the handed activities. KN's deferred morning callback
-			// does not support scorers that require alignment with the selected plan's activity order.
+			// Read the handed activities directly rather than their selected-plan counterparts.
+			// This ensures the earlier-start copy itself retains the typical-duration attribute.
 			scoring.addScoringFunction(new CharyparNagelActivityScoring(parameters.getScoringParameters(agent),
 				new ActivityAttributeTypicalDurationCalculator(), null));
 			return scoring;

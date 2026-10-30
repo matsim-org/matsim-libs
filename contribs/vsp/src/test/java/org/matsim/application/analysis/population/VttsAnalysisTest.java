@@ -1,6 +1,8 @@
 package org.matsim.application.analysis.population;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -93,6 +95,75 @@ class VttsAnalysisTest {
 		analysis.analyze(person, person.getSelectedPlan());
 		assertTrue(Double.isNaN(getDouble(person, MUSE)));
 		assertEquals("incomplete_plan", person.getAttributes().getAttribute(STATUS));
+	}
+
+	/** Home -> work is complete when work has started and remains open at the end of the day. */
+	@Test
+	void acceptsAFinalActivityAwayFromHome() {
+		var scenario = scenario();
+		var person = person(scenario, "person", 2000, false);
+		var plan = person.getSelectedPlan();
+		plan.getPlanElements().subList(3, plan.getPlanElements().size()).clear();
+		Activity work = (Activity) plan.getPlanElements().getLast();
+		work.setEndTimeUndefined();
+
+		new VttsAnalysis(muse(scenario), parameters(2, -6), new DefaultAnalysisMainModeIdentifier())
+			.analyze(person, plan);
+
+		// The run's scorer treats different first/last types separately. Work lasts 09:00-24:00;
+		// starting it one second earlier leaves the morning-home contribution unchanged.
+		double workMuse = marginal(8, 15);
+		assertEquals(workMuse, getDouble(work, MUSE), TOLERANCE);
+		assertEquals(workMuse, getDouble(person, MUSE), TOLERANCE);
+		assertEquals((workMuse + 6) / 2, getDouble(person, VTTS), TOLERANCE);
+		assertEquals(1, person.getAttributes().getAttribute(DESTINATIONS));
+		assertEquals("ok", person.getAttributes().getAttribute(STATUS));
+	}
+
+	/** No arrival must not be interpreted as a stay-at-home day or silently dropped from the plan. */
+	@ParameterizedTest
+	@ValueSource(strings = {"final_departure", "outbound_leg", "return_leg", "initial_leg", "leg_after_open_activity"})
+	void rejectsIncompleteActivityAndTripBoundaries(String shape) {
+		var scenario = scenario();
+		var person = person(scenario, "person", 2000, false);
+		var plan = person.getSelectedPlan();
+		var analysis = new VttsAnalysis(muse(scenario), parameters(2, -6), new DefaultAnalysisMainModeIdentifier());
+		analysis.analyze(person, plan);
+		var elements = plan.getPlanElements();
+		switch (shape) {
+			case "final_departure" -> ((Activity) elements.getLast()).setEndTime(22 * HOUR);
+			case "outbound_leg" -> elements.subList(2, elements.size()).clear();
+			case "return_leg" -> elements.removeLast();
+			case "initial_leg" -> elements.removeFirst();
+			case "leg_after_open_activity" -> elements.add(PopulationUtils.createLeg((Leg) elements.get(1)));
+			default -> throw new AssertionError(shape);
+		}
+
+		assertDoesNotThrow(() -> analysis.analyze(person, plan));
+
+		assertEquals("incomplete_plan", person.getAttributes().getAttribute(STATUS));
+		assertEquals("incomplete_plan", plan.getAttributes().getAttribute(STATUS));
+		assertTrue(Double.isNaN(getDouble(person, MUSE)));
+		assertTrue(Double.isNaN(getDouble(person, VTTS)));
+		assertEquals(0, person.getAttributes().getAttribute(DESTINATIONS));
+	}
+
+	@Test
+	void aSingleAllDayActivityHasNoVttsAndClearsPreviousResults() {
+		var scenario = scenario();
+		var person = person(scenario, "person", 2000, false);
+		var plan = person.getSelectedPlan();
+		var analysis = new VttsAnalysis(muse(scenario), parameters(2, -6), new DefaultAnalysisMainModeIdentifier());
+		analysis.analyze(person, plan);
+		plan.getPlanElements().subList(1, plan.getPlanElements().size()).clear();
+		((Activity) plan.getPlanElements().getFirst()).setEndTimeUndefined();
+
+		analysis.analyze(person, plan);
+
+		assertEquals("not_mobile", person.getAttributes().getAttribute(STATUS));
+		assertEquals("not_mobile", plan.getAttributes().getAttribute(STATUS));
+		assertTrue(Double.isNaN(getDouble(person, VTTS)));
+		assertEquals(0, person.getAttributes().getAttribute(DESTINATIONS));
 	}
 
 	@Test

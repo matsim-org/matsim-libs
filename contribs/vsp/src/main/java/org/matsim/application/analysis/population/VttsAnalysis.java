@@ -38,9 +38,20 @@ public final class VttsAnalysis {
 		if (plan == null) return;
 		resetSummary(plan, "not_mobile");
 		// Remove only our previous results. Other activity attributes remain inputs to scoring.
-		for (Activity activity : TripStructureUtils.getActivities(plan, ExcludeStageActivities)) {
+		var activities = TripStructureUtils.getActivities(plan, ExcludeStageActivities);
+		for (Activity activity : activities) {
 			for (String key : new String[]{MUSE, VSE, VTTS, MONEY_UTILITY, TRAVEL_UTILITY, MODE, STATUS})
 				activity.getAttributes().removeAttribute(key);
+		}
+		// getTrips() only extracts closed trips: an unfinished outbound/return leg could disappear
+		// from that list, and a leading leg can cause extraction to fail. Check the actual plan
+		// boundaries first. The final main activity may have any type; returning home is not required.
+		var elements = plan.getPlanElements();
+		if (!elements.isEmpty() && (activities.isEmpty()
+			|| elements.getFirst() != activities.getFirst() || elements.getLast() != activities.getLast())) {
+			person.getAttributes().putAttribute(STATUS, "incomplete_plan");
+			plan.getAttributes().putAttribute(STATUS, "incomplete_plan");
+			return;
 		}
 		var trips = TripStructureUtils.getTrips(plan);
 		if (trips.isEmpty()) {
@@ -48,7 +59,7 @@ public final class VttsAnalysis {
 			return;
 		}
 		// Experienced plans may be truncated. Report those explicitly instead of handing
-		// malformed timing sequences to the unchanged KN calculation.
+		// malformed timing sequences to the incremental MUSE calculation.
 		if (!isComplete(plan)) {
 			person.getAttributes().putAttribute(STATUS, "incomplete_plan");
 			plan.getAttributes().putAttribute(STATUS, "incomplete_plan");
@@ -122,13 +133,13 @@ public final class VttsAnalysis {
 		}
 	}
 
-	/** Validate dashboard inputs without changing the original KN calculation's input handling. */
+	/** Validate dashboard inputs before calling the incremental KN calculation. */
 	private static boolean isComplete(Plan plan) {
 		var activities = TripStructureUtils.getActivities(plan, ExcludeStageActivities);
 		if (activities.size() < 2) return false;
 		for (int i = 0; i < activities.size(); i++) {
 			Activity activity = activities.get(i);
-			// Undefined morning start and evening end are expected MATSim boundary markers.
+			// Undefined first start and final end are expected MATSim boundary markers, for any type.
 			// All other starts/ends must be defined, and defined times must be finite.
 			if (i == 0 ? activity.getStartTime().isDefined() : activity.getStartTime().isUndefined()) return false;
 			if (i == activities.size() - 1 ? activity.getEndTime().isDefined() : activity.getEndTime().isUndefined()) return false;

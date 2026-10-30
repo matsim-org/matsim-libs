@@ -16,9 +16,9 @@ import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.Ex
 /**
  * MUSE = marginal utility of starting early.  In score space, only time structure, i.e. no direct disutilities of travelling etc.
  *
- * <p>Preserves the KN incremental calculation: two scoring functions are reused, the morning
- * activity is deferred until the evening activity, and finish() is called after every destination.
- * Scoring functions must support this sequence and expose intermediate scores.
+ * <p>Preserves the KN incremental calculation with two reused scoring functions. Activities are
+ * delivered in plan order and finish() is called only after the final activity, so person-based
+ * typical durations can be aligned with the selected plan. Scorers must expose intermediate scores.
  */
 public class MuseComputation{
 	// Use the scenario's bindings, including person/subpopulation-specific scoring behavior.
@@ -38,7 +38,6 @@ public class MuseComputation{
 		ScoringFunction sfNormal = scoringFunctionFactory.createNewScoringFunction( person );
 		ScoringFunction sfEarly = scoringFunctionFactory.createNewScoringFunction( person );
 		MuseComputationForOneAct museComputation = new MuseComputationForOneAct( sfNormal, sfEarly );
-		Activity firstActivityOfPlan = null;
 		double sumMuse_h = 0.;
 		double cntMuse_h = 0.;
 		// Stage interactions are not destinations in the mean. Legs are not scored here either:
@@ -51,25 +50,23 @@ public class MuseComputation{
 				sumMuse_h += museComputation.computeMUSE_h( act, pf, scoreNormalBefore, scoreEarlyBefore );
 				cntMuse_h++;
 			} else if( act.getStartTime().isUndefined() ){
-				// Morning home is an origin, not an additional incoming-trip destination. Save it
-				// until evening so the scorer can combine both home durations across midnight.
-				firstActivityOfPlan = act;
+				// The first activity is an origin, not an additional incoming-trip destination. Deliver it
+				// unchanged to both scorers now: person-based typical durations require plan order.
+				// The standard activity scorer keeps it for the later morning/evening combination.
+				// A lone activity with neither time defined has no destinations and is not scored.
+				if( act.getEndTime().isDefined() ){
+					sfNormal.handleActivity( act );
+					sfEarly.handleActivity( act );
+				}
 			} else{
 				Gbl.assertIf( act.getEndTime().isUndefined() );
 
 				double scoreNormalBefore = sfNormal.getScore();
 				double scoreEarlyBefore = sfEarly.getScore();
 
-				// Deliver morning home unchanged to both scorers. Take the score snapshots above
-				// before this, so any morning/evening pairing is included in the final increment.
-				sfNormal.handleActivity( firstActivityOfPlan );
-				sfEarly.handleActivity( firstActivityOfPlan );
-				// (the standard scoring function treats an activity without startTime as firstActivityOfPlan.  no matter if it arrives in correct sequence or not, as long as
-				// it arrives before the evening activity)
-
-				// handle the last activity of the plan:
+				// Handle the final activity (any type, with an undefined end time):
 				sumMuse_h += museComputation.computeMUSE_h( act, pf, scoreNormalBefore, scoreEarlyBefore );
-				// ("act" is now the evening activity; will be started once at the normal time and once one second early)
+				// It is started once at the normal time and once one second early.
 
 				cntMuse_h++;
 			}
@@ -102,10 +99,13 @@ public class MuseComputation{
 			earlyActivity.setStartTime( earlyActivity.getStartTime().seconds() - 1 );
 			sfEarly.handleActivity( earlyActivity );
 
-			// Preserve KN's repeated finish() calls. Compatibility requires scorers that can
-			// expose intermediate scores and accept more activities after being finished.
-			sfNormal.finish();
-			sfEarly.finish();
+			// Finish once, after the final activity; its type need not be home. Finishing earlier would
+			// prematurely score the stored morning activity before the overnight pair is complete.
+			// Intermediate activities already contribute their scores through handleActivity().
+			if( act.getEndTime().isUndefined() ){
+				sfNormal.finish();
+				sfEarly.finish();
+			}
 
 			// Subtract the earlier cumulative totals to isolate this destination's score increments.
 			double scoreDiffNormal = sfNormal.getScore() - scoreNormalBefore;

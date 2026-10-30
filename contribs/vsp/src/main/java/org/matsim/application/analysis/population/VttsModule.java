@@ -31,7 +31,8 @@ public final class VttsModule extends AbstractModule {
 		this(person -> {
 			String subpopulation = PopulationUtils.getSubpopulation(person);
 			return subpopulation == null || subpopulation.equals(SubpopulationDefaultNames.SUBPOP_PERSON);
-		});
+		}, "Included subpopulation: " + SubpopulationDefaultNames.SUBPOP_PERSON
+			+ ". Agents without a subpopulation attribute are also included. All other named subpopulations are excluded.");
 	}
 
 	/**
@@ -40,7 +41,14 @@ public final class VttsModule extends AbstractModule {
 	 * appear as excluded in the coverage export; filtering never changes income normalization.
 	 */
 	public VttsModule(Predicate<Person> personFilter) {
-		options = new Options(Objects.requireNonNull(personFilter));
+		this(personFilter, "Included population: agents accepted by the scenario-specific VTTS person filter.");
+	}
+
+	/** Describe a custom filter explicitly so the dashboard states which agents it includes. */
+	public VttsModule(Predicate<Person> personFilter, String populationDescription) {
+		if (populationDescription == null || populationDescription.isBlank())
+			throw new IllegalArgumentException("A description of the included population is required");
+		options = new Options(Objects.requireNonNull(personFilter), populationDescription);
 	}
 
 	@Override
@@ -57,8 +65,8 @@ public final class VttsModule extends AbstractModule {
 		addControllerListenerBinding().to(VttsAnalysisListener.class);
 		addEventHandlerBinding().to(VttsAnalysisListener.class);
 		// The listener produces CSVs; this dashboard reads them through SimWrapper's file references.
-		SimWrapper.addDashboardBinding(binder()).toInstance(new VttsDashboard());
+		SimWrapper.addDashboardBinding(binder()).toInstance(new VttsDashboard(VttsDashboard.DEFAULT_DIRECTORY, options.populationDescription()));
 	}
 
-	record Options(Predicate<Person> personFilter) { }
+	record Options(Predicate<Person> personFilter, String populationDescription) { }
 }

@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -77,7 +78,7 @@ final class VttsAnalysisListener implements IterationEndsListener, PersonStuckEv
 				skip(person, plan, "excluded");
 			} else if (stuck.contains(person.getId())) {
 				skip(person, plan, "stuck");
-			} else if (plan != null && !copyActivityAttributes(person, plan)) {
+			} else if (plan != null && !isSingleActivityWithoutEvents(person, plan) && !copyActivityAttributes(person, plan)) {
 				skip(person, plan, "activity_mismatch");
 			} else {
 				analysis.analyze(person, plan);
@@ -90,6 +91,16 @@ final class VttsAnalysisListener implements IterationEndsListener, PersonStuckEv
 		} catch (IOException e) {
 			throw new UncheckedIOException("Could not export VTTS results", e);
 		}
+	}
+
+	private static boolean isSingleActivityWithoutEvents(Person person, Plan experienced) {
+		// ExperiencedPlansService starts each person with an empty plan and fills it from events.
+		// A person staying at one activity all day has no activity start/end or leg events. Their
+		// empty experienced plan therefore means no trips, rather than a sequence mismatch.
+		Plan selected = person.getSelectedPlan();
+		return experienced.getPlanElements().isEmpty() && selected != null
+			&& selected.getPlanElements().size() == 1 && selected.getPlanElements().getFirst() instanceof Activity
+			&& TripStructureUtils.getActivities(selected, ExcludeStageActivities).size() == 1;
 	}
 
 	private static void skip(Person person, Plan plan, String status) {

@@ -3,6 +3,7 @@ package org.matsim.application.analysis.population;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.QuoteMode;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -52,7 +53,10 @@ public final class VttsCsvWriter {
 				Plan plan = plans.get(person.getId());
 				if (plan == null) continue;
 				int index = 0;
-				for (var trip : TripStructureUtils.getTrips(plan)) {
+				// Incomplete/stuck plans remain in the export. Extract open chains safely, but
+				// write destination rows only for trips with both an origin and an actual arrival.
+				for (var trip : TripStructureUtils.getTrips2(plan)) {
+					if (trip.getOriginActivity() == null || trip.getDestinationActivity() == null) continue;
 					var activity = trip.getDestinationActivity();
 					Object status = attribute(activity, STATUS);
 					tripCsv.printRecord(person.getId(), index++, activity.getType(), attribute(activity, MODE), number(activity, MUSE),
@@ -64,25 +68,43 @@ public final class VttsCsvWriter {
 				}
 			}
 		}
-		// SimWrapper's Tile format has no header row. Counts refer to the simulated sample;
-		// this writer never expands them by a scenario sample-size factor.
-		try (CSVPrinter overview = csv(directory.resolve("vtts_overview.csv"))) {
+		// Tile input has no header. Quote every field so delimiter detection cannot split labels
+		// at spaces, and keep an empty third column where no icon is supplied. Counts refer to
+		// the simulated sample; this writer never expands them by a scenario sample-size factor.
+		try (CSVPrinter overview = new CSVPrinter(IOUtils.getBufferedWriter(directory.resolve("vtts_overview.csv").toString()),
+			CSVFormat.DEFAULT.builder().setQuoteMode(QuoteMode.ALL).build())) {
 			overview.printRecord("Agents in population", population.getPersons().size(), "user-group");
 			overview.printRecord("Persons with MUSE", persons.get(MUSE).size(), "user-group");
 			overview.printRecord("Persons with VTTS", persons.get(VTTS).size(), "user-group");
-			overview.printRecord("Destinations with MUSE", destinations.get(MUSE).size());
-			overview.printRecord("Destinations with VTTS", destinations.get(VTTS).size());
+			overview.printRecord("Trips with MUSE", destinations.get(MUSE).size(), "");
+			overview.printRecord("Trips with VTTS", destinations.get(VTTS).size(), "");
 		}
 		try (CSVPrinter csv = csv(directory.resolve("vtts_coverage.csv"))) {
-			csv.printRecord("status", "persons");
-			for (var entry : coverage.entrySet()) csv.printRecord(entry.getKey(), entry.getValue());
+			csv.printRecord("status", "persons", "meaning");
+			for (var entry : coverage.entrySet()) csv.printRecord(entry.getKey(), entry.getValue(), coverageMeaning(entry.getKey()));
 		}
 		try (CSVPrinter summary = csv(directory.resolve("vtts_summary.csv"))) {
 			summary.printRecord("metric", "unit", "weighting", "observations", "mean", "p25", "median", "p75", "p95");
 			writeStatistics(summary, persons, "person");
-			writeStatistics(summary, destinations, "destination");
+			writeStatistics(summary, destinations, "trip");
 		}
 		writePopulation(directory.resolve("vtts_experienced_plans.xml.gz"), population, plans);
+	}
+
+	private static String coverageMeaning(String status) {
+		return switch (status) {
+			case "ok" -> "VTTS calculated for all trips.";
+			case "excluded" -> "Outside the included population stated above; excluded by subpopulation or the scenario-specific person filter.";
+			case "not_mobile" -> "No trips: the person stayed at one activity all day. VTTS does not apply.";
+			case "activity_mismatch" -> "Selected and experienced plans have different main-activity counts or types; scoring attributes cannot be matched safely.";
+			case "stuck" -> "A stuck event was recorded; the person is excluded from VTTS statistics.";
+			case "missing_plan" -> "No experienced plan is available.";
+			case "incomplete_plan" -> "The experienced plan has incomplete trip or activity boundaries/times.";
+			case "invalid_money_utility" -> "MUSE is available but marginal utility of money is invalid; monetary conversion is unavailable.";
+			case "partial_vtts" -> "VTTS is available for only some trips; the person mean uses those valid trips.";
+			case "non_finite_muse" -> "No finite trip MUSE values are available.";
+			default -> status;
+		};
 	}
 
 	/** Stream copies one person at a time, preserving the original experienced plans and their owners. */
