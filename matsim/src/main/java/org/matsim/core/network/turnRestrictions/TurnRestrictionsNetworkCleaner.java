@@ -265,7 +265,11 @@ public class TurnRestrictionsNetworkCleaner {
             for (TurnRestrictionsContext.ColoredLink link : toAdvance) {
                 List<Id<Link>> nextPath = new ArrayList<>(currentPath);
                 nextPath.add(link.link.getId());
-                if (turnRestrictions.replacedLinks.containsKey(link.link.getId())) {
+                TurnRestrictionsContext.ColoredLink replacedLink = turnRestrictions.replacedLinks.get(link.link.getId());
+                if (replacedLink != null && replacedLink.toColoredNode == link.toColoredNode) {
+                    // this link leaves the current colored subgraph and enters the one of the link's own
+                    // turn restrictions, which is handled when that link itself is processed.
+                    // But if the link stays inside the current colored subgraph, the restricted path continues here.
                     continue;
                 }
                 advance(link, nextPath, replacedStartLink, network, turnRestrictions, mode, visitedLinkIds);

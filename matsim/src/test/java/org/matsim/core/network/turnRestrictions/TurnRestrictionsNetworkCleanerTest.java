@@ -636,6 +636,66 @@ class TurnRestrictionsNetworkCleanerTest {
 	}
 
 	/**
+	 * Turn restrictions chained along a cycle (each restriction ends on the link that starts the next one)
+	 * that do not disconnect anything must all be kept.
+	 */
+	@Test
+	void testCyclicTurnRestrictionsAreKept() {
+		Network network = createCyclicRestrictionsNetwork();
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		new TurnRestrictionsNetworkCleaner().run(network, CAR);
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = createCyclicRestrictionsNetwork();
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+	}
+
+	/**
+	 * A cycle of four links a: n1 -> n2, b: n2 -> n3, c: n3 -> n4, d: n4 -> n1, each node with a stub
+	 * (link to and from a dead-end node). Restrictions: a -> b -> c, b -> c -> d, and d -> a -> b.
+	 */
+	private static Network createCyclicRestrictionsNetwork() {
+		Network network = NetworkUtils.createNetwork();
+		List<Node> nodes = new ArrayList<>();
+		List<Node> stubs = new ArrayList<>();
+		for (int i = 1; i <= 4; i++) {
+			Node node = NetworkUtils.createNode(Id.createNodeId("n" + i), new Coord(i, 0));
+			Node stub = NetworkUtils.createNode(Id.createNodeId("s" + i), new Coord(i, 1));
+			network.addNode(node);
+			network.addNode(stub);
+			nodes.add(node);
+			stubs.add(stub);
+		}
+		List<Link> links = new ArrayList<>();
+		for (int i = 0; i < 4; i++) {
+			links.add(NetworkUtils.createLink(Id.createLinkId("cycle" + (i + 1)), nodes.get(i), nodes.get((i + 1) % 4), network, 1, 1, 300, 1));
+			links.add(NetworkUtils.createLink(Id.createLinkId("out" + (i + 1)), nodes.get(i), stubs.get(i), network, 1, 1, 300, 1));
+			links.add(NetworkUtils.createLink(Id.createLinkId("in" + (i + 1)), stubs.get(i), nodes.get(i), network, 1, 1, 300, 1));
+		}
+		for (Link link : links) {
+			link.setAllowedModes(Set.of(CAR));
+			network.addLink(link);
+		}
+		addRestriction(network, "cycle1", "cycle2", "cycle3");
+		addRestriction(network, "cycle2", "cycle3", "cycle4");
+		addRestriction(network, "cycle4", "cycle1", "cycle2");
+		return network;
+	}
+
+	private static void addRestriction(Network network, String startLink, String... followingLinks) {
+		List<Id<Link>> sequence = new ArrayList<>();
+		for (String linkId : followingLinks) {
+			sequence.add(Id.createLinkId(linkId));
+		}
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId(startLink))).addDisallowedLinkSequence(CAR, sequence);
+	}
+
+	/**
 	 * Links not allowing the cleaned mode must neither get that mode added, nor must they provide
 	 * connectivity for the mode, even if they start at a node affected by a turn restriction.
 	 */
