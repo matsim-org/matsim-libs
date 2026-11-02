@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>org.matsim</groupId>
+		<artifactId>contrib</artifactId>
+		<version>2027.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.matsim.contrib</groupId>
+	<artifactId>msp</artifactId>
+	<name>msp</name>
+	<description>Playground of the Chair of Mobility System Planning (MSP), TU Dresden</description>
+
+	<!-- MATSim core (which also contains MATSimApplication), matsim-examples (test scope) and -->
+	<!-- JUnit 5 are inherited from the contrib parent pom, so no dependency is needed here yet. -->
+	<!-- Only add dependencies that are actually needed; keep this list as small as possible. -->
+	<dependencies>
+		<!-- travel-time-matrix: the zonal + sparse matrix (org.matsim.contrib.zone.skims) it builds on -->
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>dvrp</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<!-- travel-time-matrix: TrafficStatsCalculator, the congestion index is read from -->
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>application</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>
