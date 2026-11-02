@@ -35,6 +35,7 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [locationchoice](locationchoice/README.md)                               | Location choice for discretionary activities
 | [matrixbasedptrouter](matrixbasedptrouter/README.md)                     | Calculate PT travel times using a set of stops and a pre-calculated travel time 
 | [minibus](minibus/README.md)                                             | Runs an adaptive "minibus" model to serve given demand
+| [msp](msp/README.md)                                                     | Playground of the Chair of Mobility System Planning (MSP), TU Dresden
 | [multimodal](multimodal/README.md)                                       | Enables multi-modal simulation
 | [noise](noise/README.md)                                                 | Tools to compute various noise metrics (emissions, imission, exposure costs)
 | osm                                                                      |
