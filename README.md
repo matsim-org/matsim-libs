@@ -46,7 +46,6 @@ Releases (also PR-based and weekly releases) and snapshots can be found at https
 
 An example how to get started with your own project, including a complete pom.xml, is at https://github.com/matsim-org/matsim-example-project .
 
-Code examples are at https://github.com/matsim-org/matsim-code-examples.
-
+Code examples are available in the [code-examples](code-examples/) module.
 
 
