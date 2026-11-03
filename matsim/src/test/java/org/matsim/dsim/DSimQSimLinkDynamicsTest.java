@@ -1,6 +1,5 @@
 package org.matsim.dsim;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -44,8 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * The corridor is sampled like a scenario: {@code sample * VEHICLES} vehicles depart from l0 at midnight, with flow and storage
  * capacity factors of {@code sample}. qsim scales the links with these factors, dsim scales the vehicles instead, to a pce of
- * 1 / flowCapacityFactor ({@link org.matsim.dsim.simulation.ScaledQVehicleFactory}). 0.1 and 0.25 stand for sampled scenarios, 4 for a
- * scaled-up capacity as in the cadyts calibration of Open Berlin (25 % sample, five copies of each car driver, capacity factor 4).
+ * 1 / flowCapacityFactor ({@link org.matsim.dsim.simulation.ScaledQVehicleFactory}). 0.1 and 0.25 stand for sampled scenarios, 4 for
+ * capacities scaled up beyond the sample, where one second of a link's flow capacity holds several vehicles.
  */
 class DSimQSimLinkDynamicsTest {
 
@@ -61,8 +60,8 @@ class DSimQSimLinkDynamicsTest {
 	MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
-	 * The control: an outflow bottleneck, without inflow capacity and without stuck vehicles. l1 lets 1800 veh/h out, so about
-	 * {@code 1800 * sample} vehicles enter l2 in the first hour.
+	 * The control: an outflow bottleneck, without stuck vehicles. l1 lets 1800 veh/h out, so about {@code 1800 * sample} vehicles
+	 * enter l2 in the first hour.
 	 */
 	@ParameterizedTest
 	@ValueSource(doubles = {0.1, 0.25, 1, 4})
@@ -72,35 +71,9 @@ class DSimQSimLinkDynamicsTest {
 	}
 
 	/**
-	 * The inflow capacity of {@code kinematicWaves}, without stuck vehicles. l1 has one lane at 36 km/h, which the fundamental
-	 * diagram limits to an inflow of 1412 veh/h, below its 3600 veh/h flow capacity.
-	 * <p>
-	 * qsim does not scale the inflow capacity with the flow capacity factor (see the comment on maxFlowFromFdiag in
-	 * {@code QueueWithBuffer}, and matsim-libs #3770 and #3845), dsim counts it in pce, which scales it. So the two agree only at 1.
-	 */
-	@ParameterizedTest
-	@ValueSource(doubles = {1})
-	void sameInflowCapacity(double sample) {
-		assertSameVolume(sample, TrafficDynamics.kinematicWaves, NEVER_STUCK, network -> {
-		}, "l1", 0, 3600);
-	}
-
-	/**
-	 * {@link #sameInflowCapacity} with sampled and scaled-up capacities. Below 1, qsim lets in as many vehicles as leave l1, at 4 it
-	 * lets in 1412 veh/h. dsim lets in {@code 1412 * sample}. Measured at 0.1, 0.25 and 4: qsim 358, 895 and 1412, dsim 142, 353 and
-	 * 5646.
-	 */
-	@Disabled("known difference: qsim does not scale the kinematicWaves inflow capacity with the flow capacity factor, dsim does")
-	@ParameterizedTest
-	@ValueSource(doubles = {0.1, 0.25, 4})
-	void sameInflowCapacityWhenSampled(double sample) {
-		sameInflowCapacity(sample);
-	}
-
-	/**
-	 * Vehicles pushed onto a full link once they are stuck, without inflow capacity. l2 is 75 m long and lets 10 veh/h out, so it is
-	 * full at once and the queue reaches back over l1. From then on, vehicles enter l2 only because the vehicle at the head of l1 has
-	 * waited for the stuck time of 30 s, and l2 holds more vehicles than its storage capacity.
+	 * Vehicles pushed onto a full link once they are stuck. l2 is 75 m long and lets 10 veh/h out, so it is full at once and the queue
+	 * reaches back over l1. From then on, vehicles enter l2 only because the vehicle at the head of l1 has waited for the stuck time
+	 * of 30 s, and l2 holds more vehicles than its storage capacity.
 	 * <p>
 	 * Both mobsims restart the stuck time whenever a vehicle leaves the buffer ({@code bufferLastMovedTime} in qsim's
 	 * {@code QueueWithBuffer}, {@code lastMovedTime} in {@code SimBuffer}), so they move one vehicle per stuck time, also at 4, where
