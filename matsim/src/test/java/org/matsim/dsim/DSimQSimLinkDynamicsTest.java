@@ -103,14 +103,12 @@ class DSimQSimLinkDynamicsTest {
 	 * full at once and the queue reaches back over l1. From then on, vehicles enter l2 only because the vehicle at the head of l1 has
 	 * waited for the stuck time of 30 s, and l2 holds more vehicles than its storage capacity.
 	 * <p>
-	 * qsim restarts the stuck time whenever a vehicle leaves the buffer ({@code QueueWithBuffer.bufferLastMovedTime}), so it moves one
-	 * vehicle per stuck time. dsim takes the time at which each vehicle entered the buffer ({@code SimBuffer.isStuck}), so it moves
-	 * every vehicle in the buffer that has waited for the stuck time, in the same time step. The buffer of l1 holds one second of its
-	 * flow capacity, which is one vehicle at 1, so the two agree there: qsim moves one vehicle every 31 s, after more than the stuck
-	 * time, dsim every 30 s.
+	 * Both mobsims restart the stuck time whenever a vehicle leaves the buffer ({@code bufferLastMovedTime} in qsim's
+	 * {@code QueueWithBuffer}, {@code lastMovedTime} in {@code SimBuffer}), so they move one vehicle per stuck time, also at 4, where
+	 * the buffer of l1 holds four vehicles. qsim moves it after more than the stuck time, every 31 s, dsim every 30 s.
 	 */
 	@ParameterizedTest
-	@ValueSource(doubles = {1})
+	@ValueSource(doubles = {1, 4})
 	void sameStuckVehiclesOverAFullLink(double sample) {
 		assertSameVolume(sample, TrafficDynamics.queue, 30, network -> {
 			link(network, "l2").setCapacity(10);
@@ -119,14 +117,14 @@ class DSimQSimLinkDynamicsTest {
 	}
 
 	/**
-	 * {@link #sameStuckVehiclesOverAFullLink} with sampled and scaled-up capacities. At 4, the buffer of l1 holds four vehicles, which
-	 * dsim moves together. Below 1, qsim refills the flow capacity of l1 only once the buffer is empty, so the next vehicle enters the
-	 * buffer and starts its stuck time 1 / sample seconds later. dsim refills it while the stuck vehicle waits. Measured at 0.1, 0.25
-	 * and 4: qsim 90, 106 and 116, dsim 120, 120 and 480.
+	 * {@link #sameStuckVehiclesOverAFullLink} with sampled capacities. Below 1, qsim refills the flow capacity of l1 only once the
+	 * buffer is empty, so the next vehicle enters the buffer and starts its stuck time 1 / sample seconds later. dsim refills it while
+	 * the stuck vehicle waits. Measured at 0.1 and 0.25: qsim 90 and 106, dsim 120 and 120.
 	 */
-	@Disabled("known difference: qsim moves one stuck vehicle per stuck time, dsim every vehicle that has waited for it")
+	@Disabled("known difference: below 1, qsim refills the flow capacity of a blocked buffer only once it is empty, dsim while the "
+		+ "vehicle waits")
 	@ParameterizedTest
-	@ValueSource(doubles = {0.1, 0.25, 4})
+	@ValueSource(doubles = {0.1, 0.25})
 	void sameStuckVehiclesOverAFullLinkWhenSampled(double sample) {
 		sameStuckVehiclesOverAFullLink(sample);
 	}
