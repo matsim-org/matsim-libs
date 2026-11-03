@@ -47,7 +47,8 @@ public class SimProvider implements LPProvider {
 		return injector;
 	}
 
-	private final Set<MobsimListener> listeners = new HashSet<>();
+	// LinkedHashSet, so that listeners are notified in a reproducible order; a hash set orders them by identity hash code.
+	private final Set<MobsimListener> listeners = new LinkedHashSet<>();
 
 	public Collection<? extends MobsimListener> getListeners() {
 		return this.listeners;

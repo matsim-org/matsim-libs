@@ -34,7 +34,7 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -76,7 +76,8 @@ public final class DSim implements Mobsim {
 		DistributedEventsManager manager = (DistributedEventsManager) injector.getInstance(EventsManager.class);
 
 		List<LPTask> tasks = new ArrayList<>();
-		Set<MobsimListener> listeners = new HashSet<>();
+		// LinkedHashSet, so that listeners are notified in a reproducible order; a hash set orders them by identity hash code.
+		Set<MobsimListener> listeners = new LinkedHashSet<>();
 
 		for (LPProvider lpp : lps) {
 			for (int part : computeNode.getParts()) {

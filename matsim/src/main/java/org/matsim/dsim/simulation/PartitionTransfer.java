@@ -48,7 +48,7 @@ public class PartitionTransfer implements MobsimMessageCollector {
 			for (var types : partitions.getValue().int2ObjectEntrySet()) {
 				var messageType = types.getIntKey();
 				var messages = types.getValue();
-				var simStepMessage = new SimStepMessage(now, messageType, messages);
+				var simStepMessage = new SimStepMessage(partition.getIndex(), now, messageType, messages);
 				messageBroker.send(simStepMessage, toPartition);
 			}
 			// remove reference to the list of message for given type.

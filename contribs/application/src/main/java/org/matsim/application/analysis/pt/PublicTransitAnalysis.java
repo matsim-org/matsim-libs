@@ -141,7 +141,8 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 	private Config prepareConfig() {
 		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString());
 
-		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("vehicles", input.getRunDirectory()).toAbsolutePath().toString());
+		//make sure not to read the drt vehicles file by explicitly searching for output_vehicles
+		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("output_vehicles", input.getRunDirectory()).toAbsolutePath().toString());
 		config.network().setInputFile(ApplicationUtils.matchInput("network", input.getRunDirectory()).toAbsolutePath().toString());
 		config.transit().setTransitScheduleFile(ApplicationUtils.matchInput("transitSchedule", input.getRunDirectory()).toAbsolutePath().toString());
 		config.transit().setVehiclesFile(ApplicationUtils.matchInput("transitVehicles", input.getRunDirectory()).toAbsolutePath().toString());

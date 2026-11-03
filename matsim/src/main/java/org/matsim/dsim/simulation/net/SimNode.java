@@ -65,6 +65,20 @@ public class SimNode {
 		return rng.nextDouble();
 	}
 
+	/**
+	 * A node is identified by its id. Defining equality and hash code explicitly keeps hash-based collections from falling back to
+	 * {@link System#identityHashCode(Object)}, which differs between JVM runs and would make their iteration order irreproducible.
+	 */
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof SimNode other && this.id.equals(other.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.id.hashCode();
+	}
+
 	void addInLink(SimLink link) {
 		inLinks.add(link);
 	}

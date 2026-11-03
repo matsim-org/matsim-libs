@@ -41,7 +41,7 @@ public class AcceptedDrtRequest {
 				.latestStartTime(request.getLatestStartTime())
 				.latestArrivalTime(request.getLatestArrivalTime())
 				.maxRideDuration(request.getConstraints().maxRideDuration())
-				.dropoffDuration(pickupDuration)
+				.pickupDuration(pickupDuration)
 				.dropoffDuration(dropoffDuration)
 				.build();
 	}

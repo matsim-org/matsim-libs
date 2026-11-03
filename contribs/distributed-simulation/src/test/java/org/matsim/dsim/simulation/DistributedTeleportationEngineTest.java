@@ -73,6 +73,47 @@ class DistributedTeleportationEngineTest {
 		verify(em, times(2)).processEvent(assertArg(e -> assertEquals(10 + 42, e.getTime())));
 	}
 
+	/**
+	 * Agents due in the same time step have to be released in the same order whatever sequence they were handed to the engine in. That
+	 * sequence is not the same in every run: a hand-over to a partition that is not a network neighbour is not covered by the per-step
+	 * barrier, so it can be applied in a different step, which reshapes the queue without moving any arrival time. The order matters,
+	 * because it carries over into the order of the departures that follow the arrivals.
+	 */
+	@Test
+	public void releasesAgentsDueTogetherInIdOrderWhateverTheInsertionOrder() {
+
+		assertEquals(List.of("one", "two"), releaseOrderOfTwoAgentsDueTogether(false));
+		assertEquals(List.of("one", "two"), releaseOrderOfTwoAgentsDueTogether(true));
+	}
+
+	private static List<String> releaseOrderOfTwoAgentsDueTogether(boolean handInReversed) {
+
+		var em = mock(EventsManager.class);
+		var first = createPerson("one", em);
+		var second = createPerson("two", em);
+
+		var messaging = mock(PartitionTransfer.class);
+		when(messaging.isLocal(any())).thenReturn(true);
+		var internalInterface = mock(InternalInterface.class);
+		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class));
+		engine.setInternalInterface(internalInterface);
+
+		// identical departure and travel time, so both are due in the same step
+		if (handInReversed) {
+			engine.handleDeparture(10, second, second.getCurrentLinkId());
+			engine.handleDeparture(10, first, first.getCurrentLinkId());
+		} else {
+			engine.handleDeparture(10, first, first.getCurrentLinkId());
+			engine.handleDeparture(10, second, second.getCurrentLinkId());
+		}
+
+		engine.doSimStep(10 + 42);
+
+		var released = ArgumentCaptor.forClass(MobsimAgent.class);
+		verify(internalInterface, times(2)).arrangeNextAgentState(released.capture());
+		return released.getAllValues().stream().map(agent -> agent.getId().toString()).toList();
+	}
+
 	@Test
 	public void multiPersonLocal() {
 

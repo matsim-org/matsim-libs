@@ -91,6 +91,18 @@ public class ControlerIT {
 	}
 
 	@Test
+	void testInitialConfigWithXmlInOutputDirectory() {
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		String outputDirectory = new File(utils.getOutputDirectory(), "run.xml").getPath();
+		config.controller().setOutputDirectory(outputDirectory);
+		config.controller().setLastIteration(0);
+		config.controller().setCleanItersAtEnd(ControllerConfigGroup.CleanIterations.keep);
+		new Controler(config).run();
+
+		assertTrue(new File(outputDirectory, "output_config_initial.xml").exists());
+	}
+
+	@Test
 	void testTerminationCriterion() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setOutputDirectory(utils.getOutputDirectory());

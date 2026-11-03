@@ -39,6 +39,8 @@
 		<osmosis.version>0.49.2</osmosis.version>
 		<jts.version>1.20.0</jts.version>
 		<guice.version>7.0.0</guice.version>
+		<!-- Guice's own shaded ASM is outdated, so we use the "classes" classifier of Guice and provide ASM ourselves. -->
+		<asm.version>9.10.1</asm.version>
 		<jackson.version>2.22.3</jackson.version>
 		<fory.version>1.7.7</fory.version>
 		<jogl.version>2.6.0</jogl.version>
@@ -125,7 +127,13 @@
 			<dependency>
 				<groupId>com.google.inject</groupId>
 				<artifactId>guice</artifactId>
+				<classifier>classes</classifier>
 				<version>${guice.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.ow2.asm</groupId>
+				<artifactId>asm</artifactId>
+				<version>${asm.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>jakarta.annotation</groupId>
