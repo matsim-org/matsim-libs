@@ -45,21 +45,24 @@ class MatrixEvaluationTest {
 
 	private Network network;
 	private RoutedTravelTimes reference;
+	private List<TravelTimeQuery> queries;
 
 	@BeforeEach
 	void computeAReference() {
 		this.network = TestNetworks.corridor();
 		// both ends of the corridor, at two times of day, on an empty network: every reference travel
 		// time is then 223 s, so an expected error is a number and not a sum
-		ODSample sample = ODSample.of(Map.of(node("n1"), List.of(node("n4"))),
-			new double[]{3 * 3600.0, 8 * 3600.0});
-		this.reference = RoutedTravelTimes.compute(this.network, sample, new QSimFreeSpeedTravelTime(1), 1, 1);
+		this.reference = RoutedTravelTimes.compute(this.network, List.of(
+				TravelTimeQuery.of(node("n1"), node("n4"), 3 * 3600.0),
+				TravelTimeQuery.of(node("n1"), node("n4"), 8 * 3600.0)),
+			new QSimFreeSpeedTravelTime(1), 1, 1);
+		this.queries = this.reference.getQueries();
 	}
 
 	@Test
 	void theReferenceComparedAgainstItselfIsOffByTheRoundingAndNothingElse() {
 
-		MatrixEvaluation evaluation = MatrixEvaluation.evaluate(this.reference,
+		MatrixEvaluation evaluation = MatrixEvaluation.evaluate(this.queries,
 			Map.of(MatrixEvaluation.REFERENCE, this.reference.asTimeDependentMatrix()),
 			ODSample.DEFAULT_DISTANCE_BANDS, null);
 
@@ -75,7 +78,7 @@ class MatrixEvaluationTest {
 		variants.put("TOO_SLOW", scaled(1.1));
 		variants.put("TOO_FAST", scaled(0.9));
 
-		MatrixEvaluation evaluation = MatrixEvaluation.evaluate(this.reference, variants,
+		MatrixEvaluation evaluation = MatrixEvaluation.evaluate(this.queries, variants,
 			ODSample.DEFAULT_DISTANCE_BANDS, null);
 
 		// to within the rounding: a matrix answers whole seconds, so 10% of 223 s is 245 s and not 245.3
@@ -92,7 +95,7 @@ class MatrixEvaluationTest {
 	@Test
 	void theErrorIsGroupedByTimeOfDayAndByDistance() {
 
-		MatrixEvaluation evaluation = MatrixEvaluation.evaluate(this.reference,
+		MatrixEvaluation evaluation = MatrixEvaluation.evaluate(this.queries,
 			Map.of("TOO_SLOW", scaled(1.1)), ODSample.DEFAULT_DISTANCE_BANDS, null);
 
 		// one query per hour, and both of them in the 2 to 5 km band - the corridor is 3 km long
@@ -119,18 +122,18 @@ class MatrixEvaluationTest {
 	@Test
 	void itWritesOneQueryRowPerVariantAndOneErrorRowPerGroup() throws IOException {
 
-		Path queries = Path.of(utils.getOutputDirectory(), "queries.csv");
+		Path queryFile = Path.of(utils.getOutputDirectory(), "queries.csv");
 		Path errors = Path.of(utils.getOutputDirectory(), "errors.csv");
 
 		Map<String, TravelTimeMatrix> variants = new LinkedHashMap<>();
 		variants.put("TOO_SLOW", scaled(1.1));
 		variants.put("TOO_FAST", scaled(0.9));
 
-		MatrixEvaluation evaluation = MatrixEvaluation.evaluate(this.reference, variants,
-			ODSample.DEFAULT_DISTANCE_BANDS, queries.toString());
+		MatrixEvaluation evaluation = MatrixEvaluation.evaluate(this.queries, variants,
+			ODSample.DEFAULT_DISTANCE_BANDS, queryFile.toString());
 		evaluation.writeErrors(errors.toString());
 
-		List<String> queryLines = Files.readAllLines(queries);
+		List<String> queryLines = Files.readAllLines(queryFile);
 		assertEquals(1 + 2 * 2, queryLines.size(), "a header plus one pair times two departure times times "
 			+ "two variants");
 		assertTrue(queryLines.get(0).startsWith("from_node,to_node,departure_time"));
@@ -141,6 +144,34 @@ class MatrixEvaluationTest {
 		assertEquals(1 + 2 * 4, errorLines.size());
 		assertTrue(errorLines.get(0).startsWith("variant,group,group_value,n,"));
 		assertTrue(errorLines.stream().anyMatch(line -> line.startsWith("TOO_SLOW,all,all,2,")));
+	}
+
+
+	@Test
+	void aQueryWithoutAReferenceIsRefusedRatherThanSkipped() {
+
+		// the state a generated pair is in before anything determined what it should have taken: a
+		// silently skipped query would quietly shrink the sample an error is reported over
+		List<TravelTimeQuery> undetermined = List.of(TravelTimeQuery.of(node("n1"), node("n4"), 8 * 3600.0));
+
+		IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
+			() -> MatrixEvaluation.evaluate(undetermined, Map.of("TOO_SLOW", scaled(1.1)),
+				ODSample.DEFAULT_DISTANCE_BANDS, null));
+		assertTrue(thrown.getMessage().contains("no reference travel time"));
+	}
+
+	@Test
+	void aQueryWhosePathLengthIsUnknownGetsAGroupOfItsOwn() {
+
+		// an experienced or API travel time can arrive without a path length. It must neither disappear
+		// from the table nor be guessed into a band it may not belong to.
+		List<TravelTimeQuery> withoutDistance = List.of(
+			new TravelTimeQuery(node("n1"), node("n4"), 8 * 3600.0, 300, Double.NaN, Double.NaN));
+
+		MatrixEvaluation evaluation = MatrixEvaluation.evaluate(withoutDistance,
+			Map.of("TOO_SLOW", scaled(1.1)), ODSample.DEFAULT_DISTANCE_BANDS, null);
+
+		assertEquals(1, evaluation.getStats("TOO_SLOW", "distance_band", "unknown").getCount());
 	}
 
 	/**

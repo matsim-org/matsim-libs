@@ -2,7 +2,6 @@ package org.matsim.contrib.msp.traveltimematrix.evaluation;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.msp.traveltimematrix.TestNetworks;
@@ -11,17 +10,16 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests the sample an evaluation is carried out on: that a sample by distance bands really does put one
- * destination in each band, that a seed reproduces a sample, and that a written sample reads back.
+ * Tests the generated queries an evaluation can run on: that a sample by distance bands really does put
+ * one destination in each band, that a seed reproduces a sample, and that a written sample reads back.
  */
 class ODSampleTest {
 
@@ -35,23 +33,30 @@ class ODSampleTest {
 	void everyDestinationLiesInTheBandItWasDrawnFor() {
 
 		Network network = TestNetworks.grid(9);
-		ODSample sample = ODSample.byDistanceBands(network, 10, BANDS, NOON, 1234);
+		List<TravelTimeQuery> queries = ODSample.byDistanceBands(network, 10, BANDS, NOON, 1234);
 
-		for (Node origin : sample.getOrigins()) {
-
-			List<Node> destinations = sample.getDestinations(origin);
-			assertEquals(BANDS.length, destinations.size(),
-				"a grid of 9 by 9 km holds a node in each of the bands " + List.of(1000, 2000, 4000) + " m");
-
-			for (int band = 0; band < destinations.size(); band++) {
-				double distance = CoordUtils.calcEuclideanDistance(origin.getCoord(),
-					destinations.get(band).getCoord());
-				double lower = BANDS[band];
-				double upper = band + 1 < BANDS.length ? BANDS[band + 1] : 2 * lower;
-				assertTrue(distance >= lower && distance < upper,
-					"the destination of band " + lower + " m is " + distance + " m away");
-			}
+		for (TravelTimeQuery query : queries) {
+			double distance = CoordUtils.calcEuclideanDistance(query.fromNode().getCoord(),
+				query.toNode().getCoord());
+			assertTrue(distance >= BANDS[0] && distance < 2 * BANDS[BANDS.length - 1],
+				"the pair is " + distance + " m apart, which is in none of the bands " + List.of(1000, 2000, 4000));
 		}
+
+		// a grid of 9 by 9 km holds a node in each band for every origin, so every origin gets one pair
+		// per band and no more
+		assertEquals(10 * BANDS.length, queries.size());
+	}
+
+	@Test
+	void aGeneratedQueryHasNoReferenceTravelTimeOfItsOwn() {
+
+		Network network = TestNetworks.grid(5);
+		List<TravelTimeQuery> queries = ODSample.uniform(network, 2, 2, NOON, 1);
+
+		assertTrue(queries.stream().noneMatch(TravelTimeQuery::hasReference),
+			"nobody drove a generated pair, so what it should have taken is still to be determined");
+		assertTrue(queries.stream().allMatch(query -> Double.isNaN(query.distance())),
+			"and no path has been computed for it either");
 	}
 
 	@Test
@@ -59,49 +64,36 @@ class ODSampleTest {
 
 		Network network = TestNetworks.grid(9);
 
-		ODSample first = ODSample.byDistanceBands(network, 5, BANDS, NOON, 42);
-		ODSample second = ODSample.byDistanceBands(network, 5, BANDS, NOON, 42);
-		ODSample other = ODSample.byDistanceBands(network, 5, BANDS, NOON, 43);
+		List<TravelTimeQuery> first = ODSample.byDistanceBands(network, 5, BANDS, NOON, 42);
+		List<TravelTimeQuery> second = ODSample.byDistanceBands(network, 5, BANDS, NOON, 42);
+		List<TravelTimeQuery> other = ODSample.byDistanceBands(network, 5, BANDS, NOON, 43);
 
-		assertEquals(first.getOrigins(), second.getOrigins());
-		first.getOrigins().forEach(origin -> assertEquals(first.getDestinations(origin),
-			second.getDestinations(origin)));
-		assertEquals(first.getNumberOfPairs(), second.getNumberOfPairs());
-
-		// not a property of the sampling, but of this test being able to tell two samples apart at all
-		assertTrue(!first.getOrigins().equals(other.getOrigins())
-			|| !first.getDestinations(first.getOrigins().get(0))
-			.equals(other.getDestinations(other.getOrigins().get(0))), "another seed gives another sample");
+		assertEquals(first, second);
+		assertFalse(first.equals(other), "another seed gives another sample");
 	}
 
 	@Test
-	void aUniformSampleHasAsManyPairsAsItWasAskedFor() {
+	void everyPairIsAskedAtEveryDepartureTime() {
 
 		Network network = TestNetworks.grid(5);
-		ODSample sample = ODSample.uniform(network, 4, 3, ODSample.hourly(7, 10), 7);
+		List<TravelTimeQuery> queries = ODSample.uniform(network, 4, 3, ODSample.hourly(7, 10), 7);
 
-		assertEquals(4, sample.getOrigins().size());
-		assertEquals(12, sample.getNumberOfPairs());
-		assertEquals(3, sample.getNumberOfDepartureTimes());
-		assertEquals(36, sample.getNumberOfQueries());
-
-		sample.getOrigins().forEach(origin -> {
-			List<Node> destinations = sample.getDestinations(origin);
-			assertEquals(3, destinations.size());
-			assertTrue(!destinations.contains(origin), "a pair of a node with itself is not a query");
-			assertEquals(3, Set.copyOf(destinations).size(), "the destinations of one origin are distinct");
-		});
+		assertEquals(4 * 3 * 3, queries.size(), "four origins, three destinations each, three hours");
+		assertEquals(4, queries.stream().map(TravelTimeQuery::fromNode).distinct().count());
+		assertEquals(3, queries.stream().map(TravelTimeQuery::departureTime).distinct().count());
+		assertTrue(queries.stream().noneMatch(query -> query.fromNode() == query.toNode()),
+			"a pair of a node with itself is not a query");
 	}
 
 	@Test
 	void aSampleIsNotAskedForMoreOriginsOrDestinationsThanTheNetworkHasNodes() {
 
 		Network network = TestNetworks.corridor();
-		ODSample sample = ODSample.uniform(network, 100, 100, NOON, 1);
+		List<TravelTimeQuery> queries = ODSample.uniform(network, 100, 100, NOON, 1);
 
-		assertEquals(4, sample.getOrigins().size(), "the corridor has four nodes");
-		sample.getOrigins().forEach(origin -> assertEquals(3, sample.getDestinations(origin).size(),
-			"every node but the origin itself, and no more than that"));
+		assertEquals(4, queries.stream().map(TravelTimeQuery::fromNode).distinct().count(),
+			"the corridor has four nodes");
+		assertEquals(4 * 3, queries.size(), "every node but the origin itself, and no more than that");
 	}
 
 	@Test
@@ -121,58 +113,10 @@ class ODSampleTest {
 
 		// 4 to 8 km in a grid of 5 by 5 km: the corners can fill it, the middle cannot
 		Network network = TestNetworks.grid(6);
-		ODSample sample = ODSample.byDistanceBands(network, 20, new double[]{1000, 4000}, NOON, 3);
+		List<TravelTimeQuery> queries = ODSample.byDistanceBands(network, 20, new double[]{1000, 4000}, NOON, 3);
 
-		assertTrue(sample.getNumberOfPairs() >= sample.getOrigins().size(),
-			"every origin that made it into the sample has at least one destination");
-		assertTrue(sample.getOrigins().size() <= 20);
-	}
-
-	@Test
-	void aWrittenSampleReadsBackAsTheSameQueries() {
-
-		Network network = TestNetworks.grid(5);
-		ODSample written = ODSample.byDistanceBands(network, 6, BANDS, ODSample.hourly(8, 10), 99);
-
-		Path file = Path.of(utils.getOutputDirectory(), "od_sample.csv");
-		written.write(file.toString());
-
-		ODSample read = ODSample.read(file.toString(), network);
-
-		assertEquals(written.getOrigins(), read.getOrigins());
-		assertEquals(written.getNumberOfPairs(), read.getNumberOfPairs());
-		assertArrayEquals(written.getDepartureTimes(), read.getDepartureTimes());
-		written.getOrigins().forEach(origin -> assertEquals(written.getDestinations(origin),
-			read.getDestinations(origin)));
-	}
-
-	@Test
-	void aSampleOfNodesTheNetworkDoesNotHoldIsRefused() {
-
-		Network grid = TestNetworks.grid(5);
-		Path file = Path.of(utils.getOutputDirectory(), "od_sample.csv");
-		ODSample.uniform(grid, 3, 2, NOON, 5).write(file.toString());
-
-		// the same sample, read over a different network - which is what cutting the study area
-		// differently does, and what would otherwise silently drop queries
-		IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-			() -> ODSample.read(file.toString(), TestNetworks.corridor()));
-		assertTrue(thrown.getMessage().contains("which the network does not hold"));
-	}
-
-	@Test
-	void aSampleWithoutQueriesIsRefused() {
-
-		Network network = TestNetworks.corridor();
-		Node n1 = network.getNodes().get(Id.createNodeId("n1"));
-		Node n2 = network.getNodes().get(Id.createNodeId("n2"));
-
-		assertThrows(IllegalArgumentException.class, () -> ODSample.of(Map.of(), NOON),
-			"no origin at all");
-		assertThrows(IllegalArgumentException.class, () -> ODSample.of(Map.of(n1, List.of()), NOON),
-			"an origin without destinations costs a tree and answers nothing");
-		assertThrows(IllegalArgumentException.class, () -> ODSample.of(Map.of(n1, List.of(n2)), new double[0]),
-			"no departure time");
+		assertTrue(!queries.isEmpty());
+		assertTrue(queries.stream().map(TravelTimeQuery::fromNode).distinct().count() <= 20);
 	}
 
 	@Test
@@ -187,5 +131,63 @@ class ODSampleTest {
 		assertArrayEquals(new double[]{7 * 3600.0, 8 * 3600.0, 9 * 3600.0}, ODSample.hourly(7, 10));
 		assertEquals(24, ODSample.HOURLY_DEPARTURE_TIMES.length);
 		assertThrows(IllegalArgumentException.class, () -> ODSample.hourly(10, 10));
+	}
+
+	@Test
+	void writtenQueriesReadBackAsTheSameQuestions() {
+
+		Network network = TestNetworks.grid(5);
+		List<TravelTimeQuery> written = ODSample.byDistanceBands(network, 6, BANDS, ODSample.hourly(8, 10), 99);
+
+		Path file = Path.of(utils.getOutputDirectory(), "od_queries.csv");
+		TravelTimeQuery.write(written, file.toString());
+		List<TravelTimeQuery> read = TravelTimeQuery.read(file.toString(), network);
+
+		assertEquals(written.size(), read.size());
+		for (int i = 0; i < written.size(); i++) {
+			assertEquals(written.get(i).fromNode(), read.get(i).fromNode());
+			assertEquals(written.get(i).toNode(), read.get(i).toNode());
+			assertEquals(written.get(i).departureTime(), read.get(i).departureTime(), 1e-9);
+			assertFalse(read.get(i).hasReference(), "the sample had no reference travel time to write");
+		}
+	}
+
+	@Test
+	void aWrittenReferenceTravelTimeComesBackWithTheQuery() {
+
+		Network network = TestNetworks.grid(5);
+		Node from = network.getNodes().values().iterator().next();
+		Node to = network.getNodes().values().stream().filter(node -> node != from).findFirst().orElseThrow();
+
+		// the column is what makes the csv an interchange: a travel time fetched from a routing API can
+		// be written into it and evaluated as if it had been measured
+		Path file = Path.of(utils.getOutputDirectory(), "with_reference.csv");
+		TravelTimeQuery.write(List.of(new TravelTimeQuery(from, to, 28800, 612.5, 4200, Double.NaN)),
+			file.toString());
+
+		TravelTimeQuery read = TravelTimeQuery.read(file.toString(), network).get(0);
+		assertTrue(read.hasReference());
+		assertEquals(612.5, read.referenceTravelTime(), 1e-9);
+		assertEquals(4200, read.distance(), 1e-9);
+	}
+
+	@Test
+	void queriesOfNodesTheNetworkDoesNotHoldAreRefused() {
+
+		Network grid = TestNetworks.grid(5);
+		Path file = Path.of(utils.getOutputDirectory(), "od_queries.csv");
+		TravelTimeQuery.write(ODSample.uniform(grid, 3, 2, NOON, 5), file.toString());
+
+		// the same queries, read over a different network - which is what cutting the study area
+		// differently does, and what would otherwise silently drop them
+		IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
+			() -> TravelTimeQuery.read(file.toString(), TestNetworks.corridor()));
+		assertTrue(thrown.getMessage().contains("which the network does not hold"));
+	}
+
+	@Test
+	void aSampleNeedsADepartureTime() {
+		Network network = TestNetworks.grid(5);
+		assertThrows(IllegalArgumentException.class, () -> ODSample.uniform(network, 2, 2, new double[0], 1));
 	}
 }

@@ -97,11 +97,10 @@ run output (network, events)
    --[TimeVaryingTravelTimeMatrix]-->  TT(o,d,t)       (RunComputeTravelTimeMatrix: build + cache)
          |
   step 6 v                                                   (evaluation only, see below)
-         +--[RoutedTravelTimes]-->  the same queries by time-dependent routing
-         |    --[MatrixEvaluation]-->  errors.csv             (RunEvaluateTravelTimeMatrix)
+   the questions:  [ODSample] generated pairs | [ExperiencedLegs] the trips of the run
+   the reference:  [RoutedTravelTimes] a router | what those trips really took | an API
          |
-         +--[ExperiencedLegs]-->  the car legs the run actually drove
-              --[MatrixEvaluation]-->  errors.csv             (RunValidateTravelTimeMatrix)
+   --[MatrixEvaluation]-->  errors.csv, queries.csv           (RunEvaluateTravelTimeMatrix)
 ```
 
 Step 2 is a command of its own, because the index is the only thing the matrix needs from a run and it
@@ -146,9 +145,9 @@ The code is split by step of the method:
 | | `RoutedTravelTimes` | the reference (variant 4) and level 3, by routing |
 | | `TravelTimeErrorStats` | MAPE, bias, RMSE, accumulated per group |
 | | `ExperiencedLegs` | the car legs a run drove, as node-to-node travel times |
+| | `TravelTimeQuery` | the pair, time and reference every comparison is made of, and its csv |
 | | `MatrixEvaluation` | compares anything answering a query, and writes the tables |
-| | `RunEvaluateTravelTimeMatrix` | the sampled experiment against routing, as one command |
-| | `RunValidateTravelTimeMatrix` | the validation against the legs of a run, as one command |
+| | `RunEvaluateTravelTimeMatrix` | the whole experiment as one command |
 
 Dependencies run from the root package into the sub packages and never the other way round, and nothing
 in here knows about any particular *use* of the matrix — see [Using it in an
@@ -283,92 +282,94 @@ more than the travel times do.
 ### Evaluating it
 
 `org.matsim.contrib.msp.traveltimematrix.evaluation` — the matrix trades accuracy for one lookup, so the
-number that decides whether it is usable is the error. There are **two** errors, they answer different
-questions, and both are worth reporting:
+number that decides whether it is usable is the error. One command measures it,
+`RunEvaluateTravelTimeMatrix`, and it has exactly two choices to make:
 
-| | against what | what it measures | command |
-|---|---|---|---|
-| **approximation error** | a time-dependent router on the same travel times | the error of the method alone, on any pairs and departure times one likes | `RunEvaluateTravelTimeMatrix` |
-| **prediction error** | the car legs the run actually drove | the error an analysis using the matrix really suffers — which also contains everything the matrix cannot know | `RunValidateTravelTimeMatrix` |
+```
+                        │ --reference ROUTED            │ --reference EXPERIENCED
+                        │ (a time-dependent router)     │ (what the trips really took)
+────────────────────────┼───────────────────────────────┼──────────────────────────────
+--od-pairs RANDOM       │ the error of the method, on    │ impossible, and refused:
+(generated pairs)       │ any pair and hour one likes    │ nobody drove that pair
+────────────────────────┼───────────────────────────────┼──────────────────────────────
+--od-pairs TRIPS        │ the error of the method,        │ the error an analysis using
+(the trips of the run)  │ weighted by real demand        │ the matrix really suffers
+```
 
-The second is always the larger, and the difference between the two is the route the agent chose, the
-queue it sat in and the exact minute it left. Both write the same `errors.csv`, through the same
-`MatrixEvaluation`, so the two tables can be put side by side. The ladder below is the first of them,
-from the exact answer down:
+**`--od-pairs`: which questions to ask.** `TRIPS` takes the car trips the run really made and weights
+the error by what actually happens. `RANDOM` generates pairs, one destination per distance band and
+origin, and covers the matrix evenly — including the pairs and hours nobody drove in this scenario,
+which for an analysis asking *"could this person have reached that shop at 19:00"* is most of them.
+`FILE` reads back the `od_queries.csv` of an earlier run, so two experiments can be compared on exactly
+the same questions.
 
-| rung | what it is | cost |
-|---|---|---|
-| `REFERENCE_TIME_DEPENDENT` | **variant 4**: time-dependent shortest paths over the congested travel times of the run | one shortest-path tree per origin *and departure time* — the thing the matrix exists to avoid |
-| `LEVEL_3_FIXED_PATH` | **level 3**: the free-speed path, timed link by link under congestion | one tree per origin, plus a walk along the path per departure time |
-| `BY_ROAD_CLASS` | level 1 | one lookup per road class |
-| `GLOBAL_INDEX` | level 0 | one lookup |
-| `CONSTANT_INDEX` | the daily mean index as a constant speed factor — what `DetourTimeEstimator` of `contribs/drt` does today | one multiplication |
-| `FREE_SPEED` | no congestion at all | none |
+**`--reference`: what to compare against.** `ROUTED` is time-dependent shortest paths over the congested
+travel times of the run — the exact answer *under the model the matrix lives in*, so it isolates the
+error of the approximation. `EXPERIENCED` is what the trips really took, which also contains everything
+the matrix cannot know: the route the agent chose, the queue it sat in, the exact minute it left.
+`API` is a seam, not an implementation — see below.
 
-Every one of them is a `TravelTimeMatrix`, the reference included (`RoutedTravelTimes.asTimeDependentMatrix()`),
-so `MatrixEvaluation` asks all of them the same three-argument question and knows nothing about which of
-them routes. Adding a rung is a map entry.
-
-The gap between variant 4 and level 3 is the one error that no congestion index can remove: a real
-driver reroutes around congestion, a fixed free-speed path does not, so **level 3 is an upper bound of
-variant 4, and so is every rung below it**. `RoutedTravelTimes` logs that gap as a percentage of the
-optimum, which splits the error of the matrix into the part a better index could fix and the part that is
-built into the method.
+The two references typically have **opposite signs**: against a router the matrix comes out too slow,
+because it holds the free-speed path fixed, and against the experienced travel times it can come out too
+fast, because a network-wide index does not see the queue a particular trip sat in. Both are worth
+reporting, and because every combination goes through the same `MatrixEvaluation`, the tables have the
+same columns and can be read side by side.
 
 ```
 java -cp matsim-msp.jar org.matsim.contrib.msp.traveltimematrix.evaluation.RunEvaluateTravelTimeMatrix \
     --network output_network.xml.gz --events output_events.xml.gz --shp dresden-with-buffer.shp \
     --congestion-index congestion_index.csv --output-directory evaluation \
-    --origins 200 --departure-hours 0,3,6,7,8,9,12,15,16,17,18,21
+    --od-pairs TRIPS --reference EXPERIENCED --also-route
 ```
 
-One command on purpose: the reference, the index and the matrix all have to be built over the same
-network and the same run, and splitting them up is how they come to disagree. The network is cut once,
-the events are read once (`MeasuredTraffic`), and the base matrix is computed once and cached in the
-output directory, where the four result files land:
+Four files come out of `--output-directory`: `errors.csv` (MAPE, bias and RMSE per variant, overall and
+by hour and distance band — this is the table), `od_queries.csv` (the questions and their reference
+travel times, for `--od-pairs FILE`), `congestion_index.csv` (the index that was used, next to the
+results it produced) and, with `--write-queries`, one row per query and variant for plots.
 
-- `errors.csv` — MAPE, bias and RMSE per rung, overall and by hour of day and distance band. This is the
-  table.
-- `queries.csv` — one row per query and rung, for plots.
-- `od_sample.csv` — the queries, so that `--od-sample` can repeat the experiment on exactly the same
-  pairs with other matrix parameters.
-- `congestion_index.csv` — the index that was used, copied next to the results it produced.
+#### The ladder, and `--also-route`
 
-**The sample.** The reference costs one tree per origin and departure time, so the error is estimated on
-a sample rather than on every pair — which is all a MAPE needs. Two decisions in `ODSample` matter for
-reading the result. Pairs are **grouped by origin**, because one tree answers every destination of that
-origin at once: 200 origins with 6 destinations each cost the same as 200 with one. And destinations are
-drawn **one per distance band** rather than uniformly: uniformly random node pairs are overwhelmingly
-medium-range trips through the dense part of the network, which would leave the short trips as a handful
-of rows in the very table that is supposed to say whether short trips are the problem.
+The variants in the table, from the exact answer down:
 
-**Two errors in one number.** The query table carries the exact free-speed travel time of each pair
-(`tt_free_speed_path`) next to what each rung answered, because the error of the matrix is two things
-added together: the congestion model, which cannot know *where* the queue is, and the zone system, which
-answers a long pair with the travel time between the *central nodes* of the two zones. The `FREE_SPEED`
-row — whose only error is the discretisation plus the absence of congestion — is what anchors the
-comparison, and `cellSize` and `maxNeighborDistance` are what move it.
+| rung | what it is | cost |
+|---|---|---|
+| `REFERENCE_TIME_DEPENDENT` | **variant 4**: time-dependent shortest paths over the congested travel times of the run | one shortest-path tree per *distinct origin and departure time* |
+| `LEVEL_3_FIXED_PATH` | **level 3**: the free-speed path, timed link by link under congestion | one free-speed tree per origin, plus a walk along the path |
+| `BY_ROAD_CLASS` | level 1 | one lookup per road class |
+| `GLOBAL_INDEX` | level 0 | one lookup |
+| `CONSTANT_INDEX` | the daily mean index as a constant speed factor — what `DetourTimeEstimator` of `contribs/drt` does today | one multiplication |
+| `FREE_SPEED` | no congestion at all | none |
 
-**What the reference is not.** It is the exact answer *under the travel times of one finished run*, not
-measured reality: a route the simulation would never have taken is still optimal here, and a run whose
-congestion is wrong yields a reference that is wrong in the same way. Validating the run itself against
-route APIs is a different job, and `SampleValidationRoutes` of `contribs/application` is where it lives —
-it reads `from_node,to_node` pairs, which is the shape `od_sample.csv` is written in.
+Every one of them is a `TravelTimeMatrix`, the reference included, so `MatrixEvaluation` asks all of them
+the same three-argument question and knows nothing about which of them routes. Adding a rung is a map
+entry.
 
-#### Against the run itself
+The top two rungs appear whenever a router ran — always with `--reference ROUTED`, and with
+`--reference EXPERIENCED` if `--also-route` is given. **That combination is the point of there being one
+command**: with the real trips as the questions, what they really took as the reference, *and* the router
+as one more variant, the table attributes the error. On `equil`:
 
 ```
-java -cp matsim-msp.jar org.matsim.contrib.msp.traveltimematrix.evaluation.RunValidateTravelTimeMatrix \
-    --network output_network.xml.gz --events output_events.xml.gz --shp dresden-with-buffer.shp \
-    --congestion-index congestion_index.csv --output-directory validation
+variant,group,group_value,n,mean_reference,mean_estimate,bias,relative_bias,mape,...
+REFERENCE_TIME_DEPENDENT,all,all,20,1272.4,1188.0,-84.4,-0.1147,0.1147
+LEVEL_3_FIXED_PATH,all,all,20,1272.4,1277.7,5.3,0.0167,0.0609
+GLOBAL_INDEX,all,all,20,1272.4,1232.0,-40.4,-0.0502,0.0662
+FREE_SPEED,all,all,20,1272.4,1188.0,-84.4,-0.1147,0.1147
 ```
 
-No routing happens here, which is what makes it cheap enough to use **every** car leg of the run rather
-than a sample of pairs: the events are read once, each leg is reduced to the interval the matrix is
-about, and each variant is asked one question per leg. The routing rungs (level 3 and the reference) are
-therefore not in this table — they would need a shortest-path tree per leg.
+Read it as: a time-dependent router is itself 11% faster than the trips really were, so most of the gap
+is not the matrix at all but route choice and queueing; timing the *fixed* path (level 3) is within 2%,
+because agents do not re-optimise either; and the matrix recovers half of what `FREE_SPEED` gets wrong.
+Without `--also-route` only the last two rows exist and that attribution cannot be made.
 
-**A leg is cut at the nodes, not taken as the agent experienced it.** The qsim inserts a vehicle at the
+Note what `--also-route` costs with `--od-pairs TRIPS`: real trips depart at distinct seconds, so it is
+about one shortest-path tree per trip, where generated pairs share their departure times and cost one
+tree per origin and hour. `--max-trips` is the knob — a reservoir sample over the whole day, so capping
+it does not turn the sample into "the morning peak".
+
+#### What is compared, exactly
+
+**A trip is cut at the nodes, not taken as the agent experienced it.** The qsim inserts a vehicle at the
 end of its first link and ends the leg once it has driven its last one, so a leg's own travel time
 contains a first-link insertion delay and a full last link, neither of which is in a node-to-node
 matrix. `ExperiencedLegs` therefore starts the clock when the vehicle **leaves its first link** (passing
@@ -376,21 +377,36 @@ matrix. `ExperiencedLegs` therefore starts the clock when the vehicle **leaves i
 the interval `getTravelTime(fromNode, toNode, t)` is about, and the departure time it is asked about is
 the moment the first node was passed. No correction term, no last-link convention, nothing to get wrong.
 This is also why the comparison is not made against `output_trips.csv`, whose travel time includes the
-access and egress walk, nor against a leg's `trav_time`.
+access and egress walk, nor against a leg's `trav_time`. Experienced plans are the same story: they carry
+a leg's travel time but not the instants it crossed those two nodes, so the events are the input that can
+answer the question exactly.
 
-Only legs that **stayed inside the study area** count: for a leg that left the area and came back, the
+Only trips that **stayed inside the study area** count: for one that left the area and came back, the
 matrix would answer about a path through the area that the vehicle never drove, and scoring that as an
-error of the congestion model would be wrong. How many legs were dropped for it is logged, and a large
-share is the sign that the buffer around the city is too small. A reservoir sample caps how many legs are
-kept (`--max-legs`), because a city produces millions and a MAPE needs tens of thousands.
+error of the congestion model would be wrong. How many were dropped for it is logged, and a large share
+is the sign that the buffer around the city is too small.
 
-**What this still is not.** It is the matrix against *the simulation*, not against the world. If the run
-itself is wrong about Dresden's congestion, this table is happy and the matrix is still wrong — the index
-was measured from the same events, so the two share that error. Validating the **run** against real
-travel times is a different job and already has tools: `SampleValidationRoutes` of `contribs/application`
-(Google, HERE, TomTom, Mapbox per hour) and `TravelTimeValidationRunner` of `contribs/analysis`. The
-`od_sample.csv` written here is in the `from_node,to_node` shape the former reads, so the same pairs can
-be sent to an API and the three numbers — API, run, matrix — put in one table.
+The error of the matrix is also **two things added together**, which is why the query table carries the
+exact free-speed travel time of each pair (`tt_free_speed_path`) next to what each variant answered: the
+congestion model, which cannot know *where* the queue is, and the zone system, which answers a long pair
+with the travel time between the *central nodes* of the two zones. The `FREE_SPEED` row — whose only
+error is the discretisation plus the absence of congestion — is what anchors the comparison, and
+`cellSize` and `maxNeighborDistance` are what move it.
+
+#### Against the real world (`--reference API`)
+
+Neither implemented reference is reality. Both are measured against one run, and the congestion index was
+measured from the same events, so a run that is wrong about Dresden's congestion gives two happy tables.
+Validating the **run** needs external data, and `--reference API` is where that will plug in — one
+method, because everything else about the command is independent of where a reference travel time comes
+from.
+
+It can be done today without any new code, which is why it is not urgent: run with
+`--reference ROUTED`, take the `od_queries.csv`, fetch the travel times of those pairs with
+`SampleValidationRoutes` of `contribs/application` (Google, HERE, TomTom, Mapbox per hour — it reads
+`from_node,to_node`, which is the shape of that file), write them into its `reference_travel_time`
+column, and evaluate with `--od-pairs FILE --reference EXPERIENCED`. That is the same comparison, by
+hand. `TravelTimeValidationRunner` of `contribs/analysis` is the other tool in that area.
 
 ### Using it in an analysis
 

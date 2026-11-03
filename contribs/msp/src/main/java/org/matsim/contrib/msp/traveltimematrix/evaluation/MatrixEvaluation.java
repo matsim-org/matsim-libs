@@ -26,12 +26,12 @@ import java.util.Map;
  * writes the two tables a paper reports: one row per query, and the error aggregated by time of day and
  * by distance.
  * <p>
- * It serves both studies of this package, and that is the point of it taking plain {@link Query}
- * objects: the reference is the time-dependent optimum over an {@link ODSample} in one of them
- * ({@link RoutedTravelTimes}) and the experienced travel time of a car leg of the run in the other
- * ({@link ExperiencedLegs}), and the grouping, the metrics and the csv are the same either way - so the
- * two error tables can be read side by side without wondering which of them computed its MAPE
- * differently.
+ * It serves every study of this package, and that is the point of it taking plain
+ * {@link TravelTimeQuery} objects: where the pairs come from (a generated {@link ODSample} or the trips
+ * of a run, {@link ExperiencedLegs}) and what determines the reference travel time (what the trip really
+ * took, or {@link RoutedTravelTimes}) are two independent choices, and none of them reaches this class.
+ * The grouping, the metrics and the csv are the same whatever was chosen, so the tables can be read side
+ * by side.
  * <p>
  * Everything compared here is a {@link TravelTimeMatrix}, the reference included
  * ({@link RoutedTravelTimes#asTimeDependentMatrix()}), so this class contains no knowledge of which
@@ -47,8 +47,7 @@ import java.util.Map;
  * variant, whose only error is discretisation plus the absence of congestion, is the row that anchors
  * the comparison.
  *
- * @see RunEvaluateTravelTimeMatrix against a time-dependent router, on sampled pairs
- * @see RunValidateTravelTimeMatrix against the legs a run actually drove
+ * @see RunEvaluateTravelTimeMatrix the command that composes the choices
  */
 public final class MatrixEvaluation {
 
@@ -82,25 +81,16 @@ public final class MatrixEvaluation {
 	}
 
 	/**
-	 * One question put to every variant: a node pair, a departure time, and the travel time the variant
-	 * is to be compared against.
+	 * Evaluates every variant over a set of queries, however they were produced and whatever filled in
+	 * their reference travel time.
+	 * <p>
+	 * This is the whole comparison, and it is deliberately the only one: a generated sample judged by a
+	 * router and the trips of a run judged by what they really took are the same subtraction over
+	 * different inputs, so they produce error tables with the same columns that can be read side by side
+	 * without wondering which of them computed its MAPE differently.
 	 *
-	 * @param referenceTravelTime what the variant should have answered [s] - the time-dependent optimum
-	 * of {@link RoutedTravelTimes} in the sampled study, the experienced travel time of
-	 * {@link ExperiencedLegs} in the validation against a run
-	 * @param distance the length of the path [m], which the error table groups by
-	 * @param freeSpeedTravelTime the exact free-speed travel time of the pair [s], or
-	 * {@link Double#NaN} when it is not known separately. It is reported next to the answers so that the
-	 * discretisation of the zone system can be told from the congestion model.
-	 */
-	public record Query(Node fromNode, Node toNode, double departureTime, double referenceTravelTime,
-						double distance, double freeSpeedTravelTime) {
-	}
-
-	/**
-	 * Evaluates every variant over the sampled queries, against the time-dependent routing reference.
-	 *
-	 * @param reference the routing reference, which also carries the sample and the distances
+	 * @param queries what to ask, each with a reference travel time - see {@link ODSample},
+	 * {@link ExperiencedLegs} and {@link RoutedTravelTimes}
 	 * @param variants what to evaluate, by the name they are reported under. Pass a
 	 * {@link java.util.LinkedHashMap} to fix the order of the tables; the reference itself may be among
 	 * them and then comes out with the rounding of a travel time to whole seconds as its only error,
@@ -108,41 +98,21 @@ public final class MatrixEvaluation {
 	 * @param distanceBands lower edges of the distance bands [m], e.g.
 	 * {@link ODSample#DEFAULT_DISTANCE_BANDS}
 	 * @param queryFile a csv of one row per query and variant, or null for the aggregates alone. It is
-	 * written while the queries are evaluated, so it costs no memory - but it has as many rows as the
-	 * sample has queries times variants.
+	 * written while the queries are evaluated, so it costs no memory - but it has as many rows as there
+	 * are queries times variants.
+	 * @throws IllegalArgumentException if a query has no reference travel time, i.e. nothing has
+	 * determined yet what the variants should have answered
 	 */
-	public static MatrixEvaluation evaluate(RoutedTravelTimes reference, Map<String, TravelTimeMatrix> variants,
-		double[] distanceBands, @Nullable String queryFile) {
+	public static MatrixEvaluation evaluate(Collection<TravelTimeQuery> queries,
+		Map<String, TravelTimeMatrix> variants, double[] distanceBands, @Nullable String queryFile) {
 
-		ODSample sample = reference.getSample();
-		double[] departureTimes = sample.getDepartureTimes();
-		List<Query> queries = new ArrayList<>(sample.getNumberOfQueries());
-
-		for (Node origin : sample.getOrigins()) {
-			for (Node destination : sample.getDestinations(origin)) {
-				RoutedTravelTimes.PairTravelTimes pair = reference.get(origin, destination);
-				for (int t = 0; t < departureTimes.length; t++) {
-					queries.add(new Query(origin, destination, departureTimes[t], pair.timeDependent()[t],
-						pair.distance(), pair.freeSpeedTravelTime()));
-				}
-			}
+		long withoutReference = queries.stream().filter(query -> !query.hasReference()).count();
+		if (withoutReference > 0) {
+			throw new IllegalArgumentException(withoutReference + " of " + queries.size() + " queries have no "
+				+ "reference travel time, so there is nothing to compare the variants against. A generated "
+				+ "origin-destination pair carries no travel time of its own - something has to determine one, "
+				+ "e.g. RoutedTravelTimes.");
 		}
-
-		return evaluate(queries, variants, distanceBands, queryFile);
-	}
-
-	/**
-	 * Evaluates every variant over any set of queries - the sampled ones above, or the car legs a run
-	 * actually drove ({@link ExperiencedLegs#asQueries()}).
-	 * <p>
-	 * This is the whole comparison, and it is the same code for both studies on purpose: the two error
-	 * tables then have the same columns and the same grouping, and can be read side by side without
-	 * asking which of them computed its MAPE differently.
-	 *
-	 * @see #evaluate(RoutedTravelTimes, Map, double[], String) for the parameters
-	 */
-	public static MatrixEvaluation evaluate(Collection<Query> queries, Map<String, TravelTimeMatrix> variants,
-		double[] distanceBands, @Nullable String queryFile) {
 
 		Map<String, Map<String, TravelTimeErrorStats>> stats = new LinkedHashMap<>();
 		variants.keySet().forEach(variant -> stats.put(variant, new LinkedHashMap<>()));
@@ -151,7 +121,7 @@ public final class MatrixEvaluation {
 
 		try (CSVPrinter printer = queryPrinter(queryFile)) {
 
-			for (Query query : queries) {
+			for (TravelTimeQuery query : queries) {
 
 				String distanceBand = bandOf(query.distance(), distanceBands);
 				String hour = Integer.toString((int) (query.departureTime() / 3600));
@@ -168,9 +138,11 @@ public final class MatrixEvaluation {
 
 					if (printer != null) {
 						printer.printRecord(query.fromNode().getId(), query.toNode().getId(),
-							format(query.departureTime(), 0), format(query.distance(), 1),
-							format(query.freeSpeedTravelTime(), 1), format(query.referenceTravelTime(), 1),
-							variant.getKey(), format(estimate, 1));
+							TravelTimeQuery.format(query.departureTime(), 0),
+							TravelTimeQuery.format(query.distance(), 1),
+							TravelTimeQuery.format(query.freeSpeedTravelTime(), 1),
+							TravelTimeQuery.format(query.referenceTravelTime(), 1),
+							variant.getKey(), TravelTimeQuery.format(estimate, 1));
 					}
 				}
 			}
@@ -209,20 +181,15 @@ public final class MatrixEvaluation {
 	}
 
 	/**
-	 * A number for the query csv. Fixed decimals rather than whatever {@code Double.toString} produces,
-	 * so that the file stays diffable and does not carry an accuracy a travel time does not have.
-	 */
-	private static String format(double value, int decimals) {
-		// an unknown free-speed travel time is an empty field and not the string "NaN", which every
-		// reader of the csv would then have to know to filter out
-		return Double.isNaN(value) ? "" : String.format(Locale.ROOT, "%." + decimals + "f", value);
-	}
-
-	/**
 	 * The band a distance falls into, as the label the error table groups by: {@code "2000-5000"}, or
 	 * {@code "20000+"} for the open-ended last band.
 	 */
 	static String bandOf(double distance, double[] bandEdges) {
+		if (Double.isNaN(distance)) {
+			// a query whose path nobody computed - an API reference, say. Its own group rather than a
+			// guess, so that it neither disappears from the table nor pollutes a band it may not be in.
+			return "unknown";
+		}
 		for (int band = bandEdges.length - 1; band >= 0; band--) {
 			if (distance >= bandEdges[band]) {
 				return band + 1 < bandEdges.length

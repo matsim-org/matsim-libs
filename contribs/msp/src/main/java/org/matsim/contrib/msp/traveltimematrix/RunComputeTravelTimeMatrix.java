@@ -5,12 +5,12 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.ODSample;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.TravelTimeQuery;
 import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaNetwork;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
@@ -179,24 +179,19 @@ public final class RunComputeTravelTimeMatrix implements MATSimAppCommand {
 			return Double.NaN;
 		}
 
-		// one origin with many destinations is one sampling call; the pairs are still random pairs
-		int destinations = Math.min(1000, network.getNodes().size() - 1);
-		List<Node> origins = ODSample.uniform(network, Math.min(1000, network.getNodes().size()), destinations,
-			new double[]{8 * 3600.0}, 1).getOrigins();
+		// a few thousand random pairs, cycled: enough that the queries jump around the study area the way
+		// an analysis does, few enough that the list of them is not what is being measured
+		int side = Math.min(100, network.getNodes().size() - 1);
+		List<TravelTimeQuery> pairs = ODSample.uniform(network, side, side, new double[]{8 * 3600.0}, 1);
 
 		long answered = 0;
 		long checksum = 0;
 		long startedAt = System.nanoTime();
 		while (answered < this.benchmarkQueries) {
-			for (Node origin : origins) {
-				for (Node destination : origins) {
-					// a time of day per query, so that the index lookup is part of what is measured
-					checksum += matrix.getTravelTime(origin, destination, answered % 86400);
-					if (++answered >= this.benchmarkQueries) {
-						break;
-					}
-				}
-				if (answered >= this.benchmarkQueries) {
+			for (TravelTimeQuery pair : pairs) {
+				// a time of day per query, so that the index lookup is part of what is measured
+				checksum += matrix.getTravelTime(pair.fromNode(), pair.toNode(), answered % 86400);
+				if (++answered >= this.benchmarkQueries) {
 					break;
 				}
 			}

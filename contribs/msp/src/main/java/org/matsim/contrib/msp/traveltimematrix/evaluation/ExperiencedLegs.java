@@ -257,17 +257,19 @@ public final class ExperiencedLegs implements VehicleEntersTrafficEventHandler, 
 	}
 
 	/**
-	 * The legs as queries for {@link MatrixEvaluation}: the experienced travel time becomes the
-	 * reference each variant is compared against.
+	 * The legs as queries: the experienced travel time becomes the reference each variant is compared
+	 * against, and {@link RoutedTravelTimes} can replace it with what a router says about the same pairs
+	 * and departure times - which is the comparison that separates what the matrix gets wrong from what
+	 * the simulation's route choice adds.
 	 * <p>
 	 * The free-speed travel time is left unknown, unlike in the sampled study: here it is not a separate
 	 * piece of information but one of the variants - the {@code FREE_SPEED} row of the error table is
 	 * exactly the free-speed travel time of every one of these pairs.
 	 */
-	public List<MatrixEvaluation.Query> asQueries() {
+	public List<TravelTimeQuery> asQueries() {
 		return getLegs().stream()
-			.map(leg -> new MatrixEvaluation.Query(leg.fromNode(), leg.toNode(), leg.departureTime(),
-				leg.travelTime(), leg.distance(), Double.NaN))
+			.map(leg -> new TravelTimeQuery(leg.fromNode(), leg.toNode(), leg.departureTime(), leg.travelTime(),
+				leg.distance(), Double.NaN))
 			.toList();
 	}
 }

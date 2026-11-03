@@ -160,7 +160,7 @@ class ExperiencedLegsTest {
 		legs.handleEvent(new VehicleLeavesTrafficEvent(150, PERSON, link(network, "3-4"), VEHICLE,
 			TransportMode.car, 1));
 
-		MatrixEvaluation.Query query = legs.asQueries().get(0);
+		TravelTimeQuery query = legs.asQueries().get(0);
 		assertEquals("n2", query.fromNode().getId().toString());
 		assertEquals("n3", query.toNode().getId().toString());
 		assertEquals(110, query.departureTime(), 1e-9);
