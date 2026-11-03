@@ -82,7 +82,7 @@ public class TestSplitInLink {
 
 		// verify the state of the link
 		assertTrue(simLink.isOffering());
-		assertEquals(Id.createVehicleId("vehicle-2"), simLink.popVehicle().getId());
+		assertEquals(Id.createVehicleId("vehicle-2"), simLink.popVehicle(0).getId());
 		assertFalse(simLink.isOffering());
 		assertEquals(Id.createVehicleId("vehicle-1"), simLink.peekFirstVehicle().getId());
 	}
@@ -116,7 +116,7 @@ public class TestSplitInLink {
 
 		// verify link state
 		assertTrue(simLink.isOffering());
-		assertEquals(Id.createVehicleId("vehicle-1"), simLink.popVehicle().getId());
+		assertEquals(Id.createVehicleId("vehicle-1"), simLink.popVehicle(0).getId());
 
 		// the hole should arrive after 24 seconds. Then it is sent upstream
 		assertFalse(simLink.doSimStep(24));

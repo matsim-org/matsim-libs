@@ -42,10 +42,11 @@ class SimBufferTest {
 		assertFalse(buffer.isAvailable(0));
 		assertEquals(vehicle.getSizeInEquivalents(), buffer.getPceInBuffer());
 		assertFalse(buffer.isStuck(0));
-		assertTrue(buffer.isStuck(stuckThreshold));
+		assertFalse(buffer.isStuck(stuckThreshold));
+		assertTrue(buffer.isStuck(stuckThreshold + 1));
 
-		// Remove the vehicle
-		buffer.pollFirst();
+		// Remove the vehicle, in the next time step at the earliest, as the node does
+		buffer.pollFirst(1);
 
 		// make sure that flow capacity is rebuild slowly
 		var now = vehicle.getSizeInEquivalents() / buffer.getMaxFlowCapacity() - 1;
@@ -74,14 +75,14 @@ class SimBufferTest {
 		assertFalse(buffer.isAvailable(0));
 		assertEquals(2, wasActivated.get());
 
-		// the buffer could accept more vehicles according to flow capacity, but is blocked by the vehicles still inside the buffer
+		// the buffer is blocked by the vehicles still inside it, which hold on to the flow capacity they consumed
 		assertFalse(buffer.isAvailable(2));
 
 		// remove vehicles
 		assertEquals(vehicle1.getId(), buffer.peek().getId());
-		assertEquals(vehicle1.getId(), buffer.pollFirst().getId());
+		assertEquals(vehicle1.getId(), buffer.pollFirst(2).getId());
 		assertTrue(buffer.isAvailable(2));
 		assertEquals(vehicle2.getId(), buffer.peek().getId());
-		assertEquals(vehicle2.getId(), buffer.pollFirst().getId());
+		assertEquals(vehicle2.getId(), buffer.pollFirst(2).getId());
 	}
 }
