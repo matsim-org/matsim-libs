@@ -84,8 +84,9 @@ class RunEvaluateTravelTimeMatrixTest {
 		assertTrue(Files.exists(output.resolve("errors.csv")));
 		assertTrue(Files.exists(output.resolve("congestion_index.csv")),
 			"the index is copied next to the results it produced");
-		assertTrue(Files.exists(output.resolve("free_speed_matrix.bin")),
-			"the base matrix is cached, so a second experiment does not compute it again");
+		assertTrue(Files.exists(output.resolve("free_speed_matrix_cell1000_nb5000.bin")),
+			"the base matrix is cached under the thresholds it was built with, so a second experiment does not "
+				+ "compute it again and a sweep cannot read back the wrong one");
 
 		List<String> errors = Files.readAllLines(output.resolve("errors.csv"));
 		for (String variant : List.of(MatrixEvaluation.REFERENCE, MatrixEvaluation.FIXED_PATH,

@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
@@ -70,9 +71,13 @@ public final class MeasuredTraffic {
 	 * belongs in the weight even when its travel time does not belong in the index.
 	 * @param timeBinSize resolution of the travel times [s]
 	 * @param endTime end of the day to measure [s]
+	 * @param alsoMeasure anything else to be read from the same events, e.g.
+	 * {@link org.matsim.contrib.msp.traveltimematrix.evaluation.ExperiencedLegs}. Reading the events is
+	 * the expensive part of every command here, and reading them twice also risks the two passes
+	 * disagreeing about which run they are looking at.
 	 */
 	public static MeasuredTraffic readFromEvents(Network network, String eventsFile, Set<String> modes,
-		int timeBinSize, int endTime) {
+		int timeBinSize, int endTime, EventHandler... alsoMeasure) {
 
 		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
 		builder.setCalculateLinkTravelTimes(true);
@@ -92,6 +97,9 @@ public final class MeasuredTraffic {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(travelTimeCalculator);
 		events.addHandler(volumes);
+		for (EventHandler handler : alsoMeasure) {
+			events.addHandler(handler);
+		}
 		events.initProcessing();
 		EventsUtils.readEvents(events, eventsFile);
 		events.finishProcessing();

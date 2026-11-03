@@ -7,6 +7,7 @@ import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexProfile
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -228,6 +229,39 @@ public final class TravelTimeMatrixConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
+	 * The name a cache file of the current thresholds has to have: {@code free_speed_matrix_cell1000_nb5000.bin}.
+	 * <p>
+	 * The thresholds are in the <b>name</b> because a cache is only valid for the zone system and the
+	 * neighbourhood it was built with, and nothing checks the second of those. Point two different
+	 * {@link #getCellSize()} at one cache file and {@code FreeSpeedTravelTimeMatrix} throws a bare
+	 * {@code VerifyException} from deep inside itself, because the zones of the file are not the zones it
+	 * was asked for. Change only {@link #getMaxNeighborDistance()} and nothing complains at all: the
+	 * sparse part of the cache is read back as it was written, so the matrix would quietly answer short
+	 * trips with the threshold of a previous run. A sweep over the thresholds is exactly what one does to
+	 * choose them, so the file name has to make the two impossible to confuse.
+	 *
+	 * @see #setMatrixCacheDirectory(String)
+	 */
+	public String getMatrixCacheFileName() {
+		String name = String.format("free_speed_matrix_cell%d_nb%d", (long) this.cellSize,
+			(long) this.maxNeighborDistance);
+		if (this.maxNeighborTravelTime > 0) {
+			name += "_nbtt" + (long) this.maxNeighborTravelTime;
+		}
+		return name + ".bin";
+	}
+
+	/**
+	 * Caches the base matrix in this directory, under the name the thresholds imply. Call it <b>after</b>
+	 * the thresholds are set, for the obvious reason.
+	 *
+	 * @see #getMatrixCacheFileName()
+	 */
+	public void setMatrixCacheDirectory(String directory) {
+		setMatrixCacheFile(Path.of(directory, getMatrixCacheFileName()).toString());
+	}
+
+	/**
 	 * The parameters of the free-speed base matrix, in the form {@code contribs/dvrp} wants them: a
 	 * square grid of {@link #getCellSize()} plus the neighbourhood thresholds of the sparse part.
 	 * <p>
@@ -306,7 +340,9 @@ public final class TravelTimeMatrixConfigGroup extends ReflectiveConfigGroup {
 		comments.put(MAX_NEIGHBOR_TRAVEL_TIME, "The same threshold as a travel time [s]. Meeting either threshold "
 			+ "is enough; 0 switches this one off.");
 		comments.put(MATRIX_CACHE_FILE, "Binary cache of the free-speed matrix, as a file path. Read if the file "
-			+ "exists, written if it does not, so that a series of experiments computes the matrix once.");
+			+ "exists, written if it does not, so that a series of experiments computes the matrix once. A cache "
+			+ "is only valid for the cellSize and maxNeighborDistance it was built with - name it accordingly, or "
+			+ "let setMatrixCacheDirectory(..) do it.");
 		comments.put(NUMBER_OF_THREADS, "Threads the matrix and the road class shares are computed with.");
 		return comments;
 	}

@@ -54,6 +54,8 @@ import java.util.Set;
  *
  * @see MatrixEvaluation what is computed
  * @see RoutedTravelTimes the reference
+ * @see RunValidateTravelTimeMatrix the other comparison: against the legs the run actually drove, which
+ * is the error an analysis using the matrix really suffers
  */
 @CommandLine.Command(
 	name = "evaluate-travel-time-matrix",
@@ -253,7 +255,7 @@ public final class RunEvaluateTravelTimeMatrix implements MATSimAppCommand {
 		config.setTimeBinSize(this.timeBinSize);
 		config.setEndTime(this.endTime);
 		config.setNumberOfThreads(threads());
-		config.setMatrixCacheFile(output("free_speed_matrix.bin"));
+		config.setMatrixCacheDirectory(this.outputDirectory);
 		return config;
 	}
 

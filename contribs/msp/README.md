@@ -94,12 +94,14 @@ run output (network, events)
   step 5  --[RoadClassSharesCalculator]-->  s_k(o,d), one byte per class and zone pair   (level 1 only)
          |
          v
-   --[TimeVaryingTravelTimeMatrix]-->  TT(o,d,t)
+   --[TimeVaryingTravelTimeMatrix]-->  TT(o,d,t)       (RunComputeTravelTimeMatrix: build + cache)
          |
   step 6 v                                                   (evaluation only, see below)
-   --[RoutedTravelTimes]-->  the same queries by time-dependent routing
+         +--[RoutedTravelTimes]-->  the same queries by time-dependent routing
+         |    --[MatrixEvaluation]-->  errors.csv             (RunEvaluateTravelTimeMatrix)
          |
-   --[MatrixEvaluation]-->  errors.csv, queries.csv           (RunEvaluateTravelTimeMatrix)
+         +--[ExperiencedLegs]-->  the car legs the run actually drove
+              --[MatrixEvaluation]-->  errors.csv             (RunValidateTravelTimeMatrix)
 ```
 
 Step 2 is a command of its own, because the index is the only thing the matrix needs from a run and it
@@ -134,6 +136,7 @@ The code is split by step of the method:
 | | `RoadClassShares` | `s_k(o,d)`, one byte per class and zone pair |
 | | `RoadClassSharesCalculator` | computes them, by walking each free-speed path back |
 | | `RunComputeCongestionIndex` | measures the index on a finished run |
+| | `RunComputeTravelTimeMatrix` | builds and caches the matrix of a study area |
 | `traveltimematrix.congestion` | `CongestionIndex` | the interface the matrix reads: `CI(t, road class)` |
 | | `CongestionIndexProfile` | the binned curve, and its csv |
 | | `CongestionIndexCalculator` | measures it from a `TravelTime` and a `VolumesAnalyzer` |
@@ -142,12 +145,51 @@ The code is split by step of the method:
 | `traveltimematrix.evaluation` | `ODSample` | the queries an evaluation runs on, grouped by origin |
 | | `RoutedTravelTimes` | the reference (variant 4) and level 3, by routing |
 | | `TravelTimeErrorStats` | MAPE, bias, RMSE, accumulated per group |
-| | `MatrixEvaluation` | compares the rungs and writes the two csvs |
-| | `RunEvaluateTravelTimeMatrix` | the whole experiment as one command |
+| | `ExperiencedLegs` | the car legs a run drove, as node-to-node travel times |
+| | `MatrixEvaluation` | compares anything answering a query, and writes the tables |
+| | `RunEvaluateTravelTimeMatrix` | the sampled experiment against routing, as one command |
+| | `RunValidateTravelTimeMatrix` | the validation against the legs of a run, as one command |
 
 Dependencies run from the root package into the sub packages and never the other way round, and nothing
 in here knows about any particular *use* of the matrix — see [Using it in an
 analysis](#using-it-in-an-analysis).
+
+### Building it for a study area
+
+There is no matrix file to produce — the matrix is a library object, built in a few lines wherever it is
+used (see [Drop-in](#drop-in)). What there is to do beforehand is to compute the expensive part once and
+to find out whether the thresholds fit the network:
+
+```
+# 1. the congestion index, off the run
+java -cp matsim-msp.jar org.matsim.contrib.msp.traveltimematrix.RunComputeCongestionIndex \
+    --network output_network.xml.gz --events output_events.xml.gz \
+    --shp dresden-with-buffer.shp --output congestion_index.csv
+
+# 2. the matrix: build it, cache the free-speed part, report what it cost
+java -cp matsim-msp.jar org.matsim.contrib.msp.traveltimematrix.RunComputeTravelTimeMatrix \
+    --network output_network.xml.gz --shp dresden-with-buffer.shp \
+    --congestion-index congestion_index.csv --output matrix \
+    --cell-size 1000 --max-neighbor-distance 5000
+```
+
+The free-speed base matrix is the only slow step and does not depend on the index, so it is cached:
+every later run — an evaluation, a parameter sweep, the analysis itself — reads it back instead of
+routing the zone system again. `matrix_summary.csv` gets one row per invocation, so a sweep is a loop in
+the shell and the result is the table that decides `cellSize` and `maxNeighborDistance`:
+
+```
+variant,cell_size,max_neighbor_distance,links,nodes,zones,zonal_matrix_bytes,road_class_shares_bytes,cache_file_bytes,build_seconds,microseconds_per_query
+GLOBAL_INDEX,2000,5000,23,15,14,392,0,1264,0.0,1.527
+```
+
+**The cache carries its thresholds in its file name** (`free_speed_matrix_cell1000_nb5000.bin`), and that
+is not cosmetic. A cache is only valid for the zone system and the neighbourhood it was built with:
+change `cellSize` and `FreeSpeedTravelTimeMatrix` throws a bare `VerifyException` from inside itself,
+change `maxNeighborDistance` and **nothing complains at all** — the sparse part is read back as it was
+written, so short trips would quietly be answered with a previous run's threshold. Use
+`config.setMatrixCacheDirectory(dir)` rather than naming the file by hand and the two cannot be
+confused.
 
 ### Study area
 
@@ -211,7 +253,18 @@ more than the travel times do.
 ### Evaluating it
 
 `org.matsim.contrib.msp.traveltimematrix.evaluation` — the matrix trades accuracy for one lookup, so the
-number that decides whether it is usable is the error. The ladder, from the exact answer down:
+number that decides whether it is usable is the error. There are **two** errors, they answer different
+questions, and both are worth reporting:
+
+| | against what | what it measures | command |
+|---|---|---|---|
+| **approximation error** | a time-dependent router on the same travel times | the error of the method alone, on any pairs and departure times one likes | `RunEvaluateTravelTimeMatrix` |
+| **prediction error** | the car legs the run actually drove | the error an analysis using the matrix really suffers — which also contains everything the matrix cannot know | `RunValidateTravelTimeMatrix` |
+
+The second is always the larger, and the difference between the two is the route the agent chose, the
+queue it sat in and the exact minute it left. Both write the same `errors.csv`, through the same
+`MatrixEvaluation`, so the two tables can be put side by side. The ladder below is the first of them,
+from the exact answer down:
 
 | rung | what it is | cost |
 |---|---|---|
@@ -271,6 +324,43 @@ measured reality: a route the simulation would never have taken is still optimal
 congestion is wrong yields a reference that is wrong in the same way. Validating the run itself against
 route APIs is a different job, and `SampleValidationRoutes` of `contribs/application` is where it lives —
 it reads `from_node,to_node` pairs, which is the shape `od_sample.csv` is written in.
+
+#### Against the run itself
+
+```
+java -cp matsim-msp.jar org.matsim.contrib.msp.traveltimematrix.evaluation.RunValidateTravelTimeMatrix \
+    --network output_network.xml.gz --events output_events.xml.gz --shp dresden-with-buffer.shp \
+    --congestion-index congestion_index.csv --output-directory validation
+```
+
+No routing happens here, which is what makes it cheap enough to use **every** car leg of the run rather
+than a sample of pairs: the events are read once, each leg is reduced to the interval the matrix is
+about, and each variant is asked one question per leg. The routing rungs (level 3 and the reference) are
+therefore not in this table — they would need a shortest-path tree per leg.
+
+**A leg is cut at the nodes, not taken as the agent experienced it.** The qsim inserts a vehicle at the
+end of its first link and ends the leg once it has driven its last one, so a leg's own travel time
+contains a first-link insertion delay and a full last link, neither of which is in a node-to-node
+matrix. `ExperiencedLegs` therefore starts the clock when the vehicle **leaves its first link** (passing
+`toNode(startLink)`) and stops it when it **enters its last** (passing `fromNode(endLink)`) — precisely
+the interval `getTravelTime(fromNode, toNode, t)` is about, and the departure time it is asked about is
+the moment the first node was passed. No correction term, no last-link convention, nothing to get wrong.
+This is also why the comparison is not made against `output_trips.csv`, whose travel time includes the
+access and egress walk, nor against a leg's `trav_time`.
+
+Only legs that **stayed inside the study area** count: for a leg that left the area and came back, the
+matrix would answer about a path through the area that the vehicle never drove, and scoring that as an
+error of the congestion model would be wrong. How many legs were dropped for it is logged, and a large
+share is the sign that the buffer around the city is too small. A reservoir sample caps how many legs are
+kept (`--max-legs`), because a city produces millions and a MAPE needs tens of thousands.
+
+**What this still is not.** It is the matrix against *the simulation*, not against the world. If the run
+itself is wrong about Dresden's congestion, this table is happy and the matrix is still wrong — the index
+was measured from the same events, so the two share that error. Validating the **run** against real
+travel times is a different job and already has tools: `SampleValidationRoutes` of `contribs/application`
+(Google, HERE, TomTom, Mapbox per hour) and `TravelTimeValidationRunner` of `contribs/analysis`. The
+`od_sample.csv` written here is in the `from_node,to_node` shape the former reads, so the same pairs can
+be sent to an API and the three numbers — API, run, matrix — put in one table.
 
 ### Using it in an analysis
 

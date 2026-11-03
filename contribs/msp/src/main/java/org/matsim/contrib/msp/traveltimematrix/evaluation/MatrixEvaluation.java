@@ -15,15 +15,23 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 /**
- * Compares the rungs of the approximation ladder against the time-dependent routing reference, over an
- * {@link ODSample}, and writes the two tables a paper reports: one row per query, and the error
- * aggregated by time of day and by distance.
+ * Compares anything that answers {@code getTravelTime(from, to, t)} against a reference travel time, and
+ * writes the two tables a paper reports: one row per query, and the error aggregated by time of day and
+ * by distance.
+ * <p>
+ * It serves both studies of this package, and that is the point of it taking plain {@link Query}
+ * objects: the reference is the time-dependent optimum over an {@link ODSample} in one of them
+ * ({@link RoutedTravelTimes}) and the experienced travel time of a car leg of the run in the other
+ * ({@link ExperiencedLegs}), and the grouping, the metrics and the csv are the same either way - so the
+ * two error tables can be read side by side without wondering which of them computed its MAPE
+ * differently.
  * <p>
  * Everything compared here is a {@link TravelTimeMatrix}, the reference included
  * ({@link RoutedTravelTimes#asTimeDependentMatrix()}), so this class contains no knowledge of which
@@ -39,7 +47,8 @@ import java.util.Map;
  * variant, whose only error is discretisation plus the absence of congestion, is the row that anchors
  * the comparison.
  *
- * @see RunEvaluateTravelTimeMatrix to run this on a finished run
+ * @see RunEvaluateTravelTimeMatrix against a time-dependent router, on sampled pairs
+ * @see RunValidateTravelTimeMatrix against the legs a run actually drove
  */
 public final class MatrixEvaluation {
 
@@ -73,7 +82,23 @@ public final class MatrixEvaluation {
 	}
 
 	/**
-	 * Evaluates every variant over the whole sample.
+	 * One question put to every variant: a node pair, a departure time, and the travel time the variant
+	 * is to be compared against.
+	 *
+	 * @param referenceTravelTime what the variant should have answered [s] - the time-dependent optimum
+	 * of {@link RoutedTravelTimes} in the sampled study, the experienced travel time of
+	 * {@link ExperiencedLegs} in the validation against a run
+	 * @param distance the length of the path [m], which the error table groups by
+	 * @param freeSpeedTravelTime the exact free-speed travel time of the pair [s], or
+	 * {@link Double#NaN} when it is not known separately. It is reported next to the answers so that the
+	 * discretisation of the zone system can be told from the congestion model.
+	 */
+	public record Query(Node fromNode, Node toNode, double departureTime, double referenceTravelTime,
+						double distance, double freeSpeedTravelTime) {
+	}
+
+	/**
+	 * Evaluates every variant over the sampled queries, against the time-dependent routing reference.
 	 *
 	 * @param reference the routing reference, which also carries the sample and the distances
 	 * @param variants what to evaluate, by the name they are reported under. Pass a
@@ -91,43 +116,61 @@ public final class MatrixEvaluation {
 
 		ODSample sample = reference.getSample();
 		double[] departureTimes = sample.getDepartureTimes();
+		List<Query> queries = new ArrayList<>(sample.getNumberOfQueries());
+
+		for (Node origin : sample.getOrigins()) {
+			for (Node destination : sample.getDestinations(origin)) {
+				RoutedTravelTimes.PairTravelTimes pair = reference.get(origin, destination);
+				for (int t = 0; t < departureTimes.length; t++) {
+					queries.add(new Query(origin, destination, departureTimes[t], pair.timeDependent()[t],
+						pair.distance(), pair.freeSpeedTravelTime()));
+				}
+			}
+		}
+
+		return evaluate(queries, variants, distanceBands, queryFile);
+	}
+
+	/**
+	 * Evaluates every variant over any set of queries - the sampled ones above, or the car legs a run
+	 * actually drove ({@link ExperiencedLegs#asQueries()}).
+	 * <p>
+	 * This is the whole comparison, and it is the same code for both studies on purpose: the two error
+	 * tables then have the same columns and the same grouping, and can be read side by side without
+	 * asking which of them computed its MAPE differently.
+	 *
+	 * @see #evaluate(RoutedTravelTimes, Map, double[], String) for the parameters
+	 */
+	public static MatrixEvaluation evaluate(Collection<Query> queries, Map<String, TravelTimeMatrix> variants,
+		double[] distanceBands, @Nullable String queryFile) {
 
 		Map<String, Map<String, TravelTimeErrorStats>> stats = new LinkedHashMap<>();
 		variants.keySet().forEach(variant -> stats.put(variant, new LinkedHashMap<>()));
 
-		log.info("Evaluating {} variants {} over {} queries.", variants.size(), variants.keySet(),
-			sample.getNumberOfQueries());
+		log.info("Evaluating {} variants {} over {} queries.", variants.size(), variants.keySet(), queries.size());
 
 		try (CSVPrinter printer = queryPrinter(queryFile)) {
 
-			for (Node origin : sample.getOrigins()) {
-				for (Node destination : sample.getDestinations(origin)) {
+			for (Query query : queries) {
 
-					RoutedTravelTimes.PairTravelTimes pair = reference.get(origin, destination);
-					String distanceBand = bandOf(pair.distance(), distanceBands);
+				String distanceBand = bandOf(query.distance(), distanceBands);
+				String hour = Integer.toString((int) (query.departureTime() / 3600));
 
-					for (int t = 0; t < departureTimes.length; t++) {
+				for (Map.Entry<String, TravelTimeMatrix> variant : variants.entrySet()) {
 
-						double departureTime = departureTimes[t];
-						double referenceTravelTime = pair.timeDependent()[t];
-						String hour = Integer.toString((int) (departureTime / 3600));
+					double estimate = variant.getValue().getTravelTime(query.fromNode(), query.toNode(),
+						query.departureTime());
+					Map<String, TravelTimeErrorStats> groups = stats.get(variant.getKey());
 
-						for (Map.Entry<String, TravelTimeMatrix> variant : variants.entrySet()) {
+					add(groups, GROUP_ALL, GROUP_ALL, query.referenceTravelTime(), estimate);
+					add(groups, GROUP_HOUR, hour, query.referenceTravelTime(), estimate);
+					add(groups, GROUP_DISTANCE, distanceBand, query.referenceTravelTime(), estimate);
 
-							double estimate = variant.getValue().getTravelTime(origin, destination, departureTime);
-							Map<String, TravelTimeErrorStats> groups = stats.get(variant.getKey());
-
-							add(groups, GROUP_ALL, GROUP_ALL, referenceTravelTime, estimate);
-							add(groups, GROUP_HOUR, hour, referenceTravelTime, estimate);
-							add(groups, GROUP_DISTANCE, distanceBand, referenceTravelTime, estimate);
-
-							if (printer != null) {
-								printer.printRecord(origin.getId(), destination.getId(),
-									format(departureTime, 0), format(pair.distance(), 1),
-									format(pair.freeSpeedTravelTime(), 1), format(referenceTravelTime, 1),
-									variant.getKey(), format(estimate, 1));
-							}
-						}
+					if (printer != null) {
+						printer.printRecord(query.fromNode().getId(), query.toNode().getId(),
+							format(query.departureTime(), 0), format(query.distance(), 1),
+							format(query.freeSpeedTravelTime(), 1), format(query.referenceTravelTime(), 1),
+							variant.getKey(), format(estimate, 1));
 					}
 				}
 			}
@@ -136,7 +179,7 @@ public final class MatrixEvaluation {
 		}
 
 		if (queryFile != null) {
-			log.info("Wrote {} query results to {}.", (long) sample.getNumberOfQueries() * variants.size(), queryFile);
+			log.info("Wrote {} query results to {}.", (long) queries.size() * variants.size(), queryFile);
 		}
 
 		MatrixEvaluation evaluation = new MatrixEvaluation(stats, distanceBands.clone());
@@ -170,7 +213,9 @@ public final class MatrixEvaluation {
 	 * so that the file stays diffable and does not carry an accuracy a travel time does not have.
 	 */
 	private static String format(double value, int decimals) {
-		return String.format(Locale.ROOT, "%." + decimals + "f", value);
+		// an unknown free-speed travel time is an empty field and not the string "NaN", which every
+		// reader of the csv would then have to know to filter out
+		return Double.isNaN(value) ? "" : String.format(Locale.ROOT, "%." + decimals + "f", value);
 	}
 
 	/**
