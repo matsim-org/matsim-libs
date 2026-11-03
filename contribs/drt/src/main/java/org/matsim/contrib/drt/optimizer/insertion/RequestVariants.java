@@ -1,8 +1,12 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.passenger.DrtStopCandidate;
@@ -18,6 +22,8 @@ public final class RequestVariants {
 	/**
 	 * Returns all variants of the request as an immutable list. Index 0 is the request itself (its own from/to link);
 	 * then one variant per further combination of pickup and dropoff stop, skipping combinations on the same link.
+	 * Candidates on a link that already occurs (the request's own link or an earlier candidate) are ignored, so each
+	 * pair of links is evaluated once; the first candidate per link wins.
 	 * Without stop candidates, a single variant wrapping the request.
 	 * <p>
 	 * Time windows of a variant with pickup stop a and dropoff stop e (walk = walking duration):
@@ -37,12 +43,10 @@ public final class RequestVariants {
 		}
 		DrtStopCandidates c = candidates.get();
 
-		List<DrtStopCandidate> access = new ArrayList<>();
-		access.add(new DrtStopCandidate(request.getFromLink(), c.accessWalkDuration()));
-		access.addAll(c.alternativeAccess());
-		List<DrtStopCandidate> egress = new ArrayList<>();
-		egress.add(new DrtStopCandidate(request.getToLink(), c.egressWalkDuration()));
-		egress.addAll(c.alternativeEgress());
+		List<DrtStopCandidate> access = firstPerLink(
+				new DrtStopCandidate(request.getFromLink(), c.accessWalkDuration()), c.alternativeAccess());
+		List<DrtStopCandidate> egress = firstPerLink(
+				new DrtStopCandidate(request.getToLink(), c.egressWalkDuration()), c.alternativeEgress());
 
 		double departureAtOrigin = request.getEarliestStartTime() - c.accessWalkDuration();
 		double latestArrivalAtDestination = request.getLatestArrivalTime() + c.egressWalkDuration();
@@ -73,6 +77,19 @@ public final class RequestVariants {
 			}
 		}
 		return List.copyOf(variants);
+	}
+
+	private static List<DrtStopCandidate> firstPerLink(DrtStopCandidate own, List<DrtStopCandidate> alternatives) {
+		List<DrtStopCandidate> candidates = new ArrayList<>(alternatives.size() + 1);
+		Set<Id<Link>> links = new HashSet<>();
+		candidates.add(own);
+		links.add(own.link().getId());
+		for (DrtStopCandidate candidate : alternatives) {
+			if (links.add(candidate.link().getId())) {
+				candidates.add(candidate);
+			}
+		}
+		return candidates;
 	}
 
 	private static DrtRouteConstraints withMaxTravelDuration(DrtRouteConstraints c, double maxTravelDuration) {

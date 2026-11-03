@@ -112,6 +112,37 @@ public class RequestVariantsTest {
 		assertThat(variants).extracting(RequestVariant::index).containsExactly(0, 1, 2);
 	}
 
+	/**
+	 * Several stops may lie on the same link (e.g. one per direction or per platform). Such duplicates must not lead to
+	 * several identical variants: the first candidate per link is kept, the request's own stop always wins.
+	 */
+	@Test
+	void candidatesOnTheSameLink_onlyFirstKept() {
+		DrtRequest request = builder().stopCandidates(new DrtStopCandidates(60, 30,
+				List.of(new DrtStopCandidate(from, 90), new DrtStopCandidate(accessFar, 100),
+						new DrtStopCandidate(accessFar, 150)),
+				List.of(new DrtStopCandidate(to, 50), new DrtStopCandidate(egressFar, 130),
+						new DrtStopCandidate(egressFar, 200)))).build();
+
+		// pickup {from, accessFar} x dropoff {to, egressFar}
+		var variants = RequestVariants.of(request);
+		assertThat(variants).hasSize(4);
+		assertThat(variants).extracting(RequestVariant::index).containsExactly(0, 1, 2, 3);
+		assertThat(variants).extracting(v -> v.request().getFromLink().getId() + "-" + v.request().getToLink().getId())
+				.doesNotHaveDuplicates();
+
+		// the request's own stops keep their own walking durations
+		assertThat(variants).filteredOn(v -> v.request().getFromLink() == from)
+				.allMatch(v -> v.accessWalkDuration() == 60);
+		assertThat(variants).filteredOn(v -> v.request().getToLink() == to)
+				.allMatch(v -> v.egressWalkDuration() == 30);
+		// of the duplicated alternatives, the first one is kept
+		assertThat(variants).filteredOn(v -> v.request().getFromLink() == accessFar)
+				.allMatch(v -> v.accessWalkDuration() == 100);
+		assertThat(variants).filteredOn(v -> v.request().getToLink() == egressFar)
+				.allMatch(v -> v.egressWalkDuration() == 130);
+	}
+
 	@Test
 	void copyOfRequestKeepsCandidates() {
 		// as in DrtRequestInsertionRetryQueue
