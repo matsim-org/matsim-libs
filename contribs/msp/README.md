@@ -210,6 +210,36 @@ The index has to be measured over **the same network the matrix is built over**,
 of `RunComputeCongestionIndex` is for. The congestion of a Germany-wide network says nothing about the
 congestion in Dresden.
 
+#### "Undefined Time. Reason could be that the dvrp network is not fully connected"
+
+If the matrix ever throws this, the cut network is not strongly connected — a zonal matrix refuses a pair
+it finds no path for, and it says so only once it reaches that pair, after computing everything else.
+**Cleaning the network for the mode does not prevent it**, for two reasons, and `StudyAreaNetwork.cut`
+deals with both:
+
+1. **The cleaner takes the mode away from a link; it does not remove the link.**
+   `MultimodalNetworkCleaner` deletes a link outside the connected cluster only if *no* allowed mode is
+   left on it. A car dead-end that also allows `ride` — on a network from the usual OSM pipeline, nearly
+   every car dead-end there is — therefore stays as a `ride` link, with its node. And the router does not
+   care: `SpeedyGraphBuilder` builds its graph from **all** links "without caring about allowedModes". So
+   the matrix routes over a graph that still has the dead-end, picks the node behind it as a zone's
+   central node, and finds no way out. The cut therefore removes every link that no longer allows one of
+   the requested modes, and then the nodes left without links.
+2. **A turn restriction of another mode.** `cleanNetwork(network, modes)` keeps only the restrictions that
+   do not disconnect the network *for those modes*, while the matrix's router merges the restrictions of
+   **every** mode (`SpeedyGraphBuilder.build(network)` passes no mode, and its own javadoc notes this
+   "could result in a network which is more restrictive than necessary"). A truck-only restriction can
+   thus cut a node off in the matrix's graph while the links look perfectly connected and the network is
+   properly cleaned for car. The cut drops all turn restrictions when that happens, and says so in the
+   log: it costs a few paths a few seconds of detour, which is far inside the error budget of a matrix
+   scaled by a network-wide index, and the network of the run is untouched because the cut is a copy.
+
+What is left is checked rather than assumed: `StudyAreaNetwork.verifyRoutable` runs two shortest-path
+searches — forwards and backwards from one node, over `SpeedyGraphBuilder` and `LeastCostPathTree`, which
+is the very graph the matrix will route — and refuses the network naming the nodes that are cut off. Two
+searches, instead of finding out thousands of searches into the matrix. It is public, so a network built
+some other way can be checked the same way before handing it to `TimeVaryingTravelTimeMatrix.create`.
+
 ### The variants
 
 `variant` of the config group, in increasing order of what they know:

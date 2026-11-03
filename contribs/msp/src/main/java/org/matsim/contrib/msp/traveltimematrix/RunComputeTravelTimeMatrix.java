@@ -8,10 +8,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.ODSample;
 import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaNetwork;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
