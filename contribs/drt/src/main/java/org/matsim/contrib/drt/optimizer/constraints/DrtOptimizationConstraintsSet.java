@@ -41,6 +41,15 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
 
     @Parameter
     @Comment(
+            "Minimum beeline distance (in meters) between the access and the egress link of a drt trip, measured between"
+                    + " the link coordinates. Shorter trips are not served: routing returns null (in most cases caught by"
+                    + " the fallback routing module), and requests that reach the mobsim without having been routed in this"
+                    + " run are rejected. By default, this bound is disabled (i.e. set to 0).")
+    @PositiveOrZero
+    private double minimumTripDistance = 0;// [m]
+
+    @Parameter
+    @Comment(
             "Time before reaching a planned dropoff from which it is not allowed to insert new detours for new requests. I.e.," +
                     " if set to 180, then a vehicle will not divert to pickup or dropoff a new passenger once a boarded passenger is only " +
                     "3 minutes away from her destination, even though her time window would allow it." +
@@ -92,6 +101,15 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
 
     public void setMaxWalkDistance(@PositiveOrZero double maxWalkDistance) {
         this.maxWalkDistance = maxWalkDistance;
+    }
+
+    @PositiveOrZero
+    public double getMinimumTripDistance() {
+        return minimumTripDistance;
+    }
+
+    public void setMinimumTripDistance(@PositiveOrZero double minimumTripDistance) {
+        this.minimumTripDistance = minimumTripDistance;
     }
 
     @PositiveOrZero
