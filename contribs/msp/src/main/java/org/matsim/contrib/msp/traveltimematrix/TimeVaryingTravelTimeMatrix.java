@@ -227,6 +227,19 @@ public final class TimeVaryingTravelTimeMatrix implements TravelTimeMatrix {
 	}
 
 	/**
+	 * The free-speed base matrix this one scales, unchanged.
+	 * <p>
+	 * Exposed so that several variants can share <b>one</b> base matrix: they differ in the congestion
+	 * model only, and computing the base matrix once per variant would buy nothing but the chance of it
+	 * coming out differently. Note that what comes back is free-speed travel times, so it is the right
+	 * argument for {@link #global} and {@link #byRoadClass} - and wrapping a matrix that already carries
+	 * congestion is exactly what those two refuse to be given.
+	 */
+	public TravelTimeMatrix getFreeSpeedMatrix() {
+		return this.freeSpeedMatrix;
+	}
+
+	/**
 	 * @return the congestion index this matrix reads, e.g. to write it out next to the results it
 	 * produced
 	 */

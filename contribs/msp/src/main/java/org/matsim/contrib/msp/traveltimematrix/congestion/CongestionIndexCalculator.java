@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.analysis.traffic.TrafficStatsCalculator;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.msp.traveltimematrix.RoadClassification;
+import org.matsim.contrib.msp.traveltimematrix.prepare.MeasuredTraffic;
 import org.matsim.core.router.util.TravelTime;
 
 import java.util.LinkedHashMap;
@@ -50,9 +51,10 @@ public final class CongestionIndexCalculator {
 
 	/**
 	 * The time bin size {@link VolumesAnalyzer} is hard-wired to, and whose getter it does not expose.
-	 * {@link TrafficStatsCalculator} makes the same assumption, with the same comment.
+	 * {@link TrafficStatsCalculator} makes the same assumption, with the same comment. Taken from
+	 * {@link MeasuredTraffic}, which is where the volumes this reads were created with it.
 	 */
-	private static final int VOLUME_BIN_SIZE = 3600;
+	private static final int VOLUME_BIN_SIZE = MeasuredTraffic.VOLUME_BIN_SIZE;
 
 	private final Network network;
 	private final TravelTime travelTime;

@@ -14,17 +14,21 @@ import org.matsim.core.network.NetworkUtils;
 import java.util.Set;
 
 /**
- * The networks the tests of this package are built on. They are deliberately tiny and their travel times
- * are round numbers, so that an expected value can be written down by hand rather than copied from a
- * previous run.
+ * The networks the tests of this package and its sub packages are built on. They are deliberately tiny
+ * and their travel times are round numbers, so that an expected value can be written down by hand rather
+ * than copied from a previous run.
+ * <p>
+ * Public because the tests of the sub packages build on the same networks: an expected value that was
+ * worked out once should not be worked out again, and two test networks that are nearly the same are how
+ * two tests come to disagree about what they are testing.
  */
-final class TestNetworks {
+public final class TestNetworks {
 
 	/**
 	 * The node spacing of {@link #corridor()} [m]. Also the cell size that puts every node of it into a
 	 * zone of its own.
 	 */
-	static final double SPACING = 1000;
+	public static final double SPACING = 1000;
 
 	private TestNetworks() {
 	}
@@ -41,7 +45,7 @@ final class TestNetworks {
 	 * motorway link 21 s, so n1 to n4 takes 223 s of which 101 + 101 = 202 s are residential: the road
 	 * class shares of that pair are 202/223 residential and 21/223 motorway.
 	 */
-	static Network corridor() {
+	public static Network corridor() {
 
 		Network network = NetworkUtils.createNetwork();
 
@@ -62,9 +66,61 @@ final class TestNetworks {
 	}
 
 	/**
+	 * A square grid of {@code size * size} nodes, {@link #SPACING} apart, every link of it a two-way
+	 * residential street. Every node is reachable from every other, there is more than one shortest path
+	 * between most pairs, and the beeline distance between two nodes covers a wide range - which is what
+	 * a test about sampling by distance, or about rerouting around a congested link, needs and what the
+	 * {@link #corridor()} cannot offer.
+	 *
+	 * <pre>
+	 *   n0-2 -- n1-2 -- n2-2
+	 *     |       |       |
+	 *   n0-1 -- n1-1 -- n2-1
+	 *     |       |       |
+	 *   n0-0 -- n1-0 -- n2-0
+	 * </pre>
+	 * Nodes are named {@code n<x>-<y>} and links {@code <from>_<to>}, so that a test can address a
+	 * particular one.
+	 */
+	public static Network grid(int size) {
+
+		Network network = NetworkUtils.createNetwork();
+
+		for (int x = 0; x < size; x++) {
+			for (int y = 0; y < size; y++) {
+				NetworkUtils.createAndAddNode(network, Id.createNodeId("n" + x + "-" + y),
+					new Coord(x * SPACING, y * SPACING));
+			}
+		}
+
+		for (int x = 0; x < size; x++) {
+			for (int y = 0; y < size; y++) {
+				if (x + 1 < size) {
+					twoWay(network, "n" + x + "-" + y, "n" + (x + 1) + "-" + y);
+				}
+				if (y + 1 < size) {
+					twoWay(network, "n" + x + "-" + y, "n" + x + "-" + (y + 1));
+				}
+			}
+		}
+
+		return network;
+	}
+
+	/**
+	 * A residential street between two nodes, in both directions.
+	 */
+	private static void twoWay(Network network, String from, String to) {
+		Node fromNode = network.getNodes().get(Id.createNodeId(from));
+		Node toNode = network.getNodes().get(Id.createNodeId(to));
+		link(network, from + "_" + to, fromNode, toNode, 10, "residential");
+		link(network, to + "_" + from, toNode, fromNode, 10, "residential");
+	}
+
+	/**
 	 * A link of 1 km, open to car, with its OSM highway type set.
 	 */
-	static Link link(Network network, String id, Node from, Node to, double freeSpeed, String highwayType) {
+	public static Link link(Network network, String id, Node from, Node to, double freeSpeed, String highwayType) {
 		Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId(id), from, to, SPACING, freeSpeed, 1800, 1);
 		link.setAllowedModes(Set.of(TransportMode.car));
 		NetworkUtils.setType(link, highwayType);
@@ -74,7 +130,7 @@ final class TestNetworks {
 	/**
 	 * A square grid zone system over the network.
 	 */
-	static ZoneSystem zoneSystem(Network network, double cellSize) {
+	public static ZoneSystem zoneSystem(Network network, double cellSize) {
 		SquareGridZoneSystemParams params = new SquareGridZoneSystemParams();
 		params.setCellSize(cellSize);
 		return ZoneSystemUtils.createZoneSystem(network, params);
@@ -90,7 +146,7 @@ final class TestNetworks {
 	 * puts its cell boundaries is not this test's business, and a grid that pairs two nodes up would make
 	 * a test fail with a plausible wrong number instead of saying what went wrong.
 	 */
-	static ZoneSystem oneZonePerNode(Network network) {
+	public static ZoneSystem oneZonePerNode(Network network) {
 		ZoneSystem zoneSystem = zoneSystem(network, SPACING / 2.5);
 		if (zoneSystem.getZones().size() != network.getNodes().size()) {
 			throw new AssertionError("Expected one zone per node, but " + network.getNodes().size() + " nodes ended "

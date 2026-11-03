@@ -2,18 +2,14 @@ package org.matsim.contrib.msp.traveltimematrix;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexCalculator;
 import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexProfile;
+import org.matsim.contrib.msp.traveltimematrix.prepare.MeasuredTraffic;
 import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaNetwork;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.scenario.ProjectionUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import picocli.CommandLine;
 
 import java.util.Set;
@@ -96,27 +92,10 @@ public final class RunComputeCongestionIndex implements MATSimAppCommand {
 	public Integer call() {
 
 		Network fullNetwork = NetworkUtils.readNetwork(this.networkFile);
-		Network network = StudyAreaNetwork.cut(fullNetwork, studyArea(fullNetwork), this.modes);
+		Network network = StudyAreaNetwork.cut(fullNetwork, StudyAreaNetwork.index(this.shp, fullNetwork), this.modes);
 
-		// the same settings the traffic dashboard of contribs/application uses, so that an index measured
-		// here and one read off that dashboard are the same number
-		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
-		builder.setCalculateLinkTravelTimes(true);
-		builder.setMaxTime(this.endTime);
-		builder.setTimeslice(this.timeBinSize);
-		// the travel times of the modes asked for, so that the index of a car matrix is measured on cars
-		// and not on the buses sharing the links
-		builder.setFilterModes(true);
-		builder.setAnalyzedModes(this.modes);
-		TravelTimeCalculator travelTimes = builder.build();
-		VolumesAnalyzer volumes = new VolumesAnalyzer(3600, this.endTime, network, true);
-
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(travelTimes);
-		events.addHandler(volumes);
-		events.initProcessing();
-		EventsUtils.readEvents(events, this.eventsFile);
-		events.finishProcessing();
+		MeasuredTraffic traffic = MeasuredTraffic.readFromEvents(network, this.eventsFile, this.modes,
+			this.timeBinSize, this.endTime);
 
 		RoadClassification classification = switch (this.roadClasses) {
 			case NONE -> RoadClassification.single();
@@ -124,26 +103,12 @@ public final class RunComputeCongestionIndex implements MATSimAppCommand {
 			case OSM_HIGHWAY_TYPE -> RoadClassification.byHighwayType(network);
 		};
 
-		CongestionIndexProfile profile = new CongestionIndexCalculator(network, travelTimes.getLinkTravelTimes(),
-			volumes, classification, this.qSimTimeStepSize).calculate(this.timeBinSize, this.endTime);
+		CongestionIndexProfile profile = new CongestionIndexCalculator(network, traffic.getTravelTimes(),
+			traffic.getVolumes(), classification, this.qSimTimeStepSize).calculate(this.timeBinSize, this.endTime);
 		profile.write(this.outputFile);
 
 		log.info("Set '{}' of the '{}' config group to {} to use this index.", "congestionIndexFile",
 			TravelTimeMatrixConfigGroup.GROUP_NAME, this.outputFile);
 		return 0;
-	}
-
-	/**
-	 * The study area, in the coordinate reference system of the network - taken from the network itself
-	 * when it carries one, so that a shape file in a different projection is still read correctly.
-	 */
-	private ShpOptions.Index studyArea(Network network) {
-		if (!this.shp.isDefined()) {
-			log.warn("No --shp given, so the index is measured over the whole network. That is only what you want "
-				+ "if the network is already the study area.");
-			return null;
-		}
-		String crs = ProjectionUtils.getCRS(network);
-		return this.shp.createIndex(crs != null ? crs : this.shp.getShapeCrs(), "_");
 	}
 }

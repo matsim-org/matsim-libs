@@ -83,15 +83,23 @@ run output (network, events)
    --[StudyAreaNetwork]-->  car subnetwork of the study area, link ids kept
          |
   step 2 v
+   --[MeasuredTraffic]-->  congested link TravelTime + VolumesAnalyzer, events read once
+         |
+  step 3 v
    --[CongestionIndexCalculator]-->  CI per time bin and road class
          |                           -> congestion_index.csv  (RunComputeCongestionIndex)
          v
-  step 3  --[FreeSpeedTravelTimeMatrix]-->  TT_ff(o,d), zonal + sparse, cacheable  (contribs/dvrp)
+  step 4  --[FreeSpeedTravelTimeMatrix]-->  TT_ff(o,d), zonal + sparse, cacheable  (contribs/dvrp)
          |
-  step 4  --[RoadClassSharesCalculator]-->  s_k(o,d), one byte per class and zone pair   (level 1 only)
+  step 5  --[RoadClassSharesCalculator]-->  s_k(o,d), one byte per class and zone pair   (level 1 only)
          |
          v
    --[TimeVaryingTravelTimeMatrix]-->  TT(o,d,t)
+         |
+  step 6 v                                                   (evaluation only, see below)
+   --[RoutedTravelTimes]-->  the same queries by time-dependent routing
+         |
+   --[MatrixEvaluation]-->  errors.csv, queries.csv           (RunEvaluateTravelTimeMatrix)
 ```
 
 Step 2 is a command of its own, because the index is the only thing the matrix needs from a run and it
@@ -130,6 +138,12 @@ The code is split by step of the method:
 | | `CongestionIndexProfile` | the binned curve, and its csv |
 | | `CongestionIndexCalculator` | measures it from a `TravelTime` and a `VolumesAnalyzer` |
 | `traveltimematrix.prepare` | `StudyAreaNetwork` | cuts the car subnetwork of the study area |
+| | `MeasuredTraffic` | reads the events once: congested travel times and volumes |
+| `traveltimematrix.evaluation` | `ODSample` | the queries an evaluation runs on, grouped by origin |
+| | `RoutedTravelTimes` | the reference (variant 4) and level 3, by routing |
+| | `TravelTimeErrorStats` | MAPE, bias, RMSE, accumulated per group |
+| | `MatrixEvaluation` | compares the rungs and writes the two csvs |
+| | `RunEvaluateTravelTimeMatrix` | the whole experiment as one command |
 
 Dependencies run from the root package into the sub packages and never the other way round, and nothing
 in here knows about any particular *use* of the matrix — see [Using it in an
@@ -194,6 +208,70 @@ the design: the travel time of a short trip has to be exact, the road class mix 
 almost always "local streets" anyway, and giving the shares a node-level matrix of their own would cost
 more than the travel times do.
 
+### Evaluating it
+
+`org.matsim.contrib.msp.traveltimematrix.evaluation` — the matrix trades accuracy for one lookup, so the
+number that decides whether it is usable is the error. The ladder, from the exact answer down:
+
+| rung | what it is | cost |
+|---|---|---|
+| `REFERENCE_TIME_DEPENDENT` | **variant 4**: time-dependent shortest paths over the congested travel times of the run | one shortest-path tree per origin *and departure time* — the thing the matrix exists to avoid |
+| `LEVEL_3_FIXED_PATH` | **level 3**: the free-speed path, timed link by link under congestion | one tree per origin, plus a walk along the path per departure time |
+| `BY_ROAD_CLASS` | level 1 | one lookup per road class |
+| `GLOBAL_INDEX` | level 0 | one lookup |
+| `CONSTANT_INDEX` | the daily mean index as a constant speed factor — what `DetourTimeEstimator` of `contribs/drt` does today | one multiplication |
+| `FREE_SPEED` | no congestion at all | none |
+
+Every one of them is a `TravelTimeMatrix`, the reference included (`RoutedTravelTimes.asTimeDependentMatrix()`),
+so `MatrixEvaluation` asks all of them the same three-argument question and knows nothing about which of
+them routes. Adding a rung is a map entry.
+
+The gap between variant 4 and level 3 is the one error that no congestion index can remove: a real
+driver reroutes around congestion, a fixed free-speed path does not, so **level 3 is an upper bound of
+variant 4, and so is every rung below it**. `RoutedTravelTimes` logs that gap as a percentage of the
+optimum, which splits the error of the matrix into the part a better index could fix and the part that is
+built into the method.
+
+```
+java -cp matsim-msp.jar org.matsim.contrib.msp.traveltimematrix.evaluation.RunEvaluateTravelTimeMatrix \
+    --network output_network.xml.gz --events output_events.xml.gz --shp dresden-with-buffer.shp \
+    --congestion-index congestion_index.csv --output-directory evaluation \
+    --origins 200 --departure-hours 0,3,6,7,8,9,12,15,16,17,18,21
+```
+
+One command on purpose: the reference, the index and the matrix all have to be built over the same
+network and the same run, and splitting them up is how they come to disagree. The network is cut once,
+the events are read once (`MeasuredTraffic`), and the base matrix is computed once and cached in the
+output directory, where the four result files land:
+
+- `errors.csv` — MAPE, bias and RMSE per rung, overall and by hour of day and distance band. This is the
+  table.
+- `queries.csv` — one row per query and rung, for plots.
+- `od_sample.csv` — the queries, so that `--od-sample` can repeat the experiment on exactly the same
+  pairs with other matrix parameters.
+- `congestion_index.csv` — the index that was used, copied next to the results it produced.
+
+**The sample.** The reference costs one tree per origin and departure time, so the error is estimated on
+a sample rather than on every pair — which is all a MAPE needs. Two decisions in `ODSample` matter for
+reading the result. Pairs are **grouped by origin**, because one tree answers every destination of that
+origin at once: 200 origins with 6 destinations each cost the same as 200 with one. And destinations are
+drawn **one per distance band** rather than uniformly: uniformly random node pairs are overwhelmingly
+medium-range trips through the dense part of the network, which would leave the short trips as a handful
+of rows in the very table that is supposed to say whether short trips are the problem.
+
+**Two errors in one number.** The query table carries the exact free-speed travel time of each pair
+(`tt_free_speed_path`) next to what each rung answered, because the error of the matrix is two things
+added together: the congestion model, which cannot know *where* the queue is, and the zone system, which
+answers a long pair with the travel time between the *central nodes* of the two zones. The `FREE_SPEED`
+row — whose only error is the discretisation plus the absence of congestion — is what anchors the
+comparison, and `cellSize` and `maxNeighborDistance` are what move it.
+
+**What the reference is not.** It is the exact answer *under the travel times of one finished run*, not
+measured reality: a route the simulation would never have taken is still optimal here, and a run whose
+congestion is wrong yields a reference that is wrong in the same way. Validating the run itself against
+route APIs is a different job, and `SampleValidationRoutes` of `contribs/application` is where it lives —
+it reads `from_node,to_node` pairs, which is the shape `od_sample.csv` is written in.
+
 ### Using it in an analysis
 
 The matrix knows nothing about who uses it, and that is deliberate: it is a `TravelTimeMatrix` and a
@@ -254,8 +332,11 @@ Recorded here because it bounds what the numbers mean:
 5. **One day.** The profile is the average day of one run, so it carries no day-to-day variability and no
    reliability measure. Percentile profiles over iterations would be the way to get one.
 
-Levels 2 and 3 of the ladder (index by space × road type, and link-level evaluation along the free-speed
-path), and the time-dependent routing these are to be validated against, are not implemented yet.
+Level 2 of the ladder — the index by space × road type, which is the one rung that would let the matrix
+know *where* the congestion is — is not implemented yet. Level 3 and the time-dependent routing reference
+are, in [`traveltimematrix.evaluation`](#evaluating-it); they live there rather than next to the matrix
+because both need a router and the network at query time, which is exactly what the matrix refuses to
+need.
 
 Please put your code into a sub-package of `org.matsim.contrib.msp` (e.g. one package per project or
 per person) and add tests for everything that is meant to be used by someone else.
