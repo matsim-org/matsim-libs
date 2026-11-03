@@ -222,10 +222,11 @@ public class TestLocalLink {
 		// move vehicles 1 and 2 to the buffer
 		var now = vehicle1.getEarliestLinkExitTime();
 		simLink.doSimStep(now);
+		// the node moves them in the next time step at the earliest
 		assertTrue(simLink.isOffering());
-		assertEquals(vehicle1.getId(), simLink.popVehicle(now).getId());
+		assertEquals(vehicle1.getId(), simLink.popVehicle(now + 1).getId());
 		assertTrue(simLink.isOffering());
-		assertEquals(vehicle2.getId(), simLink.popVehicle(now).getId());
+		assertEquals(vehicle2.getId(), simLink.popVehicle(now + 1).getId());
 
 		now = now + (vehicle1.getSizeInEquivalents() + vehicle2.getSizeInEquivalents()) / simLink.getMaxFlowCapacity() - 1;
 		simLink.doSimStep(now);
