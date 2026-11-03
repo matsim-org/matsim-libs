@@ -76,7 +76,8 @@ class SimBuffer {
 	}
 
 	boolean isStuck(double now) {
-		return !internalBuffer.isEmpty() && lastMovedTime + stuckThreshold <= now;
+		// after more than the stuck time, as qsim's QNodeImpl.vehicleIsStuck
+		return !internalBuffer.isEmpty() && now - lastMovedTime > stuckThreshold;
 	}
 
 	@Override

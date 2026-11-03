@@ -36,7 +36,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.withinPercentage;
 
 /**
  * dsim is meant to replace qsim, so the same scenario must give the same traffic in both. Each test here runs one corridor
@@ -106,8 +105,8 @@ class DSimQSimLinkDynamicsTest {
 	 * Both mobsims restart the stuck time whenever a vehicle leaves the buffer ({@code bufferLastMovedTime} in qsim's
 	 * {@code QueueWithBuffer}, {@code lastMovedTime} in {@code SimBuffer}), so they move one vehicle per stuck time, also at 4, where
 	 * the buffer of l1 holds four vehicles. And in both, the vehicles in the buffer hold on to the flow capacity they consumed until
-	 * they leave, so below 1 the next vehicle enters the buffer and starts its stuck time 1 / sample seconds later. qsim moves a vehicle
-	 * after more than the stuck time, dsim after the stuck time.
+	 * they leave, so below 1 the next vehicle enters the buffer and starts its stuck time 1 / sample seconds later. Both move a vehicle
+	 * once it has waited for more than the stuck time.
 	 */
 	@ParameterizedTest
 	@ValueSource(doubles = {0.1, 0.25, 1, 4})
@@ -128,8 +127,7 @@ class DSimQSimLinkDynamicsTest {
 			sample, dynamics, stuckTime, linkId, from, to, qsim, dsim);
 
 		assertThat(qsim).as("the scenario must produce traffic on %s to be a meaningful test", linkId).isPositive();
-		assertThat(dsim).as("vehicles entering %s between %s and %s, at sample %s", linkId, from, to, sample)
-			.isCloseTo(qsim, withinPercentage(5));
+		assertThat(dsim).as("vehicles entering %s between %s and %s, at sample %s", linkId, from, to, sample).isEqualTo(qsim);
 	}
 
 	private long run(String mobsim, double sample, TrafficDynamics dynamics, double stuckTime, Consumer<Network> bottleneck,

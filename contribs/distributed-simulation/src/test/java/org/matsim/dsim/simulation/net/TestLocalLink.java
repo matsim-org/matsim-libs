@@ -198,7 +198,8 @@ public class TestLocalLink {
 		assertFalse(simLink.isStuck(now));
 
 		now = vehicle1.getEarliestLinkExitTime() + stuckThreshold;
-		assertTrue(simLink.isStuck(now));
+		assertFalse(simLink.isStuck(now));
+		assertTrue(simLink.isStuck(now + 1));
 	}
 
 	@Test

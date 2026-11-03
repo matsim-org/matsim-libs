@@ -42,7 +42,8 @@ class SimBufferTest {
 		assertFalse(buffer.isAvailable(0));
 		assertEquals(vehicle.getSizeInEquivalents(), buffer.getPceInBuffer());
 		assertFalse(buffer.isStuck(0));
-		assertTrue(buffer.isStuck(stuckThreshold));
+		assertFalse(buffer.isStuck(stuckThreshold));
+		assertTrue(buffer.isStuck(stuckThreshold + 1));
 
 		// Remove the vehicle, in the next time step at the earliest, as the node does
 		buffer.pollFirst(1);
