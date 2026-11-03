@@ -42,7 +42,9 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
     @Parameter
     @Comment(
             "Minimum beeline distance (in meters) between the access and the egress link of a drt trip, measured between"
-                    + " the link coordinates. Shorter trips are not served: routing returns null (in most cases caught by"
+                    + " the link coordinates. In a stopbased or serviceAreaBased system, these are the links of the chosen"
+                    + " access and egress stops, not the locations of the activities. In a door2door system, these are the links of the activities."
+                    + " Shorter trips are not served: routing returns null (in most cases caught by"
                     + " the fallback routing module), and requests that reach the mobsim without having been routed in this"
                     + " run are rejected. By default, this bound is disabled (i.e. set to 0).")
     @PositiveOrZero
