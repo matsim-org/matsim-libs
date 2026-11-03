@@ -195,6 +195,7 @@
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
+			<classifier>classes</classifier>
 			<!-- Use newer guava version -->
 			<exclusions>
 				<exclusion>
@@ -204,9 +205,22 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<!-- needed by the "classes" classifier of Guice, which does not include a (shaded) copy of ASM -->
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-grapher</artifactId>
 			<version>${guice.version}</version>
+			<exclusions>
+				<!-- we use the "classes" classifier of guice, see above -->
+				<exclusion>
+					<groupId>com.google.inject</groupId>
+					<artifactId>guice</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>

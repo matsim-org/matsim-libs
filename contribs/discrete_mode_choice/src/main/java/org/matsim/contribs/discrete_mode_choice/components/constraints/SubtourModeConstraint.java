@@ -53,7 +53,7 @@ public class SubtourModeConstraint extends AbstractTourConstraint {
 				if (destinationLocations.get(offset + index + tourLocationOffset).equals(startLocationId)) {
 					// We found a destination that has the origin location. Now we need to check
 					// that all modes in between are of the same type.
-					String mode = modes.get(index + tourLocationOffset);
+					String mode = modes.get(index);
 
 					for (int testIndex = index + 1; testIndex <= index + offset; testIndex++) {
 						String testMode = modes.get(testIndex);
