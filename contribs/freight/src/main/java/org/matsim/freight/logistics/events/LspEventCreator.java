@@ -27,10 +27,22 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
+ * Factory for {@link Event}s that can be created from a generic event. Implementations typically
+ * transform a {@link LspShipment} related event into a logistics event together with the activity
+ * it belongs to.
+ *
  * @author Kai Martins-Turner (kturner)
  */
 public interface LspEventCreator {
 
-  // I am unsure, if I need the activity or not. kmt 'dec22
+  /**
+   * Create a logistics {@link Event} from a generic event.
+   * (I am unsure, if I need the activity or not. kmt 'dec22)
+   *
+   * @param event the generic event to convert
+   * @param lspShipmentId the {@link Id} of the {@link LspShipment} the event belongs to
+   * @param activity the {@link Activity} the event belongs to
+   * @return the created {@link Event}
+   */
   Event createEvent(Event event, Id<LspShipment> lspShipmentId, Activity activity);
 }

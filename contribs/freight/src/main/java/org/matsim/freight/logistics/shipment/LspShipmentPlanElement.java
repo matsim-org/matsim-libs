@@ -25,10 +25,18 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
+/**
+ * A single entry in a shipment's plan history ({@link LspShipmentPlan}). Each element records one
+ * activity applied to the shipment while it travels through the logistics network - a load, an
+ * unload, a transport leg, or an in-hub handling operation. The four concrete variants are produced
+ * by the builders in {@link LspShipmentUtils}.
+ */
 public interface LspShipmentPlanElement {
 
+	/** @return the logistics-chain element (resource) this plan element was executed at. */
 	LogisticChainElement getLogisticChainElement();
 
+	/** @return the id of the resource the activity was carried out at. */
 	Id<LSPResource> getResourceId();
 
 	// yyyy "type" feels like this makes it a tagged class.  These should be avoided (Effective Java
@@ -43,9 +51,12 @@ public interface LspShipmentPlanElement {
 	@Deprecated
 	String getElementType();
 
+	/** @return the simulation time at which the activity started. */
 	double getStartTime();
 
+	/** @return the simulation time at which the activity ended. */
 	double getEndTime();
 
+	/** @return the link the activity was carried out at (the destination link for a transport). */
 	Id<Link> getLinkId();
 }

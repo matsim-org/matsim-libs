@@ -24,15 +24,33 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.HasBackpointer;
 
+/**
+ * The ordered history of a single {@link LspShipment}: the sequence of load/transport/unload/handling
+ * elements that were applied to it during a scenario. Instances live inside an
+ * {@link org.matsim.freight.logistics.LSPPlan}.
+ */
 public interface LspShipmentPlan extends HasBackpointer<Id<LspShipment>> {
 
+  /** @return the id of the shipment this plan belongs to. */
   Id<LspShipment> getLspShipmentId();
 
+  /** @return the plan elements recorded for the shipment, keyed by their id. */
   Map<Id<LspShipmentPlanElement>, LspShipmentPlanElement> getPlanElements();
 
+  /**
+   * Appends an element to the plan.
+   *
+   * @param id the id of the element
+   * @param element the element to record
+   */
   void addPlanElement(Id<LspShipmentPlanElement> id, LspShipmentPlanElement element);
 
+  /**
+   * @return the plan element scheduled to be added next, i.e. the most recent one by element order
+   *     (or null if the plan is empty).
+   */
   LspShipmentPlanElement getMostRecentEntry();
 
+  /** Removes all recorded elements from the plan. */
   void clear();
 }

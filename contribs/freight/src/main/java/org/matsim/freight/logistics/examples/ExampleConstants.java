@@ -45,8 +45,12 @@ package org.matsim.freight.logistics.examples;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Constants shared by the multiple-chains examples. The example scenarios toll a set of links.
+ * The list of tolled link ids is referenced from the scenario configuration.
+ */
 public class ExampleConstants {
-  //Both, the ingoing and outgoing links are tolled. -> Please be aware of it.
+  // Both the ingoing and outgoing links in the list are tolled.
   public static final List<String> TOLLED_LINK_LIST_BERLIN_BOTH_DIRECTIONS =
       Arrays.asList(
           "70831", "14691", "49319", "70830", "17284", "65008", "65007", "62413", "17283", "144164",

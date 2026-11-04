@@ -25,10 +25,15 @@ package org.matsim.freight.logistics.analysis;
 
 import java.util.Map;
 
+/**
+ * Read-only view over the per-iteration logistics score statistics gathered during planning.
+ * The concrete implementation is {@link LspScoreStatsControlerListener}.
+ */
 public interface LspScoreStats {
 
     /**
-     * @return the history of scores in last iterations
+     * @return a map from each {@link LspScoreStatsControlerListener.ScoreItem} to that item's value
+     *     recorded at each iteration
      */
     Map<LspScoreStatsControlerListener.ScoreItem, Map<Integer, Double>> getScoreHistory();
 

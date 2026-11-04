@@ -67,6 +67,11 @@ import org.matsim.vehicles.VehicleType;
 		this.scenario = scenario;
 	}
 
+	/**
+	 * Clears any previously scheduled plan and remembers the resource being scheduled.
+	 *
+	 * @param resource the resource being scheduled, expected to be a {@link MainRunCarrierResource}
+	 */
 	@Override
 	protected void initializeValues(LSPResource resource) {
 		this.pairs = new ArrayList<>();

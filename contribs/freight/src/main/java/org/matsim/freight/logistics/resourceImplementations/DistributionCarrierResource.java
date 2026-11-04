@@ -1,23 +1,22 @@
 /*
-  *********************************************************************** *
-  * project: org.matsim.*
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  * copyright       :  (C) 2022 by the members listed in the COPYING,       *
-  *                   LICENSE and WARRANTY file.                            *
-  * email           : info at matsim dot org                                *
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  *   This program is free software; you can redistribute it and/or modify  *
-  *   it under the terms of the GNU General Public License as published by  *
-  *   the Free Software Foundation; either version 2 of the License, or     *
-  *   (at your option) any later version.                                   *
-  *   See also COPYING, LICENSE and WARRANTY file                           *
-  *                                                                         *
-  * ***********************************************************************
- */
+   *********************************************************************** *
+   * project: org.matsim.*
+   *   *********************************************************************** *
+   *                                                                          *
+   * copyright       :  (C) 2022 by the members listed in the COPYING,
+   *                   LICENSE and WARRANTY file.
+   * email           : info at matsim dot org
+   *                                                                          *
+   *   *********************************************************************** *
+   *                                                                          *
+   *   This program is free software; you can redistribute it and/or modify  *
+   *   it under the terms of the GNU General Public License as published by  *
+   *   the Free Software Foundation; either version 2 of the License, or     *
+   *   (at your option) any later version.                                   *
+   *   See also COPYING, LICENSE and WARRANTY file
+   *                                                                          *
+   *   ***********************************************************************
+   */
 
 package org.matsim.freight.logistics.resourceImplementations;
 
@@ -29,6 +28,10 @@ import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.DistributionCarrierResourceBuilder;
 
+/**
+ * The {@link LSPCarrierResource} responsible for the physical delivery of shipments to the
+ * logistic-chain elements on the demand side, backed by a {@link Carrier} from the freight contrib.
+ */
 /*package-private*/ class DistributionCarrierResource extends LSPDataObject<LSPResource>
     implements LSPCarrierResource {
 
