@@ -484,7 +484,7 @@ public class CompleteLSPSchedulingTest {
 			{
 				assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.getFirst());
 				LSPTourEndEventHandler endHandler = (LSPTourEndEventHandler) eventHandlers.getFirst();
-				CarrierService carrierService = (CarrierService) endHandler.getCarrierService();
+				CarrierService carrierService = endHandler.getCarrierService();
 				assertSame(carrierService.getServiceLinkId(), shipment.getFrom());
 				assertEquals(carrierService.getCapacityDemand(), shipment.getSize());
 				assertEquals(carrierService.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);

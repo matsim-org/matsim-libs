@@ -25,15 +25,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.logistics.FreightLogisticsConfigGroup;
 import org.matsim.freight.logistics.LSPUtils;
+import org.matsim.freight.logistics.LspTestUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 import static org.matsim.freight.logistics.consistency_checkers.LogisticsConsistencyChecker.CheckResult.CHECK_FAILED;
 import static org.matsim.freight.logistics.consistency_checkers.LogisticsConsistencyChecker.CheckResult.CHECK_SUCCESSFUL;
 
@@ -58,17 +53,7 @@ public class LspConsistencyCheckerTest {
 	 */
 	@Test
 	public void checkBeforePlanning_Passes() {
-		Config config = ConfigUtils.createConfig();
-		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
-		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps.xml");
-
-		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
-		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
-
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		LSPUtils.loadLspsAccordingToConfig(scenario);
-
+		Scenario scenario = LspTestUtils.loadScenario(utils.getPackageInputDirectory(), "lsps.xml");
 		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsistencyChecker.checkBeforePlanning(LSPUtils.getLSPs(scenario), lvl),"At least one resource Id exists more than once.");
 	}
 
@@ -77,17 +62,7 @@ public class LspConsistencyCheckerTest {
 	 */
 	@Test
 	public void checkBeforePlanning_Fails() {
-		Config config = ConfigUtils.createConfig();
-		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
-		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
-
-		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
-		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
-
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		LSPUtils.loadLspsAccordingToConfig(scenario);
-
+		Scenario scenario = LspTestUtils.loadScenario(utils.getPackageInputDirectory(), "lsps_fail.xml");
 		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.checkBeforePlanning(LSPUtils.getLSPs(scenario), lvl),"All resource IDs are unique.");
 	}
 
@@ -100,19 +75,8 @@ public class LspConsistencyCheckerTest {
 	 * This test will check if checksAfterPlanning work  as intended and should succeed
 	 */
 	@Test
-	public void checkBeforePlanning_passes() {
-		Config config = ConfigUtils.createConfig();
-
-		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
-		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps.xml");
-
-		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
-		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
-
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		LSPUtils.loadLspsAccordingToConfig(scenario);
-
+	public void checkAfterPlanning_passes() {
+		Scenario scenario = LspTestUtils.loadScenario(utils.getPackageInputDirectory(), "lsps.xml");
 		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsistencyChecker.checkAfterPlanning(LSPUtils.getLSPs(scenario), lvl));
 	}
 
@@ -120,21 +84,9 @@ public class LspConsistencyCheckerTest {
 	 * This test will check if checksAfterPlanning works as intended and should succeed, because shipmentWOPlan is not planned in any plan.
 	 */
 	@Test
-	public void checkBeforePlanning_fails() {
-		Config config = ConfigUtils.createConfig();
-
-		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
-		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
-
-		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
-		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
-
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		LSPUtils.loadLspsAccordingToConfig(scenario);
-
+	public void checkAfterPlanning_fails() {
+		Scenario scenario = LspTestUtils.loadScenario(utils.getPackageInputDirectory(), "lsps_fail.xml");
 		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.checkAfterPlanning(LSPUtils.getLSPs(scenario), lvl));
 	}
 }
-
 

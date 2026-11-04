@@ -9,12 +9,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
-
-import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,7 +54,7 @@ class ExampleMultipleTwoEchelonChainsReplanningTest{
 			}
 
 		} catch ( Exception ee ) {
-			LogManager.getLogger(this.getClass() ).fatal("there was an exception: \n" + ee ) ;
+			LogManager.getLogger(this.getClass()).fatal("there was an exception: \n{}", String.valueOf(ee));
 
 			// if one catches an exception, then one needs to explicitly fail the test:
 			fail();
