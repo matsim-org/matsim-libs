@@ -40,7 +40,6 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.DistributionCarrierResourceBuilder;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 

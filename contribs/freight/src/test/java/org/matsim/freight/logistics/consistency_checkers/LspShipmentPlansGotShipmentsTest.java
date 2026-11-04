@@ -153,7 +153,7 @@ public class LspShipmentPlansGotShipmentsTest {
 			}
 		}
 		assert lspPlan != null;
-		LspShipmentPlan planWoShipmentInJobs = LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, Id.create("planWOShipmentSelected", LspShipment.class));
+		LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, Id.create("planWOShipmentSelected", LspShipment.class));
 
 		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentForEveryShipmentPlanAllPlans(LSPUtils.getLSPs(scenario), lvl),"All plans got a shipment.");
 	}

@@ -29,7 +29,6 @@ import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.LspTestUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 import static org.matsim.freight.logistics.consistency_checkers.LogisticsConsistencyChecker.CheckResult.CHECK_FAILED;
 import static org.matsim.freight.logistics.consistency_checkers.LogisticsConsistencyChecker.CheckResult.CHECK_SUCCESSFUL;
 
