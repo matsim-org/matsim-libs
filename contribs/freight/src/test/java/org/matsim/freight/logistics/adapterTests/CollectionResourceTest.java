@@ -39,7 +39,6 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -93,7 +92,7 @@ public class CollectionResourceTest {
 	private void testCollectionResource(LSPCarrierResource resource, Carrier carrier, Id<Link> linkId, VehicleType vehicleType, CarrierCapabilities capabilities) {
 		assertNotNull(resource.getClientElements());
 		assertTrue(resource.getClientElements().isEmpty());
-		assertTrue(LSPCarrierResource.class.isAssignableFrom(resource.getClass()));
+		assertTrue(resource.getClass().isAssignableFrom(LSPCarrierResource.class));
 		assertSame(resource.getCarrier(), carrier);
 		assertSame(resource.getEndLinkId(), linkId);
 		assertSame(resource.getStartLinkId(), linkId);
@@ -104,7 +103,7 @@ public class CollectionResourceTest {
 
 		if (resource.getCarrier() == carrier) {
 			assertSame(carrier.getCarrierCapabilities(), capabilities);
-			assertTrue(Carrier.class.isAssignableFrom(carrier.getClass()));
+			assertTrue(carrier.getClass().isAssignableFrom(Carrier.class));
 			assertTrue(carrier.getPlans().isEmpty());
 			assertNull(carrier.getSelectedPlan());
 			assertTrue(carrier.getServices().isEmpty());

@@ -93,7 +93,7 @@ public class MainRunResourceTest {
 	private void testMainRunResource(LSPCarrierResource resource, Carrier carrier, Id<Link> fromLinkId, Id<Link> toLinkId, VehicleType vehicleType, CarrierCapabilities capabilities) {
 		assertNotNull(resource.getClientElements());
 		assertTrue(resource.getClientElements().isEmpty());
-		assertTrue(LSPCarrierResource.class.isAssignableFrom(resource.getClass()));
+		assertTrue(resource.getClass().isAssignableFrom(LSPCarrierResource.class));
 		assertSame(resource.getCarrier(), carrier);
 		assertSame(resource.getEndLinkId(), toLinkId);
 		assertSame(resource.getStartLinkId(), fromLinkId);
@@ -104,7 +104,7 @@ public class MainRunResourceTest {
 
 		if (resource.getCarrier() == carrier) {
 			assertSame(carrier.getCarrierCapabilities(), capabilities);
-			assertTrue(Carrier.class.isAssignableFrom(carrier.getClass()));
+			assertTrue(carrier.getClass().isAssignableFrom(Carrier.class));
 			assertTrue(carrier.getPlans().isEmpty());
 			assertNull(carrier.getSelectedPlan());
 			assertTrue(carrier.getServices().isEmpty());
