@@ -53,7 +53,7 @@ public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<
    * Tells this {@link LSP} that it becomes responsible for the given shipment, assigning it to each
    * plan of the {@link LSP}.
    *
-   * @param lspShipment the shipment this {@link LSP} should now be responsible fo
+   * @param lspShipment the shipment this {@link LSP} should now be responsible for
    */
   void assignShipmentToLspPlan(LspShipment lspShipment);
 

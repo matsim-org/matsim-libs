@@ -58,7 +58,7 @@ import org.matsim.freight.logistics.LSPs;
  * are not included in the statistics. The calculated values are written to a file, each iteration on
  * a separate line.
  *
- * @author mriese
+ * @author mrieser
  */
 public class LspScoreStatsControlerListener implements StartupListener, IterationEndsListener, ShutdownListener, LspScoreStats {
 
@@ -101,10 +101,10 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 		}
 
 		try {
-			this.out.write("iteration" + this.delimiter + "avg_executed" + this.delimite
+			this.out.write("iteration" + this.delimiter + "avg_executed" + this.delimiter
 				+ "avg_worst" + this.delimiter + "avg_average" + this.delimiter + "avg_best\n");
 			for (Map.Entry<String, ScoreHist> e : this.perLsp.entrySet()) {
-				e.getValue().out.write("iteration" + this.delimiter + "avg_executed" + this.delimite
+				e.getValue().out.write("iteration" + this.delimiter + "avg_executed" + this.delimiter
 					+ "avg_worst" + this.delimiter + "avg_average" + this.delimiter + "avg_best\n");
 			}
 
@@ -271,10 +271,10 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 		}
 
 		private void write(int iteration, BufferedWriter out, String delimiter) throws IOException {
-			out.write(iteration + delimite
-				+ (this.sumExecutedScores / this.nofExecutedScores) + delimite
-				+ (this.sumScoreWorst / this.nofScoreWorst) + delimite
-				+ (this.sumAvgScores / this.nofAvgScores) + delimite
+			out.write(iteration + delimiter
+				+ (this.sumExecutedScores / this.nofExecutedScores) + delimiter
+				+ (this.sumScoreWorst / this.nofScoreWorst) + delimiter
+				+ (this.sumAvgScores / this.nofAvgScores) + delimiter
 				+ (this.sumScoreBest / this.nofScoreBest) + "\n");
 			out.flush();
 		}

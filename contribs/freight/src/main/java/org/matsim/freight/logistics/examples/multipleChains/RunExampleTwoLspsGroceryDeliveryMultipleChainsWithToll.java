@@ -25,7 +25,7 @@ import static org.matsim.freight.logistics.examples.multipleChains.ExampleTwoLsp
 /**
  * This class runs the example of two LSPs (Edeka and Kaufland) with grocery delivery,
  * where each LSP has multiple transport chains and tolls are applied to certain vehicle types.
- * It sets the parameters for the simulation, including the number of iterations for the jsprit solve
+ * It sets the parameters for the simulation, including the number of iterations for the jsprit solver
  * and the toll value for specific vehicle types.
  * The hub costs and hub link IDs for both LSPs are also specified.
  */

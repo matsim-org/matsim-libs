@@ -262,7 +262,7 @@ import org.matsim.vehicles.VehicleUtils;
     completeLSPBuilder.setInitialPlan(completePlan);
 
     // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
-    // added to the LSPBuilde
+    // added to the LSPBuilder
     ArrayList<LSPResource> resourcesList = new ArrayList<>();
     resourcesList.add(collectionResource);
     resourcesList.add(firstTranshipmentHubResource);

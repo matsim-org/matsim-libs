@@ -137,7 +137,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
                         .setCapacityNeedFixed(
                             capacityNeedFixed) // Time needed, fixed (for Scheduler)
                         .setCapacityNeedLinear(
-                            capacityNeedLinear) // additional time needed per shipmentSize (fo
+                            capacityNeedLinear) // additional time needed per shipmentSize (for
                                                 // Scheduler)
                         .build())
                 .build();

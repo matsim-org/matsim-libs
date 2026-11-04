@@ -40,7 +40,7 @@ public class LspEventsReader {
     Map<String, MatsimEventsReader.CustomEventMapper> map =
         new TreeMap<>(
             CarrierEventsReaders
-                .createCustomEventMappers()); // also get all the Carrier-related EventMappe
+                .createCustomEventMappers()); // also get all the Carrier-related EventMapper
     map.put(HandlingInHubStartsEvent.EVENT_TYPE, HandlingInHubStartsEvent::convert);
     return map;
   }

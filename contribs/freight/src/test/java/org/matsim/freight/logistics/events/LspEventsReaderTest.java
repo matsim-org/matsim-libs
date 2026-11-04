@@ -51,7 +51,7 @@ public class LspEventsReaderTest {
 		Assertions.assertArrayEquals(lspEvents.toArray(), handler.handledEvents.toArray());
 	}
 
-	private static class TestEventHandle
+	private static class TestEventHandler
 			implements HandlingInHubStartedEventHandler, CarrierTourEndEventHandler {
 		private final List<Event> handledEvents = new ArrayList<>();
 

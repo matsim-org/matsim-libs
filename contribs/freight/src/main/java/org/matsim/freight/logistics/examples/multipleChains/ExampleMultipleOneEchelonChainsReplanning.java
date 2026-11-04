@@ -160,7 +160,7 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 
 		// The VSP default settings are designed for person transport simulation. After talking to Kai,
 		// they will be set to WARN here. Kai MT may'23
-		controlle
+		controller
 			.getConfig()
 			.vspExperimental()
 			.setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);

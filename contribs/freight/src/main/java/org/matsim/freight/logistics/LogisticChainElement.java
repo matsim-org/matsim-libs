@@ -43,7 +43,7 @@ public interface LogisticChainElement
   LogisticChainElement getNextElement();
 
   /**
-   * This collection stores LSPShipments that are waiting for their treatment in this element o
+   * This collection stores LSPShipments that are waiting for their treatment in this element or
    * more precisely the Resource that is in charge of the actual physical handling.
    *
    * @return WaitingShipments

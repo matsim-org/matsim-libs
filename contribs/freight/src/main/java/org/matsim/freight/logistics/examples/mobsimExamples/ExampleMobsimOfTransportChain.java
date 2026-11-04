@@ -268,7 +268,7 @@ import org.matsim.vehicles.VehicleUtils;
     completeLSPBuilder.setInitialPlan(completePlan);
 
     // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
-    // added to the LSPBuilde
+    // added to the LSPBuilder
     ArrayList<LSPResource> resourcesList = new ArrayList<>();
     resourcesList.add(collectionResource);
     resourcesList.add(firstTranshipmentHubResource);
@@ -369,7 +369,7 @@ import org.matsim.vehicles.VehicleUtils;
     config.network().setInputFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
     // The VSP default settings are designed for person transport simulation, so the checking
     // level is relaxed to WARN here.  (KMT may'23 after talking to Kai)
-    controlle
+    controller
         .getConfig()
         .vspExperimental()
         .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);

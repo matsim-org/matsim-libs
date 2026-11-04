@@ -43,7 +43,7 @@ import org.matsim.vehicles.Vehicles;
  * time-based costs of carriers by pairing {@link LinkEnterEvent}s with {@link LinkLeaveEvent}s /
  * {@link VehicleLeavesTrafficEvent}s on the same vehicle.
  */
-/*package-private*/ class DistanceAndTimeHandle
+/*package-private*/ class DistanceAndTimeHandler
     implements LinkEnterEventHandler, VehicleLeavesTrafficEventHandler, LinkLeaveEventHandler {
   private static final Logger log = LogManager.getLogger(DistanceAndTimeHandler.class);
 

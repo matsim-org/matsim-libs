@@ -27,7 +27,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.freight.carriers.Carrier;
 
 /**
- * This is somewhat similar to the MATSim core {@link ScoringFunction}, which is also used fo
+ * This is somewhat similar to the MATSim core {@link ScoringFunction}, which is also used for
  * {@link Carrier}s. A difference, however, is that it does not implement the separate methods
  * {@link ScoringFunction#handleActivity(Activity)} etc., but is just an {@link EventHandler} and a
  * {@link ControllerListener}. (This is, in some sense, the old design for {@link ScoringFunction},

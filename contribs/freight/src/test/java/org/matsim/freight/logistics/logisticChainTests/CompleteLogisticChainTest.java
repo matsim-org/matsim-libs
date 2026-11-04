@@ -85,14 +85,14 @@ public class CompleteLogisticChainTest {
 		Carrier collectionCarrier = CarriersUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
-		CollectionCarrierResourceBuilder collectionResourceBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilde
+		CollectionCarrierResourceBuilder collectionResourceBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder
 				.newInstance(collectionCarrier);
 		collectionResourceBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario));
 		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
 
 		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement",
 				LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionBuilder = LSPUtils.LogisticChainElementBuilde
+		LSPUtils.LogisticChainElementBuilder collectionBuilder = LSPUtils.LogisticChainElementBuilder
 				.newInstance(collectionElementId);
 		collectionBuilder.setResource(collectionResourceBuilder.build());
 		collectionElement = collectionBuilder.build();
@@ -109,7 +109,7 @@ public class CompleteLogisticChainTest {
 				.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 
 		Id<LogisticChainElement> firstHubElementId = Id.create("FirstHubElement", LogisticChainElement.class);
-		firstHubElement = LSPUtils.LogisticChainElementBuilde
+		firstHubElement = LSPUtils.LogisticChainElementBuilder
 				.newInstance(firstHubElementId)
 				.setResource(firstTransshipmentHubBuilder.build())
 				.build();
@@ -140,7 +140,7 @@ public class CompleteLogisticChainTest {
 				.build();
 
 		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilde
+		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder
 				.newInstance(mainRunElementId);
 		mainRunBuilder.setResource(mainRunResource);
 		mainRunElement = mainRunBuilder.build();
@@ -158,7 +158,7 @@ public class CompleteLogisticChainTest {
 
 		Id<LogisticChainElement> secondHubElementId = Id.create("SecondHubElement",
 				LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder secondHubElementBuilder = LSPUtils.LogisticChainElementBuilde
+		LSPUtils.LogisticChainElementBuilder secondHubElementBuilder = LSPUtils.LogisticChainElementBuilder
 				.newInstance(secondHubElementId);
 		secondHubElementBuilder.setResource(secondTransshipmentHubBuilder.build());
 		secondHubElement = secondHubElementBuilder.build();
@@ -183,14 +183,14 @@ public class CompleteLogisticChainTest {
 		Carrier carrier = CarriersUtils.createCarrier(distributionCarrierId);
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
-		final LSPResource distributionCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilde
+		final LSPResource distributionCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder
 				.newInstance(carrier)
 				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();
 
 		Id<LogisticChainElement> distributionElementId = Id.create("DistributionElement", LogisticChainElement.class);
-		distributionElement = LSPUtils.LogisticChainElementBuilde
+		distributionElement = LSPUtils.LogisticChainElementBuilder
 				.newInstance(distributionElementId)
 				.setResource(distributionCarrierResource)
 				.build();

@@ -78,7 +78,7 @@ public final class LSPUtils {
 	 * If it does not exist, it will be created.
 	 *
 	 * @param scenario The scenario where the LSPs should be added.
-	 * @return the lsps containe
+	 * @return the lsps container
 	 */
 	public static LSPs addOrGetLsps(Scenario scenario) {
 		LSPs lsps = (LSPs) scenario.getScenarioElement(lspsString);

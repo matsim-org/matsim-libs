@@ -41,7 +41,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
 /**
- * In the case of the MainRunResource, the incoming LSPShipments are bundled together until thei
+ * In the case of the MainRunResource, the incoming LSPShipments are bundled together until their
  * total weight exceeds the capacity of the deployed vehicle type. Then, this bundle of LSPShipments
  * is converted to a scheduled tour from the freight contrib of MATSim. The start of this tour is
  * located at the first TranshipmentHub and the end at the second one. All LSPShipments are
@@ -189,7 +189,7 @@ import org.matsim.vehicles.VehicleType;
 	/**
 	 * For the main run, there is currently (nov'22) no jsprit planning. The plan is instead
 	 * constructed manually. As a consequence, there is no score (from jsprit) for this plan
-	 * available. To avoid issues in later scoring of the LSP, we would like to hava also a score fo
+	 * available. To avoid issues in later scoring of the LSP, we would like to hava also a score for
 	 * the MainRunCarrier. This is calculated here manually
 	 *
 	 * <p>It bases on the - vehicle's fixed costs - distance dependent costs - (expected) travel time

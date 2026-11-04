@@ -47,7 +47,7 @@ class MultipleChainsUtils {
 		return new RandomLogisticChainShipmentAssigner();
 	}
 
-	public static RoundRobinLogisticChainShipmentAssigne
+	public static RoundRobinLogisticChainShipmentAssigner
 	createRoundRobinLogisticChainShipmentAssigner() {
 		return new RoundRobinLogisticChainShipmentAssigner();
 	}
@@ -80,7 +80,7 @@ class MultipleChainsUtils {
 	 * This is a modified copy from StrategyManager.
 	 * It was necessary, because I was unable to bind that StrategyManger in a way, that it uses its internal structure -.-.
 	 *
-	 * @param strategyManage
+	 * @param strategyManager
 	 * @param subpopulation
 	 * @param config
 	 */

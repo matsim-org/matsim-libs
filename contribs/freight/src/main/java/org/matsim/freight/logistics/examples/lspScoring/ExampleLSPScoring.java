@@ -112,7 +112,7 @@ import org.matsim.vehicles.VehicleUtils;
             .addLogisticChain(logisticChain);
 
     // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
-    // added to the LSPBuilde
+    // added to the LSPBuilder
 
     return LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
         .setInitialPlan(lspPlan)
@@ -168,7 +168,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     // The VSP default settings are designed for person transport simulation, so the checking
     // level is relaxed to WARN here.      (KMT may'23 after talking to Kai)
-    controlle
+    controller
         .getConfig()
         .vspExperimental()
         .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
@@ -227,7 +227,7 @@ import org.matsim.vehicles.VehicleUtils;
     return config;
   }
 
-  /*package-private*/ static class TipScore
+  /*package-private*/ static class TipScorer
       implements LSPScorer, LSPSimulationTracker<LSP>, CarrierServiceEndEventHandler {
 
     private static final Logger log = LogManager.getLogger(TipScorer.class);

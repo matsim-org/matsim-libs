@@ -48,7 +48,7 @@ import org.matsim.freight.logistics.LogisticChain;
  * DistanceAndTimeHandler}, {@link CollectionServiceHandler}). The fixed/variable cost split is
  * controlled by {@code shareOfFixedCosts}.
  */
-/*package-private*/ class LinearCostTracke
+/*package-private*/ class LinearCostTracker
     implements AfterMobsimListener,
         LSPSimulationTracker<LogisticChain>,
         LinkEnterEventHandler,

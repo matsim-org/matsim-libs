@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  * <p>
  * In a first step only used internally. When needed more often, I have nothing against putting it more central. -> matsim-libs
  *
- * @author kturne
+ * @author kturner
  */
 public class Vehicle2CarrierEventHandler implements CarrierTourStartEventHandler, CarrierTourEndEventHandler {
 
@@ -62,7 +62,7 @@ public class Vehicle2CarrierEventHandler implements CarrierTourStartEventHandler
 
   /**
    * @param vehicleId the unique vehicle Id
-   * @return  id of the vehicle's carrie
+   * @return  id of the vehicle's carrier
    */
   public Id<Carrier> getCarrierOfVehicle(Id<Vehicle> vehicleId) {
     return vehicle2carrier.get(vehicleId);

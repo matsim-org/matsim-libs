@@ -81,7 +81,7 @@ import org.matsim.freight.logistics.shipment.*;
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		servicesWaitedFo
+		servicesWaitedFor
 			.clear(); // cleanup after Mobsim ends (instead of doing it in reset() = before Mobsim
 		// starts.) kmt oct'22
 	}
@@ -220,7 +220,7 @@ import org.matsim.freight.logistics.shipment.*;
 	private void throwHandlingEvent(
 		CarrierTourEndEvent event, LspShipment lspShipment, double expHandlingDuration) {
 		// New event-based approach
-		// Todo: We need to decide what we write into the exp. handling duration: See #175 fo
+		// Todo: We need to decide what we write into the exp. handling duration: See #175 for
 		// discussion.
 		// The start time, must start at the same time as the triggering event. -> keep events stream
 		// ordered.

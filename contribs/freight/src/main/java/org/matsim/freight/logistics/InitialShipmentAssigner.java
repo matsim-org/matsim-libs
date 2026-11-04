@@ -33,8 +33,8 @@ import org.matsim.freight.logistics.shipment.LspShipment;
  * (or only the LSP? - kmt jan'24), contains a pluggable strategy
  * that is contained in classes implementing the interface {@link InitialShipmentAssigner}. <br>
  * <br>
- * During iterations, it can happen that the {@link LspShipment} should be moved to anothe
- * {@link LogisticChain} of the same {@link LSPPlan}. This is now (since fall 2023; see maste
+ * During iterations, it can happen that the {@link LspShipment} should be moved to another
+ * {@link LogisticChain} of the same {@link LSPPlan}. This is now (since fall 2023; see master
  * thesis of nrichter) part of the (innovative) **Replanning** strategies.
  */
 public interface InitialShipmentAssigner {

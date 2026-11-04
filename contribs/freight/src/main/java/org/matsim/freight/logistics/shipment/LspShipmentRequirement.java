@@ -24,7 +24,7 @@ import org.matsim.freight.logistics.LogisticChain;
 
 /**
  * A condition that a {@link org.matsim.freight.logistics.LogisticChain} must satisfy for a given
- * {@link LspShipment} to be handled by it. Implementations are used to decide, for example, whethe
+ * {@link LspShipment} to be handled by it. Implementations are used to decide, for example, whether
  * a chain's resources can meet the shipment's capacity or delivery requirements.
  */
 public interface LspShipmentRequirement {
