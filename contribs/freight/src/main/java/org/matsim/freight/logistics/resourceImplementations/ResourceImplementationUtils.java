@@ -69,9 +69,9 @@ public class ResourceImplementationUtils {
    * Collects all the vehicle types from the different vehicles of the carrier.
    * This is needed since we do not use {@code carrier.getCarrierCapabilities().getVehicleTypes()}
    * any more as the second field to store the vehicle types.
-   *
+   * <p>
    * TODO: Maybe move to CarriersUtils in MATSim-libs / freight contrib.
-   * <p> KMT/Jul22
+   * KMT/Jul22
    *
    * @param carrier the carrier
    * @return the collection of the carrier's vehicle types
@@ -165,7 +165,7 @@ public class ResourceImplementationUtils {
    * output directory.
    *
    * @param outputDir path, defining the location for the results
-   * @param lsp the LSP, for which the results should be written out.
+   * @param lsp the LSP, for which the shipment logs should be written out.
    */
   public static void printResults_shipmentLog(String outputDir, LSP lsp) {
     System.out.println("Writing out shipmentLog for LSP");
