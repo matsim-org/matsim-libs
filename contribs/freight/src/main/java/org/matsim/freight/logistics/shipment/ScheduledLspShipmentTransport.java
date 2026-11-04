@@ -29,6 +29,11 @@ import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
+/**
+ * A {@link LspShipmentLeg} describing a planned (pre-simulation) transport leg between two links,
+ * including the carrier and its carrier shipment. Contrasts with
+ * {@code LoggedLspShipmentTransport}, which is reconstructed from simulation events.
+ */
 final class ScheduledLspShipmentTransport implements LspShipmentLeg {
 
 	private final double startTime;
@@ -53,12 +58,12 @@ final class ScheduledLspShipmentTransport implements LspShipmentLeg {
 		this.carrierShipment = builder.carrierShipment;
 	}
 
-	/**
-	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
+	/**  @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
 	 * Mixing class tagging and class hierarchies is a bad idea.
 	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
 	 * So maybe better use something like getActivityType() -- analogous to e.g. PersonEntersVehicleEvent.class) kmt/kn jan'25
-	 */
+	 *
+	 * @return the fixed element type {@code TRANSPORT}. */
 	@Override
 	@Deprecated
 	public String getElementType() {

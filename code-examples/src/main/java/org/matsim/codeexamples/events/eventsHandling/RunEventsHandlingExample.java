@@ -32,15 +32,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 
 /**
- * This class contains a main method to call the 
+ * This class contains a main method to call the
  * example event handlers MyEventHandler1-3.
- * 
+ *
  * @author dgrether
  */
 public class RunEventsHandlingExample {
 
-	
-	
+
+
 	public static void main(String[] args) {
 
 		//path to events file. For this you first need to run a simulation.
@@ -62,7 +62,7 @@ public class RunEventsHandlingExample {
 		events.addHandler(handler1);
 		events.addHandler(handler2);
 		events.addHandler(handler3);
-		
+
         //create the reader and read the file
 		events.initProcessing();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -71,7 +71,7 @@ public class RunEventsHandlingExample {
 
 		System.out.println("average travel time: " + handler2.getTotalTravelTime());
 		handler3.writeChart("output/departuresPerHour.png");
-		
+
 		System.out.println("Events file read!");
 	}
 

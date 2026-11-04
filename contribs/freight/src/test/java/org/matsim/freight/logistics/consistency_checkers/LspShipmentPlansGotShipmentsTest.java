@@ -39,7 +39,6 @@ import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
-import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -99,7 +98,7 @@ public class LspShipmentPlansGotShipmentsTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		LSPUtils.loadLspsAccordingToConfig(scenario);
 
-		//manually add a shipment plan to the selcted plan of LSP_1. The shipmentId of this plan does NOT match to the shipments defined in the lsp itself.
+		//manually add a shipment plan to the selected plan of LSP_1. The shipmentId of this plan does NOT match to the shipments defined in the lsp itself.
 		//This must be done here in code, because when reading in the XML file, only shipment plans are added, if their shipmentId that matches to the shipments defined in the lsp.
 		LSP lsp1 = LSPUtils.addOrGetLsps(scenario).getLSPs().get(Id.create("LSP_1", LSP.class));
 		LspShipmentUtils.getOrCreateShipmentPlan(lsp1.getSelectedPlan(), Id.create("planWOShipmentSelected", LspShipment.class));
@@ -143,7 +142,7 @@ public class LspShipmentPlansGotShipmentsTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		LSPUtils.loadLspsAccordingToConfig(scenario);
 
-		//manually add a shipment plan to the selcted plan of LSP_1. The shipmentId of this plan does NOT match to the shipments defined in the lsp itself.
+		//Manually add a shipment plan to the selcted plan of LSP_1. The shipmentId of this plan does NOT match to the shipments defined in the lsp itself.
 		//This must be done here in code, because when reading in the XML file, only shipment plans are added, if their shipmentId that matches to the shipments defined in the lsp.
 		LSP lsp1 = LSPUtils.addOrGetLsps(scenario).getLSPs().get(Id.create("LSP_1", LSP.class));
 		LSPPlan lspPlan = null;
@@ -153,7 +152,7 @@ public class LspShipmentPlansGotShipmentsTest {
 			}
 		}
 		assert lspPlan != null;
-		LspShipmentPlan planWoShipmentInJobs = LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, Id.create("planWOShipmentSelected", LspShipment.class));
+		LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, Id.create("planWOShipmentSelected", LspShipment.class));
 
 		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentForEveryShipmentPlanAllPlans(LSPUtils.getLSPs(scenario), lvl),"All plans got a shipment.");
 	}

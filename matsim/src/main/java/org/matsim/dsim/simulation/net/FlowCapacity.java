@@ -29,12 +29,26 @@ class FlowCapacity {
 	}
 
 	void update(double now) {
+		update(now, max);
+	}
+
+	/**
+	 * Accumulates capacity up to {@code ceiling} instead of {@code max}.
+	 */
+	void update(double now, double ceiling) {
 		if (lastUpdateTime < now) {
 			var timeSteps = now - lastUpdateTime;
 			var accFlow = timeSteps * max + accumulatedCapacity;
-			accumulatedCapacity = Math.min(accFlow, max);
+			accumulatedCapacity = Math.min(accFlow, ceiling);
 			lastUpdateTime = now;
 		}
+	}
+
+	/**
+	 * Accumulates capacity from the time step before {@code now} on, regardless of when it was last updated.
+	 */
+	void restartAccumulation(double now) {
+		lastUpdateTime = now - 1;
 	}
 
 	@Override

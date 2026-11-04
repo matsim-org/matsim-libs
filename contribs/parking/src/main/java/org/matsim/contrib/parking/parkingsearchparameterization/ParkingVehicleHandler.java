@@ -12,8 +12,26 @@ import org.matsim.vehicles.Vehicle;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Lets arriving vehicles search for parking if the network mode of their vehicle type is one of the given modes.
+ */
 public class ParkingVehicleHandler implements VehicleHandler, TransitDriverStartsEventHandler {
+	private final Set<String> modes;
 	private final Set<Id<Vehicle>> knownPtVehicles = new HashSet<>();
+
+	/**
+	 * Only cars search for parking.
+	 */
+	public ParkingVehicleHandler() {
+		this(Set.of(TransportMode.car));
+	}
+
+	/**
+	 * @param modes network modes of the vehicles that search for parking on arrival
+	 */
+	public ParkingVehicleHandler(Set<String> modes) {
+		this.modes = Set.copyOf(modes);
+	}
 
 	@Override
 	public void handleVehicleDeparture(QVehicle vehicle, Link link) {
@@ -22,8 +40,8 @@ public class ParkingVehicleHandler implements VehicleHandler, TransitDriverStart
 
 	@Override
 	public VehicleArrival handleVehicleArrival(QVehicle vehicle, Link link) {
-		if (!vehicle.getVehicle().getType().getNetworkMode().equals(TransportMode.car)) {
-			// If vehicle is no car, do not park it
+		if (!modes.contains(vehicle.getVehicle().getType().getNetworkMode())) {
+			// If vehicle is not of a parking mode, do not park it
 			return VehicleArrival.ALLOWED;
 		}
 

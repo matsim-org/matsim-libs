@@ -35,8 +35,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Runs consistency checks on a set of {@link org.matsim.freight.logistics.LSP}s, e.g.
+ * to validate the plan before and after scheduling.
+ * The available checks verify that resource Ids are unique across all LSPs and that every
+ * shipment is covered by a shipment plan (and vice versa).
+ * This class provides tests to check if resource Ids are unique and if all existing shipments are assigned to exactly one plan.
+ *
  * @author anton stock
- * this class provides tests to check if resource Ids are unique and if all existing shipments are assigned to exactly one plan.
  */
 public class LogisticsConsistencyChecker {
 
@@ -94,7 +99,6 @@ public class LogisticsConsistencyChecker {
 			nuOfChecksFailed++;
 		}
 
-		//If no Check has failed, everything is fine :)
 		if (nuOfChecksFailed == 0) {
 			log.info("Checks passed.");
 			return CheckResult.CHECK_SUCCESSFUL;

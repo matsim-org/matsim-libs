@@ -50,14 +50,25 @@ import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentRequirement;
 
+/**
+ * Example {@link InitialShipmentAssigner} that only considers logistic chains satisfying every
+ * requirement of the shipment being assigned. Chains that fail any requirement are skipped.
+ */
 class RequirementsAssigner implements InitialShipmentAssigner {
 
   private final Collection<LogisticChain> feasibleLogisticChains;
 
+  /** Creates a new assigner that starts with an empty set of feasible chains. */
   public RequirementsAssigner() {
     this.feasibleLogisticChains = new ArrayList<>();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Only chains that satisfy every requirement of the shipment are eligible; the first eligible
+   * chain is selected and the shipment is added to it.
+   */
   @Override
   public void assignToPlan(LSPPlan lspPlan, LspShipment lspShipment) {
     feasibleLogisticChains.clear();

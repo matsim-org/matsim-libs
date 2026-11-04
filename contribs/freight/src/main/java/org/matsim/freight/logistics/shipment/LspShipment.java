@@ -29,9 +29,10 @@ import org.matsim.freight.logistics.HasSimulationTrackers;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
- * This is, for example, a shipment that DHL moves from A to B. It may use multiple carriers to
- * achieve that.
- *
+ * Represents a shipment of goods from one location to another (for example a parcel a carrier moves
+ * from A to B). A shipment may be handled by more than one carrier along the way. It is the unit
+ * that a Logistics Service Provider ({@link org.matsim.freight.logistics.LSP}) assigns to a
+ * transport chain.
  * <p>Questions/comments:
  *
  * <ul>
@@ -42,24 +43,34 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 public interface LspShipment
     extends Identifiable<LspShipment>, Attributable, HasSimulationTrackers<LspShipment> {
 
-  Id<Link> getFrom(); // same as in CarrierShipment
+  /** @return the link the shipment is picked up from (same concept as in CarrierShipment). */
+  Id<Link> getFrom();
 
-  Id<Link> getTo(); // same as in CarrierShipment
+  /** @return the link the shipment is delivered to (same concept as in CarrierShipment). */
+  Id<Link> getTo();
 
-  TimeWindow getPickupTimeWindow(); // same as in CarrierShipment
+  /** @return the time window during which the shipment must be picked up. */
+  TimeWindow getPickupTimeWindow();
 
-  TimeWindow getDeliveryTimeWindow(); // same as in CarrierShipment
+  /** @return the time window during which the shipment must be delivered. */
+  TimeWindow getDeliveryTimeWindow();
 
-  int getSize(); // same as in CarrierShipment
+  /** @return the size of the shipment, e.g. the number of units or its capacity demand. */
+  int getSize();
 
-  double getDeliveryServiceTime(); // same as in CarrierShipment
+  /** @return the service time required to deliver the shipment. */
+  double getDeliveryServiceTime();
 
-  double getPickupServiceTime(); // same as in CarrierShipment
+  /** @return the service time required to pick up the shipment. */
+  double getPickupServiceTime();
 
-  //Consider changing this ShipmentLog to MATSim's experienced plans.
-  //This would be closer to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
+  /**
+   * @return the record of what happened to this shipment during the simulation (load, transport,
+   *     unload, handling).
+   */
   LspShipmentPlan getShipmentLog();
 
+  /** @return the requirements that must be fulfilled for this shipment to be handled. */
   Collection<LspShipmentRequirement> getRequirements();
 
 }

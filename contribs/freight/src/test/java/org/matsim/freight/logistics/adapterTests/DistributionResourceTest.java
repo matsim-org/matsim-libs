@@ -23,6 +23,7 @@ package org.matsim.freight.logistics.adapterTests;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -39,7 +40,6 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.DistributionCarrierResourceBuilder;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -47,13 +47,11 @@ public class DistributionResourceTest {
 
 	//Die Tracker sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
 	//Man kann sie deshalb ja extra außerhalb des Builders einsetzen.
-
-	private org.matsim.vehicles.VehicleType distributionVehType;
-	private CarrierVehicle distributionCarrierVehicle;
-	private CarrierCapabilities capabilities;
 	private Carrier distributionCarrier;
 	private LSPCarrierResource distributionResource;
 	private Id<Link> distributionLinkId;
+	private VehicleType distributionVehType;
+	private CarrierCapabilities capabilities;
 
 	@BeforeEach
 	public void initialize() {
@@ -61,8 +59,7 @@ public class DistributionResourceTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 
-
-        Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
+		Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
 		distributionVehType = VehicleUtils.createVehicleType(vehicleTypeId, TransportMode.car);
 		distributionVehType.getCapacity().setOther(10);
@@ -72,16 +69,14 @@ public class DistributionResourceTest {
 		distributionVehType.setMaximumVelocity(50 / 3.6);
 
 		distributionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
-		distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, this.distributionVehType);
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("DistributionVehicle"), distributionLinkId, distributionVehType);
 
-		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
-		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-		capabilities = capabilitiesBuilder.build();
+		capabilities = CarrierCapabilities.Builder.newInstance()
+				.addVehicle(carrierVehicle)
+				.setFleetSize(FleetSize.INFINITE)
+				.build();
 		distributionCarrier = CarriersUtils.createCarrier(carrierId);
 		distributionCarrier.setCarrierCapabilities(capabilities);
-
 
 		DistributionCarrierResourceBuilder builder = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier);
 		builder.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario));
@@ -91,47 +86,52 @@ public class DistributionResourceTest {
 
 
 	@Test
-	public void testCollectionResource() {
-		assertNotNull(distributionResource.getClientElements());
-		assertTrue(distributionResource.getClientElements().isEmpty());
-		assertTrue(LSPCarrierResource.class.isAssignableFrom(distributionResource.getClass()));
-		assertSame(distributionResource.getCarrier(), distributionCarrier);
-		assertSame(distributionResource.getEndLinkId(), distributionLinkId);
-		assertSame(distributionResource.getStartLinkId(), distributionLinkId);
-		assertNotNull(distributionResource.getSimulationTrackers());
-		assertTrue(distributionResource.getSimulationTrackers().isEmpty());
-		assertNotNull(distributionResource.getAttributes());
-		assertTrue(distributionResource.getAttributes().isEmpty());
-		assertSame(distributionResource.getStartLinkId(), distributionLinkId);
-		if (distributionResource.getCarrier() == distributionCarrier) {
-			assertSame(distributionCarrier.getCarrierCapabilities(), capabilities);
-			assertTrue(Carrier.class.isAssignableFrom(distributionCarrier.getClass()));
-			assertTrue(distributionCarrier.getPlans().isEmpty());
-			assertNull(distributionCarrier.getSelectedPlan());
-			assertTrue(distributionCarrier.getServices().isEmpty());
-			assertTrue(distributionCarrier.getShipments().isEmpty());
-			if (distributionCarrier.getCarrierCapabilities() == capabilities) {
+	public void testDistributionResource() {
+		testDistributionResource(distributionResource, distributionCarrier, distributionLinkId, distributionVehType, capabilities);
+	}
+
+	private void testDistributionResource(LSPCarrierResource resource, Carrier carrier, Id<Link> linkId, VehicleType vehicleType, CarrierCapabilities capabilities) {
+		assertNotNull(resource.getClientElements());
+		assertTrue(resource.getClientElements().isEmpty());
+		assertTrue(LSPCarrierResource.class.isAssignableFrom(resource.getClass()));
+		assertSame(resource.getCarrier(), carrier);
+		assertSame(resource.getEndLinkId(), linkId);
+		assertSame(resource.getStartLinkId(), linkId);
+		assertNotNull(resource.getSimulationTrackers());
+		assertTrue(resource.getSimulationTrackers().isEmpty());
+		assertNotNull(resource.getAttributes());
+		assertTrue(resource.getAttributes().isEmpty());
+
+		if (resource.getCarrier() == carrier) {
+			assertSame(carrier.getCarrierCapabilities(), capabilities);
+			assertTrue(Carrier.class.isAssignableFrom(carrier.getClass()));
+			assertTrue(carrier.getPlans().isEmpty());
+			assertNull(carrier.getSelectedPlan());
+			assertTrue(carrier.getServices().isEmpty());
+			assertTrue(carrier.getShipments().isEmpty());
+			if (carrier.getCarrierCapabilities() == capabilities) {
 				assertSame(FleetSize.INFINITE, capabilities.getFleetSize());
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
-				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
+				List<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {
-					assertSame(types.getFirst(), distributionVehType);
-					assertEquals(10, distributionVehType.getCapacity().getOther().intValue());
-					assertEquals(0.0004, distributionVehType.getCostInformation().getCostsPerMeter(), 0.0);
-					assertEquals(0.38, distributionVehType.getCostInformation().getCostsPerSecond(), 0.0);
-					assertEquals(49, distributionVehType.getCostInformation().getFixedCosts(), 0.0);
-					assertEquals((50 / 3.6), distributionVehType.getMaximumVelocity(), 0.0);
-
+					assertSame(types.getFirst(), vehicleType);
+					assertEquals(10, vehicleType.getCapacity().getOther().intValue());
+					assertEquals(0.0004, vehicleType.getCostInformation().getCostsPerMeter(), 0.0);
+					assertEquals(0.38, vehicleType.getCostInformation().getCostsPerSecond(), 0.0);
+					assertEquals(49, vehicleType.getCostInformation().getFixedCosts(), 0.0);
+					assertEquals((50 / 3.6), vehicleType.getMaximumVelocity(), 0.0);
 				}
-				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
+				List<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if (vehicles.size() == 1) {
-					assertSame(vehicles.getFirst(), distributionCarrierVehicle);
-					assertSame(distributionCarrierVehicle.getType(), distributionVehType);
-					assertSame(distributionCarrierVehicle.getLinkId(), distributionLinkId);
+					assertSame(vehicles.getFirst(), vehicleVehicle(carrier));
+					assertSame(vehicles.getFirst().getType(), vehicleType);
+					assertSame(vehicles.getFirst().getLinkId(), linkId);
 				}
 			}
 		}
 	}
 
-
+	private static CarrierVehicle vehicleVehicle(Carrier carrier) {
+		return carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
+	}
 }

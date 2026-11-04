@@ -198,7 +198,8 @@ public class TestLocalLink {
 		assertFalse(simLink.isStuck(now));
 
 		now = vehicle1.getEarliestLinkExitTime() + stuckThreshold;
-		assertTrue(simLink.isStuck(now));
+		assertFalse(simLink.isStuck(now));
+		assertTrue(simLink.isStuck(now + 1));
 	}
 
 	@Test
@@ -222,10 +223,11 @@ public class TestLocalLink {
 		// move vehicles 1 and 2 to the buffer
 		var now = vehicle1.getEarliestLinkExitTime();
 		simLink.doSimStep(now);
+		// the node moves them in the next time step at the earliest
 		assertTrue(simLink.isOffering());
-		assertEquals(vehicle1.getId(), simLink.popVehicle().getId());
+		assertEquals(vehicle1.getId(), simLink.popVehicle(now + 1).getId());
 		assertTrue(simLink.isOffering());
-		assertEquals(vehicle2.getId(), simLink.popVehicle().getId());
+		assertEquals(vehicle2.getId(), simLink.popVehicle(now + 1).getId());
 
 		now = now + (vehicle1.getSizeInEquivalents() + vehicle2.getSizeInEquivalents()) / simLink.getMaxFlowCapacity() - 1;
 		simLink.doSimStep(now);
@@ -234,7 +236,7 @@ public class TestLocalLink {
 		now = now + 1;
 		simLink.doSimStep(now);
 		assertTrue(simLink.isOffering());
-		assertEquals(vehicle3.getId(), simLink.popVehicle().getId());
+		assertEquals(vehicle3.getId(), simLink.popVehicle(now).getId());
 	}
 
 	@Test
@@ -260,7 +262,7 @@ public class TestLocalLink {
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
 
 		// remove the vehicle from the buffer - not strictly necessary
-		assertEquals(vehicle.getId(), simLink.popVehicle().getId());
+		assertEquals(vehicle.getId(), simLink.popVehicle(0).getId());
 		assertFalse(simLink.isOffering());
 
 		// the backward travelling hole arrives after 24 seconds
@@ -311,7 +313,7 @@ public class TestLocalLink {
 		now = vehicle2.getEarliestLinkExitTime();
 		simLink.doSimStep(now);
 		assertTrue(simLink.isOffering());
-		assertEquals(vehicle2.getId(), simLink.popVehicle().getId());
+		assertEquals(vehicle2.getId(), simLink.popVehicle(now).getId());
 	}
 
 	@Test
@@ -352,7 +354,7 @@ public class TestLocalLink {
 		now = now + blockTime;
 		simLink.doSimStep(now);
 		assertTrue(simLink.isOffering());
-		var pop1 = simLink.popVehicle();
+		var pop1 = simLink.popVehicle(now);
 		assertEquals(vehicle1.getId(), pop1.getId());
 		assertEquals(now, pop1.getEarliestLinkExitTime());
 
@@ -360,7 +362,7 @@ public class TestLocalLink {
 		now = now + pop1.getSizeInEquivalents() / simLink.getMaxFlowCapacity();
 		simLink.doSimStep(now);
 		assertTrue(simLink.isOffering());
-		var pop2 = simLink.popVehicle();
+		var pop2 = simLink.popVehicle(now);
 		assertEquals(vehicle2.getId(), pop2.getId());
 		assertEquals(link.getLength() / link.getFreespeed(), pop2.getEarliestLinkExitTime());
 	}
@@ -370,7 +372,7 @@ public class TestLocalLink {
 
 		var link = TestUtils.createSingleLink(0, 0);
 		var simLink = TestUtils.createLink(link, 0);
-		assertThrows(RuntimeException.class, simLink::popVehicle);
+		assertThrows(RuntimeException.class, () -> simLink.popVehicle(0));
 	}
 
 	@Test

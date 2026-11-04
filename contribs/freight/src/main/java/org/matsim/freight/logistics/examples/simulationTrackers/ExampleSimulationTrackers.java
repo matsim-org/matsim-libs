@@ -47,6 +47,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+/**
+ * Example that attaches a {@link LinearCostTracker} (and its event handlers) to a single-echelon
+ * collection LSP and reads back the computed cost function.
+ */
 /*package-private*/ class ExampleSimulationTrackers {
 
   /*package-private*/
@@ -197,8 +201,8 @@ import org.matsim.vehicles.VehicleUtils;
     config.controller().setLastIteration(0);
     config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
     config.network().setInputFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
-    // The VSP default settings are designed for person transport simulation. After talking to Kai,
-    // they will be set to WARN here. Kai MT may'23
+    // The VSP default settings are designed for person transport simulation, so the checking
+    // level is relaxed to WARN here.  (KMT may'23 after talking to Kai)
     controler
         .getConfig()
         .vspExperimental()
