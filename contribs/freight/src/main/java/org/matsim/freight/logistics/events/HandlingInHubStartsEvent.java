@@ -32,7 +32,7 @@ import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
- * An event, that informs that the handling of a {@link LspShipment} in a hub has started.
+ * An event signalling that the handling of a {@link LspShipment} in a {@link LSPResource} hub has started.
  *
  * @author Kai Martins-Turner (kturner)
  */
@@ -53,6 +53,13 @@ public final class HandlingInHubStartsEvent extends AbstractLogisticEvent {
     this.expHandlingDuration = expHandlingDuration;
   }
 
+  /**
+   * Reconstructs a {@link HandlingInHubStartsEvent} from the attributes of a generic event, e.g.
+   * read back from an events file.
+   *
+   * @param event the generic event whose attributes encode the hub, shipment and handling duration
+   * @return the reconstructed {@link HandlingInHubStartsEvent}
+   */
   public static HandlingInHubStartsEvent convert(GenericEvent event) {
     Map<String, String> attributes = event.getAttributes();
     double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));

@@ -45,6 +45,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+/**
+ * Example that builds a single-echelon collection LSP and schedules it according to its resource
+ * schedulers, then prints the scheduled {@link LspShipmentPlanElement}s.
+ */
 /*package-private*/ class ExampleSchedulingOfInitialPlan {
 
   private static LSP createInitialLSP(Scenario scenario) {

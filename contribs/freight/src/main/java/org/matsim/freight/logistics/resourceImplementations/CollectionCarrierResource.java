@@ -30,6 +30,10 @@ import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.CollectionCarrierResourceBuilder;
 
+/**
+ * The {@link LSPCarrierResource} responsible for the physical collection of shipments from the
+ * logistic-chain elements on the demand side, backed by a {@link Carrier} from the freight contrib.
+ */
 /*package-private*/ class CollectionCarrierResource extends LSPDataObject<LSPResource>
     implements LSPCarrierResource {
 
@@ -44,6 +48,7 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
     this.carrier = builder.carrier;
   }
 
+  /** @return the depot link where the collection carrier's vehicles start and end. */
   @Override
   public Id<Link> getStartLinkId() {
     Id<Link> depotLinkId = null;
@@ -56,6 +61,7 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
     return depotLinkId;
   }
 
+  /** @return the depot link where the collection carrier's vehicles start and end. */
   @Override
   public Id<Link> getEndLinkId() {
     Id<Link> depotLinkId = null;
@@ -68,11 +74,19 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
     return depotLinkId;
   }
 
+  /** @return the logistics-chain elements this resource is responsible for collecting. */
   @Override
   public Collection<LogisticChainElement> getClientElements() {
     return clientElements;
   }
 
+  /**
+   * Schedules the shipments assigned to this resource via the
+   * {@link CollectionCarrierScheduler}.
+   *
+   * @param bufferTime the buffer time to use when scheduling
+   * @param lspPlan the plan that carries the shipments to schedule
+   */
   @Override
   public void schedule(int bufferTime, LSPPlan lspPlan) {
     collectionScheduler.scheduleLspShipments(lspPlan, this, bufferTime);

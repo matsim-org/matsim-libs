@@ -28,13 +28,11 @@ import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
-* This class is deprecated and will be removed in the future.
- * It follows the old and no longer wanted approach.
- * Now, an Assigner is used to assign all LSPShipments to one LogisticChain of the LSPPlan.
- * <p></p>
- * This class here is in contrast used as a Replanning strategy. This behavior is not wanted anymore.
+ * @deprecated Legacy {@link InitialShipmentAssigner} that, on a first attempt, assigns a shipment
+ *     to the single logistic chain of the plan. Used as a replanning strategy; superseded by the
+ *     initial-assigner approach and slated for removal.
  * KMT, Jul'24
-*/
+ */
 @Deprecated
 /*package-private*/ class MaybeTodayAssigner implements InitialShipmentAssigner {
 
