@@ -52,7 +52,7 @@ class ExampleTestOutput {
 
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23
-    controller
+    controlle
         .getConfig()
         .vspExperimental()
         .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);

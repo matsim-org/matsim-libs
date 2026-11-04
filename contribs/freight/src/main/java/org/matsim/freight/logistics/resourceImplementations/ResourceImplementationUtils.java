@@ -42,7 +42,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
 /**
- * Collection of utility methods and builder classes shared by the {@link LSPResource}s and their
+ * Collection of utility methods and builder classes shared by the {@link LSPResource}s and thei
  * schedulers. Besides a few helper methods for carrier and resource construction, this class also
  * collects the builder classes that are used to instantiate the various carrier resources
  * ({@link DistributionCarrierResource}, {@link CollectionCarrierResource}, {@link MainRunCarrierResource}
@@ -56,7 +56,7 @@ public class ResourceImplementationUtils {
   private static final Logger log = LogManager.getLogger(ResourceImplementationUtils.class);
   private static final String CARRIER_TYPE_ATTR = "carrierType";
 
-  public static SimpleForwardLogisticChainScheduler
+  public static SimpleForwardLogisticChainSchedule
       createDefaultSimpleForwardLogisticChainScheduler(List<LSPResource> resources) {
     return new SimpleForwardLogisticChainScheduler(resources);
   }
@@ -73,7 +73,7 @@ public class ResourceImplementationUtils {
    * TODO: Maybe move to CarriersUtils in MATSim-libs / freight contrib.
    * KMT/Jul22
    *
-   * @param carrier the carrier
+   * @param carrier the carrie
    * @return the collection of the carrier's vehicle types
    */
   public static Collection<VehicleType> getVehicleTypeCollection(Carrier carrier) {
@@ -236,7 +236,7 @@ public class ResourceImplementationUtils {
   }
 
   /**
-   * Utils method to create a DistributionCarrierScheduler
+   * Utils method to create a DistributionCarrierSchedule
    *  TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
    *
    * @param scenario the scenario
@@ -246,7 +246,7 @@ public class ResourceImplementationUtils {
   }
 
   /**
-   * Utils method to create a CollectionCarrierScheduler
+   * Utils method to create a CollectionCarrierSchedule
    * TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
    *
    * @param scenario the scenario
@@ -256,7 +256,7 @@ public class ResourceImplementationUtils {
   }
 
   /**
-   * Utils method to create a MainRunCarrierScheduler
+   * Utils method to create a MainRunCarrierSchedule
    * TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
    *
    * @param scenario the scenario

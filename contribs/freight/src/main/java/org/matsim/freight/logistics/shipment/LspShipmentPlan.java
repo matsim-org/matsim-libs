@@ -46,7 +46,7 @@ public interface LspShipmentPlan extends HasBackpointer<Id<LspShipment>> {
   void addPlanElement(Id<LspShipmentPlanElement> id, LspShipmentPlanElement element);
 
   /**
-   * @return the plan element scheduled to be added next, i.e. the most recent one by element order
+   * @return the plan element scheduled to be added next, i.e. the most recent one by element orde
    *     (or null if the plan is empty).
    */
   LspShipmentPlanElement getMostRecentEntry();

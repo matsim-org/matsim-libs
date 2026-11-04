@@ -127,7 +127,7 @@ final class ExampleGroceryDeliveryMultipleChains {
 
 		// The VSP default settings are designed for person transport simulation. After talking to Kai,
 		// they will be set to WARN here. Kai MT may'23
-		controller
+		controlle
 			.getConfig()
 			.vspExperimental()
 			.setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
@@ -183,7 +183,7 @@ final class ExampleGroceryDeliveryMultipleChains {
 
 		Carrier carrier = carriers.getCarriers()
 			.get(Id.create("kaufland_VERBRAUCHERMARKT_TROCKEN", CarrierImpl.class));
-		Id<Link> depotLinkFromVehicles = carrier
+		Id<Link> depotLinkFromVehicles = carrie
 			.getCarrierCapabilities()
 			.getCarrierVehicles()
 			.values()
@@ -273,7 +273,7 @@ final class ExampleGroceryDeliveryMultipleChains {
 
 				Carrier distributionCarrier =
 					CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
-				distributionCarrier
+				distributionCarrie
 					.getCarrierCapabilities()
 					.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 

@@ -61,7 +61,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 	}
 
 	/**
-	 * Resets the carrier's services, shipments and plans before scheduling, and binds the carrier
+	 * Resets the carrier's services, shipments and plans before scheduling, and binds the carrie
 	 * and resource of the scheduler.
 	 */
 	@Override

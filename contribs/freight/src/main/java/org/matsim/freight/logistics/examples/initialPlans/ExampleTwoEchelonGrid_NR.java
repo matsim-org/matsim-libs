@@ -190,7 +190,7 @@ final class ExampleTwoEchelonGrid_NR {
 	private static Scenario prepareScenario(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// Change speed on all links to 30 km/h (8.33333 m/s) for easier computation --> Freeflow TT per
+		// Change speed on all links to 30 km/h (8.33333 m/s) for easier computation --> Freeflow TT pe
 		// link is 2min
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			link.setFreespeed(30 / 3.6);
@@ -272,7 +272,7 @@ final class ExampleTwoEchelonGrid_NR {
 			// werden dann dort "Zusammengestellt".
 
 			Carrier distributionCarrier = CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
-			distributionCarrier
+			distributionCarrie
 				.getCarrierCapabilities()
 				.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 

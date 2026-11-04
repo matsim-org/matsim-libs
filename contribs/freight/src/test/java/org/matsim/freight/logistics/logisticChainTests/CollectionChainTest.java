@@ -73,20 +73,20 @@ public class CollectionChainTest {
 		Carrier carrier = CarriersUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
-		LSPCarrierResource carrierResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder
+		LSPCarrierResource carrierResource = ResourceImplementationUtils.CollectionCarrierResourceBuilde
 				.newInstance(carrier)
 				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
 		Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder
+		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilde
 				.newInstance(elementId);
 		collectionElementBuilder.setResource(carrierResource);
 		LogisticChainElement collectionElement = collectionElementBuilder.build();
 
 		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder
+		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilde
 				.newInstance(collectionSolutionId);
 		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 		logisticChain = collectionSolutionBuilder.build();

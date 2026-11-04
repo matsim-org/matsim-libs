@@ -35,11 +35,11 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 /**
- * Example {@link org.matsim.core.events.handler.EventHandler} that tracks, for all carrier
+ * Example {@link org.matsim.core.events.handler.EventHandler} that tracks, for all carrie
  * services of a simulation run, the total number of shipments, their total weight, and the total
  * loading costs incurred by service durations.
  */
-/*package-private*/ class CollectionServiceHandler
+/*package-private*/ class CollectionServiceHandle
 	implements CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
 
 	private final Collection<ServiceTuple> tuples;

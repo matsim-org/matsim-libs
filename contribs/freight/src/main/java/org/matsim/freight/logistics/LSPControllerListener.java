@@ -44,7 +44,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 import java.util.ArrayList;
 import java.util.List;
 
-class LSPControllerListener
+class LSPControllerListene
 	implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
 	private static final Logger log = LogManager.getLogger(LSPControllerListener.class);
@@ -162,7 +162,7 @@ class LSPControllerListener
 			lsp.scheduleLogisticChains();
 		}
 
-		// Update carriers in scenario and CarrierAgentTracker
+		// Update carriers in scenario and CarrierAgentTracke
 		carrierAgentTracker.clearCarriers();
 		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
 			carrierAgentTracker.addCarrier(carrier);

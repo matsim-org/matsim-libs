@@ -44,7 +44,7 @@ import org.matsim.vehicles.VehicleType;
  * Similar to the CollectionCarrierScheduler: But here the jobs are delivery instead of collected.
  *
  * <p>BUT: scheduleResource() is different from the one used in the case of collection. The
- * LSPShipments are not simply handed over to jsprit which calculates the vehicle tours, but rather
+ * LSPShipments are not simply handed over to jsprit which calculates the vehicle tours, but rathe
  * loaded into a waiting distribution vehicle in the order of their arrival at the depot. Once this
  * vehicle is full, the tour for this single one is planned by jsprit. All vehicles are thus filled
  * and scheduled consecutively. (Service-based approach by Tilmann Matteis)
@@ -159,7 +159,7 @@ import org.matsim.vehicles.VehicleType;
 	/**
 	 * This method builds the tours based on the {@link CarrierService}s.
 	 * So everytime a vehicle is full, it gets planned by jsprit - based on services.
-	 * In the end all of these tours are just added unified, and added to the carrier
+	 * In the end all of these tours are just added unified, and added to the carrie
 	 * <p>
 	 * It is the design by Tilmann Matteis.
 	 *

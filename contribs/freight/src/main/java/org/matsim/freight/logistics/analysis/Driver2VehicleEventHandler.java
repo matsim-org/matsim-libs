@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  * <p>
  * In a first step only used internally. When needed more often, I have nothing against putting it more central. -> matsim-libs
  *
- * @author kturner
+ * @author kturne
  */
 public class Driver2VehicleEventHandler implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 

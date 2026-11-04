@@ -43,12 +43,12 @@ public class SecondHubElementTest {
 		schedulerBuilder.setCapacityNeedLinear(1);
 
 
-		point = ResourceImplementationUtils.TransshipmentHubBuilder
+		point = ResourceImplementationUtils.TransshipmentHubBuilde
 				.newInstance(Id.create("TranshipmentHub2", LSPResource.class), Id.createLinkId("(14 2) (14 3)"), null)
 				.setTransshipmentHubScheduler(schedulerBuilder.build())
 				.build();
 
-		hubElement = LSPUtils.LogisticChainElementBuilder
+		hubElement = LSPUtils.LogisticChainElementBuilde
 				.newInstance(Id.create("SecondHubElement", LogisticChainElement.class))
 				.setResource(point)
 				.build();

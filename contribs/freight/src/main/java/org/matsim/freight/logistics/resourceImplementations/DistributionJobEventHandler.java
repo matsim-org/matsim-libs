@@ -39,7 +39,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
-/*package-private*/ class DistributionJobEventHandler
+/*package-private*/ class DistributionJobEventHandle
         implements AfterMobsimListener,
         CarrierServiceStartEventHandler,
         CarrierShipmentDeliveryStartEventHandler,

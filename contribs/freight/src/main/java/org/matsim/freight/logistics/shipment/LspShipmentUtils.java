@@ -51,7 +51,7 @@ public final class LspShipmentUtils {
    * Returns the {@link LspShipmentPlan} of the {@link LSPPlan} that matches the given shipment id,
    * creating and adding one if it does not yet exist.
    *
-   * @param lspPlan the plan in which the shipment plan is searched for
+   * @param lspPlan the plan in which the shipment plan is searched fo
    * @param shipmentId id of the shipment for which the shipment plan is looked up
    * @return the shipment plan, or {@code null} if it is not found
    */

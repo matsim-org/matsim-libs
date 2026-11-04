@@ -178,7 +178,7 @@ class ExampleCheckRequirementsOfAssigner {
 
   public static Collection<LspShipment> createShipmentsWithRequirements(Network network) {
     // Create ten shipments with either a red or blue requirement, i.e. that they only can be
-    // transported in a solution with the matching color
+    // transported in a solution with the matching colo
     ArrayList<LspShipment> shipmentList = new ArrayList<>();
     ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 

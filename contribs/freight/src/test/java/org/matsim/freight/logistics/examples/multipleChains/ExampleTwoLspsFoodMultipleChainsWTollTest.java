@@ -64,7 +64,7 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 					"--lsp1HubLinkId=91085",
 					"--lsp1vehTypesDirect=" + HEAVY_40T,
 					"--lsp1vehTypesMain=null",				//set to null
-					"--lsp1vehTypesDelivery=",				//not set -> should also get ignored later
+					"--lsp1vehTypesDelivery=",				//not set -> should also get ignored late
 					"--lsp2Name=Kaufland",
 					"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
 					"--lsp2HubLinkId=91085",

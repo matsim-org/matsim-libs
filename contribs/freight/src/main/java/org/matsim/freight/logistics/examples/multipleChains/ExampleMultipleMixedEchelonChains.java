@@ -146,7 +146,7 @@ final class ExampleMultipleMixedEchelonChains {
 
 		// The VSP default settings are designed for person transport simulation. After talking to Kai,
 		// they will be set to WARN here. Kai MT may'23
-		controller
+		controlle
 			.getConfig()
 			.vspExperimental()
 			.setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
@@ -368,7 +368,7 @@ final class ExampleMultipleMixedEchelonChains {
 
 				Carrier distributionCarrier =
 					CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
-				distributionCarrier
+				distributionCarrie
 					.getCarrierCapabilities()
 					.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 

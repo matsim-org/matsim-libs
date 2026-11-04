@@ -42,12 +42,12 @@ public class FirstHubElementTest {
 		schedulerBuilder.setCapacityNeedLinear(1);
 
 
-		point = ResourceImplementationUtils.TransshipmentHubBuilder
+		point = ResourceImplementationUtils.TransshipmentHubBuilde
 				.newInstance(Id.create("TranshipmentHub1", LSPResource.class), Id.createLinkId("(4 2) (4 3)"), null)
 				.setTransshipmentHubScheduler(schedulerBuilder.build())
 				.build();
 
-		reloadingElement = LSPUtils.LogisticChainElementBuilder
+		reloadingElement = LSPUtils.LogisticChainElementBuilde
 				.newInstance(Id.create("FirstHubElement", LogisticChainElement.class))
 				.setResource(point)
 				.build();
