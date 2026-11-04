@@ -46,8 +46,11 @@ import org.matsim.vehicles.VehicleUtils;
 import org.xml.sax.Attributes;
 
 /**
- * Reads data out of LSPPlans file and builds the LSPs with their according resources, shipments and
- * plans. StartTag mainly for parsing data, endTag for assigning data to according LSP.
+ * SAX parser that reads the V1 XSD format of an LSP plan definition file and builds the corresponding
+ * {@link LSP}s, each with its resources, shipments and plans.
+ * <p>
+ * The SAX lifecycle methods drive the build: {@link #startTag} accumulates the data of a single element
+ * into instance fields, and {@link #endTag} commits that data to the {@link LSP}s under construction.
  *
  * @author nrichter (Niclas Richter)
  */

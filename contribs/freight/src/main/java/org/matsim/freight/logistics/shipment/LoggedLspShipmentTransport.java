@@ -28,9 +28,13 @@ import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
+/**
+ * A {@link LspShipmentLeg} describing a transport that a carrier actually performed during the
+ * simulation, as derived from events. The end link and end time are updated as the leg progresses.
+ */
+final class LoggedLspShipmentTransport implements LspShipmentLeg {
 //Consider changing this Logged<...> ShipmentPlanElement to MATSim's experienced plans.
 //This would be closer to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
-final class LoggedLspShipmentTransport implements LspShipmentLeg {
 
 	private final double startTime;
 	private final LogisticChainElement element;
@@ -79,9 +83,6 @@ final class LoggedLspShipmentTransport implements LspShipmentLeg {
 		return endTime;
 	}
 
-	/**
-	 * @return
-	 */
 	@Override
 	public Id<Link> getLinkId() {
 		return toLinkId;
