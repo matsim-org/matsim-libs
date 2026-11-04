@@ -39,7 +39,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
-/*package-private*/ class LSPTourEndEventHandle
+/*package-private*/ class LSPTourEndEventHandler
     implements AfterMobsimListener, CarrierTourEndEventHandler, LSPSimulationTracker<LspShipment> {
 
   private final CarrierService carrierService;
