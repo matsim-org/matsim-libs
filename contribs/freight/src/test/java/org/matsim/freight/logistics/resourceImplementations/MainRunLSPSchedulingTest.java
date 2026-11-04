@@ -353,7 +353,7 @@ public class MainRunLSPSchedulingTest {
 			{//LspTourEnd
 				assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.getFirst());
 				LSPTourEndEventHandler endHandler = (LSPTourEndEventHandler) eventHandlers.getFirst();
-				CarrierService carrierService = (CarrierService) endHandler.getCarrierService();
+				CarrierService carrierService = endHandler.getCarrierService();
 				assertSame(carrierService.getServiceLinkId(), shipment.getFrom());
 				assertEquals(carrierService.getCapacityDemand(), shipment.getSize());
 				assertEquals(carrierService.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
@@ -413,7 +413,7 @@ public class MainRunLSPSchedulingTest {
 			{//MainRunTourEnd
 				assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.get(3));
 				LSPTourEndEventHandler mainRunEndHandler = (LSPTourEndEventHandler) eventHandlers.get(3);
-				CarrierService carrierService = (CarrierService) mainRunEndHandler.getCarrierService();
+				CarrierService carrierService = mainRunEndHandler.getCarrierService();
 				assertSame(carrierService.getServiceLinkId(), toLinkId);
 				assertEquals(carrierService.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 				assertEquals(carrierService.getCapacityDemand(), shipment.getSize());

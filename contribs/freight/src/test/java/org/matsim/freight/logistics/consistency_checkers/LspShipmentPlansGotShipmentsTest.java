@@ -39,7 +39,6 @@ import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
-import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
