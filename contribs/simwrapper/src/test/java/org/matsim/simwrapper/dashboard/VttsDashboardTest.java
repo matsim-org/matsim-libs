@@ -27,16 +27,18 @@ class VttsDashboardTest {
 		wrapper.generate(directory);
 		// SimWrapper numbers generated dashboards from 1.
 		String yaml = Files.readString(directory.resolve("dashboard-1.yaml"));
+		JsonNode dashboard = new ObjectMapper(new YAMLFactory()).readTree(yaml);
 		// Browser discovery checks only current-folder filenames. A trigger pointing at the
 		// nested person CSV would silently hide the dashboard even when those data exist.
-		assertFalse(yaml.contains("triggerPattern:"));
-		assertTrue(yaml.contains("Included subpopulation: berlin_person."));
+		assertFalse(dashboard.path("header").has("triggerPattern"));
+		// Read the description as YAML: line wrapping must not affect the population-rule check.
+		String description = dashboard.path("header").path("description").asText();
+		assertTrue(description.contains("Included subpopulation: berlin_person."), description);
 		assertTrue(yaml.contains("analysis/custom_vtts/vtts_persons.csv.gz"));
 		assertTrue(yaml.contains("analysis/custom_vtts/vtts_summary.csv"));
 		assertTrue(yaml.contains("analysis/custom_vtts/vtts_coverage.csv"));
 		assertTrue(yaml.contains("mean_vtts_money_per_hour"));
 		// The two tabs must use different observation levels, not duplicate person means.
-		JsonNode dashboard = new ObjectMapper(new YAMLFactory()).readTree(yaml);
 		assertEquals("Per person", dashboard.path("subtabs").get(0).path("title").asText());
 		assertEquals("Per trip", dashboard.path("subtabs").get(1).path("title").asText());
 		for (String metric : List.of("vtts", "muse", "vse")) {

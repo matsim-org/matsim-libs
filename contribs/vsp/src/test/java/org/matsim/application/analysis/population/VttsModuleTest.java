@@ -1,5 +1,7 @@
 package org.matsim.application.analysis.population;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.matsim.api.core.v01.Id;
@@ -91,9 +93,12 @@ class VttsModuleTest {
 		assertTrue(coverage.stream().filter(row -> row.get("status").equals("not_mobile"))
 			.findFirst().orElseThrow().get("meaning").contains("No trips"));
 		assertTrue(Files.exists(output.resolve("analysis/vtts/vtts_experienced_plans.xml.gz")));
-		String dashboard = Files.readString(output.resolve("dashboard-1.yaml"));
-		assertTrue(dashboard.contains("analysis/vtts/vtts_persons.csv.gz"));
-		assertTrue(dashboard.contains("Included subpopulation: person"));
+		String yaml = Files.readString(output.resolve("dashboard-1.yaml"));
+		assertTrue(yaml.contains("analysis/vtts/vtts_persons.csv.gz"));
+		// YAML may wrap long descriptions across lines; check the parsed text seen by the dashboard.
+		var dashboard = new ObjectMapper(new YAMLFactory()).readTree(yaml);
+		String description = dashboard.path("header").path("description").asText();
+		assertTrue(description.contains("Included subpopulation: person"), description);
 	}
 
 	private static void addAllDayPerson(Scenario scenario, String id, Activity template, String subpopulation) {
