@@ -24,40 +24,19 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
 public class LspTestUtils {
-
 	/**
 	 * @return {@code true} if both endpoints of {@code link} lie within the axis-aligned box spanned by {@code minCoord}/{@code maxCoord}
 	 */
-	public static boolean isWithinBound(Link link, Coord minCoord, Coord maxCoord) {
-		Coord fromNodeCoord = link.getFromNode().getCoord();
-		Coord toNodeCoord = link.getToNode().getCoord();
-		return isWithinBound(fromNodeCoord, minCoord, maxCoord) && isWithinBound(toNodeCoord, minCoord, maxCoord);
-	}
-
-	private static boolean isWithinBound(Coord coord, Coord minCoord, Coord maxCoord) {
-		return coord.getX() >= minCoord.getX() && coord.getX() <= maxCoord.getX()
-				&& coord.getY() >= minCoord.getY() && coord.getY() <= maxCoord.getY();
-	}
-
-	/**
-	 * Loads the LSPs from the configuration-file setup used throughout the logistics consistency tests.
-	 *
-	 * @param inputDirectory directory containing the carriers, vehicle-types and LSP input files
-	 * @param lspsFileName   the LSP file to load (e.g. {@code "lsps.xml"} or {@code "lsps_fail.xml"})
-	 * @return the configured {@link Scenario} with its LSPs loaded
-	 */
-	public static Scenario loadScenario(String inputDirectory, String lspsFileName) {
-		Config config = ConfigUtils.createConfig();
-
-		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
-		logisticsConfigGroup.setLspsFile(inputDirectory + lspsFileName);
-
-		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(inputDirectory + "carriers.xml");
-		freightConfigGroup.setCarriersVehicleTypesFile(inputDirectory + "vehicles.xml");
-
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		LSPUtils.loadLspsAccordingToConfig(scenario);
-		return scenario;
+	public static boolean isWithinBound(Link pendingFromLink, Coord minCoord, Coord maxCoord) {
+		Coord fromNodeCoord = pendingFromLink.getFromNode().getCoord();
+		Coord toNodeCoord = pendingFromLink.getToNode().getCoord();
+		return fromNodeCoord.getX() >= minCoord.getX() &&
+			fromNodeCoord.getX() <= maxCoord.getX() &&
+			fromNodeCoord.getY() >= minCoord.getY() &&
+			fromNodeCoord.getY() <= maxCoord.getY() &&
+			toNodeCoord.getX() >= minCoord.getX() &&
+			toNodeCoord.getX() <= maxCoord.getX() &&
+			toNodeCoord.getY() >= minCoord.getY() &&
+			toNodeCoord.getY() <= maxCoord.getY();
 	}
 }
