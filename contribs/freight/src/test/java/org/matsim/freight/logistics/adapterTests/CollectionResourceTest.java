@@ -92,7 +92,7 @@ public class CollectionResourceTest {
 	private void testCollectionResource(LSPCarrierResource resource, Carrier carrier, Id<Link> linkId, VehicleType vehicleType, CarrierCapabilities capabilities) {
 		assertNotNull(resource.getClientElements());
 		assertTrue(resource.getClientElements().isEmpty());
-		assertTrue(resource.getClass().isAssignableFrom(LSPCarrierResource.class));
+		assertTrue(LSPCarrierResource.class.isAssignableFrom(resource.getClass()));
 		assertSame(resource.getCarrier(), carrier);
 		assertSame(resource.getEndLinkId(), linkId);
 		assertSame(resource.getStartLinkId(), linkId);
@@ -103,7 +103,7 @@ public class CollectionResourceTest {
 
 		if (resource.getCarrier() == carrier) {
 			assertSame(carrier.getCarrierCapabilities(), capabilities);
-			assertTrue(carrier.getClass().isAssignableFrom(Carrier.class));
+			assertTrue(Carrier.class.isAssignableFrom(carrier.getClass()));
 			assertTrue(carrier.getPlans().isEmpty());
 			assertNull(carrier.getSelectedPlan());
 			assertTrue(carrier.getServices().isEmpty());
