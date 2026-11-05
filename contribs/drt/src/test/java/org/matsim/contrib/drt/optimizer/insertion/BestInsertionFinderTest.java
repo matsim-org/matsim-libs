@@ -122,6 +122,22 @@ public class BestInsertionFinderTest {
 		assertThat(findBestInsertion(insertion2, insertion1)).hasValue(insertion1);
 	}
 
+	@Test
+	void insertionIsEvaluatedWithItsRequestVariant() {
+		// the insertion serves a variant of the search request (e.g. another stop); its cost must be computed for the variant
+		var variant = mock(DrtRequest.class);
+		var vehicle = mock(DvrpVehicle.class);
+		when(vehicle.getId()).thenReturn(Id.create("v1", DvrpVehicle.class));
+		var vehicleEntry = new VehicleEntry(vehicle, null, null, null, null, 0);
+		var insertion = new InsertionWithDetourData(
+				InsertionTestUtils.insertionFor(variant, vehicleEntry, 0, 0, loadType.fromInt(1)), null, null);
+
+		when(insertionCostCalculator.calculate(eq(variant), eq(insertion.insertion), any())).thenReturn(123.);
+		when(insertionCostCalculator.calculate(eq(request), any(), any())).thenReturn(INFEASIBLE_SOLUTION_COST);
+
+		assertThat(findBestInsertion(insertion)).hasValue(insertion);
+	}
+
 	@SafeVarargs
 	private Optional<InsertionWithDetourData> findBestInsertion(InsertionWithDetourData... insertions) {
 		return bestInsertionFinder.findBestInsertion(request, Arrays.stream(insertions));
@@ -137,10 +153,7 @@ public class BestInsertionFinderTest {
 		when(vehicle.getId()).thenReturn(Id.create(vehicleId, DvrpVehicle.class));
 		var vehicleEntry = new VehicleEntry(vehicle, null, null, null, null, 0);
 
-		var pickupInsertion = new InsertionGenerator.InsertionPoint(pickupIdx, null, null, null);
-		var dropoffInsertion = new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null);
-
 		return new InsertionWithDetourData(
-				new InsertionGenerator.Insertion(vehicleEntry, pickupInsertion, dropoffInsertion, loadType.fromInt(1)), null, null);
+				InsertionTestUtils.insertionFor(request, vehicleEntry, pickupIdx, dropoffIdx, loadType.fromInt(1)), null, null);
 	}
 }
