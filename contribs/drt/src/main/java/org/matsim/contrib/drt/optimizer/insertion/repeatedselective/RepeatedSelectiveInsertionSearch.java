@@ -100,13 +100,13 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
 		for (int i = 0; i < n; i++) {
 			var selectedInsertion = selectedInsertionList.get(i);
 			var insertion = selectedInsertion.insertion;
-			var insertionDetourData = detourPathCalculator.calculatePaths(drtRequest, insertion);
+			var insertionDetourData = detourPathCalculator.calculatePaths(insertion.getRequest(), insertion);
 			var insertionWithDetourData = new InsertionWithDetourData(insertion, insertionDetourData,
-				detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData, drtRequest));
+				detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData, insertion.getRequest()));
 
 			collectDifferences(selectedInsertion.detourTimeInfo, insertionWithDetourData.detourTimeInfo);
 
-			double insertionCost = insertionCostCalculator.calculate(drtRequest, insertion,
+			double insertionCost = insertionCostCalculator.calculate(insertion.getRequest(), insertion,
 				insertionWithDetourData.detourTimeInfo);
 
 			// For each realized routing, we update the adaptiveTravelTimeMatrix

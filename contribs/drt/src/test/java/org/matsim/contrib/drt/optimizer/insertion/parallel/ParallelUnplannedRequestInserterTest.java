@@ -234,7 +234,7 @@ public class ParallelUnplannedRequestInserterTest {
 
 		DrtInsertionSearch insertionSearch = (drtRequest, vEntries) -> drtRequest == request1 ?
 				Optional.of(new InsertionWithDetourData(
-						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null, loadType.fromInt(1)), null,
+						InsertionTestUtils.insertionFor(drtRequest, vEntries.iterator().next(), loadType.fromInt(1)), null,
 						new InsertionDetourTimeCalculator.DetourTimeInfo(
 								mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 								mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class)))) :
@@ -270,7 +270,8 @@ public class ParallelUnplannedRequestInserterTest {
 		verify(eventsManager, times(1)).processEvent(captor.capture());
 		assertThat(captor.getValue()).isEqualToComparingFieldByField(
 				new PassengerRequestScheduledEvent(processTime, mode, request1.getId(), request1.getPassengerIds(),
-						vehicle1.getId(), pickupEndTime, dropoffBeginTime));
+						vehicle1.getId(), pickupEndTime, dropoffBeginTime, request1.getFromLink().getId(),
+						request1.getToLink().getId()));
 
 		//vehicle entry was created at least once
 		assertThat(createEntryCounter.getValue()).isGreaterThanOrEqualTo(1);
@@ -323,7 +324,7 @@ public class ParallelUnplannedRequestInserterTest {
 				return Optional.empty();
 			}
 			return Optional.of(new InsertionWithDetourData(
-					new InsertionGenerator.Insertion(vehicleEntry, null, null, loadType.fromInt(1)), null,
+					InsertionTestUtils.insertionFor(drtRequest, vehicleEntry, loadType.fromInt(1)), null,
 					new InsertionDetourTimeCalculator.DetourTimeInfo(
 							mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 							mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class))));
@@ -421,7 +422,7 @@ public class ParallelUnplannedRequestInserterTest {
 						return Optional.empty();
 					}
 					return Optional.of(new InsertionWithDetourData(
-							new InsertionGenerator.Insertion(vehicleEntry, null, null, loadType.fromInt(1)), null,
+							InsertionTestUtils.insertionFor(drtRequest, vehicleEntry, loadType.fromInt(1)), null,
 							new InsertionDetourTimeCalculator.DetourTimeInfo(
 									mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 									mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class))));
@@ -516,7 +517,7 @@ public class ParallelUnplannedRequestInserterTest {
 				return Optional.empty();
 			}
 			return Optional.of(new InsertionWithDetourData(
-					new InsertionGenerator.Insertion(vehicleEntry, null, null, loadType.fromInt(1)), null,
+					InsertionTestUtils.insertionFor(drtRequest, vehicleEntry, loadType.fromInt(1)), null,
 					new InsertionDetourTimeCalculator.DetourTimeInfo(
 							mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 							mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class))));
@@ -613,7 +614,7 @@ public class ParallelUnplannedRequestInserterTest {
 				return Optional.empty();
 			}
 			return Optional.of(new InsertionWithDetourData(
-					new InsertionGenerator.Insertion(vehicleEntry, null, null, loadType.fromInt(1)), null,
+					InsertionTestUtils.insertionFor(drtRequest, vehicleEntry, loadType.fromInt(1)), null,
 					new InsertionDetourTimeCalculator.DetourTimeInfo(
 							mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 							mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class))));
@@ -712,7 +713,7 @@ public class ParallelUnplannedRequestInserterTest {
 				return Optional.empty();
 			}
 			return Optional.of(new InsertionWithDetourData(
-					new InsertionGenerator.Insertion(vehicleEntry, null, null, loadType.fromInt(1)), null,
+					InsertionTestUtils.insertionFor(drtRequest, vehicleEntry, loadType.fromInt(1)), null,
 					new InsertionDetourTimeCalculator.DetourTimeInfo(
 							mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 							mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class))));
@@ -823,7 +824,7 @@ public class ParallelUnplannedRequestInserterTest {
 				int vehicleIndex = requestNum % numVehicles;
 				var vehicleEntry = vehicleEntryMap.get(Id.create("mv" + vehicleIndex, DvrpVehicle.class));
 				return Optional.of(new InsertionWithDetourData(
-						new InsertionGenerator.Insertion(vehicleEntry, null, null, loadType.fromInt(1)), null,
+						InsertionTestUtils.insertionFor(drtRequest, vehicleEntry, loadType.fromInt(1)), null,
 						new InsertionDetourTimeCalculator.DetourTimeInfo(
 								mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 								mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class))));
@@ -916,7 +917,7 @@ public class ParallelUnplannedRequestInserterTest {
 					return Optional.empty();
 				}
 				return Optional.of(new InsertionWithDetourData(
-						new InsertionGenerator.Insertion(vehicleEntry, null, null, loadType.fromInt(1)), null,
+						InsertionTestUtils.insertionFor(drtRequest, vehicleEntry, loadType.fromInt(1)), null,
 						new InsertionDetourTimeCalculator.DetourTimeInfo(
 								mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 								mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class))));
@@ -1020,7 +1021,7 @@ public class ParallelUnplannedRequestInserterTest {
 				return Optional.empty();
 			}
 			return Optional.of(new InsertionWithDetourData(
-					new InsertionGenerator.Insertion(vehicleEntry, null, null, loadType.fromInt(1)), null,
+					InsertionTestUtils.insertionFor(drtRequest, vehicleEntry, loadType.fromInt(1)), null,
 					new InsertionDetourTimeCalculator.DetourTimeInfo(
 							mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 							mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class))));

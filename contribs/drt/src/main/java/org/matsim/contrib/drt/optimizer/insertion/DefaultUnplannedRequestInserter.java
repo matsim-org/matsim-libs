@@ -129,12 +129,14 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		} else {
 			InsertionWithDetourData insertion = best.get();
 			var vehicle = insertion.insertion.vehicleEntry.vehicle;
+			// the request variant of the chosen insertion (same id as req, links and time windows of the chosen stops)
+			var stopRequest = insertion.insertion.getRequest();
 
-			double pickupDuration = stopDurationProvider.calcPickupDuration(vehicle, req);
-			double dropoffDuration = stopDurationProvider.calcDropoffDuration(vehicle, req);
+			double pickupDuration = stopDurationProvider.calcPickupDuration(vehicle, stopRequest);
+			double dropoffDuration = stopDurationProvider.calcDropoffDuration(vehicle, stopRequest);
 
 			// accept offered drt ride
-			var acceptedRequest = drtOfferAcceptor.acceptDrtOffer(req,
+			var acceptedRequest = drtOfferAcceptor.acceptDrtOffer(stopRequest,
 				insertion.detourTimeInfo.pickupDetourInfo.requestPickupTime,
 				insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime,
 				pickupDuration, dropoffDuration);
@@ -162,7 +164,9 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 				eventsManager.processEvent(
 					new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerIds(), vehicle.getId(),
-						expectedPickupTime, expectedDropoffTime));
+						expectedPickupTime, expectedDropoffTime,
+						// the scheduled stops (may differ from the submitted request with stop selection)
+						stopRequest.getFromLink().getId(), stopRequest.getToLink().getId()));
 			} else {
 				retryOrReject(req, now, OFFER_REJECTED_CAUSE);
 			}
