@@ -1,10 +1,12 @@
 package org.matsim.dsim;
 
+import org.apache.commons.math3.util.Precision;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.misc.Time;
 
@@ -180,6 +182,13 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 		}
 		if (trafficDynamics == QSimConfigGroup.TrafficDynamics.withHoles) {
 			throw new IllegalArgumentException("TrafficDynamics=withHoles is not implemented for DSim. Available options: [queue, kinematicWaves (default)]");
+		}
+		// DSim scales the vehicles' pce by 1 / flowCapFactor and has no storage capacity factor of its own. The global
+		// relativeToleranceForSampleSizeFactors is for the qsim and does not apply here.
+		if (ControllerConfigGroup.MobsimType.dsim.name().equals(config.controller().getMobsim())
+			&& !Precision.equalsWithRelativeTolerance(config.qsim().getFlowCapFactor(), config.qsim().getStorageCapFactor(), 0.)) {
+			throw new IllegalArgumentException("qsim.storageCapacityFactor=" + config.qsim().getStorageCapFactor() + " differs from qsim.flowCapacityFactor="
+				+ config.qsim().getFlowCapFactor() + ". DSim takes both from the flow capacity factor, so they must be equal, whatever global.relativeToleranceForSampleSizeFactors says.");
 		}
 		if (networkModes.isEmpty()) {
 			log.warn("No network modes were defined. Most of the times at least car is simulated as network mode. Make sure this is intended.");

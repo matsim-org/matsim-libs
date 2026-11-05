@@ -25,6 +25,10 @@ package org.matsim.freight.logistics.analysis;
 import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
+/**
+ * Guice module that binds {@link LspScoreStatsControlerListener} (as a singleton)
+ * as both a controller listener and the {@link LspScoreStats} implementation.
+ */
 public class LspScoreStatsModule extends AbstractModule {
     @Override
     public void install() {

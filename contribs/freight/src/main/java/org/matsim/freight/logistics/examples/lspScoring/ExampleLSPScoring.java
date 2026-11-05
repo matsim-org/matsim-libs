@@ -49,11 +49,11 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-/* Example for customized scoring. Each customer that is visited will give a random tip between zero and five
- *
- *
+/**
+ * Example for customized scoring in which each visited customer grants a random tip between zero
+ * and five. The example demonstrates registering an {@link LSPScorer} that also reacts to
+ * carrier service end events to accumulate the tips.
  */
-
 /*package-private*/ final class ExampleLSPScoring {
 
   private ExampleLSPScoring() {}
@@ -166,8 +166,8 @@ import org.matsim.vehicles.VehicleUtils;
 
     Controller controller = prepareController(scenario);
 
-    // The VSP default settings are designed for person transport simulation. After talking to Kai,
-    // they will be set to WARN here. Kai MT may'23
+    // The VSP default settings are designed for person transport simulation, so the checking
+    // level is relaxed to WARN here.      (KMT may'23 after talking to Kai)
     controller
         .getConfig()
         .vspExperimental()
@@ -235,11 +235,18 @@ import org.matsim.vehicles.VehicleUtils;
     private final Random tipRandom;
     private double tipSum;
 
-    /*package-private*/ TipScorer() {
+    /**
+   * Example {@link LSPScorer} that awards a random tip (zero to five) every time a carrier finishes a
+   * service, and reports the accumulated tip sum as the plan score.
+   */
+  /*package-private*/ TipScorer() {
       tipRandom = new Random(1);
       tipSum = 0;
     }
 
+    /**
+   * @return the accumulated tips awarded since the last {@link #reset(int)}
+   */
     @Override
     public double getScoreForCurrentPlan() {
       return tipSum;
@@ -247,9 +254,14 @@ import org.matsim.vehicles.VehicleUtils;
 
     @Override
     public void setEmbeddingContainer(LSP pointer) {
-      // backpointer not needed here, therefor not memorizing it.  kai, jun'22
+      // The backpointer is not used in this example.
     }
 
+    /**
+   * Awards a random tip on every carrier service end and adds it to the running tip sum.
+   *
+   * @param event the carrier service end event that triggers the tip
+   */
     @Override
     public void handleEvent(CarrierServiceEndEvent event) {
       double tip = tipRandom.nextDouble() * 5;
@@ -257,6 +269,11 @@ import org.matsim.vehicles.VehicleUtils;
       tipSum += tip;
     }
 
+    /**
+   * Clears the accumulated tip sum before a new iteration.
+   *
+   * @param iteration the current planning iteration (ignored beyond the reset)
+   */
     @Override
     public void reset(int iteration) {
       tipSum = 0.;
