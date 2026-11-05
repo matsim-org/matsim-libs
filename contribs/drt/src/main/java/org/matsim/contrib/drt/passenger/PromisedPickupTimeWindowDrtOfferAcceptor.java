@@ -26,8 +26,11 @@ public final class PromisedPickupTimeWindowDrtOfferAcceptor implements DrtOfferA
 				.earliestStartTime(request.getEarliestStartTime())
 				.latestArrivalTime(request.getLatestArrivalTime())
 				.latestStartTime(updatedPickupTimeWindow)
+				.maxRideDuration(request.getConstraints().maxRideDuration())
 				.pickupDuration(pickupDuration)
 				.dropoffDuration(dropoffDuration)
+				.plannedPickupTime(departureTime)
+				.plannedDropoffTime(arrivalTime)
 				.build());
 	}
 }
