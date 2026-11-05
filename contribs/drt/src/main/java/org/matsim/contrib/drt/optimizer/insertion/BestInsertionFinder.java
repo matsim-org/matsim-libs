@@ -53,11 +53,13 @@ public class BestInsertionFinder {
 					.thenComparingInt(BestInsertionFinder::variantIndex);
 
 	private static double walkDuration(Insertion insertion) {
-		return insertion.getVariant() == null ? 0 : insertion.getVariant().walkDuration();
+		RequestVariant variant = insertion.variantOrNull();
+		return variant == null ? 0 : variant.walkDuration();
 	}
 
 	private static int variantIndex(Insertion insertion) {
-		return insertion.getVariant() == null ? 0 : insertion.getVariant().index();
+		RequestVariant variant = insertion.variantOrNull();
+		return variant == null ? 0 : variant.index();
 	}
 
 	public static final Comparator<InsertionWithCost> INSERTION_WITH_COST_COMPARATOR = //
