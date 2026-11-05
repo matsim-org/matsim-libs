@@ -20,8 +20,12 @@
 
 package org.matsim.contrib.drt.run;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.inject.Singleton;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
+import org.matsim.contrib.drt.passenger.DrtMinimumTripDistanceRequestValidator;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.passenger.DrtServiceRegimeRequestValidator;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
@@ -117,13 +121,23 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 			bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
 		}
 
-		if (drtCfg.getServiceRegimesParams().isPresent()) {
-			// the service regime is a hard constraint, also for requests which have not been routed in this run
-			// (prebooking, within-day replanning, input plans carrying finished DRT routes)
-			bindModal(PassengerRequestValidator.class).toProvider(modalProvider(
-					getter -> new CompositePassengerRequestValidator(new DefaultPassengerRequestValidator(),
-							new DrtServiceRegimeRequestValidator(getter.getModal(DrtServiceRegimes.class)))))
-					.asEagerSingleton();
+		// the service regime and the minimum trip distance are hard constraints, also for requests which have not been
+		// routed in this run (prebooking, within-day replanning, input plans carrying finished DRT routes)
+		DrtMinimumTripDistanceRequestValidator minimumTripDistanceValidator = DrtMinimumTripDistanceRequestValidator
+				.forConstraintsSets(drtCfg.addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets());
+		boolean validateMinimumTripDistance = minimumTripDistanceValidator.getMinimumTripDistance() > 0;
+		if (drtCfg.getServiceRegimesParams().isPresent() || validateMinimumTripDistance) {
+			bindModal(PassengerRequestValidator.class).toProvider(modalProvider(getter -> {
+				List<PassengerRequestValidator> validators = new ArrayList<>();
+				validators.add(new DefaultPassengerRequestValidator());
+				if (drtCfg.getServiceRegimesParams().isPresent()) {
+					validators.add(new DrtServiceRegimeRequestValidator(getter.getModal(DrtServiceRegimes.class)));
+				}
+				if (validateMinimumTripDistance) {
+					validators.add(minimumTripDistanceValidator);
+				}
+				return new CompositePassengerRequestValidator(validators);
+			})).asEagerSingleton();
 		} else {
 			bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 		}

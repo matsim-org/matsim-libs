@@ -30,7 +30,7 @@ public interface SimLink {
 
 	DistributedMobsimVehicle peekFirstVehicle();
 
-	DistributedMobsimVehicle popVehicle();
+	DistributedMobsimVehicle popVehicle(double now);
 
 	Collection<DistributedMobsimVehicle> removeAllVehicles();
 
@@ -164,9 +164,9 @@ public interface SimLink {
 		}
 
 		@Override
-		public DistributedMobsimVehicle popVehicle() {
+		public DistributedMobsimVehicle popVehicle(double now) {
 			try {
-				return buffer.pollFirst();
+				return buffer.pollFirst(now);
 			} catch (NoSuchElementException e) {
 				throw new RuntimeException("The simulation attempted to take a vehicle from the buffer of a link "
 					+ this.id + ", but the buffer was empty. Call 'isOffering' first.");
@@ -180,7 +180,7 @@ public interface SimLink {
 				result.add(q.poll(Double.MIN_VALUE));
 			}
 			while (buffer.peek() != null) {
-				result.add(buffer.pollFirst());
+				result.add(buffer.pollFirst(Double.MIN_VALUE));
 			}
 			return result;
 		}
@@ -332,7 +332,7 @@ public interface SimLink {
 		}
 
 		@Override
-		public DistributedMobsimVehicle popVehicle() {
+		public DistributedMobsimVehicle popVehicle(double now) {
 			throw new RuntimeException("Not yet implemented");
 		}
 
@@ -455,9 +455,9 @@ public interface SimLink {
 		}
 
 		@Override
-		public DistributedMobsimVehicle popVehicle() {
+		public DistributedMobsimVehicle popVehicle(double now) {
 
-			var result = localLink.popVehicle();
+			var result = localLink.popVehicle(now);
 			localLink.activateLink.accept(this);
 			return result;
 		}

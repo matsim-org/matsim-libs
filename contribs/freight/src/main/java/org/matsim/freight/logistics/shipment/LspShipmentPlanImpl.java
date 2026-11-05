@@ -23,6 +23,11 @@ package org.matsim.freight.logistics.shipment;
 import java.util.*;
 import org.matsim.api.core.v01.Id;
 
+/**
+ * Mutable implementation of {@link LspShipmentPlan}. Elements are stored in insertion order; the most
+ * recently added element is the one whose {@code getStartTime}/{@code getEndTime} are used to derive
+ * the next element that should be added.
+ */
 /*package-private*/ class LspShipmentPlanImpl implements LspShipmentPlan {
 
   private final Id<LspShipment> lspShipmentId;
@@ -36,6 +41,7 @@ import org.matsim.api.core.v01.Id;
   // TODO: Ist kein embedding container!
   @Override
   public void setEmbeddingContainer(Id<LspShipment> pointer) {
+    // Backpointers are not needed here; the plan is referenced from the owning LSPPlan.
     throw new RuntimeException("not implemented");
   }
 

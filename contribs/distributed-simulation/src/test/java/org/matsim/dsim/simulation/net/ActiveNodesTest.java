@@ -151,12 +151,12 @@ class ActiveNodesTest {
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
 		activeNodes.activate(node);
 
-		for (var now = 100; now < 100 + stuckThreshold; now++) {
+		for (var now = 100; now <= 100 + stuckThreshold; now++) {
 			activeNodes.doSimStep(now);
 			verify(nextLink, never()).pushVehicle(any(), any(), anyDouble());
 		}
 
-		activeNodes.doSimStep(100 + stuckThreshold);
+		activeNodes.doSimStep(100 + stuckThreshold + 1);
 		verify(nextLink, times(1)).pushVehicle(any(), any(), anyDouble());
 	}
 
