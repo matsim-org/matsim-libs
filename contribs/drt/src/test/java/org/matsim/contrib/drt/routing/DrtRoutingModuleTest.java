@@ -315,6 +315,81 @@ public class DrtRoutingModuleTest {
 				dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf6, wf6, 8 * 3600, p6)));
 	}
 
+	/**
+	 * A trip shorter than the minimum trip distance is not routed, i.e. the routing module returns null and the fallback
+	 * routing module takes over. Like maxWalkDistance, the minimum follows the constraints set chosen for the trip.
+	 */
+	@Test
+	void testTripsBelowTheMinimumTripDistanceAreNotRouted() {
+		Scenario scenario = createTestScenario();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
+		drtCfg.setMode("DrtX");
+
+		// no trip in the test scenario is that long
+		DrtOptimizationConstraintsSetImpl defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams()
+				.addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.setMinimumTripDistance(1_000_000);
+		defaultConstraintsSet.setMaxTravelTimeAlpha(1.5);
+		defaultConstraintsSet.setMaxTravelTimeBeta(5 * 60);
+		defaultConstraintsSet.setMaxWaitTime(5 * 60);
+
+		DrtOptimizationConstraintsSetImpl noMinimumConstraintsSet = new DrtOptimizationConstraintsSetImpl();
+		noMinimumConstraintsSet.setConstraintSetName("noMinimum");
+		noMinimumConstraintsSet.setMaxTravelTimeAlpha(1.5);
+		noMinimumConstraintsSet.setMaxTravelTimeBeta(5 * 60);
+		noMinimumConstraintsSet.setMaxWaitTime(5 * 60);
+		drtCfg.addOrGetDrtOptimizationConstraintsParams().addParameterSet(noMinimumConstraintsSet);
+
+		Assertions.assertTrue(DrtModeRoutingModule.isMinimumTripDistanceConfigured(drtCfg));
+
+		// person 1 is routed (see testCottbusClosestAccessEgressStopFinder) unless the minimum trip distance applies
+		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
+		Facility hf1 = FacilitiesUtils.toFacility((Activity)p1.getSelectedPlan().getPlanElements().get(0), facilities);
+		Facility wf1 = FacilitiesUtils.toFacility((Activity)p1.getSelectedPlan().getPlanElements().get(2), facilities);
+
+		DvrpRoutingModule defaultRouting = createMinimumTripDistanceRoutingModule(scenario, drtCfg,
+				defaultConstraintsSet,
+				(departureTime, accessActLink, egressActLink, person, tripAttributes) -> Optional.of(
+						defaultConstraintsSet));
+		Assertions.assertNull(defaultRouting.calcRoute(DefaultRoutingRequest.withoutAttributes(hf1, wf1, 8 * 3600, p1)));
+
+		DvrpRoutingModule noMinimumRouting = createMinimumTripDistanceRoutingModule(scenario, drtCfg,
+				defaultConstraintsSet,
+				(departureTime, accessActLink, egressActLink, person, tripAttributes) -> Optional.of(
+						person == p1 ? noMinimumConstraintsSet : defaultConstraintsSet));
+		Assertions.assertNotNull(
+				noMinimumRouting.calcRoute(DefaultRoutingRequest.withoutAttributes(hf1, wf1, 8 * 3600, p1)));
+	}
+
+	private static DvrpRoutingModule createMinimumTripDistanceRoutingModule(Scenario scenario, DrtConfigGroup drtCfg,
+			DrtOptimizationConstraintsSetImpl defaultConstraintsSet, ConstraintSetChooser constraintSetChooser) {
+		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario, 0.83333,
+				1.3, null);
+		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
+				.getFacilities()
+				.values()
+				.stream()
+				.map(DrtStopFacilityImpl::createFromFacility)
+				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
+
+		AccessEgressFacilityFinder stopFinder = new MinimumTripDistanceAccessEgressFacilityFinder(
+				new ClosestAccessEgressFacilityFinder(defaultConstraintsSet.getMaxWalkDistance(), scenario.getNetwork(),
+						QuadTrees.createQuadTree(drtStops.values())),
+				DrtModeRoutingModule.minimumTripDistance(constraintSetChooser, defaultConstraintsSet,
+						scenario.getNetwork()), scenario.getNetwork());
+
+		DvrpLoadType loadType = new IntegerLoadType("passengers");
+		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
+				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
+				new DefaultDrtRouteConstraintsCalculator(drtCfg, constraintSetChooser),
+				new DefaultDvrpLoadFromTrip(loadType, "passengers"), loadType);
+		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtCfg.getMode(), scenario.getNetwork(),
+				scenario.getPopulation().getFactory(), drtRouteCreator);
+		return new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder, drtCfg.getMode(),
+				TimeInterpretation.create(scenario.getConfig()));
+	}
+
 	@Test
 	void testRouteDescriptionHandling() {
 		String newRouteFormatV3 =

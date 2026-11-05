@@ -36,6 +36,12 @@ import org.matsim.freight.logistics.shipment.LspShipmentLeg;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
+/**
+ * An {@link LSPSimulationTracker} (and {@link CarrierServiceEndEventHandler}) that, on the end of a
+ * carrier's service, logs the {@link LspShipment}'s load and transport legs into the shipment's log.
+ *
+ * <p>It is attached to each {@link LspShipment} as a simulation tracker during scheduling.
+ */
 /*package-private*/ class CollectionJobEventHandler implements AfterMobsimListener, CarrierServiceEndEventHandler, LSPSimulationTracker<LspShipment> {
 
 	private final CarrierService carrierService;

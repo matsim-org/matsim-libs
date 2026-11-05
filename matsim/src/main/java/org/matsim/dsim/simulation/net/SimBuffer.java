@@ -1,6 +1,5 @@
 package org.matsim.dsim.simulation.net;
 
-import it.unimi.dsi.fastutil.doubles.DoubleArrayFIFOQueue;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 
 import java.util.ArrayDeque;
@@ -11,7 +10,13 @@ import java.util.stream.Collectors;
 class SimBuffer {
 
 	private final Queue<DistributedMobsimVehicle> internalBuffer;
-	private final DoubleArrayFIFOQueue arrivalTimes = new DoubleArrayFIFOQueue();
+
+	/**
+	 * Since when the vehicle at the front of the buffer has been waiting there: since it entered the empty buffer, or since the vehicle
+	 * before it left. As {@code bufferLastMovedTime} in qsim's {@code QueueWithBuffer}, so that a blocked link moves one stuck vehicle
+	 * per stuck time, and not every vehicle in its buffer that has waited for that long.
+	 */
+	private double lastMovedTime = Double.NEGATIVE_INFINITY;
 
 	private final FlowCapacity flowCap;
 	private final double stuckThreshold;
@@ -41,15 +46,20 @@ class SimBuffer {
 		// TODO add flow efficiency
 		this.flowCap.consume(vehicle.getSizeInEquivalents());
 		this.pceInBuffer += vehicle.getSizeInEquivalents();
+		if (this.internalBuffer.isEmpty()) {
+			this.lastMovedTime = now;
+		}
 		this.internalBuffer.add(vehicle);
-		this.arrivalTimes.enqueue(now);
 		this.activateToNode.accept(toNode);
 	}
 
-	DistributedMobsimVehicle pollFirst() {
+	DistributedMobsimVehicle pollFirst(double now) {
 		DistributedMobsimVehicle result = this.internalBuffer.remove();
 		this.pceInBuffer -= result.getSizeInEquivalents();
-		this.arrivalTimes.dequeueDouble();
+		this.lastMovedTime = now;
+		// the flow capacity which the vehicle held on to accumulates from now on, not since the buffer was last asked for space. As
+		// qsim's QueueWithBuffer.removeFirstVehicle.
+		this.flowCap.restartAccumulation(now);
 		return result;
 	}
 
@@ -58,12 +68,16 @@ class SimBuffer {
 	}
 
 	boolean isAvailable(double now) {
-		flowCap.update(now);
+		// The vehicles in the buffer hold on to the flow capacity they consumed until they leave, as in qsim's
+		// QueueWithBuffer.updateFastFlowAccumulation. Otherwise, a buffer refills while its vehicle waits for a full link, and the next
+		// vehicle follows it without the time the flow capacity needs for that vehicle.
+		flowCap.update(now, flowCap.getMax() - pceInBuffer);
 		return pceInBuffer < flowCap.getMax() && flowCap.isAvailable();
 	}
 
 	boolean isStuck(double now) {
-		return !arrivalTimes.isEmpty() && arrivalTimes.firstDouble() + stuckThreshold <= now;
+		// after more than the stuck time, as qsim's QNodeImpl.vehicleIsStuck
+		return !internalBuffer.isEmpty() && now - lastMovedTime > stuckThreshold;
 	}
 
 	@Override

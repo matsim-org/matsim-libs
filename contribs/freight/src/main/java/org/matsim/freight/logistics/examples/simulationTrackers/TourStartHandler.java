@@ -29,6 +29,10 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
 
+/**
+ * Example {@link org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler} that
+ * accumulates the fixed vehicle costs for tours that start during a simulation run.
+ */
 /*package-private*/ class TourStartHandler implements CarrierTourStartEventHandler {
 
   private static final Logger log = LogManager.getLogger(TourStartHandler.class);
@@ -49,15 +53,17 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHand
     log.debug("handling tour start event={}", event.toString());
 
     CarrierVehicle carrierVehicle = null;
-    /*
-     * This somehow a workaround, because the Vehicle can't get received from the (MATSim) allVehicle container.
-     * At the TourStartEvent stage, the event.getVehicle is still not known ("null"), because it bases on ActivityEndEvent.
-     * And since it is the first ActEndEvent of the person, it never entered a vehicle before -.-
-     *
-     * My preferred approach would have been something like
-     * final Vehicle vehicle = allVehicles.getVehicles().get(event.getVehicleId());
-     *  kmt sep'22
-     */
+	  /*
+	   * This somehow a workaround, because the Vehicle can't get received from the (MATSim) allVehicle container.
+	   * At the TourStartEvent stage, the event.getVehicle is still not known ("null"), because it bases on ActivityEndEvent.
+	   * And since it is the first ActEndEvent of the person, it never entered a vehicle before -.-
+	   *
+	   * My preferred approach would have been something like
+	   * final Vehicle vehicle = allVehicles.getVehicles().get(event.getVehicleId());
+	   *  kmt sep'22
+	   */
+    // The vehicle is looked up from the carrier's selected plan because it is not yet known at
+    // the tour start stage; the event id only carries the tour, not the vehicle.
     Carrier carrier = carriers.getCarriers().get(event.getCarrierId());
     Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
     for (ScheduledTour scheduledTour : scheduledTours) {
@@ -75,7 +81,7 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHand
    * ATTENTION: Does this really give back the costs of the current vehicle? Or is the value maybe
    * overwritten if another event happens before calling the getFixedCosts function? kmt sep'22
    *
-   * @return the fixedCosts
+   * @return the sum of fixed vehicle costs for the tours that started during the current iteration
    */
   public double getVehicleFixedCosts() {
     return vehicleFixedCosts;

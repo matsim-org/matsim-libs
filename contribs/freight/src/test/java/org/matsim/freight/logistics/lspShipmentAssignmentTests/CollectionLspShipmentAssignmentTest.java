@@ -47,7 +47,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-public class CollectionLspShipmentAssigmentTest {
+public class CollectionLspShipmentAssignmentTest {
 
 	private LSPPlan collectionPlan;
 	private LSP collectionLSP;

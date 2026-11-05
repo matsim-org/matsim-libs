@@ -58,7 +58,7 @@ class VehicleDepartingOnLinkTest {
 		verify(em, times(0)).processEvent(any());
 
 		// free the link
-		assertEquals(blockingVehicle.getId(), simLink.popVehicle().getId());
+		assertEquals(blockingVehicle.getId(), simLink.popVehicle(0).getId());
 		simLink.doSimStep(2);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer, 2));
 		assertFalse(simLink.isOffering());
@@ -67,12 +67,12 @@ class VehicleDepartingOnLinkTest {
 		wait2link.moveWaiting(2);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 2));
 		assertTrue(simLink.isOffering());
-		assertEquals(simVehicle1.getId(), simLink.popVehicle().getId());
+		assertEquals(simVehicle1.getId(), simLink.popVehicle(2).getId());
 		verify(em, times(1)).processEvent(any());
 
 		simLink.doSimStep(4);
 		wait2link.moveWaiting(4);
-		assertEquals(simVehicle2.getId(), simLink.popVehicle().getId());
+		assertEquals(simVehicle2.getId(), simLink.popVehicle(4).getId());
 		verify(em, times(2)).processEvent(any());
 	}
 
@@ -157,8 +157,8 @@ class VehicleDepartingOnLinkTest {
 		wait2link.accept(simVehicle2, simLink2, 0);
 		wait2link.moveWaiting(0);
 
-		assertEquals(simVehicle1.getId(), simLink1.popVehicle().getId());
-		assertEquals(simVehicle2.getId(), simLink2.popVehicle().getId());
+		assertEquals(simVehicle1.getId(), simLink1.popVehicle(0).getId());
+		assertEquals(simVehicle2.getId(), simLink2.popVehicle(0).getId());
 	}
 
 	private static PersonDriverAgentImpl createPerson(String id, List<String> linkIds, EventsManager em) {

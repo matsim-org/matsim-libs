@@ -49,7 +49,6 @@ import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.freight.logistics.LspTestUtils;
 
 public class CollectionLSPSchedulingTest {
 

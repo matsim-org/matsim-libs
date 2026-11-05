@@ -33,20 +33,27 @@ import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
+/**
+ * Utility methods and builders related to {@link LspShipment} and the elements of a
+ * {@link LspShipmentPlan}. The builders produce the concrete plan elements
+ * ({@code ScheduledLspShipment*} and {@code LoggedLspShipment*}); the helper methods store timing
+ * attributes on a shipment.
+ */
 public final class LspShipmentUtils {
   private LspShipmentUtils() {} // do not instantiate
 
+  /** @return a comparator ordering shipment plan elements by start, then end time. */
   public static Comparator<LspShipmentPlanElement> createShipmentPlanElementComparator() {
     return new ShipmentPlanElementComparator();
   }
 
   /**
-   * Gives back the {@link LspShipmentPlan} object of the {@link LSPPlan}, which matches to the id of
-   * the {@link LspShipment}
+   * Returns the {@link LspShipmentPlan} of the {@link LSPPlan} that matches the given shipment id,
+   * creating and adding one if it does not yet exist.
    *
-   * @param lspPlan The lspPlan in which this method tries to find the shipmentPlan.
-   * @param shipmentId Id of the shipment for which the Plan should be found.
-   * @return the ShipmentPlan object or null, if it is not found.
+   * @param lspPlan the plan in which the shipment plan is searched for
+   * @param shipmentId id of the shipment for which the shipment plan is looked up
+   * @return the shipment plan, or {@code null} if it is not found
    */
   public static LspShipmentPlan getOrCreateShipmentPlan(LSPPlan lspPlan, Id<LspShipment> shipmentId) {
     // Return shipmentPlan if already existing in LspPlan
@@ -62,12 +69,12 @@ public final class LspShipmentUtils {
   }
 
   /**
-   * Stores a time as Attribute in the LspShipment.
-   * This is needed for some kind of tracking the shipment.
+   * Stores a time as an attribute of the {@link LspShipment}, e.g. for tracking the shipment.
    * <p>
    * This will replace the LSPShipmentWithTime class and thus reduce the complexity of the code.
    * KMT Jul'24
-   * @param lspShipment the LspShipment to store the time in
+   *
+   * @param lspShipment the shipment to store the time in
    * @param time the time to store
    */
   public static void setTimeOfLspShipment(LspShipment lspShipment, double time){
@@ -75,16 +82,17 @@ public final class LspShipmentUtils {
   }
 
   /**
-   * Returns the time stored in the LspShipment.
+   * Returns the time stored in the {@link LspShipment} by {@link #setTimeOfLspShipment(LspShipment, double)}.
    * <p>
    * This will replace the LSPShipmentWithTime class and thus reduce the complexity of the code. KMT Jul'24
-   * @param lspShipment the LspShipment to get the time from
-   * @return the time as double
+   * @param lspShipment the shipment to read the time from
+   * @return the stored time as a double
    */
   public static double getTimeOfLspShipment(LspShipment lspShipment) {
     return (double) lspShipment.getAttributes().getAttribute("time");
   }
 
+  /** Builder for {@link LspShipment} instances. */
   public static final class LspShipmentBuilder {
     final Id<LspShipment> id;
     final List<LspShipmentRequirement> lspShipmentRequirements;
@@ -149,6 +157,7 @@ public final class LspShipmentUtils {
   //This would be closer to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
   //-----------------------------
 
+  /** Builds {@code LoggedLspShipmentLoad} instances from a shipment's logged data. */
   @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class LoggedShipmentLoadBuilder {
     private double startTime;
@@ -288,6 +297,7 @@ public final class LspShipmentUtils {
     }
   }
 
+  /** Builds {@code LoggedLspShipmentUnload} instances from a shipment's logged data. */
   @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class LoggedShipmentUnloadBuilder {
     double startTime;
@@ -332,6 +342,7 @@ public final class LspShipmentUtils {
     }
   }
 
+  /** Builds {@code LoggedLspShipmentHandling} instances from a shipment's logged data. */
   public static final class LoggedShipmentHandleBuilder {
     double startTime;
     double endTime;
@@ -375,10 +386,10 @@ public final class LspShipmentUtils {
     }
   }
 
-  //-----------------------------
-  // ScheduledShipment<..> builders
-  //-----------------------------
+  // ---- ScheduledShipment<..> builders ----
+  // These produce the elements recorded in the pre-simulation shipment plan.
 
+  /** Builds {@code ScheduledLspShipmentLoad} instances from a shipment's pre-simulation load plan. */
   @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class ScheduledShipmentLoadBuilder {
     double startTime;
@@ -416,6 +427,7 @@ public final class LspShipmentUtils {
     }
   }
 
+  /** Builds {@code ScheduledLspShipmentTransport} instances from a pre-simulation transport plan. */
   @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class ScheduledShipmentTransportBuilder {
     double startTime;
@@ -475,6 +487,7 @@ public final class LspShipmentUtils {
     }
   }
 
+  /** Builds {@code ScheduledLspShipmentUnload} instances from a pre-simulation unload plan. */
   @SuppressWarnings("ClassEscapesDefinedScope")
   public static final class ScheduledShipmentUnloadBuilder {
     double startTime;

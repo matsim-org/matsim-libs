@@ -83,7 +83,7 @@ public class ActiveNodes implements Steppable {
 					var rndNum = node.nextDouble() * availableCapacity;
 					// this test ensures that links with higher capacities have a higher probability of being served first.
 					if (selectedCapacity >= rndNum) {
-						var vehicle = inLink.popVehicle();
+						var vehicle = inLink.popVehicle(now);
 						move(inLink, vehicle, node.getOutLinks(), now);
 					}
 				} else {

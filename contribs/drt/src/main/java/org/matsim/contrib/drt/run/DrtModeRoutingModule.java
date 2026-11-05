@@ -42,6 +42,7 @@ import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
+import org.matsim.contrib.drt.routing.MinimumTripDistanceAccessEgressFacilityFinder;
 import org.matsim.contrib.drt.util.DumpDrtStopsAtEnd;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
@@ -170,24 +171,30 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 								regime.startTime().orElse(Double.NEGATIVE_INFINITY),
 								regime.endTime().orElse(Double.POSITIVE_INFINITY), delegateFactory.apply(regime)))
 						.toList();
-				return new TimeDependentAccessEgressFacilityFinder(timeWindows);
+				return withMinimumTripDistance(new TimeDependentAccessEgressFacilityFinder(timeWindows),
+						getter.getModal(ConstraintSetChooser.class), optimizationConstraintsSet, network);
 			})).asEagerSingleton();
 		} else {
 			switch(drtCfg.getOperationalScheme()){
 				case door2door -> bindModal( AccessEgressFacilityFinder.class ).toProvider(
-													       modalProvider( getter -> new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ) ) )
+													       modalProvider( getter -> withMinimumTripDistance(
+															       new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ),
+															       getter.getModal( ConstraintSetChooser.class ), optimizationConstraintsSet,
+															       getter.getModal( Network.class ) ) ) )
 											       .asEagerSingleton();
 				case stopbased, serviceAreaBased -> {
 					bindModal( AccessEgressFacilityFinder.class ).toProvider( modalProvider(
 							getter -> {
 								Network network = getter.get( Network.class );
-								return new ClosestAccessEgressFacilityFinder(
+								ConstraintSetChooser constraintSetChooser = getter.getModal( ConstraintSetChooser.class );
+								return withMinimumTripDistance( new ClosestAccessEgressFacilityFinder(
 										// maxWalkDistance is a property of the constraints set, and which constraints set applies
 										// is decided per trip by the ConstraintSetChooser (as in DefaultDrtRouteConstraintsCalculator)
-										maxWalkDistance( getter.getModal( ConstraintSetChooser.class ), optimizationConstraintsSet, network ),
+										maxWalkDistance( constraintSetChooser, optimizationConstraintsSet, network ),
 										optimizationConstraintsSet.getMaxWalkDistance(),
 															     network,
-															     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) );
+															     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) ),
+										constraintSetChooser, optimizationConstraintsSet, network );
 							} ) )
 										     .asEagerSingleton();
 				}
@@ -232,6 +239,45 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 						network.getLinks().get(egressFacility.getLinkId()), request.getPerson(), request.getAttributes())
 				.orElse(defaultConstraintsSet)
 				.getMaxWalkDistance();
+	}
+
+	/**
+	 * Asks the {@link ConstraintSetChooser} which constraints set applies to the trip at hand and returns its
+	 * {@code minimumTripDistance}. As in {@link #maxWalkDistance}, the chooser is asked with the access and egress
+	 * <b>stop</b> links.
+	 */
+	public static MinimumTripDistanceAccessEgressFacilityFinder.MinimumTripDistance minimumTripDistance(
+			ConstraintSetChooser constraintSetChooser, DrtOptimizationConstraintsSet defaultConstraintsSet,
+			Network network) {
+		return (request, accessFacility, egressFacility) -> constraintSetChooser.chooseConstraintSet(
+						request.getDepartureTime(), network.getLinks().get(accessFacility.getLinkId()),
+						network.getLinks().get(egressFacility.getLinkId()), request.getPerson(), request.getAttributes())
+				.orElse(defaultConstraintsSet)
+				.getMinimumTripDistance();
+	}
+
+	/**
+	 * @return true if any constraints set of the mode defines a positive minimum trip distance
+	 */
+	public static boolean isMinimumTripDistanceConfigured(DrtConfigGroup drtCfg) {
+		return drtCfg.addOrGetDrtOptimizationConstraintsParams()
+				.getDrtOptimizationConstraintsSets()
+				.stream()
+				.anyMatch(constraintsSet -> constraintsSet.getMinimumTripDistance() > 0);
+	}
+
+	/**
+	 * Wraps the finder so that it refuses too short trips. Without a positive minimum trip distance in any constraints
+	 * set, the finder is returned unchanged, so the default behaviour is not affected.
+	 */
+	private AccessEgressFacilityFinder withMinimumTripDistance(AccessEgressFacilityFinder finder,
+			ConstraintSetChooser constraintSetChooser, DrtOptimizationConstraintsSet defaultConstraintsSet,
+			Network network) {
+		if (!isMinimumTripDistanceConfigured(drtCfg)) {
+			return finder;
+		}
+		return new MinimumTripDistanceAccessEgressFacilityFinder(finder,
+				minimumTripDistance(constraintSetChooser, defaultConstraintsSet, network), network);
 	}
 
 	private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DvrpMode, DrtRouteCreator> {
