@@ -143,6 +143,26 @@ public class RequestVariantsTest {
 				.allMatch(v -> v.egressWalkDuration() == 130);
 	}
 
+	/**
+	 * Far pickup and dropoff stops can use up the whole travel budget between the two stops. Such a variant can never
+	 * be feasible and is not created, so that no detour paths are calculated for it.
+	 */
+	@Test
+	void variantsWithoutTravelBudgetAreSkipped() {
+		// own stops without walking: departure at the origin 1000, latest arrival at the destination 1000 + 1800 = 2800
+		DrtRequest request = builder().stopCandidates(new DrtStopCandidates(0, 0,
+				List.of(new DrtStopCandidate(accessFar, 1000), new DrtStopCandidate(accessNear, 1100)),
+				List.of(new DrtStopCandidate(egressFar, 800)))).build();
+
+		// (accessFar, egressFar): earliest start 2000, latest arrival 2800 - 800 = 2000 -> no budget, skipped
+		// (accessNear, egressFar): earliest start 2100 > latest arrival 2000 -> skipped
+		var variants = RequestVariants.of(request);
+		assertThat(variants).extracting(v -> v.request().getFromLink().getId() + "-" + v.request().getToLink().getId())
+				.containsExactly("from-to", "from-egressFar", "accessFar-to", "accessNear-to");
+		assertThat(variants).extracting(RequestVariant::index).containsExactly(0, 1, 2, 3);
+		assertThat(variants).allMatch(v -> v.request().getLatestArrivalTime() > v.request().getEarliestStartTime());
+	}
+
 	@Test
 	void copyOfRequestKeepsCandidates() {
 		// as in DrtRequestInsertionRetryQueue

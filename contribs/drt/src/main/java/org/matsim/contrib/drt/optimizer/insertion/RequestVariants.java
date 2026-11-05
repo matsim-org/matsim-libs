@@ -21,7 +21,8 @@ public final class RequestVariants {
 
 	/**
 	 * Returns all variants of the request as an immutable list. Index 0 is the request itself (its own from/to link);
-	 * then one variant per further combination of pickup and dropoff stop, skipping combinations on the same link.
+	 * then one variant per further combination of pickup and dropoff stop, skipping combinations on the same link and
+	 * combinations whose latest arrival is not after their earliest start (no travel budget between the two stops).
 	 * Candidates on a link that already occurs (the request's own link or an earlier candidate) are ignored, so each
 	 * pair of links is evaluated once; the first candidate per link wins.
 	 * Without stop candidates, a single variant wrapping the request.
@@ -65,6 +66,9 @@ public final class RequestVariants {
 				}
 				double earliestStart = departureAtOrigin + pickup.walkDuration();
 				double latestArrival = latestArrivalAtDestination - dropoff.walkDuration();
+				if (latestArrival <= earliestStart) {
+					continue; // no travel budget between the two stops: never feasible, skip the path calculation
+				}
 				DrtRequest variantRequest = DrtRequest.newBuilder(request)
 						.stopCandidates(null)
 						.fromLink(pickup.link())
