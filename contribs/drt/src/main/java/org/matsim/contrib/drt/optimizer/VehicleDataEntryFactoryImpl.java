@@ -138,6 +138,11 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	 *     their dropoff, including the start.</li>
 	 * </ul>
 	 * Stay times before a stop absorb delays for both kinds of constraints.
+	 * <p>
+	 * A vehicle running late (e.g. due to congestion, or a request accepted with a soft constraint violation) has a
+	 * negative slack. The reported slack per insertion point is capped at 0, so insertions without time loss stay
+	 * feasible. The running value itself stays uncapped, so that an upstream stay time first absorbs the existing
+	 * delay before it creates new slack.
 	 */
 	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, StopWaypoint[] stops, StopWaypoint start,
 									  List<Double> precedingStayTimes) {
@@ -185,13 +190,13 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 			double stayTime = precedingStayTimes.get(i); // reset slack before prebooked request
 			timeWindowSlack += stayTime;
 			accumulatedStayTime += stayTime;
-			slackTimes[i + 1] = Math.min(timeWindowSlack, minRideSlack(rideSlackOffsets, accumulatedStayTime));
+			slackTimes[i + 1] = Math.max(0, Math.min(timeWindowSlack, minRideSlack(rideSlackOffsets, accumulatedStayTime)));
 		}
 
 		// start: the remaining ride constraints belong to passengers already on board
 		double slackTime = Math.min(timeWindowSlack, minRideSlack(rideSlackOffsets, accumulatedStayTime));
-		slackTimes[0] = start == null ? slackTime :
-			Math.min(start.getLatestDepartureTime() - start.getTask().getEndTime(), slackTime);
+		slackTimes[0] = Math.max(0, start == null ? slackTime :
+			Math.min(start.getLatestDepartureTime() - start.getTask().getEndTime(), slackTime));
 
 		return slackTimes;
 	}

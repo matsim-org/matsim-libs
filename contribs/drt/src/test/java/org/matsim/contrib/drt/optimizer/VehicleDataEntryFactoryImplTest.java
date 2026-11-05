@@ -466,4 +466,27 @@ public class VehicleDataEntryFactoryImplTest {
 
 		assertThat(slackTimes).containsExactly(30, 30, 1000);
 	}
+
+	/**
+	 * A late stop (planned arrival after its latest arrival time) yields a negative slack. The reported slack is capped
+	 * at 0 so that insertions without time loss remain feasible, while upstream stay times first absorb the existing
+	 * delay.
+	 */
+	@Test
+	void computeSlackTimes_lateStop_cappedAtZero() {
+		StopWaypoint stop0 = stop(100, 1100, 110, 1110);
+		// arrives at 300 but must arrive by 250: 50 s late
+		StopWaypoint lateStop = stop(300, 250, 310, 1310);
+		StopWaypoint[] stops = new StopWaypoint[] {stop0, lateStop};
+		DvrpVehicle vehicle = vehicle(2000, 1000);
+
+		// no stay: 0 everywhere upstream of the late stop
+		assertThat(computeSlackTimes(vehicle, 0, stops, null, List.of(0.0, 0.0))).containsExactly(0, 0, 0, 1000);
+
+		// a 30 s stay before stop 0 only absorbs part of the 50 s delay: still 0, not 30
+		assertThat(computeSlackTimes(vehicle, 0, stops, null, List.of(30.0, 0.0))).containsExactly(0, 0, 0, 1000);
+
+		// an 80 s stay absorbs the delay and leaves 30 s
+		assertThat(computeSlackTimes(vehicle, 0, stops, null, List.of(80.0, 0.0))).containsExactly(30, 30, 0, 1000);
+	}
 }
