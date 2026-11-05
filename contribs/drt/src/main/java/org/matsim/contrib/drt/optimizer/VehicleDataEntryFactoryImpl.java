@@ -163,6 +163,9 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 			// Ride duration constraints of passengers dropping off at this stop start to bind here ...
 			for (AcceptedDrtRequest req : stop.getTask().getDropoffRequests().values()) {
+				if (req.getMaxRideDuration() == Double.POSITIVE_INFINITY) {
+					continue; // ride duration not constrained (default)
+				}
 				double plannedPickupTime = req.getRequestTiming().getPlannedPickupTime().orElseThrow(()
 						-> new IllegalStateException("Accepted request should have a (planned) pickup time at this point."));
 				double plannedDropoffTime = req.getRequestTiming().getPlannedDropoffTime().orElseThrow(()
@@ -173,8 +176,10 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 			}
 
 			// ... and stop binding before the stop where they are picked up
-			for (Id<Request> pickedUp : stop.getTask().getPickupRequests().keySet()) {
-				rideSlackOffsets.remove(pickedUp);
+			if (!rideSlackOffsets.isEmpty()) {
+				for (Id<Request> pickedUp : stop.getTask().getPickupRequests().keySet()) {
+					rideSlackOffsets.remove(pickedUp);
+				}
 			}
 
 			double stayTime = precedingStayTimes.get(i); // reset slack before prebooked request
@@ -192,6 +197,9 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	}
 
 	private static double minRideSlack(Map<Id<Request>, Double> rideSlackOffsets, double accumulatedStayTime) {
+		if (rideSlackOffsets.isEmpty()) {
+			return Double.POSITIVE_INFINITY;
+		}
 		double min = Double.POSITIVE_INFINITY;
 		for (double offset : rideSlackOffsets.values()) {
 			min = Math.min(min, offset);
