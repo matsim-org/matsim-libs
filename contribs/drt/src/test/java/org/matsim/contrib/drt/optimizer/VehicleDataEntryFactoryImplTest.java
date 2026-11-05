@@ -87,7 +87,8 @@ public class VehicleDataEntryFactoryImplTest {
 				.build();
 
 		// stop duration == 0 --> pickup time == stop begin time
-		// ---> ride duration == 200 == max ride duration --> slack should be == 0
+		// ---> ride duration == 200 == max ride duration --> ride slack == 0 between pickup and dropoff.
+		// Before the pickup, only the time windows bind (slack 20 at the pickup stop).
 
 		pickupStop.getTask().addPickupRequest(mockRequest);
 		dropoffStop.getTask().addDropoffRequest(mockRequest);
@@ -100,7 +101,7 @@ public class VehicleDataEntryFactoryImplTest {
 		DvrpVehicle vehicle = vehicle(2000, 1000);
 
 		double[] slackTimes = computeSlackTimes(vehicle, 0, stops, null, precedingStayTimes);
-		assertThat(slackTimes).containsExactly(0, 0, 0, 1000);
+		assertThat(slackTimes).containsExactly(20, 20, 0, 1000);
 	}
 
 	@Test
@@ -134,8 +135,9 @@ public class VehicleDataEntryFactoryImplTest {
 		// initial vehicle slack == 1000
 		DvrpVehicle vehicle = vehicle(2000, 1000);
 
+		// ride slack == 10 between pickup and dropoff; before the pickup, only the time windows bind
 		double[] slackTimes = computeSlackTimes(vehicle, 0, stops, null, precedingStayTimes);
-		assertThat(slackTimes).containsExactly(10, 10, 10, 1000);
+		assertThat(slackTimes).containsExactly(20, 20, 10, 1000);
 	}
 
 
@@ -269,14 +271,14 @@ public class VehicleDataEntryFactoryImplTest {
 
 		double[] slackTimes = computeSlackTimes(vehicle, 0, stops, null, precedingStayTimes);
 
-		// Expected slackTimes: [start, afterStop0, afterStop1, afterStop2, afterStop3, vehicle]
-		// At stop 3 (dropoff B): min(time_window_slack=1000, B_ride_slack=0) = 0
-		// At stop 2 (dropoff A): min(time_window_slack=1000, A_ride_slack=100, propagated=0) = 0
-		// At stop 1 (pickup B): min(time_window_slack=1000, propagated=0) = 0
-		// At stop 0 (pickup A): min(time_window_slack=1000, propagated=0) = 0
-		// Start: propagated = 0
+		// Expected slackTimes: [start, beforeStop0, beforeStop1, beforeStop2, beforeStop3, vehicle]
+		// Before stop 3 (dropoff B): A done, B on board: min(time_window=1000, B=0) = 0
+		// Before stop 2 (dropoff A): A and B on board: min(1000, A=100, B=0) = 0
+		// Before stop 1 (pickup B): only A on board: min(1000, A=100) = 100
+		// Before stop 0 (pickup A): nobody on board: time window = 1000
+		// Start: 1000
 		// Vehicle: 1000
-		assertThat(slackTimes).containsExactly(0, 0, 0, 0, 0, 1000);
+		assertThat(slackTimes).containsExactly(1000, 1000, 100, 0, 0, 1000);
 	}
 
 	/**
@@ -340,12 +342,14 @@ public class VehicleDataEntryFactoryImplTest {
 		double[] slackTimes = computeSlackTimes(vehicle, 0, stops, null, precedingStayTimes);
 
 		// Working backward:
-		// At stop 5 (dropoff C): min(time_window=1000, C_slack=max(0,100-200)) = 0
-		// At stop 4 (dropoff B): min(time_window=1000, B_slack=max(0,200-250), propagated=0) = 0
-		// At stop 3 (dropoff A): min(time_window=1000, A_slack=100, propagated=0) = 0
-		// All earlier stops: 0 propagates backward
+		// Before stop 5 (dropoff C): C on board: min(time_window=1000, C=max(0,100-200)) = 0
+		// Before stop 4 (dropoff B): B, C on board: 0
+		// Before stop 3 (dropoff A): A, B, C on board: 0
+		// Before stop 2 (pickup C): A, B on board: min(A=100, B=0) = 0
+		// Before stop 1 (pickup B): only A on board: 100
+		// Before stop 0 (pickup A): nobody on board: 1000
 		// Vehicle: 1000
-		assertThat(slackTimes).containsExactly(0, 0, 0, 0, 0, 0, 0, 1000);
+		assertThat(slackTimes).containsExactly(1000, 1000, 100, 0, 0, 0, 0, 1000);
 	}
 
 	/**
@@ -382,12 +386,84 @@ public class VehicleDataEntryFactoryImplTest {
 
 		double[] slackTimes = computeSlackTimes(vehicle, 0, stops, null, precedingStayTimes);
 
-		// Expected: [start, afterStop0, afterStop1, vehicle]
+		// Expected: [start, beforeStop0, beforeStop1, vehicle]
 		// Backward calculation:
-		// At stop 1: min(time_window=1000, ride_slack=200) = 200, then += 50 = 250
-		// At stop 0: min(time_window=1000, propagated=250) = 250
-		// Start: 250
+		// Before stop 1: min(time_window=1000, ride_slack=200) = 200, plus 50 stay = 250
+		// Before stop 0: passenger not yet on board, only the time window binds: 1000
+		// Start: 1000
 		// Vehicle: 1000
-		assertThat(slackTimes).containsExactly(250, 250, 250, 1000);
+		assertThat(slackTimes).containsExactly(1000, 1000, 250, 1000);
+	}
+
+	/**
+	 * A delay inserted before an existing request's pickup shifts its pickup and dropoff alike, so its max ride
+	 * duration must not restrict insertions there. A passenger already on board, in contrast, constrains all insertion
+	 * points up to the dropoff, including the start.
+	 */
+	@Test
+	void computeSlackTimes_rideDurationBindsOnlyAfterPickup() {
+		StopWaypoint pickupStopB = stop(100, 1100, 110, 1110);
+		StopWaypoint dropoffStopA = stop(200, 1200, 210, 1210);
+		StopWaypoint dropoffStopB = stop(300, 1300, 310, 1310);
+
+		// A is on board (pickup not part of the remaining stops), ride slack = 300 - (200 - 0) = 100
+		AcceptedDrtRequest requestA = AcceptedDrtRequest.newBuilder()
+				.request(DrtRequest.newBuilder().id(Id.create("reqA", Request.class)).build())
+				.maxRideDuration(300)
+				.plannedPickupTime(0.)
+				.plannedDropoffTime(200.)
+				.build();
+
+		// B is picked up at stop 0, ride slack = 220 - (300 - 100) = 20
+		AcceptedDrtRequest requestB = AcceptedDrtRequest.newBuilder()
+				.request(DrtRequest.newBuilder().id(Id.create("reqB", Request.class)).build())
+				.maxRideDuration(220)
+				.plannedPickupTime(100.)
+				.plannedDropoffTime(300.)
+				.build();
+
+		pickupStopB.getTask().addPickupRequest(requestB);
+		dropoffStopA.getTask().addDropoffRequest(requestA);
+		dropoffStopB.getTask().addDropoffRequest(requestB);
+
+		StopWaypoint[] stops = new StopWaypoint[] {pickupStopB, dropoffStopA, dropoffStopB};
+		var precedingStayTimes = List.of(0.0, 0.0, 0.0);
+
+		DvrpVehicle vehicle = vehicle(2000, 1000);
+
+		double[] slackTimes = computeSlackTimes(vehicle, 0, stops, null, precedingStayTimes);
+
+		// [start, beforeStop0, beforeStop1, beforeStop2, vehicle]
+		// Before stop 2: B on board: 20
+		// Before stop 1: A and B on board: min(100, 20) = 20
+		// Before stop 0: only A on board (B's ride does not grow): 100
+		// Start: A on board: 100
+		assertThat(slackTimes).containsExactly(100, 100, 20, 20, 1000);
+	}
+
+	/**
+	 * A request being picked up at the ongoing start stop is treated like an on-board passenger: extending the start
+	 * stop prolongs its ride.
+	 */
+	@Test
+	void computeSlackTimes_rideDurationOfPickupAtStartStopBindsStart() {
+		StopWaypoint startStop = stop(0, 1000, 10, 1010);
+		StopWaypoint dropoffStop = stop(100, 1100, 110, 1110);
+
+		// ride slack = 130 - (100 - 0) = 30
+		AcceptedDrtRequest request = AcceptedDrtRequest.newBuilder()
+				.request(DrtRequest.newBuilder().id(Id.create("req", Request.class)).build())
+				.maxRideDuration(130)
+				.plannedPickupTime(0.)
+				.plannedDropoffTime(100.)
+				.build();
+
+		startStop.getTask().addPickupRequest(request);
+		dropoffStop.getTask().addDropoffRequest(request);
+
+		double[] slackTimes = computeSlackTimes(vehicle(2000, 1000), 5, new StopWaypoint[] {dropoffStop}, startStop,
+				List.of(0.0));
+
+		assertThat(slackTimes).containsExactly(30, 30, 1000);
 	}
 }
