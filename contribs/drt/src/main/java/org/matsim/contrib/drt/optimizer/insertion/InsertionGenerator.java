@@ -146,9 +146,11 @@ public class InsertionGenerator {
 		 * and time windows refer to the stops of this insertion. Evaluating or scheduling an insertion should use this
 		 * request rather than the request of the search. Without stop candidates, both are the same object.
 		 *
-		 * @return the request variant, or {@code null} if the insertion points carry no pickup/dropoff waypoints
+		 * @return the request variant
+		 * @throws IllegalStateException if the insertion points carry no pickup/dropoff waypoints
 		 */
 		public DrtRequest getRequest() {
+			Preconditions.checkState(request != null, "Insertion carries no pickup/dropoff waypoints, cannot determine its request");
 			return request;
 		}
 

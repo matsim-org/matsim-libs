@@ -25,10 +25,10 @@ public class InsertionRequestTest {
 	}
 
 	@Test
-	void requestIsNullWithoutPickupAndDropoffWaypoints() {
+	void requestFailsLoudlyWithoutPickupAndDropoffWaypoints() {
 		var point = new InsertionGenerator.InsertionPoint(0, null, null, null);
 		var insertion = new InsertionGenerator.Insertion(vehicleEntry, point, point, loadType.fromInt(1));
-		assertThat(insertion.getRequest()).isNull();
+		assertThatThrownBy(insertion::getRequest).isInstanceOf(IllegalStateException.class);
 	}
 
 	@Test
