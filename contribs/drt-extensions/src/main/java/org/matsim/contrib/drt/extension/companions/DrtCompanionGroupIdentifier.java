@@ -39,10 +39,15 @@ class DrtCompanionGroupIdentifier implements PassengerGroupIdentifier {
 		PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent);
 
 		if (pe instanceof Leg leg) {
-			return DrtCompanionUtils.getPassengerGroupIdentifier(leg);
+			return getGroupId(agent, leg);
 		} else {
 			return Optional.empty();
 		}
+	}
+
+	@Override
+	public Optional<Id<PassengerGroup>> getGroupId(MobsimPassengerAgent agent, Leg leg) {
+		return DrtCompanionUtils.getPassengerGroupIdentifier(leg);
 	}
 
 }

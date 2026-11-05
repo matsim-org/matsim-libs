@@ -56,7 +56,7 @@ public class PrebookingQueue implements MobsimBeforeSimStepListener {
 				continue;
 			}
 
-			Optional<Id<PassengerGroupIdentifier.PassengerGroup>> groupId = groupIdentifier.getGroupId((MobsimPassengerAgent) item.agent);
+			Optional<Id<PassengerGroupIdentifier.PassengerGroup>> groupId = groupIdentifier.getGroupId((MobsimPassengerAgent) item.agent, item.leg);
 			if(groupId.isEmpty()) {
 				prebookingManager.prebook(item.agent(), item.leg(), item.departureTime());
 			} else {
