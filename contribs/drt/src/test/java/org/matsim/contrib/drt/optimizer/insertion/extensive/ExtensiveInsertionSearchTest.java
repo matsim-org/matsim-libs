@@ -1,7 +1,10 @@
 package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -9,8 +12,10 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionTestUtils;
 import org.matsim.contrib.drt.optimizer.insertion.RequestVariant;
 import org.matsim.contrib.drt.optimizer.insertion.RequestVariants;
@@ -49,11 +54,35 @@ public class ExtensiveInsertionSearchTest {
 
 		var result = ExtensiveInsertionSearch.calculatePathsPerVariant(pathCalculator, List.of(base1, alt, base2));
 
-		assertThat(result).containsEntry(variants.get(0).request(), baseCache)
-				.containsEntry(variants.get(1).request(), altCache)
+		assertThat(result).containsEntry(0, baseCache)
+				.containsEntry(1, altCache)
 				.hasSize(2);
 		verify(pathCalculator).calculatePaths(variants.get(0).request(), List.of(base1, base2));
 		verify(pathCalculator).calculatePaths(variants.get(1).request(), List.of(alt));
 		verifyNoMoreInteractions(pathCalculator);
+	}
+
+	@Test
+	void variantsAreKeyedByVariantNotByRequestObject() {
+		// two variants that share one DrtRequest instance must still get separate path data
+		var request = DrtRequest.newBuilder()
+				.fromLink(new FakeLink(Id.createLinkId("from")))
+				.toLink(new FakeLink(Id.createLinkId("to")))
+				.build();
+		var first = new RequestVariant(request, 0, 0, 0);
+		var second = new RequestVariant(request, 30, 0, 1);
+		var vehicleEntry = mock(VehicleEntry.class);
+		var firstInsertion = InsertionTestUtils.insertionFor(first, vehicleEntry, 0, 0, loadType.fromInt(1));
+		var secondInsertion = InsertionTestUtils.insertionFor(second, vehicleEntry, 0, 0, loadType.fromInt(1));
+
+		var pathCalculator = mock(MultiInsertionDetourPathCalculator.class);
+		when(pathCalculator.calculatePaths(any(), any())).thenReturn(mock(DetourPathDataCache.class));
+
+		ExtensiveInsertionSearch.calculatePathsPerVariant(pathCalculator, List.of(firstInsertion, secondInsertion));
+
+		@SuppressWarnings("unchecked")
+		ArgumentCaptor<List<InsertionGenerator.Insertion>> insertionsPerCall = ArgumentCaptor.forClass(List.class);
+		verify(pathCalculator, times(2)).calculatePaths(eq(request), insertionsPerCall.capture());
+		assertThat(insertionsPerCall.getAllValues()).containsExactly(List.of(firstInsertion), List.of(secondInsertion));
 	}
 }

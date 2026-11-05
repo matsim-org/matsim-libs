@@ -62,23 +62,24 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 
 		var pathDataByVariant = calculatePathsPerVariant(detourPathCalculator, insertions);
 		return bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
-			var insertionDetourData = pathDataByVariant.get(i.getRequest()).createInsertionDetourData(i);
+			var insertionDetourData = pathDataByVariant.get(i.getVariant().index()).createInsertionDetourData(i);
 			return new InsertionWithDetourData(i, insertionDetourData,
 				detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, i.getRequest()));
 		}));
 	}
 
 	/**
-	 * Paths are calculated per request variant, because variants differ in their pickup and dropoff links.
+	 * Paths are calculated per request variant, because variants differ in their pickup and dropoff links. The result
+	 * is keyed by {@link RequestVariant#index()}, so it does not depend on the identity or equality of the variants'
+	 * {@link DrtRequest} objects.
 	 */
-	static Map<DrtRequest, DetourPathDataCache> calculatePathsPerVariant(
+	static Map<Integer, DetourPathDataCache> calculatePathsPerVariant(
 			MultiInsertionDetourPathCalculator detourPathCalculator, List<InsertionGenerator.Insertion> insertions) {
-		Map<DrtRequest, List<InsertionGenerator.Insertion>> insertionsByVariant = insertions.stream()
-				.collect(Collectors.groupingBy(InsertionGenerator.Insertion::getRequest, LinkedHashMap::new,
-						Collectors.toList()));
-		Map<DrtRequest, DetourPathDataCache> pathDataByVariant = new HashMap<>();
-		insertionsByVariant.forEach((variant, variantInsertions) -> pathDataByVariant.put(variant,
-				detourPathCalculator.calculatePaths(variant, variantInsertions)));
+		Map<Integer, List<InsertionGenerator.Insertion>> insertionsByVariant = insertions.stream()
+				.collect(Collectors.groupingBy(i -> i.getVariant().index(), LinkedHashMap::new, Collectors.toList()));
+		Map<Integer, DetourPathDataCache> pathDataByVariant = new HashMap<>();
+		insertionsByVariant.forEach((index, variantInsertions) -> pathDataByVariant.put(index,
+				detourPathCalculator.calculatePaths(variantInsertions.get(0).getVariant().request(), variantInsertions)));
 		return pathDataByVariant;
 	}
 }
