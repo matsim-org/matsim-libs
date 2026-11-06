@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -27,34 +26,21 @@ class MuseComputation{
 		ScoringFunction sfNormal = scoringFunctionFactory.createNewScoringFunction( plan.getPerson() );
 		ScoringFunction sfEarly = scoringFunctionFactory.createNewScoringFunction( plan.getPerson() );
 		MuseComputationForOneAct museComputation = new MuseComputationForOneAct( sfNormal, sfEarly );
-		Activity firstActivityOfPlan = null;
 		double sumMuse_h = 0.;
 		double cntMuse_h = 0.;
 		for( Activity act : TripStructureUtils.getActivities( plan, ExcludeStageActivities ) ){
 			// Ihab-style MarginalSumScoringFct computation but w/o leg:
-			if( act.getStartTime().isDefined() && act.getEndTime().isDefined() ){
-				double scoreNormalBefore = sfNormal.getScore();
-				double scoreEarlyBefore = sfEarly.getScore();
-				sumMuse_h += museComputation.computeMUSE_h( act, pf, scoreNormalBefore, scoreEarlyBefore );
-				cntMuse_h++;
-			} else if( act.getStartTime().isUndefined() ){
-				firstActivityOfPlan = act;
-			} else{
-				Gbl.assertIf( act.getEndTime().isUndefined() );
-
-				double scoreNormalBefore = sfNormal.getScore();
-				double scoreEarlyBefore = sfEarly.getScore();
-
+			if( act.getStartTime().isUndefined() ){
 				// handle the first activity of the plan:
-				sfNormal.handleActivity( firstActivityOfPlan );
-				sfEarly.handleActivity( firstActivityOfPlan );
-				// (the standard scoring function treats an activity without startTime as firstActivityOfPlan.  no matter if it arrives in correct sequence or not, as long as
-				// it arrives before the evening activity)
-
-				// handle the last activity of the plan:
-				sumMuse_h += museComputation.computeMUSE_h( act, pf, scoreNormalBefore, scoreEarlyBefore );
-				// ("act" is now the evening activity; will be started once at the normal time and once one second early)
-
+				sfNormal.handleActivity( act );
+				sfEarly.handleActivity( act );
+				// (the standard scoring function only memorizes it here, and scores it together with the evening activity.  It needs to
+				// arrive first nevertheless: with typical durations from the person (scoring.typicalDurationSource=personAttribute, as in
+				// matsim-berlin v7.2), the scoring pairs the activities with the main activities of the selected plan in the order in which they arrive.)
+			} else{
+				sumMuse_h += museComputation.computeMUSE_h( act, pf, sfNormal.getScore(), sfEarly.getScore() );
+				// (for the evening activity, which is started once at the normal time and once one second early, this includes the score of
+				// the first activity of the plan)
 				cntMuse_h++;
 			}
 		}
@@ -83,9 +69,8 @@ class MuseComputation{
 			earlyActivity.setStartTime( earlyActivity.getStartTime().seconds() - 1 );
 			sfEarly.handleActivity( earlyActivity );
 
-			// finish the scoring computation (this can be multiple times (or so I hope)):
-			sfNormal.finish();
-			sfEarly.finish();
+			// no finish() here: the standard scoring function has the score of the activity already, and its finish() would score the
+			// memorized first activity of the plan as a morning activity, once more each time it is called before the evening activity.
 
 			double scoreDiffNormal = sfNormal.getScore() - scoreNormalBefore;
 			double scoreDiffEarly = sfEarly.getScore() - scoreEarlyBefore;
