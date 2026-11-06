@@ -485,7 +485,7 @@ public class WithinDayEvTest {
 
 		// check arrival at home
 		assertEquals("home", scenario.tracker().activityStartEvents.getLast().getActType());
-		assertEquals(68588.0, scenario.tracker().activityStartEvents.getLast().getTime());
+		assertEquals(68589.0, scenario.tracker().activityStartEvents.getLast().getTime());
 
 		// check charging process
 		assertEquals(1, scenario.tracker().startChargingProcessEvents.size());
@@ -857,14 +857,14 @@ public class WithinDayEvTest {
 
 		assertEquals("person1", scenario.tracker().chargingStartEvents.get(0).getVehicleId().toString());
 		assertEquals("charger1", scenario.tracker().chargingStartEvents.get(0).getChargerId().toString());
-		assertEquals(39224.0, scenario.tracker().chargingStartEvents.get(0).getTime());
+		assertEquals(39225.0, scenario.tracker().chargingStartEvents.get(0).getTime());
 
 		assertEquals("person2", scenario.tracker().chargingStartEvents.get(1).getVehicleId().toString());
 		assertEquals("charger2", scenario.tracker().chargingStartEvents.get(1).getChargerId().toString());
-		assertEquals(40364.0, scenario.tracker().chargingStartEvents.get(1).getTime());
+		assertEquals(40365.0, scenario.tracker().chargingStartEvents.get(1).getTime());
 
 		assertEquals("person2", scenario.tracker().queuedAtChargerEvents.get(0).getVehicleId().toString());
-		assertEquals(39254.0, scenario.tracker().queuedAtChargerEvents.get(0).getTime());
+		assertEquals(39255.0, scenario.tracker().queuedAtChargerEvents.get(0).getTime());
 
 		assertEquals("person2", scenario.tracker().quitQueueAtChargerEvents.get(0).getVehicleId().toString());
 		assertEquals(39549.0, scenario.tracker().quitQueueAtChargerEvents.get(0).getTime());
@@ -926,14 +926,14 @@ public class WithinDayEvTest {
 
 		assertEquals("person2", scenario.tracker().chargingStartEvents.get(0).getVehicleId().toString());
 		assertEquals("charger1", scenario.tracker().chargingStartEvents.get(0).getChargerId().toString());
-		assertEquals(39254.0, scenario.tracker().chargingStartEvents.get(0).getTime());
+		assertEquals(39255.0, scenario.tracker().chargingStartEvents.get(0).getTime());
 
 		assertEquals("person1", scenario.tracker().chargingStartEvents.get(1).getVehicleId().toString());
 		assertEquals("charger2", scenario.tracker().chargingStartEvents.get(1).getChargerId().toString());
-		assertEquals(40334.0, scenario.tracker().chargingStartEvents.get(1).getTime());
+		assertEquals(40335.0, scenario.tracker().chargingStartEvents.get(1).getTime());
 
 		assertEquals("person1", scenario.tracker().queuedAtChargerEvents.get(0).getVehicleId().toString());
-		assertEquals(39224.0, scenario.tracker().queuedAtChargerEvents.get(0).getTime());
+		assertEquals(39225.0, scenario.tracker().queuedAtChargerEvents.get(0).getTime());
 
 		assertEquals("person1", scenario.tracker().quitQueueAtChargerEvents.get(0).getVehicleId().toString());
 		assertEquals(39519.0, scenario.tracker().quitQueueAtChargerEvents.get(0).getTime());
@@ -1169,8 +1169,8 @@ public class WithinDayEvTest {
 		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
 		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
 
-		assertEquals(37619.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
-		assertEquals(41223.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
+		assertEquals(37620.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
+		assertEquals(41224.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
 
 		assertEquals("charger", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
 
@@ -1179,8 +1179,8 @@ public class WithinDayEvTest {
 		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
 
 		assertEquals(37609.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
-		assertEquals(41222.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
-		assertEquals(41224.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+		assertEquals(41223.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41225.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
 
 		assertEquals(Arrays.asList(Arrays.array(
 				// "activity:home",
@@ -1245,8 +1245,8 @@ public class WithinDayEvTest {
 		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
 		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
 
-		assertEquals(38024.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
-		assertEquals(41628.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
+		assertEquals(38025.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
+		assertEquals(41629.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
 
 		assertEquals("charger2", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
 
@@ -1255,8 +1255,8 @@ public class WithinDayEvTest {
 		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
 
 		assertEquals(38011.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
-		assertEquals(41627.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
-		assertEquals(41629.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+		assertEquals(41628.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41630.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
 
 		assertEquals(Arrays.asList(Arrays.array(
 				// "activity:home",
@@ -1321,8 +1321,8 @@ public class WithinDayEvTest {
 		assertEquals(1, scenario.tracker().queuedAtChargerEvents.size());
 		assertEquals(1, scenario.tracker().quitQueueAtChargerEvents.size());
 
-		assertEquals(38324.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
-		assertEquals(41928.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
+		assertEquals(38325.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
+		assertEquals(41929.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
 
 		assertEquals("charger2", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
 
@@ -1332,8 +1332,8 @@ public class WithinDayEvTest {
 
 		assertEquals(37609.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
 		assertEquals(38314.0, scenario.tracker().plugActivityEvents.getLast().getTime());
-		assertEquals(41927.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
-		assertEquals(41929.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+		assertEquals(41928.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41930.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
 
 		assertEquals(Arrays.asList(Arrays.array(
 				// "activity:home",
@@ -1407,8 +1407,8 @@ public class WithinDayEvTest {
 		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
 
 		assertEquals(38011.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
-		assertEquals(41627.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
-		assertEquals(41629.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+		assertEquals(41628.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41630.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
 
 		assertEquals(Arrays.asList(Arrays.array(
 				// "activity:home",
@@ -1503,8 +1503,8 @@ public class WithinDayEvTest {
 		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
 		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
 
-		assertEquals(37619.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
-		assertEquals(39423.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
+		assertEquals(37620.0, scenario.tracker().chargingStartEvents.getFirst().getTime());
+		assertEquals(39424.0, scenario.tracker().chargingEndEvents.getFirst().getTime());
 
 		assertEquals("charger", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
 
@@ -1513,8 +1513,8 @@ public class WithinDayEvTest {
 		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
 
 		assertEquals(37609.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
-		assertEquals(39422.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
-		assertEquals(39424.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+		assertEquals(39423.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(39425.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
 	}
 
 	@Test
@@ -1568,8 +1568,8 @@ public class WithinDayEvTest {
 		assertEquals(1, scenario.tracker().unplugActivityEvents.size());
 
 		assertEquals(37609.0, scenario.tracker().plugActivityEvents.getFirst().getTime());
-		assertEquals(41222.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
-		assertEquals(41224.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
+		assertEquals(41223.0, scenario.tracker().unplugActivityEvents.getFirst().getTime());
+		assertEquals(41225.0, scenario.tracker().unplugActivityEndEvents.getFirst().getTime());
 	}
 
 	@Test

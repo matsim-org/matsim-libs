@@ -11,10 +11,12 @@ class PassingQueue implements SimDequeue {
 	 * Ordered by exit time, ties broken by vehicle id. Without the tie-break a {@link PriorityQueue} pops vehicles that may leave at the
 	 * same time in an order that follows its insertion history rather than the vehicles, so two runs that inserted the same vehicles in a
 	 * different sequence - which they may, without any of the times differing - let them leave in a different order.
+	 * 
+	 * Added the explicit type conversions here, because resolution of the MethodHandlers breaks testing support in VSCode and other IDEs.
 	 */
 	private final PriorityQueue<DistributedMobsimVehicle> internalQ = new PriorityQueue<>(
-		Comparator.comparingDouble(DistributedMobsimVehicle::getEarliestLinkExitTime)
-			.thenComparing(DistributedMobsimVehicle::getId)
+		Comparator.comparingDouble(v -> ((DistributedMobsimVehicle) v).getEarliestLinkExitTime())
+			.thenComparing(v -> ((DistributedMobsimVehicle) v).getId())
 	);
 
 	@Override
