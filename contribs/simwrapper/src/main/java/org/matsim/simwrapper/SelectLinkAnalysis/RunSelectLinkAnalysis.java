@@ -30,6 +30,9 @@ public class RunSelectLinkAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--output", description = "Output directory", required = true)
 	private Path outputPath;
 
+	@CommandLine.Option(names = "--rowGroupSize", description = "Row group size for parquet files")
+	private Integer rowGroupSize;
+
 	@CommandLine.Mixin
 	private CsvOptions csv = new CsvOptions();
 
@@ -41,8 +44,6 @@ public class RunSelectLinkAnalysis implements MATSimAppCommand {
 	public Integer call() throws Exception {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-
-
 
 //		1. Initialize a config instance
 		Config config = ConfigUtils.createConfig();
@@ -57,7 +58,7 @@ public class RunSelectLinkAnalysis implements MATSimAppCommand {
 		AgentTable agentTable = new AgentTable(population, outputPath.toString());
 		agentTable.run();
 
-		DbEventHandler DbEventHandler = new DbEventHandler(outputPath.toString());
+		DbEventHandler DbEventHandler = new DbEventHandler(outputPath.toString(), rowGroupSize);
 
 		eventsManager.addHandler(DbEventHandler);
 
@@ -74,6 +75,7 @@ public class RunSelectLinkAnalysis implements MATSimAppCommand {
 		SimWrapper sw = SimWrapper.create();
 		sw.addDashboard(new SelectLinkAnalysisDashboard());
 		sw.generate(outputPath, true);
+
 //		sw.run(outputPath);
 
 		return null;

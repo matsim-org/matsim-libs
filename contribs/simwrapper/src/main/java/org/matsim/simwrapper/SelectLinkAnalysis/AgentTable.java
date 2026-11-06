@@ -162,38 +162,12 @@ public class AgentTable {
 
 		String agentsParquetPath = this.outputDirectory + "/agents.parquet";
 		String agentsParquetSortedPath = this.outputDirectory + "/agents-sorted.parquet";
-		String agentsSortedCsvPath = this.outputDirectory + "/agents-sorted.csv";
-
-		// leaving out specific agent bloom filter calibration - columns are dynamic depending on scenario and difficult to organize.
-//		DbEventHandler handler = new DbEventHandler(this.outputDirectory);
-//		DbEventHandler.DictionaryCalibration calAgents = handler.calibrateDictionaryParams(duckConn, agentsParquetSortedPath, this.listSchemaAgents);
 
 		duckConn.createStatement().execute(
 			"COPY (SELECT * FROM read_parquet('" + agentsParquetPath + "') " +
 				"ORDER BY agent_id) " +
 				"TO '" + agentsParquetSortedPath + "' (FORMAT PARQUET, CODEC 'ZSTD')"
 		);
-
-		duckConn.createStatement().execute(
-			"COPY (SELECT * FROM read_parquet('" + agentsParquetPath + "') " +
-				"ORDER BY agent_id) " +
-				"TO '" + agentsSortedCsvPath + "' (FORMAT CSV, HEADER, DELIMITER ',', COMPRESSION zstd)"
-		);
-
-
-		java.nio.file.Path dbPath = java.nio.file.Path.of(this.outputDirectory + "/sla.sqlite3");
-		java.nio.file.Files.deleteIfExists(dbPath);
-
-		duckConn.createStatement().execute(
-			"ATTACH '" + this.outputDirectory + "/sla.sqlite3' AS sqlite_db (TYPE SQLITE3)"
-		);
-
-		duckConn.createStatement().execute(
-			"CREATE TABLE IF NOT EXISTS sqlite_db.agents AS " +
-				"SELECT * FROM read_parquet('" + this.outputDirectory + "/agents-sorted.parquet')"
-		);
-
-
 
 	}
 
