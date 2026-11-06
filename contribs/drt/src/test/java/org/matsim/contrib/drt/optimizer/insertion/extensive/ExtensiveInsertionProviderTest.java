@@ -33,13 +33,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.ForkJoinPoolExtension;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionTestUtils;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -82,8 +82,8 @@ public class ExtensiveInsertionProviderTest {
 		var vehicleEntry = mock(VehicleEntry.class);
 
 		// mock insertionGenerator
-		var feasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint(), loadType.fromInt(1));
-		var infeasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint(), loadType.fromInt(1));
+		var feasibleInsertion = InsertionTestUtils.insertionFor(request, vehicleEntry, loadType.fromInt(1));
+		var infeasibleInsertion = InsertionTestUtils.insertionFor(request, vehicleEntry, loadType.fromInt(1));
 		var insertionGenerator = mock(InsertionGenerator.class);
 		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry)))//
 				.thenReturn(List.of(insertionWithDetourData(feasibleInsertion),
@@ -105,10 +105,6 @@ public class ExtensiveInsertionProviderTest {
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(request, List.of(vehicleEntry))).isEqualTo(
 				nearestInsertionsAtEndLimit == 0 ? List.of() : List.of(feasibleInsertion));
-	}
-
-	private InsertionGenerator.InsertionPoint insertionPoint() {
-		return new InsertionGenerator.InsertionPoint(-1, mock(Waypoint.class), null, mock(Waypoint.class));
 	}
 
 	private InsertionWithDetourData insertionWithDetourData(Insertion insertion) {
