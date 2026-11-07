@@ -52,26 +52,13 @@ final class ScorerVttsParameters implements VttsParameters {
 		Leg leg = trip.getLegsOnly().stream().filter(l -> l.getMode().equals(mode)).findFirst().orElse(null);
 		if (leg == null || leg.getTravelTime().isUndefined()) return Double.NaN;
 		List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan);
-		double base = replay(person, trips);
+		double base = ScoringReplay.score(factory, person, trips);
 		double travelTime = leg.getTravelTime().seconds();
 		leg.setTravelTime(travelTime - 1);
 		try {
-			return (base - replay(person, trips)) * 3600;
+			return (base - ScoringReplay.score(factory, person, trips)) * 3600;
 		} finally {
 			leg.setTravelTime(travelTime);
 		}
-	}
-
-	/** The day as scoring gets it. Stage activities are left out: they are not scored, and a plan read from file has no times for them. */
-	private double replay(Person person, List<TripStructureUtils.Trip> trips) {
-		ScoringFunction scorer = factory.createNewScoringFunction(person);
-		for (var trip : trips) {
-			scorer.handleActivity(trip.getOriginActivity());
-			trip.getLegsOnly().forEach(scorer::handleLeg);
-			scorer.handleTrip(trip);
-		}
-		scorer.handleActivity(trips.getLast().getDestinationActivity());
-		scorer.finish();
-		return scorer.getScore();
 	}
 }

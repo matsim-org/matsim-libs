@@ -59,7 +59,7 @@ public final class VttsAnalysis {
 			return;
 		}
 		// Experienced plans may be truncated. Report those explicitly instead of handing
-		// malformed timing sequences to the incremental MUSE calculation.
+		// malformed timing sequences to the MUSE calculation.
 		if (!isComplete(plan)) {
 			person.getAttributes().putAttribute(STATUS, "incomplete_plan");
 			plan.getAttributes().putAttribute(STATUS, "incomplete_plan");
@@ -133,7 +133,7 @@ public final class VttsAnalysis {
 		}
 	}
 
-	/** Validate dashboard inputs before calling the incremental KN calculation. */
+	/** Validate dashboard inputs before calling the MUSE calculation. */
 	private static boolean isComplete(Plan plan) {
 		var activities = TripStructureUtils.getActivities(plan, ExcludeStageActivities);
 		if (activities.size() < 2) return false;
