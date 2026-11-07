@@ -69,7 +69,7 @@ public final class VttsAnalysis {
 		// Pass the original person even when the experienced plan has no person backpointer.
 		muse.computeMuseForAllActs(person, plan);
 		// Money utility is score/money unit. It must be positive and finite for this conversion;
-		// its actual value comes from the run's person parameters, not a new income calculation.
+		// its actual value comes from the run's scoring function, not a new income calculation.
 		double moneyUtility = parameters.marginalUtilityOfMoney(person);
 		boolean validMoney = Double.isFinite(moneyUtility) && moneyUtility > 0;
 		double sumMuse = 0;
@@ -100,7 +100,7 @@ public final class VttsAnalysis {
 			// VSE monetizes the activity effect alone. A missing travel coefficient must not
 			// discard this valid result, so compute it before checking the mode parameters.
 			destination.getAttributes().putAttribute(VSE, value / moneyUtility);
-			double travelUtility = mode == null ? Double.NaN : parameters.marginalUtilityOfTraveling(person, mode);
+			double travelUtility = mode == null ? Double.NaN : parameters.marginalUtilityOfTraveling(person, plan, trip, mode);
 			if (!Double.isFinite(travelUtility)) {
 				destination.getAttributes().putAttribute(STATUS, "unsupported_mode");
 				continue;

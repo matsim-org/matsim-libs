@@ -70,8 +70,7 @@ public final class VttsDashboard implements Dashboard {
 				+ "VTTS also includes one second less traveling in the realized trip's analysis main mode. PT values "
 				+ "concern in-vehicle time, not waiting or access time. Money/hour uses the run's monetary unit. "
 				+ "Counts describe the simulated sample without expansion. Summary rows distinguish person and trip "
-				+ "weighting. Person/trip exports contain coverage statuses. Custom scorers must support the KN activity calculation "
-				+ "and supply compatible linear travel/money conversion parameters.";
+				+ "weighting. Person/trip exports contain coverage statuses. Custom scorers must support the KN activity calculation.";
 		});
 		// Reuse the overview, statistics and interpretation; only the plotted observations change.
 		layout.tab("Per trip").add("overview");

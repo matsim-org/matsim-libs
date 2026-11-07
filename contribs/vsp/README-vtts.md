@@ -9,7 +9,7 @@ controler.addOverridingModule(new VttsModule());
 
 `VttsModule` is in `org.matsim.application.analysis.population` in the VSP contrib.
 `VttsDashboard` is in `org.matsim.simwrapper.dashboard` in the SimWrapper contrib.
-The module installs no scoring overrides: MUSE uses the run's injected `ScoringFunctionFactory`.
+The module installs no scoring overrides: MUSE and the conversions use the run's injected `ScoringFunctionFactory`.
 The calculation runs at the final iteration end, after core scoring, using in-memory experienced
 plans. It does not require the regular experienced-plans XML output to be enabled.
 The initial integration supports single-process runs; distributed collection is not implemented.
@@ -75,10 +75,12 @@ All other trip components
 are held fixed. For PT, this describes in-vehicle time, not waiting or access/egress time.
 Units are the run's money units; euros are not assumed. Finite zero and negative values are retained.
 Undefined or nonpositive money utility prevents monetary conversion but retains valid MUSE.
-Missing mode coefficients retain MUSE/VSE and mark VTTS as unavailable.
+A trip without a leg in its main mode retains MUSE/VSE and marks VTTS as unavailable.
 
-The default `VttsParameters` implementation reads the run's injected `ScoringParametersForPerson`.
-If a custom scoring factory uses different time or money coefficients, install a matching
+The default `VttsParameters` implementation asks the run's scoring function: the score of one more
+money unit, and the score of the whole day with the trip's main-mode leg one second shorter. It follows
+whatever that function does with money and travel time, including terms outside the scoring parameters.
+A scorer with no money term reports `invalid_money_utility`. To use a different conversion, install a
 `VttsParameters` binding in a scenario overriding module after `VttsModule`, for example:
 
 ```java
@@ -89,8 +91,9 @@ controler.addOverridingModule(new AbstractModule() {
 });
 ```
 
-Such a conversion must have the stated linear interpretation; a nonlinear monetary utility
-requires an explicitly defined local conversion rather than assuming a config coefficient.
+The default gives the local slope at zero money and at the realized travel time; a nonlinear monetary
+utility requires an explicitly defined local conversion. Money and score events sent by other code are
+not asked: a time-dependent charge is not part of the travel term.
 
 ## Outputs
 
