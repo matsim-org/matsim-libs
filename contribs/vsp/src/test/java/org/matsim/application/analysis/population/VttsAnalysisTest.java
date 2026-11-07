@@ -177,17 +177,21 @@ class VttsAnalysisTest {
 		// also needs PT parameters to derive waiting utility, even for this car-only fixture.
 		scoring.getOrCreateModeParams("pt");
 		PopulationUtils.putSubpopulation(person, "custom");
-		var parameters = new PersonScoringVttsParameters(new SubpopulationScoringParameters(scenario));
+		for (var type : java.util.List.of("home", "work", "shop"))
+			scoring.addActivityParams(new org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams(type).setTypicalDuration(8 * 3600));
+		var parameters = new ScorerVttsParameters(new org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory(scenario));
+		var plan = person.getSelectedPlan();
+		var trip = org.matsim.core.router.TripStructureUtils.getTrips(plan).getFirst();
 
-		assertEquals(4, parameters.marginalUtilityOfMoney(person));
-		assertEquals(-12, parameters.marginalUtilityOfTraveling(person, "car"));
-		assertTrue(Double.isNaN(parameters.marginalUtilityOfTraveling(person, "missing")));
+		assertEquals(4, parameters.marginalUtilityOfMoney(person), 1e-9);
+		assertEquals(-12, parameters.marginalUtilityOfTraveling(person, plan, trip, "car"), 1e-6);
+		assertTrue(Double.isNaN(parameters.marginalUtilityOfTraveling(person, plan, trip, "missing")));
 	}
 
 	static VttsParameters parameters(double moneyUtility, double travelUtilityPerHour) {
 		return new VttsParameters() {
 			@Override public double marginalUtilityOfMoney(Person person) { return moneyUtility; }
-			@Override public double marginalUtilityOfTraveling(Person person, String mode) { return travelUtilityPerHour; }
+			@Override public double marginalUtilityOfTraveling(Person person, org.matsim.api.core.v01.population.Plan plan, org.matsim.core.router.TripStructureUtils.Trip trip, String mode) { return travelUtilityPerHour; }
 		};
 	}
 }

@@ -38,8 +38,8 @@ class VttsModuleTest {
 		config.controller().setLastIteration(0);
 		// The integration must use in-memory experienced plans even if the usual XML output is disabled.
 		config.scoring().setWriteExperiencedPlans(false);
-		config.scoring().setDefaultMarginalUtilityOfMoney(2);
-		config.scoring().getOrCreateDefaultModeParams("car").setMarginalUtilityOfTraveling(-6);
+		config.scoring().setDefaultMarginalUtilityOfMoney(50);
+		config.scoring().getOrCreateDefaultModeParams("car").setMarginalUtilityOfTraveling(-100);
 		ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class)
 			.setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -64,6 +64,20 @@ class VttsModuleTest {
 						@Override public void handleFirstActivity(Activity activity) { }
 						@Override public void handleActivity(Activity activity) { score -= activity.getStartTime().seconds() * 12 / 3600; }
 						@Override public void handleLastActivity(Activity activity) { handleActivity(activity); }
+						@Override public void finish() { }
+						@Override public double getScore() { return score; }
+					});
+					// Money and travel come from this scorer too: neither the config's coefficients nor
+					// any other parameters may decide what this run's scoring says they are worth.
+					scoring.addScoringFunction(new SumScoringFunction.MoneyScoring() {
+						private double score;
+						@Override public void addMoney(double amount) { score += 2 * amount; }
+						@Override public void finish() { }
+						@Override public double getScore() { return score; }
+					});
+					scoring.addScoringFunction(new SumScoringFunction.LegScoring() {
+						private double score;
+						@Override public void handleLeg(org.matsim.api.core.v01.population.Leg leg) { score -= leg.getTravelTime().seconds() * 6 / 3600; }
 						@Override public void finish() { }
 						@Override public double getScore() { return score; }
 					});

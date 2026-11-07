@@ -54,11 +54,11 @@ public final class VttsModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(Options.class).toInstance(options);
-		// Resolve MUSE's factory and the conversion's person parameters from this controller.
+		// Resolve the scoring factory, which MUSE and the conversions ask, from this controller.
 		// A separate injector or a factory rebuilt from config could lose scenario scoring overrides.
 		bind(MuseComputation.class);
 		bind(VttsAnalysis.class);
-		bind(VttsParameters.class).to(PersonScoringVttsParameters.class);
+		bind(VttsParameters.class).to(ScorerVttsParameters.class);
 		// Event handling and final-iteration analysis must share one listener: the event handler
 		// records stuck persons, and the controller callback uses that same set for exclusions.
 		bind(VttsAnalysisListener.class).in(Singleton.class);
