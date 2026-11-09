@@ -36,12 +36,13 @@ import java.util.regex.Pattern;
  * and {@code network_mode} stay empty, because the vehicle id of a leg is not stored in the experienced plans file.
  * <p>
  * If no output path is given, the files are written to the run directory and compressed like the experienced plans file
- * that was found, e.g. {@code <run directory>/trips.csv.zst} for {@code output_experienced_plans.xml.zst}. Output paths
- * that are given are used as they are.
+ * that was found, e.g. {@code <run directory>/output_trips.csv.zst} for {@code output_experienced_plans.xml.zst}. Existing
+ * files with the same name are overwritten. Output paths that are given are used as they are.
  */
 @CommandLine.Command(name = "write-trips-and-legs",
 	description = "Writes the trips and legs CSV files of a finished run from its output experienced plans. " +
 		"By default, the files are written to the run directory and compressed like the experienced plans file.")
+// Tells Java at runtime that `--run-directory` is required and that `--output-trips` and `output_legs` are optional fields.
 @CommandSpec(requireRunDirectory = true, produces = {"trips.csv", "legs.csv"})
 public class TripsAndLegsCsvWriter implements MATSimAppCommand {
 
@@ -95,8 +96,8 @@ public class TripsAndLegsCsvWriter implements MATSimAppCommand {
 		}
 
 		String compression = compressionExtension(experiencedPlansPath);
-		Path tripsPath = outputPath("output_trips.csv", "--output-trips", compression);
-		Path legsPath = outputPath("output_legs.csv", "--output-legs", compression);
+		Path tripsPath = outputPath("trips.csv", "output_trips.csv", compression);
+		Path legsPath = outputPath("legs.csv", "output_legs.csv", compression);
 		log.info("Writing trips to {} and legs to {}", tripsPath, legsPath);
 		new TripsAndLegsWriter(scenario).write(experiencedPlans, tripsPath.toString(), legsPath.toString());
 
@@ -104,12 +105,15 @@ public class TripsAndLegsCsvWriter implements MATSimAppCommand {
 	}
 
 	/**
-	 * Returns the output path for {@code name}. If the path was not given on the command line, the file is put into the run
-	 * directory and the compression extension is appended.
+	 * Returns the output path for {@code name}, which has to be one of the outputs in the {@link CommandSpec}. If the path
+	 * was not given on the command line, {@code defaultFileName} with the compression extension appended is used in the run
+	 * directory.
 	 */
-	Path outputPath(String name, String option, String compression) {
+	Path outputPath(String name, String defaultFileName, String compression) {
+		// same option name as defined by OutputOptions
+		String option = "--output-" + InputOptions.argName(name);
 		boolean isGiven = !spec.findOption(option).originalStringValues().isEmpty();
-		return isGiven ? output.getPath(name) : input.getRunDirectory().resolve(name + compression);
+		return isGiven ? output.getPath(name) : input.getRunDirectory().resolve(defaultFileName + compression);
 	}
 
 	/**

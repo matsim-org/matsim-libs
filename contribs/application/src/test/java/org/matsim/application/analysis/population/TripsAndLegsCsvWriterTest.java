@@ -81,9 +81,9 @@ class TripsAndLegsCsvWriterTest {
 		TripsAndLegsCsvWriter command = (TripsAndLegsCsvWriter) new TripsAndLegsCsvWriter()
 			.withArgs("--run-directory", runDirectory.toString(), "--output-trips", givenTrips.toString());
 
-		assertThat(command.outputPath("trips.csv", "--output-trips", ".zst")).isEqualTo(givenTrips);
-		assertThat(command.outputPath("legs.csv", "--output-legs", ".zst")).isEqualTo(runDirectory.resolve("legs.csv.zst"));
-		assertThat(command.outputPath("legs.csv", "--output-legs", "")).isEqualTo(runDirectory.resolve("legs.csv"));
+		assertThat(command.outputPath("trips.csv", "output_trips.csv", ".zst")).isEqualTo(givenTrips);
+		assertThat(command.outputPath("legs.csv", "output_legs.csv", ".zst")).isEqualTo(runDirectory.resolve("output_legs.csv.zst"));
+		assertThat(command.outputPath("legs.csv", "output_legs.csv", "")).isEqualTo(runDirectory.resolve("output_legs.csv"));
 	}
 
 	/**
