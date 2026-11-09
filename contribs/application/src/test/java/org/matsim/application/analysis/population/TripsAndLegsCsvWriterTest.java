@@ -74,15 +74,16 @@ class TripsAndLegsCsvWriterTest {
 	}
 
 	@Test
-	void appendsCompressionOnlyToDefaultOutputPaths() {
+	void writesDefaultOutputToRunDirectoryWithCompression() {
+		Path runDirectory = Path.of(utils.getOutputDirectory(), "run");
 		Path givenTrips = Path.of(utils.getOutputDirectory(), "my_trips.csv");
 
 		TripsAndLegsCsvWriter command = (TripsAndLegsCsvWriter) new TripsAndLegsCsvWriter()
-			.withArgs("--run-directory", utils.getOutputDirectory(), "--output-trips", givenTrips.toString());
+			.withArgs("--run-directory", runDirectory.toString(), "--output-trips", givenTrips.toString());
 
 		assertThat(command.outputPath("trips.csv", "--output-trips", ".zst")).isEqualTo(givenTrips);
-		assertThat(command.outputPath("legs.csv", "--output-legs", ".zst")).isEqualTo(Path.of("legs.csv.zst"));
-		assertThat(command.outputPath("legs.csv", "--output-legs", "")).isEqualTo(Path.of("legs.csv"));
+		assertThat(command.outputPath("legs.csv", "--output-legs", ".zst")).isEqualTo(runDirectory.resolve("legs.csv.zst"));
+		assertThat(command.outputPath("legs.csv", "--output-legs", "")).isEqualTo(runDirectory.resolve("legs.csv"));
 	}
 
 	/**
