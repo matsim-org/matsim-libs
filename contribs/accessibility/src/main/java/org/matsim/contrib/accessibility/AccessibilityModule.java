@@ -54,6 +54,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
 import jakarta.inject.Provider;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -211,7 +212,9 @@ public final class AccessibilityModule extends AbstractModule {
 			}
 			AccessibilityUtils.assignAdditionalFacilitiesDataToMeasurePoint(measuringPoints, measurePointGeometryMap, additionalFacs);
 
-			String outputDirectory = scenario.getConfig().controller().getOutputDirectory() + "/analysis/accessibility/" + activityType;
+			String outputDirectory = Paths.get(scenario.getConfig().controller().getOutputDirectory())
+				.resolve("analysis/accessibility/" + activityType)
+				.toString();
 			AccessibilityComputationShutdownListener accessibilityShutdownListener = new AccessibilityComputationShutdownListener(scenario, measuringPoints, opportunities, outputDirectory);
 
 //				for (Modes4Accessibility mode : acg.getIsComputingMode()) {

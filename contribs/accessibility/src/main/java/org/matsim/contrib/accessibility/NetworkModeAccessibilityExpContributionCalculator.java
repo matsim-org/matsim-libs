@@ -110,17 +110,17 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 		acg = (AccessibilityConfigGroup) this.scenario.getConfig().getModules().get(AccessibilityConfigGroup.GROUP_NAME);
 
 		//todo toggle for single opportunity deepdive
-//		synchronized (CSV_LOCK) {
-//			if (csvWriter == null) {
-//				try {
-//					csvWriter = new PrintWriter(new File("person_deepdive.csv"));
-//					csvWriter.println("person,timeCar,distCar,expSum");
-//					csvWriter.flush();
-//				} catch (FileNotFoundException e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		}
+		synchronized (CSV_LOCK) {
+			if (csvWriter == null) {
+				try {
+					csvWriter = new PrintWriter(new File("person_deepdive.csv"));
+					csvWriter.println("person,timeCar,distCar,expSum");
+					csvWriter.flush();
+				} catch (FileNotFoundException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 
 		if (acg.isPersonBased()) {
 			this.globalAverageIncome = scenario.getPopulation().getPersons().values().stream()

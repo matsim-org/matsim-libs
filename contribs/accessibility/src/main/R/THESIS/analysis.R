@@ -4,6 +4,7 @@
 # ==========================================================
 
 suppressPackageStartupMessages({
+  # install.packages("sf")
   library(dplyr)
   library(readr)
   library(sf)
@@ -15,9 +16,10 @@ suppressPackageStartupMessages({
 # Directories
 # ==========================================================
 
-base_dir   <- "."
-input_dir  <- file.path(base_dir, "input")
-output_dir <- file.path(base_dir, "output")
+base_dir     <- "."
+input_dir    <- file.path(base_dir, "input")
+hospital_dir <- file.path(input_dir, "hospital")
+output_dir   <- file.path(base_dir, "output")
 
 beta <- 1
 
@@ -70,11 +72,19 @@ read_acc <- function(file){
     clean_df()
 }
 
-twalk_df <- read_acc(file.path(input_dir, "pbAcc_teleportedWalk_base_rawSum.csv"))
-pt_df <- read_acc(file.path(input_dir, "pbAcc_pt_base_rawSum.csv"))
-car_base_df <- read_acc(file.path(input_dir, "pbAcc_car_base_rawSum.csv"))
-car_policy_df <- read_acc(file.path(input_dir, "pbAcc_car_policy_rawSum.csv"))
-car_base_no_income_df <- read_acc(file.path(input_dir, "pbAcc_car_no_income.csv"))
+# Hospital-based accessibility results (current run)
+twalk_df <- read_acc(file.path(hospital_dir, "pbAcc_teleportedWalk_base_rawSum.csv"))
+pt_df <- read_acc(file.path(hospital_dir, "pbAcc_pt_base_rawSum.csv"))
+car_base_df <- read_acc(file.path(hospital_dir, "pbAcc_car_base_rawSum.csv"))
+car_policy_df <- read_acc(file.path(hospital_dir, "pbAcc_car_policy_rawSum.csv"))
+car_base_no_income_df <- read_acc(file.path(hospital_dir, "pbAcc_car_no_income.csv"))
+
+# Spa-based reference run (kept for later refactoring)
+# twalk_df <- read_acc(file.path(input_dir, "pbAcc_teleportedWalk_base_rawSum.csv"))
+# pt_df <- read_acc(file.path(input_dir, "pbAcc_pt_base_rawSum.csv"))
+# car_base_df <- read_acc(file.path(input_dir, "pbAcc_car_base_rawSum.csv"))
+# car_policy_df <- read_acc(file.path(input_dir, "pbAcc_car_policy_rawSum.csv"))
+# car_base_no_income_df <- read_acc(file.path(input_dir, "pbAcc_car_no_income.csv"))
 
 # ==========================================================
 # Merge accessibility datasets
