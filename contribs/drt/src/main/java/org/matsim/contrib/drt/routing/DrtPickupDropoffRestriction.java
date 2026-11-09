@@ -22,11 +22,13 @@ package org.matsim.contrib.drt.routing;
 
 import java.net.URL;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.drt.run.DrtPickupDropoffRestrictionParams;
 import org.matsim.contrib.drt.run.DrtPickupDropoffRestrictionParams.RequiredInArea;
 import org.matsim.core.config.Config;
@@ -75,6 +77,24 @@ public final class DrtPickupDropoffRestriction {
 	public boolean isInArea(Link link) {
 		var point = MGC.coord2Point(link.getToNode().getCoord());
 		return area.stream().anyMatch(geometry -> geometry.contains(point));
+	}
+
+	/**
+	 * @return true if every pickup must lie in the area, so idle vehicles need to be rebalanced only within it
+	 */
+	public boolean restrictsPickups() {
+		return requiredInArea == RequiredInArea.pickup || requiredInArea == RequiredInArea.pickupAndDropoff;
+	}
+
+	/**
+	 * Zones intersecting the area if {@link #restrictsPickups()}, otherwise all zones. Used to restrict the rebalancing
+	 * zone system to where pickups can happen.
+	 */
+	public Predicate<Zone> pickupZoneFilter() {
+		if (!restrictsPickups()) {
+			return zone -> true;
+		}
+		return zone -> area.stream().anyMatch(geometry -> geometry.intersects(zone.getPreparedGeometry().getGeometry()));
 	}
 
 	public RequiredInArea getRequiredInArea() {

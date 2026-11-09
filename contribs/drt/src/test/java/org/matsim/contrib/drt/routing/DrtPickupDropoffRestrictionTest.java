@@ -31,11 +31,14 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneImpl;
 import org.matsim.contrib.drt.passenger.DrtPickupDropoffRestrictionRequestValidator;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtPickupDropoffRestrictionParams.RequiredInArea;
@@ -117,6 +120,29 @@ class DrtPickupDropoffRestrictionTest {
 		var validator = new DrtPickupDropoffRestrictionRequestValidator(restriction(RequiredInArea.dropoff));
 		assertThat(validator.validateRequest(request(outside, inside))).isEmpty();
 		assertThat(validator.validateRequest(request(inside, outside))).containsExactly(PICKUP_DROPOFF_RESTRICTION_CAUSE);
+	}
+
+	@Test
+	void testRebalancingZonesAreRestrictedOnlyIfAllPickupsLieInTheArea() {
+		Zone insideZone = zone("insideZone", 100, 900);
+		Zone overlappingZone = zone("overlappingZone", 900, 1100);
+		Zone outsideZone = zone("outsideZone", 2000, 3000);
+
+		for (RequiredInArea requiredInArea : List.of(RequiredInArea.pickup, RequiredInArea.pickupAndDropoff)) {
+			var filter = restriction(requiredInArea).pickupZoneFilter();
+			assertThat(filter.test(insideZone)).isTrue();
+			assertThat(filter.test(overlappingZone)).isTrue();
+			assertThat(filter.test(outsideZone)).isFalse();
+		}
+		for (RequiredInArea requiredInArea : List.of(RequiredInArea.dropoff, RequiredInArea.pickupOrDropoff)) {
+			assertThat(restriction(requiredInArea).pickupZoneFilter().test(outsideZone)).isTrue();
+		}
+	}
+
+	private static Zone zone(String id, double min, double max) {
+		var square = new GeometryFactory().createPolygon(new Coordinate[] { new Coordinate(min, min),
+				new Coordinate(max, min), new Coordinate(max, max), new Coordinate(min, max), new Coordinate(min, min) });
+		return new ZoneImpl(Id.create(id, Zone.class), new PreparedPolygon(square), null);
 	}
 
 	private Optional<?> findFacilities(DrtPickupDropoffRestriction restriction, Link pickup, Link dropoff) {

@@ -57,7 +57,8 @@ public final class DrtPickupDropoffRestrictionParams extends ReflectiveConfigGro
 	@Parameter(REQUIRED_IN_AREA)
 	@Comment("Which end of a DRT trip has to lie within the area: pickup (pickup in the area, dropoff anywhere),"
 			+ " dropoff (dropoff in the area, pickup anywhere), pickupOrDropoff (at least one of them in the area) or"
-			+ " pickupAndDropoff (both in the area). Trips violating the restriction are not routed with DRT.")
+			+ " pickupAndDropoff (both in the area). Trips violating the restriction are not routed with DRT. With pickup"
+			+ " and pickupAndDropoff, the rebalancing zones are additionally restricted to those intersecting the area.")
 	@NotNull
 	private RequiredInArea requiredInArea = RequiredInArea.pickupOrDropoff;
 

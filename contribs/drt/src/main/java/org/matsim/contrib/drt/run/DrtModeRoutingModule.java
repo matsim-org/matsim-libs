@@ -119,10 +119,14 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 		DrtServiceAreas.createIfConfigured(getConfig(), drtCfg)
 				.ifPresent(serviceAreas -> serviceAreasBinder.setBinding().toInstance(serviceAreas));
 
-		// shared by the routing (finder) and the QSim (request validator), so the GIS file is read only once
+		// shared by the routing (finder), the QSim (request validator) and the rebalancing zone system, so the GIS file
+		// is read only once
+		OptionalBinder<DrtPickupDropoffRestriction> pickupDropoffRestrictionBinder = OptionalBinder.newOptionalBinder(
+				binder(), modalKey(DrtPickupDropoffRestriction.class));
 		Optional<DrtPickupDropoffRestriction> pickupDropoffRestriction = drtCfg.getPickupDropoffRestrictionParams()
 				.map(params -> DrtPickupDropoffRestriction.create(getConfig(), params));
-		pickupDropoffRestriction.ifPresent(restriction -> bindModal(DrtPickupDropoffRestriction.class).toInstance(restriction));
+		pickupDropoffRestriction.ifPresent(
+				restriction -> pickupDropoffRestrictionBinder.setBinding().toInstance(restriction));
 
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 		// yyyy possibly not used for door2door; try to move inside the corresponding switch statement below.  kai, feb'24
