@@ -64,7 +64,7 @@ public class RunPersonBasedAccBerlin {
 //		== Run options ==
 		boolean personBased = true; //todo select accessibility measure (true for person-based/false for location-based)
 		RunScenario runScenario = RunScenario.policy; //todo select scenario (base/policy)
-		Modes4Accessibility targetMode = Modes4Accessibility.pt; //todo select transport mode (car/pt/teleportedWalk)
+		Modes4Accessibility targetMode = Modes4Accessibility.car; //todo select transport mode (car/pt/teleportedWalk)
 		AccessibilityConfigGroup.AccessibilityMeasureType measureType = AccessibilityConfigGroup.AccessibilityMeasureType.rawSum; //todo select measure type (logSum/rawSum, rawSum for multimodal R analysis)
 
 		OUTPUT_DIR = OUTPUT_ROOT + runScenario + "/";
