@@ -29,6 +29,15 @@ public final class MapPlot extends VizMap<MapPlot> {
 		super("map");
 	}
 
+	// customize type of map
+	public MapPlot(String name) {
+		super(name);
+	}
+
+	public String setNetwork(String file) {
+		return file;
+	}
+
 	/**
 	 * Set the shape url, providing the path.
 	 */
