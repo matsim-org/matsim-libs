@@ -28,22 +28,145 @@ import org.matsim.api.core.v01.network.Link;
  * @author dziemke
  */
 public final class BicycleUtils {
-	public static final String AVERAGE_ELEVATION = "averageElevation";
 	public static final String SURFACE = "surface";
 	public static final String SMOOTHNESS = "smoothness";
 	public static final String CYCLEWAY = "cycleway";
 	static final String WAY_TYPE = "type";
 	/*package*/ static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 
+	// ---- attributes written by the network tools in org.matsim.contrib.bicycle.network ----
+	// Their keys are snake_case, following what network-from-sumo already writes on the same
+	// networks (allowed_speed, restricted_lanes).
+
+	/** Cycling infrastructure category, holding a {@code BicycleInfraCategory} name. */
+	public static final String BICYCLE_INFRA = "bicycle_infra";
+
+	/**
+	 * Set to {@code true} on links whose OSM ways were merged into one edge but classify
+	 * differently, so their {@link #BICYCLE_INFRA} fell back to {@code NEEDS_CLARIFICATION}.
+	 */
+	public static final String BICYCLE_INFRA_MIXED = "bicycle_infra_mixed";
+
+	/**
+	 * Whether the link lies inside the area the {@code --bike-area-marker} selects:
+	 * {@code true} inside, {@code false} outside, absent when no marker was configured
+	 * and the whole network therefore got the full bicycle treatment. Outside links keep
+	 * their modes — bikes may still ride them — but carry no classification and no
+	 * elevation, so this is what to filter on rather than "has a category".
+	 */
+	public static final String BICYCLE_AREA = "bicycle_area";
+
+	/** Mean elevation over the link in m; written for inspection, not consumed by the simulation. */
+	public static final String AVERAGE_ELEVATION = "average_elevation";
+
+	/** Signed end-to-end gradient as a ratio, e.g. {@code +0.03} for 3 % uphill. */
+	public static final String GRADIENT = "gradient";
+
+	/** Steepest gradient on any sub-segment, as a ratio. */
+	public static final String MAX_GRADIENT = "max_gradient";
+
+	/** Cumulative meters climbed along the link. */
+	public static final String ELEVATION_GAIN = "elevation_gain";
+
+	/** Cumulative meters descended along the link, as a positive number. */
+	public static final String ELEVATION_LOSS = "elevation_loss";
+
+	/**
+	 * Prefix under which the network-building tools in {@code org.matsim.contrib.bicycle.network}
+	 * store raw OSM tag values on links, e.g. {@code osm:surface}.
+	 */
+	public static final String OSM_PREFIX = "osm:";
+
+	// ---- separate bike links (bicycle-split-links) ----
+	//
+	// Where cycling infrastructure is tagged on the road way itself - a lane, or a track
+	// mapped on the centerline instead of as its own OSM way - the network tools can split
+	// a parallel bike-only link off the car link, so bikes stop queueing behind cars.
+	// These two attributes tie such a pair together, in both directions.
+	//
+	// They record STRUCTURE, not scoring policy: a split link pair exists wherever the
+	// infrastructure was centerline-tagged, including physically separated tracks. Whether
+	// motorized interaction between the pair is counted, scored, or ignored is left to the
+	// consumer, which can decide it per BICYCLE_INFRA category of the bike link - what
+	// allows counting the interactions an infrastructure *avoided*. Build lookup maps from
+	// these attributes; do not parse link id suffixes.
+
+	/** On a split-off bike link: the id of the car link it runs parallel to. */
+	public static final String CAR_LINK = "car_link";
+
+	/** On a split car link: the id of the parallel bike-only link that was split off it. */
+	public static final String BIKE_LINK = "bike_link";
+
 	private BicycleUtils() {
 		// Don't allow to create instances of this class
 	}
 	public static String getCyclewaytype( Link link ){
-		return (String) link.getAttributes().getAttribute( CYCLEWAY );
+		return getStringAttribute( link, CYCLEWAY );
 	}
 
 	public static String getSurface( Link link ){
-		return (String) link.getAttributes().getAttribute( SURFACE );
+		return getStringAttribute( link, SURFACE );
+	}
+
+	/** The cycling infrastructure category name, or {@code null} on an unclassified link. */
+	public static String getBicycleInfra( Link link ){
+		return (String) link.getAttributes().getAttribute( BICYCLE_INFRA );
+	}
+
+	/**
+	 * Whether the link sits inside the bicycle area, or {@code null} when the network was
+	 * built without a {@code --bike-area-marker} — then every link had the full treatment.
+	 */
+	public static Boolean getBicycleArea( Link link ){
+		return (Boolean) link.getAttributes().getAttribute( BICYCLE_AREA );
+	}
+
+	// The elevation getters return null when the link carries no metrics — no DEM was
+	// supplied, the DEM had no data there, or the link sat outside the bicycle area.
+
+	public static Double getAverageElevation( Link link ){
+		return (Double) link.getAttributes().getAttribute( AVERAGE_ELEVATION );
+	}
+
+	public static Double getGradient( Link link ){
+		return (Double) link.getAttributes().getAttribute( GRADIENT );
+	}
+
+	public static Double getMaxGradient( Link link ){
+		return (Double) link.getAttributes().getAttribute( MAX_GRADIENT );
+	}
+
+	public static Double getElevationGain( Link link ){
+		return (Double) link.getAttributes().getAttribute( ELEVATION_GAIN );
+	}
+
+	public static Double getElevationLoss( Link link ){
+		return (Double) link.getAttributes().getAttribute( ELEVATION_LOSS );
+	}
+
+	/** The parallel car link's id, or {@code null} when this is not a split-off bike link. */
+	public static String getCarLink( Link link ){
+		return (String) link.getAttributes().getAttribute( CAR_LINK );
+	}
+
+	/** The split-off bike link's id, or {@code null} when no bike link was split off this link. */
+	public static String getBikeLink( Link link ){
+		return (String) link.getAttributes().getAttribute( BIKE_LINK );
+	}
+
+	/**
+	 * Reads a link attribute that may sit under its plain OSM key (as {@code OsmBicycleReader}
+	 * writes it) or under the {@code osm:} prefix (as the network tools in
+	 * {@code org.matsim.contrib.bicycle.network} write it), so networks from either source
+	 * score the same. The plain key wins; the tools move the attribute rather than copy it,
+	 * so a network never carries both.
+	 */
+	private static String getStringAttribute( Link link, String key ){
+		Object value = link.getAttributes().getAttribute( key );
+		if ( value == null ){
+			value = link.getAttributes().getAttribute( OSM_PREFIX + key );
+		}
+		return (String) value;
 	}
 
 	// ===
