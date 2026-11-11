@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.router.StopCandidatesRoute;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter.RouteCreator;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
 import org.matsim.core.config.Config;
@@ -93,12 +94,24 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 
 		Route drtRoute = drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, person,
 			tripAttributes, routeFactories);
+		keepStopCandidates(drtLeg.getRoute(), drtRoute);
 		drtLeg.setRoute(drtRoute);
 
 		// update DRT estimate
 		if (drtEstimator != null) {
 			DrtEstimator.Estimate estimate = drtEstimator.estimate((DrtRoute) drtRoute, drtLeg.getDepartureTime());
 			DrtEstimator.setEstimateAttributes(drtLeg, estimate);
+		}
+	}
+
+	/**
+	 * The updated route keeps the stops of the old one, so its stop candidates (and their walks) remain valid. Without
+	 * this, stop choice would only work in the first iteration.
+	 */
+	static void keepStopCandidates(Route oldRoute, Route newRoute) {
+		if (oldRoute instanceof StopCandidatesRoute oldCandidates
+				&& newRoute instanceof StopCandidatesRoute newCandidates) {
+			oldCandidates.getStopCandidates().ifPresent(newCandidates::setStopCandidates);
 		}
 	}
 
