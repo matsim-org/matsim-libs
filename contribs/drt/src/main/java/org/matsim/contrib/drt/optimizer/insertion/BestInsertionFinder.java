@@ -44,10 +44,23 @@ public class BestInsertionFinder {
 		}
 	}
 
+	// ties between request variants (same vehicle and insertion indices): less walking first, then variant order
 	public static final Comparator<Insertion> INSERTION_COMPARATOR = //
 			Comparator.<Insertion, Id<DvrpVehicle>>comparing(insertion -> insertion.vehicleEntry.vehicle.getId())
 					.thenComparingInt(insertion -> insertion.pickup.index)
-					.thenComparingInt(insertion -> insertion.dropoff.index);
+					.thenComparingInt(insertion -> insertion.dropoff.index)
+					.thenComparingDouble(BestInsertionFinder::walkDuration)
+					.thenComparingInt(BestInsertionFinder::variantIndex);
+
+	private static double walkDuration(Insertion insertion) {
+		RequestVariant variant = insertion.variantOrNull();
+		return variant == null ? 0 : variant.walkDuration();
+	}
+
+	private static int variantIndex(Insertion insertion) {
+		RequestVariant variant = insertion.variantOrNull();
+		return variant == null ? 0 : variant.index();
+	}
 
 	public static final Comparator<InsertionWithCost> INSERTION_WITH_COST_COMPARATOR = //
 			Comparator.<InsertionWithCost>comparingDouble(insertionWithCost -> insertionWithCost.cost)

@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
+import org.matsim.contrib.drt.optimizer.insertion.RequestVariants;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 
@@ -61,12 +62,14 @@ class RepeatedSelectiveInsertionProvider {
 	}
 
     public List<InsertionWithDetourData> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
+        // variants are created once per search and shared by all vehicles
+        var variants = RequestVariants.of(drtRequest);
         // Parallel outer stream over vehicle entries. The inner stream (flatmap) is
         // sequential.
         List<InsertionWithDetourData> preFilteredInsertions = forkJoinPool.submit(() -> vehicleEntries.parallelStream()
                 // generate feasible insertions (wrt occupancy limits) with admissible detour
                 // times
-                .flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
+                .flatMap(e -> insertionGenerator.generateInsertions(variants, e).stream())
                 .map(i -> new InsertionWithCost(i,
                         this.insertionCostCalculator.calculate(i.insertion.getRequest(), i.insertion, i.detourTimeInfo)))
                 // optimistic pre-filtering wrt admissible cost function (SPEED_FACTOR 1.0)

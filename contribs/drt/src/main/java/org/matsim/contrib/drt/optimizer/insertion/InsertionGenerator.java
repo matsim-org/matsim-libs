@@ -122,14 +122,30 @@ public class InsertionGenerator {
 		public final InsertionPoint pickup;
 		public final InsertionPoint dropoff;
 		public final DvrpLoad insertedLoad;
-		private final DrtRequest request;
+		private final RequestVariant variant;
 
 		public Insertion(VehicleEntry vehicleEntry, InsertionPoint pickup, InsertionPoint dropoff, DvrpLoad insertedLoad) {
+			this(null, vehicleEntry, pickup, dropoff, insertedLoad);
+		}
+
+		/**
+		 * @param variant the request variant served by this insertion; if {@code null}, it is derived from the
+		 *                pickup/dropoff waypoints (without walking information)
+		 */
+		public Insertion(RequestVariant variant, VehicleEntry vehicleEntry, InsertionPoint pickup, InsertionPoint dropoff,
+				DvrpLoad insertedLoad) {
 			this.vehicleEntry = vehicleEntry;
 			this.pickup = pickup;
 			this.dropoff = dropoff;
 			this.insertedLoad = insertedLoad;
-			this.request = requestOf(pickup, dropoff);
+			DrtRequest waypointRequest = requestOf(pickup, dropoff);
+			if (variant == null) {
+				this.variant = waypointRequest == null ? null : RequestVariant.of(waypointRequest);
+			} else {
+				Preconditions.checkArgument(waypointRequest == null || waypointRequest == variant.request(),
+						"Waypoints must carry the request of the variant");
+				this.variant = variant;
+			}
 		}
 
 		public Insertion(DrtRequest request, VehicleEntry vehicleEntry, int pickupIdx, int dropoffIdx) {
@@ -137,7 +153,7 @@ public class InsertionGenerator {
 			pickup = createPickupInsertion(request, vehicleEntry, pickupIdx, pickupIdx == dropoffIdx);
 			dropoff = createDropoffInsertion(request, vehicleEntry, pickup, dropoffIdx);
 			this.insertedLoad = request.getLoad();
-			this.request = request;
+			this.variant = RequestVariant.of(request);
 		}
 
 		/**
@@ -150,8 +166,24 @@ public class InsertionGenerator {
 		 * @throws IllegalStateException if the insertion points carry no pickup/dropoff waypoints
 		 */
 		public DrtRequest getRequest() {
-			Preconditions.checkState(request != null, "Insertion carries no pickup/dropoff waypoints, cannot determine its request");
-			return request;
+			return getVariant().request();
+		}
+
+		/**
+		 * @return the request variant served by this insertion (incl. walking durations)
+		 * @throws IllegalStateException if the insertion points carry no pickup/dropoff waypoints
+		 */
+		public RequestVariant getVariant() {
+			Preconditions.checkState(variant != null, "Insertion carries no pickup/dropoff waypoints, cannot determine its request");
+			return variant;
+		}
+
+		/**
+		 * Like {@link #getVariant()}, but {@code null} instead of failing; for ordering insertions that may lack
+		 * pickup/dropoff waypoints.
+		 */
+		RequestVariant variantOrNull() {
+			return variant;
 		}
 
 		private static DrtRequest requestOf(InsertionPoint pickup, InsertionPoint dropoff) {
@@ -180,7 +212,36 @@ public class InsertionGenerator {
 		detourTimeCalculator = new InsertionDetourTimeCalculator(stopTimeCalculator, detourTimeEstimator);
 	}
 
+	/**
+	 * Generates insertions for all variants of the request (see {@link RequestVariants#of(DrtRequest)}). Each insertion
+	 * carries the variant it serves ({@link Insertion#getVariant()}). Without stop candidates, there is only one
+	 * variant, the request itself. When called for many vehicles, prefer
+	 * {@link #generateInsertions(List, VehicleEntry)} with variants created once.
+	 */
 	public List<InsertionWithDetourData> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
+		return generateInsertions(RequestVariants.of(drtRequest), vEntry);
+	}
+
+	/**
+	 * Generates insertions for the given variants of one request.
+	 */
+	public List<InsertionWithDetourData> generateInsertions(List<RequestVariant> variants, VehicleEntry vEntry) {
+		if (variants.size() == 1) {
+			return generateInsertionsForVariant(variants.getFirst(), vEntry);
+		}
+
+		List<InsertionWithDetourData> insertions = new ArrayList<>();
+		for (RequestVariant variant : variants) {
+			insertions.addAll(generateInsertionsForVariant(variant, vEntry));
+		}
+		return insertions;
+	}
+
+	/**
+	 * Generates insertions for exactly one variant. Package visible for testing.
+	 */
+	List<InsertionWithDetourData> generateInsertionsForVariant(RequestVariant variant, VehicleEntry vEntry) {
+		DrtRequest drtRequest = variant.request();
 		int stopCount = vEntry.stops.size();
 		List<InsertionWithDetourData> insertions = new ArrayList<>();
 
@@ -229,7 +290,7 @@ public class InsertionGenerator {
 
 			if (allowed) {
 				if (drtRequest.getFromLink() != nextStop.getTask().getLink()) {// next stop at different link
-					generateDropoffInsertions(drtRequest, vEntry, i, insertions);
+					generateDropoffInsertions(variant, vEntry, i, insertions);
 				} else {
 					// this is the case where we insert a new request *before* a stop that is
 					// on the same link as the pickup link. Initially, the reasoning was that the
@@ -248,7 +309,7 @@ public class InsertionGenerator {
 						// covered further downstream as a special case of merging the pickup into the
 						// existing stop task.
 
-						generateDropoffInsertions(drtRequest, vEntry, i, insertions);
+						generateDropoffInsertions(variant, vEntry, i, insertions);
 					}
 				}
 			}
@@ -263,14 +324,15 @@ public class InsertionGenerator {
 
 		// here we still have to check if the load of the request is compatible with the last vehicle capacity
 		if(drtRequest.getLoad().fitsIn(vehicleCapacity)) {
-			generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// at/after last stop
+			generateDropoffInsertions(variant, vEntry, stopCount, insertions);// at/after last stop
 		}
 
 		return insertions;
 	}
 
-	private void generateDropoffInsertions(DrtRequest request, VehicleEntry vEntry, int i,
+	private void generateDropoffInsertions(RequestVariant variant, VehicleEntry vEntry, int i,
 			List<InsertionWithDetourData> insertions) {
+		DrtRequest request = variant.request();
 		var pickupInsertion = createPickupInsertion(request, vEntry, i, true);
 		double toPickupDepartureTime = pickupInsertion.previousWaypoint.getDepartureTime();
 		double toPickupTT = detourTimeEstimator.estimateTime(pickupInsertion.previousWaypoint.getLink(),
@@ -296,7 +358,7 @@ public class InsertionGenerator {
 				// next stop at different link
 				// otherwise, do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 				addInsertion(insertions,
-						createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+						createInsertionWithDetourData(variant, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
 								j));
 			} else {
 				// special case: inserting dropoff before prebooked task on the same link
@@ -305,7 +367,7 @@ public class InsertionGenerator {
 				boolean viableSameLink = vEntry.getPrecedingStayTime(j) > 0.0;
 				if (viableSameLink && earliestPickupStartTime + fromPickupTT < nextStop(vEntry, j).getArrivalTime()) {
 					addInsertion(insertions,
-							createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+							createInsertionWithDetourData(variant, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
 									j));
 				}
 			}
@@ -343,7 +405,7 @@ public class InsertionGenerator {
 				if (request.getToLink() == currentStop.getTask().getLink()) {
 					//special case -- we can insert dropoff exactly at node j
 					addInsertion(insertions,
-							createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT,
+							createInsertionWithDetourData(variant, vEntry, pickupInsertion, fromPickupTT,
 									pickupDetourInfo, j));
 				}
 
@@ -353,7 +415,7 @@ public class InsertionGenerator {
 			if (request.getToLink() != nextStop(vEntry, j).getTask().getLink()) {// next stop at different link
 				//do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 				addInsertion(insertions,
-						createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+						createInsertionWithDetourData(variant, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
 								j));
 			} else {
 				// special case: inserting dropoff before prebooked task on the same link
@@ -362,7 +424,7 @@ public class InsertionGenerator {
 				boolean viableSameLink = vEntry.getPrecedingStayTime(j) > 0.0;
 				if (viableSameLink && earliestPickupStartTime + fromPickupTT < nextStop(vEntry, j).getArrivalTime()) {
 					addInsertion(insertions,
-							createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+							createInsertionWithDetourData(variant, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
 									j));
 				}
 			}
@@ -376,7 +438,7 @@ public class InsertionGenerator {
 
 		if(request.getLoad().fitsIn(capacity)) {
 			addInsertion(insertions,
-				createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+				createInsertionWithDetourData(variant, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
 					stopCount));
 		}
 	}
@@ -428,10 +490,11 @@ public class InsertionGenerator {
 		return vehicleCapacity;
 	}
 
-	private InsertionWithDetourData createInsertionWithDetourData(DrtRequest request, VehicleEntry vehicleEntry,
+	private InsertionWithDetourData createInsertionWithDetourData(RequestVariant variant, VehicleEntry vehicleEntry,
 			InsertionPoint pickupInsertion, double fromPickupTT, PickupDetourInfo pickupDetourInfo, int dropoffIdx) {
+		DrtRequest request = variant.request();
 		var dropoffInsertion = createDropoffInsertion(request, vehicleEntry, pickupInsertion, dropoffIdx);
-		var insertion = new Insertion(vehicleEntry, pickupInsertion, dropoffInsertion, request.getLoad());
+		var insertion = new Insertion(variant, vehicleEntry, pickupInsertion, dropoffInsertion, request.getLoad());
 
 		double toDropoffDepartureTime = pickupInsertion.index == dropoffIdx ?
 				pickupDetourInfo.vehicleDepartureTime :
