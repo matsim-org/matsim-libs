@@ -1,4 +1,6 @@
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
+
+import org.matsim.application.analysis.population.MuseComputation;
 
 import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
@@ -47,7 +49,7 @@ import java.util.*;
 
 import static org.matsim.api.core.v01.TransportMode.*;
 import static org.matsim.application.ApplicationUtils.globFile;
-import static org.matsim.application.analysis.population.HeadersKN.*;
+import static org.matsim.application.analysis.population.kn.HeadersKN.*;
 import static org.matsim.core.population.PersonUtils.getMarginalUtilityOfMoney;
 
 class AgentWiseComparisonKNUtils{

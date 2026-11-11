@@ -1,4 +1,6 @@
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
+
+import org.matsim.application.analysis.population.VttsAttributes;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,6 +47,7 @@ import static org.matsim.application.ApplicationUtils.globFile;
 import static tech.tablesaw.aggregate.AggregateFunctions.*;
 
 @CommandLine.Command(name = "run-vtts-analysis", description = "")
+@Deprecated(since = "2027.0", forRemoval = false)
 public class AddVttsEtcToActivities implements MATSimAppCommand {
 	private static final Logger log = LogManager.getLogger( AddVttsEtcToActivities.class );
 
@@ -246,23 +249,17 @@ public class AddVttsEtcToActivities implements MATSimAppCommand {
 		return (Double) activity.getAttributes().getAttribute( VTTS_H );
 	}
 
-	private static final String MUSE_H = "marginal_utility_of_starting_earlier_h";
 	public static void setMUSE_h( Activity activity, double muse_h ){
-		activity.getAttributes().putAttribute( MUSE_H, muse_h );
+		VttsAttributes.setMuse(activity, muse_h);
 	}
 	public static Double getMUSE_h( Activity activity ) {
-		Double muse = (Double) activity.getAttributes().getAttribute( MUSE_H );
-		if ( muse!=null ){
-			return muse;
-		} else {
-			return (Double) activity.getAttributes().getAttribute( "marginal_utility_of_starting_later_h" );
-		}
+		return VttsAttributes.getMuse(activity);
 	}
 	public static void setMUSE_h( Plan plan, double muse_h ) {
-		plan.getAttributes().putAttribute( MUSE_H, muse_h );
+		VttsAttributes.setMuse(plan, muse_h);
 	}
 	public static Double getMUSE_h( Plan plan ) {
-		return (Double) plan.getAttributes().getAttribute( MUSE_H );
+		return VttsAttributes.getMuse(plan);
 	}
 
 	public static void setActScore( Activity activity, double score ) {

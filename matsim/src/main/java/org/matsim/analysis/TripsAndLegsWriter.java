@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.router.AnalysisMainModeIdentifier;
+import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.utils.collections.Tuple;
@@ -84,6 +85,15 @@ public class TripsAndLegsWriter {
 
 		TRIPSHEADER = ArrayUtils.addAll(TRIPSHEADER_BASE, tripsWriterExtension.getAdditionalTripHeader());
 		LEGSHEADER = ArrayUtils.addAll(LEGSHEADER_BASE, legWriterExtension.getAdditionalLegHeader());
+	}
+
+	/**
+	 * Creates a writer with the same settings that a default MATSim run uses: no additional trip or leg columns, the
+	 * {@link DefaultAnalysisMainModeIdentifier} and times written as {@code hh:mm:ss}. Use this to write the files outside
+	 * of a running controller, e.g. from the output files of a finished run.
+	 */
+	public TripsAndLegsWriter(Scenario scenario) {
+		this(scenario, new NoTripWriterExtension(), new NoLegsWriterExtension(), new DefaultAnalysisMainModeIdentifier(), new DefaultTimeWriter());
 	}
 
 	private char getDefaultDelimiter() {
