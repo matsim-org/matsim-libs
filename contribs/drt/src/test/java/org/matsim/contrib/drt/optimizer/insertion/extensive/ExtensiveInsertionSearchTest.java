@@ -15,7 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionTestUtils;
 import org.matsim.contrib.drt.optimizer.insertion.RequestVariant;
 import org.matsim.contrib.drt.optimizer.insertion.RequestVariants;
@@ -84,5 +87,56 @@ public class ExtensiveInsertionSearchTest {
 		ArgumentCaptor<List<InsertionGenerator.Insertion>> insertionsPerCall = ArgumentCaptor.forClass(List.class);
 		verify(pathCalculator, times(2)).calculatePaths(eq(request), insertionsPerCall.capture());
 		assertThat(insertionsPerCall.getAllValues()).containsExactly(List.of(firstInsertion), List.of(secondInsertion));
+	}
+
+	/**
+	 * With lazy path creation, the paths of an earlier variant follow the search tree of the last calculated variant.
+	 * The paths of a chosen insertion of an earlier variant are therefore calculated again; times are kept.
+	 */
+	@Test
+	void pathsOfAChosenEarlierVariantAreCalculatedAgain() {
+		var variants = RequestVariants.of(requestWithAlternativePickup());
+		var vehicleEntry = mock(VehicleEntry.class);
+		var insertion = InsertionTestUtils.insertionFor(variants.get(0), vehicleEntry, 0, 0, loadType.fromInt(1));
+		var staleData = mock(InsertionDetourData.class);
+		var timeInfo = mock(InsertionDetourTimeCalculator.DetourTimeInfo.class);
+		var best = new InsertionWithDetourData(insertion, staleData, timeInfo);
+
+		var freshData = mock(InsertionDetourData.class);
+		var freshCache = mock(DetourPathDataCache.class);
+		when(freshCache.createInsertionDetourData(insertion)).thenReturn(freshData);
+		var pathCalculator = mock(MultiInsertionDetourPathCalculator.class);
+		when(pathCalculator.calculatePaths(variants.get(0).request(), List.of(insertion))).thenReturn(freshCache);
+
+		// variant 1 was calculated last
+		var result = ExtensiveInsertionSearch.withPathsOfItsVariant(pathCalculator, best, 1);
+
+		assertThat(result.insertion).isSameAs(insertion);
+		assertThat(result.detourData).isSameAs(freshData);
+		assertThat(result.detourTimeInfo).isSameAs(timeInfo);
+		verify(pathCalculator).calculatePaths(variants.get(0).request(), List.of(insertion));
+	}
+
+	@Test
+	void pathsOfTheLastCalculatedVariantAreKept() {
+		var variants = RequestVariants.of(requestWithAlternativePickup());
+		var insertion = InsertionTestUtils.insertionFor(variants.get(1), mock(VehicleEntry.class), 0, 0,
+				loadType.fromInt(1));
+		var best = new InsertionWithDetourData(insertion, mock(InsertionDetourData.class),
+				mock(InsertionDetourTimeCalculator.DetourTimeInfo.class));
+		var pathCalculator = mock(MultiInsertionDetourPathCalculator.class);
+
+		// also the case of a request without candidates (single variant 0)
+		assertThat(ExtensiveInsertionSearch.withPathsOfItsVariant(pathCalculator, best, 1)).isSameAs(best);
+		verifyNoMoreInteractions(pathCalculator);
+	}
+
+	private static DrtRequest requestWithAlternativePickup() {
+		return DrtRequest.newBuilder()
+				.fromLink(new FakeLink(Id.createLinkId("from")))
+				.toLink(new FakeLink(Id.createLinkId("to")))
+				.stopCandidates(new DrtStopCandidates(0, 0,
+						List.of(new DrtStopCandidate(new FakeLink(Id.createLinkId("alt")), 60)), List.of()))
+				.build();
 	}
 }
