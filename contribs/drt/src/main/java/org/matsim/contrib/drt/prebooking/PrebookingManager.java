@@ -19,7 +19,6 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.router.StopCandidates;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
@@ -331,7 +330,6 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 			this.walkers = List.copyOf(walkers);
 			this.alternativePickups = alternativePickups;
 		}
-
 	}
 
 	private final IdMap<Request, PendingStopCandidates> pendingStopCandidates = new IdMap<>(Request.class);
