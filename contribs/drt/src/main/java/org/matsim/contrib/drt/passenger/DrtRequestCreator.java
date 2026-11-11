@@ -112,6 +112,8 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				.constraints(consolidatedConstrains)
 				.submissionTime(submissionTime)
 				.load(load)
+			// is this just from one single route
+				.unsharedRideTime(drtRoute.getDirectRideTime())
 				.build();
 
 		log.debug(drtRoute);

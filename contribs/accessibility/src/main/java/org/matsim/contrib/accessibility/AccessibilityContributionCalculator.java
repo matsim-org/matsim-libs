@@ -2,8 +2,6 @@ package org.matsim.contrib.accessibility;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -61,7 +59,11 @@ interface AccessibilityContributionCalculator {
 
 	/*
 	Needed for perallelization
+	Kai is not so happy about duplication on this level. Prone to errors since the deep copy needs to be programmed manually.
 	 */
 	AccessibilityContributionCalculator duplicate();
-	// Kai is not so happy about duplication on this level. Prone to errors since the deep copy needs to be programmed manually.
+
+	/** Called once after all departure times for an opportunity type have been processed. */
+	default void finish() {
+	}
 }

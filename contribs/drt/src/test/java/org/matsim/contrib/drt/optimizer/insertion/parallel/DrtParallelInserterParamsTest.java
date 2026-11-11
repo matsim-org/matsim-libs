@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DrtParallelInserterParamsTest {
 
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils() ;
+	private final MatsimTestUtils utils = new MatsimTestUtils() ;
 
     @Test
     void DrtParallelInserterParamsIOTest() {
@@ -32,7 +32,6 @@ class DrtParallelInserterParamsTest {
         originalParams.setLogThreadActivity(true);
         originalParams.setVehiclesPartitioner(DrtParallelInserterParams.VehiclesPartitioner.RoundRobinVehicleEntryPartitioner);
         originalParams.setRequestsPartitioner(DrtParallelInserterParams.RequestsPartitioner.RoundRobinRequestsPartitioner);
-
 		drtConfigGroup.addParameterSet(originalParams);
 
         config.addModule(drtConfigGroup);
