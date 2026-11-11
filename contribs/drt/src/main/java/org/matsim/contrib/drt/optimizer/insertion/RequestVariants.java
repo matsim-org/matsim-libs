@@ -22,7 +22,8 @@ public final class RequestVariants {
 	/**
 	 * Returns all variants of the request as an immutable list. Index 0 is the request itself (its own from/to link);
 	 * then one variant per further combination of pickup and dropoff stop, skipping combinations on the same link and
-	 * combinations whose latest arrival is not after their earliest start (no travel budget between the two stops).
+	 * combinations whose latest arrival is not after their earliest start (no travel budget between the two stops) and
+	 * pickup stops the passenger cannot reach before the latest pickup of the request.
 	 * Candidates on a link that already occurs (the request's own link or an earlier candidate) are ignored, so each
 	 * pair of links is evaluated once; the first candidate per link wins.
 	 * Without stop candidates, a single variant wrapping the request.
@@ -31,7 +32,9 @@ public final class RequestVariants {
 	 * <ul>
 	 * <li>departure at the origin = earliest start of the request - walk(own pickup stop)</li>
 	 * <li>latest arrival at the destination = latest arrival of the request + walk(own dropoff stop)</li>
-	 * <li>earliest start = departure at the origin + walk(a); max wait counts from there (arrival at the stop)</li>
+	 * <li>earliest start = departure at the origin + walk(a) (arrival at the stop)</li>
+	 * <li>latest start = latest start of the request, i.e. the same for all variants: walking farther does not allow a
+	 * later pickup, the longer walk is taken from the waiting budget (max wait = latest start - earliest start)</li>
 	 * <li>latest arrival = latest arrival at the destination - walk(e)</li>
 	 * <li>max travel duration = latest arrival - earliest start (budget between the two stops)</li>
 	 * </ul>
@@ -69,12 +72,16 @@ public final class RequestVariants {
 				if (latestArrival <= earliestStart) {
 					continue; // no travel budget between the two stops: never feasible, skip the path calculation
 				}
+				double maxWait = request.getLatestStartTime() - earliestStart;
+				if (maxWait < 0) {
+					continue; // the passenger cannot reach the pickup stop before the latest pickup
+				}
 				DrtRequest variantRequest = DrtRequest.newBuilder(request)
 						.stopCandidates(null)
 						.fromLink(pickup.link())
 						.toLink(dropoff.link())
 						.earliestDepartureTime(earliestStart)
-						.constraints(withMaxTravelDuration(request.getConstraints(), latestArrival - earliestStart))
+						.constraints(withMaxDurations(request.getConstraints(), latestArrival - earliestStart, maxWait))
 						.build();
 				variants.add(new RequestVariant(variantRequest, pickup.walkDuration(), dropoff.walkDuration(),
 						variants.size()));
@@ -96,8 +103,9 @@ public final class RequestVariants {
 		return candidates;
 	}
 
-	private static DrtRouteConstraints withMaxTravelDuration(DrtRouteConstraints c, double maxTravelDuration) {
-		return new DrtRouteConstraints(maxTravelDuration, c.maxRideDuration(), c.maxWaitDuration(), c.maxPickupDelay(),
+	private static DrtRouteConstraints withMaxDurations(DrtRouteConstraints c, double maxTravelDuration,
+			double maxWaitDuration) {
+		return new DrtRouteConstraints(maxTravelDuration, c.maxRideDuration(), maxWaitDuration, c.maxPickupDelay(),
 				c.lateDiversionThreshold(), c.allowRejection());
 	}
 }
