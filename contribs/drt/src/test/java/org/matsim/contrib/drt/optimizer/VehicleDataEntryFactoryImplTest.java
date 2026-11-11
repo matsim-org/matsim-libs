@@ -489,4 +489,71 @@ public class VehicleDataEntryFactoryImplTest {
 		// an 80 s stay absorbs the delay and leaves 30 s
 		assertThat(computeSlackTimes(vehicle, 0, stops, null, List.of(80.0, 0.0))).containsExactly(30, 30, 0, 1000);
 	}
+
+	/**
+	 * Two requests dropped off at the same stop: the tighter ride slack binds between the later pickup and the shared
+	 * dropoff, the looser one alone between the two pickups.
+	 */
+	@Test
+	void computeSlackTimes_sharedDropoffStop() {
+		StopWaypoint pickupStopA = stop(100, 1100, 110, 1110);
+		StopWaypoint pickupStopB = stop(200, 1200, 210, 1210);
+		StopWaypoint sharedDropoffStop = stop(300, 1300, 310, 1310);
+
+		// ride slack A = 300 - (300 - 100) = 100
+		AcceptedDrtRequest requestA = AcceptedDrtRequest.newBuilder()
+				.request(DrtRequest.newBuilder().id(Id.create("reqA", Request.class)).build())
+				.maxRideDuration(300)
+				.plannedPickupTime(100.)
+				.plannedDropoffTime(300.)
+				.build();
+
+		// ride slack B = 120 - (300 - 200) = 20
+		AcceptedDrtRequest requestB = AcceptedDrtRequest.newBuilder()
+				.request(DrtRequest.newBuilder().id(Id.create("reqB", Request.class)).build())
+				.maxRideDuration(120)
+				.plannedPickupTime(200.)
+				.plannedDropoffTime(300.)
+				.build();
+
+		pickupStopA.getTask().addPickupRequest(requestA);
+		pickupStopB.getTask().addPickupRequest(requestB);
+		sharedDropoffStop.getTask().addDropoffRequest(requestA);
+		sharedDropoffStop.getTask().addDropoffRequest(requestB);
+
+		StopWaypoint[] stops = new StopWaypoint[] {pickupStopA, pickupStopB, sharedDropoffStop};
+		double[] slackTimes = computeSlackTimes(vehicle(2000, 1000), 0, stops, null, List.of(0.0, 0.0, 0.0));
+
+		// [start, beforeStop0, beforeStop1, beforeStop2, vehicle]
+		// Before stop 2: A and B on board: min(100, 20) = 20
+		// Before stop 1: only A on board: 100
+		// Before stop 0: nobody on board: time window = 1000
+		assertThat(slackTimes).containsExactly(1000, 1000, 100, 20, 1000);
+	}
+
+	/**
+	 * A request picked up and dropped off at the same stop never rides across an insertion point, so its ride slack
+	 * does not restrict any insertion.
+	 */
+	@Test
+	void computeSlackTimes_pickupAndDropoffAtSameStop() {
+		StopWaypoint sameStop = stop(100, 1100, 110, 1110);
+		StopWaypoint laterStop = stop(200, 1200, 210, 1210);
+
+		// ride slack would be 0
+		AcceptedDrtRequest request = AcceptedDrtRequest.newBuilder()
+				.request(DrtRequest.newBuilder().id(Id.create("req", Request.class)).build())
+				.maxRideDuration(0)
+				.plannedPickupTime(110.)
+				.plannedDropoffTime(110.)
+				.build();
+
+		sameStop.getTask().addPickupRequest(request);
+		sameStop.getTask().addDropoffRequest(request);
+
+		StopWaypoint[] stops = new StopWaypoint[] {sameStop, laterStop};
+		double[] slackTimes = computeSlackTimes(vehicle(2000, 1000), 0, stops, null, List.of(0.0, 0.0));
+
+		assertThat(slackTimes).containsExactly(1000, 1000, 1000, 1000);
+	}
 }
