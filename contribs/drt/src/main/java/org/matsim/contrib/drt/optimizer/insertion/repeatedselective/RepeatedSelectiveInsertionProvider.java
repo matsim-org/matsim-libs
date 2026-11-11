@@ -68,7 +68,7 @@ class RepeatedSelectiveInsertionProvider {
                 // times
                 .flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
                 .map(i -> new InsertionWithCost(i,
-                        this.insertionCostCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)))
+                        this.insertionCostCalculator.calculate(i.insertion.getRequest(), i.insertion, i.detourTimeInfo)))
                 // optimistic pre-filtering wrt admissible cost function (SPEED_FACTOR 1.0)
                 .filter(iWithCost -> iWithCost.cost < INFEASIBLE_SOLUTION_COST)
                 // sort all found insertions
