@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.prebooking;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+import com.google.common.collect.Iterables;
 import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -183,12 +184,13 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 		Optional<DrtStopCandidates> stopCandidates = Optional.empty();
 		// only passengers with own access/egress walks can be moved to another stop; a group gets candidates only if
 		// all its passengers have them (passengers without own walks, e.g. DRT companions, are not supported yet)
-		List<PersonLeg> walkers = personsLegs.stream().filter(this::hasAccessAndEgressWalks).toList();
-		List<Route> walkerRoutes = walkers.stream().map(personLeg -> personLeg.leg().getRoute()).toList();
-		if (request instanceof DrtRequest drtRequest && walkers.size() == personsLegs.size()
-				&& PrebookingStopCandidates.haveStopCandidates(walkerRoutes)) {
-			boolean pickupMayChange = personsLegs.stream().noneMatch(this::hasLeftOrigin);
-			stopCandidates = PrebookingStopCandidates.toDrtStopCandidates(walkerRoutes, network, pickupMayChange);
+		List<Route> routesOfAll = personsLegs.stream().map(personLeg -> personLeg.leg().getRoute()).toList();
+		List<StopCandidatePassenger> passengers = List.of();
+		if (request instanceof DrtRequest drtRequest && PrebookingStopCandidates.haveStopCandidates(routesOfAll)
+				&& personsLegs.stream().allMatch(PrebookingManager::hasAccessAndEgressWalks)) {
+			passengers = personsLegs.stream().map(StopCandidatePassenger::new).toList();
+			boolean pickupMayChange = passengers.stream().noneMatch(StopCandidatePassenger::hasLeftOrigin);
+			stopCandidates = PrebookingStopCandidates.toDrtStopCandidates(routesOfAll, network, pickupMayChange);
 			request = PrebookingStopCandidates.withStopCandidates(drtRequest, stopCandidates);
 		}
 
@@ -213,7 +215,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 				personLeg.leg().getAttributes().putAttribute(requestAttribute, request.getId().toString());
 			}
 			if (stopCandidates.isPresent()) {
-				pendingStopCandidates.put(request.getId(), new PendingStopCandidates(walkers,
+				pendingStopCandidates.put(request.getId(), new PendingStopCandidates(passengers,
 						!stopCandidates.get().alternativeAccess().isEmpty()));
 			}
 			bookingQueue.add(request);
@@ -316,44 +318,49 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	/**
 	 * A request with stop candidates that has not been scheduled yet. If it offers alternative pickup stops, its
 	 * passengers are held in the activity before the trip until the request is scheduled (or rejected), so that their
-	 * plans can still be rewritten to the chosen pickup stop.
-	 * <p>
-	 * All passengers have own access/egress walks; these walks are rewritten to the chosen stops.
+	 * plans can still be rewritten to the chosen pickup stop. All passengers have own access/egress walks.
 	 */
-	private static final class PendingStopCandidates {
-		final List<PersonLeg> walkers;
-		final boolean alternativePickups;
-		final Map<Id<Person>, Double> heldUntil = new HashMap<>();
-		final Map<Id<Person>, Double> originalEndTime = new HashMap<>();
+	private record PendingStopCandidates(List<StopCandidatePassenger> passengers, boolean alternativePickups) {
+	}
 
-		PendingStopCandidates(List<PersonLeg> walkers, boolean alternativePickups) {
-			this.walkers = List.copyOf(walkers);
-			this.alternativePickups = alternativePickups;
+	/**
+	 * A passenger of a request with stop candidates: the activity before the trip (looked up once at booking) and, while
+	 * held in it, the originally planned end and the end set for holding.
+	 */
+	private static final class StopCandidatePassenger {
+		private final PersonLeg personLeg;
+		private final Activity origin;
+		private double originalEndTime = Double.NaN;
+		private double heldUntil = Double.NaN;
+
+		private StopCandidatePassenger(PersonLeg personLeg) {
+			this.personLeg = personLeg;
+			this.origin = PrebookingStopCandidates.originActivity(plan(personLeg), personLeg.leg());
+		}
+
+		private boolean isInOrigin() {
+			return WithinDayAgentUtils.getCurrentPlanElement(personLeg.agent()) == origin;
+		}
+
+		private boolean hasLeftOrigin() {
+			int originIndex = Iterables.indexOf(plan(personLeg).getPlanElements(), e -> e == origin);
+			return WithinDayAgentUtils.getCurrentPlanElementIndex(personLeg.agent()) > originIndex;
+		}
+
+		private boolean isHeld() {
+			return !Double.isNaN(heldUntil) && origin.getEndTime().isDefined()
+					&& origin.getEndTime().seconds() == heldUntil;
 		}
 	}
 
 	private final IdMap<Request, PendingStopCandidates> pendingStopCandidates = new IdMap<>(Request.class);
 
-	private boolean hasAccessAndEgressWalks(PersonLeg personLeg) {
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(personLeg.agent());
-		return PrebookingStopCandidates.hasAccessAndEgressLegs(plan, personLeg.leg());
+	private static Plan plan(PersonLeg personLeg) {
+		return WithinDayAgentUtils.getModifiablePlan(personLeg.agent());
 	}
 
-	private boolean hasLeftOrigin(PersonLeg personLeg) {
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(personLeg.agent());
-		int originIndex = PrebookingStopCandidates.originActivityIndex(plan, personLeg.leg());
-		return WithinDayAgentUtils.getCurrentPlanElementIndex(personLeg.agent()) > originIndex;
-	}
-
-	private Activity originActivity(PersonLeg personLeg) {
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(personLeg.agent());
-		return (Activity)plan.getPlanElements().get(PrebookingStopCandidates.originActivityIndex(plan, personLeg.leg()));
-	}
-
-	private boolean isInOriginActivity(PersonLeg personLeg) {
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(personLeg.agent());
-		return WithinDayAgentUtils.getCurrentPlanElementIndex(personLeg.agent())
-				== PrebookingStopCandidates.originActivityIndex(plan, personLeg.leg());
+	private static boolean hasAccessAndEgressWalks(PersonLeg personLeg) {
+		return PrebookingStopCandidates.hasAccessAndEgressLegs(plan(personLeg), personLeg.leg());
 	}
 
 	private void materializeStopCandidates(double now, PassengerRequestScheduledEvent event) {
@@ -361,21 +368,18 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 		if (pending == null) {
 			return;
 		}
-		Route referenceRoute = pending.walkers.getFirst().leg().getRoute();
+		Route referenceRoute = pending.passengers().getFirst().personLeg.leg().getRoute();
 		Id<Link> pickupLinkId = event.getPickupLinkId().orElse(referenceRoute.getStartLinkId());
 		Id<Link> dropoffLinkId = event.getDropoffLinkId().orElse(referenceRoute.getEndLinkId());
 
-		for (PersonLeg personLeg : pending.walkers) {
+		for (StopCandidatePassenger passenger : pending.passengers()) {
+			Leg leg = passenger.personLeg.leg();
 			// passengers are held until scheduled, so the pickup can only differ if they are still at the origin
-			Verify.verify(pickupLinkId.equals(personLeg.leg().getRoute().getStartLinkId()) || !hasLeftOrigin(personLeg),
-					"Passenger %s has left for the routed pickup stop, but %s was scheduled", personLeg.agent().getId(),
-					pickupLinkId);
-		}
-
-		for (PersonLeg personLeg : pending.walkers) {
-			Plan plan = WithinDayAgentUtils.getModifiablePlan(personLeg.agent());
-			if (PrebookingStopCandidates.materialize(plan, personLeg.leg(), pickupLinkId, dropoffLinkId)) {
-				WithinDayAgentUtils.resetCaches(personLeg.agent());
+			Verify.verify(pickupLinkId.equals(leg.getRoute().getStartLinkId()) || !passenger.hasLeftOrigin(),
+					"Passenger %s has left for the routed pickup stop, but %s was scheduled",
+					passenger.personLeg.agent().getId(), pickupLinkId);
+			if (PrebookingStopCandidates.materialize(plan(passenger.personLeg), leg, pickupLinkId, dropoffLinkId)) {
+				WithinDayAgentUtils.resetCaches(passenger.personLeg.agent());
 			}
 		}
 		release(now, pending);
@@ -383,7 +387,9 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 	/**
 	 * Holds passengers of unscheduled requests with alternative pickups in their activity and releases those of
-	 * requests that are no longer pending (rejected, canceled).
+	 * requests that are no longer pending (rejected, canceled). Runs after each sim step, i.e. after the activity ends of
+	 * the step have been processed; the end is therefore set two steps ahead, so that it is extended again before the
+	 * passenger would leave.
 	 */
 	private void holdPassengersOfPendingRequests(double now) {
 		double timeStep = mobsimTimer.getSimTimestepSize();
@@ -392,23 +398,24 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 			var entry = iterator.next();
 			PendingStopCandidates pending = entry.getValue();
 			if (!requests.containsKey(entry.getKey())) {
-				// rejected or canceled before being scheduled: back to the routed stop
+				// rejected or canceled before being scheduled: the plan still leads to the routed stop
 				iterator.remove();
 				release(now, pending);
 				continue;
 			}
-			if (!pending.alternativePickups) {
+			if (!pending.alternativePickups()) {
 				continue;
 			}
-			for (PersonLeg personLeg : pending.walkers) {
-				MobsimAgent agent = personLeg.agent();
-				if (!isInOriginActivity(personLeg) || agent.getActivityEndTime() > now + timeStep) {
+			for (StopCandidatePassenger passenger : pending.passengers()) {
+				MobsimAgent agent = passenger.personLeg.agent();
+				if (!passenger.isInOrigin() || agent.getActivityEndTime() > now + timeStep) {
 					continue; // not yet in the activity, or not about to leave it
 				}
-				pending.originalEndTime.putIfAbsent(agent.getId(), agent.getActivityEndTime());
-				double holdUntil = now + 2 * timeStep;
-				originActivity(personLeg).setEndTime(holdUntil);
-				pending.heldUntil.put(agent.getId(), holdUntil);
+				if (Double.isNaN(passenger.originalEndTime)) {
+					passenger.originalEndTime = agent.getActivityEndTime();
+				}
+				passenger.heldUntil = now + 2 * timeStep;
+				passenger.origin.setEndTime(passenger.heldUntil);
 				WithinDayAgentUtils.resetCaches(agent);
 				internalInterface.getMobsim().rescheduleActivityEnd(agent);
 			}
@@ -421,15 +428,12 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	 */
 	private void release(double now, PendingStopCandidates pending) {
 		double timeStep = mobsimTimer.getSimTimestepSize();
-		for (PersonLeg personLeg : pending.walkers) {
-			MobsimAgent agent = personLeg.agent();
-			Double heldUntil = pending.heldUntil.get(agent.getId());
-			Activity origin = originActivity(personLeg);
-			if (heldUntil == null || !isInOriginActivity(personLeg) || origin.getEndTime().isUndefined()
-					|| origin.getEndTime().seconds() != heldUntil) {
+		for (StopCandidatePassenger passenger : pending.passengers()) {
+			if (!passenger.isInOrigin() || !passenger.isHeld()) {
 				continue;
 			}
-			origin.setEndTime(Math.max(pending.originalEndTime.get(agent.getId()), now + timeStep));
+			passenger.origin.setEndTime(Math.max(passenger.originalEndTime, now + timeStep));
+			MobsimAgent agent = passenger.personLeg.agent();
 			WithinDayAgentUtils.resetCaches(agent);
 			internalInterface.getMobsim().rescheduleActivityEnd(agent);
 		}

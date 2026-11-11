@@ -21,10 +21,11 @@
 package org.matsim.contrib.drt.prebooking;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,9 +43,13 @@ import org.matsim.contrib.dvrp.router.StopCandidates;
 import org.matsim.contrib.dvrp.router.StopCandidatesRoute;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Connects the stop candidates routed into a {@link StopCandidatesRoute} with prebooking:
@@ -117,31 +122,23 @@ public final class PrebookingStopCandidates {
 	}
 
 	/**
-	 * @return the candidates (preferred first) that all passengers share, each with the longest walk duration
+	 * @return the candidates (preferred first) that all passengers share, each with the longest walk among them
 	 */
 	private static List<StopCandidates.Candidate> common(List<StopCandidates> all,
 			Function<StopCandidates, List<StopCandidates.Candidate>> side) {
-		List<StopCandidates.Candidate> result = new ArrayList<>();
-		for (StopCandidates.Candidate candidate : side.apply(all.getFirst())) {
-			double walkDuration = candidate.walkDuration();
-			boolean shared = true;
-			for (StopCandidates other : all.subList(1, all.size())) {
-				Optional<StopCandidates.Candidate> match = side.apply(other)
-						.stream()
-						.filter(c -> c.linkId().equals(candidate.linkId()))
-						.findFirst();
-				if (match.isEmpty()) {
-					shared = false;
-					break;
-				}
-				walkDuration = Math.max(walkDuration, match.get().walkDuration());
-			}
-			if (shared) {
-				result.add(new StopCandidates.Candidate(candidate.linkId(), candidate.coord(), walkDuration,
-						candidate.walkDistance()));
-			}
-		}
-		return result;
+		List<Map<Id<Link>, StopCandidates.Candidate>> byLink = all.stream()
+				.map(candidates -> side.apply(candidates).stream()
+						.collect(Collectors.toMap(StopCandidates.Candidate::linkId, c -> c, (a, b) -> a)))
+				.toList();
+		return side.apply(all.getFirst()).stream()
+				.filter(candidate -> byLink.stream().allMatch(m -> m.containsKey(candidate.linkId())))
+				.map(candidate -> {
+					List<StopCandidates.Candidate> perPassenger = byLink.stream().map(m -> m.get(candidate.linkId())).toList();
+					return new StopCandidates.Candidate(candidate.linkId(), candidate.coord(),
+							perPassenger.stream().mapToDouble(StopCandidates.Candidate::walkDuration).max().orElseThrow(),
+							perPassenger.stream().mapToDouble(StopCandidates.Candidate::walkDistance).max().orElseThrow());
+				})
+				.toList();
 	}
 
 	private static List<DrtStopCandidate> alternatives(List<StopCandidates.Candidate> candidates, Network network) {
@@ -168,21 +165,14 @@ public final class PrebookingStopCandidates {
 	 * so that it can be moved to other stops
 	 */
 	public static boolean hasAccessAndEgressLegs(Plan plan, Leg drtLeg) {
-		List<PlanElement> elements = plan.getPlanElements();
-		int legIndex = indexOf(elements, drtLeg);
-		int originIndex = legIndex - 1;
-		while (originIndex >= 0 && !isMainActivity(elements.get(originIndex))) {
-			originIndex--;
-		}
-		int destinationIndex = legIndex + 1;
-		while (destinationIndex < elements.size() && !isMainActivity(elements.get(destinationIndex))) {
-			destinationIndex++;
-		}
-		if (originIndex < 0 || destinationIndex >= elements.size()) {
+		Trip trip = TripStructureUtils.findTripAtPlanElement(drtLeg, plan);
+		if (trip == null) {
 			return false; // not a complete trip between two activities
 		}
-		return elements.subList(originIndex + 1, legIndex).stream().anyMatch(Leg.class::isInstance)
-				&& elements.subList(legIndex + 1, destinationIndex).stream().anyMatch(Leg.class::isInstance);
+		List<PlanElement> elements = trip.getTripElements();
+		int legIndex = Iterables.indexOf(elements, e -> e == drtLeg);
+		return elements.subList(0, legIndex).stream().anyMatch(Leg.class::isInstance)
+				&& elements.subList(legIndex + 1, elements.size()).stream().anyMatch(Leg.class::isInstance);
 	}
 
 	/**
@@ -203,84 +193,58 @@ public final class PrebookingStopCandidates {
 				"Leg has no route with stop candidates");
 		Route route = drtLeg.getRoute();
 		StopCandidates candidates = ((StopCandidatesRoute)route).getStopCandidates().orElseThrow();
-		String mode = drtLeg.getMode();
-		String routingMode = TripStructureUtils.getRoutingMode(drtLeg);
-
 		boolean changePickup = !pickupLinkId.equals(route.getStartLinkId());
 		boolean changeDropoff = !dropoffLinkId.equals(route.getEndLinkId());
 		if (!changePickup && !changeDropoff) {
 			return false;
 		}
 
-		List<PlanElement> elements = plan.getPlanElements();
-		int legIndex = indexOf(elements, drtLeg);
-		int originIndex = legIndex - 1;
-		while (!isMainActivity(elements.get(originIndex))) {
-			originIndex--;
-		}
-		int destinationIndex = legIndex + 1;
-		while (!isMainActivity(elements.get(destinationIndex))) {
-			destinationIndex++;
-		}
+		Trip trip = Preconditions.checkNotNull(TripStructureUtils.findTripAtPlanElement(drtLeg, plan),
+				"Leg is not part of a trip between two activities");
+		List<PlanElement> elements = trip.getTripElements();
+		int legIndex = Iterables.indexOf(elements, e -> e == drtLeg);
+		List<PlanElement> accessPart = elements.subList(0, legIndex);
+		List<PlanElement> egressPart = elements.subList(legIndex + 1, elements.size());
+		String mode = drtLeg.getMode();
+		String routingMode = TripStructureUtils.getRoutingMode(drtLeg);
 
-		if (changeDropoff) { // first the egress part, so that the indices of the access part stay valid
-			StopCandidates.Candidate dropoff = find(candidates.egress(), dropoffLinkId);
-			Activity destination = (Activity)elements.get(destinationIndex);
-			Id<Link> destinationLinkId = lastWalkEndLink(elements, legIndex + 1, destinationIndex)
-					.orElse(destination.getLinkId());
-			List<PlanElement> egress = List.of(stageActivity(dropoff, mode),
-					walkLeg(dropoff, dropoff.linkId(), destinationLinkId, routingMode));
-			replace(elements, legIndex + 1, destinationIndex, egress);
-			route.setEndLinkId(dropoffLinkId);
-		}
-
+		List<PlanElement> newTrip = new ArrayList<>();
 		if (changePickup) {
 			StopCandidates.Candidate pickup = find(candidates.access(), pickupLinkId);
-			Activity origin = (Activity)elements.get(originIndex);
-			Id<Link> originLinkId = firstWalkStartLink(elements, originIndex + 1, legIndex).orElse(origin.getLinkId());
+			Activity origin = trip.getOriginActivity();
+			Id<Link> originLinkId = firstWalkStartLink(accessPart).orElse(origin.getLinkId());
 			Leg walk = walkLeg(pickup, originLinkId, pickup.linkId(), routingMode);
 			origin.getEndTime().ifDefined(walk::setDepartureTime);
-			List<PlanElement> access = List.of(walk, stageActivity(pickup, mode));
-			replace(elements, originIndex + 1, legIndex, access);
+			newTrip.add(walk);
+			newTrip.add(stageActivity(pickup, mode));
 			route.setStartLinkId(pickupLinkId);
 			if (walk.getDepartureTime().isDefined()) {
 				drtLeg.setDepartureTime(walk.getDepartureTime().seconds() + pickup.walkDuration());
 			}
+		} else {
+			newTrip.addAll(accessPart);
 		}
+		newTrip.add(drtLeg);
+		if (changeDropoff) {
+			StopCandidates.Candidate dropoff = find(candidates.egress(), dropoffLinkId);
+			Id<Link> destinationLinkId = lastWalkEndLink(egressPart).orElse(trip.getDestinationActivity().getLinkId());
+			newTrip.add(stageActivity(dropoff, mode));
+			newTrip.add(walkLeg(dropoff, dropoff.linkId(), destinationLinkId, routingMode));
+			route.setEndLinkId(dropoffLinkId);
+		} else {
+			newTrip.addAll(egressPart);
+		}
+
+		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
 		return true;
 	}
 
 	/**
-	 * @return the candidate of the given route for the given stop link
+	 * @return the activity at which the trip of the given leg starts
 	 */
-	public static StopCandidates.Candidate candidate(Route route, Id<Link> linkId, boolean access) {
-		StopCandidates candidates = ((StopCandidatesRoute)route).getStopCandidates().orElseThrow();
-		return find(access ? candidates.access() : candidates.egress(), linkId);
-	}
-
-	/**
-	 * @return the index of the activity at which the trip of the given leg starts
-	 */
-	public static int originActivityIndex(Plan plan, Leg drtLeg) {
-		List<PlanElement> elements = plan.getPlanElements();
-		int index = indexOf(elements, drtLeg) - 1;
-		while (!isMainActivity(elements.get(index))) {
-			index--;
-		}
-		return index;
-	}
-
-	private static boolean isMainActivity(PlanElement element) {
-		return element instanceof Activity activity && !TripStructureUtils.isStageActivityType(activity.getType());
-	}
-
-	private static int indexOf(List<PlanElement> elements, Leg leg) {
-		for (int i = 0; i < elements.size(); i++) {
-			if (elements.get(i) == leg) {
-				return i;
-			}
-		}
-		throw new IllegalArgumentException("Leg is not part of the plan");
+	public static Activity originActivity(Plan plan, Leg drtLeg) {
+		return Preconditions.checkNotNull(TripStructureUtils.findTripAtPlanElement(drtLeg, plan),
+				"Leg is not part of a trip between two activities").getOriginActivity();
 	}
 
 	private static StopCandidates.Candidate find(List<StopCandidates.Candidate> candidates, Id<Link> linkId) {
@@ -290,9 +254,8 @@ public final class PrebookingStopCandidates {
 				.orElseThrow(() -> new IllegalStateException("Link " + linkId + " is not a stop candidate"));
 	}
 
-	private static Optional<Id<Link>> firstWalkStartLink(List<PlanElement> elements, int from, int to) {
-		return elements.subList(from, to)
-				.stream()
+	private static Optional<Id<Link>> firstWalkStartLink(List<PlanElement> part) {
+		return part.stream()
 				.filter(Leg.class::isInstance)
 				.map(element -> ((Leg)element).getRoute())
 				.filter(r -> r != null && r.getStartLinkId() != null)
@@ -300,10 +263,8 @@ public final class PrebookingStopCandidates {
 				.findFirst();
 	}
 
-	private static Optional<Id<Link>> lastWalkEndLink(List<PlanElement> elements, int from, int to) {
-		List<PlanElement> part = new ArrayList<>(elements.subList(from, to));
-		Collections.reverse(part);
-		return part.stream()
+	private static Optional<Id<Link>> lastWalkEndLink(List<PlanElement> part) {
+		return Lists.reverse(part).stream()
 				.filter(Leg.class::isInstance)
 				.map(element -> ((Leg)element).getRoute())
 				.filter(r -> r != null && r.getEndLinkId() != null)
@@ -335,8 +296,4 @@ public final class PrebookingStopCandidates {
 		return walk;
 	}
 
-	private static void replace(List<PlanElement> elements, int from, int to, List<PlanElement> replacement) {
-		elements.subList(from, to).clear();
-		elements.addAll(from, replacement);
-	}
 }

@@ -226,9 +226,9 @@ public class PrebookingStopCandidatesTest {
 	}
 
 	@Test
-	void testOriginActivityIndex() {
+	void testOriginActivity() {
 		Plan plan = routedPlan();
-		assertThat(PrebookingStopCandidates.originActivityIndex(plan, drtLeg(plan))).isZero();
+		assertThat(PrebookingStopCandidates.originActivity(plan, drtLeg(plan))).isSameAs(plan.getPlanElements().get(0));
 	}
 
 	private Leg drtLeg(Plan plan) {
