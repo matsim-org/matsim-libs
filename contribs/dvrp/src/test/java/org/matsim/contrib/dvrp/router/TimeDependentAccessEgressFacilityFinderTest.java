@@ -77,6 +77,20 @@ public class TimeDependentAccessEgressFacilityFinderTest {
 	}
 
 	@Test
+	void testCandidatesAreDelegatedWithinTheWindow() {
+		Facility alternativeStop = facility("alternativeStop");
+		AccessEgressFacilityFinder delegate = mock(AccessEgressFacilityFinder.class);
+		when(delegate.findCandidates(any())).thenReturn(Optional.of(
+				new AccessEgressFacilityCandidates(List.of(accessStop, alternativeStop), List.of(egressStop))));
+		var finder = new TimeDependentAccessEgressFacilityFinder(
+				List.of(new TimeWindow(6 * 3600, 10 * 3600, delegate)));
+
+		assertThat(finder.findCandidates(request(8 * 3600)).orElseThrow().access())
+				.containsExactly(accessStop, alternativeStop);
+		assertThat(finder.findCandidates(request(11 * 3600))).isEmpty();
+	}
+
+	@Test
 	void testWindowIsHalfOpen() {
 		AccessEgressFacilityFinder delegate = delegateReturningStops();
 		var finder = new TimeDependentAccessEgressFacilityFinder(

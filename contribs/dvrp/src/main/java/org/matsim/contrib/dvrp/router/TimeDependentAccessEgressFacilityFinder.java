@@ -63,4 +63,12 @@ public class TimeDependentAccessEgressFacilityFinder implements AccessEgressFaci
 				.findFirst()
 				.flatMap(timeWindow -> timeWindow.delegate().findFacilities(request));
 	}
+
+	@Override
+	public Optional<AccessEgressFacilityCandidates> findCandidates(RoutingRequest request) {
+		return timeWindows.stream()
+				.filter(timeWindow -> timeWindow.covers(request.getDepartureTime()))
+				.findFirst()
+				.flatMap(timeWindow -> timeWindow.delegate().findCandidates(request));
+	}
 }
