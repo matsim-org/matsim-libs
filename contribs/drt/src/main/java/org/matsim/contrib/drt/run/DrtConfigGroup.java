@@ -293,6 +293,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Nullable
 	private DrtServiceRegimesParams serviceRegimesParams;
 
+	@Nullable
+	private DrtPickupDropoffRestrictionParams pickupDropoffRestrictionParams;
+
 	private ZoneSystemParams analysisZoneSystemParams;
 
 	public DrtConfigGroup() {
@@ -359,6 +362,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtServiceRegimesParams.SET_NAME, DrtServiceRegimesParams::new,
 			() -> serviceRegimesParams,
 			params -> serviceRegimesParams = (DrtServiceRegimesParams) params);
+
+		// area in which the pickup and/or dropoff has to lie (optional)
+		addDefinition(DrtPickupDropoffRestrictionParams.SET_NAME, DrtPickupDropoffRestrictionParams::new,
+			() -> pickupDropoffRestrictionParams,
+			params -> pickupDropoffRestrictionParams = (DrtPickupDropoffRestrictionParams) params);
 
 		// load
 		addDefinition(DvrpLoadParams.SET_NAME, DvrpLoadParams::new,
@@ -535,6 +543,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<DrtServiceRegimesParams> getServiceRegimesParams() {
 		return Optional.ofNullable(serviceRegimesParams);
+	}
+
+	public Optional<DrtPickupDropoffRestrictionParams> getPickupDropoffRestrictionParams() {
+		return Optional.ofNullable(pickupDropoffRestrictionParams);
 	}
 
 	public DvrpLoadParams addOrGetLoadParams() {

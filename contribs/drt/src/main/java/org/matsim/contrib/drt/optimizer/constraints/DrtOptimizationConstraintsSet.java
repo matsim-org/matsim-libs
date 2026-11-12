@@ -27,7 +27,9 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
             + " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
             + " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
             + " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
-            + " InsertionCostCalculator.PenaltyCalculator")
+            + " InsertionCostCalculator.PenaltyCalculator. Note that this only applies to the request being inserted:"
+            + " the constraints of already scheduled requests are never relaxed, so a new insertion must not delay a"
+            + " stop whose constraints are already violated.")
     public boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 
 
