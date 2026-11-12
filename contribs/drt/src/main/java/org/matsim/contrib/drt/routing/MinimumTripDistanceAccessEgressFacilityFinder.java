@@ -20,14 +20,10 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.router.AccessEgressFacilityCandidates;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.FilteringAccessEgressFacilityFinder;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
@@ -45,7 +41,7 @@ import org.matsim.facilities.Facility;
  *
  * @author nkuehnel / MOIA
  */
-public class MinimumTripDistanceAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
+public class MinimumTripDistanceAccessEgressFacilityFinder extends FilteringAccessEgressFacilityFinder {
 
 	/**
 	 * Provides the minimum trip distance that applies to a single routing request. It is queried after the access and
@@ -56,58 +52,18 @@ public class MinimumTripDistanceAccessEgressFacilityFinder implements AccessEgre
 		double get(RoutingRequest request, Facility accessFacility, Facility egressFacility);
 	}
 
-	private final AccessEgressFacilityFinder delegate;
 	private final MinimumTripDistance minimumTripDistance;
 	private final Network network;
 
 	public MinimumTripDistanceAccessEgressFacilityFinder(AccessEgressFacilityFinder delegate,
 			MinimumTripDistance minimumTripDistance, Network network) {
-		this.delegate = delegate;
+		super(delegate);
 		this.minimumTripDistance = minimumTripDistance;
 		this.network = network;
 	}
 
 	@Override
-	public Optional<Pair<Facility, Facility>> findFacilities(RoutingRequest request) {
-		return delegate.findFacilities(request).filter(facilities -> {
-			Facility access = facilities.getLeft();
-			Facility egress = facilities.getRight();
-			double tripDistance = calcTripDistance(network.getLinks().get(access.getLinkId()),
-					network.getLinks().get(egress.getLinkId()));
-			return tripDistance >= minimumTripDistance.get(request, access, egress);
-		});
-	}
-
-	/**
-	 * Passes on the stop candidates of the delegate. As in {@link #findFacilities}, there are none if the preferred trip
-	 * is too short. Alternative stops are kept only if every combination of the remaining access and egress candidates
-	 * respects the minimum, so that the insertion search cannot choose a too short trip.
-	 */
-	@Override
-	public Optional<AccessEgressFacilityCandidates> findCandidates(RoutingRequest request) {
-		return delegate.findCandidates(request).flatMap(candidates -> {
-			Facility preferredAccess = candidates.preferredAccess();
-			Facility preferredEgress = candidates.preferredEgress();
-			if (!isLongEnough(request, preferredAccess, preferredEgress)) {
-				return Optional.empty();
-			}
-			// egress candidates that are long enough from the preferred access ...
-			List<Facility> egress = candidates.egress().stream()
-					.filter(e -> e == preferredEgress || isLongEnough(request, preferredAccess, e))
-					.toList();
-			// ... access candidates that are long enough to all of them ...
-			List<Facility> access = candidates.access().stream()
-					.filter(a -> a == preferredAccess || egress.stream().allMatch(e -> isLongEnough(request, a, e)))
-					.toList();
-			// ... and egress candidates that are long enough from all remaining access candidates
-			List<Facility> finalEgress = egress.stream()
-					.filter(e -> access.stream().allMatch(a -> isLongEnough(request, a, e)))
-					.toList();
-			return Optional.of(new AccessEgressFacilityCandidates(access, finalEgress));
-		});
-	}
-
-	private boolean isLongEnough(RoutingRequest request, Facility access, Facility egress) {
+	protected boolean isAllowed(RoutingRequest request, Facility access, Facility egress) {
 		double tripDistance = calcTripDistance(network.getLinks().get(access.getLinkId()),
 				network.getLinks().get(egress.getLinkId()));
 		return tripDistance >= minimumTripDistance.get(request, access, egress);

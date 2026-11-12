@@ -20,11 +20,9 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.Optional;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.FilteringAccessEgressFacilityFinder;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.Facility;
 
@@ -32,25 +30,24 @@ import org.matsim.facilities.Facility;
  * Decorates an {@link AccessEgressFacilityFinder} and refuses trips whose access (pickup) and egress (dropoff)
  * facilities violate the {@link DrtPickupDropoffRestriction}. As with
  * {@link MinimumTripDistanceAccessEgressFacilityFinder}, the trip is then not routed, which is the same signal as for a
- * trip without a stop within reach.
+ * trip without a stop within reach. Stop candidates are filtered in the same way (see
+ * {@link FilteringAccessEgressFacilityFinder}).
  */
-public class PickupDropoffRestrictionAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
+public class PickupDropoffRestrictionAccessEgressFacilityFinder extends FilteringAccessEgressFacilityFinder {
 
-	private final AccessEgressFacilityFinder delegate;
 	private final DrtPickupDropoffRestriction restriction;
 	private final Network network;
 
 	public PickupDropoffRestrictionAccessEgressFacilityFinder(AccessEgressFacilityFinder delegate,
 			DrtPickupDropoffRestriction restriction, Network network) {
-		this.delegate = delegate;
+		super(delegate);
 		this.restriction = restriction;
 		this.network = network;
 	}
 
 	@Override
-	public Optional<Pair<Facility, Facility>> findFacilities(RoutingRequest request) {
-		return delegate.findFacilities(request)
-				.filter(facilities -> restriction.isAllowed(network.getLinks().get(facilities.getLeft().getLinkId()),
-						network.getLinks().get(facilities.getRight().getLinkId())));
+	protected boolean isAllowed(RoutingRequest request, Facility access, Facility egress) {
+		return restriction.isAllowed(network.getLinks().get(access.getLinkId()),
+				network.getLinks().get(egress.getLinkId()));
 	}
 }
