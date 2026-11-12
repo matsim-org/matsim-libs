@@ -850,12 +850,13 @@ public class SwissRailRaptorCore {
 				int chainedDepartureIndex = chain.toDeparture;
 
 				int chainedDepartureTime = this.data.departures[chainedDepartureIndex];
-
-				assert chainedDepartureTime >= lastPE.arrivalTime:
-					String.format("Chained departure (%s -> %s) arrival time should be before departure time",
-						this.data.departureIds[currentDepartureIndex], this.data.departureIds[chainedDepartureIndex]);
-
 				RRouteStop firstStop = this.data.routeStops[chainedRoute.indexFirstRouteStop];
+
+				if (chainedDepartureTime + firstStop.departureOffset < lastPE.arrivalTime) {
+					throw new IllegalStateException(String.format("Chained departure (%s -> %s) departs at %s before arrival at %s",
+						this.data.departureIds[currentDepartureIndex], this.data.departureIds[chainedDepartureIndex],
+						chainedDepartureTime + firstStop.departureOffset, lastPE.arrivalTime));
+				}
 
 				PathElement chainPe = new PathElement(lastPE, firstStop, lastPE.firstDepartureTime, lastPE.arrivalTime, chainedDepartureTime,
 					lastPE.arrivalTime, lastPE.arrivalTravelCost, lastPE.arrivalTransferCost, 0, lastPE.transferCount, false, true, null, null);
