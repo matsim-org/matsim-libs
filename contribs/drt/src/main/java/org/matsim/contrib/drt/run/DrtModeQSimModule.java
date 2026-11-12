@@ -26,6 +26,8 @@ import java.util.List;
 import com.google.inject.Singleton;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtMinimumTripDistanceRequestValidator;
+import org.matsim.contrib.drt.passenger.DrtPickupDropoffRestrictionRequestValidator;
+import org.matsim.contrib.drt.routing.DrtPickupDropoffRestriction;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.passenger.DrtServiceRegimeRequestValidator;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
@@ -121,12 +123,15 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 			bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
 		}
 
-		// the service regime and the minimum trip distance are hard constraints, also for requests which have not been
-		// routed in this run (prebooking, within-day replanning, input plans carrying finished DRT routes)
+		// the service regime, the minimum trip distance and the pickup/dropoff restriction are hard constraints, also for
+		// requests which have not been routed in this run (prebooking, within-day replanning, input plans carrying
+		// finished DRT routes)
 		DrtMinimumTripDistanceRequestValidator minimumTripDistanceValidator = DrtMinimumTripDistanceRequestValidator
 				.forConstraintsSets(drtCfg.addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets());
 		boolean validateMinimumTripDistance = minimumTripDistanceValidator.getMinimumTripDistance() > 0;
-		if (drtCfg.getServiceRegimesParams().isPresent() || validateMinimumTripDistance) {
+		boolean validatePickupDropoffRestriction = drtCfg.getPickupDropoffRestrictionParams().isPresent();
+		if (drtCfg.getServiceRegimesParams().isPresent() || validateMinimumTripDistance
+				|| validatePickupDropoffRestriction) {
 			bindModal(PassengerRequestValidator.class).toProvider(modalProvider(getter -> {
 				List<PassengerRequestValidator> validators = new ArrayList<>();
 				validators.add(new DefaultPassengerRequestValidator());
@@ -135,6 +140,10 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				}
 				if (validateMinimumTripDistance) {
 					validators.add(minimumTripDistanceValidator);
+				}
+				if (validatePickupDropoffRestriction) {
+					validators.add(new DrtPickupDropoffRestrictionRequestValidator(
+							getter.getModal(DrtPickupDropoffRestriction.class)));
 				}
 				return new CompositePassengerRequestValidator(validators);
 			})).asEagerSingleton();
