@@ -29,4 +29,70 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<!-- A single self-contained jar, for running an experiment on a cluster where there is no maven  -->
+		<!-- and no ~/.m2: mvn -Pfatjar -pl contribs/msp -am -DskipTests package                          -->
+		<!-- A profile and not part of the normal build, because shading takes longer than the rest of    -->
+		<!-- the module's build put together and nothing that runs locally needs it.                      -->
+		<profile>
+			<id>fatjar</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>3.6.2</version>
+						<configuration>
+							<outputFile>${project.build.directory}/matsim-msp-experiments.jar</outputFile>
+							<!-- the shaded jar is a deliverable and never a maven artifact anyone depends -->
+							<!-- on, so the rewritten pom shade would otherwise drop in the module root is  -->
+							<!-- only an untracked file waiting to be committed by accident                  -->
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<!-- No Main-Class: the module holds several commands and the one to run is   -->
+							<!-- named on the java command line, so baking one in would only mislead.     -->
+							<transformers>
+								<!-- merges the GeoTools and MATSim META-INF/services files; without this -->
+								<!-- the last jar unpacked wins and coordinate transformations disappear  -->
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+								<!-- the log4j2 configuration, which is xml and has to be appended        -->
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer" />
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Implementation-Version>${project.version}</Implementation-Version>
+										<Multi-Release>true</Multi-Release>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<!-- a signed jar's signature does not survive being repacked, and -->
+										<!-- a leftover signature file makes the jvm refuse the class      -->
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+										<exclude>module-info.class</exclude>
+										<exclude>META-INF/versions/*/module-info.class</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>

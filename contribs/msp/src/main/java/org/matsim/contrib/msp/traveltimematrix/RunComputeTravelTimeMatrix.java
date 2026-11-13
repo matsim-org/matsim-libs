@@ -6,14 +6,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.ODSample;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.TravelTimeQuery;
-import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaNetwork;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
+import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaOptions;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
@@ -24,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 /**
  * Builds the time-varying travel time matrix for a study area, caches it, and reports what it cost:
@@ -63,9 +59,6 @@ public final class RunComputeTravelTimeMatrix implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(RunComputeTravelTimeMatrix.class);
 
-	@CommandLine.Option(names = "--network", description = "Network of the run.", required = true)
-	private String networkFile;
-
 	@CommandLine.Option(names = "--congestion-index", description = "The congestion index csv, as written by "
 		+ "RunComputeCongestionIndex. Without it only the FREE_SPEED variant can be built.")
 	private String congestionIndexFile;
@@ -75,43 +68,24 @@ public final class RunComputeTravelTimeMatrix implements MATSimAppCommand {
 	private String outputDirectory;
 
 	@CommandLine.Option(names = "--variant", description = "Which variant to build: ${COMPLETION-CANDIDATES}.",
-		defaultValue = "BY_ROAD_CLASS")
+		defaultValue = "GLOBAL_INDEX")
 	private TravelTimeMatrixConfigGroup.Variant variant;
-
-	@CommandLine.Option(names = "--modes", description = "Modes of the subnetwork.", defaultValue = "car",
-		split = ",")
-	private Set<String> modes;
-
-	@CommandLine.Option(names = "--cell-size", description = "Cell size of the zonal part [m]. Memory grows with "
-		+ "the square of the number of cells.", defaultValue = "1000")
-	private double cellSize;
-
-	@CommandLine.Option(names = "--max-neighbor-distance", description = "Trips shorter than this are answered node "
-		+ "to node [m]. Memory grows with the number of node pairs within it.", defaultValue = "5000")
-	private double maxNeighborDistance;
-
-	@CommandLine.Option(names = "--max-neighbor-travel-time", description = "The same threshold as a travel time "
-		+ "[s]; 0 switches it off.", defaultValue = "0")
-	private double maxNeighborTravelTime;
-
-	@CommandLine.Option(names = "--qsim-time-step-size", description = "Time step size of the run [s].",
-		defaultValue = "1")
-	private double qSimTimeStepSize;
 
 	@CommandLine.Option(names = "--benchmark-queries", description = "How many random queries to time at the end. "
 		+ "0 skips the benchmark.", defaultValue = "1000000")
 	private int benchmarkQueries;
 
-	@CommandLine.Option(names = "--threads", description = "Threads the matrix is computed with.")
-	private Integer numberOfThreads;
+	@CommandLine.Mixin
+	private StudyAreaOptions studyArea = new StudyAreaOptions();
 
 	@CommandLine.Mixin
-	private ShpOptions shp = new ShpOptions();
+	private MatrixOptions matrix = new MatrixOptions();
 
 	/**
-	 * How many zones the configured cell size gives over the study area network. Counted for the summary
-	 * only - the matrix builds its own zone system from the same parameters, and a square grid over the
-	 * nodes costs a pass over them.
+	 * How many zones the configured cell size gives over the study area network, or 0 when the
+	 * neighbourhood is unbounded and there is no zone system at all. Counted for the summary only - the
+	 * matrix builds its own zone system from the same parameters, and a square grid over the nodes costs
+	 * a pass over them.
 	 */
 	private int zones;
 
@@ -128,22 +102,29 @@ public final class RunComputeTravelTimeMatrix implements MATSimAppCommand {
 			throw new UncheckedIOException("Cannot create the output directory " + this.outputDirectory, e);
 		}
 
-		Network fullNetwork = NetworkUtils.readNetwork(this.networkFile);
-		Network network = StudyAreaNetwork.cut(fullNetwork, StudyAreaNetwork.index(this.shp, fullNetwork), this.modes);
+		Network network = this.studyArea.readSubnetwork();
 
 		TravelTimeMatrixConfigGroup config = config();
-		this.zones = ZoneSystemUtils.createZoneSystem(network, config.getMatrixParams().getZoneSystemParams())
+		this.zones = config.isUnboundedNeighborhood()
+			? 0
+			: ZoneSystemUtils.createZoneSystem(network, config.getMatrixParams().getZoneSystemParams())
 			.getZones().size();
 
 		long startedAt = System.currentTimeMillis();
 		TimeVaryingTravelTimeMatrix matrix = TimeVaryingTravelTimeMatrix.create(network, config,
-			this.qSimTimeStepSize);
+			this.matrix.getQSimTimeStepSize());
 		double seconds = (System.currentTimeMillis() - startedAt) / 1000.0;
 
 		log.info("Built {} in {} s.", matrix, String.format(Locale.ROOT, "%.1f", seconds));
-		log.info("The free-speed base matrix is cached in {}; point 'matrixCacheFile' of the '{}' config group at it "
-				+ "and every later run reads it instead of routing again.", config.getMatrixCacheFile(),
-			TravelTimeMatrixConfigGroup.GROUP_NAME);
+		if (config.getMatrixCacheFile() == null) {
+			log.info("The base matrix is not cached: an unbounded maxNeighborDistance holds a travel time per node "
+				+ "pair, which the cache format of contribs/dvrp cannot express - it starts with the zone system "
+				+ "this configuration has none of - and which it is cheaper to route again than to write out.");
+		} else {
+			log.info("The free-speed base matrix is cached in {}; point 'matrixCacheFile' of the '{}' config group "
+					+ "at it and every later run reads it instead of routing again.", config.getMatrixCacheFile(),
+				TravelTimeMatrixConfigGroup.GROUP_NAME);
+		}
 
 		double microsecondsPerQuery = benchmark(network, matrix);
 		writeSummary(network, config, matrix, seconds, microsecondsPerQuery);
@@ -156,14 +137,8 @@ public final class RunComputeTravelTimeMatrix implements MATSimAppCommand {
 		TravelTimeMatrixConfigGroup config = new TravelTimeMatrixConfigGroup();
 		config.setVariant(this.variant);
 		config.setCongestionIndexFile(this.congestionIndexFile);
-		config.setCellSize(this.cellSize);
-		config.setMaxNeighborDistance(this.maxNeighborDistance);
-		config.setMaxNeighborTravelTime(this.maxNeighborTravelTime);
 		config.setMatrixCacheDirectory(this.outputDirectory);
-		if (this.numberOfThreads != null) {
-			config.setNumberOfThreads(this.numberOfThreads);
-		}
-		return config;
+		return this.matrix.applyTo(config);
 	}
 
 	/**
@@ -215,7 +190,6 @@ public final class RunComputeTravelTimeMatrix implements MATSimAppCommand {
 		Path file = Path.of(this.outputDirectory, "matrix_summary.csv");
 		boolean exists = Files.exists(file);
 
-		RoadClassShares shares = matrix.getRoadClassShares();
 		long zonalBytes = (long) this.zones * this.zones * Short.BYTES;
 		long cacheBytes = cacheFileSize(config);
 
@@ -224,25 +198,42 @@ public final class RunComputeTravelTimeMatrix implements MATSimAppCommand {
 				 ? CSVFormat.DEFAULT
 				 : CSVFormat.DEFAULT.builder()
 				 .setHeader("variant", "cell_size", "max_neighbor_distance", "links", "nodes", "zones",
-					 "zonal_matrix_bytes", "road_class_shares_bytes", "cache_file_bytes", "build_seconds",
-					 "microseconds_per_query")
+					 "zonal_matrix_bytes", "cache_file_bytes", "build_seconds", "microseconds_per_query")
 				 .build())) {
 
-			printer.printRecord(this.variant, (long) this.cellSize, (long) this.maxNeighborDistance,
-				network.getLinks().size(), network.getNodes().size(), this.zones, zonalBytes,
-				shares == null ? 0 : shares.getSizeInBytes(), cacheBytes,
+			printer.printRecord(this.variant, cellSizeLabel(), neighborhoodLabel(),
+				network.getLinks().size(), network.getNodes().size(), this.zones, zonalBytes, cacheBytes,
 				String.format(Locale.ROOT, "%.1f", seconds),
 				Double.isNaN(microsecondsPerQuery) ? "" : String.format(Locale.ROOT, "%.3f", microsecondsPerQuery));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 
-		log.info("Zonal part {} MB over {} zones, road class shares {} MB, cache file {} MB. Wrote the summary to "
-				+ "{}.", zonalBytes / 1024 / 1024, this.zones,
-			shares == null ? 0 : shares.getSizeInBytes() / 1024 / 1024, cacheBytes / 1024 / 1024, file);
+		log.info("Zonal part {} MB over {} zones (none when the neighbourhood is unbounded), cache file {} MB. "
+			+ "Wrote the summary to {}.", zonalBytes / 1024 / 1024, this.zones, cacheBytes / 1024 / 1024, file);
+	}
+
+	/**
+	 * The neighbourhood radius as the summary reports it: {@value MatrixOptions#UNBOUNDED} rather than a
+	 * number, because {@code (long)} of an infinity is {@link Long#MAX_VALUE} and a reader of the csv
+	 * would take that for a radius.
+	 */
+	private Object neighborhoodLabel() {
+		return this.matrix.isUnbounded() ? MatrixOptions.UNBOUNDED : (long) this.matrix.getMaxNeighborDistance();
+	}
+
+	/**
+	 * The cell size, left empty when no zone system was built - a number there would invite a comparison
+	 * along an axis that cannot move the result.
+	 */
+	private Object cellSizeLabel() {
+		return this.matrix.isUnbounded() ? "" : (long) this.matrix.getCellSize();
 	}
 
 	private long cacheFileSize(TravelTimeMatrixConfigGroup config) {
+		if (config.getMatrixCacheFile() == null) {
+			return 0;
+		}
 		try {
 			Path cache = Path.of(config.getMatrixCacheFile());
 			return Files.exists(cache) ? Files.size(cache) : 0;

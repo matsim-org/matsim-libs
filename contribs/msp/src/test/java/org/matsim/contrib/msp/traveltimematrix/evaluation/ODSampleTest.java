@@ -48,12 +48,12 @@ class ODSampleTest {
 	}
 
 	@Test
-	void aGeneratedQueryHasNoReferenceTravelTimeOfItsOwn() {
+	void aGeneratedQueryHasNoMeasuredTravelTimeOfItsOwn() {
 
 		Network network = TestNetworks.grid(5);
 		List<TravelTimeQuery> queries = ODSample.uniform(network, 2, 2, NOON, 1);
 
-		assertTrue(queries.stream().noneMatch(TravelTimeQuery::hasReference),
+		assertTrue(queries.stream().noneMatch(TravelTimeQuery::hasObserved),
 			"nobody drove a generated pair, so what it should have taken is still to be determined");
 		assertTrue(queries.stream().allMatch(query -> Double.isNaN(query.distance())),
 			"and no path has been computed for it either");
@@ -148,12 +148,12 @@ class ODSampleTest {
 			assertEquals(written.get(i).fromNode(), read.get(i).fromNode());
 			assertEquals(written.get(i).toNode(), read.get(i).toNode());
 			assertEquals(written.get(i).departureTime(), read.get(i).departureTime(), 1e-9);
-			assertFalse(read.get(i).hasReference(), "the sample had no reference travel time to write");
+			assertFalse(read.get(i).hasObserved(), "the sample had no measured travel time to write");
 		}
 	}
 
 	@Test
-	void aWrittenReferenceTravelTimeComesBackWithTheQuery() {
+	void aWrittenMeasuredTravelTimeComesBackWithTheQuery() {
 
 		Network network = TestNetworks.grid(5);
 		Node from = network.getNodes().values().iterator().next();
@@ -166,8 +166,8 @@ class ODSampleTest {
 			file.toString());
 
 		TravelTimeQuery read = TravelTimeQuery.read(file.toString(), network).get(0);
-		assertTrue(read.hasReference());
-		assertEquals(612.5, read.referenceTravelTime(), 1e-9);
+		assertTrue(read.hasObserved());
+		assertEquals(612.5, read.observedTravelTime(), 1e-9);
 		assertEquals(4200, read.distance(), 1e-9);
 	}
 

@@ -4,15 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexCalculator;
 import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexProfile;
 import org.matsim.contrib.msp.traveltimematrix.prepare.MeasuredTraffic;
-import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaNetwork;
-import org.matsim.core.network.NetworkUtils;
+import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaOptions;
 import picocli.CommandLine;
 
-import java.util.Set;
 
 /**
  * Measures the congestion index of a finished run and writes it as a csv:
@@ -42,9 +39,6 @@ public final class RunComputeCongestionIndex implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(RunComputeCongestionIndex.class);
 
-	@CommandLine.Option(names = "--network", description = "Network of the run.", required = true)
-	private String networkFile;
-
 	@CommandLine.Option(names = "--events", description = "Events of the run, the congested travel times and the "
 		+ "volumes are read from.", required = true)
 	private String eventsFile;
@@ -52,10 +46,6 @@ public final class RunComputeCongestionIndex implements MATSimAppCommand {
 	@CommandLine.Option(names = "--output", description = "The congestion index csv to write.",
 		defaultValue = "congestion_index.csv")
 	private String outputFile;
-
-	@CommandLine.Option(names = "--modes", description = "Modes the index is measured for.", defaultValue = "car",
-		split = ",")
-	private Set<String> modes;
 
 	@CommandLine.Option(names = "--time-bin-size", description = "Resolution of the index [s].",
 		defaultValue = "900")
@@ -75,7 +65,7 @@ public final class RunComputeCongestionIndex implements MATSimAppCommand {
 	private double qSimTimeStepSize;
 
 	@CommandLine.Mixin
-	private ShpOptions shp = new ShpOptions();
+	private StudyAreaOptions studyArea = new StudyAreaOptions();
 
 	/**
 	 * The road classes of the command line, with the extra option of not splitting at all.
@@ -91,10 +81,9 @@ public final class RunComputeCongestionIndex implements MATSimAppCommand {
 	@Override
 	public Integer call() {
 
-		Network fullNetwork = NetworkUtils.readNetwork(this.networkFile);
-		Network network = StudyAreaNetwork.cut(fullNetwork, StudyAreaNetwork.index(this.shp, fullNetwork), this.modes);
+		Network network = this.studyArea.readSubnetwork();
 
-		MeasuredTraffic traffic = MeasuredTraffic.readFromEvents(network, this.eventsFile, this.modes,
+		MeasuredTraffic traffic = MeasuredTraffic.readFromEvents(network, this.eventsFile, this.studyArea.getModes(),
 			this.timeBinSize, this.endTime);
 
 		RoadClassification classification = switch (this.roadClasses) {

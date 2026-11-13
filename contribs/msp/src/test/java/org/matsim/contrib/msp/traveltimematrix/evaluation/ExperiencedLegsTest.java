@@ -164,7 +164,7 @@ class ExperiencedLegsTest {
 		assertEquals("n2", query.fromNode().getId().toString());
 		assertEquals("n3", query.toNode().getId().toString());
 		assertEquals(110, query.departureTime(), 1e-9);
-		assertEquals(20, query.referenceTravelTime(), 1e-9, "the experienced travel time is the reference here");
+		assertEquals(20, query.observedTravelTime(), 1e-9, "the experienced travel time is what the leg took");
 		assertTrue(Double.isNaN(query.freeSpeedTravelTime()),
 			"the free-speed travel time is one of the variants in this study, not a separate input");
 	}

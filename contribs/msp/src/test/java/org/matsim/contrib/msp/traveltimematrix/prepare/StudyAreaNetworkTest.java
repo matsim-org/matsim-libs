@@ -238,7 +238,12 @@ class StudyAreaNetworkTest {
 	/**
 	 * The study area: a square from (0,0) to (1000,1000), so the city is inside and the suburb is not.
 	 */
-	private ShpOptions.Index studyArea() {
+	/**
+	 * A square kilometre at the origin, as a shape file - so that what is exercised is the same
+	 * {@link StudyArea#fromShapeFile} path every command of the package uses, and not a hand-written
+	 * predicate that could disagree with it.
+	 */
+	private StudyArea studyArea() {
 
 		Path file = Path.of(utils.getOutputDirectory(), "study-area.shp");
 
@@ -252,6 +257,7 @@ class StudyAreaNetworkTest {
 			new Coordinate(0, 0), new Coordinate(1000, 0), new Coordinate(1000, 1000), new Coordinate(0, 1000)
 		}, Map.of("name", "study-area"), "study-area")), file.toString());
 
-		return new ShpOptions(file, CRS, null).createIndex(ShpOptions.SAME_CRS, "name");
+		ShpOptions.Index index = new ShpOptions(file, CRS, null).createIndex(ShpOptions.SAME_CRS, "name");
+		return index::contains;
 	}
 }

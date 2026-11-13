@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
@@ -16,7 +15,6 @@ import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.router.speedy.LeastCostPathTree;
 import org.matsim.core.router.speedy.SpeedyGraphBuilder;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import java.util.List;
@@ -64,9 +62,9 @@ public final class StudyAreaNetwork {
 	/**
 	 * The car subnetwork of the study area, cleaned.
 	 *
-	 * @see #cut(Network, ShpOptions.Index, Set)
+	 * @see #cut(Network, StudyArea, Set)
 	 */
-	public static Network cutCarNetwork(Network network, @Nullable ShpOptions.Index studyArea) {
+	public static Network cutCarNetwork(Network network, @Nullable StudyArea studyArea) {
 		return cut(network, studyArea, Set.of(TransportMode.car));
 	}
 
@@ -82,7 +80,7 @@ public final class StudyAreaNetwork {
 	 * connected, so a dead end left in by the cut would make the matrix throw rather than be slightly
 	 * wrong
 	 */
-	public static Network cut(Network network, @Nullable ShpOptions.Index studyArea, Set<String> modes) {
+	public static Network cut(Network network, @Nullable StudyArea studyArea, Set<String> modes) {
 
 		NetworkFilterManager filter = new NetworkFilterManager(network, new NetworkConfigGroup());
 		filter.addLinkFilter(link -> link.getAllowedModes().stream().anyMatch(modes::contains));
@@ -256,34 +254,11 @@ public final class StudyAreaNetwork {
 	}
 
 	/**
-	 * The study area of a {@code --shp} command line option, in the coordinate reference system of the
-	 * <b>network</b> - taken from the network itself when it carries one, so that a shape file in a
-	 * different projection is still read correctly and a silently empty cut is avoided.
-	 * <p>
-	 * Every command of this package resolves its study area this way, and they have to: the congestion
-	 * index, the matrix and the evaluation of the matrix all have to be built over the same area, or the
-	 * numbers describe different cities.
-	 *
-	 * @return the index to cut with, or null when no shape file was given - which keeps the whole network
-	 * and is only right when the network already is the study area
-	 */
-	@Nullable
-	public static ShpOptions.Index index(ShpOptions shp, Network network) {
-		if (!shp.isDefined()) {
-			log.warn("No --shp given, so the whole network is used as the study area. That is only what you want if "
-				+ "the network is already cut to the area the results are about.");
-			return null;
-		}
-		String crs = ProjectionUtils.getCRS(network);
-		return shp.createIndex(crs != null ? crs : shp.getShapeCrs(), "_");
-	}
-
-	/**
 	 * A link counts as inside when both of its nodes are. Using the nodes rather than the link's own
 	 * coordinate matters at the edge of the area: the matrix routes from node to node, so a link whose
 	 * far node was cut away is a link into nowhere.
 	 */
-	private static boolean inside(ShpOptions.Index studyArea, Link link) {
+	private static boolean inside(StudyArea studyArea, Link link) {
 		return studyArea.contains(link.getFromNode().getCoord()) && studyArea.contains(link.getToNode().getCoord());
 	}
 }

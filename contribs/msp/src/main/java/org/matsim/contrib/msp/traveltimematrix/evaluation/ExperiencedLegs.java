@@ -58,7 +58,7 @@ import java.util.SplittableRandom;
  * and capped by a reservoir sample, because a city-sized run has millions of legs and a few tens of
  * thousands are plenty for a MAPE.
  *
- * @see RunValidateTravelTimeMatrix the command
+ * @see RunEvaluateTravelTimeMatrix the command
  */
 public final class ExperiencedLegs implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
 	LinkEnterEventHandler, LinkLeaveEventHandler {

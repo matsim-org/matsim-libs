@@ -108,60 +108,6 @@ class TimeVaryingTravelTimeMatrixTest {
 	}
 
 	@Test
-	void levelOneWeighsTheIndexByTheRoadClassesOfThePair() {
-
-		Network network = TestNetworks.corridor();
-		ZoneSystem zoneSystem = TestNetworks.oneZonePerNode(network);
-		RoadClassification roadClasses = RoadClassification.byHighwayType(network);
-		RoadClassShares shares = RoadClassSharesCalculator.calculateFreeSpeedShares(network, zoneSystem, roadClasses,
-			1, 1);
-
-		// a free-flowing motorway and a badly congested residential network
-		Map<String, double[]> byClass = new LinkedHashMap<>();
-		byClass.put(RoadClassification.ALL, new double[]{0.5});
-		byClass.put("motorway", new double[]{0.0});
-		byClass.put("residential", new double[]{1.0});
-		byClass.put(RoadClassification.OTHER, new double[]{0.0});
-		CongestionIndexProfile profile = new CongestionIndexProfile(86400, byClass);
-
-		TimeVaryingTravelTimeMatrix matrix = TimeVaryingTravelTimeMatrix.byRoadClass(freeSpeedMatrix(), profile,
-			shares, config());
-
-		Node n1 = network.getNodes().get(Id.createNodeId("n1"));
-		Node n2 = network.getNodes().get(Id.createNodeId("n2"));
-		Node n3 = network.getNodes().get(Id.createNodeId("n3"));
-		Node n4 = network.getNodes().get(Id.createNodeId("n4"));
-
-		// n2 to n3 is all motorway, which is free flowing: no slowdown at all
-		assertEquals(FREE_SPEED_TRAVEL_TIME, matrix.getTravelTime(n2, n3, 0));
-		// n1 to n2 is all residential, which is twice as slow
-		assertEquals(2 * FREE_SPEED_TRAVEL_TIME, matrix.getTravelTime(n1, n2, 0));
-		// n1 to n4 is 202 of 223 s residential, so the factor is 1 + 202/223
-		double expected = FREE_SPEED_TRAVEL_TIME * (1 + 202.0 / 223);
-		assertEquals(expected, matrix.getTravelTime(n1, n4, 0), FREE_SPEED_TRAVEL_TIME / 255.0 + 1);
-		// and that is strictly between the two pure cases, which is the whole point of level 1
-		assertTrue(matrix.getTravelTime(n2, n3, 0) < matrix.getTravelTime(n1, n4, 0));
-		assertTrue(matrix.getTravelTime(n1, n4, 0) < matrix.getTravelTime(n1, n2, 0));
-	}
-
-	@Test
-	void levelOneRefusesAnIndexThatDoesNotCoverTheRoadClasses() {
-
-		Network network = TestNetworks.corridor();
-		ZoneSystem zoneSystem = TestNetworks.oneZonePerNode(network);
-		RoadClassShares shares = RoadClassSharesCalculator.calculateFreeSpeedShares(network, zoneSystem,
-			RoadClassification.byHighwayType(network), 1, 1);
-
-		// an index measured without a road class split: level 1 has nothing to weigh with
-		CongestionIndexProfile global = new CongestionIndexProfile(86400,
-			Map.of(RoadClassification.ALL, new double[]{0.5}));
-
-		IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-			() -> TimeVaryingTravelTimeMatrix.byRoadClass(freeSpeedMatrix(), global, shares, config()));
-		assertTrue(e.getMessage().contains("motorway"), e.getMessage());
-	}
-
-	@Test
 	void theFreeSpeedTravelTimeStaysAvailable() {
 
 		TimeVaryingTravelTimeMatrix matrix = TimeVaryingTravelTimeMatrix.global(freeSpeedMatrix(),

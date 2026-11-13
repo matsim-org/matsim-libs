@@ -1,6 +1,5 @@
 package org.matsim.contrib.msp.traveltimematrix;
 
-import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -16,7 +15,6 @@ import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -24,7 +22,6 @@ import java.util.Locale;
  * on the time of day.
  * <pre>
  *   TT(o, d, t) = TT_ff(o, d) * (1 + beta * CI(t))                               level 0
- *   TT(o, d, t) = TT_ff(o, d) * (1 + beta * sum_k s_k(o,d) * CI_k(t))            level 1
  * </pre>
  * The point is what it does <b>not</b> store: there is one travel time per origin-destination pair, not
  * one per pair and time bin, so the time of day costs a lookup in a curve of a few dozen numbers and a
@@ -38,14 +35,12 @@ import java.util.Locale;
  * <p>
  * <b>What it is not.</b> The congestion index is an aggregate over the network and the fleet, so this is
  * a model of <em>when</em> traffic is slow, not of <em>where</em>. Two pairs of the same free-speed
- * travel time get the same congested travel time at level 0, however differently they are actually
- * affected; level 1 separates them by the kind of road they use, and not by anything else. Nor does the
- * path change: the free-speed path is held fixed and slowed down, while a real driver would route around
+ * travel time get the same congested travel time, however differently they are actually affected. Nor
+ * does the path change: the free-speed path is held fixed and slowed down, while a real driver would route around
  * the congestion, so the matrix is biased <b>upwards</b> under heavy congestion. Both are the price of
  * the one lookup, and both are what an evaluation against time-dependent routing has to quantify.
  *
  * @see #global(TravelTimeMatrix, CongestionIndex, TravelTimeMatrixConfigGroup) level 0
- * @see #byRoadClass(TravelTimeMatrix, CongestionIndex, RoadClassShares, TravelTimeMatrixConfigGroup) level 1
  * @see #create(Network, TravelTimeMatrixConfigGroup, double) to build everything from a config
  */
 public final class TimeVaryingTravelTimeMatrix implements TravelTimeMatrix {
@@ -55,32 +50,16 @@ public final class TimeVaryingTravelTimeMatrix implements TravelTimeMatrix {
 	private final TravelTimeMatrix freeSpeedMatrix;
 	private final CongestionIndex congestionIndex;
 
-	/**
-	 * Null for level 0: the index does not depend on the pair, so there is nothing to weigh.
-	 */
-	@Nullable
-	private final RoadClassShares roadClassShares;
-
-	/**
-	 * The index per road class at one point in time, reused across queries to keep the inner loop free of
-	 * allocations. Confined to one thread; see {@link #congestionFactorByRoadClass}.
-	 */
-	private final ThreadLocal<double[]> indexBuffer;
-
 	private final double calibrationFactor;
 	private final boolean evaluateAtMidpoint;
 
 	private TimeVaryingTravelTimeMatrix(TravelTimeMatrix freeSpeedMatrix, CongestionIndex congestionIndex,
-		@Nullable RoadClassShares roadClassShares, double calibrationFactor, boolean evaluateAtMidpoint) {
+		double calibrationFactor, boolean evaluateAtMidpoint) {
 
 		this.freeSpeedMatrix = freeSpeedMatrix;
 		this.congestionIndex = congestionIndex;
-		this.roadClassShares = roadClassShares;
 		this.calibrationFactor = calibrationFactor;
 		this.evaluateAtMidpoint = evaluateAtMidpoint;
-
-		int numberOfClasses = roadClassShares == null ? 0 : roadClassShares.getRoadClasses().size();
-		this.indexBuffer = ThreadLocal.withInitial(() -> new double[numberOfClasses]);
 	}
 
 	/**
@@ -92,48 +71,27 @@ public final class TimeVaryingTravelTimeMatrix implements TravelTimeMatrix {
 	 */
 	public static TimeVaryingTravelTimeMatrix global(TravelTimeMatrix freeSpeedMatrix,
 		CongestionIndex congestionIndex, TravelTimeMatrixConfigGroup config) {
-		return new TimeVaryingTravelTimeMatrix(freeSpeedMatrix, congestionIndex, null, config.getCalibrationFactor(),
-			config.getEvaluateIndexAt() == TravelTimeMatrixConfigGroup.EvaluateIndexAt.MIDPOINT);
-	}
-
-	/**
-	 * Level 1: one index per road class, weighted by the road class shares of the origin-destination
-	 * pair.
-	 *
-	 * @throws IllegalArgumentException if the index does not hold every class the shares are indexed by,
-	 * which would mean the two were computed over different classifications
-	 */
-	public static TimeVaryingTravelTimeMatrix byRoadClass(TravelTimeMatrix freeSpeedMatrix,
-		CongestionIndex congestionIndex, RoadClassShares roadClassShares, TravelTimeMatrixConfigGroup config) {
-
-		List<String> missing = roadClassShares.getRoadClasses().stream()
-			.filter(roadClass -> !congestionIndex.getRoadClasses().contains(roadClass))
-			.toList();
-		if (!missing.isEmpty()) {
-			throw new IllegalArgumentException("The congestion index holds " + congestionIndex.getRoadClasses()
-				+ " but the road class shares are split by " + roadClassShares.getRoadClasses() + ", so the index of "
-				+ missing + " is missing. The index and the shares have to be built over the same road "
-				+ "classification.");
-		}
-
-		return new TimeVaryingTravelTimeMatrix(freeSpeedMatrix, congestionIndex, roadClassShares,
-			config.getCalibrationFactor(),
+		return new TimeVaryingTravelTimeMatrix(freeSpeedMatrix, congestionIndex, config.getCalibrationFactor(),
 			config.getEvaluateIndexAt() == TravelTimeMatrixConfigGroup.EvaluateIndexAt.MIDPOINT);
 	}
 
 	/**
 	 * Builds the whole thing from a config and a network: the free-speed base matrix (from the cache file
-	 * if the config names one that exists), the congestion index from the file the config names, and the
-	 * road class shares if the variant needs them.
+	 * if the config names one that exists) and the congestion index from the file the config names.
 	 *
 	 * @param network the car subnetwork of the study area, see
 	 * {@link org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaNetwork}. Has to be the same
 	 * network the congestion index was measured over, and has to be connected - a zonal matrix refuses a
 	 * pair it finds no path for.
 	 * @param qSimTimeStepSize {@code config.qsim().getTimeStepSize()} of the run
+	 * @see #createWithoutZones what an unbounded {@code maxNeighborDistance} builds instead
 	 */
 	public static TimeVaryingTravelTimeMatrix create(Network network, TravelTimeMatrixConfigGroup config,
 		double qSimTimeStepSize) {
+
+		if (config.isUnboundedNeighborhood()) {
+			return createWithoutZones(network, config, qSimTimeStepSize);
+		}
 
 		DvrpTravelTimeMatrixParams params = config.getMatrixParams();
 		ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(network, params.getZoneSystemParams());
@@ -147,17 +105,34 @@ public final class TimeVaryingTravelTimeMatrix implements TravelTimeMatrix {
 			: FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, params,
 			config.getNumberOfThreads(), qSimTimeStepSize, cacheUrl(params.getCachePath()));
 
-		CongestionIndex congestionIndex = config.getCongestionIndex();
+		return global(freeSpeedMatrix, config.getCongestionIndex(), config);
+	}
 
-		return switch (config.getVariant()) {
-			case FREE_SPEED, GLOBAL_INDEX -> global(freeSpeedMatrix, congestionIndex, config);
-			case BY_ROAD_CLASS -> {
-				RoadClassification roadClasses = config.getRoadClassification(network);
-				RoadClassShares shares = RoadClassSharesCalculator.calculateFreeSpeedShares(network, zoneSystem,
-					roadClasses, config.getNumberOfThreads(), qSimTimeStepSize);
-				yield byRoadClass(freeSpeedMatrix, congestionIndex, shares, config);
-			}
-		};
+	/**
+	 * The exact variant: one {@link NodeToNodeTravelTimeMatrix} and <b>no zone system whatsoever</b>.
+	 * <p>
+	 * This is the whole point of {@link TravelTimeMatrixConfigGroup#isUnboundedNeighborhood()} being a
+	 * configuration rather than a large number. Asking {@code contribs/dvrp} for an unbounded radius does
+	 * produce a matrix that answers every pair node to node, but it routes a complete zone-to-zone matrix
+	 * first and then never reads it, because {@code FreeSpeedTravelTimeMatrix.getTravelTime} consults the
+	 * sparse half first and returns as soon as the pair is present - which, with no radius, is always. So
+	 * the zone system here is not cheap-but-unused, it is a second full matrix build thrown away, and the
+	 * cell size that sizes it cannot move a single answer. Here it is not built, and
+	 * {@link TravelTimeMatrixConfigGroup#getCellSize()} is ignored.
+	 * <p>
+	 * It is the configuration the congestion model is meant to be judged in: with the discretisation
+	 * error zero by construction, whatever error is left is the congestion model's own.
+	 */
+	private static TimeVaryingTravelTimeMatrix createWithoutZones(Network network,
+		TravelTimeMatrixConfigGroup config, double qSimTimeStepSize) {
+
+		log.info("maxNeighborDistance is unbounded, so the base matrix is exact and no zone system is built; "
+			+ "cellSize ({} m) is ignored.", (long) config.getCellSize());
+
+		NodeToNodeTravelTimeMatrix freeSpeedMatrix = NodeToNodeTravelTimeMatrix.create(network,
+			config.getNumberOfThreads(), qSimTimeStepSize);
+
+		return global(freeSpeedMatrix, config.getCongestionIndex(), config);
 	}
 
 	/**
@@ -206,24 +181,7 @@ public final class TimeVaryingTravelTimeMatrix implements TravelTimeMatrix {
 		// recursive - the difference is second order and the bin is 15 minutes wide.
 		double at = this.evaluateAtMidpoint ? departureTime + freeSpeedTravelTime / 2 : departureTime;
 
-		double index = this.roadClassShares == null
-			? this.congestionIndex.get(at)
-			: congestionFactorByRoadClass(fromNode, toNode, at);
-
-		return 1 + this.calibrationFactor * index;
-	}
-
-	/**
-	 * {@code sum_k s_k(o,d) * CI_k(t)}: the index of each road class, weighted by how much of the
-	 * free-speed travel time of this pair is spent on that class.
-	 */
-	private double congestionFactorByRoadClass(Node fromNode, Node toNode, double at) {
-		List<String> roadClasses = this.roadClassShares.getRoadClasses();
-		double[] index = this.indexBuffer.get();
-		for (int k = 0; k < roadClasses.size(); k++) {
-			index[k] = this.congestionIndex.get(at, roadClasses.get(k));
-		}
-		return this.roadClassShares.weigh(fromNode, toNode, index);
+		return 1 + this.calibrationFactor * this.congestionIndex.get(at);
 	}
 
 	/**
@@ -232,8 +190,8 @@ public final class TimeVaryingTravelTimeMatrix implements TravelTimeMatrix {
 	 * Exposed so that several variants can share <b>one</b> base matrix: they differ in the congestion
 	 * model only, and computing the base matrix once per variant would buy nothing but the chance of it
 	 * coming out differently. Note that what comes back is free-speed travel times, so it is the right
-	 * argument for {@link #global} and {@link #byRoadClass} - and wrapping a matrix that already carries
-	 * congestion is exactly what those two refuse to be given.
+	 * argument for {@link #global} - and wrapping a matrix that already carries congestion is exactly
+	 * what that method refuses to be given.
 	 */
 	public TravelTimeMatrix getFreeSpeedMatrix() {
 		return this.freeSpeedMatrix;
@@ -247,24 +205,13 @@ public final class TimeVaryingTravelTimeMatrix implements TravelTimeMatrix {
 		return this.congestionIndex;
 	}
 
-	/**
-	 * @return the road class shares of level 1, or null at level 0
-	 */
-	@Nullable
-	public RoadClassShares getRoadClassShares() {
-		return this.roadClassShares;
-	}
-
 	@Override
 	public String toString() {
-		String level = this.roadClassShares == null
-			? "level 0, one index for the whole network"
-			: "level 1, " + this.roadClassShares.getRoadClasses().size() + " road classes "
-			+ this.roadClassShares.getRoadClasses();
 		String bins = this.congestionIndex instanceof CongestionIndexProfile profile
 			? profile.getNumberOfBins() + " bins of " + profile.getTimeBinSize() + " s"
 			: this.congestionIndex.toString();
-		return String.format(Locale.ROOT, "TimeVaryingTravelTimeMatrix[%s, %s, beta = %.3f, index read at %s]", level,
-			bins, this.calibrationFactor, this.evaluateAtMidpoint ? "the middle of the trip" : "departure");
+		return String.format(Locale.ROOT, "TimeVaryingTravelTimeMatrix[one index for the whole network, %s, "
+				+ "beta = %.3f, index read at %s]", bins, this.calibrationFactor,
+			this.evaluateAtMidpoint ? "the middle of the trip" : "departure");
 	}
 }

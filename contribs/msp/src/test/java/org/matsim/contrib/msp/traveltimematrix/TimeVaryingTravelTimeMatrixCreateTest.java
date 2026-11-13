@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -65,38 +66,6 @@ class TimeVaryingTravelTimeMatrixCreateTest {
 	}
 
 	@Test
-	void levelOneScalesAMotorwayPairLessThanAResidentialOne() {
-
-		Network network = TestNetworks.corridor();
-		TravelTimeMatrixConfigGroup config = config(TravelTimeMatrixConfigGroup.Variant.BY_ROAD_CLASS);
-		config.setRoadClasses(TravelTimeMatrixConfigGroup.RoadClasses.OSM_HIGHWAY_TYPE);
-
-		Map<String, double[]> byClass = new LinkedHashMap<>();
-		byClass.put(RoadClassification.ALL, new double[]{0.5, 0.5});
-		byClass.put("motorway", new double[]{0.0, 0.0});
-		byClass.put("residential", new double[]{1.0, 1.0});
-		byClass.put(RoadClassification.OTHER, new double[]{0.0, 0.0});
-		config.setCongestionIndexFile(writeIndex("by-road-class.csv", byClass));
-
-		TimeVaryingTravelTimeMatrix matrix = TimeVaryingTravelTimeMatrix.create(network, config, 1);
-
-		Node n1 = node(network, "n1");
-		Node n2 = node(network, "n2");
-		Node n3 = node(network, "n3");
-		Node n4 = node(network, "n4");
-
-		// the motorway is free flowing, the residential streets are twice as slow, and the end to end
-		// trip sits between the two in proportion to how much of its time is spent on each
-		assertEquals(21, matrix.getTravelTime(n2, n3, 8 * 3600));
-		assertEquals(2 * 101, matrix.getTravelTime(n1, n2, 8 * 3600));
-		int endToEnd = matrix.getTravelTime(n1, n4, 8 * 3600);
-		assertEquals(Math.round(FREE_SPEED_END_TO_END * (1 + 202.0 / 223)), endToEnd, 2);
-		assertTrue(endToEnd > FREE_SPEED_END_TO_END && endToEnd < 2 * FREE_SPEED_END_TO_END);
-
-		assertEquals(3, matrix.getRoadClassShares().getRoadClasses().size());
-	}
-
-	@Test
 	void theMatrixCacheIsWrittenAndReadBack() {
 
 		Network network = TestNetworks.corridor();
@@ -114,6 +83,52 @@ class TimeVaryingTravelTimeMatrixCreateTest {
 		assertEquals(first, second, "a matrix read from the cache answers like the one that wrote it");
 	}
 
+	/**
+	 * The exact configuration: no zone system is built, so the cell size cannot matter - which is the
+	 * assertion, made by giving it two wildly different ones and demanding the same answer. A zonal
+	 * matrix at these cell sizes would not agree with itself, the whole corridor falling into one cell at
+	 * 10 km.
+	 */
+	@Test
+	void anUnboundedNeighborhoodIgnoresTheCellSizeAndIsExact() {
+
+		Network network = TestNetworks.corridor();
+		Node n1 = node(network, "n1");
+		Node n4 = node(network, "n4");
+
+		TravelTimeMatrixConfigGroup fine = config(TravelTimeMatrixConfigGroup.Variant.FREE_SPEED);
+		fine.setMaxNeighborDistance(Double.POSITIVE_INFINITY);
+		fine.setCellSize(TestNetworks.SPACING / 2.5);
+
+		TravelTimeMatrixConfigGroup coarse = config(TravelTimeMatrixConfigGroup.Variant.FREE_SPEED);
+		coarse.setMaxNeighborDistance(Double.POSITIVE_INFINITY);
+		coarse.setCellSize(10_000);
+
+		assertEquals(FREE_SPEED_END_TO_END,
+			TimeVaryingTravelTimeMatrix.create(network, fine, 1).getTravelTime(n1, n4, 8 * 3600));
+		assertEquals(FREE_SPEED_END_TO_END,
+			TimeVaryingTravelTimeMatrix.create(network, coarse, 1).getTravelTime(n1, n4, 8 * 3600));
+	}
+
+	/**
+	 * Level 0 on top of the exact matrix, which is the configuration the whole method is meant to be
+	 * judged in: the discretisation error is zero, so what is left is the congestion index alone.
+	 */
+	@Test
+	void levelZeroWorksOnTopOfTheExactMatrix() {
+
+		Network network = TestNetworks.corridor();
+		TravelTimeMatrixConfigGroup config = config(TravelTimeMatrixConfigGroup.Variant.GLOBAL_INDEX);
+		config.setMaxNeighborDistance(Double.POSITIVE_INFINITY);
+		config.setCongestionIndexFile(writeIndex("exact-global.csv",
+			Map.of(RoadClassification.ALL, new double[]{0.0, 0.5})));
+
+		TimeVaryingTravelTimeMatrix matrix = TimeVaryingTravelTimeMatrix.create(network, config, 1);
+
+		assertEquals(FREE_SPEED_END_TO_END, matrix.getTravelTime(node(network, "n1"), node(network, "n4"), 3600));
+		assertEquals(Math.round(FREE_SPEED_END_TO_END * 1.5),
+			matrix.getTravelTime(node(network, "n1"), node(network, "n4"), 16 * 3600));
+	}
 	private TravelTimeMatrixConfigGroup config(TravelTimeMatrixConfigGroup.Variant variant) {
 		TravelTimeMatrixConfigGroup config = new TravelTimeMatrixConfigGroup();
 		config.setVariant(variant);

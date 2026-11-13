@@ -1,5 +1,6 @@
 package org.matsim.contrib.msp.traveltimematrix.evaluation;
 
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -55,6 +56,12 @@ import java.util.stream.IntStream;
  * is an upper bound of variant 4 and so is everything below it. The mean gap is logged when the
  * computation finishes.
  * <p>
+ * <b>Free speed alone.</b> Passing no congested travel time computes only the free-speed part - one tree
+ * per origin, no events needed at all - and fills in {@link TravelTimeQuery#freeSpeedTravelTime()}. That
+ * is the reference the <em>zone system</em> of the matrix is measured against on its own: compared
+ * against an exact free-speed travel time, the free-speed variant of the matrix can be wrong about
+ * nothing but its own discretisation.
+ * <p>
  * <b>What it costs</b> is one shortest-path tree per <em>distinct origin and departure time</em> of the
  * queries, plus one free-speed tree per origin. That is what makes the shape of the queries matter: a
  * {@link ODSample} shares its departure times between all pairs, so 200 origins at 12 times are 2400
@@ -69,8 +76,9 @@ public final class RoutedTravelTimes {
 	private static final Logger log = LogManager.getLogger(RoutedTravelTimes.class);
 
 	/**
-	 * What was routed for one query. {@link Double#NaN} nowhere - a query that cannot be routed makes
-	 * the computation fail rather than carry a hole.
+	 * What was routed for one query. The free-speed fields are always filled in; the two congested ones
+	 * are {@link Double#NaN} exactly when no congested travel time was given, i.e. in free-speed-only
+	 * mode. A query that cannot be routed at all makes the computation fail rather than carry a hole.
 	 */
 	private record Answer(double timeDependent, double fixedPath, double freeSpeedTravelTime, double distance) {
 	}
@@ -83,10 +91,12 @@ public final class RoutedTravelTimes {
 
 	private final Map<Key, Answer> answers;
 	private final List<TravelTimeQuery> queries;
+	private final boolean congested;
 
-	private RoutedTravelTimes(Map<Key, Answer> answers, List<TravelTimeQuery> queries) {
+	private RoutedTravelTimes(Map<Key, Answer> answers, List<TravelTimeQuery> queries, boolean congested) {
 		this.answers = answers;
 		this.queries = queries;
+		this.congested = congested;
 	}
 
 	/**
@@ -99,13 +109,14 @@ public final class RoutedTravelTimes {
 	 * @param congestedTravelTime the congested link travel times of the run, e.g.
 	 * {@link org.matsim.contrib.msp.traveltimematrix.prepare.MeasuredTraffic#getTravelTimes()}. The same
 	 * travel times the congestion index was measured from, or the reference and the thing under test
-	 * would disagree about the run rather than about the approximation.
+	 * would disagree about the run rather than about the approximation. Pass {@code null} to route the
+	 * free-speed paths only, which needs no events and no per-departure-time trees.
 	 * @param qSimTimeStepSize {@code config.qsim().getTimeStepSize()} of the run, so that the free-speed
 	 * path is the one the free-speed matrix routes and its travel time is rounded the same way
 	 * @param numberOfThreads origins are routed one per thread
 	 */
 	public static RoutedTravelTimes compute(Network network, Collection<TravelTimeQuery> queries,
-		TravelTime congestedTravelTime, double qSimTimeStepSize, int numberOfThreads) {
+		@Nullable TravelTime congestedTravelTime, double qSimTimeStepSize, int numberOfThreads) {
 
 		// by origin, because one tree answers every destination of that origin at once, and within an
 		// origin by departure time, because one tree answers one of those
@@ -116,9 +127,10 @@ public final class RoutedTravelTimes {
 				.add(query.toNode());
 		}
 
-		long trees = byOrigin.values().stream().mapToLong(Map::size).sum();
-		log.info("Routing {} queries: {} origins, {} shortest-path trees over {} nodes (one per origin and "
-				+ "departure time, plus one free-speed tree per origin).", queries.size(), byOrigin.size(),
+		long trees = congestedTravelTime == null ? 0 : byOrigin.values().stream().mapToLong(Map::size).sum();
+		log.info("Routing {} queries{}: {} origins, {} shortest-path trees over {} nodes (one free-speed tree per "
+				+ "origin, plus one per origin and departure time when there is congestion to route on).",
+			queries.size(), congestedTravelTime == null ? " at free speed only" : "", byOrigin.size(),
 			trees + byOrigin.size(), network.getNodes().size());
 
 		TravelTime freeSpeedTravelTime = new QSimFreeSpeedTravelTime(qSimTimeStepSize);
@@ -128,7 +140,9 @@ public final class RoutedTravelTimes {
 			SpeedyGraph graph = SpeedyGraphBuilder.build(network);
 			return new Trees(
 				new LeastCostPathTree(graph, freeSpeedTravelTime, new TimeAsTravelDisutility(freeSpeedTravelTime)),
-				new LeastCostPathTree(graph, congestedTravelTime, new TimeAsTravelDisutility(congestedTravelTime)));
+				congestedTravelTime == null ? null
+					: new LeastCostPathTree(graph, congestedTravelTime,
+					new TimeAsTravelDisutility(congestedTravelTime)));
 		}).toList();
 
 		ExecutorServiceWithResource<Trees> executor = new ExecutorServiceWithResource<>(resources);
@@ -150,32 +164,37 @@ public final class RoutedTravelTimes {
 		counter.printCounter();
 		executor.shutdown();
 
-		log.info("Routing done. Holding the free-speed path fixed costs on average {}% of the time-dependent "
-				+ "optimum over {} queries; in {} of them the fixed path came out shorter than the optimum, which "
-				+ "can only be rounding.",
-			String.format(Locale.ROOT, "%.2f", 100 * fixedPathExcess.sum() / Math.max(1, answers.size())),
-			answers.size(), fixedPathShorter.sum());
+		if (congestedTravelTime == null) {
+			log.info("Routing done: the free-speed travel time of {} pairs.", answers.size());
+		} else {
+			log.info("Routing done. Holding the free-speed path fixed costs on average {}% of the time-dependent "
+					+ "optimum over {} queries; in {} of them the fixed path came out shorter than the optimum, "
+					+ "which can only be rounding.",
+				String.format(Locale.ROOT, "%.2f", 100 * fixedPathExcess.sum() / Math.max(1, answers.size())),
+				answers.size(), fixedPathShorter.sum());
+		}
 
 		List<TravelTimeQuery> answered = queries.stream()
 			.map(query -> {
 				Answer answer = answers.get(new Key(query.fromNode(), query.toNode(), query.departureTime()));
-				return query.withReference(answer.timeDependent(), answer.distance(), answer.freeSpeedTravelTime());
+				return query.withRoutedPath(answer.distance(), answer.freeSpeedTravelTime());
 			})
 			.toList();
 
-		return new RoutedTravelTimes(Map.copyOf(answers), answered);
+		return new RoutedTravelTimes(Map.copyOf(answers), answered, congestedTravelTime != null);
 	}
 
 	/**
-	 * The two trees one thread works with. The free-speed one is calculated once per origin, the
-	 * congested one once per origin and departure time.
+	 * The trees one thread works with. The free-speed one is calculated once per origin, the congested
+	 * one once per origin and departure time - and is null in free-speed-only mode, where building a
+	 * second graph search per thread would be paid for and never used.
 	 */
-	private record Trees(LeastCostPathTree freeSpeed, LeastCostPathTree congested) {
+	private record Trees(LeastCostPathTree freeSpeed, @Nullable LeastCostPathTree congested) {
 	}
 
 	private static void computeForOrigin(Node origin, Map<Double, Set<Node>> destinationsByDepartureTime,
-		TravelTime congestedTravelTime, Trees trees, Map<Key, Answer> answers, DoubleAdder fixedPathExcess,
-		LongAdder fixedPathShorter) {
+		@Nullable TravelTime congestedTravelTime, Trees trees, Map<Key, Answer> answers,
+		DoubleAdder fixedPathExcess, LongAdder fixedPathShorter) {
 
 		// departure time 0: a free-speed path does not depend on when the trip starts, so this tree is
 		// calculated once and its paths are reused for every departure time
@@ -201,6 +220,15 @@ public final class RoutedTravelTimes {
 		for (Map.Entry<Double, Set<Node>> departure : destinationsByDepartureTime.entrySet()) {
 
 			double departureTime = departure.getKey();
+
+			if (congestedTravelTime == null) {
+				for (Node destination : departure.getValue()) {
+					answers.put(new Key(origin, destination, departureTime), new Answer(Double.NaN, Double.NaN,
+						freeSpeedTravelTimes.get(destination), distances.get(destination)));
+				}
+				continue;
+			}
+
 			trees.congested().calculate(origin, departureTime, null, null);
 
 			for (Node destination : departure.getValue()) {
@@ -268,17 +296,27 @@ public final class RoutedTravelTimes {
 	}
 
 	/**
-	 * @return the queries that were routed, with the time-dependent optimum as their reference travel
-	 * time and with the length and free-speed travel time of the free-speed path filled in
+	 * @return the queries that were routed, with the length and the free-speed travel time of the
+	 * free-speed path filled in. A measured travel time a query already carried is left alone, so a
+	 * trip of a run can be compared against what it took <em>and</em> against routing.
 	 */
 	public List<TravelTimeQuery> getQueries() {
 		return this.queries;
 	}
 
 	/**
-	 * Variant 4, the reference: the time-dependent shortest path travel time [s].
+	 * @return whether congested travel times were given, i.e. whether anything but the free-speed path
+	 * was routed
+	 */
+	public boolean hasCongestion() {
+		return this.congested;
+	}
+
+	/**
+	 * Variant 4: the time-dependent shortest path travel time [s].
 	 */
 	public double getTimeDependentTravelTime(Node origin, Node destination, double departureTime) {
+		checkCongestion();
 		return answer(origin, destination, departureTime).timeDependent();
 	}
 
@@ -286,7 +324,16 @@ public final class RoutedTravelTimes {
 	 * Level 3: the time-dependent travel time along the free-speed path [s].
 	 */
 	public double getFixedPathTravelTime(Node origin, Node destination, double departureTime) {
+		checkCongestion();
 		return answer(origin, destination, departureTime).fixedPath();
+	}
+
+	private void checkCongestion() {
+		if (!this.congested) {
+			throw new IllegalStateException("These queries were routed at free speed only, so there is no "
+				+ "time-dependent travel time to hand out. Pass the congested travel times of a run to compute(..) "
+				+ "to get one.");
+		}
 	}
 
 	private Answer answer(Node origin, Node destination, double departureTime) {
@@ -306,6 +353,7 @@ public final class RoutedTravelTimes {
 	 * be used in its place.
 	 */
 	public TravelTimeMatrix asTimeDependentMatrix() {
+		checkCongestion();
 		return matrixOf(Answer::timeDependent, "the time-dependent optimum (variant 4)");
 	}
 
@@ -315,6 +363,7 @@ public final class RoutedTravelTimes {
 	 * @see #asTimeDependentMatrix()
 	 */
 	public TravelTimeMatrix asFixedPathMatrix() {
+		checkCongestion();
 		return matrixOf(Answer::fixedPath, "the free-speed path, timed under congestion (level 3)");
 	}
 

@@ -33,9 +33,17 @@ public final class TravelTimeMatrixConfigGroup extends ReflectiveConfigGroup {
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 
 	/**
-	 * How much of the time of day the matrix models - the rungs of the approximation ladder that are
-	 * implemented. They are strictly nested: every one of them answers the same query, and each knows
-	 * more than the one above it.
+	 * How much of the time of day the matrix models. The two are nested: both answer the same query,
+	 * and {@link #GLOBAL_INDEX} knows one thing more than {@link #FREE_SPEED}.
+	 * <p>
+	 * There used to be a third, {@code BY_ROAD_CLASS}, weighting one index per road class by the share
+	 * of the pair's free-speed travel time spent on each. It was removed: splitting the index by road
+	 * class moves the estimate closer to the travel times the <em>simulation recorded</em>, and the
+	 * problem it was meant to solve is that the simulation records no congestion at all on the links an
+	 * accessibility analysis mostly asks about - so no re-weighting of what was measured can fix it. See
+	 * {@link org.matsim.contrib.msp.traveltimematrix.evaluation.CongestionExposure}. The road
+	 * <em>classification</em> survives as a diagnostic on the index itself, which is cheap and tells one
+	 * something; the per-pair shares cost 3.2 GB on Dresden and told one nothing.
 	 */
 	public enum Variant {
 		/**
@@ -47,18 +55,13 @@ public final class TravelTimeMatrixConfigGroup extends ReflectiveConfigGroup {
 		 * Level 0: one congestion index for the whole network per time bin,
 		 * {@code TT = TT_ff * (1 + beta * CI(t))}.
 		 */
-		GLOBAL_INDEX,
-		/**
-		 * Level 1: one index per road class, weighted by the share of the free-speed travel time the
-		 * origin-destination pair spends on each class. Costs the
-		 * {@link RoadClassShares road class shares} in memory and a second pass over the network when
-		 * the matrix is built.
-		 */
-		BY_ROAD_CLASS
+		GLOBAL_INDEX
 	}
 
 	/**
-	 * Which road classes {@link Variant#BY_ROAD_CLASS} distinguishes.
+	 * Which road classes the congestion index is measured per, as a diagnostic - see
+	 * {@link org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexCalculator}. The matrix
+	 * itself reads only the network-wide curve.
 	 */
 	public enum RoadClasses {
 		/**
@@ -102,6 +105,13 @@ public final class TravelTimeMatrixConfigGroup extends ReflectiveConfigGroup {
 	private double maxNeighborDistance = 5000;
 	private double maxNeighborTravelTime = 0;
 	private String matrixCacheFile = null;
+
+	/**
+	 * Set instead of {@link #matrixCacheFile} when the name is to be derived from the thresholds. Kept as
+	 * a directory rather than resolved on the spot, so that the thresholds may be set afterwards - see
+	 * {@link #setMatrixCacheDirectory(String)}.
+	 */
+	private String matrixCacheDirectory = null;
 	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	public TravelTimeMatrixConfigGroup() {
@@ -208,9 +218,41 @@ public final class TravelTimeMatrixConfigGroup extends ReflectiveConfigGroup {
 		this.maxNeighborTravelTime = maxNeighborTravelTime;
 	}
 
+	/**
+	 * Whether the neighbourhood is unbounded, i.e. whether {@link #getMaxNeighborDistance()} is infinite.
+	 * <p>
+	 * It is a configuration of its own and not merely a large radius, because it changes what is built:
+	 * every pair is then stored node to node, so there is no zonal half, no zone system, and
+	 * {@link #getCellSize()} describes nothing and is ignored. See
+	 * {@link NodeToNodeTravelTimeMatrix}, which is what
+	 * {@link TimeVaryingTravelTimeMatrix#create} builds in this case instead of the two-half matrix of
+	 * {@code contribs/dvrp}.
+	 */
+	public boolean isUnboundedNeighborhood() {
+		return Double.isInfinite(this.maxNeighborDistance);
+	}
+
+	/**
+	 * @return the cache file: the one that was set explicitly, or the one
+	 * {@link #setMatrixCacheDirectory(String)} implies for the thresholds <em>as they are now</em>, or
+	 * null if the base matrix is not to be cached at all
+	 * <p>
+	 * An unbounded neighbourhood is never cached from a directory, whatever
+	 * {@link #setMatrixCacheDirectory(String)} was given. The cache format of {@code contribs/dvrp}
+	 * starts with the zone system, which this configuration does not have; and it would be a false
+	 * economy anyway - the file holds a travel time per node pair, which on Dresden is a 2 GB file
+	 * written by {@code n^2} binary searches, against under a minute to route the whole thing again.
+	 * An explicitly set {@link #setMatrixCacheFile(String)} is still honoured, so that a caller who has
+	 * their own format can say so.
+	 */
 	@StringGetter(MATRIX_CACHE_FILE)
 	public String getMatrixCacheFile() {
-		return this.matrixCacheFile;
+		if (this.matrixCacheFile != null) {
+			return this.matrixCacheFile;
+		}
+		return this.matrixCacheDirectory == null || isUnboundedNeighborhood()
+			? null
+			: Path.of(this.matrixCacheDirectory, getMatrixCacheFileName()).toString();
 	}
 
 	@StringSetter(MATRIX_CACHE_FILE)
@@ -252,13 +294,18 @@ public final class TravelTimeMatrixConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * Caches the base matrix in this directory, under the name the thresholds imply. Call it <b>after</b>
-	 * the thresholds are set, for the obvious reason.
+	 * Caches the base matrix in this directory, under the name the thresholds imply.
+	 * <p>
+	 * The name is worked out when {@link #getMatrixCacheFile()} is asked, not here, so the thresholds may
+	 * be set before or after this in any order. That is deliberate: resolving it here means a caller who
+	 * sets the directory first silently caches under the <em>default</em> thresholds and then reads that
+	 * file back for every setting of a sweep - which is a wrong answer, not an error, and is exactly the
+	 * mistake this file's own commands made.
 	 *
 	 * @see #getMatrixCacheFileName()
 	 */
 	public void setMatrixCacheDirectory(String directory) {
-		setMatrixCacheFile(Path.of(directory, getMatrixCacheFileName()).toString());
+		this.matrixCacheDirectory = directory;
 	}
 
 	/**
@@ -277,17 +324,16 @@ public final class TravelTimeMatrixConfigGroup extends ReflectiveConfigGroup {
 		params.addParameterSet(zones);
 		params.setMaxNeighborDistance(this.maxNeighborDistance);
 		params.setMaxNeighborTravelTime(this.maxNeighborTravelTime);
-		params.setCachePath(this.matrixCacheFile);
+		params.setCachePath(getMatrixCacheFile());
 		return params;
 	}
 
 	/**
-	 * The classification the configured {@link RoadClasses} means, over the given network.
+	 * The classification the configured {@link RoadClasses} means, over the given network. Used to
+	 * <em>measure</em> the index per road class, not to query it: the matrix reads the network-wide curve
+	 * alone.
 	 */
 	public RoadClassification getRoadClassification(Network network) {
-		if (this.variant != Variant.BY_ROAD_CLASS) {
-			return RoadClassification.single();
-		}
 		return switch (this.roadClasses) {
 			case DEFAULT_GROUPS -> RoadClassification.byDefaultGroups(network);
 			case OSM_HIGHWAY_TYPE -> RoadClassification.byHighwayType(network);
@@ -317,33 +363,36 @@ public final class TravelTimeMatrixConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(VARIANT, "How much of the time of day the matrix models: " + Variant.FREE_SPEED
-			+ " (no congestion at all, the baseline), " + Variant.GLOBAL_INDEX + " (one index for the whole network) "
-			+ "or " + Variant.BY_ROAD_CLASS + " (one index per road class, weighted per origin-destination pair).");
+			+ " (no congestion at all, the baseline) or " + Variant.GLOBAL_INDEX + " (one index for the whole "
+			+ "network).");
 		comments.put(TIME_BIN_SIZE, "Resolution of the congestion index [s]. Only used when the index is measured; "
 			+ "an index read from a file brings its own bin size.");
 		comments.put(END_TIME, "End of the day the index is measured over [s]. A query past it gets the last bin.");
 		comments.put(CONGESTION_INDEX_FILE, "The congestion index profile csv, as written by "
 			+ RunComputeCongestionIndex.class.getSimpleName() + ". Required for every variant but "
 			+ Variant.FREE_SPEED + ".");
-		comments.put(ROAD_CLASSES, "Which road classes " + Variant.BY_ROAD_CLASS + " distinguishes: "
-			+ RoadClasses.DEFAULT_GROUPS + " or " + RoadClasses.OSM_HIGHWAY_TYPE + ".");
+		comments.put(ROAD_CLASSES, "Which road classes the congestion index is measured per, as a diagnostic: "
+			+ RoadClasses.DEFAULT_GROUPS + " or " + RoadClasses.OSM_HIGHWAY_TYPE + ". The matrix reads the "
+			+ "network-wide curve whichever is set.");
 		comments.put(EVALUATE_INDEX_AT, "When during the trip the index is read: " + EvaluateIndexAt.DEPARTURE
 			+ ", or " + EvaluateIndexAt.MIDPOINT + " (departure + half the free-speed travel time).");
 		comments.put(CALIBRATION_FACTOR, "beta of TT = TT_ff * (1 + beta * CI). 1 means the index is used as "
 			+ "measured; fit it on a sample of time-dependent routes to correct the systematic error of the "
 			+ "approximation.");
 		comments.put(CELL_SIZE, "Cell size of the square grid the zonal part of the free-speed matrix is built over "
-			+ "[m]. Memory grows with the square of the number of cells.");
+			+ "[m]. Memory grows with the square of the number of cells. Ignored when '" + MAX_NEIGHBOR_DISTANCE
+			+ "' is infinite, which leaves no zonal part to describe.");
 		comments.put(MAX_NEIGHBOR_DISTANCE, "Trips shorter than this are answered node to node instead of zone to "
 			+ "zone [m], which is what keeps short trips accurate. Memory grows with the number of node pairs "
-			+ "within it.");
+			+ "within it. Infinity means every pair is stored node to node: the matrix is then exact, no zone "
+			+ "system is built at all.");
 		comments.put(MAX_NEIGHBOR_TRAVEL_TIME, "The same threshold as a travel time [s]. Meeting either threshold "
 			+ "is enough; 0 switches this one off.");
 		comments.put(MATRIX_CACHE_FILE, "Binary cache of the free-speed matrix, as a file path. Read if the file "
 			+ "exists, written if it does not, so that a series of experiments computes the matrix once. A cache "
 			+ "is only valid for the cellSize and maxNeighborDistance it was built with - name it accordingly, or "
 			+ "let setMatrixCacheDirectory(..) do it.");
-		comments.put(NUMBER_OF_THREADS, "Threads the matrix and the road class shares are computed with.");
+		comments.put(NUMBER_OF_THREADS, "Threads the matrix is computed with.");
 		return comments;
 	}
 }

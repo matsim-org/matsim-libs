@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -52,11 +53,34 @@ class RoutedTravelTimesTest {
 		for (TravelTimeQuery query : routed.getQueries()) {
 			assertEquals(CORRIDOR_END_TO_END, query.freeSpeedTravelTime(), 1e-9);
 			assertEquals(3 * TestNetworks.SPACING, query.distance(), 1e-9, "three links of 1 km");
-			assertEquals(CORRIDOR_END_TO_END, query.referenceTravelTime(), 1e-9,
+			assertEquals(CORRIDOR_END_TO_END, routed.getTimeDependentTravelTime(query.fromNode(), query.toNode(),
+					query.departureTime()), 1e-9,
 				"an empty network is equally empty at every time of day");
 			assertEquals(CORRIDOR_END_TO_END, routed.getFixedPathTravelTime(query.fromNode(), query.toNode(),
 				query.departureTime()), 1e-9);
 		}
+	}
+
+	@Test
+	void withNoCongestedTravelTimesOnlyTheFreeSpeedPathIsRouted() {
+
+		// the zone check of the evaluation needs nothing but this, and nothing but a network to get it:
+		// no events, no congested travel times, one tree per origin
+		Network network = TestNetworks.corridor();
+		RoutedTravelTimes routed = RoutedTravelTimes.compute(network, corridorQueries(network, NIGHT, MORNING),
+			null, TIME_STEP, 1);
+
+		assertFalse(routed.hasCongestion());
+		for (TravelTimeQuery query : routed.getQueries()) {
+			assertEquals(CORRIDOR_END_TO_END, query.freeSpeedTravelTime(), 1e-9);
+			assertEquals(3 * TestNetworks.SPACING, query.distance(), 1e-9);
+		}
+
+		// and asking for what was not routed is an error rather than a free-speed travel time in
+		// disguise, which would silently turn a congestion check into a free-speed one
+		assertThrows(IllegalStateException.class, () -> routed.getTimeDependentTravelTime(node(network, "n1"),
+			node(network, "n4"), MORNING));
+		assertThrows(IllegalStateException.class, routed::asFixedPathMatrix);
 	}
 
 	@Test

@@ -76,7 +76,7 @@ class RunComputeTravelTimeMatrixTest {
 		List<String> summary = Files.readAllLines(output.resolve("matrix_summary.csv"));
 		assertEquals(2, summary.size(), "a header and one row");
 		assertTrue(summary.get(0).startsWith("variant,cell_size,max_neighbor_distance,links,nodes,zones,"));
-		assertTrue(summary.get(1).startsWith("BY_ROAD_CLASS,5000,"));
+		assertTrue(summary.get(1).startsWith("GLOBAL_INDEX,5000,"));
 	}
 
 	@Test

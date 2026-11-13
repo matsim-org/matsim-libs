@@ -27,14 +27,15 @@ public final class TravelTimeErrorStats {
 	/**
 	 * The header of {@link #toRecord()}, for a csv of one row per group.
 	 */
-	public static final List<String> HEADER = List.of("n", "mean_reference", "mean_estimate", "bias", "relative_bias",
-		"mape", "rmse", "max_absolute_percentage_error");
+	public static final List<String> HEADER = List.of("n", "mean_reference", "mean_estimate", "bias",
+		"error_std_dev", "mean_absolute_error", "relative_bias", "mape", "rmse", "max_absolute_percentage_error");
 
 	private long count;
 	private long countWithoutPercentage;
 	private double sumReference;
 	private double sumEstimate;
 	private double sumError;
+	private double sumAbsoluteError;
 	private double sumSquaredError;
 	private double sumRelativeError;
 	private double sumAbsoluteRelativeError;
@@ -54,6 +55,7 @@ public final class TravelTimeErrorStats {
 		this.sumReference += reference;
 		this.sumEstimate += estimate;
 		this.sumError += error;
+		this.sumAbsoluteError += Math.abs(error);
 		this.sumSquaredError += error * error;
 
 		if (reference > 0) {
@@ -107,6 +109,31 @@ public final class TravelTimeErrorStats {
 	}
 
 	/**
+	 * @return the mean absolute error [s]. The companion of {@link #getBias()}: the bias says which way
+	 * the approximation leans, this says how far off it is regardless of direction, in seconds rather
+	 * than as a share - which is what matters when the reference travel times span a factor of twenty, as
+	 * they do across distance bands, and a percentage of a two-minute trip is not comparable to a
+	 * percentage of a forty-minute one.
+	 */
+	public double getMeanAbsoluteError() {
+		return mean(this.sumAbsoluteError, this.count);
+	}
+
+	/**
+	 * @return the standard deviation of the signed error [s]: the part of the error that does <em>not</em>
+	 * cancel out over many pairs, as opposed to {@link #getBias()}, which is the part that does.
+	 * <p>
+	 * The two together are the whole of {@link #getRmse()}, since
+	 * {@code rmse^2 = bias^2 + stdDev^2}. That identity is why both are reported: a calibration factor
+	 * can remove a bias and can do nothing at all about a standard deviation, so the two halves say
+	 * different things about whether an approximation is fixable.
+	 */
+	public double getStandardDeviation() {
+		double bias = getBias();
+		return Math.sqrt(Math.max(0, mean(this.sumSquaredError, this.count) - bias * bias));
+	}
+
+	/**
 	 * @return the mean signed relative error, as a share of the reference
 	 */
 	public double getRelativeBias() {
@@ -149,6 +176,8 @@ public final class TravelTimeErrorStats {
 			format(getMeanReference(), 1),
 			format(getMeanEstimate(), 1),
 			format(getBias(), 1),
+			format(getStandardDeviation(), 1),
+			format(getMeanAbsoluteError(), 1),
 			format(getRelativeBias(), 4),
 			format(getMape(), 4),
 			format(getRmse(), 1),
@@ -161,7 +190,8 @@ public final class TravelTimeErrorStats {
 
 	@Override
 	public String toString() {
-		return String.format(Locale.ROOT, "n = %d, MAPE = %.1f%%, bias = %+.1f s (%+.1f%%), RMSE = %.1f s",
-			this.count, 100 * getMape(), getBias(), 100 * getRelativeBias(), getRmse());
+		return String.format(Locale.ROOT, "n = %d, MAPE = %.1f%%, bias = %+.1f s (%+.1f%%), sd = %.1f s, "
+				+ "MAE = %.1f s, RMSE = %.1f s", this.count, 100 * getMape(), getBias(), 100 * getRelativeBias(),
+			getStandardDeviation(), getMeanAbsoluteError(), getRmse());
 	}
 }

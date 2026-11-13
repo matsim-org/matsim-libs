@@ -20,6 +20,15 @@
  *     {@code TT = TT_ff * (1 + beta * sum_k s_k(o,d) * CI_k(t))}. A motorway trip is then not slowed
  *     down by congestion that happens in residential streets.</li>
  * </ul>
+ * <b>The base matrix comes in two shapes</b>, and which one is built follows from
+ * {@code maxNeighborDistance} alone. A finite radius gives the two-half matrix of {@code contribs/dvrp}:
+ * zone to zone for long pairs, node to node for short ones. An <b>unbounded</b> radius gives
+ * {@link org.matsim.contrib.msp.traveltimematrix.NodeToNodeTravelTimeMatrix} - every pair node to node,
+ * no zone system at all, and therefore exact. That matters for measuring rather than only for answering:
+ * with the discretisation error at zero, what is left of the error of the equation above is the
+ * congestion index and nothing else. Its price is level 1, whose road class shares are stored per zone
+ * pair.
+ * <p>
  * The pieces live one per step of the method:
  * <ul>
  *     <li>{@link org.matsim.contrib.msp.traveltimematrix.prepare} - cutting the car subnetwork the
