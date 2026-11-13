@@ -47,6 +47,7 @@ public class DefaultDashboardProvider implements DashboardProvider {
 
 		result.add(new StuckAgentDashboard());
 
+
 		return result;
 	}
 
