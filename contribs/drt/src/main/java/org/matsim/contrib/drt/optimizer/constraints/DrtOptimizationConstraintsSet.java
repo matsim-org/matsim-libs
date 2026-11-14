@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.optimizer.constraints;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -51,6 +52,15 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
                     + " run are rejected. By default, this bound is disabled (i.e. set to 0).")
     @PositiveOrZero
     private double minimumTripDistance = 0;// [m]
+
+    @Parameter
+    @Comment(
+            "Maximum number of access and of egress stops (including the closest one) a passenger accepts in a stopbased"
+                    + " system. With more than 1, the stops within maxWalkDistance become stop candidates of the trip, and the"
+                    + " insertion search may pick up/drop off the passenger at another candidate than the closest one."
+                    + " Currently only used for prebooked requests. 1 (default) = closest stop only.")
+    @Positive
+    private int maxStopCandidates = 1;
 
     @Parameter
     @Comment(
@@ -105,6 +115,15 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
 
     public void setMaxWalkDistance(@PositiveOrZero double maxWalkDistance) {
         this.maxWalkDistance = maxWalkDistance;
+    }
+
+    @Positive
+    public int getMaxStopCandidates() {
+        return maxStopCandidates;
+    }
+
+    public void setMaxStopCandidates(@Positive int maxStopCandidates) {
+        this.maxStopCandidates = maxStopCandidates;
     }
 
     @PositiveOrZero

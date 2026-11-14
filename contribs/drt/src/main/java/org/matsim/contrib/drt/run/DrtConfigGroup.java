@@ -428,6 +428,12 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 					"maxWaitTime must not be smaller than stopDuration");
 		}
 
+		boolean withStopCandidates = drtOptimizationConstraintsSets.stream()
+				.anyMatch(constraintsSet -> constraintsSet.getMaxStopCandidates() > 1);
+		// the walks to/from alternative stops are inserted as teleported legs (with the routed duration and distance)
+		Verify.verify(!withStopCandidates || !config.routing().getNetworkModes().contains(TransportMode.walk),
+				"maxStopCandidates > 1 requires a teleported walk mode (walk must not be a network mode)");
+
 		Verify.verify(getOperationalScheme() != OperationalScheme.stopbased || getTransitStopFile() != null,
 				"transitStopFile must not be null when operationalScheme is " + OperationalScheme.stopbased);
 

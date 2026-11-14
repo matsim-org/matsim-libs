@@ -17,10 +17,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.drt.routing;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.MoreObjects;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -28,12 +30,15 @@ import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.router.StopCandidates;
+import org.matsim.contrib.dvrp.router.StopCandidatesRoute;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -48,7 +53,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  *
  * @author michalm (Michal Maciejewski)
  */
-public class DrtRoute extends AbstractRoute {
+public class DrtRoute extends AbstractRoute implements StopCandidatesRoute {
   	private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	public final static String ROUTE_TYPE = TransportMode.drt;
 	private RouteDescription routeDescription = null;
@@ -88,6 +93,21 @@ public class DrtRoute extends AbstractRoute {
 		//TODO: consolidate constraints / route description
 		this.routeDescription.setConstraints(constraints);
 		super.setTravelTime(constraints.maxTravelDuration());
+	}
+
+	/**
+	 * @return the stop candidates of the trip (first = preferred = the stops of this route as routed), if the trip was
+	 * routed with more than one candidate
+	 */
+	@Override
+	public Optional<StopCandidates> getStopCandidates() {
+		return Optional.ofNullable(routeDescription.getStopCandidates()).map(StopCandidatesDescription::toStopCandidates);
+	}
+
+	@Override
+	public void setStopCandidates(StopCandidates stopCandidates) {
+		routeDescription.setStopCandidates(
+				stopCandidates == null ? null : StopCandidatesDescription.of(stopCandidates));
 	}
 
 	private DvrpLoad load;
@@ -157,6 +177,21 @@ public class DrtRoute extends AbstractRoute {
 
 		private DrtRouteConstraints constraints = DrtRouteConstraints.UNDEFINED;
 
+		private StopCandidatesDescription stopCandidates = null;
+
+		/**
+		 * Omitted if not set, so that routes without stop candidates are written as before.
+		 */
+		@JsonProperty("stopCandidates")
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public StopCandidatesDescription getStopCandidates() {
+			return stopCandidates;
+		}
+
+		public void setStopCandidates(StopCandidatesDescription stopCandidates) {
+			this.stopCandidates = stopCandidates;
+		}
+
 		@JsonProperty("directRideTime")
 		public double getDirectRideTime() {
 			return directRideTime.isUndefined() ? OptionalTime.undefined().seconds() : directRideTime.seconds();
@@ -191,6 +226,35 @@ public class DrtRoute extends AbstractRoute {
 
 		public void setUnsharedPath(List<String> unsharedPath) {
 			this.unsharedPath = unsharedPath;
+		}
+	}
+
+	/**
+	 * Serialised form of {@link StopCandidates} in the route description.
+	 */
+	public record StopCandidatesDescription(@JsonProperty("access") List<CandidateDescription> access,
+											@JsonProperty("egress") List<CandidateDescription> egress) {
+		static StopCandidatesDescription of(StopCandidates candidates) {
+			return new StopCandidatesDescription(candidates.access().stream().map(CandidateDescription::of).toList(),
+					candidates.egress().stream().map(CandidateDescription::of).toList());
+		}
+
+		StopCandidates toStopCandidates() {
+			return new StopCandidates(access.stream().map(CandidateDescription::toCandidate).toList(),
+					egress.stream().map(CandidateDescription::toCandidate).toList());
+		}
+	}
+
+	public record CandidateDescription(@JsonProperty("link") String link, @JsonProperty("x") double x,
+									   @JsonProperty("y") double y, @JsonProperty("walkTime") double walkTime,
+									   @JsonProperty("walkDistance") double walkDistance) {
+		static CandidateDescription of(StopCandidates.Candidate candidate) {
+			return new CandidateDescription(candidate.linkId().toString(), candidate.coord().getX(),
+					candidate.coord().getY(), candidate.walkDuration(), candidate.walkDistance());
+		}
+
+		StopCandidates.Candidate toCandidate() {
+			return new StopCandidates.Candidate(Id.createLinkId(link), new Coord(x, y), walkTime, walkDistance);
 		}
 	}
 }

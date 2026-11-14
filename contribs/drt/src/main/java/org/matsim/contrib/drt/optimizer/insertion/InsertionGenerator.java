@@ -186,6 +186,14 @@ public class InsertionGenerator {
 			return variant;
 		}
 
+		/**
+		 * @return the index of the request variant served by this insertion, or 0 if it carries no pickup/dropoff
+		 * waypoints (e.g. in tests)
+		 */
+		public int variantIndex() {
+			return variant == null ? 0 : variant.index();
+		}
+
 		private static DrtRequest requestOf(InsertionPoint pickup, InsertionPoint dropoff) {
 			DrtRequest pickupRequest = pickup != null && pickup.newWaypoint instanceof Waypoint.Pickup p ? p.request : null;
 			DrtRequest dropoffRequest = dropoff != null && dropoff.newWaypoint instanceof Waypoint.Dropoff d ? d.request : null;
