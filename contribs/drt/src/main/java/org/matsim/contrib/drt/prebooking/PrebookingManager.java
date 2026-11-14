@@ -215,8 +215,12 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 				personLeg.leg().getAttributes().putAttribute(requestAttribute, request.getId().toString());
 			}
 			if (stopCandidates.isPresent()) {
-				pendingStopCandidates.put(request.getId(), new PendingStopCandidates(passengers,
-						!stopCandidates.get().alternativeAccess().isEmpty()));
+				PendingStopCandidates pending = new PendingStopCandidates(passengers,
+						!stopCandidates.get().alternativeAccess().isEmpty());
+				pendingStopCandidates.put(request.getId(), pending);
+				// a booking at the activity end is submitted before the activity end of this step is processed: hold the
+				// passengers right away, the regular holding after the step would come too late
+				holdPassengersAboutToLeave(now, pending);
 			}
 			bookingQueue.add(request);
 		}
@@ -392,7 +396,6 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	 * passenger would leave.
 	 */
 	private void holdPassengersOfPendingRequests(double now) {
-		double timeStep = mobsimTimer.getSimTimestepSize();
 		Iterator<Map.Entry<Id<Request>, PendingStopCandidates>> iterator = pendingStopCandidates.entrySet().iterator();
 		while (iterator.hasNext()) {
 			var entry = iterator.next();
@@ -403,22 +406,31 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 				release(now, pending);
 				continue;
 			}
-			if (!pending.alternativePickups()) {
-				continue;
+			holdPassengersAboutToLeave(now, pending);
+		}
+	}
+
+	/**
+	 * Holds the passengers of a pending request with alternative pickups who would leave their activity in this or the
+	 * next time step. The end is set two steps ahead, so that it is extended again before the passenger would leave.
+	 */
+	private void holdPassengersAboutToLeave(double now, PendingStopCandidates pending) {
+		if (!pending.alternativePickups()) {
+			return;
+		}
+		double timeStep = mobsimTimer.getSimTimestepSize();
+		for (StopCandidatePassenger passenger : pending.passengers()) {
+			MobsimAgent agent = passenger.personLeg.agent();
+			if (!passenger.isInOrigin() || agent.getActivityEndTime() > now + timeStep) {
+				continue; // not yet in the activity, or not about to leave it
 			}
-			for (StopCandidatePassenger passenger : pending.passengers()) {
-				MobsimAgent agent = passenger.personLeg.agent();
-				if (!passenger.isInOrigin() || agent.getActivityEndTime() > now + timeStep) {
-					continue; // not yet in the activity, or not about to leave it
-				}
-				if (Double.isNaN(passenger.originalEndTime)) {
-					passenger.originalEndTime = agent.getActivityEndTime();
-				}
-				passenger.heldUntil = now + 2 * timeStep;
-				passenger.origin.setEndTime(passenger.heldUntil);
-				WithinDayAgentUtils.resetCaches(agent);
-				internalInterface.getMobsim().rescheduleActivityEnd(agent);
+			if (Double.isNaN(passenger.originalEndTime)) {
+				passenger.originalEndTime = agent.getActivityEndTime();
 			}
+			passenger.heldUntil = now + 2 * timeStep;
+			passenger.origin.setEndTime(passenger.heldUntil);
+			WithinDayAgentUtils.resetCaches(agent);
+			internalInterface.getMobsim().rescheduleActivityEnd(agent);
 		}
 	}
 

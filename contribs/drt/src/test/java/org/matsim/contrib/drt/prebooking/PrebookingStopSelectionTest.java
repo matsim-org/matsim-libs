@@ -134,6 +134,21 @@ public class PrebookingStopSelectionTest {
 	}
 
 	@Test
+	void testBookingAtTheActivityEndHoldsThePassengerUntilScheduled() {
+		// booked when leaving ("book first, then walk"): the request is submitted before the activity end of the same
+		// time step is processed, so the passenger must be held right away, not only after the step
+		Result result = runPickup(2, DEPARTURE_TIME, new PrebookingParams(), false);
+
+		assertThat(result.drtDepartures).extracting(e -> e.getLinkId()).containsExactly(STOP_B);
+		assertThat(result.originActivityEnds).singleElement()
+				.satisfies(time -> assertThat(time).isBetween(DEPARTURE_TIME + 1, DEPARTURE_TIME + 5));
+		assertThat(result.drtDepartures.getFirst().getTime())
+				.isEqualTo(result.originActivityEnds.getFirst() + 312, offset(1.0));
+		assertThat(result.finalArrivalLinks).containsExactly(DESTINATION);
+		assertThat(result.stuck).isEmpty();
+	}
+
+	@Test
 	void testScheduledBeforeTheActivityEndDoesNotDelayThePassenger() {
 		Result result = runPickup(2, LATE_BOOKING);
 
