@@ -224,7 +224,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 					// prebooking: may want to wait before or after driving
 					beforePickupTask = insertDriveWithWait(vehicleEntry.vehicle, currentTask, vrpPath, request.getEarliestStartTime(), scheduleWaitBeforeDriveToNewStop);
 				} else { // no need for a new drive task, but may want to wait until start of stop
-					beforePickupTask = insertWait(vehicleEntry.vehicle, currentTask, dropoffIdx);
+					beforePickupTask = insertWait(vehicleEntry.vehicle, currentTask, request.getEarliestStartTime());
 				}
 			}
 			if(!stops.isEmpty() && stops.size() + 1 > pickupIdx) {

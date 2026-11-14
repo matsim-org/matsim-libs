@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -174,6 +175,67 @@ public class DefaultRequestInsertionSchedulerTest {
         compareTwoSchedules(actualScheduleInfo, expectedScheduleInfo);
 
 
+    }
+
+    /**
+     * Prebooking: the vehicle is on a drive that cannot be diverted any more and that ends at the pickup link, and the
+     * passenger is ready only later. The vehicle waits in a separate wait (stay) task before the pickup stop, which
+     * starts at the earliest start time of the request.
+     */
+    @Test
+    public void testPickupAtEndOfUndivertableDrive_waitsUntilEarliestStart() {
+        Link startLink = link("start");
+        Link pickupLink = link("pickup");
+        Link dropoffLink = link("dropoff");
+        FleetSpecificationImpl fleetSpecification = new FleetSpecificationImpl();
+        fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
+                .id(V_1_ID)
+                .startLinkId(startLink.getId())
+                .capacity(6)
+                .serviceBeginTime(0)
+                .serviceEndTime(1000)
+                .build());
+        Fleet fleet = Fleets.createDefaultFleet(fleetSpecification, dvrpVehicleSpecification -> startLink);
+        MobsimTimer timer = new MobsimTimer(1);
+        timer.setTime(CURRENT_TIME);
+        DefaultRequestInsertionScheduler insertionScheduler = getDefaultRequestInsertionScheduler(fleet, timer);
+        DvrpVehicle vehicle = fleet.getVehicles().get(V_1_ID);
+
+        // the vehicle is driving to the pickup link (arrival at 20) and cannot be diverted
+        vehicle.getSchedule().nextTask();
+        vehicle.getSchedule().getCurrentTask().setEndTime(CURRENT_TIME);
+        LeastCostPathCalculator.Path path = new LeastCostPathCalculator.Path(null, List.of(), DRIVE_TIME, 0);
+        VrpPathWithTravelData drivePath = VrpPaths.createPath(startLink, pickupLink, CURRENT_TIME, path, TRAVEL_TIME);
+        DrtDriveTask driveTask = new DrtDriveTask(drivePath, DrtDriveTask.TYPE);
+        vehicle.getSchedule().addTask(driveTask);
+        vehicle.getSchedule().nextTask();
+        OnlineDriveTaskTracker tracker = org.mockito.Mockito.mock(OnlineDriveTaskTracker.class);
+        org.mockito.Mockito.when(tracker.getDiversionPoint()).thenReturn(null);
+        org.mockito.Mockito.when(tracker.predictEndTime()).thenReturn(driveTask.getEndTime());
+        driveTask.initTaskTracker(tracker);
+
+        double earliestStart = 100;
+        DrtRequest request = request("r", pickupLink, dropoffLink, CURRENT_TIME, 500, earliestStart, 200);
+        Waypoint.Start start = start(driveTask, driveTask.getEndTime(), pickupLink, integerLoadType.getEmptyLoad());
+        var vehicleEntry = entry(vehicle, start);
+        var detourTimeInfo = new InsertionDetourTimeCalculator.DetourTimeInfo(
+                new InsertionDetourTimeCalculator.PickupDetourInfo(earliestStart + STOP_DURATION,
+                        earliestStart + STOP_DURATION, earliestStart + STOP_DURATION - driveTask.getEndTime()),
+                new InsertionDetourTimeCalculator.DropoffDetourInfo(earliestStart + STOP_DURATION + DRIVE_TIME,
+                        earliestStart + STOP_DURATION + DRIVE_TIME, DRIVE_TIME + STOP_DURATION));
+        InsertionWithDetourData insertion = insertion(vehicleEntry, 0, 0, detourData(0, DRIVE_TIME, DRIVE_TIME, 0),
+                request, detourTimeInfo);
+
+        var taskPair = insertionScheduler.scheduleRequest(AcceptedDrtRequest.createFromOriginalRequest(request, 60),
+                insertion);
+
+        List<? extends Task> tasks = vehicle.getSchedule().getTasks();
+        Task afterDrive = tasks.get(driveTask.getTaskIdx() + 1);
+        assertThat(afterDrive).isInstanceOf(DrtStayTask.class);
+        assertThat(afterDrive.getBeginTime()).isEqualTo(driveTask.getEndTime());
+        assertThat(afterDrive.getEndTime()).isEqualTo(earliestStart);
+        assertThat(taskPair.pickupTask.getBeginTime()).isEqualTo(earliestStart);
+        assertThat(taskPair.pickupTask.getEndTime()).isEqualTo(earliestStart + STOP_DURATION);
     }
 
     private InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo() {
