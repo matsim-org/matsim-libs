@@ -1,6 +1,10 @@
 package org.matsim.contrib.drt.prebooking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -83,6 +87,30 @@ public class PrebookingTest {
 		}
 
 		return drtConfig.getPrebookingParams().get();
+	}
+
+	@Test
+	void requestSubmittedAtTheDepartureTime() {
+		/*-
+		 * The prebooked request is submitted in the same time step in which the passenger departs. The departure must
+		 * use the prebooked request and must not create a second (immediate) request.
+		 */
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicleA", 1, 1) //
+				.addRequest("personA", 0, 0, 5, 5, 2000.0, 2000.0) //
+				.configure(600.0, 1.3, 600.0, 60.0) //
+				.endTime(10.0 * 3600.0);
+
+		Controler controller = environment.build();
+		installPrebooking(controller);
+		controller.run();
+
+		RequestInfo requestInfo = environment.getRequestInfo().get("personA");
+		assertEquals(List.of(2000.0), requestInfo.submissionTimes);
+		assertTrue(requestInfo.drtRequestId.toString().contains("prebooked"));
+		assertFalse(requestInfo.rejected);
+		assertTrue(Double.isFinite(requestInfo.dropoffTime));
 	}
 
 	@Test
