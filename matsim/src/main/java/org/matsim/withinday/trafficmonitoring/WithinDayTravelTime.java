@@ -59,6 +59,13 @@ import java.util.concurrent.CyclicBarrier;
  * Collects link travel times over a given time span (storedTravelTimesBinSize)
  * and calculates an average travel time over this time span.
  * <p>
+ * Trips that are still in progress are taken into account as censored observations:
+ * a vehicle that entered a link at time e and is still on it at time t will need at
+ * least t - e. The reported travel time is therefore never below the longest elapsed
+ * time of the vehicles currently on the link. Otherwise a blocked link, from which no
+ * vehicle leaves for longer than the time window, would fall back to its free speed
+ * travel time.
+ * <p>
  * TODO:
  * - make storedTravelTimesBinSize configurable (e.g. via config)
  *
@@ -67,7 +74,7 @@ import java.util.concurrent.CyclicBarrier;
 @Singleton
 public class WithinDayTravelTime implements TravelTime,
 	LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler,
-	VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler,
+	VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler, VehicleAbortsEventHandler,
 	MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
 	MobsimBeforeCleanupListener {
 
@@ -240,10 +247,27 @@ public class WithinDayTravelTime implements TravelTime,
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		double time = event.getTime();
 
+		// should be a no-op, a vehicle cannot be on two links
+		this.removeActiveTrip(vehicleId);
+
+		TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(event.getLinkId());
+
 		TripBin tripBin = new TripBin();
 		tripBin.enterTime = time;
+		tripBin.travelTimeInfo = travelTimeInfo;
 
 		this.regularActiveTrips.put(vehicleId, tripBin);
+		travelTimeInfo.activeTrips.add(tripBin);
+		travelTimeInfo.checkActiveState();
+	}
+
+	/*
+	 * Removes the vehicle's current trip from the trips in progress.
+	 */
+	private TripBin removeActiveTrip(Id<Vehicle> vehicleId) {
+		TripBin tripBin = this.regularActiveTrips.remove(vehicleId);
+		if (tripBin != null) tripBin.travelTimeInfo.activeTrips.remove(tripBin);
+		return tripBin;
 	}
 
 	@Override
@@ -252,7 +276,7 @@ public class WithinDayTravelTime implements TravelTime,
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		double time = event.getTime();
 
-		TripBin tripBin = this.regularActiveTrips.remove(vehicleId);
+		TripBin tripBin = this.removeActiveTrip(vehicleId);
 		if (tripBin != null) {
 			tripBin.leaveTime = time;
 
@@ -286,10 +310,19 @@ public class WithinDayTravelTime implements TravelTime,
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		Id<Vehicle> vehicleId = event.getVehicleId();
 
-		this.regularActiveTrips.remove(vehicleId);
+		this.removeActiveTrip(vehicleId);
 
 		// try to remove vehicle from set with filtered vehicles
 		if (filterModes) this.vehiclesToFilter.remove(event.getVehicleId());
+	}
+
+	/*
+	 * An aborted vehicle (e.g. removed from the network at the end of the simulation)
+	 * does not leave its link, so its trip has to be removed from the trips in progress.
+	 */
+	@Override
+	public void handleEvent(VehicleAbortsEvent event) {
+		this.removeActiveTrip(event.getVehicleId());
 	}
 
 	@Override
@@ -431,15 +464,17 @@ public class WithinDayTravelTime implements TravelTime,
 	private static class TripBin {
 		double enterTime;
 		double leaveTime;
+		TravelTimeInfo travelTimeInfo;
 	}
 
 	/*package*/ static class TravelTimeInfo {
 
 		UpdateMeanTravelTimesRunnable runnable;
 		List<TripBin> tripBins = new ArrayList<>();
+		// trips still in progress on the link, in order of their link enter time
+		Set<TripBin> activeTrips = new LinkedHashSet<>();
 
 		boolean isActive = false;
-		// int numActiveTrips = 0;
 		int addedTrips = 0;
 		double addedTravelTimes = 0.0;
 		double sumTravelTimes = 0.0; // We cache the sum of the TravelTimes
@@ -634,11 +669,11 @@ public class WithinDayTravelTime implements TravelTime,
 						calcBinTravelTime(this.time.seconds(), travelTimeInfo);
 
 						/*
-						 * If no further trips are stored in the TravelTimeInfo,
-						 * we deactivate the link and ensure that its expected
-						 * travel time is its free speed travel time.
+						 * If no further trips are stored in the TravelTimeInfo and
+						 * no trips are in progress, we deactivate the link and ensure
+						 * that its expected travel time is its free speed travel time.
 						 */
-						if (travelTimeInfo.tripBins.size() == 0) {
+						if (travelTimeInfo.tripBins.isEmpty() && travelTimeInfo.activeTrips.isEmpty()) {
 							travelTimeInfo.isActive = false;
 							travelTimeInfo.travelTime = travelTimeInfo.freeSpeedTravelTime;
 							iter.remove();
@@ -690,10 +725,19 @@ public class WithinDayTravelTime implements TravelTime,
 			if (meanTravelTime < travelTimeInfo.freeSpeedTravelTime) {
 //				log.warn("Mean TravelTime too short?");
 				// can happen when network change event came in with lower speed. kai, feb'18
-				travelTimeInfo.travelTime = travelTimeInfo.freeSpeedTravelTime;
-			} else {
-				travelTimeInfo.travelTime = meanTravelTime;
+				meanTravelTime = travelTimeInfo.freeSpeedTravelTime;
 			}
+
+			/*
+			 * Trips in progress are censored observations: the vehicle that entered
+			 * the link first will need at least time - enterTime.
+			 * travelTime = max(meanTravelTime, time - earliest enterTime of the trips in progress)
+			 */
+			double longestActiveTripTime = 0.0;
+			if (!travelTimeInfo.activeTrips.isEmpty()) {
+				longestActiveTripTime = time - travelTimeInfo.activeTrips.iterator().next().enterTime;
+			}
+			travelTimeInfo.travelTime = Math.max(meanTravelTime, longestActiveTripTime);
 		}
 
 	} // ReplannerRunnable
