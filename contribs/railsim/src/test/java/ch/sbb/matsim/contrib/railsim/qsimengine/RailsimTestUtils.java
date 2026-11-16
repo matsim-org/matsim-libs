@@ -38,6 +38,7 @@ import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.*;
 import org.mockito.Answers;
@@ -108,6 +109,63 @@ public class RailsimTestUtils {
 		Mockito.when(mobVeh.getId()).thenReturn(vehicleId);
 		Mockito.when(driver.getVehicle()).thenReturn(mobVeh);
 		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_" + veh));
+
+		test.engine.handleDeparture(time, driver, route.getStartLinkId(), route);
+	}
+
+	/**
+	 * Create a departure within the engine on the given route. Useful for routes that a shortest path
+	 * search does not produce, e.g. routes with a reversal.
+	 */
+	public static void createDeparture(Holder test, VehicleType type, String veh, double time, List<String> links) {
+
+		NetworkRoute route = RouteUtils.createNetworkRoute(links.stream().map(Id::createLinkId).toList());
+
+		Id<Vehicle> vehicleId = Id.createVehicleId(veh);
+
+		MobsimDriverAgent driver = Mockito.mock(MobsimDriverAgent.class, Answers.RETURNS_MOCKS);
+		MobsimVehicle mobVeh = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
+		Vehicle vehicle = VehicleUtils.createVehicle(vehicleId, type);
+
+		Mockito.when(mobVeh.getVehicle()).thenReturn(vehicle);
+		Mockito.when(mobVeh.getId()).thenReturn(vehicleId);
+		Mockito.when(driver.getVehicle()).thenReturn(mobVeh);
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_" + veh));
+
+		test.engine.handleDeparture(time, driver, route.getStartLinkId(), route);
+	}
+
+	/**
+	 * Create a departure of a transit driver that has one stop on {@code stopLink} with the given stop
+	 * time. Afterwards the driver continues to the end of its route.
+	 *
+	 * @param nextStopLink link of the stop after {@code stopLink}. It is only needed to end the stop and
+	 *                     should not be part of the remaining route.
+	 */
+	public static void createTransitDeparture(Holder test, VehicleType type, String veh, double time, List<String> links,
+											  String stopLink, double stopTime, String nextStopLink) {
+
+		NetworkRoute route = RouteUtils.createNetworkRoute(links.stream().map(Id::createLinkId).toList());
+
+		Id<Vehicle> vehicleId = Id.createVehicleId(veh);
+
+		RailsimTransitDriverAgent driver = Mockito.mock(RailsimTransitDriverAgent.class, Answers.RETURNS_MOCKS);
+		MobsimVehicle mobVeh = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
+		Vehicle vehicle = VehicleUtils.createVehicle(vehicleId, type);
+		TransitStopFacility stop = Mockito.mock(TransitStopFacility.class);
+		TransitStopFacility nextStop = Mockito.mock(TransitStopFacility.class);
+
+		Mockito.when(mobVeh.getVehicle()).thenReturn(vehicle);
+		Mockito.when(mobVeh.getId()).thenReturn(vehicleId);
+		Mockito.when(driver.getVehicle()).thenReturn(mobVeh);
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_" + veh));
+		Mockito.when(driver.getMode()).thenReturn("rail");
+		Mockito.when(driver.getActivityEndTime()).thenReturn(Double.POSITIVE_INFINITY);
+
+		Mockito.when(stop.getLinkId()).thenReturn(Id.createLinkId(stopLink));
+		Mockito.when(nextStop.getLinkId()).thenReturn(Id.createLinkId(nextStopLink));
+		Mockito.when(driver.getNextTransitStop()).thenReturn(stop, nextStop);
+		Mockito.when(driver.handleTransitStop(Mockito.any(), Mockito.anyDouble())).thenReturn(stopTime, 0.0);
 
 		test.engine.handleDeparture(time, driver, route.getStartLinkId(), route);
 	}

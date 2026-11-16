@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -305,6 +307,70 @@ public class RailsimEngineTest {
 		assertThat(event.type).isEqualTo(UpdateEvent.Type.REVERSE_TRAIN);
 		assertThat(event.plannedTime).isEqualTo(370);
 		assertThat(event.lastArrivalTime).isEqualTo(300);
+	}
+
+	/**
+	 * Create a reversible vehicle type for tests that need real reversing.
+	 */
+	private static VehicleType createReversibleType(String id, double length) {
+		VehicleType type = VehicleUtils.createVehicleType(Id.create(id, VehicleType.class));
+		type.setLength(length);
+		type.setMaximumVelocity(44.444);
+		type.setNetworkMode("rail");
+		RailsimUtils.setTrainAcceleration(type, 0.5);
+		RailsimUtils.setTrainDeceleration(type, 0.5);
+		RailsimUtils.setTrainReversible(type, 0.0);
+		return type;
+	}
+
+	/**
+	 * Time of the first train state event of a vehicle on a link.
+	 */
+	private static double firstTimeOnLink(RailsimTestUtils.EventCollector collector, String veh, String link) {
+		return collector.events.stream()
+			.filter(ev -> ev instanceof RailsimTrainStateEvent state
+				&& state.getVehicleId().toString().equals(veh)
+				&& state.getHeadLink().toString().equals(link))
+			.mapToDouble(Event::getTime)
+			.min()
+			.orElse(Double.POSITIVE_INFINITY);
+	}
+
+	@Test
+	void testReverseReleasesArrivalReservations() {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroReverseStub.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimTestUtils.Holder test = new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, resources, trains,
+			new SimpleDisposition(resources, speed, router), createTrainTimeDistanceHandler()), net);
+
+		// The train is longer than the platform link p6 and reverses onto the departure links q1..q5.
+		// No further stop is reached after p6 ("none"), the helper only needs it to end the dwell.
+		RailsimTestUtils.createTransitDeparture(test, createReversibleType("reversing", 205), "reversing", 0,
+			List.of("p1", "p2", "p3", "p4", "p5", "p6", "q1", "q2", "q3", "q4", "q5"),
+			"p6", 60.0, "none");
+
+		// The follower only needs the platform approach p5, which the reversing train has left long before.
+		RailsimTestUtils.createDeparture(test, createReversibleType("following", 100), "following", 120,
+			List.of("f1", "p5", "p6"));
+
+		test.doSimStepUntil(600);
+		test.debugFiles(collector, utils.getOutputDirectory() + "/reverseStub");
+
+		RailsimTestUtils.assertThat(collector).hasSizeGreaterThan(5);
+		assertThat(collector.events.stream().anyMatch(ev -> ev instanceof RailsimTrainStateEvent state
+			&& state.getVehicleId().toString().equals("reversing")
+			&& state.getHeadLink().toString().equals("q5")
+			&& FuzzyUtils.equals(state.getSpeed(), 0))).isTrue();
+
+		// Reservations of the arrival links must not outlive the reversal: the follower can enter the
+		// platform approach right after its departure instead of waiting for the reversing train's
+		// route end, where all reservations are dropped.
+		assertThat(firstTimeOnLink(collector, "following", "p5")).isLessThan(250);
 	}
 
 	@Test

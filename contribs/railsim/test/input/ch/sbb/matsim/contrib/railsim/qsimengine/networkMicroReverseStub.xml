@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="test network">
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+	<!-- Stub platform whose link is shorter than the train.
+
+	n0 <-> n1 <-> n2 <-> n3 <-> n4 <-> n5 <-> n6
+	                                       |     |
+	                                      m1     n5 <- departure q1..q5
+
+	A train arriving on p1..p6 reverses on the platform link p6 (18.5 m) and leaves on
+	q1..q5. The train is longer than p6, so the reversal rebuilds the body across several
+	links. A follower joins the platform approach p5 from n9.
+
+	-->
+
+	<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="n0" x="0" y="0"/>
+		<node id="n1" x="200" y="0"/>
+		<node id="n2" x="231.643411687990604" y="0"/>
+		<node id="n3" x="260.05042825318147" y="0"/>
+		<node id="n4" x="291.6124129405" y="0"/>
+		<node id="n5" x="407.71556422234" y="0"/>
+		<node id="n6" x="426.22935827946" y="0"/>
+		<node id="m1" x="526.22935827946" y="0"/>
+		<node id="m2" x="626.22935827946" y="0"/>
+		<node id="m3" x="726.22935827946" y="0"/>
+		<node id="m4" x="3726.22935827946" y="0"/>
+		<node id="n9" x="291.6124129405" y="-100"/>
+	</nodes>
+
+	<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="p1" from="n0" to="n1" length="200.0" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="p2" from="n1" to="n2" length="31.643411687990604" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="p3" from="n2" to="n3" length="28.407016565190865" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="p4" from="n3" to="n4" length="31.561984687322937" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="p5" from="n4" to="n5" length="116.10315128183883" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="p6" from="n5" to="n6" length="18.51379405712302" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+
+		<link id="q1" from="n6" to="n5" length="18.51379405712302" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="q2" from="n5" to="m1" length="100.0" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="q3" from="m1" to="m2" length="100.0" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="q4" from="m2" to="m3" length="100.0" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="q5" from="m3" to="m4" length="3000.0" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+
+		<link id="f1" from="n9" to="n4" length="100.0" freespeed="11.11111111111111" capacity="9999"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+	</links>
+
+	<!-- ====================================================================== -->
+
+</network>
