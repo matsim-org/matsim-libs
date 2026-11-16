@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
@@ -540,5 +541,32 @@ public class RailsimEngineTest {
 			.hasTrainState("cargo2", 2033, 1000, 0);
 
 
+	}
+
+	@Test
+	void testNoStopCommandOnOpenLine() {
+
+		RailsimTestUtils.Holder test = getTestEngine("networkShortLinks.xml");
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "train", 0, "1-2", "14-15");
+
+		test.doSimStepUntil(200);
+		test.debugFiles(collector, utils.getOutputDirectory() + "/noStopOnOpenLine");
+
+		// A reserved window that ends less than the safety distance (10 m) behind the required stopping
+		// distance must not be treated as a stop. On a sequence of short links this happened on the open
+		// line, and the train braked for a stop that never existed. Only the final approach may stop.
+		List<String> stopCommands = collector.events.stream()
+			.filter(RailsimTrainStateEvent.class::isInstance)
+			.map(RailsimTrainStateEvent.class::cast)
+			.filter(ev -> !ev.getHeadLink().toString().equals("14-15"))
+			.filter(ev -> ev.getSpeed() > 0 && ev.getTargetSpeed() == 0)
+			.map(ev -> String.format("t=%.1f link=%s speed=%.2f", ev.getTime(), ev.getHeadLink(), ev.getSpeed()))
+			.toList();
+
+		assertThat(stopCommands).isEmpty();
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("train", 73, 500, 0);
 	}
 }
