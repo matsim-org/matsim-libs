@@ -439,6 +439,11 @@ final class RailsimEngine implements Steppable {
 
 		state.approvedDist = response.approvedDist();
 
+		// The approved distance is a remaining distance and can not be negative. It is used as a distance in
+		// RailsimCalc.calcTargetSpeed(), which otherwise yields NaN as target speed.
+		if (state.approvedDist < 0)
+			state.approvedDist = 0;
+
 		assert FuzzyUtils.greaterEqualThan(state.approvedDist, 0) : "Approved distance must be positive, but was " + response.approvedDist();
 
 		// Stop when the approved distance is not enough
@@ -783,6 +788,12 @@ final class RailsimEngine implements Steppable {
 		state.headPosition += dist;
 		state.tailPosition += dist;
 		state.approvedDist -= dist;
+
+		// The train always drives to the end of its head link, so it can pass the end of a short approved
+		// window, and floating point noise adds to that. A negative approved distance yields NaN as target
+		// speed in RailsimCalc.calcTargetSpeed(), after which the train drives backwards.
+		if (state.approvedDist < 0)
+			state.approvedDist = 0;
 
 		if (Double.isFinite(state.targetDecelDist)) {
 			state.targetDecelDist -= dist;
