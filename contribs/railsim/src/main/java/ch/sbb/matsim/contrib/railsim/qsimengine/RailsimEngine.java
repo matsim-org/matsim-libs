@@ -621,6 +621,15 @@ final class RailsimEngine implements Steppable {
 		applyReverseGeometry(state, computeReverseGeometry(state, nextLink, nextRouteIdx, previousHeadLink,
 			previousHeadPosition, previousTailLink, previousTailPosition));
 
+		// The approved distance is measured from the head. The reversal moves the head forward along the
+		// departure route without driving, so the distance it jumped is no longer ahead of the train.
+		double jump = resources.getLink(previousHeadLink).length - previousHeadPosition;
+		for (int i = nextRouteIdx - 1; i < state.routeIdx - 1; i++) {
+			jump += state.route.get(i).length;
+		}
+		jump += state.headPosition;
+		state.approvedDist = Math.max(0, state.approvedDist - jump);
+
 		// Keep the time-distance head reference aligned when the train flips direction.
 		state.cumulativeDistance += state.train.length();
 
