@@ -23,8 +23,10 @@ import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.DispositionResponse;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.MaxSpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManagerImpl;
@@ -38,6 +40,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -123,6 +126,105 @@ public class RailsimEngineTest {
 		Method leaveLink = RailsimEngine.class.getDeclaredMethod("leaveLink", double.class, UpdateEvent.class);
 		leaveLink.setAccessible(true);
 		leaveLink.invoke(engine, time, event);
+	}
+
+	private void invokeUpdatePosition(RailsimEngine engine, double time, UpdateEvent event) throws ReflectiveOperationException {
+		Method updatePosition = RailsimEngine.class.getDeclaredMethod("updatePosition", double.class, UpdateEvent.class);
+		updatePosition.setAccessible(true);
+		updatePosition.invoke(engine, time, event);
+	}
+
+	private boolean invokeBlockLinkTracks(RailsimEngine engine, double time, TrainState state) throws ReflectiveOperationException {
+		Method blockLinkTracks = RailsimEngine.class.getDeclaredMethod("blockLinkTracks", double.class, TrainState.class);
+		blockLinkTracks.setAccessible(true);
+		return (boolean) blockLinkTracks.invoke(engine, time, state);
+	}
+
+	/**
+	 * Create a moving train whose approved distance is shorter than the distance it still drives until the
+	 * end of its head link.
+	 */
+	private TrainState createStateWithShortApprovedDistance(RailResourceManager resources) {
+
+		RailLink previous = resources.getLink(Id.createLinkId("l1-2"));
+		RailLink head = resources.getLink(Id.createLinkId("l2-3"));
+		RailLink next = resources.getLink(Id.createLinkId("l3-4"));
+
+		MobsimVehicle vehicle = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
+		MobsimDriverAgent driver = Mockito.mock(MobsimDriverAgent.class, Answers.RETURNS_MOCKS);
+
+		Mockito.when(vehicle.getId()).thenReturn(Id.createVehicleId("train"));
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_train"));
+		Mockito.when(driver.getVehicle()).thenReturn(vehicle);
+		Mockito.when(driver.getMode()).thenReturn("rail");
+
+		TrainState state = new TrainState(driver, new TrainInfo(Id.create("train_type", VehicleType.class), 100, 44, 0.5, 0.5, 0.5, 240),
+			100, head.getLinkId(), new ArrayList<>(List.of(previous, head, next)));
+
+		state.headLink = head.getLinkId();
+		state.headPosition = 100;
+		state.tailLink = head.getLinkId();
+		state.tailPosition = state.headPosition - state.train.length();
+		state.routeIdx = 2;
+		state.speed = 10;
+		state.targetSpeed = 10;
+		state.acceleration = 0;
+		state.allowedMaxSpeed = 44;
+		state.approvedDist = 5;
+		state.approvedSpeed = 0;
+
+		return state;
+	}
+
+	@Test
+	void testApprovedDistanceDoesNotBecomeNegative() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroBi.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains,
+			new SimpleDisposition(resources, new MaxSpeedProfile(), new TrainRouter(net, resources)),
+			createTrainTimeDistanceHandler());
+
+		TrainState state = createStateWithShortApprovedDistance(resources);
+
+		// One second later the train has driven 10 m, but only 5 m are approved
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.POSITION);
+		invokeUpdatePosition(engine, 101, event);
+
+		assertThat(state.approvedDist)
+			.describedAs("approved distance must not become negative, it is used as a distance")
+			.isZero();
+	}
+
+	@Test
+	void testBlockLinkTracksClampsNegativeApprovedDistance() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroBi.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net,
+			new NoDeadlockAvoidance(net), new TrainManager());
+
+		// A disposition response can be negative, e.g. when the head has already passed the end of the
+		// approved track
+		TrainDisposition disposition = Mockito.mock(TrainDisposition.class);
+		Mockito.when(disposition.requestNextSegment(Mockito.anyDouble(), Mockito.any(TrainPosition.class), Mockito.anyDouble()))
+			.thenReturn(new DispositionResponse(-42, 0, null));
+
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, new TrainManager(), disposition,
+			createTrainTimeDistanceHandler());
+
+		TrainState state = createStateWithShortApprovedDistance(resources);
+
+		boolean blocked = invokeBlockLinkTracks(engine, 100, state);
+
+		assertThat(state.approvedDist)
+			.describedAs("approved distance from the disposition must not become negative")
+			.isZero();
+		assertThat(blocked)
+			.describedAs("an approved distance of zero means that the train has to stop")
+			.isFalse();
 	}
 
 	@Test
