@@ -378,6 +378,54 @@ public class RailsimEngineTest {
 	}
 
 	@Test
+	void testReverseKeepsApprovedDistanceWithinReservedTrack() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroReverseStub.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
+			createTrainTimeDistanceHandler());
+
+		List<RailLink> route = new ArrayList<>(List.of("p1", "p2", "p3", "p4", "p5", "p6", "q1", "q2", "q3", "q4", "q5").stream()
+			.map(id -> resources.getLink(Id.createLinkId(id))).toList());
+
+		TrainInfo info = new TrainInfo(Id.create("reversing", VehicleType.class), 205, 44.444, 0.5, 0.5, 0.5, 0.0);
+
+		// The train stands on the short platform link p6, its body reaches back to p2.
+		TrainState state = createState(info, "reversing", route, 6, 5, route.get(5).length, 1, 21.229358279466254);
+		state.timestamp = 100;
+		state.speed = 0;
+		state.targetSpeed = 0;
+		state.acceleration = 0;
+		state.approvedDist = 0;
+		state.approvedSpeed = 0;
+
+		resources.tryBlockLink(100, route.get(5), RailResourceManager.ANY_TRACK_NON_BLOCKING, state);
+
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.REVERSE_TRAIN);
+		event.plannedTime = 100;
+
+		// Reserves the departure track from the end of p6 and reverses: the head moves 205 m forward onto q3
+		// without driving.
+		invokeEnterLink(engine, 100, event);
+
+		assertThat(state.headLink).isEqualTo(route.get(8).getLinkId());
+
+		// The approved distance is measured from the head and must end within the track the train holds.
+		double reservedAhead = route.get(state.routeIdx - 1).length - state.headPosition;
+		for (int i = state.routeIdx; i < route.size() && resources.isBlockedBy(route.get(i), state); i++) {
+			reservedAhead += route.get(i).length;
+		}
+
+		assertThat(state.approvedDist)
+			.describedAs("approved distance after the reversal must not reach beyond the reserved track")
+			.isLessThanOrEqualTo(reservedAhead + 1e-6);
+	}
+
+	@Test
 	void testReverseWaitsForUnheldDepartureTrack() throws ReflectiveOperationException {
 
 		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroReverseStub.xml").toString());
