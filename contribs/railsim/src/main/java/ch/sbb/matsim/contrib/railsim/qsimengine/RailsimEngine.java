@@ -457,6 +457,27 @@ final class RailsimEngine implements Steppable {
 
 		updatePosition(time, event);
 
+		// The head may only be moved onto the next link once it has reached the end of the current one.
+		// Link changes can be scheduled too early, e.g. with an update time that was calculated for the end
+		// of a speed change instead of the arrival at the link end.
+		RailLink headLink = resources.getLink(state.headLink);
+		if (!event.waitingForLink && FuzzyUtils.greaterThan(headLink.length - state.headPosition, 0.01)) {
+
+			if (FuzzyUtils.equals(state.speed, 0)) {
+				// Standing before the link end: nothing moves until the next reservation check
+				event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
+				event.waitingForLink = false;
+				event.checkReservation = time + config.getPollInterval();
+				event.plannedTime = event.checkReservation;
+				return;
+			}
+
+			// Still moving: plan the next update again from the current state
+			decideTargetSpeed(event, state);
+			decideNextUpdate(event);
+			return;
+		}
+
 		// current head link is the pt stop, which means the train is at the end of the link when this is called
 		if (!event.waitingForLink && state.isStop(state.headLink)) {
 

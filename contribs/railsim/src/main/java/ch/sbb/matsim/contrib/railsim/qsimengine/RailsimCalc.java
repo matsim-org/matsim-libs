@@ -63,7 +63,8 @@ public final class RailsimCalc {
 
 	/**
 	 * Calculate time needed to advance distance {@code dist}. Depending on acceleration and max speed.
-	 * If dist can never be reached, will return time needed to stop.
+	 * If the distance can not be reached, because the train brakes to a standstill before, will return the
+	 * time needed to stop.
 	 */
 	static double calcRequiredTime(TrainState state, double dist) {
 
@@ -98,7 +99,10 @@ public final class RailsimCalc {
 				return decelTime;
 			} else if (dist <= max) {
 				return solveTraveledDist(state.speed, dist, state.acceleration);
-			} else
+			} else if (FuzzyUtils.greaterThan(state.targetSpeed, 0))
+				// Time for decel plus remaining dist at target speed
+				return decelTime + (dist - max) / state.targetSpeed;
+			else
 				return decelTime;
 		}
 	}
