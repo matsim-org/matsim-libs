@@ -32,9 +32,11 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -481,6 +483,14 @@ final class RailsimEngine implements Steppable {
 //			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end, but was " + state.speed;
 
 			state.speed = 0;
+
+			// Close the leg with the counterparts of the departure events, in the same order as the
+			// standard QSim: the vehicle leaves traffic, the driver leaves the vehicle, and only then
+			// the arrival of the driver is processed in endLegAndComputeNextState.
+			createEvent(new VehicleLeavesTrafficEvent(time, state.driver.getId(), state.headLink,
+				state.driver.getVehicle().getId(), state.driver.getMode(), 1.0));
+			createEvent(new PersonLeavesVehicleEvent(time, state.driver.getId(), state.driver.getVehicle().getId()));
+
 			state.driver.notifyArrivalOnLinkByNonNetworkMode(state.headLink);
 			state.driver.endLegAndComputeNextState(Math.ceil(time));
 
