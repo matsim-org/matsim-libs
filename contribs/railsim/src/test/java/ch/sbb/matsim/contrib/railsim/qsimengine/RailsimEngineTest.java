@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -100,13 +101,13 @@ public class RailsimEngineTest {
 		return getTestEngine(network, null);
 	}
 
-	private void invokeReverseTrain(RailsimEngine engine, UpdateEvent event, RailLink nextLink,
+	private void invokeReverseTrain(RailsimEngine engine, double time, UpdateEvent event, RailLink nextLink,
 									Id<Link> previousHeadLink, double previousHeadPosition,
 									Id<Link> previousTailLink, double previousTailPosition,
 									int nextRouteIdx) throws ReflectiveOperationException {
-		Method reverseTrain = RailsimEngine.class.getDeclaredMethod("reverseTrain", TrainState.class, RailLink.class, Id.class, double.class, Id.class, double.class, int.class);
+		Method reverseTrain = RailsimEngine.class.getDeclaredMethod("reverseTrain", double.class, TrainState.class, RailLink.class, Id.class, double.class, Id.class, double.class, int.class);
 		reverseTrain.setAccessible(true);
-		reverseTrain.invoke(engine, event.state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
+		reverseTrain.invoke(engine, time, event.state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
 	}
 
 	private void invokeUpdateDeparture(RailsimEngine engine, double time, UpdateEvent event) throws ReflectiveOperationException {
@@ -161,7 +162,8 @@ public class RailsimEngineTest {
 		RailLink forward = resources.getLink(Id.createLinkId("l1-2"));
 		RailLink reverse = resources.getLink(Id.createLinkId("l2-1"));
 
-		TrainState state = new TrainState(null, new TrainInfo(Id.create("reversible", VehicleType.class), 200, 10, 1, 1, 1, 60),
+		MobsimDriverAgent driver = Mockito.mock(MobsimDriverAgent.class, Answers.RETURNS_MOCKS);
+		TrainState state = new TrainState(driver, new TrainInfo(Id.create("reversible", VehicleType.class), 200, 10, 1, 1, 1, 60),
 			0, forward.getLinkId(), new ArrayList<>(List.of(forward, reverse)));
 		state.headLink = forward.getLinkId();
 		state.headPosition = 1000;
@@ -171,7 +173,9 @@ public class RailsimEngineTest {
 		state.routeIdx = 1;
 
 		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.REVERSE_TRAIN);
-		invokeReverseTrain(new RailsimEngine(null, null, null, null, null, null), event, reverse, forward.getLinkId(), 1000, forward.getLinkId(), 800, 2);
+		RailsimEngine engine = new RailsimEngine(null, new RailsimConfigGroup(), resources, null,
+			new SimpleDisposition(resources, new MaxSpeedProfile(), new TrainRouter(net, resources)), null);
+		invokeReverseTrain(engine, 0, event, reverse, forward.getLinkId(), 1000, forward.getLinkId(), 800, 2);
 
 		assertThat(state.headLink).isEqualTo(reverse.getLinkId());
 		assertThat(state.headPosition).isEqualTo(200);

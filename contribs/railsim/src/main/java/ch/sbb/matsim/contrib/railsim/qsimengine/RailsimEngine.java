@@ -19,10 +19,13 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -55,6 +58,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.DispositionResponse;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
 
 /**
  * Engine to simulate train movement.
@@ -566,7 +570,7 @@ final class RailsimEngine implements Steppable {
 			double previousHeadPosition = state.headPosition;
 			double previousTailPosition = state.tailPosition;
 
-			reverseTrain(state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
+			reverseTrain(time, state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
 		} else {
 			state.headLink = nextLink.getLinkId();
 			state.headPosition = 0;
@@ -595,7 +599,7 @@ final class RailsimEngine implements Steppable {
 	/**
 	 * Reverse the train.
 	 */
-	private void reverseTrain(TrainState state, RailLink nextLink, Id<Link> previousHeadLink, double previousHeadPosition,
+	private void reverseTrain(double time, TrainState state, RailLink nextLink, Id<Link> previousHeadLink, double previousHeadPosition,
 							  Id<Link> previousTailLink, double previousTailPosition, int nextRouteIdx) {
 
 		// Train is fully contained on the current link. Keep the tail on the current link and flip the head
@@ -660,6 +664,56 @@ final class RailsimEngine implements Steppable {
 
 		// Keep the time-distance head reference aligned when the train flips direction.
 		state.cumulativeDistance += state.train.length();
+
+		releaseReverseReservations(time, state);
+	}
+
+	/**
+	 * Release the reservations on arrival links that the new body no longer covers.
+	 * <p>
+	 * A reversal re-defines the train body without passing through {@link #leaveLink}, which only ever
+	 * releases {@link TrainState#tailLink}. After the reversal the tail walks along the *departure*
+	 * links, so the reservations of the arrival links behind the body are never released. Since a
+	 * resource is only freed once the driver holds none of its links, the whole track section would stay
+	 * blocked while physically empty.
+	 */
+	private void releaseReverseReservations(double time, TrainState state) {
+
+		List<RailLink> body = bodyLinks(state);
+		Set<Id<Link>> bodyIds = new HashSet<>();
+		for (RailLink link : body) {
+			bodyIds.add(link.getLinkId());
+		}
+
+		// A route may visit a link twice: never touch a reservation that is still ahead of the head.
+		Set<Id<Link>> ahead = new HashSet<>();
+		for (int i = Math.max(0, state.routeIdx); i < state.route.size(); i++) {
+			ahead.add(state.route.get(i).getLinkId());
+		}
+
+		for (int i = Math.max(0, state.routeIdx - 1); i >= 0; i--) {
+			RailLink link = state.route.get(i);
+
+			if (bodyIds.contains(link.getLinkId()) || ahead.contains(link.getLinkId()))
+				continue;
+
+			if (!resources.isBlockedBy(link, state))
+				continue;
+
+			// Do not free a resource that the body still occupies: its link in the body has to be
+			// reserved, otherwise the release would open the track below the train.
+			boolean covered = true;
+			for (RailLink bodyLink : body) {
+				if (bodyLink.getResource() == link.getResource() && !resources.isBlockedBy(bodyLink, state)) {
+					covered = false;
+					break;
+				}
+			}
+
+			if (covered) {
+				disposition.unblockRailLink(time, state.driver, link);
+			}
+		}
 	}
 
 	private void leaveLink(double time, UpdateEvent event) {
@@ -719,6 +773,64 @@ final class RailsimEngine implements Steppable {
 	 */
 	private void unblockTrack(double time, TrainState state, RailLink unblockLink) {
 		disposition.unblockRailLink(time, state.driver, unblockLink);
+		releaseResourceSiblings(time, state, unblockLink);
+	}
+
+	/**
+	 * Release the train's reservations on the other links of the resource of {@code released}, except
+	 * the links the body still stands on and the links that are still ahead of the head. A resource
+	 * stays blocked as long as the driver holds any of its links, so leaving it in one direction is not
+	 * enough once the train does not occupy it any more.
+	 */
+	private void releaseResourceSiblings(double time, TrainState state, RailLink released) {
+
+		// A moving block reservation is kept per link and distance and is released link by link when
+		// the tail leaves it. Only a fixed block resource blocks all of its links together.
+		if (released.getResource().getType() != ResourceType.fixedBlock)
+			return;
+
+		Set<Id<Link>> bodyIds = new HashSet<>();
+		for (RailLink link : bodyLinks(state)) {
+			bodyIds.add(link.getLinkId());
+		}
+
+		Set<Id<Link>> ahead = new HashSet<>();
+		for (int i = Math.max(0, state.routeIdx); i < state.route.size(); i++) {
+			ahead.add(state.route.get(i).getLinkId());
+		}
+
+		for (RailLink other : released.getResource().getLinks()) {
+			if (other == released || bodyIds.contains(other.getLinkId()) || ahead.contains(other.getLinkId())) {
+				continue;
+			}
+			if (resources.isBlockedBy(other, state)) {
+				disposition.unblockRailLink(time, state.driver, other);
+			}
+		}
+	}
+
+	/**
+	 * Links physically covered by the train body, walking back from the head by the train length. The
+	 * recorded tail is deliberately not used, so that a stale tail cannot hide track the train has
+	 * already left.
+	 */
+	private List<RailLink> bodyLinks(TrainState state) {
+
+		List<RailLink> body = new ArrayList<>();
+		double remaining = state.train.length();
+		double pos = state.headPosition;
+
+		for (int i = state.routeIdx - 1; i >= 0; i--) {
+			RailLink link = state.route.get(i);
+			body.add(link);
+			if (remaining <= pos + 1e-6) {
+				break;
+			}
+			remaining -= pos;
+			pos = link.length;
+		}
+
+		return body;
 	}
 
 	/**
