@@ -667,10 +667,12 @@ final class RailsimEngine implements Steppable {
 		TrainState state = event.state;
 
 		RailLink nextTailLink = null;
-		// Find the next link in the route
+		// Find the next link in the route. The tail is at most one train length behind the head, so the
+		// nearest occurrence of the tail link is the one the tail is on.
 		for (int i = state.routeIdx; i >= 1; i--) {
 			if (state.route.get(i - 1).getLinkId().equals(state.tailLink)) {
 				nextTailLink = state.route.get(i);
+				break;
 			}
 		}
 
@@ -680,6 +682,7 @@ final class RailsimEngine implements Steppable {
 				if (state.previousRoute.get(i).getLinkId().equals(state.tailLink)) {
 					// Use next link from current route if it is the last
 					nextTailLink = i == state.previousRoute.size() - 1 ? state.route.getFirst() : state.previousRoute.get(i + 1);
+					break;
 				}
 			}
 
