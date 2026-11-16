@@ -30,6 +30,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManagerImpl;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import jakarta.annotation.Nullable;
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -38,6 +39,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -123,6 +125,127 @@ public class RailsimEngineTest {
 		Method leaveLink = RailsimEngine.class.getDeclaredMethod("leaveLink", double.class, UpdateEvent.class);
 		leaveLink.setAccessible(true);
 		leaveLink.invoke(engine, time, event);
+	}
+
+	private void invokeDecideNextUpdate(RailsimEngine engine, UpdateEvent event) throws ReflectiveOperationException {
+		Method decideNextUpdate = RailsimEngine.class.getDeclaredMethod("decideNextUpdate", UpdateEvent.class);
+		decideNextUpdate.setAccessible(true);
+		decideNextUpdate.invoke(engine, event);
+	}
+
+	/**
+	 * Create a train that is 357.12 m before the end of its head link and decelerating to a positive
+	 * target speed. Reaching the end of the link needs the deceleration phase (203.35 m) plus another
+	 * 153.77 m at target speed.
+	 */
+	private TrainState createStateShortOfLinkEnd(RailResourceManager resources) {
+
+		RailLink previous = resources.getLink(Id.createLinkId("l1-2"));
+		RailLink head = resources.getLink(Id.createLinkId("l2-3"));
+		RailLink next = resources.getLink(Id.createLinkId("l3-4"));
+
+		MobsimVehicle vehicle = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
+		MobsimDriverAgent driver = Mockito.mock(MobsimDriverAgent.class, Answers.RETURNS_MOCKS);
+
+		Mockito.when(vehicle.getId()).thenReturn(Id.createVehicleId("train"));
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_train"));
+		Mockito.when(driver.getVehicle()).thenReturn(vehicle);
+		Mockito.when(driver.getMode()).thenReturn("rail");
+
+		TrainState state = new TrainState(driver, new TrainInfo(Id.create("train_type", VehicleType.class), 500, 44, 0.5, 0.5, 0.5, 240),
+			100, head.getLinkId(), new ArrayList<>(List.of(previous, head, next)));
+
+		state.headLink = head.getLinkId();
+		state.headPosition = head.length - 357.12;
+		state.tailLink = head.getLinkId();
+		state.tailPosition = state.headPosition - state.train.length();
+		state.routeIdx = 2;
+		state.speed = 31.01;
+		state.targetSpeed = 26.79;
+		state.acceleration = -0.6;
+		state.targetDecelDist = Double.POSITIVE_INFINITY;
+		state.approvedDist = 1e6;
+		state.approvedSpeed = 0;
+		state.allowedMaxSpeed = 44;
+
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+
+		return state;
+	}
+
+	private RailsimEngine createEngine(RailResourceManager resources, Network net) {
+		TrainManager trains = new TrainManager();
+		return new RailsimEngine(eventsManager, new RailsimConfigGroup(), resources, trains,
+			new SimpleDisposition(resources, new MaxSpeedProfile(), new TrainRouter(net, resources)),
+			createTrainTimeDistanceHandler());
+	}
+
+	@Test
+	void testNextLinkChangeIsScheduledByKinematics() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroBi.xml").toString());
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, new RailsimConfigGroup(), net,
+			new NoDeadlockAvoidance(net), new TrainManager());
+		RailsimEngine engine = createEngine(resources, net);
+
+		TrainState state = createStateShortOfLinkEnd(resources);
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.ENTER_LINK);
+
+		invokeDecideNextUpdate(engine, event);
+
+		double decelTime = (31.01 - 26.79) / 0.6;
+		double decelDist = RailsimCalc.calcTraveledDist(31.01, decelTime, -0.6);
+		double expected = 100 + decelTime + (357.12 - decelDist) / 26.79;
+
+		assertThat(event.type).isEqualTo(UpdateEvent.Type.ENTER_LINK);
+		assertThat(event.plannedTime)
+			.describedAs("link change must be scheduled when the head reaches the end of the link")
+			.isCloseTo(expected, Offset.offset(0.0001));
+	}
+
+	@Test
+	void testEnterLinkDoesNotMoveHeadBeforeLinkEnd() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroBi.xml").toString());
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, new RailsimConfigGroup(), net,
+			new NoDeadlockAvoidance(net), new TrainManager());
+		RailsimEngine engine = createEngine(resources, net);
+
+		TrainState state = createStateShortOfLinkEnd(resources);
+		// The next link is already reserved, only the position of the head is wrong for a link change
+		resources.tryBlockLink(100, resources.getLink(Id.createLinkId("l3-4")), RailResourceManager.ANY_TRACK, state);
+
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.ENTER_LINK);
+		invokeEnterLink(engine, 100, event);
+
+		assertThat(state.headLink)
+			.describedAs("head must not enter the next link while it is 357.12 m before the end")
+			.isEqualTo(Id.createLinkId("l2-3"));
+		assertThat(state.headPosition).isEqualTo(2500 - 357.12);
+	}
+
+	@Test
+	void testEnterLinkWaitsBeforeLinkEndWhenStanding() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroBi.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net,
+			new NoDeadlockAvoidance(net), new TrainManager());
+		RailsimEngine engine = createEngine(resources, net);
+
+		TrainState state = createStateShortOfLinkEnd(resources);
+		state.speed = 0;
+		state.targetSpeed = 0;
+		state.acceleration = 0;
+
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.ENTER_LINK);
+		invokeEnterLink(engine, 100, event);
+
+		assertThat(state.headLink)
+			.describedAs("head must not enter the next link while it is standing 357.12 m before the end")
+			.isEqualTo(Id.createLinkId("l2-3"));
+		assertThat(event.type).isEqualTo(UpdateEvent.Type.WAIT_FOR_RESERVATION);
+		assertThat(event.plannedTime).isEqualTo(100 + config.getPollInterval());
 	}
 
 	@Test

@@ -172,6 +172,44 @@ public class RailsimCalcTest {
 	}
 
 	@Test
+	public void testCalcRequiredTimeDeceleratingBeyondDecelDistance() {
+
+		TrainState state = new TrainState(null, null, 0, null, null);
+
+		state.speed = 31.01;
+		state.targetSpeed = 26.79;
+		state.acceleration = -0.6;
+
+		// Time and distance of the deceleration to the target speed
+		double decelTime = (state.speed - state.targetSpeed) / -state.acceleration;
+		double decelDist = RailsimCalc.calcTraveledDist(state.speed, decelTime, state.acceleration);
+
+		// The requested distance is farther than the deceleration phase, the rest is driven at target speed
+		double dist = 357.12;
+
+		assertThat(RailsimCalc.calcRequiredTime(state, dist))
+			.isCloseTo(decelTime + (dist - decelDist) / state.targetSpeed, Offset.offset(0.0001));
+
+		// The result needs to be later than the end of the speed change
+		assertThat(RailsimCalc.calcRequiredTime(state, dist))
+			.isGreaterThan(decelTime);
+	}
+
+	@Test
+	void testCalcRequiredTimeDeceleratingToStandstill() {
+
+		TrainState state = new TrainState(null, null, 0, null, null);
+
+		state.speed = 10;
+		state.targetSpeed = 0;
+		state.acceleration = -1;
+
+		// The train comes to a standstill after 50 m, the distance can not be reached
+		assertThat(RailsimCalc.calcRequiredTime(state, 1000))
+			.isEqualTo(10);
+	}
+
+	@Test
 	void testCheckTrainLengthSingleLink() {
 		RailLink link = RailsimTestUtils.createLink(100, 2);
 
