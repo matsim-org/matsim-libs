@@ -64,7 +64,8 @@ import java.util.concurrent.CyclicBarrier;
  * least t - e. The reported travel time is therefore never below the longest elapsed
  * time of the vehicles currently on the link. Otherwise a blocked link, from which no
  * vehicle leaves for longer than the time window, would fall back to its free speed
- * travel time.
+ * travel time. Vehicles that have been overtaken (a vehicle that entered the link later
+ * has already left it) do not block the link and are therefore not taken into account.
  * <p>
  * TODO:
  * - make storedTravelTimesBinSize configurable (e.g. via config)
@@ -270,14 +271,33 @@ public class WithinDayTravelTime implements TravelTime,
 		return tripBin;
 	}
 
+	/*
+	 * Removes the leaving trip and all trips that entered the link before it from the trips in progress.
+	 * Those trips have been overtaken by the leaving vehicle, so they do not block the link and their
+	 * elapsed time is no lower bound for the link travel time (e.g. a bus at a non-blocking stop, or a
+	 * slow vehicle on a link that allows passing). They stay in regularActiveTrips, so their trip still
+	 * counts towards the mean once they leave the link.
+	 * On FIFO links, the leaving trip is always the first one, so only the leaving trip is removed.
+	 * Each trip is removed at most once, so this is amortized O(1) per event.
+	 */
+	private static void removeLeavingAndOvertakenTrips(TripBin tripBin) {
+		Iterator<TripBin> iter = tripBin.travelTimeInfo.activeTrips.iterator();
+		while (iter.hasNext()) {
+			TripBin first = iter.next();
+			iter.remove();
+			if (first == tripBin) break;
+		}
+	}
+
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Link> linkId = event.getLinkId();
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		double time = event.getTime();
 
-		TripBin tripBin = this.removeActiveTrip(vehicleId);
+		TripBin tripBin = this.regularActiveTrips.remove(vehicleId);
 		if (tripBin != null) {
+			removeLeavingAndOvertakenTrips(tripBin);
 			tripBin.leaveTime = time;
 
 			double tripTime = tripBin.leaveTime - tripBin.enterTime;
@@ -471,7 +491,7 @@ public class WithinDayTravelTime implements TravelTime,
 
 		UpdateMeanTravelTimesRunnable runnable;
 		List<TripBin> tripBins = new ArrayList<>();
-		// trips still in progress on the link, in order of their link enter time
+		// trips still in progress on the link that have not been overtaken, in order of their link enter time
 		Set<TripBin> activeTrips = new LinkedHashSet<>();
 
 		boolean isActive = false;

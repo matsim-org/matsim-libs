@@ -21,6 +21,7 @@
 package org.matsim.withinday.trafficmonitoring;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -144,6 +145,27 @@ public class WithinDayTravelTimeInProgressTripsTest {
 				leave("flowing" + (i - tripTime), i);
 			}
 		}
+	}
+
+	@Test
+	void overtakenVehicle_doesNotDetermineTravelTime() {
+		// a slow vehicle (e.g. a bus at a non-blocking stop) stays on the link, while the
+		// following vehicles overtake it: one enters every second and needs 12s
+		int tripTime = 12;
+		int slowTripTime = 100;
+		enter("slow", 0);
+		for (int i = 1; i < slowTripTime; i++) {
+			// once the first vehicle has overtaken the slow one, the slow vehicle's elapsed time is ignored
+			if (i > tripTime + 2) assertEquals(tripTime, travelTimeAt(i), 0, "travel time at " + i);
+			enter("flowing" + i, i);
+			if (i > tripTime) {
+				leave("flowing" + (i - tripTime), i);
+			}
+		}
+
+		// when the slow vehicle leaves the link, its trip counts towards the mean
+		leave("slow", slowTripTime);
+		assertTrue(travelTimeAt(slowTripTime + 1) > tripTime);
 	}
 
 	private void enter(String vehicle, double time) {
