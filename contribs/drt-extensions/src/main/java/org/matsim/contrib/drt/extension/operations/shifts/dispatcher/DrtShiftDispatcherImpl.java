@@ -20,6 +20,7 @@
 package org.matsim.contrib.drt.extension.operations.shifts.dispatcher;
 
 import com.google.common.base.Verify;
+import com.google.common.collect.Iterables;
 import org.apache.commons.collections4.iterators.IteratorChain;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -322,10 +323,20 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         return Optional.of(vehicle);
     }
 
+    /**
+     * Looks for a vehicle whose current shift ends early enough to take over the given shift afterwards. Shifts that
+     * are within {@code shiftEndLookAhead} of their end have already moved from {@link #activeShifts} to
+     * {@link #endingShifts}, so both are scanned. All ending shifts end before all active ones, so scanning
+     * {@link #endingShifts} first keeps the order by end time. Ended shifts are skipped: their vehicles are either idle
+     * (and found by {@link #findIdleVehicle}) or already hold their next shift.
+     */
     private Optional<ShiftDvrpVehicle> findReuseVehicle(DrtShift shift) {
-        for (ShiftEntry active : activeShifts) {
+        for (ShiftEntry active : Iterables.concat(endingShifts, activeShifts)) {
             if (active.shift().getEndTime() > shift.getStartTime()) {
                 break;
+            }
+            if (active.shift().isEnded()) {
+                continue;
             }
             if (shift.getOperationFacilityId().isPresent()) {
                 Id<OperationFacility> target = shift.getOperationFacilityId().get();
@@ -430,6 +441,10 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     private boolean endShiftActively(ShiftEntry endingShift, double now) {
         if (endingShift.shift().getOperationFacilityId().isPresent()) {
             // fixed start/end facility: not eligible for discretionary early end
+            return false;
+        }
+        if (nextShiftRequiresFacility(endingShift)) {
+            // the changeover has to stay where the follow-up shift starts
             return false;
         }
 
@@ -551,6 +566,11 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
             //start and end facility are fixed
             return;
         }
+        if (nextShiftRequiresFacility(endingShift)) {
+            // the follow-up shift starts at a fixed facility, and the vehicle was only assigned to it because its
+            // changeover is scheduled there (see findReuseVehicle)
+            return;
+        }
 
         ShiftEndAnchor anchor = findShiftEndAnchor(endingShift.vehicle());
         Task lastTask = anchor.lastTask();
@@ -592,6 +612,19 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 }
             }
         }
+    }
+
+    /**
+     * Whether the vehicle already holds a follow-up shift that has to start at a specific facility. Moving the
+     * changeover of the ending shift elsewhere would then fail at the start of the follow-up shift.
+     */
+    private boolean nextShiftRequiresFacility(ShiftEntry endingShift) {
+        for (DrtShift shift : endingShift.vehicle().getShifts()) {
+            if (shift != endingShift.shift()) {
+                return shift.getOperationFacilityId().isPresent();
+            }
+        }
+        return false;
     }
 
     private void updateShiftBreaks(double now) {
