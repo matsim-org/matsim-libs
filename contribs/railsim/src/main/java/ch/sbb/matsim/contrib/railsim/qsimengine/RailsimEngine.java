@@ -66,6 +66,12 @@ final class RailsimEngine implements Steppable {
 	 * Ensure that trains always have enough distance to progress.
 	 */
 	private static final double SAFETY_DIST = 10;
+	/**
+	 * Distance in meter before the end of its link up to which the head counts as having reached the link end.
+	 * Larger than {@link FuzzyUtils} epsilon on purpose: the position is integrated over many updates, and a
+	 * link change that is a few millimetres early must not be rescheduled.
+	 */
+	private static final double LINK_END_TOLERANCE = 0.01;
 	private static final Logger log = LogManager.getLogger(RailsimEngine.class);
 	private final EventsManager eventsManager;
 	private final RailsimConfigGroup config;
@@ -461,10 +467,12 @@ final class RailsimEngine implements Steppable {
 		// Link changes can be scheduled too early, e.g. with an update time that was calculated for the end
 		// of a speed change instead of the arrival at the link end.
 		RailLink headLink = resources.getLink(state.headLink);
-		if (!event.waitingForLink && FuzzyUtils.greaterThan(headLink.length - state.headPosition, 0.01)) {
+		if (!event.waitingForLink && FuzzyUtils.greaterThan(headLink.length - state.headPosition, LINK_END_TOLERANCE)) {
 
 			if (FuzzyUtils.equals(state.speed, 0)) {
-				// Standing before the link end: nothing moves until the next reservation check
+				// Standing before the link end: nothing moves until the next reservation check. The event
+				// becomes a plain reservation check (waitingForLink = false), so the retry recomputes speed and
+				// next update instead of entering the link directly in checkTrackReservation().
 				event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
 				event.waitingForLink = false;
 				event.checkReservation = time + config.getPollInterval();
