@@ -28,3 +28,4 @@ output/
 # local-only scratch / editor files
 tmp.typ
 .mcp.json
+.Rproj.user

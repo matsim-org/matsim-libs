@@ -128,4 +128,57 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+	<profiles>
+		<!--
+			Build a self-contained jar for the cluster:
+			  mvn -Pcluster-jar -pl contribs/accessibility -DskipTests package
+			The jar is written to target/RunPersonBasedAccBerlin-cluster.jar.
+		-->
+		<profile>
+			<id>cluster-jar</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>3.6.2</version>
+						<configuration>
+							<outputFile>${project.build.directory}/RunPersonBasedAccBerlin-cluster.jar</outputFile>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>org.matsim.contrib.accessibility.run.RunPersonBasedAccBerlin</mainClass>
+									<manifestEntries>
+										<Multi-Release>true</Multi-Release>
+									</manifestEntries>
+								</transformer>
+								<!-- Merge GeoTools/ServiceLoader registrations. -->
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+							</transformers>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-cluster-jar</id>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

@@ -1,7 +1,15 @@
 package org.matsim.contrib.accessibility.run;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.api.referencing.operation.TransformException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,31 +36,55 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
+import java.io.PrintStream;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+/**
+ * Person-based accessibility for the Berlin scenario.
+ * <p>
+ * The class is meant to be run from a cluster jar, one opportunity/scenario/mode combination per process:
+ *
+ * <pre>
+ * java -jar accessibility-cluster.jar --opportunity baeder --scenario policy --mode car
+ * java -jar accessibility-cluster.jar --all
+ * </pre>
+ *
+ * See {@link #printUsage(PrintStream)} for all options.
+ */
 public class RunPersonBasedAccBerlin {
 
-	private static final String OUTPUT_ROOT = "../../public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/output-1pct/";
-	private static final String OUTPUT_BASE = OUTPUT_ROOT + "base/";
-	private static final String OUTPUT_POLICY = OUTPUT_ROOT + "policy/";
-	private static String OUTPUT_DIR;
-
-	private static final String HOSPITAL_INPUT_DIR = OUTPUT_ROOT + "input/";
-	private static final String PLANKRANKENHAEUSER_XML = HOSPITAL_INPUT_DIR + "plankrankenhaeuser.xml";
-	private static final String WEITERE_KRANKENHAEUSER_XML = HOSPITAL_INPUT_DIR + "weitere_krankenhaeuser.xml";
-	private static final String HOSPITAL_ACTIVITY_TYPE = "hospital";
+//	The current run root contains the policy simulation files. Base outputs are expected
+//	in "base/" below the same root once available, or can be passed via --base-dir.
+	private static final String DEFAULT_OUTPUT_ROOT =
+		"../../runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-policy/";
 
 //	Hospital accessibility results are written into a dedicated folder of the R analysis input directory.
-	private static final String R_INPUT_DIR = "contribs/accessibility/src/main/R/THESIS/input/";
+	private static final String DEFAULT_R_INPUT_DIR = "contribs/accessibility/src/main/R/THESIS/input/";
 
+	private static final String DEFAULT_VERSION = "6.4";
 	private static final String CRS = "EPSG:25832";
+
+	private static final List<Modes4Accessibility> ANALYSIS_MODES = List.of(
+		Modes4Accessibility.car,
+		Modes4Accessibility.pt,
+		Modes4Accessibility.teleportedWalk
+	);
+
+	private static final boolean PERSON_BASED = true;
 
 	private static Scenario scenario;
 
@@ -62,7 +94,9 @@ public class RunPersonBasedAccBerlin {
 
 	private enum OpportunityType {
 		hospital("hospital"),
-		spa("spa");
+		spa("spa"),
+		baeder("baeder"),
+		jobcenter("jobcenter");
 
 		private final String activityType;
 
@@ -74,77 +108,419 @@ public class RunPersonBasedAccBerlin {
 			return activityType;
 		}
 
-		String outputDir() {
-			return R_INPUT_DIR + name() + "/";
+		String outputDir(String rInputDir) {
+//			The R analysis directory is named "jobCenter" (capital C), unlike the enum constant.
+			String directory = this == jobcenter ? "jobCenter" : name();
+			return new File(rInputDir, directory).getPath();
 		}
 	}
 
 	public static void main(String[] args) {
-//		== Run options ==
-		boolean personBased = true; //todo select accessibility measure (true for person-based/false for location-based)
-		RunScenario runScenario = RunScenario.base; //todo select scenario (base/policy)
-		Modes4Accessibility targetMode = Modes4Accessibility.pt; //todo select transport mode (car/pt/teleportedWalk)
-		OpportunityType opportunity = OpportunityType.spa; //todo select opportunity type (hospital/spa)
-		AccessibilityConfigGroup.AccessibilityMeasureType measureType = AccessibilityConfigGroup.AccessibilityMeasureType.rawSum; //todo select measure type (logSum/rawSum, rawSum for multimodal R analysis)
+		RunOptions options;
+		try {
+			options = parseArgs(args);
+		} catch (IllegalArgumentException e) {
+			System.err.println("Error: " + e.getMessage());
+			printUsage(System.err);
+			System.exit(2);
+			return;
+		}
 
-		OUTPUT_DIR = OUTPUT_ROOT + runScenario + "/";
-		loadFiles(personBased, targetMode, measureType, opportunity);
+		if (options == null) {
+			return;
+		}
 
-//		== Write spa/hospital locations for mapping in R ==
-		writeLocationsCSV(opportunity.outputDir() + "locations.csv");
+		if (options.all) {
+			runAll(options);
+		} else {
+			runCombination(options);
+		}
+	}
 
+//	== Command-line handling ==
+
+	private static RunOptions parseArgs(String[] args) {
+		if (args.length == 0) {
+			printUsage(System.out);
+			return null;
+		}
+
+		RunOptions options = new RunOptions();
+		int[] index = {0};
+
+		while (index[0] < args.length) {
+			String arg = args[index[0]++];
+			String key = arg;
+			String inlineValue = null;
+
+			if (arg.startsWith("--")) {
+				int equals = arg.indexOf('=');
+				if (equals > 0) {
+					key = arg.substring(0, equals);
+					inlineValue = arg.substring(equals + 1);
+				}
+			}
+
+			switch (key) {
+				case "-h", "--help" -> {
+					printUsage(System.out);
+					return null;
+				}
+				case "--all" -> options.all = true;
+				case "--dry-run" -> options.dryRun = true;
+				case "--opportunity" -> options.opportunity = parseOpportunity(
+					requireValue(args, index, inlineValue, key));
+				case "--scenario" -> options.scenario = parseEnum(
+					RunScenario.class, requireValue(args, index, inlineValue, key), key);
+				case "--mode" -> options.mode = parseMode(
+					requireValue(args, index, inlineValue, key));
+				case "--measure-type" -> options.measureType = parseEnum(
+					AccessibilityConfigGroup.AccessibilityMeasureType.class,
+					requireValue(args, index, inlineValue, key), key);
+				case "--output-root" -> options.outputRoot =
+					requireValue(args, index, inlineValue, key);
+				case "--base-dir" -> options.baseDir =
+					requireValue(args, index, inlineValue, key);
+				case "--scenario-dir" -> options.scenarioDir =
+					requireValue(args, index, inlineValue, key);
+				case "--work-dir" -> options.workDir =
+					requireValue(args, index, inlineValue, key);
+				case "--r-input-dir" -> options.rInputDir =
+					requireValue(args, index, inlineValue, key);
+				case "--hospital-input-dir" -> options.hospitalInputDir =
+					requireValue(args, index, inlineValue, key);
+				case "--version" -> options.version =
+					requireValue(args, index, inlineValue, key);
+				case "--network-file" -> options.networkFile =
+					requireValue(args, index, inlineValue, key);
+				case "--plans-file" -> options.plansFile =
+					requireValue(args, index, inlineValue, key);
+				case "--transit-schedule-file" -> options.transitScheduleFile =
+					requireValue(args, index, inlineValue, key);
+				case "--events-file" -> options.eventsFile =
+					requireValue(args, index, inlineValue, key);
+				case "--plankrankenhaeuser-xml" -> options.plankrankenhaeuserXml =
+					requireValue(args, index, inlineValue, key);
+				case "--weitere-krankenhaeuser-xml" -> options.weitereKrankenhaeuserXml =
+					requireValue(args, index, inlineValue, key);
+				case "--baeder-geojson" -> options.baederGeoJson =
+					requireValue(args, index, inlineValue, key);
+				default -> throw new IllegalArgumentException("Unknown argument: " + arg);
+			}
+		}
+
+		if (options.all) {
+			if (options.opportunity != null || options.scenario != null || options.mode != null) {
+				throw new IllegalArgumentException(
+					"--all cannot be combined with --opportunity, --scenario or --mode");
+			}
+			if (options.scenarioDir != null) {
+				throw new IllegalArgumentException("--scenario-dir cannot be used together with --all");
+			}
+		} else {
+			if (options.opportunity == null) {
+				throw new IllegalArgumentException("Missing required option --opportunity (or use --all)");
+			}
+			if (options.scenario == null) {
+				throw new IllegalArgumentException("Missing required option --scenario (or use --all)");
+			}
+			if (options.mode == null) {
+				throw new IllegalArgumentException("Missing required option --mode (or use --all)");
+			}
+		}
+
+		return options;
+	}
+
+	private static String requireValue(String[] args, int[] index, String inlineValue, String key) {
+		if (inlineValue != null) {
+			if (inlineValue.isBlank()) {
+				throw new IllegalArgumentException("Missing value for " + key);
+			}
+			return inlineValue;
+		}
+		if (index[0] >= args.length) {
+			throw new IllegalArgumentException("Missing value for " + key);
+		}
+		return args[index[0]++];
+	}
+
+	private static OpportunityType parseOpportunity(String value) {
+		String normalized = value.trim();
+		if (normalized.equalsIgnoreCase("jobCenter")) {
+			normalized = "jobcenter";
+		}
+		try {
+			return OpportunityType.valueOf(normalized.toLowerCase(Locale.ROOT));
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Unknown --opportunity '" + value
+				+ "'. Choose one of: hospital, spa, baeder, jobcenter");
+		}
+	}
+
+	private static Modes4Accessibility parseMode(String value) {
+		Modes4Accessibility mode = parseEnum(Modes4Accessibility.class, value, "--mode");
+		if (!ANALYSIS_MODES.contains(mode)) {
+			throw new IllegalArgumentException("Unsupported --mode '" + value
+				+ "'. Choose one of: " + ANALYSIS_MODES);
+		}
+		return mode;
+	}
+
+	private static <T extends Enum<T>> T parseEnum(Class<T> type, String value, String key) {
+		try {
+			return Enum.valueOf(type, value.trim());
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Unknown " + key + " '" + value + "'. Choose one of: "
+				+ List.of(type.getEnumConstants()));
+		}
+	}
+
+	private static void printUsage(PrintStream out) {
+		out.println("""
+			Person-based accessibility for Berlin.
+
+			Single combination:
+			  java -jar accessibility-cluster.jar \\
+			    --opportunity <hospital|spa|baeder|jobcenter> \\
+			    --scenario <base|policy> \\
+			    --mode <car|pt|teleportedWalk>
+
+			All combinations (4 opportunities x 2 scenarios x 3 modes):
+			  java -jar accessibility-cluster.jar --all
+
+			Options:
+			  --output-root <dir>            Policy run root (default: the current Berlin policy root)
+			  --base-dir <dir>               Base run dir (default: <output-root>/base)
+			  --scenario-dir <dir>           Exact scenario dir; overrides --output-root/--base-dir
+			  --work-dir <dir>               Base scratch dir (default: <java.io.tmpdir>/matsim-acc)
+			  --r-input-dir <dir>            Root for the R input folders
+			  --hospital-input-dir <dir>     Dir containing the hospital WFS XML files
+			  --version <v>                  Berlin scenario version, used in file names (default: 6.4)
+			  --network-file <file>          Override network file
+			  --plans-file <file>            Override plans file
+			  --transit-schedule-file <file> Override transit schedule file
+			  --events-file <file>           Override events file
+			  --plankrankenhaeuser-xml <f>   Override plankrankenhaeuser.xml
+			  --weitere-krankenhaeuser-xml <f> Override weitere_krankenhaeuser.xml
+			  --baeder-geojson <file>        Override baeder.geojson
+			  --measure-type <rawSum|logSum|gravity>  Accessibility measure (default: rawSum)
+			  --dry-run                      Print resolved paths and combinations without running
+			  --help                         Show this help
+			""");
+	}
+
+	private static final class RunOptions {
+		OpportunityType opportunity;
+		RunScenario scenario;
+		Modes4Accessibility mode;
+		AccessibilityConfigGroup.AccessibilityMeasureType measureType =
+			AccessibilityConfigGroup.AccessibilityMeasureType.rawSum;
+
+		String outputRoot = DEFAULT_OUTPUT_ROOT;
+		String baseDir;
+		String scenarioDir;
+		String workDir;
+		String rInputDir = DEFAULT_R_INPUT_DIR;
+		String hospitalInputDir;
+		String version = DEFAULT_VERSION;
+
+		String networkFile;
+		String plansFile;
+		String transitScheduleFile;
+		String eventsFile;
+		String plankrankenhaeuserXml;
+		String weitereKrankenhaeuserXml;
+		String baederGeoJson;
+
+		boolean all;
+		boolean dryRun;
+
+		RunOptions copy() {
+			RunOptions copy = new RunOptions();
+			copy.opportunity = opportunity;
+			copy.scenario = scenario;
+			copy.mode = mode;
+			copy.measureType = measureType;
+			copy.outputRoot = outputRoot;
+			copy.baseDir = baseDir;
+			copy.scenarioDir = scenarioDir;
+			copy.workDir = workDir;
+			copy.rInputDir = rInputDir;
+			copy.hospitalInputDir = hospitalInputDir;
+			copy.version = version;
+			copy.networkFile = networkFile;
+			copy.plansFile = plansFile;
+			copy.transitScheduleFile = transitScheduleFile;
+			copy.eventsFile = eventsFile;
+			copy.plankrankenhaeuserXml = plankrankenhaeuserXml;
+			copy.weitereKrankenhaeuserXml = weitereKrankenhaeuserXml;
+			copy.baederGeoJson = baederGeoJson;
+				copy.all = all;
+			copy.dryRun = dryRun;
+			return copy;
+		}
+	}
+
+	private static final class RunCombination {
+		final OpportunityType opportunity;
+		final RunScenario scenario;
+		final Modes4Accessibility mode;
+		final AccessibilityConfigGroup.AccessibilityMeasureType measureType;
+
+		RunCombination(RunOptions options) {
+			this.opportunity = options.opportunity;
+			this.scenario = options.scenario;
+			this.mode = options.mode;
+			this.measureType = options.measureType;
+		}
+
+		@Override
+		public String toString() {
+			return opportunity + "/" + scenario + "/" + mode + "/" + measureType;
+		}
+	}
+
+//	== Run orchestration ==
+
+	private static void runAll(RunOptions baseOptions) {
+		int total = 0;
+		int failed = 0;
+		List<String> failures = new ArrayList<>();
+
+//		Run policy first: it is the scenario whose files are currently available.
+		for (OpportunityType opportunity : OpportunityType.values()) {
+			for (RunScenario runScenario : List.of(RunScenario.policy, RunScenario.base)) {
+				for (Modes4Accessibility mode : ANALYSIS_MODES) {
+					total++;
+					RunOptions options = baseOptions.copy();
+					options.opportunity = opportunity;
+					options.scenario = runScenario;
+					options.mode = mode;
+
+					String label = new RunCombination(options).toString();
+					try {
+						runCombination(options);
+					} catch (Exception e) {
+						failed++;
+						failures.add(label + " -> " + e.getMessage());
+						LOG.error("Combination {} failed; continuing with the next one.", label, e);
+					}
+				}
+			}
+		}
+
+		LOG.info("Finished {} combinations, {} failed.", total, failed);
+		if (failed > 0) {
+			failures.forEach(failure -> LOG.error("FAILED: {}", failure));
+			throw new RuntimeException(failed + " of " + total + " combinations failed");
+		}
+	}
+
+	private static void runCombination(RunOptions options) {
+		resolvePaths(options);
+		RunCombination combination = new RunCombination(options);
+
+		if (options.dryRun) {
+			LOG.info("Dry run: {}", combination);
+			LOG.info("  scenario dir:  {}", options.scenarioDir);
+			LOG.info("  work dir:      {}", options.workDir);
+			LOG.info("  network:       {}", options.networkFile);
+			LOG.info("  plans:         {}", options.plansFile);
+			LOG.info("  transit:       {}", options.transitScheduleFile);
+			LOG.info("  events:        {}", options.eventsFile);
+			LOG.info("  R input dir:   {}", options.opportunity.outputDir(options.rInputDir));
+			return;
+		}
+
+		LOG.info("=== Running {} ===", combination);
+		long start = System.currentTimeMillis();
+
+		loadFiles(options);
+
+//		== Write POI locations for mapping in R ==
+		String outputDir = options.opportunity.outputDir(options.rInputDir);
+		writeLocationsCSV(options.opportunity,
+			new File(outputDir, "locations.csv").getPath());
 
 //		== Calculate accessibility ==
-		String eventsFile = OUTPUT_DIR + "berlin-v6.3.output_events.xml.gz";
-		long start = System.currentTimeMillis();
-		String accessibilityType = personBased ? "person-based" : "location-based";
-		LOG.info(
-			"Calculating {} {} accessibility for {} scenario using {}...",
-			accessibilityType,
-			targetMode,
-			runScenario,
-			measureType
-		);
-
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(
-			scenario, eventsFile, List.of(opportunity.activityType()));
+			scenario, options.eventsFile, List.of(options.opportunity.activityType()));
 
-		PersonBasedResultsComparator dataListener = null;
-		if (personBased) {
-			dataListener = new PersonBasedResultsComparator();
-			builder.addDataListener(dataListener);
-		}
-		builder.build().run() ;
+		PersonBasedResultsComparator dataListener = new PersonBasedResultsComparator();
+		builder.addDataListener(dataListener);
+		builder.build().run();
 
 		long ms = System.currentTimeMillis() - start;
 		long seconds = ms / 1000;
 		long minutes = seconds / 60;
 		LOG.info("Accessibility computation finished in {} minutes (≈ {} seconds)", minutes, seconds);
 
-		if (personBased){
-			Map<Tuple<Person, Double>, Map<String, Double>> accessibilitiesMap = dataListener.getAccessibilitiesMap();
-			String outputDir = opportunity.outputDir();
-			writeCSV(accessibilitiesMap, outputDir + "pbAcc_" + targetMode + "_" + runScenario + "_" + measureType + ".csv");
-			writePersonsCSV(accessibilitiesMap, outputDir + "persons_" + targetMode + "_" + runScenario + ".csv");
-		}
+		Map<Tuple<Person, Double>, Map<String, Double>> accessibilitiesMap =
+			dataListener.getAccessibilitiesMap();
+		writeCSV(accessibilitiesMap, new File(outputDir,
+			"pbAcc_" + options.mode + "_" + options.scenario + "_" + options.measureType + ".csv").getPath());
+		writePersonsCSV(accessibilitiesMap, new File(outputDir,
+			"persons_" + options.mode + "_" + options.scenario + ".csv").getPath());
 	}
 
-	private static void loadFiles(boolean personBased, Modes4Accessibility targetMode,
-	                              AccessibilityConfigGroup.AccessibilityMeasureType measureType,
-	                              OpportunityType opportunity) {
+	private static void resolvePaths(RunOptions options) {
+		if (options.hospitalInputDir == null) {
+			options.hospitalInputDir = new File(options.outputRoot, "input").getPath();
+		}
 
-//		== Input Files ==
-		String networkFile 			= OUTPUT_DIR + "berlin-v6.3.output_network.xml.gz";
-		//String facilitiesFile 	= OUTPUT_DIR + "berlin-v6.3.output_facilities.xml.gz";//manually set facilities
-		String plansFile			= OUTPUT_BASE + "berlin-v6.3.output_plans.xml.gz";
-		String transitScheduleFile 	= OUTPUT_DIR + "berlin-v6.3.output_transitSchedule.xml.gz";
+		if (options.scenarioDir == null) {
+			options.scenarioDir = switch (options.scenario) {
+				case policy -> options.outputRoot;
+				case base -> options.baseDir != null
+					? options.baseDir
+					: new File(options.outputRoot, "base").getPath();
+			};
+		}
 
+//		The controller output hierarchy is not used for results (this class writes its own
+//		CSV files), but it is instantiated as an eager singleton. Give every combination
+//		its own scratch directory so parallel cluster jobs never write into the read-only
+//		scenario input folders or into each other's directories.
+		File workRoot = options.workDir != null
+			? new File(options.workDir)
+			: new File(System.getProperty("java.io.tmpdir"), "matsim-acc");
+		options.workDir = new File(workRoot,
+			options.scenario + File.separator + options.opportunity + File.separator
+				+ options.mode + "-" + ProcessHandle.current().pid()).getPath();
+
+		options.networkFile = orDefault(options.networkFile,
+			file(options.scenarioDir, "berlin-v" + options.version + ".output_network.xml.zst"));
+		options.plansFile = orDefault(options.plansFile,
+			file(options.scenarioDir, "berlin-v" + options.version + ".output_plans.xml.zst"));
+		options.transitScheduleFile = orDefault(options.transitScheduleFile,
+			file(options.scenarioDir, "berlin-v" + options.version + ".output_transitSchedule.xml.zst"));
+		options.eventsFile = orDefault(options.eventsFile,
+			file(options.scenarioDir, "berlin-v" + options.version + ".output_events.xml.zst"));
+
+		options.plankrankenhaeuserXml = orDefault(options.plankrankenhaeuserXml,
+			file(options.hospitalInputDir, "plankrankenhaeuser.xml"));
+		options.weitereKrankenhaeuserXml = orDefault(options.weitereKrankenhaeuserXml,
+			file(options.hospitalInputDir, "weitere_krankenhaeuser.xml"));
+		options.baederGeoJson = orDefault(options.baederGeoJson,
+			file(new File(options.rInputDir, "baeder").getPath(), "baeder.geojson"));
+	}
+
+	private static String file(String parent, String child) {
+		return new File(parent, child).getPath();
+	}
+
+	private static String orDefault(String value, String defaultValue) {
+		return value != null ? value : defaultValue;
+	}
+
+	private static void loadFiles(RunOptions options) {
 //		== Create config ==
 		final Config config = ConfigUtils.createConfig();
 
 //		== Adjust config ==
 		config.controller().setLastIteration(0);
-		config.controller().setOutputDirectory(OUTPUT_DIR);
+		config.controller().setOutputDirectory(options.workDir);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.global().setCoordinateSystem(CRS);
 		config.routing().setRoutingRandomness(0.);
@@ -152,35 +528,25 @@ public class RunPersonBasedAccBerlin {
 		// add monetary distance rate for car
 		config.scoring().getModes().get(TransportMode.car).setMonetaryDistanceRate(-0.0002);
 
-		config.network().setInputFile(networkFile);
-		//config.facilities().setInputFile(facilitiesFile);
+		config.network().setInputFile(options.networkFile);
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
-		config.plans().setInputFile(plansFile);
-		config.transit().setTransitScheduleFile(transitScheduleFile);
-
+		config.plans().setInputFile(options.plansFile);
+		config.transit().setTransitScheduleFile(options.transitScheduleFile);
 
 //		== Accessibility config ==
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setPersonBased(personBased);
-		acg.setAccessibilityMeasureType(measureType);
-		acg.setTimeOfDay(8*60*60.);
+		acg.setPersonBased(PERSON_BASED);
+		acg.setAccessibilityMeasureType(options.measureType);
+		acg.setTimeOfDay(8 * 60 * 60.);
 		acg.setTileSize_m(1000);
-		if (personBased) {
-			acg.setAreaOfAccessibilityComputation(
-				AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromPopulation
-			);
-		} else {
-			acg.setAreaOfAccessibilityComputation(
-				AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromBoundingBox
-			);
-		}
+		acg.setAreaOfAccessibilityComputation(
+			AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromPopulation);
 
 //		== Mode selection ==
-		List<Modes4Accessibility> accModes = List.of(targetMode);
-		for(Modes4Accessibility mode : Modes4Accessibility.values()) {
+		List<Modes4Accessibility> accModes = List.of(options.mode);
+		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 			acg.setComputingAccessibilityForMode(mode, accModes.contains(mode));
 		}
-
 
 //		== Load scenario ==
 		scenario = ScenarioUtils.loadScenario(config);
@@ -189,24 +555,20 @@ public class RunPersonBasedAccBerlin {
 		ActivityFacilities activityFacilities = scenario.getActivityFacilities();
 		ActivityFacilitiesFactory af = activityFacilities.getFactory();
 
-//		--- Opportunities (hospital or spa, selected by OpportunityType) ---
-		ActivityOption activityOption = af.createActivityOption(opportunity.activityType());
-		switch (opportunity) {
-			case hospital -> addHospitals(activityFacilities, af, activityOption);
+//		--- Opportunities (selected by OpportunityType) ---
+		ActivityOption activityOption = af.createActivityOption(options.opportunity.activityType());
+		switch (options.opportunity) {
+			case hospital -> addHospitals(activityFacilities, af, activityOption, options);
 			case spa -> addSpas(activityFacilities, af, activityOption);
+			case baeder -> addGeoJsonOpportunities(activityFacilities, af, activityOption,
+				options.baederGeoJson, location -> true);
+			case jobcenter -> addJobcenters(activityFacilities, af, activityOption);
 		}
-
 
 //		== Assigning home coords for each person ==
 		int[] kept = {0};
 		int[] skipped = {0};
-		int[] limit = {0};
 		scenario.getPopulation().getPersons().values().removeIf(person -> {
-//			if (limit[0] >= 1000){	//todo set limit how many person(s) get parsed
-//				skipped[0]++;
-//				return true;
-//			}
-
 			Plan selectedPlan = person.getSelectedPlan();
 			if (selectedPlan == null) {
 				LOG.warn("Skipping {} (no plan)", person.getId());
@@ -233,12 +595,10 @@ public class RunPersonBasedAccBerlin {
 			person.getAttributes().putAttribute("homeY", home.getCoord().getY());
 
 			kept[0]++;
-			limit[0]++;
 			return false;
 		});
 		LOG.info("Sanity check: {} persons kept with valid home coords, {} skipped", kept[0], skipped[0]);
 		LOG.info("Final population size after filtering: {}", scenario.getPopulation().getPersons().size());
-
 
 //		== Bounding box from persons home coords ==
 		double minX = Double.POSITIVE_INFINITY;
@@ -259,17 +619,13 @@ public class RunPersonBasedAccBerlin {
 		acg.setBoundingBoxBottom(minY).setBoundingBoxTop(maxY)
 			.setBoundingBoxLeft(minX).setBoundingBoxRight(maxX);
 		LOG.info("Bounding box set to: minX={}, maxX={}, minY={}, maxY={}", minX, maxX, minY, maxY);
-
-//		== Run ==
-		LOG.info("Running person-based accessibility computation for Berlin...");
-
 	}
 
-//	Kept for the spa-based reference run; uncomment together with the spa block in loadFiles().
+//	Kept for the spa-based reference run.
 	private static void addSpas(
 		ActivityFacilities facilities,
 		ActivityFacilitiesFactory factory,
-		ActivityOption activityOption){
+		ActivityOption activityOption) {
 		for (Spa spa : SPAS) {
 			ActivityFacility facility = factory.createActivityFacility(
 				Id.create(spa.name(), ActivityFacility.class),
@@ -281,16 +637,28 @@ public class RunPersonBasedAccBerlin {
 		LOG.info("Added {} spas as accessibility opportunities", SPAS.size());
 	}
 
+//	Job centers are a fixed list of sites, handled exactly like the spas.
+	private static void addJobcenters(
+		ActivityFacilities facilities,
+		ActivityFacilitiesFactory factory,
+		ActivityOption activityOption) {
+		for (Jobcenter jobcenter : JOBCENTERS) {
+			ActivityFacility facility = factory.createActivityFacility(
+				Id.create(jobcenter.name(), ActivityFacility.class),
+				new Coord(jobcenter.x(), jobcenter.y())
+			);
+			facility.addActivityOption(activityOption);
+			facilities.addActivityFacility(facility);
+		}
+		LOG.info("Added {} job centers as accessibility opportunities", JOBCENTERS.size());
+	}
+
 	private static class PersonBasedResultsComparator implements PersonDataExchangeInterface {
-		private final Map<Tuple<Person, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
+		private final Map<Tuple<Person, Double>, Map<String, Double>> accessibilitiesMap = new HashMap<>();
 
 		@Override
 		public synchronized void setPersonAccessibilities(Person person, Double timeOfDay, String mode, double accessibility) {
 			Tuple<Person, Double> key = new Tuple<>(person, timeOfDay);
-//			if (!accessibilitiesMap.containsKey(key)) {
-//				Map<String,Double> accessibilitiesByMode = new HashMap<>();
-//				accessibilitiesMap.put(key, accessibilitiesByMode);
-//			}
 			/*FIX: using computeIfAbsent to ensure inner map (mode → accessibility values)
 			always exists for each (person, time) tuple. without this, accessibilitiesMap.get(key)
 			could return null, causing NullPointerException when calling .put(mode, accessibility).*/
@@ -377,47 +745,111 @@ public class RunPersonBasedAccBerlin {
 	}
 
 	/**
-	 * Writes spa and hospital locations (EPSG:25832) to a single CSV for mapping in R.
-	 * One row per location, with a {@code type} column to distinguish spas from hospitals.
+	 * Writes the locations of the selected opportunity type (EPSG:25832) to a CSV for mapping in R.
+	 * One row per location, with a {@code type} column to distinguish the opportunity source.
 	 */
-	private static void writeLocationsCSV(String csvFile) {
-		new File(csvFile).getParentFile().mkdirs();
-		try (FileWriter writer = new FileWriter(csvFile)) {
+	private static void writeLocationsCSV(OpportunityType opportunity, String csvFile) {
+		File target = new File(csvFile);
+		target.getParentFile().mkdirs();
+//		Parallel cluster jobs share locations.csv per opportunity; write a private
+//		temp file and move it into place so readers never see a partial file.
+		File temp = new File(target.getParentFile(),
+			target.getName() + ".tmp." + ProcessHandle.current().pid());
+		int rows = 0;
+		try (FileWriter writer = new FileWriter(temp)) {
 			writer.write("type,id,name,x,y,district,beds,street,house_number,postal_code,gisid,source_layer\n");
 
-			for (Spa spa : SPAS) {
-				writer.write(String.join(",",
-					csv("spa"),
-					csv(spa.name()),
-					csv(spa.name()),
-					Double.toString(spa.x()),
-					Double.toString(spa.y()),
-					csv(spa.district()),
-					"", "", "", "", "", ""
-				) + "\n");
-			}
-
-			for (Hospital hospital : hospitalLocations) {
-				Map<String, String> attributes = hospital.attributes();
-				writer.write(String.join(",",
-					csv("hospital"),
-					csv(hospital.id()),
-					csv(hospital.name()),
-					Double.toString(hospital.x()),
-					Double.toString(hospital.y()),
-					csv(attributes.getOrDefault("district", "")),
-					csv(attributes.getOrDefault("beds", "")),
-					csv(attributes.getOrDefault("street", "")),
-					csv(attributes.getOrDefault("house_number", "")),
-					csv(attributes.getOrDefault("postal_code", "")),
-					csv(attributes.getOrDefault("gisid", "")),
-					csv(attributes.getOrDefault("source_layer", ""))
-				) + "\n");
+			switch (opportunity) {
+				case spa -> {
+					for (Spa spa : SPAS) {
+						writer.write(String.join(",",
+							csv("spa"),
+							csv(spa.name()),
+							csv(spa.name()),
+							Double.toString(spa.x()),
+							Double.toString(spa.y()),
+							csv(spa.district()),
+							"", "", "", "", "", ""
+						) + "\n");
+						rows++;
+					}
+				}
+				case hospital -> {
+					for (Hospital hospital : hospitalLocations) {
+						Map<String, String> attributes = hospital.attributes();
+						writer.write(String.join(",",
+							csv("hospital"),
+							csv(hospital.id()),
+							csv(hospital.name()),
+							Double.toString(hospital.x()),
+							Double.toString(hospital.y()),
+							csv(attributes.getOrDefault("district", "")),
+							csv(attributes.getOrDefault("beds", "")),
+							csv(attributes.getOrDefault("street", "")),
+							csv(attributes.getOrDefault("house_number", "")),
+							csv(attributes.getOrDefault("postal_code", "")),
+							csv(attributes.getOrDefault("gisid", "")),
+							csv(attributes.getOrDefault("source_layer", ""))
+						) + "\n");
+						rows++;
+					}
+				}
+				case jobcenter -> {
+					for (Jobcenter jobcenter : JOBCENTERS) {
+						writer.write(String.join(",",
+							csv("jobcenter"),
+							csv(jobcenter.name()),
+							csv(jobcenter.name()),
+							Double.toString(jobcenter.x()),
+							Double.toString(jobcenter.y()),
+							csv(jobcenter.district()),
+							"", "", "", "", "", ""
+						) + "\n");
+						rows++;
+					}
+				}
+				case baeder -> {
+					for (GeoJsonOpportunity location : geoJsonLocations) {
+						Map<String, String> attributes = location.attributes();
+						writer.write(String.join(",",
+							csv(opportunity.activityType()),
+							csv(location.id()),
+							csv(location.name()),
+							Double.toString(location.x()),
+							Double.toString(location.y()),
+							csv(firstNonEmpty(attributes.get("bezirk"), attributes.get("district"))),
+							csv(firstNonEmpty(attributes.get("betten"), attributes.get("beds"))),
+							csv(firstNonEmpty(attributes.get("adresse"), attributes.get("street"))),
+							csv(firstNonEmpty(attributes.get("hausnummer"), attributes.get("house_number"))),
+							csv(firstNonEmpty(attributes.get("postleitzahl"), attributes.get("postal_code"))),
+							csv(firstNonEmpty(attributes.get("gml_id"), attributes.get("gisid"))),
+							csv(firstNonEmpty(attributes.get("source_layer"), opportunity.activityType()))
+						) + "\n");
+						rows++;
+					}
+				}
 			}
 		} catch (IOException e) {
+			temp.delete();
 			throw new RuntimeException("Error writing locations CSV", e);
 		}
-		LOG.info("Wrote {} spa and {} hospital locations to {}", SPAS.size(), hospitalLocations.size(), csvFile);
+
+		try {
+			Files.move(temp.toPath(), target.toPath(),
+				StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+		} catch (AtomicMoveNotSupportedException e) {
+			try {
+				Files.move(temp.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException moveError) {
+				temp.delete();
+				throw new RuntimeException("Error moving locations CSV into place", moveError);
+			}
+		} catch (IOException e) {
+			temp.delete();
+			throw new RuntimeException("Error moving locations CSV into place", e);
+		}
+
+		LOG.info("Wrote {} {} locations to {}", rows, opportunity.activityType(), csvFile);
 	}
 
 	private static String csv(String value) {
@@ -442,10 +874,34 @@ public class RunPersonBasedAccBerlin {
 		new Spa("kristall", 786190.0, 5791400.0, "NA (Ludwigsfelde)")
 	);
 
+	private record Jobcenter(String name, double x, double y, String district) {}
+
+//	One site per Berlin job center (one per district), EPSG:25832.
+//	Coordinates: Google Maps lookup of the address on 2026-11-16, converted from WGS84.
+	private static final List<Jobcenter> JOBCENTERS = List.of(
+		new Jobcenter("mitte", 798698.44, 5826935.14, "001_Mitte"),                                    // Seydelstraße 2-5, 10117
+		new Jobcenter("friedrichshain-kreuzberg", 801337.60, 5828666.40, "002_Friedrichshain-Kreuzberg"), // Landsberger Allee 50/52, 10249
+		new Jobcenter("pankow", 802068.37, 5829842.42, "003_Pankow"),                                  // Storkower Str. 133, 10407
+		new Jobcenter("charlottenburg-wilmersdorf", 792616.09, 5828353.94, "004_Charlottenburg-Wilmersdorf"), // Goslarer Ufer 37, 10589
+		new Jobcenter("spandau", 783921.00, 5828572.10, "005_Spandau"),                                // Altonaer Str. 70/72, 13581
+		new Jobcenter("steglitz-zehlendorf", 793563.59, 5820041.03, "006_Steglitz-Zehlendorf"),        // Birkbuschstraße 10, 12167
+		new Jobcenter("tempelhof-schoeneberg", 797488.57, 5820537.45, "007_Tempelhof-Schöneberg"),     // Wolframstraße 89-92, 12105
+		new Jobcenter("neukoelln", 800647.83, 5823553.86, "008_Neukölln"),                             // Mainzer Str. 27, 12053
+		new Jobcenter("treptow-koepenick", 806846.77, 5820236.07, "009_Treptow-Köpenick"),             // Groß-Berliner Damm 73 A-E, 12487
+		new Jobcenter("marzahn-hellersdorf", 807063.57, 5829242.13, "010_Marzahn-Hellersdorf"),        // Allee der Kosmonauten 29, 12681
+		new Jobcenter("lichtenberg", 804448.81, 5828153.84, "011_Lichtenberg"),                        // Gotlindestraße 93, 10365
+		new Jobcenter("reinickendorf", 791900.76, 5834857.02, "012_Reinickendorf")                     // Miraustraße 54, 13509
+	);
+
 	private record Hospital(String id, String name, double x, double y,
 	                        Map<String, String> attributes) {}
 
 	private static List<Hospital> hospitalLocations = new ArrayList<>();
+
+	private record GeoJsonOpportunity(String id, String name, double x, double y,
+	                                  Map<String, String> attributes) {}
+
+	private static List<GeoJsonOpportunity> geoJsonLocations = new ArrayList<>();
 
 	private static final String WFS_NS = "http://www.opengis.net/wfs/2.0";
 	private static final String GML_NS = "http://www.opengis.net/gml/3.2";
@@ -536,10 +992,11 @@ public class RunPersonBasedAccBerlin {
 
 	private static void addHospitals(ActivityFacilities facilities,
 	                                 ActivityFacilitiesFactory factory,
-	                                 ActivityOption option) {
-		List<Hospital> plank = parseWfsFile(PLANKRANKENHAEUSER_XML, "plankrankenhaus",
+	                                 ActivityOption option,
+	                                 RunOptions options) {
+		List<Hospital> plank = parseWfsFile(options.plankrankenhaeuserXml, "plankrankenhaus",
 			"kkh_standort", "betten_insgesamt");
-		List<Hospital> weitere = parseWfsFile(WEITERE_KRANKENHAEUSER_XML, "weitere_krankenhaus",
+		List<Hospital> weitere = parseWfsFile(options.weitereKrankenhaeuserXml, "weitere_krankenhaus",
 			"name", "betten");
 
 		List<Hospital> all = new ArrayList<>(plank.size() + weitere.size());
@@ -560,4 +1017,166 @@ public class RunPersonBasedAccBerlin {
 			all.size(), plank.size(), weitere.size());
 	}
 
+//	== GeoJSON opportunities (baeder) ==
+
+	/**
+	 * Parses a GeoJSON FeatureCollection and adds every feature that passes {@code filter}
+	 * as an activity facility, i.e. the same representation used for the WFS/XML opportunities.
+	 * <p>
+	 * Only point features are supported. All coordinates are transformed to EPSG:25832, so
+	 * downstream code sees the same CRS as for the XML sources.
+	 */
+	private static void addGeoJsonOpportunities(ActivityFacilities facilities,
+	                                            ActivityFacilitiesFactory factory,
+	                                            ActivityOption option,
+	                                            String path,
+	                                            Predicate<GeoJsonOpportunity> filter) {
+		List<GeoJsonOpportunity> parsed = parseGeoJson(path);
+		List<GeoJsonOpportunity> selected = parsed.stream().filter(filter).toList();
+		geoJsonLocations = selected;
+
+		for (GeoJsonOpportunity opportunity : selected) {
+			ActivityFacility facility = factory.createActivityFacility(
+				Id.create(opportunity.id(), ActivityFacility.class),
+				new Coord(opportunity.x(), opportunity.y()));
+			facility.addActivityOption(option);
+			opportunity.attributes().forEach((key, value) -> facility.getAttributes().putAttribute(key, value));
+			facilities.addActivityFacility(facility);
+		}
+
+		LOG.info("Added {} of {} GeoJSON features from {} as {} opportunities",
+			selected.size(), parsed.size(), path, option.getType());
+	}
+
+	private static List<GeoJsonOpportunity> parseGeoJson(String path) {
+		JsonObject root;
+		try (FileReader reader = new FileReader(path)) {
+			root = JsonParser.parseReader(reader).getAsJsonObject();
+		} catch (IOException e) {
+			throw new RuntimeException("Could not read GeoJSON file '" + path + "'.", e);
+		}
+
+		MathTransform transform = geoJsonTransform(root, path);
+		JsonArray features = root.has("features") ? root.getAsJsonArray("features") : new JsonArray();
+		List<GeoJsonOpportunity> opportunities = new ArrayList<>(features.size());
+
+		for (int i = 0; i < features.size(); i++) {
+			JsonObject feature = features.get(i).getAsJsonObject();
+			JsonObject properties = feature.has("properties") && feature.get("properties").isJsonObject()
+				? feature.getAsJsonObject("properties")
+				: new JsonObject();
+			JsonObject geometry = feature.has("geometry") && feature.get("geometry").isJsonObject()
+				? feature.getAsJsonObject("geometry")
+				: null;
+
+			double[] coordinate = representativePoint(geometry, transform);
+			if (coordinate == null) {
+				LOG.warn("Skipping GeoJSON feature {} from {} because its coordinate could not be parsed.",
+					i, path);
+				continue;
+			}
+
+			Map<String, String> attributes = new LinkedHashMap<>();
+			for (Map.Entry<String, JsonElement> entry : properties.entrySet()) {
+				JsonElement value = entry.getValue();
+				if (value != null && !value.isJsonNull()) {
+					attributes.put(entry.getKey(),
+						value.isJsonPrimitive() ? value.getAsString() : value.toString());
+				}
+			}
+
+			String id = firstNonEmpty(attributes.get("gml_id"), attributes.get("id"), String.valueOf(i));
+			String name = firstNonEmpty(
+				attributes.get("name_des_schwimmbads"),
+				attributes.get("name"),
+				attributes.get("uebergeord"),
+				id);
+			attributes.putIfAbsent("name", name);
+
+			opportunities.add(new GeoJsonOpportunity(id, name, coordinate[0], coordinate[1], attributes));
+		}
+
+		LOG.info("Parsed {} GeoJSON features from {}", opportunities.size(), path);
+		return opportunities;
+	}
+
+	/**
+	 * Builds the transformation from the GeoJSON's CRS (usually CRS84/WGS84 lon-lat) to EPSG:25832.
+	 */
+	private static MathTransform geoJsonTransform(JsonObject root, String path) {
+		String sourceCode = "4326";
+		if (root.has("crs") && root.get("crs").isJsonObject()) {
+			JsonObject crs = root.getAsJsonObject("crs");
+			if (crs.has("properties") && crs.get("properties").isJsonObject()) {
+				JsonObject properties = crs.getAsJsonObject("properties");
+				String name = properties.has("name") ? properties.get("name").getAsString() : "";
+				sourceCode = epsgCodeOf(name, sourceCode);
+			}
+		}
+
+		try {
+//			Geographic CRS in GeoJSON is lon/lat; projected CRS use their natural easting/northing order.
+			boolean longitudeFirst = sourceCode.equals("4326");
+			CoordinateReferenceSystem source = org.geotools.referencing.CRS.decode(
+				"EPSG:" + sourceCode, longitudeFirst);
+			CoordinateReferenceSystem target = org.geotools.referencing.CRS.decode(CRS);
+			return org.geotools.referencing.CRS.findMathTransform(source, target, true);
+		} catch (FactoryException e) {
+			throw new RuntimeException("Could not create CRS transformation from EPSG:" + sourceCode
+				+ " to " + CRS + " for GeoJSON file '" + path + "'.", e);
+		}
+	}
+
+	private static String epsgCodeOf(String crsName, String fallback) {
+		if (crsName == null || crsName.isBlank()
+			|| crsName.toUpperCase().contains("CRS84")
+			|| crsName.contains("4326")) {
+			return "4326";
+		}
+		Matcher matcher = Pattern.compile("EPSG[:/]{1,2}(\\d+)").matcher(crsName);
+		return matcher.find() ? matcher.group(1) : fallback;
+	}
+
+	private static double[] representativePoint(JsonObject geometry, MathTransform transform) {
+		if (geometry == null || !geometry.has("type") || !geometry.has("coordinates")) {
+			return null;
+		}
+
+		JsonElement coordinates = geometry.get("coordinates");
+		return switch (geometry.get("type").getAsString()) {
+			case "Point" -> transformPosition(coordinates.getAsJsonArray(), transform);
+			case "MultiPoint" -> {
+				JsonArray points = coordinates.getAsJsonArray();
+				yield points.isEmpty() ? null : transformPosition(points.get(0).getAsJsonArray(), transform);
+			}
+			default -> {
+				LOG.warn("Unsupported GeoJSON geometry type '{}'", geometry.get("type").getAsString());
+				yield null;
+			}
+		};
+	}
+
+	private static double[] transformPosition(JsonArray position, MathTransform transform) {
+		if (position == null || position.size() < 2) {
+			return null;
+		}
+		double[] coordinate = {position.get(0).getAsDouble(), position.get(1).getAsDouble()};
+		try {
+			transform.transform(coordinate, 0, coordinate, 0, 1);
+			return coordinate;
+		} catch (TransformException e) {
+			LOG.warn("Could not transform coordinate ({}, {}): {}",
+				coordinate[0], coordinate[1], e.getMessage());
+			return null;
+		}
+	}
+
+	private static String firstNonEmpty(String... values) {
+		for (String value : values) {
+			if (value != null && !value.isBlank()) {
+				return value;
+			}
+		}
+		return "";
+	}
 }

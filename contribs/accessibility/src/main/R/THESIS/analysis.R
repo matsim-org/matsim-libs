@@ -16,17 +16,94 @@ suppressPackageStartupMessages({
 # Directories
 # ==========================================================
 
-base_dir     <- "."
-opportunity  <- "hospital"   # "hospital" or "spa" (matches OpportunityType in RunPersonBasedAccBerlin)
-input_dir    <- file.path(base_dir, "input")
-hospital_dir <- file.path(input_dir, opportunity)
-output_dir   <- file.path(base_dir, "output", opportunity)
+base_dir     <- "/home/brendan/Documents/arbeit/abmtrans_paper"
+input_dir    <- base_dir
+
+# Berlin district shapefile and S-Bahn ring: static files kept in the repo,
+# independent of where the run folders are.
+shape_dir <- path.expand(
+  "~/git/matsim-libs/contribs/accessibility/src/main/R/THESIS/input/Berlin shapefiles"
+)
+
+# Run folders from the cluster, one per scenario, as written by
+# run-person-based-acc-berlin-<scenario>.sh: <date>[a-z]-<scenario>/<opportunity>/...
+# Change the folder names here when you use results from another day or rerun.
+run_dirs <- list(
+  base   = file.path(input_dir, "2026-11-16-base"),
+  policy = file.path(input_dir, "2026-11-16-policy")
+)
+
+# Results go to output/<date>-output/, named after the policy run folder,
+# e.g. input 2026-11-16-policy -> output/2026-11-16-output/<opportunity>/
+run_label   <- sub("-policy$", "", basename(run_dirs$policy))
+output_root <- file.path(base_dir, "output", paste0(run_label, "-output"))
+
+missing_run_dirs <- Filter(function(d) !dir.exists(d), run_dirs)
+if (length(missing_run_dirs) > 0) {
+  stop("Run folder(s) not found: ", paste(unlist(missing_run_dirs), collapse = ", "))
+}
+
+# Opportunities to analyse in one go. The whole analysis below runs once per
+# entry. Any of: "hospital", "spa", "baeder", "jobCenter".
+# Use a single entry, e.g. c("baeder"), to run just one.
+opportunities <- c("hospital", "spa", "jobCenter")
+
+# Metadata for every POI type written by RunPersonBasedAccBerlin.
+# The list names are the input/output folder names; `type` is the value in
+# locations.csv (the Java OpportunityType activity type).
+poi_meta <- list(
+  hospital = list(
+    type = "hospital", label = "Hospital",
+    color = "#1f78b4", shape = 16, label_points = FALSE
+  ),
+  spa = list(
+    type = "spa", label = "Spa",
+    color = "#e31a1c", shape = 17, label_points = TRUE
+  ),
+  baeder = list(
+    type = "baeder", label = "Public bath",
+    color = "#33a02c", shape = 15, label_points = TRUE
+  ),
+  jobCenter = list(
+    type = "jobcenter", label = "Job center",
+    color = "#ff7f00", shape = 18, label_points = TRUE
+  )
+)
+
+unknown_opportunities <- setdiff(opportunities, names(poi_meta))
+if (length(unknown_opportunities) > 0) {
+  stop(
+    "Unknown opportunity '", paste(unknown_opportunities, collapse = "', '"),
+    "'. Choose from: ", paste(names(poi_meta), collapse = ", ")
+  )
+}
+
+poi_types  <- vapply(poi_meta, `[[`, character(1), "type")
+poi_labels <- vapply(poi_meta, `[[`, character(1), "label")
+poi_colors <- vapply(poi_meta, `[[`, character(1), "color")
+poi_shapes <- vapply(poi_meta, `[[`, numeric(1), "shape")
 
 beta <- 1
 
 # ==========================================================
 # Read input data
 # ==========================================================
+
+# Income is a continuous value per person, so it is grouped into five
+# equal-sized groups (quintiles), labelled with their income range,
+# e.g. "249-1167", "1168-1571", ... Persons with the same income always land
+# in the same group, so the groups are only approximately equal in size.
+income_quintile <- function(income) {
+  breaks <- unique(quantile(income, probs = seq(0, 1, 0.2), na.rm = TRUE, names = FALSE))
+  if (length(breaks) < 2) {
+    return(factor(rep(NA_character_, length(income)), ordered = TRUE))
+  }
+  n      <- length(breaks) - 1
+  lower  <- c(floor(breaks[1]), floor(breaks[2:n]) + 1)[seq_len(n)]
+  upper  <- floor(breaks[-1])
+  labels <- paste0(lower, "-", upper)
+  cut(income, breaks = breaks, labels = labels, include.lowest = TRUE, ordered_result = TRUE)
+}
 
 clean_df <- function(df){
   df %>%
@@ -38,33 +115,8 @@ clean_df <- function(df){
         levels = c("f", "m")
       ),
       accessibility = as.numeric(accessibility),
-      income = case_when(
-        income %in% c(499, 500) ~ "500",
-        income == 900  ~ "900",
-        income == 1500 ~ "1500",
-        income == 2000 ~ "2000",
-        income == 2600 ~ "2600",
-        income == 3000 ~ "3000",
-        income == 3600 ~ "3600",
-        income == 4600 ~ "4600",
-        income == 5600 ~ "5600",
-        TRUE ~ NA_character_
-      ),
-      income = factor(
-        income,
-        levels = c(
-          "500",
-          "900",
-          "1500",
-          "2000",
-          "2600",
-          "3000",
-          "3600",
-          "4600",
-          "5600"
-        ),
-        ordered = TRUE
-      )
+      income_raw = as.numeric(income),
+      income = income_quintile(income_raw)
     )
 }
 
@@ -73,14 +125,55 @@ read_acc <- function(file){
     clean_df()
 }
 
-# Hospital-based accessibility results (current run)
-twalk_df <- read_acc(file.path(hospital_dir, "pbAcc_teleportedWalk_base_rawSum.csv"))
-pt_df <- read_acc(file.path(hospital_dir, "pbAcc_pt_base_rawSum.csv"))
-car_base_df <- read_acc(file.path(hospital_dir, "pbAcc_car_base_rawSum.csv"))
-car_policy_df <- read_acc(file.path(hospital_dir, "pbAcc_car_policy_rawSum.csv"))
-car_base_no_income_df <- read_acc(file.path(hospital_dir, "pbAcc_car_no_income.csv"))
+# ==========================================================
+# Per-opportunity analysis
+# ==========================================================
+# Everything from here to the end of the file runs once per opportunity.
+# If one opportunity fails (e.g. an input file is missing), the error is
+# reported and the loop continues with the next one.
+# To step through a single opportunity by hand: set e.g. opportunity <- "baeder"
+# and run the lines inside the loop.
 
-# Spa-based reference run (kept for later refactoring)
+failed_opportunities <- character(0)
+
+for (opportunity in opportunities) {
+message("\n===== Opportunity: ", opportunity, " =====")
+opportunity_ok <- tryCatch({
+
+# input folder of this opportunity, per scenario
+scenario_dirs <- lapply(run_dirs, function(d) file.path(d, opportunity))
+output_dir   <- file.path(output_root, opportunity)
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+poi <- poi_meta[[opportunity]]
+
+# Accessibility results for the selected POI (current run)
+twalk_df <- read_acc(file.path(scenario_dirs$base, "pbAcc_teleportedWalk_base_rawSum.csv"))
+pt_df <- read_acc(file.path(scenario_dirs$base, "pbAcc_pt_base_rawSum.csv"))
+car_base_df <- read_acc(file.path(scenario_dirs$base, "pbAcc_car_base_rawSum.csv"))
+car_policy_df <- read_acc(file.path(scenario_dirs$policy, "pbAcc_car_policy_rawSum.csv"))
+
+# Income range and number of persons per quintile, for reporting
+income_quintiles <- twalk_df %>%
+  group_by(income) %>%
+  summarise(
+    min_income = min(income_raw),
+    max_income = max(income_raw),
+    persons = n(),
+    .groups = "drop"
+  )
+write_csv(income_quintiles, file.path(output_dir, "income_quintiles.csv"))
+
+# Optional: base car run without income integration. If the file is missing,
+# the income-integration table and plots are skipped for this opportunity.
+no_income_file <- file.path(scenario_dirs$base, "pbAcc_car_no_income.csv")
+has_no_income  <- file.exists(no_income_file)
+if (has_no_income) {
+  car_base_no_income_df <- read_acc(no_income_file)
+} else {
+  message("No pbAcc_car_no_income.csv for '", opportunity, "': skipping income-integration outputs.")
+}
+
+# Legacy spa-based reference run (kept for later refactoring)
 # twalk_df <- read_acc(file.path(input_dir, "pbAcc_teleportedWalk_base_rawSum.csv"))
 # pt_df <- read_acc(file.path(input_dir, "pbAcc_pt_base_rawSum.csv"))
 # car_base_df <- read_acc(file.path(input_dir, "pbAcc_car_base_rawSum.csv"))
@@ -107,12 +200,21 @@ df <- twalk_df %>%
     car_policy_df %>%
       select(personId, car_policy_rawSum = accessibility),
     by = "personId"
-  ) %>%
-  left_join(
-    car_base_no_income_df %>% 
-      select(personId, car_base_logSum_no_income = accessibility),
-    by = "personId"
-  ) %>% 
+  )
+
+if (has_no_income) {
+  df <- df %>%
+    left_join(
+      car_base_no_income_df %>%
+        select(personId, car_base_logSum_no_income = accessibility),
+      by = "personId"
+    )
+} else {
+  # keep the column so the rest of the script runs unchanged (values are NA)
+  df$car_base_logSum_no_income <- NA_real_
+}
+
+df <- df %>%
   relocate(
     twalk_rawSum,
     pt_rawSum,
@@ -126,7 +228,7 @@ df <- twalk_df %>%
 # Add district
 # ==========================================================
 
-berlin_sf <- st_read("input/Berlin shapefiles/Berlin_Bezirke.shp", quiet = TRUE)
+berlin_sf <- st_read(file.path(shape_dir, "Berlin_Bezirke.shp"), quiet = TRUE)
 
 if (is.na(st_crs(berlin_sf))) st_crs(berlin_sf) <- 25832
 if (st_crs(berlin_sf)$epsg != 25832) {
@@ -279,7 +381,8 @@ theme_set(
     )
 )
 
-# income integration
+# income integration (only if the no-income run is available)
+if (has_no_income) {
 
 # summary table income integration
 table_summary_income_integration <- df_acc %>%
@@ -315,6 +418,8 @@ boxplot_base_car_deltaacc_by_income <- ggplot(df_acc, aes(income, base_car_delta
     y = "Car accessibility change (utils)"
   )
 ggsave(file.path(output_dir, "boxplot_base_car_deltaacc_by_income.png"), boxplot_base_car_deltaacc_by_income, dpi = 300, width = 8, height = 5)
+
+} # end income integration
 
 # scatter base car & mm accessibility
 scatter_car_mm_acc_base <- ggplot(df_acc, aes(car_logSum_base, mm_logSum_base)) +
@@ -567,16 +672,23 @@ write_csv(
 )
 
 # ==========================================================
-# Map of spa and hospital locations
+# Map of POI locations
 # ==========================================================
 # locations.csv is written by RunPersonBasedAccBerlin (EPSG:25832),
-# one row per location with type = "spa" or "hospital".
+# one row per location with type = "hospital", "spa", "baeder" or "jobcenter".
 
-locations_csv <- file.path(hospital_dir, "locations.csv")
+# Both scenarios write the same locations.csv; take whichever exists.
+locations_csv <- file.path(scenario_dirs$policy, "locations.csv")
 if (!file.exists(locations_csv)) {
-  locations_csv <- file.path(input_dir, "locations.csv")
+  locations_csv <- file.path(scenario_dirs$base, "locations.csv")
 }
-map_dir <- file.path(base_dir, "output/maps", opportunity)
+if (!file.exists(locations_csv)) {
+  stop(
+    "locations.csv not found for opportunity '", opportunity, "' at ",
+    locations_csv, ". Run RunPersonBasedAccBerlin for this opportunity first."
+  )
+}
+map_dir <- file.path(output_root, "maps", opportunity)
 dir.create(map_dir, recursive = TRUE, showWarnings = FALSE)
 
 locations_sf <- read_csv(locations_csv, show_col_types = FALSE) %>%
@@ -584,8 +696,8 @@ locations_sf <- read_csv(locations_csv, show_col_types = FALSE) %>%
   mutate(
     type = factor(
       type,
-      levels = c("hospital", "spa"),
-      labels = c("Hospital", "Spa")
+      levels = unname(poi_types),
+      labels = unname(poi_labels)
     )
   ) %>%
   st_as_sf(
@@ -601,15 +713,15 @@ berlin_bbox <- st_bbox(berlin_sf)
 # member), so it must be transformed to the map CRS before plotting;
 # fill = NA keeps it as an outline instead of hiding the districts below.
 ring_sf <- st_read(
-  file.path(input_dir, "Berlin shapefiles", "Berlin_sbahn_ring.geojson"),
+  file.path(shape_dir, "Berlin_sbahn_ring.geojson"),
   quiet = TRUE
 )
 if (is.na(st_crs(ring_sf))) st_crs(ring_sf) <- 4326
 ring_sf <- st_transform(ring_sf, 25832)
 
 plot_locations_map <- function(locations,
-                               title = "Spa and hospital locations in Berlin",
-                               show_spa_labels = FALSE,
+                               title = paste0(poi$label, " locations in Berlin"),
+                               label_points = poi$label_points,
                                show_ring = TRUE) {
   p <- ggplot() +
     geom_sf(
@@ -638,12 +750,12 @@ plot_locations_map <- function(locations,
       alpha = 0.85
     ) +
     scale_color_manual(
-      values = c(Hospital = "#1f78b4", Spa = "#e31a1c"),
-      drop = FALSE
+      values = stats::setNames(unname(poi_colors), unname(poi_labels)),
+      drop = TRUE
     ) +
     scale_shape_manual(
-      values = c(Hospital = 16, Spa = 17),
-      drop = FALSE
+      values = stats::setNames(unname(poi_shapes), unname(poi_labels)),
+      drop = TRUE
     ) +
     coord_sf(
       xlim = c(berlin_bbox["xmin"], berlin_bbox["xmax"]),
@@ -660,14 +772,14 @@ plot_locations_map <- function(locations,
       plot.title = element_text(face = "bold", hjust = 0.5)
     )
 
-  if (show_spa_labels) {
+  if (label_points) {
     p <- p +
       geom_sf_text(
-        data = filter(locations, type == "Spa"),
+        data = locations,
         aes(label = name),
         size = 3,
         vjust = -1,
-        check_overlap = FALSE,
+        check_overlap = TRUE,
         color = "grey20"
       )
   }
@@ -675,44 +787,11 @@ plot_locations_map <- function(locations,
   p
 }
 
-# Combined map, spa names labelled
-map_locations <- plot_locations_map(
-  locations_sf,
-  title = "Spa and hospital locations in Berlin",
-  show_spa_labels = TRUE
-)
+# Locations of the selected POI
+map_locations <- plot_locations_map(locations_sf)
 ggsave(
-  file.path(map_dir, "map_spa_hospital_locations.png"),
+  file.path(map_dir, paste0("map_", opportunity, "_locations.png")),
   map_locations,
-  dpi = 300,
-  width = 8,
-  height = 6.5,
-  bg = "white"
-)
-
-# Spas only
-map_spas <- plot_locations_map(
-  filter(locations_sf, type == "Spa"),
-  title = "Spa locations in Berlin",
-  show_spa_labels = TRUE
-)
-ggsave(
-  file.path(map_dir, "map_spa_locations.png"),
-  map_spas,
-  dpi = 300,
-  width = 8,
-  height = 6.5,
-  bg = "white"
-)
-
-# Hospitals only
-map_hospitals <- plot_locations_map(
-  filter(locations_sf, type == "Hospital"),
-  title = "Hospital locations in Berlin"
-)
-ggsave(
-  file.path(map_dir, "map_hospital_locations.png"),
-  map_hospitals,
   dpi = 300,
   width = 8,
   height = 6.5,
@@ -728,7 +807,7 @@ ggsave(
 
 read_persons <- function(mode, scenario) {
   path <- file.path(
-    hospital_dir,
+    scenario_dirs[[scenario]],
     paste0("persons_", mode, "_", scenario, ".csv")
   )
 
@@ -741,29 +820,20 @@ read_persons <- function(mode, scenario) {
 }
 
 # Reads one mode's accessibility for a scenario: the persons file if it exists,
-# otherwise the matching pbAcc file. Files are looked up in input/<opportunity>/
-# first, then in the legacy input/ directory. Modes that are unchanged by the
+# otherwise the matching pbAcc file, from that scenario's run folder
+# (run_dirs$<scenario>/<opportunity>/). Modes that are unchanged by the
 # policy reuse their base file when the policy file is missing.
 policy_unchanged_modes <- c("pt", "teleportedWalk")
 
 read_mode_accessibility <- function(mode, scenario) {
   candidates <- c(
-    file.path(hospital_dir, paste0("persons_", mode, "_", scenario, ".csv")),
-    file.path(hospital_dir, paste0("pbAcc_", mode, "_", scenario, "_rawSum.csv")),
-    file.path(input_dir, paste0("persons_", mode, "_", scenario, ".csv")),
-    file.path(input_dir, paste0("pbAcc_", mode, "_", scenario, "_rawSum.csv"))
+    file.path(scenario_dirs[[scenario]], paste0("persons_", mode, "_", scenario, ".csv")),
+    file.path(scenario_dirs[[scenario]], paste0("pbAcc_", mode, "_", scenario, "_rawSum.csv"))
   )
 
   path <- Find(file.exists, candidates)
 
   if (!is.null(path)) {
-    if (!startsWith(path, hospital_dir)) {
-      message(
-        "Using ", basename(path), " from input/ (not found in ",
-        basename(hospital_dir), "/)"
-      )
-    }
-    # legacy files may carry extra columns (suppress the resulting readr warning)
     return(suppressWarnings(read_csv(path, show_col_types = FALSE)))
   }
 
@@ -982,4 +1052,18 @@ for (mode in c("car", "pt", "teleportedWalk", "mm")) {
   }
 }
 
+# ---- end of per-opportunity analysis ----
+TRUE
+}, error = function(e) {
+  message("FAILED for '", opportunity, "': ", conditionMessage(e))
+  FALSE
+})
+if (!opportunity_ok) failed_opportunities <- c(failed_opportunities, opportunity)
+}
 
+message(
+  "\nDone. Succeeded: ",
+  paste(setdiff(opportunities, failed_opportunities), collapse = ", "),
+  if (length(failed_opportunities) > 0)
+    paste0(" | Failed: ", paste(failed_opportunities, collapse = ", "))
+)
