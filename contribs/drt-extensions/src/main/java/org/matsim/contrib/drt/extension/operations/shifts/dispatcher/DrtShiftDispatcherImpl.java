@@ -461,7 +461,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 endingShift.vehicle(),
                 anchor.start().time,
                 endingShift.vehicle().getServiceEndTime(),
-                endingShift.vehicle().getServiceEndTime() - timer.getTimeOfDay(),
+                endingShift.vehicle().getServiceEndTime(),
                 types);
 
         if (maybeFacility.isEmpty()) {
@@ -589,7 +589,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 endingShift.vehicle(),
                 start.time,
                 endingShift.shift().getEndTime(),
-                endingShift.vehicle().getServiceEndTime() - timer.getTimeOfDay(),
+                endingShift.vehicle().getServiceEndTime(),
                 types);
         if (maybeFacility.isPresent()) {
             OperationFacility shiftChangeFacility = maybeFacility.get().operationFacility();
