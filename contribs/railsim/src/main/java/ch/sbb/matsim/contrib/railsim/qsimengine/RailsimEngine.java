@@ -691,8 +691,10 @@ final class RailsimEngine implements Steppable {
 
 			released.add(tailLink);
 
+			// The next tail link can be the same link: a new route usually starts on the link where the previous
+			// one ended (see nextTailLink). Its position has been reduced above, so the loop has to stop here.
 			if (Objects.equals(state.tailLink, tailLink.getLinkId()))
-				break; // link appears twice in the route, its position has decreased already
+				break;
 
 			tailLink = nextTailLink;
 		}
