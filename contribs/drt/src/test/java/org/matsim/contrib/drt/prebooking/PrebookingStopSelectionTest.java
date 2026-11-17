@@ -184,6 +184,25 @@ public class PrebookingStopSelectionTest {
 	}
 
 	@Test
+	void testGroupBookingAtTheActivityEndHoldsAllMembersUntilScheduled() {
+		// "book first, then walk" for a group: both members are held in the activity until the one group request is
+		// scheduled, then both walk to the chosen stop
+		PrebookingTestEnvironment environment = pickupEnvironment(2, DEPARTURE_TIME, false) //
+				.addRequest("personB", 3, 5, 3, 9, DEPARTURE_TIME, DEPARTURE_TIME);
+		Controler controller = environment.build();
+		PrebookingGroupTest.installPrebooking(controller);
+		Result result = run(environment, controller);
+
+		assertThat(result.drtDepartures).extracting(e -> e.getLinkId()).containsExactly(STOP_B, STOP_B);
+		assertThat(environment.getRequestInfo().get("personA").drtRequestId)
+				.isEqualTo(environment.getRequestInfo().get("personB").drtRequestId);
+		assertThat(result.originActivityEnds).singleElement()
+				.satisfies(time -> assertThat(time).isBetween(DEPARTURE_TIME + 1, DEPARTURE_TIME + 5));
+		assertThat(result.finalArrivalLinks).containsExactly(DESTINATION, DESTINATION);
+		assertThat(result.stuck).isEmpty();
+	}
+
+	@Test
 	void testTwoCandidatesDropOffOnTheWay() {
 		Result withOne = runDropoff(1);
 		Result withTwo = runDropoff(2);
