@@ -88,7 +88,8 @@ plans  --[DefaultCapabilityPersonFilter]-->  the persons the analysis speaks for
                      |
   step 3             v
        --[CapabilityTravelTimes]-->  per-mode travel time, routed on the fly
-                     |               (a precomputed car / bike / pt matrix is still to come)
+                     |               (network modes at free speed, pt by SwissRailRaptor;
+                     |                a precomputed matrix is still to come)
   step 4             v
        --[InsertionCalculator]-->  feasibility, slack, detour and utility per place and mode
                      |
@@ -129,7 +130,7 @@ The code is split into one package per step of the method, under `capability`:
 | `capability.structure` | `FundamentalPlanExtractor` | reduces a plan to its mandatory activities, keeping their times |
 | | `FreePeriod` | splits the remaining day into insertion positions - where elastic home lives |
 | | `CapabilityTimeline` | the day as blocks on a 00:00-24:00 axis, with the soft home boundaries |
-| `capability.measure` | `CapabilityTravelTimes` | free speed on each mode's own part of the network, teleported walk |
+| `capability.measure` | `CapabilityTravelTimes` | free speed on each mode's own part of the network, SwissRailRaptor for pt, teleported walk |
 | | `InsertionCalculator` | feasibility, slack, detour and `u_potential` for one position and place |
 | | `FlexibilityFunction` | how total flexible time becomes utility. `LOG` only so far |
 | | `InsertionCost` | what an insertion costs, `VoT * t_extra` by default |
@@ -154,15 +155,32 @@ controler.addOverridingModule(CapabilityModule.withPlaces(places));
 times are computed follows the **config of the run**, so that the analysis never contradicts the scenario
 it is analysing:
 
-| the run's `routing` says | the analysis does |
+| the run's config says | the analysis does |
 |---|---|
-| the mode is a `networkModes` entry | least cost paths over the links that allow the mode, at `min(link free speed, mode speed)` |
+| the mode is a `transit.transitModes` entry and the scenario has a schedule | door to door `SwissRailRaptor`, see [Public transport](#public-transport) |
+| the mode is walk | beeline distance x `beelineDistanceFactor` / `teleportedModeSpeed`, **always** |
+| the mode is a `routing.networkModes` entry | least cost paths over the links that allow the mode, at `min(link free speed, mode speed)` |
 | the mode has a teleported speed | beeline distance x `beelineDistanceFactor` / `teleportedModeSpeed` |
-| neither | fails, naming the mode |
+| none of the four | fails, naming the mode |
 
-Being a network mode wins, which matters for bike: MATSim's own config defaults give bike a teleported
+The order matters, because a mode can satisfy several rows. Being a **transit mode wins over everything**
+- MATSim's own config defaults route `pt` by a free speed factor, and a scenario that carries a schedule
+is meant to be analysed on the schedule. **Walk is never routed on the network**, even in a scenario that
+routes it there: beeline distance times the detour factor is MATSim's own treatment of walking, and it is
+also exactly the walk `SwissRailRaptor` builds for its access and egress legs, so the walk mode, the walk
+inside a pt trip and the walk a pt trip falls back to are all one and the same walk. Otherwise being a
+**network mode wins over a teleported speed**, which matters for bike: the defaults give bike a teleported
 speed of 15 km/h *as well*, and a scenario that routes bike on the network is meant to be analysed on the
 network.
+
+**A teleported walk speed is therefore required**, whether or not walk is one of the analysed modes,
+because a pt trip that cannot be routed falls back to walking. It is read from the `walk` teleported mode
+parameters of the run - the ones a walk leg of the simulation uses - and the analysis says in the log
+which parameter set it took. Note that `SwissRailRaptor` looks for `transit_walk` and `non_network_walk`
+*before* `walk` when it sets up its own beeline walk, so a config that keeps MATSim's default helper
+modes around can have the access walk inside a pt trip run at a different speed from the walk mode of the
+analysis. A config that clears the defaults and declares `walk` alone - which the Dresden config does -
+has them agree.
 
 **Where a mode's speed comes from.** From the `maximumVelocity` of the vehicle type whose id is the mode
 - MATSim's own convention (`modeVehicleTypesFromVehiclesData`), and what `contribs/bicycle` reads too, so
@@ -194,6 +212,141 @@ differ in speed alone and nothing else, which is tidier. It was rejected because
 not noise but **bias in the direction of the question**: a place in a car-free street would be measured
 from the nearest link that does carry cars, hundreds of metres away, understating the advantage of cycling
 exactly where cycling has one. For a car-free zone policy case that is the result, not a rounding error.
+
+### Public transport
+
+`pt` is routed by **`SwissRailRaptor`**, the router the scenario itself uses, on the scenario's own
+transit schedule and with the raptor parameters of its config - so a pt travel time of the analysis is
+the one the run would have produced. Everything door to door is in it: the access walk, the **wait**,
+the rides, the transfers and the egress walk.
+
+```
+java -cp matsim-msp.jar org.matsim.contrib.msp.capability.RunCapabilityAnalysis \
+    --input-directory output/ --places large-supermarkets.csv --shp study-area.shp
+```
+
+**What to do to include pt**, in full:
+
+1. **Ask for the mode.** `pt` has to be among the modes the analysis reports on, either as
+   `--modes car,walk,pt` on the command line or as `<param name="modes" value="car,walk,pt" />` in the
+   `capability` module of the config. There is no default: the schedule is only read when a transit mode
+   is actually asked for, so a car-and-bike analysis of a scenario with a schedule pays nothing for it.
+2. **Make the schedule findable.** A file whose name contains `transitschedule` in the input directory
+   is picked up on its own, which is what a MATSim output directory gives you
+   (`output_transitSchedule.xml.gz`). Otherwise pass `--transit-schedule`, which takes a path *or a URL* -
+   handy for the Dresden scenarios, whose schedules live on the VSP svn. `--transit-vehicles` does the
+   same for the transit vehicles; they are optional, since their capacities are only read with capacity
+   constraints switched on.
+3. **Have a teleported walk speed in the config.** The `routing` module needs
+   `teleportedModeParameters` for `walk`, because a pt trip that cannot be routed falls back to walking.
+   The Dresden `capability-config.xml` already has it.
+
+Nothing else: `useTransit` is switched on for you when a transit mode is asked for and a schedule is
+found. A transit mode with no schedule to route it on is an error naming the mode, not an empty result -
+every person unable to reach anything by pt would look like a finding rather than like the missing input
+it is.
+
+Three things are worth knowing when reading a pt row:
+
+- **Waiting is part of the travel time**, which is the whole point, and it is also what makes pt the
+  expensive mode: the travel time genuinely depends on *when* the agent leaves, so nothing can be cached
+  per pair of places the way the network modes are. Every query is a full raptor search.
+- **A trip the raptor cannot route is walked instead.** The raptor builds a direct walk as a fallback but
+  then discards any route with no pt leg in it, because its `intermodalLegOnlyHandling` defaults to
+  `forbid` - so it answers "no connection" both where walking simply beats pt and where nothing runs at
+  all. Neither is a reason to call the place unreachable, since the agent still has legs, so the trip
+  falls back to the **teleported walk of the run**, and a pt row means "by pt, or on foot where pt is no
+  use". The number does not jump at the boundary: the fallback walk is the same beeline walk the raptor
+  would have built. Where nothing runs *and* the place is far, the fallback returns a walk of hours and
+  the insertion then fails on the deadline or on `maxExtraTravelTime` - the honest outcome, and visible
+  in the walking distance of the row. The log says how often the fallback was taken.
+- **Both trips are routed from the earliest time the agent could set off, not from when it would.** The
+  way in is routed from the start of the free period and the way out from the moment the agent arrives at
+  the place. Those are the only times the step knows before the activity is placed, and they give the
+  *earliest possible arrival*, which is what `slack` needs. But the waiting they contain is then also
+  charged to `t_extra`, and that is an approximation in both directions: an agent whose free period
+  starts at 00:00 is routed as if it set off at midnight, so where the timetable has a gap there the
+  detour comes out far too long and `maxExtraTravelTime` may prune a place the agent could easily reach
+  at 09:00. Dresden runs night services, so period 0 is still the best insertion for 19% of the pt rows
+  against 35% of the car rows - but in a scenario without night service that first period would be dead
+  for pt. **Optimising the departure time within the period is the obvious next step for pt**, and the
+  one thing that would change pt results materially.
+
+**How long it takes.** The analysis logs its progress every 5% with the time elapsed and an estimate of
+what is left, and afterwards reports per mode how many travel time queries it took and how long they
+took. Routing on the fly is essentially the whole runtime, so these two numbers are what to look at
+before reaching for a precomputed matrix.
+
+Measured on the **Dresden 1% scenario** (8596 persons, 5332 of them analysed, 28 supermarkets,
+`--skip-insertions`, a schedule of 2238 lines and 74 613 stops, one core of an M-series laptop):
+
+```
+The analysis took 0:17:34.
+Mode 'car':  660345 travel time queries in 211.6 s, 0.3205 ms each. 0 of them (0.0%) could not be routed at all.
+Mode 'walk': 660345 travel time queries in   0.0 s, 0.0000 ms each. 0 of them (0.0%) could not be routed at all.
+Mode 'pt':   660345 travel time queries in 841.3 s, 1.2740 ms each. 0 of them (0.0%) could not be routed at all.
+Mode 'pt': 168789 of the 660345 trips (25.6%) had no pt connection and were walked instead.
+```
+
+So **pt is about four times the cost of car per query and three quarters of the runtime**, and the whole
+thing scales linearly with the population: the same analysis on a 10% scenario is of the order of **3
+hours** on one core. That is slow but not prohibitive, which is the answer to whether the pt matrix is
+urgent - it is not, as long as the analysis is run once per scenario rather than in a loop. The two
+cheaper things to do first, in this order, are to **parallelise over persons** (the persons are
+independent, and one `SwissRailRaptor` per thread over the same `SwissRailRaptorData` is all it takes)
+and to **prune by beeline distance before routing**, since `maxExtraTravelTime` currently prunes a
+facility only after all three trips to it have been routed.
+
+What the run says about the measure itself, on level 3 for `shop`:
+
+| mode | persons reaching at least one shop | mean shops reached | median `min_walk_distance` |
+|---|---|---|---|
+| car | 98.1% | 13.99 | 0 m |
+| pt | 71.5% | 2.96 | 1210 m |
+| walk | 59.5% | 1.33 | 5097 m |
+
+Walk's median of 5 km is not a bug and is worth understanding: `min_walk_distance` is the **whole
+detour**, `walk_in + walk_out`, while `maxExtraTravelTime` bounds only the *extra* over the direct trip
+(limitation 5 below). A shop on the way home is never pruned however far the way home is, so a person
+who walks a long way anyway can walk a long way past a shop. That is exactly the kind of thing the
+walking distance column is there to make visible.
+
+### Walking distance
+
+Every trip the analysis routes reports **how far of it the agent walks**, alongside how long it takes:
+
+| mode | walking distance of a trip |
+|---|---|
+| walk | the whole trip, i.e. beeline x `beelineDistanceFactor` |
+| pt | the access walk to the first stop, the walks of any transfers, and the egress walk from the last stop - and the whole trip where it [fell back to walking](#public-transport) |
+| car, bike, any other network mode | zero |
+
+This is **not a cost**. The measure prices a detour in time (`c_insertion = VoT * t_extra`) and the
+walking distance is not in it. It is a statement about *who could make the trip*: the walk to the stop is
+the part of a pt trip a person with reduced mobility may not be able to do, and the part of a walk trip
+that is the whole trip. Recording it per trip is what will let the output be read per person once
+persons with and without reduced mobility are told apart, and it is what a **cap on the walking distance
+- ideally read from a person attribute** - would be applied to. Nothing is capped yet.
+
+Zero for car and bike is a **simplification**: the walk to where the vehicle is parked is not modelled.
+It is also what makes a future cap behave correctly for those modes - it never bites.
+
+The columns, one per level, all in metres:
+
+| level | columns |
+|---|---|
+| 1, insertion | `walk_in`, `walk_out` - the way to the place and the way on - plus `walk_direct`, the same for the trip the agent was making anyway, so the *extra* walking of the insertion is available from the row too |
+| 2, facility | `best_walk_distance` (`walk_in + walk_out` of the best insertion) and `min_walk_distance` (the least walking any possible insertion of this place asks for) |
+| 3, person | the same two, over the facilities: `best_walk_distance` is the walking that comes with the best the person can do, `min_walk_distance` the least they have to walk to perform the activity *anywhere at all* |
+
+`min_walk_distance` is the one to compare against what a person can walk, on both aggregated levels: it
+says whether the opportunity is within reach on foot at all, which the insertion or facility that happens
+to maximise utility need not be. On level 3 it is the natural reduced-mobility indicator - a person whose
+nearest opportunity is 200 m away keeps it whatever they can walk, while one whose nearest is 1.5 km away
+loses it as soon as a cap bites.
+
+The modes MATSim spells as walking are listed in one place, `CapabilityTravelTimes.WALK_MODES`, which is
+also where a per-person cap would read them from.
 
 ### Which persons are analysed
 
@@ -286,7 +439,8 @@ usually wants.
 person_id, mode, act_type, facility_id, facility_name, facility_sub_type, insertion_id,
 slack, t_extra, c_insertion, u_0, t_typ, k, u_potential, n_mandatory_act, n_fixed_act,
 period_from, period_to, origin_act, dest_act, origin_x, origin_y, dest_x, dest_y,
-facility_x, facility_y, earliest_start, latest_start, travel_in, travel_out
+facility_x, facility_y, earliest_start, latest_start, travel_in, travel_out,
+walk_in, walk_out, walk_direct
 ```
 
 Each row carries the parameters its own utility was computed with (`u_0`, `t_typ`, `k`), so the whole
@@ -301,7 +455,8 @@ destination for the trip the agent was making anyway, dotted lines through the f
 ```
 person_id, mode, act_type, facility_id, facility_name, facility_sub_type,
 n_mandatory_act, n_fixed_act, n_insertions, best_insertion_id,
-best_slack, best_t_extra, sum_slack, c_insertion_min, u_potential_max
+best_slack, best_t_extra, sum_slack, c_insertion_min, u_potential_max,
+best_walk_distance, min_walk_distance
 ```
 
 **Level 3**, `capability_persons.csv`:
@@ -309,7 +464,8 @@ best_slack, best_t_extra, sum_slack, c_insertion_min, u_potential_max
 ```
 person_id, mode, act_type, n_mandatory_act, n_fixed_act,
 n_reachable_facilities, n_sub_types, n_insertions,
-u_potential_max, u_star, cost_logsum, beta_1, beta_2
+u_potential_max, u_star, cost_logsum, beta_1, beta_2,
+best_walk_distance, min_walk_distance
 ```
 
 `cost_logsum` is the accessibility-contrib style measure over the costs alone, kept for comparison with
@@ -412,7 +568,11 @@ Recorded here because they bound what the numbers mean:
 3. **No car availability or reduced mobility.** Every analysed person is assumed able to use every
    configured mode. Age *is* filtered on (`minAge`, default 18), but only to decide who is analysed at
    all - it does not restrict which modes they may use. `CapabilityPersonFilter` is the hook for more.
-4. **Car at free speed only**, no congestion. Public transport is not implemented; bike is (see *Modes*).
+   The [walking distance](#walking-distance) is now recorded per trip, which is the input a cap on how
+   far a person can walk will need, but **nothing is capped yet**: the columns are reported, not applied.
+4. **Car at free speed only**, no congestion. Public transport is routed on the schedule but on the
+   *planned* timetable, so it has no delays either, and the trip out of a facility is routed from the
+   arrival time rather than from the departure time - see [Public transport](#public-transport).
 5. **`maxExtraTravelTime` bounds the detour, not the total trip**, so a place exactly on the way to work is
    never pruned however far away it is.
 6. **Several occasions do not add up.** Because insertions → facility is a maximum, a person who could go

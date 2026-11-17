@@ -28,6 +28,7 @@ import org.matsim.core.router.TripStructureUtils;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -78,8 +79,14 @@ import java.util.Map;
  *     together with the point above.</li>
  *     <li><b>No car availability or reduced mobility.</b> Every analysed person is assumed able to use
  *     every configured mode. {@link DefaultCapabilityPersonFilter} does filter on age, but only to decide
- *     who is analysed at all - it does not restrict which modes they may use.</li>
- *     <li><b>Car at free speed only.</b> Congestion is not accounted for.</li>
+ *     who is analysed at all - it does not restrict which modes they may use. How far each trip is walked
+ *     <i>is</i> recorded now ({@link CapabilityTravelTimes.Trip#walkDistance()}), which is the input a cap
+ *     on how far a person can walk will need, but nothing is capped yet: the columns are reported, not
+ *     applied.</li>
+ *     <li><b>Car at free speed only.</b> Congestion is not accounted for. Public transport is routed on
+ *     the schedule, but on the planned timetable, so it has no delays either - and the trip out of a
+ *     facility is routed from the arrival time rather than from the departure time, see
+ *     {@link CapabilityTravelTimes.PublicTransport}.</li>
  *     <li><b>Several occasions do not add up.</b> Taking the maximum over the insertions of a facility
  *     means that a person who could go in the morning <i>or</i> in the evening scores the same as one
  *     who can only go in the evening; {@code sum_slack} on level 2 is the only trace of the difference.
@@ -90,9 +97,11 @@ import java.util.Map;
 public final class CapabilityAnalysis {
 
 	/**
-	 * How often the progress through the population is reported, in percent.
+	 * How often the progress through the population is reported, in percent. Small enough that a run
+	 * over a 10% population - which takes long enough for the remaining time to be worth knowing - says
+	 * something before it is a fifth of the way through.
 	 */
-	private static final int PROGRESS_STEP = 10;
+	private static final int PROGRESS_STEP = 5;
 
 	private static final Logger log = LogManager.getLogger(CapabilityAnalysis.class);
 
@@ -175,6 +184,8 @@ public final class CapabilityAnalysis {
 
 		log.info("Start analyzing capability. There are {} persons to be analyzed.", population);
 
+		long started = System.nanoTime();
+
 		try (CapabilityWriter writer = new CapabilityWriter(directory, this.writeInsertions)) {
 
 			int processed = 0;
@@ -182,34 +193,55 @@ public final class CapabilityAnalysis {
 
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				analyse(person, places, paramsByType, travelTimesByMode, counts, writer);
-				nextStep = logProgress(++processed, population, nextStep);
+				nextStep = logProgress(++processed, population, nextStep, started);
 			}
 		}
+
+		log.info("The analysis took {}.", duration(System.nanoTime() - started));
+		CapabilityTravelTimes.logQueryStatistics(travelTimesByMode);
 
 		this.filter.logSummary();
 		counts.log(population, directory);
 	}
 
 	/**
-	 * Reports how far the analysis has got, in steps of {@link #PROGRESS_STEP} percent. A population
-	 * smaller than ten persons crosses several steps with one person, so a step may be skipped - but
-	 * 100% is always reached, because the last person makes the percentage exact.
+	 * Reports how far the analysis has got, in steps of {@link #PROGRESS_STEP} percent, with the time it
+	 * has taken so far and an estimate of what is left. A population smaller than twenty persons crosses
+	 * several steps with one person, so a step may be skipped - but 100% is always reached, because the
+	 * last person makes the percentage exact.
+	 * <p>
+	 * The estimate simply extrapolates the average person so far, which is honest enough for a progress
+	 * line: the persons are analysed in the order of the population, which is not sorted by anything the
+	 * runtime depends on.
 	 *
 	 * @param processed how many persons have been through the analysis
 	 * @param population how many there are in total
 	 * @param nextStep the percentage that is still to be reported
+	 * @param started when the run over the population began, in {@link System#nanoTime()}
 	 * @return the percentage to be reported next, to be passed back in on the following person
 	 */
-	private static int logProgress(int processed, int population, int nextStep) {
+	private static int logProgress(int processed, int population, int nextStep, long started) {
 
 		int percent = (int) (100L * processed / population);
 
 		while (percent >= nextStep && nextStep <= 100) {
-			log.info("{}% complete", nextStep);
+			long elapsed = System.nanoTime() - started;
+			long remaining = (long) (elapsed * ((double) population / processed - 1));
+			log.info("{}% complete: {} of {} persons in {}, about {} left.", nextStep, processed, population,
+				duration(elapsed), duration(remaining));
 			nextStep += PROGRESS_STEP;
 		}
 
 		return nextStep;
+	}
+
+	/**
+	 * @return a duration in nanoseconds as {@code h:mm:ss}, which is readable at every scale a run of
+	 * this analysis takes
+	 */
+	private static String duration(long nanos) {
+		long seconds = nanos / 1_000_000_000L;
+		return String.format(Locale.ROOT, "%d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, seconds % 60);
 	}
 
 	/**

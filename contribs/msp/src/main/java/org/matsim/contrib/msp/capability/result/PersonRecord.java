@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.msp.capability.CapabilityConfigGroup;
 import org.matsim.contrib.msp.capability.measure.CapabilityLogsums;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -40,7 +41,8 @@ public record PersonRecord(
 	public static final String[] HEADER = {
 		"person_id", "mode", "act_type", "n_mandatory_act", "n_fixed_act",
 		"n_reachable_facilities", "n_sub_types", "n_insertions",
-		"u_potential_max", "u_star", "cost_logsum", "beta_1", "beta_2"
+		"u_potential_max", "u_star", "cost_logsum", "beta_1", "beta_2",
+		"best_walk_distance", "min_walk_distance"
 	};
 
 	/**
@@ -52,7 +54,8 @@ public record PersonRecord(
 			this.mandatoryActivities, this.fixedActivities,
 			this.facilities.size(), subTypes(), insertions(),
 			Format.utils(maxUtility()), Format.utils(utilityLogsum()), Format.utils(costLogsum()),
-			Format.utils(this.config.getBetaWithinSubType()), Format.utils(this.config.getBetaAcrossSubType())
+			Format.utils(this.config.getBetaWithinSubType()), Format.utils(this.config.getBetaAcrossSubType()),
+			Format.metres(bestWalkDistance()), Format.metres(minWalkDistance())
 		};
 	}
 
@@ -92,6 +95,32 @@ public record PersonRecord(
 		return CapabilityLogsums.nestedUtilityLogsum(this.facilities.stream()
 			.map(facility -> new CapabilityLogsums.Alternative(facility.subType(), facility.utility()))
 			.toList(), this.config);
+	}
+
+	/**
+	 * @return how far the person walks to get to the place behind {@code u_potential_max} [m],
+	 * {@link Double#NaN} if nothing is reachable. The walking that comes with the best the person can do.
+	 */
+	public double bestWalkDistance() {
+		return this.facilities.stream()
+			.max(Comparator.comparingDouble(FacilityRecord::utility))
+			.map(facility -> facility.totals().bestWalkDistance())
+			.orElse(Double.NaN);
+	}
+
+	/**
+	 * @return the least the person has to walk to perform the activity anywhere at all [m],
+	 * {@link Double#NaN} if nothing is reachable.
+	 * <p>
+	 * This is the column that will tell persons with and without reduced mobility apart: a person whose
+	 * nearest opportunity is 200 m of walking away keeps it whatever they can walk, while one whose
+	 * nearest is 1.5 km away loses it as soon as a cap bites.
+	 */
+	public double minWalkDistance() {
+		return this.facilities.stream()
+			.mapToDouble(facility -> facility.totals().minWalkDistance())
+			.min()
+			.orElse(Double.NaN);
 	}
 
 	/**

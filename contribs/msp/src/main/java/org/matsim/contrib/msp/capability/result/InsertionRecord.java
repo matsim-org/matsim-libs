@@ -24,6 +24,13 @@ import org.matsim.contrib.msp.capability.structure.FreePeriod;
  * triangle can be drawn from the row alone - a solid line from origin to destination for the trip the
  * agent was making anyway, dotted lines through the facility for the detour - plus the start time window
  * the activity could be placed in.
+ * <p>
+ * {@code walk_in} and {@code walk_out} are how far of the detour the agent goes on foot [m] - the whole
+ * way for walk, the way to and from the stops for pt, nothing for car and bike. They are not part of
+ * any utility: they say who could make this trip rather than what it is worth, which is what the
+ * analysis will need to tell persons with and without reduced mobility apart. {@code walk_direct} is the
+ * same for the trip the agent was making anyway, so that the <i>extra</i> walking of the insertion is
+ * available from the row as well.
  *
  * @param insertionId the index of the free period this insertion sits in, which is also the index of the
  * matching row of {@link CapabilityWriter#ACTIVITIES_FILE}'s free stretches. Insertions of one person
@@ -48,7 +55,8 @@ public record InsertionRecord(
 		"n_mandatory_act", "n_fixed_act",
 		"period_from", "period_to", "origin_act", "dest_act",
 		"origin_x", "origin_y", "dest_x", "dest_y", "facility_x", "facility_y",
-		"earliest_start", "latest_start", "travel_in", "travel_out"
+		"earliest_start", "latest_start", "travel_in", "travel_out",
+		"walk_in", "walk_out", "walk_direct"
 	};
 
 	/**
@@ -75,7 +83,9 @@ public record InsertionRecord(
 			Format.x(destination), Format.y(destination),
 			Format.x(this.facility.getCoord()), Format.y(this.facility.getCoord()),
 			Format.time(this.insertion.earliestStart()), Format.time(this.insertion.latestStart()),
-			Format.time(this.insertion.travelIn()), Format.time(this.insertion.travelOut())
+			Format.time(this.insertion.travelIn()), Format.time(this.insertion.travelOut()),
+			Format.metres(this.insertion.walkIn()), Format.metres(this.insertion.walkOut()),
+			Format.metres(this.insertion.walkDirect())
 		};
 	}
 }

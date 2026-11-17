@@ -16,6 +16,11 @@ import org.matsim.contrib.msp.capability.measure.InsertionCalculator.Totals;
  * the pair would describe a trip nobody can make. The two are written anyway, as diagnostics, and
  * {@code best_insertion_id} says which level 1 row the utility came from.
  * <p>
+ * {@code best_walk_distance} is how far the agent walks on that best insertion [m] and
+ * {@code min_walk_distance} the least walking any possible insertion of this place asks for. The second
+ * is the one to compare against what a person can walk: it says whether the place is within reach on
+ * foot <i>at all</i>, which the insertion that happens to maximise utility need not be.
+ * <p>
  * A row exists only where the activity can actually be performed. The absence of a row means the person
  * cannot do this here - the place is too far away, closed, or there is no stretch of the day long
  * enough.
@@ -33,7 +38,8 @@ public record FacilityRecord(
 	public static final String[] HEADER = {
 		"person_id", "mode", "act_type", "facility_id", "facility_name", "facility_sub_type",
 		"n_mandatory_act", "n_fixed_act", "n_insertions", "best_insertion_id",
-		"best_slack", "best_t_extra", "sum_slack", "c_insertion_min", "u_potential_max"
+		"best_slack", "best_t_extra", "sum_slack", "c_insertion_min", "u_potential_max",
+		"best_walk_distance", "min_walk_distance"
 	};
 
 	/**
@@ -69,7 +75,8 @@ public record FacilityRecord(
 			this.totals.insertions(), this.totals.bestIndex(),
 			Format.time(best.slack()), Format.time(best.extraTravelTime()),
 			Format.time(this.totals.sumSlack()), Format.utils(this.totals.minCost()),
-			Format.utils(utility())
+			Format.utils(utility()),
+			Format.metres(best.walkDistance()), Format.metres(this.totals.minWalkDistance())
 		};
 	}
 }

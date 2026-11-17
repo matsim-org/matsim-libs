@@ -49,9 +49,11 @@ public final class CapabilityConfigGroup extends ReflectiveConfigGroup {
 
 	/**
 	 * The modes the capability analysis reports on by default: car at free speed and teleported walk.
-	 * Bike is supported and only left out of the default because it needs the scenario to route bike on
-	 * the network - add it to {@code modes} where that is the case. Public transport and car under
-	 * congested conditions are meant to follow.
+	 * Bike and pt are supported and only left out of the default because each needs something of the
+	 * scenario - bike has to be routed on the network, pt needs a transit schedule - and a default that
+	 * silently failed on a scenario without them would be worse than one that has to be asked for. Add
+	 * them to {@code modes} where the scenario carries what they need. Car under congested conditions is
+	 * meant to follow.
 	 */
 	public static final List<String> DEFAULT_MODES = List.of(TransportMode.car, TransportMode.walk);
 

@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -25,7 +26,17 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.VehicleType;
@@ -34,6 +45,7 @@ import org.matsim.vehicles.VehicleUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -401,6 +413,131 @@ public class RunCapabilityAnalysisTest {
 	/**
 	 * Writes a config, a network and plans the way a run's output directory holds them.
 	 */
+	@Test
+	void runsWithPublicTransport() throws IOException {
+
+		Path directory = Path.of(utils.getOutputDirectory(), "run");
+		Files.createDirectories(directory);
+		writeScenario(directory);
+
+		// the schedule deliberately lives OUTSIDE the input directory, so that --transit-schedule is the
+		// thing under test rather than the lookup by name
+		Path schedule = Path.of(utils.getOutputDirectory(), "schedule.xml.gz");
+		writeTransitSchedule(schedule);
+
+		Path places = Path.of(utils.getOutputDirectory(), "places.csv");
+		Files.writeString(places, """
+			id,name,type,sub_type,x,y,opening_time,closing_time
+			far,Shop at the end of the line,shop,Edeka,10000,0,08:00:00,20:00:00
+			""");
+
+		Path output = Path.of(utils.getOutputDirectory(), "out");
+		new RunCapabilityAnalysis().execute(
+			"--input-directory", directory.toString(),
+			"--places", places.toString(),
+			"--transit-schedule", schedule.toString(),
+			"--modes", "car,walk,pt",
+			"--output", output.toString()
+		);
+
+		Map<String, List<CSVRecord>> byMode = read(output.resolve(CapabilityWriter.PERSONS_FILE)).stream()
+			.collect(Collectors.groupingBy(row -> row.get("mode")));
+
+		assertTrue(byMode.containsKey(TransportMode.pt), "pt should have a row on the person level");
+		assertEquals(byMode.get(TransportMode.car).size(), byMode.get(TransportMode.pt).size(),
+			"every analysed person has a pt row, reachable or not");
+
+		// the shop is 10 km down the line, which the commuter cannot walk there and back in the time -
+		// but the train makes it, so pt has to reach what walk does not
+		long ptReaches = byMode.get(TransportMode.pt).stream()
+			.filter(row -> Integer.parseInt(row.get("n_reachable_facilities")) > 0).count();
+		long walkReaches = byMode.get(TransportMode.walk).stream()
+			.filter(row -> Integer.parseInt(row.get("n_reachable_facilities")) > 0).count();
+
+		assertTrue(ptReaches > 0, "the shop is reachable by train");
+		assertEquals(0, walkReaches, "10 km each way is not walkable inside the day of these agents");
+
+		// and the walking of a pt trip is the walk to and from the stops, which here sit on the places
+		// themselves - so there is a column, and it is small
+		for (CSVRecord row : byMode.get(TransportMode.pt)) {
+			if (Integer.parseInt(row.get("n_reachable_facilities")) > 0) {
+				assertFalse(row.get("min_walk_distance").isBlank(),
+					"a reachable pt row carries a walking distance");
+				assertTrue(Double.parseDouble(row.get("min_walk_distance")) < 1000,
+					"the stops are at the places, so hardly any walking");
+			}
+		}
+	}
+
+	/**
+	 * A train along the line of the network, stopping at x=0 (home), x=2000 (work) and x=10000 (the
+	 * shop), every 5 minutes in both directions. The stops sit exactly on the activities and the place,
+	 * so there is next to no access or egress walk to muddle the numbers.
+	 * <p>
+	 * Each direction gets its own stop facilities, because a stop facility names one link and the two
+	 * directions run over different ones - which is how MATSim models a bidirectional line.
+	 */
+	private static void writeTransitSchedule(Path file) {
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		buildNetwork(scenario.getNetwork(), false);
+
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory factory = schedule.getFactory();
+
+		// out: 0 -> 2000 -> 10000, two minutes to work and ten to the shop
+		TransitStopFacility homeOut = stop(schedule, "home-out", 0, "0-1000");
+		TransitStopFacility workOut = stop(schedule, "work-out", 2000, "1000-2000");
+		TransitStopFacility shopOut = stop(schedule, "shop-out", 10000, "9000-10000");
+
+		// and back again
+		TransitStopFacility shopIn = stop(schedule, "shop-in", 10000, "10000-9000");
+		TransitStopFacility workIn = stop(schedule, "work-in", 2000, "2000-1000");
+		TransitStopFacility homeIn = stop(schedule, "home-in", 0, "1000-0");
+
+		List<Id<Link>> there = new ArrayList<>();
+		for (int x = 0; x < 10000; x += 1000) {
+			there.add(Id.createLinkId(x + "-" + (x + 1000)));
+		}
+		List<Id<Link>> back = new ArrayList<>();
+		for (int x = 10000; x > 0; x -= 1000) {
+			back.add(Id.createLinkId(x + "-" + (x - 1000)));
+		}
+
+		TransitLine line = factory.createTransitLine(Id.create("line", TransitLine.class));
+		line.addRoute(route(factory, "outbound", RouteUtils.createNetworkRoute(there),
+			List.of(factory.createTransitRouteStop(homeOut, 0, 0),
+				factory.createTransitRouteStop(workOut, 120, 120),
+				factory.createTransitRouteStop(shopOut, 600, 600))));
+		line.addRoute(route(factory, "inbound", RouteUtils.createNetworkRoute(back),
+			List.of(factory.createTransitRouteStop(shopIn, 0, 0),
+				factory.createTransitRouteStop(workIn, 480, 480),
+				factory.createTransitRouteStop(homeIn, 600, 600))));
+		schedule.addTransitLine(line);
+
+		new TransitScheduleWriter(schedule).writeFile(file.toString());
+	}
+
+	private static TransitStopFacility stop(TransitSchedule schedule, String id, double x, String linkId) {
+		TransitStopFacility stop = schedule.getFactory().createTransitStopFacility(
+			Id.create(id, TransitStopFacility.class), new Coord(x, 0), false);
+		stop.setLinkId(Id.createLinkId(linkId));
+		schedule.addStopFacility(stop);
+		return stop;
+	}
+
+	private static TransitRoute route(TransitScheduleFactory factory, String id, NetworkRoute along,
+									  List<TransitRouteStop> stops) {
+		TransitRoute route = factory.createTransitRoute(Id.create(id, TransitRoute.class), along, stops,
+			TransportMode.pt);
+		// every 5 minutes from 05:00 to 23:00, so waiting never dominates the detour
+		for (int i = 0; 5 * 3600 + i * 300 <= 23 * 3600; i++) {
+			route.addDeparture(factory.createDeparture(
+				Id.create(id + "-" + i, Departure.class), 5 * 3600 + i * 300));
+		}
+		return route;
+	}
+
 	private void writeScenario(Path directory) {
 		writeScenario(directory, false);
 	}

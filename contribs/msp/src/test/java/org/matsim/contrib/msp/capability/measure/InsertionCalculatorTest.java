@@ -45,7 +45,8 @@ public class InsertionCalculatorTest {
 	 * anything else.
 	 */
 	private CapabilityTravelTimes travelTimes(DiscretionaryActivityFacility shop) {
-		return (from, to, departureTime) -> (from == shop || to == shop) ? TO_SHOP : DIRECT;
+		return (from, to, departureTime) -> CapabilityTravelTimes.Trip
+			.withoutWalking((from == shop || to == shop) ? TO_SHOP : DIRECT);
 	}
 
 	private InsertionCalculator calculator(CapabilityTravelTimes travelTimes) {
@@ -130,9 +131,9 @@ public class InsertionCalculatorTest {
 		// the shop is 10 min away in the morning and 15 min away in the evening
 		CapabilityTravelTimes travelTimes = (from, to, departureTime) -> {
 			if (from != shop && to != shop) {
-				return DIRECT;
+				return CapabilityTravelTimes.Trip.withoutWalking(DIRECT);
 			}
-			return departureTime < 12 * 3600 ? 600 : 900;
+			return CapabilityTravelTimes.Trip.withoutWalking(departureTime < 12 * 3600 ? 600 : 900);
 		};
 
 		// a gap that the activity only just fits into, and an evening with hours to spare
@@ -182,7 +183,8 @@ public class InsertionCalculatorTest {
 		FreePeriod evening = new FreePeriod(place(), 17 * 3600, place(), FreePeriod.END_OF_DAY);
 
 		// there and back is 2 h of detour, well past the 30 min the search allows
-		CapabilityTravelTimes far = (from, to, time) -> (from == shop || to == shop) ? 3600 : DIRECT;
+		CapabilityTravelTimes far = (from, to, time) -> CapabilityTravelTimes.Trip
+			.withoutWalking((from == shop || to == shop) ? 3600 : DIRECT);
 
 		assertFalse(calculator(far).evaluate(evening, shop).possible(),
 			"the detour exceeds maxExtraTravelTime");
@@ -216,6 +218,67 @@ public class InsertionCalculatorTest {
 
 		// arrives at 00:10, has to be back by 23:50, minus the 30 min minimum duration
 		assertEquals(FreePeriod.END_OF_DAY - TO_SHOP - TO_SHOP - 1800, insertion.slack(), 1e-9);
+	}
+
+	@Test
+	void theWalkingDistanceOfAnInsertionIsTheWayInPlusTheWayOut() {
+
+		DiscretionaryActivityFacility shop = shop(8 * 3600, 21 * 3600);
+		FreePeriod evening = new FreePeriod(place(), 17 * 3600, place(), FreePeriod.END_OF_DAY);
+
+		// a pt-like mode: 400 m of walking to the stops on the way to the shop, 300 m on the way on, and
+		// 250 m on the trip the agent was making anyway
+		CapabilityTravelTimes travelTimes = (from, to, departureTime) -> {
+			if (to == shop) {
+				return new CapabilityTravelTimes.Trip(TO_SHOP, 400);
+			}
+			if (from == shop) {
+				return new CapabilityTravelTimes.Trip(TO_SHOP, 300);
+			}
+			return new CapabilityTravelTimes.Trip(DIRECT, 250);
+		};
+
+		InsertionCalculator.Insertion insertion = calculator(travelTimes).evaluate(evening, shop);
+
+		assertTrue(insertion.possible());
+		assertEquals(400, insertion.walkIn(), 1e-9);
+		assertEquals(300, insertion.walkOut(), 1e-9);
+		assertEquals(700, insertion.walkDistance(), 1e-9, "the way in plus the way out");
+
+		// the direct trip is kept so that the extra walking of the insertion, 700 - 250, can be worked
+		// out from the output row as well
+		assertEquals(250, insertion.walkDirect(), 1e-9);
+	}
+
+	@Test
+	void theLeastWalkingOfAFacilityIsNotNecessarilyTheBestInsertion() {
+
+		DiscretionaryActivityFacility shop = shop(8 * 3600, 21 * 3600);
+
+		// the morning trip walks far, the evening one hardly at all - and the evening is the one with
+		// hours of slack, so it is also the one the utility picks
+		CapabilityTravelTimes travelTimes = (from, to, departureTime) -> {
+			if (from != shop && to != shop) {
+				return new CapabilityTravelTimes.Trip(DIRECT, 0);
+			}
+			return departureTime < 12 * 3600
+				? new CapabilityTravelTimes.Trip(TO_SHOP, 100)
+				: new CapabilityTravelTimes.Trip(TO_SHOP, 500);
+		};
+
+		FreePeriod morning = new FreePeriod(place(), 9 * 3600, place(), 9 * 3600 + 3000);
+		FreePeriod evening = new FreePeriod(place(), 17 * 3600, place(), FreePeriod.END_OF_DAY);
+
+		InsertionCalculator.Totals totals =
+			calculator(travelTimes).evaluate(List.of(morning, evening), shop);
+
+		assertEquals(1, totals.bestIndex(), "the evening has the slack, so it has the utility");
+
+		// the evening walks 500 m there and 500 m on, the morning 100 m each way. A person who can only
+		// walk 400 m keeps this shop - but not through the insertion that maximises utility, which is
+		// why min_walk_distance is the column to compare a cap against.
+		assertEquals(1000, totals.bestWalkDistance(), 1e-9);
+		assertEquals(200, totals.minWalkDistance(), 1e-9);
 	}
 
 	private static DiscretionaryActivityFacility shop(double opening, double closing) {

@@ -1,13 +1,16 @@
 package org.matsim.contrib.msp.capability.measure;
 
 import org.matsim.contrib.msp.capability.DiscretionaryActivityParams;
+import org.matsim.contrib.msp.capability.measure.CapabilityTravelTimes.Trip;
 import org.matsim.contrib.msp.capability.facilities.DiscretionaryActivityFacility;
 import org.matsim.contrib.msp.capability.structure.FreePeriod;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.OpeningTimeImpl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Works out whether a discretionary activity can be inserted into a {@link FreePeriod}, how much freedom the
@@ -51,6 +54,14 @@ public final class InsertionCalculator {
 	private final DiscretionaryActivityParams params;
 	private final InsertionCost cost;
 
+	/**
+	 * The trip the agent was making anyway, per free period. It is the same for every facility, so it
+	 * would otherwise be routed once per place - a third of all travel time queries, and the third that
+	 * is most worth saving once a mode is expensive to route. A calculator lives for one person, one
+	 * mode and one activity type, so the map stays small and goes away with the person.
+	 */
+	private final Map<FreePeriod, Trip> directTrips = new HashMap<>();
+
 	public InsertionCalculator(CapabilityTravelTimes travelTimes, DiscretionaryActivityParams params, InsertionCost cost) {
 		this.travelTimes = travelTimes;
 		this.params = params;
@@ -63,16 +74,22 @@ public final class InsertionCalculator {
 	 */
 	public Insertion evaluate(FreePeriod period, DiscretionaryActivityFacility facility) {
 
-		double in = this.travelTimes.travelTime(period.origin(), facility, period.availableFrom());
-		double out = this.travelTimes.travelTime(facility, period.destination(), period.availableFrom() + in);
-
-		if (Double.isInfinite(in) || Double.isInfinite(out)) {
+		Trip inbound = this.travelTimes.travel(period.origin(), facility, period.availableFrom());
+		if (!inbound.possible()) {
 			return Insertion.IMPOSSIBLE;
 		}
 
-		double direct = this.travelTimes.travelTime(period.origin(), period.destination(), period.availableFrom());
+		double in = inbound.travelTime();
+		Trip outbound = this.travelTimes.travel(facility, period.destination(), period.availableFrom() + in);
+		if (!outbound.possible()) {
+			return Insertion.IMPOSSIBLE;
+		}
+		double out = outbound.travelTime();
+
+		Trip direct = this.directTrips.computeIfAbsent(period, p ->
+			this.travelTimes.travel(p.origin(), p.destination(), p.availableFrom()));
 		// a disconnected direct trip would make the detour meaningless, so treat it as zero in that case
-		double extra = Math.max(0, in + out - (Double.isInfinite(direct) ? 0 : direct));
+		double extra = Math.max(0, in + out - (direct.possible() ? direct.travelTime() : 0));
 
 		// only a search space cut: a facility that costs more of a detour than this is not considered
 		if (extra > this.params.getMaxExtraTravelTime()) {
@@ -107,7 +124,9 @@ public final class InsertionCalculator {
 
 		double c = this.cost.cost(extra);
 		return new Insertion(slack, extra, c, this.params.utility(slack) - c,
-			earliestStart, latestStart, in, out);
+			earliestStart, latestStart, in, out,
+			inbound.walkDistance(), outbound.walkDistance(),
+			direct.possible() ? direct.walkDistance() : Double.NaN);
 	}
 
 	/**
@@ -144,15 +163,30 @@ public final class InsertionCalculator {
 	 * activity only just fits.
 	 * @param travelIn the travel time from the origin of the period to the facility [s]
 	 * @param travelOut the travel time from the facility to the destination of the period [s]
+	 * @param walkIn how far of the way in is walked [m], see {@link CapabilityTravelTimes.Trip}
+	 * @param walkOut how far of the way out is walked [m]
+	 * @param walkDirect how far of the trip the agent was making anyway is walked [m], so that the
+	 * <i>extra</i> walking of this insertion can be worked out from the row. {@link Double#NaN} if the
+	 * direct trip cannot be made at all, which is also when {@code t_extra} ignores it.
 	 */
 	public record Insertion(double slack, double extraTravelTime, double cost, double utility,
-							double earliestStart, double latestStart, double travelIn, double travelOut) {
+							double earliestStart, double latestStart, double travelIn, double travelOut,
+							double walkIn, double walkOut, double walkDirect) {
 
 		public static final Insertion IMPOSSIBLE = new Insertion(-1, Double.NaN, Double.NaN, Double.NaN,
-			Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+			Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 
 		public boolean possible() {
 			return this.slack >= 0;
+		}
+
+		/**
+		 * @return how far the agent walks on this insertion [m]: the way in plus the way out. This is
+		 * the number a person with reduced mobility would be judged against, which is why it is the
+		 * absolute distance rather than the extra over the direct trip.
+		 */
+		public double walkDistance() {
+			return this.walkIn + this.walkOut;
 		}
 	}
 
@@ -236,6 +270,26 @@ public final class InsertionCalculator {
 		public double minCost() {
 			return this.byPeriod.stream().filter(Insertion::possible)
 				.mapToDouble(Insertion::cost).min().orElse(Double.NaN);
+		}
+
+		/**
+		 * @return how far the agent walks on the insertion it would actually take [m],
+		 * {@link Double#NaN} if the activity does not fit anywhere
+		 */
+		public double bestWalkDistance() {
+			int best = bestIndex();
+			return best < 0 ? Double.NaN : this.byPeriod.get(best).walkDistance();
+		}
+
+		/**
+		 * @return the least walking any possible insertion of this place asks for [m],
+		 * {@link Double#NaN} if there is none. This is the one to compare against what a person can
+		 * walk: it says whether the place is within reach <i>at all</i> on foot, which the best
+		 * insertion by utility need not be.
+		 */
+		public double minWalkDistance() {
+			return this.byPeriod.stream().filter(Insertion::possible)
+				.mapToDouble(Insertion::walkDistance).min().orElse(Double.NaN);
 		}
 	}
 }

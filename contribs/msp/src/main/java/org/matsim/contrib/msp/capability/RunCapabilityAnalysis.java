@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -96,6 +97,16 @@ public final class RunCapabilityAnalysis implements MATSimAppCommand {
 		+ "a mode is how fast that mode goes, so without it bike travels at the free speed of the links.")
 	private String vehiclesFile;
 
+	@CommandLine.Option(names = "--transit-schedule", description = "Transit schedule file, if it should not be "
+		+ "looked up in the main directory. Only read when a transit mode - 'pt' unless the config says otherwise - "
+		+ "is among the analysed modes.")
+	private String transitScheduleFile;
+
+	@CommandLine.Option(names = "--transit-vehicles", description = "Transit vehicles file, if it should not be "
+		+ "looked up in the main directory. It carries the capacities of the transit vehicles, which the router "
+		+ "only reads with capacity constraints switched on.")
+	private String transitVehiclesFile;
+
 	@CommandLine.Option(names = "--output", description = "Directory the three output levels are written to. "
 		+ "Default is the main directory.")
 	private String output;
@@ -112,6 +123,12 @@ public final class RunCapabilityAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--value-of-time", description = "What one hour of travel is worth in utility, i.e. "
 		+ "the VoT of c_insertion = VoT * t_extra. Overrides 'valueOfTimePerHour' of the capability config group.")
 	private Double valueOfTimePerHour;
+
+	@CommandLine.Option(names = "--modes", description = "Modes the capability is computed for, one output row per "
+		+ "mode, e.g. 'car,walk,pt'. Overrides 'modes' of the capability config group. A transit mode needs a "
+		+ "transit schedule, which is looked up in the input directory unless --transit-schedule says otherwise.",
+		split = ",")
+	private Set<String> modes;
 
 	@CommandLine.Option(names = "--write-facilities", description = "Also write the facilities built from the places csv, "
 		+ "for checking what the analysis used.")
@@ -164,6 +181,10 @@ public final class RunCapabilityAnalysis implements MATSimAppCommand {
 			capabilityConfig.setValueOfTimePerHour(this.valueOfTimePerHour);
 			log.info("Value of time set to {} utils per hour.", this.valueOfTimePerHour);
 		}
+		if (this.modes != null && !this.modes.isEmpty()) {
+			capabilityConfig.setModes(this.modes);
+			log.info("Modes set to {}.", this.modes);
+		}
 
 		if (config == null) {
 			log.warn("No config file found in {}, using defaults. Walk travel times need the routing config of the "
@@ -172,7 +193,10 @@ public final class RunCapabilityAnalysis implements MATSimAppCommand {
 
 		String network = this.networkFile != null ? this.networkFile : find(directory, "network", ".xml", ".xml.gz");
 		String plans = this.plansFile != null ? this.plansFile : find(directory, "plans", ".xml", ".xml.gz");
-		String vehicles = this.vehiclesFile != null ? this.vehiclesFile : find(directory, "vehicles", ".xml", ".xml.gz");
+		// 'transit' is excluded because output_transitVehicles.xml.gz also contains "vehicles", and a run
+		// whose output holds only the transit vehicles would otherwise read bus capacities as mode speeds
+		String vehicles = this.vehiclesFile != null ? this.vehiclesFile
+			: findExcluding(directory, "vehicles", "transit", ".xml", ".xml.gz");
 
 		if (network == null) {
 			log.error("No network file found in {}. Pass --network.", directory);
@@ -184,20 +208,28 @@ public final class RunCapabilityAnalysis implements MATSimAppCommand {
 		}
 
 		// point the config at the files we found, so that loading the scenario picks them up
-		scenarioConfig.network().setInputFile(Path.of(network).toAbsolutePath().toString());
-		scenarioConfig.plans().setInputFile(Path.of(plans).toAbsolutePath().toString());
+		scenarioConfig.network().setInputFile(location(network));
+		scenarioConfig.plans().setInputFile(location(plans));
 		// the scenario's own facilities are not needed: the places come from the csv instead
 		scenarioConfig.facilities().setInputFile(null);
 		// the vehicle types carry the speed of the network modes, see CapabilityTravelTimes#maxSpeed
 		if (vehicles != null) {
-			scenarioConfig.vehicles().setVehiclesFile(Path.of(vehicles).toAbsolutePath().toString());
+			scenarioConfig.vehicles().setVehiclesFile(location(vehicles));
 		}
 
-		log.info("Config:   {}", config);
-		log.info("Network:  {}", network);
-		log.info("Plans:    {}", plans);
-		log.info("Vehicles: {}", vehicles);
-		log.info("Places:   {}", this.placesFile);
+		// the schedule is only loaded when a transit mode is actually analysed: reading and preprocessing
+		// it costs time and memory that a car-and-bike analysis has no use for
+		String schedule = transitSchedule(directory, scenarioConfig, capabilityConfig);
+
+		log.info("Config:           {}", config);
+		log.info("Network:          {}", network);
+		log.info("Plans:            {}", plans);
+		log.info("Vehicles:         {}", vehicles);
+		if (schedule != null) {
+			log.info("Transit schedule: {}", schedule);
+			log.info("Transit vehicles: {}", scenarioConfig.transit().getVehiclesFile());
+		}
+		log.info("Places:           {}", this.placesFile);
 
 		Scenario scenario = ScenarioUtils.loadScenario(scenarioConfig);
 
@@ -220,6 +252,47 @@ public final class RunCapabilityAnalysis implements MATSimAppCommand {
 			.run(scenario, places, outputDirectory(directory));
 
 		return 0;
+	}
+
+	/**
+	 * Points the config at a transit schedule and switches transit on, but only if a transit mode is
+	 * among the modes the capability is computed for. Public transport is routed by SwissRailRaptor on
+	 * that schedule, see {@link org.matsim.contrib.msp.capability.measure.CapabilityTravelTimes}.
+	 * <p>
+	 * A missing schedule is not failed on here: the analysis fails later, naming the mode, which is the
+	 * one place that knows what it needed the schedule for.
+	 *
+	 * @return the schedule file, or null if none is used
+	 */
+	private String transitSchedule(Path directory, Config scenarioConfig, CapabilityConfigGroup capabilityConfig) {
+
+		Set<String> transitModes = capabilityConfig.getModes().stream()
+			.filter(scenarioConfig.transit().getTransitModes()::contains)
+			.collect(Collectors.toCollection(LinkedHashSet::new));
+
+		if (transitModes.isEmpty()) {
+			return null;
+		}
+
+		String schedule = this.transitScheduleFile != null ? this.transitScheduleFile
+			: find(directory, "transitschedule", ".xml", ".xml.gz");
+
+		if (schedule == null) {
+			log.error("{} is to be analysed, but no transit schedule was found in {}. Pass --transit-schedule.",
+				transitModes, directory);
+			return null;
+		}
+
+		String transitVehicles = this.transitVehiclesFile != null ? this.transitVehiclesFile
+			: find(directory, "transitvehicles", ".xml", ".xml.gz");
+
+		scenarioConfig.transit().setUseTransit(true);
+		scenarioConfig.transit().setTransitScheduleFile(location(schedule));
+		if (transitVehicles != null) {
+			scenarioConfig.transit().setVehiclesFile(location(transitVehicles));
+		}
+
+		return schedule;
 	}
 
 	/**
@@ -252,18 +325,48 @@ public final class RunCapabilityAnalysis implements MATSimAppCommand {
 	}
 
 	/**
+	 * Where an input file is, as the config has to name it.
+	 * <p>
+	 * A local path is made absolute, because the config the analysis builds is not read relative to the
+	 * input directory. <b>A URL is left exactly as it is</b>: MATSim reads an input straight from one -
+	 * the Dresden configs name their network, plans and schedule on the VSP svn that way - and a URL is
+	 * not a path, so {@code Path.of("https://...")} would quietly turn it into a relative file name.
+	 */
+	private static String location(String fileOrUrl) {
+		return URL_SCHEME.matcher(fileOrUrl).matches()
+			? fileOrUrl
+			: Path.of(fileOrUrl).toAbsolutePath().toString();
+	}
+
+	/**
+	 * A URL scheme, i.e. {@code https://} and friends. Requires the {@code //}, so a Windows drive
+	 * letter is still a path.
+	 */
+	private static final Pattern URL_SCHEME = Pattern.compile("^[a-zA-Z][a-zA-Z0-9+.\\-]*://.*");
+
+	/**
 	 * Looks for the usual MATSim output naming, e.g. {@code output_network.xml.gz} for "network".
 	 *
 	 * @return the matching file, preferring the shortest name so that {@code output_plans.xml.gz} wins
 	 * over {@code output_experienced_plans.xml.gz}; null if there is none
 	 */
 	private static String find(Path directory, String kind, String... suffixes) {
+		return findExcluding(directory, kind, null, suffixes);
+	}
+
+	/**
+	 * {@link #find(Path, String, String...)}, but skipping the files whose name contains {@code excluded}.
+	 * "vehicles" needs it, because {@code output_transitVehicles.xml.gz} contains "vehicles" as well.
+	 */
+	private static String findExcluding(Path directory, String kind, String excluded, String... suffixes) {
 		try (Stream<Path> files = Files.list(directory)) {
 			List<Path> candidates = files
 				.filter(Files::isRegularFile)
 				.filter(file -> {
 					String name = file.getFileName().toString().toLowerCase();
-					return name.contains(kind) && Stream.of(suffixes).anyMatch(name::endsWith);
+					return name.contains(kind)
+						&& (excluded == null || !name.contains(excluded))
+						&& Stream.of(suffixes).anyMatch(name::endsWith);
 				})
 				.sorted((a, b) -> {
 					int byLength = Integer.compare(a.getFileName().toString().length(),

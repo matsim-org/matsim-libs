@@ -9,7 +9,7 @@ import java.util.Locale;
  * separator whatever the machine's locale is, and an empty cell rather than {@code NaN} or
  * {@code Infinity} for "there is no number here".
  * <p>
- * Times are seconds after midnight throughout, utilities are MATSim utils.
+ * Times are seconds after midnight throughout, utilities are MATSim utils, distances are metres.
  */
 final class Format {
 
@@ -28,6 +28,13 @@ final class Format {
 	 */
 	static String utils(double value) {
 		return Double.isFinite(value) ? String.format(Locale.ROOT, "%.4f", value) : "";
+	}
+
+	/**
+	 * @return a distance [m], one decimal
+	 */
+	static String metres(double metres) {
+		return Double.isFinite(metres) ? String.format(Locale.ROOT, "%.1f", metres) : "";
 	}
 
 	static String x(Coord coord) {
