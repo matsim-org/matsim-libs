@@ -281,6 +281,8 @@ public class WithinDayTravelTime implements TravelTime,
 	 * Each trip is removed at most once, so this is amortized O(1) per event.
 	 */
 	private static void removeLeavingAndOvertakenTrips(TripBin tripBin) {
+		// already removed because it was overtaken earlier
+		if (!tripBin.travelTimeInfo.activeTrips.contains(tripBin)) return;
 		Iterator<TripBin> iter = tripBin.travelTimeInfo.activeTrips.iterator();
 		while (iter.hasNext()) {
 			TripBin first = iter.next();

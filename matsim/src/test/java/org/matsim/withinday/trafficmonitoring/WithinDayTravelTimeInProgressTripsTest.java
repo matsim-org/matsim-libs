@@ -168,6 +168,16 @@ public class WithinDayTravelTimeInProgressTripsTest {
 		assertTrue(travelTimeAt(slowTripTime + 1) > tripTime);
 	}
 
+	@Test
+	void overtakenVehicleLeaving_keepsLowerBoundOfLaterVehicles() {
+		enter("slow", 0);
+		enter("fast", 1);
+		leave("fast", 5);      // overtakes slow -> slow dropped from lower bound
+		enter("blocked", 6);   // enters after the overtake, then gets stuck
+		leave("slow", 20);     // slow leaves; blocked is still on the link
+		assertEquals(500 - 6, travelTimeAt(500), 0);
+	}
+
 	private void enter(String vehicle, double time) {
 		travelTime.handleEvent(new LinkEnterEvent(time, vehicleId(vehicle), link.getId()));
 	}
