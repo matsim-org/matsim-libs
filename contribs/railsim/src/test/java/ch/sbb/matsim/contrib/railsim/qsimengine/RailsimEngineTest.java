@@ -485,6 +485,62 @@ public class RailsimEngineTest {
 		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
 	}
 
+	@Test
+	@SuppressWarnings("unchecked")
+	void testBodyLinksUseTheLengthOfEachLink() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroReverseStub.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), new TrainManager());
+
+		// p1 200 m, p2 31.6 m, p3 28.4 m, p4 31.6 m, p5 116.1 m, p6 18.5 m: links of unequal length.
+		List<RailLink> route = List.of("p1", "p2", "p3", "p4", "p5", "p6").stream()
+			.map(id -> resources.getLink(Id.createLinkId(id))).toList();
+
+		Method bodyLinks = RailsimEngine.class.getDeclaredMethod("bodyLinks", List.class, int.class, double.class, double.class);
+		bodyLinks.setAccessible(true);
+
+		// Head at the end of p5, 150 m train: 116.1 m on p5, 31.6 m on p4 and the last 2.3 m on p3.
+		List<RailLink> body = (List<RailLink>) bodyLinks.invoke(null, route, 5, route.get(4).length, 150.0);
+		assertThat(body).containsExactly(route.get(4), route.get(3), route.get(2));
+
+		// Head at the end of p6, 120 m train: 18.5 m on p6 and the remaining 101.5 m on p5, nothing on p4.
+		body = (List<RailLink>) bodyLinks.invoke(null, route, 6, route.get(5).length, 120.0);
+		assertThat(body).containsExactly(route.get(5), route.get(4));
+	}
+
+	@Test
+	void testReverseHoldsMovingBlockTrackPerLink() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMixedTypes.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
+			createTrainTimeDistanceHandler());
+
+		Method isHeld = RailsimEngine.class.getDeclaredMethod("isHeld", TrainState.class, RailLink.class);
+		isHeld.setAccessible(true);
+
+		TrainInfo info = new TrainInfo(Id.create("train", VehicleType.class), 100, 44.444, 0.5, 0.5, 0.5, 0.0);
+
+		// Moving block l23 (2-3, 3-4): holding 2-3 does not reserve 3-4.
+		List<RailLink> moving = new ArrayList<>(List.of(resources.getLink(Id.createLinkId("2-3")), resources.getLink(Id.createLinkId("3-4"))));
+		TrainState onMoving = createState(info, "moving", moving, 1, 0, 100, 0, 0);
+		resources.tryBlockLink(0, moving.get(0), RailResourceManager.ANY_TRACK_NON_BLOCKING, onMoving);
+		assertThat(resources.isBlockedBy(moving.get(0), onMoving)).isTrue();
+		assertThat((boolean) isHeld.invoke(engine, onMoving, moving.get(1))).isFalse();
+
+		// Fixed block l67 (6-7, 7-8): the resource is reserved per driver, holding 6-7 holds the track.
+		List<RailLink> fixed = new ArrayList<>(List.of(resources.getLink(Id.createLinkId("6-7")), resources.getLink(Id.createLinkId("7-8"))));
+		TrainState onFixed = createState(info, "fixed", fixed, 1, 0, 50, 0, 0);
+		resources.tryBlockLink(0, fixed.get(0), RailResourceManager.ANY_TRACK_NON_BLOCKING, onFixed);
+		assertThat(resources.isBlockedBy(fixed.get(0), onFixed)).isTrue();
+		assertThat((boolean) isHeld.invoke(engine, onFixed, fixed.get(1))).isTrue();
+	}
+
 	/**
 	 * Create a train state with a driver and a vehicle, so that it can reserve tracks.
 	 */
