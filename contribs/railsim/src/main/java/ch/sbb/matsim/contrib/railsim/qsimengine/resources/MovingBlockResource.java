@@ -232,6 +232,7 @@ final class MovingBlockResource implements RailResourceInternal {
 	public boolean release(RailLink link, MobsimDriverAgent driver) {
 
 		moving.get(link).remove(driver);
+		reservations.get(driver).reservedDistance.remove(link.getLinkId().index());
 
 		boolean allFree = true;
 		for (Set<MobsimDriverAgent> others : moving.values()) {

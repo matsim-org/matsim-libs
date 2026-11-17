@@ -727,8 +727,11 @@ final class RailsimEngine implements Steppable {
 			previousHeadPosition, previousTailLink, previousTailPosition);
 
 		List<RailLink> unheld = new ArrayList<>();
-		for (RailLink link : bodyLinks(state.route, geometry.routeIdx(), geometry.headPosition(), state.train.length())) {
-			if (!isHeld(state, link)) {
+		List<RailLink> body = bodyLinks(state.route, geometry.routeIdx(), geometry.headPosition(), state.train.length());
+		for (int i = 0; i < body.size(); i++) {
+			RailLink link = body.get(i);
+			double occupiedEnd = i == 0 ? geometry.headPosition() : link.length;
+			if (!isHeld(state, link, occupiedEnd)) {
 				unheld.add(link);
 			}
 		}
@@ -739,11 +742,11 @@ final class RailsimEngine implements Steppable {
 	/**
 	 * Whether the physical track of a link is reserved by the train. A fixed block resource is reserved per
 	 * driver: once the driver holds one of its links, it holds the resource in any direction. A moving block
-	 * is reserved per link, so only the link itself counts.
+	 * reserves a distance on each link, which must cover the body up to its furthest occupied position.
 	 */
-	private boolean isHeld(TrainState state, RailLink link) {
+	private boolean isHeld(TrainState state, RailLink link, double occupiedEnd) {
 		if (link.getResource().getType() != ResourceType.fixedBlock) {
-			return resources.isBlockedBy(link, state);
+			return FuzzyUtils.greaterEqualThan(link.getReservedDistance(state), occupiedEnd);
 		}
 		for (RailLink other : link.getResource().getLinks()) {
 			if (resources.isBlockedBy(other, state)) {

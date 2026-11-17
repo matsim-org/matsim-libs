@@ -521,7 +521,7 @@ public class RailsimEngineTest {
 		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
 			createTrainTimeDistanceHandler());
 
-		Method isHeld = RailsimEngine.class.getDeclaredMethod("isHeld", TrainState.class, RailLink.class);
+		Method isHeld = RailsimEngine.class.getDeclaredMethod("isHeld", TrainState.class, RailLink.class, double.class);
 		isHeld.setAccessible(true);
 
 		TrainInfo info = new TrainInfo(Id.create("train", VehicleType.class), 100, 44.444, 0.5, 0.5, 0.5, 0.0);
@@ -529,16 +529,28 @@ public class RailsimEngineTest {
 		// Moving block l23 (2-3, 3-4): holding 2-3 does not reserve 3-4.
 		List<RailLink> moving = new ArrayList<>(List.of(resources.getLink(Id.createLinkId("2-3")), resources.getLink(Id.createLinkId("3-4"))));
 		TrainState onMoving = createState(info, "moving", moving, 1, 0, 100, 0, 0);
-		resources.tryBlockLink(0, moving.get(0), RailResourceManager.ANY_TRACK_NON_BLOCKING, onMoving);
+		resources.tryBlockLink(0, moving.get(0), 0, onMoving);
 		assertThat(resources.isBlockedBy(moving.get(0), onMoving)).isTrue();
-		assertThat((boolean) isHeld.invoke(engine, onMoving, moving.get(1))).isFalse();
+		assertThat((boolean) isHeld.invoke(engine, onMoving, moving.get(1), 1.0)).isFalse();
+
+		// A following train on the same track can reserve only up to the leading tail.
+		onMoving.tailPosition = 25;
+		TrainState follower = createState(info, "follower", moving, 1, 0, 10, 0, 0);
+		assertThat(resources.tryBlockLink(0, moving.get(0), 0, follower)).isEqualTo(25);
+		assertThat((boolean) isHeld.invoke(engine, follower, moving.get(0), 25.0)).isTrue();
+		assertThat((boolean) isHeld.invoke(engine, follower, moving.get(0), 26.0)).isFalse();
+
+		// Releasing a link clears its reserved distance even while another link of the resource is held.
+		resources.tryBlockLink(0, moving.get(1), 0, onMoving);
+		resources.releaseLink(0, moving.get(0), onMoving.driver);
+		assertThat(resources.isBlockedBy(moving.get(0), onMoving)).isFalse();
 
 		// Fixed block l67 (6-7, 7-8): the resource is reserved per driver, holding 6-7 holds the track.
 		List<RailLink> fixed = new ArrayList<>(List.of(resources.getLink(Id.createLinkId("6-7")), resources.getLink(Id.createLinkId("7-8"))));
 		TrainState onFixed = createState(info, "fixed", fixed, 1, 0, 50, 0, 0);
 		resources.tryBlockLink(0, fixed.get(0), RailResourceManager.ANY_TRACK_NON_BLOCKING, onFixed);
 		assertThat(resources.isBlockedBy(fixed.get(0), onFixed)).isTrue();
-		assertThat((boolean) isHeld.invoke(engine, onFixed, fixed.get(1))).isTrue();
+		assertThat((boolean) isHeld.invoke(engine, onFixed, fixed.get(1), 50.0)).isTrue();
 	}
 
 	/**

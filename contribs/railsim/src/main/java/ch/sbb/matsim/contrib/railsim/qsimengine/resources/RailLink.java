@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
@@ -86,6 +87,13 @@ public final class RailLink implements HasLinkId {
 
 		this.vMax = vMax;
 		this.disallowedNextLinks = disallowedNextLinks;
+	}
+
+	/**
+	 * Distance from the start of this link reserved by the train, or {@link RailResource#NO_RESERVATION}.
+	 */
+	public double getReservedDistance(TrainPosition train) {
+		return resource.getReservedDist(this, train);
 	}
 
 	@Override
