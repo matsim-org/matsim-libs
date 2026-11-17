@@ -737,9 +737,14 @@ final class RailsimEngine implements Steppable {
 	}
 
 	/**
-	 * Whether the physical track of a link, i.e. its resource in any direction, is reserved by the train.
+	 * Whether the physical track of a link is reserved by the train. A fixed block resource is reserved per
+	 * driver: once the driver holds one of its links, it holds the resource in any direction. A moving block
+	 * is reserved per link, so only the link itself counts.
 	 */
 	private boolean isHeld(TrainState state, RailLink link) {
+		if (link.getResource().getType() != ResourceType.fixedBlock) {
+			return resources.isBlockedBy(link, state);
+		}
 		for (RailLink other : link.getResource().getLinks()) {
 			if (resources.isBlockedBy(other, state)) {
 				return true;
@@ -791,7 +796,11 @@ final class RailsimEngine implements Steppable {
 			}
 
 			if (covered) {
-				disposition.unblockRailLink(time, state.driver, link);
+				// Same headway rule as when the tail leaves a link.
+				if (link.minimumHeadwayTime == 0)
+					disposition.unblockRailLink(time, state.driver, link);
+				else
+					updateQueue.add(new UpdateEvent(state, link, time));
 			}
 		}
 	}
@@ -869,6 +878,17 @@ final class RailsimEngine implements Steppable {
 		if (released.getResource().getType() != ResourceType.fixedBlock)
 			return;
 
+		// Usually the train holds no other link of the resource; skip the route scans below then.
+		boolean holdsSibling = false;
+		for (RailLink other : released.getResource().getLinks()) {
+			if (other != released && resources.isBlockedBy(other, state)) {
+				holdsSibling = true;
+				break;
+			}
+		}
+		if (!holdsSibling)
+			return;
+
 		Set<Id<Link>> bodyIds = new HashSet<>();
 		for (RailLink link : bodyLinks(state)) {
 			bodyIds.add(link.getLinkId());
@@ -905,16 +925,16 @@ final class RailsimEngine implements Steppable {
 
 		List<RailLink> body = new ArrayList<>();
 		double remaining = length;
-		double pos = headPosition;
 
 		for (int i = routeIdx - 1; i >= 0; i--) {
 			RailLink link = route.get(i);
 			body.add(link);
-			if (remaining <= pos + 1e-6) {
+			// The head covers its link up to the head position, every link behind it completely.
+			double covered = i == routeIdx - 1 ? headPosition : link.length;
+			if (FuzzyUtils.lessEqualThan(remaining, covered)) {
 				break;
 			}
-			remaining -= pos;
-			pos = link.length;
+			remaining -= covered;
 		}
 
 		return body;
