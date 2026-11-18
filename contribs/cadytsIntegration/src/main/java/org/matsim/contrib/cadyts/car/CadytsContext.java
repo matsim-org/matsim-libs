@@ -25,7 +25,6 @@ import cadyts.supply.SimResults;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -43,6 +42,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Counts;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -72,15 +72,15 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	private SimResults<Link> simResults;
 	private Scenario scenario;
 	private EventsManager eventsManager;
-	private VolumesAnalyzer volumesAnalyzer;
 	private OutputDirectoryHierarchy controlerIO;
 
+	private PcuVolumesAnalyzer pcuVolumesAnalyzer;
+
 	@Inject CadytsContext( Config config, Scenario scenario, @Named(CadytsCarModule.CALIBRATION) Counts<Link> calibrationCounts,
-			       EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
+						   EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
 		this.scenario = scenario;
 		this.calibrationCounts = calibrationCounts;
 		this.eventsManager = eventsManager;
-		this.volumesAnalyzer = volumesAnalyzer;
 		this.controlerIO = controlerIO;
 		this.countsScaleFactor = config.counts().getCountsScaleFactor();
 
@@ -110,14 +110,29 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	}
 
 	@Override
-	public void notifyStartup(StartupEvent event) {
-		this.simResults = new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor);
+	public double getAgentWeight(Person person) {
+		// Look up the vehicle for the person and return its PCU
+		if (scenario.getVehicles() != null) {
+			// Assuming standard MATSim mapping where vehicleId == personId
+			Vehicle v = scenario.getVehicles().getVehicles().get(Id.create(person.getId(), Vehicle.class));
+			if (v != null && v.getType() != null) {
+				return v.getType().getPcuEquivalents();
+			}
+		}
+		return 1.0;
+	}
 
-		// this collects events and generates cadyts plans from it
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		// Initialize the PCU analyzer
+		this.pcuVolumesAnalyzer = new PcuVolumesAnalyzer(scenario.getVehicles(), 3600, 30 * 3600);
+		this.eventsManager.addHandler(this.pcuVolumesAnalyzer);
+
+		this.simResults = new SimResultsContainerImpl(this.pcuVolumesAnalyzer, this.countsScaleFactor);
 		this.plansTranslator = new PlansTranslatorBasedOnEvents(scenario);
 		this.eventsManager.addHandler(plansTranslator);
 
-		this.calibrator = buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class );
+		this.calibrator = buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new LinkLookUp(scenario), Link.class );
 	}
 
 	@Override
@@ -148,7 +163,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		String filename = controlerIO.getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
 			new CadytsCostOffsetsXMLFileIO<>(new LinkLookUp(scenario), Link.class)
-   			   .write(filename, this.calibrator.getLinkCostOffsets());
+				.write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);
 		}

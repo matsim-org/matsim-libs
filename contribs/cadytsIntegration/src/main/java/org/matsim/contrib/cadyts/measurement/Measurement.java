@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Measurement.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.contrib.cadyts.measurement;
 
 import org.matsim.api.core.v01.Id;
@@ -6,7 +25,7 @@ import org.matsim.api.core.v01.Identifiable;
 /**
  * Cadyts measurements are attached to "facilities", such as links.  With distributions, the measurements are attached to nothing.
  * To satisfy Cadyts, Measurement is used as facility to which cadyts can attach the measurement.
- * 
+ *
  * @author nagel
  *
  */
@@ -16,7 +35,7 @@ public class Measurement implements Identifiable<Measurement>, Comparable<Measur
 
 	private Id<Measurement> id;
 	private double lowerBound;
-	
+
 	public Measurement( Id<Measurement> id, double lowerBound ) {
 		this.id = id ;
 		this.lowerBound = lowerBound ;
