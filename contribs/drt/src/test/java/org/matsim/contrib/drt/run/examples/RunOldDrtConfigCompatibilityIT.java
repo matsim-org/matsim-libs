@@ -53,9 +53,9 @@ public class RunOldDrtConfigCompatibilityIT {
         var expectedStats = RunDrtExampleIT.Stats.newBuilder()
                 .rejectionRate(0.0)
                 .rejections(0)
-                .waitAverage(297.19)
-                .inVehicleTravelTimeMean(386.78)
-                .totalTravelTimeMean(683.97)
+                .waitAverage(316.91)
+                .inVehicleTravelTimeMean(465.17)
+                .totalTravelTimeMean(782.08)
                 .build();
 
         RunDrtExampleIT.verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);

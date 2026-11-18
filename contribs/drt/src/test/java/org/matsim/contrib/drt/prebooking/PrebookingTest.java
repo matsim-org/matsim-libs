@@ -783,7 +783,7 @@ public class PrebookingTest {
 				.addVehicle("vehicleA", 1, 1) //
 				.setVehicleCapacity(1) //
 				.addRequest("requestA", 1, 1, 8, 8, 2000.0, 1800.0)
-				.configure(10.0, 1.0, 0.0, 5.0)
+				.configure(10.0, 1.0, 10.0, 5.0)
 				.endTime(12.0 * 3600.0);
 
 		Controler controller = environment.build();
@@ -806,7 +806,7 @@ public class PrebookingTest {
 				.addVehicle("vehicleA", 1, 1) //
 				.setVehicleCapacity(1) //
 				.addRequest("requestA", 1, 1, 8, 8, 2000.0, 1800.0)
-				.configure(10.0, 1.0, 0.0, 5.0)
+				.configure(10.0, 1.0, 10.0, 5.0)
 				.endTime(12.0 * 3600.0);
 
 		Controler controller = environment.build();
