@@ -21,9 +21,9 @@ package org.matsim.core.controler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -37,6 +37,7 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
  */
 public final class ControllerUtils{
 	private static final Logger log = LogManager.getLogger( ControllerUtils.class ) ;
+	private static int debugHintCnt = 0;
 	/**
 	 * This is meant for creating the matsim injector if one does not need/want {@link Controler}.  Technical reason is that {@link Controler} creates
 	 * the injector in the run method, and then it is too late to extract material in a direct way.
@@ -101,11 +102,10 @@ public final class ControllerUtils{
 	    StringWriter writer = new StringWriter();
 	    new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
 
-		if (log.getLevel().isMoreSpecificThan(Level.INFO)) {
-			// (in the implementation, this uses <=, instead of the "<" that the "more" would imply)
+		if (!log.isDebugEnabled() && debugHintCnt < 1) {
+			debugHintCnt++;
 			log.info("=== logging config.xml skipped ===");
-			log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
-				+ "or use Configurator...Level.DEBUG) in your run class.");
+			log.info(Gbl.ENABLE_DEBUG_OUTPUT_HINT + Gbl.ONLYONCE);
 		}
 	    log.debug(newline + newline + writer.getBuffer().toString());
 	    log.info("Complete config dump done.");

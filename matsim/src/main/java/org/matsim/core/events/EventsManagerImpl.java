@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
@@ -63,6 +63,7 @@ import org.matsim.core.utils.misc.Counter;
 public final class EventsManagerImpl implements EventsManager {
 
 	private static final Logger log = LogManager.getLogger(EventsManagerImpl.class);
+	private static int debugHintCnt = 0;
 
 	static private class HandlerData {
 
@@ -131,10 +132,10 @@ public final class EventsManagerImpl implements EventsManager {
 	public void addHandler (final EventHandler handler) {
 		Set<Class<?>> addedHandlers = new HashSet<>();
 		Class<?> test = handler.getClass();
-		if (log.getLevel().isMoreSpecificThan(Level.DEBUG)) {
+		if (!log.isDebugEnabled() && debugHintCnt < 1) {
+			debugHintCnt++;
 			log.info("=== Logging of event-handlers skipped ===");
-			log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
-				+ "or use Configurator...Level.DEBUG) in your run class.");
+			log.info(Gbl.ENABLE_DEBUG_OUTPUT_HINT + Gbl.ONLYONCE);
 		}
 		log.debug("adding Event-Handler: " + test.getName());
 		do {

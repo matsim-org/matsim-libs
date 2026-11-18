@@ -45,6 +45,9 @@ public abstract class Gbl {
 
 	public final static String SEPARATOR = "****************************" ;
 
+	public static final String ENABLE_DEBUG_OUTPUT_HINT = "To enable debug output, set an environment variable, e.g. export LOG_LEVEL='debug', "
+		+ "or set the log level to Level.DEBUG (e.g. via Configurator) in your run class.";
+
 	public static final String CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE = "This class wants to overwrite createRoutingAlgorithm(), which is no longer possible.  Making createRoutingAlgorithm() non-final would not help since, after recent code changes, it is only used during initialization but not in replanning.  kai, may'13.  Aborting ...";
 
 	public static final String NOT_IMPLEMENTED = "not implemented" ;
