@@ -36,6 +36,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.FacilityStop;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftSchedules;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
@@ -45,6 +46,7 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -165,6 +167,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
             if (facilityStop instanceof ShiftChangeOverTask changeover) {
                 endShift(vehicle, changeover.getLink().getId(), changeover.getFacilityId());
             } else if (facilityStop instanceof ShiftBreakTask shiftBreak) {
+                shortenBreakReservation(shiftBreak, reservation.get());
                 startBreak(vehicle, shiftBreak.getLink().getId());
             }
 
@@ -178,6 +181,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         if (facilityStop instanceof ShiftBreakTask shiftBreakTask) {
             endBreak(vehicle, shiftBreakTask);
         }
+        releaseReservationIfUnused(vehicle, facilityStop);
         OperationFacility facility = Objects.requireNonNull(operationFacilities.getFacilities().get(facilityStop.getFacilityId()));
         boolean checkOut = facility.deregisterVehicle(vehicle.getId());
         if (checkOut) {
@@ -385,6 +389,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         Gbl.assertNotNull(vehicle);
         vehicle.addShift(shift);
         assignedShifts.add(new ShiftEntry(shift, vehicle));
+        shortenWaitReservation(vehicle, shift);
         eventsManager.processEvent(new DrtShiftAssignedEvent(timer.getTimeOfDay(), mode, shift.getId(),
                 vehicle.getId(), shift.getShiftType().orElse(null)));
     }
@@ -515,6 +520,69 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
      * it start from the current task (diverting a drive, or leaving from a stop/stay).
      */
     private record ShiftEndAnchor(Task lastTask, LinkTimePair start, ShiftChangeOverTask existingChangeover) {}
+
+    /**
+     * A vehicle waiting at a facility holds a reservation until its service end, because the next shift is not known
+     * when the reservation is made. Once that next shift is assigned, the facility is only needed until the shift
+     * starts, so the reservation is shortened accordingly and the capacity becomes available for other vehicles.
+     * <p>
+     * This is only done if the vehicle is already waiting and the shift is its next one. The shift then starts on time,
+     * and {@code ShiftTaskScheduler.startShift} releases the reservation. A vehicle that is still serving an earlier
+     * shift may start the new one late, after its previous changeover; a shortened reservation would then end while
+     * the vehicle is still at the facility.
+     */
+    private void shortenWaitReservation(ShiftDvrpVehicle vehicle, DrtShift shift) {
+        Schedule schedule = vehicle.getSchedule();
+        if (schedule.getStatus() != Schedule.ScheduleStatus.STARTED || vehicle.getShifts().peek() != shift) {
+            return;
+        }
+        if (!(schedule.getCurrentTask() instanceof WaitForShiftTask waitTask) || !Schedules.getLastTask(schedule).equals(waitTask)) {
+            return;
+        }
+        if (waitTask.getReservationId().isEmpty()) {
+            return;
+        }
+        double shiftStartTime = shift.getStartTime();
+        Id<ReservationManager.Reservation> reservationId = waitTask.getReservationId().get();
+        facilityReservationManager.findReservation(waitTask.getFacilityId(), reservationId)
+                .filter(reservation -> reservation.startTime() < shiftStartTime && reservation.endTime() > shiftStartTime)
+                .ifPresent(reservation -> facilityReservationManager.updateReservation(waitTask.getFacilityId(),
+                        reservationId, reservation.startTime(), shiftStartTime));
+    }
+
+    /**
+     * A break is reserved until its latest end, because it may still be moved within its window. Once the break
+     * starts, its end is known and the rest of the window is released.
+     */
+    private void shortenBreakReservation(ShiftBreakTask breakTask,
+                                         ReservationManager.ReservationInfo<OperationFacility, DvrpVehicle> reservation) {
+        double now = timer.getTimeOfDay();
+        double breakEnd = Math.max(breakTask.getEndTime(), now + breakTask.getShiftBreak().getDuration());
+        if (breakEnd < reservation.endTime()) {
+            facilityReservationManager.updateReservation(reservation.resource().getId(), reservation.reservationId(),
+                    reservation.startTime(), breakEnd);
+        }
+    }
+
+    /**
+     * Removes the reservation of a facility task that ends, unless the next task uses the same reservation (a
+     * changeover and the subsequent {@link WaitForShiftTask} share one). Otherwise reservations whose tasks have ended
+     * would be kept until the end of the iteration.
+     */
+    private void releaseReservationIfUnused(ShiftDvrpVehicle vehicle, FacilityStop facilityStop) {
+        if (facilityStop.getReservationId().isEmpty()) {
+            return;
+        }
+        Id<ReservationManager.Reservation> reservationId = facilityStop.getReservationId().get();
+        Schedule schedule = vehicle.getSchedule();
+        int nextTaskIdx = schedule.getCurrentTask().getTaskIdx() + 1;
+        if (nextTaskIdx < schedule.getTaskCount()
+                && schedule.getTasks().get(nextTaskIdx) instanceof FacilityStop nextStop
+                && nextStop.getReservationId().equals(facilityStop.getReservationId())) {
+            return;
+        }
+        facilityReservationManager.removeReservation(facilityStop.getFacilityId(), reservationId);
+    }
 
     private ShiftEndAnchor findShiftEndAnchor(ShiftDvrpVehicle vehicle) {
         final List<? extends Task> tasks = vehicle.getSchedule().getTasks();

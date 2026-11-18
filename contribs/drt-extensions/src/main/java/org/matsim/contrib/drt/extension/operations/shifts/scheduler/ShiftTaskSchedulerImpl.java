@@ -153,8 +153,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 
             if (Schedules.getLastTask(schedule).equals(currentTask)) {
                 waitForShiftTask.setEndTime(Math.max(now, shift.getStartTime()));
-                Optional<Id<ReservationManager.Reservation>> reservationId = waitForShiftTask.getReservationId();
-                reservationId.ifPresent(id -> facilityReservationManager.updateReservation(waitForShiftTask.getFacilityId(), id, now, shift.getStartTime()));
+                // the reservation of the wait task is released when the task ends (DrtShiftDispatcherImpl.endOperationalTask)
 
                 // A shift with a discretionary end (e.g. a remote-guidance virtual shift running to the simulation
                 // horizon) does NOT materialise a changeover/wait tail: the horizon-anchored changeover and its
@@ -963,8 +962,18 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
     public void cancelAssignedShift(ShiftDvrpVehicle vehicle, double timeStep, DrtShift shift) {
         Schedule schedule = vehicle.getSchedule();
         StayTask stayTask = (StayTask) schedule.getCurrentTask();
-        if (stayTask instanceof WaitForShiftTask) {
+        if (stayTask instanceof WaitForShiftTask waitTask) {
             stayTask.setEndTime(vehicle.getServiceEndTime());
+            // the reservation may have been shortened to the start of the cancelled shift; the vehicle now stays
+            waitTask.getReservationId().ifPresent(id -> facilityReservationManager.findReservation(waitTask.getFacilityId(), id)
+                    .filter(reservation -> reservation.endTime() < vehicle.getServiceEndTime())
+                    .ifPresent(reservation -> {
+                        if (!facilityReservationManager.updateReservation(waitTask.getFacilityId(), id,
+                                reservation.startTime(), vehicle.getServiceEndTime())) {
+                            logger.warn("Could not extend the reservation of vehicle {} at facility {} after cancelling shift {}.",
+                                    vehicle.getId(), waitTask.getFacilityId(), shift.getId());
+                        }
+                    }));
         }
     }
     
