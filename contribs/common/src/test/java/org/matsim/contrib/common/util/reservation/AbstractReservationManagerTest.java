@@ -89,6 +89,8 @@ public class AbstractReservationManagerTest {
 		assertThat(reservationManager.isAvailable(resource1, consumer1, 100, 200)).isFalse(); // Exact same range
 		assertThat(reservationManager.isAvailable(resource1, consumer1, 50, 250)).isFalse(); // Completely contains
 		assertThat(reservationManager.isAvailable(resource1, consumer1, 120, 180)).isFalse(); // Completely inside
+		assertThat(reservationManager.isAvailable(resource1, consumer1, 50, 200)).isFalse(); // Starts before, same end
+		assertThat(reservationManager.isAvailable(resource1, consumer1, 100, 250)).isFalse(); // Same start, ends after
 	}
 
 	@Test

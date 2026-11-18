@@ -3,6 +3,7 @@ package org.matsim.contrib.common.util.reservation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.contrib.common.util.TimeInterval;
 
 import java.util.*;
 
@@ -45,10 +46,11 @@ public abstract class AbstractReservationManager<
 
 		// Use a Set to track unique consumers with overlapping reservations
 		Set<C> consumersWithOverlappingReservations = new HashSet<>();
+		TimeInterval requested = new TimeInterval(startTime, endTime).expandBy(bufferTime);
 
 		for (ReservationInfo<R, C> reservationInfo : reservations.get(resource.getId()).values()) {
 			if (!reservationInfo.consumer().getId().equals(consumer.getId()) &&
-				isOverlapping(reservationInfo, startTime - bufferTime, endTime + bufferTime)) {
+				requested.overlaps(new TimeInterval(reservationInfo.startTime(), reservationInfo.endTime()))) {
 
 				consumersWithOverlappingReservations.add(reservationInfo.consumer());
 			}
@@ -147,18 +149,6 @@ public abstract class AbstractReservationManager<
 		return Optional.ofNullable(reservationInfos.getOrDefault(reservationId, null));
 	}
 
-
-	private boolean isOverlapping(ReservationInfo<R, C> reservationInfo, double startTime, double endTime) {
-		if (startTime >= reservationInfo.startTime() && startTime < reservationInfo.endTime()) {
-			return true; // start time within existing range
-		} else if (endTime > reservationInfo.startTime() && endTime < reservationInfo.endTime()) {
-			return true; // end time within existing range
-		} else if (startTime <= reservationInfo.startTime() && endTime > reservationInfo.endTime()) {
-			return true; // new range covers existing range
-		} else {
-			return false;
-		}
-	}
 
 	protected void cleanReservations() {
 		reservations.clear();
