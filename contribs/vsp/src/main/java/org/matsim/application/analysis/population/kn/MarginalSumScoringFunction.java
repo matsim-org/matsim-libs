@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,6 +36,7 @@ import java.util.function.Supplier;
  * @author ikaddoura
  *
  */
+@Deprecated(since = "2027.0", forRemoval = false)
 public final class MarginalSumScoringFunction {
 	private final static Logger log = LogManager.getLogger(MarginalSumScoringFunction.class);
 	private final ScoringParameters params;

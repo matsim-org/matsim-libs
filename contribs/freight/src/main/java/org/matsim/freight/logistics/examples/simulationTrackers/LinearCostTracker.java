@@ -42,6 +42,12 @@ import org.matsim.freight.logistics.LSPSimulationTracker;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.LogisticChain;
 
+/**
+ * Example {@link LSPSimulationTracker} that derives a per-shipment linear cost function for a
+ * {@link LogisticChain} by combining its child event handlers (see {@link TourStartHandler}, {@link
+ * DistanceAndTimeHandler}, {@link CollectionServiceHandler}). The fixed/variable cost split is
+ * controlled by {@code shareOfFixedCosts}.
+ */
 /*package-private*/ class LinearCostTracker
     implements AfterMobsimListener,
         LSPSimulationTracker<LogisticChain>,
@@ -70,6 +76,9 @@ import org.matsim.freight.logistics.LogisticChain;
       this.eventHandlers = new ArrayList<>();
   }
 
+  /**
+   * @return the registered child event handlers whose aggregated costs are folded into the tracker.
+   */
   public final Collection<EventHandler> getEventHandlers() {
     return eventHandlers;
   }
@@ -101,6 +110,7 @@ import org.matsim.freight.logistics.LogisticChain;
   }
 
   @Override
+  /** Resets all accumulated cost and shipment counters at the start of an iteration. */
   public void reset(int iteration) {
     distanceCosts = 0;
     timeCosts = 0;
@@ -113,6 +123,7 @@ import org.matsim.freight.logistics.LogisticChain;
   }
 
   @Override
+  /** Sets the {@link LogisticChain} that this tracker is evaluating. */
   public void setEmbeddingContainer(LogisticChain pointer) {
     this.logisticChain = pointer;
   }

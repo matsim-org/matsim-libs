@@ -26,10 +26,15 @@ import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
-//"Handle" sounds a bit unclear in the German translation. Therefor we are breaking the unofficial naming convention here. KMT/KN jan'25
+/**
+ * A {@link LspShipmentPlanElement} recording an in-hub handling operation that happened to a
+ * shipment, as derived from the simulation events (as opposed to the pre-plan in
+ * {@code ScheduledLspShipmentHandling}).
+ */
+/*package*/ class LoggedLspShipmentHandling implements LspShipmentPlanElement {
+	//"Handle" sounds a bit unclear in the German translation. Therefor we are breaking the unofficial naming convention here. KMT/KN jan'25
 //Consider changing this Logged<...> ShipmentPlanElement to MATSim's experienced plans.
 //This would be clother to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
-/*package*/ class LoggedLspShipmentHandling implements LspShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;
@@ -78,9 +83,6 @@ import org.matsim.freight.logistics.LogisticChainElement;
 		return endTime;
 	}
 
-	/**
-	 * @return
-	 */
 	@Override
 	public Id<Link> getLinkId() {
 		return linkId;

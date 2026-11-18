@@ -1,4 +1,4 @@
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
 
 import org.apache.commons.numbers.gamma.RegularizedGamma;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +17,7 @@ import java.util.Map;
 import static org.matsim.application.ApplicationUtils.globFile;
 
 @CommandLine.Command(name = "run-vtts-analysis", description = "")
+@Deprecated(since = "2027.0", forRemoval = false)
 public class AddPersonAttribsToExperiencedPlans implements MATSimAppCommand {
 	private static final Logger log = LogManager.getLogger( AddPersonAttribsToExperiencedPlans.class );
 

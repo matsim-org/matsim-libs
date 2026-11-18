@@ -34,6 +34,11 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
+/**
+ * Example {@link org.matsim.core.events.handler.EventHandler} that tracks, for all carrier
+ * services of a simulation run, the total number of shipments, their total weight, and the total
+ * loading costs incurred by service durations.
+ */
 /*package-private*/ class CollectionServiceHandler
 	implements CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
 
@@ -48,6 +53,11 @@ import org.matsim.vehicles.Vehicles;
 		this.tuples = new ArrayList<>();
 	}
 
+	/**
+	 * Clears the accumulated counters and the recorded service tuples for a new iteration.
+	 *
+	 * @param iteration the current iteration (used only to trigger the reset)
+	 */
 	@Override
 	public void reset(int iteration) {
 		tuples.clear();
@@ -55,6 +65,13 @@ import org.matsim.vehicles.Vehicles;
 		totalWeightOfShipments = 0;
 	}
 
+	/**
+	 * Completes the service recorded for the matching {@link #handleEvent(CarrierServiceStartEvent)}
+	 * and adds the resulting loading cost (duration times per-second vehicle cost) to the running
+	 * total.
+	 *
+	 * @param event the carrier service end event
+	 */
 	@Override
 	public void handleEvent(CarrierServiceEndEvent event) {
 		System.out.println("Service Ends");
@@ -91,6 +108,7 @@ import org.matsim.vehicles.Vehicles;
 		return totalWeightOfShipments;
 	}
 
+	/** Pairing of a service id with the time at which the service started. */
 	private record ServiceTuple(Id<CarrierService> serviceId, double startTime) {
 	}
 }

@@ -26,6 +26,10 @@ import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
+/**
+ * A {@link LspShipmentPlanElement} describing a planned (pre-simulation) load operation. Contrasts
+ * with {@code LoggedLspShipmentLoad}, which is reconstructed from simulation events.
+ */
 class ScheduledLspShipmentLoad implements LspShipmentPlanElement {
 
 	private final double startTime;
@@ -42,12 +46,12 @@ class ScheduledLspShipmentLoad implements LspShipmentPlanElement {
 		this.linkId = builder.linkId;
 	}
 
-	/**
-	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
+	/** @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
 	 * Mixing class tagging and class hierarchies is a bad idea.
 	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
 	 * So maybe better use something like getActivityType() -- analogous to e.g. PersonEntersVehicleEvent.class) kmt/kn jan'25
-	 */
+	 *
+	 * @return the fixed element type {@code LOAD}. */
 	@Override
 	@Deprecated
 	public String getElementType() {
@@ -64,9 +68,6 @@ class ScheduledLspShipmentLoad implements LspShipmentPlanElement {
 		return endTime;
 	}
 
-	/**
-	 * @return
-	 */
 	@Override
 	public Id<Link> getLinkId() {
 		return linkId;

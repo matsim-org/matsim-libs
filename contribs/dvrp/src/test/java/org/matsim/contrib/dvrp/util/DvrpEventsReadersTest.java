@@ -73,11 +73,28 @@ public class DvrpEventsReadersTest {
 	private final List<Event> dvrpEvents = List.of(
 			new PassengerRequestSubmittedEvent(0, mode, request, List.of(person), fromLink, toLink, null, "1"),
 			new PassengerRequestScheduledEvent(1, mode, request, List.of(person), vehicle, 100, 200),
+			new PassengerRequestScheduledEvent(1, mode, request, List.of(person), vehicle, 100, 200, fromLink, null),
+			new PassengerRequestScheduledEvent(1, mode, request, List.of(person), vehicle, 100, 200, null, toLink),
 			new PassengerRequestRejectedEvent(2, mode, request, List.of(person), "cause_1"),
 			new PassengerPickedUpEvent(111, mode, request, person, vehicle),
 			new PassengerDroppedOffEvent(222, mode, request, person, vehicle),
 			new TaskStartedEvent(300, mode, vehicle, driver, TestTaskType.DRIVE_TASK, 0, fromLink),
 			new TaskEndedEvent(333, mode, vehicle, driver, TestTaskType.DRIVE_TASK, 0, toLink));
+
+	@Test
+	void scheduledEvent_linksOnlyWrittenIfSet() {
+		var withoutLinks = new PassengerRequestScheduledEvent(1, mode, request, List.of(person), vehicle, 100, 200);
+		assertThat(withoutLinks.getAttributes()).doesNotContainKeys(PassengerRequestScheduledEvent.ATTRIBUTE_PICKUP_LINK,
+				PassengerRequestScheduledEvent.ATTRIBUTE_DROPOFF_LINK);
+		assertThat(withoutLinks.getPickupLinkId()).isEmpty();
+
+		var withLinks = new PassengerRequestScheduledEvent(1, mode, request, List.of(person), vehicle, 100, 200, fromLink,
+				toLink);
+		assertThat(withLinks.getAttributes()).containsEntry(PassengerRequestScheduledEvent.ATTRIBUTE_PICKUP_LINK,
+				fromLink.toString()).containsEntry(PassengerRequestScheduledEvent.ATTRIBUTE_DROPOFF_LINK, toLink.toString());
+		assertThat(withLinks.getPickupLinkId()).contains(fromLink);
+		assertThat(withLinks.getDropoffLinkId()).contains(toLink);
+	}
 
 	@Test
 	void testReader() {

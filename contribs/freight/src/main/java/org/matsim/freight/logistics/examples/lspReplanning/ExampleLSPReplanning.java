@@ -22,10 +22,10 @@
 package org.matsim.freight.logistics.examples.lspReplanning;
 
 /**
-* Please refer to the
- * - org.matsim.freight.logistics.example.lsp.multipleChains.ExampleMultipleOneEchelonChainsReplanning for an example with Replanning
- * <p></p>
- *  - CollectionLSPReplanningTest for an idea, how replanning works (old way -- will be removed in the future).
-*/
+ * @deprecated Place-holder for the legacy (deprecated) replanning example. Refer to {@link
+ *     org.matsim.freight.logistics.examples.multipleChains.ExampleMultipleOneEchelonChainsReplanning}
+ *     for the current replanning approach and to {@code
+ *     org.matsim.freight.logistics.example.lsp} for a reference on how replanning works.
+ */
 @Deprecated
 /*package-private*/ class ExampleLSPReplanning {}

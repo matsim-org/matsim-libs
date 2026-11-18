@@ -26,7 +26,9 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
             + " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
             + " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
             + " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
-            + " InsertionCostCalculator.PenaltyCalculator")
+            + " InsertionCostCalculator.PenaltyCalculator. Note that this only applies to the request being inserted:"
+            + " the constraints of already scheduled requests are never relaxed, so a new insertion must not delay a"
+            + " stop whose constraints are already violated.")
     public boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 
 
@@ -38,6 +40,17 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
     @PositiveOrZero // used only for stopbased DRT scheme
     private
     double maxWalkDistance = Double.MAX_VALUE;// [m];
+
+    @Parameter
+    @Comment(
+            "Minimum beeline distance (in meters) between the access and the egress link of a drt trip, measured between"
+                    + " the link coordinates. In a stopbased or serviceAreaBased system, these are the links of the chosen"
+                    + " access and egress stops, not the locations of the activities. In a door2door system, these are the links of the activities."
+                    + " Shorter trips are not served: routing returns null (in most cases caught by"
+                    + " the fallback routing module), and requests that reach the mobsim without having been routed in this"
+                    + " run are rejected. By default, this bound is disabled (i.e. set to 0).")
+    @PositiveOrZero
+    private double minimumTripDistance = 0;// [m]
 
     @Parameter
     @Comment(
@@ -92,6 +105,15 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
 
     public void setMaxWalkDistance(@PositiveOrZero double maxWalkDistance) {
         this.maxWalkDistance = maxWalkDistance;
+    }
+
+    @PositiveOrZero
+    public double getMinimumTripDistance() {
+        return minimumTripDistance;
+    }
+
+    public void setMinimumTripDistance(@PositiveOrZero double minimumTripDistance) {
+        this.minimumTripDistance = minimumTripDistance;
     }
 
     @PositiveOrZero

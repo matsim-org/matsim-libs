@@ -41,6 +41,15 @@ import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
+/**
+ * Collection of utility methods and builder classes shared by the {@link LSPResource}s and their
+ * schedulers. Besides a few helper methods for carrier and resource construction, this class also
+ * collects the builder classes that are used to instantiate the various carrier resources
+ * ({@link DistributionCarrierResource}, {@link CollectionCarrierResource}, {@link MainRunCarrierResource}
+ * and {@link TransshipmentHubResource}) and schedulers ({@link TransshipmentHubScheduler}).
+ *
+ * <p>A helper for writing out LSP/shipment results to files is also provided.
+ */
 @SuppressWarnings("ClassEscapesDefinedScope")
 public class ResourceImplementationUtils {
 
@@ -57,14 +66,15 @@ public class ResourceImplementationUtils {
   }
 
   /**
-   * Collects all the vehicleTyps from the different Vehicle of the carrier. This is needed since we
-   * do not use carrier.getCarrierCapabilities().getVehicleTypes() any more as second field to safe
-   * vehicleTypes ... TODO: Maybe move to CarriersUtils in MATSim-libs / freight contrib.
-   *
-   * <p>KMT/Jul22
+   * Collects all the vehicle types from the different vehicles of the carrier.
+   * This is needed since we do not use {@code carrier.getCarrierCapabilities().getVehicleTypes()}
+   * any more as the second field to store the vehicle types.
+   * <p>
+   * TODO: Maybe move to CarriersUtils in MATSim-libs / freight contrib.
+   * KMT/Jul22
    *
    * @param carrier the carrier
-   * @return Collection of VehicleTypes
+   * @return the collection of the carrier's vehicle types
    */
   public static Collection<VehicleType> getVehicleTypeCollection(Carrier carrier) {
     Set<VehicleType> vehicleTypeCollection = new HashSet<>();
@@ -75,6 +85,12 @@ public class ResourceImplementationUtils {
     return vehicleTypeCollection;
   }
 
+  /**
+   * Writes out the list of the {@link LSP}'s shipments as TSV into the given output directory.
+   *
+   * @param outputDir path, defining the location for the results
+   * @param lsp the LSP, for which the shipments should be written out
+   */
   public static void printShipmentsOfLSP(String outputDir, LSP lsp) {
     System.out.println("Writing out shipments of LSP");
     try (BufferedWriter writer =
@@ -92,6 +108,13 @@ public class ResourceImplementationUtils {
     }
   }
 
+  /**
+   * Writes out the shipmentPlan (the scheduled plan elements) of each of the {@link LSP}'s
+   * shipments as TSV into the given output directory.
+   *
+   * @param outputDir path, defining the location for the results
+   * @param lsp the LSP, for which the shipmentPlan should be written out
+   */
   public static void printResults_shipmentPlan(String outputDir, LSP lsp) {
     System.out.println("Writing out shipmentPlan for LSP");
     try (BufferedWriter writer =
@@ -138,11 +161,11 @@ public class ResourceImplementationUtils {
   }
 
   /**
-   * Prints out the log of the shipment - this is not the shipment's plan Maybe the log will get
-   * removed soon. kmt sep/oct'22
+   * Writes out the log of each shipment (not its plan) of the {@link LSP} as TSV into the given
+   * output directory.
    *
    * @param outputDir path, defining the location for the results
-   * @param lsp the LSP, for which the results should be written out.
+   * @param lsp the LSP, for which the shipment logs should be written out.
    */
   public static void printResults_shipmentLog(String outputDir, LSP lsp) {
     System.out.println("Writing out shipmentLog for LSP");

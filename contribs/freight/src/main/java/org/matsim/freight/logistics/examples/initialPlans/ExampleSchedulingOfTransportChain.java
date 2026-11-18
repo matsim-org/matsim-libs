@@ -47,8 +47,9 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-/*A transport chain with five elements (collection-> reloading -> main run -> reloading -> delivery) is created and scheduled
- *
+/**
+ * Example that builds a five-element transport chain (collection → reloading → main run →
+ * reloading → delivery) in a single {@link LogisticChain}, schedules it, and prints the schedule.
  */
 
 /*package-private*/ class ExampleSchedulingOfTransportChain {
@@ -270,8 +271,8 @@ import org.matsim.vehicles.VehicleUtils;
     resourcesList.add(distributionResource);
 
     //		SolutionScheduler forwardSolutionScheduler = LSPUtils.createForwardSolutionScheduler();
-    // //Ist der "nicht einfache" Scheduler. TODO braucht der keine RessourcenListe oder ähnliches?
-    // --> Offenbar ja, weil Null Pointer. argh!
+    // // The "non-simple" scheduler. TODO: does it need a resource list or similar?
+    // --> Apparently yes, otherwise it throws a Null Pointer.
     //		completeLSPBuilder.setSolutionScheduler(forwardSolutionScheduler);
 
     LogisticChainScheduler simpleScheduler =

@@ -65,6 +65,11 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+/**
+ * Example that assigns shipments only to logistic chains whose requirements match. Two logistic
+ * chains (red and blue) are created and each shipment is given a color requirement; {@link
+ * RequirementsAssigner} then only admits a shipment to a chain that satisfies its requirement.
+ */
 class ExampleCheckRequirementsOfAssigner {
 
   static final String ATTRIBUTE_COLOR = "color";

@@ -29,8 +29,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /**
- * This class contains some code fragments, that are used in the different *CarrierScheduler
- * classes. To avoid code duplication these methods are extracted and located here more centralized.
+ * Central place for helper methods that are used by the different {@link CarrierScheduler}
+ * implementations, in order to avoid code duplication between them.
  *
  * @author Kai Martins-Turner (kturner)
  */
@@ -39,22 +39,23 @@ public class CarrierSchedulerUtils {
 	private static final String LOGIC_OF_VRP = "logicOfVrp";
 
 	/**
-	 * Creates a VehicleRoutingProblem from a carrier and a network and solves it with Jsprit.
-	 * If a roadPricingScheme is given, the tolls are considered in the routing costs.
+	 * Creates a {@link VehicleRoutingProblem} from a carrier and a network and solves it with Jsprit.
+	 * If a {@link RoadPricingScheme} is present in the scenario, the tolls are considered in the routing costs.
 	 * <p>
 	 * This looks for me (KMT) similar to what is done in {@link org.matsim.freight.carriers.CarriersUtils#runJsprit(Scenario)}.
-   * So, maybe this can be more simplified. (Most probably, the runJsprit method need this rpscheme - handling as well)
+	 * So, maybe this can be more simplified. (Most probably, the runJsprit method need this rpscheme - handling as well)
 	 *
 	 * @param carrier  Carrier for which the problem should be solved
 	 * @param scenario the scenario
 	 * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
 	 */
 	public static Carrier solveVrpWithJsprit(Carrier carrier, Scenario scenario) {
+		// Rebuilt for each carrier (rather than cached) to keep a clear state, since the network load may change between iterations.
+		// ---
 		// Maybe it make sense to store this object instead of rebuilding it for each carrier (in each iteration) ???
 		// pro: save computation time
 		// con: interdependencies, if something changes in the network (load), the object is not up-to-date & it is not clear, if the object is thread safe
 		// Decision for the time being: rebuild it for each carrier to have a clear state KMT/KN Aug'24
-
 
 		NetworkBasedTransportCosts netbasedTransportCosts;
 		Network network = scenario.getNetwork();
@@ -99,6 +100,12 @@ public class CarrierSchedulerUtils {
 		return carrier;
 	}
 
+	/**
+	 * Sum up the score of the given list of {@link CarrierPlan}s.
+	 *
+	 * @param scheduledPlans the scheduled plans whose scores should be added up
+	 * @return the sum of the scores coming from jsprit
+	 */
 	public static Double sumUpScore(List<CarrierPlan> scheduledPlans) {
 		double score = 0;
 		for (CarrierPlan scheduledPlan : scheduledPlans) {

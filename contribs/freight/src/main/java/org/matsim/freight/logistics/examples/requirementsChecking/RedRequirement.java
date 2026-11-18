@@ -45,10 +45,20 @@ package org.matsim.freight.logistics.examples.requirementsChecking;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LspShipmentRequirement;
 
+/**
+ * Example {@link LspShipmentRequirement} that is satisfied only by a logistic chain tagged with the
+ * red color attribute (see {@link ExampleCheckRequirementsOfAssigner#ATTRIBUTE_COLOR}).
+ */
 /*package-private*/ class RedRequirement implements LspShipmentRequirement {
 
   static final String RED = "red";
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Satisfied only when the chain carries the red color attribute (see {@link
+   * ExampleCheckRequirementsOfAssigner#ATTRIBUTE_COLOR}).
+   */
   @Override
   public boolean checkRequirement(LogisticChain solution) {
     return solution

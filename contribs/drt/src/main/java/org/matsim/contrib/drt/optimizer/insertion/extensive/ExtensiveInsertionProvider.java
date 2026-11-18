@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
+import org.matsim.contrib.drt.optimizer.insertion.RequestVariants;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
@@ -67,12 +68,14 @@ class ExtensiveInsertionProvider {
 	}
 
 	List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
+		// variants are created once per search and shared by all vehicles
+		var variants = RequestVariants.of(drtRequest);
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		List<InsertionWithDetourData> preFilteredInsertions = forkJoinPool.submit(() -> vehicleEntries.parallelStream()
 				//generate feasible insertions (wrt occupancy limits) with admissible detour times
-				.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
+				.flatMap(e -> insertionGenerator.generateInsertions(variants, e).stream())
 				//optimistic pre-filtering wrt admissible cost function
-				.filter(i -> admissibleCostCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)
+				.filter(i -> admissibleCostCalculator.calculate(i.insertion.getRequest(), i.insertion, i.detourTimeInfo)
 						< INFEASIBLE_SOLUTION_COST)
 				//collect
 				.collect(Collectors.toList())).join();

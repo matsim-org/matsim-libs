@@ -41,7 +41,7 @@ public class ExampleTwoLspsFoodMultipleChainsTest {
 	 * It is **not** meat to get never chanced. In contrast, it will prevent me from unintended changes.
 	 * I assume that with ongoing work, I will adapt the test input regularly.
 	 * <p>
-	 * TODO re evaluate this test. The code which was used did not work correctly in my oppinion, as it summed scores of the wrong carriers.
+	 * TODO re evaluate this test. The code which was used did not work correctly in my opinion, as it summed scores of the wrong carriers.
 	 * janek Jan' 26
 	 */
 	@Test

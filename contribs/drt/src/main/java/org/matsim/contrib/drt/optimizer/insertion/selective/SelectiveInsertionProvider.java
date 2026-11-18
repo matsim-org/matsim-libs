@@ -30,6 +30,7 @@ import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
+import org.matsim.contrib.drt.optimizer.insertion.RequestVariants;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 
@@ -59,6 +60,8 @@ class SelectiveInsertionProvider {
 	}
 
 	Optional<InsertionWithDetourData> getInsertion(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
+		// variants are created once per search and shared by all vehicles
+		var variants = RequestVariants.of(drtRequest);
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		return forkJoinPool.submit(
 				// find best insertion given a stream of insertion with time data
@@ -66,6 +69,6 @@ class SelectiveInsertionProvider {
 						//for each vehicle entry
 						vehicleEntries.parallelStream()
 								//generate feasible insertions (wrt occupancy limits) with restrictive detour times
-								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream()))).join();
+								.flatMap(e -> insertionGenerator.generateInsertions(variants, e).stream()))).join();
 	}
 }

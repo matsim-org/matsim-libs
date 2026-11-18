@@ -41,9 +41,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /**
- * Writes out resources, shipments and plans for each LSP in an XML-file including header for
- * validating against respective XSD and setting up according writer. Uses variables defined in
- * LSPConstants-class for the elements and attributes within the XML.
+ * Guice-independent writer that serializes {@link LSP}s (resources, shipments and plans) to an XML
+ * file in the V1 XSD format. Element and attribute names are taken from {@code LSPConstants}.
  *
  * @author nrichter (Niclas Richter)
  */
@@ -58,6 +57,15 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 		this.lsPs = lsPs.getLSPs().values();
 	}
 
+	/**
+	 * Writes all {@link LSP}s to the given XML file in the V1 XSD format.
+	 * <p>
+	 * The file starts with an XML head that validates against the corresponding XSD, followed by the
+	 * resources, shipments and plans of every LSP. Element and attribute names are taken from
+	 * {@code LSPConstants}.
+	 *
+	 * @param filename the destination XML file
+	 */
 	public void write(String filename) {
 		logger.info(Gbl.aboutToWrite("lsps", filename));
 		try {

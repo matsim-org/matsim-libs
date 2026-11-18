@@ -1,4 +1,4 @@
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +30,8 @@ import java.util.List;
 
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.StagesAsNormalActivities;
 
+/** @deprecated Manual score comparison retained for reference. */
+@Deprecated(since = "2027.0", forRemoval = false)
 class AgentWiseQuickKN {
 	private static final Logger log = LogManager.getLogger( AgentWiseQuickKN.class );
 

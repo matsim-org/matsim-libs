@@ -37,6 +37,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFl
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.DrtModePlusOneRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
+import org.matsim.contrib.drt.routing.DrtPickupDropoffRestriction;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtServiceAreas;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -67,12 +68,20 @@ public class RebalancingModule extends AbstractDvrpModeModule {
 
 			// bound in DrtModeRoutingModule, which is installed alongside
 			OptionalBinder.newOptionalBinder(binder(), modalKey(DrtServiceAreas.class));
+			OptionalBinder.newOptionalBinder(binder(), modalKey(DrtPickupDropoffRestriction.class));
 
 			modalMapBinder(String.class, ZoneSystem.class).addBinding(REBALANCING_ZONE_SYSTEM).toProvider(modalProvider(getter -> {
 				Network network = getter.getModal(Network.class);
 				Predicate<Zone> zoneFilter = DrtServiceAreas.servedAreaZoneFilter(getConfig(), drtCfg,
 						getter.getModal(new TypeLiteral<Optional<DrtServiceAreas>>() {
 						}));
+				// if all pickups must lie in the pickup/dropoff restriction area, there is no point in rebalancing outside
+				Optional<DrtPickupDropoffRestriction> pickupDropoffRestriction = getter.getModal(
+						new TypeLiteral<Optional<DrtPickupDropoffRestriction>>() {
+						});
+				if (pickupDropoffRestriction.isPresent()) {
+					zoneFilter = zoneFilter.and(pickupDropoffRestriction.get().pickupZoneFilter());
+				}
 				String crs = getConfig().global().getCoordinateSystem();
 				ZoneSystemParams zoneSystemParams = rebalancingParams.getZoneSystemParams();
 				return ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network, zoneSystemParams, crs, zoneFilter);

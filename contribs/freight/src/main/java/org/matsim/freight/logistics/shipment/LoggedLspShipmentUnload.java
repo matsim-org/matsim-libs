@@ -26,9 +26,14 @@ import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
+/**
+ * A {@link LspShipmentPlanElement} recording a shipment unload that happened during the simulation,
+ * as derived from events. Contrasts with {@code ScheduledLspShipmentUnload}, which describes a
+ * planned (pre-simulation) unload.
+ */
+class LoggedLspShipmentUnload implements LspShipmentPlanElement {
 //Consider changing this Logged<...> ShipmentPlanElement to MATSim's experienced plans.
 //This would be closer to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
-class LoggedLspShipmentUnload implements LspShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;

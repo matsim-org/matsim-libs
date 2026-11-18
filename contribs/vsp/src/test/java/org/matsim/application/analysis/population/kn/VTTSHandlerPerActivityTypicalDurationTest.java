@@ -1,4 +1,4 @@
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;

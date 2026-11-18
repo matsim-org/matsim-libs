@@ -27,13 +27,10 @@ import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
- * Ganz einfacher {@link InitialShipmentAssigner}: Voraussetzung: Der {@link LSPPlan} hat genau 1 {@link
- * LogisticChain}.
+ * A simple {@link InitialShipmentAssigner} that assumes an {@link LSPPlan} with exactly one
+ * {@link LogisticChain}, and assigns the given {@link LspShipment} to that chain.
  *
- * <p>Dann wird das {@link LspShipment} diesem zugeordnet.
- *
- * <p>(Falls die Voraussetzung "exakt 1 LogisticChain pro Plan" nicht erfüllt ist, kommt eine
- * RuntimeException)
+ * <p>Throws a {@link RuntimeException} if the plan does not contain exactly one logistic chain.
  */
 class SingleLogisticChainShipmentAssigner implements InitialShipmentAssigner {
 

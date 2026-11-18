@@ -31,6 +31,10 @@ import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
+/**
+ * @deprecated Creates a replanning strategy that delegates shipment assignment to an {@link
+ *     InitialShipmentAssigner}. Retained only to preserve the older behavior and existing tests.
+ */
 @Deprecated
 /*package-private*/ class TomorrowShipmentAssignerStrategyFactory {
 

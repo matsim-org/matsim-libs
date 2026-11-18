@@ -26,6 +26,10 @@ import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
+/**
+ * A {@link LspShipmentPlanElement} describing a planned (pre-simulation) unload operation. Contrasts
+ * with {@code LoggedLspShipmentUnload}, which is reconstructed from simulation events.
+ */
 class ScheduledLspShipmentUnload implements LspShipmentPlanElement {
 
 	private final double startTime;
@@ -46,8 +50,7 @@ class ScheduledLspShipmentUnload implements LspShipmentPlanElement {
 	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
 	 * Mixing class tagging and class hierarchies is a bad idea.
 	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
-	 * So maybe better use something like getActivityType() -- analogous to e.g. PersonEntersVehicleEvent.class) kmt/kn jan'25
-	 */
+	 * So maybe better use something like getActivityType() -- analogous to e.g. PersonEntersVehicleEvent.class) kmt/kn jan'25@return the fixed element type {@code UNLOAD}. */
 	@Override
 	@Deprecated
 	public String getElementType() { return LSPConstants.UNLOAD; }
@@ -72,13 +75,8 @@ class ScheduledLspShipmentUnload implements LspShipmentPlanElement {
 		return resourceId;
 	}
 
-	/**
-	 * @return
-	 */
 	@Override
 	public Id<Link> getLinkId() {
 		return linkId;
 	}
-
-
 }

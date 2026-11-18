@@ -38,6 +38,11 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
+/**
+ * Example {@link org.matsim.core.events.handler.EventHandler} that accumulates distance-based and
+ * time-based costs of carriers by pairing {@link LinkEnterEvent}s with {@link LinkLeaveEvent}s /
+ * {@link VehicleLeavesTrafficEvent}s on the same vehicle.
+ */
 /*package-private*/ class DistanceAndTimeHandler
     implements LinkEnterEventHandler, VehicleLeavesTrafficEventHandler, LinkLeaveEventHandler {
   private static final Logger log = LogManager.getLogger(DistanceAndTimeHandler.class);
@@ -91,10 +96,16 @@ import org.matsim.vehicles.Vehicles;
 
   }
 
+  /**
+   * @return the accumulated distance-based costs since the last {@link #reset(int)}.
+   */
   public double getDistanceCosts() {
     return distanceCosts;
   }
 
+  /**
+   * @return the accumulated time-based costs since the last {@link #reset(int)}.
+   */
   public double getTimeCosts() {
     return timeCosts;
   }

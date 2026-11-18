@@ -52,8 +52,16 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+/**
+ * Example that runs a single-echelon collection scenario end-to-end in a mobsim. A collection LSP
+ * with five shipments is built, assigned, scheduled, and simulated.
+ */
 /*package-private*/ class ExampleMobsimOfSimpleLSP {
 
+  /**
+   * Runs the collection LSP end-to-end in a mobsim, then prints the scheduled and logged plan
+   * elements of each shipment for inspection.
+   */
   public static void main(String[] args) {
     // Set up required MATSim classes
     Config config = new Config();
@@ -101,8 +109,8 @@ import org.matsim.vehicles.VehicleUtils;
             install(new LSPModule());
           }
         });
-    // The VSP default settings are designed for person transport simulation. After talking to Kai,
-    // they will be set to WARN here. Kai MT may'23
+    // The VSP default settings are designed for person transport simulation, so the checking
+    // level is relaxed to WARN here. (KMT may'23 after talking to Kai)
     controller
         .getConfig()
         .vspExperimental()

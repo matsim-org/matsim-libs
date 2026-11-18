@@ -32,10 +32,10 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHand
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Basic event handler that collects the relation between vehicles and carrier.
- * Necessary since there is no event having all this information together.
+ * Basic event handler that collects the relation between vehicles and their carrier.
+ * Necessary since no single event carries both pieces of information.
  * <p>
- * This is a modified implementation of {@link org.matsim.core.events.algorithms.Vehicle2DriverEventHandler}.
+ * This is a carrier-oriented adaptation of {@link org.matsim.core.events.algorithms.Vehicle2DriverEventHandler}.
  * <p>
  * In a first step only used internally. When needed more often, I have nothing against putting it more central. -> matsim-libs
  *

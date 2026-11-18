@@ -52,6 +52,11 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+/**
+ * Example that runs a two-echelon collection–main-run–distribution scenario in a mobsim. A single
+ * logistic chain with collection and distribution carriers and two transshipment hubs is built,
+ * assigned, scheduled, and simulated.
+ */
 /*package-private*/ class ExampleMobsimOfTransportChain {
 
   private static LSP createInitialLSP(Scenario scenario) {
@@ -323,6 +328,10 @@ import org.matsim.vehicles.VehicleUtils;
     return shipmentList;
   }
 
+  /**
+   * Runs the collection–main-run–distribution LSP end-to-end in a mobsim, then prints the scheduled
+   * and logged plan elements of each shipment for inspection.
+   */
   public static void main(String[] args) {
     // Set up required MATSim classes
     Config config = new Config();
@@ -351,17 +360,15 @@ import org.matsim.vehicles.VehicleUtils;
         new AbstractModule() {
           @Override
           public void install() {
-            install(
-                new LSPModule()); // this is the better syntax, having everything in one module.
-                                  // kai, may'22
+            install(new LSPModule());
           }
         });
     config.controller().setFirstIteration(0);
     config.controller().setLastIteration(0);
     config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
     config.network().setInputFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
-    // The VSP default settings are designed for person transport simulation. After talking to Kai,
-    // they will be set to WARN here. Kai MT may'23
+    // The VSP default settings are designed for person transport simulation, so the checking
+    // level is relaxed to WARN here.  (KMT may'23 after talking to Kai)
     controller
         .getConfig()
         .vspExperimental()

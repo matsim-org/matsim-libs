@@ -22,9 +22,18 @@ package org.matsim.freight.logistics.shipment;
 
 import java.util.Comparator;
 
+/**
+ * Orders {@link LspShipmentPlanElement}s for a shipment by time, first by start time and then by end
+ * time. Used to determine which element should be added next to a shipment's plan.
+ */
 final class ShipmentPlanElementComparator implements Comparator<LspShipmentPlanElement> {
 
 	/*package-private*/ ShipmentPlanElementComparator() {}
+
+	/**
+	 * @return a negative, zero, or positive integer as {@code o1} is earlier, equal to, or later than
+	 *     {@code o2}
+	 */
 
 	@Override
 	public int compare(LspShipmentPlanElement o1, LspShipmentPlanElement o2) {

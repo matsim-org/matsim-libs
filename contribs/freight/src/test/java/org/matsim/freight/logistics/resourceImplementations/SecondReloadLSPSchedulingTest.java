@@ -424,7 +424,7 @@ public class SecondReloadLSPSchedulingTest {
 			{//CollectionTourEnd
 				assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.getFirst());
 				LSPTourEndEventHandler collectionEndHandler = (LSPTourEndEventHandler) eventHandlers.getFirst();
-				CarrierService carrierService = (CarrierService) collectionEndHandler.getCarrierService();
+				CarrierService carrierService = collectionEndHandler.getCarrierService();
 				assertSame(carrierService.getServiceLinkId(), shipment.getFrom());
 				assertEquals(carrierService.getCapacityDemand(), shipment.getSize());
 				assertEquals(carrierService.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
@@ -444,7 +444,7 @@ public class SecondReloadLSPSchedulingTest {
 			{//CollectionServiceEnd
 				assertInstanceOf(CollectionJobEventHandler.class, eventHandlers.get(1));
 				CollectionJobEventHandler collectionServiceHandler = (CollectionJobEventHandler) eventHandlers.get(1);
-				CarrierService carrierService = (CarrierService) collectionServiceHandler.getCarrierService();
+				CarrierService carrierService = collectionServiceHandler.getCarrierService();
 				assertSame(carrierService.getServiceLinkId(), shipment.getFrom());
 				assertEquals(carrierService.getCapacityDemand(), shipment.getSize());
 				assertEquals(carrierService.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
@@ -484,7 +484,7 @@ public class SecondReloadLSPSchedulingTest {
 			{//MainRunEnd
 				assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.get(3));
 				LSPTourEndEventHandler mainRunEndHandler = (LSPTourEndEventHandler) eventHandlers.get(3);
-				CarrierService carrierService = (CarrierService) mainRunEndHandler.getCarrierService();
+				CarrierService carrierService = mainRunEndHandler.getCarrierService();
 				assertSame(carrierService.getServiceLinkId(), toLinkId);
 				assertEquals(carrierService.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 				assertEquals(carrierService.getCapacityDemand(), shipment.getSize());

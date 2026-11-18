@@ -56,15 +56,15 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
- * The LSP have to possibilities to send the goods from the first depot to the recipients: A) via
- * another hub and then distributed or B) directly from the depot
+ * The LSP has two possibilities to move goods from the depot to the recipients: A) via a hub and
+ * then distributed, or B) directly from the depot.
  *
- * <p>This examples bases on the Example ExampleSchedulingOfTransportChain.class -- the collection
- * Part is removed, Chain is now starting at the CollectionHub
+ * <p>This example is based on {@link ExampleSchedulingOfTransportChain}; the collection part is
+ * removed and the chain now starts at the depot.
  *
- * <p>Scheduler = Macht die Pläne für die Fahrzeuge für die nächste MATSim-Iteration. Er plant es
- * für jede Ressource. → jede Ressource hat einen eigenen Scheduler: 1.) Simple: Nimm die
- * mitgegebene Reihenfolge. 2.)
+ * <p>Schedulers build the vehicle plans for the next MATSim iteration; each resource has its own
+ * scheduler. The scheduler either takes the given order of the chain ("simple"), or runs a
+ * scheduling algorithm.
  */
 /*package-private*/ final class ExampleSchedulingOfTransportChainHubsVsDirect {
 
@@ -104,8 +104,8 @@ import org.matsim.vehicles.VehicleUtils;
         .setOverwriteFileSetting(
             OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 	  config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
-    // The VSP default settings are designed for person transport simulation. After talking to Kai,
-    // they will be set to WARN here. Kai MT may'23
+    // The VSP default settings are designed for person transport simulation, so the checking
+    // level is relaxed to WARN here. (KMT may'23, after talking to Kai)
     config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
     var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
@@ -389,8 +389,7 @@ import org.matsim.vehicles.VehicleUtils;
     // TODO: Für die Auswahl "CostInfo an die Solutions dran heften.
 
     // The SolutionElements are now inserted into the only LogisticsSolution of the LSP.
-    // Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten
-    // Vorgänger/Nachfolger bestimmt wurden.
+    // The order of adding them is irrelevant, since the predecessor/successor links were already set above.
 
     switch (solutionType) {
       case onePlan_withHub -> {
@@ -462,8 +461,7 @@ import org.matsim.vehicles.VehicleUtils;
   private static List<LSPResource> createResourcesListFromLSPPlan(LSPPlan lspPlanWithReloading) {
     log.info("Collecting all LSPResources from the LSPPlan");
     List<LSPResource> resourcesList =
-        new ArrayList<>(); // TODO: Mahe daraus ein Set, damit jede Resource nur einmal drin ist?
-                           // kmt Feb22
+        new ArrayList<>(); // TODO: Mahe daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
     for (LogisticChain solution : lspPlanWithReloading.getLogisticChains()) {
       for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
         resourcesList.add(solutionElement.getResource());

@@ -1,4 +1,4 @@
-package org.matsim.application.analysis.population;
+package org.matsim.application.analysis.population.kn;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,8 +33,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.matsim.application.analysis.population.AgentWiseComparisonKNUtils.setIsInShp;
+import static org.matsim.application.analysis.population.kn.AgentWiseComparisonKNUtils.setIsInShp;
 
+/** @deprecated Manual example retained alongside the KN comparison. */
+@Deprecated(since = "2027.0", forRemoval = false)
 class AgentWiseComparisonKNExample{
 	private static final Logger log = LogManager.getLogger( AgentWiseComparisonKNExample.class );
 	static void main() throws IOException{

@@ -19,19 +19,23 @@
 package org.matsim.contrib.drt.optimizer;
 
 import com.google.common.collect.ImmutableList;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.DrtCapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.*;
 
@@ -120,43 +124,92 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 				ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, currentTime);
 	}
 
+	/**
+	 * Computes the slack time for each insertion point: the maximum delay that can be introduced there without
+	 * violating any constraint of the stops downstream or the vehicle's service end time.
+	 * <p>
+	 * Two kinds of constraints are treated differently:
+	 * <ul>
+	 *     <li>Time windows (latest arrival/departure) and the service end time bind any delay introduced upstream of
+	 *     the stop, so they propagate backwards as a running minimum.</li>
+	 *     <li>The max ride duration of a request binds only delays introduced <em>after</em> its pickup. A delay
+	 *     introduced before the pickup shifts pickup and dropoff alike and does not prolong the ride. Requests that
+	 *     are already on board (or are being picked up at the ongoing start stop) bind all insertion points up to
+	 *     their dropoff, including the start.</li>
+	 * </ul>
+	 * Stay times before a stop absorb delays for both kinds of constraints.
+	 * <p>
+	 * A vehicle running late (e.g. due to congestion, or a request accepted with a soft constraint violation) has a
+	 * negative slack. The reported slack per insertion point is capped at 0, so insertions without time loss stay
+	 * feasible. The running value itself stays uncapped, so that an upstream stay time first absorbs the existing
+	 * delay before it creates new slack.
+	 */
 	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, StopWaypoint[] stops, StopWaypoint start,
 									  List<Double> precedingStayTimes) {
 		double[] slackTimes = new double[stops.length + 2];
 
 		//vehicle
-		double slackTime = calcVehicleSlackTime(vehicle, now);
-		slackTimes[stops.length + 1] = slackTime;
+		double timeWindowSlack = calcVehicleSlackTime(vehicle, now);
+		slackTimes[stops.length + 1] = timeWindowSlack;
+
+		// Ride slack of the requests whose ride spans the current insertion point. Each entry stores the remaining
+		// ride slack minus the stay time accumulated (backwards) up to its dropoff, so that its slack at the current
+		// insertion point is entry + accumulatedStayTime.
+		Map<Id<Request>, Double> rideSlackOffsets = new HashMap<>();
+		double accumulatedStayTime = 0.0;
 
 		//stops
 		for (int i = stops.length - 1; i >= 0; i--) {
 			StopWaypoint stop = stops[i];
 
 			// Check time window constraints at this stop
-			slackTime = Math.min(stop.getLatestArrivalTime() - stop.getTask().getBeginTime(), slackTime);
-			slackTime = Math.min(stop.getLatestDepartureTime() - stop.getTask().getEndTime(), slackTime);
+			timeWindowSlack = Math.min(stop.getLatestArrivalTime() - stop.getTask().getBeginTime(), timeWindowSlack);
+			timeWindowSlack = Math.min(stop.getLatestDepartureTime() - stop.getTask().getEndTime(), timeWindowSlack);
 
-			// Check ride duration constraints for passengers dropping off at this stop
-			// The backward iteration ensures slack propagates correctly to earlier insertion points
+			// Ride duration constraints of passengers dropping off at this stop start to bind here ...
 			for (AcceptedDrtRequest req : stop.getTask().getDropoffRequests().values()) {
+				if (req.getMaxRideDuration() == Double.POSITIVE_INFINITY) {
+					continue; // ride duration not constrained (default)
+				}
 				double plannedPickupTime = req.getRequestTiming().getPlannedPickupTime().orElseThrow(()
 						-> new IllegalStateException("Accepted request should have a (planned) pickup time at this point."));
 				double plannedDropoffTime = req.getRequestTiming().getPlannedDropoffTime().orElseThrow(()
 						-> new IllegalStateException("Accepted request should have a (planned) dropoff time at this point."));
 				double currentRideDuration = plannedDropoffTime - plannedPickupTime;
 				double currentRideSlack = Math.max(0, req.getMaxRideDuration() - currentRideDuration);
-				slackTime = Math.min(slackTime, currentRideSlack);
+				rideSlackOffsets.put(req.getId(), currentRideSlack - accumulatedStayTime);
 			}
 
-			slackTime += precedingStayTimes.get(i); // reset slack before prebooked request
-			slackTimes[i + 1] = slackTime;
+			// ... and stop binding before the stop where they are picked up
+			if (!rideSlackOffsets.isEmpty()) {
+				for (Id<Request> pickedUp : stop.getTask().getPickupRequests().keySet()) {
+					rideSlackOffsets.remove(pickedUp);
+				}
+			}
+
+			double stayTime = precedingStayTimes.get(i); // reset slack before prebooked request
+			timeWindowSlack += stayTime;
+			accumulatedStayTime += stayTime;
+			slackTimes[i + 1] = Math.max(0, Math.min(timeWindowSlack, minRideSlack(rideSlackOffsets, accumulatedStayTime)));
 		}
 
-		// start
-		slackTimes[0] = start == null ? slackTime :
-			Math.min(start.getLatestDepartureTime() - start.getTask().getEndTime(), slackTime);
+		// start: the remaining ride constraints belong to passengers already on board
+		double slackTime = Math.min(timeWindowSlack, minRideSlack(rideSlackOffsets, accumulatedStayTime));
+		slackTimes[0] = Math.max(0, start == null ? slackTime :
+			Math.min(start.getLatestDepartureTime() - start.getTask().getEndTime(), slackTime));
 
 		return slackTimes;
+	}
+
+	private static double minRideSlack(Map<Id<Request>, Double> rideSlackOffsets, double accumulatedStayTime) {
+		if (rideSlackOffsets.isEmpty()) {
+			return Double.POSITIVE_INFINITY;
+		}
+		double min = Double.POSITIVE_INFINITY;
+		for (double offset : rideSlackOffsets.values()) {
+			min = Math.min(min, offset);
+		}
+		return min + accumulatedStayTime;
 	}
 
 	static double calcVehicleSlackTime(DvrpVehicle vehicle, double now) {

@@ -77,13 +77,13 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 		}
 
 		var insertion = selectedInsertion.get().insertion;
-		var insertionDetourData = detourPathCalculator.calculatePaths(drtRequest, insertion);
+		var insertionDetourData = detourPathCalculator.calculatePaths(insertion.getRequest(), insertion);
 		var insertionWithDetourData = new InsertionWithDetourData(insertion, insertionDetourData,
-				detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData, drtRequest));
+				detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData, insertion.getRequest()));
 
 		collectDifferences(selectedInsertion.get().detourTimeInfo, insertionWithDetourData.detourTimeInfo);
 
-		double insertionCost = insertionCostCalculator.calculate(drtRequest, insertion,
+		double insertionCost = insertionCostCalculator.calculate(insertion.getRequest(), insertion,
 				insertionWithDetourData.detourTimeInfo);
 		return insertionCost >= INFEASIBLE_SOLUTION_COST ? Optional.empty() : Optional.of(insertionWithDetourData);
 	}

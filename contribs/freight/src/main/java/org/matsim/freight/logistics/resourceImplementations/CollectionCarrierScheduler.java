@@ -51,15 +51,19 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 	private final Scenario scenario;
 
 	/**
-	 * Constructor for the CollectionCarrierScheduler.
+	 * Creates a scheduler bound to the given scenario.
 	 * TODO: In the future, the scenario should come via injection(?) This here is only a dirty workaround. KMT'Aug'24
 	 *
-	 * @param scenario the road pricing scheme
+	 * @param scenario the MATSim scenario providing the road network
 	 */
 	CollectionCarrierScheduler(Scenario scenario) {
 		this.scenario = scenario;
 	}
 
+	/**
+	 * Resets the carrier's services, shipments and plans before scheduling, and binds the carrier
+	 * and resource of the scheduler.
+	 */
 	@Override
 	public void initializeValues(LSPResource resource) {
 		if (resource.getClass() == CollectionCarrierResource.class) {
@@ -71,6 +75,10 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 		}
 	}
 
+	/**
+	 * Converts the queued {@link LspShipment}s into {@link CarrierService}s, routes the carrier's
+	 * vehicles through the network via jsprit and then updates the shipment plans.
+	 */
 	@Override
 	public void scheduleResource() {
 		for (LspShipment lspShipmentToBeAssigned : lspShipmentsToSchedule) {
@@ -87,7 +95,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 		CarrierService carrierService = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(lspShipment.getPickupTimeWindow().getStart(), lspShipment.getPickupTimeWindow().getEnd()))
 			.setServiceDuration(lspShipment.getDeliveryServiceTime())
 			.build();
-		//ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan
+		// Ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan.
 		if (! Objects.equals(lspShipment.getId().toString(), carrierService.getId().toString())) {
 			log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierService.getId().toString(),
 				new IllegalStateException("Id of LspShipment and CarrierService do not match"));

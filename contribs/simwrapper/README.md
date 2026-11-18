@@ -125,3 +125,15 @@ In a dashboard, the output of this analysis can be referenced using `data.comput
 The contrib will collect all required analysis classes, no further configuration for the post-processing is necessary.
 
 For detailed examples, please refer to existing dashboards in `org.matsim.simwrapper.dashboard`.
+
+## VTTS dashboard
+
+`VttsDashboard` displays person distributions of MUSE, VSE and VTTS, summary statistics, and
+coverage counts from CSVs under `analysis/vtts/`. It reads existing files rather than reconstructing
+a scoring function in a post-processing command.
+
+During initial development, the calculation lives in the VSP contrib. Its `VttsModule` uses the
+scenario's injected scoring factory and exports results at the final iteration end. Install it
+alongside `SimWrapperModule`; it also registers the shared dashboard. See the
+[VSP VTTS documentation](../vsp/README-vtts.md) for configuration, supported scoring contracts,
+the output schema, and the test command. SimWrapper does not depend on VSP.

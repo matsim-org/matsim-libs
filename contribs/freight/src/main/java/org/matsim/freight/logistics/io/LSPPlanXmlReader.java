@@ -33,7 +33,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * Delegates a LSPPlanXmlParser according to declared schema definition file
+ * Reads LSP plan definition XML files, delegating to a version-specific
+ * {@link LSPPlanXmlParserV1} that is selected according to the declared XSD schema.
  *
  * @author nrichter (Niclas Richter)
  */
@@ -46,6 +47,11 @@ public final class LSPPlanXmlReader implements MatsimReader {
 		this.parser = new LSPsPlanParser(lsPs, carriers);
 	}
 
+	/**
+	 * Reads an LSP plan definition file from the given path.
+	 *
+	 * @param filename the path to the LSP plan definition XML file
+	 */
 	public void readFile(String filename) {
 		try {
 			this.parser.setValidating(true);
@@ -56,6 +62,11 @@ public final class LSPPlanXmlReader implements MatsimReader {
 		}
 	}
 
+	/**
+	 * Reads an LSP plan definition file from the given URL.
+	 *
+	 * @param url the location of the LSP plan definition XML file
+	 */
 	public void readURL(URL url) {
 		try {
 			this.parser.readURL(url);
@@ -66,6 +77,10 @@ public final class LSPPlanXmlReader implements MatsimReader {
 	}
 
 
+	/**
+	 * SAX parser that inspects the schema location of the {@code <lsps>} root element and delegates
+	 * to the concrete {@link LSPPlanXmlParserV1} that matches the schema version.
+	 */
 	private static final class LSPsPlanParser extends MatsimXmlParser {
 		private final LSPs lsPs;
 		private final Carriers carriers;

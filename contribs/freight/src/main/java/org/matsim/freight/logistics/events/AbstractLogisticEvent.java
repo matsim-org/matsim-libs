@@ -9,10 +9,9 @@ import org.matsim.freight.logistics.HasLspShipmentId;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
- * A general logistic event contains the information (= {@link Id}) of the - the location (= {@link
- * Link}) - the lspShipment (= {@link LspShipment}) belonging to it.
- *
- * <p>Please note, that general _freight_ events can be found in the freight contrib.
+ * Base class for logistics events. A logistics event couples a point in time ({@link Event}) with
+ * the {@link Id} of the {@link Link} (location) and the {@link Id} of the {@link LspShipment} it
+ * belongs to.
  *
  * @author Kai Martins-Turner (kturner)
  */

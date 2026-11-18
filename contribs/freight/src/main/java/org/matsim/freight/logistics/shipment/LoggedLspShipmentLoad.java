@@ -26,9 +26,13 @@ import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
+/**
+ * A {@link LspShipmentPlanElement} recording that a shipment was loaded onto a resource during the
+ * simulation (as derived from events).
+ */
+/*package-private*/ class LoggedLspShipmentLoad implements LspShipmentPlanElement {
 //Consider changing this Logged<...> ShipmentPlanElement to MATSim's experienced plans.
 //This would be closer to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
-/*package-private*/ class LoggedLspShipmentLoad implements LspShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;
@@ -76,9 +80,6 @@ import org.matsim.freight.logistics.LogisticChainElement;
 		return resourceId;
 	}
 
-	/**
-	 * @return
-	 */
 	@Override
 	public Id<Link> getLinkId() {
 		return linkId;
