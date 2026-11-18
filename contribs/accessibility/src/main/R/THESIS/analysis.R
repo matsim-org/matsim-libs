@@ -16,21 +16,21 @@ suppressPackageStartupMessages({
 # Directories
 # ==========================================================
 
-base_dir     <- "/home/brendan/Documents/arbeit/abmtrans_paper"
-input_dir    <- base_dir
+base_dir     <- "../public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-16-v6.4-spa-hosp-jobcenter/"
+# input_dir    <- base_dir
 
 # Berlin district shapefile and S-Bahn ring: static files kept in the repo,
 # independent of where the run folders are.
 shape_dir <- path.expand(
-  "~/git/matsim-libs/contribs/accessibility/src/main/R/THESIS/input/Berlin shapefiles"
+  "contribs/accessibility/src/main/R/THESIS/input/Berlin shapefiles"
 )
 
 # Run folders from the cluster, one per scenario, as written by
 # run-person-based-acc-berlin-<scenario>.sh: <date>[a-z]-<scenario>/<opportunity>/...
 # Change the folder names here when you use results from another day or rerun.
 run_dirs <- list(
-  base   = file.path(input_dir, "2026-11-16-base"),
-  policy = file.path(input_dir, "2026-11-16-policy")
+  base   = file.path("../public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-16-v6.4-spa-hosp-jobcenter/2026-11-16-base"),
+  policy = file.path("../public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-16-v6.4-spa-hosp-jobcenter/2026-11-16-policy")
 )
 
 # Results go to output/<date>-output/, named after the policy run folder,
@@ -932,6 +932,43 @@ join_persons_mm <- function(base = "base", policy = "policy") {
 
   join_base_policy(base_df, policy_df)
 }
+
+plot_mm_ecdf <- function(persons) {
+  ecdf_data <- persons %>%
+    filter(is.finite(logSum_base), is.finite(logSum_policy)) %>%
+    select(Base = logSum_base, Policy = logSum_policy) %>%
+    pivot_longer(everything(), names_to = "scenario", values_to = "accessibility") %>%
+    mutate(scenario = factor(scenario, levels = c("Base", "Policy")))
+  x_min <- quantile(ecdf_data$accessibility, 0.01, names = FALSE)
+
+  ggplot(ecdf_data, aes(accessibility, colour = scenario, linetype = scenario)) +
+    geom_hline(yintercept = c(0.1, 0.5, 0.9), colour = "grey80", linetype = "dotted") +
+    geom_vline(xintercept = c(-6, -3), colour = "grey65", linetype = "dashed") +
+    stat_ecdf(geom = "step", linewidth = 1) +
+    scale_colour_manual(values = c(Base = "#434343", Policy = "#2166ac")) +
+    scale_y_continuous(labels = scales::label_percent(), limits = c(0, 1)) +
+    coord_cartesian(xlim = c(x_min, NA), expand = FALSE) +
+    labs(
+      x = "Multimodal accessibility (utils)",
+      y = "Cumulative share of persons",
+      colour = NULL, linetype = NULL,
+      title = poi$label, subtitle = "Walk + PT + car; departure at 08:00"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "bottom")
+}
+
+mm_persons <- join_persons_mm()
+if (!is.null(mm_persons)) {
+  ecdf_mm_base_vs_policy <- plot_mm_ecdf(mm_persons)
+  ggsave(
+    file.path(output_dir, "ecdf_mm_base_vs_policy.png"),
+    ecdf_mm_base_vs_policy,
+    dpi = 300, width = 8, height = 6
+  )
+}
+
+ecdf_mm_base_vs_policy
 
 # Car base vs policy (same function works for "pt" and "teleportedWalk")
 car_persons <- join_persons("car")
