@@ -1,0 +1,68 @@
+name: prime-maven-cache
+
+# Resolves all Maven dependencies once and saves them as a single, complete cache.
+# The verify-push matrix (~50 jobs) only restores this cache, so a pom change (e.g. a dependabot bump)
+# downloads from Maven Central once instead of once per job, which avoids 429 throttling.
+# Running on main makes the cache visible to all PR branches.
+
+on:
+  workflow_call:
+    outputs:
+      cache-key:
+        description: "Key of the saved ~/.m2/repository cache"
+        value: ${{ jobs.prime.outputs.cache-key }}
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**/pom.xml'
+  workflow_dispatch:
+
+jobs:
+  prime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      cache-key: ${{ steps.key.outputs.key }}
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v7
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          java-version: 25
+          distribution: 'zulu'
+
+      - name: Compute cache key
+        id: key
+        run: echo "key=maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Maven repository
+        id: restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ steps.key.outputs.key }}
+          # on a pom change, start from the previous cache so only the changed artifacts are downloaded
+          restore-keys: maven-${{ runner.os }}-
+
+      - name: Resolve dependencies of the whole reactor
+        if: steps.restore.outputs.cache-hit != 'true'
+        # Building (without running tests) resolves compile, test and plugin dependencies;
+        # running surefire with a non-matching test filter also resolves its test providers.
+        run: >-
+          mvn install --batch-mode -Dsource.skip -DskipITs
+          -Dtest=NoSuchTest -Dsurefire.failIfNoSpecifiedTests=false
+
+      - name: Remove reactor snapshots from the cache
+        if: steps.restore.outputs.cache-hit != 'true'
+        run: find ~/.m2/repository/org/matsim -type d -name '*-SNAPSHOT' -prune -exec rm -rf {} +
+
+      - name: Save Maven repository
+        if: steps.restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ steps.key.outputs.key }}
