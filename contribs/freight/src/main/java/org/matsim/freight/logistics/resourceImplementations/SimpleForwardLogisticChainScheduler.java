@@ -42,6 +42,10 @@ import org.matsim.freight.logistics.shipment.LspShipment;
  * <p>The SimpleForwardLogisticChainScheduler needs the sequence in which the Resources are scheduled as
  * exogenous input.
  *
+ * <p>This class is kept as an example of a very short {@link LogisticChainScheduler}. The forward scheduler
+ * that determines the order of the Resources itself, from the predecessors and successors of the Resources
+ * in the {@link LogisticChain}s, is created by {@link LSPUtils#createForwardLogisticChainScheduler()}.
+ *
  * <p>The expression "`forward"' refers to the fact that in both cases the scheduling process starts
  * at the first element of each {@link LogisticChain} and from the earliest possible point of time.
  */
