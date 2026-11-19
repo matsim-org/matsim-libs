@@ -346,9 +346,7 @@ public final class LSPUtils {
 			return this;
 		}
 
-		@Deprecated // see comment below method name.
 		public LSPBuilder setInitialPlan(LSPPlan plan) {
-			// yy maybe one could use the first plan by default, and then get rid of this method here?  kai, jul'25
 			// The resources of the plan are collected in LSPImpl#addPlan, called from the LSPImpl constructor.
 			this.initialPlan = plan;
 			return this;
