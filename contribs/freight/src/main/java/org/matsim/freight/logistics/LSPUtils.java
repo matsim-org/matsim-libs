@@ -65,10 +65,6 @@ public final class LSPUtils {
 		return lspPlan.getLSP().getSelectedPlan() == lspPlan;
 	}
 
-	public static LogisticChainScheduler createForwardLogisticChainScheduler() {
-		return new ForwardLogisticChainSchedulerImpl();
-	}
-
 	public static WaitingShipments createWaitingShipments() {
 		return new WaitingShipmentsImpl();
 	}
@@ -163,7 +159,7 @@ public final class LSPUtils {
 	/**
 	 * Hands each {@link LspShipment} of the selected plan of the given {@link LSP} over to the incoming
 	 * shipments of the first {@link LogisticChainElement} of the {@link LogisticChain} it is assigned to.
-	 * This is the first step of the forward {@link LogisticChainScheduler}s.
+	 * This is the first step of a forward {@link LogisticChainScheduler}.
 	 *
 	 * @throws IllegalStateException if a shipment id of a chain is not found in the LSP
 	 */

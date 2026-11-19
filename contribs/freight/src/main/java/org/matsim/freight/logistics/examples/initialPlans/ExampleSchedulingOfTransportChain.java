@@ -270,11 +270,6 @@ import org.matsim.vehicles.VehicleUtils;
     resourcesList.add(secondTransshipmentHubResource);
     resourcesList.add(distributionResource);
 
-    //		SolutionScheduler forwardSolutionScheduler = LSPUtils.createForwardSolutionScheduler();
-    // // The "non-simple" scheduler. TODO: does it need a resource list or similar?
-    // --> Apparently yes, otherwise it throws a Null Pointer.
-    //		completeLSPBuilder.setSolutionScheduler(forwardSolutionScheduler);
-
     LogisticChainScheduler simpleScheduler =
         ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
     completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
