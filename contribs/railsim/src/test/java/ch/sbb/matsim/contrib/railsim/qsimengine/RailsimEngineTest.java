@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
@@ -34,10 +35,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -98,13 +101,13 @@ public class RailsimEngineTest {
 		return getTestEngine(network, null);
 	}
 
-	private void invokeReverseTrain(RailsimEngine engine, UpdateEvent event, RailLink nextLink,
+	private void invokeReverseTrain(RailsimEngine engine, double time, UpdateEvent event, RailLink nextLink,
 									Id<Link> previousHeadLink, double previousHeadPosition,
 									Id<Link> previousTailLink, double previousTailPosition,
 									int nextRouteIdx) throws ReflectiveOperationException {
-		Method reverseTrain = RailsimEngine.class.getDeclaredMethod("reverseTrain", TrainState.class, RailLink.class, Id.class, double.class, Id.class, double.class, int.class);
+		Method reverseTrain = RailsimEngine.class.getDeclaredMethod("reverseTrain", double.class, TrainState.class, RailLink.class, Id.class, double.class, Id.class, double.class, int.class);
 		reverseTrain.setAccessible(true);
-		reverseTrain.invoke(engine, event.state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
+		reverseTrain.invoke(engine, time, event.state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
 	}
 
 	private void invokeUpdateDeparture(RailsimEngine engine, double time, UpdateEvent event) throws ReflectiveOperationException {
@@ -159,7 +162,8 @@ public class RailsimEngineTest {
 		RailLink forward = resources.getLink(Id.createLinkId("l1-2"));
 		RailLink reverse = resources.getLink(Id.createLinkId("l2-1"));
 
-		TrainState state = new TrainState(null, new TrainInfo(Id.create("reversible", VehicleType.class), 200, 10, 1, 1, 1, 60),
+		MobsimDriverAgent driver = Mockito.mock(MobsimDriverAgent.class, Answers.RETURNS_MOCKS);
+		TrainState state = new TrainState(driver, new TrainInfo(Id.create("reversible", VehicleType.class), 200, 10, 1, 1, 1, 60),
 			0, forward.getLinkId(), new ArrayList<>(List.of(forward, reverse)));
 		state.headLink = forward.getLinkId();
 		state.headPosition = 1000;
@@ -169,7 +173,9 @@ public class RailsimEngineTest {
 		state.routeIdx = 1;
 
 		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.REVERSE_TRAIN);
-		invokeReverseTrain(new RailsimEngine(null, null, null, null, null, null), event, reverse, forward.getLinkId(), 1000, forward.getLinkId(), 800, 2);
+		RailsimEngine engine = new RailsimEngine(null, new RailsimConfigGroup(), resources, null,
+			new SimpleDisposition(resources, new MaxSpeedProfile(), new TrainRouter(net, resources)), null);
+		invokeReverseTrain(engine, 0, event, reverse, forward.getLinkId(), 1000, forward.getLinkId(), 800, 2);
 
 		assertThat(state.headLink).isEqualTo(reverse.getLinkId());
 		assertThat(state.headPosition).isEqualTo(200);
@@ -305,6 +311,271 @@ public class RailsimEngineTest {
 		assertThat(event.type).isEqualTo(UpdateEvent.Type.REVERSE_TRAIN);
 		assertThat(event.plannedTime).isEqualTo(370);
 		assertThat(event.lastArrivalTime).isEqualTo(300);
+	}
+
+	/**
+	 * Create a reversible vehicle type for tests that need real reversing.
+	 */
+	private static VehicleType createReversibleType(String id, double length) {
+		VehicleType type = VehicleUtils.createVehicleType(Id.create(id, VehicleType.class));
+		type.setLength(length);
+		type.setMaximumVelocity(44.444);
+		type.setNetworkMode("rail");
+		RailsimUtils.setTrainAcceleration(type, 0.5);
+		RailsimUtils.setTrainDeceleration(type, 0.5);
+		RailsimUtils.setTrainReversible(type, 0.0);
+		return type;
+	}
+
+	/**
+	 * Time of the first train state event of a vehicle on a link.
+	 */
+	private static double firstTimeOnLink(RailsimTestUtils.EventCollector collector, String veh, String link) {
+		return collector.events.stream()
+			.filter(ev -> ev instanceof RailsimTrainStateEvent state
+				&& state.getVehicleId().toString().equals(veh)
+				&& state.getHeadLink().toString().equals(link))
+			.mapToDouble(Event::getTime)
+			.min()
+			.orElse(Double.POSITIVE_INFINITY);
+	}
+
+	@Test
+	void testReverseReleasesArrivalReservations() {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroReverseStub.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimTestUtils.Holder test = new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, resources, trains,
+			new SimpleDisposition(resources, speed, router), createTrainTimeDistanceHandler()), net);
+
+		// The train is longer than the platform link p6 and reverses onto the departure links q1..q5.
+		// No further stop is reached after p6 ("none"), the helper only needs it to end the dwell.
+		RailsimTestUtils.createTransitDeparture(test, createReversibleType("reversing", 205), "reversing", 0,
+			List.of("p1", "p2", "p3", "p4", "p5", "p6", "q1", "q2", "q3", "q4", "q5"),
+			"p6", 60.0, "none");
+
+		// The follower only needs the platform approach p5, which the reversing train has left long before.
+		RailsimTestUtils.createDeparture(test, createReversibleType("following", 100), "following", 120,
+			List.of("f1", "p5", "p6"));
+
+		test.doSimStepUntil(600);
+		test.debugFiles(collector, utils.getOutputDirectory() + "/reverseStub");
+
+		RailsimTestUtils.assertThat(collector).hasSizeGreaterThan(5);
+		assertThat(collector.events.stream().anyMatch(ev -> ev instanceof RailsimTrainStateEvent state
+			&& state.getVehicleId().toString().equals("reversing")
+			&& state.getHeadLink().toString().equals("q5")
+			&& FuzzyUtils.equals(state.getSpeed(), 0))).isTrue();
+
+		// Reservations of the arrival links must not outlive the reversal: the follower can enter the
+		// platform approach right after its departure instead of waiting for the reversing train's
+		// route end, where all reservations are dropped.
+		assertThat(firstTimeOnLink(collector, "following", "p5")).isLessThan(250);
+	}
+
+	@Test
+	void testReverseKeepsApprovedDistanceWithinReservedTrack() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroReverseStub.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
+			createTrainTimeDistanceHandler());
+
+		List<RailLink> route = new ArrayList<>(List.of("p1", "p2", "p3", "p4", "p5", "p6", "q1", "q2", "q3", "q4", "q5").stream()
+			.map(id -> resources.getLink(Id.createLinkId(id))).toList());
+
+		TrainInfo info = new TrainInfo(Id.create("reversing", VehicleType.class), 205, 44.444, 0.5, 0.5, 0.5, 0.0);
+
+		// The train stands on the short platform link p6, its body reaches back to p2.
+		TrainState state = createState(info, "reversing", route, 6, 5, route.get(5).length, 1, 21.229358279466254);
+		state.timestamp = 100;
+		state.speed = 0;
+		state.targetSpeed = 0;
+		state.acceleration = 0;
+		state.approvedDist = 0;
+		state.approvedSpeed = 0;
+
+		resources.tryBlockLink(100, route.get(5), RailResourceManager.ANY_TRACK_NON_BLOCKING, state);
+
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.REVERSE_TRAIN);
+		event.plannedTime = 100;
+
+		// Reserves the departure track from the end of p6 and reverses: the head moves 205 m forward onto q3
+		// without driving.
+		invokeEnterLink(engine, 100, event);
+
+		assertThat(state.headLink).isEqualTo(route.get(8).getLinkId());
+
+		// The approved distance is measured from the head and must end within the track the train holds.
+		double reservedAhead = route.get(state.routeIdx - 1).length - state.headPosition;
+		for (int i = state.routeIdx; i < route.size() && resources.isBlockedBy(route.get(i), state); i++) {
+			reservedAhead += route.get(i).length;
+		}
+
+		assertThat(state.approvedDist)
+			.describedAs("approved distance after the reversal must not reach beyond the reserved track")
+			.isLessThanOrEqualTo(reservedAhead + 1e-6);
+	}
+
+	@Test
+	void testReverseWaitsForUnheldDepartureTrack() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroReverseStub.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
+			createTrainTimeDistanceHandler());
+
+		List<RailLink> route = new ArrayList<>(List.of("p1", "p2", "p3", "p4", "p5", "p6", "q1", "q2", "q3", "q4", "q5").stream()
+			.map(id -> resources.getLink(Id.createLinkId(id))).toList());
+
+		TrainInfo info = new TrainInfo(Id.create("reversing", VehicleType.class), 205, 44.444, 0.5, 0.5, 0.5, 0.0);
+
+		// The train stands on the short platform link p6, its body reaches back to p2.
+		TrainState state = createState(info, "reversing", route, 6, 5, route.get(5).length, 1, 21.229358279466254);
+		state.timestamp = 100;
+		state.speed = 0;
+		state.targetSpeed = 0;
+		state.acceleration = 0;
+		state.approvedDist = 0;
+		state.approvedSpeed = 0;
+
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+
+		// The train holds the platform track in the arrival direction.
+		resources.tryBlockLink(100, route.get(5), RailResourceManager.ANY_TRACK_NON_BLOCKING, state);
+
+		// Another train holds the departure track that the rebuilt body would cover (q3). The reversal
+		// must not move the body onto it.
+		TrainState other = createState(info, "other", new ArrayList<>(List.of(route.get(8))), 1, 0, 50, 0, 0);
+		resources.tryBlockLink(100, route.get(8), RailResourceManager.ANY_TRACK_NON_BLOCKING, other);
+
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.REVERSE_TRAIN);
+		event.plannedTime = 100;
+
+		invokeEnterLink(engine, 100, event);
+
+		assertThat(state.headLink).isEqualTo(route.get(5).getLinkId());
+		assertThat(state.tailLink).isEqualTo(route.get(1).getLinkId());
+		assertThat(state.routeIdx).isEqualTo(6);
+		assertThat(event.type).isEqualTo(UpdateEvent.Type.REVERSE_TRAIN);
+		assertThat(event.plannedTime).isEqualTo(100 + config.getPollInterval());
+
+		// Once the departure track is free, the train reverses.
+		resources.releaseLink(110, route.get(8), other.driver);
+		state.timestamp = 110;
+		event.plannedTime = 110;
+
+		invokeEnterLink(engine, 110, event);
+
+		assertThat(state.headLink).isEqualTo(route.get(8).getLinkId());
+		assertThat(state.tailLink).isEqualTo(route.get(6).getLinkId());
+		assertThat(state.routeIdx).isEqualTo(9);
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void testBodyLinksUseTheLengthOfEachLink() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMicroReverseStub.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), new TrainManager());
+
+		// p1 200 m, p2 31.6 m, p3 28.4 m, p4 31.6 m, p5 116.1 m, p6 18.5 m: links of unequal length.
+		List<RailLink> route = List.of("p1", "p2", "p3", "p4", "p5", "p6").stream()
+			.map(id -> resources.getLink(Id.createLinkId(id))).toList();
+
+		Method bodyLinks = RailsimEngine.class.getDeclaredMethod("bodyLinks", List.class, int.class, double.class, double.class);
+		bodyLinks.setAccessible(true);
+
+		// Head at the end of p5, 150 m train: 116.1 m on p5, 31.6 m on p4 and the last 2.3 m on p3.
+		List<RailLink> body = (List<RailLink>) bodyLinks.invoke(null, route, 5, route.get(4).length, 150.0);
+		assertThat(body).containsExactly(route.get(4), route.get(3), route.get(2));
+
+		// Head at the end of p6, 120 m train: 18.5 m on p6 and the remaining 101.5 m on p5, nothing on p4.
+		body = (List<RailLink>) bodyLinks.invoke(null, route, 6, route.get(5).length, 120.0);
+		assertThat(body).containsExactly(route.get(5), route.get(4));
+	}
+
+	@Test
+	void testReverseHoldsMovingBlockTrackPerLink() throws ReflectiveOperationException {
+
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMixedTypes.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
+			createTrainTimeDistanceHandler());
+
+		Method isHeld = RailsimEngine.class.getDeclaredMethod("isHeld", TrainState.class, RailLink.class, double.class);
+		isHeld.setAccessible(true);
+
+		TrainInfo info = new TrainInfo(Id.create("train", VehicleType.class), 100, 44.444, 0.5, 0.5, 0.5, 0.0);
+
+		// Moving block l23 (2-3, 3-4): holding 2-3 does not reserve 3-4.
+		List<RailLink> moving = new ArrayList<>(List.of(resources.getLink(Id.createLinkId("2-3")), resources.getLink(Id.createLinkId("3-4"))));
+		TrainState onMoving = createState(info, "moving", moving, 1, 0, 100, 0, 0);
+		resources.tryBlockLink(0, moving.get(0), 0, onMoving);
+		assertThat(resources.isBlockedBy(moving.get(0), onMoving)).isTrue();
+		assertThat((boolean) isHeld.invoke(engine, onMoving, moving.get(1), 1.0)).isFalse();
+
+		// A following train on the same track can reserve only up to the leading tail.
+		onMoving.tailPosition = 25;
+		TrainState follower = createState(info, "follower", moving, 1, 0, 10, 0, 0);
+		assertThat(resources.tryBlockLink(0, moving.get(0), 0, follower)).isEqualTo(25);
+		assertThat((boolean) isHeld.invoke(engine, follower, moving.get(0), 25.0)).isTrue();
+		assertThat((boolean) isHeld.invoke(engine, follower, moving.get(0), 26.0)).isFalse();
+
+		// Releasing a link clears its reserved distance even while another link of the resource is held.
+		resources.tryBlockLink(0, moving.get(1), 0, onMoving);
+		resources.releaseLink(0, moving.get(0), onMoving.driver);
+		assertThat(resources.isBlockedBy(moving.get(0), onMoving)).isFalse();
+
+		// Fixed block l67 (6-7, 7-8): the resource is reserved per driver, holding 6-7 holds the track.
+		List<RailLink> fixed = new ArrayList<>(List.of(resources.getLink(Id.createLinkId("6-7")), resources.getLink(Id.createLinkId("7-8"))));
+		TrainState onFixed = createState(info, "fixed", fixed, 1, 0, 50, 0, 0);
+		resources.tryBlockLink(0, fixed.get(0), RailResourceManager.ANY_TRACK_NON_BLOCKING, onFixed);
+		assertThat(resources.isBlockedBy(fixed.get(0), onFixed)).isTrue();
+		assertThat((boolean) isHeld.invoke(engine, onFixed, fixed.get(1), 50.0)).isTrue();
+	}
+
+	/**
+	 * Create a train state with a driver and a vehicle, so that it can reserve tracks.
+	 */
+	private static TrainState createState(TrainInfo info, String veh, List<RailLink> route, int routeIdx,
+										  int headIdx, double headPosition, int tailIdx, double tailPosition) {
+
+		MobsimVehicle mobVeh = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
+		MobsimDriverAgent driver = Mockito.mock(MobsimDriverAgent.class, Answers.RETURNS_MOCKS);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId(veh),
+			VehicleUtils.createVehicleType(Id.create(info.id().toString(), VehicleType.class)));
+
+		Mockito.when(mobVeh.getVehicle()).thenReturn(vehicle);
+		Mockito.when(mobVeh.getId()).thenReturn(vehicle.getId());
+		Mockito.when(driver.getVehicle()).thenReturn(mobVeh);
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_" + veh));
+
+		TrainState state = new TrainState(driver, info, 0, route.getFirst().getLinkId(), new ArrayList<>(route));
+		state.headLink = route.get(headIdx).getLinkId();
+		state.headPosition = headPosition;
+		state.tailLink = route.get(tailIdx).getLinkId();
+		state.tailPosition = tailPosition;
+		state.routeIdx = routeIdx;
+		return state;
 	}
 
 	@Test

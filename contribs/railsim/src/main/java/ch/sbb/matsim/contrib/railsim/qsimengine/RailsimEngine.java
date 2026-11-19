@@ -19,10 +19,13 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -55,6 +58,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.DispositionResponse;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
 
 /**
  * Engine to simulate train movement.
@@ -554,19 +558,35 @@ final class RailsimEngine implements Steppable {
 
 		int nextRouteIdx = state.routeIdx + 1;
 
+		// Reverse-state reconstruction must use the pre-move geometry.
+		Id<Link> previousHeadLink = state.headLink;
+		Id<Link> previousTailLink = state.tailLink;
+		double previousHeadPosition = state.headPosition;
+		double previousTailPosition = state.tailPosition;
+
+		// A reversal moves the body onto the departure route, which is only safe when the train already
+		// holds that track. Otherwise it keeps standing on its arrival track, asks for the reservation
+		// again on every poll and reverses as soon as the departure track under its body is free.
+		if (event.type == UpdateEvent.Type.REVERSE_TRAIN) {
+
+			List<RailLink> unheld = unheldReverseBody(state, nextLink, nextRouteIdx, previousHeadLink,
+				previousHeadPosition, previousTailLink, previousTailPosition);
+
+			if (!unheld.isEmpty()) {
+				log.debug("Train {} waits to reverse, body links not held: {}", state.driver.getId(),
+					unheld.stream().map(RailLink::getLinkId).toList());
+				event.plannedTime = time + config.getPollInterval();
+				return;
+			}
+		}
+
 		// On route departure the head link is null
 		createEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
 
 		assert resources.isBlockedBy(nextLink, state) : "Link has to be blocked by driver when entered";
 
 		if (event.type == UpdateEvent.Type.REVERSE_TRAIN) {
-			// Reverse-state reconstruction must use the pre-move geometry.
-			Id<Link> previousHeadLink = state.headLink;
-			Id<Link> previousTailLink = state.tailLink;
-			double previousHeadPosition = state.headPosition;
-			double previousTailPosition = state.tailPosition;
-
-			reverseTrain(state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
+			reverseTrain(time, state, nextLink, previousHeadLink, previousHeadPosition, previousTailLink, previousTailPosition, nextRouteIdx);
 		} else {
 			state.headLink = nextLink.getLinkId();
 			state.headPosition = 0;
@@ -595,71 +615,197 @@ final class RailsimEngine implements Steppable {
 	/**
 	 * Reverse the train.
 	 */
-	private void reverseTrain(TrainState state, RailLink nextLink, Id<Link> previousHeadLink, double previousHeadPosition,
+	private void reverseTrain(double time, TrainState state, RailLink nextLink, Id<Link> previousHeadLink, double previousHeadPosition,
 							  Id<Link> previousTailLink, double previousTailPosition, int nextRouteIdx) {
+
+		applyReverseGeometry(state, computeReverseGeometry(state, nextLink, nextRouteIdx, previousHeadLink,
+			previousHeadPosition, previousTailLink, previousTailPosition));
+
+		// The approved distance is measured from the head. The reversal moves the head forward along the
+		// departure route without driving, so the distance it jumped is no longer ahead of the train.
+		double jump = resources.getLink(previousHeadLink).length - previousHeadPosition;
+		for (int i = nextRouteIdx - 1; i < state.routeIdx - 1; i++) {
+			jump += state.route.get(i).length;
+		}
+		jump += state.headPosition;
+		state.approvedDist = Math.max(0, state.approvedDist - jump);
+
+		// Keep the time-distance head reference aligned when the train flips direction.
+		state.cumulativeDistance += state.train.length();
+
+		releaseReverseReservations(time, state);
+	}
+
+	/**
+	 * Geometry of a reversal, before it is applied to the train state.
+	 */
+	private record ReverseGeometry(Id<Link> headLink, double headPosition, int routeIdx, Id<Link> tailLink,
+								   double tailPosition) {
+	}
+
+	/**
+	 * Compute the state a reversal produces. {@link #unheldReverseBody} needs the resulting body before
+	 * the train is actually moved.
+	 */
+	private ReverseGeometry computeReverseGeometry(TrainState state, RailLink nextLink, int nextRouteIdx,
+												   Id<Link> previousHeadLink, double previousHeadPosition,
+												   Id<Link> previousTailLink, double previousTailPosition) {
 
 		// Train is fully contained on the current link. Keep the tail on the current link and flip the head
 		// onto the opposite link so routeIdx still means "first link the head has not entered yet".
 		if (nextLink.isOppositeLink(previousTailLink)) {
 
-			state.headLink = nextLink.getLinkId();
-			state.headPosition = nextLink.length - previousTailPosition;
-			state.tailLink = previousHeadLink;
-			state.tailPosition = previousHeadPosition;
-			state.routeIdx = nextRouteIdx;
+			return new ReverseGeometry(nextLink.getLinkId(), nextLink.length - previousTailPosition, nextRouteIdx,
+				previousHeadLink, previousHeadPosition);
+		}
 
-		} else {
-			state.tailLink = nextLink.getLinkId();
-			state.tailPosition = nextLink.length - previousHeadPosition;
+		Id<Link> tailLink = nextLink.getLinkId();
+		double tailPosition = nextLink.length - previousHeadPosition;
 
-			// Multi-link reverse: find the route element opposite to the old tail.
-			RailLink tailReverse = null;
-			int tailReverseIdx = nextRouteIdx;
-			for (; tailReverseIdx < state.route.size(); tailReverseIdx++) {
-				RailLink link = state.route.get(tailReverseIdx);
-				if (link.isOppositeLink(previousTailLink)) {
-					tailReverse = link;
+		// Multi-link reverse: find the route element opposite to the old tail.
+		RailLink tailReverse = null;
+		int tailReverseIdx = nextRouteIdx;
+		for (; tailReverseIdx < state.route.size(); tailReverseIdx++) {
+			RailLink link = state.route.get(tailReverseIdx);
+			if (link.isOppositeLink(previousTailLink)) {
+				tailReverse = link;
+				break;
+			}
+		}
+
+		if (tailReverse != null) {
+			return new ReverseGeometry(tailReverse.getLinkId(), tailReverse.length - previousTailPosition,
+				tailReverseIdx + 1, tailLink, tailPosition);
+		}
+
+		// Reconstruct the new head by walking train length along the reversed route.
+		double remainingLength = state.train.length();
+		RailLink headLink = nextLink;
+		double headPosition = tailPosition;
+		int headIdx = nextRouteIdx - 1;
+
+		double available = headLink.length - headPosition;
+		while (FuzzyUtils.greaterThan(remainingLength, available) || (FuzzyUtils.equals(remainingLength, available) && headIdx + 1 < state.route.size()
+			&& !state.isStop(headLink.getLinkId()))) {
+			remainingLength -= available;
+			headIdx++;
+
+			if (headIdx >= state.route.size()) {
+				throw new IllegalStateException(("Train %s is trying to reverse on a route that does not contain enough links for %s. " +
+					"Make sure that a single transit line contains all links and stops needed for reversing.")
+					.formatted(state.driver.getVehicle().getId(), previousTailLink));
+			}
+
+			headLink = state.route.get(headIdx);
+			headPosition = 0;
+			available = headLink.length;
+		}
+
+		return new ReverseGeometry(headLink.getLinkId(), headPosition + remainingLength, headIdx + 1, tailLink,
+			tailPosition);
+	}
+
+	private void applyReverseGeometry(TrainState state, ReverseGeometry geometry) {
+		state.headLink = geometry.headLink();
+		state.headPosition = geometry.headPosition();
+		state.routeIdx = geometry.routeIdx();
+		state.tailLink = geometry.tailLink();
+		state.tailPosition = geometry.tailPosition();
+	}
+
+	/**
+	 * Links of the body a reversal would produce whose physical track the train does not hold, i.e.
+	 * resources reserved by another train or by nobody. Holding any direction link of a resource is
+	 * enough, since a fixed block resource keeps other trains out as long as the driver holds one of its
+	 * links.
+	 */
+	private List<RailLink> unheldReverseBody(TrainState state, RailLink nextLink, int nextRouteIdx,
+											 Id<Link> previousHeadLink, double previousHeadPosition,
+											 Id<Link> previousTailLink, double previousTailPosition) {
+
+		ReverseGeometry geometry = computeReverseGeometry(state, nextLink, nextRouteIdx, previousHeadLink,
+			previousHeadPosition, previousTailLink, previousTailPosition);
+
+		List<RailLink> unheld = new ArrayList<>();
+		List<RailLink> body = bodyLinks(state.route, geometry.routeIdx(), geometry.headPosition(), state.train.length());
+		for (int i = 0; i < body.size(); i++) {
+			RailLink link = body.get(i);
+			double occupiedEnd = i == 0 ? geometry.headPosition() : link.length;
+			if (!isHeld(state, link, occupiedEnd)) {
+				unheld.add(link);
+			}
+		}
+
+		return unheld;
+	}
+
+	/**
+	 * Whether the physical track of a link is reserved by the train. A fixed block resource is reserved per
+	 * driver: once the driver holds one of its links, it holds the resource in any direction. A moving block
+	 * reserves a distance on each link, which must cover the body up to its furthest occupied position.
+	 */
+	private boolean isHeld(TrainState state, RailLink link, double occupiedEnd) {
+		if (link.getResource().getType() != ResourceType.fixedBlock) {
+			return FuzzyUtils.greaterEqualThan(link.getReservedDistance(state), occupiedEnd);
+		}
+		for (RailLink other : link.getResource().getLinks()) {
+			if (resources.isBlockedBy(other, state)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Release the reservations on arrival links that the new body no longer covers.
+	 * <p>
+	 * A reversal re-defines the train body without passing through {@link #leaveLink}, which only ever
+	 * releases {@link TrainState#tailLink}. After the reversal the tail walks along the *departure*
+	 * links, so the reservations of the arrival links behind the body are never released. Since a
+	 * resource is only freed once the driver holds none of its links, the whole track section would stay
+	 * blocked while physically empty.
+	 */
+	private void releaseReverseReservations(double time, TrainState state) {
+
+		List<RailLink> body = bodyLinks(state);
+		Set<Id<Link>> bodyIds = new HashSet<>();
+		for (RailLink link : body) {
+			bodyIds.add(link.getLinkId());
+		}
+
+		// A route may visit a link twice: never touch a reservation that is still ahead of the head.
+		Set<Id<Link>> ahead = new HashSet<>();
+		for (int i = Math.max(0, state.routeIdx); i < state.route.size(); i++) {
+			ahead.add(state.route.get(i).getLinkId());
+		}
+
+		for (int i = Math.max(0, state.routeIdx - 1); i >= 0; i--) {
+			RailLink link = state.route.get(i);
+
+			if (bodyIds.contains(link.getLinkId()) || ahead.contains(link.getLinkId()))
+				continue;
+
+			if (!resources.isBlockedBy(link, state))
+				continue;
+
+			// Do not free a resource that the body still occupies: its link in the body has to be
+			// reserved, otherwise the release would open the track below the train.
+			boolean covered = true;
+			for (RailLink bodyLink : body) {
+				if (bodyLink.getResource() == link.getResource() && !resources.isBlockedBy(bodyLink, state)) {
+					covered = false;
 					break;
 				}
 			}
 
-			if (tailReverse != null) {
-				state.headLink = tailReverse.getLinkId();
-				state.headPosition = tailReverse.length - previousTailPosition;
-				state.routeIdx = tailReverseIdx + 1;
-
-			} else {
-				// Reconstruct the new head by walking train length along the reversed route.
-				double remainingLength = state.train.length();
-				RailLink headLink = nextLink;
-				double headPosition = state.tailPosition;
-				int headIdx = nextRouteIdx - 1;
-
-				double available = headLink.length - headPosition;
-				while (FuzzyUtils.greaterThan(remainingLength, available) || (FuzzyUtils.equals(remainingLength, available) && headIdx + 1 < state.route.size()
-					&& !state.isStop(headLink.getLinkId()))) {
-					remainingLength -= available;
-					headIdx++;
-
-					if (headIdx >= state.route.size()) {
-						throw new IllegalStateException(("Train %s is trying to reverse on a route that does not contain enough links for %s. " +
-							"Make sure that a single transit line contains all links and stops needed for reversing.")
-							.formatted(state.driver.getVehicle().getId(), previousTailLink));
-					}
-
-					headLink = state.route.get(headIdx);
-					headPosition = 0;
-					available = headLink.length;
-				}
-
-				state.headLink = headLink.getLinkId();
-				state.headPosition = headPosition + remainingLength;
-				state.routeIdx = headIdx + 1;
+			if (covered) {
+				// Same headway rule as when the tail leaves a link.
+				if (link.minimumHeadwayTime == 0)
+					disposition.unblockRailLink(time, state.driver, link);
+				else
+					updateQueue.add(new UpdateEvent(state, link, time));
 			}
 		}
-
-		// Keep the time-distance head reference aligned when the train flips direction.
-		state.cumulativeDistance += state.train.length();
 	}
 
 	private void leaveLink(double time, UpdateEvent event) {
@@ -719,6 +865,82 @@ final class RailsimEngine implements Steppable {
 	 */
 	private void unblockTrack(double time, TrainState state, RailLink unblockLink) {
 		disposition.unblockRailLink(time, state.driver, unblockLink);
+		releaseResourceSiblings(time, state, unblockLink);
+	}
+
+	/**
+	 * Release the train's reservations on the other links of the resource of {@code released}, except
+	 * the links the body still stands on and the links that are still ahead of the head. A resource
+	 * stays blocked as long as the driver holds any of its links, so leaving it in one direction is not
+	 * enough once the train does not occupy it any more.
+	 */
+	private void releaseResourceSiblings(double time, TrainState state, RailLink released) {
+
+		// A moving block reservation is kept per link and distance and is released link by link when
+		// the tail leaves it. Only a fixed block resource blocks all of its links together.
+		if (released.getResource().getType() != ResourceType.fixedBlock)
+			return;
+
+		// Usually the train holds no other link of the resource; skip the route scans below then.
+		boolean holdsSibling = false;
+		for (RailLink other : released.getResource().getLinks()) {
+			if (other != released && resources.isBlockedBy(other, state)) {
+				holdsSibling = true;
+				break;
+			}
+		}
+		if (!holdsSibling)
+			return;
+
+		Set<Id<Link>> bodyIds = new HashSet<>();
+		for (RailLink link : bodyLinks(state)) {
+			bodyIds.add(link.getLinkId());
+		}
+
+		Set<Id<Link>> ahead = new HashSet<>();
+		for (int i = Math.max(0, state.routeIdx); i < state.route.size(); i++) {
+			ahead.add(state.route.get(i).getLinkId());
+		}
+
+		for (RailLink other : released.getResource().getLinks()) {
+			if (other == released || bodyIds.contains(other.getLinkId()) || ahead.contains(other.getLinkId())) {
+				continue;
+			}
+			if (resources.isBlockedBy(other, state)) {
+				disposition.unblockRailLink(time, state.driver, other);
+			}
+		}
+	}
+
+	/**
+	 * Links physically covered by the train body, walking back from the head by the train length. The
+	 * recorded tail is deliberately not used, so that a stale tail cannot hide track the train has
+	 * already left.
+	 */
+	private List<RailLink> bodyLinks(TrainState state) {
+		return bodyLinks(state.route, state.routeIdx, state.headPosition, state.train.length());
+	}
+
+	/**
+	 * Links physically covered by a body on the given route geometry.
+	 */
+	private static List<RailLink> bodyLinks(List<RailLink> route, int routeIdx, double headPosition, double length) {
+
+		List<RailLink> body = new ArrayList<>();
+		double remaining = length;
+
+		for (int i = routeIdx - 1; i >= 0; i--) {
+			RailLink link = route.get(i);
+			body.add(link);
+			// The head covers its link up to the head position, every link behind it completely.
+			double covered = i == routeIdx - 1 ? headPosition : link.length;
+			if (FuzzyUtils.lessEqualThan(remaining, covered)) {
+				break;
+			}
+			remaining -= covered;
+		}
+
+		return body;
 	}
 
 	/**
