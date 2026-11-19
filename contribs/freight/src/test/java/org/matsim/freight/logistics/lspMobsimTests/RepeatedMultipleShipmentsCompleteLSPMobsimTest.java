@@ -211,8 +211,8 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		mainRunElement.connectWithNextElement(secondHubElement);
 		secondHubElement.connectWithNextElement(distributionElement);
 
-		final Id<LogisticChain> chainId = Id.create("SolutionId", LogisticChain.class);
-		LogisticChain completeSolution  = LSPUtils.LogisticChainBuilder.newInstance(chainId)
+		final Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);
+		LogisticChain completeChain  = LSPUtils.LogisticChainBuilder.newInstance(chainId)
 				.addLogisticChainElement(collectionElement)
 				.addLogisticChainElement(firstHubElement)
 				.addLogisticChainElement(mainRunElement)
@@ -223,7 +223,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setInitialShipmentAssigner(assigner);
-		completePlan.addLogisticChain(completeSolution);
+		completePlan.addLogisticChain(completeChain);
 
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);

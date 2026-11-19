@@ -108,12 +108,12 @@ class LSPControllerListener
 				registerSimulationTrackers(lspShipment);
 			}
 
-			// simulation trackers of solutions:
-			for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-				registerSimulationTrackers(solution);
+			// simulation trackers of logistic chains:
+			for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
+				registerSimulationTrackers(chain);
 
-				// simulation trackers of solution elements:
-				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+				// simulation trackers of logistic chain elements:
+				for (LogisticChainElement element : chain.getLogisticChainElements()) {
 					registerSimulationTrackers(element);
 
 					// simulation trackers of resources:
@@ -188,8 +188,8 @@ class LSPControllerListener
 		Carriers carriers = new Carriers();
 		for (LSP lsp : lsps.getLSPs().values()) {
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
-			for (LogisticChain solution : selectedPlan.getLogisticChains()) {
-				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+			for (LogisticChain chain : selectedPlan.getLogisticChains()) {
+				for (LogisticChainElement element : chain.getLogisticChainElements()) {
 					if (element.getResource() instanceof LSPCarrierResource carrierResource) {
 						Carrier carrier = carrierResource.getCarrier();
 						if (!carriers.getCarriers().containsKey(carrier.getId())) {

@@ -29,20 +29,20 @@ import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
- * In the class SimpleForwardSolutionScheduler two tasks are performed:
+ * In the class SimpleForwardLogisticChainScheduler two tasks are performed:
  *
  * <p>1.) the {@link LspShipment}s that were assigned to the suitable {@link LogisticChain} by the
  * {@link InitialShipmentAssigner} in a previous step are handed over to the first {@link
  * LogisticChainElement}.
  *
- * <p>2.) all {@link LSPResource}s that were handed over to the SimpleForwardSolutionScheduler
+ * <p>2.) all {@link LSPResource}s that were handed over to the SimpleForwardLogisticChainScheduler
  * exogenous, are now scheduled sequentially in an order that was also specified exogenously. This
  * order ensures that each {@link LogisticChain} is traversed from the first to the last {@link
  * LogisticChainElement}. During this procedure, the concerned {@link LspShipment}s are taken from
  * the collection of incoming shipments, handled by the {@link LSPResource} in charge and then added
  * to the collection of outgoing shipments of the client {@link LogisticChainElement}.
  *
- * <p>The SimpleForwardSolutionScheduler needs the sequence in which the Resources are scheduled as
+ * <p>The SimpleForwardLogisticChainScheduler needs the sequence in which the Resources are scheduled as
  * exogenous input.
  *
  * <p>The expression "`forward"' refers to the fact that in both cases the scheduling process starts
@@ -97,8 +97,8 @@ import org.matsim.freight.logistics.shipment.LspShipment;
     }
   }
 
-  private LogisticChainElement getFirstElement(LogisticChain solution) {
-    for (LogisticChainElement element : solution.getLogisticChainElements()) {
+  private LogisticChainElement getFirstElement(LogisticChain logisticChain) {
+    for (LogisticChainElement element : logisticChain.getLogisticChainElements()) {
       if (element.getPreviousElement() == null) {
         return element;
       }

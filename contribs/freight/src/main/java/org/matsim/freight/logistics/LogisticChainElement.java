@@ -32,7 +32,7 @@ public interface LogisticChainElement
   void connectWithNextElement(LogisticChainElement element);
 
   /**
-   * The logistics solution element wraps around a resource. Don't know why we need this wrapping.
+   * The logistic chain element wraps around a resource. Don't know why we need this wrapping.
    *
    * @return the resource
    */

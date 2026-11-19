@@ -123,19 +123,19 @@ public class CollectionLSPMobsimTest {
 			collectionElementBuilder.setResource(collectionResource);
 			collectionElement = collectionElementBuilder.build();
 		}
-		final LogisticChain collectionSolution;
+		final LogisticChain collectionChain;
 		{
-			Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
-			LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
-			collectionSolutionBuilder.addLogisticChainElement(collectionElement);
-			collectionSolution = collectionSolutionBuilder.build();
+			Id<LogisticChain> collectionChainId = Id.create("CollectionChain", LogisticChain.class);
+			LSPUtils.LogisticChainBuilder collectionChainBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionChainId);
+			collectionChainBuilder.addLogisticChainElement(collectionElement);
+			collectionChain = collectionChainBuilder.build();
 		}
 		final LSPPlan collectionPlan;
 		{
 			InitialShipmentAssigner assigner = createSingleLogisticChainShipmentAssigner();
 			collectionPlan = LSPUtils.createLSPPlan();
 			collectionPlan.setInitialShipmentAssigner(assigner);
-			collectionPlan.addLogisticChain(collectionSolution);
+			collectionPlan.addLogisticChain(collectionChain);
 		}
 		{
 			final LSPUtils.LSPBuilder collectionLSPBuilder;

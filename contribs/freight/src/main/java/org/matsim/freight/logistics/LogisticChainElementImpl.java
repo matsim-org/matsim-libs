@@ -26,7 +26,7 @@ package org.matsim.freight.logistics;
   private final LSPResource resource;
   private final WaitingShipments incomingShipments;
   private final WaitingShipments outgoingShipments;
-  // die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
+  // die beiden nicht im Builder. Die können erst in der LogisticChain als ganzes gesetzt werden
   private LogisticChainElement previousElement;
   private LogisticChainElement nextElement;
 
@@ -77,7 +77,7 @@ package org.matsim.freight.logistics;
   @Override
   public String toString() {
     StringBuilder strb = new StringBuilder();
-    strb.append("LogisticsSolutionElementImpl{")
+    strb.append("LogisticChainElementImpl{")
         .append("resourceId=")
         .append(resource.getId())
         .append(", incomingShipments=")

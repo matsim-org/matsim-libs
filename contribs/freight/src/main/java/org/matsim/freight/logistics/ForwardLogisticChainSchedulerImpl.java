@@ -128,10 +128,10 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   }
 
   private void insertShipmentsAtBeginning() {
-    for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-      LogisticChainElement firstElement = getFirstElement(solution);
+    for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
+      LogisticChainElement firstElement = getFirstElement(chain);
       assert firstElement != null;
-      for (Id<LspShipment> lspShipmentId : solution.getLspShipmentIds()) {
+      for (Id<LspShipment> lspShipmentId : chain.getLspShipmentIds()) {
         var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
         assert shipment != null;
         firstElement
@@ -141,8 +141,8 @@ import org.matsim.freight.logistics.shipment.LspShipment;
     }
   }
 
-  private LogisticChainElement getFirstElement(LogisticChain solution) {
-    for (LogisticChainElement element : solution.getLogisticChainElements()) {
+  private LogisticChainElement getFirstElement(LogisticChain logisticChain) {
+    for (LogisticChainElement element : logisticChain.getLogisticChainElements()) {
       if (element.getPreviousElement() == null) {
         return element;
       }

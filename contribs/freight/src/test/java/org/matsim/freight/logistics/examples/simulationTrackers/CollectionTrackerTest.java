@@ -116,10 +116,10 @@ public class CollectionTrackerTest {
 		collectionElementBuilder.setResource(collectionResource);
 		LogisticChainElement collectionElement = collectionElementBuilder.build();
 
-		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
-		logisticChain = collectionSolutionBuilder.build();
+		Id<LogisticChain> collectionChainId = Id.create("CollectionChain", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder collectionChainBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionChainId);
+		collectionChainBuilder.addLogisticChainElement(collectionElement);
+		logisticChain = collectionChainBuilder.build();
 
 		{
 			shareOfFixedCosts = 0.2;

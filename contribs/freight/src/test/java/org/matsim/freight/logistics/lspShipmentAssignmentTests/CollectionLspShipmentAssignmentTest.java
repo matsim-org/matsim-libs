@@ -91,15 +91,15 @@ public class CollectionLspShipmentAssignmentTest {
 		collectionElementBuilder.setResource(collectionResource);
 		LogisticChainElement collectionElement = collectionElementBuilder.build();
 
-		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
-		LogisticChain collectionSolution = collectionSolutionBuilder.build();
+		Id<LogisticChain> collectionChainId = Id.create("CollectionChain", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder collectionChainBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionChainId);
+		collectionChainBuilder.addLogisticChainElement(collectionElement);
+		LogisticChain collectionChain = collectionChainBuilder.build();
 
 		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setInitialShipmentAssigner(assigner);
-		collectionPlan.addLogisticChain(collectionSolution);
+		collectionPlan.addLogisticChain(collectionChain);
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
@@ -146,19 +146,19 @@ public class CollectionLspShipmentAssignmentTest {
 	public void testCollectionLSPShipmentAssignment() {
 		assertSame(collectionLSP.getSelectedPlan(), collectionPlan);
 		assertFalse(collectionLSP.getLspShipments().isEmpty());
-		ArrayList<LogisticChain> solutions = new ArrayList<>(collectionLSP.getSelectedPlan().getLogisticChains());
+		ArrayList<LogisticChain> chains = new ArrayList<>(collectionLSP.getSelectedPlan().getLogisticChains());
 
-		for (LogisticChain solution : solutions) {
-			if (solutions.indexOf(solution) == 0) {
-				assertEquals(10, solution.getLspShipmentIds().size());
-				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+		for (LogisticChain chain : chains) {
+			if (chains.indexOf(chain) == 0) {
+				assertEquals(10, chain.getLspShipmentIds().size());
+				for (LogisticChainElement element : chain.getLogisticChainElements()) {
 					if (element.getPreviousElement() == null) {
 						assertTrue(element.getIncomingShipments().getLspShipmentsWTime().isEmpty());
 						assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 					}
 				}
 			} else {
-				assertTrue(solution.getLspShipmentIds().isEmpty());
+				assertTrue(chain.getLspShipmentIds().isEmpty());
 			}
 		}
 

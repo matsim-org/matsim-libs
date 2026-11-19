@@ -96,15 +96,15 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 		collectionElementBuilder.setResource(collectionResource);
 		collectionElement = collectionElementBuilder.build();
 
-		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
-		LogisticChain collectionSolution = collectionSolutionBuilder.build();
+		Id<LogisticChain> collectionChainId = Id.create("CollectionChain", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder collectionChainBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionChainId);
+		collectionChainBuilder.addLogisticChainElement(collectionElement);
+		LogisticChain collectionChain = collectionChainBuilder.build();
 
 		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setInitialShipmentAssigner(assigner);
-		collectionPlan.addLogisticChain(collectionSolution);
+		collectionPlan.addLogisticChain(collectionChain);
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
@@ -225,8 +225,8 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			assertSame(serviceHandler.getResourceId(), collectionLSP.getResources().iterator().next().getId());
 		}
 
-		for (LogisticChain solution : collectionLSP.getSelectedPlan().getLogisticChains()) {
-			for (LogisticChainElement element : solution.getLogisticChainElements()) {
+		for (LogisticChain chain : collectionLSP.getSelectedPlan().getLogisticChains()) {
+			for (LogisticChainElement element : chain.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getLspShipmentsWTime().isEmpty());
 				if (element.getNextElement() != null) {
 					assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());

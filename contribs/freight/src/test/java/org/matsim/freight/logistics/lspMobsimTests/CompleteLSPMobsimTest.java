@@ -205,19 +205,19 @@ public class CompleteLSPMobsimTest {
 		mainRunElement.connectWithNextElement(secondHubElement);
 		secondHubElement.connectWithNextElement(distributionElement);
 
-		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder completeSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(solutionId);
-		completeSolutionBuilder.addLogisticChainElement(collectionElement);
-		completeSolutionBuilder.addLogisticChainElement(firstHubElement);
-		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
-		completeSolutionBuilder.addLogisticChainElement(secondHubElement);
-		completeSolutionBuilder.addLogisticChainElement(distributionElement);
-		LogisticChain completeSolution = completeSolutionBuilder.build();
+		Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder completeChainBuilder = LSPUtils.LogisticChainBuilder.newInstance(chainId);
+		completeChainBuilder.addLogisticChainElement(collectionElement);
+		completeChainBuilder.addLogisticChainElement(firstHubElement);
+		completeChainBuilder.addLogisticChainElement(mainRunElement);
+		completeChainBuilder.addLogisticChainElement(secondHubElement);
+		completeChainBuilder.addLogisticChainElement(distributionElement);
+		LogisticChain completeChain = completeChainBuilder.build();
 
 		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setInitialShipmentAssigner(assigner);
-		completePlan.addLogisticChain(completeSolution);
+		completePlan.addLogisticChain(completeChain);
 
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);

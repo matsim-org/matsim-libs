@@ -218,14 +218,14 @@ final class ExampleTwoEchelonGrid {
 				.setResource(directCarrierRessource)
 				.build();
 
-			LogisticChain solution_direct = LSPUtils.LogisticChainBuilder.newInstance(Id.create("directSolution", LogisticChain.class))
+			LogisticChain directChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("directChain", LogisticChain.class))
 				.addLogisticChainElement(directCarrierElement)
 				.build();
 
-			final InitialShipmentAssigner singleSolutionShipmentAssigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+			final InitialShipmentAssigner singleChainShipmentAssigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 			lspPlan_direct = LSPUtils.createLSPPlan()
-				.addLogisticChain(solution_direct)
-				.setInitialShipmentAssigner(singleSolutionShipmentAssigner);
+				.addLogisticChain(directChain)
+				.setInitialShipmentAssigner(singleChainShipmentAssigner);
 		}
 
 		LSPPlan lspPlan_withHub;
@@ -289,24 +289,24 @@ final class ExampleTwoEchelonGrid {
 
 			// Kettenbildung per hand, damit dann klar ist, wie das Scheduling ablaufen soll. TODO:
 			// Vielleicht bekommt man das noch eleganter hin.
-			// z.B. in der Reihenfolge in der die solutionsElements der LogisticsSolution zugeordnet
-			// werden: ".addSolutionElement(..)"
+			// z.B. in der Reihenfolge in der die LogisticChainElements der LogisticChain zugeordnet
+			// werden: ".addLogisticChainElement(..)"
 			mainCarrierLCE.connectWithNextElement(hubLCE);
 			hubLCE.connectWithNextElement(distributionCarrierLCE);
 
-			LogisticChain solution_withHub = LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubSolution", LogisticChain.class))
+			LogisticChain hubChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubChain", LogisticChain.class))
 				.addLogisticChainElement(mainCarrierLCE)
 				.addLogisticChainElement(hubLCE)
 				.addLogisticChainElement(distributionCarrierLCE)
 				.build();
 
 			lspPlan_withHub = LSPUtils.createLSPPlan()
-				.addLogisticChain(solution_withHub)
+				.addLogisticChain(hubChain)
 				.setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner());
 		}
 
 		// Todo: Auch das ist wirr: Muss hier alle sammeln, damit man die dann im LSPBuilder dem
-		// SolutionScheduler mitgeben kann. Im Nachgang packt man dann aber erst den zweiten Plan dazu
+		// LogisticChainScheduler mitgeben kann. Im Nachgang packt man dann aber erst den zweiten Plan dazu
 		// ... urgs KMT'Jul22
 		List<LSPPlan> lspPlans = new ArrayList<>();
 		lspPlans.add(lspPlan_withHub);
@@ -398,9 +398,9 @@ final class ExampleTwoEchelonGrid {
 			new ArrayList<>(); // TODO: Mache daraus ein Set, damit jede Resource nur einmal drin ist?
 		// kmt Feb22
 		for (LSPPlan lspPlan : lspPlans) {
-			for (LogisticChain solution : lspPlan.getLogisticChains()) {
-				for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
-					resourcesList.add(solutionElement.getResource());
+			for (LogisticChain chain : lspPlan.getLogisticChains()) {
+				for (LogisticChainElement chainElement : chain.getLogisticChainElements()) {
+					resourcesList.add(chainElement.getResource());
 				}
 			}
 		}

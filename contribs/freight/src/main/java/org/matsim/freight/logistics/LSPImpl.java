@@ -88,8 +88,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   @Override
   public boolean addPlan(LSPPlan plan) {
-    for (LogisticChain solution : plan.getLogisticChains()) {
-      for (LogisticChainElement element : solution.getLogisticChainElements()) {
+    for (LogisticChain chain : plan.getLogisticChains()) {
+      for (LogisticChainElement element : chain.getLogisticChainElements()) {
         if (!resources.contains(element.getResource())) {
           resources.add(element.getResource());
         }

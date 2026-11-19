@@ -72,14 +72,14 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   @Override
   public String toString() {
     StringBuilder strb = new StringBuilder();
-    strb.append("LogisticsSolutionImpl{")
-        .append("[No of SolutionsElements=")
+    strb.append("LogisticChainImpl{")
+        .append("[No of LogisticChainElements=")
         .append(logisticChainElements.size())
         .append("] \n");
     if (!logisticChainElements.isEmpty()) {
-      strb.append("{SolutionElements=");
-      for (LogisticChainElement solutionElement : logisticChainElements) {
-        strb.append("\n [").append(solutionElement.toString()).append("]");
+      strb.append("{LogisticChainElements=");
+      for (LogisticChainElement chainElement : logisticChainElements) {
+        strb.append("\n [").append(chainElement.toString()).append("]");
       }
       strb.append("}");
     }

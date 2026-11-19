@@ -230,12 +230,12 @@ final class ExampleMultipleOneEchelonChains {
 					.addLogisticChainElement(singleCarrierElement)
 					.build();
 
-			final InitialShipmentAssigner singleSolutionShipmentAssigner =
+			final InitialShipmentAssigner singleChainShipmentAssigner =
 				MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
 			singleOneEchelonChainPlan =
 				LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
-					.setInitialShipmentAssigner(singleSolutionShipmentAssigner);
+					.setInitialShipmentAssigner(singleChainShipmentAssigner);
 		}
 
 		// A plan with two different logistic chains on the left and right, with respective carriers is

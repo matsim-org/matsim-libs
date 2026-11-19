@@ -100,8 +100,8 @@ public class LSPPlanImpl implements LSPPlan {
 	@Override
 	public void setLSP(LSP lsp) {
 		this.lsp = lsp;
-		for (LogisticChain solution : logisticChains) {
-			solution.setLSP(lsp);
+		for (LogisticChain chain : logisticChains) {
+			chain.setLSP(lsp);
 		}
 	}
 
@@ -117,8 +117,8 @@ public class LSPPlanImpl implements LSPPlan {
 				.append(logisticChain.getLogisticChainElements().size())
 				.append("] \n");
 			if (!logisticChain.getLogisticChainElements().isEmpty()) {
-				for (LogisticChainElement solutionElement : logisticChain.getLogisticChainElements()) {
-					strb.append("\t \t").append(solutionElement.toString()).append("\n");
+				for (LogisticChainElement chainElement : logisticChain.getLogisticChainElements()) {
+					strb.append("\t \t").append(chainElement.toString()).append("\n");
 				}
 			}
 		}

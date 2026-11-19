@@ -68,9 +68,9 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
               assigner.assignToPlan(plan, lspShipment);
             }
 
-            for (LogisticChain solution : plan.getLogisticChains()) {
-              solution.getLspShipmentIds().clear();
-              for (LogisticChainElement element : solution.getLogisticChainElements()) {
+            for (LogisticChain chain : plan.getLogisticChains()) {
+              chain.getLspShipmentIds().clear();
+              for (LogisticChainElement element : chain.getLogisticChainElements()) {
                 element.getIncomingShipments().clear();
                 element.getOutgoingShipments().clear();
               }

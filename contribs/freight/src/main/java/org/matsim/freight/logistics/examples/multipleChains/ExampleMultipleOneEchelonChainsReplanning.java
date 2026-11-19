@@ -245,12 +245,12 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 					.addLogisticChainElement(singleCarrierElement)
 					.build();
 
-			final InitialShipmentAssigner singleSolutionShipmentAssigner =
+			final InitialShipmentAssigner singleChainShipmentAssigner =
 				MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
 			singleOneEchelonChainPlan =
 				LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
-					.setInitialShipmentAssigner(singleSolutionShipmentAssigner)
+					.setInitialShipmentAssigner(singleChainShipmentAssigner)
 					.setType(MultipleChainsUtils.LspPlanTypes.SINGLE_ONE_ECHELON_CHAIN.toString());
 		}
 

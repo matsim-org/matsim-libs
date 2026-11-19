@@ -63,9 +63,9 @@ public class AssignmentStrategyFactory {
           @Override
           public void handlePlan(LSPPlan lspPlan) {
 
-            for (LogisticChain solution : lspPlan.getLogisticChains()) {
-              solution.getLspShipmentIds().clear();
-              for (LogisticChainElement element : solution.getLogisticChainElements()) {
+            for (LogisticChain chain : lspPlan.getLogisticChains()) {
+              chain.getLspShipmentIds().clear();
+              for (LogisticChainElement element : chain.getLogisticChainElements()) {
                 element.getIncomingShipments().clear();
                 element.getOutgoingShipments().clear();
               }

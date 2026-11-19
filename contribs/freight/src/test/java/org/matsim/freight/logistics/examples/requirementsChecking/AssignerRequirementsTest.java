@@ -90,7 +90,7 @@ public class AssignerRequirementsTest {
 				.setResource(redCollectionResource)
 				.build();
 
-		redChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("RedCollectionSolution", LogisticChain.class))
+		redChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("RedCollectionChain", LogisticChain.class))
 				.addLogisticChainElement(redCollectionElement)
 				.build();
 		redChain.getAttributes().putAttribute("color", "red");
@@ -121,7 +121,7 @@ public class AssignerRequirementsTest {
 		blueCollectionElementBuilder.setResource(blueCollectionResource);
 		LogisticChainElement blueCollectionElement = blueCollectionElementBuilder.build();
 
-		blueChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("BlueCollectionSolution", LogisticChain.class))
+		blueChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("BlueCollectionChain", LogisticChain.class))
 				.addLogisticChainElement(blueCollectionElement)
 				.build();
 		blueChain.getAttributes().putAttribute("color", "blue");
