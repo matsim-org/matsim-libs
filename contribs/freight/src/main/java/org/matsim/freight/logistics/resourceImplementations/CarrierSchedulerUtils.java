@@ -195,8 +195,8 @@ public class CarrierSchedulerUtils {
 			}
 		}
 
-		int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-		Tour.Leg legAfterStart = (Tour.Leg) tour.getTourElements().get(startIndex + 1);
+		// The start activity is not contained in the tour elements, so the first tour element is the leg after the start.
+		Tour.Leg legAfterStart = (Tour.Leg) tour.getTourElements().getFirst();
 		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
 		double cumulatedLoadingTime = 0;
 		for (Tour.TourElement element : tour.getTourElements()) {

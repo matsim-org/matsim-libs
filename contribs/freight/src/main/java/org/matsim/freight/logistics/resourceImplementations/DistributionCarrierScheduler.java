@@ -385,8 +385,8 @@ import org.matsim.vehicles.VehicleType;
 			}
 		}
 
-		int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-		Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
+		// The start activity is not contained in the tour elements, so the first tour element is the leg after the start.
+		Leg legAfterStart = (Leg) tour.getTourElements().getFirst();
 		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime(); //TODO: Hier die richtigen Zeiten eintragen!
 //		double startTimeOfTransport = Double.MIN_VALUE;
 		double cumulatedLoadingTime = 0;
