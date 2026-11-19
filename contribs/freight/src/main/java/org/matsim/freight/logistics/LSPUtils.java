@@ -161,6 +161,26 @@ public final class LSPUtils {
 	}
 
 	/**
+	 * Hands each {@link LspShipment} of the selected plan of the given {@link LSP} over to the incoming
+	 * shipments of the first {@link LogisticChainElement} of the {@link LogisticChain} it is assigned to.
+	 * This is the first step of the forward {@link LogisticChainScheduler}s.
+	 *
+	 * @throws IllegalStateException if a shipment id of a chain is not found in the LSP
+	 */
+	public static void insertShipmentsAtBeginningOfLogisticChains(LSP lsp) {
+		for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+			LogisticChainElement firstElement = logisticChain.getFirstLogisticChainElement();
+			for (Id<LspShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
+				LspShipment lspShipment = findLspShipment(lsp, lspShipmentId);
+				if (lspShipment == null) {
+					throw new IllegalStateException("Shipment with id " + lspShipmentId + " not found in LSP " + lsp.getId() + ".");
+				}
+				firstElement.getIncomingShipments().addShipment(lspShipment.getPickupTimeWindow().getStart(), lspShipment);
+			}
+		}
+	}
+
+	/**
 	 * Returns the {@link LspShipmentPlan} of an {@link LspShipment}.
 	 *
 	 * @param lspPlan    the lspPlan: It contains the information of its shipmentPlans

@@ -21,8 +21,6 @@
 package org.matsim.freight.logistics;
 
 import java.util.ArrayList;
-import org.matsim.api.core.v01.Id;
-import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  * .... Macht 3 Schritte: 1.) the LSPShipments are handed over to the first {@link
@@ -58,7 +56,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
   @Override
   public void scheduleLogisticChain() {
-    insertShipmentsAtBeginning();
+    LSPUtils.insertShipmentsAtBeginningOfLogisticChains(lsp);
     setResourceNeighbours();
     sortResources();
     for (LSPResource resource : sortedResourceList) {
@@ -125,29 +123,6 @@ import org.matsim.freight.logistics.shipment.LspShipment;
       }
     }
     return false;
-  }
-
-  private void insertShipmentsAtBeginning() {
-    for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
-      LogisticChainElement firstElement = getFirstElement(chain);
-      assert firstElement != null;
-      for (Id<LspShipment> lspShipmentId : chain.getLspShipmentIds()) {
-        var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
-        assert shipment != null;
-        firstElement
-            .getIncomingShipments()
-            .addShipment(shipment.getPickupTimeWindow().getStart(), shipment);
-      }
-    }
-  }
-
-  private LogisticChainElement getFirstElement(LogisticChain logisticChain) {
-    for (LogisticChainElement element : logisticChain.getLogisticChainElements()) {
-      if (element.getPreviousElement() == null) {
-        return element;
-      }
-    }
-    return null;
   }
 
   @Override

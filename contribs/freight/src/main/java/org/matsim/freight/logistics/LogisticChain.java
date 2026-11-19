@@ -41,4 +41,18 @@ public interface LogisticChain extends Identifiable<LogisticChain>, KnowsLSP, Ha
   Collection<Id<LspShipment>> getLspShipmentIds();
 
   void addShipmentToChain(LspShipment lspShipment);
+
+  /**
+   * Returns the first element of this chain, i.e. the element without a predecessor.
+   *
+   * @throws IllegalStateException if every element has a predecessor (or the chain is empty)
+   */
+  default LogisticChainElement getFirstLogisticChainElement() {
+    for (LogisticChainElement element : getLogisticChainElements()) {
+      if (element.getPreviousElement() == null) {
+        return element;
+      }
+    }
+    throw new IllegalStateException("Logistic chain " + getId() + " has no first element, i.e. no element without a predecessor.");
+  }
 }
