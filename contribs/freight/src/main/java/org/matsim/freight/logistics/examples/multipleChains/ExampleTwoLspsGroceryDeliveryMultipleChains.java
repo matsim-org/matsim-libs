@@ -375,7 +375,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 		mainCarrierElement.connectWithNextElement(hubElement);
 		hubElement.connectWithNextElement(distributionCarrierElement);
 
-		//TODO: Hier das Verbinden einfügen und in der Reihenfolge ist es. KMT Nov'24
 		hubChain =
 			LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubChain", LogisticChain.class))
 				.addLogisticChainElement(mainCarrierElement)

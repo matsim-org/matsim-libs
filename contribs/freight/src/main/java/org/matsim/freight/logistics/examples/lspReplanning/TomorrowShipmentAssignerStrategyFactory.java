@@ -51,8 +51,6 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
           @Override
           public void prepareReplanning(ReplanningContext replanningContext) {
-            // TODO Auto-generated method stub
-
           }
 
           @Override
@@ -72,8 +70,6 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
           @Override
           public void finishReplanning() {
-            // TODO Auto-generated method stub
-
           }
         };
 

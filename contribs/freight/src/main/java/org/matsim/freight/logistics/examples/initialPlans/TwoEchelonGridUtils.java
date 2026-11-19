@@ -279,10 +279,7 @@ final class TwoEchelonGridUtils {
 				.setResource(distributionCarrierRessource)
 				.build();
 
-			// Kettenbildung per hand, damit dann klar ist, wie das Scheduling ablaufen soll. TODO:
-			// Vielleicht bekommt man das noch eleganter hin.
-			// z.B. in der Reihenfolge in der die LogisticChainElements der LogisticChain zugeordnet
-			// werden: ".addLogisticChainElement(..)"
+			// Kettenbildung per hand, damit dann klar ist, wie das Scheduling ablaufen soll.
 			mainCarrierLCE.connectWithNextElement(hubLCE);
 			hubLCE.connectWithNextElement(distributionCarrierLCE);
 
