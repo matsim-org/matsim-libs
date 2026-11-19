@@ -145,6 +145,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setPickupServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLspPlan(shipment);
 		}
@@ -203,7 +204,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			LSPTourEndEventHandler endHandler = (LSPTourEndEventHandler) eventHandlers.getFirst();
 			assertSame(endHandler.getCarrierService().getServiceLinkId(), shipment.getFrom());
             assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
-			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getPickupServiceTime(), 0.0);
 			assertEquals(endHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
 			assertEquals(endHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(endHandler.getLogisticChainElement(), planElements.get(2).getLogisticChainElement());
@@ -216,7 +217,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			CollectionJobEventHandler serviceHandler = (CollectionJobEventHandler) eventHandlers.get(1);
 			assertSame(serviceHandler.getCarrierService().getServiceLinkId(), shipment.getFrom());
             assertEquals(serviceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
-			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getPickupServiceTime(), 0.0);
 			assertEquals(serviceHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
 			assertEquals(serviceHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(serviceHandler.getElement(), planElements.get(1).getLogisticChainElement());

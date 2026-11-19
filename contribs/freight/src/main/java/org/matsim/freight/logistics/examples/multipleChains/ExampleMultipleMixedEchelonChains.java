@@ -436,6 +436,7 @@ final class ExampleMultipleMixedEchelonChains {
 				builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 				builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 				builder.setDeliveryServiceTime(capacityDemand * 60);
+				builder.setPickupServiceTime(capacityDemand * 60);
 
 				shipmentList.add(builder.build());
 			} else {
@@ -450,6 +451,7 @@ final class ExampleMultipleMixedEchelonChains {
 				builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 				builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 				builder.setDeliveryServiceTime(capacityDemand * 60);
+				builder.setPickupServiceTime(capacityDemand * 60);
 
 				shipmentList.add(builder.build());
 			}

@@ -187,7 +187,7 @@ import org.matsim.vehicles.VehicleType;
 			}
 			shipmentsInCurrentTour.add(lspShipment);
 			load += lspShipment.getSize();
-			cumulatedLoadingTime += lspShipment.getDeliveryServiceTime();
+			cumulatedLoadingTime += lspShipment.getPickupServiceTime();
 			availabilityTimeOfLastShipment = LspShipmentUtils.getTimeOfLspShipment(lspShipment);
 		}
 		//Restliche Sendungen in einem letzten Vrp planen
@@ -389,12 +389,7 @@ import org.matsim.vehicles.VehicleType;
 		Leg legAfterStart = (Leg) tour.getTourElements().getFirst();
 		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime(); //TODO: Hier die richtigen Zeiten eintragen!
 //		double startTimeOfTransport = Double.MIN_VALUE;
-		double cumulatedLoadingTime = 0;
-		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity activity) {
-				cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
-			}
-		}
+		double cumulatedLoadingTime = CarrierSchedulerUtils.sumOfPickupServiceTimes(tour, super.lspPlan.getLSP());
 		builder.setStartTime(startTimeOfTransport - cumulatedLoadingTime);
 		builder.setEndTime(startTimeOfTransport);
 
@@ -527,7 +522,7 @@ import org.matsim.vehicles.VehicleType;
 		CarriersUtils.setJspritIterations(auxiliaryCarrier, jspritIterations);
 
 		for (LspShipment lspShipment : shipmentsInCurrentTour) {
-			CarrierService carrierService = CarrierSchedulerUtils.convertToCarrierService(lspShipment, lspShipment.getTo(), null);
+			CarrierService carrierService = CarrierSchedulerUtils.convertToCarrierService(lspShipment, lspShipment.getTo(), null, lspShipment.getDeliveryServiceTime());
 			auxiliaryCarrier.getServices().put(carrierService.getId(), carrierService);
 		}
 
@@ -546,11 +541,13 @@ import org.matsim.vehicles.VehicleType;
 				switch (tourActivity) {
 					case Tour.ServiceActivity serviceActivity -> {
 						serviceHandler = new DistributionJobEventHandler(serviceActivity.getService(), lspShipment, element, resource);
-						tourHandler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour);
+						tourHandler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour,
+							CarrierSchedulerUtils.sumOfPickupServiceTimes(tour, super.lspPlan.getLSP()));
 					}
 					case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
 						serviceHandler = new DistributionJobEventHandler(shipmentBasedActivity.getShipment(), lspShipment, element, resource);
-						tourHandler = new LSPTourStartEventHandler(lspShipment, shipmentBasedActivity.getShipment(), element, resource, tour);
+						tourHandler = new LSPTourStartEventHandler(lspShipment, shipmentBasedActivity.getShipment(), element, resource, tour,
+							CarrierSchedulerUtils.sumOfPickupServiceTimes(tour, super.lspPlan.getLSP()));
 					}
 					default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
 				}

@@ -187,11 +187,20 @@ import org.matsim.freight.logistics.shipment.*;
 		return allShipmentsOfTourEndInOnePoint;
 	}
 
+	/**
+	 * Returns the time needed to unload all shipments of the tour at the hub, i.e. the sum of their delivery service
+	 * times. All services of the tour must be registered via {@link #addShipment}.
+	 */
 	private double getTotalUnloadingTime(Tour tour) {
 		double totalTime = 0;
 		for (TourElement element : tour.getTourElements()) {
 			if (element instanceof ServiceActivity serviceActivity) {
-				totalTime = totalTime + serviceActivity.getDuration();
+				TransshipmentHubEventHandlerPair pair = servicesWaitedFor.get(serviceActivity.getService());
+				if (pair == null) {
+					throw new IllegalStateException("Service " + serviceActivity.getService().getId() + " of tour " + tour.getId()
+						+ " is not registered at hub " + resourceId + ".");
+				}
+				totalTime = totalTime + pair.lspShipment.getDeliveryServiceTime();
 			}
 		}
 		return totalTime;

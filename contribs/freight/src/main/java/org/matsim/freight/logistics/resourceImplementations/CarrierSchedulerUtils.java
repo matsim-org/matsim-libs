@@ -6,6 +6,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 import java.util.List;
+import java.util.function.ToDoubleFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -23,6 +24,7 @@ import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
+import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPUtils;
@@ -174,15 +176,51 @@ public class CarrierSchedulerUtils {
 	 * @param linkId                     the link where the service takes place
 	 * @param serviceStartingTimeWindow  the time window for the start of the service, or {@code null} to use the default
 	 *                                   of {@link CarrierService.Builder}
+	 * @param serviceDuration            the duration of the service: {@link LspShipment#getPickupServiceTime()} if the
+	 *                                   shipment is loaded at the service, {@link LspShipment#getDeliveryServiceTime()} if
+	 *                                   it is unloaded
 	 */
-	static CarrierService convertToCarrierService(LspShipment lspShipment, Id<Link> linkId, TimeWindow serviceStartingTimeWindow) {
+	static CarrierService convertToCarrierService(LspShipment lspShipment, Id<Link> linkId, TimeWindow serviceStartingTimeWindow,
+												  double serviceDuration) {
 		Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
 		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, linkId, lspShipment.getSize())
-			.setServiceDuration(lspShipment.getDeliveryServiceTime());
+			.setServiceDuration(serviceDuration);
 		if (serviceStartingTimeWindow != null) {
 			builder.setServiceStartingTimeWindow(serviceStartingTimeWindow);
 		}
 		return builder.build();
+	}
+
+	/**
+	 * Returns the sum of the pickup service times, i.e. the loading durations, of the {@link LspShipment}s that are served
+	 * by the service activities of the given tour. The ids of the carrier services equal the ids of the LSP shipments.
+	 */
+	static double sumOfPickupServiceTimes(Tour tour, LSP lsp) {
+		return sumOverShipmentsOfServiceActivities(tour, lsp, LspShipment::getPickupServiceTime);
+	}
+
+	/**
+	 * Returns the sum of the delivery service times, i.e. the unloading durations, of the {@link LspShipment}s that are
+	 * served by the service activities of the given tour. The ids of the carrier services equal the ids of the LSP
+	 * shipments.
+	 */
+	static double sumOfDeliveryServiceTimes(Tour tour, LSP lsp) {
+		return sumOverShipmentsOfServiceActivities(tour, lsp, LspShipment::getDeliveryServiceTime);
+	}
+
+	private static double sumOverShipmentsOfServiceActivities(Tour tour, LSP lsp, ToDoubleFunction<LspShipment> duration) {
+		double sum = 0;
+		for (Tour.TourElement element : tour.getTourElements()) {
+			if (element instanceof Tour.ServiceActivity serviceActivity) {
+				Id<LspShipment> lspShipmentId = Id.create(serviceActivity.getService().getId().toString(), LspShipment.class);
+				LspShipment lspShipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
+				if (lspShipment == null) {
+					throw new IllegalStateException("No LSP shipment with id " + lspShipmentId + " found in LSP " + lsp.getId() + ".");
+				}
+				sum += duration.applyAsDouble(lspShipment);
+			}
+		}
+		return sum;
 	}
 
 	static void addShipmentLoadElement(LspShipment lspShipment, Tour tour, LSPCarrierResource resource, LSPPlan lspPlan) {
@@ -198,12 +236,7 @@ public class CarrierSchedulerUtils {
 		// The start activity is not contained in the tour elements, so the first tour element is the leg after the start.
 		Tour.Leg legAfterStart = (Tour.Leg) tour.getTourElements().getFirst();
 		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
-		double cumulatedLoadingTime = 0;
-		for (Tour.TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity activity) {
-				cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
-			}
-		}
+		double cumulatedLoadingTime = sumOfPickupServiceTimes(tour, lspPlan.getLSP());
 		builder.setStartTime(startTimeOfTransport - cumulatedLoadingTime);
 		builder.setEndTime(startTimeOfTransport);
 

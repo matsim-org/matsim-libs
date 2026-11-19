@@ -35,16 +35,23 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
   private final CarrierService carrierService;
   private final Tour tour;
+  private final double unloadingDuration;
 
+  /**
+   * @param unloadingDuration the time needed at the end of the tour to unload all shipments of the tour, i.e. the sum of
+   *                          their delivery service times
+   */
   public LSPTourEndEventHandler(
       LspShipment lspShipment,
       CarrierService carrierService,
       LogisticChainElement logisticChainElement,
       LSPCarrierResource resource,
-      Tour tour) {
+      Tour tour,
+      double unloadingDuration) {
     super(lspShipment, logisticChainElement, resource);
     this.carrierService = carrierService;
     this.tour = tour;
+    this.unloadingDuration = unloadingDuration;
   }
 
   @Override
@@ -56,10 +63,10 @@ import org.matsim.freight.logistics.shipment.LspShipment;
               && isCarrierOfResource(event.getCarrierId())) {
             if (getCarrierResource() instanceof CollectionCarrierResource) {
               logTransportEnd(event.getTime(), tour.getEndLinkId());
-              logUnload(event.getCarrierId(), null, event.getTime(), event.getTime() + getTotalUnloadingTime(tour));
+              logUnload(event.getCarrierId(), null, event.getTime(), event.getTime() + unloadingDuration);
             } else if (getCarrierResource() instanceof MainRunCarrierResource) {
-              logUnload(event.getCarrierId(), null, event.getTime() - getTotalUnloadingTime(tour), event.getTime());
-              logTransportEnd(event.getTime() - getTotalUnloadingTime(tour), event.getLinkId());
+              logUnload(event.getCarrierId(), null, event.getTime() - unloadingDuration, event.getTime());
+              logTransportEnd(event.getTime() - unloadingDuration, event.getLinkId());
             }
           }
         }
@@ -67,15 +74,6 @@ import org.matsim.freight.logistics.shipment.LspShipment;
     }
   }
 
-  private double getTotalUnloadingTime(Tour tour) {
-    double totalTime = 0;
-    for (TourElement element : tour.getTourElements()) {
-      if (element instanceof ServiceActivity serviceActivity) {
-        totalTime = totalTime + serviceActivity.getDuration();
-      }
-    }
-    return totalTime;
-  }
 
   public CarrierService getCarrierService() {
     return carrierService;

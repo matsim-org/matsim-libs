@@ -36,11 +36,18 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
   private final Tour tour;
   private final CarrierJob carrierJob;
+  private final double loadingDuration;
 
-  public LSPTourStartEventHandler(LspShipment lspShipment, CarrierJob carrierJob, LogisticChainElement logisticChainElement, LSPCarrierResource resource, Tour tour) {
+  /**
+   * @param loadingDuration the time needed before the tour start to load all shipments of the tour, i.e. the sum of their
+   *                        pickup service times
+   */
+  public LSPTourStartEventHandler(LspShipment lspShipment, CarrierJob carrierJob, LogisticChainElement logisticChainElement, LSPCarrierResource resource,
+                                  Tour tour, double loadingDuration) {
     super(lspShipment, logisticChainElement, resource);
     this.carrierJob = carrierJob;
     this.tour = tour;
+    this.loadingDuration = loadingDuration;
   }
 
   @Override
@@ -67,20 +74,11 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
   private void logLoadAndTransport(CarrierTourStartEvent event) {
     if (getCarrierResource() instanceof DistributionCarrierResource || getCarrierResource() instanceof MainRunCarrierResource) {
-      logLoad(event.getCarrierId(), event.getLinkId(), event.getTime() - getCumulatedLoadingTime(tour), event.getTime());
+      logLoad(event.getCarrierId(), event.getLinkId(), event.getTime() - loadingDuration, event.getTime());
       logTransportStart(event.getCarrierId(), event.getLinkId(), tour.getEndLinkId(), event.getTime());
     }
   }
 
-  private double getCumulatedLoadingTime(Tour tour) {
-    double cumulatedLoadingTime = 0;
-    for (TourElement tourElement : tour.getTourElements()) {
-      if (tourElement instanceof ServiceActivity serviceActivity) {
-        cumulatedLoadingTime = cumulatedLoadingTime + serviceActivity.getDuration();
-      }
-    }
-    return cumulatedLoadingTime;
-  }
 
   public CarrierJob getCarrierJob() {
     return carrierJob;

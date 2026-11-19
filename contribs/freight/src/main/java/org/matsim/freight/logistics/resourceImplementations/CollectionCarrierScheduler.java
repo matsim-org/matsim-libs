@@ -82,7 +82,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 	@Override
 	public void scheduleResource() {
 		for (LspShipment lspShipmentToBeAssigned : lspShipmentsToSchedule) {
-			CarrierService carrierService = CarrierSchedulerUtils.convertToCarrierService(lspShipmentToBeAssigned, lspShipmentToBeAssigned.getFrom(), lspShipmentToBeAssigned.getPickupTimeWindow());
+			CarrierService carrierService = CarrierSchedulerUtils.convertToCarrierService(lspShipmentToBeAssigned, lspShipmentToBeAssigned.getFrom(), lspShipmentToBeAssigned.getPickupTimeWindow(),
+				lspShipmentToBeAssigned.getPickupServiceTime());
 			carrier.getServices().put(carrierService.getId(), carrierService);
 		}
 		CarrierSchedulerUtils.solveVrpWithJsprit(carrier, scenario);
@@ -123,7 +124,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 		Leg legBeforeService = (Leg) tour.getTourElements().get(tour.getTourElements().indexOf(serviceActivity) - 1);
 		double startTimeOfLoading = legBeforeService.getExpectedDepartureTime() + legBeforeService.getExpectedTransportTime();
 		builder.setStartTime(startTimeOfLoading);
-		builder.setEndTime(startTimeOfLoading + lspShipment.getDeliveryServiceTime());
+		builder.setEndTime(startTimeOfLoading + lspShipment.getPickupServiceTime());
 
 		LspShipmentPlanElement load = builder.build();
 		Id<LspShipmentPlanElement> id = LspShipmentUtils.createPlanElementId(load);
@@ -169,7 +170,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 	private void addCollectionTourEndEventHandler(CarrierService carrierService, LspShipment lspShipment, LSPCarrierResource resource, Tour tour) {
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-				LSPTourEndEventHandler handler = new LSPTourEndEventHandler(lspShipment, carrierService, element, resource, tour);
+				LSPTourEndEventHandler handler = new LSPTourEndEventHandler(lspShipment, carrierService, element, resource, tour,
+					CarrierSchedulerUtils.sumOfDeliveryServiceTimes(tour, super.lspPlan.getLSP()));
 				lspShipment.addSimulationTracker(handler);
 				break;
 			}
@@ -188,21 +190,12 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 		Leg lastLeg = (Leg) tour.getTourElements().getLast();
 		double startTime = lastLeg.getExpectedDepartureTime() + lastLeg.getExpectedTransportTime();
 		builder.setStartTime(startTime);
-		builder.setEndTime(startTime + getUnloadEndTime(tour));
+		builder.setEndTime(startTime + CarrierSchedulerUtils.sumOfDeliveryServiceTimes(tour, super.lspPlan.getLSP()));
 
 		LspShipmentPlanElement unload = builder.build();
 		Id<LspShipmentPlanElement> id = LspShipmentUtils.createPlanElementId(unload);
 		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, unload);
 	}
 
-	private double getUnloadEndTime(Tour tour) {
-		double unloadEndTime = 0;
-		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity serviceActivity) {
-				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
-			}
-		}
-		return unloadEndTime;
-	}
 
 }

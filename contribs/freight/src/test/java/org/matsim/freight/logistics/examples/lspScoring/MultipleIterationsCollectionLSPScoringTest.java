@@ -161,6 +161,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setPickupServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLspPlan(shipment);
 		}
