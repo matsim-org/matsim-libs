@@ -23,12 +23,10 @@ package org.matsim.freight.logistics;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
@@ -45,8 +43,8 @@ public class LSPImplCopyPlanTest {
 
 	@BeforeEach
 	public void initialize() {
-		LSPResource firstResource = new TestResource(Id.create("firstResource", LSPResource.class));
-		LSPResource secondResource = new TestResource(Id.create("secondResource", LSPResource.class));
+		LSPResource firstResource = new TestLspResource(Id.create("firstResource", LSPResource.class));
+		LSPResource secondResource = new TestLspResource(Id.create("secondResource", LSPResource.class));
 
 		firstElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("firstElement", LogisticChainElement.class))
 			.setResource(firstResource)
@@ -155,34 +153,6 @@ public class LSPImplCopyPlanTest {
 	private static LogisticChain getOnlyChain(LSPPlan plan) {
 		assertEquals(1, plan.getLogisticChains().size());
 		return plan.getLogisticChains().iterator().next();
-	}
-
-	/** Minimal resource that does nothing when scheduled. */
-	private static final class TestResource extends LSPDataObject<LSPResource> implements LSPResource {
-		private final Collection<LogisticChainElement> clientElements = new ArrayList<>();
-
-		TestResource(Id<LSPResource> id) {
-			super(id);
-		}
-
-		@Override
-		public Id<Link> getStartLinkId() {
-			return null;
-		}
-
-		@Override
-		public Id<Link> getEndLinkId() {
-			return null;
-		}
-
-		@Override
-		public Collection<LogisticChainElement> getClientElements() {
-			return clientElements;
-		}
-
-		@Override
-		public void schedule(int bufferTime, LSPPlan lspPlan) {
-		}
 	}
 
 	/** Tracker that does nothing; only needed to check whether chain trackers are copied. */

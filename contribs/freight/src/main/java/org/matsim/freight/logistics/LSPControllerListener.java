@@ -163,9 +163,7 @@ class LSPControllerListener
 		strategyManager.run(lsps.getLSPs().values(), event.getIteration(), event.getReplanningContext());
 
 		for (LSP lsp : lsps.getLSPs().values()) {
-			lsp.getSelectedPlan()
-				.getShipmentPlans()
-				.clear(); // clear ShipmentPlans to start with clear(n) state. Otherwise, some of the times were accumulating over the time. :(
+			// scheduleLogisticChains starts with removing the shipment plans of the selected plan and emptying the waiting shipments.
 			lsp.scheduleLogisticChains();
 		}
 

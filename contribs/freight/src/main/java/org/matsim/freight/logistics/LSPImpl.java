@@ -100,8 +100,36 @@ import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
   @Override
   public void scheduleLogisticChains() {
-
+    resetSchedulingState();
     logisticChainScheduler.scheduleLogisticChain();
+  }
+
+  /**
+   * Resets the state that a scheduling run builds up, so that every run starts from the same state:
+   *
+   * <ul>
+   *   <li>The shipment plans of the selected plan are removed. They are the result of the scheduling run and
+   *       are re-created by it.
+   *   <li>The incoming and outgoing {@link WaitingShipments} of all {@link LogisticChainElement}s of all plans
+   *       of this LSP are emptied. The waiting shipments are temporary state of a scheduling run. Without this,
+   *       shipments that remain in them from a previous run (e.g. in the outgoing shipments of the last
+   *       element, or after a run that was aborted) would be handled again. The elements of all plans are
+   *       cleared, since the elements are shared between plans (see {@link #copyPlan(LSPPlan)}) and a resource
+   *       schedules the incoming shipments of all its client elements.
+   * </ul>
+   *
+   * The assignment of the shipments to the logistic chains is part of the plan and is not changed.
+   */
+  private void resetSchedulingState() {
+    selectedPlan.getShipmentPlans().clear();
+    for (LSPPlan plan : lspPlans) {
+      for (LogisticChain chain : plan.getLogisticChains()) {
+        for (LogisticChainElement element : chain.getLogisticChainElements()) {
+          element.getIncomingShipments().clear();
+          element.getOutgoingShipments().clear();
+        }
+      }
+    }
   }
 
   @Override

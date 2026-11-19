@@ -21,7 +21,6 @@
 
 package org.matsim.freight.logistics.examples.lspReplanning;
 
-import java.util.Collection;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -29,7 +28,6 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LspShipment;
-import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /**
  * @deprecated Creates a replanning strategy that delegates shipment assignment to an {@link
@@ -61,23 +59,18 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
           public void handlePlan(LSPPlan plan) {
             plan.getLogisticChains().iterator().next().getLspShipmentIds().clear();
             plan.setInitialShipmentAssigner(assigner);
-            //				LSP lsp = assigner.getLSP();
-            LSP lsp = plan.getLSP();
-            Collection<LspShipment> lspShipments = lsp.getLspShipments();
-            for (LspShipment lspShipment : lspShipments) {
+            // This first assignment is overwritten below. It is kept because it changes the state of the assigner:
+            // e.g. MaybeTodayAssigner draws random numbers, so removing it changes the results (see CollectionLSPReplanningTest).
+            for (LspShipment lspShipment : plan.getLSP().getLspShipments()) {
               assigner.assignToPlan(plan, lspShipment);
             }
 
+            // The shipment plans and the waiting shipments of the chain elements are reset by LSP#scheduleLogisticChains.
             for (LogisticChain chain : plan.getLogisticChains()) {
               chain.getLspShipmentIds().clear();
-              for (LogisticChainElement element : chain.getLogisticChainElements()) {
-                element.getIncomingShipments().clear();
-                element.getOutgoingShipments().clear();
-              }
             }
 
             for (LspShipment lspShipment : plan.getLSP().getLspShipments()) {
-              LspShipmentUtils.getOrCreateShipmentPlan(plan, lspShipment.getId()).clear();
               lspShipment.getShipmentLog().clear();
               plan.getInitialShipmentAssigner().assignToPlan(plan, lspShipment);
             }
