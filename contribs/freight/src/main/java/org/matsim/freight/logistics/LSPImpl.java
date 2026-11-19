@@ -22,11 +22,11 @@ package org.matsim.freight.logistics;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 /* package-private */ final class LSPImpl extends LSPDataObject<LSP> implements LSP {
   @SuppressWarnings("unused")
@@ -52,21 +52,39 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     this.selectedPlan = builder.initialPlan;
   }
 
+  /**
+   * Creates a copy of the given plan, e.g. for replanning.
+   *
+   * <ul>
+   *   <li>Copied: the {@link InitialShipmentAssigner} (same instance), score, type, and LSP of the plan.
+   *   <li>Each {@link LogisticChain} is a new object with the same id, a new collection of the same
+   *       shipment ids, and a copy of the attributes (same attribute values, new attribute map).
+   *   <li>Shared, not copied: the {@link LogisticChainElement}s. Original and copy refer to the same
+   *       element instances, i.e. the same structure (resources, predecessors, successors) and the same
+   *       attributes and simulation trackers of the elements. A deep copy would register additional
+   *       client elements with the resources each time a plan is copied (see the constructor of
+   *       {@link LogisticChainElementImpl}), and there is no way to unregister them.
+   *   <li>Not copied: the simulation trackers of the chains. A tracker has exactly one backpointer to its
+   *       chain, so it cannot be shared between the chain of the original and the chain of the copy.
+   *   <li>Not copied: the shipment plans. They are re-created when the plan is scheduled.
+   * </ul>
+   */
   public static LSPPlan copyPlan(LSPPlan plan2copy) {
-    List<LogisticChain> newPlanChains = new ArrayList<>();
+    LSPPlan copiedPlan = LSPUtils.createLSPPlan();
+    copiedPlan.setInitialShipmentAssigner(plan2copy.getInitialShipmentAssigner());
+    copiedPlan.setScore(plan2copy.getScore());
+    copiedPlan.setType(plan2copy.getType());
+
     for (LogisticChain initialPlanChain : plan2copy.getLogisticChains()) {
       LogisticChain newPlanChain = LSPUtils.LogisticChainBuilder.newInstance(initialPlanChain.getId()).build();
       newPlanChain.getLogisticChainElements().addAll(initialPlanChain.getLogisticChainElements());
       newPlanChain.getLspShipmentIds().addAll(initialPlanChain.getLspShipmentIds());
-      newPlanChains.add(newPlanChain);
+      AttributesUtils.copyTo(initialPlanChain.getAttributes(), newPlanChain.getAttributes());
+      copiedPlan.addLogisticChain(newPlanChain);
     }
 
-    LSPPlan copiedPlan = LSPUtils.createLSPPlan();
-    copiedPlan.setInitialShipmentAssigner(plan2copy.getInitialShipmentAssigner());
+    // Set the LSP after the chains are added, so that the chains also get the backpointer to the LSP.
     copiedPlan.setLSP(plan2copy.getLSP());
-    copiedPlan.setScore(plan2copy.getScore());
-    copiedPlan.setType(plan2copy.getType());
-    copiedPlan.getLogisticChains().addAll(newPlanChains);
     return copiedPlan;
   }
 
