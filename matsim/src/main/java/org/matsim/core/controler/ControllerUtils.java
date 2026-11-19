@@ -37,7 +37,6 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
  */
 public final class ControllerUtils{
 	private static final Logger log = LogManager.getLogger( ControllerUtils.class ) ;
-	private static int debugHintCnt = 0;
 	/**
 	 * This is meant for creating the matsim injector if one does not need/want {@link Controler}.  Technical reason is that {@link Controler} creates
 	 * the injector in the run method, and then it is too late to extract material in a direct way.
@@ -102,11 +101,7 @@ public final class ControllerUtils{
 	    StringWriter writer = new StringWriter();
 	    new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
 
-		if (!log.isDebugEnabled() && debugHintCnt < 1) {
-			debugHintCnt++;
-			log.info("=== logging config.xml skipped ===");
-			log.info(Gbl.ENABLE_DEBUG_OUTPUT_HINT + Gbl.ONLYONCE);
-		}
+		Gbl.logDebugOutputSkipped(log, "logging config.xml");
 	    log.debug(newline + newline + writer.getBuffer().toString());
 	    log.info("Complete config dump done.");
 	    log.info("Checking consistency of config...");

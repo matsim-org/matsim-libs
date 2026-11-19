@@ -54,7 +54,6 @@ public final class Injector {
 	private Injector() {} // namespace only, do not instantiate
 
 	private static final Logger logger = LogManager.getLogger(Injector.class);
-	private static int debugHintCnt = 0;
 
 	public static com.google.inject.Injector createInjector(final Config config, Module... modules) {
 		return createInjector(config, LocalContext.create(config), modules);
@@ -85,11 +84,7 @@ public final class Injector {
 
 	public static void printInjector(com.google.inject.Injector injector, Logger log) {
 		Level level = Level.DEBUG;
-		if (!log.isDebugEnabled() && debugHintCnt < 1) {
-			debugHintCnt++;
-			log.info("=== printInjector output skipped ===");
-			log.info(Gbl.ENABLE_DEBUG_OUTPUT_HINT + Gbl.ONLYONCE);
-		}
+		Gbl.logDebugOutputSkipped(log, "printInjector output");
 
 		log.log(level,"=== printInjector start ===") ;
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet()) {

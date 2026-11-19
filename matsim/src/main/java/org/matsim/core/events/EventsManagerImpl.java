@@ -63,7 +63,6 @@ import org.matsim.core.utils.misc.Counter;
 public final class EventsManagerImpl implements EventsManager {
 
 	private static final Logger log = LogManager.getLogger(EventsManagerImpl.class);
-	private static int debugHintCnt = 0;
 
 	static private class HandlerData {
 
@@ -132,11 +131,7 @@ public final class EventsManagerImpl implements EventsManager {
 	public void addHandler (final EventHandler handler) {
 		Set<Class<?>> addedHandlers = new HashSet<>();
 		Class<?> test = handler.getClass();
-		if (!log.isDebugEnabled() && debugHintCnt < 1) {
-			debugHintCnt++;
-			log.info("=== Logging of event-handlers skipped ===");
-			log.info(Gbl.ENABLE_DEBUG_OUTPUT_HINT + Gbl.ONLYONCE);
-		}
+		Gbl.logDebugOutputSkipped(log, "Logging of event-handlers");
 		log.debug("adding Event-Handler: " + test.getName());
 		do {
 			for (Class<?> theInterface : test.getInterfaces()) {
