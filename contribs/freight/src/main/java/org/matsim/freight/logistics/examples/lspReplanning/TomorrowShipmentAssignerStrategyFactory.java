@@ -57,13 +57,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
           @Override
           public void handlePlan(LSPPlan plan) {
-            plan.getLogisticChains().iterator().next().getLspShipmentIds().clear();
             plan.setInitialShipmentAssigner(assigner);
-            // This first assignment is overwritten below. It is kept because it changes the state of the assigner:
-            // e.g. MaybeTodayAssigner draws random numbers, so removing it changes the results (see CollectionLSPReplanningTest).
-            for (LspShipment lspShipment : plan.getLSP().getLspShipments()) {
-              assigner.assignToPlan(plan, lspShipment);
-            }
 
             // The shipment plans and the waiting shipments of the chain elements are reset by LSP#scheduleLogisticChains.
             for (LogisticChain chain : plan.getLogisticChains()) {
