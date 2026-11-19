@@ -313,14 +313,12 @@ public final class LSPUtils {
 	public enum LogicOfVrp {serviceBased, shipmentBased}
 
 	public static final class LSPBuilder {
-		final Collection<LSPResource> resources;
 		final Id<LSP> id;
 		LogisticChainScheduler logisticChainScheduler;
 		LSPPlan initialPlan;
 
 		private LSPBuilder(Id<LSP> id) {
 			this.id = id; // this line was not there until today.  kai, may'22
-			this.resources = new ArrayList<>();
 		}
 
 		public static LSPBuilder getInstance(Id<LSP> id) {
@@ -335,14 +333,8 @@ public final class LSPUtils {
 		@Deprecated // see comment below method name.
 		public LSPBuilder setInitialPlan(LSPPlan plan) {
 			// yy maybe one could use the first plan by default, and then get rid of this method here?  kai, jul'25
+			// The resources of the plan are collected in LSPImpl#addPlan, called from the LSPImpl constructor.
 			this.initialPlan = plan;
-			for (LogisticChain logisticChain : plan.getLogisticChains()) {
-				for (LogisticChainElement element : logisticChain.getLogisticChainElements()) {
-					if (!resources.contains(element.getResource())) {
-						resources.add(element.getResource());
-					}
-				}
-			}
 			return this;
 		}
 

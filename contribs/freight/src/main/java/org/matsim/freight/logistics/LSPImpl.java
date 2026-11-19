@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
-/* package-private */ class LSPImpl extends LSPDataObject<LSP> implements LSP {
+/* package-private */ final class LSPImpl extends LSPDataObject<LSP> implements LSP {
   @SuppressWarnings("unused")
   private static final Logger log = LogManager.getLogger(LSPImpl.class);
 
@@ -44,12 +44,12 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     super(builder.id);
     this.lspShipments = new ArrayList<>();
     this.lspPlans = new ArrayList<>();
+    this.resources = new ArrayList<>();
     this.logisticChainScheduler = builder.logisticChainScheduler;
     this.logisticChainScheduler.setEmbeddingContainer(this);
+    // addPlan collects the resources of the plan, sets the LSP of the plan, and adds it to lspPlans.
+    addPlan(builder.initialPlan);
     this.selectedPlan = builder.initialPlan;
-    this.selectedPlan.setLSP(this);
-    this.lspPlans.add(builder.initialPlan);
-    this.resources = builder.resources;
   }
 
   public static LSPPlan copyPlan(LSPPlan plan2copy) {
