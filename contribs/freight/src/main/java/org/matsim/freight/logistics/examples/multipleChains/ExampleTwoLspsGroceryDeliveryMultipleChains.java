@@ -69,13 +69,13 @@ import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
+import org.matsim.freight.logistics.examples.LogisticsExampleUtils;
 import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -268,7 +268,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 			.setInitialPlan(multipleMixedEchelonChainsPlan)
 			.setLogisticChainScheduler(
 				ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(
-					createResourcesListFromLSPPlans(lspPlans)))
+					LogisticsExampleUtils.createResourcesListFromLSPPlans(lspPlans)))
 			.build();
 
 		log.info("assign the shipments to the LSP");
@@ -407,7 +407,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 				.setInitialPlan(lspPlan)
 				.setLogisticChainScheduler(
 					ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(
-						createResourcesListFromLSPPlans(List.of(lspPlan))))
+						LogisticsExampleUtils.createResourcesListFromLSPPlans(List.of(lspPlan))))
 				.build();
 
 		log.info("assign the shipments to the LSP");
@@ -448,18 +448,5 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 				.addLogisticChainElement(singleCarrierElement)
 				.build();
 		return directChain;
-	}
-
-	private static List<LSPResource> createResourcesListFromLSPPlans(List<LSPPlan> lspPlans) {
-		log.info("Collecting all LSPResources from the LSPPlans");
-		List<LSPResource> resourceList = new ArrayList<>();
-		for (LSPPlan lspPlan : lspPlans) {
-			for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-				for (LogisticChainElement logisticChainElement : logisticChain.getLogisticChainElements()) {
-					resourceList.add(logisticChainElement.getResource());
-				}
-			}
-		}
-		return resourceList;
 	}
 }
