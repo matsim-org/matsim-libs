@@ -454,8 +454,8 @@ import org.matsim.vehicles.VehicleType;
 			}
 		}
 
-		int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-		final Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
+		// The start activity is not contained in the tour elements, so the first tour element is the leg after the start.
+		final Leg legAfterStart = (Leg) tour.getTourElements().getFirst();
 		final int serviceIndex = tour.getTourElements().indexOf(tourActivity);
 		final Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex - 1);
 		final double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();

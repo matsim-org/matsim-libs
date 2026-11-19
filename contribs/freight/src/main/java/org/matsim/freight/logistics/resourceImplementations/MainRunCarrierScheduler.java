@@ -279,8 +279,8 @@ import org.matsim.vehicles.VehicleType;
 				builder.setLogisticChainElement(element);
 			}
 		}
-		int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-		Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
+		// The start activity is not contained in the tour elements, so the first tour element is the leg after the start.
+		Leg legAfterStart = (Leg) tour.getTourElements().getFirst();
 		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
 		builder.setStartTime(startTimeOfTransport);
 		builder.setEndTime(legAfterStart.getExpectedTransportTime() + startTimeOfTransport);
@@ -309,8 +309,8 @@ import org.matsim.vehicles.VehicleType;
 				cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
 			}
 		}
-		int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-		Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
+		// The start activity is not contained in the tour elements, so the first tour element is the leg after the start.
+		Leg legAfterStart = (Leg) tour.getTourElements().getFirst();
 		builder.setStartTime(
 			legAfterStart.getExpectedDepartureTime() + legAfterStart.getExpectedTransportTime());
 		builder.setEndTime(
