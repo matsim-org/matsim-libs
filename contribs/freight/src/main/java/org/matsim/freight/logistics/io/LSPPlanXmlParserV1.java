@@ -266,7 +266,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
         LspShipmentPlanElement planElement = null;
 
-        switch (type) {
+        switch (LspShipmentPlanElement.ElementType.valueOf(type)) {
 			case LOAD -> {
             var planElementBuilder = LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
             planElementBuilder.setStartTime(parseTimeToDouble(startTime));

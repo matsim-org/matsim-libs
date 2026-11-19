@@ -52,6 +52,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import static org.matsim.freight.logistics.LSPConstants.*;
+import static org.matsim.freight.logistics.shipment.LspShipmentPlanElement.ElementType.*;
 
 public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 	private LSP lsp;
