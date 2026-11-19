@@ -19,6 +19,7 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
@@ -666,6 +667,57 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 
+		updatePosition(time, event);
+
+		RailLink tailLink = resources.getLink(state.tailLink);
+
+		// Forced position updates can make a queued leave-link event stale, i.e. the tail may be before or
+		// beyond the end of its link. While it is beyond, the distance past the boundary is its position on
+		// the next link, and every link that is really left has to be released.
+		List<RailLink> released = new ArrayList<>(1);
+		while (!FuzzyUtils.lessThan(state.tailPosition, tailLink.length)) {
+
+			RailLink nextTailLink = nextTailLink(state);
+			Objects.requireNonNull(nextTailLink, () -> "Could not find next link in route " + state.tailLink);
+
+			createEvent(new RailsimTrainLeavesLinkEvent(time, state.driver.getVehicle().getId(), state.tailLink));
+
+			// Positions within the tolerance of the boundary are the boundary (see FuzzyUtils), everything
+			// beyond it is the tail's position on the next link.
+			double overshoot = FuzzyUtils.greaterThan(state.tailPosition, tailLink.length)
+				? state.tailPosition - tailLink.length : 0;
+			state.tailLink = nextTailLink.getLinkId();
+			state.tailPosition = overshoot;
+
+			released.add(tailLink);
+
+			// The next tail link can be the same link: a new route usually starts on the link where the previous
+			// one ended (see nextTailLink). Its position has been reduced above, so the loop has to stop here.
+			if (Objects.equals(state.tailLink, tailLink.getLinkId()))
+				break;
+
+			tailLink = nextTailLink;
+		}
+
+		assert RailsimCalc.checkTrainLength(state) : String.format("Train %s length incorrect at t=%.2f, link=%s", state.driver.getId(), time, state.headLink);
+
+		decideTargetSpeed(event, state);
+
+		decideNextUpdate(event);
+
+		for (RailLink link : released) {
+			if (link.minimumHeadwayTime == 0)
+				unblockTrack(time, state, link);
+			else
+				updateQueue.add(new UpdateEvent(state, link, time));
+		}
+	}
+
+	/**
+	 * Next link of the tail in the route, or in the previous route across a circulation boundary.
+	 */
+	private RailLink nextTailLink(TrainState state) {
+
 		RailLink nextTailLink = null;
 		// Find the next link in the route
 		for (int i = state.routeIdx; i >= 1; i--) {
@@ -683,35 +735,7 @@ final class RailsimEngine implements Steppable {
 				}
 			}
 
-		Objects.requireNonNull(nextTailLink, () -> "Could not find next link in route " + state.tailLink);
-
-		updatePosition(time, event);
-
-		RailLink tailLink = resources.getLink(state.tailLink);
-
-		// Forced position updates can make a queued leave-link event stale before the tail reaches the boundary.
-		if (FuzzyUtils.lessThan(state.tailPosition, tailLink.length)) {
-			assert RailsimCalc.checkTrainLength(state) : String.format("Train %s length incorrect at t=%.2f, link=%s", state.driver.getId(), time, state.tailLink);
-			decideTargetSpeed(event, state);
-			decideNextUpdate(event);
-			return;
-		}
-
-		createEvent(new RailsimTrainLeavesLinkEvent(time, state.driver.getVehicle().getId(), state.tailLink));
-
-		state.tailLink = nextTailLink.getLinkId();
-		state.tailPosition = 0;
-
-		assert RailsimCalc.checkTrainLength(state) : String.format("Train %s length incorrect at t=%.2f, link=%s", state.driver.getId(), time, state.headLink);
-
-		decideTargetSpeed(event, state);
-
-		decideNextUpdate(event);
-
-		if (tailLink.minimumHeadwayTime == 0)
-			unblockTrack(time, state, tailLink);
-		else
-			updateQueue.add(new UpdateEvent(state, tailLink, time));
+		return nextTailLink;
 	}
 
 	/**
@@ -1044,13 +1068,13 @@ final class RailsimEngine implements Steppable {
 
 		double maxSpeed = resources.getLink(state.headLink).getAllowedFreespeed(state.driver);
 
-		// get minium allowed speed on all links occupied by the train
-		for (int i = state.routeIdx - 1; i >= 0; i--) {
+		// get minium allowed speed on all links occupied by the train, i.e. the vehicle length measured
+		// back from the head. The tail link is only bookkeeping and can lag behind the real tail.
+		double back = state.headPosition;
+		for (int i = state.routeIdx - 2; i >= 0 && FuzzyUtils.lessThan(back, state.train.length()); i--) {
 			RailLink link = state.route.get(i);
 			maxSpeed = Math.min(maxSpeed, link.getAllowedFreespeed(state.driver));
-			if (link.getLinkId().equals(state.tailLink)) {
-				break;
-			}
+			back += link.length;
 		}
 
 		return maxSpeed;
