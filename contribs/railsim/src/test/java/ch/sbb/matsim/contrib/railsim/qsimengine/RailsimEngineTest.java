@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
@@ -123,6 +124,12 @@ public class RailsimEngineTest {
 		Method leaveLink = RailsimEngine.class.getDeclaredMethod("leaveLink", double.class, UpdateEvent.class);
 		leaveLink.setAccessible(true);
 		leaveLink.invoke(engine, time, event);
+	}
+
+	private double invokeRetrieveAllowedMaxSpeed(RailsimEngine engine, TrainState state) throws ReflectiveOperationException {
+		Method retrieve = RailsimEngine.class.getDeclaredMethod("retrieveAllowedMaxSpeed", TrainState.class);
+		retrieve.setAccessible(true);
+		return (double) retrieve.invoke(engine, state);
 	}
 
 	@Test
@@ -358,6 +365,141 @@ public class RailsimEngineTest {
 		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
 		assertThat(event.type).isNotEqualTo(UpdateEvent.Type.LEAVE_LINK);
 		assertThat(collector.events).noneMatch(RailsimTrainLeavesLinkEvent.class::isInstance);
+	}
+
+	@Test
+	void testLeaveLinkKeepsTailOvershoot() throws ReflectiveOperationException {
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMixedTypes.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
+			createTrainTimeDistanceHandler());
+
+		RailLink link12 = resources.getLink(Id.createLinkId("1-2"));
+		RailLink link23 = resources.getLink(Id.createLinkId("2-3"));
+		RailLink link34 = resources.getLink(Id.createLinkId("3-4"));
+
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId("sprinter"), RailsimTestUtils.vehicles.get(TestVehicle.Sprinter));
+		MobsimVehicle mobsimVehicle = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
+		RailsimTransitDriverAgent driver = Mockito.mock(RailsimTransitDriverAgent.class, Answers.RETURNS_MOCKS);
+
+		Mockito.when(mobsimVehicle.getVehicle()).thenReturn(vehicle);
+		Mockito.when(mobsimVehicle.getId()).thenReturn(vehicle.getId());
+		Mockito.when(driver.getVehicle()).thenReturn(mobsimVehicle);
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_sprinter"));
+		Mockito.when(driver.getMode()).thenReturn("rail");
+
+		// 200 m train running at 10 m/s: the tail is 5 m before the end of 1-2 and moves 80 m until the
+		// leave-link event is processed, i.e. 75 m of the tail are already beyond the link boundary.
+		TrainState state = new TrainState(driver,
+			new TrainInfo(vehicle.getType().getId(), vehicle.getType().getLength(), 90, 0.7, 0.7, 0.7, -1),
+			700, link23.getLinkId(), new ArrayList<>(List.of(link12, link23, link34)));
+		state.headLink = link23.getLinkId();
+		state.headPosition = 195;
+		state.tailLink = link12.getLinkId();
+		state.tailPosition = 995;
+		state.routeIdx = 2;
+		state.speed = 10;
+		state.targetSpeed = 10;
+		state.acceleration = 0;
+		state.allowedMaxSpeed = 90;
+		state.targetDecelDist = Double.POSITIVE_INFINITY;
+		state.approvedDist = 1000;
+
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+
+		UpdateEvent event = new UpdateEvent(state, UpdateEvent.Type.LEAVE_LINK);
+		event.plannedTime = 708.0;
+
+		invokeLeaveLink(engine, 708.0, event);
+
+		assertThat(state.tailLink).isEqualTo(link23.getLinkId());
+		assertThat(state.tailPosition).isEqualTo(75);
+		assertThat(RailsimCalc.checkTrainLength(state)).isTrue();
+		assertThat(collector.events)
+			.filteredOn(RailsimTrainLeavesLinkEvent.class::isInstance)
+			.hasSize(1);
+	}
+
+	@Test
+	void testAllowedSpeedFollowsTrainBodyNotTailPointer() throws ReflectiveOperationException {
+		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), "networkMixedTypes.xml").toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
+		TrainManager trains = new TrainManager();
+		RailResourceManager resources = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
+		TrainRouter router = new TrainRouter(net, resources);
+		RailsimEngine engine = new RailsimEngine(eventsManager, config, resources, trains, new SimpleDisposition(resources, speed, router),
+			createTrainTimeDistanceHandler());
+
+		// 1-2 is by far the slowest link of the network
+		RailLink link12 = resources.getLink(Id.createLinkId("1-2"));
+		RailLink link23 = resources.getLink(Id.createLinkId("2-3"));
+		RailLink link34 = resources.getLink(Id.createLinkId("3-4"));
+
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId("sprinter"), RailsimTestUtils.vehicles.get(TestVehicle.Sprinter));
+		MobsimVehicle mobsimVehicle = Mockito.mock(MobsimVehicle.class, Answers.RETURNS_MOCKS);
+		RailsimTransitDriverAgent driver = Mockito.mock(RailsimTransitDriverAgent.class, Answers.RETURNS_MOCKS);
+
+		Mockito.when(mobsimVehicle.getVehicle()).thenReturn(vehicle);
+		Mockito.when(mobsimVehicle.getId()).thenReturn(vehicle.getId());
+		Mockito.when(driver.getVehicle()).thenReturn(mobsimVehicle);
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_sprinter"));
+		Mockito.when(driver.getMode()).thenReturn("rail");
+
+		// The 200 m body is entirely on 2-3 and 3-4, but the tail pointer still points at 1-2, as it does
+		// after a deferred tail update. Only the 50 km/h of the covered links may cap the train.
+		TrainState state = new TrainState(driver,
+			new TrainInfo(vehicle.getType().getId(), vehicle.getType().getLength(), 90, 0.7, 0.7, 0.7, -1),
+			0, link34.getLinkId(), new ArrayList<>(List.of(link12, link23, link34)));
+		state.headLink = link34.getLinkId();
+		state.headPosition = 100;
+		state.tailLink = link12.getLinkId();
+		state.tailPosition = 1000;
+		state.routeIdx = 3;
+
+		assertThat(link12.getAllowedFreespeed(driver)).isLessThan(10);
+		assertThat(invokeRetrieveAllowedMaxSpeed(engine, state)).isEqualTo(50.0);
+	}
+
+	@Test
+	void testTrainBodyLengthStaysConsistentOverShortLinks() {
+
+		RailsimTestUtils.Holder test = getTestEngine("networkMixedTypes.xml");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 0, "1-2", "20-21");
+
+		test.doSimStepUntil(3000);
+		test.debugFiles(collector, utils.getOutputDirectory() + "/tailOvershoot");
+
+		List<RailsimTrainStateEvent> states = collector.events.stream()
+			.filter(RailsimTrainStateEvent.class::isInstance)
+			.map(RailsimTrainStateEvent.class::cast)
+			.toList();
+
+		assertThat(states).isNotEmpty();
+
+		// The network is a single chain of links 1-2, 2-3, ... 20-21, which is also the driven route.
+		List<RailLink> route = new ArrayList<>();
+		for (int i = 1; i < 21; i++) {
+			route.add(new RailLink(test.network().getLinks().get(Id.createLinkId(i + "-" + (i + 1))), null));
+		}
+
+		for (RailsimTrainStateEvent ev : states) {
+			TrainState state = new TrainState(null, new TrainInfo(Id.create("train", VehicleType.class), 200, 90, 0.7, 0.7, 0.7, -1),
+				ev.getTime(), ev.getHeadLink(), new ArrayList<>(route));
+			state.headLink = ev.getHeadLink();
+			state.headPosition = ev.getHeadPosition();
+			state.tailLink = ev.getTailLink();
+			state.tailPosition = ev.getTailPosition();
+
+			assertThat(RailsimCalc.checkTrainLength(state))
+				.as("train body at t = %.0f (head %s %.2f, tail %s %.2f)", ev.getTime(), ev.getHeadLink(),
+					ev.getHeadPosition(), ev.getTailLink(), ev.getTailPosition())
+				.isTrue();
+		}
 	}
 
 	@Test
