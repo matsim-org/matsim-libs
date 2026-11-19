@@ -101,21 +101,16 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
     builder.setResourceId(resource.getId());
     builder.setCarrierId(carrierId);
     LspShipmentPlanElement unload = builder.build();
-    String idString =
-        unload.getResourceId().toString()
-            + unload.getLogisticChainElement().getId()
-            + unload.getElementType();
-    Id<LspShipmentPlanElement> unloadId = Id.create(idString, LspShipmentPlanElement.class);
+    Id<LspShipmentPlanElement> unloadId = LspShipmentUtils.createPlanElementId(unload);
     lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
   }
 
   private void logTransport(double endTime, Id<Link> endLinkId) {
-    String idString = resource.getId().toString() + logisticChainElement.getId() + TRANSPORT;
     LspShipmentPlanElement abstractPlanElement =
         lspShipment
             .getShipmentLog()
             .getPlanElements()
-            .get(Id.create(idString, LspShipmentPlanElement.class));
+            .get(LspShipmentUtils.createPlanElementId(resource.getId(), logisticChainElement.getId(), TRANSPORT));
     if (abstractPlanElement instanceof LspShipmentLeg transport) {
       transport.setEndTime(endTime);
       transport.setToLinkId(endLinkId);

@@ -310,20 +310,6 @@ import org.matsim.vehicles.VehicleType;
 	}
 
 
-	private CarrierService convertToCarrierService(LspShipment lspShipment) {
-		Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
-		CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getTo(), lspShipment.getSize())
-			//TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
-			//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
-			.setServiceDuration(lspShipment.getDeliveryServiceTime())
-			.build();
-		//ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan
-		if (!Objects.equals(lspShipment.getId().toString(), carrierService.getId().toString())) {
-			log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierService.getId().toString(),
-				new IllegalStateException("Id of LspShipment and CarrierService do not match"));
-		}
-		return carrierService;
-	}
 
 	/**
 	 * This method converts a LspShipment to a CarrierShipment.
@@ -413,8 +399,7 @@ import org.matsim.vehicles.VehicleType;
 		builder.setEndTime(startTimeOfTransport);
 
 		LspShipmentPlanElement load = builder.build();
-		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
-		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		Id<LspShipmentPlanElement> id = LspShipmentUtils.createPlanElementId(load);
 		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, load);
 	}
 
@@ -432,8 +417,7 @@ import org.matsim.vehicles.VehicleType;
 		builder.setEndTime(pickupActivity.getExpectedArrival() + pickupActivity.getDuration());
 
 		LspShipmentPlanElement load = builder.build();
-		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
-		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(Id.create(idString, LspShipmentPlanElement.class), load);
+		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(LspShipmentUtils.createPlanElementId(load), load);
 	}
 
 	private void addShipmentTransportElementShipmentBased(LspShipment lspShipment, Tour tour, Tour.ShipmentBasedActivity tourActivity, double beginOfTransport) {
@@ -455,8 +439,7 @@ import org.matsim.vehicles.VehicleType;
 		builder.setCarrierShipment(tourActivity.getShipment());
 
 		LspShipmentPlanElement transport = builder.build();
-		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + transport.getElementType();
-		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		Id<LspShipmentPlanElement> id = LspShipmentUtils.createPlanElementId(transport);
 		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, transport);
 	}
 
@@ -494,8 +477,7 @@ import org.matsim.vehicles.VehicleType;
 			// services. See also MATSim issue #3510  kai/kai, oct'24
 		}
 		LspShipmentPlanElement transport = builder.build();
-		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + transport.getElementType();
-		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		Id<LspShipmentPlanElement> id = LspShipmentUtils.createPlanElementId(transport);
 		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, transport);
 	}
 
@@ -519,8 +501,7 @@ import org.matsim.vehicles.VehicleType;
 		builder.setEndTime(endTime);
 
 		LspShipmentPlanElement unload = builder.build();
-		String idString = unload.getResourceId() + String.valueOf(unload.getLogisticChainElement().getId()) + unload.getElementType();
-		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		Id<LspShipmentPlanElement> id = LspShipmentUtils.createPlanElementId(unload);
 		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, unload);
 	}
 
@@ -546,7 +527,7 @@ import org.matsim.vehicles.VehicleType;
 		CarriersUtils.setJspritIterations(auxiliaryCarrier, jspritIterations);
 
 		for (LspShipment lspShipment : shipmentsInCurrentTour) {
-			CarrierService carrierService = convertToCarrierService(lspShipment);
+			CarrierService carrierService = CarrierSchedulerUtils.convertToCarrierService(lspShipment, lspShipment.getTo(), null);
 			auxiliaryCarrier.getServices().put(carrierService.getId(), carrierService);
 		}
 

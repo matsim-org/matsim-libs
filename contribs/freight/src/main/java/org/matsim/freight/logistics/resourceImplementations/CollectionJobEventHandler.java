@@ -79,12 +79,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 		builder.setLinkId(event.getLinkId());
 		builder.setCarrierId(event.getCarrierId());
 		LspShipmentPlanElement loggedShipmentLoad = builder.build();
-		String idString =
-			loggedShipmentLoad.getResourceId()
-				+ ""
-				+ loggedShipmentLoad.getLogisticChainElement().getId()
-				+ loggedShipmentLoad.getElementType();
-		Id<LspShipmentPlanElement> loadId = Id.create(idString, LspShipmentPlanElement.class);
+		Id<LspShipmentPlanElement> loadId = LspShipmentUtils.createPlanElementId(loggedShipmentLoad);
 		lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
 
@@ -96,12 +91,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 		builder.setFromLinkId(event.getLinkId());
 		builder.setCarrierId(event.getCarrierId());
 		LspShipmentLeg transport = builder.build();
-		String idString =
-			transport.getResourceId()
-				+ ""
-				+ transport.getLogisticChainElement().getId()
-				+ transport.getElementType();
-		Id<LspShipmentPlanElement> transportId = Id.create(idString, LspShipmentPlanElement.class);
+		Id<LspShipmentPlanElement> transportId = LspShipmentUtils.createPlanElementId(transport);
 		lspShipment.getShipmentLog().addPlanElement(transportId, transport);
 	}
 

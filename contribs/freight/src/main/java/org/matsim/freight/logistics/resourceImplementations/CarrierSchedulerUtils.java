@@ -10,12 +10,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.contrib.roadpricing.RoadPricingUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierPlan;
+import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.TimeWindow;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
@@ -163,6 +166,25 @@ public class CarrierSchedulerUtils {
 	// Central methods for the different CarrierSchedulers
 	//*************************
 
+	/**
+	 * Converts an {@link LspShipment} into a {@link CarrierService} with the same id. The id equality is needed to
+	 * update the {@link org.matsim.freight.logistics.shipment.LspShipmentPlan} after the carrier has been scheduled.
+	 *
+	 * @param lspShipment                the shipment to convert
+	 * @param linkId                     the link where the service takes place
+	 * @param serviceStartingTimeWindow  the time window for the start of the service, or {@code null} to use the default
+	 *                                   of {@link CarrierService.Builder}
+	 */
+	static CarrierService convertToCarrierService(LspShipment lspShipment, Id<Link> linkId, TimeWindow serviceStartingTimeWindow) {
+		Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
+		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, linkId, lspShipment.getSize())
+			.setServiceDuration(lspShipment.getDeliveryServiceTime());
+		if (serviceStartingTimeWindow != null) {
+			builder.setServiceStartingTimeWindow(serviceStartingTimeWindow);
+		}
+		return builder.build();
+	}
+
 	static void addShipmentLoadElement(LspShipment lspShipment, Tour tour, LSPCarrierResource resource, LSPPlan lspPlan) {
 		LspShipmentUtils.ScheduledShipmentLoadBuilder builder = LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
 		builder.setResourceId(resource.getId());
@@ -186,8 +208,7 @@ public class CarrierSchedulerUtils {
 		builder.setEndTime(startTimeOfTransport);
 
 		LspShipmentPlanElement load = builder.build();
-		String idString = load.getResourceId() + String.valueOf(load.getLogisticChainElement().getId()) + load.getElementType();
-		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		Id<LspShipmentPlanElement> id = LspShipmentUtils.createPlanElementId(load);
 		LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipment.getId()).addPlanElement(id, load);
 	}
 
