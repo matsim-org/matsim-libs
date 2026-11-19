@@ -4,6 +4,8 @@ name: prime-maven-cache
 # The verify-push matrix (~50 jobs) only restores this cache, so a pom change (e.g. a dependabot bump)
 # downloads from Maven Central once instead of once per job, which avoids 429 throttling.
 # Running on main makes the cache visible to all PR branches.
+# The key includes the month: each new cache starts from the previous one of the same month,
+# so artifacts of outdated versions are dropped at the latest by the next month's cold build.
 
 on:
   workflow_call:
@@ -11,12 +13,20 @@ on:
       cache-key:
         description: "Key of the saved ~/.m2/repository cache"
         value: ${{ jobs.prime.outputs.cache-key }}
+      cache-key-prefix:
+        description: "Prefix for restoring the closest older cache of the current month"
+        value: ${{ jobs.prime.outputs.cache-key-prefix }}
   push:
     branches:
       - 'main'
     paths:
       - '**/pom.xml'
   workflow_dispatch:
+    inputs:
+      cold-cache:
+        description: "Ignore existing caches and save nothing (to measure a full cold build)"
+        type: boolean
+        default: false
 
 jobs:
   prime:
@@ -24,6 +34,7 @@ jobs:
     timeout-minutes: 45
     outputs:
       cache-key: ${{ steps.key.outputs.key }}
+      cache-key-prefix: ${{ steps.key.outputs.prefix }}
 
     steps:
       - name: Checkout git repo
@@ -37,16 +48,20 @@ jobs:
 
       - name: Compute cache key
         id: key
-        run: echo "key=maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}" >> "$GITHUB_OUTPUT"
+        run: |
+          prefix="maven-${{ runner.os }}-$(date -u +%Y-%m)-"
+          echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
+          echo "key=${prefix}${{ hashFiles('**/pom.xml') }}" >> "$GITHUB_OUTPUT"
 
       - name: Restore Maven repository
         id: restore
+        if: ${{ !inputs.cold-cache }}
         uses: actions/cache/restore@v4
         with:
           path: ~/.m2/repository
           key: ${{ steps.key.outputs.key }}
           # on a pom change, start from the previous cache so only the changed artifacts are downloaded
-          restore-keys: maven-${{ runner.os }}-
+          restore-keys: ${{ steps.key.outputs.prefix }}
 
       - name: Resolve dependencies of the whole reactor
         if: steps.restore.outputs.cache-hit != 'true'
@@ -61,7 +76,7 @@ jobs:
         run: find ~/.m2/repository/org/matsim -type d -name '*-SNAPSHOT' -prune -exec rm -rf {} +
 
       - name: Save Maven repository
-        if: steps.restore.outputs.cache-hit != 'true'
+        if: ${{ steps.restore.outputs.cache-hit != 'true' && !inputs.cold-cache }}
         uses: actions/cache/save@v4
         with:
           path: ~/.m2/repository
