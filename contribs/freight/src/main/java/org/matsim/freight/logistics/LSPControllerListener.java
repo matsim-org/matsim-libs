@@ -42,7 +42,9 @@ import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 class LSPControllerListener
 	implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
@@ -99,8 +101,10 @@ class LSPControllerListener
 			registerSimulationTrackers(lsp);
 
 			// simulation trackers of resources:
+			Set<LSPResource> registeredResources = new HashSet<>();
 			for (LSPResource resource : lsp.getResources()) {
 				registerSimulationTrackers(resource);
+				registeredResources.add(resource);
 			}
 
 			// simulation trackers of shipments:
@@ -116,8 +120,11 @@ class LSPControllerListener
 				for (LogisticChainElement element : chain.getLogisticChainElements()) {
 					registerSimulationTrackers(element);
 
-					// simulation trackers of resources:
-					registerSimulationTrackers(element.getResource());
+					// Resources of the selected plan are not necessarily contained in lsp.getResources(), e.g. if the plan
+					// was set via setSelectedPlan. Only register those that were not registered above.
+					if (registeredResources.add(element.getResource())) {
+						registerSimulationTrackers(element.getResource());
+					}
 				}
 			}
 		}
