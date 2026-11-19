@@ -75,8 +75,7 @@ public class EmissionsDashboardTest {
 
 
 		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "impact"))
-			.isDirectoryContaining("glob:**emissions_car.csv")
-			.isDirectoryContaining("glob:**general_car.csv");
+			.isDirectoryContaining("glob:**impact.csv");
 
 	}
 
