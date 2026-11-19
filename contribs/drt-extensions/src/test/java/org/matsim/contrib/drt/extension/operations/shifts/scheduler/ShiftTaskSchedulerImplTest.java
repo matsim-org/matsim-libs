@@ -23,6 +23,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftBreakSt
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.optimizer.StopWaypoint;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -278,6 +279,28 @@ public class ShiftTaskSchedulerImplTest {
         verify(taskFactory).createShiftBreakTask(eq(mockVehicle), anyDouble(), anyDouble(), any(Link.class),
                 eq(shiftBreak), any(Id.class), any(Id.class));
         verify(mockSchedule, atLeast(1)).addTask(anyInt(), any(Task.class));
+    }
+
+    @Test
+    public void testCancelAssignedShift_extendsShortenedWaitReservation() {
+        Id<OperationFacility> facilityId = Id.create("hub", OperationFacility.class);
+        Id<ReservationManager.Reservation> reservationId = Id.create("hub_0", ReservationManager.Reservation.class);
+        double serviceEnd = 30 * 3600.;
+        when(standardVehicle.getSchedule()).thenReturn(schedule);
+        when(standardVehicle.getServiceEndTime()).thenReturn(serviceEnd);
+        when(schedule.getCurrentTask()).thenReturn(waitForShiftTask);
+        when(waitForShiftTask.getFacilityId()).thenReturn(facilityId);
+        when(waitForShiftTask.getReservationId()).thenReturn(Optional.of(reservationId));
+        // shortened to the start of the shift that is now cancelled
+        when(facilityReservationManager.findReservation(facilityId, reservationId)).thenReturn(Optional.of(
+                new ReservationManager.ReservationInfo<OperationFacility, DvrpVehicle>(reservationId, facility, standardVehicle,
+                        10 * 3600., 16 * 3600., ReservationManager.ReservationStatus.CONFIRMED)));
+        when(facilityReservationManager.updateReservation(facilityId, reservationId, 10 * 3600., serviceEnd)).thenReturn(true);
+
+        shiftTaskScheduler.cancelAssignedShift(standardVehicle, 17 * 3600., mock(DrtShift.class));
+
+        verify(waitForShiftTask).setEndTime(serviceEnd);
+        verify(facilityReservationManager).updateReservation(facilityId, reservationId, 10 * 3600., serviceEnd);
     }
 
     @Test
