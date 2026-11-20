@@ -32,6 +32,7 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
+import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
@@ -66,16 +67,14 @@ import org.matsim.freight.logistics.shipment.LspShipment;
             // Shifting shipments only makes sense for multiple chains
             if (lspPlan.getLogisticChains().size() < 2) return;
 
-            for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-              logisticChain.getLspShipmentIds().clear();
-            }
+            LSPUtils.clearShipmentAssignments(lspPlan);
 
             LSP lsp = lspPlan.getLSP();
             Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
 
             for (LspShipment lspShipment : lsp.getLspShipments()) {
               if (shipmentCountByChain.isEmpty()) {
-                for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
+                for (LogisticChain chain : lspPlan.getLogisticChains()) {
                   shipmentCountByChain.put(chain, 0);
                 }
               }

@@ -32,6 +32,7 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
+import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
@@ -66,13 +67,11 @@ final class RandomDistributionAllShipmentsStrategyFactory {
                         //				Shifting shipments only makes sense for multiple chains
                         if (lspPlan.getLogisticChains().size() < 2) return;
 
-                        for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-                            logisticChain.getLspShipmentIds().clear();
-                        }
+                        LSPUtils.clearShipmentAssignments(lspPlan);
 
                         LSP lsp = lspPlan.getLSP();
                         List<LogisticChain> logisticChains =
-                                new ArrayList<>(lsp.getSelectedPlan().getLogisticChains());
+                                new ArrayList<>(lspPlan.getLogisticChains());
 
                         for (LspShipment lspShipment : lsp.getLspShipments()) {
                             int index = MatsimRandom.getRandom().nextInt(logisticChains.size());

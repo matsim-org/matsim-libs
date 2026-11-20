@@ -215,13 +215,9 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 				.setResource(distributionResource)
 				.build();
 
-		collectionElement.connectWithNextElement(firstHubElement);
-		firstHubElement.connectWithNextElement(mainRunElement);
-		mainRunElement.connectWithNextElement(secondHubElement);
-		secondHubElement.connectWithNextElement(distributionElement);
 
-		final Id<LogisticChain> chainId = Id.create("SolutionId", LogisticChain.class);
-		LogisticChain completeSolution  = LSPUtils.LogisticChainBuilder.newInstance(chainId)
+		final Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);
+		LogisticChain completeChain  = LSPUtils.LogisticChainBuilder.newInstance(chainId)
 				.addLogisticChainElement(collectionElement)
 				.addLogisticChainElement(firstHubElement)
 				.addLogisticChainElement(mainRunElement)
@@ -232,7 +228,7 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setInitialShipmentAssigner(assigner);
-		completePlan.addLogisticChain(completeSolution);
+		completePlan.addLogisticChain(completeChain);
 
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
@@ -292,6 +288,7 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setPickupServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
 			completeLSP.assignShipmentToLspPlan(shipment);
 		}

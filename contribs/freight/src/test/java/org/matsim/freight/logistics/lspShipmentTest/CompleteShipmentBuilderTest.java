@@ -86,6 +86,7 @@ public class CompleteShipmentBuilderTest {
 
 			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setPickupServiceTime(capacityDemand * 60);
 			builder.setCapacityDemand(capacityDemand);
 			builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 			builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));

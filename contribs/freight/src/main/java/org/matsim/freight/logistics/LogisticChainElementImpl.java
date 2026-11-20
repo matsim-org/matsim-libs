@@ -26,7 +26,7 @@ package org.matsim.freight.logistics;
   private final LSPResource resource;
   private final WaitingShipments incomingShipments;
   private final WaitingShipments outgoingShipments;
-  // die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
+  // Not set by the builder of this element; set by LSPUtils.LogisticChainBuilder#build().
   private LogisticChainElement previousElement;
   private LogisticChainElement nextElement;
 
@@ -38,10 +38,13 @@ package org.matsim.freight.logistics;
     resource.getClientElements().add(this);
   }
 
-  @Override
-  public void connectWithNextElement(LogisticChainElement element) {
+  /**
+   * Sets this element and the given element as neighbors in the chain. Only called by {@link
+   * LSPUtils.LogisticChainBuilder#build()}, which connects the elements in the order in which they were added.
+   */
+  void connectWithNextElement(LogisticChainElementImpl element) {
     this.nextElement = element;
-    ((LogisticChainElementImpl) element).previousElement = this;
+    element.previousElement = this;
   }
 
   @Override
@@ -60,11 +63,6 @@ package org.matsim.freight.logistics;
   }
 
   @Override
-  public void setEmbeddingContainer(LogisticChain logisticChain) {
-    /* not */
-  }
-
-  @Override
   public LogisticChainElement getPreviousElement() {
     return previousElement;
   }
@@ -77,7 +75,7 @@ package org.matsim.freight.logistics;
   @Override
   public String toString() {
     StringBuilder strb = new StringBuilder();
-    strb.append("LogisticsSolutionElementImpl{")
+    strb.append("LogisticChainElementImpl{")
         .append("resourceId=")
         .append(resource.getId())
         .append(", incomingShipments=")

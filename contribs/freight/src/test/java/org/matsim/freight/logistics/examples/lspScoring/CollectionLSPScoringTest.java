@@ -100,11 +100,11 @@ public class CollectionLSPScoringTest {
 		LogisticChainElement collectionElement = LSPUtils.LogisticChainElementBuilder
 				.newInstance(Id.create("CollectionElement", LogisticChainElement.class)).setResource(collectionResource).build();
 
-		LogisticChain collectionSolution = LSPUtils.LogisticChainBuilder.newInstance(Id.create("CollectionSolution", LogisticChain.class))
+		LogisticChain collectionChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("CollectionChain", LogisticChain.class))
 				.addLogisticChainElement(collectionElement).build();
 
 		collectionLSP = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
-				.setInitialPlan(LSPUtils.createLSPPlan().setInitialShipmentAssigner(createSingleLogisticChainShipmentAssigner()).addLogisticChain(collectionSolution))
+				.setInitialPlan(LSPUtils.createLSPPlan().setInitialShipmentAssigner(createSingleLogisticChainShipmentAssigner()).addLogisticChain(collectionChain))
 				.setLogisticChainScheduler(createDefaultSimpleForwardLogisticChainScheduler(Collections.singletonList(collectionResource)))
 				.build();
 
@@ -135,6 +135,7 @@ public class CollectionLSPScoringTest {
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setPickupServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLspPlan(shipment);
 		}

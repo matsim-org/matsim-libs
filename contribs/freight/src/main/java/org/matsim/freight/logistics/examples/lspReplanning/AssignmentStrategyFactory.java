@@ -28,10 +28,8 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
-import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.LogisticChainElement;
+import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
-import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /**
  * @deprecated This class is a work-around. Please do not use this method for any new runs!
@@ -63,17 +61,9 @@ public class AssignmentStrategyFactory {
           @Override
           public void handlePlan(LSPPlan lspPlan) {
 
-            for (LogisticChain solution : lspPlan.getLogisticChains()) {
-              solution.getLspShipmentIds().clear();
-              for (LogisticChainElement element : solution.getLogisticChainElements()) {
-                element.getIncomingShipments().clear();
-                element.getOutgoingShipments().clear();
-              }
-            }
+            LSPUtils.clearShipmentAssignments(lspPlan);
 
             for (LspShipment lspShipment : lspPlan.getLSP().getLspShipments()) {
-              LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipment.getId()).clear();
-              lspShipment.getShipmentLog().clear();
               lspPlan.getInitialShipmentAssigner().assignToPlan(lspPlan, lspShipment);
             }
           }

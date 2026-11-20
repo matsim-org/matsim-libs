@@ -116,7 +116,9 @@ public class LSPModule extends AbstractModule {
         }
 
         @Override
-        public void setEmbeddingContainer(LSP pointer) {}
+        public void setEmbeddingContainer(LSP pointer) {
+          // The back pointer is not used by this tracker.
+        }
       };
     }
   }

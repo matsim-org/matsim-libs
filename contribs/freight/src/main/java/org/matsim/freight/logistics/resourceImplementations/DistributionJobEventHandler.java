@@ -21,140 +21,47 @@
 
 package org.matsim.freight.logistics.resourceImplementations;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.freight.carriers.CarrierJob;
 import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
 import org.matsim.freight.carriers.events.CarrierShipmentDeliveryStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
 import org.matsim.freight.carriers.events.eventhandler.CarrierShipmentDeliveryStartEventHandler;
 import org.matsim.freight.logistics.LSPCarrierResource;
-import org.matsim.freight.logistics.LSPSimulationTracker;
 import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.shipment.LspShipment;
-import org.matsim.freight.logistics.shipment.LspShipmentLeg;
-import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
-import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
-
-/*package-private*/ class DistributionJobEventHandler
-        implements AfterMobsimListener,
-        CarrierServiceStartEventHandler,
-        CarrierShipmentDeliveryStartEventHandler,
-        LSPSimulationTracker<LspShipment> {
+/*package-private*/ class DistributionJobEventHandler extends AbstractLspShipmentEventHandler
+        implements CarrierServiceStartEventHandler, CarrierShipmentDeliveryStartEventHandler {
 
   private final CarrierJob carrierJob;
-  private final LogisticChainElement logisticChainElement;
-  private final LSPCarrierResource resource;
-  private LspShipment lspShipment;
 
   DistributionJobEventHandler(CarrierJob carrierJob, LspShipment lspShipment, LogisticChainElement element, LSPCarrierResource resource) {
+    super(lspShipment, element, resource);
     this.carrierJob = carrierJob;
-    this.lspShipment = lspShipment;
-    this.logisticChainElement = element;
-    this.resource = resource;
-  }
-
-  @Override
-  public void reset(int iteration) {
-    // TODO Auto-generated method stub
   }
 
   @Override
   public void handleEvent(CarrierServiceStartEvent event) {
-    if (event.getServiceId() == carrierJob.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
-      logTransport(event);
-      logUnload(event);
+    if (event.getServiceId() == carrierJob.getId() && isCarrierOfResource(event.getCarrierId())) {
+      logTransportEnd(event.getTime(), null);
+      logUnload(event.getCarrierId(), event.getLinkId(), event.getTime(), event.getTime() + event.getServiceDuration());
     }
   }
 
+  //TODO: Inhaltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
   @Override
   public void handleEvent(CarrierShipmentDeliveryStartEvent event) {
-    if (event.getShipmentId() == this.carrierJob.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
-      logTransport(event);
-      logUnload(event);
+    if (event.getShipmentId() == this.carrierJob.getId() && isCarrierOfResource(event.getCarrierId())) {
+      logTransportEnd(event.getTime(), null);
+      logUnload(event.getCarrierId(), event.getLinkId(), event.getTime(), event.getTime() + event.getDeliveryDuration());
     }
-  }
-
-  private void logTransport(CarrierServiceStartEvent event) {
-    String idString = resource.getId() + "" + logisticChainElement.getId() + TRANSPORT;
-    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentPlanElement abstractPlanElement = lspShipment.getShipmentLog().getPlanElements().get(id);
-    if (abstractPlanElement instanceof LspShipmentLeg transport) {
-      transport.setEndTime(event.getTime());
-    }
-  }
-
-  //TODO: Inhaltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
-  private void logTransport(CarrierShipmentDeliveryStartEvent event) {
-    String idString = resource.getId() + "" + logisticChainElement.getId() + TRANSPORT;
-    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentPlanElement abstractPlanElement = lspShipment.getShipmentLog().getPlanElements().get(id);
-    if (abstractPlanElement instanceof LspShipmentLeg transport) {
-      transport.setEndTime(event.getTime());
-    }
-  }
-
-  private void logUnload(CarrierServiceStartEvent event) {
-    LspShipmentUtils.LoggedShipmentUnloadBuilder builder = LspShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
-    builder.setCarrierId(event.getCarrierId());
-    builder.setLinkId(event.getLinkId());
-    builder.setLogisticChainElement(logisticChainElement);
-    builder.setResourceId(resource.getId());
-    builder.setStartTime(event.getTime());
-    builder.setEndTime(event.getTime() + event.getServiceDuration());
-    LspShipmentPlanElement unload = builder.build();
-    String idString =
-            unload.getResourceId()
-                    + ""
-                    + unload.getLogisticChainElement().getId()
-                    + unload.getElementType();
-    Id<LspShipmentPlanElement> unloadId = Id.create(idString, LspShipmentPlanElement.class);
-    lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
-  }
-
-  //TODO: Inhaltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
-  private void logUnload(CarrierShipmentDeliveryStartEvent event) {
-    LspShipmentUtils.LoggedShipmentUnloadBuilder builder = LspShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
-    builder.setCarrierId(event.getCarrierId());
-    builder.setLinkId(event.getLinkId());
-    builder.setLogisticChainElement(logisticChainElement);
-    builder.setResourceId(resource.getId());
-    builder.setStartTime(event.getTime());
-    builder.setEndTime(event.getTime() + event.getDeliveryDuration());
-    LspShipmentPlanElement unload = builder.build();
-    String idString =
-            unload.getResourceId()
-                    + ""
-                    + unload.getLogisticChainElement().getId()
-                    + unload.getElementType();
-    Id<LspShipmentPlanElement> unloadId = Id.create(idString, LspShipmentPlanElement.class);
-    lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
   }
 
   //Todo: Wird das auch inhaltlich irgendwo genutzt,oder ist das nur für die Tests da?
   //todo ctd. Brauchen wir den CarrierService hier eigentlich wirklich oder kann das zurück gebaut werden? KMT Okt'24
   public CarrierJob getCarrierJob() {return carrierJob;  }
 
-  public LspShipment getLspShipment() {
-    return lspShipment;
-  }
-
-  public LogisticChainElement getLogisticChainElement() {
-    return logisticChainElement;
-  }
-
   public LSPCarrierResource getResource() {
-    return resource;
+    return getCarrierResource();
   }
-
-  @Override
-  public void setEmbeddingContainer(LspShipment pointer) {
-    this.lspShipment = pointer;
-  }
-
-  @Override
-  public void notifyAfterMobsim(AfterMobsimEvent event) {}
 }
