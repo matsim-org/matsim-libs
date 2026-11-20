@@ -30,8 +30,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
@@ -56,6 +58,15 @@ public class DvrpRoutingModule implements RoutingModule {
 		 * and the trip attributes into account.
 		 */
 		Optional<Pair<Facility, Facility>> findFacilities(RoutingRequest request);
+
+		/**
+		 * Finds the access and egress facilities a passenger accepts for the given routing request. The first entry of
+		 * each list is the preferred facility, which must be the one {@link #findFacilities} returns. By default, there
+		 * are no alternatives.
+		 */
+		default Optional<AccessEgressFacilityCandidates> findCandidates(RoutingRequest request) {
+			return findFacilities(request).map(pair -> AccessEgressFacilityCandidates.of(pair.getLeft(), pair.getRight()));
+		}
 	}
 
 	private final AccessEgressFacilityFinder stopFinder;
@@ -112,6 +123,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		// access (sub-)trip:
 		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(
 				DefaultRoutingRequest.of(fromFacility, accessFacility, now, person, request.getAttributes()));
+		double accessEndTime = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
 			now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
@@ -127,6 +139,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		now = timeInterpretation.decideOnElementsEndTime(drtLeg, now).seconds();
 
 		// egress (sub-)trip:
+		double egressStartTime = now;
 		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(
 				DefaultRoutingRequest.of(egressFacility, toFacility, now, person, request.getAttributes()));
 		if (!egressTrip.isEmpty()) {
@@ -136,7 +149,76 @@ public class DvrpRoutingModule implements RoutingModule {
 			trip.addAll(egressTrip);
 		}
 
+		// the trip itself is always built for the facilities of findFacilities; candidates are only an addition
+		Optional<AccessEgressFacilityCandidates> candidates = stopFinder.findCandidates(request)
+				.filter(AccessEgressFacilityCandidates::hasAlternatives)
+				.filter(c -> c.preferredAccess().getLinkId().equals(accessFacility.getLinkId())
+						&& c.preferredEgress().getLinkId().equals(egressFacility.getLinkId()));
+		if (candidates.isPresent()) {
+			attachStopCandidates(request, candidates.get(), drtLeg, accessTrip, departureTime, accessEndTime,
+					egressTrip, egressStartTime);
+		}
+
 		return trip;
+	}
+
+	/**
+	 * Routes the walks to/from all stop candidates with the access/egress routers and attaches them to the route of the
+	 * main leg. The preferred candidates reuse the walks of the routed trip.
+	 */
+	private void attachStopCandidates(RoutingRequest request, AccessEgressFacilityCandidates candidates,
+			List<? extends PlanElement> mainLeg, List<? extends PlanElement> accessTrip, double departureTime,
+			double accessEndTime, List<? extends PlanElement> egressTrip, double egressStartTime) {
+		Optional<StopCandidatesRoute> route = mainLeg.stream()
+				.filter(Leg.class::isInstance)
+				.map(element -> ((Leg)element).getRoute())
+				.filter(StopCandidatesRoute.class::isInstance)
+				.map(StopCandidatesRoute.class::cast)
+				.findFirst();
+		if (route.isEmpty()) {
+			return; // the main leg router does not support stop candidates
+		}
+
+		List<StopCandidates.Candidate> access = new ArrayList<>();
+		access.add(candidate(candidates.preferredAccess(), accessTrip, departureTime, accessEndTime));
+		for (Facility facility : candidates.access().subList(1, candidates.access().size())) {
+			List<? extends PlanElement> walk = accessRouter.calcRoute(
+					DefaultRoutingRequest.of(request.getFromFacility(), facility, departureTime, request.getPerson(),
+							request.getAttributes()));
+			if (walk == null) {
+				continue; // candidate not reachable
+			}
+			double endTime = timeInterpretation.decideOnElementsEndTime(walk, departureTime).seconds();
+			access.add(candidate(facility, walk, departureTime, endTime));
+		}
+
+		List<StopCandidates.Candidate> egress = new ArrayList<>();
+		double egressEndTime = timeInterpretation.decideOnElementsEndTime(egressTrip, egressStartTime).seconds();
+		egress.add(candidate(candidates.preferredEgress(), egressTrip, egressStartTime, egressEndTime));
+		for (Facility facility : candidates.egress().subList(1, candidates.egress().size())) {
+			List<? extends PlanElement> walk = egressRouter.calcRoute(
+					DefaultRoutingRequest.of(facility, request.getToFacility(), egressStartTime, request.getPerson(),
+							request.getAttributes()));
+			if (walk == null) {
+				continue; // candidate not reachable
+			}
+			double endTime = timeInterpretation.decideOnElementsEndTime(walk, egressStartTime).seconds();
+			egress.add(candidate(facility, walk, egressStartTime, endTime));
+		}
+
+		route.get().setStopCandidates(new StopCandidates(access, egress));
+	}
+
+	private static StopCandidates.Candidate candidate(Facility facility, List<? extends PlanElement> walk,
+			double startTime, double endTime) {
+		double distance = walk.stream()
+				.filter(Leg.class::isInstance)
+				.map(element -> ((Leg)element).getRoute())
+				.filter(Objects::nonNull)
+				.mapToDouble(Route::getDistance)
+				.filter(Double::isFinite)
+				.sum();
+		return new StopCandidates.Candidate(facility.getLinkId(), facility.getCoord(), endTime - startTime, distance);
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility, double now) {

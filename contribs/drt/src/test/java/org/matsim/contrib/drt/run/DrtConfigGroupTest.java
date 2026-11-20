@@ -1,8 +1,11 @@
 package org.matsim.contrib.drt.run;
 
+import java.util.List;
+
 import com.google.common.base.VerifyException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
@@ -50,6 +53,27 @@ class DrtConfigGroupTest {
 		params.setMaxWaitTime(drtConfig.getStopDuration());
 		defaultConstraints.setMaxWaitTime(drtConfig.getStopDuration());
 
+		Assertions.assertDoesNotThrow(() -> drtConfig.checkConsistency(config));
+	}
+
+	@Test
+	void testStopCandidatesRequireTeleportedWalk() {
+		Config config = ConfigUtils.createConfig();
+		DrtConfigGroup drtConfig = new DrtConfigGroup();
+		config.addModule(drtConfig);
+		drtConfig.setStopDuration(0);
+		DrtOptimizationConstraintsSet params = drtConfig.addOrGetDrtOptimizationConstraintsParams()
+				.addOrGetDefaultDrtOptimizationConstraintsSet();
+		params.setMaxWaitTime(0);
+		params.setMaxStopCandidates(3);
+
+		// walk is teleported by default
+		Assertions.assertDoesNotThrow(() -> drtConfig.checkConsistency(config));
+
+		config.routing().setNetworkModes(List.of(TransportMode.car, TransportMode.walk));
+		Assertions.assertThrows(VerifyException.class, () -> drtConfig.checkConsistency(config));
+
+		params.setMaxStopCandidates(1);
 		Assertions.assertDoesNotThrow(() -> drtConfig.checkConsistency(config));
 	}
 }

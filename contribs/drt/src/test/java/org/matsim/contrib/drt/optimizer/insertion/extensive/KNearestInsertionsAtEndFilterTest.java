@@ -38,6 +38,10 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionTestUtils;
+import org.matsim.contrib.drt.optimizer.insertion.RequestVariant;
+import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.load.IntegerLoadType;
 
@@ -109,6 +113,37 @@ public class KNearestInsertionsAtEndFilterTest {
 		//insertionAtEnd always returned last
 		assertThat(filterOneInsertionAtEnd(insertionAfterStart, insertionAtEnd)).containsExactlyInAnyOrder(
 				insertionAfterStart.insertion, insertionAtEnd.insertion);
+	}
+
+	/**
+	 * The limit applies per request variant: other variants (e.g. other pickup stops) must not crowd out the at-end
+	 * insertions of a variant, otherwise the search with stop candidates can be worse than without them.
+	 */
+	@Test
+	void onlyAtEndInsertions_theEarliestReturnedPerVariant() {
+		var request = DrtRequest.newBuilder()
+				.fromLink(new FakeLink(Id.createLinkId("from")))
+				.toLink(new FakeLink(Id.createLinkId("to")))
+				.build();
+		var routed = new RequestVariant(request, 0, 0, 0);
+		var other = new RequestVariant(request, 60, 0, 1);
+		var vehicleEntry1 = vehicleEntry("v1", start(0));
+		var vehicleEntry2 = vehicleEntry("v2", start(0));
+		// the other variant has the earliest pickups at both vehicles
+		var routed1 = insertion(routed, vehicleEntry1, 120);
+		var routed2 = insertion(routed, vehicleEntry2, 130);
+		var other1 = insertion(other, vehicleEntry1, 100);
+		var other2 = insertion(other, vehicleEntry2, 110);
+
+		assertThat(filterOneInsertionAtEnd(other1, routed2, other2, routed1))
+				.containsExactlyInAnyOrder(other1.insertion, routed1.insertion);
+	}
+
+	private InsertionWithDetourData insertion(RequestVariant variant, VehicleEntry vehicleEntry,
+			double pickupDepartureTime) {
+		return new InsertionWithDetourData(
+				InsertionTestUtils.insertionFor(variant, vehicleEntry, 0, 0, loadType.fromInt(1)), null,
+				new DetourTimeInfo(new PickupDetourInfo(pickupDepartureTime, pickupDepartureTime, Double.NaN), null));
 	}
 
 	private InsertionWithDetourData insertion(VehicleEntry vehicleEntry, int pickupIdx, double pickupDepartureTime) {

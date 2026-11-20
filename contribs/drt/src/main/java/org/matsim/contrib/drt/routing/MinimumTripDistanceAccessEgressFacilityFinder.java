@@ -20,12 +20,10 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.Optional;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.FilteringAccessEgressFacilityFinder;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
@@ -43,7 +41,7 @@ import org.matsim.facilities.Facility;
  *
  * @author nkuehnel / MOIA
  */
-public class MinimumTripDistanceAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
+public class MinimumTripDistanceAccessEgressFacilityFinder extends FilteringAccessEgressFacilityFinder {
 
 	/**
 	 * Provides the minimum trip distance that applies to a single routing request. It is queried after the access and
@@ -54,26 +52,21 @@ public class MinimumTripDistanceAccessEgressFacilityFinder implements AccessEgre
 		double get(RoutingRequest request, Facility accessFacility, Facility egressFacility);
 	}
 
-	private final AccessEgressFacilityFinder delegate;
 	private final MinimumTripDistance minimumTripDistance;
 	private final Network network;
 
 	public MinimumTripDistanceAccessEgressFacilityFinder(AccessEgressFacilityFinder delegate,
 			MinimumTripDistance minimumTripDistance, Network network) {
-		this.delegate = delegate;
+		super(delegate);
 		this.minimumTripDistance = minimumTripDistance;
 		this.network = network;
 	}
 
 	@Override
-	public Optional<Pair<Facility, Facility>> findFacilities(RoutingRequest request) {
-		return delegate.findFacilities(request).filter(facilities -> {
-			Facility access = facilities.getLeft();
-			Facility egress = facilities.getRight();
-			double tripDistance = calcTripDistance(network.getLinks().get(access.getLinkId()),
-					network.getLinks().get(egress.getLinkId()));
-			return tripDistance >= minimumTripDistance.get(request, access, egress);
-		});
+	protected boolean isAllowed(RoutingRequest request, Facility access, Facility egress) {
+		double tripDistance = calcTripDistance(network.getLinks().get(access.getLinkId()),
+				network.getLinks().get(egress.getLinkId()));
+		return tripDistance >= minimumTripDistance.get(request, access, egress);
 	}
 
 	/**

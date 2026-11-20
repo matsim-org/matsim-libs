@@ -22,7 +22,6 @@
 package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,11 +60,30 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 		}
 
 		var pathDataByVariant = calculatePathsPerVariant(detourPathCalculator, insertions);
-		return bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
+		var best = bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
 			var insertionDetourData = pathDataByVariant.get(i.getVariant().index()).createInsertionDetourData(i);
 			return new InsertionWithDetourData(i, insertionDetourData,
 				detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, i.getRequest()));
 		}));
+		int lastCalculatedVariant = pathDataByVariant.keySet().stream().reduce((first, second) -> second).orElseThrow();
+		return best.map(b -> withPathsOfItsVariant(detourPathCalculator, b, lastCalculatedVariant));
+	}
+
+	/**
+	 * The path searches are reused for all variants, and (with lazy path creation) a {@link org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData} builds its path
+	 * from the search tree only when the path is requested. After the searches for later variants, the paths of an
+	 * earlier variant would therefore follow the tree of the last variant (wrong pickup/dropoff link), while the travel
+	 * times (computed eagerly) are correct. If the chosen insertion belongs to another than the last calculated variant,
+	 * its paths are calculated again, so that it can be scheduled. Travel times and detour times are kept.
+	 */
+	static InsertionWithDetourData withPathsOfItsVariant(MultiInsertionDetourPathCalculator detourPathCalculator,
+			InsertionWithDetourData best, int lastCalculatedVariant) {
+		if (best.insertion.getVariant().index() == lastCalculatedVariant) {
+			return best;
+		}
+		var detourData = detourPathCalculator.calculatePaths(best.insertion.getVariant().request(),
+				List.of(best.insertion)).createInsertionDetourData(best.insertion);
+		return new InsertionWithDetourData(best.insertion, detourData, best.detourTimeInfo);
 	}
 
 	/**
@@ -77,7 +95,8 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 			MultiInsertionDetourPathCalculator detourPathCalculator, List<InsertionGenerator.Insertion> insertions) {
 		Map<Integer, List<InsertionGenerator.Insertion>> insertionsByVariant = insertions.stream()
 				.collect(Collectors.groupingBy(i -> i.getVariant().index(), LinkedHashMap::new, Collectors.toList()));
-		Map<Integer, DetourPathDataCache> pathDataByVariant = new HashMap<>();
+		// in the order of calculation (see withPathsOfItsVariant)
+		Map<Integer, DetourPathDataCache> pathDataByVariant = new LinkedHashMap<>();
 		insertionsByVariant.forEach((index, variantInsertions) -> pathDataByVariant.put(index,
 				detourPathCalculator.calculatePaths(variantInsertions.get(0).getVariant().request(), variantInsertions)));
 		return pathDataByVariant;

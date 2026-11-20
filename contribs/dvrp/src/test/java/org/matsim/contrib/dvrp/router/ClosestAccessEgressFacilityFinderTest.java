@@ -152,6 +152,72 @@ public class ClosestAccessEgressFacilityFinderTest {
 		assertThat(finder.findClosestStop(facility("linkAtA", new Coord(500, 0)), 600)).isNotNull();
 	}
 
+	// stop candidates: from (100, 0) the stops A, C and D are 100, 200 and 250 m away, from (900, 0) only B is close
+
+	private final Facility stopC = facility("linkAtC", new Coord(300, 0));
+	private final Facility stopD = facility("linkAtD", new Coord(-150, 0));
+
+	@Test
+	void testCandidatesWithOneCandidateAreTheClosestStops() {
+		var finder = candidateFinder(300, 1);
+
+		Optional<AccessEgressFacilityCandidates> candidates = finder.findCandidates(request(0, null));
+
+		assertThat(candidates).isPresent();
+		assertThat(candidates.get().access()).containsExactly(stopA);
+		assertThat(candidates.get().egress()).containsExactly(stopB);
+		assertThat(candidates.get().hasAlternatives()).isFalse();
+	}
+
+	@Test
+	void testCandidatesAreOrderedByDistanceAndStartWithTheClosestStop() {
+		var finder = candidateFinder(300, 3);
+
+		var candidates = finder.findCandidates(request(0, null)).orElseThrow();
+
+		assertThat(candidates.access()).containsExactly(stopA, stopC, stopD);
+		assertThat(candidates.egress()).containsExactly(stopB);
+		assertThat(candidates.preferredAccess()).isSameAs(finder.findFacilities(request(0, null)).orElseThrow().getLeft());
+	}
+
+	@Test
+	void testCandidatesAreLimitedByNumberAndDistance() {
+		assertThat(candidateFinder(300, 2).findCandidates(request(0, null)).orElseThrow().access())
+				.containsExactly(stopA, stopC);
+		assertThat(candidateFinder(220, 3).findCandidates(request(0, null)).orElseThrow().access())
+				.containsExactly(stopA, stopC);
+	}
+
+	@Test
+	void testNoCandidatesIfClosestStopIsTooFarAway() {
+		assertThat(candidateFinder(99, 3).findCandidates(request(0, null))).isEmpty();
+	}
+
+	@Test
+	void testCandidatesWithEqualDistanceAreOrderedById() {
+		Facility stopE = facility("linkAtE", new Coord(100, 200));
+		Facility stopF = facility("linkAtF", new Coord(100, -200));
+		var finder = new ClosestAccessEgressFacilityFinder((r, a, e) -> 300, (r, a, e) -> 3, 300, network,
+				QuadTrees.createQuadTree(List.of(stopA, stopB, stopF, stopE)));
+
+		assertThat(finder.findCandidates(request(0, null)).orElseThrow().access()).containsExactly(stopA, stopE, stopF);
+	}
+
+	@Test
+	void testDefaultCandidatesOfAFinderAreItsFacilities() {
+		DvrpRoutingModule.AccessEgressFacilityFinder finder = r -> Optional.of(Pair.of(stopA, stopB));
+
+		var candidates = finder.findCandidates(request(0, null)).orElseThrow();
+
+		assertThat(candidates.access()).containsExactly(stopA);
+		assertThat(candidates.egress()).containsExactly(stopB);
+	}
+
+	private ClosestAccessEgressFacilityFinder candidateFinder(double maxDistance, int maxCandidates) {
+		return new ClosestAccessEgressFacilityFinder((r, a, e) -> maxDistance, (r, a, e) -> maxCandidates,
+				maxDistance, network, QuadTrees.createQuadTree(List.of(stopA, stopB, stopC, stopD)));
+	}
+
 	private RoutingRequest request(double departureTime, Person person) {
 		return DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, departureTime, person);
 	}

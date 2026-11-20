@@ -51,6 +51,7 @@ import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.StopCandidates;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -429,6 +430,104 @@ public class DrtRoutingModuleTest {
 	/**
 	 * @return
 	 */
+	/**
+	 * With more than one stop candidate, the routed trip is unchanged (closest stops), and the route carries all
+	 * candidates within the max walk distance, each with the duration and distance of its own routed walk.
+	 */
+	@Test
+	void testStopCandidatesAreRoutedWithTheWalkRouter() {
+		Scenario scenario = createTestScenario();
+		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario, 0.83333,
+				1.3, null);
+		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
+		Facility from = FacilitiesUtils.toFacility((Activity)p1.getSelectedPlan().getPlanElements().get(0),
+				scenario.getActivityFacilities());
+		Facility to = FacilitiesUtils.toFacility((Activity)p1.getSelectedPlan().getPlanElements().get(2),
+				scenario.getActivityFacilities());
+
+		List<? extends PlanElement> withoutCandidates = routingModule(scenario, walkRouter, 1).calcRoute(
+				DefaultRoutingRequest.withoutAttributes(from, to, 8 * 3600, p1));
+		List<? extends PlanElement> withCandidates = routingModule(scenario, walkRouter, 4).calcRoute(
+				DefaultRoutingRequest.withoutAttributes(from, to, 8 * 3600, p1));
+
+		DrtRoute routeWithout = (DrtRoute)((Leg)withoutCandidates.get(2)).getRoute();
+		DrtRoute routeWith = (DrtRoute)((Leg)withCandidates.get(2)).getRoute();
+		Assertions.assertTrue(routeWithout.getStopCandidates().isEmpty());
+		Assertions.assertFalse(routeWithout.getRouteDescription().contains("stopCandidates"));
+
+		// the routed trip itself does not change
+		Assertions.assertEquals(routeWithout.getStartLinkId(), routeWith.getStartLinkId());
+		Assertions.assertEquals(routeWithout.getEndLinkId(), routeWith.getEndLinkId());
+		Assertions.assertEquals(withoutCandidates.size(), withCandidates.size());
+
+		StopCandidates candidates = routeWith.getStopCandidates().orElseThrow();
+		Assertions.assertTrue(candidates.hasAlternatives());
+		Assertions.assertEquals(routeWith.getStartLinkId(), candidates.preferredAccess().linkId());
+		Assertions.assertEquals(routeWith.getEndLinkId(), candidates.preferredEgress().linkId());
+		Assertions.assertEquals(((Leg)withCandidates.get(0)).getTravelTime().seconds(),
+				candidates.preferredAccess().walkDuration(), 1e-9);
+		Assertions.assertEquals(((Leg)withCandidates.get(4)).getTravelTime().seconds(),
+				candidates.preferredEgress().walkDuration(), 1e-9);
+
+		for (StopCandidates.Candidate candidate : candidates.access()) {
+			Leg walk = (Leg)walkRouter.calcRoute(
+					DefaultRoutingRequest.withoutAttributes(from, stopAt(scenario, candidate), 8 * 3600, p1)).get(0);
+			Assertions.assertEquals(walk.getTravelTime().seconds(), candidate.walkDuration(), 1e-9);
+			Assertions.assertEquals(walk.getRoute().getDistance(), candidate.walkDistance(), 1e-9);
+		}
+		for (StopCandidates.Candidate candidate : candidates.egress()) {
+			Leg walk = (Leg)walkRouter.calcRoute(
+					DefaultRoutingRequest.withoutAttributes(stopAt(scenario, candidate), to, 8 * 3600, p1)).get(0);
+			Assertions.assertEquals(walk.getTravelTime().seconds(), candidate.walkDuration(), 1e-9);
+		}
+
+		// the candidates survive writing and reading the route description; old descriptions have none
+		DrtRoute copy = new DrtRoute(routeWith.getStartLinkId(), routeWith.getEndLinkId());
+		copy.setRouteDescription(routeWith.getRouteDescription());
+		Assertions.assertEquals(candidates, copy.getStopCandidates().orElseThrow());
+		DrtRoute old = new DrtRoute(routeWith.getStartLinkId(), routeWith.getEndLinkId());
+		old.setRouteDescription(routeWithout.getRouteDescription());
+		Assertions.assertTrue(old.getStopCandidates().isEmpty());
+	}
+
+	private static Facility stopAt(Scenario scenario, StopCandidates.Candidate candidate) {
+		return scenario.getTransitSchedule()
+				.getFacilities()
+				.values()
+				.stream()
+				.filter(stop -> stop.getLinkId().equals(candidate.linkId()) && stop.getCoord().equals(candidate.coord()))
+				.findFirst()
+				.orElseThrow();
+	}
+
+	private static DvrpRoutingModule routingModule(Scenario scenario, TeleportationRoutingModule walkRouter,
+			int maxStopCandidates) {
+		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
+		DrtOptimizationConstraintsSetImpl constraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams()
+				.addOrGetDefaultDrtOptimizationConstraintsSet();
+		constraintsSet.setMaxTravelTimeAlpha(1.5);
+		constraintsSet.setMaxTravelTimeBeta(5 * 60);
+		constraintsSet.setMaxWaitTime(5 * 60);
+		DvrpLoadType loadType = new IntegerLoadType("passengers");
+		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
+				.getFacilities()
+				.values()
+				.stream()
+				.map(DrtStopFacilityImpl::createFromFacility)
+				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
+		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder((r, a, e) -> 500,
+				(r, a, e) -> maxStopCandidates, 500, scenario.getNetwork(), QuadTrees.createQuadTree(drtStops.values()));
+		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
+				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
+				new DefaultDrtRouteConstraintsCalculator(drtCfg,
+						(departureTime, accessActLink, egressActLink, person, tripAttributes) -> Optional.of(constraintsSet)),
+				new DefaultDvrpLoadFromTrip(loadType, "passengers"), loadType);
+		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtCfg.getMode(), scenario.getNetwork(),
+				scenario.getPopulation().getFactory(), drtRouteCreator);
+		return new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder, drtCfg.getMode(),
+				TimeInterpretation.create(scenario.getConfig()));
+	}
+
 	private Scenario createTestScenario() {
 		Config config = ConfigUtils.createConfig();
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
