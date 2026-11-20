@@ -9,9 +9,10 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
  * route stops are elements of {@link SwissRailRaptorData#routeStops}; a departure is only asked for the route
  * stops of its own route. Times are seconds since midnight.
  * <p>
- * Implementations must keep the departures of a route in order: at every route stop, a departure with a
- * higher index neither arrives nor departs earlier than one with a lower index of the same route. The search
- * for the next departure relies on that.
+ * The departures of a route must not overtake each other: there is an order of them in which, at every route
+ * stop, no departure arrives or departs earlier than the one before. This order need not be the order of the
+ * indices; each implementation searches the next departure in its own order. {@link SwissRailRaptorCore}
+ * does not rely on the order of the indices.
  */
 interface RaptorTimetable {
 

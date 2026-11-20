@@ -88,6 +88,10 @@ public class SwissRailRaptor implements TransitRouter {
 
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
         if (parameters.getConfig().isUseRangeQuery()) {
+            if (this.data.config.isUseTimetableUpdates()) {
+                // the range query is not checked with departure times that differ from the schedule
+                throw new IllegalStateException("SwissRailRaptor: timetable updates cannot be combined with the range query.");
+            }
             return this.performRangeQuery(fromFacility, toFacility, departureTime, person, routingAttributes, parameters);
         }
         List<InitialStop> accessStops = findAccessStops(fromFacility, toFacility, person, departureTime, routingAttributes, parameters);

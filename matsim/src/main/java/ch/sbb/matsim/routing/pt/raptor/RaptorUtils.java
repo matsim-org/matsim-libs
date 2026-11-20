@@ -97,6 +97,7 @@ public final class RaptorUtils {
 			staticConfig.addModeToModeTransferPenalty(penalty.fromMode,penalty.toMode,penalty.transferPenalty);
 		}
         staticConfig.setUseCapacityConstraints(srrConfig.isUseCapacityConstraints());
+        staticConfig.setUseTimetableUpdates(srrConfig.isUseTimetableUpdates());
 
         return staticConfig;
     }

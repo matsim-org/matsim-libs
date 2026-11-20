@@ -112,6 +112,11 @@ public class SwissRailRaptorData {
 		log.info("Preparing data for SwissRailRaptor...");
 		long startMillis = System.currentTimeMillis();
 
+		if (staticConfig.isUseTimetableUpdates() && staticConfig.isUseCapacityConstraints()) {
+			// the capacity constraints look for departures in OccupancyData, with the times of the schedule
+			throw new IllegalArgumentException("SwissRailRaptor: timetable updates cannot be combined with capacity constraints.");
+		}
+
 		Map<Id<Vehicle>, Vehicle> vehicles = transitVehicles == null ? Collections.emptyMap() : transitVehicles.getVehicles();
 		int countRoutes = 0;
 		long countRouteStops = 0;
@@ -260,6 +265,11 @@ public class SwissRailRaptorData {
 
 			chainedDepartures.put((int) departureIdRef.get(e.getKey()), chains);
 		}
+		if (staticConfig.isUseTimetableUpdates() && !chainedDepartures.isEmpty()) {
+			// chained departures take their start time from the schedule, see SwissRailRaptorCore.exploreRoute
+			throw new IllegalArgumentException("SwissRailRaptor: timetable updates cannot be combined with chained departures, but the schedule has "
+				+ chainedDepartures.size() + " departures with chained departures.");
+		}
 
 		// only put used transit stops into the quad tree
 		Set<TransitStopFacility> stops = routeStopsPerStopFacility.keySet();
@@ -386,7 +396,7 @@ public class SwissRailRaptorData {
 					stopTransfers.clear();
 					for (int toRouteStopIndex : toRouteStopIndices) {
 						RRouteStop toRouteStop = routeStops[toRouteStopIndex];
-						if (isUsefulTransfer(fromRouteStop, toRouteStop, maxBeelineWalkConnectionDistance, config.getOptimization())
+						if (isUsefulTransfer(fromRouteStop, toRouteStop, maxBeelineWalkConnectionDistance, config.getOptimization(), config.isUseTimetableUpdates())
 							&& isTransferAllowed(fromRouteStop, toRouteStop)
 						) {
 							RTransfer newTransfer = new RTransfer(fromRouteStopIndex, toRouteStopIndex, fixedTransferTime,
@@ -410,8 +420,13 @@ public class SwissRailRaptorData {
 		return transfers;
 	}
 
+	/**
+	 * With {@code useTimetableUpdates}, the departure times may differ from the schedule, so the two checks that rely
+	 * on the times of the schedule are relaxed: {@link #hasNoPossibleDeparture} is skipped, and
+	 * {@link #cannotReachAdditionalStops} only applies within the same route, whose departures do not overtake each other.
+	 */
 	private static boolean isUsefulTransfer(RRouteStop fromRouteStop, RRouteStop toRouteStop, double maxBeelineWalkConnectionDistance,
-		RaptorStaticConfig.RaptorOptimization optimization) {
+		RaptorStaticConfig.RaptorOptimization optimization, boolean useTimetableUpdates) {
 		if (fromRouteStop == toRouteStop) {
 			return false;
 		}
@@ -425,7 +440,7 @@ public class SwissRailRaptorData {
 		}
 		// if the first departure at fromRouteStop arrives after the last departure at toRouteStop,
 		// we'll never get any connection here
-		if (hasNoPossibleDeparture(fromRouteStop, toRouteStop)) {
+		if (!useTimetableUpdates && hasNoPossibleDeparture(fromRouteStop, toRouteStop)) {
 			return false;
 		}
 		// if the stop facilities are different, and the destination stop is part
@@ -435,7 +450,8 @@ public class SwissRailRaptorData {
 		}
 		// assuming vehicles serving the exact same stop sequence do not overtake each other,
 		// it does not make sense to transfer to another route that serves the exact same upcoming stops
-		if (cannotReachAdditionalStops(fromRouteStop, toRouteStop)) {
+		// (with timetable updates, only the departures of the same route are guaranteed not to overtake each other)
+		if ((!useTimetableUpdates || fromRouteStop.route == toRouteStop.route) && cannotReachAdditionalStops(fromRouteStop, toRouteStop)) {
 			return false;
 		}
 		if (optimization == RaptorStaticConfig.RaptorOptimization.OneToOneRouting) {
@@ -781,7 +797,7 @@ public class SwissRailRaptorData {
 					transferTime = transferTimes.getOrDefault(toRouteFacility, transferTime);
 				}
 
-				if (SwissRailRaptorData.isUsefulTransfer(fromRouteStop, toRouteStop, beelineWalkConnectionDistance, optimization)) {
+				if (SwissRailRaptorData.isUsefulTransfer(fromRouteStop, toRouteStop, beelineWalkConnectionDistance, optimization, config.isUseTimetableUpdates())) {
 					transfers.add(new RTransfer(fromRouteStop.index, toRouteStop.index, transferTime, beelineDistance * beelineDistanceFactor));
 				}
 			}
