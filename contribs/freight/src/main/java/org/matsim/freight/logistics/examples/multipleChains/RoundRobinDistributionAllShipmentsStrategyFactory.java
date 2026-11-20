@@ -74,7 +74,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
             for (LspShipment lspShipment : lsp.getLspShipments()) {
               if (shipmentCountByChain.isEmpty()) {
-                for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
+                for (LogisticChain chain : lspPlan.getLogisticChains()) {
                   shipmentCountByChain.put(chain, 0);
                 }
               }

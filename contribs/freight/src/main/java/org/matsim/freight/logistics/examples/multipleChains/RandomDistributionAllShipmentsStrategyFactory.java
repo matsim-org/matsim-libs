@@ -71,7 +71,7 @@ final class RandomDistributionAllShipmentsStrategyFactory {
 
                         LSP lsp = lspPlan.getLSP();
                         List<LogisticChain> logisticChains =
-                                new ArrayList<>(lsp.getSelectedPlan().getLogisticChains());
+                                new ArrayList<>(lspPlan.getLogisticChains());
 
                         for (LspShipment lspShipment : lsp.getLspShipments()) {
                             int index = MatsimRandom.getRandom().nextInt(logisticChains.size());
