@@ -26,8 +26,8 @@ public class SumoNetworkHandlerTest {
 
 	/**
 	 * Pins the part of the handler that post-processing outside this package relies on:
-	 * the OSM way id behind an edge, the exported tags and the shape. Everything here is
-	 * reachable through public API only, without touching package-private state.
+	 * the OSM way id behind an edge and its shape. Everything here is reachable through
+	 * public API only, without touching package-private state.
 	 */
 	@Test
 	void exposesEdgeOriginAndShape() throws Exception {
@@ -38,12 +38,7 @@ public class SumoNetworkHandlerTest {
 
 		SumoNetworkHandler.Edge edge = handler.getEdges().get("1001");
 		assertNotNull(edge, "Fixture must contain edge 1001");
-
-		assertEquals("1001", edge.getId());
-		assertEquals("highway.footway", edge.getType());
 		assertEquals("1001", edge.getOrigId(), "origId must be the plain OSM way id");
-		assertEquals("yes", edge.getAttributes().get("bicycle"));
-		assertEquals("asphalt", edge.getAttributes().get("surface"));
 
 		// the reverse edge of the same way carries the same origId, only the id is negated
 		SumoNetworkHandler.Edge reverse = handler.getEdges().get("-1001");

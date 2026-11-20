@@ -147,8 +147,6 @@ public class SumoBicycleAttributesTest {
 		// param anyway - reading that param would claim a bike lane over twice the length.
 		assertNull(merged.getAttributes().getAttribute(BicycleUtils.OSM_PREFIX + "cycleway"),
 			"a tag only one of the merged ways carries must not be adopted");
-		assertEquals("lane", f.sumo().getEdges().get("1001").getAttributes().get("cycleway"),
-			"the SUMO edge does carry it - which is precisely why we do not read it from there");
 
 		assertEquals(2, stats.tagsDroppedAsAmbiguous, "one per direction of the merged edge");
 	}

@@ -385,24 +385,6 @@ public class SumoNetworkHandler extends DefaultHandler {
 			return lanes.stream().mapToDouble(l -> l.length).max().orElseThrow();
 		}
 
-		/** Edge id; {@code SumoNetworkConverter} reuses it verbatim as the MATSim link id. */
-		public String getId() {
-			return id;
-		}
-
-		public String getFrom() {
-			return from;
-		}
-
-		public String getTo() {
-			return to;
-		}
-
-		/** Edge type, e.g. {@code highway.residential}. */
-		public String getType() {
-			return type;
-		}
-
 		/**
 		 * The OSM way id(s) this edge was built from, written by netconvert's
 		 * {@code output.original-names}. Space-separated when {@code geometry.remove}
@@ -410,17 +392,6 @@ public class SumoNetworkHandler extends DefaultHandler {
 		 */
 		public String getOrigId() {
 			return origId;
-		}
-
-		/**
-		 * OSM tags netconvert exported as generic {@code param} elements, i.e. whatever
-		 * {@code osm.extra-attributes} listed. Beware: on merged edges the values of the
-		 * constituent ways are concatenated, and a tag present on only one of them wins
-		 * silently — use {@link #getOrigId()} and the OSM source for anything that has to
-		 * be exact.
-		 */
-		public Map<String, String> getAttributes() {
-			return attributes;
 		}
 
 		/**
