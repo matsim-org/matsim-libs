@@ -17,6 +17,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.contrib.accessibility.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -90,13 +92,19 @@ public class RunPersonBasedAccBerlin {
 
 	private static final Logger LOG = LogManager.getLogger(RunPersonBasedAccBerlin.class);
 
+//	Daily monetary constants as in the Berlin v6.4 scoring config (modeParams car/pt) [money/day].
+//	Only used if --daily-monetary-constant is set; change the values here, not on the command line.
+	private static final double CAR_DAILY_MONETARY_CONSTANT = -5.0;
+	private static final double PT_DAILY_MONETARY_CONSTANT = -3.0;
+
 	private enum RunScenario {base, policy}
 
 	private enum OpportunityType {
 		hospital("hospital"),
 		spa("spa"),
 		baeder("baeder"),
-		jobcenter("jobcenter");
+		jobcenter("jobcenter"),
+		university("university");
 
 		private final String activityType;
 
@@ -174,6 +182,11 @@ public class RunPersonBasedAccBerlin {
 					RunScenario.class, requireValue(args, index, inlineValue, key), key);
 				case "--mode" -> options.mode = parseMode(
 					requireValue(args, index, inlineValue, key));
+				case "--sample" -> options.sample = parseSample(
+					requireValue(args, index, inlineValue, key));
+				case "--daily-monetary-constant" -> options.includeDailyMonetaryConstant = true;
+				case "--sample-seed" -> options.sampleSeed = Long.parseLong(
+					requireValue(args, index, inlineValue, key).trim());
 				case "--measure-type" -> options.measureType = parseEnum(
 					AccessibilityConfigGroup.AccessibilityMeasureType.class,
 					requireValue(args, index, inlineValue, key), key);
@@ -254,8 +267,21 @@ public class RunPersonBasedAccBerlin {
 			return OpportunityType.valueOf(normalized.toLowerCase(Locale.ROOT));
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("Unknown --opportunity '" + value
-				+ "'. Choose one of: hospital, spa, baeder, jobcenter");
+				+ "'. Choose one of: hospital, spa, baeder, jobcenter, university");
 		}
+	}
+
+	private static double parseSample(String value) {
+		double sample;
+		try {
+			sample = Double.parseDouble(value.trim());
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("--sample must be a number, e.g. 0.1, but is '" + value + "'");
+		}
+		if (sample <= 0 || sample > 1) {
+			throw new IllegalArgumentException("--sample must be in (0, 1], but is " + sample);
+		}
+		return sample;
 	}
 
 	private static Modes4Accessibility parseMode(String value) {
@@ -282,11 +308,11 @@ public class RunPersonBasedAccBerlin {
 
 			Single combination:
 			  java -jar accessibility-cluster.jar \\
-			    --opportunity <hospital|spa|baeder|jobcenter> \\
+			    --opportunity <hospital|spa|baeder|jobcenter|university> \\
 			    --scenario <base|policy> \\
 			    --mode <car|pt|teleportedWalk>
 
-			All combinations (4 opportunities x 2 scenarios x 3 modes):
+			All combinations (5 opportunities x 2 scenarios x 3 modes):
 			  java -jar accessibility-cluster.jar --all
 
 			Options:
@@ -305,6 +331,12 @@ public class RunPersonBasedAccBerlin {
 			  --weitere-krankenhaeuser-xml <f> Override weitere_krankenhaeuser.xml
 			  --baeder-geojson <file>        Override baeder.geojson
 			  --measure-type <rawSum|logSum|gravity>  Accessibility measure (default: rawSum)
+			  --sample <fraction>            Keep only this share of the loaded persons, e.g. 0.1 to
+			                                 compute a 10% scenario at 1% cost (default: 1 = all).
+			                                 Same seed and same plans order give the same persons.
+			  --sample-seed <n>              Random seed for --sample (default: 4711)
+			  --daily-monetary-constant      Add the daily monetary constant of car (-5.0) and pt (-3.0)
+			                                 to the monetary costs of every car and pt trip (default: off)
 			  --dry-run                      Print resolved paths and combinations without running
 			  --help                         Show this help
 			""");
@@ -333,6 +365,12 @@ public class RunPersonBasedAccBerlin {
 		String weitereKrankenhaeuserXml;
 		String baederGeoJson;
 
+		double sample = 1.0;
+		long sampleSeed = 4711;
+
+//		Whether the daily monetary constants (CAR_/PT_DAILY_MONETARY_CONSTANT) are included.
+		boolean includeDailyMonetaryConstant = false;
+
 		boolean all;
 		boolean dryRun;
 
@@ -358,6 +396,9 @@ public class RunPersonBasedAccBerlin {
 			copy.baederGeoJson = baederGeoJson;
 				copy.all = all;
 			copy.dryRun = dryRun;
+			copy.sample = sample;
+			copy.sampleSeed = sampleSeed;
+			copy.includeDailyMonetaryConstant = includeDailyMonetaryConstant;
 			return copy;
 		}
 	}
@@ -429,6 +470,9 @@ public class RunPersonBasedAccBerlin {
 			LOG.info("  plans:         {}", options.plansFile);
 			LOG.info("  transit:       {}", options.transitScheduleFile);
 			LOG.info("  events:        {}", options.eventsFile);
+			LOG.info("  sample:        {} (seed {})", options.sample, options.sampleSeed);
+			LOG.info("  daily monetary constant: {} (car {}, pt {})", options.includeDailyMonetaryConstant,
+				CAR_DAILY_MONETARY_CONSTANT, PT_DAILY_MONETARY_CONSTANT);
 			LOG.info("  R input dir:   {}", options.opportunity.outputDir(options.rInputDir));
 			return;
 		}
@@ -490,13 +534,13 @@ public class RunPersonBasedAccBerlin {
 				+ options.mode + "-" + ProcessHandle.current().pid()).getPath();
 
 		options.networkFile = orDefault(options.networkFile,
-			file(options.scenarioDir, "berlin-v" + options.version + ".output_network.xml.zst"));
+			matsimFile(options.scenarioDir, "berlin-v" + options.version + ".output_network.xml"));
 		options.plansFile = orDefault(options.plansFile,
-			file(options.scenarioDir, "berlin-v" + options.version + ".output_plans.xml.zst"));
+			matsimFile(options.scenarioDir, "berlin-v" + options.version + ".output_plans.xml"));
 		options.transitScheduleFile = orDefault(options.transitScheduleFile,
-			file(options.scenarioDir, "berlin-v" + options.version + ".output_transitSchedule.xml.zst"));
+			matsimFile(options.scenarioDir, "berlin-v" + options.version + ".output_transitSchedule.xml"));
 		options.eventsFile = orDefault(options.eventsFile,
-			file(options.scenarioDir, "berlin-v" + options.version + ".output_events.xml.zst"));
+			matsimFile(options.scenarioDir, "berlin-v" + options.version + ".output_events.xml"));
 
 		options.plankrankenhaeuserXml = orDefault(options.plankrankenhaeuserXml,
 			file(options.hospitalInputDir, "plankrankenhaeuser.xml"));
@@ -504,6 +548,21 @@ public class RunPersonBasedAccBerlin {
 			file(options.hospitalInputDir, "weitere_krankenhaeuser.xml"));
 		options.baederGeoJson = orDefault(options.baederGeoJson,
 			file(new File(options.rInputDir, "baeder").getPath(), "baeder.geojson"));
+	}
+
+	/**
+	 * Returns the MATSim output file {@code baseName} in {@code dir}, whichever compression exists:
+	 * .zst first, then .gz, then uncompressed. MATSim's readers detect the compression from the
+	 * file ending. If none exists, the .zst path is returned so the error message names it.
+	 */
+	private static String matsimFile(String dir, String baseName) {
+		for (String ending : List.of(".zst", ".gz", "")) {
+			File candidate = new File(dir, baseName + ending);
+			if (candidate.isFile()) {
+				return candidate.getPath();
+			}
+		}
+		return new File(dir, baseName + ".zst").getPath();
 	}
 
 	private static String file(String parent, String child) {
@@ -525,8 +584,18 @@ public class RunPersonBasedAccBerlin {
 		config.global().setCoordinateSystem(CRS);
 		config.routing().setRoutingRandomness(0.);
 
-		// add monetary distance rate for car
-		config.scoring().getModes().get(TransportMode.car).setMonetaryDistanceRate(-0.0002);
+		// add monetary distance rate for car (Berlin v6.4 scoring config, modeParams car)
+		config.scoring().getModes().get(TransportMode.car).setMonetaryDistanceRate(-1.49E-4);
+
+		// daily monetary constants (fixed monetary costs per day); only used by the car and pt
+		// calculators if includeDailyMonetaryConstant is switched on (--daily-monetary-constant)
+		config.scoring().getModes().get(TransportMode.car).setDailyMonetaryConstant(CAR_DAILY_MONETARY_CONSTANT);
+		config.scoring().getModes().get(TransportMode.pt).setDailyMonetaryConstant(PT_DAILY_MONETARY_CONSTANT);
+
+		// mode constants (ASC) as in the Berlin v6.4 scoring config (modeParams car/pt).
+		// Used by the car and pt calculators via AccessibilityUtils.getModeSpecificConstantForAccessibilities.
+		config.scoring().getModes().get(TransportMode.car).setConstant(-0.487593225702316);
+		config.scoring().getModes().get(TransportMode.pt).setConstant(0.43220302370275404);
 
 		config.network().setInputFile(options.networkFile);
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
@@ -536,11 +605,19 @@ public class RunPersonBasedAccBerlin {
 //		== Accessibility config ==
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setPersonBased(PERSON_BASED);
+		acg.setIncludeDailyMonetaryConstant(options.includeDailyMonetaryConstant);
+		LOG.info("Daily monetary constant included: {} (car {}, pt {})", options.includeDailyMonetaryConstant,
+			CAR_DAILY_MONETARY_CONSTANT, PT_DAILY_MONETARY_CONSTANT);
 		acg.setAccessibilityMeasureType(options.measureType);
-		acg.setTimeOfDay(8 * 60 * 60.);
+		acg.setTimeOfDay(8 * 60 * 60.); // does it run until the end of scenario from start time?
 		acg.setTileSize_m(1000);
 		acg.setAreaOfAccessibilityComputation(
 			AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromPopulation);
+//		Skip the Voronoi measure-point geometries. They are only needed for additional facility
+//		data and Geoserver/QGIS output, neither of which is used here, and building them compares
+//		every person with every other person (hours for a 10% population). Results are unchanged.
+		acg.setMeasurePointGeometryProvision(
+			AccessibilityConfigGroup.MeasurePointGeometryProvision.fromShapeFile);
 
 //		== Mode selection ==
 		List<Modes4Accessibility> accModes = List.of(options.mode);
@@ -550,6 +627,15 @@ public class RunPersonBasedAccBerlin {
 
 //		== Load scenario ==
 		scenario = ScenarioUtils.loadScenario(config);
+
+//		== Optional downsampling of the population ==
+		if (options.sample < 1.0) {
+//			sampleDown draws from MatsimRandom; resetting it makes the selection reproducible.
+			MatsimRandom.reset(options.sampleSeed);
+			PopulationUtils.sampleDown(scenario.getPopulation(), options.sample);
+			LOG.info("Downsampled population to {} (seed {}): {} persons",
+				options.sample, options.sampleSeed, scenario.getPopulation().getPersons().size());
+		}
 
 //		== Adding facilities ==
 		ActivityFacilities activityFacilities = scenario.getActivityFacilities();
@@ -563,6 +649,7 @@ public class RunPersonBasedAccBerlin {
 			case baeder -> addGeoJsonOpportunities(activityFacilities, af, activityOption,
 				options.baederGeoJson, location -> true);
 			case jobcenter -> addJobcenters(activityFacilities, af, activityOption);
+			case university -> addUniversities(activityFacilities, af, activityOption);
 		}
 
 //		== Assigning home coords for each person ==
@@ -651,6 +738,22 @@ public class RunPersonBasedAccBerlin {
 			facilities.addActivityFacility(facility);
 		}
 		LOG.info("Added {} job centers as accessibility opportunities", JOBCENTERS.size());
+	}
+
+//	Universities are a fixed list of sites, handled exactly like the job centers.
+	private static void addUniversities(
+		ActivityFacilities facilities,
+		ActivityFacilitiesFactory factory,
+		ActivityOption activityOption) {
+		for (University university : UNIVERSITIES) {
+			ActivityFacility facility = factory.createActivityFacility(
+				Id.create(university.name(), ActivityFacility.class),
+				new Coord(university.x(), university.y())
+			);
+			facility.addActivityOption(activityOption);
+			facilities.addActivityFacility(facility);
+		}
+		LOG.info("Added {} universities as accessibility opportunities", UNIVERSITIES.size());
 	}
 
 	private static class PersonBasedResultsComparator implements PersonDataExchangeInterface {
@@ -808,6 +911,20 @@ public class RunPersonBasedAccBerlin {
 						rows++;
 					}
 				}
+				case university -> {
+					for (University university : UNIVERSITIES) {
+						writer.write(String.join(",",
+							csv("university"),
+							csv(university.name()),
+							csv(university.name()),
+							Double.toString(university.x()),
+							Double.toString(university.y()),
+							csv(university.district()),
+							"", "", "", "", "", ""
+						) + "\n");
+						rows++;
+					}
+				}
 				case baeder -> {
 					for (GeoJsonOpportunity location : geoJsonLocations) {
 						Map<String, String> attributes = location.attributes();
@@ -891,6 +1008,18 @@ public class RunPersonBasedAccBerlin {
 		new Jobcenter("marzahn-hellersdorf", 807063.57, 5829242.13, "010_Marzahn-Hellersdorf"),        // Allee der Kosmonauten 29, 12681
 		new Jobcenter("lichtenberg", 804448.81, 5828153.84, "011_Lichtenberg"),                        // Gotlindestraße 93, 10365
 		new Jobcenter("reinickendorf", 791900.76, 5834857.02, "012_Reinickendorf")                     // Miraustraße 54, 13509
+	);
+
+	private record University(String name, double x, double y, String district) {}
+
+//	One site per university (main building / main campus), EPSG:25832.
+//	Coordinates: WGS84 of the main address (looked up 2026-11-19, accurate to ~100 m), converted with pyproj.
+	private static final List<University> UNIVERSITIES = List.of(
+		new University("fu", 791161.51, 5819555.71, "006_Steglitz-Zehlendorf"),      // FU, Kaiserswerther Str. 16-18, 14195
+		new University("hu", 798034.45, 5827706.95, "001_Mitte"),                    // HU, Unter den Linden 6, 10117
+		new University("tu", 793535.69, 5826810.07, "004_Charlottenburg-Wilmersdorf"), // TU, Straße des 17. Juni 135, 10623
+		new University("udk", 793650.65, 5826482.32, "004_Charlottenburg-Wilmersdorf"), // UdK, Hardenbergstraße 33, 10623
+		new University("charite", 796973.18, 5828277.46, "001_Mitte")               // Charité Campus Mitte, Charitéplatz 1, 10117
 	);
 
 	private record Hospital(String id, String name, double x, double y,

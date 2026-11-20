@@ -1,0 +1,68 @@
+type,id,name,x,y,district,beds,street,house_number,postal_code,gisid,source_layer
+baeder,schwimmbaeder.1,Stadtbad Mitte - James Simon,797971.1964236673,5829013.269644734,Mitte,,Gartenstraße 5,,10115,schwimmbaeder.1,baeder
+baeder,schwimmbaeder.2,Schwimmhalle Fischerinsel,798843.0358977274,5827163.476495965,Mitte,,Fischerinsel 11,,10179,schwimmbaeder.2,baeder
+baeder,schwimmbaeder.3,Kinderbad Monbijou,798198.9087475991,5828270.774477526,Mitte,,Oranienburger Straße 78,,10178,schwimmbaeder.3,baeder
+baeder,schwimmbaeder.4,Stadtbad Tiergarten,795686.1252737637,5828638.410974951,Mitte,,Seydlitzstraße 7,,10557,schwimmbaeder.4,baeder
+baeder,schwimmbaeder.7,Sommerbad Humboldthain,797085.5226990096,5830749.869473978,Mitte,,Wiesenstraße 1,,13357,schwimmbaeder.7,baeder
+baeder,schwimmbaeder.8,Strandbad Plötzensee,793384.7834275821,5830388.050012379,Mitte,,Nordufer 26,,13351,schwimmbaeder.8,baeder
+baeder,schwimmbaeder.9,Kombibad Seestraße Hallenbad,795732.341501425,5831938.483472734,Mitte,,Seestraße 80,,13347,schwimmbaeder.9,baeder
+baeder,schwimmbaeder.11,Schwimmhalle Thomas-Mann-Straße,801246.9448314284,5830727.107480119,Pankow,,Thomas-Mann-Straße 3,,10409,schwimmbaeder.11,baeder
+baeder,schwimmbaeder.12,Schwimmhalle Ernst-Thälmann-Park,800620.7037636468,5830450.4344654735,Pankow,,Lilli-Henoch-Straße 20,,10405,schwimmbaeder.12,baeder
+baeder,schwimmbaeder.15,Wellenbad am Spreewaldplatz,800802.0176959212,5825676.8255843725,Friedrichshain-Kreuzberg,,Wiener Str. 59 H,,10999,schwimmbaeder.15,baeder
+baeder,schwimmbaeder.17,Sommerbad Kreuzberg,799016.4632798582,5825528.979053804,Friedrichshain-Kreuzberg,,Prinzenstraße 113-119,,10969,schwimmbaeder.17,baeder
+baeder,schwimmbaeder.18,Stadtbad Schöneberg - Hans Rosenthal,795390.2333928787,5823854.125650247,Tempelhof-Schöneberg,,Hauptstraße 39,,10827,schwimmbaeder.18,baeder
+baeder,schwimmbaeder.19,"Sport- und Lehrschwimmhalle
+Schöneberg",795746.4063762845,5822967.022899668,Tempelhof-Schöneberg,,Sachsendamm 11,,10829,schwimmbaeder.19,baeder
+baeder,schwimmbaeder.20,Strandbad Jungfernheide,789807.8357825022,5830121.4061609665,Charlottenburg-Wilmersdorf,,Jungfernheideweg 60,,13629,schwimmbaeder.20,baeder
+baeder,schwimmbaeder.21,Stadtbad Charlottenburg -Alte Halle-,792328.9456203991,5826997.132941843,Charlottenburg-Wilmersdorf,,Krumme Straße 10,,10585,schwimmbaeder.21,baeder
+baeder,schwimmbaeder.23,Schwimmhalle Forumbad Olympiastadion,787599.5394275789,5827365.933953961,Charlottenburg-Wilmersdorf,,Hanns-Braun-Straße,,14053,schwimmbaeder.23,baeder
+baeder,schwimmbaeder.24,Sommerbad Olympiastadion,787585.0594370344,5826929.637351403,Charlottenburg-Wilmersdorf,,Olympischer Platz 3,,14053,schwimmbaeder.24,baeder
+baeder,schwimmbaeder.26,Stadtbad Spandau Nord,784322.4836900375,5831011.393219785,Spandau,,Radelandstraße 1,,13589,schwimmbaeder.26,baeder
+baeder,schwimmbaeder.27,Sommerbad Staaken-West,780159.054628347,5828436.4521979755,Spandau,,Brunsbüttler Damm 443,,13591,schwimmbaeder.27,baeder
+baeder,schwimmbaeder.28,Kombibad Spandau Süd Hallenbad,784117.9512291809,5826997.073244008,Spandau,,Gatower Straße 19,,13595,schwimmbaeder.28,baeder
+baeder,schwimmbaeder.29,Stadtbad Wilmersdorf I,792938.6440784466,5823239.175204522,Charlottenburg-Wilmersdorf,,Mecklenburgische Straße 80,,10713,schwimmbaeder.29,baeder
+baeder,schwimmbaeder.30,Stadtbad Wilmersdorf II,791987.4403523125,5823792.507732408,Charlottenburg-Wilmersdorf,,Fritz-Wildung-Straße 7,,14199,schwimmbaeder.30,baeder
+baeder,schwimmbaeder.31,Sommerbad Wilmersdorf,792096.3452004071,5823332.2945609735,Charlottenburg-Wilmersdorf,,Forckenbeckstraße 14,,14199,schwimmbaeder.31,baeder
+baeder,schwimmbaeder.32,Strandbad Halensee,790712.9553657413,5824614.5723012835,Charlottenburg-Wilmersdorf,,Koenigsallee 5 a-b,,14193,schwimmbaeder.32,baeder
+baeder,schwimmbaeder.34,Schwimmhalle Hüttenweg ,789940.9875141934,5820077.432468109,Steglitz-Zehlendorf,,Hüttenweg 41,,14195,schwimmbaeder.34,baeder
+baeder,schwimmbaeder.35,Strandbad Wannsee,784046.2936086887,5817993.720014421,Steglitz-Zehlendorf,,Wannseebadweg 25,,14129,schwimmbaeder.35,baeder
+baeder,schwimmbaeder.36,Paracelsus-Bad,794525.2335315726,5833931.946061661,Reinickendorf,,Roedernallee 200-204,,13407,schwimmbaeder.36,baeder
+baeder,schwimmbaeder.38,Stadtbad Märkisches Viertel,794771.6094560954,5836522.652671337,Reinickendorf,,Wilhelmsruher Damm 142d,,13439,schwimmbaeder.38,baeder
+baeder,schwimmbaeder.39,Strandbad Lübars,793432.1896629564,5838630.187656012,Reinickendorf,,Am Freibad 9,,13469,schwimmbaeder.39,baeder
+baeder,schwimmbaeder.40,Strandbad Tegeler See,787537.7675786885,5833828.217833751,Reinickendorf,,Schwarzer Weg 95,,13505,schwimmbaeder.40,baeder
+baeder,schwimmbaeder.42,Stadtbad Lankwitz,795154.6968371263,5819070.485020779,Steglitz-Zehlendorf,,Leonorenstraße 39,,12247,schwimmbaeder.42,baeder
+baeder,schwimmbaeder.43,Schwimmhalle Finckensteinallee,792129.6253763118,5817772.494258941,Steglitz-Zehlendorf,,Finckensteinallee 73,,12205,schwimmbaeder.43,baeder
+baeder,schwimmbaeder.45,Sommerbad am Insulaner,795615.1089857952,5820655.844159792,Steglitz-Zehlendorf,,Munsterdamm 80,,12169,schwimmbaeder.45,baeder
+baeder,schwimmbaeder.46,Stadtbad Tempelhof,798131.3025527039,5821702.562928509,Tempelhof-Schöneberg,,Götzstraße 14-18,,12099,schwimmbaeder.46,baeder
+baeder,schwimmbaeder.47,Kombibad Mariendorf - Hallenbad,799251.892766387,5816884.533116671,Tempelhof-Schöneberg,,Ankogelweg 95,,12107,schwimmbaeder.47,baeder
+baeder,schwimmbaeder.48,Sommerbad Mariendorf,798805.345967029,5819489.561366063,Tempelhof-Schöneberg,,Rixdorfer Straße 130,,12109,schwimmbaeder.48,baeder
+baeder,schwimmbaeder.49,Stadtbad Neukölln,801446.9890528983,5823609.133093363,Neukölln,,Ganghofer Straße 3,,12043,schwimmbaeder.49,baeder
+baeder,schwimmbaeder.50,Sportbad Britz,804038.5703729696,5819408.061361109,Neukölln,,Kleiberweg 3,,12359,schwimmbaeder.50,baeder
+baeder,schwimmbaeder.51,Sommerbad Neukölln,799890.2433209075,5823633.222215606,Neukölln,,Columbiadamm 160,,10965,schwimmbaeder.51,baeder
+baeder,schwimmbaeder.52,Kombibad Gropiusstadt - Hallenbad,803824.4249646277,5818028.933989249,Neukölln,,Lipschitzallee 27-33,,12351,schwimmbaeder.52,baeder
+baeder,schwimmbaeder.54,Schwimmhalle Baumschulenweg,805203.9833530704,5822839.216929485,Treptow-Köpenick,,Neue Krugallee 209,,12437,schwimmbaeder.54,baeder
+baeder,schwimmbaeder.56,Strandbad Friedrichshagen,814632.9997489885,5820790.571866415,Treptow-Köpenick,,Müggelseedamm 216,,12587,schwimmbaeder.56,baeder
+baeder,schwimmbaeder.58,Strandbad Wendenschloss,812739.3421070452,5817199.868152431,Treptow-Köpenick,,Möllhausenufer 30,,12557,schwimmbaeder.58,baeder
+baeder,schwimmbaeder.59,Strandbad Grünau,813287.2323919436,5816505.688890448,Treptow-Köpenick,,Sportpromenade 9,,12527,schwimmbaeder.59,baeder
+baeder,schwimmbaeder.60,Kleine Schwimmhalle Wuhlheide,808352.4344923038,5821906.046817167,Treptow-Köpenick,,An der Wuhlheide 161,,12459,schwimmbaeder.60,baeder
+baeder,schwimmbaeder.61,Schwimmhalle Allendeviertel,811747.2185610505,5820149.49960266,Treptow-Köpenick,,Pablo-Neruda-Straße 5,,12559,schwimmbaeder.61,baeder
+baeder,schwimmbaeder.62,Sommerbad Wuhlheide,806901.522128121,5822953.023530187,Treptow-Köpenick,,Treskowallee 211,,12459,schwimmbaeder.62,baeder
+baeder,schwimmbaeder.64,Schwimmhalle Sewanstraße,806496.4028422483,5825759.732607638,Lichtenberg,,Sewanstraße 229,,10319,schwimmbaeder.64,baeder
+baeder,schwimmbaeder.65,Schwimmhalle Anton-Saefkow-Platz,803283.1482162826,5829472.639772168,Lichtenberg,,Anton-Saefkow-Platz 1,,10369,schwimmbaeder.65,baeder
+baeder,schwimmbaeder.67,Strandbad Weißensee,802683.988140075,5832027.412150758,Pankow,,Berliner Allee 155,,13088,schwimmbaeder.67,baeder
+baeder,schwimmbaeder.68,Schwimmhalle Buch,803951.5317160927,5840450.864133298,Pankow,,Wolfgang-Heinz-Straße 41,,13125,schwimmbaeder.68,baeder
+baeder,schwimmbaeder.70,Sommerbad Pankow,798987.9663777339,5834239.12045002,Pankow,,"Wolfshagener Straße 91-93
+",,13187,schwimmbaeder.70,baeder
+baeder,schwimmbaeder.71,"Schwimmhalle Helene-Weigel-Platz ""Helmut Behrendt""",808014.517349844,5829460.221442886,Marzahn-Hellersdorf,,Helene-Weigel-Platz 9,,12681,schwimmbaeder.71,baeder
+baeder,schwimmbaeder.72,Kinderbad Marzahn (Platsch),809277.4609373955,5832202.464659004,Marzahn-Hellersdorf,,Max-Herrmann-Straße 7,,12687,schwimmbaeder.72,baeder
+baeder,schwimmbaeder.73,Strandbad Orankesee,803979.0969882088,5831621.641203161,Lichtenberg,,Gertrudstraße 7,,13053,schwimmbaeder.73,baeder
+baeder,schwimmbaeder.74,Schwimmhalle Zingster Straße,805137.0258868096,5833558.675413738,Lichtenberg,,Zingster Straße 16,,13051,schwimmbaeder.74,baeder
+baeder,schwimmbaeder.75,"Schwimmhalle Sportforum 
+Hohenschönhausen",803272.2948403519,5830599.746427168,Lichtenberg,,Fritz-Lesch-Straße 24,,13053,schwimmbaeder.75,baeder
+baeder,schwimmbaeder.76,Schwimmhalle Kaulsdorf,811044.2636830611,5828876.833994914,Marzahn-Hellersdorf,,Clara-Zetkin-Weg 13,,12619,schwimmbaeder.76,baeder
+baeder,schwimmbaeder.79,SSE  /  Schwimm- und Sprunghalle im Europasportpark ,801978.958617447,5829217.808707749,Pankow,,Paul-Heyse-Straße 26,,10407,schwimmbaeder.79,baeder
+baeder,schwimmbaeder.81,Schwimmhalle Kreuzberg,798771.2870279591,5825557.842798478,Friedrichshain-Kreuzberg,,Gitschiner Straße 18,,10969,schwimmbaeder.81,baeder
+baeder,schwimmbaeder.91,Kombibad Seestraße - Sommerbad,795636.9271816008,5831957.916078556,Mitte,,Seestraße 80,,13347,schwimmbaeder.91,baeder
+baeder,schwimmbaeder.281,Kombibad Spandau Süd - Sommerbad,784119.5889607647,5826944.302822685,Spandau,,Gatower Straße 19,,13595,schwimmbaeder.281,baeder
+baeder,schwimmbaeder.471,Kombibad Mariendorf - Sommerbad ,799347.890788405,5816879.568663723,Tempelhof-Schöneberg,,Ankogelweg 95,,12107,schwimmbaeder.471,baeder
+baeder,schwimmbaeder.521,Kombibad Gropiusstadt - Sommerbad,803888.9115526995,5817987.631941371,Neukölln,,Lipschitzallee 27-33,,12351,schwimmbaeder.521,baeder

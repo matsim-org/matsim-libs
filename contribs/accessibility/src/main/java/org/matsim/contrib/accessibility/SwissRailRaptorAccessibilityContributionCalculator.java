@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
@@ -64,6 +65,10 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 	private final double teleportedWalkSpeed_m_s;
 	private final AccessibilityConfigGroup acg;
 
+	private final double ptDailyMonetaryConstant;
+	private final double marginalUtilityOfMoney;
+	private final Double globalAverageIncome;
+
 	Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
     Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
@@ -73,15 +78,20 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 
 
     public SwissRailRaptorAccessibilityContributionCalculator(String mode, ScoringConfigGroup scoringConfigGroup, Scenario scenario, TripRouter tripRouter) {
+		this(mode, scoringConfigGroup, scenario, tripRouter, createRaptorData(scenario));
+	}
+
+	/**
+	 * The timetable data (SwissRailRaptorData) is read-only and can be shared by all threads;
+	 * only the SwissRailRaptor router itself is per thread. Sharing it avoids one full copy of
+	 * the timetable (incl. ~10 million transfers for Berlin) per thread, which otherwise runs
+	 * out of memory on machines with many cores.
+	 */
+	private SwissRailRaptorAccessibilityContributionCalculator(String mode, ScoringConfigGroup scoringConfigGroup, Scenario scenario,
+															   TripRouter tripRouter, SwissRailRaptorData raptorData) {
 		this.mode = mode;
 
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		Network ptNetwork = scenario.getNetwork();
-
-		RaptorStaticConfig raptorConfig = RaptorUtils.createStaticConfig(scenario.getConfig());
-		raptorConfig.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-			this.raptorData = SwissRailRaptorData.create(schedule, null, raptorConfig, ptNetwork, null);
-
+		this.raptorData = raptorData;
 		this.raptor = new SwissRailRaptor.Builder(raptorData, scenario.getConfig()).build();
 		this.scoringConfigGroup = scoringConfigGroup;
 		this.scenario = scenario;
@@ -94,6 +104,19 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 //		this.acg = ConfigUtils.addOrGetModule(this.scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class); this or the next one
 		acg = (AccessibilityConfigGroup) this.scenario.getConfig().getModules().get(AccessibilityConfigGroup.GROUP_NAME);
 
+		this.ptDailyMonetaryConstant = scoringConfigGroup.getModes().get(mode).getDailyMonetaryConstant();
+		this.marginalUtilityOfMoney = scoringConfigGroup.getMarginalUtilityOfMoney();
+
+		// reference income for the income-dependent marginal utility of money, as in the car calculator
+		if (acg.isPersonBased()) {
+			this.globalAverageIncome = scenario.getPopulation().getPersons().values().stream()
+				.filter(person -> PersonUtils.getIncome(person) != null)
+				.mapToDouble(PersonUtils::getIncome)
+				.filter(dd -> dd > 0)
+				.average().getAsDouble();
+		} else {
+			this.globalAverageIncome = null;
+		}
 	}
 
 
@@ -160,6 +183,18 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
         double expSum = 0.;
 
 		Person person = null;
+
+		// optional fixed monetary costs of a pt trip (daily monetary constant), weighted by the
+		// income-dependent marginal utility of money; the same for every destination of this origin
+		double utilityPtFixedMonetary = 0.;
+		if (acg.isIncludeDailyMonetaryConstant()) {
+			double incomeFactor = 1.;
+			if (acg.isPersonBased()) {
+				Person originPerson = (Person) origin.getAttributes().getAttribute("person");
+				incomeFactor = this.globalAverageIncome / PersonUtils.getIncome(originPerson);
+			}
+			utilityPtFixedMonetary = this.ptDailyMonetaryConstant * this.marginalUtilityOfMoney * incomeFactor;
+		}
         final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null, new AttributesImpl());
 
         for (final AggregationObject destination : aggregatedOpportunities.values()) {
@@ -193,7 +228,7 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 					double egressWalkTime_h = egressWalkLeg.getTravelTime().seconds() / 3600;
 					double egressWalkDist_m = egressWalkLeg.getRoute().getDistance();
 					double utilityEgressWalk = egressWalkTime_h * betaWalkTT_h + egressWalkDist_m * betaWalkDist_m;
-					double utility = -travelInfo.accessCost - travelInfo.travelCost  - travelInfo.waitingCost + utilityEgressWalk + ascPt;
+					double utility = -travelInfo.accessCost - travelInfo.travelCost  - travelInfo.waitingCost + utilityEgressWalk + ascPt + utilityPtFixedMonetary;
 					travelUtility = Math.max(travelUtility, utility);
                 }
             }
@@ -208,10 +243,19 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 	}
 
 
+	private static SwissRailRaptorData createRaptorData(Scenario scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		Network ptNetwork = scenario.getNetwork();
+
+		RaptorStaticConfig raptorConfig = RaptorUtils.createStaticConfig(scenario.getConfig());
+		raptorConfig.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
+		return SwissRailRaptorData.create(schedule, null, raptorConfig, ptNetwork, null);
+	}
+
 	@Override
 	public SwissRailRaptorAccessibilityContributionCalculator duplicate() {
 		SwissRailRaptorAccessibilityContributionCalculator swissRailRaptorAccessibilityContributionCalculator =
-				new SwissRailRaptorAccessibilityContributionCalculator(this.mode, this.scoringConfigGroup, this.scenario, this.tripRouter);
+				new SwissRailRaptorAccessibilityContributionCalculator(this.mode, this.scoringConfigGroup, this.scenario, this.tripRouter, this.raptorData);
         swissRailRaptorAccessibilityContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
         swissRailRaptorAccessibilityContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
         swissRailRaptorAccessibilityContributionCalculator.stopsPerAggregatedOpportunity = this.stopsPerAggregatedOpportunity;

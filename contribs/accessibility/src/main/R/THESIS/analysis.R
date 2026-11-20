@@ -16,21 +16,21 @@ suppressPackageStartupMessages({
 # Directories
 # ==========================================================
 
-base_dir     <- "../public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-16-v6.4-spa-hosp-jobcenter/"
-# input_dir    <- base_dir
+base_dir     <- "/home/brendan/Documents/arbeit/abmtrans_paper/2026-11-19-v6.4-spa-uni-jobcenter-NoMonConstant"
+input_dir    <- base_dir
 
 # Berlin district shapefile and S-Bahn ring: static files kept in the repo,
 # independent of where the run folders are.
 shape_dir <- path.expand(
-  "contribs/accessibility/src/main/R/THESIS/input/Berlin shapefiles"
+  "~/git/matsim-libs/contribs/accessibility/src/main/R/THESIS/input/Berlin shapefiles"
 )
 
 # Run folders from the cluster, one per scenario, as written by
 # run-person-based-acc-berlin-<scenario>.sh: <date>[a-z]-<scenario>/<opportunity>/...
 # Change the folder names here when you use results from another day or rerun.
 run_dirs <- list(
-  base   = file.path("../public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-16-v6.4-spa-hosp-jobcenter/2026-11-16-base"),
-  policy = file.path("../public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-16-v6.4-spa-hosp-jobcenter/2026-11-16-policy")
+  base   = file.path(input_dir, "2026-11-19-base"),
+  policy = file.path(input_dir, "2026-11-19-policy")
 )
 
 # Results go to output/<date>-output/, named after the policy run folder,
@@ -46,7 +46,7 @@ if (length(missing_run_dirs) > 0) {
 # Opportunities to analyse in one go. The whole analysis below runs once per
 # entry. Any of: "hospital", "spa", "baeder", "jobCenter".
 # Use a single entry, e.g. c("baeder"), to run just one.
-opportunities <- c("hospital", "spa", "jobCenter")
+opportunities <- c("university", "spa", "jobCenter")
 
 # Metadata for every POI type written by RunPersonBasedAccBerlin.
 # The list names are the input/output folder names; `type` is the value in
@@ -60,8 +60,8 @@ poi_meta <- list(
     type = "spa", label = "Spa",
     color = "#e31a1c", shape = 17, label_points = TRUE
   ),
-  baeder = list(
-    type = "baeder", label = "Public bath",
+  university = list(
+    type = "university", label = "Public University",
     color = "#33a02c", shape = 15, label_points = TRUE
   ),
   jobCenter = list(
@@ -89,21 +89,18 @@ beta <- 1
 # Read input data
 # ==========================================================
 
-# Income is a continuous value per person, so it is grouped into five
-# equal-sized groups (quintiles), labelled with their income range,
-# e.g. "249-1167", "1168-1571", ... Persons with the same income always land
-# in the same group, so the groups are only approximately equal in size.
-income_quintile <- function(income) {
-  breaks <- unique(quantile(income, probs = seq(0, 1, 0.2), na.rm = TRUE, names = FALSE))
-  if (length(breaks) < 2) {
-    return(factor(rep(NA_character_, length(income)), ordered = TRUE))
-  }
-  n      <- length(breaks) - 1
-  lower  <- c(floor(breaks[1]), floor(breaks[2:n]) + 1)[seq_len(n)]
-  upper  <- floor(breaks[-1])
-  labels <- paste0(lower, "-", upper)
-  cut(income, breaks = breaks, labels = labels, include.lowest = TRUE, ordered_result = TRUE)
-}
+# Income is a continuous value per person. It is grouped into the same nine
+# brackets used in the earlier analysis. Each bracket is labelled with its
+# upper bound: "500" = up to 500, "900" = 501-900, ..., "4600" = 3601-4600,
+# and "5600" = everything above 4600.
+income_breaks <- c(-Inf, 500, 900, 1500, 2000, 2600, 3000, 3600, 4600, Inf)
+income_labels <- c("500", "900", "1500", "2000", "2600", "3000", "3600", "4600", "5600")
+
+income_group <- function(income) {
+  cut(income, breaks = income_breaks, labels = income_labels,
+      right = TRUE, ordered_result = TRUE)
+}  
+
 
 clean_df <- function(df){
   df %>%
@@ -116,7 +113,7 @@ clean_df <- function(df){
       ),
       accessibility = as.numeric(accessibility),
       income_raw = as.numeric(income),
-      income = income_quintile(income_raw)
+      income = income_group(income_raw)
     )
 }
 
@@ -933,43 +930,6 @@ join_persons_mm <- function(base = "base", policy = "policy") {
   join_base_policy(base_df, policy_df)
 }
 
-plot_mm_ecdf <- function(persons) {
-  ecdf_data <- persons %>%
-    filter(is.finite(logSum_base), is.finite(logSum_policy)) %>%
-    select(Base = logSum_base, Policy = logSum_policy) %>%
-    pivot_longer(everything(), names_to = "scenario", values_to = "accessibility") %>%
-    mutate(scenario = factor(scenario, levels = c("Base", "Policy")))
-  x_min <- quantile(ecdf_data$accessibility, 0.01, names = FALSE)
-
-  ggplot(ecdf_data, aes(accessibility, colour = scenario, linetype = scenario)) +
-    geom_hline(yintercept = c(0.1, 0.5, 0.9), colour = "grey80", linetype = "dotted") +
-    geom_vline(xintercept = c(-6, -3), colour = "grey65", linetype = "dashed") +
-    stat_ecdf(geom = "step", linewidth = 1) +
-    scale_colour_manual(values = c(Base = "#434343", Policy = "#2166ac")) +
-    scale_y_continuous(labels = scales::label_percent(), limits = c(0, 1)) +
-    coord_cartesian(xlim = c(x_min, NA), expand = FALSE) +
-    labs(
-      x = "Multimodal accessibility (utils)",
-      y = "Cumulative share of persons",
-      colour = NULL, linetype = NULL,
-      title = poi$label, subtitle = "Walk + PT + car; departure at 08:00"
-    ) +
-    theme_minimal(base_size = 14) +
-    theme(legend.position = "bottom")
-}
-
-mm_persons <- join_persons_mm()
-if (!is.null(mm_persons)) {
-  ecdf_mm_base_vs_policy <- plot_mm_ecdf(mm_persons)
-  ggsave(
-    file.path(output_dir, "ecdf_mm_base_vs_policy.png"),
-    ecdf_mm_base_vs_policy,
-    dpi = 300, width = 8, height = 6
-  )
-}
-
-ecdf_mm_base_vs_policy
-
 # Car base vs policy (same function works for "pt" and "teleportedWalk")
 car_persons <- join_persons("car")
 
@@ -987,6 +947,14 @@ if (!is.null(car_persons)) {
 # One point per person at their home location, coloured by the signed
 # accessibility change between the policy and base scenario (log scale,
 # i.e. delta from join_persons()). Works for any mode with both person files.
+
+# POI locations as an overlay on maps: white points with a black outline, so
+# they stay visible on any colour scale. Returns NULL (no layer) without data.
+poi_overlay <- function(locations) {
+  if (is.null(locations) || nrow(locations) == 0) return(NULL)
+  geom_sf(data = locations, shape = 21, fill = "white", colour = "black",
+          size = 2.4, stroke = 0.7, inherit.aes = FALSE)
+}
 
 plot_person_delta_map <- function(mode,
                                   base = "base",
@@ -1041,6 +1009,7 @@ plot_person_delta_map <- function(mode,
       size = 0.4,
       alpha = 0.7
     ) +
+    poi_overlay(locations_sf) +
     scale_color_gradient2(
       low = "#b2182b",
       mid = "grey92",
@@ -1087,6 +1056,55 @@ for (mode in c("car", "pt", "teleportedWalk", "mm")) {
       bg = "white"
     )
   }
+}
+
+# ==========================================================
+# ECDF of multimodal accessibility: base vs policy
+# ==========================================================
+
+plot_mm_ecdf <- function(persons) {
+  # join_persons_mm() returns raw sums; build the log sums if they're not there yet
+  if (!all(c("logSum_base", "logSum_policy") %in% names(persons))) {
+    persons <- persons %>%
+      mutate(
+        logSum_base   = log(accessibility_base) / beta,
+        logSum_policy = log(accessibility_policy) / beta
+      )
+  }
+  
+  ecdf_data <- persons %>%
+    filter(is.finite(logSum_base), is.finite(logSum_policy)) %>%
+    select(Base = logSum_base, Policy = logSum_policy) %>%
+    pivot_longer(everything(), names_to = "scenario", values_to = "accessibility") %>%
+    mutate(scenario = factor(scenario, levels = c("Base", "Policy")))
+  x_min <- quantile(ecdf_data$accessibility, 0.01, names = FALSE)
+  
+  ggplot(ecdf_data, aes(accessibility, colour = scenario, linetype = scenario)) +
+    geom_hline(yintercept = c(0.1, 0.5, 0.9), colour = "grey80", linetype = "dotted") +
+    geom_vline(xintercept = c(-6, -3), colour = "grey65", linetype = "dashed") +
+    stat_ecdf(geom = "step", linewidth = 1) +
+    scale_colour_manual(values = c(Base = "#434343", Policy = "#2166ac")) +
+    scale_y_continuous(labels = scales::label_percent(), limits = c(0, 1)) +
+    coord_cartesian(xlim = c(x_min, NA), expand = FALSE) +
+    labs(
+      x = "Multimodal accessibility (utils)",
+      y = "Cumulative share of persons",
+      colour = NULL, linetype = NULL,
+      title = poi$label, subtitle = "Walk + PT + car; departure at 08:00"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "bottom")
+}
+
+mm_persons <- join_persons_mm()
+if (!is.null(mm_persons)) {
+  ecdf_mm_base_vs_policy <- plot_mm_ecdf(mm_persons)
+  ggsave(
+    file.path(output_dir, "ecdf_mm_base_vs_policy.png"),
+    ecdf_mm_base_vs_policy,
+    dpi = 300, width = 8, height = 6
+  )
+  print(ecdf_mm_base_vs_policy)
 }
 
 # ---- end of per-opportunity analysis ----

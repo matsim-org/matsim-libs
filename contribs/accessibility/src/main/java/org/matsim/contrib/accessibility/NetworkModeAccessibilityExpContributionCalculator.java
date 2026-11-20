@@ -50,6 +50,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 
 	private final AccessibilityConfigGroup acg;
 
+	private final double carDailyMonetaryConstant;
 
 	private Network subNetwork;
 
@@ -100,6 +101,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 		// drt params
 		this.betaCarTT_h = scoringConfigGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 		this.betaCarDist_m = scoringConfigGroup.getModes().get(TransportMode.car).getMarginalUtilityOfDistance();
+		this.carDailyMonetaryConstant = scoringConfigGroup.getModes().get(TransportMode.car).getDailyMonetaryConstant();
 
 		// euros per meter
 		this.betaCarDistMonetary_m = scoringConfigGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
@@ -223,7 +225,10 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 
 				double incomeFactor = this.globalAverageIncome / PersonUtils.getIncome((Person) origin.getAttributes().getAttribute("person"));
 
-				double utilityDistCarMonetary = distCar * betaCarDistMonetary_m * marginalUtilityOfMoney * incomeFactor;//distance * monetary distance rate * marginal utility of money
+				// monetary costs of the trip (Nagel et al., eq. 2): fixed costs (optional daily monetary constant)
+				// plus distance-based costs, weighted by the income-dependent marginal utility of money
+				double fixedCarCosts = acg.isIncludeDailyMonetaryConstant() ? this.carDailyMonetaryConstant : 0.;
+				double utilityDistCarMonetary = (fixedCarCosts + distCar * betaCarDistMonetary_m) * marginalUtilityOfMoney * incomeFactor;
 
 				congestedCarUtility = utilityTimeCar + utilityDistCar + utilityDistCarMonetary;
 				//			CharyparNagelScoringFunctionFactory fac = new CharyparNagelScoringFunctionFactory(scenario);

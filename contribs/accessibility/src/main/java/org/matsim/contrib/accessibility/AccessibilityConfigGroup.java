@@ -65,6 +65,9 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private static final String USE_PARALLELIZATION = "useParallelization";
 	private boolean useParallelization = true;
 
+	private static final String INCLUDE_DAILY_MONETARY_CONSTANT = "includeDailyMonetaryConstant";
+	private boolean includeDailyMonetaryConstant = false;
+
 //	private static final String ACCESSIBILITY_DESTINATION_SAMPLING_RATE = "accessibilityDestinationSamplingRate";
 //	private Double accessibilityDestinationSamplingRate;
 
@@ -155,6 +158,9 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 //				"(reduces accuracy -- not recommended except when necessary for computational speed reasons)");
 
 		map.put(ACCESSIBILITY_MEASURE_TYPE, "defines type of measure for accessibility computation.");
+
+		map.put(INCLUDE_DAILY_MONETARY_CONSTANT, "if true, the mode's dailyMonetaryConstant (scoring modeParams) is added to the " +
+			"monetary costs of every car and pt trip, weighted by the (income-dependent) marginal utility of money. Default: false");
 
 		map.put(USING_CUSTOM_BOUNDING_BOX, "true if custom bounding box should be used for accessibility computation (otherwise e.g. extent of network will be used)");
 		map.put(BOUNDING_BOX_BOTTOM,"custom bounding box parameters for accessibility computation (if enabled)");
@@ -280,6 +286,16 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     	this.useOpportunityWeights = useOpportunityWeights;
 	    return this;
     }
+
+	@StringGetter(INCLUDE_DAILY_MONETARY_CONSTANT)
+	public boolean isIncludeDailyMonetaryConstant() {
+		return includeDailyMonetaryConstant;
+	}
+	@StringSetter(INCLUDE_DAILY_MONETARY_CONSTANT)
+	public AccessibilityConfigGroup setIncludeDailyMonetaryConstant(boolean includeDailyMonetaryConstant) {
+		this.includeDailyMonetaryConstant = includeDailyMonetaryConstant;
+		return this;
+	}
 
 	// yyyy change the following Boolean to an enum
 	@StringGetter(USE_PARALLELIZATION)
