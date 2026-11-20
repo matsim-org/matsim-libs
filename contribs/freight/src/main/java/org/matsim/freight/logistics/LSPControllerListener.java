@@ -110,6 +110,9 @@ class LSPControllerListener
 			// simulation trackers of shipments:
 			for (LspShipment lspShipment : lsp.getLspShipments()) {
 				registerSimulationTrackers(lspShipment);
+				// The shipment log records what happens to the shipment in the mobsim of this iteration.  Entries from
+				// the previous iteration are removed, otherwise those that are not overwritten would remain.
+				lspShipment.getShipmentLog().clear();
 			}
 
 			// simulation trackers of logistic chains:

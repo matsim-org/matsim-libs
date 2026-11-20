@@ -28,7 +28,7 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
-import org.matsim.freight.logistics.LogisticChain;
+import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
@@ -61,13 +61,9 @@ public class AssignmentStrategyFactory {
           @Override
           public void handlePlan(LSPPlan lspPlan) {
 
-            // The shipment plans and the waiting shipments of the chain elements are reset by LSP#scheduleLogisticChains.
-            for (LogisticChain chain : lspPlan.getLogisticChains()) {
-              chain.getLspShipmentIds().clear();
-            }
+            LSPUtils.clearShipmentAssignments(lspPlan);
 
             for (LspShipment lspShipment : lspPlan.getLSP().getLspShipments()) {
-              lspShipment.getShipmentLog().clear();
               lspPlan.getInitialShipmentAssigner().assignToPlan(lspPlan, lspShipment);
             }
           }

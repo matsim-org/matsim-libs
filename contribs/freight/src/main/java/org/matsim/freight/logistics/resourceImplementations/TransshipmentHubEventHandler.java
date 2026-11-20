@@ -221,7 +221,7 @@ import org.matsim.freight.logistics.shipment.*;
 					.setEndTime(endTime)
 					.setLogisticsChainElement(servicesWaitedFor.get(carrierService).logisticChainElement)
 					.build();
-			Id<LspShipmentPlanElement> loadId = Id.create(handle.getResourceId() + String.valueOf(handle.getLogisticChainElement().getId()) + handle.getElementType(), LspShipmentPlanElement.class);
+			Id<LspShipmentPlanElement> loadId = LspShipmentUtils.createPlanElementId(handle);
 			if (!lspShipment.getShipmentLog().getPlanElements().containsKey(loadId)) {
 				lspShipment.getShipmentLog().addPlanElement(loadId, handle);
 			}

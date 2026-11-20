@@ -157,6 +157,20 @@ public final class LSPUtils {
 	}
 
 	/**
+	 * Removes the assignment of all shipments to the {@link LogisticChain}s of the given plan, i.e. empties
+	 * {@link LogisticChain#getLspShipmentIds()} of each chain. To be called by replanning strategies before
+	 * they assign the shipments anew.
+	 *
+	 * <p>The shipment plans and the waiting shipments of the chain elements are not changed here; they are
+	 * reset by {@link LSP#scheduleLogisticChains()}.
+	 */
+	public static void clearShipmentAssignments(LSPPlan lspPlan) {
+		for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+			logisticChain.getLspShipmentIds().clear();
+		}
+	}
+
+	/**
 	 * Hands each {@link LspShipment} of the selected plan of the given {@link LSP} over to the incoming
 	 * shipments of the first {@link LogisticChainElement} of the {@link LogisticChain} it is assigned to.
 	 * This is the first step of a forward {@link LogisticChainScheduler}.
@@ -287,9 +301,7 @@ public final class LSPUtils {
 		// Clear the existing shipments and plans in the LSP
 		for (LSPPlan lspPlan : lsp.getPlans()) {
 			lspPlan.getShipmentPlans().clear();
-			for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-				logisticChain.getLspShipmentIds().clear();
-			}
+			clearShipmentAssignments(lspPlan);
 		}
 		lsp.getLspShipments().clear();
 

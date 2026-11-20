@@ -57,13 +57,9 @@ import org.matsim.freight.logistics.shipment.LspShipment;
           public void handlePlan(LSPPlan plan) {
             plan.setInitialShipmentAssigner(assigner);
 
-            // The shipment plans and the waiting shipments of the chain elements are reset by LSP#scheduleLogisticChains.
-            for (LogisticChain chain : plan.getLogisticChains()) {
-              chain.getLspShipmentIds().clear();
-            }
+            LSPUtils.clearShipmentAssignments(plan);
 
             for (LspShipment lspShipment : plan.getLSP().getLspShipments()) {
-              lspShipment.getShipmentLog().clear();
               plan.getInitialShipmentAssigner().assignToPlan(plan, lspShipment);
             }
           }
