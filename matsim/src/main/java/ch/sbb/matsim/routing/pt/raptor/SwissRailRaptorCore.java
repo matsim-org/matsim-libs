@@ -51,6 +51,7 @@ import java.util.*;
  */
 public class SwissRailRaptorCore {
     private final SwissRailRaptorData data;
+    private final RaptorTimetable timetable;
 
     private final PathElement[] arrivalPathPerRouteStop;
     private final double[] egressCostsPerRouteStop;
@@ -75,6 +76,7 @@ public class SwissRailRaptorCore {
 
     SwissRailRaptorCore(SwissRailRaptorData data, RaptorInVehicleCostCalculator inVehicleCostCalculator, RaptorTransferCostCalculator transferCostCalculator) {
         this.data = data;
+        this.timetable = data.scheduleTimetable;
         this.arrivalPathPerRouteStop = new PathElement[data.countRouteStops];
         this.egressCostsPerRouteStop = new double[data.countRouteStops];
         this.leastArrivalCostAtRouteStop = new double[data.countRouteStops];
@@ -185,11 +187,10 @@ public class SwissRailRaptorCore {
                 }
 
                 RRoute route = this.data.routes[routeStop.transitRouteIndex];
-                int depOffset = routeStop.departureOffset;
 
                 int departureIndex = findNextDepartureIndex(route, routeStop, arrivalTime);
                 if (departureIndex >= 0) {
-                    int nextDepartureTimeAtStop = this.data.departures[departureIndex] + depOffset;
+                    int nextDepartureTimeAtStop = this.timetable.getDepartureTime(departureIndex, routeStop);
                     int waitingTime = nextDepartureTimeAtStop - arrivalTime;
                     double waitingCost = waitingTime * -parameters.getMarginalUtilityOfWaitingPt_utl_s();
 
@@ -350,10 +351,8 @@ public class SwissRailRaptorCore {
                         continue;
                     }
                     RRoute route = this.data.routes[routeStop.transitRouteIndex];
-                    int depOffset = routeStop.departureOffset;
                     for (int depIndex = route.indexFirstDeparture; depIndex < route.indexFirstDeparture + route.countDepartures; depIndex++) {
-                        int depTimeAtStart = this.data.departures[depIndex];
-                        int depTimeAtStop = depTimeAtStart + depOffset;
+                        int depTimeAtStop = this.timetable.getDepartureTime(depIndex, routeStop);
                         if (depTimeAtStop >= earliestTimeAtStop && depTimeAtStop <= latestTimeAtStop) {
                             double costOffset = (depTimeAtStop - earliestTimeAtStop) * marginalUtilityOfWaitingPt_utl_s;
                             departures.add(new DepartureAtRouteStop(routeStop, routeStopIndex, depIndex, depTimeAtStop, costOffset, accessStop));
@@ -541,8 +540,7 @@ public class SwissRailRaptorCore {
 								RRoute route = this.data.routes[routeIndex];
 								int currentDepartureIndex = findNextDepartureIndex(route, routeStop, (int) depTime);
 								if (currentDepartureIndex >= 0) {
-									int firstDepartureTime = this.data.departures[currentDepartureIndex];
-									int stopDepartureTime = firstDepartureTime + routeStop.departureOffset;
+									int stopDepartureTime = this.timetable.getDepartureTime(currentDepartureIndex, routeStop);
 									useStop = Math.abs(depTime - stopDepartureTime) < 1e-5;
 								} else {
 									useStop = false;
@@ -714,12 +712,11 @@ public class SwissRailRaptorCore {
 		boolean useTransportModeUtilities = parameters.isUseTransportModeUtilities();
 
 		Vehicle currentVehicle = this.data.departureVehicles[currentDepartureIndex];
-		int currentDepartureTime = this.data.departures[currentDepartureIndex];
 		int currentAgentBoardingTime;
 		double currentTravelCostWhenBoarding;
 		double currentTransferCostWhenBoarding;
 		{
-			int vehicleArrivalTime = currentDepartureTime + firstRouteStop.arrivalOffset;
+			int vehicleArrivalTime = this.timetable.getArrivalTime(currentDepartureIndex, firstRouteStop);
 			currentAgentBoardingTime = Math.max(agentFirstArrivalTime, vehicleArrivalTime);
 			int waitingTime = currentAgentBoardingTime - agentFirstArrivalTime;
 			double waitingCost = -marginalUtilityOfWaitingPt_utl_s * waitingTime;
@@ -755,8 +752,8 @@ public class SwissRailRaptorCore {
 			if (!toRouteStop.routeStop.isAllowAlighting()) {
 				continue;
 			}
-			this.routeSegmentIterator.reset(currentDepartureIndex, currentAgentBoardingTime, currentBoardingRouteStopIndex, toRouteStopIndex);
-			int arrivalTime = currentDepartureTime + toRouteStop.arrivalOffset;
+			this.routeSegmentIterator.reset(this.timetable, currentDepartureIndex, currentAgentBoardingTime, currentBoardingRouteStopIndex, toRouteStopIndex);
+			int arrivalTime = this.timetable.getArrivalTime(currentDepartureIndex, toRouteStop);
 			int inVehicleTime = arrivalTime - currentAgentBoardingTime;
 			double inVehicleCost = this.inVehicleCostCalculator.getInVehicleCost(inVehicleTime, marginalUtilityOfTravelTime_utl_s, person, currentVehicle, parameters, routeSegmentIterator);
 			double arrivalTravelCost = currentTravelCostWhenBoarding + inVehicleCost;
@@ -768,7 +765,7 @@ public class SwissRailRaptorCore {
 
 			// Create last path element if necessary
 			lastPE = totalArrivalCost <= previousArrivalCost || hasChains ?
-				new PathElement(boardingPE, toRouteStop, firstDepartureTime, currentAgentBoardingTime, currentDepartureTime + firstRouteStop.departureOffset, arrivalTime, arrivalTravelCost, arrivalTransferCost, distance, boardingPE.transferCount, false, false, null, null) :
+				new PathElement(boardingPE, toRouteStop, firstDepartureTime, currentAgentBoardingTime, this.timetable.getDepartureTime(currentDepartureIndex, firstRouteStop), arrivalTime, arrivalTravelCost, arrivalTransferCost, distance, boardingPE.transferCount, false, false, null, null) :
 				null;
 
 			// update the arrival information if we found a better connection, paul, feb'26
@@ -788,8 +785,7 @@ public class SwissRailRaptorCore {
 				int alternativeAgentFirstArrivalTime = alternativeBoardingPE.arrivalTime;
 				int alternativeDepartureIndex = findNextDepartureIndex(route, toRouteStop, alternativeAgentFirstArrivalTime);
 				if (alternativeDepartureIndex >= 0) {
-					int alternativeDepartureTime = this.data.departures[alternativeDepartureIndex];
-					int alternativeVehicleArrivalTime = alternativeDepartureTime + toRouteStop.arrivalOffset;
+					int alternativeVehicleArrivalTime = this.timetable.getArrivalTime(alternativeDepartureIndex, toRouteStop);
 					int alternativeAgentBoardingTime = Math.max(alternativeAgentFirstArrivalTime, alternativeVehicleArrivalTime);
 					int alternativeWaitingTime = alternativeAgentBoardingTime - alternativeAgentFirstArrivalTime;
 					double alternativeWaitingCost = -marginalUtilityOfWaitingPt_utl_s * alternativeWaitingTime;
@@ -798,7 +794,6 @@ public class SwissRailRaptorCore {
 					if (alternativeTotalCostWhenBoarding < totalArrivalCost) {
 						currentDepartureIndex = alternativeDepartureIndex;
 						currentVehicle = this.data.departureVehicles[currentDepartureIndex];
-						currentDepartureTime = alternativeDepartureTime;
 
 						// Reset chain information when switching connection
 						chains = null;
@@ -812,7 +807,7 @@ public class SwissRailRaptorCore {
 							// but set the boarding info back to the original boarding of this route
 							alternativeBoardingPE = alternativeBoardingPE.comingFrom;
 							alternativeAgentFirstArrivalTime = alternativeBoardingPE.arrivalTime;
-							alternativeVehicleArrivalTime = alternativeDepartureTime + alternativeBoardingPE.toRouteStop.arrivalOffset;
+							alternativeVehicleArrivalTime = this.timetable.getArrivalTime(alternativeDepartureIndex, alternativeBoardingPE.toRouteStop);
 							alternativeAgentBoardingTime = Math.max(alternativeAgentFirstArrivalTime, alternativeVehicleArrivalTime);
 
 							alternativeWaitingTime = alternativeAgentBoardingTime - alternativeAgentFirstArrivalTime;
@@ -849,6 +844,8 @@ public class SwissRailRaptorCore {
 				RRoute chainedRoute = this.data.routes[chain.toRoute];
 				int chainedDepartureIndex = chain.toDeparture;
 
+				// The departure time at the start of the chained route, as in the schedule. Chained departures
+				// do not read their times through the timetable.
 				int chainedDepartureTime = this.data.departures[chainedDepartureIndex];
 
 				assert chainedDepartureTime >= lastPE.arrivalTime:
@@ -884,23 +881,7 @@ public class SwissRailRaptorCore {
         if (this.useCapacityConstraints) {
             return findNextDepartureIndexWithConstraints(route, routeStop, time);
         }
-        int depTimeAtRouteStart = time - routeStop.departureOffset;
-        int fromIndex = route.indexFirstDeparture;
-        int toIndex = fromIndex + route.countDepartures;
-        int pos = Arrays.binarySearch(this.data.departures, fromIndex, toIndex, depTimeAtRouteStart);
-        if (pos < 0) {
-            // binarySearch returns (-(insertion point) - 1) if the element was not found, which will happen most of the times.
-            // insertion_point points to the next larger element, which is the next departure in our case
-            // This can be transformed as follows:
-            // retval = -(insertion point) - 1
-            // ==> insertion point = -(retval+1) .
-            pos = -(pos + 1);
-        }
-        if (pos >= toIndex) {
-            // there is no later departure time
-            return -1;
-        }
-        return pos;
+        return this.timetable.findNextDepartureIndex(route, routeStop, time);
     }
 
     private int findNextDepartureIndexWithConstraints(RRoute route, RRouteStop routeStop, int time) {
@@ -1274,7 +1255,8 @@ public class SwissRailRaptorCore {
         private int fromRouteStopIndex;
         private int toRouteStopIndex;
 
-        private int routeDepartureTime;
+        private RaptorTimetable timetable;
+        private int departureIndex;
         private int currentRouteStopIndex;
 
         private double currentInVehicleTime = -1;
@@ -1286,12 +1268,13 @@ public class SwissRailRaptorCore {
             this.data = data;
         }
 
-        void reset(int departureIndex, int boardingTime, int fromRouteStopIndex, int toRouteStopIndex) {
+        void reset(RaptorTimetable timetable, int departureIndex, int boardingTime, int fromRouteStopIndex, int toRouteStopIndex) {
             this.boardingTime = boardingTime;
             this.fromRouteStopIndex = fromRouteStopIndex;
             this.toRouteStopIndex = toRouteStopIndex;
 
-            this.routeDepartureTime = this.data.departures[departureIndex];
+            this.timetable = timetable;
+            this.departureIndex = departureIndex;
             this.currentRouteStopIndex = fromRouteStopIndex;
             this.currentInVehicleTime = -1;
             this.currentPassengerCount = -1;
@@ -1314,14 +1297,14 @@ public class SwissRailRaptorCore {
             this.currentRouteStopIndex++;
             int nextRouteStopIndex = this.currentRouteStopIndex;
             RRouteStop depRouteStop = this.data.routeStops[departureRouteStopIndex];
-            int startTime = this.routeDepartureTime + depRouteStop.departureOffset;
+            int startTime = this.timetable.getDepartureTime(this.departureIndex, depRouteStop);
             if (departureRouteStopIndex == this.fromRouteStopIndex) {
                 startTime = this.boardingTime;
             }
             RRouteStop nextRouteStop = this.data.routeStops[nextRouteStopIndex];
-            int endTime = this.routeDepartureTime + nextRouteStop.departureOffset;
+            int endTime = this.timetable.getDepartureTime(this.departureIndex, nextRouteStop);
             if (nextRouteStopIndex == this.toRouteStopIndex) {
-                endTime = this.routeDepartureTime + nextRouteStop.arrivalOffset;
+                endTime = this.timetable.getArrivalTime(this.departureIndex, nextRouteStop);
             }
             this.currentInVehicleTime = endTime - startTime;
             this.currentTimeOfDay = startTime;

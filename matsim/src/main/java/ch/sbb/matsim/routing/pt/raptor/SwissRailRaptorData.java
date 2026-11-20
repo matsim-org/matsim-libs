@@ -57,6 +57,7 @@ public class SwissRailRaptorData {
 	final int countRouteStops;
 	final RRoute[] routes;
 	final int[] departures; // in the RAPTOR paper, this is usually called "trips", but I stick with the MATSim nomenclature
+	final RaptorTimetable scheduleTimetable; // the times of the departures at the route stops, from the schedule
 	final Vehicle[] departureVehicles; // the vehicle used for each departure
 	final Id<Departure>[] departureIds;
 	final RRouteStop[] routeStops; // list of all route stops
@@ -84,6 +85,7 @@ public class SwissRailRaptorData {
 		this.countRouteStops = routeStops.length;
 		this.routes = routes;
 		this.departures = departures;
+		this.scheduleTimetable = new RaptorScheduleTimetable(departures);
 		this.departureVehicles = departureVehicles;
 		this.departureIds = departureIds;
 		this.routeStops = routeStops;
