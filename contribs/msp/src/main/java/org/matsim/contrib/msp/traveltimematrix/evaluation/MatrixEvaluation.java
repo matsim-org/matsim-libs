@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
+import org.matsim.contrib.msp.traveltimematrix.TravelTimeMatrixConfigGroup;
+import org.matsim.contrib.msp.traveltimematrix.run.RunCongestionIndexExperiment;
 
 /**
  * Compares anything that answers {@code getTravelTime(from, to, t)} against one or more reference travel
@@ -61,7 +63,8 @@ import java.util.function.ToDoubleFunction;
  * variant is which - it asks the same three-argument question of each of them and subtracts. Adding a
  * rung to the ladder therefore means adding a map entry, not touching this.
  *
- * @see RunEvaluateTravelTimeMatrix the command that composes the choices
+ * @see org.matsim.contrib.msp.traveltimematrix.experiments.RunCongestionIndexExperiment the command
+ * that composes the choices
  */
 public final class MatrixEvaluation {
 

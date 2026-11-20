@@ -1,4 +1,4 @@
-package org.matsim.contrib.msp.traveltimematrix;
+package org.matsim.contrib.msp.traveltimematrix.run;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +20,8 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.matsim.contrib.msp.traveltimematrix.RoadClassification;
+import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexCalculatorTest;
 
 /**
  * Runs the congestion index command on the output of a real run, so that the step from events to a

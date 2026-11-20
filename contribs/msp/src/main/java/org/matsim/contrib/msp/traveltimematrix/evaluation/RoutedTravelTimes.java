@@ -34,6 +34,8 @@ import java.util.concurrent.atomic.DoubleAdder;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.IntStream;
+import org.matsim.contrib.msp.traveltimematrix.prepare.MeasuredTraffic;
+import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaNetwork;
 
 /**
  * The travel times of a set of queries that only a router can give: the time-dependent optimum, and the

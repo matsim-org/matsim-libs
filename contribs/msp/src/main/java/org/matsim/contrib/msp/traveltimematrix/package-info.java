@@ -46,3 +46,5 @@
  * @see org.matsim.contrib.msp.traveltimematrix.RunComputeCongestionIndex to measure the index on a run
  */
 package org.matsim.contrib.msp.traveltimematrix;
+
+import org.matsim.contrib.msp.traveltimematrix.run.RunComputeCongestionIndex;

@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.matsim.contrib.msp.traveltimematrix.run.MatrixOptions;
 
 /**
  * Tests the config group: that it survives a round trip through a config file, and that the derived

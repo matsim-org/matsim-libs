@@ -1,4 +1,4 @@
-package org.matsim.contrib.msp.traveltimematrix;
+package org.matsim.contrib.msp.traveltimematrix.run;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,6 +9,9 @@ import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexProfile
 import org.matsim.contrib.msp.traveltimematrix.prepare.MeasuredTraffic;
 import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaOptions;
 import picocli.CommandLine;
+import org.matsim.contrib.msp.traveltimematrix.RoadClassification;
+import org.matsim.contrib.msp.traveltimematrix.TimeVaryingTravelTimeMatrix;
+import org.matsim.contrib.msp.traveltimematrix.TravelTimeMatrixConfigGroup;
 
 
 /**

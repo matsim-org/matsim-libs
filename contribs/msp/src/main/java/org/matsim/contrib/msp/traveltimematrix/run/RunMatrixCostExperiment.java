@@ -1,4 +1,4 @@
-package org.matsim.contrib.msp.traveltimematrix.experiments;
+package org.matsim.contrib.msp.traveltimematrix.run;
 
 import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
@@ -27,9 +27,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Locale;
 import java.util.function.ToIntBiFunction;
+import org.matsim.contrib.msp.traveltimematrix.NodeToNodeTravelTimeMatrix;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.MatrixEvaluation;
+import org.matsim.contrib.msp.traveltimematrix.experiments.AccuracyByDistance;
+import org.matsim.contrib.msp.traveltimematrix.experiments.HeapProbe;
+import org.matsim.contrib.msp.traveltimematrix.experiments.MatrixFootprint;
+import org.matsim.contrib.msp.traveltimematrix.experiments.MemoryCalibration;
+import org.matsim.contrib.msp.traveltimematrix.experiments.QueryBenchmark;
+import org.matsim.contrib.msp.traveltimematrix.experiments.ResultTable;
+import org.matsim.contrib.msp.traveltimematrix.experiments.RoutingBaseline;
 
 /**
  * <b>What a free-speed travel time matrix costs, and when it is worth building.</b> One sweep over three
@@ -64,8 +75,8 @@ import java.util.function.ToIntBiFunction;
  * </ol>
  * <b>Everything here is at free speed</b>, and that is what makes it a clean experiment rather than a
  * confounded one: with no congestion model in play, the only thing a matrix can be wrong about is its own
- * spatial discretisation. The congestion model is
- * {@link org.matsim.contrib.msp.traveltimematrix.evaluation.RunEvaluateTravelTimeMatrix}' business.
+ * spatial discretisation. The congestion model is {@link RunCongestionIndexExperiment}' business, which
+ * is experiment 3.
  * <p>
  * <b>The baseline is measured per area, not once.</b> {@link Answerer#DIRECT_ROUTING} runs one
  * shortest-path search per query, which is what an analysis that asks about pairs in no particular order
@@ -136,6 +147,18 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 	 */
 	private static final String INFINITY = MatrixOptions.UNBOUNDED;
 
+	/**
+	 * How "a neighbourhood as wide as one zone" is written in {@code --max-neighbor-distances}: the
+	 * smallest radius a row of the grid can usefully have, and a different number in every row.
+	 * <p>
+	 * It is a sentinel rather than a number because the grid is swept by cell size as well. Below the cell
+	 * size a sparse half answers pairs the zonal half already answers exactly - both ends of such a pair
+	 * are in the same zone - so it buys nothing and costs a bit set per row; at exactly the cell size it
+	 * is the cheapest sparse half that can still improve on the zones. A study that wants one fixed radius
+	 * across cell sizes gives the number instead.
+	 */
+	private static final String CELL = "cell";
+
 	@CommandLine.Option(names = "--output", description = "Directory the result csvs are written to.",
 		defaultValue = "matrix-cost-experiment")
 	private String outputDirectory;
@@ -154,8 +177,9 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 	private List<Double> cellSizes;
 
 	@CommandLine.Option(names = "--max-neighbor-distances", description = "Radii of the exact node-to-node half to "
-		+ "sweep [m]. '" + INFINITY + "' stores every pair node to node, which makes the matrix exact.",
-		defaultValue = INFINITY, split = ",")
+		+ "sweep [m]. '" + INFINITY + "' stores every pair node to node, which makes the matrix exact; '"
+		+ CELL + "' means the cell size of the row, which is the smallest radius worth sweeping. A radius below "
+		+ "the cell size of a row is skipped.", defaultValue = INFINITY, split = ",")
 	private List<String> maxNeighborDistances;
 
 	@CommandLine.Option(names = "--origins", description = "How many origins the accuracy sample draws per area. "
@@ -192,9 +216,15 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 	private boolean skipBaseline;
 
 	@CommandLine.Option(names = "--memory-budget", description = "Configurations estimated to need more memory than "
-		+ "this are skipped [MB]. Capped at 60%% of this JVM's -Xmx, whichever is smaller.",
+		+ "this are skipped [MB], the estimate being corrected by --memory-calibration first. A configuration "
+		+ "within the budget is skipped as well when this JVM has not the heap to build it.",
 		defaultValue = "" + MatrixFootprint.DEFAULT_BUDGET_MEGABYTES)
 	private Long memoryBudgetMegabytes;
+
+	@CommandLine.Option(names = "--memory-calibration", description = "What to multiply the estimated sparse "
+		+ "half by for a configuration that is not built, instead of learning the factor from the matrices this "
+		+ "sweep does build. 1 reports the raw estimates, which the measurements say are about a third low.")
+	private Double memoryCalibration;
 
 	@CommandLine.Option(names = "--build-timeout", description = "Give up on a matrix that has not finished "
 		+ "building after this long [s]; 0 switches the check off. A backstop only - memory is the binding "
@@ -215,6 +245,13 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 
 	@CommandLine.Mixin
 	private RoutingOptions routing = new RoutingOptions();
+
+	/**
+	 * What this sweep has learned about its own estimates, from every matrix it has weighed so far. One per
+	 * run rather than one per area: the correction is a property of the object layout and the node index
+	 * space, neither of which changes when the study area does.
+	 */
+	private MemoryCalibration calibration;
 
 	private ResultTable accuracyTable;
 	private ResultTable costTable;
@@ -297,6 +334,7 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 		}
 
 		long memoryBudget = MatrixFootprint.budget(this.memoryBudgetMegabytes);
+		this.calibration = new MemoryCalibration(this.memoryCalibration);
 		double[] bands = this.distanceBands.stream().mapToDouble(Double::doubleValue).toArray();
 
 		openTables();
@@ -418,30 +456,64 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 			: this.cellSizes.stream().mapToDouble(Double::doubleValue).max().orElseThrow();
 
 		List<Configuration> configurations = new ArrayList<>();
-		for (String given : this.maxNeighborDistances) {
 
-			double radius = MatrixOptions.parseNeighborDistance(given);
+		if (this.maxNeighborDistances.stream().anyMatch(RunMatrixCostExperiment::isUnbounded)) {
+			configurations.add(new Configuration(coarsest, Double.POSITIVE_INFINITY, true,
+				MatrixFootprint.estimate(network, Double.isNaN(coarsest) ? 1000 : coarsest,
+					Double.POSITIVE_INFINITY)));
+		}
 
-			if (Double.isInfinite(radius)) {
-				configurations.add(new Configuration(coarsest, radius, true,
-					MatrixFootprint.estimate(network, Double.isNaN(coarsest) ? 1000 : coarsest, radius)));
-				continue;
+		boolean finite = this.maxNeighborDistances.stream().anyMatch(given -> !isUnbounded(given));
+
+		if (finite && Double.isNaN(coarsest)) {
+			throw new IllegalArgumentException("--max-neighbor-distances holds a finite radius, which needs a "
+				+ "zonal half to answer the pairs beyond it - but no --cell-sizes were given. Give some, or "
+				+ "sweep only '" + INFINITY + "'.");
+		}
+
+		for (double cellSize : Double.isNaN(coarsest) ? List.<Double>of() : this.cellSizes) {
+
+			// a set, because 'cell' can resolve to a radius the explicit list already holds: at a 5,000 m
+			// cell size, 'cell,5000' is one configuration and not two
+			Set<Double> radii = new LinkedHashSet<>();
+			for (String given : this.maxNeighborDistances) {
+
+				double radius = neighborDistance(given, cellSize);
+				if (Double.isInfinite(radius)) {
+					continue;
+				}
+				if (radius < cellSize) {
+					log.info("Skipping a maxNeighborDistance of {} m at a cell size of {} m: both ends of a pair "
+							+ "that close are in the same zone, which the zonal half already answers exactly, so "
+							+ "the sparse half would buy nothing and still cost a bit set per row.",
+						(long) radius, (long) cellSize);
+					continue;
+				}
+				radii.add(radius);
 			}
 
-			if (Double.isNaN(coarsest)) {
-				throw new IllegalArgumentException("--max-neighbor-distances holds the finite radius " + given
-					+ " m, which needs a zonal half to answer the pairs beyond it - but no --cell-sizes were "
-					+ "given. Give some, or sweep only '" + INFINITY + "'.");
-			}
-
-			for (double cellSize : this.cellSizes) {
-				configurations.add(new Configuration(cellSize, radius, false,
-					MatrixFootprint.estimate(network, cellSize, radius)));
-			}
+			radii.forEach(radius -> configurations.add(new Configuration(cellSize, radius, false,
+				MatrixFootprint.estimate(network, cellSize, radius))));
 		}
 
 		configurations.sort(Comparator.comparingLong(configuration -> configuration.footprint().totalBytes()));
 		return configurations;
+	}
+
+	/**
+	 * One entry of {@code --max-neighbor-distances} as a radius: a number of metres, {@value #INFINITY},
+	 * or {@value #CELL} for the cell size of the row it is being read for.
+	 */
+	private static double neighborDistance(String given, double cellSize) {
+		return given.trim().equalsIgnoreCase(CELL) ? cellSize : MatrixOptions.parseNeighborDistance(given);
+	}
+
+	/**
+	 * Whether one entry of {@code --max-neighbor-distances} asks for the exact matrix. {@value #CELL} never
+	 * does, whatever the row's cell size is, so it does not have to be resolved to answer this.
+	 */
+	private static boolean isUnbounded(String given) {
+		return !given.trim().equalsIgnoreCase(CELL) && Double.isInfinite(MatrixOptions.parseNeighborDistance(given));
 	}
 
 	/**
@@ -482,22 +554,29 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 		List<TravelTimeQuery> pool, double[] bands, long memoryBudget, Baseline baseline) {
 
 		if (!configuration.footprint().fitsIn(memoryBudget, configuration.cellSize(),
-			configuration.maxNeighborDistance())) {
-			writeCost(Answerer.MATRIX, area, configuration, Double.NaN, null, baseline,
+			configuration.maxNeighborDistance(), this.calibration)) {
+			writeCost(Answerer.MATRIX, area, configuration, Double.NaN, null, null, baseline,
 				"skipped_over_memory_budget");
 			return;
 		}
 
-		// the previous matrix is unreachable by now but may not have been collected, and the next one is
-		// the largest allocation this process makes. A hint is all this can be, and it is worth the ask.
-		System.gc();
+		// built inside a measurement, so that the row carries what the matrix cost as well as what it was
+		// estimated to cost. The estimate is what decides whether a configuration is attempted at all, so
+		// the size and the direction of its error are a result and not an implementation detail.
+		HeapProbe.Result<TravelTimeMatrix> measured = HeapProbe.measure(() ->
+			TimeVaryingTravelTimeMatrix.create(area.network(), config(area, configuration),
+				this.routing.getQSimTimeStepSize()).getFreeSpeedMatrix());
 
-		long startedAt = System.nanoTime();
-		TravelTimeMatrix matrix = TimeVaryingTravelTimeMatrix.create(area.network(), config(area, configuration),
-			this.routing.getQSimTimeStepSize()).getFreeSpeedMatrix();
-		double buildSeconds = (System.nanoTime() - startedAt) / 1e9;
+		TravelTimeMatrix matrix = measured.value();
+		double buildSeconds = measured.seconds();
+		this.calibration.add(configuration.footprint(), measured.retainedBytes());
 
-		log.info("Built in {} s.", String.format(Locale.ROOT, "%.1f", buildSeconds));
+		log.info("Built in {} s. Estimated {} retained, measured {}: the estimate is {} by a factor of {}.",
+			String.format(Locale.ROOT, "%.1f", buildSeconds),
+			MatrixFootprint.megabytes(configuration.footprint().totalBytes()),
+			MatrixFootprint.megabytes(measured.retainedBytes()),
+			measured.retainedBytes() > configuration.footprint().totalBytes() ? "optimistic" : "conservative",
+			String.format(Locale.ROOT, "%.2f", measured.overEstimate(configuration.footprint().totalBytes())));
 
 		ToIntBiFunction<Node, Node> answer = (from, to) -> matrix.getTravelTime(from, to, 0);
 		writeAccuracy(Answerer.MATRIX, area, configuration, sample, bands, answer);
@@ -505,7 +584,8 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 		QueryBenchmark.Result benchmark = QueryBenchmark.run(pool, this.numberOfQueries, checkpoints(),
 			this.queryBudgetSeconds, answer);
 
-		writeCost(Answerer.MATRIX, area, configuration, buildSeconds, benchmark, baseline, status(buildSeconds));
+		writeCost(Answerer.MATRIX, area, configuration, buildSeconds, benchmark, measured, baseline,
+			status(buildSeconds));
 		writeScaling(Answerer.MATRIX, area, configuration, benchmark);
 	}
 
@@ -544,7 +624,7 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 
 		QueryBenchmark.Result perQuery = QueryBenchmark.run(pool, this.numberOfQueries, checkpoints(),
 			this.queryBudgetSeconds, isolated);
-		writeCost(Answerer.DIRECT_ROUTING, area, null, Double.NaN, perQuery, Baseline.NONE, "ok");
+		writeCost(Answerer.DIRECT_ROUTING, area, null, Double.NaN, perQuery, null, Baseline.NONE, "ok");
 		writeScaling(Answerer.DIRECT_ROUTING, area, null, perQuery);
 
 		// the same router used well: with the pool sorted by origin, one search answers a whole run of
@@ -552,7 +632,8 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 		QueryBenchmark.Result perOrigin = QueryBenchmark.run(RoutingBaseline.sortedByOrigin(pool),
 			this.numberOfQueries, checkpoints(), this.queryBudgetSeconds,
 			RoutingBaseline.byOrigin(area.network(), this.routing.getQSimTimeStepSize()));
-		writeCost(Answerer.DIRECT_ROUTING_BY_ORIGIN, area, null, Double.NaN, perOrigin, Baseline.NONE, "ok");
+		writeCost(Answerer.DIRECT_ROUTING_BY_ORIGIN, area, null, Double.NaN, perOrigin, null, Baseline.NONE,
+			"ok");
 		writeScaling(Answerer.DIRECT_ROUTING_BY_ORIGIN, area, null, perOrigin);
 
 		return new Baseline(perQuery.microsecondsPerQuery(), perOrigin.microsecondsPerQuery());
@@ -591,8 +672,14 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 			accuracy.getOverall());
 	}
 
+	/**
+	 * @param measured what the matrix actually cost, or null when none was built - a skipped configuration
+	 * and a routing baseline both leave the measured columns empty, which is what keeps an estimate
+	 * without a measurement next to it from being read as one that was checked
+	 */
 	private void writeCost(Answerer answerer, Area area, @Nullable Configuration configuration, double buildSeconds,
-		@Nullable QueryBenchmark.Result benchmark, Baseline baseline, String status) {
+		@Nullable QueryBenchmark.Result benchmark, @Nullable HeapProbe.Result<?> measured, Baseline baseline,
+		String status) {
 
 		MatrixFootprint footprint = configuration == null ? null : configuration.footprint();
 		double querySeconds = benchmark == null ? Double.NaN : benchmark.seconds();
@@ -604,6 +691,11 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 			footprint == null ? "" : footprint.zonalBytes(),
 			footprint == null ? "" : footprint.sparseBytes(),
 			footprint == null ? "" : footprint.totalBytes(),
+			measured == null ? "" : measured.retainedBytes(),
+			measured == null ? "" : measured.peakBytes(),
+			memoryBytes(footprint, measured),
+			memorySource(footprint, measured),
+			memoryFactor(footprint, measured),
 			seconds(buildSeconds),
 			benchmark == null ? "" : benchmark.queries(),
 			seconds(querySeconds),
@@ -629,6 +721,53 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 			return "";
 		}
 		return Math.round(buildSeconds * 1e6 / (routerMicroseconds - matrixMicroseconds));
+	}
+
+	/**
+	 * <b>The memory column to read</b>: what the matrix of this row costs, measured when it was built and
+	 * expected when it was not.
+	 * <p>
+	 * A sweep reports both kinds of row and they are not equally good, which is what {@code memory_source}
+	 * is for - but a reader plotting memory against nodes wants one column, and wants it to be the best
+	 * number available for every row rather than the worst one available for all of them. Empty for a
+	 * routing baseline, which has no matrix.
+	 *
+	 * @see MemoryCalibration why an unbuilt configuration is not reported at its raw estimate
+	 */
+	private Object memoryBytes(@Nullable MatrixFootprint footprint, @Nullable HeapProbe.Result<?> measured) {
+
+		if (measured != null) {
+			return measured.retainedBytes();
+		}
+		return footprint == null ? "" : this.calibration.expectedBytes(footprint);
+	}
+
+	/**
+	 * Where {@link #memoryBytes} came from: measured, or corrected by a factor from this sweep's own
+	 * measurements, or by the documented default when the sweep weighed nothing.
+	 */
+	private Object memorySource(@Nullable MatrixFootprint footprint, @Nullable HeapProbe.Result<?> measured) {
+
+		if (measured != null) {
+			return MemoryCalibration.Source.MEASURED;
+		}
+		return footprint == null ? "" : this.calibration.source();
+	}
+
+	/**
+	 * How far the raw estimate of the sparse half was out: the factor that was applied for an unbuilt
+	 * configuration, and the one this row would have contributed for a built one - which is the quantity
+	 * the calibration is a median of, and the one to plot when asking whether it holds at scale.
+	 */
+	private Object memoryFactor(@Nullable MatrixFootprint footprint, @Nullable HeapProbe.Result<?> measured) {
+
+		if (footprint == null) {
+			return "";
+		}
+		double factor = measured == null || footprint.sparseBytes() <= 0
+			? this.calibration.factor()
+			: (measured.retainedBytes() - footprint.zonalBytes()) / (double) footprint.sparseBytes();
+		return String.format(Locale.ROOT, "%.3f", factor);
 	}
 
 	private void writeScaling(Answerer answerer, Area area, @Nullable Configuration configuration,
@@ -665,7 +804,8 @@ public final class RunMatrixCostExperiment implements MATSimAppCommand {
 		this.accuracyTable = new ResultTable(Path.of(output("matrix_accuracy.csv")), accuracy);
 
 		List<String> cost = new ArrayList<>(labels);
-		cost.addAll(List.of("answerer", "zonal_bytes", "sparse_bytes", "total_bytes", "build_seconds", "queries",
+		cost.addAll(List.of("answerer", "zonal_bytes", "sparse_bytes", "total_bytes", "measured_bytes",
+			"peak_heap_bytes", "memory_bytes", "memory_source", "memory_factor", "build_seconds", "queries",
 			"query_seconds", "microseconds_per_query", "stopped_on_budget", "break_even_queries_isolated",
 			"break_even_queries_by_origin", "status"));
 		this.costTable = new ResultTable(Path.of(output("matrix_cost.csv")), cost);

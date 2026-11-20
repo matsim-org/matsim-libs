@@ -1,4 +1,4 @@
-package org.matsim.contrib.msp.traveltimematrix.prepare;
+package org.matsim.contrib.msp.traveltimematrix.run;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,6 +8,8 @@ import org.matsim.core.network.NetworkUtils;
 import picocli.CommandLine;
 
 import java.util.Set;
+import org.matsim.contrib.msp.traveltimematrix.prepare.StudyArea;
+import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaNetwork;
 
 /**
  * The three options every command of this package needs to answer "which network, and which part of

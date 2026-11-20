@@ -7,7 +7,7 @@
  * likes.
  * <p>
  * An evaluation is two independent choices, and
- * {@link org.matsim.contrib.msp.traveltimematrix.evaluation.RunEvaluateTravelTimeMatrix} is those two
+ * {@link org.matsim.contrib.msp.traveltimematrix.experiments.RunCongestionIndexExperiment} is those two
  * choices and nothing else:
  * <ul>
  *     <li><b>which questions to ask</b> - the trips the run really made
@@ -79,3 +79,7 @@
  * so the same pairs can go to an API and come back as the measured travel time of another evaluation.
  */
 package org.matsim.contrib.msp.traveltimematrix.evaluation;
+
+import org.matsim.contrib.msp.traveltimematrix.TimeVaryingTravelTimeMatrix;
+import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndex;
+import org.matsim.contrib.msp.traveltimematrix.run.RunCongestionIndexExperiment;

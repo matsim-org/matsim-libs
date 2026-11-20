@@ -1,4 +1,4 @@
-package org.matsim.contrib.msp.traveltimematrix;
+package org.matsim.contrib.msp.traveltimematrix.run;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

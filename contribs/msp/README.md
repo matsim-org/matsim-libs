@@ -104,7 +104,7 @@ run output (network, events)
    the questions:  [ODSample] generated pairs | [ExperiencedLegs] the trips of the run
    the references: [RoutedTravelTimes] free speed | a time-dependent router | what those trips took
          |
-   --[MatrixEvaluation]-->  errors.csv, queries.csv           (RunEvaluateTravelTimeMatrix)
+   --[MatrixEvaluation]-->  errors.csv, queries.csv           (RunCongestionIndexExperiment)
 ```
 
 `RunMatrixCostExperiment` is a loop around steps 4 and 5 with the congestion model switched off — see
@@ -146,6 +146,7 @@ The code is split by step of the method:
 | | `CongestionIndexProfile` | the binned curve, and its csv |
 | | `CongestionIndexCalculator` | measures it from a `TravelTime` and a `VolumesAnalyzer` |
 | `traveltimematrix.prepare` | `StudyAreaNetwork` | cuts the car subnetwork of the study area |
+| | `RunCutStudyAreaNetwork` | cuts it once and **writes** it, so later JVMs see a small node id space |
 | | `StudyAreaOptions` | `--network`, `--shp`, `--modes`: one place that reads the network |
 | | `MeasuredTraffic` | reads the events once: congested travel times and volumes |
 | `traveltimematrix.evaluation` | `ODSample` | the queries an evaluation runs on, grouped by origin |
@@ -155,11 +156,13 @@ The code is split by step of the method:
 | | `TravelTimeQuery` | the pair and time every comparison is made of, what is known about it, and its csv |
 | | `MatrixEvaluation` | compares every variant against every reference, and writes the tables |
 | | `CongestionExposure` | how much congestion the queries carry against how much the index applies |
-| | `RunEvaluateTravelTimeMatrix` | the error of one matrix, as one command |
 | `traveltimematrix.experiments` | `RunMatrixCostExperiment` | parts 1 and 2: study area size × cell size × radius against accuracy, runtime and memory |
+| | `RunCongestionIndexExperiment` | part 3: the error of one exact matrix plus a congestion index, as one command |
 | | `RoutingBaseline` | the router the matrix has to beat, timed isolated and amortised by origin |
 | | `AccuracyByDistance` | the error of one answerer, overall and per distance band |
 | | `MatrixFootprint` | how much memory a configuration needs, before building it |
+| | `HeapProbe` | what it actually cost once built, so the estimate above can be checked |
+| | `MemoryCalibration` | what the estimate is out by, learned from the matrices this sweep weighed |
 | | `QueryBenchmark` | query rates at a ladder of counts, under a wall-clock budget |
 
 Dependencies run from the root package into the sub packages and never the other way round, and nothing
@@ -294,9 +297,10 @@ more than the travel times do.
 ### Evaluating it
 
 `org.matsim.contrib.msp.traveltimematrix.evaluation` — the matrix trades accuracy for one lookup, so the
-number that decides whether it is usable is the error. One command measures it,
-`RunEvaluateTravelTimeMatrix`, and it has exactly two choices to make: **which questions to ask**
-(`--od-pairs`) and **what to compare against** (`--references`, a list).
+number that decides whether it is usable is the error. The package is the library that measures it; the
+command is `experiments.RunCongestionIndexExperiment`, which is **part 3 of the study**, and it has
+exactly two choices to make: **which questions to ask** (`--od-pairs`) and **what to compare against**
+(`--references`, a list).
 
 **`--od-pairs`: which questions to ask.** `TRIPS` — **the default** — takes the car trips the run really
 made and weights the error by what actually happens. `RANDOM` generates pairs, one destination per
@@ -382,7 +386,9 @@ wrong in the last, and those are two different questions. Four cells are worth n
 
 How coarse the matrix is (`--cell-size`, `--max-neighbor-distance`) is not one of the two choices above
 but the thing being judged — and one setting of it deserves naming, because it changes what the
-evaluation *measures* and not merely how well it scores.
+evaluation *measures* and not merely how well it scores. It is **the default of
+`RunCongestionIndexExperiment`**, and of no other command: a run that forgot the flag would not measure
+a slightly worse version of the right thing, it would measure the wrong thing.
 
 With `--max-neighbor-distance inf` every pair is stored node to node. No zone system is built at all,
 `--cell-size` is ignored, and the matrix's discretisation error is **zero by construction** — cell 2 of
@@ -398,10 +404,9 @@ through a 7 % blur.
 
 ```
 java -Xmx12g -cp matsim-msp.jar \
-    org.matsim.contrib.msp.traveltimematrix.evaluation.RunEvaluateTravelTimeMatrix \
+    org.matsim.contrib.msp.traveltimematrix.experiments.RunCongestionIndexExperiment \
     --network output_network.xml.gz --events output_events.xml.gz --shp dresden-with-buffer.shp \
     --congestion-index congestion_index.csv --output-directory evaluation-exact \
-    --max-neighbor-distance inf \
     --od-pairs TRIPS --references FREE_SPEED_ROUTING,CONGESTED_ROUTING,EXPERIENCED --with-constant-index
 ```
 
@@ -433,13 +438,14 @@ fast, because a network-wide index does not see the queue a particular trip sat 
 table, with the same columns, which is the point of them being a list.
 
 ```
-java -cp matsim-msp.jar org.matsim.contrib.msp.traveltimematrix.evaluation.RunEvaluateTravelTimeMatrix \
+java -cp matsim-msp.jar \
+    org.matsim.contrib.msp.traveltimematrix.experiments.RunCongestionIndexExperiment \
     --network output_network.xml.gz --events output_events.xml.gz --shp dresden-with-buffer.shp \
     --congestion-index congestion_index.csv --output-directory evaluation \
     --od-pairs TRIPS --references FREE_SPEED_ROUTING,CONGESTED_ROUTING,EXPERIENCED
 ```
 
-Both of those are the defaults, so the two last lines can be left off.
+Both of those are the defaults, as is the exact matrix, so the last line can be left off.
 
 The one combination that cannot work is refused before anything is read: `EXPERIENCED` needs
 `--od-pairs TRIPS`, because a pair nobody drove has no experienced travel time.
@@ -566,9 +572,11 @@ first, so an interrupted sweep has finished the ones that fit. **No shape file p
 `StudyArea.circle(centre, radius)` is the same predicate `StudyArea.fromShapeFile(..)` is, behind one
 interface, and `--centre` defaults to the centroid of `--shp`.
 
-**Memory is the binding constraint, not time.** A full matrix costs about `nodes² × 6.1` bytes — 4.7 GB at
-Dresden's 22,948 nodes, 61 GB at 100,000 — so `--memory-budget` (default 64 GB, capped at 60 % of `-Xmx`)
-is what decides how far the sweep gets. A configuration over it is **refused rather than attempted**: the
+**Memory is the binding constraint, not time.** A full matrix costs, as measured on Dresden, about
+`nodes² × 6.7 + nodes × 112 KB` bytes — the second term is the per-row bit sets, which span the
+**Germany-wide** node index space rather than the study area, so it is large and linear. That is 5.7 GB at
+Dresden's 22,948 nodes and 73 GB at 100,000, so `--memory-budget` (default 64 GB) is what decides how far
+the sweep gets. A configuration over it is **refused rather than attempted**: the
 sweep writes a `skipped_over_memory_budget` row and goes on, instead of running out of heap on
 configuration 28 of 31 and losing the 27 that worked. For part 1 those rows are not a failure but *the
 result* — the node count at which a full matrix stops fitting is the wall that makes zoning necessary at
@@ -615,12 +623,19 @@ query count at which the build time has paid for itself.
 
 Three tables, appended row by row as the sweep runs, so an interrupted sweep is still usable:
 
+`--max-neighbor-distances` takes two sentinels beside plain metres: **`inf`** stores every pair node to
+node (the exact matrix, built once however many cell sizes are swept) and **`cell`** means *the cell size
+of this row*, which is the smallest radius worth measuring — below it both ends of a pair share a zone,
+which the zonal half already answers exactly, so such a configuration is skipped with a line in the log.
+`--cell-sizes 2000,1000,750,500,250,100 --max-neighbor-distances cell,5000,10000,15000,20000,inf` is
+therefore 6 × 5 + 1 = 31 configurations, each with the cheapest sparse half its own resolution allows.
+
 Three tables, every row starting with `area, radius, links, nodes, cell_size, max_neighbor_distance,
 zones` so that all three join on the same key:
 
 | file | one row per | holds |
 |---|---|---|
-| `matrix_cost.csv` | area × configuration (and the two baselines) | `zonal_bytes`, `sparse_bytes`, `total_bytes`, `build_seconds`, `microseconds_per_query`, `break_even_queries_isolated`, `break_even_queries_by_origin`, `status` |
+| `matrix_cost.csv` | area × configuration (and the two baselines) | `zonal_bytes`, `sparse_bytes`, `total_bytes` (all three **estimated**, before the build), `measured_bytes` and `peak_heap_bytes` (weighed, empty when no matrix was built), **`memory_bytes`** with `memory_source` and `memory_factor` (the column to read: see below), `build_seconds`, `microseconds_per_query`, `break_even_queries_isolated`, `break_even_queries_by_origin`, `status` |
 | `matrix_accuracy.csv` | area × configuration × distance band | `bias`, `error_std_dev`, `mean_absolute_error`, `relative_bias`, `mape`, `rmse`. Not written at all when `--origins` is 0, which is the default — an exact matrix has no error worth a table |
 | `matrix_query_scaling.csv` | area × configuration × query count | the rate at 10k, 100k, 1M, 10M — so a rate that has not settled is visible rather than averaged away |
 
@@ -659,6 +674,33 @@ Three things to read out of it, and the first two are the reason the table has t
 3. **The matrix is ~1000× faster than a well-used router, not ~60,000×.** 0.03 µs against 30 µs
    amortised by origin; the 2.6 ms figure is the same router used badly.
 
+#### Step 0: cut the network and write it out
+
+**Run `RunCutStudyAreaNetwork` first, and point the sweeps at its files.** It is not a convenience, it is
+what makes the memory column mean anything:
+
+```
+java -cp matsim-msp.jar org.matsim.contrib.msp.traveltimematrix.prepare.RunCutStudyAreaNetwork \
+    --network 012.output_network.xml.gz --shp dresden-with-10km-buffer.shp.zip \
+    --radii 5000,10000,20000 --output-directory ./networks --prefix dresden
+```
+
+Every sparse row keeps a `BitSet` indexed by the **global** node id index (see below), so cutting 22,948
+Dresden nodes out of a 530,136 node Germany-wide network *in the same JVM* costs
+22,948 × 530,136/8 = **1.5 GB** of bit sets — against the 66 MB the study area alone needs. That single
+term is larger than everything the resolution grid sweeps and it is identical in every configuration, so
+it hides the differences the grid exists to measure:
+
+| cell 100 / nb 5000 | zonal half | sparse half | total |
+|---|---|---|---|
+| cut in the same JVM (id space 530,136) | 487 MB | 1.7 GB | 2.1 GB — 71 % bit sets |
+| over a written-out network (id space 22,948) | 487 MB | 356 MB | 0.84 GB |
+
+Reading a written-out network in a **fresh JVM** creates exactly as many node ids as it has nodes, which
+is what collapses the space. It cannot be done inside one JVM: re-reading a network adds ids next to the
+old ones. The radius ladder gets the same treatment — one pre-cut network and one JVM per radius — which
+also removes the linear `nodes × 112 KB` term from part 1's memory curve.
+
 #### What keeps the sweep alive
 
 The expensive corner of the grid is real: at `cellSize 100` the zone count approaches the node count, so
@@ -666,7 +708,7 @@ the zonal half approaches `nodes² × 2` bytes, and an unbounded neighbourhood s
 bytes each. On a 23,000 node area that is a few GB, and finding out on configuration 28 of 31 is how a
 sweep is lost. So `MatrixFootprint` estimates both halves **before** building — the zone count exactly,
 the neighbourhood by sampling straight-line distances, which over-estimates because network distance is
-never shorter — and a configuration over `--memory-budget` (60% of `-Xmx` by default) gets a row saying
+never shorter — and a configuration over `--memory-budget` gets a row saying
 `skipped_over_memory_budget` rather than an `OutOfMemoryError`. Configurations run cheapest first for the
 same reason.
 
@@ -679,6 +721,45 @@ bit set is then twenty times what the study area alone suggests: 1.3 GB rather t
 `MatrixFootprint` therefore estimates against `Id.getNumberOfIds(Node.class)` and logs the index space it
 used. If it ever matters, writing the cut subnetwork to a file and running over *that* in a fresh JVM
 collapses the index space to the study area.
+
+**The estimate is checked against the thing it estimates**, because a prediction nothing is compared
+against is not a number to put in a paper. Every matrix is built inside a `HeapProbe`, which reads the
+used heap before and after it (collecting in between) and writes `measured_bytes` next to the estimated
+`total_bytes`, plus `peak_heap_bytes`, the high-water mark of the build itself. What that says on the
+Dresden discs, with the full Germany-wide network in the same JVM:
+
+| area | nodes | estimated | measured | measured / estimated | peak |
+|---|---|---|---|---|---|
+| r5000 | 3,349 | 0.27 GB | 0.36 GB | 1.31 | 1.70 GB |
+| r10000 | 10,538 | 1.27 GB | 1.76 GB | 1.38 | 3.38 GB |
+| r20000 | 21,778 | 4.00 GB | 5.34 GB | 1.34 | 10.39 GB |
+| r30000 | 30,315 | 7.01 GB | 8.89 GB | 1.27 | 13.36 GB |
+
+So **the estimate is optimistic by about a third**, flat in the number of nodes. Two things it leaves out,
+both in the sparse half: a `BitSet` grows its backing `long[]` by doubling, so a row's bit set ends up
+between once and twice the words its highest set index needs (1.47× at r5000, 1.60× at r20000), and a row
+is not one array but a few hundred `Bucket`s of 32 to 64 entries, each paying two array headers on top of
+the six bytes an entry is counted at. The zonal half, by contrast, is estimated almost exactly: a
+`short[zones][zones]` misses only one array header per zone row, 0.8 % at 1,183 zones.
+
+**What the tables report, therefore, is the measurement where there is one.** `memory_bytes` is
+`measured_bytes` for a matrix that was built and `zonal_bytes + factor × sparse_bytes` for one that was
+not, where the factor is the median of what this sweep's own measurements came out at — `memory_source`
+says which of the two a row is (`MEASURED`, `CALIBRATED_FROM_SWEEP`, `CALIBRATED_FROM_DEFAULT` for a JVM
+that weighed nothing, `ESTIMATED` under `--memory-calibration 1`) and `memory_factor` says what was
+applied, or for a measured row what it would have contributed. Plot `memory_bytes` against nodes and every
+point is the best number available for it; read `memory_factor` down the column to see whether the
+correction holds at scale.
+
+**A configuration now has to pass two checks**, because the budget and the heap are different questions.
+The budget is what the *study* allows one matrix to cost, so it is no longer quietly scaled down to 60 %
+of `-Xmx` — the node count at which a matrix stops fitting in 64 GB is a result, and a laptop should
+report the cluster's wall rather than its own. What stops that from being a lie is the second check: a
+configuration within the budget is still skipped when *this* JVM cannot build it, which needs about
+**1.4× what the finished matrix retains**. That factor is measured too, and the margin is thin — the 20 km
+disc retains 5.3 GB, builds under `-Xmx7500m` and dies of an `OutOfMemoryError` under `-Xmx6500m`. (The
+`peak_heap_bytes` column reads higher, 1.5 to 1.9×, because it counts garbage a large heap simply had no
+reason to collect yet; it is what the build was allowed to use, not what it needed.)
 
 `--query-budget` (60 s by default) is the same idea for time: a benchmark stops at the query target or
 the budget, whichever comes first, and says which in `stopped_on_budget`. Without it the direct-routing

@@ -2,6 +2,7 @@ package org.matsim.contrib.msp.traveltimematrix.evaluation;
 
 import java.util.List;
 import java.util.Locale;
+import org.matsim.contrib.msp.traveltimematrix.TravelTimeMatrixConfigGroup;
 
 /**
  * The error of one approximation against the reference, accumulated over queries: MAPE, bias, RMSE.

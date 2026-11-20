@@ -1,6 +1,7 @@
-package org.matsim.contrib.msp.traveltimematrix;
+package org.matsim.contrib.msp.traveltimematrix.run;
 
 import picocli.CommandLine;
+import org.matsim.contrib.msp.traveltimematrix.TravelTimeMatrixConfigGroup;
 
 /**
  * The options that decide the <b>shape</b> of the free-speed base matrix, and nothing else: how coarse
@@ -78,7 +79,7 @@ public final class MatrixOptions {
 	 * A neighbourhood radius as written on a command line: a number of metres, or {@value #UNBOUNDED}
 	 * (also {@code infinity}, in any case) for no bound.
 	 * <p>
-	 * Shared with {@link org.matsim.contrib.msp.traveltimematrix.experiments.RunMatrixResolutionExperiment},
+	 * Shared with {@link org.matsim.contrib.msp.traveltimematrix.experiments.RunMatrixCostExperiment},
 	 * which sweeps a list of these, so that a sweep and a single build cannot disagree about what
 	 * {@value #UNBOUNDED} means.
 	 *

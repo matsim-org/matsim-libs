@@ -12,6 +12,9 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import java.util.Set;
+import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexCalculator;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.ExperiencedLegs;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.RoutedTravelTimes;
 
 /**
  * What a finished run tells us about congestion: the congested link travel times per time bin and the

@@ -1,4 +1,4 @@
-package org.matsim.contrib.msp.traveltimematrix.evaluation;
+package org.matsim.contrib.msp.traveltimematrix.run;
 
 import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +12,12 @@ import org.matsim.contrib.msp.traveltimematrix.MatrixOptions;
 import org.matsim.contrib.msp.traveltimematrix.TravelTimeMatrixConfigGroup;
 import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndex;
 import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexProfile;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.CongestionExposure;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.ExperiencedLegs;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.MatrixEvaluation;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.ODSample;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.RoutedTravelTimes;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.TravelTimeQuery;
 import org.matsim.contrib.msp.traveltimematrix.prepare.MeasuredTraffic;
 import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaOptions;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
@@ -29,16 +35,25 @@ import java.util.Set;
 import java.util.function.ToDoubleFunction;
 
 /**
+ * <b>Experiment 3 of the study: how much accuracy survives one matrix plus a congestion index.</b>
  * Measures how wrong the time-varying travel time matrix is, and writes the error tables:
  * <pre>
- *   java -cp matsim-msp.jar org.matsim.contrib.msp.traveltimematrix.evaluation.RunEvaluateTravelTimeMatrix \
+ *   java -cp matsim-msp.jar org.matsim.contrib.msp.traveltimematrix.experiments.RunCongestionIndexExperiment \
  *       --network output_network.xml.gz --events output_events.xml.gz --shp dresden-with-buffer.shp \
- *       --congestion-index congestion_index.csv --output-directory evaluation \
- *       --od-pairs TRIPS --references FREE_SPEED_ROUTING,CONGESTED_ROUTING,EXPERIENCED
+ *       --congestion-index congestion_index.csv --output-directory output/experiment-3
  * </pre>
- * Both of those are the defaults, so the line above is what the command does with neither option given.
- * Add {@code --max-neighbor-distance inf} for the exact base matrix, with no zone system at all.
- *
+ * That is the whole run: everything else is a default, {@code --od-pairs TRIPS} and
+ * {@code --references FREE_SPEED_ROUTING,CONGESTED_ROUTING,EXPERIENCED} and - unlike anywhere else in
+ * this package - {@code --max-neighbor-distance inf}, the exact matrix. See {@link ExactByDefault} for
+ * why that one is a default here and nowhere else.
+ * <p>
+ * Where experiments 1 and 2 ({@link RunMatrixCostExperiment}) sweep the <em>shape</em> of the matrix and
+ * report what each shape costs, this one holds the shape fixed at the one that costs nothing in accuracy
+ * and varies the <em>congestion model</em> on top of it. So it benchmarks nothing: there is no query
+ * ladder and no memory ledger here, because what a lookup costs has been measured already and does not
+ * depend on which index is wrapped around it. What is left to measure is the error, which is why this
+ * command writes error tables and not a cost table.
+ * <p>
  * There are two independent choices to make, and they are the whole command.
  * <p>
  * <b>Which questions to ask</b> ({@code --od-pairs}), and the default is {@link ODPairs#TRIPS} - the
@@ -77,15 +92,18 @@ import java.util.function.ToDoubleFunction;
  *     case it has to beat) and {@code GLOBAL_INDEX} (level 0, one index curve).</li>
  * </ol>
  * <b>How coarse the matrix is</b> ({@code --cell-size} and {@code --max-neighbor-distance}) is not one of
- * the two choices but the thing being judged, and one setting of it deserves naming here:
- * {@code --max-neighbor-distance inf}. Every pair is then stored node to node, so no zone system is built
- * at all, {@code --cell-size} is ignored, and the matrix's own discretisation error is <b>zero by
- * construction</b>. That is the configuration in which the error against
- * {@link Reference#CONGESTED_ROUTING} is the error of the congestion model and of nothing else - which is
- * the quantity the method is about, and which a zonal matrix cannot show separately, because at a 500 m
- * to 1 km cell the discretisation alone is already 5 to 8 % and it is all scatter, so it does not simply
- * add up with the congestion error. It costs one shortest-path tree per node - under a minute and about
- * 4.7 GB on the Dresden study area.
+ * the two choices but the thing this experiment holds still, and here it is held at
+ * {@code --max-neighbor-distance inf}, which is <b>the default of this command</b> and of no other.
+ * Every pair is then stored node to node, so no zone system is built at all, {@code --cell-size} is
+ * ignored, and the matrix's own discretisation error is <b>zero by construction</b>. That is the
+ * configuration in which the error against {@link Reference#CONGESTED_ROUTING} is the error of the
+ * congestion model and of nothing else - which is the quantity the method is about, and which a zonal
+ * matrix cannot show separately, because at a 500 m to 1 km cell the discretisation alone is already 5
+ * to 8 % and it is all scatter, so it does not simply add up with the congestion error. It costs one
+ * shortest-path tree per node - under a minute and about 5.7 GiB on the Dresden study area, which is
+ * why this experiment runs on a laptop and does not need the cluster. Pass a radius in metres to get a
+ * zonal matrix back, and then read the {@code FREE_SPEED_ROUTING x FREE_SPEED} row as the blur every
+ * other row is measured through.
  * <p>
  * The references typically have <b>opposite signs</b>: against a router the matrix is too slow, because
  * it holds the free-speed path fixed, and against the experienced travel times it can be too fast,
@@ -113,14 +131,42 @@ import java.util.function.ToDoubleFunction;
  * itself
  */
 @CommandLine.Command(
-	name = "evaluate-travel-time-matrix",
+	name = "congestion-index-experiment",
 	description = "Measures the error of the time-varying travel time matrix against routing and against a run.",
 	mixinStandardHelpOptions = true,
-	showDefaultValues = true
+	showDefaultValues = true,
+	defaultValueProvider = RunCongestionIndexExperiment.ExactByDefault.class
 )
-public final class RunEvaluateTravelTimeMatrix implements MATSimAppCommand {
+public final class RunCongestionIndexExperiment implements MATSimAppCommand {
 
-	private static final Logger log = LogManager.getLogger(RunEvaluateTravelTimeMatrix.class);
+	private static final Logger log = LogManager.getLogger(RunCongestionIndexExperiment.class);
+
+	/**
+	 * Makes {@code --max-neighbor-distance} default to {@value MatrixOptions#UNBOUNDED} for this command
+	 * alone, leaving every other option at the default its own annotation gives it.
+	 * <p>
+	 * {@link MatrixOptions} is shared with the commands that <em>build</em> a matrix for use, where 5 km
+	 * is the sensible radius and an unbounded one is a deliberate act. Here it is the other way round:
+	 * the quantity this experiment exists to measure is the error of the congestion model, and a zonal
+	 * matrix adds 5 to 8 % of discretisation scatter that cannot be subtracted back out afterwards - so
+	 * a run that forgot the flag does not measure a slightly worse version of the right thing, it
+	 * measures the wrong thing. A default is the only place that can be fixed once; the mixin cannot
+	 * carry two defaults, and a second copy of the four options would let a sweep and this command drift
+	 * apart in what they mean by a cell size.
+	 * <p>
+	 * Returning {@code null} for everything else is what hands the option back to its annotation -
+	 * picocli consults a provider first and falls back to {@code defaultValue} when it declines.
+	 */
+	public static final class ExactByDefault implements CommandLine.IDefaultValueProvider {
+
+		@Override
+		public String defaultValue(CommandLine.Model.ArgSpec argument) {
+			return argument.isOption() && List.of(((CommandLine.Model.OptionSpec) argument).names())
+				.contains("--max-neighbor-distance")
+				? MatrixOptions.UNBOUNDED
+				: null;
+		}
+	}
 
 	/**
 	 * What the matrix is compared against. More than one can be chosen, and normally is.
@@ -270,7 +316,7 @@ public final class RunEvaluateTravelTimeMatrix implements MATSimAppCommand {
 	private MatrixOptions matrix = new MatrixOptions();
 
 	public static void main(String[] args) {
-		new RunEvaluateTravelTimeMatrix().execute(args);
+		new RunCongestionIndexExperiment().execute(args);
 	}
 
 	@Override
@@ -365,10 +411,17 @@ public final class RunEvaluateTravelTimeMatrix implements MATSimAppCommand {
 		}
 
 		if (this.matrix.isUnbounded()) {
-			log.info("--max-neighbor-distance is {}, so the base matrix is exact: every pair is answered node to "
-				+ "node, no zone system is built, and --cell-size is ignored. The discretisation error is then "
-				+ "zero by construction, which is what makes this the configuration that isolates the congestion "
-				+ "model.", MatrixOptions.UNBOUNDED);
+			log.info("--max-neighbor-distance is {}, the default of this experiment, so the base matrix is exact: "
+				+ "every pair is answered node to node, no zone system is built, and --cell-size is ignored. The "
+				+ "discretisation error is then zero by construction, which is what makes this the configuration "
+				+ "that isolates the congestion model.", MatrixOptions.UNBOUNDED);
+		} else {
+			log.warn("--max-neighbor-distance is {} m rather than '{}', so the base matrix is zonal and carries a "
+				+ "discretisation error of its own - several percent at a cell size of {} m, and all of it "
+				+ "scatter, so it cannot be subtracted back out of the rows below. Every error reported here is "
+				+ "then the congestion model *through* that blur. Read the FREE_SPEED_ROUTING x FREE_SPEED row "
+				+ "first: it is the blur, measured.", (long) this.matrix.getMaxNeighborDistance(),
+				MatrixOptions.UNBOUNDED, (long) this.matrix.getCellSize());
 		}
 
 		if (needsEvents(chosen) && this.eventsFile == null) {

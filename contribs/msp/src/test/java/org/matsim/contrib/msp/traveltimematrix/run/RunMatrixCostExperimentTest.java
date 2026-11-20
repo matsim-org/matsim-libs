@@ -1,4 +1,4 @@
-package org.matsim.contrib.msp.traveltimematrix.experiments;
+package org.matsim.contrib.msp.traveltimematrix.run;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.matsim.contrib.msp.traveltimematrix.experiments.MemoryCalibration;
 
 /**
  * Runs the whole sweep on a grid network small enough to finish in a second, and asserts the things that
@@ -241,6 +242,31 @@ class RunMatrixCostExperimentTest {
 	}
 
 	@Test
+	void aNeighbourhoodGivenAsCellIsTheCellSizeOfItsOwnRowAndOneBelowItIsSkipped() throws IOException {
+
+		// 'cell' is the smallest radius worth sweeping, and it is a different number in every row of the
+		// grid - which is the whole reason it is a sentinel and not a number
+		Path output = run("cell-sentinel", "--cell-sizes", "2000,1000", "--max-neighbor-distances", "cell,3000",
+			"--skip-baseline");
+
+		List<Map<String, String>> cost = rows(output, "matrix_cost.csv");
+		assertEquals(4, cost.size(), "two cell sizes times two radii");
+		for (String[] expected : new String[][]{{"2000", "2000"}, {"2000", "3000"}, {"1000", "1000"},
+			{"1000", "3000"}}) {
+			assertTrue(cost.stream().anyMatch(row -> row.get("cell_size").equals(expected[0])
+					&& row.get("max_neighbor_distance").equals(expected[1])),
+				"a row for cellSize " + expected[0] + " and maxNeighborDistance " + expected[1]);
+		}
+
+		// at a 2 km cell, a 1 km neighbourhood answers pairs whose ends share a zone - which the zonal half
+		// already answers exactly - so it is dropped rather than measured
+		List<Map<String, String>> below = rows(run("below-cell", "--cell-sizes", "2000",
+			"--max-neighbor-distances", "1000,3000", "--skip-baseline"), "matrix_cost.csv");
+		assertEquals(1, below.size());
+		assertEquals("3000", below.get(0).get("max_neighbor_distance"));
+	}
+
+	@Test
 	void aConfigurationOverTheMemoryBudgetIsRefusedRatherThanAttempted() throws IOException {
 
 		// a budget of nothing: the sweep has to write the row and carry on, because the alternative is
@@ -259,11 +285,45 @@ class RunMatrixCostExperimentTest {
 		assertTrue(Long.parseLong(skipped.get("total_bytes")) > 0,
 			"but the estimate that refused it is on the record");
 
+		// a matrix that was never built can only be predicted, and it is predicted with the correction the
+		// measurements call for rather than raw - see MemoryCalibration
+		assertEquals("CALIBRATED_FROM_DEFAULT", skipped.get("memory_source"),
+			"this sweep built nothing, so the documented default factor is what was applied");
+		assertTrue(Long.parseLong(skipped.get("memory_bytes")) > Long.parseLong(skipped.get("total_bytes")),
+			"the correction is upwards: the raw estimate is about a third low");
+		assertEquals("", skipped.get("measured_bytes"), "and nothing was weighed");
+
 		assertTrue(rows(output, "matrix_accuracy.csv").stream()
 				.noneMatch(row -> row.get("answerer").equals(MATRIX)),
 			"a matrix that was never built has no accuracy");
 		assertTrue(cost.stream().anyMatch(row -> row.get("answerer").equals(DIRECT)),
 			"and the baseline still ran");
+	}
+
+	@Test
+	void aMatrixThatWasBuiltIsWeighedAndReportsWhatItWeighedRatherThanWhatItWasEstimatedAt() throws IOException {
+
+		Path output = run("measured", "--cell-sizes", "2000", "--max-neighbor-distances", "2000",
+			"--skip-baseline");
+
+		Map<String, String> row = rows(output, "matrix_cost.csv").stream()
+			.filter(entry -> entry.get("answerer").equals(MATRIX))
+			.findFirst().orElseThrow();
+
+		assertEquals("MEASURED", row.get("memory_source"));
+		assertEquals(row.get("measured_bytes"), row.get("memory_bytes"),
+			"the column to read is the measurement when there is one");
+		assertTrue(Long.parseLong(row.get("measured_bytes")) > 0, "a built matrix occupies something");
+		assertTrue(Long.parseLong(row.get("peak_heap_bytes")) >= Long.parseLong(row.get("measured_bytes")),
+			"the build cannot have peaked below what it left behind");
+
+		Map<String, String> raw = rows(run("measured-raw", "--cell-sizes", "2000",
+			"--max-neighbor-distances", "2000", "--skip-baseline", "--memory-calibration", "1"),
+			"matrix_cost.csv").stream()
+			.filter(entry -> entry.get("answerer").equals(MATRIX))
+			.findFirst().orElseThrow();
+		assertEquals("MEASURED", raw.get("memory_source"),
+			"--memory-calibration says what to do without a measurement, and this row has one");
 	}
 
 	private Path run(String name, String... options) {

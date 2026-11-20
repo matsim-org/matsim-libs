@@ -111,9 +111,41 @@ class MatrixFootprintTest {
 
 		Network network = TestNetworks.grid(5);
 		MatrixFootprint footprint = MatrixFootprint.estimate(network, 1, Double.POSITIVE_INFINITY);
+		MemoryCalibration calibration = new MemoryCalibration(null);
 
-		assertTrue(footprint.fitsIn(Long.MAX_VALUE, 1, Double.POSITIVE_INFINITY));
-		assertFalse(footprint.fitsIn(1, 1, Double.POSITIVE_INFINITY));
+		assertTrue(footprint.fitsIn(Long.MAX_VALUE, 1, Double.POSITIVE_INFINITY, calibration));
+		assertFalse(footprint.fitsIn(1, 1, Double.POSITIVE_INFINITY, calibration));
 		assertEquals(footprint.zonalBytes() + footprint.sparseBytes(), footprint.totalBytes());
+	}
+
+	@Test
+	void theBudgetIsCheckedAgainstTheCalibratedFigureAndNotTheRawOne() {
+
+		Network network = TestNetworks.grid(5);
+		MatrixFootprint footprint = MatrixFootprint.estimate(network, 1, Double.POSITIVE_INFINITY);
+
+		// a budget that exactly fits the raw estimate does not fit the matrix that estimate describes: the
+		// correction is upwards, and a budget check that ignored it would admit a configuration and then
+		// run out of heap building it
+		long raw = footprint.totalBytes();
+		assertFalse(footprint.fitsIn(raw, 1, Double.POSITIVE_INFINITY, new MemoryCalibration(null)),
+			"the raw estimate is about a third below what the matrix costs");
+		assertTrue(footprint.fitsIn(raw, 1, Double.POSITIVE_INFINITY, new MemoryCalibration(1.0)),
+			"--memory-calibration 1 asks for the old, uncorrected behaviour");
+	}
+
+	@Test
+	void aMatrixThatFitsTheBudgetButNotThisJvmIsAlsoRefused() {
+
+		Network network = TestNetworks.grid(5);
+		MatrixFootprint footprint = MatrixFootprint.estimate(network, 1, Double.POSITIVE_INFINITY);
+
+		// the budget is what the study allows; the heap is what this machine can get through, and a build
+		// needs more than the matrix it leaves behind. A budget far over -Xmx therefore does not license a
+		// matrix far over -Xmx.
+		MemoryCalibration calibration = new MemoryCalibration(Runtime.getRuntime().maxMemory()
+			/ (double) footprint.sparseBytes());
+		assertFalse(footprint.fitsIn(Long.MAX_VALUE, 1, Double.POSITIVE_INFINITY, calibration),
+			"a matrix the size of the whole heap cannot be built in it");
 	}
 }

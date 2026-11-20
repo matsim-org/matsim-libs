@@ -12,6 +12,8 @@ import org.matsim.contrib.zone.skims.TravelTimeMatrices;
 import org.matsim.core.router.util.TravelTime;
 
 import java.util.Locale;
+import org.matsim.contrib.msp.traveltimematrix.experiments.MatrixFootprint;
+import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaNetwork;
 
 /**
  * The free-speed travel time of <b>every</b> node pair of the network, stored node to node, with no zone

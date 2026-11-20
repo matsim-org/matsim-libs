@@ -14,6 +14,8 @@ import org.matsim.core.router.util.TravelTime;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaNetwork;
+import org.matsim.contrib.msp.traveltimematrix.run.RunComputeCongestionIndex;
 
 /**
  * Measures a {@link CongestionIndexProfile} on a finished run: the excess travel time index per time bin

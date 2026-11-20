@@ -1,4 +1,4 @@
-package org.matsim.contrib.msp.traveltimematrix.evaluation;
+package org.matsim.contrib.msp.traveltimematrix.run;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +7,8 @@ import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.msp.run.RunMspScenario;
 import org.matsim.contrib.msp.traveltimematrix.RunComputeCongestionIndex;
 import org.matsim.contrib.msp.traveltimematrix.TravelTimeMatrixConfigGroup;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.CongestionExposure;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.MatrixEvaluation;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -40,16 +42,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * files are written - and not what the errors are. What the errors are is a property of a scenario, not
  * of this code. The one exception is the self-check, which is a property of the code.
  */
-class RunEvaluateTravelTimeMatrixTest {
+class RunCongestionIndexExperimentTest {
 
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final String FREE_SPEED_ROUTING =
-		RunEvaluateTravelTimeMatrix.Reference.FREE_SPEED_ROUTING.name();
+		RunCongestionIndexExperiment.Reference.FREE_SPEED_ROUTING.name();
 	private static final String CONGESTED_ROUTING =
-		RunEvaluateTravelTimeMatrix.Reference.CONGESTED_ROUTING.name();
-	private static final String EXPERIENCED = RunEvaluateTravelTimeMatrix.Reference.EXPERIENCED.name();
+		RunCongestionIndexExperiment.Reference.CONGESTED_ROUTING.name();
+	private static final String EXPERIENCED = RunCongestionIndexExperiment.Reference.EXPERIENCED.name();
 
 	private static final String FREE_SPEED = TravelTimeMatrixConfigGroup.Variant.FREE_SPEED.name();
 	private static final String GLOBAL_INDEX = TravelTimeMatrixConfigGroup.Variant.GLOBAL_INDEX.name();
@@ -90,8 +92,10 @@ class RunEvaluateTravelTimeMatrixTest {
 	@Test
 	void generatedPairsAgainstBothRoutedReferencesEvaluateEveryRungOfTheLadder() throws IOException {
 
+		// a zonal matrix has to be asked for now that the exact one is the default, and this is the test
+		// that reads its cache file, so it asks
 		Path output = run("random-routed", "--od-pairs", "RANDOM",
-			"--references", FREE_SPEED_ROUTING + "," + CONGESTED_ROUTING,
+			"--references", FREE_SPEED_ROUTING + "," + CONGESTED_ROUTING, "--max-neighbor-distance", "5000",
 			"--origins", "3", "--departure-hours", "6,8", "--distance-bands", "0,10000", "--write-queries");
 
 		assertTrue(Files.exists(output.resolve("errors.csv")));
@@ -134,7 +138,7 @@ class RunEvaluateTravelTimeMatrixTest {
 		// what the zone check is on its own: a property of the network and the thresholds, with no run
 		// involved. So it must not demand the events of one.
 		Path output = Path.of(utils.getOutputDirectory(), "free-speed-only");
-		new RunEvaluateTravelTimeMatrix().execute(
+		new RunCongestionIndexExperiment().execute(
 			"--network", network(),
 			"--congestion-index", this.congestionIndex.toString(),
 			"--output-directory", output.toString(),
@@ -288,6 +292,32 @@ class RunEvaluateTravelTimeMatrixTest {
 	}
 
 	/**
+	 * And that configuration is the <b>default</b> of this command, which is the one default it does not
+	 * inherit from {@link org.matsim.contrib.msp.traveltimematrix.MatrixOptions}.
+	 * <p>
+	 * It matters because the mistake it prevents is silent: a zonal matrix answers every query, writes
+	 * every table and reports a plausible error, and nothing in the output says that several percent of
+	 * it is discretisation scatter rather than the congestion model this experiment is about.
+	 */
+	@Test
+	void theExactMatrixIsTheDefaultSoNoRunCanForgetToAskForIt() throws IOException {
+
+		// no --max-neighbor-distance and no --cell-size
+		Path output = run("default-shape", "--od-pairs", "RANDOM", "--references", FREE_SPEED_ROUTING,
+			"--origins", "3", "--departure-hours", "8", "--distance-bands", "0,10000");
+
+		String[] zones = overallRow(output, FREE_SPEED_ROUTING, FREE_SPEED);
+		assertTrue(Long.parseLong(zones[4]) > 0, "it was evaluated over some queries");
+		assertEquals(0.0, Double.parseDouble(zones[11]), 0.01,
+			"the default matrix has no discretisation error: " + zones[11]);
+
+		try (java.util.stream.Stream<Path> files = Files.list(output)) {
+			assertTrue(files.noneMatch(file -> file.getFileName().toString().endsWith(".bin")),
+				"and it is the exact matrix that is not cached, not a zonal one that would be");
+		}
+	}
+
+	/**
 	 * {@code --cell-size} is ignored when the neighbourhood is unbounded, and the way to show that is
 	 * that two cell sizes which would give very different zonal matrices give the same errors.
 	 */
@@ -327,7 +357,8 @@ class RunEvaluateTravelTimeMatrixTest {
 		// the same questions and the same measured travel times, with another cell size - and without
 		// reading the events at all, which is what the measured column in the file is for
 		Path second = run("second", "--od-pairs", "FILE", "--references", EXPERIENCED,
-			"--od-file", first.resolve("od_queries.csv").toString(), "--cell-size", "5000",
+			"--od-file", first.resolve("od_queries.csv").toString(),
+			"--max-neighbor-distance", "1000", "--cell-size", "5000",
 			"--distance-bands", "0,10000");
 
 		assertEquals(Files.readAllLines(first.resolve("od_queries.csv")),
@@ -344,7 +375,7 @@ class RunEvaluateTravelTimeMatrixTest {
 		// events, the network and the matrix
 		// execute(..) rethrows a RuntimeException of the command, so the message can be asserted
 		IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-			() -> new RunEvaluateTravelTimeMatrix().execute(
+			() -> new RunCongestionIndexExperiment().execute(
 				"--network", network(),
 				"--events", events(),
 				"--congestion-index", this.congestionIndex.toString(),
@@ -359,7 +390,7 @@ class RunEvaluateTravelTimeMatrixTest {
 
 	@Test
 	void theApiReferenceSaysHowToDoItByHand() {
-		assertThrows(UnsupportedOperationException.class, () -> new RunEvaluateTravelTimeMatrix().execute(
+		assertThrows(UnsupportedOperationException.class, () -> new RunCongestionIndexExperiment().execute(
 			"--network", network(),
 			"--events", events(),
 			"--congestion-index", this.congestionIndex.toString(),
@@ -381,7 +412,7 @@ class RunEvaluateTravelTimeMatrixTest {
 			"--threads", "2"));
 		arguments.addAll(List.of(options));
 
-		new RunEvaluateTravelTimeMatrix().execute(arguments.toArray(String[]::new));
+		new RunCongestionIndexExperiment().execute(arguments.toArray(String[]::new));
 		return output;
 	}
 

@@ -9,6 +9,9 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.nio.file.Path;
 import java.util.Map;
+import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexCalculator;
+import org.matsim.contrib.msp.traveltimematrix.evaluation.CongestionExposure;
+import org.matsim.contrib.msp.traveltimematrix.run.RunComputeCongestionIndex;
 
 /**
  * Config group of the time-varying travel time matrix.

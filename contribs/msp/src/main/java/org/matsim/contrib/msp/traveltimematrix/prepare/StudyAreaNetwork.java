@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.matsim.contrib.msp.traveltimematrix.RoadClassification;
 
 /**
  * Cuts the part of a network the matrix is built over: the links of one mode inside a study area, as one

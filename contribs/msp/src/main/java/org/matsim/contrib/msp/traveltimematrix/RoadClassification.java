@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexProfile;
 
 /**
  * Which road classes the congestion index is measured separately for, and which class a link belongs to.

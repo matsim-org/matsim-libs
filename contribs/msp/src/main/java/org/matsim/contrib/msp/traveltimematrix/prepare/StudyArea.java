@@ -12,6 +12,7 @@ import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.Locale;
+import org.matsim.contrib.msp.traveltimematrix.run.RunMatrixCostExperiment;
 
 /**
  * The area a matrix network is cut to: "is this coordinate in it", and a name to say which area it was.

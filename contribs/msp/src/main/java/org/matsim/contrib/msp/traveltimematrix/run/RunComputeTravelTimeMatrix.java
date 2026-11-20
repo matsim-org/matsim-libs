@@ -1,4 +1,4 @@
-package org.matsim.contrib.msp.traveltimematrix;
+package org.matsim.contrib.msp.traveltimematrix.run;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -21,6 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import org.matsim.contrib.msp.traveltimematrix.TimeVaryingTravelTimeMatrix;
+import org.matsim.contrib.msp.traveltimematrix.TravelTimeMatrixConfigGroup;
 
 /**
  * Builds the time-varying travel time matrix for a study area, caches it, and reports what it cost:
@@ -46,7 +48,7 @@ import java.util.Locale;
  * query is a lookup, and this is the number to put next to the routing it replaces.
  *
  * @see RunComputeCongestionIndex for the index this needs, which comes first
- * @see org.matsim.contrib.msp.traveltimematrix.evaluation.RunEvaluateTravelTimeMatrix to find out how
+ * @see org.matsim.contrib.msp.traveltimematrix.experiments.RunCongestionIndexExperiment to find out how
  * good the result is
  */
 @CommandLine.Command(
