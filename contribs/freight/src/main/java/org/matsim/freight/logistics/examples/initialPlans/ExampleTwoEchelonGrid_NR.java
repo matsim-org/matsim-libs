@@ -57,6 +57,17 @@ import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
  * @author Kai Martins-Turner (kturner)
  */
 final class ExampleTwoEchelonGrid_NR {
+	/*
+	 * Notes on the history of this class (from the git log, nov'26):
+	 * - The class was created on 2023-01-09 by Kai Martins-Turner as a copy of ExampleTwoEchelonGrid ("Use own run class
+	 *   for LSP-writer development."). Until 2023-02 it was then mostly changed by Niclas Richter (git user
+	 *   "niclasrichter") during the development of the LSPPlan writer and parser. "NR" thus presumably stands for
+	 *   Niclas Richter.
+	 * - What remains of this purpose is the writing of lsps.xml and carriers.xml after the run.
+	 * - The run also had a "new LSPPlanXmlReader(...)" without reading a file (added in "More work on parsing LSPPlan",
+	 *   2023-01-21), presumably an intermediate state of the parser development. It had no effect and was removed in
+	 *   nov'26.
+	 */
 
 	// Run Settings
 	static final double HUBCOSTS_FIX = 100;

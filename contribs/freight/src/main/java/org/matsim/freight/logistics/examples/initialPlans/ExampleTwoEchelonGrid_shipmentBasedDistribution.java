@@ -57,6 +57,12 @@ import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
  * @author Kai Martins-Turner (kturner)
  */
 final class ExampleTwoEchelonGrid_shipmentBasedDistribution {
+	/*
+	 * Notes on the history of this class (from the git log, nov'26):
+	 * - The class was created on 2025-02-07 by Kai Martins-Turner ("set vrpLogic for carriers"). The output written
+	 *   after the run (lsps.xml, carriers.xml) is the same as in ExampleTwoEchelonGrid_NR; see the notes there.
+	 * - This included a "new LSPPlanXmlReader(...)" without reading a file. It had no effect and was removed in nov'26.
+	 */
 
 	// Run Settings
 	static final double HUBCOSTS_FIX = 100;
