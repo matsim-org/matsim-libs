@@ -13,6 +13,7 @@ import tech.tablesaw.api.Table;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.matsim.application.analysis.population.kn.AgentWiseComparisonKNUtils.*;
@@ -147,7 +148,7 @@ class AgentWiseComparisonKNTest {
 	}
 
 	private Table baseCase(Scenario scenario) {
-		scenario.getConfig().controller().setOutputDirectory(directory.resolve("run").toString());
+		scenario.getConfig().controller().setOutputDirectory(directory.resolve("run-" + UUID.randomUUID()).toString());
 		// Reproduce the relevant preparation steps from AgentWiseComparisonKN.call(). All
 		// persons in these table tests have positive income, so both utility calculations apply.
 		computeAndSetMarginalUtilitiesOfMoney(scenario);
