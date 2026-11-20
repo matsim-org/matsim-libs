@@ -372,8 +372,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 				.setResource(distributionCarrierResource)
 				.build();
 
-		mainCarrierElement.connectWithNextElement(hubElement);
-		hubElement.connectWithNextElement(distributionCarrierElement);
 
 		hubChain =
 			LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubChain", LogisticChain.class))

@@ -187,10 +187,6 @@ public class CompleteLSPPlanTest {
 				.setResource(distributionCarrierResource)
 				.build();
 
-		collectionElement.connectWithNextElement(firstHubElement);
-		firstHubElement.connectWithNextElement(mainRunElement);
-		mainRunElement.connectWithNextElement(secondHubElement);
-		secondHubElement.connectWithNextElement(distributionElement);
 
 		final Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);
 		logisticChain = LSPUtils.LogisticChainBuilder.newInstance(chainId)

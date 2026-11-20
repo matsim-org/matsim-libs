@@ -115,7 +115,6 @@ public class FirstReloadLSPSchedulingTest {
 		firstHubElementBuilder.setResource(firstTranshipmentHubResource);
 		firstHubElement = firstHubElementBuilder.build();
 
-		collectionElement.connectWithNextElement(firstHubElement);
 
 
 		Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);

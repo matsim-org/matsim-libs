@@ -473,10 +473,6 @@ import org.matsim.vehicles.VehicleUtils;
   private static LSPPlan createLSPPlan_direct(
       LogisticChainElement depotElement, LogisticChainElement directDistributionElement) {
 
-    log.info("The order of the LogisticChainElements is now specified");
-    depotElement.connectWithNextElement(directDistributionElement);
-
-
     log.info("set up logistic chain - direct distribution from the depot is created");
 
     LogisticChain completeChainDirect =
@@ -500,11 +496,6 @@ import org.matsim.vehicles.VehicleUtils;
       LogisticChainElement distributionElement) {
 
     log.info("set up logistic chain - original with hub usage chain is created");
-
-    // Das ist wichtig, damit er die Kette zur Verfügung hat.
-    depotElement.connectWithNextElement(mainRunElement);
-    mainRunElement.connectWithNextElement(hubElement);
-    hubElement.connectWithNextElement(distributionElement);
 
     LogisticChain completeChainWithReloading =
         LSPUtils.LogisticChainBuilder.newInstance(
@@ -590,7 +581,9 @@ import org.matsim.vehicles.VehicleUtils;
     }
 
     @Override
-    public void setEmbeddingContainer(LSP pointer) {}
+    public void setEmbeddingContainer(LSP pointer) {
+      // The back pointer is not used by this tracker.
+    }
 
     @Override
     public void handleEvent(CarrierTourEndEvent event) {

@@ -232,13 +232,8 @@ import org.matsim.vehicles.VehicleUtils;
     distributionBuilder.setResource(distributionResource);
     LogisticChainElement distributionElement = distributionBuilder.build();
 
-    // The Order of the LogisticChainElements is now specified
-    collectionElement.connectWithNextElement(firstHubElement);
-    firstHubElement.connectWithNextElement(mainRunElement);
-    mainRunElement.connectWithNextElement(secondHubElement);
-    secondHubElement.connectWithNextElement(distributionElement);
-
-    // The LogisticChainElements are now inserted into the only LogisticChain of the LSP
+    // The LogisticChainElements are now inserted into the only LogisticChain of the LSP. The builder connects them in the
+    // order in which they are added.
     Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);
     LSPUtils.LogisticChainBuilder completeChainBuilder =
         LSPUtils.LogisticChainBuilder.newInstance(chainId);

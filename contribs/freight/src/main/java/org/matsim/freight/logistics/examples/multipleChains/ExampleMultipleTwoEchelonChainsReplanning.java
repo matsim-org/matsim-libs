@@ -34,7 +34,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
@@ -51,7 +50,6 @@ import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.LSPUtils.LogisticChainElementBuilder;
 import org.matsim.freight.logistics.examples.LogisticsExampleUtils;
 import org.matsim.freight.logistics.examples.MyLSPScorer;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
@@ -232,18 +230,6 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
 
 					hubChainLeftBuilder.addLogisticChainElement( distributionCarrierElementLeft );
 				}
-//				mainCarrierElementLeft.connectWithNextElement(hubElementLeft);
-//				hubElementLeft.connectWithNextElement(distributionCarrierElementLeft);
-				// yyyy would it be possible to get the info for the two previous lines out of the logistic chain? Because then one could write this a
-				// lot more like matsim standard: first generate the logistic chain, and then keep adding material to it. However, one would need to
-				// remove the chain builder and build "directly".  kai, jul'25
-				// --> I have moved this into the "build" method?
-
-//																 .addLogisticChainElement( mainCarrierElementLeft )
-//																 .addLogisticChainElement( hubElementLeft )
-//																 .addLogisticChainElement( distributionCarrierElementLeft )
-//																 .build();
-
 				multipleTwoEchelonChainsPlan.addLogisticChain( hubChainLeftBuilder.build() );
 			}
 
@@ -307,10 +293,6 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
 																			.setResource( distributionCarrierResource )
 																			.build();
 				}
-//				mainCarrierElement.connectWithNextElement(hubElementRight);
-//				hubElementRight.connectWithNextElement(distributionCarrierElement);
-				// done in "build"
-
 				LogisticChain hubChainRight = LogisticChainBuilder.newInstance( Id.create( "hubChainRight", LogisticChain.class ) )
 																  .addLogisticChainElement( mainCarrierElement )
 																  .addLogisticChainElement( hubElementRight )

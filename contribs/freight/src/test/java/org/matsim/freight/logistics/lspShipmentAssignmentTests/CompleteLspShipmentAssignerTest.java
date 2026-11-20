@@ -188,10 +188,6 @@ public class CompleteLspShipmentAssignerTest {
 				.setResource(distributionResource)
 				.build();
 
-		collectionElement.connectWithNextElement(firstHubElement);
-		firstHubElement.connectWithNextElement(mainRunElement);
-		mainRunElement.connectWithNextElement(secondHubElement);
-		secondHubElement.connectWithNextElement(distributionElement);
 
 		LogisticChain completeChain  = LSPUtils.LogisticChainBuilder.newInstance(Id.create("ChainId", LogisticChain.class))
 				.addLogisticChainElement(collectionElement)

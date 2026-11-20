@@ -279,10 +279,7 @@ final class TwoEchelonGridUtils {
 				.setResource(distributionCarrierRessource)
 				.build();
 
-			// Kettenbildung per hand, damit dann klar ist, wie das Scheduling ablaufen soll.
-			mainCarrierLCE.connectWithNextElement(hubLCE);
-			hubLCE.connectWithNextElement(distributionCarrierLCE);
-
+			// The builder connects the elements in the order in which they are added. This order defines the order of the scheduling.
 			LogisticChain hubChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubChain", LogisticChain.class))
 				.addLogisticChainElement(mainCarrierLCE)
 				.addLogisticChainElement(hubLCE)

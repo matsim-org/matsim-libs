@@ -126,7 +126,6 @@ public class MultipleShipmentsFirstReloadLSPMobsimTest {
 		firstHubElementBuilder.setResource(firstTranshipmentHubResource);
 		LogisticChainElement firstHubElement = firstHubElementBuilder.build();
 
-		collectionElement.connectWithNextElement(firstHubElement);
 
 
 		Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);

@@ -173,9 +173,6 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 		secondHubElement = secondHubElementBuilder.build();
 
 
-		collectionElement.connectWithNextElement(firstHubElement);
-		firstHubElement.connectWithNextElement(mainRunElement);
-		mainRunElement.connectWithNextElement(secondHubElement);
 
 
 		Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);

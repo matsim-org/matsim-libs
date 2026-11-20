@@ -160,8 +160,6 @@ public class MultipleShipmentsMainRunLSPMobsimTest {
 				.setResource(mainRunResource)
 				.build();
 
-		collectionElement.connectWithNextElement(firstHubElement);
-		firstHubElement.connectWithNextElement(mainRunElement);
 
 		Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);
 		LSPUtils.LogisticChainBuilder completeChainBuilder = LSPUtils.LogisticChainBuilder.newInstance(chainId);

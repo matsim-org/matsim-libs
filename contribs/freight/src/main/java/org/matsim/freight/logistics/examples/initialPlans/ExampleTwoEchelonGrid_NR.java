@@ -33,7 +33,6 @@ import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.examples.initialPlans.TwoEchelonGridUtils.CarrierCostSetting;
 import org.matsim.freight.logistics.examples.initialPlans.TwoEchelonGridUtils.DemandSetting;
-import org.matsim.freight.logistics.io.LSPPlanXmlReader;
 import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
 
 /**
@@ -86,9 +85,7 @@ final class ExampleTwoEchelonGrid_NR {
 		log.warn("Runs settings were: Demand: {}\n CarrierCosts: {}\n HubCosts: " + HUBCOSTS_FIX + "\n tollValue: " + TOLL_VALUE, demandSetting, costSetting);
 		controller.run();
 
-		// Ggf. muss der Ordner noch erstellt werden (?)
 		new LSPPlanXmlWriter(LSPUtils.getLSPs(controller.getScenario())).write(controller.getConfig().controller().getOutputDirectory() + "/lsps.xml");
-		new LSPPlanXmlReader(LSPUtils.getLSPs(controller.getScenario()), CarriersUtils.getCarriers(controller.getScenario()));
 		CarriersUtils.writeCarriers(controller.getScenario(), "carriers.xml");
 
 		log.info("Some results ....");

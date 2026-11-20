@@ -395,19 +395,13 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
         elementIdResourceIdMap.clear();
 
-        LogisticChain currentLogisticChain =
-            LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
-                .addLogisticChainElement(logisticChainElements.getFirst())
-                .build();
-
-        for (int i = 1;
-            i < logisticChainElements.size();
-            i++) { // element 0 was already added in Builder as first element.
-          logisticChainElements.get(i - 1).connectWithNextElement(logisticChainElements.get(i));
-          currentLogisticChain.getLogisticChainElements().add(logisticChainElements.get(i));
+        // The builder connects the elements in the order in which they are added.
+        LSPUtils.LogisticChainBuilder chainBuilder =
+            LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class));
+        for (LogisticChainElement logisticChainElement : logisticChainElements) {
+          chainBuilder.addLogisticChainElement(logisticChainElement);
         }
-
-        logisticChains.add(currentLogisticChain);
+        logisticChains.add(chainBuilder.build());
       }
 
       case SHIPMENT_PLAN -> {

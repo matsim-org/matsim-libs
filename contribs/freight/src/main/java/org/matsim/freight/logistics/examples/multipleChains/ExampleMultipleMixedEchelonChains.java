@@ -244,8 +244,6 @@ final class ExampleMultipleMixedEchelonChains {
 						.setResource(distributionCarrierResource1)
 						.build();
 
-				mainCarrierElement1.connectWithNextElement(hubElement1);
-				hubElement1.connectWithNextElement(distributionCarrierElement1);
 
 				hubChain1 =
 					LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubChain", LogisticChain.class))
@@ -361,8 +359,6 @@ final class ExampleMultipleMixedEchelonChains {
 						.setResource(distributionCarrierResource)
 						.build();
 
-				mainCarrierElement.connectWithNextElement(hubElement);
-				hubElement.connectWithNextElement(distributionCarrierElement);
 
 				hubChain =
 					LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubChain", LogisticChain.class))

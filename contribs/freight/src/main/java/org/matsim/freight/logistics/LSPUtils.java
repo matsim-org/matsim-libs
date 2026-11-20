@@ -384,16 +384,15 @@ public final class LSPUtils {
 		}
 
 		public LogisticChain build() {
-			//TODO: Prüfe of das alle Elemente Verbunden sind (in irgendeiner Art). Plus Hinweis auf die Änderung.
-			// yyyyyy was ist mit "Hinweis auf Änderung" gemeint???
-
-			// connect all elements:
-			LogisticChainElement prev = null;
+			// Connect the elements in the order in which they were added.  The elements are always created by
+			// LogisticChainElementBuilder, so the cast is safe.
+			LogisticChainElementImpl prev = null;
 			for( LogisticChainElement logisticChainElement : this.elements ){
+				LogisticChainElementImpl current = (LogisticChainElementImpl) logisticChainElement;
 				if ( prev != null ) {
-					prev.connectWithNextElement( logisticChainElement );
+					prev.connectWithNextElement( current );
 				}
-				prev = logisticChainElement;
+				prev = current;
 			}
 
 			return new LogisticChainImpl(this);

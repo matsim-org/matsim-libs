@@ -38,9 +38,6 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   LogisticChainImpl(LSPUtils.LogisticChainBuilder builder) {
     super(builder.id);
     this.logisticChainElements = builder.elements;
-    for (LogisticChainElement element : this.logisticChainElements) {
-      element.setEmbeddingContainer(this);
-    }
     this.lspShipmentIds = new ArrayList<>();
   }
 

@@ -72,7 +72,9 @@ import org.matsim.freight.logistics.shipment.*;
 	}
 
 	@Override
-	public void setEmbeddingContainer(LSPResource pointer) {}
+	public void setEmbeddingContainer(LSPResource pointer) {
+		// The back pointer is not used by this tracker.
+	}
 
 	@Override
 	public void setEventsManager(EventsManager eventsManager) {
