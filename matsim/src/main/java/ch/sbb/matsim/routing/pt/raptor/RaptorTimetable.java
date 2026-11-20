@@ -14,7 +14,7 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
  * indices; each implementation searches the next departure in its own order. {@link SwissRailRaptorCore}
  * does not rely on the order of the indices.
  */
-interface RaptorTimetable {
+sealed interface RaptorTimetable permits RaptorScheduleTimetable, VersionedRaptorTimetable {
 
 	int getArrivalTime(int departureIndex, RRouteStop routeStop);
 
