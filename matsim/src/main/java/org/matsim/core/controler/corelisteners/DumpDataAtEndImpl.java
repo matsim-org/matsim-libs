@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -372,11 +372,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	}
 
 	private void dumpPlans() {
-		// dump plans
-
-		final PopulationWriter writer = new PopulationWriter(this.population, this.network);
-		writer.putAttributeConverters(this.attributeConverters);
-		writer.write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.population));
+		PopulationUtils.writePopulation(this.population,
+				this.controlerIO.getOutputFilename(Controler.DefaultFiles.population),
+				this.attributeConverters);
 	}
 
 }
