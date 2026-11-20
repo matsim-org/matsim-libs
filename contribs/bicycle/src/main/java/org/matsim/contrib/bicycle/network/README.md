@@ -401,9 +401,8 @@ the file is missing.
    supplied via `--dem`), and `BicycleLinkPolicy` classifies the link's cycling infrastructure via
    `BicycleInfraClassifier` — written to the `bicycle_infra` attribute as a `BicycleInfraCategory` name — and enforces
    access rules.
-2. Normalize `origid` to a `String` (the reader stores it as a `Long`), move OSM-derived attributes (`bicycle`,
-   `surface`, `smoothness`, `cycleway`) under the `osm:` prefix, and — with `--store-original-geometry` — repair
-   reversed geometry on the reader's synthetic `*_bike-reverse` links.
+2. Normalize `origid` to a `String` (the reader stores it as a `Long`) and move OSM-derived attributes (`bicycle`,
+   `surface`, `smoothness`, `cycleway`) under the `osm:` prefix.
 3. `NetworkUtils.cleanNetwork` drops isolated components.
 4. Bicycle-aware simplification merges consecutive links only when their infra-relevant attributes agree
    (`bicycle_infra`, `bicycle_area`, `type`, `osm:surface`, `osm:smoothness`, `allowed_speed`) and their link stats
@@ -552,12 +551,6 @@ prints the DEM's own extent, which is usually enough to spot the right one.
 - **Some surviving nodes may lack a Z coordinate.** A node that survives simplification but was never touched by the
   reader's `setAfterLinkCreated` callback keeps no Z. The per-link metrics are unaffected (they sample the DEM directly).
   This gap disappears once node Z is retired.
-
-### Geometry
-
-- **Reverse-direction links need a geometry repair.** With `--store-original-geometry`, the reader copies geometry onto
-  its synthetic `*_bike-reverse` links in the wrong order; a heuristic pass (`repairReversedGeometry`) mirrors it back
-  before simplification. The proper fix belongs upstream in `OsmBicycleReader`.
 
 ### Attributes & scoring
 
