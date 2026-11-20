@@ -30,6 +30,9 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Some utility functions for dumping time and memory usage, and for logging.
@@ -44,6 +47,28 @@ public abstract class Gbl {
 	public final static String FUTURE_SUPPRESSED = " Future occurences of this logging statement are suppressed." ;
 
 	public final static String SEPARATOR = "****************************" ;
+
+	public static final String ENABLE_DEBUG_OUTPUT_HINT = "To enable debug output, set an environment variable, e.g. export LOG_LEVEL='debug', "
+		+ "or set the log level to Level.DEBUG (e.g. via Configurator) in your run class.";
+
+	private static final Set<String> debugOutputSkippedLogged = ConcurrentHashMap.newKeySet();
+	private static final AtomicBoolean debugOutputHintLogged = new AtomicBoolean(false);
+
+	/**
+	 * If debug is disabled for {@code log}, logs "=== {@code what} skipped ===" once per {@code what},
+	 * and {@link #ENABLE_DEBUG_OUTPUT_HINT} once per JVM. Does nothing if debug is enabled.
+	 */
+	public static void logDebugOutputSkipped(Logger log, String what) {
+		if (log.isDebugEnabled()) {
+			return; // debug output will follow, nothing was skipped
+		}
+		if (debugOutputSkippedLogged.add(what)) {
+			log.info("=== " + what + " skipped ===");
+		}
+		if (debugOutputHintLogged.compareAndSet(false, true)) {
+			log.info(ENABLE_DEBUG_OUTPUT_HINT + ONLYONCE);
+		}
+	}
 
 	public static final String CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE = "This class wants to overwrite createRoutingAlgorithm(), which is no longer possible.  Making createRoutingAlgorithm() non-final would not help since, after recent code changes, it is only used during initialization but not in replanning.  kai, may'13.  Aborting ...";
 
