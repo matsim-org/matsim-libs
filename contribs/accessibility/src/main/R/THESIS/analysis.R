@@ -16,7 +16,7 @@ suppressPackageStartupMessages({
 # Directories
 # ==========================================================
 
-base_dir     <- "/home/brendan/Documents/arbeit/abmtrans_paper/2026-11-19-v6.4-spa-uni-jobcenter-NoMonConstant"
+base_dir     <- "../public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-19-v6.4-spa-uni-jobcenter-NoMonConstant"
 input_dir    <- base_dir
 
 # Berlin district shapefile and S-Bahn ring: static files kept in the repo,
@@ -410,6 +410,7 @@ ggsave(file.path(output_dir, "scatter_car_acc_income.png"), scatter_car_acc_inco
 # boxplot Δ base car accessibility by income (income integration)
 boxplot_base_car_deltaacc_by_income <- ggplot(df_acc, aes(income, base_car_delta_incomeFactor)) +
   geom_boxplot(outlier.alpha = 0.3) +
+  stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5, na.rm = TRUE) +
   labs(
     x = "Income group",
     y = "Car accessibility change (utils)"
@@ -597,20 +598,40 @@ ggsave(file.path(output_dir, "bar_medianacc_by_income_mode_scenario.png"), bar_m
 # boxplot Δ car accessibility by income
 boxplot_car_deltaacc_by_income <- ggplot(df_acc, aes(income, car_delta)) +
   geom_boxplot(outlier.alpha = 0.3) +
+  stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5, na.rm = TRUE) +
   labs(
     x = "Income group",
     y = "Car accessibility change (utils)"
   )
 ggsave(file.path(output_dir, "boxplot_car_deltaacc_by_income.png"), boxplot_car_deltaacc_by_income, dpi = 300, width = 8, height = 5)
 
+
+
+# library(tmap)
+# tmap_mode('view')
 # boxplot Δ multimodal accessibility by income
 boxplot_mm_deltaacc_by_income <- ggplot(df_acc, aes(income, mm_delta)) +
   geom_boxplot(outlier.alpha = 0.3) +
+  stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5, na.rm = TRUE) +
   labs(
     x = "Income group",
     y = "Multimodal accessibility change (utils)"
   )
 ggsave(file.path(output_dir, "boxplot_mm_deltaacc_by_income.png"), boxplot_mm_deltaacc_by_income, dpi = 300, width = 8, height = 5)
+
+# faceted by w/in or outside of ring
+df_acc_ring <- df_acc |> st_as_sf(coords=c("homeX","homeY"), crs=25832) |> st_join(ring_sf |> mutate(within = TRUE)) |> mutate(within = case_when(is.na(within)~"Outside Ring",.default="Within Ring"))
+boxplot_mm_deltaacc_by_income_ring <- ggplot(df_acc_ring, aes(income, mm_delta)) +
+  geom_boxplot(outlier.alpha = 0.3) +
+  stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5, na.rm = TRUE) +
+  labs(
+    x = "Income group",
+    y = "Multimodal accessibility change (utils)"
+  ) +
+  facet_grid(~within)
+boxplot_mm_deltaacc_by_income_ring
+ggsave(file.path(output_dir, "boxplot_mm_deltaacc_by_income_ring.png"), boxplot_mm_deltaacc_by_income_ring, dpi = 300, width = 8, height = 5)
+
 
 # boxplot Δ car accessibility by district
 boxplot_car_acc_by_district <- ggplot(df_acc, aes(x = district,
