@@ -18,6 +18,11 @@ final class RaptorScheduleTimetable implements RaptorTimetable {
 	}
 
 	@Override
+	public boolean belongsTo(SwissRailRaptorData data) {
+		return this.departures == data.departures;
+	}
+
+	@Override
 	public int getArrivalTime(int departureIndex, RRouteStop routeStop) {
 		return this.departures[departureIndex] + routeStop.arrivalOffset;
 	}

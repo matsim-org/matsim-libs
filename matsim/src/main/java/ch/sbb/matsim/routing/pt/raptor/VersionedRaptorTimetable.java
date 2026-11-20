@@ -137,7 +137,7 @@ public final class VersionedRaptorTimetable implements RaptorTimetable {
 		return new VersionedRaptorTimetable(this.base, newTimes);
 	}
 
-	/** @return whether this version belongs to {@code data}, i.e. uses its indices of departures and route stops */
+	@Override
 	public boolean belongsTo(SwissRailRaptorData data) {
 		return this.base.data == data;
 	}

@@ -51,7 +51,7 @@ import java.util.*;
  */
 public class SwissRailRaptorCore {
     private final SwissRailRaptorData data;
-    private final RaptorTimetable timetable;
+    private RaptorTimetable timetable; // the times of the current search, set at its start
 
     private final PathElement[] arrivalPathPerRouteStop;
     private final double[] egressCostsPerRouteStop;
@@ -110,12 +110,20 @@ public class SwissRailRaptorCore {
         this.bestArrivalCost = Double.POSITIVE_INFINITY;
     }
 
+    private void useTimetable(RaptorTimetable timetable) {
+        if (!timetable.belongsTo(this.data)) {
+            throw new IllegalArgumentException("SwissRailRaptor: the timetable belongs to other SwissRailRaptorData.");
+        }
+        this.timetable = timetable;
+    }
+
 	// This function uses the above defined arrays to keep track of the best route. It minimizes the travel cost. For each request, all the internal
 	// state is reset. paul, feb '26.
-	public RaptorRoute calcLeastCostRoute(double depTime, Facility fromFacility, Facility toFacility, List<InitialStop> accessStops, List<InitialStop> egressStops, RaptorParameters parameters, Person person) {
+	public RaptorRoute calcLeastCostRoute(RaptorTimetable timetable, double depTime, Facility fromFacility, Facility toFacility, List<InitialStop> accessStops, List<InitialStop> egressStops, RaptorParameters parameters, Person person) {
 		final int maxTransfers = 20; // sensible defaults, could be made configurable if there is a need for it.
         final int maxTransfersAfterFirstArrival = 2;
 
+        useTimetable(timetable);
         reset();
         CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
@@ -312,6 +320,11 @@ public class SwissRailRaptorCore {
         final int maxTransfersAfterFirstArrival = 2;
         Map<PathElement, InitialStop> initialStopsPerStartPath = new HashMap<>();
 
+        if (this.data.config.isUseTimetableUpdates()) {
+            // the range query is not checked with departure times that differ from the schedule
+            throw new IllegalStateException("SwissRailRaptor: timetable updates cannot be combined with the range query.");
+        }
+        useTimetable(this.data.scheduleTimetable);
         reset();
 
         CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
@@ -518,11 +531,12 @@ public class SwissRailRaptorCore {
         return routesToKeep;
     }
 
-    public Map<Id<TransitStopFacility>, TravelInfo> calcLeastCostTree(double depTime, Collection<InitialStop> startStops, RaptorParameters parameters, Person person) {
-      return this.calcLeastCostTree(depTime, startStops, parameters, person, null);
+    public Map<Id<TransitStopFacility>, TravelInfo> calcLeastCostTree(RaptorTimetable timetable, double depTime, Collection<InitialStop> startStops, RaptorParameters parameters, Person person) {
+      return this.calcLeastCostTree(timetable, depTime, startStops, parameters, person, null);
     }
 
-    public Map<Id<TransitStopFacility>, TravelInfo> calcLeastCostTree(double depTime, Collection<InitialStop> startStops, RaptorParameters parameters, Person person, RaptorObserver observer) {
+    public Map<Id<TransitStopFacility>, TravelInfo> calcLeastCostTree(RaptorTimetable timetable, double depTime, Collection<InitialStop> startStops, RaptorParameters parameters, Person person, RaptorObserver observer) {
+        useTimetable(timetable);
         reset();
 
         CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();

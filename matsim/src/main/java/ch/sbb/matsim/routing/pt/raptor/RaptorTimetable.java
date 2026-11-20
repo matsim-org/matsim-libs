@@ -13,8 +13,15 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
  * stop, no departure arrives or departs earlier than the one before. This order need not be the order of the
  * indices; each implementation searches the next departure in its own order. {@link SwissRailRaptorCore}
  * does not rely on the order of the indices.
+ * <p>
+ * A {@link RaptorTimetableProvider} chooses the timetable of each request. Other packages can hold and pass on
+ * timetables, but cannot implement them: there are the times of the schedule
+ * ({@link DefaultRaptorTimetableProvider}) and versions of updated times ({@link VersionedRaptorTimetable}).
  */
-sealed interface RaptorTimetable permits RaptorScheduleTimetable, VersionedRaptorTimetable {
+public sealed interface RaptorTimetable permits RaptorScheduleTimetable, VersionedRaptorTimetable {
+
+	/** @return whether this timetable can be used with {@code data}, i.e. uses its indices of departures and route stops */
+	boolean belongsTo(SwissRailRaptorData data);
 
 	int getArrivalTime(int departureIndex, RRouteStop routeStop);
 

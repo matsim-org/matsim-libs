@@ -68,6 +68,7 @@ public class SwissRailRaptorModule extends AbstractModule {
 			}
 
 			bind(RaptorStopFinder.class).to(DefaultRaptorStopFinder.class);
+			bind(RaptorTimetableProvider.class).to(DefaultRaptorTimetableProvider.class);
 			bind(OccupancyData.class).toInstance(this.occupancyData);
 			if (srrConfig.isUseCapacityConstraints()) {
 				bindOccupancyTracker();
