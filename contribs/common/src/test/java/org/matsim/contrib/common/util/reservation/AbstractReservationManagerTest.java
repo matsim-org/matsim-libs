@@ -89,6 +89,8 @@ public class AbstractReservationManagerTest {
 		assertThat(reservationManager.isAvailable(resource1, consumer1, 100, 200)).isFalse(); // Exact same range
 		assertThat(reservationManager.isAvailable(resource1, consumer1, 50, 250)).isFalse(); // Completely contains
 		assertThat(reservationManager.isAvailable(resource1, consumer1, 120, 180)).isFalse(); // Completely inside
+		assertThat(reservationManager.isAvailable(resource1, consumer1, 50, 200)).isFalse(); // Starts before, same end
+		assertThat(reservationManager.isAvailable(resource1, consumer1, 100, 250)).isFalse(); // Same start, ends after
 	}
 
 	@Test
@@ -387,6 +389,78 @@ public class AbstractReservationManagerTest {
 		assertThat(reservationManager.isAvailable(resource1, consumer3, 160, 220)).isTrue();
 	}
 
+	/**
+	 * Reservations that overlap the requested range but not each other occupy only one unit of capacity at a time.
+	 */
+	@Test
+	public void testIsAvailable_CountsSimultaneousReservationsOnly() {
+		resource1.capacity = 2;
+		reservationManager.addReservation(resource1, consumer1, 100, 200);
+		reservationManager.addReservation(resource1, consumer2, 300, 400);
+
+		// at most one other consumer at any time within 150-350
+		assertThat(reservationManager.isAvailable(resource1, consumer3, 150, 350)).isTrue();
+
+		// with a third reservation overlapping the first one, two consumers are present at 150-200
+		TestConsumer consumer4 = new TestConsumer("consumer4");
+		reservationManager.addReservation(resource1, consumer4, 150, 250);
+		assertThat(reservationManager.isAvailable(resource1, consumer3, 150, 350)).isFalse();
+		assertThat(reservationManager.isAvailable(resource1, consumer3, 200, 350)).isTrue();
+	}
+
+	/**
+	 * Reservations that only touch each other are not simultaneous.
+	 */
+	@Test
+	public void testIsAvailable_TouchingReservationsAreNotSimultaneous() {
+		resource1.capacity = 2;
+		reservationManager.addReservation(resource1, consumer1, 100, 200);
+		reservationManager.addReservation(resource1, consumer2, 200, 300);
+
+		assertThat(reservationManager.isAvailable(resource1, consumer3, 0, 400)).isTrue();
+	}
+
+	/**
+	 * A zero-length reservation occupies its instant (see TimeInterval).
+	 */
+	@Test
+	public void testIsAvailable_ZeroLengthReservationCountsAtItsInstant() {
+		resource1.capacity = 1;
+		reservationManager.addReservation(resource1, consumer1, 150, 150);
+
+		assertThat(reservationManager.isAvailable(resource1, consumer2, 100, 200)).isFalse();
+		assertThat(reservationManager.isAvailable(resource1, consumer2, 150, 200)).isFalse();
+		assertThat(reservationManager.isAvailable(resource1, consumer2, 100, 150)).isTrue();
+
+		resource1.capacity = 2;
+		reservationManager.addReservation(resource1, consumer3, 100, 150);
+		// the reservation ending at 150 and the instant at 150 do not overlap
+		assertThat(reservationManager.isAvailable(resource1, consumer2, 100, 200)).isTrue();
+	}
+
+	/**
+	 * Operation facility pattern from the DRT shifts module (buffer 300 s, capacity 2): a vehicle waiting at its hub
+	 * holds a reservation until its service end, another vehicle has its shift-end reservation from 20:00 until service
+	 * end, and a third vehicle reserved a break from 13:00 to 14:00. When the first vehicle starts a shift ending at
+	 * 14:00, its changeover reservation from 14:00 until service end has to fit. At no time is more than one other
+	 * vehicle present, but all three overlap the long changeover range.
+	 */
+	@Test
+	public void testIsAvailable_ShiftEndAfterBreakOfOtherVehicle() {
+		TestReservationManager manager = new TestReservationManager(300);
+		resource1.capacity = 2;
+		double serviceEnd = 30 * 3600;
+
+		Optional<ReservationManager.ReservationInfo<TestResource, TestConsumer>> waiting =
+			manager.addReservation(resource1, consumer1, 0, serviceEnd);
+		assertThat(manager.addReservation(resource1, consumer2, 20 * 3600, serviceEnd)).isPresent();
+		assertThat(manager.addReservation(resource1, consumer3, 13 * 3600, 14 * 3600)).isPresent();
+
+		// consumer1 starts its shift at 06:00: the waiting reservation ends, the changeover reservation is added
+		assertThat(manager.updateReservation(resource1.getId(), waiting.get().reservationId(), 6 * 3600, 6 * 3600)).isTrue();
+		assertThat(manager.addReservation(resource1, consumer1, 14 * 3600, serviceEnd)).isPresent();
+	}
+
 	@Test
 	public void testCleanReservations() {
 		// Add reservations
@@ -435,6 +509,14 @@ public class AbstractReservationManagerTest {
 	}
 
 	private static class TestReservationManager extends AbstractReservationManager<TestResource, TestConsumer> {
+		TestReservationManager() {
+			super();
+		}
+
+		TestReservationManager(double bufferTime) {
+			super(bufferTime);
+		}
+
 		@Override
 		public int getCapacity(TestResource resource) {
 			return resource.capacity;
