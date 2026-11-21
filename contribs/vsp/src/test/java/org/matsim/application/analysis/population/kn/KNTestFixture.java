@@ -134,7 +134,7 @@ public final class KNTestFixture {
 
 	public static MuseComputation muse(Scenario scenario) {
 		// Use real standard activity scoring for the numerical MUSE tests. The KN base-case
-		// tests separately exercise the full injector with its income-dependent provider.
+		// tests separately exercise the production scoring bindings with the income-dependent provider.
 		return muse(scenario, new CharyparNagelScoringFunctionFactory(scenario));
 	}
 
