@@ -77,14 +77,15 @@ public class GeoFileReader implements MatsimSomeReader {
 
 
 	public static Collection<SimpleFeature> getAllFeatures(final String filename, Name layerName) {
+		String lcFilename = filename.toLowerCase(Locale.ROOT);
 		try {
-			if(filename.endsWith(".shp")) {
+			if (lcFilename.endsWith(".shp")) {
 				File dataFile = new File(filename);
 				log.info("will try to read from " + dataFile.getAbsolutePath());
 				Gbl.assertIf(dataFile.exists());
                 FileDataStore dataStore = FileDataStoreFinder.getDataStore(dataFile);
 				return getSimpleFeatures(dataStore);
-			} else if(filename.endsWith(".gpkg")){
+			} else if (lcFilename.endsWith(".gpkg")){
 				Map<String, Object> params = new HashMap<>();
 				params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
 				params.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
