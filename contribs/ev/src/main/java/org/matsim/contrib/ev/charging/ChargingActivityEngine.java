@@ -25,6 +25,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Collection;
@@ -80,11 +81,14 @@ public class ChargingActivityEngine implements DistributedActivityHandler, Distr
 		if (evCfg.isEnforceChargingInteractionDuration()) {
 			for (var agentId : agentsInChargerQueue) {
 				// SAFETY: We know that we have a plan agent because we test for it in handleActivity.
-				var agent = personsCharging.get(agentId).agent;
+				var chargingActivity = personsCharging.get(agentId);
+				var agent = chargingActivity.agent;
 				checkReplanningConditions(agent);
 
-				// this magically sets the activity end time to now + actDur. Apparently, agents have access to the
-				// sim timer internally...
+				// the charging interaction should last its duration from now on: extend the maximum duration (which
+				// counts from the activity start) by the time spent waiting so far, so that it ends at now + duration
+				chargingActivity.maximumDuration.ifDefined(duration -> chargingActivity.activity
+					.setMaximumDuration(time - chargingActivity.startTime + duration));
 				WithinDayAgentUtils.resetCaches(agent);
 				rescheduleActivityEnd(agent);
 			}
@@ -130,7 +134,7 @@ public class ChargingActivityEngine implements DistributedActivityHandler, Distr
 				var strategy = strategyFactory.createStrategy(charger.getSpecification(), ev);
 				var now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 				charger.getLogic().addVehicle(ev, strategy, this, now);
-				var chargingActivity = new ChargingActivity(charger.getId(), vehicleId, ma);
+				var chargingActivity = new ChargingActivity(charger.getId(), vehicleId, ma, currentAct, now);
 				personsCharging.put(ma.getId(), chargingActivity);
 				vehiclesAtCharger.put(vehicleId, ma.getId());
 				// we setup all the charging stuff first. The activity engine might decide that it
@@ -151,6 +155,8 @@ public class ChargingActivityEngine implements DistributedActivityHandler, Distr
 	private void endChargingActivity(MobsimAgent agent) {
 		var chargingActivity = personsCharging.remove(agent.getId());
 		if (chargingActivity == null) return;
+		// restore the maximum duration that may have been extended while waiting in the charger queue
+		chargingActivity.maximumDuration.ifDefined(chargingActivity.activity::setMaximumDuration);
 
 		// vehiclesAtCharger is removed in notifyChargingEnded when charging completes naturally,
 		// or here when the agent departs while charging is still in progress.
@@ -250,11 +256,18 @@ public class ChargingActivityEngine implements DistributedActivityHandler, Distr
 		private final Id<Charger> chargerId;
 		private final Id<Vehicle> vehicleId;
 		private final MobsimAgent agent;
+		private final Activity activity;
+		private final double startTime;
+		private final OptionalTime maximumDuration;
 
-		private ChargingActivity(Id<Charger> chargerId, Id<Vehicle> vehicleId, MobsimAgent agent) {
+		private ChargingActivity(Id<Charger> chargerId, Id<Vehicle> vehicleId, MobsimAgent agent, Activity activity,
+			double startTime) {
 			this.chargerId = chargerId;
 			this.vehicleId = vehicleId;
 			this.agent = agent;
+			this.activity = activity;
+			this.startTime = startTime;
+			this.maximumDuration = activity.getMaximumDuration();
 		}
 	}
 }
