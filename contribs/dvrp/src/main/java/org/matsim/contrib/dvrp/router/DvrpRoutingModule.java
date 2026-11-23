@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
@@ -178,6 +179,9 @@ public class DvrpRoutingModule implements RoutingModule {
 		if (route.isEmpty()) {
 			return; // the main leg router does not support stop candidates
 		}
+		if (!isTeleported(accessTrip) || !isTeleported(egressTrip)) {
+			return; // the legs to/from alternative stops can only be inserted as teleported legs
+		}
 
 		List<StopCandidates.Candidate> access = new ArrayList<>();
 		access.add(candidate(candidates.preferredAccess(), accessTrip, departureTime, accessEndTime));
@@ -185,8 +189,8 @@ public class DvrpRoutingModule implements RoutingModule {
 			List<? extends PlanElement> walk = accessRouter.calcRoute(
 					DefaultRoutingRequest.of(request.getFromFacility(), facility, departureTime, request.getPerson(),
 							request.getAttributes()));
-			if (walk == null) {
-				continue; // candidate not reachable
+			if (walk == null || !isTeleported(walk)) {
+				continue; // candidate not reachable, or not by a teleported leg
 			}
 			double endTime = timeInterpretation.decideOnElementsEndTime(walk, departureTime).seconds();
 			access.add(candidate(facility, walk, departureTime, endTime));
@@ -199,14 +203,23 @@ public class DvrpRoutingModule implements RoutingModule {
 			List<? extends PlanElement> walk = egressRouter.calcRoute(
 					DefaultRoutingRequest.of(facility, request.getToFacility(), egressStartTime, request.getPerson(),
 							request.getAttributes()));
-			if (walk == null) {
-				continue; // candidate not reachable
+			if (walk == null || !isTeleported(walk)) {
+				continue; // candidate not reachable, or not by a teleported leg
 			}
 			double endTime = timeInterpretation.decideOnElementsEndTime(walk, egressStartTime).seconds();
 			egress.add(candidate(facility, walk, egressStartTime, endTime));
 		}
 
 		route.get().setStopCandidates(new StopCandidates(access, egress));
+	}
+
+	/**
+	 * @return true if the access/egress (sub-)trip is empty or a single leg without a network route, i.e. one that can
+	 * be replaced by a teleported leg of the same mode with the routed duration and distance
+	 */
+	private static boolean isTeleported(List<? extends PlanElement> trip) {
+		return trip.isEmpty()
+				|| trip.size() == 1 && trip.getFirst() instanceof Leg leg && !(leg.getRoute() instanceof NetworkRoute);
 	}
 
 	private static StopCandidates.Candidate candidate(Facility facility, List<? extends PlanElement> walk,
