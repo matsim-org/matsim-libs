@@ -25,7 +25,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,12 +47,12 @@ import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.examples.LogisticsExampleUtils;
 import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,32 +66,8 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
 
-	private static final VehicleType VEH_TYPE_LARGE_50 = createVehTypeLarge50();
-	private static final VehicleType VEH_TYPE_SMALL_05 = createVehTypeSmall05();
-
-	private static VehicleType createVehTypeLarge50() {
-		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("large50", VehicleType.class), TransportMode.car);
-		vehicleType.getCapacity().setOther(50);
-		vehicleType.getCostInformation().setCostsPerMeter(0.01);
-		vehicleType.getCostInformation().setCostsPerSecond(0.01);
-		vehicleType.getCostInformation().setFixedCost(150.);
-		vehicleType.setMaximumVelocity(10);
-		vehicleType.setNetworkMode(TransportMode.car);
-
-		return vehicleType;
-	}
-
-	private static VehicleType createVehTypeSmall05() {
-		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("small05", VehicleType.class), TransportMode.car);
-		vehicleType.getCapacity().setOther(5);
-		vehicleType.getCostInformation().setCostsPerMeter(0.001);
-		vehicleType.getCostInformation().setCostsPerSecond(0.005);
-		vehicleType.getCostInformation().setFixedCost(25.);
-		vehicleType.setMaximumVelocity(10);
-		vehicleType.setNetworkMode(TransportMode.car);
-
-		return vehicleType;
-	}
+	private static final VehicleType VEH_TYPE_LARGE_50 = LogisticsExampleUtils.createVehTypeLarge50();
+	private static final VehicleType VEH_TYPE_SMALL_05 = LogisticsExampleUtils.createVehTypeSmall05();
 
 	private ExampleMultipleOneEchelonChainsReplanning() {
 	}
@@ -202,10 +177,7 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 	private static Scenario prepareScenario(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		for (Link link : scenario.getNetwork().getLinks().values()) {
-			link.setFreespeed(30 / 3.6);
-			link.setCapacity(1000);
-		}
+		LogisticsExampleUtils.setFreespeed30KmhAndCapacity1000OnAllLinks(scenario.getNetwork());
 
 		log.info("Add LSP to the scenario");
 		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
@@ -245,12 +217,12 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 					.addLogisticChainElement(singleCarrierElement)
 					.build();
 
-			final InitialShipmentAssigner singleSolutionShipmentAssigner =
+			final InitialShipmentAssigner singleChainShipmentAssigner =
 				MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
 			singleOneEchelonChainPlan =
 				LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
-					.setInitialShipmentAssigner(singleSolutionShipmentAssigner)
+					.setInitialShipmentAssigner(singleChainShipmentAssigner)
 					.setType(MultipleChainsUtils.LspPlanTypes.SINGLE_ONE_ECHELON_CHAIN.toString());
 		}
 
@@ -334,7 +306,7 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 				.setInitialPlan(singleOneEchelonChainPlan)
 				.setLogisticChainScheduler(
 					ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(
-						createResourcesListFromLSPPlans(lspPlans)))
+						LogisticsExampleUtils.createResourcesListFromLSPPlans(lspPlans)))
 				.build();
 		lsp.addPlan(multipleOneEchelonChainsPlan);
 
@@ -367,6 +339,7 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 				builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 				builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 				builder.setDeliveryServiceTime(capacityDemand * 60);
+				builder.setPickupServiceTime(capacityDemand * 60);
 
 				shipmentList.add(builder.build());
 			} else {
@@ -381,23 +354,11 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 				builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 				builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 				builder.setDeliveryServiceTime(capacityDemand * 60);
+				builder.setPickupServiceTime(capacityDemand * 60);
 
 				shipmentList.add(builder.build());
 			}
 		}
 		return shipmentList;
-	}
-
-	private static List<LSPResource> createResourcesListFromLSPPlans(List<LSPPlan> lspPlans) {
-		log.info("Collecting all LSPResources from the LSPPlans");
-		List<LSPResource> resourceList = new ArrayList<>();
-		for (LSPPlan lspPlan : lspPlans) {
-			for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-				for (LogisticChainElement logisticChainElement : logisticChain.getLogisticChainElements()) {
-					resourceList.add(logisticChainElement.getResource());
-				}
-			}
-		}
-		return resourceList;
 	}
 }

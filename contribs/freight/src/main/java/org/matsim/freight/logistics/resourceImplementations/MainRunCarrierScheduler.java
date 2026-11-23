@@ -97,7 +97,7 @@ import org.matsim.vehicles.VehicleType;
 
 		for (LspShipment lspShipment : copyOfAssignedShipments) {
 			// Add job as "services" to the carrier. So the carrier has this available
-			CarrierService carrierService = convertToCarrierService(lspShipment);
+			CarrierService carrierService = CarrierSchedulerUtils.convertToCarrierService(lspShipment, resource.getEndLinkId(), null, lspShipment.getDeliveryServiceTime());
 			carrier.getServices().put(carrierService.getId(), carrierService);
 
 			//TODO: Include all vehicle(types) here and perform a jsprit run for tour planning.
@@ -152,12 +152,12 @@ import org.matsim.vehicles.VehicleType;
 		double latestLspShipmentTime = 0;
 
 		for (LspShipment lspShipment : lspShipments) {
-			totalLoadingTime = totalLoadingTime + lspShipment.getDeliveryServiceTime();
+			totalLoadingTime = totalLoadingTime + lspShipment.getPickupServiceTime();
 			if (LspShipmentUtils.getTimeOfLspShipment(lspShipment) > latestLspShipmentTime) {
 				latestLspShipmentTime = LspShipmentUtils.getTimeOfLspShipment(lspShipment);
 			}
 			tourBuilder.addLeg(new Leg());
-			CarrierService carrierService = convertToCarrierService(lspShipment);
+			CarrierService carrierService = CarrierSchedulerUtils.convertToCarrierService(lspShipment, resource.getEndLinkId(), null, lspShipment.getDeliveryServiceTime());
 			pairs.add(new LSPShipmentCarrierServicePair(lspShipment, carrierService));
 			tourBuilder.scheduleService(carrierService);
 		}
@@ -241,12 +241,6 @@ import org.matsim.vehicles.VehicleType;
 		return (-score); // negative, because we are looking at "costs" instead of "utility"
 	}
 
-	private CarrierService convertToCarrierService(LspShipment lspShipment) {
-		Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
-		return  CarrierService.Builder.newInstance(serviceId, resource.getEndLinkId(), lspShipment.getSize())
-			.setServiceDuration(lspShipment.getDeliveryServiceTime())
-			.build();
-	}
 
 	@Override
 	protected void updateShipments() {
@@ -285,8 +279,8 @@ import org.matsim.vehicles.VehicleType;
 				builder.setLogisticChainElement(element);
 			}
 		}
-		int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-		Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
+		// The start activity is not contained in the tour elements, so the first tour element is the leg after the start.
+		Leg legAfterStart = (Leg) tour.getTourElements().getFirst();
 		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
 		builder.setStartTime(startTimeOfTransport);
 		builder.setEndTime(legAfterStart.getExpectedTransportTime() + startTimeOfTransport);
@@ -295,11 +289,7 @@ import org.matsim.vehicles.VehicleType;
 		builder.setToLinkId(tour.getEndLinkId());
 		builder.setCarrierService(serviceActivity.getService());
 		LspShipmentPlanElement transport = builder.build();
-		String idString =
-			transport.getResourceId()
-				+ String.valueOf(transport.getLogisticChainElement().getId())
-				+ transport.getElementType();
-		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		Id<LspShipmentPlanElement> id = LspShipmentUtils.createPlanElementId(transport);
 		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
 			.addPlanElement(id, transport);
 	}
@@ -313,27 +303,18 @@ import org.matsim.vehicles.VehicleType;
 				builder.setLogisticsChainElement(element);
 			}
 		}
-		double cumulatedLoadingTime = 0;
-		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity activity) {
-				cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
-			}
-		}
-		int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-		Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
+		double cumulatedUnloadingTime = CarrierSchedulerUtils.sumOfDeliveryServiceTimes(tour, super.lspPlan.getLSP());
+		// The start activity is not contained in the tour elements, so the first tour element is the leg after the start.
+		Leg legAfterStart = (Leg) tour.getTourElements().getFirst();
 		builder.setStartTime(
 			legAfterStart.getExpectedDepartureTime() + legAfterStart.getExpectedTransportTime());
 		builder.setEndTime(
 			legAfterStart.getExpectedDepartureTime()
 				+ legAfterStart.getExpectedTransportTime()
-				+ cumulatedLoadingTime);
+				+ cumulatedUnloadingTime);
 
 		LspShipmentPlanElement unload = builder.build();
-		String idString =
-			unload.getResourceId()
-				+ String.valueOf(unload.getLogisticChainElement().getId())
-				+ unload.getElementType();
-		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		Id<LspShipmentPlanElement> id = LspShipmentUtils.createPlanElementId(unload);
 		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
 			.addPlanElement(id, unload);
 	}
@@ -347,7 +328,8 @@ import org.matsim.vehicles.VehicleType;
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
 				LSPTourStartEventHandler handler =
-            new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour);
+            new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour,
+						CarrierSchedulerUtils.sumOfPickupServiceTimes(tour, super.lspPlan.getLSP()));
 				lspShipment.addSimulationTracker(handler);
 				break;
 			}
@@ -362,7 +344,8 @@ import org.matsim.vehicles.VehicleType;
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
 				LSPTourEndEventHandler handler =
-					new LSPTourEndEventHandler(lspShipment, carrierService, element, resource, tour);
+					new LSPTourEndEventHandler(lspShipment, carrierService, element, resource, tour,
+						CarrierSchedulerUtils.sumOfDeliveryServiceTimes(tour, super.lspPlan.getLSP()));
 				lspShipment.addSimulationTracker(handler);
 				break;
 			}

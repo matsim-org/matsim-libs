@@ -21,7 +21,6 @@
 
 package org.matsim.freight.logistics.examples.lspReplanning;
 
-import java.util.Collection;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -29,7 +28,6 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LspShipment;
-import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /**
  * @deprecated Creates a replanning strategy that delegates shipment assignment to an {@link
@@ -53,40 +51,21 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
           @Override
           public void prepareReplanning(ReplanningContext replanningContext) {
-            // TODO Auto-generated method stub
-
           }
 
           @Override
           public void handlePlan(LSPPlan plan) {
-            plan.getLogisticChains().iterator().next().getLspShipmentIds().clear();
             plan.setInitialShipmentAssigner(assigner);
-            //				LSP lsp = assigner.getLSP();
-            LSP lsp = plan.getLSP();
-            Collection<LspShipment> lspShipments = lsp.getLspShipments();
-            for (LspShipment lspShipment : lspShipments) {
-              assigner.assignToPlan(plan, lspShipment);
-            }
 
-            for (LogisticChain solution : plan.getLogisticChains()) {
-              solution.getLspShipmentIds().clear();
-              for (LogisticChainElement element : solution.getLogisticChainElements()) {
-                element.getIncomingShipments().clear();
-                element.getOutgoingShipments().clear();
-              }
-            }
+            LSPUtils.clearShipmentAssignments(plan);
 
             for (LspShipment lspShipment : plan.getLSP().getLspShipments()) {
-              LspShipmentUtils.getOrCreateShipmentPlan(plan, lspShipment.getId()).clear();
-              lspShipment.getShipmentLog().clear();
               plan.getInitialShipmentAssigner().assignToPlan(plan, lspShipment);
             }
           }
 
           @Override
           public void finishReplanning() {
-            // TODO Auto-generated method stub
-
           }
         };
 

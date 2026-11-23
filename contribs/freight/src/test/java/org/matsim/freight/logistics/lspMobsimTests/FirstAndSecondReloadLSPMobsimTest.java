@@ -177,23 +177,20 @@ public class FirstAndSecondReloadLSPMobsimTest {
 		LogisticChainElement secondHubElement = secondHubElementBuilder.build();
 
 
-		collectionElement.connectWithNextElement(firstHubElement);
-		firstHubElement.connectWithNextElement(mainRunElement);
-		mainRunElement.connectWithNextElement(secondHubElement);
 
 
-		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder completeSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(solutionId);
-		completeSolutionBuilder.addLogisticChainElement(collectionElement);
-		completeSolutionBuilder.addLogisticChainElement(firstHubElement);
-		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
-		completeSolutionBuilder.addLogisticChainElement(secondHubElement);
-		LogisticChain completeSolution = completeSolutionBuilder.build();
+		Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder completeChainBuilder = LSPUtils.LogisticChainBuilder.newInstance(chainId);
+		completeChainBuilder.addLogisticChainElement(collectionElement);
+		completeChainBuilder.addLogisticChainElement(firstHubElement);
+		completeChainBuilder.addLogisticChainElement(mainRunElement);
+		completeChainBuilder.addLogisticChainElement(secondHubElement);
+		LogisticChain completeChain = completeChainBuilder.build();
 
 		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setInitialShipmentAssigner(assigner);
-		completePlan.addLogisticChain(completeSolution);
+		completePlan.addLogisticChain(completeChain);
 
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
@@ -249,6 +246,7 @@ public class FirstAndSecondReloadLSPMobsimTest {
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setPickupServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
 			lsp.assignShipmentToLspPlan(shipment);
 		}

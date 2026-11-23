@@ -6,8 +6,11 @@ import org.junit.jupiter.api.io.TempDir;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.core.controler.Injector.InjectorBuilder;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import tech.tablesaw.api.Table;
 
@@ -22,16 +25,14 @@ import static org.matsim.application.analysis.population.kn.KNTestFixture.*;
 /**
  * Characterizes the existing KN base-case helpers and person-table calculation.
  *
- * <p>The fixture supplies experienced plans directly, and the table tests use the same injector
- * construction as the production base case. They cover population cleanup, income utilities,
+ * <p>The fixture supplies experienced plans directly, and the table tests share the production
+ * scoring bindings without starting a controller. They cover population cleanup, income utilities,
  * aggregation, and selected score-accounting columns. They do not run the CLI, load complete run
  * directories, simulate traffic, or execute policy comparisons and rule-of-half calculations.
  */
 class AgentWiseComparisonKNTest {
 
 	private static final double TOLERANCE = 1e-6;
-	// Synthetic events and any injector output stay in JUnit-managed temporary storage.
-	@TempDir Path directory;
 	// The existing implementation stores its population average in a mutable static field.
 	// Save and restore it so these tests do not change the initial state of later tests.
 	private final double previousPopulationMarginal = MUTTS_AV;
@@ -43,7 +44,7 @@ class AgentWiseComparisonKNTest {
 
 	/** Exercises the real cleanup/event-reading path with one example of each exclusion rule. */
 	@Test
-	void cleansBasePopulationAndCollectsMoneyEvents() {
+	void cleansBasePopulationAndCollectsMoneyEvents(@TempDir Path directory) {
 		Scenario scenario = scenario();
 		var retained = person(scenario, "retained", 2000, false);
 		var stuck = person(scenario, "stuck", 2000, false);
@@ -147,12 +148,16 @@ class AgentWiseComparisonKNTest {
 	}
 
 	private Table baseCase(Scenario scenario) {
-		scenario.getConfig().controller().setOutputDirectory(directory.resolve("run").toString());
 		// Reproduce the relevant preparation steps from AgentWiseComparisonKN.call(). All
 		// persons in these table tests have positive income, so both utility calculations apply.
 		computeAndSetMarginalUtilitiesOfMoney(scenario);
 		computeAndSetIncomeDeciles(scenario.getPopulation());
-		var injector = createInjector(scenario);
+		// The full controller injector opens statistics files that are only closed on shutdown.
+		var injector = new InjectorBuilder(scenario)
+			.addModule(new ScenarioByInstanceModule(scenario))
+			.addModule(new CharyparNagelScoringFunctionModule())
+			.addOverridingModule(knScoringModule())
+			.build();
 		// The KN helper stores money utilities on persons, while the injected scoring provider
 		// also derives them. Check agreement before building the table, which uses both paths.
 		var parameters = injector.getInstance(ScoringParametersForPerson.class);

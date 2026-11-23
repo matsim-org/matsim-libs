@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.NetworkUtils;
 
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -115,7 +116,14 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 
 			// test whether the reverse link is actually reverse relative to the segment
 			Direction direction = reverseLink.getFromNode().getId().equals(Id.createNodeId(segment.getFromNode().getId())) ? Direction.Forward : Direction.Reverse;
-			this.afterLinkCreated.accept(link, segment.getTags(), direction);
+
+			// the geometry copied over from the other link runs the other way
+			if (reverseLink.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM) != null) {
+				reverseLink.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, getOriginalGeometry(segment.getNodesForSegment(), direction));
+			}
+
+			// the other link went through the callback when it was created, this one has not
+			this.afterLinkCreated.accept(reverseLink, segment.getTags(), direction);
 		}
 		return links;
 	}

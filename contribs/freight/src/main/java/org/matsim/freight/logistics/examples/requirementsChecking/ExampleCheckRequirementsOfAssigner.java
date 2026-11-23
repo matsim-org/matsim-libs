@@ -76,7 +76,7 @@ class ExampleCheckRequirementsOfAssigner {
 
   private static LSP createLSPWithProperties(Scenario scenario) {
 
-    // Create red LogisticsSolution which has the corresponding info
+    // Create red LogisticChain which has the corresponding info
     final Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
     final Id<VehicleType> collectionVehTypeId = Id.create("RedCarrierVehicleType", VehicleType.class);
     final VehicleType collectionVehType = VehicleUtils.createVehicleType(collectionVehTypeId, TransportMode.car);
@@ -111,16 +111,16 @@ class ExampleCheckRequirementsOfAssigner {
             .setResource(redResource)
             .build();
 
-    Id<LogisticChain> redSolutionId = Id.create("RedSolution", LogisticChain.class);
-    LSPUtils.LogisticChainBuilder redSolutionBuilder =
-        LSPUtils.LogisticChainBuilder.newInstance(redSolutionId);
-    redSolutionBuilder.addLogisticChainElement(redElement);
-    LogisticChain redSolution = redSolutionBuilder.build();
+    Id<LogisticChain> redChainId = Id.create("RedChain", LogisticChain.class);
+    LSPUtils.LogisticChainBuilder redChainBuilder =
+        LSPUtils.LogisticChainBuilder.newInstance(redChainId);
+    redChainBuilder.addLogisticChainElement(redElement);
+    LogisticChain redChain = redChainBuilder.build();
 
-    // Add info that shows the world the color of the solution
-    redSolution.getAttributes().putAttribute(ATTRIBUTE_COLOR, RedRequirement.RED);
+    // Add info that shows the world the color of the chain
+    redChain.getAttributes().putAttribute(ATTRIBUTE_COLOR, RedRequirement.RED);
 
-    // Create blue LogisticsSolution which has the corresponding info
+    // Create blue LogisticChain which has the corresponding info
     Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);
     Id<Vehicle> blueVehicleId = Id.createVehicleId("BlueVehicle");
     CarrierVehicle blueVehicle =
@@ -147,22 +147,22 @@ class ExampleCheckRequirementsOfAssigner {
             .setResource(blueResource)
             .build();
 
-    LogisticChain blueSolution =
-        LSPUtils.LogisticChainBuilder.newInstance(Id.create("BlueSolution", LogisticChain.class))
+    LogisticChain blueChain =
+        LSPUtils.LogisticChainBuilder.newInstance(Id.create("BlueChain", LogisticChain.class))
             .addLogisticChainElement(blueElement)
             .build();
 
-    // Add info that shows the world the color of the solution
-    blueSolution.getAttributes().putAttribute(ATTRIBUTE_COLOR, BlueRequirement.BLUE);
+    // Add info that shows the world the color of the chain
+    blueChain.getAttributes().putAttribute(ATTRIBUTE_COLOR, BlueRequirement.BLUE);
 
     // Create the initial plan, add assigner that checks requirements of the shipments when
-    // assigning and add both solutions (red and blue) to the
+    // assigning and add both chains (red and blue) to the
     // plan.
     LSPPlan plan =
         LSPUtils.createLSPPlan()
             .setInitialShipmentAssigner(new RequirementsAssigner())
-            .addLogisticChain(redSolution)
-            .addLogisticChain(blueSolution);
+            .addLogisticChain(redChain)
+            .addLogisticChain(blueChain);
 
     ArrayList<LSPResource> resourcesList = new ArrayList<>();
     resourcesList.add(redResource);
@@ -178,7 +178,7 @@ class ExampleCheckRequirementsOfAssigner {
 
   public static Collection<LspShipment> createShipmentsWithRequirements(Network network) {
     // Create ten shipments with either a red or blue requirement, i.e. that they only can be
-    // transported in a solution with the matching color
+    // transported in a chain with the matching color
     ArrayList<LspShipment> shipmentList = new ArrayList<>();
     ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
@@ -208,6 +208,7 @@ class ExampleCheckRequirementsOfAssigner {
       TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
       builder.setStartTimeWindow(startTimeWindow);
       builder.setDeliveryServiceTime(capacityDemand * 60);
+      builder.setPickupServiceTime(capacityDemand * 60);
       boolean blue = rand.nextBoolean();
       if (blue) {
         builder.addRequirement(new BlueRequirement());
@@ -241,7 +242,7 @@ class ExampleCheckRequirementsOfAssigner {
     }
 
     for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
-      if (logisticChain.getId().toString().equals("RedSolution")) {
+      if (logisticChain.getId().toString().equals("RedChain")) {
         for (Id<LspShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
           LspShipment lspShipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
             if (lspShipment != null && !(lspShipment.getRequirements().iterator().next() instanceof RedRequirement)) {
@@ -250,7 +251,7 @@ class ExampleCheckRequirementsOfAssigner {
         }
         System.out.println("All lspShipments in " + logisticChain.getId() + " are red");
       }
-      if (logisticChain.getId().toString().equals("BlueSolution")) {
+      if (logisticChain.getId().toString().equals("BlueChain")) {
         for (Id<LspShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
           LspShipment shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
             if (shipment != null && !(shipment.getRequirements().iterator().next() instanceof BlueRequirement)) {
