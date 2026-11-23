@@ -45,6 +45,25 @@ public class BicycleScoreEventsCreatorTest {
 	@Test
 	void testCarCountOnBicycleLeaveLink() {
 		Fixture f = new Fixture(BicycleConfigGroup.MotorizedInteraction.CAR_COUNT_ON_BICYCLE_LEAVE_LINK);
+		leaveALinkWithOneCarOnIt(f);
+
+		List<PersonScoreEvent> scores = f.motorizedInteractionScores();
+		assertEquals(1, scores.size());
+		assertEquals(BIKE_DRIVER, scores.get(0).getPersonId());
+		assertEquals(-0.004, scores.get(0).getAmount(), DELTA);
+	}
+
+	@Test
+	void testMarginalUtilityOfMotorizedInteractionFromConfig() {
+		Fixture f = new Fixture(BicycleConfigGroup.MotorizedInteraction.CAR_COUNT_ON_BICYCLE_LEAVE_LINK, "-0.01");
+		leaveALinkWithOneCarOnIt(f);
+
+		List<PersonScoreEvent> scores = f.motorizedInteractionScores();
+		assertEquals(1, scores.size());
+		assertEquals(-0.01, scores.get(0).getAmount(), DELTA);
+	}
+
+	private static void leaveALinkWithOneCarOnIt(Fixture f) {
 		BicycleScoreEventsCreator c = f.creator;
 		String bike = f.bicycleMode;
 
@@ -56,11 +75,6 @@ public class BicycleScoreEventsCreatorTest {
 		c.handleEvent(new LinkEnterEvent(20., BIKE, L2));
 		c.handleEvent(new VehicleLeavesTrafficEvent(30., BIKE_DRIVER, L2, BIKE, bike, 1.));
 		c.handleEvent(new VehicleLeavesTrafficEvent(40., CAR_DRIVER, L1, CAR, TransportMode.car, 1.));
-
-		List<PersonScoreEvent> scores = f.motorizedInteractionScores();
-		assertEquals(1, scores.size());
-		assertEquals(BIKE_DRIVER, scores.get(0).getPersonId());
-		assertEquals(-0.004, scores.get(0).getAmount(), DELTA);
 	}
 
 	@Test
@@ -128,9 +142,17 @@ public class BicycleScoreEventsCreatorTest {
 		final List<PersonScoreEvent> scoreEvents = new ArrayList<>();
 
 		Fixture(BicycleConfigGroup.MotorizedInteraction motorizedInteraction) {
+			this(motorizedInteraction, null);
+		}
+
+		Fixture(BicycleConfigGroup.MotorizedInteraction motorizedInteraction, String marginalUtilityOfMotorizedInteraction) {
 			Config config = ConfigUtils.createConfig();
 			BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule(config, BicycleConfigGroup.class);
 			bicycleConfigGroup.setMotorizedInteractionType(motorizedInteraction);
+			if (marginalUtilityOfMotorizedInteraction != null) {
+				// the way a config file or --config:bicycle.marginalUtilityOfMotorizedInteraction sets it
+				bicycleConfigGroup.addParam("marginalUtilityOfMotorizedInteraction", marginalUtilityOfMotorizedInteraction);
+			}
 			this.bicycleMode = bicycleConfigGroup.getBicycleMode();
 			Scenario scenario = ScenarioUtils.createScenario(config);
 

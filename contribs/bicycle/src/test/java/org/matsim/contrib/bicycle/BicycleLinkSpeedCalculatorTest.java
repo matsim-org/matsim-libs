@@ -193,4 +193,21 @@ public class BicycleLinkSpeedCalculatorTest {
 
 		assertEquals(comparisonSpeed, gradientSpeed, 0.0);
 	}
+
+	@Test
+	void getMaximumVelocityForLink_followsTheConfiguredInfraAttribute() {
+
+		Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
+		Link trackAlongCobblestoneRoad = createLink(0, "cobblestone", "primary", 1.0);
+		trackAlongCobblestoneRoad.getAttributes().putAttribute(BicycleUtils.BicycleInfraAttribute.bicycle_infra.name(), "CYCLEWAY_ADJOINING");
+		Vehicle vehicle = createVehicle(linkForComparison.getFreespeed(), 1);
+
+		double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison, vehicle);
+
+		// with the default attribute (cycleway) only highway=cycleway is dedicated, so the road surface slows the bicycle down
+		assertTrue(comparisonSpeed > calculator.getMaximumVelocityForLink(trackAlongCobblestoneRoad, vehicle));
+
+		bicycleConfigGroup.setBicycleInfraAttribute(BicycleUtils.BicycleInfraAttribute.bicycle_infra);
+		assertEquals(comparisonSpeed, calculator.getMaximumVelocityForLink(trackAlongCobblestoneRoad, vehicle), 0.0);
+	}
 }

@@ -68,6 +68,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	private static final String INPUT_GRADIENT = "marginalUtilityOfGradient_m_100m";
 	private static final String BICYCLE_MODE = "bicycleMode";
 	private static final String MOTORIZED_INTERACTION = "motorizedInteraction";
+	private static final String MARGINAL_UTILITY_OF_MOTORIZED_INTERACTION = "marginalUtilityOfMotorizedInteraction";
 
 	private double marginalUtilityOfComfort;
 
@@ -75,6 +76,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	private double marginalUtilityOfGradient;
 	private String bicycleMode = "bicycle";
 	private MotorizedInteraction motorizedInteraction = MotorizedInteraction.NONE;
+	private double marginalUtilityOfMotorizedInteraction = -0.004;
 
 	public BicycleConfigGroup() {
 		super(GROUP_NAME);
@@ -90,6 +92,11 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		map.put(MOTORIZED_INTERACTION,
 			"Defines the motorized interaction behavior. Possible values [none, carCountOnBicycleLeaveLink, carsPassedBicycleOnLink, avgCarOccupancyDuringBicycleTraversal]. "
 				+ "Default: none.");
+		map.put(MARGINAL_UTILITY_OF_MOTORIZED_INTERACTION,
+			"Score per unit of the measure selected with " + MOTORIZED_INTERACTION + ", applied per link the bicycle traverses: "
+				+ "the number of cars on the link when the bicycle leaves it (carCountOnBicycleLeaveLink), the number of cars that "
+				+ "overtook the bicycle on the link (carsPassedBicycleOnLink), or the time-averaged number of cars on the link "
+				+ "during the traversal (avgCarOccupancyDuringBicycleTraversal). Default: -0.004.");
 //		map.put(BICYCLE_INFRA_ATTRIBUTE,
 //			"Network attribute used for bicycle infrastructure evaluation. "
 //				+ "Supported values: 'cycleway' (legacy default) and 'bicycle_infra'.");
@@ -220,6 +227,17 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		this.motorizedInteraction = motorizedInteraction
 			? MotorizedInteraction.CAR_COUNT_ON_BICYCLE_LEAVE_LINK
 			: MotorizedInteraction.NONE;
+		return this;
+	}
+
+	@StringGetter(MARGINAL_UTILITY_OF_MOTORIZED_INTERACTION)
+	public double getMarginalUtilityOfMotorizedInteraction() {
+		return this.marginalUtilityOfMotorizedInteraction;
+	}
+
+	@StringSetter(MARGINAL_UTILITY_OF_MOTORIZED_INTERACTION)
+	public BicycleConfigGroup setMarginalUtilityOfMotorizedInteraction(double marginalUtilityOfMotorizedInteraction) {
+		this.marginalUtilityOfMotorizedInteraction = marginalUtilityOfMotorizedInteraction;
 		return this;
 	}
 

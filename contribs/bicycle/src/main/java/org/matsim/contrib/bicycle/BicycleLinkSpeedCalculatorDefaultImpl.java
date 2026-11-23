@@ -51,7 +51,7 @@ public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkS
 
 		double maxBicycleSpeed = vehicle.getType().getMaximumVelocity();
 		double bicycleInfrastructureFactor = computeInfrastructureFactor(link);
-		double surfaceFactor = params.computeSurfaceFactor(link);
+		double surfaceFactor = params.computeSurfaceFactor(link, bicycleConfigGroup.getBicycleInfraAttribute());
 		double gradientFactor = computeGradientFactor(link);
 		double speed = maxBicycleSpeed * bicycleInfrastructureFactor * surfaceFactor * gradientFactor;
 		return Math.min(speed, link.getFreespeed());

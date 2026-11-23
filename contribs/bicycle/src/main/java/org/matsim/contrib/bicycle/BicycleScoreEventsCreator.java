@@ -69,15 +69,13 @@ class BicycleScoreEventsCreator implements
 	private static final Logger log = LogManager.getLogger(BicycleScoreEventsCreator.class);
 	private static final String BICYCLE_ADDITIONAL_LINK_SCORE = "bicycleAdditionalLinkScore";
 	private static final String BICYCLE_MOTORIZED_INTERACTION_SCORE = "bicycleMotorizedInteractionScore";
-	private static final double MARGINAL_UTILITY_OF_CAR_COUNT_ON_BICYCLE_LEAVE_LINK = -0.004;
-	private static final double MARGINAL_UTILITY_OF_CARS_PASSED_BICYCLE_ON_LINK = -0.004;
-	private static final double MARGINAL_UTILITY_OF_AVG_CAR_OCCUPANCY_DURING_BICYCLE_TRAVERSAL = -0.004;
 
 	private final Network network;
 	private final EventsManager eventsManager;
 	private final AdditionalBicycleLinkScore additionalBicycleLinkScore;
 	private final String bicycleMode;
 	private final BicycleConfigGroup bicycleConfig;
+	private final double marginalUtilityOfMotorizedInteraction;
 
 	// -----------------------------------------------------------------------------
 	// State for bicycleAdditionalLinkScore
@@ -110,6 +108,7 @@ class BicycleScoreEventsCreator implements
 		this.additionalBicycleLinkScore = additionalBicycleLinkScore;
 		this.bicycleConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), BicycleConfigGroup.class);
 		this.bicycleMode = bicycleConfig.getBicycleMode();
+		this.marginalUtilityOfMotorizedInteraction = bicycleConfig.getMarginalUtilityOfMotorizedInteraction();
 	}
 
 	@Override
@@ -241,7 +240,7 @@ class BicycleScoreEventsCreator implements
 					var carCounts = this.numberOfVehiclesOnLinkByMode.get(TransportMode.car);
 					if (carCounts != null) {
 						double interactionAmount =
-							MARGINAL_UTILITY_OF_CAR_COUNT_ON_BICYCLE_LEAVE_LINK * carCounts.getOrDefault(event.getLinkId(), 0.);
+							marginalUtilityOfMotorizedInteraction * carCounts.getOrDefault(event.getLinkId(), 0.);
 						if (interactionAmount != 0.) {
 							this.eventsManager.processEvent(
 								new PersonScoreEvent(event.getTime(), driverOfVehicle, interactionAmount, BICYCLE_MOTORIZED_INTERACTION_SCORE));
@@ -396,7 +395,7 @@ class BicycleScoreEventsCreator implements
 				this.eventsManager.processEvent(new PersonScoreEvent(
 					time,
 					driverOfVehicle,
-					MARGINAL_UTILITY_OF_AVG_CAR_OCCUPANCY_DURING_BICYCLE_TRAVERSAL * avgCarOccupancy,
+					marginalUtilityOfMotorizedInteraction * avgCarOccupancy,
 					BICYCLE_MOTORIZED_INTERACTION_SCORE
 				));
 			}
@@ -534,7 +533,7 @@ class BicycleScoreEventsCreator implements
 					this.eventsManager.processEvent(new PersonScoreEvent(
 						time,
 						driverOfVehicle,
-						MARGINAL_UTILITY_OF_CARS_PASSED_BICYCLE_ON_LINK * carsPassedBicycleOnLink,
+						marginalUtilityOfMotorizedInteraction * carsPassedBicycleOnLink,
 						BICYCLE_MOTORIZED_INTERACTION_SCORE
 					));
 				}
