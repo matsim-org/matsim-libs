@@ -104,48 +104,6 @@ class BicycleTravelDisutility implements TravelDisutility {
 		String infrastructureValue =
 			BicycleUtils.getBicycleInfrastructureValue(link, bicycleInfraAttribute);
 
-
-//		//  debugging
-//		if ("FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING".equals(bicycleInfraType)) {
-//			double f = bicycleParams.getInfrastructureFactor(type, bicycleInfraType);
-//			System.out.println("INFRA " + bicycleInfraType
-//				+ " link=" + link.getId()
-//				+ " type=" + type
-//				+ " factor=" + f);
-//
-//			System.out.println("COMFORT " + surface
-//				+ " link=" + link.getId()
-//				+ " type=" + type
-//				+ " factor=" + bicycleParams.getComfortFactor(surface));
-//		}
-
-		///
-
-
-//		double travelTime_ = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
-//
-//		// === DEBUG START ===
-//		if (link.getId().toString().equals(DEBUG_LINK_1) ||
-//			link.getId().toString().equals(DEBUG_LINK_2)) {
-//
-//			System.out.println("---- DEBUG LINK ----");
-//			System.out.println("linkId = " + link.getId());
-//			System.out.println("freespeed = " + link.getFreespeed());
-//			System.out.println("travelTime = " + travelTime_);
-//			System.out.println("length = " + link.getLength());
-//
-//			if (vehicle != null) {
-//				System.out.println("vehicle maxVel = " +
-//					vehicle.getType().getMaximumVelocity());
-//			} else {
-//				System.out.println("vehicle = null");
-//			}
-//
-//			System.out.println("--------------------");
-//		}
-//		// === DEBUG END ===
-
-
 		double distance = link.getLength();
 
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;

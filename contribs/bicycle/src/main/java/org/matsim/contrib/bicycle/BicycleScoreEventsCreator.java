@@ -206,11 +206,19 @@ class BicycleScoreEventsCreator implements
 
 		String mode = this.modeFromVehicle.get(event.getVehicleId());
 
-		if (this.bicycleConfig.isMotorizedInteraction()) {
+		if (this.bicycleConfig.isCarCountOnBicycleLeaveLink() && mode != null) {
+			// 1a. carCountOnBicycleLeaveLink: decrement link occupancy.
+			// Only this mode increments the counter for all modes, so only this mode may decrement it for all modes.
 			// dec count by one:
 			numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
 			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
 			Gbl.assertIf(map.merge(event.getLinkId(), -1., Double::sum) >= 0);
+		}
+
+		if (this.bicycleConfig.isAvgCarOccupancyDuringBicycleTraversal() && TransportMode.car.equals(mode)) {
+			// 1b. avgCarOccupancyDuringBicycleTraversal: only cars are counted; update exposure before changing car occupancy.
+			updateBikeExposureOnLink(event.getLinkId(), event.getTime());
+			decrementVehicleCountOnLink(TransportMode.car, event.getLinkId());
 		}
 
 		if (vehicle2driver.getDriverOfVehicle(event.getVehicleId()) != null) {
