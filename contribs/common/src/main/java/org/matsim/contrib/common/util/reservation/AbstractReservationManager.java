@@ -45,7 +45,7 @@ public abstract class AbstractReservationManager<
 			return true;
 		}
 
-		TimeInterval requested = new TimeInterval(startTime, endTime).expandBy(bufferTime);
+		TimeInterval requested = new TimeInterval(startTime, endTime);
 		return getPeakOccupancy(resourceReservations.values(), consumer, requested) < capacity;
 	}
 
@@ -65,7 +65,7 @@ public abstract class AbstractReservationManager<
 	/**
 	 * Returns the highest number of other consumers that hold a reservation at the same time within the requested
 	 * interval. Reservations of the requesting consumer are ignored, and several reservations of one consumer count
-	 * once. The count is obtained by sweeping over the start and end points of the overlapping reservations, clipped to
+	 * once. Stored reservations are padded by the buffer time. The count is obtained by sweeping over the start and end points of the overlapping reservations, clipped to
 	 * the requested interval. At equal times, departures are processed before arrivals, so reservations that only touch
 	 * are not counted as simultaneous. A zero-length occupancy counts at its instant (see {@link TimeInterval}).
 	 */
@@ -76,7 +76,11 @@ public abstract class AbstractReservationManager<
 			if (reservationInfo.consumer().getId().equals(consumer.getId())) {
 				continue;
 			}
-			TimeInterval reserved = new TimeInterval(reservationInfo.startTime(), reservationInfo.endTime());
+			// the buffer pads the stored reservations, not the request: padding only the request would still let
+			// back-to-back reservations through, as they are never simultaneous with each other. Vehicles do not
+			// arrive and leave on the minute, so such handovers would exceed the physical capacity.
+			TimeInterval reserved = new TimeInterval(reservationInfo.startTime(), reservationInfo.endTime())
+				.expandBy(bufferTime);
 			if (requested.overlaps(reserved)) {
 				double start = Math.max(reserved.start(), requested.start());
 				double end = Math.min(reserved.end(), requested.end());

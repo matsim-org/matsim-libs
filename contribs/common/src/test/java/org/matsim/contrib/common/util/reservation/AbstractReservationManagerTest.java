@@ -421,6 +421,22 @@ public class AbstractReservationManagerTest {
 	}
 
 	/**
+	 * With a buffer, back-to-back reservations are padded and count as simultaneous, so that a vehicle that leaves
+	 * late does not block the arrival of two vehicles that start when its reservation ends.
+	 */
+	@Test
+	public void testIsAvailable_BufferPadsBackToBackReservations() {
+		TestReservationManager manager = new TestReservationManager(900);
+		resource1.capacity = 2;
+		manager.addReservation(resource1, consumer1, 44100, 45900);
+		manager.addReservation(resource1, consumer2, 45900, 47700);
+
+		assertThat(manager.isAvailable(resource1, consumer3, 45900, 47700)).isFalse();
+		// a gap of at least the buffer is enough
+		assertThat(manager.isAvailable(resource1, consumer3, 46800, 48600)).isTrue();
+	}
+
+	/**
 	 * A zero-length reservation occupies its instant (see TimeInterval).
 	 */
 	@Test
