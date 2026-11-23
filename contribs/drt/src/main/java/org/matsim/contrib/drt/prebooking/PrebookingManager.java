@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.utils.misc.OptionalTime;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -329,12 +330,13 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 	/**
 	 * A passenger of a request with stop candidates: the activity before the trip (looked up once at booking) and, while
-	 * held in it, the originally planned end and the end set for holding.
+	 * held in it, the originally planned end, its maximum duration (cleared while held) and the end set for holding.
 	 */
 	private static final class StopCandidatePassenger {
 		private final PersonLeg personLeg;
 		private final Activity origin;
 		private double originalEndTime = Double.NaN;
+		private OptionalTime originalMaximumDuration = OptionalTime.undefined();
 		private double heldUntil = Double.NaN;
 
 		private StopCandidatePassenger(PersonLeg personLeg) {
@@ -426,6 +428,9 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 			}
 			if (Double.isNaN(passenger.originalEndTime)) {
 				passenger.originalEndTime = agent.getActivityEndTime();
+				// under minOfDurationAndEndTime, a maximum duration would end the activity regardless of the end time
+				passenger.originalMaximumDuration = passenger.origin.getMaximumDuration();
+				passenger.origin.setMaximumDurationUndefined();
 			}
 			passenger.heldUntil = now + 2 * timeStep;
 			passenger.origin.setEndTime(passenger.heldUntil);
@@ -445,6 +450,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 				continue;
 			}
 			passenger.origin.setEndTime(Math.max(passenger.originalEndTime, now + timeStep));
+			passenger.originalMaximumDuration.ifDefined(passenger.origin::setMaximumDuration);
 			MobsimAgent agent = passenger.personLeg.agent();
 			WithinDayAgentUtils.resetCaches(agent);
 			internalInterface.getMobsim().rescheduleActivityEnd(agent);

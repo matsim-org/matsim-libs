@@ -36,9 +36,11 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripStructureUtils;
@@ -144,6 +146,28 @@ public class PrebookingStopSelectionTest {
 				.satisfies(time -> assertThat(time).isBetween(DEPARTURE_TIME + 1, DEPARTURE_TIME + 5));
 		assertThat(result.drtDepartures.getFirst().getTime())
 				.isEqualTo(result.originActivityEnds.getFirst() + 312, offset(1.0));
+		assertThat(result.finalArrivalLinks).containsExactly(DESTINATION);
+		assertThat(result.stuck).isEmpty();
+	}
+
+	@Test
+	void testHoldingWorksWithMinOfDurationAndEndTime() {
+		// the activity also ends by its maximum duration (here at the same time as by its end time): holding must not be
+		// undone by the duration, otherwise the passenger leaves for the routed stop A while B is scheduled. Holding
+		// therefore clears the maximum duration; it must not rely on the agent measuring the duration from the time of
+		// the end time update (current core behaviour of resetCaches)
+		PrebookingTestEnvironment environment = pickupEnvironment(2, DEPARTURE_TIME, false);
+		Controler controller = environment.build();
+		controller.getConfig().plans()
+				.setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
+		Person person = controller.getScenario().getPopulation().getPersons().get(Id.createPersonId("personA"));
+		((Activity) person.getSelectedPlan().getPlanElements().getFirst()).setMaximumDuration(DEPARTURE_TIME);
+		PrebookingTest.installPrebooking(controller, new PrebookingParams());
+		Result result = run(environment, controller);
+
+		assertThat(result.drtDepartures).extracting(e -> e.getLinkId()).containsExactly(STOP_B);
+		assertThat(result.originActivityEnds).singleElement()
+				.satisfies(time -> assertThat(time).isBetween(DEPARTURE_TIME + 1, DEPARTURE_TIME + 5));
 		assertThat(result.finalArrivalLinks).containsExactly(DESTINATION);
 		assertThat(result.stuck).isEmpty();
 	}
