@@ -20,6 +20,7 @@ package org.matsim.core.controler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,14 +47,7 @@ public final class ControllerUtils{
 	 * @return
 	 */
 	public static com.google.inject.Injector createAdhocInjector( Config config, Scenario scenario ){
-		return Injector.createInjector( config, new AbstractModule(){
-			@Override public void install(){
-				install( new NewControlerModule() );
-				install( new ControlerDefaultCoreListenersModule() );
-				install( new ControlerDefaultsModule() );
-				install( new ScenarioByInstanceModule( scenario ) );
-			}
-		} );
+		return Injector.createInjector( config, adhocModules( scenario ) );
 	}
 	/**
 	 * This is meant for creating the matsim injector if one does not need/want {@link Controler}.
@@ -64,14 +58,42 @@ public final class ControllerUtils{
 	 * @return
 	 */
 	public static com.google.inject.Injector createAdhocInjector( Scenario scenario ){
-		return Injector.createInjector( scenario.getConfig(), new AbstractModule(){
+		return Injector.createInjector( scenario.getConfig(), adhocModules( scenario ) );
+	}
+
+	/**
+	 * Like {@link #createAdhocInjector(Config, Scenario)}, but the bindings of {@code overridingModules} replace those of
+	 * the default modules, as with {@link Controler#addOverridingModule}. Use it to replace a default implementation,
+	 * e.g. one that {@link ControlerDefaultsModule} binds; a second binding of the same key would otherwise make the
+	 * injector fail. As with several calls of {@link Controler#addOverridingModule}, each module also overrides the
+	 * modules before it in the list.
+	 */
+	public static com.google.inject.Injector createAdhocInjector( Config config, Scenario scenario, List<AbstractModule> overridingModules ){
+		AbstractModule modules = adhocModules( scenario );
+		for( AbstractModule overridingModule : overridingModules ){
+			modules = AbstractModule.override( List.of( modules ), overridingModule );
+		}
+		return Injector.createInjector( config, modules );
+	}
+
+	/**
+	 * Like {@link #createAdhocInjector(Scenario)}, with {@code overridingModules} as in
+	 * {@link #createAdhocInjector(Config, Scenario, List)}.
+	 */
+	public static com.google.inject.Injector createAdhocInjector( Scenario scenario, List<AbstractModule> overridingModules ){
+		return createAdhocInjector( scenario.getConfig(), scenario, overridingModules );
+	}
+
+	/** The modules of the ad-hoc injector: the default modules of the controller, and {@code scenario}. */
+	private static AbstractModule adhocModules( Scenario scenario ){
+		return new AbstractModule(){
 			@Override public void install(){
 				install( new NewControlerModule() );
 				install( new ControlerDefaultCoreListenersModule() );
 				install( new ControlerDefaultsModule() );
 				install( new ScenarioByInstanceModule( scenario ) );
 			}
-		} );
+		};
 	}
 
 	private ControllerUtils() {} // namespace for static methods only should not be instantiated
