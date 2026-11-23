@@ -156,6 +156,21 @@ public class PrebookingStopCandidatesTest {
 	}
 
 	@Test
+	void testMaterializeKeepsTheModeOfTheRoutedAccessAndEgress() {
+		// with custom access/egress routers (e.g. bike), the candidate durations come from these routers, so the
+		// rewritten legs must keep their mode
+		Plan plan = routedPlan();
+		((Leg)plan.getPlanElements().get(1)).setMode(TransportMode.bike);
+		((Leg)plan.getPlanElements().get(5)).setMode(TransportMode.bike);
+
+		assertThat(PrebookingStopCandidates.materialize(plan, drtLeg(plan), Id.createLinkId("B"),
+				Id.createLinkId("F"))).isTrue();
+
+		assertThat(((Leg)plan.getPlanElements().get(1)).getMode()).isEqualTo(TransportMode.bike);
+		assertThat(((Leg)plan.getPlanElements().get(5)).getMode()).isEqualTo(TransportMode.bike);
+	}
+
+	@Test
 	void testMaterializeDoesNothingForTheRoutedStops() {
 		Plan plan = routedPlan();
 		var before = List.copyOf(plan.getPlanElements());

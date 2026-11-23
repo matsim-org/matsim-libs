@@ -184,7 +184,8 @@ public final class PrebookingStopCandidates {
 
 	/**
 	 * Rewrites the access and/or egress part of the trip of the given DRT leg to the chosen pickup/dropoff stops. The
-	 * new walk legs are teleported legs with the routed duration and distance of the chosen candidate.
+	 * new legs are teleported legs with the routed duration and distance of the chosen candidate and the mode of the
+	 * routed access/egress leg (the candidates are routed with the same access/egress router).
 	 *
 	 * @return true if the plan was changed
 	 */
@@ -213,7 +214,7 @@ public final class PrebookingStopCandidates {
 			StopCandidates.Candidate pickup = find(candidates.access(), pickupLinkId);
 			Activity origin = trip.getOriginActivity();
 			Id<Link> originLinkId = firstWalkStartLink(accessPart).orElse(origin.getLinkId());
-			Leg walk = walkLeg(pickup, originLinkId, pickup.linkId(), routingMode);
+			Leg walk = accessEgressLeg(pickup, firstLegMode(accessPart), originLinkId, pickup.linkId(), routingMode);
 			origin.getEndTime().ifDefined(walk::setDepartureTime);
 			newTrip.add(walk);
 			newTrip.add(stageActivity(pickup, mode));
@@ -229,7 +230,8 @@ public final class PrebookingStopCandidates {
 			StopCandidates.Candidate dropoff = find(candidates.egress(), dropoffLinkId);
 			Id<Link> destinationLinkId = lastWalkEndLink(egressPart).orElse(trip.getDestinationActivity().getLinkId());
 			newTrip.add(stageActivity(dropoff, mode));
-			newTrip.add(walkLeg(dropoff, dropoff.linkId(), destinationLinkId, routingMode));
+			newTrip.add(accessEgressLeg(dropoff, lastLegMode(egressPart), dropoff.linkId(), destinationLinkId,
+					routingMode));
 			route.setEndLinkId(dropoffLinkId);
 		} else {
 			newTrip.addAll(egressPart);
@@ -282,9 +284,19 @@ public final class PrebookingStopCandidates {
 				PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(stop.coord(), stop.linkId(), mode));
 	}
 
-	private static Leg walkLeg(StopCandidates.Candidate candidate, Id<Link> startLinkId, Id<Link> endLinkId,
-			String routingMode) {
-		Leg walk = PopulationUtils.createLeg(TransportMode.walk);
+	private static String firstLegMode(List<PlanElement> part) {
+		return part.stream().filter(Leg.class::isInstance).map(e -> ((Leg)e).getMode()).findFirst()
+				.orElse(TransportMode.walk);
+	}
+
+	private static String lastLegMode(List<PlanElement> part) {
+		return Lists.reverse(part).stream().filter(Leg.class::isInstance).map(e -> ((Leg)e).getMode()).findFirst()
+				.orElse(TransportMode.walk);
+	}
+
+	private static Leg accessEgressLeg(StopCandidates.Candidate candidate, String mode, Id<Link> startLinkId,
+			Id<Link> endLinkId, String routingMode) {
+		Leg walk = PopulationUtils.createLeg(mode);
 		Route route = RouteUtils.createGenericRouteImpl(startLinkId, endLinkId);
 		route.setTravelTime(candidate.walkDuration());
 		route.setDistance(candidate.walkDistance());
