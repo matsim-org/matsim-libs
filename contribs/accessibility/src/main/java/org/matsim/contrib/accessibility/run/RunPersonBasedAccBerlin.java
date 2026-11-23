@@ -97,6 +97,21 @@ public class RunPersonBasedAccBerlin {
 	private static final double CAR_DAILY_MONETARY_CONSTANT = -5.0;
 	private static final double PT_DAILY_MONETARY_CONSTANT = -3.0;
 
+	private static final List<String> FACILITY_ACTIVITY_TYPES = List.of(
+		// "dining",
+		// "edu_higher",
+		// "edu_kiga",
+		// "edu_other",
+		// "edu_primary",
+		// "edu_secondary",
+		// "leisure",
+		// "personal_business",
+		// "shop_daily",
+		// "shop_other",
+		// "work_business",
+		"work"
+	);
+
 	private enum RunScenario {base, policy}
 
 	private enum OpportunityType {
@@ -104,7 +119,8 @@ public class RunPersonBasedAccBerlin {
 		spa("spa"),
 		baeder("baeder"),
 		jobcenter("jobcenter"),
-		university("university");
+		university("university"),
+		facilities("facilities");
 
 		private final String activityType;
 
@@ -204,6 +220,8 @@ public class RunPersonBasedAccBerlin {
 					requireValue(args, index, inlineValue, key);
 				case "--version" -> options.version =
 					requireValue(args, index, inlineValue, key);
+				case "--facilities-file" -> options.facilitiesFile =
+					requireValue(args, index, inlineValue, key);
 				case "--network-file" -> options.networkFile =
 					requireValue(args, index, inlineValue, key);
 				case "--plans-file" -> options.plansFile =
@@ -267,7 +285,7 @@ public class RunPersonBasedAccBerlin {
 			return OpportunityType.valueOf(normalized.toLowerCase(Locale.ROOT));
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("Unknown --opportunity '" + value
-				+ "'. Choose one of: hospital, spa, baeder, jobcenter, university");
+				+ "'. Choose one of: hospital, spa, baeder, jobcenter, university, facilities");
 		}
 	}
 
@@ -308,7 +326,7 @@ public class RunPersonBasedAccBerlin {
 
 			Single combination:
 			  java -jar accessibility-cluster.jar \\
-			    --opportunity <hospital|spa|baeder|jobcenter|university> \\
+			    --opportunity <hospital|spa|baeder|jobcenter|university|facilities> \\
 			    --scenario <base|policy> \\
 			    --mode <car|pt|teleportedWalk>
 
@@ -323,6 +341,7 @@ public class RunPersonBasedAccBerlin {
 			  --r-input-dir <dir>            Root for the R input folders
 			  --hospital-input-dir <dir>     Dir containing the hospital WFS XML files
 			  --version <v>                  Berlin scenario version, used in file names (default: 6.4)
+			  --facilities-file <file>      Opportunities for --opportunity facilities (default: base facilities)
 			  --network-file <file>          Override network file
 			  --plans-file <file>            Override plans file
 			  --transit-schedule-file <file> Override transit schedule file
@@ -357,6 +376,7 @@ public class RunPersonBasedAccBerlin {
 		String hospitalInputDir;
 		String version = DEFAULT_VERSION;
 
+		String facilitiesFile;
 		String networkFile;
 		String plansFile;
 		String transitScheduleFile;
@@ -387,6 +407,7 @@ public class RunPersonBasedAccBerlin {
 			copy.rInputDir = rInputDir;
 			copy.hospitalInputDir = hospitalInputDir;
 			copy.version = version;
+			copy.facilitiesFile = facilitiesFile;
 			copy.networkFile = networkFile;
 			copy.plansFile = plansFile;
 			copy.transitScheduleFile = transitScheduleFile;
@@ -430,7 +451,8 @@ public class RunPersonBasedAccBerlin {
 		List<String> failures = new ArrayList<>();
 
 //		Run policy first: it is the scenario whose files are currently available.
-		for (OpportunityType opportunity : OpportunityType.values()) {
+		for (OpportunityType opportunity : List.of(OpportunityType.hospital, OpportunityType.spa,
+			OpportunityType.baeder, OpportunityType.jobcenter, OpportunityType.university)) {
 			for (RunScenario runScenario : List.of(RunScenario.policy, RunScenario.base)) {
 				for (Modes4Accessibility mode : ANALYSIS_MODES) {
 					total++;
@@ -473,7 +495,12 @@ public class RunPersonBasedAccBerlin {
 			LOG.info("  sample:        {} (seed {})", options.sample, options.sampleSeed);
 			LOG.info("  daily monetary constant: {} (car {}, pt {})", options.includeDailyMonetaryConstant,
 				CAR_DAILY_MONETARY_CONSTANT, PT_DAILY_MONETARY_CONSTANT);
-			LOG.info("  R input dir:   {}", options.opportunity.outputDir(options.rInputDir));
+			LOG.info("  R input dir:   {}", options.opportunity == OpportunityType.facilities
+				? options.rInputDir : options.opportunity.outputDir(options.rInputDir));
+			if (options.opportunity == OpportunityType.facilities) {
+				LOG.info("  facilities:    {}", options.facilitiesFile);
+				LOG.info("  activity types: {}", FACILITY_ACTIVITY_TYPES);
+			}
 			return;
 		}
 
@@ -482,23 +509,25 @@ public class RunPersonBasedAccBerlin {
 
 		loadFiles(options);
 
-//		== Write POI locations for mapping in R ==
-		String outputDir = options.opportunity.outputDir(options.rInputDir);
-		writeLocationsCSV(options.opportunity,
-			new File(outputDir, "locations.csv").getPath());
+		List<String> activityTypes = options.opportunity == OpportunityType.facilities
+			? FACILITY_ACTIVITY_TYPES : List.of(options.opportunity.activityType());
+		for (String activityType : activityTypes) {
+			runActivityType(options, activityType);
+		}
+		LOG.info("Accessibility computation finished in {} seconds", (System.currentTimeMillis() - start) / 1000);
+	}
 
-//		== Calculate accessibility ==
+	private static void runActivityType(RunOptions options, String activityType) {
+		String outputDir = options.opportunity == OpportunityType.facilities
+			? file(options.rInputDir, activityType) : options.opportunity.outputDir(options.rInputDir);
+		writeLocationsCSV(options.opportunity, activityType, file(outputDir, "locations.csv"));
+
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(
-			scenario, options.eventsFile, List.of(options.opportunity.activityType()));
+			scenario, options.eventsFile, List.of(activityType));
 
 		PersonBasedResultsComparator dataListener = new PersonBasedResultsComparator();
 		builder.addDataListener(dataListener);
 		builder.build().run();
-
-		long ms = System.currentTimeMillis() - start;
-		long seconds = ms / 1000;
-		long minutes = seconds / 60;
-		LOG.info("Accessibility computation finished in {} minutes (≈ {} seconds)", minutes, seconds);
 
 		Map<Tuple<Person, Double>, Map<String, Double>> accessibilitiesMap =
 			dataListener.getAccessibilitiesMap();
@@ -532,6 +561,12 @@ public class RunPersonBasedAccBerlin {
 		options.workDir = new File(workRoot,
 			options.scenario + File.separator + options.opportunity + File.separator
 				+ options.mode + "-" + ProcessHandle.current().pid()).getPath();
+
+		if (options.opportunity == OpportunityType.facilities && options.facilitiesFile == null) {
+			String facilitiesDir = options.baseDir != null ? options.baseDir
+				: options.scenario == RunScenario.base ? options.scenarioDir : file(options.outputRoot, "base");
+			options.facilitiesFile = matsimFile(facilitiesDir, "berlin-v" + options.version + ".output_facilities.xml");
+		}
 
 		options.networkFile = orDefault(options.networkFile,
 			matsimFile(options.scenarioDir, "berlin-v" + options.version + ".output_network.xml"));
@@ -598,7 +633,12 @@ public class RunPersonBasedAccBerlin {
 		config.scoring().getModes().get(TransportMode.pt).setConstant(0.43220302370275404);
 
 		config.network().setInputFile(options.networkFile);
-		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
+		if (options.opportunity == OpportunityType.facilities) {
+			config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
+			config.facilities().setInputFile(options.facilitiesFile);
+		} else {
+			config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
+		}
 		config.plans().setInputFile(options.plansFile);
 		config.transit().setTransitScheduleFile(options.transitScheduleFile);
 
@@ -639,17 +679,25 @@ public class RunPersonBasedAccBerlin {
 
 //		== Adding facilities ==
 		ActivityFacilities activityFacilities = scenario.getActivityFacilities();
-		ActivityFacilitiesFactory af = activityFacilities.getFactory();
+		if (options.opportunity == OpportunityType.facilities) {
+			for (String activityType : FACILITY_ACTIVITY_TYPES) {
+				if (activityFacilities.getFacilitiesForActivityType(activityType).isEmpty()) {
+					throw new IllegalArgumentException("No facilities for activity type " + activityType
+						+ " in " + options.facilitiesFile);
+				}
+			}
+		} else {
+			ActivityFacilitiesFactory af = activityFacilities.getFactory();
 
-//		--- Opportunities (selected by OpportunityType) ---
-		ActivityOption activityOption = af.createActivityOption(options.opportunity.activityType());
-		switch (options.opportunity) {
-			case hospital -> addHospitals(activityFacilities, af, activityOption, options);
-			case spa -> addSpas(activityFacilities, af, activityOption);
-			case baeder -> addGeoJsonOpportunities(activityFacilities, af, activityOption,
-				options.baederGeoJson, location -> true);
-			case jobcenter -> addJobcenters(activityFacilities, af, activityOption);
-			case university -> addUniversities(activityFacilities, af, activityOption);
+			ActivityOption activityOption = af.createActivityOption(options.opportunity.activityType());
+			switch (options.opportunity) {
+				case hospital -> addHospitals(activityFacilities, af, activityOption, options);
+				case spa -> addSpas(activityFacilities, af, activityOption);
+				case baeder -> addGeoJsonOpportunities(activityFacilities, af, activityOption,
+					options.baederGeoJson, location -> true);
+				case jobcenter -> addJobcenters(activityFacilities, af, activityOption);
+				case university -> addUniversities(activityFacilities, af, activityOption);
+			}
 		}
 
 //		== Assigning home coords for each person ==
@@ -851,7 +899,7 @@ public class RunPersonBasedAccBerlin {
 	 * Writes the locations of the selected opportunity type (EPSG:25832) to a CSV for mapping in R.
 	 * One row per location, with a {@code type} column to distinguish the opportunity source.
 	 */
-	private static void writeLocationsCSV(OpportunityType opportunity, String csvFile) {
+	private static void writeLocationsCSV(OpportunityType opportunity, String activityType, String csvFile) {
 		File target = new File(csvFile);
 		target.getParentFile().mkdirs();
 //		Parallel cluster jobs share locations.csv per opportunity; write a private
@@ -863,6 +911,15 @@ public class RunPersonBasedAccBerlin {
 			writer.write("type,id,name,x,y,district,beds,street,house_number,postal_code,gisid,source_layer\n");
 
 			switch (opportunity) {
+				case facilities -> {
+					for (ActivityFacility facility : scenario.getActivityFacilities()
+							.getFacilitiesForActivityType(activityType).values()) {
+						writer.write(String.join(",", csv(activityType), csv(facility.getId().toString()),
+							"", Double.toString(facility.getCoord().getX()), Double.toString(facility.getCoord().getY()),
+							"", "", "", "", "", "", "") + "\n");
+						rows++;
+					}
+				}
 				case spa -> {
 					for (Spa spa : SPAS) {
 						writer.write(String.join(",",
@@ -966,7 +1023,7 @@ public class RunPersonBasedAccBerlin {
 			throw new RuntimeException("Error moving locations CSV into place", e);
 		}
 
-		LOG.info("Wrote {} {} locations to {}", rows, opportunity.activityType(), csvFile);
+		LOG.info("Wrote {} {} locations to {}", rows, activityType, csvFile);
 	}
 
 	private static String csv(String value) {
