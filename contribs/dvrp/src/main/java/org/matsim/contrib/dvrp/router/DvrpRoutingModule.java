@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
@@ -76,6 +77,7 @@ public class DvrpRoutingModule implements RoutingModule {
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
 	private final TimeInterpretation timeInterpretation;
+	private final AtomicBoolean warnedAboutRouteTypes = new AtomicBoolean();
 
 	public DvrpRoutingModule(RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
 			AccessEgressFacilityFinder stopFinder, String mode, TimeInterpretation timeInterpretation) {
@@ -176,8 +178,10 @@ public class DvrpRoutingModule implements RoutingModule {
 		if (route.isEmpty()) {
 			return; // the main leg router does not support stop candidates
 		}
-		if (!isTeleported(accessTrip) || !isTeleported(egressTrip)) {
-			return; // the legs to/from alternative stops can only be inserted as teleported legs
+		if (!hasGenericRoute(accessTrip) || !hasGenericRoute(egressTrip)) {
+			// the legs to/from alternative stops can only be inserted with generic routes
+			warnOnceAboutRouteTypes(hasGenericRoute(accessTrip) ? egressTrip : accessTrip);
+			return;
 		}
 
 		List<StopCandidates.Candidate> access = new ArrayList<>();
@@ -186,8 +190,8 @@ public class DvrpRoutingModule implements RoutingModule {
 			List<? extends PlanElement> walk = accessRouter.calcRoute(
 					DefaultRoutingRequest.of(request.getFromFacility(), facility, departureTime, request.getPerson(),
 							request.getAttributes()));
-			if (walk == null || !isTeleported(walk)) {
-				continue; // candidate not reachable, or not by a teleported leg
+			if (walk == null || !hasGenericRoute(walk)) {
+				continue; // candidate not reachable, or not by a leg with a generic route
 			}
 			double endTime = timeInterpretation.decideOnElementsEndTime(walk, departureTime).seconds();
 			access.add(candidate(facility, walk, departureTime, endTime));
@@ -200,8 +204,8 @@ public class DvrpRoutingModule implements RoutingModule {
 			List<? extends PlanElement> walk = egressRouter.calcRoute(
 					DefaultRoutingRequest.of(facility, request.getToFacility(), egressStartTime, request.getPerson(),
 							request.getAttributes()));
-			if (walk == null || !isTeleported(walk)) {
-				continue; // candidate not reachable, or not by a teleported leg
+			if (walk == null || !hasGenericRoute(walk)) {
+				continue; // candidate not reachable, or not by a leg with a generic route
 			}
 			double endTime = timeInterpretation.decideOnElementsEndTime(walk, egressStartTime).seconds();
 			egress.add(candidate(facility, walk, egressStartTime, endTime));
@@ -210,13 +214,26 @@ public class DvrpRoutingModule implements RoutingModule {
 		route.get().setStopCandidates(new StopCandidates(access, egress));
 	}
 
+	private void warnOnceAboutRouteTypes(List<? extends PlanElement> trip) {
+		if (warnedAboutRouteTypes.compareAndSet(false, true)) {
+			logger.warn("Stop candidates of mode {} are not used for trips whose access or egress is not a single leg "
+					+ "with a generic route (here: {}); such trips use the routed stops. Further occurrences are not "
+					+ "logged.", mode, trip.stream()
+					.map(e -> e instanceof Leg leg ? leg.getMode() + "/" + (leg.getRoute() == null ? "no route" :
+							leg.getRoute().getRouteType()) : "activity")
+					.toList());
+		}
+	}
+
 	/**
-	 * @return true if the access/egress (sub-)trip is empty or a single leg without a network route, i.e. one that can
-	 * be replaced by a teleported leg of the same mode with the routed duration and distance
+	 * @return true if the access/egress (sub-)trip is empty or a single leg with a generic route, i.e. one that can be
+	 * replaced by a leg of the same mode with a generic route of another duration and distance. This is conservative:
+	 * legs with network routes are excluded even if the mobsim teleports them (e.g. network-routed modes that are no
+	 * main modes of the qsim, or legs teleported by FISS), as are other route types (e.g. transit routes).
 	 */
-	private static boolean isTeleported(List<? extends PlanElement> trip) {
+	private static boolean hasGenericRoute(List<? extends PlanElement> trip) {
 		return trip.isEmpty()
-				|| trip.size() == 1 && trip.getFirst() instanceof Leg leg && !(leg.getRoute() instanceof NetworkRoute);
+				|| trip.size() == 1 && trip.getFirst() instanceof Leg leg && leg.getRoute() instanceof GenericRouteImpl;
 	}
 
 	private static StopCandidates.Candidate candidate(Facility facility, List<? extends PlanElement> walk,

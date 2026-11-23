@@ -36,10 +36,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
@@ -79,7 +81,7 @@ public class DvrpRoutingModuleStopFinderTest {
 	}
 
 	@Test
-	void testAlternativesAreAttachedForTeleportedAccessAndEgress() {
+	void testAlternativesAreAttachedForAccessAndEgressWithGenericRoutes() {
 		StopCandidatesRoute route = candidatesRoute();
 		routeWithAlternatives(route, router("walk"));
 
@@ -88,7 +90,7 @@ public class DvrpRoutingModuleStopFinderTest {
 
 	@Test
 	void testNoAlternativesForNetworkRoutedAccess() {
-		// the legs to/from alternative stops are inserted as teleported legs, which a network-routed access cannot be
+		// the legs to/from alternative stops are inserted with generic routes, which a network-routed access cannot get
 		RoutingModule networkAccess = mock(RoutingModule.class);
 		when(networkAccess.calcRoute(Mockito.any())).thenAnswer(invocation -> {
 			Leg leg = PopulationUtils.createLeg("car");
@@ -101,6 +103,26 @@ public class DvrpRoutingModuleStopFinderTest {
 		});
 		StopCandidatesRoute route = candidatesRoute();
 		routeWithAlternatives(route, networkAccess);
+
+		verify(route, never()).setStopCandidates(any());
+	}
+
+	@Test
+	void testNoAlternativesForAccessWithAnotherRouteType() {
+		// e.g. a single transit leg: neither a network route nor generic, so it cannot be replaced by a generic route
+		RoutingModule transitAccess = mock(RoutingModule.class);
+		when(transitAccess.calcRoute(Mockito.any())).thenAnswer(invocation -> {
+			Leg leg = PopulationUtils.createLeg("pt");
+			leg.setDepartureTime(((RoutingRequest)invocation.getArgument(0)).getDepartureTime());
+			leg.setTravelTime(60.0);
+			Route transitRoute = mock(Route.class);
+			when(transitRoute.getTravelTime()).thenReturn(OptionalTime.defined(60.0));
+			when(transitRoute.getRouteType()).thenReturn("default_pt");
+			leg.setRoute(transitRoute);
+			return List.of(leg);
+		});
+		StopCandidatesRoute route = candidatesRoute();
+		routeWithAlternatives(route, transitAccess);
 
 		verify(route, never()).setStopCandidates(any());
 	}
@@ -150,9 +172,16 @@ public class DvrpRoutingModuleStopFinderTest {
 	private static RoutingModule router(String mode) {
 		RoutingModule router = mock(RoutingModule.class);
 		when(router.calcRoute(Mockito.any())).thenAnswer(invocation -> {
+			RoutingRequest request = invocation.getArgument(0);
 			Leg leg = PopulationUtils.createLeg(mode);
-			leg.setDepartureTime(((RoutingRequest)invocation.getArgument(0)).getDepartureTime());
+			leg.setDepartureTime(request.getDepartureTime());
 			leg.setTravelTime(60.0);
+			// teleported legs get a generic route
+			Route teleported = RouteUtils.createGenericRouteImpl(request.getFromFacility().getLinkId(),
+					request.getToFacility().getLinkId());
+			teleported.setTravelTime(60.0);
+			teleported.setDistance(50.0);
+			leg.setRoute(teleported);
 			return List.of(leg);
 		});
 		return router;
