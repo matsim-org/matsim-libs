@@ -666,12 +666,17 @@ class AgentWiseComparisonKNUtils{
 
 		return new org.matsim.core.controler.Injector.InjectorBuilder( baseScenario )
 				   .addStandardModules()
-				   .addOverridingModule( new AbstractModule(){
-					   @Override public void install(){
-						   bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
-						   bind( MuseComputation.class );
-					   }
-				   } ).build();
+				   .addOverridingModule( knScoringModule() )
+				   .build();
+	}
+
+	static AbstractModule knScoringModule(){
+		return new AbstractModule(){
+			@Override public void install(){
+				bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
+				bind( MuseComputation.class );
+			}
+		};
 	}
 	static void writeMuseHtml( Table baseTablePersons, Path inputPath ){
 		HistogramTrace histogramTrace = HistogramTrace.builder( baseTablePersons.doubleColumn( MUSE_h ) ).build();

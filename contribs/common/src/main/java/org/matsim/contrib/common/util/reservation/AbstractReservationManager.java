@@ -3,6 +3,7 @@ package org.matsim.contrib.common.util.reservation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.contrib.common.util.TimeInterval;
 
 import java.util.*;
 
@@ -39,23 +40,64 @@ public abstract class AbstractReservationManager<
 			return false;
 		}
 
-		if (!reservations.containsKey(resource.getId())) {
+		IdMap<Reservation, ReservationInfo<R, C>> resourceReservations = reservations.get(resource.getId());
+		if (resourceReservations == null) {
 			return true;
 		}
 
-		// Use a Set to track unique consumers with overlapping reservations
-		Set<C> consumersWithOverlappingReservations = new HashSet<>();
+		TimeInterval requested = new TimeInterval(startTime, endTime).expandBy(bufferTime);
+		return getPeakOccupancy(resourceReservations.values(), consumer, requested) < capacity;
+	}
 
-		for (ReservationInfo<R, C> reservationInfo : reservations.get(resource.getId()).values()) {
-			if (!reservationInfo.consumer().getId().equals(consumer.getId()) &&
-				isOverlapping(reservationInfo, startTime - bufferTime, endTime + bufferTime)) {
+	/**
+	 * A consumer starts or stops occupying the resource at the given time. The kind also defines the processing order
+	 * at equal times.
+	 */
+	private record OccupancyChange(double time, int kind, Id<?> consumerId) {
+	}
 
-				consumersWithOverlappingReservations.add(reservationInfo.consumer());
+	private static final int DEPARTURE = 0;
+	private static final int ARRIVAL = 1;
+	// departure of a zero-length occupancy: processed after the arrivals at the same time, so that it counts at its
+	// instant
+	private static final int DEPARTURE_OF_INSTANT = 2;
+
+	/**
+	 * Returns the highest number of other consumers that hold a reservation at the same time within the requested
+	 * interval. Reservations of the requesting consumer are ignored, and several reservations of one consumer count
+	 * once. The count is obtained by sweeping over the start and end points of the overlapping reservations, clipped to
+	 * the requested interval. At equal times, departures are processed before arrivals, so reservations that only touch
+	 * are not counted as simultaneous. A zero-length occupancy counts at its instant (see {@link TimeInterval}).
+	 */
+	private int getPeakOccupancy(Collection<ReservationInfo<R, C>> reservationInfos, C consumer,
+								 TimeInterval requested) {
+		List<OccupancyChange> changes = new ArrayList<>();
+		for (ReservationInfo<R, C> reservationInfo : reservationInfos) {
+			if (reservationInfo.consumer().getId().equals(consumer.getId())) {
+				continue;
+			}
+			TimeInterval reserved = new TimeInterval(reservationInfo.startTime(), reservationInfo.endTime());
+			if (requested.overlaps(reserved)) {
+				double start = Math.max(reserved.start(), requested.start());
+				double end = Math.min(reserved.end(), requested.end());
+				Id<?> consumerId = reservationInfo.consumer().getId();
+				changes.add(new OccupancyChange(start, ARRIVAL, consumerId));
+				changes.add(new OccupancyChange(end, end > start ? DEPARTURE : DEPARTURE_OF_INSTANT, consumerId));
 			}
 		}
+		changes.sort(Comparator.comparingDouble(OccupancyChange::time).thenComparingInt(OccupancyChange::kind));
 
-		// Return true if the number of unique consumers with overlapping reservations is less than capacity
-		return consumersWithOverlappingReservations.size() < capacity;
+		Map<Id<?>, Integer> activeReservations = new HashMap<>();
+		int peak = 0;
+		for (OccupancyChange change : changes) {
+			if (change.kind() == ARRIVAL) {
+				activeReservations.merge(change.consumerId(), 1, Integer::sum);
+				peak = Math.max(peak, activeReservations.size());
+			} else {
+				activeReservations.computeIfPresent(change.consumerId(), (id, count) -> count == 1 ? null : count - 1);
+			}
+		}
+		return peak;
 	}
 
 	@Override
@@ -147,18 +189,6 @@ public abstract class AbstractReservationManager<
 		return Optional.ofNullable(reservationInfos.getOrDefault(reservationId, null));
 	}
 
-
-	private boolean isOverlapping(ReservationInfo<R, C> reservationInfo, double startTime, double endTime) {
-		if (startTime >= reservationInfo.startTime() && startTime < reservationInfo.endTime()) {
-			return true; // start time within existing range
-		} else if (endTime > reservationInfo.startTime() && endTime < reservationInfo.endTime()) {
-			return true; // end time within existing range
-		} else if (startTime <= reservationInfo.startTime() && endTime > reservationInfo.endTime()) {
-			return true; // new range covers existing range
-		} else {
-			return false;
-		}
-	}
 
 	protected void cleanReservations() {
 		reservations.clear();

@@ -367,7 +367,7 @@ public class SupersonicOsmNetworkReader {
         return properties.lanesPerDirection;
     }
 
-    private String getOriginalGeometry(TLongList nodeIds, Direction direction) {
+    String getOriginalGeometry(TLongList nodeIds, Direction direction) {
 
         var stringBuilder = new StringBuilder();
 

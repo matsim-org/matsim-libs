@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.MobsimMessageCollector;
 import org.matsim.api.core.v01.network.NetworkPartition;
+import org.matsim.contrib.common.util.TimeInterval;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.mobsim.dsim.DSimComponentsMessageProcessor;
@@ -73,27 +74,16 @@ public class DistributedChargerReservationManager implements DSimComponentsMessa
 			throw new IllegalStateException("Charger " + chargerId + " is not present on this partition. addLocalReservation may only be called for local chargers.");
 
 		var overlappingReservations = new HashSet<>();
+		TimeInterval requested = new TimeInterval(startTime, endTime);
 		var chargerReservations = chargerToReservation.computeIfAbsent(chargerId, _ -> new ArrayList<>());
 		for (var reservationId : chargerReservations) {
 			var reservation = reservations.get(reservationId);
-			if (!reservation.consumer().equals(vehicleId) && isOverlapping(reservation, startTime, endTime)) {
+			if (!reservation.consumer().equals(vehicleId) && requested.overlaps(new TimeInterval(reservation.startTime(), reservation.endTime()))) {
 				overlappingReservations.add(reservationId);
 			}
 		}
 
 		return overlappingReservations.size() < charger.getPlugCount();
-	}
-
-	private boolean isOverlapping(ChargerReservation info, double startTime, double endTime) {
-		if (startTime >= info.startTime() && startTime < info.endTime()) {
-			return true; // start time within existing range
-		} else if (endTime > info.startTime() && endTime < info.endTime()) {
-			return true; // end time within existing range
-		} else if (startTime <= info.startTime() && endTime > info.endTime()) {
-			return true; // new range covers existing range
-		} else {
-			return false;
-		}
 	}
 
 	public void addReservation(Id<Charger> resource, Id<Vehicle> consumer, double startTime, double endTime, Consumer<Optional<ChargerReservation>> callback) {
