@@ -22,7 +22,6 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.vehicles.Vehicle;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -162,14 +161,11 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 		if (state == null || state.legSequence.isEmpty()) return;
 
 		String legId = state.getLegId();
-//		String tripId = state.getTripId();
 		String links = String.join("|", state.legSequence);
 
 		try {
 			writerLegSequences.write(factoryLegSequences.newGroup()
 				.append("leg_id", legId)
-//				.append("trip_id", tripId)
-//				.append("agent_id", state.agentId)
 				.append("leg_sequence", links));
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
@@ -186,180 +182,68 @@ public class DbEventHandler implements LinkEnterEventHandler, PersonDepartureEve
 	@Override public void handleEvent(PersonArrivalEvent event) {}
 
 	public void createComparisonDatasets(Integer rowGroupSize) throws SQLException, IOException {
-		Connection duckConn = DriverManager.getConnection("jdbc:duckdb:");
+		try (Connection duckConn = DriverManager.getConnection("jdbc:duckdb:")) {
 
-		try (var stmt = duckConn.createStatement();
-		     var rs = stmt.executeQuery("SELECT version()")) {
+			try (var stmt = duckConn.createStatement();
+			     var rs = stmt.executeQuery("SELECT version()")) {
 
-			if (rs.next()) {
-				log.info("DuckDB JDBC version: {}", rs.getString(1));
+				if (rs.next()) {
+					log.info("DuckDB JDBC version: {}", rs.getString(1));
+				}
 			}
-		}
 
-		String linkTraversalsPath = this.pathLinkTraversals.toString();
-		String linkTraversalsSortedPath = this.outputDirectory + "/link-traversals-sorted.parquet";
-		String legSequencesPath = this.pathLegSequences.toString();
-		String legSequencesSortedPath = this.outputDirectory + "/leg-sequences-sorted.parquet";
-		String partitionDirParquet = this.outputDirectory + "/hour-partition-parquet";
-		String partitionDirCsv = this.outputDirectory + "/hour-partition-csv";
-		String linkTraversalsCsvPathUncompressed =  this.outputDirectory + "/link-traversals-sorted.csv";
-		String legSequencesCsvPathUncompressed =  this.outputDirectory + "/leg-sequences-sorted.csv";
+			String linkTraversalsPath = this.pathLinkTraversals.toString();
+			String linkTraversalsSortedPath = this.outputDirectory + "/link-traversals-sorted.parquet";
+			String legSequencesPath = this.pathLegSequences.toString();
+			String legSequencesSortedPath = this.outputDirectory + "/leg-sequences-sorted.parquet";
+			String partitionDirParquet = this.outputDirectory + "/hour-partition-parquet";
 
-		String rowGroupClause = (rowGroupSize != null) ? ", ROW_GROUP_SIZE " + rowGroupSize : "";
-		System.out.println(rowGroupClause);
-
-		duckConn.createStatement().execute(
-			"SET preserve_insertion_order=false"
-		);
-
-		duckConn.createStatement().execute(
-			"COPY (SELECT * FROM read_parquet('" + linkTraversalsPath + "') " +
-				"ORDER BY link_id, hour) " +
-				"TO '" + linkTraversalsSortedPath + "' " +
-				"(FORMAT PARQUET, CODEC 'ZSTD'" + rowGroupClause + ")"
-		);
-
-		duckConn.createStatement().execute(
-			"COPY (SELECT * FROM read_parquet('" + legSequencesPath + "') " +
-				"ORDER BY leg_id) " +
-				"TO '" + legSequencesSortedPath + "' " +
-				"(FORMAT PARQUET, CODEC 'ZSTD'" + rowGroupClause + ")"
-		);
-
-		for (int hour = 0; hour < 35; hour++) {
-			String hourDir = partitionDirParquet + "/hour-" + hour;
-			String hourCsvDir = partitionDirCsv  + "/hour-" + hour;
-
-			fs.mkdirs(new Path(hourCsvDir));
-			fs.mkdirs(new Path(hourDir));
+			String rowGroupClause = (rowGroupSize != null) ? ", ROW_GROUP_SIZE " + rowGroupSize : "";
 
 			duckConn.createStatement().execute(
-				"COPY (SELECT * FROM read_parquet('" + linkTraversalsPath + "') lt " +
-					"  WHERE lt.hour = " + hour +
-					"ORDER BY link_id, hour) " + " " +
-					"TO '" + hourDir + "/link-traversals-sorted-" + hour + ".parquet" + "'" +
+				"SET preserve_insertion_order=false"
+			);
+
+			duckConn.createStatement().execute(
+				"COPY (SELECT * FROM read_parquet('" + linkTraversalsPath + "') " +
+					"ORDER BY link_id, hour) " +
+					"TO '" + linkTraversalsSortedPath + "' " +
 					"(FORMAT PARQUET, CODEC 'ZSTD'" + rowGroupClause + ")"
 			);
 
 			duckConn.createStatement().execute(
-				"COPY (" +
-//					"SELECT  lt.leg_id, ls.leg_sequence " +
-					"SELECT DISTINCT lt.leg_id, ls.leg_sequence " +
-					"FROM read_parquet('" + linkTraversalsSortedPath + "') lt " +
-					"JOIN read_parquet('" + legSequencesSortedPath + "') ls " +
-					"  ON lt.leg_id = ls.leg_id " +
-					"  WHERE lt.hour = " + hour +
-					"ORDER BY leg_id) " + " " +
-					"TO '" + hourDir + "/leg-sequences-sorted-" + hour + ".parquet" + "'" +
-					"(FORMAT PARQUET, CODEC 'ZSTD'" + rowGroupClause + ")"
-			);
-
-			duckConn.createStatement().execute(
-				"COPY (SELECT * FROM read_parquet('" + linkTraversalsPath + "') lt " +
-					"  WHERE lt.hour = " + hour +
-					"ORDER BY link_id, hour) " + " " +
-					"TO '" + hourCsvDir + "/link-traversals-sorted-" + hour + ".csv'" +
-					"(FORMAT CSV, HEADER, DELIMITER ',')"
-			);
-
-			duckConn.createStatement().execute(
-				"COPY (" +
-//					"SELECT  lt.leg_id, ls.leg_sequence " +
-					"SELECT DISTINCT lt.leg_id, ls.leg_sequence " +
-					"FROM read_parquet('" + linkTraversalsSortedPath + "') lt " +
-					"JOIN read_parquet('" + legSequencesSortedPath + "') ls " +
-					"  ON lt.leg_id = ls.leg_id " +
-					"  WHERE lt.hour = " + hour + " " +
+				"COPY (SELECT * FROM read_parquet('" + legSequencesPath + "') " +
 					"ORDER BY leg_id) " +
-					"TO '" + hourCsvDir + "/leg-sequences-sorted-" + hour + ".csv'" +
-					"(FORMAT CSV, HEADER, DELIMITER ',')"
+					"TO '" + legSequencesSortedPath + "' " +
+					"(FORMAT PARQUET, CODEC 'ZSTD'" + rowGroupClause + ")"
 			);
 
-		}
+			for (int hour = 0; hour < 35; hour++) {
+				String hourDir = partitionDirParquet + "/hour-" + hour;
+				fs.mkdirs(new Path(hourDir));
 
+				duckConn.createStatement().execute(
+					"COPY (SELECT * FROM read_parquet('" + linkTraversalsPath + "') lt " +
+						"  WHERE lt.hour = " + hour + " " +
+						"ORDER BY link_id, hour) " + " " +
+						"TO '" + hourDir + "/link-traversals-sorted-" + hour + ".parquet" + "'" +
+						"(FORMAT PARQUET, CODEC 'ZSTD'" + rowGroupClause + ")"
+				);
 
-		duckConn.createStatement().execute(
-			"COPY (SELECT * FROM read_parquet('" + linkTraversalsSortedPath + "') " +
-				"ORDER BY link_id, hour) " +
-				"TO '" + linkTraversalsCsvPathUncompressed + "' (FORMAT CSV, HEADER, DELIMITER ',')"
-		);
+				duckConn.createStatement().execute(
+					"COPY (" +
+//						"SELECT  lt.leg_id, ls.leg_sequence " +
+						"SELECT DISTINCT lt.leg_id, ls.leg_sequence " +
+						"FROM read_parquet('" + linkTraversalsSortedPath + "') lt " +
+						"JOIN read_parquet('" + legSequencesSortedPath + "') ls " +
+						"  ON lt.leg_id = ls.leg_id " +
+						"  WHERE lt.hour = " + hour + " " +
+						"ORDER BY leg_id) " + " " +
+						"TO '" + hourDir + "/leg-sequences-sorted-" + hour + ".parquet" + "'" +
+						"(FORMAT PARQUET, CODEC 'ZSTD'" + rowGroupClause + ")"
+				);
 
-		duckConn.createStatement().execute(
-			"COPY (SELECT * FROM read_parquet('" + legSequencesSortedPath + "') " +
-				"ORDER BY leg_id) " +
-				"TO '" + legSequencesCsvPathUncompressed + "' (FORMAT CSV, HEADER, DELIMITER ',')"
-		);
-
-		java.nio.file.Path dbPath = java.nio.file.Path.of(outputDirectory + "/sla.sqlite3");
- 		Files.deleteIfExists(dbPath);
-
-		duckConn.createStatement().execute("INSTALL sqlite;");
-		duckConn.createStatement().execute("LOAD sqlite;");
-
-		duckConn.createStatement().execute(
-			"ATTACH '" + outputDirectory + "/sla.sqlite3' AS sqlite_db (TYPE SQLITE)"
-		);
-
-		duckConn.createStatement().execute(
-			"CREATE TABLE IF NOT EXISTS sqlite_db.link_traversals AS " +
-				"SELECT * FROM read_parquet('" + linkTraversalsSortedPath + "') " +
-				"ORDER BY (link_id, hour) "
-		);
-		duckConn.createStatement().execute(
-			"CREATE TABLE IF NOT EXISTS sqlite_db.leg_sequences AS " +
-				"SELECT ls.leg_id, ls.leg_sequence FROM read_parquet('" + legSequencesSortedPath + "') ls " +
-				"ORDER BY (leg_id) "
-		);
-
-		duckConn.createStatement().execute(
-			"CREATE INDEX IF NOT EXISTS idx_t ON sqlite_db.traversals(link_id, hour, leg_id)"
-		);
-		duckConn.createStatement().execute(
-			"CREATE INDEX IF NOT EXISTS idx_s ON sqlite_db.sequences(leg_id)"
-		);
-
-		duckConn.createStatement().execute("DETACH sqlite_db");
-
-		for (int hour = 0; hour < 35; hour++) {
-			String hourDir = this.outputDirectory + "/hour-partition-sqlite/hour-" + hour;
-			fs.mkdirs(new Path(hourDir));
-
-			String sqlitePathHour = hourDir + "/sla-" + hour + ".sqlite3";
-
-			java.nio.file.Path dbPathHour = java.nio.file.Path.of(sqlitePathHour);
-			java.nio.file.Files.deleteIfExists(dbPathHour);
-
-			duckConn.createStatement().execute(
-				"ATTACH '" + dbPathHour + "' AS sqlite_db_hour (TYPE SQLITE)"
-			);
-
-			duckConn.createStatement().execute(
-				"CREATE TABLE sqlite_db_hour.traversals AS " +
-					"SELECT * " +
-					"FROM read_parquet('" + linkTraversalsSortedPath + "') lt " +
-					" WHERE lt.hour = " + hour + " " +
-					"ORDER BY (link_id, hour) "
-			);
-
-			duckConn.createStatement().execute(
-				"CREATE TABLE sqlite_db_hour.sequences AS " +
-					"SELECT DISTINCT lt.leg_id, ls.leg_sequence " +
-					"FROM read_parquet('" + linkTraversalsSortedPath + "') lt " +
-					"JOIN read_parquet('" + legSequencesSortedPath + "') ls " +
-					"  ON lt.leg_id = ls.leg_id " +
-					" WHERE lt.hour = " + hour + " " +
-					"ORDER BY (leg_id) "
-			);
-
-			duckConn.createStatement().execute(
-				"CREATE INDEX IF NOT EXISTS idx_t ON sqlite_db_hour.traversals(link_id, hour, leg_id)"
-			);
-			duckConn.createStatement().execute(
-				"CREATE INDEX IF NOT EXISTS idx_s ON sqlite_db_hour.sequences(leg_id)"
-			);
-
-
-			duckConn.createStatement().execute("DETACH sqlite_db_hour");
+			}
 		}
 	}
 

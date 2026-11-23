@@ -12,11 +12,10 @@ import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.dashboard.SelectLinkAnalysisDashboard;
 import picocli.CommandLine;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.CsvOptions;
 
 import java.nio.file.Path;
 
-@CommandLine.Command(name = "select-link-analysis", description = "Compute Necessary sqlite, csv and parquet files for Select-Link-Analysis")
+@CommandLine.Command(name = "select-link-analysis", description = "Compute necessary parquet files for Select-Link-Analysis")
 public class RunSelectLinkAnalysis implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(RunSelectLinkAnalysis.class);
@@ -32,9 +31,6 @@ public class RunSelectLinkAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--rowGroupSize", description = "Row group size for parquet files")
 	private Integer rowGroupSize;
-
-	@CommandLine.Mixin
-	private CsvOptions csv = new CsvOptions();
 
 	public static void main(String[] args) {
 		new RunSelectLinkAnalysis().execute(args);
@@ -75,8 +71,6 @@ public class RunSelectLinkAnalysis implements MATSimAppCommand {
 		SimWrapper sw = SimWrapper.create();
 		sw.addDashboard(new SelectLinkAnalysisDashboard());
 		sw.generate(outputPath, true);
-
-//		sw.run(outputPath);
 
 		return null;
 	}
