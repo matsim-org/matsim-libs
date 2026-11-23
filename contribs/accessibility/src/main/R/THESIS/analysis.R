@@ -35,6 +35,16 @@ run_dirs <- list(
   policy = file.path(input_dir, "2026-11-19-policy")
 )
 
+# Use the noise outputs from the simulations underlying the accessibility runs.
+noise_root <- file.path(dirname(dirname(base_dir)), "10pct-v6.4")
+noise_dirs <- file.path(
+  noise_root,
+  c(base = "berlin-autofrei-v6.4-baseCaseCtdExtended-10pct",
+    policy = "berlin-autofrei-v6.4-policy-10pct-deparking-p20_d0_i0_max1000"),
+  "analysis", "noise", "noise-analysis"
+)
+names(noise_dirs) <- c("base", "policy")
+
 # Results go to output/<date>-output/, named after the policy run folder,
 # e.g. input 2026-11-16-policy -> output/2026-11-16-output/<opportunity>/
 run_label   <- sub("-policy$", "", basename(run_dirs$policy))
@@ -152,6 +162,27 @@ read_acc <- function(file){
   read_person_data(file) %>%
     clean_df()
 }
+
+read_daily_noise <- function(dir) {
+  receivers <- read_delim(file.path(dir, "receiverPoints", "receiverPoints.csv"),
+                          delim = ";", show_col_types = FALSE)
+  stopifnot(!anyDuplicated(receivers$receiverPointId))
+  energy_sum <- numeric(nrow(receivers))
+  for (hour in 1:24) {
+    path <- file.path(dir, "immissions", sprintf("immission_%d.0.csv", hour * 3600))
+    hourly <- read_delim(path, delim = ";", show_col_types = FALSE, num_threads = 1)
+    level <- hourly[[2]][match(receivers$receiverPointId, hourly[["Receiver Point Id"]])]
+    if (anyDuplicated(hourly[["Receiver Point Id"]]) || any(!is.finite(level))) {
+      stop("Incomplete or duplicate receiver levels in ", path)
+    }
+    # MATSim writes zero for an hour with no modeled road noise.
+    energy_sum <- energy_sum + if_else(level == 0, 0, 10^(level / 10))
+  }
+  receivers %>%
+    mutate(laeq = 10 * log10(na_if(energy_sum, 0) / 24))
+}
+
+noise_receivers <- NULL
 
 # ==========================================================
 # Per-opportunity analysis
@@ -1128,6 +1159,81 @@ if (!is.null(mm_persons)) {
     dpi = 300, width = 8, height = 6
   )
   print(ecdf_mm_base_vs_policy)
+}
+
+# Residential road noise and accessibility
+if (is.null(noise_receivers)) {
+  noise_base <- read_daily_noise(noise_dirs[["base"]])
+  noise_policy <- read_daily_noise(noise_dirs[["policy"]])
+  noise_receivers <- noise_base %>%
+    rename(noise_base_dba = laeq) %>%
+    left_join(select(noise_policy, xCoord, yCoord, noise_policy_dba = laeq),
+              by = c("xCoord", "yCoord"), relationship = "one-to-one") %>%
+    st_as_sf(coords = c("xCoord", "yCoord"), crs = 25832, remove = FALSE)
+}
+
+noise_persons <- df_acc %>%
+  select(personId, income, homeX, homeY, within, mm_delta)
+homes <- noise_persons %>%
+  filter(is.finite(homeX), is.finite(homeY)) %>%
+  st_as_sf(coords = c("homeX", "homeY"), crs = 25832)
+nearest <- st_nearest_feature(homes, noise_receivers)
+distance <- as.numeric(st_distance(homes, noise_receivers[nearest, ], by_element = TRUE))
+home_noise <- noise_receivers[nearest, ] %>%
+  st_drop_geometry() %>%
+  transmute(personId = homes$personId, receiverPointId, xCoord, yCoord,
+            receiver_distance_m = distance, noise_base_dba, noise_policy_dba) %>%
+  # Beyond the half-diagonal of a 250 m cell, the home is outside grid coverage.
+  filter(receiver_distance_m <= 250 / sqrt(2) + 1e-6)
+
+noise_persons <- noise_persons %>%
+  left_join(home_noise, by = "personId", relationship = "one-to-one") %>%
+  mutate(noise_reduction_db = noise_base_dba - noise_policy_dba)
+write_csv(noise_persons, file.path(output_dir, "noise_by_person.csv"))
+
+noise_valid <- filter(noise_persons, is.finite(noise_reduction_db))
+message("Paired residential noise levels for ", nrow(noise_valid), " / ",
+        nrow(noise_persons), " accessibility records.")
+
+if (nrow(noise_valid) > 0) {
+  noise_label <- "Residential noise reduction (dB, base − policy)"
+  noise_map <- noise_valid %>%
+    distinct(xCoord, yCoord, noise_reduction_db) %>%
+    st_as_sf(coords = c("xCoord", "yCoord"), crs = 25832)
+  plot_noise_map <- ggplot() +
+    geom_sf(data = berlin_sf, fill = "grey95", colour = "grey65", linewidth = 0.25) +
+    geom_sf(data = noise_map, aes(colour = noise_reduction_db), shape = 15, size = 1.1) +
+    geom_sf(data = ring_sf, fill = NA, colour = "grey30", linetype = "dashed", linewidth = 0.35) +
+    scale_colour_gradient2(low = "#b2182b", mid = "grey80", high = "#2166ac",
+                           name = "Noise reduction (dB)") +
+    labs(title = "Road noise change at residential receiver points") +
+    theme_void()
+  ggsave(file.path(output_dir, "map_noise_reduction.png"), plot_noise_map,
+         dpi = 300, width = 8, height = 6.5, bg = "white")
+
+  plot_noise_income <- ggplot(filter(noise_valid, !is.na(income)),
+                              aes(income, noise_reduction_db)) +
+    geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
+    geom_boxplot(outlier.alpha = 0.3) +
+    stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5) +
+    labs(x = "Income group", y = noise_label)
+  ggsave(file.path(output_dir, "boxplot_noise_by_income.png"), plot_noise_income,
+         dpi = 300, width = 8, height = 5)
+  ggsave(file.path(output_dir, "boxplot_noise_by_income_ring.png"),
+         plot_noise_income + facet_grid(~within), dpi = 300, width = 10, height = 5)
+
+  tradeoff <- filter(noise_valid, is.finite(mm_delta))
+  plot_noise_accessibility <- ggplot(tradeoff, aes(mm_delta, noise_reduction_db)) +
+    geom_bin_2d(bins = 65) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    scale_fill_viridis_c(trans = "log10", name = "People per bin") +
+    facet_grid(~within) +
+    labs(x = "Multimodal accessibility change (utils, policy − base)", y = noise_label,
+         title = poi$label, subtitle = "Upper left shows quieter homes with lower accessibility") +
+    theme_minimal()
+  ggsave(file.path(output_dir, "noise_vs_accessibility.png"), plot_noise_accessibility,
+         dpi = 300, width = 10, height = 5)
 }
 
 # ---- end of per-opportunity analysis ----
