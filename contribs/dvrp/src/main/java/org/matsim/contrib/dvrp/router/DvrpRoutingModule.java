@@ -94,7 +94,8 @@ public class DvrpRoutingModule implements RoutingModule {
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
 
-		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(request);
+		// one lookup per trip: the preferred candidates are the facilities of findFacilities
+		Optional<AccessEgressFacilityCandidates> stops = stopFinder.findCandidates(request);
 		if (stops.isEmpty()) {
 			logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually "
 					+ TransportMode.walk
@@ -105,8 +106,8 @@ public class DvrpRoutingModule implements RoutingModule {
 			return null;
 		}
 
-		Facility accessFacility = stops.get().getLeft();
-		Facility egressFacility = stops.get().getRight();
+		Facility accessFacility = stops.get().preferredAccess();
+		Facility egressFacility = stops.get().preferredEgress();
 		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
 			logger.debug("Start and end stop are the same, agent will use fallback mode as leg mode (usually "
 					+ TransportMode.walk
@@ -150,14 +151,10 @@ public class DvrpRoutingModule implements RoutingModule {
 			trip.addAll(egressTrip);
 		}
 
-		// the trip itself is always built for the facilities of findFacilities; candidates are only an addition
-		Optional<AccessEgressFacilityCandidates> candidates = stopFinder.findCandidates(request)
-				.filter(AccessEgressFacilityCandidates::hasAlternatives)
-				.filter(c -> c.preferredAccess().getLinkId().equals(accessFacility.getLinkId())
-						&& c.preferredEgress().getLinkId().equals(egressFacility.getLinkId()));
-		if (candidates.isPresent()) {
-			attachStopCandidates(request, candidates.get(), drtLeg, accessTrip, departureTime, accessEndTime,
-					egressTrip, egressStartTime);
+		// the trip itself is always built for the preferred facilities; alternatives are only an addition
+		if (stops.get().hasAlternatives()) {
+			attachStopCandidates(request, stops.get(), drtLeg, accessTrip, departureTime, accessEndTime, egressTrip,
+					egressStartTime);
 		}
 
 		return trip;

@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.dvrp.router;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -47,11 +49,34 @@ import org.matsim.facilities.Facility;
 import org.mockito.Mockito;
 
 /**
- * Stop candidates in {@link DvrpRoutingModule}.
+ * How {@link DvrpRoutingModule} queries its {@link AccessEgressFacilityFinder}.
  *
  * @author nkuehnel / MOIA
  */
 public class DvrpRoutingModuleStopFinderTest {
+
+	@Test
+	void testStopsAreLookedUpOncePerRoutingCall() {
+		Facility from = facility("from");
+		Facility to = facility("to");
+		Facility access = facility("access");
+		Facility egress = facility("egress");
+
+		// a finder without own candidates: findCandidates falls back to findFacilities
+		int[] lookups = {0};
+		AccessEgressFacilityFinder finder = request -> {
+			lookups[0]++;
+			return Optional.of(Pair.of(access, egress));
+		};
+
+		DvrpRoutingModule routingModule = new DvrpRoutingModule(router("drt"), router("walk"), router("walk"), finder,
+				"drt", TimeInterpretation.create(ConfigUtils.createConfig()));
+		List<? extends PlanElement> trip = routingModule.calcRoute(
+				DefaultRoutingRequest.withoutAttributes(from, to, 8 * 3600, null));
+
+		assertThat(trip).hasSize(5);
+		assertThat(lookups[0]).isEqualTo(1);
+	}
 
 	@Test
 	void testAlternativesAreAttachedForTeleportedAccessAndEgress() {
