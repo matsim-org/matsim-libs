@@ -12,6 +12,8 @@ suppressPackageStartupMessages({
   library(ggplot2)
 })
 
+berlin_only <- TRUE  # TRUE keeps only people whose homes are inside Berlin.
+
 # ==========================================================
 # Directories
 # ==========================================================
@@ -36,7 +38,7 @@ run_dirs <- list(
 # Results go to output/<date>-output/, named after the policy run folder,
 # e.g. input 2026-11-16-policy -> output/2026-11-16-output/<opportunity>/
 run_label   <- sub("-policy$", "", basename(run_dirs$policy))
-output_root <- file.path(base_dir, "output", paste0(run_label, "-output"))
+output_root <- file.path(base_dir, "output", paste0(run_label, "-output-berlinfiltered"))
 
 missing_run_dirs <- Filter(function(d) !dir.exists(d), run_dirs)
 if (length(missing_run_dirs) > 0) {
@@ -117,8 +119,37 @@ clean_df <- function(df){
     )
 }
 
+berlin_sf <- st_read(file.path(shape_dir, "Berlin_Bezirke.shp"), quiet = TRUE)
+
+if (is.na(st_crs(berlin_sf))) st_crs(berlin_sf) <- 25832
+if (st_crs(berlin_sf)$epsg != 25832) {
+  berlin_sf <- st_transform(berlin_sf, 25832)
+}
+
+ring_sf <- st_read(
+  file.path(shape_dir, "Berlin_sbahn_ring.geojson"),
+  quiet = TRUE
+)
+if (is.na(st_crs(ring_sf))) st_crs(ring_sf) <- 4326
+ring_sf <- st_transform(ring_sf, 25832)
+
+read_person_data <- function(path) {
+  people <- read_csv(path, show_col_types = FALSE)
+  homes <- st_as_sf(people, coords = c("homeX", "homeY"), crs = 25832, remove = FALSE)
+  districts <- st_intersects(homes, berlin_sf)
+  people$district <- berlin_sf$Gemeinde_n[vapply(districts, function(matches) {
+    matches[1L]
+  }, integer(1))]
+  people$within <- if_else(lengths(st_intersects(homes, ring_sf)) > 0,
+                           "Within Ring", "Outside Ring")
+  if (berlin_only) {
+    people <- people[lengths(districts) > 0, ]
+  }
+  people
+}
+
 read_acc <- function(file){
-  read_csv(file, show_col_types = FALSE) %>% 
+  read_person_data(file) %>%
     clean_df()
 }
 
@@ -222,29 +253,10 @@ df <- df %>%
   )
 
 # ==========================================================
-# Add district
+# Order Berlin districts
 # ==========================================================
 
-berlin_sf <- st_read(file.path(shape_dir, "Berlin_Bezirke.shp"), quiet = TRUE)
-
-if (is.na(st_crs(berlin_sf))) st_crs(berlin_sf) <- 25832
-if (st_crs(berlin_sf)$epsg != 25832) {
-  berlin_sf <- st_transform(berlin_sf, 25832)
-}
-
-df_acc <- df %>%
-  st_as_sf(
-    coords = c("homeX", "homeY"),
-    crs = 25832,
-    remove = FALSE
-  ) %>%
-  st_join(
-    berlin_sf[, "Gemeinde_n", drop = FALSE]
-  ) %>%
-  st_drop_geometry() %>%
-  rename(
-    district = Gemeinde_n
-  )
+df_acc <- df
 
 df_acc$district <- factor(
   df_acc$district,
@@ -334,6 +346,7 @@ df_acc <- df_acc %>%
     homeX,
     homeY,
     district,
+    within,
     
     twalk_rawSum,
     pt_rawSum,
@@ -620,8 +633,7 @@ boxplot_mm_deltaacc_by_income <- ggplot(df_acc, aes(income, mm_delta)) +
 ggsave(file.path(output_dir, "boxplot_mm_deltaacc_by_income.png"), boxplot_mm_deltaacc_by_income, dpi = 300, width = 8, height = 5)
 
 # faceted by w/in or outside of ring
-df_acc_ring <- df_acc |> st_as_sf(coords=c("homeX","homeY"), crs=25832) |> st_join(ring_sf |> mutate(within = TRUE)) |> mutate(within = case_when(is.na(within)~"Outside Ring",.default="Within Ring"))
-boxplot_mm_deltaacc_by_income_ring <- ggplot(df_acc_ring, aes(income, mm_delta)) +
+boxplot_mm_deltaacc_by_income_ring <- ggplot(df_acc, aes(income, mm_delta)) +
   geom_boxplot(outlier.alpha = 0.3) +
   stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5, na.rm = TRUE) +
   labs(
@@ -727,16 +739,6 @@ locations_sf <- read_csv(locations_csv, show_col_types = FALSE) %>%
 # (e.g. the spa in Ludwigsfelde).
 berlin_bbox <- st_bbox(berlin_sf)
 
-# S-Bahn Ring overlay. The GeoJSON is in WGS84 lon/lat (and carries no CRS
-# member), so it must be transformed to the map CRS before plotting;
-# fill = NA keeps it as an outline instead of hiding the districts below.
-ring_sf <- st_read(
-  file.path(shape_dir, "Berlin_sbahn_ring.geojson"),
-  quiet = TRUE
-)
-if (is.na(st_crs(ring_sf))) st_crs(ring_sf) <- 4326
-ring_sf <- st_transform(ring_sf, 25832)
-
 plot_locations_map <- function(locations,
                                title = paste0(poi$label, " locations in Berlin"),
                                label_points = poi$label_points,
@@ -834,7 +836,7 @@ read_persons <- function(mode, scenario) {
     return(NULL)
   }
 
-  read_csv(path, show_col_types = FALSE)
+  read_person_data(path)
 }
 
 # Reads one mode's accessibility for a scenario: the persons file if it exists,
@@ -852,7 +854,7 @@ read_mode_accessibility <- function(mode, scenario) {
   path <- Find(file.exists, candidates)
 
   if (!is.null(path)) {
-    return(suppressWarnings(read_csv(path, show_col_types = FALSE)))
+    return(suppressWarnings(read_person_data(path)))
   }
 
   if (scenario != "base" && mode %in% policy_unchanged_modes) {
