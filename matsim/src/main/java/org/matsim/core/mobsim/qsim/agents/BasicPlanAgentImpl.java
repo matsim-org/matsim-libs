@@ -64,6 +64,8 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 
 	private MobsimVehicle vehicle;
 	private double activityEndTime;
+	// start of the current activity (simulation start for the first one); the maximum duration counts from here
+	private double activityStartTime;
 	private int currentPlanElementIndex = 0;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
@@ -82,6 +84,7 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 		this.plan.setPerson(scenario.getPopulation().getPersons().get(message.personId()));
 		this.currentPlanElementIndex = message.currentPlanElementIndex();
 		this.activityEndTime = message.activityEndTime();
+		this.activityStartTime = message.activityStartTime();
 		this.state = message.state();
 		this.currentLinkId = message.currentLinkId();
 		this.currentLinkIndex = message.currentLinkIndex();
@@ -109,6 +112,7 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 		final Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity(firstAct, scenario);
 		this.setCurrentLinkId(linkId);
 		this.setState(State.ACTIVITY);
+		this.activityStartTime = simTimer.getTimeOfDay();
 		calculateAndSetDepartureTime(firstAct);
 	}
 
@@ -174,6 +178,7 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 		this.setState(MobsimAgent.State.ACTIVITY);
 		this.getEvents().processEvent(new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType(),
 			act.getCoord()));
+		this.activityStartTime = now;
 		calculateAndSetDepartureTime(act);
 		act.setStartTime(now);
 	}
@@ -184,7 +189,7 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 	 */
 	private void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getSimTimer().getTimeOfDay();
-		double departure = Math.max(now, timeInterpretation.decideOnActivityEndTime(act, now).orElse(Double.POSITIVE_INFINITY));
+		double departure = Math.max(now, timeInterpretation.decideOnActivityEndTime(act, activityStartTime).orElse(Double.POSITIVE_INFINITY));
 
 		if (this.getCurrentPlanElementIndex() == this.getCurrentPlan().getPlanElements().size() - 1) {
 			if (finalActHasDpTimeWrnCnt < 1 && departure != Double.POSITIVE_INFINITY) {
@@ -439,7 +444,8 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 
 	@Override
 	public BasicPlanAgentMessage toMessage() {
-		return new BasicPlanAgentMessage(plan.getPerson().getId(), plan.getPlanElements(), currentPlanElementIndex, activityEndTime, state, currentLinkId, currentLinkIndex);
+		return new BasicPlanAgentMessage(plan.getPerson().getId(), plan.getPlanElements(), currentPlanElementIndex, activityEndTime, activityStartTime, state, currentLinkId,
+			currentLinkIndex);
 	}
 
 	@Override
@@ -461,6 +467,7 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 		List<PlanElement> planElements,
 		int currentPlanElementIndex,
 		double activityEndTime,
+		double activityStartTime,
 		MobsimAgent.State state,
 		Id<Link> currentLinkId,
 		int currentLinkIndex
