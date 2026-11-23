@@ -5,6 +5,13 @@ import org.matsim.api.core.v01.network.Link;
 public interface BicycleParams {
 	public double getComfortFactor(String surface);
 
+	/**
+	 * Comfort factor of the surface the bicycle rides on. The default rates the link's surface.
+	 */
+	default double getComfortFactor(Link link, BicycleUtils.BicycleInfraAttribute infrastructureAttribute) {
+		return getComfortFactor(BicycleUtils.getSurface(link));
+	}
+
 	// legacy: just here to make the preceived-safety tests work
 	@Deprecated(forRemoval = true)
 	default double getInfrastructureFactor(String type, String infrastructureValue) {

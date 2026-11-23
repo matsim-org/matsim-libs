@@ -37,11 +37,19 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 	}
 
 	@Override
+	public double getComfortFactor(Link link, BicycleUtils.BicycleInfraAttribute attr) {
+		// the legacy cycleway mode keeps rating the link surface everywhere
+		if (attr == BicycleUtils.BicycleInfraAttribute.bicycle_infra && ignoresLinkSurface(link, attr)) return 1.0;
+		return getComfortFactor(BicycleUtils.getSurface(link));
+	}
+
+	@Override
 	public double getInfrastructureFactor(String type, String infrastructureValue,
 										  BicycleUtils.BicycleInfraAttribute infrastructureAttribute) {
+		String highwayType = normalizeHighwayType(type);
 		return switch (infrastructureAttribute) {
-			case cycleway -> getInfrastructureFactorForCycleway(type, infrastructureValue);
-			case bicycle_infra -> getInfrastructureFactorForBicycleInfra(type, infrastructureValue);
+			case cycleway -> getInfrastructureFactorForCycleway(highwayType, infrastructureValue);
+			case bicycle_infra -> getInfrastructureFactorForBicycleInfra(highwayType, infrastructureValue);
 		};
 	}
 
@@ -105,6 +113,9 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 				case "SHARED_BUS_LANE_BUS_WITH_BIKE":
 				case "CROSSING":
 				case "NEEDS_CLARIFICATION":
+				case "SHARED_MOTOR_VEHICLE_LANE":
+				case "CYCLEWAY_ON_HIGHWAY_BETWEEN_LANES":
+				case "SHARED_BUS_LANE_BIKE_WITH_BUS":
 					return 0.75;
 
 				case "NONE":
@@ -225,16 +236,17 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 		};
 	}
 
-	/**
-	 * The link type without the "highway." prefix that networks converted from SUMO carry (e.g. highway.cycleway).
-	 */
 	private static String highwayType(Link link) {
 		Object type = link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE);
+		return type == null ? null : normalizeHighwayType(type.toString());
+	}
+
+	/**
+	 * The type without the "highway." prefix that networks converted from SUMO carry (e.g. highway.cycleway).
+	 */
+	private static String normalizeHighwayType(String type) {
 		if (type == null) return null;
-		String highwayType = type.toString();
-		if (highwayType.startsWith("highway.")) {
-			highwayType = highwayType.substring("highway.".length());
-		}
+		String highwayType = type.startsWith("highway.") ? type.substring("highway.".length()) : type;
 		int compound = highwayType.indexOf('|');
 		return compound < 0 ? highwayType : highwayType.substring(0, compound);
 	}

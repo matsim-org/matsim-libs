@@ -150,7 +150,7 @@ public class BicycleParamsDefaultImplTest {
 		}
 
 		List<Case> cases = List.of(
-			// Fallback (kein infra)
+			// no bicycle infrastructure: rated by road type
 			new Case("trunk", null, 0.05),
 			new Case("primary", null, 0.10),
 			new Case("secondary", null, 0.30),
@@ -159,17 +159,42 @@ public class BicycleParamsDefaultImplTest {
 			new Case("residential", null, 0.95),
 			new Case(null, null, 0.85),
 
-			// Kategorien
+			// every category the network tools write, so that a change of the table shows up here
 			new Case("primary", "CYCLEWAY_ISOLATED", 1.00),
-			new Case("primary", "CYCLEWAY_ADJOINING", 0.95),
-			new Case("primary", "BICYCLE_ROAD_VEHICLE_DESTINATION", 0.90),
-			new Case("primary", "CYCLEWAY_ON_HIGHWAY_ADVISORY", 0.85),
-			new Case("primary", "FOOT_AND_CYCLEWAY_SHARED_ADJOINING", 0.80),
-			new Case("primary", "CROSSING", 0.75),
+			new Case("primary", "CYCLEWAY_ADJOINING_OR_ISOLATED", 1.00),
+			new Case("primary", "CYCLEWAY_ON_HIGHWAY_PROTECTED", 1.00),
+			new Case("primary", "FOOT_AND_CYCLEWAY_SEGREGATED_ISOLATED", 1.00),
+			new Case("primary", "FOOT_AND_CYCLEWAY_SHARED_ISOLATED", 1.00),
 
-			// spezielle Fälle
-			new Case("primary", "NONE", 0.10),                // fällt zurück auf highway
-			new Case("primary", "SOMETHING_UNKNOWN", 0.80)   // default fallback
+			new Case("primary", "CYCLEWAY_ADJOINING", 0.95),
+			new Case("primary", "CYCLEWAY_ON_HIGHWAY_EXCLUSIVE", 0.95),
+			new Case("primary", "FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING", 0.95),
+			new Case("primary", "FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING_OR_ISOLATED", 0.95),
+			new Case("primary", "BICYCLE_ROAD", 0.95),
+
+			new Case("primary", "BICYCLE_ROAD_VEHICLE_DESTINATION", 0.90),
+
+			new Case("primary", "CYCLEWAY_ON_HIGHWAY_ADVISORY", 0.85),
+			new Case("primary", "CYCLEWAY_ON_HIGHWAY_ADVISORY_OR_EXCLUSIVE", 0.85),
+			new Case("primary", "FOOT_AND_CYCLEWAY_SHARED_ADJOINING", 0.85),
+			new Case("primary", "FOOT_AND_CYCLEWAY_SHARED_ADJOINING_OR_ISOLATED", 0.85),
+
+			new Case("primary", "FOOTWAY_BICYCLE_YES_ISOLATED", 0.80),
+			new Case("primary", "FOOTWAY_BICYCLE_YES_ADJOINING", 0.80),
+			new Case("primary", "FOOTWAY_BICYCLE_YES_ADJOINING_OR_ISOLATED", 0.80),
+			new Case("primary", "PEDESTRIAN_AREA_BICYCLE_YES", 0.80),
+			new Case("primary", "CYCLEWAY_LINK", 0.80),
+
+			new Case("primary", "SHARED_BUS_LANE_BUS_WITH_BIKE", 0.75),
+			new Case("primary", "SHARED_BUS_LANE_BIKE_WITH_BUS", 0.75),
+			new Case("primary", "SHARED_MOTOR_VEHICLE_LANE", 0.75),
+			new Case("primary", "CYCLEWAY_ON_HIGHWAY_BETWEEN_LANES", 0.75),
+			new Case("primary", "CROSSING", 0.75),
+			new Case("primary", "NEEDS_CLARIFICATION", 0.75),
+
+			// special cases
+			new Case("primary", "NONE", 0.10),                // falls back to the road type
+			new Case("primary", "SOMETHING_UNKNOWN", 0.80)   // default
 		);
 
 		for (Case testCase : cases) {
@@ -178,7 +203,7 @@ public class BicycleParamsDefaultImplTest {
 				testCase.bicycleInfra(),
 				BicycleUtils.BicycleInfraAttribute.bicycle_infra
 			);
-			assertEquals(testCase.expected(), actual, 1e-5);
+			assertEquals(testCase.expected(), actual, 1e-5, testCase.toString());
 		}
 	}
 
@@ -227,15 +252,44 @@ public class BicycleParamsDefaultImplTest {
 		);
 
 		for (Case testCase : cases) {
-			Link link = createLink(new Coord(0, 0), new Coord(100, 0));
-			link.getAttributes().putAttribute(BicycleUtils.WAY_TYPE, testCase.type());
-			link.getAttributes().putAttribute(BicycleUtils.OSM_PREFIX + BicycleUtils.SURFACE, testCase.surface());
-			if (testCase.bicycleInfra() != null) {
-				link.getAttributes().putAttribute(BicycleUtils.BicycleInfraAttribute.bicycle_infra.name(), testCase.bicycleInfra());
-			}
+			Link link = createLink(testCase.type(), testCase.bicycleInfra(), testCase.surface());
 			assertEquals(testCase.expected(), params.computeSurfaceFactor(link, BicycleUtils.BicycleInfraAttribute.bicycle_infra), 1e-5,
 				testCase.toString());
 		}
+	}
+
+	@Test
+	void testComfortFactor_bicycleInfra() {
+		BicycleUtils.BicycleInfraAttribute bicycleInfra = BicycleUtils.BicycleInfraAttribute.bicycle_infra;
+
+		// track tagged on the road: the sett belongs to the road, not to the track
+		assertEquals(1.0, params.getComfortFactor(createLink("primary", "CYCLEWAY_ADJOINING", "sett"), bicycleInfra), 1e-5);
+		// lane on the carriageway: the bicycle rides on the sett
+		assertEquals(0.5, params.getComfortFactor(createLink("highway.secondary", "CYCLEWAY_ON_HIGHWAY_EXCLUSIVE", "sett"), bicycleInfra), 1e-5);
+		// separately mapped path: its own surface
+		assertEquals(0.8, params.getComfortFactor(createLink("cycleway", "CYCLEWAY_ADJOINING", "paving_stones"), bicycleInfra), 1e-5);
+		// the legacy cycleway mode rates the link surface everywhere
+		assertEquals(0.5, params.getComfortFactor(createLink("primary", "CYCLEWAY_ADJOINING", "sett"),
+			BicycleUtils.BicycleInfraAttribute.cycleway), 1e-5);
+	}
+
+	@Test
+	void testInfrastructureFactors_sumoTypePrefix() {
+		// networks converted from SUMO carry the type as highway.<type>
+		assertEquals(0.1, params.getInfrastructureFactor("highway.primary", null, BicycleUtils.BicycleInfraAttribute.bicycle_infra), 1e-5);
+		assertEquals(0.1, params.getInfrastructureFactor("highway.primary", "NONE", BicycleUtils.BicycleInfraAttribute.bicycle_infra), 1e-5);
+		assertEquals(0.3, params.getInfrastructureFactor("highway.secondary", null, BicycleUtils.BicycleInfraAttribute.cycleway), 1e-5);
+		assertEquals(1.0, params.getInfrastructureFactor("highway.cycleway", null, BicycleUtils.BicycleInfraAttribute.cycleway), 1e-5);
+	}
+
+	private static Link createLink(String type, String bicycleInfra, String surface) {
+		Link link = createLink(new Coord(0, 0), new Coord(100, 0));
+		link.getAttributes().putAttribute(BicycleUtils.WAY_TYPE, type);
+		link.getAttributes().putAttribute(BicycleUtils.OSM_PREFIX + BicycleUtils.SURFACE, surface);
+		if (bicycleInfra != null) {
+			link.getAttributes().putAttribute(BicycleUtils.BicycleInfraAttribute.bicycle_infra.name(), bicycleInfra);
+		}
+		return link;
 	}
 
 	private static Link createLink(Coord from, Coord to) {

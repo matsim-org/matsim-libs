@@ -41,7 +41,6 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 			return Double.NaN;
 		}
 
-		String surface = BicycleUtils.getSurface(link);
 		String type = NetworkUtils.getType(link);
 		//String bicycleinfratype = BicycleUtils.getBicycleInfraType(link);
 		//String cyclewaytype = BicycleUtils.getCyclewaytype(link);
@@ -50,7 +49,7 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 
 		double distance_m = link.getLength();
 
-		double comfortFactor = bicycleParams.getComfortFactor(surface);
+		double comfortFactor = bicycleParams.getComfortFactor(link, bicycleInfraAttribute);
 		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance_m;
 
 		//double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, bicycleinfratype);
