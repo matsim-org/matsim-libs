@@ -74,17 +74,17 @@ class RequirementsAssigner implements InitialShipmentAssigner {
     feasibleLogisticChains.clear();
 
     label:
-    for (LogisticChain solution : lspPlan.getLogisticChains()) {
+    for (LogisticChain chain : lspPlan.getLogisticChains()) {
       for (LspShipmentRequirement requirement : lspShipment.getRequirements()) {
-        if (!requirement.checkRequirement(solution)) {
+        if (!requirement.checkRequirement(chain)) {
 
           continue label;
         }
       }
-      feasibleLogisticChains.add(solution);
+      feasibleLogisticChains.add(chain);
     }
-    LogisticChain chosenSolution = feasibleLogisticChains.iterator().next();
-    chosenSolution.addShipmentToChain(lspShipment);
+    LogisticChain chosenChain = feasibleLogisticChains.iterator().next();
+    chosenChain.addShipmentToChain(lspShipment);
   }
 
 }

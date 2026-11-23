@@ -48,6 +48,27 @@ public final class LspShipmentUtils {
   }
 
   /**
+   * Creates the id under which an {@link LspShipmentPlanElement} is stored in an {@link LspShipmentPlan}. The id is the
+   * concatenation of the resource id, the logistic chain element id, and the element type (e.g. {@code LOAD}).
+   *
+   * @param resourceId  id of the {@link LSPResource} that handles the shipment
+   * @param elementId   id of the {@link LogisticChainElement} that the plan element belongs to
+   * @param elementType type of the plan element, see {@link LspShipmentPlanElement#getElementType()}
+   */
+  public static Id<LspShipmentPlanElement> createPlanElementId(Id<LSPResource> resourceId, Id<LogisticChainElement> elementId, LspShipmentPlanElement.ElementType elementType) {
+    return Id.create(resourceId.toString() + elementId + elementType, LspShipmentPlanElement.class);
+  }
+
+  /**
+   * Creates the id under which the given {@link LspShipmentPlanElement} is stored in an {@link LspShipmentPlan}.
+   *
+   * @see #createPlanElementId(Id, Id, LspShipmentPlanElement.ElementType)
+   */
+  public static Id<LspShipmentPlanElement> createPlanElementId(LspShipmentPlanElement planElement) {
+    return createPlanElementId(planElement.getResourceId(), planElement.getLogisticChainElement().getId(), planElement.getElementType());
+  }
+
+  /**
    * Returns the {@link LspShipmentPlan} of the {@link LSPPlan} that matches the given shipment id,
    * creating and adding one if it does not yet exist.
    *

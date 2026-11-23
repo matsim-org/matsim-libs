@@ -60,8 +60,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentRequirement;
    * ExampleCheckRequirementsOfAssigner#ATTRIBUTE_COLOR}).
    */
   @Override
-  public boolean checkRequirement(LogisticChain solution) {
-    return solution
+  public boolean checkRequirement(LogisticChain logisticChain) {
+    return logisticChain
         .getAttributes()
         .getAttribute(ExampleCheckRequirementsOfAssigner.ATTRIBUTE_COLOR)
         .equals(RED);

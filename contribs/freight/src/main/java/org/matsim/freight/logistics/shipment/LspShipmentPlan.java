@@ -22,14 +22,13 @@ package org.matsim.freight.logistics.shipment;
 
 import java.util.Map;
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.logistics.HasBackpointer;
 
 /**
  * The ordered history of a single {@link LspShipment}: the sequence of load/transport/unload/handling
  * elements that were applied to it during a scenario. Instances live inside an
  * {@link org.matsim.freight.logistics.LSPPlan}.
  */
-public interface LspShipmentPlan extends HasBackpointer<Id<LspShipment>> {
+public interface LspShipmentPlan {
 
   /** @return the id of the shipment this plan belongs to. */
   Id<LspShipment> getLspShipmentId();
