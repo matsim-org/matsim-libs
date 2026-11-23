@@ -2,6 +2,8 @@ package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.network.Link;
 
+import java.util.Set;
+
 import static org.matsim.contrib.bicycle.BicycleLinkSpeedCalculatorDefaultImpl.hasNotAttribute;
 
 public class BicycleParamsDefaultImpl implements BicycleParams {
@@ -72,11 +74,11 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 				case "CYCLEWAY_ADJOINING_OR_ISOLATED":
 				case "CYCLEWAY_ON_HIGHWAY_PROTECTED":
 				case "FOOT_AND_CYCLEWAY_SEGREGATED_ISOLATED":
+				case "FOOT_AND_CYCLEWAY_SHARED_ISOLATED":
 					return 1.0;
 
 				case "CYCLEWAY_ADJOINING":
 				case "CYCLEWAY_ON_HIGHWAY_EXCLUSIVE":
-				case "CYCLEWAY_ON_HIGHWAY_ADVISORY_OR_EXCLUSIVE":
 				case "FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING":
 				case "FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING_OR_ISOLATED":
 				case "BICYCLE_ROAD":
@@ -86,14 +88,16 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 					return 0.90;
 
 				case "CYCLEWAY_ON_HIGHWAY_ADVISORY":
+				case "CYCLEWAY_ON_HIGHWAY_ADVISORY_OR_EXCLUSIVE":
+				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING":
+				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING_OR_ISOLATED": // TODO!
+					return 0.85;
+
+
+
 				case "FOOTWAY_BICYCLE_YES_ISOLATED":
 				case "FOOTWAY_BICYCLE_YES_ADJOINING":
 				case "FOOTWAY_BICYCLE_YES_ADJOINING_OR_ISOLATED":
-					return 0.85;
-
-				case "FOOT_AND_CYCLEWAY_SHARED_ISOLATED":
-				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING":
-				case "FOOT_AND_CYCLEWAY_SHARED_ADJOINING_OR_ISOLATED": // TODO!
 				case "PEDESTRIAN_AREA_BICYCLE_YES":
 				case "CYCLEWAY_LINK":
 					return 0.80;
@@ -122,8 +126,8 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 			case "primary", "primary_link" -> 0.1;
 			case "secondary", "secondary_link" -> 0.3;
 			case "tertiary", "tertiary_link" -> 0.4;
-			case "unclassified" -> 0.9;
-			default -> 0.95;
+			case "unclassified" -> 0.9;  // this should be lower
+			default -> 0.95; //this pretty high values applys to all the residential streets, not perfect
 		};
 	}
 
@@ -135,7 +139,7 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 		// through the getter, which also finds the osm:-prefixed variant of the attribute
 		String surface = BicycleUtils.getSurface(link);
 		if (hasNotAttribute(link, BicycleUtils.WAY_TYPE)
-			|| isDedicatedBicycleInfrastructure(link, attr)
+			|| ignoresLinkSurface(link, attr)
 			|| surface == null
 		) {
 			return 1.0;
@@ -188,16 +192,51 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 		}
 	}
 
-	private static boolean isDedicatedBicycleInfrastructure(Link link,
-															BicycleUtils.BicycleInfraAttribute attr) {
+	/**
+	 * bicycle_infra values of a track or path of its own, as opposed to a lane, bus lane or bicycle road on the carriageway
+	 */
+	private static final Set<String> SEPARATE_PATH_INFRA = Set.of(
+		"CYCLEWAY_ADJOINING", "CYCLEWAY_ISOLATED", "CYCLEWAY_ADJOINING_OR_ISOLATED",
+		"FOOT_AND_CYCLEWAY_SHARED_ADJOINING", "FOOT_AND_CYCLEWAY_SHARED_ISOLATED", "FOOT_AND_CYCLEWAY_SHARED_ADJOINING_OR_ISOLATED",
+		"FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING", "FOOT_AND_CYCLEWAY_SEGREGATED_ISOLATED", "FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING_OR_ISOLATED",
+		"FOOTWAY_BICYCLE_YES_ADJOINING", "FOOTWAY_BICYCLE_YES_ISOLATED", "FOOTWAY_BICYCLE_YES_ADJOINING_OR_ISOLATED"
+	);
+
+	/**
+	 * highway types of ways built for walking or cycling; a link of such a type is the path itself
+	 */
+	private static final Set<String> PATH_TYPES = Set.of("cycleway", "path", "footway", "pedestrian", "track", "bridleway", "steps");
+
+	/**
+	 * Whether the surface factor leaves the link's surface out. With cycleway this is the legacy rule (highway=cycleway). With
+	 * bicycle_infra it is the case where the link's surface is not the one the bicycle rides on: a track or path tagged on the
+	 * road, so that the link (or its _bike twin) carries the type and surface of the road. A separately mapped path has its own
+	 * surface, and on lanes, bus lanes, bicycle roads or in mixed traffic the bicycle rides on the road surface.
+	 */
+	private static boolean ignoresLinkSurface(Link link, BicycleUtils.BicycleInfraAttribute attr) {
 		return switch (attr) {
-			case cycleway -> "cycleway".equals(
-				link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE));
+			case cycleway -> "cycleway".equals(link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE));
 			case bicycle_infra -> {
-				String value = BicycleUtils.getBicycleInfrastructureValue(link, attr);
-				yield value != null && !"NONE".equals(value);
+				// null checks first: Set.of(..).contains(null) throws
+				String infra = BicycleUtils.getBicycleInfrastructureValue(link, attr);
+				String type = highwayType(link);
+				yield infra != null && SEPARATE_PATH_INFRA.contains(infra) && (type == null || !PATH_TYPES.contains(type));
 			}
 		};
+	}
+
+	/**
+	 * The link type without the "highway." prefix that networks converted from SUMO carry (e.g. highway.cycleway).
+	 */
+	private static String highwayType(Link link) {
+		Object type = link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE);
+		if (type == null) return null;
+		String highwayType = type.toString();
+		if (highwayType.startsWith("highway.")) {
+			highwayType = highwayType.substring("highway.".length());
+		}
+		int compound = highwayType.indexOf('|');
+		return compound < 0 ? highwayType : highwayType.substring(0, compound);
 	}
 
 	@Override

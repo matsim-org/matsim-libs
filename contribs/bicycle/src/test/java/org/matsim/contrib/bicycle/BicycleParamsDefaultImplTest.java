@@ -206,6 +206,38 @@ public class BicycleParamsDefaultImplTest {
 
 	}
 
+	@Test
+	void testComputeSurfaceFactor_bicycleInfra() {
+		record Case(String type, String bicycleInfra, String surface, double expected) {
+		}
+
+		List<Case> cases = List.of(
+			// track tagged on the road (or its _bike twin): the surface is the road's, not the track's
+			new Case("primary", "CYCLEWAY_ADJOINING", "sett", 1.0),
+			new Case("highway.secondary", "FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING", "sett", 1.0),
+			// separately mapped path: its own surface counts, also with the SUMO type prefix
+			new Case("cycleway", "CYCLEWAY_ADJOINING", "paving_stones", 0.7),
+			new Case("highway.footway", "FOOTWAY_BICYCLE_YES_ISOLATED", "paving_stones", 0.7),
+			// on the carriageway the bicycle rides on the road surface
+			new Case("secondary", "CYCLEWAY_ON_HIGHWAY_EXCLUSIVE", "sett", 0.6),
+			new Case("residential", "BICYCLE_ROAD", "sett", 0.6),
+			new Case("highway.primary", "SHARED_BUS_LANE_BUS_WITH_BIKE", "sett", 0.6),
+			new Case("residential", "NONE", "sett", 0.6),
+			new Case("residential", null, "sett", 0.6)
+		);
+
+		for (Case testCase : cases) {
+			Link link = createLink(new Coord(0, 0), new Coord(100, 0));
+			link.getAttributes().putAttribute(BicycleUtils.WAY_TYPE, testCase.type());
+			link.getAttributes().putAttribute(BicycleUtils.OSM_PREFIX + BicycleUtils.SURFACE, testCase.surface());
+			if (testCase.bicycleInfra() != null) {
+				link.getAttributes().putAttribute(BicycleUtils.BicycleInfraAttribute.bicycle_infra.name(), testCase.bicycleInfra());
+			}
+			assertEquals(testCase.expected(), params.computeSurfaceFactor(link, BicycleUtils.BicycleInfraAttribute.bicycle_infra), 1e-5,
+				testCase.toString());
+		}
+	}
+
 	private static Link createLink(Coord from, Coord to) {
 
 		Network net = NetworkUtils.createNetwork();
