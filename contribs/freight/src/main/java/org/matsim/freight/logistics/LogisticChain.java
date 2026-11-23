@@ -27,7 +27,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
- * A LogisticsSolution can be seen as a representative of a transport chain. It consists of several
+ * A LogisticChain can be seen as a representative of a transport chain. It consists of several
  * chain links that implement the interface {@link LogisticChainElement}. The latter is more a
  * logical than a physical entity. Physical entities, in turn, are housed inside classes that
  * implement the interface {@link LSPResource}. This introduction of an intermediate layer allows
@@ -41,4 +41,18 @@ public interface LogisticChain extends Identifiable<LogisticChain>, KnowsLSP, Ha
   Collection<Id<LspShipment>> getLspShipmentIds();
 
   void addShipmentToChain(LspShipment lspShipment);
+
+  /**
+   * Returns the first element of this chain, i.e. the element without a predecessor.
+   *
+   * @throws IllegalStateException if every element has a predecessor (or the chain is empty)
+   */
+  default LogisticChainElement getFirstLogisticChainElement() {
+    for (LogisticChainElement element : getLogisticChainElements()) {
+      if (element.getPreviousElement() == null) {
+        return element;
+      }
+    }
+    throw new IllegalStateException("Logistic chain " + getId() + " has no first element, i.e. no element without a predecessor.");
+  }
 }

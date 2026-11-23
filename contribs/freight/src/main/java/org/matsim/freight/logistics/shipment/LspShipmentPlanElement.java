@@ -39,17 +39,20 @@ public interface LspShipmentPlanElement {
 	/** @return the id of the resource the activity was carried out at. */
 	Id<LSPResource> getResourceId();
 
-	// yyyy "type" feels like this makes it a tagged class.  These should be avoided (Effective Java
-	// 2018, Item 23).  It is, however, probably not
-	// used as a type, but rather as a description.  Rename?
 	/**
-	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
-	 * Mixing class tagging and class hierarchies is a bad idea.
-	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
-	 * So maybe better use something like getActivityType() | getElementDescription -- analogous to e.g. PersonEntersVehicleEvent.class. kmt/kn jan'25
+	 * Kind of a {@link LspShipmentPlanElement}. Its string representation ({@link #toString()}) is used in the
+	 * plans file and in the ids of the plan elements, see {@link LspShipmentUtils#createPlanElementId}.
 	 */
-	@Deprecated
-	String getElementType();
+	enum ElementType {LOAD, TRANSPORT, UNLOAD, HANDLING}
+
+	/**
+	 * @return the kind of this plan element.
+	 * <p>
+	 * Use this for describing the element, e.g. when writing it to a file or when creating ids. Do not use it for
+	 * specifying the type within a decision logic; prefer the class hierarchy instead (Bloch, Effective Java, Item 23:
+	 * Prefer class hierarchies to tagged classes). kmt/kn jan'25
+	 */
+	ElementType getElementType();
 
 	/** @return the simulation time at which the activity started. */
 	double getStartTime();

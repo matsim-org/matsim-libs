@@ -195,19 +195,15 @@ public class CompleteLogisticChainTest {
 				.setResource(distributionCarrierResource)
 				.build();
 
-		collectionElement.connectWithNextElement(firstHubElement);
-		firstHubElement.connectWithNextElement(mainRunElement);
-		mainRunElement.connectWithNextElement(secondHubElement);
-		secondHubElement.connectWithNextElement(distributionElement);
 
-		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder completeSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(solutionId);
-		completeSolutionBuilder.addLogisticChainElement(collectionElement);
-		completeSolutionBuilder.addLogisticChainElement(firstHubElement);
-		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
-		completeSolutionBuilder.addLogisticChainElement(secondHubElement);
-		completeSolutionBuilder.addLogisticChainElement(distributionElement);
-		logisticChain = completeSolutionBuilder.build();
+		Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder completeChainBuilder = LSPUtils.LogisticChainBuilder.newInstance(chainId);
+		completeChainBuilder.addLogisticChainElement(collectionElement);
+		completeChainBuilder.addLogisticChainElement(firstHubElement);
+		completeChainBuilder.addLogisticChainElement(mainRunElement);
+		completeChainBuilder.addLogisticChainElement(secondHubElement);
+		completeChainBuilder.addLogisticChainElement(distributionElement);
+		logisticChain = completeChainBuilder.build();
 
 	}
 

@@ -46,6 +46,7 @@ import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
+import org.matsim.freight.logistics.examples.LogisticsExampleUtils;
 import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
@@ -298,8 +299,6 @@ final class ExampleGroceryDeliveryMultipleChains {
 						.setResource(distributionCarrierResource)
 						.build();
 
-				mainCarrierElement.connectWithNextElement(hubElement);
-				hubElement.connectWithNextElement(distributionCarrierElement);
 
 				hubChain =
 					LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubChain", LogisticChain.class))
@@ -324,7 +323,7 @@ final class ExampleGroceryDeliveryMultipleChains {
 				.setInitialPlan(multipleMixedEchelonChainsPlan)
 				.setLogisticChainScheduler(
 					ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(
-						createResourcesListFromLSPPlans(lspPlans)))
+						LogisticsExampleUtils.createResourcesListFromLSPPlans(lspPlans)))
 				.build();
 
 		log.info("create initial LSPShipments");
@@ -337,18 +336,5 @@ final class ExampleGroceryDeliveryMultipleChains {
 		lsp.scheduleLogisticChains();
 
 		return lsp;
-	}
-
-	private static List<LSPResource> createResourcesListFromLSPPlans(List<LSPPlan> lspPlans) {
-		log.info("Collecting all LSPResources from the LSPPlans");
-		List<LSPResource> resourceList = new ArrayList<>();
-		for (LSPPlan lspPlan : lspPlans) {
-			for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-				for (LogisticChainElement logisticChainElement : logisticChain.getLogisticChainElements()) {
-					resourceList.add(logisticChainElement.getResource());
-				}
-			}
-		}
-		return resourceList;
 	}
 }

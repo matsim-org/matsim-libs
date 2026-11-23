@@ -41,12 +41,9 @@ class LspShipmentImpl extends LSPDataObject<LspShipment> implements LspShipment 
   private final int capacityDemand;
   private final double deliveryServiceTime;
   private final double pickupServiceTime;
-  //	private final ShipmentPlan shipmentPlan;
   @Deprecated // This will be removed in the future and replaced by using the events. KMT, Mai'23
   private final LspShipmentPlan shipmentLog;
   private final List<LspShipmentRequirement> lspShipmentRequirements;
-
-  //	private Id<LSP> lspId;
 
   LspShipmentImpl(LspShipmentUtils.LspShipmentBuilder builder) {
     super(builder.id);
@@ -57,7 +54,6 @@ class LspShipmentImpl extends LSPDataObject<LspShipment> implements LspShipment 
     this.capacityDemand = builder.capacityDemand;
     this.deliveryServiceTime = builder.deliveryServiceTime;
     this.pickupServiceTime = builder.pickupServiceTime;
-    //		this.shipmentPlan = new ShipmentPlanImpl(this.getId());
     this.shipmentLog = new LspShipmentPlanImpl(this.getId());
     this.lspShipmentRequirements = new ArrayList<>();
     this.lspShipmentRequirements.addAll(builder.lspShipmentRequirements);
@@ -130,16 +126,10 @@ class LspShipmentImpl extends LSPDataObject<LspShipment> implements LspShipment 
         + startTimeWindow
         + "\t endTimeWindow="
         + endTimeWindow
-        + "\t capacityDemand="
-        + capacityDemand
         + "\t deliveryServiceTime="
         + deliveryServiceTime
         + "\t pickupServiceTime="
         + pickupServiceTime
-        +
-        //				"\t schedule=" + schedule +
-        //				"\t log=" + log +
-        //				"\t requirements=" + requirements +
-        '}';
+        + '}';
   }
 }
