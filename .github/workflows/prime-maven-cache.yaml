@@ -66,10 +66,11 @@ jobs:
       - name: Resolve dependencies of the whole reactor
         if: steps.restore.outputs.cache-hit != 'true'
         # Building (without running tests) resolves compile, test and plugin dependencies;
-        # running surefire with a non-matching test filter also resolves its test providers.
+        # running one small real test also makes surefire download its JUnit runner (surefire-junit-platform),
+        # which it fetches only when a test actually runs. Other modules match no test and are not failed.
         run: >-
           mvn install --batch-mode -Dsource.skip -DskipITs
-          -Dtest=NoSuchTest -Dsurefire.failIfNoSpecifiedTests=false
+          -Dtest=StringUtilsTest -Dsurefire.failIfNoSpecifiedTests=false
 
       - name: Remove reactor snapshots from the cache
         if: steps.restore.outputs.cache-hit != 'true'
