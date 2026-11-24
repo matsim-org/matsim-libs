@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.passenger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.matsim.contrib.drt.passenger.StopCandidatesTestPlans.*;
 
 import java.util.List;
@@ -126,7 +127,7 @@ public class StopCandidatesTripMaterializerTest {
 	@Test
 	void testTripWithoutOwnWalksCannotBeMoved() {
 		Plan routed = routedPlan();
-		assertThat(StopCandidatesTripMaterializer.hasAccessAndEgressLegs(routed, drtLeg(routed))).isTrue();
+		assertThat(StopCandidatesTripMaterializer.hasSingleAccessAndEgressLeg(routed, drtLeg(routed))).isTrue();
 
 		// like a companion: the trip starts and ends at the stops
 		Plan plan = PopulationUtils.createPlan();
@@ -138,14 +139,28 @@ public class StopCandidatesTripMaterializerTest {
 		plan.addLeg(drt);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("work", Id.createLinkId("E")));
 
-		assertThat(StopCandidatesTripMaterializer.hasAccessAndEgressLegs(plan, drt)).isFalse();
+		assertThat(StopCandidatesTripMaterializer.hasSingleAccessAndEgressLeg(plan, drt)).isFalse();
 
 		// incomplete trip without destination activity
 		Plan incomplete = PopulationUtils.createPlan();
 		incomplete.addActivity(PopulationUtils.createActivityFromLinkId("home", Id.createLinkId("h")));
 		Leg lastLeg = PopulationUtils.createLeg(MODE);
 		incomplete.addLeg(lastLeg);
-		assertThat(StopCandidatesTripMaterializer.hasAccessAndEgressLegs(incomplete, lastLeg)).isFalse();
+		assertThat(StopCandidatesTripMaterializer.hasSingleAccessAndEgressLeg(incomplete, lastLeg)).isFalse();
+	}
+
+	@Test
+	void testTripWithSeveralAccessLegsCannotBeMoved() {
+		// e.g. a walk and a bike leg to the stop: only a single access/egress leg can be replaced by a candidate's walk
+		Plan plan = routedPlan();
+		plan.getPlanElements().add(1, walk("h", "x", 60, 50));
+		plan.getPlanElements().add(2, PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord(0, 0),
+				Id.createLinkId("x"), TransportMode.bike));
+		Leg drt = (Leg)plan.getPlanElements().get(5);
+
+		assertThat(StopCandidatesTripMaterializer.hasSingleAccessAndEgressLeg(plan, drt)).isFalse();
+		assertThatThrownBy(() -> StopCandidatesTripMaterializer.materialize(plan, drt, Id.createLinkId("B"),
+				Id.createLinkId("F"))).isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test

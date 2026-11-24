@@ -131,7 +131,7 @@ final class PendingStopChoices {
 	 */
 	Optional<DrtStopCandidates> stopCandidates(List<PersonLeg> personsLegs, List<Route> routes) {
 		if (!DrtStopCandidatesFactory.haveAlternatives(routes) || !personsLegs.stream()
-				.allMatch(p -> StopCandidatesTripMaterializer.hasAccessAndEgressLegs(plan(p), p.leg()))) {
+				.allMatch(p -> StopCandidatesTripMaterializer.hasSingleAccessAndEgressLeg(plan(p), p.leg()))) {
 			return Optional.empty();
 		}
 		boolean pickupMayChange = personsLegs.stream().map(Passenger::new).noneMatch(Passenger::hasLeftOrigin);

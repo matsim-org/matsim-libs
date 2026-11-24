@@ -20,12 +20,9 @@
 
 package org.matsim.contrib.drt.passenger;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -36,13 +33,10 @@ import org.matsim.contrib.dvrp.router.RoutedStopCandidates;
 import org.matsim.contrib.dvrp.router.StopCandidatesRoute;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 /**
  * Rewrites the access and egress part of an agent's trip to the pickup/dropoff stops chosen by the insertion search,
@@ -61,24 +55,19 @@ public final class StopCandidatesTripMaterializer {
 	}
 
 	/**
-	 * @return true if the trip of the given leg has at least one leg before and after it (the access and egress walks),
-	 * so that it can be moved to other stops
+	 * @return true if the trip of the given DRT leg can be moved to other stops, i.e. it consists of exactly one access
+	 * leg, the stage activity at the pickup stop, the DRT leg, the stage activity at the dropoff stop and one egress leg
+	 * between two (non-stage) activities. This is the structure {@code DvrpRoutingModule} produces for trips with stop
+	 * candidates.
 	 */
-	public static boolean hasAccessAndEgressLegs(Plan plan, Leg drtLeg) {
-		Trip trip = TripStructureUtils.findTripAtPlanElement(drtLeg, plan);
-		if (trip == null) {
-			return false; // not a complete trip between two activities
-		}
-		List<PlanElement> elements = trip.getTripElements();
-		int legIndex = Iterables.indexOf(elements, e -> e == drtLeg);
-		return elements.subList(0, legIndex).stream().anyMatch(Leg.class::isInstance)
-				&& elements.subList(legIndex + 1, elements.size()).stream().anyMatch(Leg.class::isInstance);
+	public static boolean hasSingleAccessAndEgressLeg(Plan plan, Leg drtLeg) {
+		return indexOfMovableLeg(plan, drtLeg) >= 0;
 	}
 
 	/**
-	 * Rewrites the access and/or egress part of the trip of the given DRT leg to the chosen pickup/dropoff stops. The
-	 * new legs are teleported legs with the routed duration and distance of the chosen candidate and the mode of the
-	 * routed access/egress leg (the candidates are routed with the same access/egress router).
+	 * Rewrites the access and/or egress leg (and the stage activity at the stop) of the trip of the given DRT leg to
+	 * the chosen pickup/dropoff stops. The new legs are teleported legs with the routed duration and distance of the
+	 * chosen candidate and the mode of the replaced leg (the candidates are routed with the same access/egress router).
 	 *
 	 * @return true if the plan was changed
 	 */
@@ -93,53 +82,78 @@ public final class StopCandidatesTripMaterializer {
 			return false;
 		}
 
-		Trip trip = Preconditions.checkNotNull(TripStructureUtils.findTripAtPlanElement(drtLeg, plan),
-				"Leg is not part of a trip between two activities");
-		List<PlanElement> elements = trip.getTripElements();
-		int legIndex = Iterables.indexOf(elements, e -> e == drtLeg);
-		List<PlanElement> accessPart = elements.subList(0, legIndex);
-		List<PlanElement> egressPart = elements.subList(legIndex + 1, elements.size());
-		String mode = drtLeg.getMode();
+		int i = indexOfMovableLeg(plan, drtLeg);
+		Preconditions.checkArgument(i >= 0, "Trip of the leg is not access leg - stop - DRT leg - stop - egress leg");
+		List<PlanElement> elements = plan.getPlanElements();
 		String routingMode = TripStructureUtils.getRoutingMode(drtLeg);
 
-		List<PlanElement> newTrip = new ArrayList<>();
 		if (changePickup) {
 			RoutedStopCandidates.Candidate pickup = find(candidates.access(), pickupLinkId);
-			Activity origin = trip.getOriginActivity();
-			Id<Link> originLinkId = firstWalkStartLink(accessPart).orElse(origin.getLinkId());
-			Leg walk = accessEgressLeg(pickup, firstLegMode(accessPart), originLinkId, pickup.linkId(), routingMode);
-			origin.getEndTime().ifDefined(walk::setDepartureTime);
-			newTrip.add(walk);
-			newTrip.add(stageActivity(pickup, mode));
+			Activity origin = (Activity)elements.get(i - 3);
+			Leg routedAccess = (Leg)elements.get(i - 2);
+			Leg access = accessEgressLeg(pickup, routedAccess.getMode(), startLinkId(routedAccess, origin),
+					pickup.linkId(), routingMode);
+			origin.getEndTime().ifDefined(access::setDepartureTime);
+			elements.set(i - 2, access);
+			elements.set(i - 1, stageActivity(pickup, drtLeg.getMode()));
 			route.setStartLinkId(pickupLinkId);
-			if (walk.getDepartureTime().isDefined()) {
-				drtLeg.setDepartureTime(walk.getDepartureTime().seconds() + pickup.walkDuration());
-			}
-		} else {
-			newTrip.addAll(accessPart);
+			access.getDepartureTime().ifDefined(t -> drtLeg.setDepartureTime(t + pickup.walkDuration()));
 		}
-		newTrip.add(drtLeg);
 		if (changeDropoff) {
 			RoutedStopCandidates.Candidate dropoff = find(candidates.egress(), dropoffLinkId);
-			Id<Link> destinationLinkId = lastWalkEndLink(egressPart).orElse(trip.getDestinationActivity().getLinkId());
-			newTrip.add(stageActivity(dropoff, mode));
-			newTrip.add(accessEgressLeg(dropoff, lastLegMode(egressPart), dropoff.linkId(), destinationLinkId,
-					routingMode));
+			Activity destination = (Activity)elements.get(i + 3);
+			Leg routedEgress = (Leg)elements.get(i + 2);
+			elements.set(i + 1, stageActivity(dropoff, drtLeg.getMode()));
+			elements.set(i + 2, accessEgressLeg(dropoff, routedEgress.getMode(), dropoff.linkId(),
+					endLinkId(routedEgress, destination), routingMode));
 			route.setEndLinkId(dropoffLinkId);
-		} else {
-			newTrip.addAll(egressPart);
 		}
-
-		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
 		return true;
 	}
 
 	/**
-	 * @return the activity at which the trip of the given leg starts
+	 * @return the activity at which the trip of the given leg starts; the trip must have a single access and egress leg
 	 */
 	public static Activity originActivity(Plan plan, Leg drtLeg) {
-		return Preconditions.checkNotNull(TripStructureUtils.findTripAtPlanElement(drtLeg, plan),
-				"Leg is not part of a trip between two activities").getOriginActivity();
+		int i = indexOfMovableLeg(plan, drtLeg);
+		Preconditions.checkArgument(i >= 0, "Trip of the leg is not access leg - stop - DRT leg - stop - egress leg");
+		return (Activity)plan.getPlanElements().get(i - 3);
+	}
+
+	/**
+	 * @return the index of the DRT leg in the plan if its trip is activity - access leg - stop - DRT leg - stop - egress
+	 * leg - activity, otherwise -1
+	 */
+	private static int indexOfMovableLeg(Plan plan, Leg drtLeg) {
+		List<PlanElement> elements = plan.getPlanElements();
+		int i = Iterables.indexOf(elements, e -> e == drtLeg);
+		if (i < 3 || i + 3 >= elements.size()) {
+			return -1;
+		}
+		boolean movable = isActivity(elements.get(i - 3)) && elements.get(i - 2) instanceof Leg
+				&& isStageActivity(elements.get(i - 1)) && isStageActivity(elements.get(i + 1))
+				&& elements.get(i + 2) instanceof Leg && isActivity(elements.get(i + 3));
+		return movable ? i : -1;
+	}
+
+	private static boolean isActivity(PlanElement element) {
+		return element instanceof Activity activity && !TripStructureUtils.isStageActivityType(activity.getType());
+	}
+
+	private static boolean isStageActivity(PlanElement element) {
+		return element instanceof Activity activity && TripStructureUtils.isStageActivityType(activity.getType());
+	}
+
+	private static Id<Link> startLinkId(Leg leg, Activity origin) {
+		return leg.getRoute() != null && leg.getRoute().getStartLinkId() != null ?
+				leg.getRoute().getStartLinkId() :
+				origin.getLinkId();
+	}
+
+	private static Id<Link> endLinkId(Leg leg, Activity destination) {
+		return leg.getRoute() != null && leg.getRoute().getEndLinkId() != null ?
+				leg.getRoute().getEndLinkId() :
+				destination.getLinkId();
 	}
 
 	private static RoutedStopCandidates.Candidate find(List<RoutedStopCandidates.Candidate> candidates, Id<Link> linkId) {
@@ -147,24 +161,6 @@ public final class StopCandidatesTripMaterializer {
 				.filter(candidate -> candidate.linkId().equals(linkId))
 				.findFirst()
 				.orElseThrow(() -> new IllegalStateException("Link " + linkId + " is not a stop candidate"));
-	}
-
-	private static Optional<Id<Link>> firstWalkStartLink(List<PlanElement> part) {
-		return part.stream()
-				.filter(Leg.class::isInstance)
-				.map(element -> ((Leg)element).getRoute())
-				.filter(r -> r != null && r.getStartLinkId() != null)
-				.map(Route::getStartLinkId)
-				.findFirst();
-	}
-
-	private static Optional<Id<Link>> lastWalkEndLink(List<PlanElement> part) {
-		return Lists.reverse(part).stream()
-				.filter(Leg.class::isInstance)
-				.map(element -> ((Leg)element).getRoute())
-				.filter(r -> r != null && r.getEndLinkId() != null)
-				.map(Route::getEndLinkId)
-				.findFirst();
 	}
 
 	/**
@@ -175,16 +171,6 @@ public final class StopCandidatesTripMaterializer {
 	private static Activity stageActivity(RoutedStopCandidates.Candidate stop, String mode) {
 		return PopulationUtils.createActivity(
 				PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(stop.coord(), stop.linkId(), mode));
-	}
-
-	private static String firstLegMode(List<PlanElement> part) {
-		return part.stream().filter(Leg.class::isInstance).map(e -> ((Leg)e).getMode()).findFirst()
-				.orElse(TransportMode.walk);
-	}
-
-	private static String lastLegMode(List<PlanElement> part) {
-		return Lists.reverse(part).stream().filter(Leg.class::isInstance).map(e -> ((Leg)e).getMode()).findFirst()
-				.orElse(TransportMode.walk);
 	}
 
 	private static Leg accessEgressLeg(RoutedStopCandidates.Candidate candidate, String mode, Id<Link> startLinkId,
