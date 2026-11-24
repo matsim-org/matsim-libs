@@ -90,6 +90,18 @@ class DSimQSimLinkDynamicsTest {
 		}, "l2", 3600, 7200);
 	}
 
+	/**
+	 * The inflow capacity of kinematic waves. l1 lets 3600 veh/h out, but its fundamental diagram lets only
+	 * (1 / 7.5 m) / (1 / 15 km/h + 1 / 36 km/h) = 1412 veh/h in, so the inflow capacity of l1 is the bottleneck. qsim scales it with
+	 * the flow capacity factor, dsim scales the vehicles, so both let about {@code 1412 * sample} vehicles into l1 in the first hour.
+	 */
+	@ParameterizedTest
+	@ValueSource(doubles = {0.1, 0.25, 1, 4})
+	void sameInflowCapacity(double sample) {
+		assertSameVolume(sample, TrafficDynamics.kinematicWaves, NEVER_STUCK, network -> {
+		}, "l1", 0, 3600);
+	}
+
 	private void assertSameVolume(double sample, TrafficDynamics dynamics, double stuckTime, Consumer<Network> bottleneck,
 								  String linkId, double from, double to) {
 

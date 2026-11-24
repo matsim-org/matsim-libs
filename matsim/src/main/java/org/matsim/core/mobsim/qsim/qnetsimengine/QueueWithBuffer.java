@@ -418,14 +418,13 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then maxFlowFromFdiag would
 				// also have to be re-computed with each freespeed change. kai, feb'18
 
-				/* We think the maxFlowFromFdiag should be scaled with the flow capacity factor because this scales how much flow can be send/received per time.
-				* It's unit is (veh/m) / (1/ m/s) = (veh/m) / (s/m) = veh/s
-				* Unfortunately, there are no tests failing when we make changes here, i.e. the qsim behavior with kinematic waves seems to be not
-				* suitable covered by tests. Still, simulation outcome of the Berlin scenario differs a lot when we multiply the flow capacity factor
-				* here (car mode shares go significantly down!). This has to be investigated further! For now, we leave the inflow capacity (unscaled)
-				* as before.
-				* tilmann, theresa + christian, feb+mar'25 */
-				final double maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize)
+				/* The max flow from the fundamental diagram is in vehicles of the full population per second, (veh/m) / (s/m) = veh/s. It is
+				* scaled with the flow capacity factor like the flow and storage capacities, so that a sample behaves like the full population.
+				* DSim gets the same by scaling the pce of the vehicles instead. Without the scaling, the inflow capacity of a 10 % sample
+				* allowed 10 times the flow of the fundamental diagram and practically never limited the flow.
+				* This was done in #3770 and reverted in #3845, because the car mode share of the Berlin scenario went down a lot. Then, the
+				* inflow capacity was not refilled while a link was inactive (#5239), which became much more frequent with the scaling. */
+				final double maxFlowFromFdiag = (context.qsimConfig.getFlowCapFactor() * this.effectiveNumberOfLanes/context.effectiveCellSize)
 					/ ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
 				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() );
 
@@ -443,7 +442,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 						}
 					}
 
-					this.maxInflowUsedInQsim = (1 / context.effectiveCellSize) / (1. / (HOLE_SPEED_KM_H / 3.6) + 1 / this.qLinkInternalInterface.getFreespeed());
+					// scaled as maxFlowFromFdiag
+					this.maxInflowUsedInQsim = (context.qsimConfig.getFlowCapFactor() / context.effectiveCellSize) / (1. / (HOLE_SPEED_KM_H / 3.6) + 1 / this.qLinkInternalInterface.getFreespeed());
 					// write out the modified qsim behavior as link attribute
 					qLinkInternalInterface.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600 * maxInflowUsedInQsim / context.qsimConfig.getTimeStepSize());
 
