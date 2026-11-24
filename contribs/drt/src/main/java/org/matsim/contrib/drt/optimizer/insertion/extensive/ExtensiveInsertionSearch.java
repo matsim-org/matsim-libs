@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedMap;
 import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -65,7 +66,7 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 			return new InsertionWithDetourData(i, insertionDetourData,
 				detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, i.getRequest()));
 		}));
-		int lastCalculatedVariant = pathDataByVariant.keySet().stream().reduce((first, second) -> second).orElseThrow();
+		int lastCalculatedVariant = pathDataByVariant.lastEntry().getKey();
 		return best.map(b -> withPathsOfItsVariant(detourPathCalculator, b, lastCalculatedVariant));
 	}
 
@@ -91,12 +92,12 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 	 * is keyed by {@link RequestVariant#index()}, so it does not depend on the identity or equality of the variants'
 	 * {@link DrtRequest} objects.
 	 */
-	static Map<Integer, DetourPathDataCache> calculatePathsPerVariant(
+	static SequencedMap<Integer, DetourPathDataCache> calculatePathsPerVariant(
 			MultiInsertionDetourPathCalculator detourPathCalculator, List<InsertionGenerator.Insertion> insertions) {
 		Map<Integer, List<InsertionGenerator.Insertion>> insertionsByVariant = insertions.stream()
 				.collect(Collectors.groupingBy(i -> i.getVariant().index(), LinkedHashMap::new, Collectors.toList()));
 		// in the order of calculation (see withPathsOfItsVariant)
-		Map<Integer, DetourPathDataCache> pathDataByVariant = new LinkedHashMap<>();
+		SequencedMap<Integer, DetourPathDataCache> pathDataByVariant = new LinkedHashMap<>();
 		insertionsByVariant.forEach((index, variantInsertions) -> pathDataByVariant.put(index,
 				detourPathCalculator.calculatePaths(variantInsertions.get(0).getVariant().request(), variantInsertions)));
 		return pathDataByVariant;

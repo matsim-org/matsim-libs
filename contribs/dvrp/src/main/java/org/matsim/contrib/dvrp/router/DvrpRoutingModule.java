@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -130,7 +131,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		double accessEndTime = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
-			now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
+			now = accessEndTime;
 
 			// interaction activity:
 			trip.add(createDrtStageActivity(accessFacility, now));
@@ -178,40 +179,47 @@ public class DvrpRoutingModule implements RoutingModule {
 		if (route.isEmpty()) {
 			return; // the main leg router does not support stop candidates
 		}
-		if (!hasGenericRoute(accessTrip) || !hasGenericRoute(egressTrip)) {
+		if (!isEmptyOrSingleGenericLeg(accessTrip) || !isEmptyOrSingleGenericLeg(egressTrip)) {
 			// the legs to/from alternative stops can only be inserted with generic routes
-			warnOnceAboutRouteTypes(hasGenericRoute(accessTrip) ? egressTrip : accessTrip);
+			warnOnceAboutRouteTypes(isEmptyOrSingleGenericLeg(accessTrip) ? egressTrip : accessTrip);
 			return;
 		}
 
-		List<RoutedStopCandidates.Candidate> access = new ArrayList<>();
-		access.add(candidate(candidates.preferredAccess(), accessTrip, departureTime, accessEndTime));
-		for (Facility facility : candidates.access().subList(1, candidates.access().size())) {
-			List<? extends PlanElement> walk = accessRouter.calcRoute(
-					DefaultRoutingRequest.of(request.getFromFacility(), facility, departureTime, request.getPerson(),
-							request.getAttributes()));
-			if (walk == null || !hasGenericRoute(walk)) {
-				continue; // candidate not reachable, or not by a leg with a generic route
-			}
-			double endTime = timeInterpretation.decideOnElementsEndTime(walk, departureTime).seconds();
-			access.add(candidate(facility, walk, departureTime, endTime));
-		}
+		RoutedStopCandidates.Candidate preferredAccess = candidate(candidates.preferredAccess(), accessTrip, departureTime,
+				accessEndTime);
+		List<RoutedStopCandidates.Candidate> access = routeAlternatives(preferredAccess,
+				candidates.access().subList(1, candidates.access().size()), departureTime,
+				stop -> accessRouter.calcRoute(DefaultRoutingRequest.of(request.getFromFacility(), stop, departureTime,
+						request.getPerson(), request.getAttributes())));
 
-		List<RoutedStopCandidates.Candidate> egress = new ArrayList<>();
 		double egressEndTime = timeInterpretation.decideOnElementsEndTime(egressTrip, egressStartTime).seconds();
-		egress.add(candidate(candidates.preferredEgress(), egressTrip, egressStartTime, egressEndTime));
-		for (Facility facility : candidates.egress().subList(1, candidates.egress().size())) {
-			List<? extends PlanElement> walk = egressRouter.calcRoute(
-					DefaultRoutingRequest.of(facility, request.getToFacility(), egressStartTime, request.getPerson(),
-							request.getAttributes()));
-			if (walk == null || !hasGenericRoute(walk)) {
-				continue; // candidate not reachable, or not by a leg with a generic route
-			}
-			double endTime = timeInterpretation.decideOnElementsEndTime(walk, egressStartTime).seconds();
-			egress.add(candidate(facility, walk, egressStartTime, endTime));
-		}
+		RoutedStopCandidates.Candidate preferredEgress = candidate(candidates.preferredEgress(), egressTrip,
+				egressStartTime, egressEndTime);
+		List<RoutedStopCandidates.Candidate> egress = routeAlternatives(preferredEgress,
+				candidates.egress().subList(1, candidates.egress().size()), egressStartTime,
+				stop -> egressRouter.calcRoute(DefaultRoutingRequest.of(stop, request.getToFacility(), egressStartTime,
+						request.getPerson(), request.getAttributes())));
 
 		route.get().setStopCandidates(new RoutedStopCandidates(access, egress));
+	}
+
+	/**
+	 * @return the preferred candidate followed by the alternatives that can be reached by a single leg with a generic
+	 * route, each with the duration and distance of its routed walk
+	 */
+	private List<RoutedStopCandidates.Candidate> routeAlternatives(RoutedStopCandidates.Candidate preferred,
+			List<Facility> alternatives, double startTime, Function<Facility, List<? extends PlanElement>> router) {
+		List<RoutedStopCandidates.Candidate> candidates = new ArrayList<>();
+		candidates.add(preferred);
+		for (Facility stop : alternatives) {
+			List<? extends PlanElement> walk = router.apply(stop);
+			if (walk == null || !isEmptyOrSingleGenericLeg(walk)) {
+				continue; // candidate not reachable, or not by a leg with a generic route
+			}
+			double endTime = timeInterpretation.decideOnElementsEndTime(walk, startTime).seconds();
+			candidates.add(candidate(stop, walk, startTime, endTime));
+		}
+		return candidates;
 	}
 
 	private void warnOnceAboutRouteTypes(List<? extends PlanElement> trip) {
@@ -231,7 +239,7 @@ public class DvrpRoutingModule implements RoutingModule {
 	 * legs with network routes are excluded even if the mobsim teleports them (e.g. network-routed modes that are no
 	 * main modes of the qsim, or legs teleported by FISS), as are other route types (e.g. transit routes).
 	 */
-	private static boolean hasGenericRoute(List<? extends PlanElement> trip) {
+	private static boolean isEmptyOrSingleGenericLeg(List<? extends PlanElement> trip) {
 		return trip.isEmpty()
 				|| trip.size() == 1 && trip.getFirst() instanceof Leg leg && leg.getRoute() instanceof GenericRouteImpl;
 	}
