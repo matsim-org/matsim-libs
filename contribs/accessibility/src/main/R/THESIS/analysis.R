@@ -4,21 +4,22 @@
 # ==========================================================
 
 suppressPackageStartupMessages({
-  # install.packages("sf")
+  # install.packages("terra")
   library(dplyr)
   library(readr)
   library(sf)
   library(tidyr)
   library(ggplot2)
+  library(patchwork)  # install.packages("patchwork"); combines plots with one legend
 })
 
-berlin_only <- TRUE  # TRUE keeps only people whose homes are inside Berlin.
+berlin_only <- TRUE 
 
 # ==========================================================
 # Directories
 # ==========================================================
 
-base_dir     <- "../public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-19-v6.4-spa-uni-jobcenter-NoMonConstant"
+base_dir     <- "~/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-19-v6.4-spa-uni-jobcenter-NoMonConstant"
 input_dir    <- base_dir
 
 # Berlin district shapefile and S-Bahn ring: static files kept in the repo,
@@ -58,7 +59,9 @@ if (length(missing_run_dirs) > 0) {
 # Opportunities to analyse in one go. The whole analysis below runs once per
 # entry. Any of: "hospital", "spa", "baeder", "jobCenter".
 # Use a single entry, e.g. c("baeder"), to run just one.
-opportunities <- c("university", "spa", "jobCenter")
+opportunities <- c("university", "jobCenter")
+
+# , "spa", "jobCenter"
 
 # Metadata for every POI type written by RunPersonBasedAccBerlin.
 # The list names are the input/output folder names; `type` is the value in
@@ -81,6 +84,8 @@ poi_meta <- list(
     color = "#ff7f00", shape = 18, label_points = TRUE
   )
 )
+
+
 
 unknown_opportunities <- setdiff(opportunities, names(poi_meta))
 if (length(unknown_opportunities) > 0) {
@@ -194,6 +199,9 @@ noise_receivers <- NULL
 # and run the lines inside the loop.
 
 failed_opportunities <- character(0)
+
+# plots kept per opportunity, combined side by side after the loop
+side_plots <- list(bar = list(), box_ring = list(), ecdf = list(), map_mm = list())
 
 for (opportunity in opportunities) {
 message("\n===== Opportunity: ", opportunity, " =====")
@@ -454,6 +462,7 @@ ggsave(file.path(output_dir, "scatter_car_acc_income.png"), scatter_car_acc_inco
 # boxplot Δ base car accessibility by income (income integration)
 boxplot_base_car_deltaacc_by_income <- ggplot(df_acc, aes(income, base_car_delta_incomeFactor)) +
   geom_boxplot(outlier.alpha = 0.3) +
+  theme_minimal(base_size=14) +
   stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5, na.rm = TRUE) +
   labs(
     x = "Income group",
@@ -629,7 +638,10 @@ medianacc_by_income_mode_scenario <- df_acc %>%
 write_csv(medianacc_by_income_mode_scenario, file.path(output_dir, "median_accessibility_by_income_mode_scenario.csv"))
 
 bar_medianacc_by_income_mode_scenario <- medianacc_by_income_mode_scenario %>%
+  filter(mode != "Walking") %>%
+  mutate(mode = droplevels(mode)) %>%
   ggplot(aes(x = income, y = median_accessibility, fill = mode)) +
+  theme_minimal(base_size=14) +
   geom_col(position = position_dodge(width = 0.8), width = 0.7) +
   facet_wrap(~ scenario, ncol = 1) +
   labs(
@@ -638,10 +650,12 @@ bar_medianacc_by_income_mode_scenario <- medianacc_by_income_mode_scenario %>%
     fill = "Mode"
   )
 ggsave(file.path(output_dir, "bar_medianacc_by_income_mode_scenario.png"), bar_medianacc_by_income_mode_scenario, dpi = 300, width = 8, height = 5)
+side_plots$bar[[opportunity]] <- bar_medianacc_by_income_mode_scenario + labs(title = poi$label)
 
 # boxplot Δ car accessibility by income
 boxplot_car_deltaacc_by_income <- ggplot(df_acc, aes(income, car_delta)) +
   geom_boxplot(outlier.alpha = 0.3) +
+  theme_minimal(base_size=14) +
   stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5, na.rm = TRUE) +
   labs(
     x = "Income group",
@@ -651,11 +665,11 @@ ggsave(file.path(output_dir, "boxplot_car_deltaacc_by_income.png"), boxplot_car_
 
 
 
-# library(tmap)
-# tmap_mode('view')
+
 # boxplot Δ multimodal accessibility by income
 boxplot_mm_deltaacc_by_income <- ggplot(df_acc, aes(income, mm_delta)) +
   geom_boxplot(outlier.alpha = 0.3) +
+  theme_minimal(base_size=14) +
   stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5, na.rm = TRUE) +
   labs(
     x = "Income group",
@@ -666,6 +680,7 @@ ggsave(file.path(output_dir, "boxplot_mm_deltaacc_by_income.png"), boxplot_mm_de
 # faceted by w/in or outside of ring
 boxplot_mm_deltaacc_by_income_ring <- ggplot(df_acc, aes(income, mm_delta)) +
   geom_boxplot(outlier.alpha = 0.3) +
+  theme_minimal(base_size=14) +
   stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5, na.rm = TRUE) +
   labs(
     x = "Income group",
@@ -674,12 +689,14 @@ boxplot_mm_deltaacc_by_income_ring <- ggplot(df_acc, aes(income, mm_delta)) +
   facet_grid(~within)
 boxplot_mm_deltaacc_by_income_ring
 ggsave(file.path(output_dir, "boxplot_mm_deltaacc_by_income_ring.png"), boxplot_mm_deltaacc_by_income_ring, dpi = 300, width = 8, height = 5)
+side_plots$box_ring[[opportunity]] <- boxplot_mm_deltaacc_by_income_ring + labs(title = poi$label)
 
 
 # boxplot Δ car accessibility by district
 boxplot_car_acc_by_district <- ggplot(df_acc, aes(x = district,
                                                   y = car_delta)) +
   geom_boxplot(outlier.alpha = 0.3, na.rm = TRUE) +
+  theme_minimal(base_size=14) +
   labs(
     x = "District",
     y = "Car accessibility change (utils)"
@@ -691,6 +708,7 @@ ggsave(file.path(output_dir, "boxplot_car_acc_by_district.png"), boxplot_car_acc
 boxplot_mm_acc_by_district <- ggplot(df_acc, aes(x = district,
                                                  y = mm_delta)) +
   geom_boxplot(outlier.alpha = 0.3, na.rm = TRUE) +
+  theme_minimal(base_size=14) +
   labs(
     x = "District",
     y = "Multimodal accessibility change (utils)"
@@ -1026,16 +1044,16 @@ plot_person_delta_map <- function(mode,
     return(NULL)
   }
 
+  # binned colour scale: one colour per 1-util step from -3 to 3; changes
+  # beyond +/-3 are squished into the outermost bins
+  colour_limit <- 3
+
   persons_sf <- persons %>%
     filter(!is.na(.data[[measure]]), !is.na(homeX), !is.na(homeY)) %>%
     st_as_sf(
       coords = c("homeX", "homeY"),
       crs = 25832
     )
-
-  # capped colour scale: most deltas are small and negative, so a wide range
-  # would hide them; values beyond the cap are squished to the end colours
-  colour_limit <- 1
 
   legend_title <- if (measure == "delta") {
     "Δ accessibility\n(policy - base, utils)"
@@ -1064,14 +1082,17 @@ plot_person_delta_map <- function(mode,
       alpha = 0.7
     ) +
     poi_overlay(locations_sf) +
-    scale_color_gradient2(
+    scale_color_steps2(
       low = "#b2182b",
       mid = "grey92",
       high = "#2166ac",
       midpoint = 0,
+      breaks = seq(-colour_limit, colour_limit, by = 1),
       limits = c(-colour_limit, colour_limit),
       oob = scales::squish,
-      name = legend_title
+      name = legend_title,
+      # one legend box per bin instead of a colour bar
+      guide = guide_bins(show.limits = TRUE, override.aes = list(size = 3, alpha = 1))
     ) +
     coord_sf(
       xlim = c(berlin_bbox["xmin"], berlin_bbox["xmax"]),
@@ -1092,9 +1113,9 @@ plot_person_delta_map <- function(mode,
     theme_void() +
     theme(
       legend.position = "right",
-      legend.key.height = unit(1.5, "cm"),
       plot.title = element_text(face = "bold", hjust = 0.5)
     )
+
 }
 
 for (mode in c("car", "pt", "teleportedWalk", "mm")) {
@@ -1109,7 +1130,11 @@ for (mode in c("car", "pt", "teleportedWalk", "mm")) {
       height = 6.5,
       bg = "white"
     )
+    if (mode == "mm") {
+      side_plots$map_mm[[opportunity]] <- person_delta_map + labs(title = poi$label)
+    }
   }
+
 }
 
 # ==========================================================
@@ -1159,6 +1184,7 @@ if (!is.null(mm_persons)) {
     dpi = 300, width = 8, height = 6
   )
   print(ecdf_mm_base_vs_policy)
+  side_plots$ecdf[[opportunity]] <- ecdf_mm_base_vs_policy
 }
 
 # Residential road noise and accessibility
@@ -1245,9 +1271,106 @@ TRUE
 if (!opportunity_ok) failed_opportunities <- c(failed_opportunities, opportunity)
 }
 
+
+# ==========================================================
+# Combined figures: opportunities side by side, one legend
+# ==========================================================
+# One panel per opportunity (in the order of `opportunities`), one shared
+# legend below, y-axis title only on the left panel, and the same axis range
+# in all panels so they can be compared. Saved to output_root as
+# <name>_<opportunity1>_<opportunity2>.png
+
+save_side_by_side <- function(plots, name, width_per_panel, height,
+                              coord = NULL, tilt_x = FALSE) {
+  if (length(plots) < 2) return(invisible(NULL))
+  for (i in seq_along(plots)[-1]) {
+    plots[[i]] <- plots[[i]] + labs(y = NULL)
+  }
+  combined <- wrap_plots(plots, nrow = 1) +
+    plot_layout(guides = "collect") &
+    theme(legend.position = "bottom")
+  if (tilt_x) {
+    combined <- combined & theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  }
+  # coord_cartesian zooms without dropping data (boxplot stats stay correct)
+  if (!is.null(coord)) combined <- combined & coord
+  file <- file.path(output_root, paste0(name, "_", paste(names(plots), collapse = "_"), ".png"))
+  ggsave(file, combined, dpi = 300, width = width_per_panel * length(plots),
+         height = height, bg = "white")
+  message("Combined figure: ", file)
+  invisible(combined)
+}
+
+shared_range <- function(plots, column) {
+  range(unlist(lapply(plots, function(p) p$data[[column]])), na.rm = TRUE, finite = TRUE)
+}
+
+# median accessibility by income, mode & scenario
+if (length(side_plots$bar) >= 2) {
+  save_side_by_side(
+    side_plots$bar, "bar_medianacc_by_income_mode_scenario",
+    width_per_panel = 5.5, height = 6, tilt_x = TRUE,
+    coord = coord_cartesian(ylim = range(0, shared_range(side_plots$bar, "median_accessibility")))
+  )
+}
+
+# Δ multimodal accessibility by income, within / outside the ring
+if (length(side_plots$box_ring) >= 2) {
+  save_side_by_side(
+    side_plots$box_ring, "boxplot_mm_deltaacc_by_income_ring",
+    width_per_panel = 6, height = 5, tilt_x = TRUE,
+    coord = coord_cartesian(ylim = shared_range(side_plots$box_ring, "mm_delta"))
+  )
+}
+
+# ECDF of multimodal accessibility, base vs policy
+if (length(side_plots$ecdf) >= 2) {
+  ecdf_x <- range(unlist(lapply(side_plots$ecdf, function(p) {
+    quantile(p$data$accessibility, c(0.01, 1), names = FALSE)
+  })))
+  save_side_by_side(
+    side_plots$ecdf, "ecdf_mm_base_vs_policy",
+    width_per_panel = 6, height = 5.5,
+    coord = coord_cartesian(xlim = ecdf_x, ylim = c(0, 1), expand = FALSE)
+  )
+}
+
+# map of Δ multimodal accessibility per person (no shared coord: maps keep
+# their own Berlin extent; the colour bins are the same in every map)
+if (length(side_plots$map_mm) >= 2) {
+  save_side_by_side(
+    side_plots$map_mm, "map_persons_mm_policy_minus_base",
+    width_per_panel = 6, height = 5.5
+  )
+}
+
 message(
   "\nDone. Succeeded: ",
   paste(setdiff(opportunities, failed_opportunities), collapse = ", "),
   if (length(failed_opportunities) > 0)
     paste0(" | Failed: ", paste(failed_opportunities, collapse = ", "))
 )
+
+# source("debug_tmap.R")   # once per session
+# 
+# lichtenberg_x <- 805074
+# lichtenberg_y <- 5827333
+# half_width    <- 1000   # metres; 500 = 1 km box
+# 
+# view_persons(
+#   mm_persons %>%
+#     filter(abs(homeX - lichtenberg_x) <= half_width,
+#            abs(homeY - lichtenberg_y) <= half_width),
+#   shape_by = "economic_status"
+# )
+
+# save_persons_map(
+#   "lichtenberg_uni.png",
+#   half_width = 1000,   
+#   mm_persons %>% filter(abs(homeX - lichtenberg_x) <= half_width,
+#          abs(homeY - lichtenberg_y) <= half_width),                       
+#   shape_by = "economic_status",
+# )
+
+# save_persons_map("lichtenberg_uni.png", half_width = 1000, shape_by = "income_level")
+
