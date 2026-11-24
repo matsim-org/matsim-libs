@@ -22,7 +22,6 @@
 #   mkdir -p logs
 #   sbatch run-person-based-acc-berlin-policy.sh               # all 9 combinations
 #   sbatch --array=3-5 run-person-based-acc-berlin-policy.sh   # only some tasks (indices below)
-#   sbatch run-person-based-acc-berlin-policy.sh --dry-run     # only print resolved paths
 # Arguments starting with "--" are passed through to the Java class.
 #
 # Task index -> combination:
@@ -47,19 +46,15 @@ SCENARIO="policy"
 # transit schedule; .zst, .gz or .xml) and the POI files.
 INPUT_DIR="berlin-autofrei-v6.4-policy"
 
-# Scenario version used in the MATSim file names: berlin-v<VERSION>.output_*.xml.zst
-VERSION="6.4"
 
 # Share of persons to compute, applied when the plans are loaded.
 # The v6.4 inputs are a 10% population (~490,000 persons); 0.1 gives a
 # 1%-sized run (~49,000 persons), while car travel times still come from
 # the full 10% simulation. 1 = all persons.
-# Base and policy keep the same persons as long as SAMPLE and SAMPLE_SEED match.
+# The runner uses seed 4711. Matching sample fractions and input population order reproduce the sample.
 SAMPLE="0.1"
-SAMPLE_SEED="4711"
 
 JAR="RunPersonBasedAccBerlin-cluster.jar"
-WORK_DIR="work"   # scratch folder for the MATSim controller
 
 POIS=(spa hospital jobcenter)
 MODES=(car pt teleportedWalk)
@@ -110,7 +105,7 @@ echo "task:     ${ARRAY_ID}_${TASK_ID}"
 echo "POI:      ${poi}"
 echo "mode:     ${mode}"
 echo "input:    ${INPUT_DIR}"
-echo "sample:   ${SAMPLE} (seed ${SAMPLE_SEED})"
+echo "sample:   ${SAMPLE} (seed 4711)"
 echo "output:   ${OUTPUT_DIR}"
 echo "=== $(date '+%F %T') opportunity=${poi} scenario=${SCENARIO} mode=${mode} ==="
 
@@ -119,19 +114,16 @@ java -Xms8g -Xmx52g -cp "${JAR}" \
   --opportunity="${poi}" \
   --scenario="${SCENARIO}" \
   --mode="${mode}" \
-  --version="${VERSION}" \
   --sample="${SAMPLE}" \
-  --sample-seed="${SAMPLE_SEED}" \
   --scenario-dir="${INPUT_DIR}" \
   --hospital-input-dir="${INPUT_DIR}" \
   --baeder-geojson="${INPUT_DIR}/baeder.geojson" \
-  --r-input-dir="${OUTPUT_DIR}" \
-  --work-dir="${WORK_DIR}" \
+  --output-dir="${OUTPUT_DIR}" \
   "$@"
 status=$?
 
 # Fix cluster permissions. Make the results accessible for everyone in our group
-chmod -R 770 "${OUTPUT_DIR}" logs "${WORK_DIR}" 2>/dev/null
+chmod -R 770 "${OUTPUT_DIR}" logs 2>/dev/null
 
 if (( status != 0 )); then
   echo "FAILED: ${poi}/${mode} (exit code ${status})" >&2

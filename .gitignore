@@ -29,3 +29,4 @@ output/
 tmp.typ
 .mcp.json
 .Rproj.user
+/matsim-libs.Rproj

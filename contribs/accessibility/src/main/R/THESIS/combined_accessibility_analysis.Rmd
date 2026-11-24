@@ -1,0 +1,22 @@
+---
+title: "xxx"
+output: html_document
+date: "2026-11-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+acts_raw <- read_delim("/Users/jakob/git/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/10pct-v6.4/berlin-autofrei-v6.4-baseCaseCtdExtended-10pct/berlin-v6.4.output_activities.csv.zst")
+
+acts_raw |> filter(str_starts(person,"berlin")) |> separate_wider_regex(activity_type, c(act = ".*","_",typical_duration=".*"),cols_remove=FALSE) |> mutate(typical_duration = as.numeric(typical_duration)) |> 
+group_by(act) |> summarise(n = n(), typical_duration = sum(typical_duration)) |> filter(act!="home") |> ungroup() |> mutate(typical_duration_share = typical_duration/sum(typical_duration)) |> pull(typical_duration_share)
+```
+

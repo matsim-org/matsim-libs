@@ -22,7 +22,6 @@
 #   mkdir -p logs
 #   sbatch run-person-based-acc-berlin-base.sh               # all 9 combinations
 #   sbatch --array=3-5 run-person-based-acc-berlin-base.sh   # only some tasks (indices below)
-#   sbatch run-person-based-acc-berlin-base.sh --dry-run     # only print resolved paths
 # Arguments starting with "--" are passed through to the Java class.
 #
 # Task index -> combination:
@@ -47,15 +46,12 @@ SCENARIO="base"
 # transit schedule; .zst, .gz or .xml) and the POI files.
 INPUT_DIR="base"
 
-# Scenario version used in the MATSim file names: berlin-v<VERSION>.output_*.xml.zst
-VERSION="6.3"
 
 # Share of persons to compute, applied when the plans are loaded.
 # 1 = all persons. For a 10% scenario, 0.1 gives a 1%-sized run (~49,000 persons)
 # while car travel times still come from the full 10% simulation.
-# Base and policy keep the same persons as long as SAMPLE and SAMPLE_SEED match.
+# The runner uses seed 4711. Matching sample fractions and input population order reproduce the sample.
 SAMPLE="1"
-SAMPLE_SEED="4711"
 
 # Include the daily monetary constant (fixed costs per trip) for car and pt:
 # "true" adds --daily-monetary-constant; the values default to the Berlin
@@ -65,7 +61,6 @@ DAILY_MONETARY_CONSTANT="true"
 #PT_DAILY_MONETARY_CONSTANT="-3.0"
 
 JAR="RunPersonBasedAccBerlin-cluster.jar"
-WORK_DIR="work"   # scratch folder for the MATSim controller
 
 POIS=(spa hospital jobcenter)
 MODES=(car pt teleportedWalk)
@@ -123,7 +118,7 @@ echo "task:     ${ARRAY_ID}_${TASK_ID}"
 echo "POI:      ${poi}"
 echo "mode:     ${mode}"
 echo "input:    ${INPUT_DIR}"
-echo "sample:   ${SAMPLE} (seed ${SAMPLE_SEED})"
+echo "sample:   ${SAMPLE} (seed 4711)"
 echo "daily monetary constant: ${DAILY_MONETARY_CONSTANT} (car ${CAR_DAILY_MONETARY_CONSTANT}, pt ${PT_DAILY_MONETARY_CONSTANT})"
 
 MONETARY_ARGS=(--car-daily-monetary-constant="${CAR_DAILY_MONETARY_CONSTANT}"
@@ -139,20 +134,17 @@ java -Xms4g -Xmx52g -cp "${JAR}" \
   --opportunity="${poi}" \
   --scenario="${SCENARIO}" \
   --mode="${mode}" \
-  --version="${VERSION}" \
   --sample="${SAMPLE}" \
-  --sample-seed="${SAMPLE_SEED}" \
   "${MONETARY_ARGS[@]}" \
   --scenario-dir="${INPUT_DIR}" \
   --hospital-input-dir="${INPUT_DIR}" \
   --baeder-geojson="${INPUT_DIR}/baeder.geojson" \
-  --r-input-dir="${OUTPUT_DIR}" \
-  --work-dir="${WORK_DIR}" \
+  --output-dir="${OUTPUT_DIR}" \
   "$@"
 status=$?
 
 # Fix cluster permissions. Make the results accessible for everyone in our group
-chmod -R 770 "${OUTPUT_DIR}" logs "${WORK_DIR}" 2>/dev/null
+chmod -R 770 "${OUTPUT_DIR}" logs 2>/dev/null
 
 if (( status != 0 )); then
   echo "FAILED: ${poi}/${mode} (exit code ${status})" >&2

@@ -93,11 +93,14 @@ AccessibilityConfigGroup.AccessibilityMeasureType measureType =
 | `targetMode` | `car`, `pt`, `teleportedWalk` | Selects the transport mode |
 | `measureType` | `rawSum`, `logSum` | Selects the MATSim accessibility measure |
 
-The selected scenario automatically determines the scenario directory:
+Pass the MATSim simulation output folder with `--scenario-dir`. The runner
+discovers the run prefix from the events file and uses it to find the other
+simulation outputs in that folder. For `--opportunity facilities`, it loads the
+facilities from the same run folder. The `--scenario` flag labels the results
+as `base` or `policy`.
 
-```java
-OUTPUT_DIR = OUTPUT_ROOT + runScenario + "/";
-```
+Accessibility CSVs go to `analysis/accessibility` inside the simulation output
+folder by default. Use `--output-dir` to write to a different location.
 
 The accessibility computation area is also selected automatically:
 
