@@ -236,11 +236,19 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 		RequestItem item = requests.get(requestId);
 
-		if (item == null) {
-			return null;
+		if (item != null) {
+			return item.request;
 		}
 
-		return item.request;
+		// submitted in this time step, but not yet passed to the optimizer (see processBookingQueue): the passenger
+		// departs in the same time step, so the departure must use this request instead of creating an immediate one
+		for (PassengerRequest request : bookingQueue) {
+			if (request.getId().equals(requestId)) {
+				return request;
+			}
+		}
+
+		return null;
 	}
 
 	// Housekeeping of requests
