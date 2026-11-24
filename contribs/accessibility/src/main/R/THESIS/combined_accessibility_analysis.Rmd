@@ -14,9 +14,319 @@ library(tidyverse)
 ```
 
 ```{r}
-acts_raw <- read_delim("/Users/jakob/git/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/10pct-v6.4/berlin-autofrei-v6.4-baseCaseCtdExtended-10pct/berlin-v6.4.output_activities.csv.zst")
+acts_raw <- read_delim(
+  pipe("zstd -dc ~/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/10pct-v6.4/berlin-autofrei-v6.4-baseCaseCtdExtended-10pct/berlin-v6.4.output_activities.csv.zst"),
+  delim = ";"
+)
 
 acts_raw |> filter(str_starts(person,"berlin")) |> separate_wider_regex(activity_type, c(act = ".*","_",typical_duration=".*"),cols_remove=FALSE) |> mutate(typical_duration = as.numeric(typical_duration)) |> 
 group_by(act) |> summarise(n = n(), typical_duration = sum(typical_duration)) |> filter(act!="home") |> ungroup() |> mutate(typical_duration_share = typical_duration/sum(typical_duration)) |> pull(typical_duration_share)
 ```
 
+
+# Combined accessibility over MATSim facility types
+
+One accessibility value per person across all 12 facility activity types,
+weighted by the share of time the population spends at each activity
+(`typical_duration_share` above):
+combined = Σ w_a · logSum_a, so Δcombined = Σ w_a · Δ_a.
+The weights are renormalised over the analysed types (home and types without
+an accessibility run are left out). Plots and maps follow `analysis.R`.
+
+```{r combined-setup}
+library(sf)
+
+# per-type accessibility results from the cluster (experiment 2026-11-23b-matsim-facs)
+facs_dir   <- path.expand("~/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-23b-matsim-facs")
+result_dir <- file.path(facs_dir, "results", "20261123-190318-WE9sAp")
+output_dir <- file.path(facs_dir, "output", "combined-duration-weighted")
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+# activities file for the duration shares: the 10pct base run, as in the
+# chunk above; falls back to the 1pct baseCtd run if it is not on disk
+activity_files <- path.expand(c(
+  "~/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/10pct-v6.4/berlin-autofrei-v6.4-baseCaseCtdExtended-10pct/berlin-v6.4.output_activities.csv.zst",
+  "~/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/1pct-v6.4/berlin-autofrei-v6.4-baseCtd/berlin-v6.4.output_activities.csv.gz"
+))
+
+shape_dir <- path.expand("~/git/matsim-libs/contribs/accessibility/src/main/R/THESIS/input/Berlin shapefiles")
+berlin_only <- TRUE  # keep only people whose homes are inside Berlin
+beta <- 1
+
+facility_labels <- c(
+  work = "Work", work_business = "Work (business)", leisure = "Leisure",
+  dining = "Dining", shop_daily = "Shopping (daily)", shop_other = "Shopping (other)",
+  personal_business = "Personal business", edu_kiga = "Kindergarten",
+  edu_primary = "Primary school", edu_secondary = "Secondary school",
+  edu_higher = "Higher education", edu_other = "Other education"
+)
+activity_types <- intersect(names(facility_labels), list.dirs(file.path(result_dir, "base"), full.names = FALSE))
+
+# same income brackets as analysis.R
+income_breaks <- c(-Inf, 500, 900, 1500, 2000, 2600, 3000, 3600, 4600, Inf)
+income_labels <- c("500", "900", "1500", "2000", "2600", "3000", "3600", "4600", "5600")
+district_levels <- c("Mitte", "Friedrichshain-Kreuzberg", "Pankow", "Charlottenburg-Wilmersdorf",
+                     "Spandau", "Steglitz-Zehlendorf", "Tempelhof-Schöneberg", "Neukölln",
+                     "Treptow-Köpenick", "Marzahn-Hellersdorf", "Lichtenberg", "Reinickendorf")
+
+berlin_sf <- st_read(file.path(shape_dir, "Berlin_Bezirke.shp"), quiet = TRUE) |> st_transform(25832)
+ring_sf <- st_read(file.path(shape_dir, "Berlin_sbahn_ring.geojson"), quiet = TRUE)
+if (is.na(st_crs(ring_sf))) st_crs(ring_sf) <- 4326
+ring_sf <- st_transform(ring_sf, 25832)
+```
+
+```{r weights}
+activity_file <- Find(file.exists, activity_files)
+message("Duration shares from ", activity_file)
+
+act_con <- if (str_ends(activity_file, "\\.zst")) pipe(paste("zstd -dc", shQuote(activity_file))) else activity_file
+
+duration_shares <- read_delim(act_con, delim = ";", col_select = c(person, activity_type),
+                              col_types = cols(.default = col_character())) |>
+  filter(str_starts(person, "berlin")) |>
+  separate_wider_regex(activity_type, c(act = ".*", "_", typical_duration = ".*"), cols_remove = FALSE) |>
+  mutate(typical_duration = as.numeric(typical_duration)) |>
+  group_by(act) |>
+  summarise(n = n(), typical_duration = sum(typical_duration)) |>
+  filter(act != "home") |>
+  ungroup() |>
+  mutate(typical_duration_share = typical_duration / sum(typical_duration))
+
+weights <- duration_shares |>
+  filter(act %in% activity_types) |>
+  mutate(weight = typical_duration_share / sum(typical_duration_share)) |>
+  arrange(desc(weight))
+stopifnot(setequal(weights$act, activity_types))
+message("Analysed types cover ", round(100 * sum(weights$typical_duration_share), 1),
+        "% of non-home activity time")
+write_csv(weights, file.path(output_dir, "weights.csv"))
+weights
+```
+
+```{r per-type-accessibility}
+read_acc <- function(act, scenario, mode) {
+  read_csv(file.path(result_dir, scenario, act, paste0("pbAcc_", mode, "_", scenario, "_rawSum.csv")),
+           show_col_types = FALSE, col_types = cols(personId = col_character()))
+}
+
+# multimodal = log(walk + pt + car) per type; policy reuses base walk and pt
+per_type <- map(activity_types, function(act) {
+  read_acc(act, "base", "teleportedWalk") |>
+    select(personId, age, sex, income, homeX, homeY, walk = accessibility) |>
+    inner_join(read_acc(act, "base", "pt") |> select(personId, pt = accessibility), by = "personId") |>
+    inner_join(read_acc(act, "base", "car") |> select(personId, car_base = accessibility), by = "personId") |>
+    inner_join(read_acc(act, "policy", "car") |> select(personId, car_policy = accessibility), by = "personId") |>
+    transmute(
+      act, personId, age, sex, income, homeX, homeY,
+      mm_logSum_base    = log(walk + pt + car_base) / beta,
+      mm_logSum_policy  = log(walk + pt + car_policy) / beta,
+      car_logSum_base   = log(car_base) / beta,
+      car_logSum_policy = log(car_policy) / beta,
+      pt_logSum         = log(pt) / beta,
+      twalk_logSum      = log(walk) / beta
+    )
+}) |>
+  list_rbind() |>
+  mutate(mm_delta = mm_logSum_policy - mm_logSum_base,
+         car_delta = car_logSum_policy - car_logSum_base)
+```
+
+```{r combine}
+# only persons with a finite value for every type
+complete_persons <- per_type |>
+  group_by(personId) |>
+  summarise(ok = n() == length(activity_types) &&
+              all(is.finite(c(mm_logSum_base, mm_logSum_policy, car_logSum_base, car_logSum_policy,
+                              pt_logSum, twalk_logSum)))) |>
+  filter(ok) |>
+  pull(personId)
+
+df_comb <- per_type |>
+  filter(personId %in% complete_persons) |>
+  inner_join(select(weights, act, weight), by = "act") |>
+  group_by(personId, age, sex, income, homeX, homeY) |>
+  summarise(across(c(mm_logSum_base, mm_logSum_policy, car_logSum_base, car_logSum_policy,
+                     pt_logSum, twalk_logSum),
+                   ~ sum(weight * .x)), .groups = "drop") |>
+  mutate(
+    mm_delta  = mm_logSum_policy - mm_logSum_base,
+    car_delta = car_logSum_policy - car_logSum_base,
+    income_raw = as.numeric(income),
+    income = cut(income_raw, income_breaks, labels = income_labels, ordered_result = TRUE)
+  )
+
+# district, ring and Berlin filter from the home location (as in analysis.R)
+homes <- st_as_sf(df_comb, coords = c("homeX", "homeY"), crs = 25832, remove = FALSE)
+district_idx <- st_intersects(homes, berlin_sf)
+df_comb <- df_comb |>
+  mutate(
+    district = factor(berlin_sf$Gemeinde_n[map_int(district_idx, ~ .x[1])],
+                      levels = district_levels, ordered = TRUE),
+    within = if_else(lengths(st_intersects(homes, ring_sf)) > 0, "Within Ring", "Outside Ring")
+  )
+if (berlin_only) df_comb <- df_comb |> filter(lengths(district_idx) > 0)
+
+message("Combined accessibility for ", nrow(df_comb), " persons")
+write_csv(df_comb, file.path(output_dir, "acc_combined.csv"))
+```
+
+```{r summaries}
+summary_combined <- tibble(
+  measure        = c("Car", "Multimodal"),
+  base_mean      = c(mean(df_comb$car_logSum_base), mean(df_comb$mm_logSum_base)),
+  policy_mean    = c(mean(df_comb$car_logSum_policy), mean(df_comb$mm_logSum_policy)),
+  mean_delta     = c(mean(df_comb$car_delta), mean(df_comb$mm_delta)),
+  median_delta   = c(median(df_comb$car_delta), median(df_comb$mm_delta)),
+  sd_delta       = c(sd(df_comb$car_delta), sd(df_comb$mm_delta)),
+  worsened_pct   = 100 * c(mean(df_comb$car_delta < 0), mean(df_comb$mm_delta < 0))
+) |> mutate(across(where(is.numeric), ~ round(.x, 3)))
+write_csv(summary_combined, file.path(output_dir, "summary_accessibility.csv"))
+summary_combined
+
+summary_by_income <- df_comb |>
+  group_by(income) |>
+  summarise(population = n(), mean_delta = mean(mm_delta), median_delta = median(mm_delta),
+            sd_delta = sd(mm_delta), worsened_pct = 100 * mean(mm_delta < 0)) |>
+  mutate(across(where(is.numeric), ~ round(.x, 3)))
+write_csv(summary_by_income, file.path(output_dir, "summary_accessibility_by_income.csv"))
+summary_by_income
+
+# how much each type contributes to the mean combined change (Berlin persons)
+contributions <- per_type |>
+  filter(personId %in% df_comb$personId) |>
+  group_by(act) |>
+  summarise(mean_mm_delta = mean(mm_delta), median_mm_delta = median(mm_delta),
+            worsened_pct = 100 * mean(mm_delta < 0)) |>
+  inner_join(select(weights, act, weight), by = "act") |>
+  mutate(weighted_mm_delta = weight * mean_mm_delta,
+         share_of_combined = weighted_mm_delta / sum(weighted_mm_delta),
+         label = facility_labels[act]) |>
+  arrange(weighted_mm_delta)
+write_csv(contributions, file.path(output_dir, "contributions_by_activity.csv"))
+contributions
+```
+
+```{r box-plots}
+theme_set(theme_minimal(base_size = 14))
+comb_title <- "Combined (duration-weighted)"
+
+box_by <- function(x, column, ylab, xlab) {
+  ggplot(df_comb, aes(.data[[x]], .data[[column]])) +
+    geom_boxplot(outlier.alpha = 0.3) +
+    stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5) +
+    labs(x = xlab, y = ylab, title = comb_title)
+}
+mm_lab  <- "Multimodal accessibility change (utils)"
+car_lab <- "Car accessibility change (utils)"
+
+p <- box_by("income", "mm_delta", mm_lab, "Income group")
+ggsave(file.path(output_dir, "boxplot_mm_deltaacc_by_income.png"), p, dpi = 300, width = 8, height = 5, bg = "white")
+p_ring <- p + facet_grid(~within) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggsave(file.path(output_dir, "boxplot_mm_deltaacc_by_income_ring.png"), p_ring,
+       dpi = 300, width = 8, height = 5, bg = "white")
+ggsave(file.path(output_dir, "boxplot_car_deltaacc_by_income.png"),
+       box_by("income", "car_delta", car_lab, "Income group"), dpi = 300, width = 8, height = 5, bg = "white")
+ggsave(file.path(output_dir, "boxplot_car_deltaacc_by_income_ring.png"),
+       box_by("income", "car_delta", car_lab, "Income group") + facet_grid(~within) + theme(axis.text.x = element_text(angle = 45, hjust = 1)),
+       dpi = 300, width = 8, height = 5, bg = "white")
+ggsave(file.path(output_dir, "boxplot_mm_acc_by_district.png"),
+       box_by("district", "mm_delta", mm_lab, "District") + theme(axis.text.x = element_text(angle = 45, hjust = 1)),
+       dpi = 300, width = 10, height = 6, bg = "white")
+ggsave(file.path(output_dir, "boxplot_car_acc_by_district.png"),
+       box_by("district", "car_delta", car_lab, "District") + theme(axis.text.x = element_text(angle = 45, hjust = 1)),
+       dpi = 300, width = 10, height = 6, bg = "white")
+
+# median accessibility by income, mode & scenario (as in analysis.R, without
+# walking; PT is unchanged by the policy, so its Policy bar repeats Base)
+medianacc_by_income_mode_scenario <- df_comb |>
+  transmute(
+    income,
+    `Walk|Base` = twalk_logSum, `Walk|Policy` = twalk_logSum,
+    `Public transport|Base` = pt_logSum, `Public transport|Policy` = pt_logSum,
+    `Car|Base` = car_logSum_base, `Car|Policy` = car_logSum_policy,
+    `Multimodal|Base` = mm_logSum_base, `Multimodal|Policy` = mm_logSum_policy
+  ) |>
+  pivot_longer(-income, names_to = c("mode", "scenario"), names_sep = "\\|",
+               values_to = "accessibility") |>
+  mutate(mode = factor(mode, levels = c("Walk", "Public transport", "Car", "Multimodal")),
+         scenario = factor(scenario, levels = c("Base", "Policy"))) |>
+  group_by(scenario, income, mode) |>
+  summarise(median_accessibility = median(accessibility), .groups = "drop")
+write_csv(medianacc_by_income_mode_scenario,
+          file.path(output_dir, "median_accessibility_by_income_mode_scenario.csv"))
+
+bar_medianacc <- ggplot(medianacc_by_income_mode_scenario,
+                        aes(income, median_accessibility, fill = mode)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.7) +
+  facet_wrap(~ scenario, ncol = 1) +
+  labs(x = "Income group", y = "Median accessibility (utils)", fill = "Mode", title = comb_title)
+ggsave(file.path(output_dir, "bar_medianacc_by_income_mode_scenario.png"), bar_medianacc,
+       dpi = 300, width = 8, height = 5, bg = "white")
+bar_medianacc
+
+bar_contrib <- ggplot(contributions, aes(weighted_mm_delta, reorder(label, weighted_mm_delta))) +
+  geom_col(fill = "#b2182b") +
+  labs(x = "Contribution to mean combined Δ (weight × mean Δ, utils)", y = NULL, title = comb_title)
+ggsave(file.path(output_dir, "bar_contributions_by_activity.png"), bar_contrib, dpi = 300, width = 9, height = 5.5, bg = "white")
+p_ring
+```
+
+```{r maps}
+# same −3…3 bins and style as the person maps in analysis.R
+# label the outer edges of the open end bins as "< -limit" / "> limit"
+open_bin_labels <- function(colour_limit) {
+  function(x) {
+    out <- format(x, trim = TRUE)
+    out[x <= -colour_limit - 1] <- paste0("< ", -colour_limit)
+    out[x >=  colour_limit + 1] <- paste0("> ", colour_limit)
+    out
+  }
+}
+
+plot_delta_map <- function(column, mode_label, colour_limit = 3) {
+  bbox <- st_bbox(berlin_sf)
+  ggplot() +
+    geom_sf(data = berlin_sf, fill = "grey95", color = "grey60", linewidth = 0.3) +
+    geom_sf(data = ring_sf, fill = NA, color = "grey40", linetype = "dashed", linewidth = 0.4) +
+    geom_sf(data = st_as_sf(df_comb, coords = c("homeX", "homeY"), crs = 25832),
+            aes(color = .data[[column]]), size = 0.4, alpha = 0.7) +
+    scale_color_steps2(
+      low = "#b2182b", mid = "grey92", high = "#2166ac", midpoint = 0,
+      # open-ended end bins: everything below -colour_limit / above colour_limit
+      breaks = seq(-colour_limit, colour_limit, 1), limits = c(-colour_limit - 1, colour_limit + 1),
+      labels = open_bin_labels(colour_limit),
+      oob = scales::squish, name = "Δ accessibility\n(policy - base, utils)",
+      guide = guide_bins(show.limits = TRUE, override.aes = list(size = 3, alpha = 1))
+    ) +
+    coord_sf(xlim = c(bbox["xmin"], bbox["xmax"]), ylim = c(bbox["ymin"], bbox["ymax"])) +
+    labs(title = paste0(mode_label, " accessibility change: policy - base"),
+         subtitle = "Combined over activity types, weighted by time spent") +
+    theme_void() +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5))
+}
+
+map_mm <- plot_delta_map("mm_delta", "Multimodal")
+ggsave(file.path(output_dir, "map_persons_mm_policy_minus_base.png"), map_mm, dpi = 300, width = 8, height = 6.5, bg = "white")
+ggsave(file.path(output_dir, "map_persons_car_policy_minus_base.png"), plot_delta_map("car_delta", "Car"),
+       dpi = 300, width = 8, height = 6.5, bg = "white")
+map_mm
+```
+
+```{r ecdf}
+ecdf_data <- df_comb |>
+  select(Base = mm_logSum_base, Policy = mm_logSum_policy) |>
+  pivot_longer(everything(), names_to = "scenario", values_to = "accessibility")
+ecdf_plot <- ggplot(ecdf_data, aes(accessibility, colour = scenario, linetype = scenario)) +
+  geom_hline(yintercept = c(0.1, 0.5, 0.9), colour = "grey80", linetype = "dotted") +
+  stat_ecdf(geom = "step", linewidth = 1) +
+  scale_colour_manual(values = c(Base = "#434343", Policy = "#2166ac")) +
+  scale_y_continuous(labels = scales::label_percent(), limits = c(0, 1)) +
+  coord_cartesian(xlim = c(quantile(ecdf_data$accessibility, 0.01), NA), expand = FALSE) +
+  labs(x = "Multimodal accessibility (utils)", y = "Cumulative share of persons",
+       colour = NULL, linetype = NULL, title = comb_title,
+       subtitle = "Walk + PT + car, weighted over activity types") +
+  theme(legend.position = "bottom")
+ggsave(file.path(output_dir, "ecdf_mm_base_vs_policy.png"), ecdf_plot, dpi = 300, width = 8, height = 6, bg = "white")
+ecdf_plot
+```

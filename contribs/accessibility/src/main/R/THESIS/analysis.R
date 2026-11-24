@@ -36,6 +36,19 @@ run_dirs <- list(
   policy = file.path(input_dir, "2026-11-19-policy")
 )
 
+# MATSim facility activity types (work, edu_*, leisure, ...) from experiment
+# 2026-11-23b-matsim-facs. TRUE reads that run instead of run_dirs above
+# (the lines above stay as they are) and analyses all 12 types.
+use_matsim_facilities <- FALSE
+facs_dir <- "~/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-23b-matsim-facs"
+facs_run <- file.path(facs_dir, "results", "20261123-190318-WE9sAp")
+if (use_matsim_facilities) {
+  run_dirs <- list(
+    base   = file.path(facs_run, "base"),
+    policy = file.path(facs_run, "policy")
+  )
+}
+
 # Use the noise outputs from the simulations underlying the accessibility runs.
 noise_root <- file.path(dirname(dirname(base_dir)), "10pct-v6.4")
 noise_dirs <- file.path(
@@ -50,6 +63,9 @@ names(noise_dirs) <- c("base", "policy")
 # e.g. input 2026-11-16-policy -> output/2026-11-16-output/<opportunity>/
 run_label   <- sub("-policy$", "", basename(run_dirs$policy))
 output_root <- file.path(base_dir, "output", paste0(run_label, "-output-berlinfiltered"))
+if (use_matsim_facilities) {
+  output_root <- file.path(facs_dir, "output", paste0(basename(facs_run), "-output-berlinfiltered"))
+}
 
 missing_run_dirs <- Filter(function(d) !dir.exists(d), run_dirs)
 if (length(missing_run_dirs) > 0) {
@@ -86,6 +102,28 @@ poi_meta <- list(
 )
 
 
+
+# MATSim facility activity types: folder name = activity type = locations.csv type
+facility_labels <- c(
+  work = "Work", work_business = "Work (business)", leisure = "Leisure",
+  dining = "Dining", shop_daily = "Shopping (daily)", shop_other = "Shopping (other)",
+  personal_business = "Personal business", edu_kiga = "Kindergarten",
+  edu_primary = "Primary school", edu_secondary = "Secondary school",
+  edu_higher = "Higher education", edu_other = "Other education"
+)
+facility_colors <- c(
+  "#1b9e77", "#66a61e", "#d95f02", "#e7298a", "#7570b3", "#a6761d",
+  "#666666", "#e6ab02", "#1f78b4", "#6a3d9a", "#33a02c", "#b15928"
+)
+for (i in seq_along(facility_labels)) {
+  poi_meta[[names(facility_labels)[i]]] <- list(
+    type = names(facility_labels)[i], label = facility_labels[[i]],
+    color = facility_colors[i], shape = 16, label_points = FALSE
+  )
+}
+if (use_matsim_facilities) {
+  opportunities <- names(facility_labels)
+}
 
 unknown_opportunities <- setdiff(opportunities, names(poi_meta))
 if (length(unknown_opportunities) > 0) {
@@ -1024,8 +1062,20 @@ if (!is.null(car_persons)) {
 # they stay visible on any colour scale. Returns NULL (no layer) without data.
 poi_overlay <- function(locations) {
   if (is.null(locations) || nrow(locations) == 0) return(NULL)
+  # thousands of MATSim facilities would cover the map
+  if (nrow(locations) > 200) return(NULL)
   geom_sf(data = locations, shape = 21, fill = "white", colour = "black",
           size = 2.4, stroke = 0.7, inherit.aes = FALSE)
+}
+
+# label the outer edges of the open end bins as "< -limit" / "> limit"
+open_bin_labels <- function(colour_limit) {
+  function(x) {
+    out <- format(x, trim = TRUE)
+    out[x <= -colour_limit - 1] <- paste0("< ", -colour_limit)
+    out[x >=  colour_limit + 1] <- paste0("> ", colour_limit)
+    out
+  }
 }
 
 plot_person_delta_map <- function(mode,
@@ -1087,8 +1137,10 @@ plot_person_delta_map <- function(mode,
       mid = "grey92",
       high = "#2166ac",
       midpoint = 0,
+      # open-ended end bins: everything below -colour_limit / above colour_limit
       breaks = seq(-colour_limit, colour_limit, by = 1),
-      limits = c(-colour_limit, colour_limit),
+      limits = c(-colour_limit - 1, colour_limit + 1),
+      labels = open_bin_labels(colour_limit),
       oob = scales::squish,
       name = legend_title,
       # one legend box per bin instead of a colour bar
@@ -1187,7 +1239,12 @@ if (!is.null(mm_persons)) {
   side_plots$ecdf[[opportunity]] <- ecdf_mm_base_vs_policy
 }
 
-# Residential road noise and accessibility
+# Residential road noise and accessibility (skipped if the noise outputs are missing)
+noise_files <- file.path(noise_dirs, "receiverPoints", "receiverPoints.csv")
+if (!all(file.exists(noise_files))) {
+  message("Noise outputs not found, skipping noise: ",
+          paste(noise_files[!file.exists(noise_files)], collapse = ", "))
+} else {
 if (is.null(noise_receivers)) {
   noise_base <- read_daily_noise(noise_dirs[["base"]])
   noise_policy <- read_daily_noise(noise_dirs[["policy"]])
@@ -1262,6 +1319,8 @@ if (nrow(noise_valid) > 0) {
          dpi = 300, width = 10, height = 5)
 }
 
+} # end noise
+
 # ---- end of per-opportunity analysis ----
 TRUE
 }, error = function(e) {
@@ -1283,6 +1342,10 @@ if (!opportunity_ok) failed_opportunities <- c(failed_opportunities, opportunity
 save_side_by_side <- function(plots, name, width_per_panel, height,
                               coord = NULL, tilt_x = FALSE) {
   if (length(plots) < 2) return(invisible(NULL))
+  if (length(plots) > 4) {
+    message("Skipping side-by-side '", name, "': ", length(plots), " panels is too many")
+    return(invisible(NULL))
+  }
   for (i in seq_along(plots)[-1]) {
     plots[[i]] <- plots[[i]] + labs(y = NULL)
   }
