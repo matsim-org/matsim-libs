@@ -63,7 +63,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	private final Stack<StringBuffer> buffers = new Stack<>();
 	private final Stack<String> theContext = new Stack<>();
 
-	private boolean isValidating = true;
+	protected boolean isValidating = true;
 	private boolean isNamespaceAware = true;
 	private final ValidationType validationType;
 
