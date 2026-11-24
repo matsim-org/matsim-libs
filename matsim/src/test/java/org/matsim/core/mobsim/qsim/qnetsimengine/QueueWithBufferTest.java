@@ -95,60 +95,99 @@ class QueueWithBufferTest {
 		var context = createNetsimeEngineContext(config, timer);
 		var link = createQLink(15, 1, 1800, context, config);
 		var driver = mock(MobsimDriverAgent.class);
-		var vehicle1 = createVehicle("vehicle-1", driver, 10,2);
+		// vehicle 1 needs 15m / 5m/s = 3s for the link, so that it is still on the link while the inflow capacity is refilled
+		var vehicle1 = createVehicle("vehicle-1", driver, 5, 2);
 		var vehicle2 = createVehicle("vehicle-2", driver, 1, 1);
 		link.doSimStep();
 
 		// the link should accept vehicles according to its max inflow capacity
 		// vehicle consumes 2pcu. Max inflow should be: 1/cellSize / (1/vHole + 1/vMax) = 0.588...
-		// the queue with buffer seems to increase the accumulated inflow per 'doSimStep' regardless of the time between invocations. This works, because
-		// in the simulation 'doSimStep' is invoked every timestep. We need 3 'doSimStep's to increase the accumulated inflow to a value over 1.
+		// the inflow capacity is refilled by the max inflow per time step, also for the time steps in which the link is not processed. We need 3
+		// time steps to increase the accumulated inflow to a value over 0.
 		assertTrue(link.getAcceptingQLane().isAcceptingFromUpstream());
 		link.getAcceptingQLane().addFromUpstream(vehicle1);
-		// acc inflow is -1.422
+		// acc inflow is -1.412
 		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
+		timer.setTime(1);
 		link.doSimStep();
-		// acc inflow is -0.842
+		// acc inflow is -0.824
 		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
+		timer.setTime(2);
 		link.doSimStep();
 		// acc inflow is -0.236
 		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
+
+		// this should move vehicle 1 into the buffer, and start a backwards travelling hole
+		timer.setTime(3);
 		link.doSimStep();
-		// acc inflow is +0.352 > 0
+		// acc inflow is +0.352 > 0, and the hole storage capacity left after vehicle 1 suffices for vehicle 2
 		assertTrue(link.getAcceptingQLane().isAcceptingFromUpstream());
 		link.getAcceptingQLane().addFromUpstream(vehicle2);
 		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
 
-		// this should move one vehicle into the buffer, and start a backwards travelling hole
-		timer.setTime(1);
-		link.doSimStep();
-
 		// now, one vehicle should be in the buffer and one vehicle should be in the queue.
 		// The link has free storage capacity, but it is not freed yet, because the leaving vehicle has sent a backwards travelling hole on its way.
-		// the earliest exit time of that hole should be: now + length / vHole -> 1 + 15 * 3.6 / 15km/h = 4.6s
-		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
+		// the earliest exit time of that hole should be: now + length / vHole -> 3 + 15 * 3.6 / 15km/h = 6.6s
 		// remove the first vehicle from the buffer and asser that it was the only vehicle in the buffer
 		assertEquals(vehicle1.getId(), link.getOfferingQLanes().getFirst().popFirstVehicle().getId());
 		assertTrue(link.getOfferingQLanes().getFirst().isNotOfferingVehicle());
 
-		// pretend we are doing 5 sim steps. I think we need to do this, as the inflow capacity accumulates per 'doSimStep' and does not keep track
-		// of the last update time.
-		timer.setTime(2);
-		link.doSimStep();
-		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
-		assertTrue(link.getOfferingQLanes().getFirst().isNotOfferingVehicle());
-		timer.setTime(3);
-		link.doSimStep();
-		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
-		assertTrue(link.getOfferingQLanes().getFirst().isNotOfferingVehicle());
+		// acc inflow is -0.06
 		timer.setTime(4);
 		link.doSimStep();
 		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
 		assertTrue(link.getOfferingQLanes().getFirst().isNotOfferingVehicle());
-		timer.setTime(5); // 5 > 4.6: 4.6 is the arrival time of the backwards travelling hole.
+		// from here on, the inflow capacity would accept a vehicle, but the storage capacity is not freed before the hole arrives
+		timer.setTime(5);
+		link.doSimStep();
+		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
+		assertTrue(link.getOfferingQLanes().getFirst().isNotOfferingVehicle());
+		timer.setTime(6);
+		link.doSimStep();
+		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
+		assertTrue(link.getOfferingQLanes().getFirst().isNotOfferingVehicle());
+		timer.setTime(7); // 7 > 6.6: 6.6 is the arrival time of the backwards travelling hole.
 		link.doSimStep();
 		assertTrue(link.getAcceptingQLane().isAcceptingFromUpstream());
 		assertTrue(link.getOfferingQLanes().getFirst().isNotOfferingVehicle());
+	}
+
+	/**
+	 * <a href="https://github.com/matsim-org/matsim-libs/issues/5239">#5239</a>: the inflow capacity is refilled also for the time steps in
+	 * which the link is not processed, i.e. not active.
+	 */
+	@Test
+	void inflowCapacityRefilledWhileInactiveKinematicWaves() {
+		var config = ConfigUtils.createConfig();
+		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		var timer = new MobsimTimer();
+		var context = createNetsimeEngineContext(config, timer);
+		var link = createQLink(10, 1, 1800, context, config);
+		var driver = mock(MobsimDriverAgent.class);
+		var truck = createVehicle("truck", driver, 10, 3.5);
+		link.doSimStep();
+
+		// acc inflow is 0.588 - 3.5 = -2.912
+		assertTrue(link.getAcceptingQLane().isAcceptingFromUpstream());
+		link.getAcceptingQLane().addFromUpstream(truck);
+		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
+
+		// the truck moves into the buffer at 1s, and its hole arrives at 1 + 10 * 3.6 / 15km/h = 3.4s. After that, the link is not active any
+		// more, with acc inflow -2.912 + 4 * 0.588 = -0.56
+		for (int now = 1; now <= 4; now++) {
+			timer.setTime(now);
+			link.doSimStep();
+			if (now == 1) {
+				assertEquals(truck.getId(), link.getOfferingQLanes().getFirst().popFirstVehicle().getId());
+			}
+		}
+		assertFalse(link.isActive());
+
+		// without further calls to doSimStep, the refill of 5s brings acc inflow to +0.028 > 0, which a vehicle from upstream sees at 6s
+		timer.setTime(5);
+		assertFalse(link.getAcceptingQLane().isAcceptingFromUpstream());
+		timer.setTime(6);
+		assertTrue(link.getAcceptingQLane().isAcceptingFromUpstream());
 	}
 
 	private static NetsimEngineContext createNetsimeEngineContext(Config config, MobsimTimer timer) {
