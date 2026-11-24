@@ -9,7 +9,13 @@ on:
   pull_request:
 
 jobs:
+  prime-cache:
+    # run if push or pull_requests from fork
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/prime-maven-cache.yaml
+
   build:
+    needs: prime-cache
     # run if push or pull_requests from fork
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
 
@@ -92,15 +98,23 @@ jobs:
         with:
           java-version: 25
           distribution: 'zulu'
-          cache: 'maven'
+
+      - name: Restore Maven repository
+        # saved by prime-cache, so the matrix jobs don't each download from Maven Central
+        if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ needs.prime-cache.outputs.cache-key }}
+          restore-keys: ${{ needs.prime-cache.outputs.cache-key-prefix }}
 
       - name: Build module (with dependencies)
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        run: mvn install --batch-mode ${{env.MAVEN_HTTP_RETRY}} --also-make --projects ${{matrix.module}} -DskipTests -Dsource.skip
+        run: mvn install --batch-mode --also-make --projects ${{matrix.module}} -DskipTests -Dsource.skip
 
       - name: Test module
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        run: mvn verify --batch-mode ${{env.MAVEN_HTTP_RETRY}} -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
+        run: mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
         #run: mvn verify --batch-mode -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
         working-directory: ${{matrix.module}}
 
@@ -121,8 +135,7 @@ jobs:
 
     env:
       MAVEN_OPTS: -Xmx2g
-      # retry transient HTTP failures when fetching from Maven Central (e.g. sporadic 403/timeout on cache miss)
-      MAVEN_HTTP_RETRY: -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true
+      # HTTP retries on Maven Central throttling are configured in .mvn/maven.config
 
   verify-all-jobs-successful:
     # always() - to ensure this job is executed (regardless of the status of the previous job)
