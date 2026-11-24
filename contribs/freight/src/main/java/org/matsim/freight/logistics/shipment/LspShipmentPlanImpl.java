@@ -38,13 +38,6 @@ import org.matsim.api.core.v01.Id;
     this.planElements = new LinkedHashMap<>();
   }
 
-  // TODO: Ist kein embedding container!
-  @Override
-  public void setEmbeddingContainer(Id<LspShipment> pointer) {
-    // Backpointers are not needed here; the plan is referenced from the owning LSPPlan.
-    throw new RuntimeException("not implemented");
-  }
-
   @Override
   public Id<LspShipment> getLspShipmentId() {
     return lspShipmentId;

@@ -58,10 +58,17 @@ public interface LspShipment
   /** @return the size of the shipment, e.g. the number of units or its capacity demand. */
   int getSize();
 
-  /** @return the service time required to deliver the shipment. */
+  /**
+   * @return the time required to unload the shipment from a vehicle. It is used wherever the shipment is unloaded: at
+   *     the customer at the end of the distribution, but also e.g. at a hub at the end of a collection or main run tour.
+   */
   double getDeliveryServiceTime();
 
-  /** @return the service time required to pick up the shipment. */
+  /**
+   * @return the time required to load the shipment onto a vehicle. It is used wherever the shipment is loaded: at the
+   *     customer at the start of the collection, but also e.g. at a depot or hub at the start of a main run or
+   *     distribution tour.
+   */
   double getPickupServiceTime();
 
   /**

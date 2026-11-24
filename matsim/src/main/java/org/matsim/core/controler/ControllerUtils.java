@@ -21,9 +21,9 @@ package org.matsim.core.controler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -101,12 +101,7 @@ public final class ControllerUtils{
 	    StringWriter writer = new StringWriter();
 	    new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
 
-		if (log.getLevel().isMoreSpecificThan(Level.INFO)) {
-			// (in the implementation, this uses <=, instead of the "<" that the "more" would imply)
-			log.info("=== logging config.xml skipped ===");
-			log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
-				+ "or use Configurator...Level.DEBUG) in your run class.");
-		}
+		Gbl.logDebugOutputSkipped(log, "logging config.xml");
 	    log.debug(newline + newline + writer.getBuffer().toString());
 	    log.info("Complete config dump done.");
 	    log.info("Checking consistency of config...");

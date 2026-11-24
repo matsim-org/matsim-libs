@@ -60,7 +60,7 @@ import org.matsim.vehicles.VehicleUtils;
 
   private static LSP createLSPWithScorer(Scenario scenario) {
 
-    // The Carrier for the resource of the sole LogisticsSolutionElement of the LSP is created
+    // The Carrier for the resource of the sole LogisticChainElement of the LSP is created
     final VehicleType carrierVehType = VehicleUtils.createVehicleType( Id.create("CollectionCarrierVehicleType", VehicleType.class), TransportMode.car);
     carrierVehType.getCapacity().setOther(10);
     carrierVehType.getCostInformation().setCostsPerMeter(0.0004);
@@ -89,29 +89,29 @@ import org.matsim.vehicles.VehicleUtils;
             .setLocationLinkId(collectionLinkId)
             .build();
 
-    // The adapter is now inserted into the only LogisticsSolutionElement of the only
-    // LogisticsSolution of the LSP
+    // The adapter is now inserted into the only LogisticChainElement of the only
+    // LogisticChain of the LSP
     LogisticChainElement logisticChainElement =
         LSPUtils.LogisticChainElementBuilder.newInstance(
                 Id.create("CollectionElement", LogisticChainElement.class))
             .setResource(lspResource)
             .build();
 
-    // The LogisticsSolutionElement is now inserted into the only LogisticsSolution of the LSP
+    // The LogisticChainElement is now inserted into the only LogisticChain of the LSP
     LogisticChain logisticChain =
         LSPUtils.LogisticChainBuilder.newInstance(
-                Id.create("CollectionSolution", LogisticChain.class))
+                Id.create("CollectionChain", LogisticChain.class))
             .addLogisticChainElement(logisticChainElement)
             .build();
 
-    // The initial plan of the lsp is generated and the assigner and the solution from above are
+    // The initial plan of the lsp is generated and the assigner and the chain from above are
     // added
     LSPPlan lspPlan =
         LSPUtils.createLSPPlan()
             .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
             .addLogisticChain(logisticChain);
 
-    // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
+    // The exogenous list of Resources for the LogisticChainScheduler is compiled and the Scheduler is
     // added to the LSPBuilder
 
     return LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
@@ -153,6 +153,7 @@ import org.matsim.vehicles.VehicleUtils;
       TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
       builder.setStartTimeWindow(startTimeWindow);
       builder.setDeliveryServiceTime(capacityDemand * 60);
+      builder.setPickupServiceTime(capacityDemand * 60);
       shipmentList.add(builder.build());
     }
     return shipmentList;

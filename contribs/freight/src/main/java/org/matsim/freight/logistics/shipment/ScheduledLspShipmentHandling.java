@@ -20,68 +20,19 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.freight.logistics.LSPConstants;
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LogisticChainElement;
-
 /**
  * A {@link LspShipmentPlanElement} describing a planned (pre-simulation) in-hub handling operation.
  * Contrasts with {@code LoggedLspShipmentHandling}, which is reconstructed from simulation events.
  */
-class ScheduledLspShipmentHandling implements LspShipmentPlanElement {
-//"Handle" sounds a bit unclear in the German translation. Therefor we are breaking the unofficial naming convention here. KMT/KN jan'25
-
-	private final double startTime;
-	private final double endTime;
-	private final LogisticChainElement element;
-	private final Id<LSPResource> resourceId;
-	private final Id<Link> linkId;
+class ScheduledLspShipmentHandling extends AbstractLspShipmentActivity {
+	//"Handle" sounds a bit unclear in the German translation. Therefor we are breaking the unofficial naming convention here. KMT/KN jan'25
 
 	ScheduledLspShipmentHandling(LspShipmentUtils.ScheduledShipmentHandleBuilder builder) {
-		this.startTime = builder.startTime;
-		this.endTime = builder.endTime;
-		this.element = builder.element;
-		this.resourceId = builder.resourceId;
-		this.linkId = builder.linkId;
-	}
-
-	/**
-	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
-	 * Mixing class tagging and class hierarchies is a bad idea.
-	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
-	 * So maybe better use something like getActivityType() -- analogous to e.g. PersonEntersVehicleEvent.class) kmt/kn jan'25
-	 *
-	 * @return the fixed element type {@code HANDLING}. */
-	@Override
-	@Deprecated
-	public String getElementType() {
-		return LSPConstants.HANDLING;
+		super(builder.startTime, builder.endTime, builder.element, builder.resourceId, builder.linkId);
 	}
 
 	@Override
-	public double getStartTime() {
-		return startTime;
-	}
-
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
-
-	@Override
-	public LogisticChainElement getLogisticChainElement() {
-		return element;
-	}
-
-	@Override
-	public Id<LSPResource> getResourceId() {
-		return resourceId;
-	}
-
-	@Override
-	public Id<Link> getLinkId() {
-		return linkId;
+	public ElementType getElementType() {
+		return ElementType.HANDLING;
 	}
 }

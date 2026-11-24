@@ -68,7 +68,7 @@ class LspRandomShipmentShiftingModule implements GenericPlanStrategyModule<LSPPl
 
 		// Find and remove the random lspShipment from its current logistic chain
 		LogisticChain sourceLogisticChain = null;
-		for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+		for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
 			if (logisticChain.getLspShipmentIds().remove(lspShipment.getId())) {
 				sourceLogisticChain = logisticChain;
 				break;
@@ -80,8 +80,8 @@ class LspRandomShipmentShiftingModule implements GenericPlanStrategyModule<LSPPl
 		int chainIndex;
 		LogisticChain targetLogisticChain = null;
 		do {
-			chainIndex = random.nextInt(lsp.getSelectedPlan().getLogisticChains().size());
-			Iterator<LogisticChain> iterator = lsp.getSelectedPlan().getLogisticChains().iterator();
+			chainIndex = random.nextInt(lspPlan.getLogisticChains().size());
+			Iterator<LogisticChain> iterator = lspPlan.getLogisticChains().iterator();
 			for (int i = 0; iterator.hasNext(); i++) {
 				targetLogisticChain = iterator.next();
 				if (i == chainIndex) {

@@ -25,14 +25,11 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 
 public interface LogisticChainElement
     extends Identifiable<LogisticChainElement>,
-        HasBackpointer<LogisticChain>,
         HasSimulationTrackers<LogisticChainElement>,
         Attributable {
 
-  void connectWithNextElement(LogisticChainElement element);
-
   /**
-   * The logistics solution element wraps around a resource. Don't know why we need this wrapping.
+   * The logistic chain element wraps around a resource. Don't know why we need this wrapping.
    *
    * @return the resource
    */

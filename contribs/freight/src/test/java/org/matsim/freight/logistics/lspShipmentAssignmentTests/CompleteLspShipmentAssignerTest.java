@@ -188,12 +188,8 @@ public class CompleteLspShipmentAssignerTest {
 				.setResource(distributionResource)
 				.build();
 
-		collectionElement.connectWithNextElement(firstHubElement);
-		firstHubElement.connectWithNextElement(mainRunElement);
-		mainRunElement.connectWithNextElement(secondHubElement);
-		secondHubElement.connectWithNextElement(distributionElement);
 
-		LogisticChain completeSolution  = LSPUtils.LogisticChainBuilder.newInstance(Id.create("SolutionId", LogisticChain.class))
+		LogisticChain completeChain  = LSPUtils.LogisticChainBuilder.newInstance(Id.create("ChainId", LogisticChain.class))
 				.addLogisticChainElement(collectionElement)
 				.addLogisticChainElement(firstHubElement)
 				.addLogisticChainElement(mainRunElement)
@@ -204,7 +200,7 @@ public class CompleteLspShipmentAssignerTest {
 		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		completePlan = LSPUtils.createLSPPlan();
 		completePlan.setInitialShipmentAssigner(assigner);
-		completePlan.addLogisticChain(completeSolution);
+		completePlan.addLogisticChain(completeChain);
 
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
@@ -261,6 +257,7 @@ public class CompleteLspShipmentAssignerTest {
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setPickupServiceTime(capacityDemand * 60);
 			completeLSP.assignShipmentToLspPlan(builder.build());
 		}
 	}
@@ -268,19 +265,19 @@ public class CompleteLspShipmentAssignerTest {
 	@Test
 	public void testCollectionLSPShipmentAssignment() {
 		assertSame(completeLSP.getSelectedPlan(), completePlan);
-		ArrayList<LogisticChain> solutions = new ArrayList<>(completeLSP.getSelectedPlan().getLogisticChains());
+		ArrayList<LogisticChain> chains = new ArrayList<>(completeLSP.getSelectedPlan().getLogisticChains());
 
-		for (LogisticChain solution : solutions) {
-			if (solutions.indexOf(solution) == 0) {
-				assertEquals(10, solution.getLspShipmentIds().size());
-				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+		for (LogisticChain chain : chains) {
+			if (chains.indexOf(chain) == 0) {
+				assertEquals(10, chain.getLspShipmentIds().size());
+				for (LogisticChainElement element : chain.getLogisticChainElements()) {
 					if (element.getPreviousElement() == null) {
 						assertTrue(element.getIncomingShipments().getLspShipmentsWTime().isEmpty());
 						assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());
 					}
 				}
 			} else {
-				assertTrue(solution.getLspShipmentIds().isEmpty());
+				assertTrue(chain.getLspShipmentIds().isEmpty());
 			}
 		}
 

@@ -24,7 +24,6 @@ package org.matsim.freight.logistics.resourceImplementations;
 import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPResourceScheduler;
 import org.matsim.freight.logistics.LogisticChainElement;
@@ -83,8 +82,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     }
     LspShipmentPlanElement handle = builder.build();
 
-    String idString = handle.getResourceId() + String.valueOf(handle.getLogisticChainElement().getId()) + handle.getElementType();
-	  LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(Id.create(idString, LspShipmentPlanElement.class), handle);
+	  LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(LspShipmentUtils.createPlanElementId(handle), handle);
   }
 
   private void addShipmentToEventHandler(LspShipment lspShipment) {

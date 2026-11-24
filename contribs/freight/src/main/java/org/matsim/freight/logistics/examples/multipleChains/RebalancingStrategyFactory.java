@@ -65,13 +65,12 @@ class RebalancingStrategyFactory {
             // Shifting shipments only makes sense for multiple chains
             if (lspPlan.getLogisticChains().size() < 2) return;
 
-            LSP lsp = lspPlan.getLSP();
             Map<LogisticChain, Integer> shipmentCountByChain = new HashMap<>();
             LogisticChain minChain;
             LogisticChain maxChain;
 
             // fill the shipmentCountByChain map with each chain's shipment count
-            for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
+            for (LogisticChain chain : lspPlan.getLogisticChains()) {
               shipmentCountByChain.put(chain, chain.getLspShipmentIds().size());
             }
 
@@ -90,7 +89,7 @@ class RebalancingStrategyFactory {
             Id<LspShipment> shipmentIdForReplanning = maxChain.getLspShipmentIds().iterator().next();
 
             // iterate through the chains and move the shipment from the max chain to the min chain
-            for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+            for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
               if (logisticChain.equals(maxChain)) {
                 logisticChain.getLspShipmentIds().remove(shipmentIdForReplanning);
               }
