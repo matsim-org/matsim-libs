@@ -21,6 +21,10 @@ on:
       - 'main'
     paths:
       - '**/pom.xml'
+  schedule:
+    # The key includes the month, so on the 1st no cache on main matches and every PR would prime cold.
+    # Build the new month's cache on main (the only ref whose caches all PRs can restore) at 03:00 UTC.
+    - cron: '0 3 1 * *'
   workflow_dispatch:
     inputs:
       cold-cache:
