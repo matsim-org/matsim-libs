@@ -68,6 +68,7 @@ jobs:
         # Building (without running tests) resolves compile, test and plugin dependencies;
         # running one small real test also makes surefire download its JUnit runner (surefire-junit-platform),
         # which it fetches only when a test actually runs. Other modules match no test and are not failed.
+        # -T 1C builds modules in parallel, one thread per CPU core ("1C" = 1 x cores), to speed up the cold build.
         run: >-
           mvn install --batch-mode -T 1C -Dsource.skip -DskipITs
           -Dtest=StringUtilsTest -Dsurefire.failIfNoSpecifiedTests=false
