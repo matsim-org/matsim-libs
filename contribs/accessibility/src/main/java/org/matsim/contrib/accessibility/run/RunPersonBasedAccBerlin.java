@@ -35,15 +35,20 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Spec;
+import picocli.CommandLine.Model.CommandSpec;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,33 +56,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Person-based accessibility for the Berlin scenario.
- * <p>
- * The class is meant to be run from a cluster jar, one opportunity/scenario/mode combination per process:
- *
- * <pre>
- * java -jar accessibility-cluster.jar --opportunity baeder --scenario policy --mode car
- * java -jar accessibility-cluster.jar --all
- * </pre>
- *
- * See {@link #printUsage(PrintStream)} for all options.
- */
-public class RunPersonBasedAccBerlin {
+@Command(name = "run-person-based-acc-berlin",
+	description = "Compute person-based accessibility for one Berlin scenario, mode and opportunity source.")
+public class RunPersonBasedAccBerlin implements Callable<Integer> {
 
-//	The current run root contains the policy simulation files. Base outputs are expected
-//	in "base/" below the same root once available, or can be passed via --base-dir.
-	private static final String DEFAULT_OUTPUT_ROOT =
-		"../../runs-svn/matsim-berlin/autofrei/1pct-v6.4/berlin-autofrei-v6.4-policy/";
-
-//	Hospital accessibility results are written into a dedicated folder of the R analysis input directory.
-	private static final String DEFAULT_R_INPUT_DIR = "contribs/accessibility/src/main/R/THESIS/input/";
-
-	private static final String DEFAULT_VERSION = "6.4";
 	private static final String CRS = "EPSG:25832";
 
 	private static final List<Modes4Accessibility> ANALYSIS_MODES = List.of(
@@ -88,7 +75,7 @@ public class RunPersonBasedAccBerlin {
 
 	private static final boolean PERSON_BASED = true;
 
-	private static Scenario scenario;
+	private Scenario scenario;
 
 	private static final Logger LOG = LogManager.getLogger(RunPersonBasedAccBerlin.class);
 
@@ -132,398 +119,125 @@ public class RunPersonBasedAccBerlin {
 			return activityType;
 		}
 
-		String outputDir(String rInputDir) {
+		String outputDir(String resultsDir) {
 //			The R analysis directory is named "jobCenter" (capital C), unlike the enum constant.
 			String directory = this == jobcenter ? "jobCenter" : name();
-			return new File(rInputDir, directory).getPath();
+			return new File(resultsDir, directory).getPath();
 		}
 	}
+
+	@Option(names = "--opportunity", required = true, converter = OpportunityTypeConverter.class,
+		description = "Opportunity source: ${COMPLETION-CANDIDATES}.")
+	private OpportunityType opportunity;
+
+	@Option(names = "--activity-type", description = "Run a single activity type from the simulation facilities.")
+	private String facilityActivityType;
+
+	@Option(names = "--scenario", required = true, description = "Run to analyze: ${COMPLETION-CANDIDATES}.")
+	private RunScenario runScenario;
+
+	@Option(names = "--mode", required = true, description = "Transport mode: car, pt, or teleportedWalk.")
+	private Modes4Accessibility mode;
+
+	@Option(names = "--measure-type", defaultValue = "rawSum",
+		description = "Accessibility measure: ${COMPLETION-CANDIDATES}. Default: ${DEFAULT-VALUE}.")
+	private AccessibilityConfigGroup.AccessibilityMeasureType measureType;
+
+	@Option(names = "--scenario-dir", required = true, description = "MATSim simulation output directory.")
+	private String scenarioDir;
+
+	@Option(names = "--output-dir", description = "Accessibility results directory. Defaults to analysis/accessibility under the scenario directory.")
+	private String resultsDir;
+
+	private String workDir;
+
+	@Option(names = "--hospital-input-dir", description = "Directory containing the hospital WFS XML files.")
+	private String hospitalInputDir;
+
+	private String facilitiesFile;
+
+	private String networkFile;
+
+	private String plansFile;
+
+	private String transitScheduleFile;
+
+	private String eventsFile;
+
+	@Option(names = "--plankrankenhaeuser-xml", description = "Override plankrankenhaeuser.xml.")
+	private String plankrankenhaeuserXml;
+
+	@Option(names = "--weitere-krankenhaeuser-xml", description = "Override weitere_krankenhaeuser.xml.")
+	private String weitereKrankenhaeuserXml;
+
+	@Option(names = "--baeder-geojson", description = "Override baeder.geojson.")
+	private String baederGeoJson;
+
+	@Option(names = "--sample", defaultValue = "1.0", description = "Fraction of loaded persons to keep, in (0, 1].")
+	private double sample;
+
+	@Option(names = "--daily-monetary-constant", description = "Include the daily monetary constant in car and PT costs.")
+	private boolean includeDailyMonetaryConstant;
+
+	@Spec
+	private CommandSpec spec;
 
 	public static void main(String[] args) {
-		RunOptions options;
-		try {
-			options = parseArgs(args);
-		} catch (IllegalArgumentException e) {
-			System.err.println("Error: " + e.getMessage());
-			printUsage(System.err);
-			System.exit(2);
-			return;
-		}
-
-		if (options == null) {
-			return;
-		}
-
-		if (options.all) {
-			runAll(options);
-		} else {
-			runCombination(options);
-		}
-	}
-
-//	== Command-line handling ==
-
-	private static RunOptions parseArgs(String[] args) {
+		CommandLine command = new CommandLine(new RunPersonBasedAccBerlin());
 		if (args.length == 0) {
-			printUsage(System.out);
-			return null;
-		}
-
-		RunOptions options = new RunOptions();
-		int[] index = {0};
-
-		while (index[0] < args.length) {
-			String arg = args[index[0]++];
-			String key = arg;
-			String inlineValue = null;
-
-			if (arg.startsWith("--")) {
-				int equals = arg.indexOf('=');
-				if (equals > 0) {
-					key = arg.substring(0, equals);
-					inlineValue = arg.substring(equals + 1);
-				}
-			}
-
-			switch (key) {
-				case "-h", "--help" -> {
-					printUsage(System.out);
-					return null;
-				}
-				case "--all" -> options.all = true;
-				case "--dry-run" -> options.dryRun = true;
-				case "--opportunity" -> options.opportunity = parseOpportunity(
-					requireValue(args, index, inlineValue, key));
-				case "--scenario" -> options.scenario = parseEnum(
-					RunScenario.class, requireValue(args, index, inlineValue, key), key);
-				case "--mode" -> options.mode = parseMode(
-					requireValue(args, index, inlineValue, key));
-				case "--sample" -> options.sample = parseSample(
-					requireValue(args, index, inlineValue, key));
-				case "--daily-monetary-constant" -> options.includeDailyMonetaryConstant = true;
-				case "--sample-seed" -> options.sampleSeed = Long.parseLong(
-					requireValue(args, index, inlineValue, key).trim());
-				case "--measure-type" -> options.measureType = parseEnum(
-					AccessibilityConfigGroup.AccessibilityMeasureType.class,
-					requireValue(args, index, inlineValue, key), key);
-				case "--output-root" -> options.outputRoot =
-					requireValue(args, index, inlineValue, key);
-				case "--base-dir" -> options.baseDir =
-					requireValue(args, index, inlineValue, key);
-				case "--scenario-dir" -> options.scenarioDir =
-					requireValue(args, index, inlineValue, key);
-				case "--work-dir" -> options.workDir =
-					requireValue(args, index, inlineValue, key);
-				case "--r-input-dir" -> options.rInputDir =
-					requireValue(args, index, inlineValue, key);
-				case "--hospital-input-dir" -> options.hospitalInputDir =
-					requireValue(args, index, inlineValue, key);
-				case "--version" -> options.version =
-					requireValue(args, index, inlineValue, key);
-				case "--facilities-file" -> options.facilitiesFile =
-					requireValue(args, index, inlineValue, key);
-				case "--network-file" -> options.networkFile =
-					requireValue(args, index, inlineValue, key);
-				case "--plans-file" -> options.plansFile =
-					requireValue(args, index, inlineValue, key);
-				case "--transit-schedule-file" -> options.transitScheduleFile =
-					requireValue(args, index, inlineValue, key);
-				case "--events-file" -> options.eventsFile =
-					requireValue(args, index, inlineValue, key);
-				case "--plankrankenhaeuser-xml" -> options.plankrankenhaeuserXml =
-					requireValue(args, index, inlineValue, key);
-				case "--weitere-krankenhaeuser-xml" -> options.weitereKrankenhaeuserXml =
-					requireValue(args, index, inlineValue, key);
-				case "--baeder-geojson" -> options.baederGeoJson =
-					requireValue(args, index, inlineValue, key);
-				default -> throw new IllegalArgumentException("Unknown argument: " + arg);
-			}
-		}
-
-		if (options.all) {
-			if (options.opportunity != null || options.scenario != null || options.mode != null) {
-				throw new IllegalArgumentException(
-					"--all cannot be combined with --opportunity, --scenario or --mode");
-			}
-			if (options.scenarioDir != null) {
-				throw new IllegalArgumentException("--scenario-dir cannot be used together with --all");
-			}
-		} else {
-			if (options.opportunity == null) {
-				throw new IllegalArgumentException("Missing required option --opportunity (or use --all)");
-			}
-			if (options.scenario == null) {
-				throw new IllegalArgumentException("Missing required option --scenario (or use --all)");
-			}
-			if (options.mode == null) {
-				throw new IllegalArgumentException("Missing required option --mode (or use --all)");
-			}
-		}
-
-		return options;
-	}
-
-	private static String requireValue(String[] args, int[] index, String inlineValue, String key) {
-		if (inlineValue != null) {
-			if (inlineValue.isBlank()) {
-				throw new IllegalArgumentException("Missing value for " + key);
-			}
-			return inlineValue;
-		}
-		if (index[0] >= args.length) {
-			throw new IllegalArgumentException("Missing value for " + key);
-		}
-		return args[index[0]++];
-	}
-
-	private static OpportunityType parseOpportunity(String value) {
-		String normalized = value.trim();
-		if (normalized.equalsIgnoreCase("jobCenter")) {
-			normalized = "jobcenter";
-		}
-		try {
-			return OpportunityType.valueOf(normalized.toLowerCase(Locale.ROOT));
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("Unknown --opportunity '" + value
-				+ "'. Choose one of: hospital, spa, baeder, jobcenter, university, facilities");
-		}
-	}
-
-	private static double parseSample(String value) {
-		double sample;
-		try {
-			sample = Double.parseDouble(value.trim());
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("--sample must be a number, e.g. 0.1, but is '" + value + "'");
-		}
-		if (sample <= 0 || sample > 1) {
-			throw new IllegalArgumentException("--sample must be in (0, 1], but is " + sample);
-		}
-		return sample;
-	}
-
-	private static Modes4Accessibility parseMode(String value) {
-		Modes4Accessibility mode = parseEnum(Modes4Accessibility.class, value, "--mode");
-		if (!ANALYSIS_MODES.contains(mode)) {
-			throw new IllegalArgumentException("Unsupported --mode '" + value
-				+ "'. Choose one of: " + ANALYSIS_MODES);
-		}
-		return mode;
-	}
-
-	private static <T extends Enum<T>> T parseEnum(Class<T> type, String value, String key) {
-		try {
-			return Enum.valueOf(type, value.trim());
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("Unknown " + key + " '" + value + "'. Choose one of: "
-				+ List.of(type.getEnumConstants()));
-		}
-	}
-
-	private static void printUsage(PrintStream out) {
-		out.println("""
-			Person-based accessibility for Berlin.
-
-			Single combination:
-			  java -jar accessibility-cluster.jar \\
-			    --opportunity <hospital|spa|baeder|jobcenter|university|facilities> \\
-			    --scenario <base|policy> \\
-			    --mode <car|pt|teleportedWalk>
-
-			All combinations (5 opportunities x 2 scenarios x 3 modes):
-			  java -jar accessibility-cluster.jar --all
-
-			Options:
-			  --output-root <dir>            Policy run root (default: the current Berlin policy root)
-			  --base-dir <dir>               Base run dir (default: <output-root>/base)
-			  --scenario-dir <dir>           Exact scenario dir; overrides --output-root/--base-dir
-			  --work-dir <dir>               Base scratch dir (default: <java.io.tmpdir>/matsim-acc)
-			  --r-input-dir <dir>            Root for the R input folders
-			  --hospital-input-dir <dir>     Dir containing the hospital WFS XML files
-			  --version <v>                  Berlin scenario version, used in file names (default: 6.4)
-			  --facilities-file <file>      Opportunities for --opportunity facilities (default: base facilities)
-			  --network-file <file>          Override network file
-			  --plans-file <file>            Override plans file
-			  --transit-schedule-file <file> Override transit schedule file
-			  --events-file <file>           Override events file
-			  --plankrankenhaeuser-xml <f>   Override plankrankenhaeuser.xml
-			  --weitere-krankenhaeuser-xml <f> Override weitere_krankenhaeuser.xml
-			  --baeder-geojson <file>        Override baeder.geojson
-			  --measure-type <rawSum|logSum|gravity>  Accessibility measure (default: rawSum)
-			  --sample <fraction>            Keep only this share of the loaded persons, e.g. 0.1 to
-			                                 compute a 10% scenario at 1% cost (default: 1 = all).
-			                                 Same seed and same plans order give the same persons.
-			  --sample-seed <n>              Random seed for --sample (default: 4711)
-			  --daily-monetary-constant      Add the daily monetary constant of car (-5.0) and pt (-3.0)
-			                                 to the monetary costs of every car and pt trip (default: off)
-			  --dry-run                      Print resolved paths and combinations without running
-			  --help                         Show this help
-			""");
-	}
-
-	private static final class RunOptions {
-		OpportunityType opportunity;
-		RunScenario scenario;
-		Modes4Accessibility mode;
-		AccessibilityConfigGroup.AccessibilityMeasureType measureType =
-			AccessibilityConfigGroup.AccessibilityMeasureType.rawSum;
-
-		String outputRoot = DEFAULT_OUTPUT_ROOT;
-		String baseDir;
-		String scenarioDir;
-		String workDir;
-		String rInputDir = DEFAULT_R_INPUT_DIR;
-		String hospitalInputDir;
-		String version = DEFAULT_VERSION;
-
-		String facilitiesFile;
-		String networkFile;
-		String plansFile;
-		String transitScheduleFile;
-		String eventsFile;
-		String plankrankenhaeuserXml;
-		String weitereKrankenhaeuserXml;
-		String baederGeoJson;
-
-		double sample = 1.0;
-		long sampleSeed = 4711;
-
-//		Whether the daily monetary constants (CAR_/PT_DAILY_MONETARY_CONSTANT) are included.
-		boolean includeDailyMonetaryConstant = false;
-
-		boolean all;
-		boolean dryRun;
-
-		RunOptions copy() {
-			RunOptions copy = new RunOptions();
-			copy.opportunity = opportunity;
-			copy.scenario = scenario;
-			copy.mode = mode;
-			copy.measureType = measureType;
-			copy.outputRoot = outputRoot;
-			copy.baseDir = baseDir;
-			copy.scenarioDir = scenarioDir;
-			copy.workDir = workDir;
-			copy.rInputDir = rInputDir;
-			copy.hospitalInputDir = hospitalInputDir;
-			copy.version = version;
-			copy.facilitiesFile = facilitiesFile;
-			copy.networkFile = networkFile;
-			copy.plansFile = plansFile;
-			copy.transitScheduleFile = transitScheduleFile;
-			copy.eventsFile = eventsFile;
-			copy.plankrankenhaeuserXml = plankrankenhaeuserXml;
-			copy.weitereKrankenhaeuserXml = weitereKrankenhaeuserXml;
-			copy.baederGeoJson = baederGeoJson;
-				copy.all = all;
-			copy.dryRun = dryRun;
-			copy.sample = sample;
-			copy.sampleSeed = sampleSeed;
-			copy.includeDailyMonetaryConstant = includeDailyMonetaryConstant;
-			return copy;
-		}
-	}
-
-	private static final class RunCombination {
-		final OpportunityType opportunity;
-		final RunScenario scenario;
-		final Modes4Accessibility mode;
-		final AccessibilityConfigGroup.AccessibilityMeasureType measureType;
-
-		RunCombination(RunOptions options) {
-			this.opportunity = options.opportunity;
-			this.scenario = options.scenario;
-			this.mode = options.mode;
-			this.measureType = options.measureType;
-		}
-
-		@Override
-		public String toString() {
-			return opportunity + "/" + scenario + "/" + mode + "/" + measureType;
-		}
-	}
-
-//	== Run orchestration ==
-
-	private static void runAll(RunOptions baseOptions) {
-		int total = 0;
-		int failed = 0;
-		List<String> failures = new ArrayList<>();
-
-//		Run policy first: it is the scenario whose files are currently available.
-		for (OpportunityType opportunity : List.of(OpportunityType.hospital, OpportunityType.spa,
-			OpportunityType.baeder, OpportunityType.jobcenter, OpportunityType.university)) {
-			for (RunScenario runScenario : List.of(RunScenario.policy, RunScenario.base)) {
-				for (Modes4Accessibility mode : ANALYSIS_MODES) {
-					total++;
-					RunOptions options = baseOptions.copy();
-					options.opportunity = opportunity;
-					options.scenario = runScenario;
-					options.mode = mode;
-
-					String label = new RunCombination(options).toString();
-					try {
-						runCombination(options);
-					} catch (Exception e) {
-						failed++;
-						failures.add(label + " -> " + e.getMessage());
-						LOG.error("Combination {} failed; continuing with the next one.", label, e);
-					}
-				}
-			}
-		}
-
-		LOG.info("Finished {} combinations, {} failed.", total, failed);
-		if (failed > 0) {
-			failures.forEach(failure -> LOG.error("FAILED: {}", failure));
-			throw new RuntimeException(failed + " of " + total + " combinations failed");
-		}
-	}
-
-	private static void runCombination(RunOptions options) {
-		resolvePaths(options);
-		RunCombination combination = new RunCombination(options);
-
-		if (options.dryRun) {
-			LOG.info("Dry run: {}", combination);
-			LOG.info("  scenario dir:  {}", options.scenarioDir);
-			LOG.info("  work dir:      {}", options.workDir);
-			LOG.info("  network:       {}", options.networkFile);
-			LOG.info("  plans:         {}", options.plansFile);
-			LOG.info("  transit:       {}", options.transitScheduleFile);
-			LOG.info("  events:        {}", options.eventsFile);
-			LOG.info("  sample:        {} (seed {})", options.sample, options.sampleSeed);
-			LOG.info("  daily monetary constant: {} (car {}, pt {})", options.includeDailyMonetaryConstant,
-				CAR_DAILY_MONETARY_CONSTANT, PT_DAILY_MONETARY_CONSTANT);
-			LOG.info("  R input dir:   {}", options.opportunity == OpportunityType.facilities
-				? options.rInputDir : options.opportunity.outputDir(options.rInputDir));
-			if (options.opportunity == OpportunityType.facilities) {
-				LOG.info("  facilities:    {}", options.facilitiesFile);
-				LOG.info("  activity types: {}", FACILITY_ACTIVITY_TYPES);
-			}
+			command.usage(System.out);
 			return;
 		}
+		System.exit(command.execute(args));
+	}
+
+	private static final class OpportunityTypeConverter implements CommandLine.ITypeConverter<OpportunityType> {
+		@Override
+		public OpportunityType convert(String value) {
+			return OpportunityType.valueOf(value.trim().toLowerCase(Locale.ROOT));
+		}
+	}
+
+	@Override
+	public Integer call() {
+		if (!ANALYSIS_MODES.contains(mode)) {
+			throw new CommandLine.ParameterException(spec.commandLine(), "Unsupported --mode. Choose one of " + ANALYSIS_MODES);
+		}
+		if (!(sample > 0 && sample <= 1)) {
+			throw new CommandLine.ParameterException(spec.commandLine(), "--sample must be in (0, 1].");
+		}
+
+		resolvePaths();
+		String combination = opportunity + "/" + runScenario + "/" + mode + "/" + measureType;
+
 
 		LOG.info("=== Running {} ===", combination);
 		long start = System.currentTimeMillis();
 
-		loadFiles(options);
-
-		List<String> activityTypes = options.opportunity == OpportunityType.facilities
-			? FACILITY_ACTIVITY_TYPES : List.of(options.opportunity.activityType());
+		if (facilityActivityType != null && !facilityActivityType.matches("[a-zA-Z0-9_]+")) {
+			throw new CommandLine.ParameterException(spec.commandLine(), "Invalid --activity-type: " + facilityActivityType);
+		}
+		if (facilityActivityType != null && opportunity != OpportunityType.facilities) {
+			throw new CommandLine.ParameterException(spec.commandLine(), "--activity-type requires --opportunity=facilities");
+		}
+		List<String> activityTypes = opportunity == OpportunityType.facilities
+			? facilityActivityType == null ? FACILITY_ACTIVITY_TYPES : List.of(facilityActivityType)
+			: List.of(opportunity.activityType());
+		loadFiles(activityTypes);
 		for (String activityType : activityTypes) {
-			runActivityType(options, activityType);
+			runActivityType(activityType);
 		}
 		LOG.info("Accessibility computation finished in {} seconds", (System.currentTimeMillis() - start) / 1000);
+		return 0;
 	}
 
-	private static void runActivityType(RunOptions options, String activityType) {
-		String outputDir = options.opportunity == OpportunityType.facilities
-			? file(options.rInputDir, activityType) : options.opportunity.outputDir(options.rInputDir);
-		writeLocationsCSV(options.opportunity, activityType, file(outputDir, "locations.csv"));
+	private void runActivityType(String activityType) {
+		String outputDir = opportunity == OpportunityType.facilities
+			? file(resultsDir, activityType) : opportunity.outputDir(resultsDir);
+		writeLocationsCSV(opportunity, activityType, file(outputDir, "locations.csv"));
 
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(
-			scenario, options.eventsFile, List.of(activityType));
+			scenario, eventsFile, List.of(activityType));
 
 		PersonBasedResultsComparator dataListener = new PersonBasedResultsComparator();
 		builder.addDataListener(dataListener);
@@ -532,72 +246,74 @@ public class RunPersonBasedAccBerlin {
 		Map<Tuple<Person, Double>, Map<String, Double>> accessibilitiesMap =
 			dataListener.getAccessibilitiesMap();
 		writeCSV(accessibilitiesMap, new File(outputDir,
-			"pbAcc_" + options.mode + "_" + options.scenario + "_" + options.measureType + ".csv").getPath());
+			"pbAcc_" + mode + "_" + runScenario + "_" + measureType + ".csv").getPath());
 		writePersonsCSV(accessibilitiesMap, new File(outputDir,
-			"persons_" + options.mode + "_" + options.scenario + ".csv").getPath());
+			"persons_" + mode + "_" + runScenario + ".csv").getPath());
 	}
 
-	private static void resolvePaths(RunOptions options) {
-		if (options.hospitalInputDir == null) {
-			options.hospitalInputDir = new File(options.outputRoot, "input").getPath();
+	private void resolvePaths() {
+		if (resultsDir == null) {
+			resultsDir = file(scenarioDir, "analysis/accessibility");
+		}
+		if (hospitalInputDir == null) {
+			hospitalInputDir = file(scenarioDir, "input");
 		}
 
-		if (options.scenarioDir == null) {
-			options.scenarioDir = switch (options.scenario) {
-				case policy -> options.outputRoot;
-				case base -> options.baseDir != null
-					? options.baseDir
-					: new File(options.outputRoot, "base").getPath();
-			};
+		// The accessibility engine requires a controller output directory for its scratch files.
+		workDir = Path.of(System.getProperty("java.io.tmpdir"), "matsim-acc",
+			runScenario + "-" + opportunity + "-" + mode + "-" + ProcessHandle.current().pid()).toString();
+
+		String prefix = simulationOutputPrefix(Path.of(scenarioDir));
+		eventsFile = matsimFile(scenarioDir, prefix + "output_events.xml");
+		networkFile = matsimFile(scenarioDir, prefix + "output_network.xml");
+		plansFile = matsimFile(scenarioDir, prefix + "output_plans.xml");
+		transitScheduleFile = matsimFile(scenarioDir, prefix + "output_transitSchedule.xml");
+		if (opportunity == OpportunityType.facilities) {
+			facilitiesFile = matsimFile(scenarioDir, prefix + "output_facilities.xml");
 		}
 
-//		The controller output hierarchy is not used for results (this class writes its own
-//		CSV files), but it is instantiated as an eager singleton. Give every combination
-//		its own scratch directory so parallel cluster jobs never write into the read-only
-//		scenario input folders or into each other's directories.
-		File workRoot = options.workDir != null
-			? new File(options.workDir)
-			: new File(System.getProperty("java.io.tmpdir"), "matsim-acc");
-		options.workDir = new File(workRoot,
-			options.scenario + File.separator + options.opportunity + File.separator
-				+ options.mode + "-" + ProcessHandle.current().pid()).getPath();
-
-		if (options.opportunity == OpportunityType.facilities && options.facilitiesFile == null) {
-			String facilitiesDir = options.baseDir != null ? options.baseDir
-				: options.scenario == RunScenario.base ? options.scenarioDir : file(options.outputRoot, "base");
-			options.facilitiesFile = matsimFile(facilitiesDir, "berlin-v" + options.version + ".output_facilities.xml");
-		}
-
-		options.networkFile = orDefault(options.networkFile,
-			matsimFile(options.scenarioDir, "berlin-v" + options.version + ".output_network.xml"));
-		options.plansFile = orDefault(options.plansFile,
-			matsimFile(options.scenarioDir, "berlin-v" + options.version + ".output_plans.xml"));
-		options.transitScheduleFile = orDefault(options.transitScheduleFile,
-			matsimFile(options.scenarioDir, "berlin-v" + options.version + ".output_transitSchedule.xml"));
-		options.eventsFile = orDefault(options.eventsFile,
-			matsimFile(options.scenarioDir, "berlin-v" + options.version + ".output_events.xml"));
-
-		options.plankrankenhaeuserXml = orDefault(options.plankrankenhaeuserXml,
-			file(options.hospitalInputDir, "plankrankenhaeuser.xml"));
-		options.weitereKrankenhaeuserXml = orDefault(options.weitereKrankenhaeuserXml,
-			file(options.hospitalInputDir, "weitere_krankenhaeuser.xml"));
-		options.baederGeoJson = orDefault(options.baederGeoJson,
-			file(new File(options.rInputDir, "baeder").getPath(), "baeder.geojson"));
+		plankrankenhaeuserXml = orDefault(plankrankenhaeuserXml,
+			file(hospitalInputDir, "plankrankenhaeuser.xml"));
+		weitereKrankenhaeuserXml = orDefault(weitereKrankenhaeuserXml,
+			file(hospitalInputDir, "weitere_krankenhaeuser.xml"));
+		baederGeoJson = orDefault(baederGeoJson,
+			file(scenarioDir, "baeder.geojson"));
 	}
 
-	/**
-	 * Returns the MATSim output file {@code baseName} in {@code dir}, whichever compression exists:
-	 * .zst first, then .gz, then uncompressed. MATSim's readers detect the compression from the
-	 * file ending. If none exists, the .zst path is returned so the error message names it.
-	 */
-	private static String matsimFile(String dir, String baseName) {
+	private String simulationOutputPrefix(Path directory) {
+		Pattern eventsName = Pattern.compile("((?:.+\\.)?)output_events\\.xml(?:\\.(?:zst|gz))?");
+		List<String> prefixes;
+		try (var files = Files.list(directory)) {
+			prefixes = files.filter(Files::isRegularFile)
+				.map(path -> eventsName.matcher(path.getFileName().toString()))
+				.filter(Matcher::matches)
+				.map(match -> match.group(1))
+				.distinct()
+				.sorted()
+				.toList();
+		} catch (IOException e) {
+			throw new CommandLine.ParameterException(spec.commandLine(),
+				"Cannot read simulation output directory " + directory + ": " + e.getMessage());
+		}
+		if (prefixes.isEmpty()) {
+			throw new CommandLine.ParameterException(spec.commandLine(), "No output_events.xml found in " + directory);
+		}
+		if (prefixes.size() > 1) {
+			throw new CommandLine.ParameterException(spec.commandLine(),
+				"Multiple MATSim runs found in " + directory + ". Use a directory containing one run.");
+		}
+		return prefixes.getFirst();
+	}
+
+	private String matsimFile(String dir, String baseName) {
 		for (String ending : List.of(".zst", ".gz", "")) {
 			File candidate = new File(dir, baseName + ending);
 			if (candidate.isFile()) {
 				return candidate.getPath();
 			}
 		}
-		return new File(dir, baseName + ".zst").getPath();
+		throw new CommandLine.ParameterException(spec.commandLine(),
+			"Missing " + baseName + " (.zst, .gz, or plain XML) in " + dir);
 	}
 
 	private static String file(String parent, String child) {
@@ -608,13 +324,13 @@ public class RunPersonBasedAccBerlin {
 		return value != null ? value : defaultValue;
 	}
 
-	private static void loadFiles(RunOptions options) {
+	private void loadFiles(List<String> activityTypes) {
 //		== Create config ==
 		final Config config = ConfigUtils.createConfig();
 
 //		== Adjust config ==
 		config.controller().setLastIteration(0);
-		config.controller().setOutputDirectory(options.workDir);
+		config.controller().setOutputDirectory(workDir);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.global().setCoordinateSystem(CRS);
 		config.routing().setRoutingRandomness(0.);
@@ -632,23 +348,23 @@ public class RunPersonBasedAccBerlin {
 		config.scoring().getModes().get(TransportMode.car).setConstant(-0.487593225702316);
 		config.scoring().getModes().get(TransportMode.pt).setConstant(0.43220302370275404);
 
-		config.network().setInputFile(options.networkFile);
-		if (options.opportunity == OpportunityType.facilities) {
+		config.network().setInputFile(networkFile);
+		if (opportunity == OpportunityType.facilities) {
 			config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
-			config.facilities().setInputFile(options.facilitiesFile);
+			config.facilities().setInputFile(facilitiesFile);
 		} else {
 			config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
 		}
-		config.plans().setInputFile(options.plansFile);
-		config.transit().setTransitScheduleFile(options.transitScheduleFile);
+		config.plans().setInputFile(plansFile);
+		config.transit().setTransitScheduleFile(transitScheduleFile);
 
 //		== Accessibility config ==
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setPersonBased(PERSON_BASED);
-		acg.setIncludeDailyMonetaryConstant(options.includeDailyMonetaryConstant);
-		LOG.info("Daily monetary constant included: {} (car {}, pt {})", options.includeDailyMonetaryConstant,
+		acg.setIncludeDailyMonetaryConstant(includeDailyMonetaryConstant);
+		LOG.info("Daily monetary constant included: {} (car {}, pt {})", includeDailyMonetaryConstant,
 			CAR_DAILY_MONETARY_CONSTANT, PT_DAILY_MONETARY_CONSTANT);
-		acg.setAccessibilityMeasureType(options.measureType);
+		acg.setAccessibilityMeasureType(measureType);
 		acg.setTimeOfDay(8 * 60 * 60.); // does it run until the end of scenario from start time?
 		acg.setTileSize_m(1000);
 		acg.setAreaOfAccessibilityComputation(
@@ -660,7 +376,7 @@ public class RunPersonBasedAccBerlin {
 			AccessibilityConfigGroup.MeasurePointGeometryProvision.fromShapeFile);
 
 //		== Mode selection ==
-		List<Modes4Accessibility> accModes = List.of(options.mode);
+		List<Modes4Accessibility> accModes = List.of(mode);
 		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 			acg.setComputingAccessibilityForMode(mode, accModes.contains(mode));
 		}
@@ -669,32 +385,33 @@ public class RunPersonBasedAccBerlin {
 		scenario = ScenarioUtils.loadScenario(config);
 
 //		== Optional downsampling of the population ==
-		if (options.sample < 1.0) {
+		int sampleSeed = 4711;
+		if (sample < 1.0) {
 //			sampleDown draws from MatsimRandom; resetting it makes the selection reproducible.
-			MatsimRandom.reset(options.sampleSeed);
-			PopulationUtils.sampleDown(scenario.getPopulation(), options.sample);
+			MatsimRandom.reset(sampleSeed);
+			PopulationUtils.sampleDown(scenario.getPopulation(), sample);
 			LOG.info("Downsampled population to {} (seed {}): {} persons",
-				options.sample, options.sampleSeed, scenario.getPopulation().getPersons().size());
+				sample, sampleSeed, scenario.getPopulation().getPersons().size());
 		}
 
 //		== Adding facilities ==
 		ActivityFacilities activityFacilities = scenario.getActivityFacilities();
-		if (options.opportunity == OpportunityType.facilities) {
-			for (String activityType : FACILITY_ACTIVITY_TYPES) {
+		if (opportunity == OpportunityType.facilities) {
+			for (String activityType : activityTypes) {
 				if (activityFacilities.getFacilitiesForActivityType(activityType).isEmpty()) {
 					throw new IllegalArgumentException("No facilities for activity type " + activityType
-						+ " in " + options.facilitiesFile);
+						+ " in " + facilitiesFile);
 				}
 			}
 		} else {
 			ActivityFacilitiesFactory af = activityFacilities.getFactory();
 
-			ActivityOption activityOption = af.createActivityOption(options.opportunity.activityType());
-			switch (options.opportunity) {
-				case hospital -> addHospitals(activityFacilities, af, activityOption, options);
+			ActivityOption activityOption = af.createActivityOption(opportunity.activityType());
+			switch (opportunity) {
+				case hospital -> addHospitals(activityFacilities, af, activityOption);
 				case spa -> addSpas(activityFacilities, af, activityOption);
 				case baeder -> addGeoJsonOpportunities(activityFacilities, af, activityOption,
-					options.baederGeoJson, location -> true);
+					baederGeoJson, location -> true);
 				case jobcenter -> addJobcenters(activityFacilities, af, activityOption);
 				case university -> addUniversities(activityFacilities, af, activityOption);
 			}
@@ -899,7 +616,7 @@ public class RunPersonBasedAccBerlin {
 	 * Writes the locations of the selected opportunity type (EPSG:25832) to a CSV for mapping in R.
 	 * One row per location, with a {@code type} column to distinguish the opportunity source.
 	 */
-	private static void writeLocationsCSV(OpportunityType opportunity, String activityType, String csvFile) {
+	private void writeLocationsCSV(OpportunityType opportunity, String activityType, String csvFile) {
 		File target = new File(csvFile);
 		target.getParentFile().mkdirs();
 //		Parallel cluster jobs share locations.csv per opportunity; write a private
@@ -1082,12 +799,12 @@ public class RunPersonBasedAccBerlin {
 	private record Hospital(String id, String name, double x, double y,
 	                        Map<String, String> attributes) {}
 
-	private static List<Hospital> hospitalLocations = new ArrayList<>();
+	private List<Hospital> hospitalLocations = new ArrayList<>();
 
 	private record GeoJsonOpportunity(String id, String name, double x, double y,
 	                                  Map<String, String> attributes) {}
 
-	private static List<GeoJsonOpportunity> geoJsonLocations = new ArrayList<>();
+	private List<GeoJsonOpportunity> geoJsonLocations = new ArrayList<>();
 
 	private static final String WFS_NS = "http://www.opengis.net/wfs/2.0";
 	private static final String GML_NS = "http://www.opengis.net/gml/3.2";
@@ -1176,13 +893,10 @@ public class RunPersonBasedAccBerlin {
 		}
 	}
 
-	private static void addHospitals(ActivityFacilities facilities,
-	                                 ActivityFacilitiesFactory factory,
-	                                 ActivityOption option,
-	                                 RunOptions options) {
-		List<Hospital> plank = parseWfsFile(options.plankrankenhaeuserXml, "plankrankenhaus",
+	private void addHospitals(ActivityFacilities facilities, ActivityFacilitiesFactory factory, ActivityOption option) {
+		List<Hospital> plank = parseWfsFile(plankrankenhaeuserXml, "plankrankenhaus",
 			"kkh_standort", "betten_insgesamt");
-		List<Hospital> weitere = parseWfsFile(options.weitereKrankenhaeuserXml, "weitere_krankenhaus",
+		List<Hospital> weitere = parseWfsFile(weitereKrankenhaeuserXml, "weitere_krankenhaus",
 			"name", "betten");
 
 		List<Hospital> all = new ArrayList<>(plank.size() + weitere.size());
@@ -1212,7 +926,7 @@ public class RunPersonBasedAccBerlin {
 	 * Only point features are supported. All coordinates are transformed to EPSG:25832, so
 	 * downstream code sees the same CRS as for the XML sources.
 	 */
-	private static void addGeoJsonOpportunities(ActivityFacilities facilities,
+	private void addGeoJsonOpportunities(ActivityFacilities facilities,
 	                                            ActivityFacilitiesFactory factory,
 	                                            ActivityOption option,
 	                                            String path,
