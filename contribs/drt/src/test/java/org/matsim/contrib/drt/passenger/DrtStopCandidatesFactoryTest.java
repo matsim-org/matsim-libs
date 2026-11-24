@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.dvrp.router.StopCandidates;
+import org.matsim.contrib.dvrp.router.RoutedStopCandidates;
 
 /**
  * Tests {@link DrtStopCandidatesFactory}.
@@ -78,7 +78,7 @@ public class DrtStopCandidatesFactoryTest {
 		assertThat(DrtStopCandidatesFactory.fromRoute(drtLeg(plan).getRoute(), network, true)).isEmpty();
 
 		// only pickup alternatives, but the pickup may not change any more
-		StopCandidates onlyPickupAlternatives = new StopCandidates(
+		RoutedStopCandidates onlyPickupAlternatives = new RoutedStopCandidates(
 				List.of(candidate("A", 300, 250), candidate("B", 720, 600)), List.of(candidate("E", 120, 100)));
 		DrtRoute route = new DrtRoute(Id.createLinkId("A"), Id.createLinkId("E"));
 		route.setStopCandidates(onlyPickupAlternatives);
@@ -87,10 +87,10 @@ public class DrtStopCandidatesFactoryTest {
 
 	@Test
 	void testGroupSharesOnlyCommonCandidatesWithTheLongestWalk() {
-		DrtRoute first = routeWith(new StopCandidates(
+		DrtRoute first = routeWith(new RoutedStopCandidates(
 				List.of(candidate("A", 300, 250), candidate("B", 720, 600)),
 				List.of(candidate("E", 120, 100), candidate("F", 360, 300))));
-		DrtRoute second = routeWith(new StopCandidates(
+		DrtRoute second = routeWith(new RoutedStopCandidates(
 				List.of(candidate("A", 400, 330), candidate("B", 600, 500)),
 				List.of(candidate("E", 100, 80))));
 

@@ -184,7 +184,7 @@ public class DvrpRoutingModule implements RoutingModule {
 			return;
 		}
 
-		List<StopCandidates.Candidate> access = new ArrayList<>();
+		List<RoutedStopCandidates.Candidate> access = new ArrayList<>();
 		access.add(candidate(candidates.preferredAccess(), accessTrip, departureTime, accessEndTime));
 		for (Facility facility : candidates.access().subList(1, candidates.access().size())) {
 			List<? extends PlanElement> walk = accessRouter.calcRoute(
@@ -197,7 +197,7 @@ public class DvrpRoutingModule implements RoutingModule {
 			access.add(candidate(facility, walk, departureTime, endTime));
 		}
 
-		List<StopCandidates.Candidate> egress = new ArrayList<>();
+		List<RoutedStopCandidates.Candidate> egress = new ArrayList<>();
 		double egressEndTime = timeInterpretation.decideOnElementsEndTime(egressTrip, egressStartTime).seconds();
 		egress.add(candidate(candidates.preferredEgress(), egressTrip, egressStartTime, egressEndTime));
 		for (Facility facility : candidates.egress().subList(1, candidates.egress().size())) {
@@ -211,7 +211,7 @@ public class DvrpRoutingModule implements RoutingModule {
 			egress.add(candidate(facility, walk, egressStartTime, endTime));
 		}
 
-		route.get().setStopCandidates(new StopCandidates(access, egress));
+		route.get().setStopCandidates(new RoutedStopCandidates(access, egress));
 	}
 
 	private void warnOnceAboutRouteTypes(List<? extends PlanElement> trip) {
@@ -236,7 +236,7 @@ public class DvrpRoutingModule implements RoutingModule {
 				|| trip.size() == 1 && trip.getFirst() instanceof Leg leg && leg.getRoute() instanceof GenericRouteImpl;
 	}
 
-	private static StopCandidates.Candidate candidate(Facility facility, List<? extends PlanElement> walk,
+	private static RoutedStopCandidates.Candidate candidate(Facility facility, List<? extends PlanElement> walk,
 			double startTime, double endTime) {
 		double distance = walk.stream()
 				.filter(Leg.class::isInstance)
@@ -245,7 +245,7 @@ public class DvrpRoutingModule implements RoutingModule {
 				.mapToDouble(Route::getDistance)
 				.filter(Double::isFinite)
 				.sum();
-		return new StopCandidates.Candidate(facility.getLinkId(), facility.getCoord(), endTime - startTime, distance);
+		return new RoutedStopCandidates.Candidate(facility.getLinkId(), facility.getCoord(), endTime - startTime, distance);
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility, double now) {

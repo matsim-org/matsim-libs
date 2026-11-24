@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.dvrp.router.StopCandidates;
+import org.matsim.contrib.dvrp.router.RoutedStopCandidates;
 import org.matsim.contrib.dvrp.router.StopCandidatesRoute;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
@@ -86,7 +86,7 @@ public final class StopCandidatesTripMaterializer {
 		Preconditions.checkArgument(drtLeg.getRoute() instanceof StopCandidatesRoute,
 				"Leg has no route with stop candidates");
 		Route route = drtLeg.getRoute();
-		StopCandidates candidates = ((StopCandidatesRoute)route).getStopCandidates().orElseThrow();
+		RoutedStopCandidates candidates = ((StopCandidatesRoute)route).getStopCandidates().orElseThrow();
 		boolean changePickup = !pickupLinkId.equals(route.getStartLinkId());
 		boolean changeDropoff = !dropoffLinkId.equals(route.getEndLinkId());
 		if (!changePickup && !changeDropoff) {
@@ -104,7 +104,7 @@ public final class StopCandidatesTripMaterializer {
 
 		List<PlanElement> newTrip = new ArrayList<>();
 		if (changePickup) {
-			StopCandidates.Candidate pickup = find(candidates.access(), pickupLinkId);
+			RoutedStopCandidates.Candidate pickup = find(candidates.access(), pickupLinkId);
 			Activity origin = trip.getOriginActivity();
 			Id<Link> originLinkId = firstWalkStartLink(accessPart).orElse(origin.getLinkId());
 			Leg walk = accessEgressLeg(pickup, firstLegMode(accessPart), originLinkId, pickup.linkId(), routingMode);
@@ -120,7 +120,7 @@ public final class StopCandidatesTripMaterializer {
 		}
 		newTrip.add(drtLeg);
 		if (changeDropoff) {
-			StopCandidates.Candidate dropoff = find(candidates.egress(), dropoffLinkId);
+			RoutedStopCandidates.Candidate dropoff = find(candidates.egress(), dropoffLinkId);
 			Id<Link> destinationLinkId = lastWalkEndLink(egressPart).orElse(trip.getDestinationActivity().getLinkId());
 			newTrip.add(stageActivity(dropoff, mode));
 			newTrip.add(accessEgressLeg(dropoff, lastLegMode(egressPart), dropoff.linkId(), destinationLinkId,
@@ -142,7 +142,7 @@ public final class StopCandidatesTripMaterializer {
 				"Leg is not part of a trip between two activities").getOriginActivity();
 	}
 
-	private static StopCandidates.Candidate find(List<StopCandidates.Candidate> candidates, Id<Link> linkId) {
+	private static RoutedStopCandidates.Candidate find(List<RoutedStopCandidates.Candidate> candidates, Id<Link> linkId) {
 		return candidates.stream()
 				.filter(candidate -> candidate.linkId().equals(linkId))
 				.findFirst()
@@ -172,7 +172,7 @@ public final class StopCandidatesTripMaterializer {
 	 * {@link PopulationUtils#copyFromTo(Plan, Plan)}), which the mobsim may modify; an {@code InteractionActivity}
 	 * would not allow setting the start time.
 	 */
-	private static Activity stageActivity(StopCandidates.Candidate stop, String mode) {
+	private static Activity stageActivity(RoutedStopCandidates.Candidate stop, String mode) {
 		return PopulationUtils.createActivity(
 				PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(stop.coord(), stop.linkId(), mode));
 	}
@@ -187,7 +187,7 @@ public final class StopCandidatesTripMaterializer {
 				.orElse(TransportMode.walk);
 	}
 
-	private static Leg accessEgressLeg(StopCandidates.Candidate candidate, String mode, Id<Link> startLinkId,
+	private static Leg accessEgressLeg(RoutedStopCandidates.Candidate candidate, String mode, Id<Link> startLinkId,
 			Id<Link> endLinkId, String routingMode) {
 		Leg walk = PopulationUtils.createLeg(mode);
 		Route route = RouteUtils.createGenericRouteImpl(startLinkId, endLinkId);

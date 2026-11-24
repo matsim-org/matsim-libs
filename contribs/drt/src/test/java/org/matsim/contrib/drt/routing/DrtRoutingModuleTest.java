@@ -51,7 +51,7 @@ import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
-import org.matsim.contrib.dvrp.router.StopCandidates;
+import org.matsim.contrib.dvrp.router.RoutedStopCandidates;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -454,13 +454,16 @@ public class DrtRoutingModuleTest {
 		DrtRoute routeWith = (DrtRoute)((Leg)withCandidates.get(2)).getRoute();
 		Assertions.assertTrue(routeWithout.getStopCandidates().isEmpty());
 		Assertions.assertFalse(routeWithout.getRouteDescription().contains("stopCandidates"));
+		// the serialised candidates use the field names of the record
+		Assertions.assertTrue(routeWith.getRouteDescription().contains("\"walkDuration\""));
+		Assertions.assertFalse(routeWith.getRouteDescription().contains("\"walkTime\""));
 
 		// the routed trip itself does not change
 		Assertions.assertEquals(routeWithout.getStartLinkId(), routeWith.getStartLinkId());
 		Assertions.assertEquals(routeWithout.getEndLinkId(), routeWith.getEndLinkId());
 		Assertions.assertEquals(withoutCandidates.size(), withCandidates.size());
 
-		StopCandidates candidates = routeWith.getStopCandidates().orElseThrow();
+		RoutedStopCandidates candidates = routeWith.getStopCandidates().orElseThrow();
 		Assertions.assertTrue(candidates.hasAlternatives());
 		Assertions.assertEquals(routeWith.getStartLinkId(), candidates.preferredAccess().linkId());
 		Assertions.assertEquals(routeWith.getEndLinkId(), candidates.preferredEgress().linkId());
@@ -469,13 +472,13 @@ public class DrtRoutingModuleTest {
 		Assertions.assertEquals(((Leg)withCandidates.get(4)).getTravelTime().seconds(),
 				candidates.preferredEgress().walkDuration(), 1e-9);
 
-		for (StopCandidates.Candidate candidate : candidates.access()) {
+		for (RoutedStopCandidates.Candidate candidate : candidates.access()) {
 			Leg walk = (Leg)walkRouter.calcRoute(
 					DefaultRoutingRequest.withoutAttributes(from, stopAt(scenario, candidate), 8 * 3600, p1)).get(0);
 			Assertions.assertEquals(walk.getTravelTime().seconds(), candidate.walkDuration(), 1e-9);
 			Assertions.assertEquals(walk.getRoute().getDistance(), candidate.walkDistance(), 1e-9);
 		}
-		for (StopCandidates.Candidate candidate : candidates.egress()) {
+		for (RoutedStopCandidates.Candidate candidate : candidates.egress()) {
 			Leg walk = (Leg)walkRouter.calcRoute(
 					DefaultRoutingRequest.withoutAttributes(stopAt(scenario, candidate), to, 8 * 3600, p1)).get(0);
 			Assertions.assertEquals(walk.getTravelTime().seconds(), candidate.walkDuration(), 1e-9);
@@ -490,7 +493,7 @@ public class DrtRoutingModuleTest {
 		Assertions.assertTrue(old.getStopCandidates().isEmpty());
 	}
 
-	private static Facility stopAt(Scenario scenario, StopCandidates.Candidate candidate) {
+	private static Facility stopAt(Scenario scenario, RoutedStopCandidates.Candidate candidate) {
 		return scenario.getTransitSchedule()
 				.getFacilities()
 				.values()

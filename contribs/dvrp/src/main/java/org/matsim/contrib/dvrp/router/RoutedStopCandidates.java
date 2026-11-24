@@ -32,14 +32,15 @@ import com.google.common.base.Preconditions;
 /**
  * Routed access and egress stop candidates of a trip, as computed by {@link DvrpRoutingModule}: for each candidate the
  * stop and the walk between the passenger's origin/destination and the stop. The first entry of each list is the
- * preferred stop, i.e. the stop of the routed trip; the other entries are alternatives.
+ * preferred stop, i.e. the stop of the routed trip; the other entries are alternatives. (Unlike
+ * {@code DrtStopCandidates} in the drt contrib, which holds only the alternatives.)
  * <p>
  * The walk durations and distances are those of the access/egress routing modules, so that a trip rebuilt for another
  * candidate (e.g. after a booking) can use exactly the same values.
  *
  * @author nkuehnel / MOIA
  */
-public record StopCandidates(List<Candidate> access, List<Candidate> egress) {
+public record RoutedStopCandidates(List<Candidate> access, List<Candidate> egress) {
 
 	/**
 	 * @param linkId       link of the stop
@@ -58,7 +59,7 @@ public record StopCandidates(List<Candidate> access, List<Candidate> egress) {
 		}
 	}
 
-	public StopCandidates {
+	public RoutedStopCandidates {
 		access = List.copyOf(Objects.requireNonNull(access, "access"));
 		egress = List.copyOf(Objects.requireNonNull(egress, "egress"));
 		Preconditions.checkArgument(!access.isEmpty(), "at least one access candidate is required");

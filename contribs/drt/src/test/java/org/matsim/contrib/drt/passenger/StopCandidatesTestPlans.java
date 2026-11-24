@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.dvrp.router.StopCandidates;
+import org.matsim.contrib.dvrp.router.RoutedStopCandidates;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
@@ -47,14 +47,14 @@ final class StopCandidatesTestPlans {
 	static final String MODE = "drt";
 
 	// routed (preferred) stops A and E, alternatives B (pickup) and F (dropoff)
-	static final StopCandidates CANDIDATES = new StopCandidates(
+	static final RoutedStopCandidates CANDIDATES = new RoutedStopCandidates(
 			List.of(candidate("A", 300, 250), candidate("B", 720, 600)),
 			List.of(candidate("E", 120, 100), candidate("F", 360, 300)));
 
 	private StopCandidatesTestPlans() {
 	}
 
-	static DrtRoute routeWith(StopCandidates stopCandidates) {
+	static DrtRoute routeWith(RoutedStopCandidates stopCandidates) {
 		DrtRoute route = new DrtRoute(Id.createLinkId("A"), Id.createLinkId("E"));
 		route.setStopCandidates(stopCandidates);
 		return route;
@@ -99,7 +99,7 @@ final class StopCandidatesTestPlans {
 		return leg;
 	}
 
-	static StopCandidates.Candidate candidate(String link, double walkDuration, double walkDistance) {
+	static RoutedStopCandidates.Candidate candidate(String link, double walkDuration, double walkDistance) {
 		Coord coord = switch (link) {
 			case "A" -> new Coord(-300, 0);
 			case "B" -> new Coord(-700, 0);
@@ -107,7 +107,7 @@ final class StopCandidatesTestPlans {
 			case "F" -> new Coord(2300, 0);
 			default -> throw new IllegalArgumentException(link);
 		};
-		return new StopCandidates.Candidate(Id.createLinkId(link), coord, walkDuration, walkDistance);
+		return new RoutedStopCandidates.Candidate(Id.createLinkId(link), coord, walkDuration, walkDistance);
 	}
 
 	static Network createNetwork() {

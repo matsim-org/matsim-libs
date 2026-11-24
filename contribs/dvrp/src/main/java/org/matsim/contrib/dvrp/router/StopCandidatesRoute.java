@@ -25,13 +25,13 @@ import java.util.Optional;
 import org.matsim.api.core.v01.population.Route;
 
 /**
- * A route of a dvrp main leg that can carry the {@link StopCandidates} of its trip. {@link DvrpRoutingModule} attaches
+ * A route of a dvrp main leg that can carry the {@link RoutedStopCandidates} of its trip. {@link DvrpRoutingModule} attaches
  * them if the {@link DvrpRoutingModule.AccessEgressFacilityFinder} returns alternatives.
  *
  * @author nkuehnel / MOIA
  */
 public interface StopCandidatesRoute extends Route {
-	Optional<StopCandidates> getStopCandidates();
+	Optional<RoutedStopCandidates> getStopCandidates();
 
-	void setStopCandidates(StopCandidates stopCandidates);
+	void setStopCandidates(RoutedStopCandidates stopCandidates);
 }

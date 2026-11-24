@@ -30,7 +30,7 @@ import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.router.StopCandidates;
+import org.matsim.contrib.dvrp.router.RoutedStopCandidates;
 import org.matsim.contrib.dvrp.router.StopCandidatesRoute;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -100,12 +100,12 @@ public class DrtRoute extends AbstractRoute implements StopCandidatesRoute {
 	 * routed with more than one candidate
 	 */
 	@Override
-	public Optional<StopCandidates> getStopCandidates() {
+	public Optional<RoutedStopCandidates> getStopCandidates() {
 		return Optional.ofNullable(routeDescription.getStopCandidates()).map(StopCandidatesDescription::toStopCandidates);
 	}
 
 	@Override
-	public void setStopCandidates(StopCandidates stopCandidates) {
+	public void setStopCandidates(RoutedStopCandidates stopCandidates) {
 		routeDescription.setStopCandidates(
 				stopCandidates == null ? null : StopCandidatesDescription.of(stopCandidates));
 	}
@@ -230,31 +230,31 @@ public class DrtRoute extends AbstractRoute implements StopCandidatesRoute {
 	}
 
 	/**
-	 * Serialised form of {@link StopCandidates} in the route description.
+	 * Serialised form of {@link RoutedStopCandidates} in the route description.
 	 */
 	public record StopCandidatesDescription(@JsonProperty("access") List<CandidateDescription> access,
 											@JsonProperty("egress") List<CandidateDescription> egress) {
-		static StopCandidatesDescription of(StopCandidates candidates) {
+		static StopCandidatesDescription of(RoutedStopCandidates candidates) {
 			return new StopCandidatesDescription(candidates.access().stream().map(CandidateDescription::of).toList(),
 					candidates.egress().stream().map(CandidateDescription::of).toList());
 		}
 
-		StopCandidates toStopCandidates() {
-			return new StopCandidates(access.stream().map(CandidateDescription::toCandidate).toList(),
+		RoutedStopCandidates toStopCandidates() {
+			return new RoutedStopCandidates(access.stream().map(CandidateDescription::toCandidate).toList(),
 					egress.stream().map(CandidateDescription::toCandidate).toList());
 		}
 	}
 
 	public record CandidateDescription(@JsonProperty("link") String link, @JsonProperty("x") double x,
-									   @JsonProperty("y") double y, @JsonProperty("walkTime") double walkTime,
+									   @JsonProperty("y") double y, @JsonProperty("walkDuration") double walkDuration,
 									   @JsonProperty("walkDistance") double walkDistance) {
-		static CandidateDescription of(StopCandidates.Candidate candidate) {
+		static CandidateDescription of(RoutedStopCandidates.Candidate candidate) {
 			return new CandidateDescription(candidate.linkId().toString(), candidate.coord().getX(),
 					candidate.coord().getY(), candidate.walkDuration(), candidate.walkDistance());
 		}
 
-		StopCandidates.Candidate toCandidate() {
-			return new StopCandidates.Candidate(Id.createLinkId(link), new Coord(x, y), walkTime, walkDistance);
+		RoutedStopCandidates.Candidate toCandidate() {
+			return new RoutedStopCandidates.Candidate(Id.createLinkId(link), new Coord(x, y), walkDuration, walkDistance);
 		}
 	}
 }

@@ -25,7 +25,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.router.StopCandidates;
+import org.matsim.contrib.dvrp.router.RoutedStopCandidates;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
 /**
@@ -33,7 +33,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
  */
 class DefaultDrtRouteUpdaterTest {
 
-	private final StopCandidates candidates = new StopCandidates(
+	private final RoutedStopCandidates candidates = new RoutedStopCandidates(
 			List.of(candidate("A", 300), candidate("B", 720)),
 			List.of(candidate("E", 120)));
 
@@ -61,7 +61,7 @@ class DefaultDrtRouteUpdaterTest {
 		assertThat(newRoute.getStopCandidates()).isEmpty();
 	}
 
-	private static StopCandidates.Candidate candidate(String link, double walkDuration) {
-		return new StopCandidates.Candidate(Id.createLinkId(link), new Coord(0, 0), walkDuration, walkDuration);
+	private static RoutedStopCandidates.Candidate candidate(String link, double walkDuration) {
+		return new RoutedStopCandidates.Candidate(Id.createLinkId(link), new Coord(0, 0), walkDuration, walkDuration);
 	}
 }
