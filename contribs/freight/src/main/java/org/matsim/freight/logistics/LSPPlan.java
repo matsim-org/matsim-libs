@@ -31,18 +31,18 @@ import org.matsim.freight.logistics.shipment.LspShipmentPlan;
  * <ul>
  *   <li>As a {@link BasicPlan} it has a score, so it can be used for evolutionary learning. kai,
  *       may'22
- *   <li>An {@link LspShipment} is added via lspPlan#getAssigner().assignToSolution(shipment). The
+ *   <li>An {@link LspShipment} is added via lspPlan#getInitialShipmentAssigner().assignToPlan(lspPlan, shipment). The
  *       {@link InitialShipmentAssigner} assigns it deterministically to a {@link LogisticChain}.
  * </ul>
  */
 public interface LSPPlan extends BasicPlan, KnowsLSP {
 
-  LSPPlan addLogisticChain(LogisticChain solution);
+  LSPPlan addLogisticChain(LogisticChain logisticChain);
 
   Collection<LogisticChain> getLogisticChains();
 
   /**
-   * yy My intuition would be to replace lspPlan#getAssigner().assignToSolution( shipment ) by
+   * yy My intuition would be to replace lspPlan#getInitialShipmentAssigner().assignToPlan( lspPlan, shipment ) by
    * lspPlan.addShipment( shipment ). kai, may'22
    */
   InitialShipmentAssigner getInitialShipmentAssigner();

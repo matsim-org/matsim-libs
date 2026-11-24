@@ -119,10 +119,10 @@ public class WorstPlanSelectorTest {
 				.addLogisticChainElement(singleCarrierElement)
 				.build();
 
-			final InitialShipmentAssigner singleSolutionShipmentAssigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
+			final InitialShipmentAssigner singleChainShipmentAssigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
 			lspPlan_singleChain = LSPUtils.createLSPPlan()
 				.addLogisticChain(singleChain)
-				.setInitialShipmentAssigner(singleSolutionShipmentAssigner);
+				.setInitialShipmentAssigner(singleChainShipmentAssigner);
 
 			lspPlan_singleChain.setType(MultipleChainsUtils.LspPlanTypes.SINGLE_ONE_ECHELON_CHAIN.toString());
 		}
@@ -226,6 +226,7 @@ public class WorstPlanSelectorTest {
 			builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 			builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setPickupServiceTime(capacityDemand * 60);
 
 			shipmentList.add(builder.build());
 		}
@@ -235,9 +236,9 @@ public class WorstPlanSelectorTest {
 	private static List<LSPResource> createResourcesListFromLSPPlans(List<LSPPlan> lspPlans) {
 		List<LSPResource> resourceList = new ArrayList<>();
 		for (LSPPlan lspPlan : lspPlans) {
-			for (LogisticChain solution : lspPlan.getLogisticChains()) {
-				for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
-					resourceList.add(solutionElement.getResource());
+			for (LogisticChain chain : lspPlan.getLogisticChains()) {
+				for (LogisticChainElement chainElement : chain.getLogisticChainElements()) {
+					resourceList.add(chainElement.getResource());
 				}
 			}
 		}

@@ -39,7 +39,7 @@ class SingleLogisticChainShipmentAssigner implements InitialShipmentAssigner {
   @Override
   public void assignToPlan(LSPPlan lspPlan, LspShipment lspShipment) {
     Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
-    LogisticChain singleSolution = lspPlan.getLogisticChains().iterator().next();
-    singleSolution.addShipmentToChain(lspShipment);
+    LogisticChain singleChain = lspPlan.getLogisticChains().iterator().next();
+    singleChain.addShipmentToChain(lspShipment);
   }
 }

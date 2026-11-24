@@ -35,6 +35,7 @@ import com.google.inject.util.Modules;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.core.config.Config;
@@ -83,9 +84,7 @@ public final class Injector {
 
 	public static void printInjector(com.google.inject.Injector injector, Logger log) {
 		Level level = Level.DEBUG;
-		log.info("=== printInjector output skipped ===");
-		log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
-			+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+		Gbl.logDebugOutputSkipped(log, "printInjector output");
 
 		log.log(level,"=== printInjector start ===") ;
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet()) {

@@ -65,10 +65,6 @@ public final class LSPUtils {
 		return lspPlan.getLSP().getSelectedPlan() == lspPlan;
 	}
 
-	public static LogisticChainScheduler createForwardLogisticChainScheduler() {
-		return new ForwardLogisticChainSchedulerImpl();
-	}
-
 	public static WaitingShipments createWaitingShipments() {
 		return new WaitingShipmentsImpl();
 	}
@@ -158,6 +154,40 @@ public final class LSPUtils {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Removes the assignment of all shipments to the {@link LogisticChain}s of the given plan, i.e. empties
+	 * {@link LogisticChain#getLspShipmentIds()} of each chain. To be called by replanning strategies before
+	 * they assign the shipments anew.
+	 *
+	 * <p>The shipment plans and the waiting shipments of the chain elements are not changed here; they are
+	 * reset by {@link LSP#scheduleLogisticChains()}.
+	 */
+	public static void clearShipmentAssignments(LSPPlan lspPlan) {
+		for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+			logisticChain.getLspShipmentIds().clear();
+		}
+	}
+
+	/**
+	 * Hands each {@link LspShipment} of the selected plan of the given {@link LSP} over to the incoming
+	 * shipments of the first {@link LogisticChainElement} of the {@link LogisticChain} it is assigned to.
+	 * This is the first step of a forward {@link LogisticChainScheduler}.
+	 *
+	 * @throws IllegalStateException if a shipment id of a chain is not found in the LSP
+	 */
+	public static void insertShipmentsAtBeginningOfLogisticChains(LSP lsp) {
+		for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+			LogisticChainElement firstElement = logisticChain.getFirstLogisticChainElement();
+			for (Id<LspShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
+				LspShipment lspShipment = findLspShipment(lsp, lspShipmentId);
+				if (lspShipment == null) {
+					throw new IllegalStateException("Shipment with id " + lspShipmentId + " not found in LSP " + lsp.getId() + ".");
+				}
+				firstElement.getIncomingShipments().addShipment(lspShipment.getPickupTimeWindow().getStart(), lspShipment);
+			}
+		}
 	}
 
 	/**
@@ -271,9 +301,7 @@ public final class LSPUtils {
 		// Clear the existing shipments and plans in the LSP
 		for (LSPPlan lspPlan : lsp.getPlans()) {
 			lspPlan.getShipmentPlans().clear();
-			for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-				logisticChain.getLspShipmentIds().clear();
-			}
+			clearShipmentAssignments(lspPlan);
 		}
 		lsp.getLspShipments().clear();
 
@@ -313,14 +341,12 @@ public final class LSPUtils {
 	public enum LogicOfVrp {serviceBased, shipmentBased}
 
 	public static final class LSPBuilder {
-		final Collection<LSPResource> resources;
 		final Id<LSP> id;
 		LogisticChainScheduler logisticChainScheduler;
 		LSPPlan initialPlan;
 
 		private LSPBuilder(Id<LSP> id) {
 			this.id = id; // this line was not there until today.  kai, may'22
-			this.resources = new ArrayList<>();
 		}
 
 		public static LSPBuilder getInstance(Id<LSP> id) {
@@ -332,17 +358,9 @@ public final class LSPUtils {
 			return this;
 		}
 
-		@Deprecated // see comment below method name.
 		public LSPBuilder setInitialPlan(LSPPlan plan) {
-			// yy maybe one could use the first plan by default, and then get rid of this method here?  kai, jul'25
+			// The resources of the plan are collected in LSPImpl#addPlan, called from the LSPImpl constructor.
 			this.initialPlan = plan;
-			for (LogisticChain logisticChain : plan.getLogisticChains()) {
-				for (LogisticChainElement element : logisticChain.getLogisticChainElements()) {
-					if (!resources.contains(element.getResource())) {
-						resources.add(element.getResource());
-					}
-				}
-			}
 			return this;
 		}
 
@@ -378,16 +396,15 @@ public final class LSPUtils {
 		}
 
 		public LogisticChain build() {
-			//TODO: Prüfe of das alle Elemente Verbunden sind (in irgendeiner Art). Plus Hinweis auf die Änderung.
-			// yyyyyy was ist mit "Hinweis auf Änderung" gemeint???
-
-			// connect all elements:
-			LogisticChainElement prev = null;
+			// Connect the elements in the order in which they were added.  The elements are always created by
+			// LogisticChainElementBuilder, so the cast is safe.
+			LogisticChainElementImpl prev = null;
 			for( LogisticChainElement logisticChainElement : this.elements ){
+				LogisticChainElementImpl current = (LogisticChainElementImpl) logisticChainElement;
 				if ( prev != null ) {
-					prev.connectWithNextElement( logisticChainElement );
+					prev.connectWithNextElement( current );
 				}
-				prev = logisticChainElement;
+				prev = current;
 			}
 
 			return new LogisticChainImpl(this);

@@ -22,6 +22,7 @@ package org.matsim.freight.logistics.resourceImplementations;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.matsim.freight.logistics.LSPConstants.*;
+import static org.matsim.freight.logistics.shipment.LspShipmentPlanElement.ElementType.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,15 +97,15 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 		collectionElementBuilder.setResource(collectionResource);
 		collectionElement = collectionElementBuilder.build();
 
-		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
-		LogisticChain collectionSolution = collectionSolutionBuilder.build();
+		Id<LogisticChain> collectionChainId = Id.create("CollectionChain", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder collectionChainBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionChainId);
+		collectionChainBuilder.addLogisticChainElement(collectionElement);
+		LogisticChain collectionChain = collectionChainBuilder.build();
 
 		InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setInitialShipmentAssigner(assigner);
-		collectionPlan.addLogisticChain(collectionSolution);
+		collectionPlan.addLogisticChain(collectionChain);
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
@@ -144,6 +145,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setPickupServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLspPlan(shipment);
 		}
@@ -202,7 +204,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			LSPTourEndEventHandler endHandler = (LSPTourEndEventHandler) eventHandlers.getFirst();
 			assertSame(endHandler.getCarrierService().getServiceLinkId(), shipment.getFrom());
             assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
-			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getPickupServiceTime(), 0.0);
 			assertEquals(endHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
 			assertEquals(endHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(endHandler.getLogisticChainElement(), planElements.get(2).getLogisticChainElement());
@@ -215,7 +217,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			CollectionJobEventHandler serviceHandler = (CollectionJobEventHandler) eventHandlers.get(1);
 			assertSame(serviceHandler.getCarrierService().getServiceLinkId(), shipment.getFrom());
             assertEquals(serviceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
-			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getPickupServiceTime(), 0.0);
 			assertEquals(serviceHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
 			assertEquals(serviceHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(serviceHandler.getElement(), planElements.get(1).getLogisticChainElement());
@@ -225,8 +227,8 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			assertSame(serviceHandler.getResourceId(), collectionLSP.getResources().iterator().next().getId());
 		}
 
-		for (LogisticChain solution : collectionLSP.getSelectedPlan().getLogisticChains()) {
-			for (LogisticChainElement element : solution.getLogisticChainElements()) {
+		for (LogisticChain chain : collectionLSP.getSelectedPlan().getLogisticChains()) {
+			for (LogisticChainElement element : chain.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getLspShipmentsWTime().isEmpty());
 				if (element.getNextElement() != null) {
 					assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().isEmpty());

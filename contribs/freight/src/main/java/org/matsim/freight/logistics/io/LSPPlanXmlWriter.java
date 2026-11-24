@@ -205,7 +205,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 							ELEMENT,
 							List.of(
 								createTuple(ID, elementId.toString()),
-								createTuple(TYPE, element.getElementType()),
+								createTuple(TYPE, element.getElementType().toString()),
 								createTuple(START_TIME, element.getStartTime()),
 								createTuple(END_TIME, element.getEndTime()),
 								createTuple(RESOURCE_ID, element.getResourceId().toString())),
