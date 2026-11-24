@@ -18,27 +18,20 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.prebooking;
+package org.matsim.contrib.drt.passenger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.passenger.DrtStopCandidate;
-import org.matsim.contrib.drt.passenger.DrtStopCandidates;
 import org.matsim.contrib.dvrp.router.StopCandidates;
 import org.matsim.contrib.dvrp.router.StopCandidatesRoute;
 import org.matsim.core.population.PopulationUtils;
@@ -52,112 +45,19 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
- * Connects the stop candidates routed into a {@link StopCandidatesRoute} with prebooking:
- * <ul>
- * <li>{@link #toDrtStopCandidates} turns them into the {@link DrtStopCandidates} of a request, so that the insertion
- * search may choose another pickup/dropoff stop than the routed one;</li>
- * <li>{@link #materialize} rewrites the access and egress part of the agent's trip to the chosen stops once the request
- * is scheduled, using the routed walk duration and distance of the chosen candidate.</li>
- * </ul>
- * Only the agent's copy of the plan is changed during the mobsim; the plan in the population keeps the routed
- * (preferred) stops, so the next iteration builds the same request again.
+ * Rewrites the access and egress part of an agent's trip to the pickup/dropoff stops chosen by the insertion search,
+ * among the stop candidates routed into the {@link StopCandidatesRoute} of its DRT leg (see
+ * {@link DrtStopCandidatesFactory}). The rewritten legs use the routed walk duration and distance of the chosen
+ * candidate. In the routed candidates, access candidates are the possible pickup stops and egress candidates the
+ * possible dropoff stops.
+ * <p>
+ * Meant for the agent's copy of the plan during the mobsim; the plan in the population keeps the routed (preferred)
+ * stops, so the next iteration builds the same request again.
  *
  * @author nkuehnel / MOIA
  */
-public final class PrebookingStopCandidates {
-	private PrebookingStopCandidates() {
-	}
-
-	/**
-	 * Single-person variant of {@link #toDrtStopCandidates(List, Network, boolean)}.
-	 */
-	public static Optional<DrtStopCandidates> toDrtStopCandidates(Route route, Network network,
-			boolean includeAccess) {
-		return toDrtStopCandidates(List.of(route), network, includeAccess);
-	}
-
-	/**
-	 * Combines the stop candidates of the routes of all passengers of one request. A stop is a candidate if it is a
-	 * candidate of every passenger; its walk duration is the longest one among the passengers, since the group boards
-	 * together. The order is that of the first route.
-	 *
-	 * @param includeAccess whether alternative pickup stops may be offered (false if a passenger may already be on the
-	 *                      way to the routed stop)
-	 * @return the candidates for a request with the routed (preferred) stops as its own from/to link, or empty if there
-	 * are no common alternatives or a route has no candidates or does not start/end at its preferred stops
-	 */
-	public static Optional<DrtStopCandidates> toDrtStopCandidates(List<Route> routes, Network network,
-			boolean includeAccess) {
-		Preconditions.checkArgument(!routes.isEmpty(), "at least one route is required");
-		List<StopCandidates> all = new ArrayList<>();
-		for (Route route : routes) {
-			if (!(route instanceof StopCandidatesRoute candidatesRoute)) {
-				return Optional.empty();
-			}
-			Optional<StopCandidates> candidates = candidatesRoute.getStopCandidates();
-			if (candidates.isEmpty()
-					|| !candidates.get().preferredAccess().linkId().equals(route.getStartLinkId())
-					|| !candidates.get().preferredEgress().linkId().equals(route.getEndLinkId())) {
-				return Optional.empty(); // no candidates, or the route was changed after routing
-			}
-			all.add(candidates.get());
-		}
-		Id<Link> preferredAccess = all.getFirst().preferredAccess().linkId();
-		Id<Link> preferredEgress = all.getFirst().preferredEgress().linkId();
-		if (all.stream().anyMatch(c -> !c.preferredAccess().linkId().equals(preferredAccess)
-				|| !c.preferredEgress().linkId().equals(preferredEgress))) {
-			return Optional.empty(); // the group does not share its routed stops
-		}
-
-		List<DrtStopCandidate> access = includeAccess ?
-				alternatives(common(all, StopCandidates::access), network) :
-				List.of();
-		List<DrtStopCandidate> egress = alternatives(common(all, StopCandidates::egress), network);
-		if (access.isEmpty() && egress.isEmpty()) {
-			return Optional.empty();
-		}
-		double accessWalk = all.stream().mapToDouble(c -> c.preferredAccess().walkDuration()).max().orElseThrow();
-		double egressWalk = all.stream().mapToDouble(c -> c.preferredEgress().walkDuration()).max().orElseThrow();
-		return Optional.of(new DrtStopCandidates(accessWalk, egressWalk, access, egress));
-	}
-
-	/**
-	 * @return the candidates (preferred first) that all passengers share, each with the longest walk among them
-	 */
-	private static List<StopCandidates.Candidate> common(List<StopCandidates> all,
-			Function<StopCandidates, List<StopCandidates.Candidate>> side) {
-		List<Map<Id<Link>, StopCandidates.Candidate>> byLink = all.stream()
-				.map(candidates -> side.apply(candidates).stream()
-						.collect(Collectors.toMap(StopCandidates.Candidate::linkId, c -> c, (a, b) -> a)))
-				.toList();
-		return side.apply(all.getFirst()).stream()
-				.filter(candidate -> byLink.stream().allMatch(m -> m.containsKey(candidate.linkId())))
-				.map(candidate -> {
-					List<StopCandidates.Candidate> perPassenger = byLink.stream().map(m -> m.get(candidate.linkId())).toList();
-					return new StopCandidates.Candidate(candidate.linkId(), candidate.coord(),
-							perPassenger.stream().mapToDouble(StopCandidates.Candidate::walkDuration).max().orElseThrow(),
-							perPassenger.stream().mapToDouble(StopCandidates.Candidate::walkDistance).max().orElseThrow());
-				})
-				.toList();
-	}
-
-	private static List<DrtStopCandidate> alternatives(List<StopCandidates.Candidate> candidates, Network network) {
-		return candidates.subList(1, candidates.size())
-				.stream()
-				.map(candidate -> new DrtStopCandidate(
-						Preconditions.checkNotNull(network.getLinks().get(candidate.linkId()),
-								"Stop candidate link %s not in network", candidate.linkId()),
-						candidate.walkDuration()))
-				.toList();
-	}
-
-	/**
-	 * @return true if every route carries stop candidates with alternatives (cheap check before looking at the plans)
-	 */
-	public static boolean haveStopCandidates(List<Route> routes) {
-		return !routes.isEmpty() && routes.stream()
-				.allMatch(route -> route instanceof StopCandidatesRoute candidatesRoute
-						&& candidatesRoute.getStopCandidates().map(StopCandidates::hasAlternatives).orElse(false));
+public final class StopCandidatesTripMaterializer {
+	private StopCandidatesTripMaterializer() {
 	}
 
 	/**
@@ -173,13 +73,6 @@ public final class PrebookingStopCandidates {
 		int legIndex = Iterables.indexOf(elements, e -> e == drtLeg);
 		return elements.subList(0, legIndex).stream().anyMatch(Leg.class::isInstance)
 				&& elements.subList(legIndex + 1, elements.size()).stream().anyMatch(Leg.class::isInstance);
-	}
-
-	/**
-	 * @return the request with the given stop candidates (or the request itself if there are none)
-	 */
-	public static DrtRequest withStopCandidates(DrtRequest request, Optional<DrtStopCandidates> candidates) {
-		return candidates.map(c -> DrtRequest.newBuilder(request).stopCandidates(c).build()).orElse(request);
 	}
 
 	/**

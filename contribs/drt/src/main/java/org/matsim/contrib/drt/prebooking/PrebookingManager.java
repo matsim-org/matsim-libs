@@ -15,6 +15,8 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.passenger.DrtStopCandidates;
+import org.matsim.contrib.drt.passenger.DrtStopCandidatesFactory;
+import org.matsim.contrib.drt.passenger.StopCandidatesTripMaterializer;
 import org.matsim.contrib.drt.prebooking.unscheduler.RequestUnscheduler;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -185,14 +187,15 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 		Optional<DrtStopCandidates> stopCandidates = Optional.empty();
 		// only passengers with own access/egress walks can be moved to another stop; a group gets candidates only if
 		// all its passengers have them (passengers without own walks, e.g. DRT companions, are not supported yet)
-		List<Route> routesOfAll = personsLegs.stream().map(personLeg -> personLeg.leg().getRoute()).toList();
 		List<StopCandidatePassenger> passengers = List.of();
-		if (request instanceof DrtRequest drtRequest && PrebookingStopCandidates.haveStopCandidates(routesOfAll)
+		if (request instanceof DrtRequest drtRequest && DrtStopCandidatesFactory.haveAlternatives(routes)
 				&& personsLegs.stream().allMatch(PrebookingManager::hasAccessAndEgressWalks)) {
 			passengers = personsLegs.stream().map(StopCandidatePassenger::new).toList();
 			boolean pickupMayChange = passengers.stream().noneMatch(StopCandidatePassenger::hasLeftOrigin);
-			stopCandidates = PrebookingStopCandidates.toDrtStopCandidates(routesOfAll, network, pickupMayChange);
-			request = PrebookingStopCandidates.withStopCandidates(drtRequest, stopCandidates);
+			stopCandidates = DrtStopCandidatesFactory.fromRoutes(routes, network, pickupMayChange);
+			if (stopCandidates.isPresent()) {
+				request = DrtRequest.newBuilder(drtRequest).stopCandidates(stopCandidates.get()).build();
+			}
 		}
 
 		Set<String> violations = requestValidator.validateRequest(request);
@@ -341,7 +344,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 		private StopCandidatePassenger(PersonLeg personLeg) {
 			this.personLeg = personLeg;
-			this.origin = PrebookingStopCandidates.originActivity(plan(personLeg), personLeg.leg());
+			this.origin = StopCandidatesTripMaterializer.originActivity(plan(personLeg), personLeg.leg());
 		}
 
 		private boolean isInOrigin() {
@@ -366,7 +369,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	}
 
 	private static boolean hasAccessAndEgressWalks(PersonLeg personLeg) {
-		return PrebookingStopCandidates.hasAccessAndEgressLegs(plan(personLeg), personLeg.leg());
+		return StopCandidatesTripMaterializer.hasAccessAndEgressLegs(plan(personLeg), personLeg.leg());
 	}
 
 	private void materializeStopCandidates(double now, PassengerRequestScheduledEvent event) {
@@ -384,7 +387,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 			Verify.verify(pickupLinkId.equals(leg.getRoute().getStartLinkId()) || !passenger.hasLeftOrigin(),
 					"Passenger %s has left for the routed pickup stop, but %s was scheduled",
 					passenger.personLeg.agent().getId(), pickupLinkId);
-			if (PrebookingStopCandidates.materialize(plan(passenger.personLeg), leg, pickupLinkId, dropoffLinkId)) {
+			if (StopCandidatesTripMaterializer.materialize(plan(passenger.personLeg), leg, pickupLinkId, dropoffLinkId)) {
 				WithinDayAgentUtils.resetCaches(passenger.personLeg.agent());
 			}
 		}
