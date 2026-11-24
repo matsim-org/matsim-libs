@@ -53,7 +53,11 @@ public class CadytsPlanChanger<T> implements PlanSelector<Plan, Person> {
 			return currentPlan;
 		}
 
-		// random plan:
+		double pcu = 1.0;
+		if (person instanceof Person) {
+			pcu = cadytsContext.getAgentWeight((Person) person);
+		}
+
 		Plan otherPlan;
 		do {
 			otherPlan = new RandomPlanSelector<Plan, Person>().selectPlan((person));
@@ -64,11 +68,13 @@ public class CadytsPlanChanger<T> implements PlanSelector<Plan, Person> {
 		}
 
 		cadyts.demand.Plan<T> currentPlanSteps = this.cadytsContext.getPlansTranslator().getCadytsPlan(currentPlan);
-		double currentPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(currentPlanSteps) / this.beta;
+		// Scale by PCU
+		double currentPlanCadytsCorrection = (this.cadytsContext.getCalibrator().calcLinearPlanEffect(currentPlanSteps) / this.beta) * pcu;
 		double currentScore = currentPlan.getScore() + cadytsWeight * currentPlanCadytsCorrection;
 
 		cadyts.demand.Plan<T> otherPlanSteps = this.cadytsContext.getPlansTranslator().getCadytsPlan(otherPlan);
-		double otherPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(otherPlanSteps) / this.beta;
+		// Scale by PCU
+		double otherPlanCadytsCorrection = (this.cadytsContext.getCalibrator().calcLinearPlanEffect(otherPlanSteps) / this.beta) * pcu;
 		double otherScore = otherPlan.getScore() + cadytsWeight * otherPlanCadytsCorrection;
 
 		Map<String,Object> planAttributes = currentPlan.getCustomAttributes() ;
