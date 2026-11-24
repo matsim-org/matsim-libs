@@ -24,7 +24,7 @@ import static org.matsim.application.analysis.population.kn.KNTestFixture.*;
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
 /**
- * KN MUSE characterization tests retained as the refactoring baseline, plus scorer-lifecycle tests.
+ * MUSE characterization tests, plus tests of how the scorer is called.
  *
  * <p>MUSE is the activity score gained by starting one second earlier, scaled to score/hour.
  * These tests compare the existing production calculation with independent expected values;
@@ -165,9 +165,9 @@ class MuseComputationTest {
 		assertTrue(Double.isNaN(getMUSE_h(plan)));
 	}
 
-	/** Keeps KN's two cumulative scorers, with chronological callbacks and one final finish. */
+	/** One replay of the day as it was, and one per destination, each with chronological callbacks and one final finish. */
 	@Test
-	void usesTwoScorersInPlanOrderAndFinishesAtTheEnd() {
+	void replaysTheDayInPlanOrderAndChangesOneStartAtATime() {
 		var scenario = scenario();
 		var person = person(scenario, "person", 2000, true);
 		List<List<String>> sequences = new ArrayList<>();
@@ -200,12 +200,81 @@ class MuseComputationTest {
 
 		// Deliver morning home before work so scorers can align callbacks with the selected plan.
 		// Finish only after evening home: finishing earlier would finalize an incomplete day.
-		assertEquals(2, sequences.size());
+		assertEquals(4, sequences.size());
 		sequences.forEach(sequence -> assertEquals(
 			List.of("first:home", "work", "shop", "home", "finish"), sequence));
 		assertEquals(List.of(9 * HOUR, 18 * HOUR, 20 * HOUR), destinationStarts.get(0));
-		assertEquals(List.of(9 * HOUR - 1, 18 * HOUR - 1, 20 * HOUR - 1), destinationStarts.get(1));
+		assertEquals(List.of(9 * HOUR - 1, 18 * HOUR, 20 * HOUR), destinationStarts.get(1));
+		assertEquals(List.of(9 * HOUR, 18 * HOUR - 1, 20 * HOUR), destinationStarts.get(2));
+		assertEquals(List.of(9 * HOUR, 18 * HOUR, 20 * HOUR - 1), destinationStarts.get(3));
 		assertEquals(12, getMUSE_h(person.getSelectedPlan()), TOLERANCE);
+	}
+
+	/** The same utility, accounted for only in finish(), must give the same value per destination. */
+	@Test
+	void doesNotDependOnWhenTheScorerAccountsForAnActivity() {
+		var scenario = scenario();
+		var person = person(scenario, "person", 2000, true);
+		var parameters = new SubpopulationScoringParameters(scenario);
+		ScoringFunctionFactory factory = agent -> {
+			var activities = new ArrayList<Activity>();
+			var core = new CharyparNagelActivityScoring(parameters.getScoringParameters(agent));
+			SumScoringFunction scoring = new SumScoringFunction();
+			scoring.addScoringFunction(new SumScoringFunction.ActivityScoring() {
+				@Override public void handleFirstActivity(Activity activity) { activities.add(activity); }
+				@Override public void handleActivity(Activity activity) { activities.add(activity); }
+				@Override public void handleLastActivity(Activity activity) { activities.add(activity); }
+				@Override public void finish() {
+					core.handleFirstActivity(activities.getFirst());
+					activities.subList(1, activities.size() - 1).forEach(core::handleActivity);
+					core.handleLastActivity(activities.getLast());
+					core.finish();
+				}
+				@Override public double getScore() { return core.getScore(); }
+			});
+			return scoring;
+		};
+		var plan = person.getSelectedPlan();
+		var activities = TripStructureUtils.getActivities(plan, ExcludeStageActivities);
+
+		muse(scenario, factory).computeMuseForAllActs(plan);
+		var deferred = activities.stream().skip(1).map(MuseComputationTest::museOf).toList();
+		muse(scenario).computeMuseForAllActs(plan);
+
+		for (int i = 0; i < deferred.size(); i++)
+			assertEquals(getMUSE_h(activities.get(i + 1)), deferred.get(i), TOLERANCE);
+	}
+
+	/** An activity's utility may depend on how the person arrived, which the scorer learns from the leg. */
+	@Test
+	void handsTheLegsToTheScorer() {
+		var scenario = scenario();
+		var person = person(scenario, "person", 2000, false);
+		ScoringFunctionFactory factory = agent -> {
+			class ArrivalMode implements SumScoringFunction.ActivityScoring, SumScoringFunction.LegScoring {
+				private String lastMode;
+				private double score;
+				@Override public void handleLeg(Leg leg) { lastMode = leg.getMode(); }
+				@Override public void handleFirstActivity(Activity activity) { }
+				@Override public void handleActivity(Activity activity) {
+					score -= activity.getStartTime().seconds() * ("car".equals(lastMode) ? 12 : 6) / HOUR;
+				}
+				@Override public void handleLastActivity(Activity activity) { handleActivity(activity); }
+				@Override public void finish() { }
+				@Override public double getScore() { return score; }
+			}
+			SumScoringFunction scoring = new SumScoringFunction();
+			scoring.addScoringFunction(new ArrivalMode());
+			return scoring;
+		};
+
+		muse(scenario, factory).computeMuseForAllActs(person.getSelectedPlan());
+
+		assertEquals(12, getMUSE_h(person.getSelectedPlan()), TOLERANCE);
+	}
+
+	private static Double museOf(Activity activity) {
+		return getMUSE_h(activity);
 	}
 
 	@Test
