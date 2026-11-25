@@ -30,8 +30,8 @@ import org.matsim.freight.logistics.LogisticChain;
 public interface LspShipmentRequirement {
 
 	/**
-	 * @param solution the chain being checked
+	 * @param logisticChain the chain being checked
 	 * @return {@code true} if the chain fulfills the requirement, {@code false} otherwise
 	 */
-	boolean checkRequirement(LogisticChain solution);
+	boolean checkRequirement(LogisticChain logisticChain);
 }

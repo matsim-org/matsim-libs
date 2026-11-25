@@ -55,6 +55,7 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -124,13 +125,13 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		this.delimiter = config.global().getDefaultDelimiter();
 	}
 
-	private record DrtLeg(Id<Request> request, double submissionTime, double readyForPickupTime, double pickupTime, Id<Person> person,
+	record DrtLeg(Id<Request> request, double submissionTime, double readyForPickupTime, double pickupTime, Id<Person> person,
 						  Id<DvrpVehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
 						  Id<Link> toLinkId, Coord toCoord, double waitTime, double unsharedDistanceEstimate_m, double unsharedTimeEstimate,
 						  double arrivalTime, double fare, double earliestDepartureTime, double latestDepartureTime, double latestArrivalTime) {
 	}
 
-	private static List<DrtLeg> newDrtLegs(EventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
+	static List<DrtLeg> newDrtLegs(EventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
 		Preconditions.checkArgument(sequence.isCompleted());
 		List<DrtLeg> legs = new ArrayList<>();
 		DrtRequestSubmittedEvent submittedEvent = sequence.getSubmitted();
@@ -139,10 +140,16 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 		var request = submittedEvent.getRequestId();
 		var submissionTime = submittedEvent.getTime();
-		var fromLinkId = submittedEvent.getFromLinkId();
+		// the scheduled stops, which may differ from the submitted ones if the request had stop candidates
+		var scheduled = sequence.getScheduled();
+		var fromLinkId = scheduled.flatMap(PassengerRequestScheduledEvent::getPickupLinkId)
+				.orElse(submittedEvent.getFromLinkId());
 		var fromCoord = linkProvider.apply(fromLinkId).getToNode().getCoord();
-		var toLinkId = submittedEvent.getToLinkId();
+		var toLinkId = scheduled.flatMap(PassengerRequestScheduledEvent::getDropoffLinkId)
+				.orElse(submittedEvent.getToLinkId());
 		var toCoord = linkProvider.apply(toLinkId).getToNode().getCoord();
+		// earliest departure of the submitted request refers to its own pickup stop
+		boolean pickupStopChanged = !fromLinkId.equals(submittedEvent.getFromLinkId());
 		var unsharedDistanceEstimate_m = submittedEvent.getUnsharedRideDistance();
 		var unsharedTimeEstimate = submittedEvent.getUnsharedRideTime();
 		// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
@@ -155,7 +162,9 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			var pickupReadyTime = personEvents.get(person).getDeparture().get().getTime();
 			PassengerPickedUpEvent pickedUp = personEvents.get(person).getPickedUp().get();
 			var vehicle = pickedUp.getVehicleId();
-			var waitTime = pickedUp.getTime() - earliestDepartureTime;
+			// waiting at the stop: from the earliest departure, or, at another than the submitted pickup stop, from the
+			// passenger's departure there (the walk to that stop is not waiting)
+			var waitTime = pickedUp.getTime() - (pickupStopChanged ? pickupReadyTime : earliestDepartureTime);
 			var arrivalTime = personEvents.get(person).getDroppedOff().get().getTime();
 			legs.add(new DrtLeg(request, submissionTime, pickupReadyTime, pickedUp.getTime(), person, vehicle, fromLinkId, fromCoord, toLinkId, toCoord, waitTime, unsharedDistanceEstimate_m,
 					unsharedTimeEstimate, arrivalTime, fare, earliestDepartureTime, latestDepartureTime, latestArrivalTime));

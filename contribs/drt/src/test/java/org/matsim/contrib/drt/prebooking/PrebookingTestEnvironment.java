@@ -1,5 +1,15 @@
 package org.matsim.contrib.drt.prebooking;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,7 +91,7 @@ public class PrebookingTestEnvironment {
 	private final int height = 10;
 
 	private final double edgeLength = 200.0;
-	private final double speed = 10.0;
+	private double speed = 10.0;
 
 	private IntegerLoadType integerLoadType = new IntegerLoadType("passengers");
 	private DvrpLoad vehicleCapacity = integerLoadType.fromInt(4);
@@ -93,6 +103,31 @@ public class PrebookingTestEnvironment {
 	private double endTime = 30.0 * 3600.0;
 
 	private boolean useExactTravelTimeEstimates = false;
+
+	// stopbased operation (optional): stops on the eastbound link starting at the given node
+	private final List<Pair<Integer, Integer>> stops = new LinkedList<>();
+	private double maxWalkDistance = Double.MAX_VALUE;
+	private int maxStopCandidates = 1;
+
+	/**
+	 * Switches to stopbased operation with a stop on the link from node (x, y) to node (x + 1, y). Activities are then
+	 * located in the centre of their link.
+	 */
+	public PrebookingTestEnvironment addStop(int x, int y) {
+		stops.add(Pair.of(x, y));
+		return this;
+	}
+
+	public PrebookingTestEnvironment speed(double speed) {
+		this.speed = speed;
+		return this;
+	}
+
+	public PrebookingTestEnvironment stopCandidates(double maxWalkDistance, int maxStopCandidates) {
+		this.maxWalkDistance = maxWalkDistance;
+		this.maxStopCandidates = maxStopCandidates;
+		return this;
+	}
 
 	public PrebookingTestEnvironment(MatsimTestUtils utils) {
 		this.utils = utils;
@@ -291,10 +326,44 @@ public class PrebookingTestEnvironment {
 		modeConfig.setIdleVehiclesReturnToDepots(false);
 		modeConfig.setVehiclesFile(null);
 
+		if (!stops.isEmpty()) {
+			modeConfig.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
+			modeConfig.setTransitStopFile(writeStops());
+			defaultConstraintsSet.setMaxWalkDistance(maxWalkDistance);
+			defaultConstraintsSet.setMaxStopCandidates(maxStopCandidates);
+		}
+
 		DrtInsertionSearchParams searchParams = new SelectiveInsertionSearchParams();
 		modeConfig.addDrtInsertionSearchParams(searchParams);
 
 		DrtConfigs.adjustMultiModeDrtConfig(drtConfig, config.scoring(), config.routing());
+	}
+
+	private String writeStops() {
+		TransitScheduleFactory factory = new TransitScheduleFactoryImpl();
+		TransitSchedule schedule = factory.createTransitSchedule();
+		for (Pair<Integer, Integer> stop : stops) {
+			Id<Link> linkId = createLinkId(createNodeId(stop.getLeft(), stop.getRight()),
+					createNodeId(stop.getLeft() + 1, stop.getRight()));
+			TransitStopFacility facility = factory.createTransitStopFacility(
+					Id.create("stop_" + linkId, TransitStopFacility.class), linkCentre(stop.getLeft(), stop.getRight()),
+					false);
+			facility.setLinkId(linkId);
+			schedule.addStopFacility(facility);
+		}
+		try {
+			// not in the output directory, which is cleared when the controller starts
+			File file = File.createTempFile("drt_stops", ".xml");
+			file.deleteOnExit();
+			new TransitScheduleWriter(schedule).writeFile(file.getAbsolutePath());
+			return file.getAbsolutePath();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private Coord linkCentre(int x, int y) {
+		return new Coord((x + 0.5) * edgeLength, y * edgeLength);
 	}
 
 	private void buildPopulation(Scenario scenario) {
@@ -317,6 +386,9 @@ public class PrebookingTestEnvironment {
 			person.addPlan(plan);
 
 			Activity firstActivity = factory.createActivityFromLinkId("generic", originLinkId);
+			if (!stops.isEmpty()) {
+				firstActivity.setCoord(linkCentre(request.origin.getLeft(), request.origin.getRight()));
+			}
 			plan.addActivity(firstActivity);
 			firstActivity.setEndTime(request.departureTime);
 
@@ -335,6 +407,9 @@ public class PrebookingTestEnvironment {
 			}
 
 			Activity secondActivity = factory.createActivityFromLinkId("generic", destinationLinkId);
+			if (!stops.isEmpty()) {
+				secondActivity.setCoord(linkCentre(request.destination.getLeft(), request.destination.getRight()));
+			}
 			plan.addActivity(secondActivity);
 		}
 	}

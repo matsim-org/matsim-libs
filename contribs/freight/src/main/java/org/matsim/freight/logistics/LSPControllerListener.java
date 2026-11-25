@@ -42,7 +42,9 @@ import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 class LSPControllerListener
 	implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
@@ -99,25 +101,33 @@ class LSPControllerListener
 			registerSimulationTrackers(lsp);
 
 			// simulation trackers of resources:
+			Set<LSPResource> registeredResources = new HashSet<>();
 			for (LSPResource resource : lsp.getResources()) {
 				registerSimulationTrackers(resource);
+				registeredResources.add(resource);
 			}
 
 			// simulation trackers of shipments:
 			for (LspShipment lspShipment : lsp.getLspShipments()) {
 				registerSimulationTrackers(lspShipment);
+				// The shipment log records what happens to the shipment in the mobsim of this iteration.  Entries from
+				// the previous iteration are removed, otherwise those that are not overwritten would remain.
+				lspShipment.getShipmentLog().clear();
 			}
 
-			// simulation trackers of solutions:
-			for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-				registerSimulationTrackers(solution);
+			// simulation trackers of logistic chains:
+			for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
+				registerSimulationTrackers(chain);
 
-				// simulation trackers of solution elements:
-				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+				// simulation trackers of logistic chain elements:
+				for (LogisticChainElement element : chain.getLogisticChainElements()) {
 					registerSimulationTrackers(element);
 
-					// simulation trackers of resources:
-					registerSimulationTrackers(element.getResource());
+					// Resources of the selected plan are not necessarily contained in lsp.getResources(), e.g. if the plan
+					// was set via setSelectedPlan. Only register those that were not registered above.
+					if (registeredResources.add(element.getResource())) {
+						registerSimulationTrackers(element.getResource());
+					}
 				}
 			}
 		}
@@ -156,9 +166,7 @@ class LSPControllerListener
 		strategyManager.run(lsps.getLSPs().values(), event.getIteration(), event.getReplanningContext());
 
 		for (LSP lsp : lsps.getLSPs().values()) {
-			lsp.getSelectedPlan()
-				.getShipmentPlans()
-				.clear(); // clear ShipmentPlans to start with clear(n) state. Otherwise, some of the times were accumulating over the time. :(
+			// scheduleLogisticChains starts with removing the shipment plans of the selected plan and emptying the waiting shipments.
 			lsp.scheduleLogisticChains();
 		}
 
@@ -188,8 +196,8 @@ class LSPControllerListener
 		Carriers carriers = new Carriers();
 		for (LSP lsp : lsps.getLSPs().values()) {
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
-			for (LogisticChain solution : selectedPlan.getLogisticChains()) {
-				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+			for (LogisticChain chain : selectedPlan.getLogisticChains()) {
+				for (LogisticChainElement element : chain.getLogisticChainElements()) {
 					if (element.getResource() instanceof LSPCarrierResource carrierResource) {
 						Carrier carrier = carrierResource.getCarrier();
 						if (!carriers.getCarriers().containsKey(carrier.getId())) {

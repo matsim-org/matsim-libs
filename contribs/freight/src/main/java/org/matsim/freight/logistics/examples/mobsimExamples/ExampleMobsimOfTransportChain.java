@@ -95,8 +95,8 @@ import org.matsim.vehicles.VehicleUtils;
             .setLocationLinkId(collectionLinkId)
             .build();
 
-    // The adapter is now inserted into the corresponding LogisticsSolutionElement of the only
-    // LogisticsSolution of the LSP
+    // The adapter is now inserted into the corresponding LogisticChainElement of the only
+    // LogisticChain of the LSP
     LogisticChainElement collectionElement =
         LSPUtils.LogisticChainElementBuilder.newInstance(
                 Id.create("CollectionElement", LogisticChainElement.class))
@@ -121,7 +121,7 @@ import org.matsim.vehicles.VehicleUtils;
         firstReloadingSchedulerBuilder.build());
     LSPResource firstTranshipmentHubResource = firstTransshipmentHubBuilder.build();
 
-    // The SolutionElement for the first reloading point is created
+    // The LogisticChainElement for the first reloading point is created
     Id<LogisticChainElement> firstHubElementId =
         Id.create("FirstHubElement", LogisticChainElement.class);
     LSPUtils.LogisticChainElementBuilder firstHubElementBuilder =
@@ -160,7 +160,7 @@ import org.matsim.vehicles.VehicleUtils;
             .setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
             .build();
 
-    // The LogisticsSolutionElement for the main run Resource is created
+    // The LogisticChainElement for the main run Resource is created
     Id<LogisticChainElement> mainRunElementId =
         Id.create("MainRunElement", LogisticChainElement.class);
     LogisticChainElement mainRunElement =
@@ -185,8 +185,8 @@ import org.matsim.vehicles.VehicleUtils;
     secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
     LSPResource secondTranshipmentHubResource = secondTransshipmentHubBuilder.build();
 
-    // The adapter is now inserted into the corresponding LogisticsSolutionElement of the only
-    // LogisticsSolution of the LSP
+    // The adapter is now inserted into the corresponding LogisticChainElement of the only
+    // LogisticChain of the LSP
     Id<LogisticChainElement> secondHubElementId =
         Id.create("SecondHubElement", LogisticChainElement.class);
     LSPUtils.LogisticChainElementBuilder secondHubElementBuilder =
@@ -229,8 +229,8 @@ import org.matsim.vehicles.VehicleUtils;
                 ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
             .build();
 
-    // The adapter is now inserted into the corresponding LogisticsSolutionElement of the only
-    // LogisticsSolution of the LSP
+    // The adapter is now inserted into the corresponding LogisticChainElement of the only
+    // LogisticChain of the LSP
     Id<LogisticChainElement> distributionElementId =
         Id.create("DistributionElement", LogisticChainElement.class);
     LSPUtils.LogisticChainElementBuilder distributionBuilder =
@@ -238,36 +238,31 @@ import org.matsim.vehicles.VehicleUtils;
     distributionBuilder.setResource(distributionResource);
     LogisticChainElement distributionElement = distributionBuilder.build();
 
-    // The Order of the logisticsSolutionElements is now specified
-    collectionElement.connectWithNextElement(firstHubElement);
-    firstHubElement.connectWithNextElement(mainRunElement);
-    mainRunElement.connectWithNextElement(secondHubElement);
-    secondHubElement.connectWithNextElement(distributionElement);
+    // The LogisticChainElements are now inserted into the only LogisticChain of the LSP. The builder connects them in the
+    // order in which they are added.
+    Id<LogisticChain> chainId = Id.create("ChainId", LogisticChain.class);
+    LSPUtils.LogisticChainBuilder completeChainBuilder =
+        LSPUtils.LogisticChainBuilder.newInstance(chainId);
+    completeChainBuilder.addLogisticChainElement(collectionElement);
+    completeChainBuilder.addLogisticChainElement(firstHubElement);
+    completeChainBuilder.addLogisticChainElement(mainRunElement);
+    completeChainBuilder.addLogisticChainElement(secondHubElement);
+    completeChainBuilder.addLogisticChainElement(distributionElement);
+    LogisticChain completeChain = completeChainBuilder.build();
 
-    // The SolutionElements are now inserted into the only LogisticsSolution of the LSP
-    Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
-    LSPUtils.LogisticChainBuilder completeSolutionBuilder =
-        LSPUtils.LogisticChainBuilder.newInstance(solutionId);
-    completeSolutionBuilder.addLogisticChainElement(collectionElement);
-    completeSolutionBuilder.addLogisticChainElement(firstHubElement);
-    completeSolutionBuilder.addLogisticChainElement(mainRunElement);
-    completeSolutionBuilder.addLogisticChainElement(secondHubElement);
-    completeSolutionBuilder.addLogisticChainElement(distributionElement);
-    LogisticChain completeSolution = completeSolutionBuilder.build();
-
-    // The initial plan of the lsp is generated and the assigner and the solution from above are
+    // The initial plan of the lsp is generated and the assigner and the chain from above are
     // added
     LSPPlan completePlan = LSPUtils.createLSPPlan();
     InitialShipmentAssigner assigner =
         ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
     completePlan.setInitialShipmentAssigner(assigner);
-    completePlan.addLogisticChain(completeSolution);
+    completePlan.addLogisticChain(completeChain);
 
     LSPUtils.LSPBuilder completeLSPBuilder =
         LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
     completeLSPBuilder.setInitialPlan(completePlan);
 
-    // The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is
+    // The exogenous list of Resources for the LogisticChainScheduler is compiled and the Scheduler is
     // added to the LSPBuilder
     ArrayList<LSPResource> resourcesList = new ArrayList<>();
     resourcesList.add(collectionResource);
@@ -323,6 +318,7 @@ import org.matsim.vehicles.VehicleUtils;
       TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
       builder.setStartTimeWindow(startTimeWindow);
       builder.setDeliveryServiceTime(capacityDemand * 60);
+      builder.setPickupServiceTime(capacityDemand * 60);
       shipmentList.add(builder.build());
     }
     return shipmentList;

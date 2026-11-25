@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
-import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
@@ -61,16 +60,9 @@ final class LoggedLspShipmentTransport implements LspShipmentLeg {
 		return resourceId;
 	}
 
-	/**
-	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
-	 * Mixing class tagging and class hierarchies is a bad idea.
-	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
-	 * So maybe better use something like getActivityType() -- analogous to e.g. PersonEntersVehicleEvent.class) kmt/kn jan'25
-	 */
 	@Override
-	@Deprecated
-	public String getElementType() {
-		return LSPConstants.TRANSPORT;
+	public ElementType getElementType() {
+		return ElementType.TRANSPORT;
 	}
 
 	@Override

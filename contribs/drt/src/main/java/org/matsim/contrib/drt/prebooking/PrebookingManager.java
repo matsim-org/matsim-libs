@@ -12,6 +12,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtStopCandidates;
 import org.matsim.contrib.drt.prebooking.unscheduler.RequestUnscheduler;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -78,6 +80,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 		this.eventsManager = eventsManager;
 		this.unscheduler = unscheduler;
 		this.abortRejectedPrebookings = abortRejectedPrebookings;
+		this.pendingStopChoices = new PendingStopChoices(network, mobsimTimer);
 	}
 
 	// Functionality for ID management
@@ -178,6 +181,13 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 			getLink(representativeRoute.getStartLinkId()), getLink(representativeRoute.getEndLinkId()), earliestDepartureTime,
 			now);
 
+		Optional<DrtStopCandidates> stopCandidates = request instanceof DrtRequest ?
+				pendingStopChoices.stopCandidates(personsLegs, routes) :
+				Optional.empty();
+		if (stopCandidates.isPresent()) {
+			request = DrtRequest.newBuilder((DrtRequest)request).stopCandidates(stopCandidates.get()).build();
+		}
+
 		Set<String> violations = requestValidator.validateRequest(request);
 
 		for (PersonLeg personLeg : personsLegs) {
@@ -197,6 +207,9 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 		} else {
 			for (PersonLeg personLeg : personsLegs) {
 				personLeg.leg().getAttributes().putAttribute(requestAttribute, request.getId().toString());
+			}
+			if (stopCandidates.isPresent()) {
+				pendingStopChoices.add(now, request.getId(), personsLegs, stopCandidates.get());
 			}
 			bookingQueue.add(request);
 		}
@@ -236,11 +249,19 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 		RequestItem item = requests.get(requestId);
 
-		if (item == null) {
-			return null;
+		if (item != null) {
+			return item.request;
 		}
 
-		return item.request;
+		// submitted in this time step, but not yet passed to the optimizer (see processBookingQueue): the passenger
+		// departs in the same time step, so the departure must use this request instead of creating an immediate one
+		for (PassengerRequest request : bookingQueue) {
+			if (request.getId().equals(requestId)) {
+				return request;
+			}
+		}
+
+		return null;
 	}
 
 	// Housekeeping of requests
@@ -279,6 +300,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 			if (item != null) {
 				item.vehicleId = event.getVehicleId();
+				pendingStopChoices.applyChosenStops(now, event);
 			}
 
 			if (unscheduleUponVehicleAssignment.contains(event.getRequestId())) {
@@ -291,6 +313,10 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 		scheduledEvents.clear();
 	}
+
+	// Stop candidates: the insertion search may choose other stops than the routed ones
+
+	private final PendingStopChoices pendingStopChoices;
 
 	// Functionality for canceling requests
 
@@ -521,6 +547,9 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 		// submit requests
 		processBookingQueue(now);
+
+		// hold passengers whose request may still change their pickup stop
+		pendingStopChoices.afterSimStep(now, requests::containsKey);
 	}
 
 	@Override
@@ -531,5 +560,6 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
+		pendingStopChoices.setInternalInterface(internalInterface);
 	}
 }
