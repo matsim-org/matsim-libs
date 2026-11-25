@@ -1,0 +1,89 @@
+name: prime-maven-cache
+
+# Resolves all Maven dependencies once and saves them as a single, complete cache.
+# The verify-push matrix (~50 jobs) only restores this cache, so a pom change (e.g. a dependabot bump)
+# downloads from Maven Central once instead of once per job, which avoids 429 throttling.
+# Running on main makes the cache visible to all PR branches.
+# The key includes the month: each new cache starts from the previous one of the same month,
+# so artifacts of outdated versions are dropped at the latest by the next month's cold build.
+
+on:
+  workflow_call:
+    outputs:
+      cache-key:
+        description: "Key of the saved ~/.m2/repository cache"
+        value: ${{ jobs.prime.outputs.cache-key }}
+      cache-key-prefix:
+        description: "Prefix for restoring the closest older cache of the current month"
+        value: ${{ jobs.prime.outputs.cache-key-prefix }}
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**/pom.xml'
+  schedule:
+    # The key includes the month, so on the 1st no cache on main matches and every PR would prime cold.
+    # Build the new month's cache on main (the only ref whose caches all PRs can restore) at 03:00 UTC.
+    - cron: '0 3 1 * *'
+  workflow_dispatch:
+    inputs:
+      cold-cache:
+        description: "Ignore existing caches and save nothing (to measure a full cold build)"
+        type: boolean
+        default: false
+
+jobs:
+  prime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      cache-key: ${{ steps.key.outputs.key }}
+      cache-key-prefix: ${{ steps.key.outputs.prefix }}
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v7
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          java-version: 25
+          distribution: 'zulu'
+
+      - name: Compute cache key
+        id: key
+        run: |
+          prefix="maven-${{ runner.os }}-$(date -u +%Y-%m)-"
+          echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
+          echo "key=${prefix}${{ hashFiles('**/pom.xml') }}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Maven repository
+        id: restore
+        if: ${{ !inputs.cold-cache }}
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ steps.key.outputs.key }}
+          # on a pom change, start from the previous cache so only the changed artifacts are downloaded
+          restore-keys: ${{ steps.key.outputs.prefix }}
+
+      - name: Resolve dependencies of the whole reactor
+        if: steps.restore.outputs.cache-hit != 'true'
+        # Building (without running tests) resolves compile, test and plugin dependencies;
+        # running one small real test also makes surefire download its JUnit runner (surefire-junit-platform),
+        # which it fetches only when a test actually runs. Other modules match no test and are not failed.
+        # -T 1C builds modules in parallel, one thread per CPU core ("1C" = 1 x cores), to speed up the cold build.
+        run: >-
+          mvn install --batch-mode -T 1C -Dsource.skip -DskipITs
+          -Dtest=StringUtilsTest -Dsurefire.failIfNoSpecifiedTests=false
+
+      - name: Remove reactor snapshots from the cache
+        if: steps.restore.outputs.cache-hit != 'true'
+        run: find ~/.m2/repository/org/matsim -type d -name '*-SNAPSHOT' -prune -exec rm -rf {} +
+
+      - name: Save Maven repository
+        if: ${{ steps.restore.outputs.cache-hit != 'true' && !inputs.cold-cache }}
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ steps.key.outputs.key }}
