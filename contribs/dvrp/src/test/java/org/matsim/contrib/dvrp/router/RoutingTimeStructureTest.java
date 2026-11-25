@@ -60,7 +60,8 @@ public class RoutingTimeStructureTest {
 		when(accessFacility.getLinkId()).thenReturn(Id.createLinkId("access"));
 		when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
 
-		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
+		// real default methods: findCandidates falls back to findFacilities
+		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class, CALLS_REAL_METHODS);
 		when(stopFinder.findFacilities(argThat(
 				(RoutingRequest r) -> r.getFromFacility() == fromFacility && r.getToFacility() == toFacility))).thenReturn(
 				Optional.of(Pair.of(accessFacility, egressFacility)));
@@ -121,7 +122,7 @@ public class RoutingTimeStructureTest {
 		when(accessFacility.getLinkId()).thenReturn(Id.createLinkId("access"));
 		when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
 
-		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
+		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class, CALLS_REAL_METHODS);
 		when(stopFinder.findFacilities(argThat(
 				(RoutingRequest r) -> r.getFromFacility() == fromFacility && r.getToFacility() == toFacility))).thenReturn(
 				Optional.of(Pair.of(accessFacility, egressFacility)));

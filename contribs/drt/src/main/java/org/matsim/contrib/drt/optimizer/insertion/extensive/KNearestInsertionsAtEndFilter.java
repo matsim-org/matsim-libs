@@ -22,6 +22,8 @@ package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.contrib.common.collections.PartialSort;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -38,8 +40,14 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
  * @author michalm
  */
 class KNearestInsertionsAtEndFilter {
+	/**
+	 * Keeps all insertions before the last stop of a vehicle and, per request variant, the k at-end insertions with the
+	 * earliest pickup. The limit applies per variant, so that the variants of a request with stop candidates do not
+	 * crowd out each other's at-end insertions: the insertions kept for a variant are the same as without the other
+	 * variants, and stop candidates never lead to a worse choice than without them.
+	 */
 	static List<Insertion> filterInsertionsAtEnd(int k, List<InsertionWithDetourData> insertions) {
-		var nearestInsertionsAtEnd = new PartialSort<>(k, BestInsertionFinder.INSERTION_WITH_COST_COMPARATOR);
+		Map<Integer, PartialSort<InsertionWithCost>> nearestInsertionsAtEnd = new TreeMap<>();
 		var filteredInsertions = new ArrayList<Insertion>(insertions.size());
 
 		for (var i : insertions) {
@@ -49,12 +57,14 @@ class KNearestInsertionsAtEndFilter {
 			if (!vEntry.isAfterLastStop(pickup.index)) {
 				filteredInsertions.add(insertion);
 			} else if (k > 0) {
-				nearestInsertionsAtEnd.add(new InsertionWithCost(i, i.detourTimeInfo.pickupDetourInfo.requestPickupTime));
+				nearestInsertionsAtEnd.computeIfAbsent(insertion.variantIndex(),
+								variant -> new PartialSort<>(k, BestInsertionFinder.INSERTION_WITH_COST_COMPARATOR))
+						.add(new InsertionWithCost(i, i.detourTimeInfo.pickupDetourInfo.requestPickupTime));
 			}
 		}
 
-		nearestInsertionsAtEnd.kSmallestElements()
-				.forEach(i -> filteredInsertions.add(i.insertionWithDetourData.insertion));
+		nearestInsertionsAtEnd.values().forEach(perVariant -> perVariant.kSmallestElements()
+				.forEach(i -> filteredInsertions.add(i.insertionWithDetourData.insertion)));
 
 		return filteredInsertions;
 	}

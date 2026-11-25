@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -43,9 +44,13 @@ import org.matsim.contrib.drt.passenger.DrtPickupDropoffRestrictionRequestValida
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtPickupDropoffRestrictionParams.RequiredInArea;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.router.AccessEgressFacilityCandidates;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.DefaultRoutingRequest;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
 
 class DrtPickupDropoffRestrictionTest {
 
@@ -113,6 +118,54 @@ class DrtPickupDropoffRestrictionTest {
 				restriction(RequiredInArea.pickupOrDropoff), network);
 		var facility = FacilitiesUtils.wrapLink(inside);
 		assertThat(finder.findFacilities(DefaultRoutingRequest.withoutAttributes(facility, facility, 0, null))).isEmpty();
+	}
+
+	@Test
+	void testFinderPassesOnTheStopCandidatesThatRespectTheRestriction() {
+		// pickup required in the area: alternative pickups outside are dropped, dropoffs are free
+		Link otherInside = link("otherInside", new Coord(600, 600), new Coord(400, 400));
+		var finder = new PickupDropoffRestrictionAccessEgressFacilityFinder(
+				candidatesDelegate(List.of(inside, otherInside, outside), List.of(outside, otherOutside)),
+				restriction(RequiredInArea.pickup), network);
+
+		assertThat(finder.findCandidates(DefaultRoutingRequest.withoutAttributes(facility(inside), facility(outside), 0,
+				null))).hasValueSatisfying(candidates -> {
+			assertThat(candidates.access()).extracting(Facility::getLinkId)
+					.containsExactly(inside.getId(), otherInside.getId());
+			assertThat(candidates.egress()).extracting(Facility::getLinkId)
+					.containsExactly(outside.getId(), otherOutside.getId());
+		});
+	}
+
+	@Test
+	void testFinderHasNoStopCandidatesIfThePreferredTripViolatesTheRestriction() {
+		var finder = new PickupDropoffRestrictionAccessEgressFacilityFinder(
+				candidatesDelegate(List.of(outside, inside), List.of(otherOutside)),
+				restriction(RequiredInArea.pickup), network);
+
+		// consistent with findFacilities: the routed (preferred) trip is refused
+		assertThat(finder.findCandidates(DefaultRoutingRequest.withoutAttributes(facility(outside),
+				facility(otherOutside), 0, null))).isEmpty();
+	}
+
+	private AccessEgressFacilityFinder candidatesDelegate(List<Link> access, List<Link> egress) {
+		List<Facility> accessFacilities = access.stream().map(DrtPickupDropoffRestrictionTest::facility).toList();
+		List<Facility> egressFacilities = egress.stream().map(DrtPickupDropoffRestrictionTest::facility).toList();
+		return new AccessEgressFacilityFinder() {
+			@Override
+			public Optional<Pair<Facility, Facility>> findFacilities(RoutingRequest request) {
+				return Optional.of(new ImmutablePair<>(accessFacilities.getFirst(), egressFacilities.getFirst()));
+			}
+
+			@Override
+			public Optional<AccessEgressFacilityCandidates> findCandidates(RoutingRequest request) {
+				return Optional.of(new AccessEgressFacilityCandidates(accessFacilities, egressFacilities));
+			}
+		};
+	}
+
+	private static Facility facility(Link link) {
+		return FacilitiesUtils.wrapLink(link);
 	}
 
 	@Test

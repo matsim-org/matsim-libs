@@ -71,8 +71,10 @@ public class RequestVariantsTest {
 
 		// departure at the origin: 1000 - 60 = 940; arrival at the farther stop: 940 + 180 = 1120
 		assertThat(v.getEarliestStartTime()).isEqualTo(1120);
-		// waiting is counted from the arrival at the stop
-		assertThat(v.getLatestStartTime()).isEqualTo(1120 + MAX_WAIT);
+		// same latest pickup as at the request's own stop: the longer walk is taken from the waiting budget
+		assertThat(v.getLatestStartTime()).isEqualTo(request.getLatestStartTime());
+		assertThat(v.getLatestStartTime()).isEqualTo(EARLIEST + MAX_WAIT);
+		assertThat(v.getConstraints().maxWaitDuration()).isEqualTo(MAX_WAIT - 120);
 		// latest arrival at the destination unchanged
 		assertThat(v.getLatestArrivalTime()).isEqualTo(request.getLatestArrivalTime());
 		assertThat(v.getConstraints().maxRideDuration()).isEqualTo(constraints.maxRideDuration());
@@ -85,7 +87,28 @@ public class RequestVariantsTest {
 
 		DrtRequest v = RequestVariants.of(request).get(1).request();
 		assertThat(v.getEarliestStartTime()).isEqualTo(EARLIEST - 40);
+		// the latest pickup is the same for all stops of the request
+		assertThat(v.getLatestStartTime()).isEqualTo(request.getLatestStartTime());
 		assertThat(v.getLatestArrivalTime()).isEqualTo(request.getLatestArrivalTime());
+	}
+
+	/**
+	 * Walking farther must not allow a later pickup: all variants share the latest pickup of the request. A stop that
+	 * the passenger cannot reach before that time is not a variant.
+	 */
+	@Test
+	void pickupStopsBeyondTheLatestPickupAreSkipped() {
+		// own stop reached at 1000, latest pickup 1600; departure at the origin 1000 - 60 = 940
+		DrtRequest request = builder().stopCandidates(new DrtStopCandidates(60, 0,
+				List.of(new DrtStopCandidate(accessFar, 60 + MAX_WAIT), new DrtStopCandidate(accessNear, 61 + MAX_WAIT)),
+				List.of())).build();
+
+		// accessFar: reached at 940 + 660 = 1600 = latest pickup -> kept (zero-length window)
+		// accessNear: reached at 1601 > latest pickup -> skipped
+		var variants = RequestVariants.of(request);
+		assertThat(variants).extracting(v -> v.request().getFromLink().getId().toString())
+				.containsExactly("from", "accessFar");
+		assertThat(variants).allMatch(v -> v.request().getLatestStartTime() == request.getLatestStartTime());
 	}
 
 	@Test
@@ -149,8 +172,10 @@ public class RequestVariantsTest {
 	 */
 	@Test
 	void variantsWithoutTravelBudgetAreSkipped() {
-		// own stops without walking: departure at the origin 1000, latest arrival at the destination 1000 + 1800 = 2800
-		DrtRequest request = builder().stopCandidates(new DrtStopCandidates(0, 0,
+		// own stops without walking: departure at the origin 1000, latest arrival at the destination 1000 + 1800 = 2800;
+		// generous max wait, so that only the travel budget limits the variants
+		DrtRequest request = builder().constraints(new DrtRouteConstraints(MAX_TRAVEL, 3600, 3600, 300, 0, true))
+				.stopCandidates(new DrtStopCandidates(0, 0,
 				List.of(new DrtStopCandidate(accessFar, 1000), new DrtStopCandidate(accessNear, 1100)),
 				List.of(new DrtStopCandidate(egressFar, 800)))).build();
 
