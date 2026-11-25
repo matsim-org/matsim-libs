@@ -10,7 +10,6 @@ import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.ODSample;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.TravelTimeQuery;
-import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaOptions;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 

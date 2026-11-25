@@ -7,7 +7,6 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexCalculator;
 import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexProfile;
 import org.matsim.contrib.msp.traveltimematrix.prepare.MeasuredTraffic;
-import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaOptions;
 import picocli.CommandLine;
 import org.matsim.contrib.msp.traveltimematrix.RoadClassification;
 import org.matsim.contrib.msp.traveltimematrix.TimeVaryingTravelTimeMatrix;

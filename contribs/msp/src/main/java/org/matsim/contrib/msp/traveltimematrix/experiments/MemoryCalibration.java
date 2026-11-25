@@ -50,7 +50,7 @@ import java.util.Locale;
  * @see HeapProbe where the measurements come from
  * @see MatrixFootprint what is being calibrated
  */
-final class MemoryCalibration {
+public final class MemoryCalibration {
 
 	private static final Logger log = LogManager.getLogger(MemoryCalibration.class);
 
@@ -70,7 +70,7 @@ final class MemoryCalibration {
 	 * Where a reported memory figure came from. The point of the column is that a reader can tell a
 	 * weighed matrix from an extrapolated one without comparing columns.
 	 */
-	enum Source {
+	public enum Source {
 		/** Weighed by {@link HeapProbe} after the build. */
 		MEASURED,
 		/** The raw estimate, corrected by what this sweep measured on smaller matrices. */
@@ -89,7 +89,7 @@ final class MemoryCalibration {
 	 * learning one, 1 to report the raw estimates, or null to learn from the sweep and fall back to
 	 * {@link #DEFAULT_SPARSE_FACTOR}
 	 */
-	MemoryCalibration(Double fixedFactor) {
+	public MemoryCalibration(Double fixedFactor) {
 		this.fixedFactor = fixedFactor;
 		if (fixedFactor != null) {
 			log.info(fixedFactor == 1
@@ -105,7 +105,7 @@ final class MemoryCalibration {
 	 * sparse half cannot say anything about the factor of one, and a measurement that came back at zero
 	 * says the probe failed rather than that the matrix was free.
 	 */
-	void add(MatrixFootprint footprint, long measuredBytes) {
+	public void add(MatrixFootprint footprint, long measuredBytes) {
 
 		if (footprint.sparseBytes() <= 0 || measuredBytes <= 0) {
 			return;
@@ -122,7 +122,7 @@ final class MemoryCalibration {
 	/**
 	 * @return the factor the sparse half of an estimate is multiplied by
 	 */
-	double factor() {
+	public double factor() {
 
 		if (this.fixedFactor != null) {
 			return this.fixedFactor;
@@ -143,14 +143,14 @@ final class MemoryCalibration {
 	 * @return what a configuration is expected to cost: its zonal half as estimated, its sparse half
 	 * corrected
 	 */
-	long expectedBytes(MatrixFootprint footprint) {
+	public long expectedBytes(MatrixFootprint footprint) {
 		return footprint.zonalBytes() + Math.round(factor() * footprint.sparseBytes());
 	}
 
 	/**
 	 * @return where {@link #expectedBytes} came from, for a configuration that was not built
 	 */
-	Source source() {
+	public Source source() {
 
 		if (this.fixedFactor != null && this.fixedFactor == 1) {
 			return Source.ESTIMATED;
@@ -163,7 +163,7 @@ final class MemoryCalibration {
 	/**
 	 * @return how many weighed matrices the factor rests on
 	 */
-	int samples() {
+	public int samples() {
 		return this.factors.size();
 	}
 }

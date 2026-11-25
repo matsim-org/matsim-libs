@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
  * a reader expects: a sample is drawn origin by origin, so insertion order is not distance order, and
  * sorting the labels as strings would put {@code "10000-20000"} before {@code "2000-5000"}.
  */
-final class AccuracyByDistance {
+public final class AccuracyByDistance {
 
 	/**
 	 * Where a pair whose path nobody computed sorts: last. It belongs at the bottom of a table ordered by
@@ -41,7 +41,7 @@ final class AccuracyByDistance {
 	/**
 	 * @param bands lower edges of the distance bands [m], ascending
 	 */
-	AccuracyByDistance(double[] bands) {
+	public AccuracyByDistance(double[] bands) {
 		this.bands = bands.clone();
 	}
 
@@ -52,7 +52,7 @@ final class AccuracyByDistance {
 	 * the path, which decides the band
 	 * @param estimate what the answerer said [s]
 	 */
-	void add(TravelTimeQuery query, double estimate) {
+	public void add(TravelTimeQuery query, double estimate) {
 
 		this.overall.add(query.freeSpeedTravelTime(), estimate);
 
@@ -65,7 +65,7 @@ final class AccuracyByDistance {
 	/**
 	 * @return the error over the whole sample
 	 */
-	TravelTimeErrorStats getOverall() {
+	public TravelTimeErrorStats getOverall() {
 		return this.overall;
 	}
 
@@ -73,7 +73,7 @@ final class AccuracyByDistance {
 	 * Hands out the overall row first and then one row per band, in ascending distance order - which is
 	 * the order they are to be written in.
 	 */
-	void forEachGroup(BiConsumer<String, TravelTimeErrorStats> row) {
+	public void forEachGroup(BiConsumer<String, TravelTimeErrorStats> row) {
 		Map<String, TravelTimeErrorStats> groups = new LinkedHashMap<>();
 		groups.put(MatrixEvaluation.GROUP_ALL, this.overall);
 		this.byBand.forEach((band, stats) -> groups.put(this.labels.get(band), stats));

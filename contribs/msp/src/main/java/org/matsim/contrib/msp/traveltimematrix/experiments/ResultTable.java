@@ -22,7 +22,7 @@ import java.util.List;
  * finished is usable whatever happens to the rest. It also means the file can be watched while the sweep
  * runs.
  */
-final class ResultTable {
+public final class ResultTable {
 
 	private static final Logger log = LogManager.getLogger(ResultTable.class);
 
@@ -31,7 +31,7 @@ final class ResultTable {
 	private boolean headerWritten;
 	private int rows;
 
-	ResultTable(Path file, List<String> header) {
+	public ResultTable(Path file, List<String> header) {
 		this.file = file;
 		this.header = List.copyOf(header);
 		this.headerWritten = Files.exists(file);
@@ -43,7 +43,7 @@ final class ResultTable {
 	 * @throws IllegalArgumentException if the row does not have as many fields as the header, which is
 	 * the mistake that turns a results table into a silently misaligned one
 	 */
-	void append(List<?> record) {
+	public void append(List<?> record) {
 
 		if (record.size() != this.header.size()) {
 			throw new IllegalArgumentException("The row has " + record.size() + " fields but the header of "
@@ -63,7 +63,7 @@ final class ResultTable {
 		this.rows++;
 	}
 
-	void logSummary() {
+	public void logSummary() {
 		log.info("Wrote {} rows to {}.", this.rows, this.file);
 	}
 }

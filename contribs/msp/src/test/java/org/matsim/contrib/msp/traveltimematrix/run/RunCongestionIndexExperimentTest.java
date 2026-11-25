@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.msp.run.RunMspScenario;
-import org.matsim.contrib.msp.traveltimematrix.RunComputeCongestionIndex;
 import org.matsim.contrib.msp.traveltimematrix.TravelTimeMatrixConfigGroup;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.CongestionExposure;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.MatrixEvaluation;

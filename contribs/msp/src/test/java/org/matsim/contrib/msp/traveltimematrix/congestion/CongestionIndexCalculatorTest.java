@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * returns the same numbers. The rest of the tests pin down what the road class split and the volume
  * weighting do.
  */
-class CongestionIndexCalculatorTest {
+public class CongestionIndexCalculatorTest {
 
 	private static final int TIME_BIN_SIZE = 900;
 	private static final int END_TIME = 3600;

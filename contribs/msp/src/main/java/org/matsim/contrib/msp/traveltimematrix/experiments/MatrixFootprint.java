@@ -317,7 +317,7 @@ public record MatrixFootprint(int zones, long zonalBytes, double meanNeighbors, 
 	 */
 	public static final long DEFAULT_BUDGET_MEGABYTES = 64 * 1024;
 
-	static String megabytes(long bytes) {
+	public static String megabytes(long bytes) {
 		return bytes < 1024L * 1024 * 1024
 			? String.format(Locale.ROOT, "%d MB", bytes / 1024 / 1024)
 			: String.format(Locale.ROOT, "%.1f GB", bytes / 1024.0 / 1024 / 1024);

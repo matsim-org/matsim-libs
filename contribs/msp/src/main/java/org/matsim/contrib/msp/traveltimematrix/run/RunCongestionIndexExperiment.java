@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.contrib.msp.traveltimematrix.RoadClassification;
 import org.matsim.contrib.msp.traveltimematrix.TimeVaryingTravelTimeMatrix;
-import org.matsim.contrib.msp.traveltimematrix.MatrixOptions;
 import org.matsim.contrib.msp.traveltimematrix.TravelTimeMatrixConfigGroup;
 import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndex;
 import org.matsim.contrib.msp.traveltimematrix.congestion.CongestionIndexProfile;
@@ -19,7 +18,6 @@ import org.matsim.contrib.msp.traveltimematrix.evaluation.ODSample;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.RoutedTravelTimes;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.TravelTimeQuery;
 import org.matsim.contrib.msp.traveltimematrix.prepare.MeasuredTraffic;
-import org.matsim.contrib.msp.traveltimematrix.prepare.StudyAreaOptions;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import picocli.CommandLine;
 

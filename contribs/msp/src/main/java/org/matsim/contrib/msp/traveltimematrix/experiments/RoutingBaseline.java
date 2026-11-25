@@ -6,6 +6,7 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.msp.traveltimematrix.evaluation.TravelTimeQuery;
 import org.matsim.core.router.speedy.LeastCostPathTree;
+import org.matsim.core.router.speedy.SpeedyGraph;
 import org.matsim.core.router.speedy.SpeedyGraphBuilder;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -49,7 +50,20 @@ public final class RoutingBaseline {
 	 * sweep unreadable
 	 */
 	public static ToIntBiFunction<Node, Node> isolated(Network network, double qSimTimeStepSize) {
-		LeastCostPathTree tree = tree(network, qSimTimeStepSize);
+		return isolated(graph(network), qSimTimeStepSize);
+	}
+
+	/**
+	 * The same, over a graph that has already been built.
+	 * <p>
+	 * For a benchmark that needs a <b>fresh</b> answerer - one per thread, and one per repetition, so that
+	 * no state survives from a repetition into the next - because the graph is the expensive part and it is
+	 * documented thread-safe, while the tree over it is a few arrays.
+	 *
+	 * @see #graph(Network)
+	 */
+	public static ToIntBiFunction<Node, Node> isolated(SpeedyGraph graph, double qSimTimeStepSize) {
+		LeastCostPathTree tree = tree(graph, qSimTimeStepSize);
 		return (from, to) -> {
 			tree.calculate(from, 0, null, null);
 			return travelTime(tree, to);
@@ -61,8 +75,22 @@ public final class RoutingBaseline {
 	 * {@link #sortedByOrigin(List)} or it degenerates into {@link #isolated}.
 	 */
 	public static ToIntBiFunction<Node, Node> byOrigin(Network network, double qSimTimeStepSize) {
+		return byOrigin(graph(network), qSimTimeStepSize);
+	}
 
-		LeastCostPathTree tree = tree(network, qSimTimeStepSize);
+	/**
+	 * The same, over a graph that has already been built.
+	 * <p>
+	 * <b>This answerer is stateful</b> - it remembers the origin of the last query - so a benchmark that
+	 * repeats a batch has to build a new one per repetition, or the second repetition finds the tree of the
+	 * first already calculated and measures lookups instead of searches. That is what this overload is for:
+	 * the graph is built once and the state is not.
+	 *
+	 * @see #graph(Network)
+	 */
+	public static ToIntBiFunction<Node, Node> byOrigin(SpeedyGraph graph, double qSimTimeStepSize) {
+
+		LeastCostPathTree tree = tree(graph, qSimTimeStepSize);
 		Node[] lastOrigin = {null};
 
 		return (from, to) -> {
@@ -84,10 +112,18 @@ public final class RoutingBaseline {
 			.toList();
 	}
 
-	private static LeastCostPathTree tree(Network network, double qSimTimeStepSize) {
+	/**
+	 * The routing graph of a network, to be shared by every answerer over it. Thread-safe by its own
+	 * documentation, and the only expensive part of building one of these - so a caller that needs many
+	 * answerers builds this once.
+	 */
+	public static SpeedyGraph graph(Network network) {
+		return SpeedyGraphBuilder.build(network);
+	}
+
+	private static LeastCostPathTree tree(SpeedyGraph graph, double qSimTimeStepSize) {
 		TravelTime freeSpeed = new QSimFreeSpeedTravelTime(qSimTimeStepSize);
-		return new LeastCostPathTree(SpeedyGraphBuilder.build(network), freeSpeed,
-			new TimeAsTravelDisutility(freeSpeed));
+		return new LeastCostPathTree(graph, freeSpeed, new TimeAsTravelDisutility(freeSpeed));
 	}
 
 	/**

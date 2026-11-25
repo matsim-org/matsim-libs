@@ -43,7 +43,7 @@ import java.util.function.Supplier;
  *
  * @see MatrixFootprint the estimate these numbers are there to check
  */
-final class HeapProbe {
+public final class HeapProbe {
 
 	private static final Logger log = LogManager.getLogger(HeapProbe.class);
 
@@ -71,13 +71,13 @@ final class HeapProbe {
 	 * @param peakBytes the most heap in use at any point of the build, garbage included
 	 * @param seconds how long the build took, excluding the collections around it
 	 */
-	record Result<T>(T value, long retainedBytes, long peakBytes, double seconds) {
+	public record Result<T>(T value, long retainedBytes, long peakBytes, double seconds) {
 
 		/**
 		 * @return how the measurement compares to an estimate, as {@code measured / estimated}. Above 1
 		 * means the estimate was optimistic, which is the dangerous direction.
 		 */
-		double overEstimate(long estimatedBytes) {
+		public double overEstimate(long estimatedBytes) {
 			return estimatedBytes == 0 ? Double.NaN : (double) this.retainedBytes / estimatedBytes;
 		}
 	}
@@ -89,7 +89,7 @@ final class HeapProbe {
 	 * is unreachable by now but may well not have been collected, and the next one is the largest
 	 * allocation this process makes.
 	 */
-	static <T> Result<T> measure(Supplier<T> build) {
+	public static <T> Result<T> measure(Supplier<T> build) {
 
 		List<MemoryPoolMXBean> heapPools = ManagementFactory.getMemoryPoolMXBeans().stream()
 			.filter(pool -> pool.getType() == MemoryType.HEAP)
@@ -123,7 +123,7 @@ final class HeapProbe {
 	 * the next one is sized up but need not have been collected - and a free-heap reading that still counts
 	 * a 9 GB matrix nobody holds would refuse the configuration after it.
 	 */
-	static long freeHeapAfterCollection() {
+	public static long freeHeapAfterCollection() {
 		return Runtime.getRuntime().maxMemory() - usedHeapAfterCollection();
 	}
 
