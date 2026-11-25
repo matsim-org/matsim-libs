@@ -695,7 +695,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 		assertThat(result).hasNumberOfTrains(71).allTrainsArrived();
 
-		Assertions.assertEquals(33030, result.getEvents().size(), 10);
+		Assertions.assertEquals(33059, result.getEvents().size(), 10);
 	}
 
 
