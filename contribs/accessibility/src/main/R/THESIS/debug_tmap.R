@@ -132,7 +132,7 @@ view_persons <- function(persons = mm_persons,
   }
 
   popup <- intersect(
-    c("personId", measure, shape_by, "logSum_base", "logSum_policy",
+    c("personId", measure, shape_by, "homeX", "homeY", "logSum_base", "logSum_policy",
       "accessibility_base", "accessibility_policy"),
     names(persons_sf)
   )

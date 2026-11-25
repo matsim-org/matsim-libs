@@ -19,8 +19,8 @@ berlin_only <- TRUE
 # Directories
 # ==========================================================
 
-base_dir     <- "~/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-19-v6.4-spa-uni-jobcenter-NoMonConstant"
-input_dir    <- base_dir
+base_dir     <- "~/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-25-citycenter"
+input_dir <- file.path(base_dir, "results", "20261125-152813-e9HAy5")
 
 # Berlin district shapefile and S-Bahn ring: static files kept in the repo,
 # independent of where the run folders are.
@@ -32,8 +32,8 @@ shape_dir <- path.expand(
 # run-person-based-acc-berlin-<scenario>.sh: <date>[a-z]-<scenario>/<opportunity>/...
 # Change the folder names here when you use results from another day or rerun.
 run_dirs <- list(
-  base   = file.path(input_dir, "2026-11-19-base"),
-  policy = file.path(input_dir, "2026-11-19-policy")
+  base   = file.path(input_dir, "base"),
+  policy = file.path(input_dir, "policy")
 )
 
 # MATSim facility activity types (work, edu_*, leisure, ...) from experiment
@@ -75,9 +75,9 @@ if (length(missing_run_dirs) > 0) {
 # Opportunities to analyse in one go. The whole analysis below runs once per
 # entry. Any of: "hospital", "spa", "baeder", "jobCenter".
 # Use a single entry, e.g. c("baeder"), to run just one.
-opportunities <- c("university", "jobCenter")
+opportunities <- c("citycenter")
 
-# , "spa", "jobCenter"
+# university, "spa", "jobCenter"
 
 # Metadata for every POI type written by RunPersonBasedAccBerlin.
 # The list names are the input/output folder names; `type` is the value in
@@ -98,6 +98,10 @@ poi_meta <- list(
   jobCenter = list(
     type = "jobcenter", label = "Job center",
     color = "#ff7f00", shape = 18, label_points = TRUE
+  ),
+  citycenter = list(
+    type = "citycenter", label = "City center",
+    color = "#6a3d9a", shape = 8, label_points = FALSE
   )
 )
 

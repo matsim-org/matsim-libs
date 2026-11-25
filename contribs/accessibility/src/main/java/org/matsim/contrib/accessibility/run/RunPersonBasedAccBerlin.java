@@ -107,6 +107,7 @@ public class RunPersonBasedAccBerlin implements Callable<Integer> {
 		baeder("baeder"),
 		jobcenter("jobcenter"),
 		university("university"),
+		citycenter("citycenter"),
 		facilities("facilities");
 
 		private final String activityType;
@@ -414,6 +415,7 @@ public class RunPersonBasedAccBerlin implements Callable<Integer> {
 					baederGeoJson, location -> true);
 				case jobcenter -> addJobcenters(activityFacilities, af, activityOption);
 				case university -> addUniversities(activityFacilities, af, activityOption);
+				case citycenter -> addCityCenter(activityFacilities, af, activityOption);
 			}
 		}
 
@@ -519,6 +521,20 @@ public class RunPersonBasedAccBerlin implements Callable<Integer> {
 			facilities.addActivityFacility(facility);
 		}
 		LOG.info("Added {} universities as accessibility opportunities", UNIVERSITIES.size());
+	}
+
+//	The city center is a single fixed point, handled like the universities.
+	private static void addCityCenter(
+		ActivityFacilities facilities,
+		ActivityFacilitiesFactory factory,
+		ActivityOption activityOption) {
+		ActivityFacility facility = factory.createActivityFacility(
+			Id.create(CITY_CENTER.name(), ActivityFacility.class),
+			new Coord(CITY_CENTER.x(), CITY_CENTER.y())
+		);
+		facility.addActivityOption(activityOption);
+		facilities.addActivityFacility(facility);
+		LOG.info("Added the city center ({}) as accessibility opportunity", CITY_CENTER.name());
 	}
 
 	private static class PersonBasedResultsComparator implements PersonDataExchangeInterface {
@@ -699,6 +715,18 @@ public class RunPersonBasedAccBerlin implements Callable<Integer> {
 						rows++;
 					}
 				}
+				case citycenter -> {
+					writer.write(String.join(",",
+						csv("citycenter"),
+						csv(CITY_CENTER.name()),
+						csv("Unter den Linden / Friedrichstraße"),
+						Double.toString(CITY_CENTER.x()),
+						Double.toString(CITY_CENTER.y()),
+						csv(CITY_CENTER.district()),
+						"", "", "", "", "", ""
+					) + "\n");
+					rows++;
+				}
 				case baeder -> {
 					for (GeoJsonOpportunity location : geoJsonLocations) {
 						Map<String, String> attributes = location.attributes();
@@ -795,6 +823,11 @@ public class RunPersonBasedAccBerlin implements Callable<Integer> {
 		new University("udk", 793650.65, 5826482.32, "004_Charlottenburg-Wilmersdorf"), // UdK, Hardenbergstraße 33, 10623
 		new University("charite", 796973.18, 5828277.46, "001_Mitte")               // Charité Campus Mitte, Charitéplatz 1, 10117
 	);
+
+//	City center: corner of Unter den Linden and Friedrichstraße, EPSG:25832.
+//	From WGS84 52.517083527727955, 13.388832256388733 (given 2026-11-25), converted with pyproj.
+	private static final University CITY_CENTER =
+		new University("unter-den-linden-friedrichstrasse", 797736.37, 5827608.85, "001_Mitte");
 
 	private record Hospital(String id, String name, double x, double y,
 	                        Map<String, String> attributes) {}

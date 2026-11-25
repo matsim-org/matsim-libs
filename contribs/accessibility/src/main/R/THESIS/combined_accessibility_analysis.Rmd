@@ -330,3 +330,175 @@ ecdf_plot <- ggplot(ecdf_data, aes(accessibility, colour = scenario, linetype = 
 ggsave(file.path(output_dir, "ecdf_mm_base_vs_policy.png"), ecdf_plot, dpi = 300, width = 8, height = 6, bg = "white")
 ecdf_plot
 ```
+
+# Comparison: combined facilities vs city center
+
+Side-by-side figures for the duration-weighted facility accessibility (above)
+and the accessibility of the city center (corner of Unter den Linden /
+Friedrichstraße). The city center results come from `analysis.R`: run it with
+`opportunities <- c("citycenter")` first, which writes `citycenter/acc.csv`.
+
+Changes (Δ, utils) are comparable and share one axis. Accessibility levels
+are not (one destination vs. thousands), so bar plot and ECDF keep their own
+axis per panel.
+
+```{r compare-setup}
+library(patchwork)
+
+# city center results from analysis.R; the newest acc.csv under this run is used
+citycenter_dir <- path.expand("~/public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/_dev/2026-11-25-citycenter")
+citycenter_file <- Sys.glob(file.path(citycenter_dir, "output", "*", "citycenter", "acc.csv"))
+citycenter_file <- citycenter_file[which.max(file.mtime(citycenter_file))]
+stopifnot(length(citycenter_file) == 1)
+message("City center results: ", citycenter_file)
+
+compare_dir <- file.path(output_dir, "compare-citycenter")
+dir.create(compare_dir, recursive = TRUE, showWarnings = FALSE)
+
+poi_names <- c("Combined facilities", "City center")
+compare_cols <- c("personId", "income", "district", "within", "homeX", "homeY",
+                  "twalk_logSum", "pt_logSum", "car_logSum_base", "car_logSum_policy",
+                  "mm_logSum_base", "mm_logSum_policy", "car_delta", "mm_delta")
+
+citycenter <- read_csv(citycenter_file, show_col_types = FALSE,
+                       col_types = cols(personId = col_character(), income = col_character()))
+
+df_compare <- bind_rows(
+  `Combined facilities` = df_comb |> mutate(income = as.character(income)) |> select(any_of(compare_cols)),
+  `City center`         = citycenter |> select(any_of(compare_cols)),
+  .id = "poi"
+) |>
+  mutate(
+    poi = factor(poi, levels = poi_names),
+    income = factor(income, levels = income_labels, ordered = TRUE),
+    district = factor(district, levels = district_levels, ordered = TRUE)
+  )
+
+# persons in both: the two runs should use the same 10% sample (seed 4711)
+both <- intersect(df_comb$personId, citycenter$personId)
+message("Persons: combined ", nrow(df_comb), ", city center ", nrow(citycenter),
+        ", in both ", length(both))
+
+# one panel per POI, one legend; shared y for changes, own y for levels
+side_by_side <- function(make_plot, file, shared_y = TRUE, width = 12, height = 5.5) {
+  plots <- map(poi_names, function(p) make_plot(filter(df_compare, poi == p)) + labs(title = p))
+  plots[[2]] <- plots[[2]] + labs(y = NULL)
+  combined <- wrap_plots(plots, nrow = 1) + plot_layout(guides = "collect") &
+    theme(legend.position = "bottom")
+  if (shared_y) {
+    y_range <- range(unlist(map(plots, ~ layer_scales(.x)$y$range$range)), na.rm = TRUE)
+    combined <- combined & coord_cartesian(ylim = y_range)
+  }
+  ggsave(file.path(compare_dir, file), combined, dpi = 300, width = width, height = height, bg = "white")
+  combined
+}
+```
+
+```{r compare-summary}
+summary_compare <- df_compare |>
+  group_by(poi) |>
+  summarise(
+    persons = n(),
+    mm_mean_delta = mean(mm_delta, na.rm = TRUE), mm_median_delta = median(mm_delta, na.rm = TRUE),
+    mm_worsened_pct = 100 * mean(mm_delta < 0, na.rm = TRUE),
+    car_mean_delta = mean(car_delta, na.rm = TRUE), car_median_delta = median(car_delta, na.rm = TRUE)
+  ) |>
+  mutate(across(where(is.numeric), ~ round(.x, 3)))
+write_csv(summary_compare, file.path(compare_dir, "summary_compare.csv"))
+summary_compare
+
+summary_compare_income <- df_compare |>
+  group_by(poi, income) |>
+  summarise(persons = n(), mm_mean_delta = mean(mm_delta, na.rm = TRUE),
+            mm_median_delta = median(mm_delta, na.rm = TRUE),
+            mm_worsened_pct = 100 * mean(mm_delta < 0, na.rm = TRUE), .groups = "drop") |>
+  mutate(across(where(is.numeric), ~ round(.x, 3)))
+write_csv(summary_compare_income, file.path(compare_dir, "summary_compare_by_income.csv"))
+```
+
+```{r compare-bar}
+# median accessibility by income, mode & scenario (no walking, PT repeated in Policy)
+bar_compare <- function(d) {
+  d |>
+    transmute(
+      income,
+      `Public transport|Base` = pt_logSum, `Public transport|Policy` = pt_logSum,
+      `Car|Base` = car_logSum_base, `Car|Policy` = car_logSum_policy,
+      `Multimodal|Base` = mm_logSum_base, `Multimodal|Policy` = mm_logSum_policy
+    ) |>
+    pivot_longer(-income, names_to = c("mode", "scenario"), names_sep = "\\|", values_to = "acc") |>
+    mutate(mode = factor(mode, levels = c("Public transport", "Car", "Multimodal"))) |>
+    group_by(scenario, income, mode) |>
+    summarise(median_accessibility = median(acc, na.rm = TRUE), .groups = "drop") |>
+    ggplot(aes(income, median_accessibility, fill = mode)) +
+    geom_col(position = position_dodge(width = 0.8), width = 0.7) +
+    facet_wrap(~ scenario, ncol = 1) +
+    labs(x = "Income group", y = "Median accessibility (utils)", fill = "Mode") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+side_by_side(bar_compare, "bar_medianacc_by_income_mode_scenario.png", shared_y = FALSE, height = 6)
+```
+
+```{r compare-box, fig.width = 16, fig.height = 5}
+box_compare <- function(column, ylab, ring = FALSE) {
+  function(d) {
+    p <- ggplot(d, aes(income, .data[[column]])) +
+      geom_boxplot(outlier.alpha = 0.3) +
+      stat_summary(fun = mean, geom = "point", shape = 23, fill = "white", size = 2.5) +
+      labs(x = "Income group", y = ylab) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    if (ring) p <- p + facet_grid(~ within)
+    p
+  }
+}
+side_by_side(box_compare("mm_delta", mm_lab), "boxplot_mm_deltaacc_by_income.png", width = 16, height = 5)
+side_by_side(box_compare("car_delta", car_lab), "boxplot_car_deltaacc_by_income.png", width = 16, height = 5)
+side_by_side(box_compare("mm_delta", mm_lab, ring = TRUE), "boxplot_mm_deltaacc_by_income_ring.png", width = 16, height = 5)
+side_by_side(box_compare("car_delta", car_lab, ring = TRUE), "boxplot_car_deltaacc_by_income_ring.png", width = 16, height = 5)
+```
+
+```{r compare-ecdf}
+ecdf_compare <- function(d) {
+  e <- d |>
+    select(Base = mm_logSum_base, Policy = mm_logSum_policy) |>
+    pivot_longer(everything(), names_to = "scenario", values_to = "accessibility") |>
+    filter(is.finite(accessibility))
+  ggplot(e, aes(accessibility, colour = scenario, linetype = scenario)) +
+    geom_hline(yintercept = c(0.1, 0.5, 0.9), colour = "grey80", linetype = "dotted") +
+    stat_ecdf(geom = "step", linewidth = 1) +
+    scale_colour_manual(values = c(Base = "#434343", Policy = "#2166ac")) +
+    scale_y_continuous(labels = scales::label_percent(), limits = c(0, 1)) +
+    coord_cartesian(xlim = c(quantile(e$accessibility, 0.01), NA), expand = FALSE) +
+    labs(x = "Multimodal accessibility (utils)", y = "Cumulative share of persons",
+         colour = NULL, linetype = NULL)
+}
+side_by_side(ecdf_compare, "ecdf_mm_base_vs_policy.png", shared_y = FALSE)
+```
+
+```{r compare-maps}
+# same bins as the single maps; one legend for both
+map_compare <- function(column, colour_limit = 3) {
+  function(d) {
+    bbox <- st_bbox(berlin_sf)
+    ggplot() +
+      geom_sf(data = berlin_sf, fill = "grey95", color = "grey60", linewidth = 0.3) +
+      geom_sf(data = st_as_sf(filter(d, is.finite(.data[[column]])),
+                              coords = c("homeX", "homeY"), crs = 25832),
+              aes(color = .data[[column]]), size = 0.15, alpha = 0.7) +
+      # ring on top of the points, so it stays visible in dense areas
+      geom_sf(data = ring_sf, fill = NA, color = "black", linetype = "dashed", linewidth = 0.8) +
+      scale_color_steps2(
+        low = "#b2182b", mid = "grey92", high = "#2166ac", midpoint = 0,
+        breaks = seq(-colour_limit, colour_limit, 1), limits = c(-colour_limit - 1, colour_limit + 1),
+        labels = open_bin_labels(colour_limit), oob = scales::squish,
+        name = "Δ accessibility\n(policy - base, utils)",
+        guide = guide_bins(show.limits = TRUE, override.aes = list(size = 3, alpha = 1))
+      ) +
+      coord_sf(xlim = c(bbox["xmin"], bbox["xmax"]), ylim = c(bbox["ymin"], bbox["ymax"])) +
+      theme_void() +
+      theme(plot.title = element_text(face = "bold", hjust = 0.5))
+  }
+}
+side_by_side(map_compare("mm_delta"), "map_persons_mm_policy_minus_base.png", shared_y = FALSE, height = 6)
+side_by_side(map_compare("car_delta"), "map_persons_car_policy_minus_base.png", shared_y = FALSE, height = 6)
+```
