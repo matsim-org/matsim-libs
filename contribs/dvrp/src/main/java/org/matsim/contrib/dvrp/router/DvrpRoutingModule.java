@@ -226,11 +226,19 @@ public class DvrpRoutingModule implements RoutingModule {
 		if (warnedAboutRouteTypes.compareAndSet(false, true)) {
 			logger.warn("Stop candidates of mode {} are not used for trips whose access or egress is not a single leg "
 					+ "with a generic route (here: {}); such trips use the routed stops. Further occurrences are not "
-					+ "logged.", mode, trip.stream()
-					.map(e -> e instanceof Leg leg ? leg.getMode() + "/" + (leg.getRoute() == null ? "no route" :
-							leg.getRoute().getRouteType()) : "activity")
-					.toList());
+					+ "logged.", mode, trip.stream().map(DvrpRoutingModule::describe).toList());
 		}
+	}
+
+	/**
+	 * @return "mode/route type" for a leg, "activity" otherwise (for log messages)
+	 */
+	private static String describe(PlanElement element) {
+		if (!(element instanceof Leg leg)) {
+			return "activity";
+		}
+		String routeType = leg.getRoute() == null ? "no route" : leg.getRoute().getRouteType();
+		return leg.getMode() + "/" + routeType;
 	}
 
 	/**

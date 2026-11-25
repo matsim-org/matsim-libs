@@ -21,16 +21,14 @@ package org.matsim.contrib.drt.passenger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.router.RoutedStopCandidates;
+import org.matsim.contrib.dvrp.router.RoutedStopCandidates.Candidate;
 import org.matsim.contrib.dvrp.router.StopCandidatesRoute;
 
 import com.google.common.base.Preconditions;
@@ -89,9 +87,10 @@ public final class DrtStopCandidatesFactory {
 		}
 
 		List<DrtStopCandidate> access = allowAlternativePickups ?
-				alternatives(common(all, RoutedStopCandidates::access), network) :
+				alternatives(sharedByAll(all.stream().map(RoutedStopCandidates::access).toList()), network) :
 				List.of();
-		List<DrtStopCandidate> egress = alternatives(common(all, RoutedStopCandidates::egress), network);
+		List<DrtStopCandidate> egress = alternatives(
+				sharedByAll(all.stream().map(RoutedStopCandidates::egress).toList()), network);
 		if (access.isEmpty() && egress.isEmpty()) {
 			return Optional.empty();
 		}
@@ -110,29 +109,48 @@ public final class DrtStopCandidatesFactory {
 	}
 
 	/**
-	 * @return the candidates (preferred first) that all passengers share, each with the longest walk among them
+	 * @param candidatesPerPassenger the access or the egress candidates of each passenger (preferred first)
+	 * @return the candidates of the first passenger that all passengers share (preferred first), each with the longest
+	 * walk among the passengers
 	 */
-	private static List<RoutedStopCandidates.Candidate> common(List<RoutedStopCandidates> all,
-			Function<RoutedStopCandidates, List<RoutedStopCandidates.Candidate>> side) {
-		List<Map<Id<Link>, RoutedStopCandidates.Candidate>> byLink = all.stream()
-				.map(candidates -> side.apply(candidates).stream()
-						.collect(Collectors.toMap(RoutedStopCandidates.Candidate::linkId, c -> c, (a, b) -> a)))
-				.toList();
-		return side.apply(all.getFirst()).stream()
-				.filter(candidate -> byLink.stream().allMatch(m -> m.containsKey(candidate.linkId())))
-				.map(candidate -> {
-					List<RoutedStopCandidates.Candidate> perPassenger = byLink.stream().map(m -> m.get(candidate.linkId())).toList();
-					return new RoutedStopCandidates.Candidate(candidate.linkId(), candidate.coord(),
-							perPassenger.stream().mapToDouble(RoutedStopCandidates.Candidate::walkDuration).max().orElseThrow(),
-							perPassenger.stream().mapToDouble(RoutedStopCandidates.Candidate::walkDistance).max().orElseThrow());
-				})
-				.toList();
+	private static List<Candidate> sharedByAll(List<List<Candidate>> candidatesPerPassenger) {
+		List<Candidate> shared = new ArrayList<>();
+		for (Candidate candidate : candidatesPerPassenger.getFirst()) {
+			double walkDuration = 0;
+			double walkDistance = 0;
+			boolean sharedByAll = true;
+			for (List<Candidate> ofPassenger : candidatesPerPassenger) {
+				Optional<Candidate> same = findByLink(ofPassenger, candidate.linkId());
+				if (same.isEmpty()) {
+					sharedByAll = false;
+					break;
+				}
+				walkDuration = Math.max(walkDuration, same.get().walkDuration());
+				walkDistance = Math.max(walkDistance, same.get().walkDistance());
+			}
+			if (sharedByAll) {
+				shared.add(new Candidate(candidate.linkId(), candidate.coord(), walkDuration, walkDistance));
+			}
+		}
+		return shared;
+	}
+
+	/**
+	 * @return the first candidate on the given link (as the insertion search, which evaluates each link once)
+	 */
+	private static Optional<Candidate> findByLink(List<Candidate> candidates, Id<Link> linkId) {
+		for (Candidate candidate : candidates) {
+			if (candidate.linkId().equals(linkId)) {
+				return Optional.of(candidate);
+			}
+		}
+		return Optional.empty();
 	}
 
 	/**
 	 * @return the candidates without the first (preferred) one
 	 */
-	private static List<DrtStopCandidate> alternatives(List<RoutedStopCandidates.Candidate> candidates, Network network) {
+	private static List<DrtStopCandidate> alternatives(List<Candidate> candidates, Network network) {
 		return candidates.subList(1, candidates.size())
 				.stream()
 				.map(candidate -> new DrtStopCandidate(

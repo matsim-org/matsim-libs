@@ -72,15 +72,17 @@ public abstract class FilteringAccessEgressFacilityFinder implements AccessEgres
 			}
 			// egress candidates allowed with the preferred access ...
 			List<Facility> egress = candidates.egress().stream()
-					.filter(e -> e == preferredEgress || isAllowed(request, preferredAccess, e))
+					.filter(egressStop -> egressStop == preferredEgress || isAllowed(request, preferredAccess, egressStop))
 					.toList();
 			// ... access candidates allowed with all of them ...
 			List<Facility> access = candidates.access().stream()
-					.filter(a -> a == preferredAccess || egress.stream().allMatch(e -> isAllowed(request, a, e)))
+					.filter(accessStop -> accessStop == preferredAccess
+							|| egress.stream().allMatch(egressStop -> isAllowed(request, accessStop, egressStop)))
 					.toList();
 			// ... and egress candidates allowed with all remaining access candidates
 			List<Facility> finalEgress = egress.stream()
-					.filter(e -> access.stream().allMatch(a -> isAllowed(request, a, e)))
+					.filter(egressStop -> access.stream()
+							.allMatch(accessStop -> isAllowed(request, accessStop, egressStop)))
 					.toList();
 			return Optional.of(new AccessEgressFacilityCandidates(access, finalEgress));
 		});

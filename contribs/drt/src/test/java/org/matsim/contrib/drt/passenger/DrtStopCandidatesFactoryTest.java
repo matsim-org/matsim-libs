@@ -106,6 +106,21 @@ public class DrtStopCandidatesFactoryTest {
 	}
 
 	@Test
+	void testGroupUsesTheLongestWalkOfAnyMember() {
+		// the second passenger walks farther to the alternative stop B than the first
+		DrtRoute first = routeWith(new RoutedStopCandidates(
+				List.of(candidate("A", 300, 250), candidate("B", 600, 500)), List.of(candidate("E", 120, 100))));
+		DrtRoute second = routeWith(new RoutedStopCandidates(
+				List.of(candidate("A", 300, 250), candidate("B", 900, 750)), List.of(candidate("E", 120, 100))));
+
+		DrtStopCandidates c = DrtStopCandidatesFactory.fromRoutes(List.of(first, second), network, true)
+				.orElseThrow();
+
+		assertThat(c.alternativeAccess()).singleElement()
+				.satisfies(a -> assertThat(a.walkDuration()).isEqualTo(900));
+	}
+
+	@Test
 	void testGroupWithoutCandidatesForOneMemberHasNoCandidates() {
 		DrtRoute first = routeWith(CANDIDATES);
 		DrtRoute second = new DrtRoute(Id.createLinkId("A"), Id.createLinkId("E"));
