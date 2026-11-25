@@ -24,6 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3ZoneSystem;
 import org.matsim.core.config.ConfigGroup;
@@ -33,6 +35,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.examples.ExamplesUtils;
 
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -154,6 +159,39 @@ public class H3DrtZonalSystemTest {
 		}
 	}
 
+
+	/**
+	 * Zone lookups by node and link use a per-node cache built at construction; they have to agree with the lookup by
+	 * coordinate, and building the cache must not create zones beyond those of the links' to-nodes.
+	 */
+	@Test
+	void test_Holzkirchen_NodeAndLinkLookupsMatchCoordLookup() {
+		Network network = getNetwork();
+		String crs = TransformationFactory.DHDN_GK4;
+
+		for (int resolution : new int[] { 5, 7, 9 }) {
+			for (boolean filtered : new boolean[] { false, true }) {
+				Predicate<Zone> filter = filtered ? z -> Math.floorMod(z.getId().toString().hashCode(), 3) != 0 : z -> true;
+				H3ZoneSystem zoneSystem = new H3ZoneSystem(crs, resolution, network, filter);
+
+				Set<Id<Zone>> zonesAfterInit = new HashSet<>(zoneSystem.getZones().keySet());
+				Set<Id<Zone>> zonesOfLinks = new HashSet<>();
+				for (Link link : network.getLinks().values()) {
+					zoneSystem.getZoneForLinkId(link.getId()).ifPresent(zone -> zonesOfLinks.add(zone.getId()));
+				}
+				assertThat(zonesAfterInit).isEqualTo(zonesOfLinks);
+
+				for (Node node : network.getNodes().values()) {
+					assertThat(zoneSystem.getZoneForNodeId(node.getId()))
+						.isEqualTo(zoneSystem.getZoneForCoord(node.getCoord()));
+				}
+				for (Link link : network.getLinks().values()) {
+					assertThat(zoneSystem.getZoneForLinkId(link.getId()))
+						.isEqualTo(zoneSystem.getZoneForCoord(link.getToNode().getCoord()));
+				}
+			}
+		}
+	}
 
 	static Network getNetwork() {
 		Network network = NetworkUtils.createNetwork();
