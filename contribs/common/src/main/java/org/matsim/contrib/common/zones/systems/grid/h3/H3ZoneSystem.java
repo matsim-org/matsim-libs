@@ -30,6 +30,14 @@ public class H3ZoneSystem implements GridZoneSystem {
 
 	private final TObjectLongMap<Coord> coordH3Cache = new TObjectLongHashMap<>();
 
+	/*
+	 * Zone of every network node whose zone exists after init, computed once. Looking up the zone of a node via its
+	 * coordinate created an Id from the H3 address (Long.toString and the global Id registry) on every call, which
+	 * made zone lookups a large part of travel time matrix queries (e.g. FreeSpeedTravelTimeMatrix.getTravelTime).
+	 * This map is only read after init, so lookups for these nodes are also safe for concurrent queries.
+	 */
+	private final IdMap<Node, Optional<Zone>> nodeZones = new IdMap<>(Node.class);
+
 	private final CoordinateTransformation toLatLong;
 	private final CoordinateTransformation fromLatLong;
 
@@ -57,6 +65,14 @@ public class H3ZoneSystem implements GridZoneSystem {
                 zones.put(z.getId(), z);
 				zoneToLinksMap.put(z.getId(), linksH3.getValue());
             });
+		}
+
+		// only nodes whose zone already exists; others keep the lazy creation in getZoneForCoord, as before
+		for (Node node : this.network.getNodes().values()) {
+			Zone zone = zones.get(Id.create(getH3Cell(node.getCoord()), Zone.class));
+			if (zone != null) {
+				nodeZones.put(node.getId(), Optional.of(zone));
+			}
 		}
 	}
 
@@ -90,12 +106,13 @@ public class H3ZoneSystem implements GridZoneSystem {
 
 	@Override
 	public Optional<Zone> getZoneForLinkId(Id<Link> link) {
-		return getZoneForCoord(network.getLinks().get(link).getToNode().getCoord());
+		return getZoneForNodeId(network.getLinks().get(link).getToNode().getId());
 	}
 
 	@Override
 	public Optional<Zone> getZoneForNodeId(Id<Node> nodeId) {
-		return getZoneForCoord(network.getNodes().get(nodeId).getCoord());
+		Optional<Zone> zone = nodeZones.get(nodeId);
+		return zone != null ? zone : getZoneForCoord(network.getNodes().get(nodeId).getCoord());
 	}
 
 	@Override
