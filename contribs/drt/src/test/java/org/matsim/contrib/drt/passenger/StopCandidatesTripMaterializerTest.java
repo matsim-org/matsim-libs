@@ -164,6 +164,29 @@ public class StopCandidatesTripMaterializerTest {
 	}
 
 	@Test
+	void testDrtFeederToPtIsNotMoved() {
+		// intermodal trip: home - walk - drt - walk - pt - walk - work. Moving the dropoff must not drop the pt part, so
+		// such trips are not moved at all (a changed dropoff would also change the arrival at the transfer)
+		Plan plan = routedPlan();
+		Activity work = (Activity)plan.getPlanElements().remove(6);
+		plan.addActivity(PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord(2100, 0),
+				Id.createLinkId("w"), TransportMode.pt));
+		Leg pt = PopulationUtils.createLeg(TransportMode.pt);
+		TripStructureUtils.setRoutingMode(pt, TransportMode.pt);
+		plan.addLeg(pt);
+		plan.addActivity(PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord(5000, 0),
+				Id.createLinkId("w"), TransportMode.pt));
+		plan.addLeg(walk("w", "w", 60, 50));
+		plan.addActivity(work);
+		var before = List.copyOf(plan.getPlanElements());
+
+		assertThat(StopCandidatesTripMaterializer.hasSingleAccessAndEgressLeg(plan, drtLeg(plan))).isFalse();
+		assertThatThrownBy(() -> StopCandidatesTripMaterializer.materialize(plan, drtLeg(plan), Id.createLinkId("A"),
+				Id.createLinkId("F"))).isInstanceOf(IllegalArgumentException.class);
+		assertThat(plan.getPlanElements()).containsExactlyElementsOf(before);
+	}
+
+	@Test
 	void testOriginActivity() {
 		Plan plan = routedPlan();
 		assertThat(StopCandidatesTripMaterializer.originActivity(plan, drtLeg(plan))).isSameAs(plan.getPlanElements().get(0));
