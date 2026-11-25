@@ -113,6 +113,23 @@
 	<!-- Some commonly used dependencies with fixed versions, please try to avoid replicating the versions in other poms -->
 	<dependencyManagement>
 		<dependencies>
+			<!-- GeoTools (via gt-metadata) declares these as the range [2.15.0,3.0.0). Resolving a range needs remote
+			     maven-metadata.xml, which intermittently fails in CI ("No versions available"). Pin to the version the range resolves to. -->
+			<dependency>
+				<groupId>org.eclipse.emf</groupId>
+				<artifactId>org.eclipse.emf.common</artifactId>
+				<version>2.15.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.emf</groupId>
+				<artifactId>org.eclipse.emf.ecore</artifactId>
+				<version>2.15.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.emf</groupId>
+				<artifactId>org.eclipse.emf.ecore.xmi</artifactId>
+				<version>2.15.0</version>
+			</dependency>
 			<dependency>
 				<groupId>com.google.code.findbugs</groupId>
 				<artifactId>jsr305</artifactId>
