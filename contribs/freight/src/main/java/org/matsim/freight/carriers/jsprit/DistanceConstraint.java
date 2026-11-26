@@ -38,8 +38,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
- * @author rewert
- *
  *         Includes all classes and methods for the distance constraint of every
  *         vehicle with an energyCapacity. The base for calculating the
  *         consumption is only the driven distance and not the transported
@@ -47,8 +45,9 @@ import org.matsim.vehicles.VehicleUtils;
  * <p>
  *         !! No recharging or refueling is integrated. Vehicles are totally
  *         full at the beginning.
- *
+ * <p>
  *         Creates the distance constraint.
+ *  @author rewert
  */
 /* package-private */ class DistanceConstraint implements HardActivityConstraint {
 

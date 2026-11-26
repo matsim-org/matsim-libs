@@ -592,9 +592,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	}
 
 
-///////////////////////////
+//************************
 // Helping methods
-//////////////////////////
+//************************
 	/**
 	 * Creates a two-echelon chain:
 	 * - main run (from depot to hub)

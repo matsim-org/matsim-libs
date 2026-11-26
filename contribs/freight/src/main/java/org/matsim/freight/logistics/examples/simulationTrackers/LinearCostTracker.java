@@ -109,8 +109,9 @@ import org.matsim.freight.logistics.LogisticChain;
     LSPUtils.setVariableCost(this.logisticChain, linearUnitCosts);
   }
 
+
+  /* Resets all accumulated cost and shipment counters at the start of an iteration. */
   @Override
-  /** Resets all accumulated cost and shipment counters at the start of an iteration. */
   public void reset(int iteration) {
     distanceCosts = 0;
     timeCosts = 0;
@@ -122,8 +123,9 @@ import org.matsim.freight.logistics.LogisticChain;
     linearUnitCosts = 0;
   }
 
+
+  /* Sets the {@link LogisticChain} that this tracker is evaluating. */
   @Override
-  /** Sets the {@link LogisticChain} that this tracker is evaluating. */
   public void setEmbeddingContainer(LogisticChain pointer) {
     this.logisticChain = pointer;
   }

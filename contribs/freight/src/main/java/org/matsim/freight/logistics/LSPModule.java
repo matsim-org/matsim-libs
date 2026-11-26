@@ -63,7 +63,7 @@ public class LSPModule extends AbstractModule {
       case ignore:
         break;
       case enforceBeginnings:
-        ////				abc.add( WithinDayActivityReScheduling.COMPONENT_NAME );
+        //				abc.add( WithinDayActivityReScheduling.COMPONENT_NAME );
         log.warn("LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
         //				break;
       default:
@@ -84,7 +84,6 @@ public class LSPModule extends AbstractModule {
               case ignore:
                 break;
               case enforceBeginnings:
-                ////
                 //	this.addQSimComponentBinding(WithinDayActivityReScheduling.COMPONENT_NAME).to(
                 // WithinDayActivityReScheduling.class );
                 log.warn("LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");

@@ -280,7 +280,7 @@ public class NetworkBasedTransportCostsTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
 
-		//Create RoadPricing Scheme from code.
+		//*** Begin: Create RoadPricing Scheme from code.
 		RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 		/* Configure roadpricing scheme. */
 		RoadPricingUtils.setName(scheme, "DemoToll4Test");
@@ -302,7 +302,7 @@ public class NetworkBasedTransportCostsTest {
 		};
 		RoadPricingScheme rpSchemeWTollFactor = new RoadPricingSchemeUsingTollFactor( scheme , tollFactor );
 
-		/// End creating roadPricing scheme from Code
+		//*** End creating roadPricing scheme from Code
 
 		//Build MATSim vehicles and convert them to jsprit Vehicles ... just to see, that this works across the whole chain and
 		//that we can filter/search by (MATSim) vehicle types in TollFactor usage
@@ -384,7 +384,7 @@ public class NetworkBasedTransportCostsTest {
 		};
 		RoadPricingSchemeUsingTollFactor rpSchemeWTollFactor = new RoadPricingSchemeUsingTollFactor( scheme , tollFactor );
 
-		///___ End creating toll scheme from code
+		//*** End creating toll scheme from code
 
 		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork());
 		builder.addVehicleTypeSpecificCosts(TYPE_1, 10.0, 0.0, 2.0);
