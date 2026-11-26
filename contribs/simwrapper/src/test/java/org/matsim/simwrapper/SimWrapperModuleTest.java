@@ -32,7 +32,7 @@ public class SimWrapperModuleTest {
 		controler.run();
 
 		//default ones + TestDashboard
-		assertDashboardFiles(5);
+		assertDashboardFiles(6);
 	}
 
 	@Test
