@@ -60,7 +60,7 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 	@Parameter
 	@Comment("Time interval for periodic check of shift break re-scheduling for shift breaks starting within the " +
 			"'shiftBreakUpdateLookAhead' in [seconds]")
-	private double updateShiftBreakInterval = 60 * 3;
+	private double updateShiftBreakInterval = 60 * 10;
 
 	@Parameter
 	@Comment("set to true if shifts can start and end at in field operational facilities," +
