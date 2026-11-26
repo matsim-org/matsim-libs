@@ -21,7 +21,6 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.matsim.freight.logistics.LSPConstants.*;
 import static org.matsim.freight.logistics.shipment.LspShipmentPlanElement.ElementType.*;
 
 import java.util.ArrayList;
