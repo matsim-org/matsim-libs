@@ -1107,7 +1107,7 @@ public class CarriersUtils {
 				netBasedCosts, problem);
 
 			algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
-			JspritStrategyAnalyzer iterationsAnalyzer = new JspritStrategyAnalyzer(carrier);
+			JspritStrategyAnalyzer iterationsAnalyzer = new JspritStrategyAnalyzer();
 			algorithm.getAlgorithmListeners().addListener(iterationsAnalyzer, VehicleRoutingAlgorithmListeners.Priority.HIGH);
 			algorithm.getSearchStrategyManager().addSearchStrategyModuleListener(iterationsAnalyzer);
 			int jspritIterations = getJspritIterations(carrier);

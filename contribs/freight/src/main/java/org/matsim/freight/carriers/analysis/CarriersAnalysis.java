@@ -63,7 +63,7 @@ public class CarriersAnalysis {
 	private final String ANALYSIS_OUTPUT_PATH;
 	private Scenario scenario = null;
 	private Carriers carriers = null;
-	private String delimiter = "\t";
+	private final String delimiter = "\t";
 
 
 	public enum CarrierAnalysisType {
