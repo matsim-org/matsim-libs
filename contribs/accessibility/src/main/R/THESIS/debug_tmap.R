@@ -280,21 +280,29 @@ save_persons_map <- function(file, ...,
 # Run analysis.R first (for the opportunity you want, e.g. citycenter).
 
 save_berlin_map_with_boxes <- function(file, areas, half_width = 1000, mode = "mm",
+                                       title = "City center",
                                        width = 8, height = 6.5, dpi = 300) {
   if (!exists("plot_person_delta_map")) stop("Run analysis.R first.")
-  boxes <- do.call(rbind, Map(area_box, areas, half_width, names(areas)))
-  # drawn north-up (EPSG:3857) so the boxes are straight
-  berlin_bbox_3857 <- st_bbox(st_transform(berlin_sf, 3857))
-  p <- suppressMessages(
-    plot_person_delta_map(mode) +
-      geom_sf(data = boxes, fill = NA, colour = "black", linewidth = 0.9, inherit.aes = FALSE) +
-      # geom_sf_text(data = boxes, aes(label = name), nudge_y = 1.6 * (half_width + 600),
-      #              size = 3.5, fontface = "bold", inherit.aes = FALSE) +
-      coord_sf(crs = 3857,
-               xlim = berlin_bbox_3857[c("xmin", "xmax")],
-               ylim = berlin_bbox_3857[c("ymin", "ymax")])
-  )
-  ggsave(file, p, width = width, height = height, dpi = dpi, bg = "white")
+  # same map as analysis.R (EPSG:25832, ring, POI marker); each box is the
+  # UTM rectangle enclosing the north-up detail-map square, so it is straight
+  # on this map and covers the detail map's area
+  boxes <- do.call(rbind, Map(function(center, name) {
+    st_sf(name = name, geometry = st_as_sfc(st_bbox(
+      st_transform(area_box(center, half_width), 25832))))
+  }, areas, names(areas)))
+  p <- plot_person_delta_map(mode) +
+    # S-Bahn ring again on top of the points, darker and thicker
+    geom_sf(data = ring_sf, fill = NA, colour = "black", linetype = "dashed",
+            linewidth = 0.8, inherit.aes = FALSE) +
+    geom_sf(data = boxes, fill = NA, colour = "black", linewidth = 0.9, inherit.aes = FALSE) +
+    # geom_sf_text(data = boxes, aes(label = name), nudge_y = half_width + 600,
+    #              size = 3.5, fontface = "bold", inherit.aes = FALSE) +
+    coord_sf(
+      xlim = c(berlin_bbox["xmin"], berlin_bbox["xmax"]),
+      ylim = c(berlin_bbox["ymin"], berlin_bbox["ymax"])
+    ) +
+    labs(title = title)
+  ggsave(file, suppressMessages(p), width = width, height = height, dpi = dpi, bg = "white")
   message("Saved ", normalizePath(file))
   invisible(p)
 }

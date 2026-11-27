@@ -1419,16 +1419,16 @@ message(
 )
 
 source("~/git/matsim-libs/contribs/accessibility/src/main/R/THESIS/debug_tmap.R")                      # all persons, pan/zoom in the Viewer
-view_persons(
-  mm_persons |>
-    filter(!is.na(homeX), !is.na(homeY)) |>
-    st_as_sf(coords = c("homeX", "homeY"), crs = st_crs(berlin_sf), remove = FALSE) |>
-    st_filter(filter(berlin_sf, Gemeinde_n == "Steglitz-Zehlendorf")) |>
-    st_drop_geometry(),
-  sample_n = NULL,
-  breaks = c(-Inf, seq(-1, 1, by = 0.25), Inf),
-  shape_by = "economic_status"
-)
+# view_persons(
+#   mm_persons |>
+#     filter(!is.na(homeX), !is.na(homeY)) |>
+#     st_as_sf(coords = c("homeX", "homeY"), crs = st_crs(berlin_sf), remove = FALSE) |>
+#     st_filter(filter(berlin_sf, Gemeinde_n == "Steglitz-Zehlendorf")) |>
+#     st_drop_geometry(),
+#   sample_n = NULL,
+#   breaks = c(-Inf, seq(-1, 1, by = 0.25), Inf),
+#   shape_by = "economic_status"
+# )
 
 steglitz_x <- 793544
 steglitz_y <- 5820541
@@ -1450,3 +1450,4 @@ save_berlin_map_with_boxes(
   areas = list(Steglitz = c(steglitz_x, steglitz_y)),
   half_width = half_width
 )
+
