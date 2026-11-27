@@ -70,7 +70,7 @@ read_persons_attr <- function(column) {
 # (df_acc$income from analysis.R): three brackets per level.
 income_levels <- list(
   Low    = c("500", "900"),
-  Medium = c("1500", "2000", "2600", "3000", "3600"),
+  # Medium = c("1500", "2000", "2600", "3000", "3600"),
   High   = c("4600", "5600")
 )
 
@@ -126,10 +126,11 @@ view_persons <- function(persons = mm_persons,
         mutate(economic_status = factor(
           case_when(
             economic_status %in% c("very_high", "high") ~ "High",
-            economic_status == "medium"                 ~ "Medium",
+            # economic_status == "medium"                 ~ "Medium",
             economic_status %in% c("low", "very_low")   ~ "Low"
           ),
-          levels = c("High", "Medium", "Low")
+          # levels = c("High", "Medium", "Low")
+          levels = c("High", "Low")
         ))
     }
     matched <- mean(persons$personId %in% attrs$personId) * 100
@@ -139,6 +140,8 @@ view_persons <- function(persons = mm_persons,
 
   persons_sf <- persons %>%
     filter(!is.na(.data[[measure]]), !is.na(homeX), !is.na(homeY)) %>%
+    # persons without a group (e.g. the commented-out Medium) are not drawn
+    filter(is.null(shape_by) | !is.na(.data[[shape_by %||% measure]])) %>%
     st_as_sf(coords = c("homeX", "homeY"), crs = 25832, remove = FALSE)
 
   if (!is.null(sample_n) && nrow(persons_sf) > sample_n) {
@@ -177,7 +180,8 @@ view_persons <- function(persons = mm_persons,
         # shape.scale = tm_scale_categorical(values = c(21, 22, 24, 23, 25)),
         # same shapes per group as before (High = up, Medium = circle, Low = down),
         # listed in the legend order High, Medium, Low
-        shape.scale = tm_scale_categorical(values = c(24, 21, 25)),
+        # shape.scale = tm_scale_categorical(values = c(24, 21, 25)),
+        shape.scale = tm_scale_categorical(values = c(24, 25)),
         # delta legend drawn with circles, not the first group's shape
         fill.legend = tm_legend(shape = 21),
         size = 0.9,
@@ -217,6 +221,35 @@ view_persons <- function(persons = mm_persons,
 # The map shows exactly the square centre +/- half_width (metres, EPSG:25832);
 # the legends go to the right of it. width/height in pixels at the given dpi.
 
+# Square study area as an sf polygon, aligned north-south. The centre is given
+# in EPSG:25832; the square is built in Web Mercator (EPSG:3857, north = up),
+# because a square that is straight in UTM 32 looks rotated by ~3 degrees in
+# Berlin. half_width is in real metres (Mercator units are scaled by 1/cos(lat)).
+area_box <- function(center, half_width, name = "area") {
+  center_pt <- st_sfc(st_point(center), crs = 25832)
+  lat <- st_coordinates(st_transform(center_pt, 4326))[2]
+  c3857 <- st_coordinates(st_transform(center_pt, 3857))
+  hw <- half_width / cos(lat * pi / 180)
+  st_sf(
+    name = name,
+    geometry = st_as_sfc(st_bbox(
+      c(xmin = c3857[1] - hw, ymin = c3857[2] - hw,
+        xmax = c3857[1] + hw, ymax = c3857[2] + hw),
+      crs = st_crs(3857)
+    ))
+  )
+}
+
+# Persons living inside that north-south square
+in_area <- function(persons, center, half_width) {
+  box <- st_transform(area_box(center, half_width), 25832)
+  persons %>%
+    filter(!is.na(homeX), !is.na(homeY)) %>%
+    st_as_sf(coords = c("homeX", "homeY"), crs = 25832, remove = FALSE) %>%
+    st_filter(box) %>%
+    st_drop_geometry()
+}
+
 save_persons_map <- function(file, ...,
                              center = c(805074, 5827333),  # S Lichtenberg
                              half_width = 500,
@@ -225,11 +258,7 @@ save_persons_map <- function(file, ...,
   old_mode <- tmap_mode("plot")
   on.exit(tmap_mode(old_mode), add = TRUE)
 
-  map_bbox <- st_bbox(
-    c(xmin = center[1] - half_width, ymin = center[2] - half_width,
-      xmax = center[1] + half_width, ymax = center[2] + half_width),
-    crs = st_crs(25832)
-  )
+  map_bbox <- st_bbox(area_box(center, half_width))
 
   m <- tm_basemap(basemap) +
     view_persons(..., bbox = map_bbox) +
@@ -238,4 +267,34 @@ save_persons_map <- function(file, ...,
   tmap_save(m, file, width = width, height = height, dpi = dpi)
   message("Saved ", normalizePath(file))
   invisible(m)
+}
+
+# ==========================================================
+# Berlin overview map with the study area(s) outlined
+# ==========================================================
+# The citywide person map from analysis.R (plot_person_delta_map, same colours
+# and bins) with one black box per study area, e.g.
+#   save_berlin_map_with_boxes("berlin_citycenter_boxes.png",
+#                              areas = list(Steglitz = c(793544, 5820541)),
+#                              half_width = 1000)
+# Run analysis.R first (for the opportunity you want, e.g. citycenter).
+
+save_berlin_map_with_boxes <- function(file, areas, half_width = 1000, mode = "mm",
+                                       width = 8, height = 6.5, dpi = 300) {
+  if (!exists("plot_person_delta_map")) stop("Run analysis.R first.")
+  boxes <- do.call(rbind, Map(area_box, areas, half_width, names(areas)))
+  # drawn north-up (EPSG:3857) so the boxes are straight
+  berlin_bbox_3857 <- st_bbox(st_transform(berlin_sf, 3857))
+  p <- suppressMessages(
+    plot_person_delta_map(mode) +
+      geom_sf(data = boxes, fill = NA, colour = "black", linewidth = 0.9, inherit.aes = FALSE) +
+      # geom_sf_text(data = boxes, aes(label = name), nudge_y = 1.6 * (half_width + 600),
+      #              size = 3.5, fontface = "bold", inherit.aes = FALSE) +
+      coord_sf(crs = 3857,
+               xlim = berlin_bbox_3857[c("xmin", "xmax")],
+               ylim = berlin_bbox_3857[c("ymin", "ymax")])
+  )
+  ggsave(file, p, width = width, height = height, dpi = dpi, bg = "white")
+  message("Saved ", normalizePath(file))
+  invisible(p)
 }

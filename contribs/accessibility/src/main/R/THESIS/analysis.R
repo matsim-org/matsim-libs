@@ -1419,28 +1419,34 @@ message(
 )
 
 source("~/git/matsim-libs/contribs/accessibility/src/main/R/THESIS/debug_tmap.R")                      # all persons, pan/zoom in the Viewer
-view_persons(sample_n = 20000, shape_by = "economic_status")        # if it's slow
+view_persons(
+  mm_persons |>
+    filter(!is.na(homeX), !is.na(homeY)) |>
+    st_as_sf(coords = c("homeX", "homeY"), crs = st_crs(berlin_sf), remove = FALSE) |>
+    st_filter(filter(berlin_sf, Gemeinde_n == "Steglitz-Zehlendorf")) |>
+    st_drop_geometry(),
+  sample_n = NULL,
+  breaks = c(-Inf, seq(-1, 1, by = 0.25), Inf),
+  shape_by = "economic_status"
+)
 
-# source("debug_tmap.R")   # once per session
-# 
-# lichtenberg_x <- 805074
-# lichtenberg_y <- 5827333
-# half_width    <- 1000   # metres; 500 = 1 km box
-# 
-# view_persons(
-#   mm_persons %>%
-#     filter(abs(homeX - lichtenberg_x) <= half_width,
-#            abs(homeY - lichtenberg_y) <= half_width),
-#   shape_by = "economic_status"
-# )
+steglitz_x <- 793544
+steglitz_y <- 5820541
+half_width <- 1000
 
-# save_persons_map(
-#   "lichtenberg_uni.png",
-#   half_width = 1000,   
-#   mm_persons %>% filter(abs(homeX - lichtenberg_x) <= half_width,
-#          abs(homeY - lichtenberg_y) <= half_width),                       
-#   shape_by = "economic_status",
-# )
+# 1. Steglitz detail map, now with a black outline of the study area
+save_persons_map(
+  "steglitz_citycenter.png",
+  steglitz,
+  center = c(steglitz_x, steglitz_y),
+  breaks = c(-Inf, seq(-1, 1, by = 0.25), Inf),
+  half_width = half_width,
+  shape_by = "economic_status"
+)
 
-# save_persons_map("lichtenberg_uni.png", half_width = 1000, shape_by = "income_level")
-
+# 2. Berlin overview map (city center) with the same box
+save_berlin_map_with_boxes(
+  "berlin_citycenter_steglitz_box.png",
+  areas = list(Steglitz = c(steglitz_x, steglitz_y)),
+  half_width = half_width
+)
