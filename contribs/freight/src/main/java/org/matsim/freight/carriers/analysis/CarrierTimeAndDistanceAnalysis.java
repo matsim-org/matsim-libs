@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -317,13 +316,23 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	/**
-	 * Shared, behavior-neutral scaffolding for the three analysis writers. Resolves the output file,
+	 * Body callback for {@link #writeAnalysis}: writes to the already-opened
+	 * {@link BufferedWriter}. Like {@link java.util.function.Consumer} but allowed to
+	 * throw the checked {@link IOException} that {@code BufferedWriter.write} declares.
+	 */
+	@FunctionalInterface
+	private interface BodyWriter {
+		void write(BufferedWriter bw) throws IOException;
+	}
+
+	/**
+	 * Shared, behavior-neutral scaffolding for the three analysis writers. Opens the output file,
 	 * streams the {@link BufferedWriter} into the given {@code body} and handles the close/error path
 	 * once, so the callers only differ in the data they write.
 	 */
-	private void writeAnalysis(String fileName, Consumer<BufferedWriter> body) {
+	private void writeAnalysis(String fileName, BodyWriter body) {
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
-			body.accept(bw);
+			body.write(bw);
 		} catch (IOException e) {
 			log.error("Error writing to file: {}", fileName, e);
 		}

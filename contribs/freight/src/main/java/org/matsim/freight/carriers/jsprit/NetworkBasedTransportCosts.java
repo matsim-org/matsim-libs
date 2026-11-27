@@ -621,7 +621,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		if (fromId.equals(toId)) {
 			return 0.0;
 		}
-		return computeTransportData(fromId, toId, departureTime, null, vehicle).transportDistance;
+		return computeTransportData(fromId, toId, departureTime, vehicle).transportDistance;
 	}
 
 	/**
